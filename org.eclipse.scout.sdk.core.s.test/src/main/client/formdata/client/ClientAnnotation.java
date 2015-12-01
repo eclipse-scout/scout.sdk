@@ -15,7 +15,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.commons.annotations.DtoRelevant;
+import org.eclipse.scout.rt.platform.annotations.DtoRelevant;
 
 /**
  *

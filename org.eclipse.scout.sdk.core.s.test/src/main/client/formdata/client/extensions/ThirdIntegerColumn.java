@@ -10,10 +10,10 @@
  ******************************************************************************/
 package formdata.client.extensions;
 
-import org.eclipse.scout.commons.annotations.Data;
-import org.eclipse.scout.commons.annotations.Extends;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.extension.Extends;
 
 import formdata.client.ui.desktop.outline.pages.ExtendedEmptyTablePage;
 import formdata.shared.extension.ThirdIntegerColumnData;

@@ -261,7 +261,7 @@ public class ReplaceFormFieldTest {
     IType ignoringGroupBoxExCreate = SdkAssert.assertTypeExists(extendedFormData, "IgnoringGroupBoxExCreate");
     SdkAssert.assertHasFlags(ignoringGroupBoxExCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(ignoringGroupBoxExCreate, "QAbstractValueFieldData<QString;>;");
-    SdkAssert.assertAnnotation(ignoringGroupBoxExCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(ignoringGroupBoxExCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of IgnoringGroupBoxExCreate
     Assert.assertEquals("field count of 'IgnoringGroupBoxExCreate'", 1, ignoringGroupBoxExCreate.fields().list().size());
@@ -279,7 +279,7 @@ public class ReplaceFormFieldTest {
     IType ignoringGroupBoxExUse = SdkAssert.assertTypeExists(extendedFormData, "IgnoringGroupBoxExUse");
     SdkAssert.assertHasFlags(ignoringGroupBoxExUse, 9);
     SdkAssert.assertHasSuperTypeSignature(ignoringGroupBoxExUse, "QUsingFormFieldData;");
-    SdkAssert.assertAnnotation(ignoringGroupBoxExUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(ignoringGroupBoxExUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of IgnoringGroupBoxExUse
     Assert.assertEquals("field count of 'IgnoringGroupBoxExUse'", 1, ignoringGroupBoxExUse.fields().list().size());
@@ -297,7 +297,7 @@ public class ReplaceFormFieldTest {
     IType nameEx = SdkAssert.assertTypeExists(extendedFormData, "NameEx");
     SdkAssert.assertHasFlags(nameEx, 9);
     SdkAssert.assertHasSuperTypeSignature(nameEx, "QName;");
-    SdkAssert.assertAnnotation(nameEx, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(nameEx, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of NameEx
     Assert.assertEquals("field count of 'NameEx'", 1, nameEx.fields().list().size());
@@ -315,7 +315,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateCreate = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandCreateCreate");
     SdkAssert.assertHasFlags(sdkCommandCreateCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateCreate, "QSdkCommandCreate;");
-    SdkAssert.assertAnnotation(sdkCommandCreateCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateCreate
     Assert.assertEquals("field count of 'SdkCommandCreateCreate'", 1, sdkCommandCreateCreate.fields().list().size());
@@ -333,7 +333,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateIgnore = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandCreateIgnore");
     SdkAssert.assertHasFlags(sdkCommandCreateIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateIgnore, "QSdkCommandCreate;");
-    SdkAssert.assertAnnotation(sdkCommandCreateIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateIgnore
     Assert.assertEquals("field count of 'SdkCommandCreateIgnore'", 1, sdkCommandCreateIgnore.fields().list().size());
@@ -351,7 +351,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateNone = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandCreateNone");
     SdkAssert.assertHasFlags(sdkCommandCreateNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateNone, "QSdkCommandCreate;");
-    SdkAssert.assertAnnotation(sdkCommandCreateNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateNone
     Assert.assertEquals("field count of 'SdkCommandCreateNone'", 1, sdkCommandCreateNone.fields().list().size());
@@ -369,7 +369,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateUse = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandCreateUse");
     SdkAssert.assertHasFlags(sdkCommandCreateUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateUse, "QSdkCommandCreate;");
-    SdkAssert.assertAnnotation(sdkCommandCreateUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateUse
     Assert.assertEquals("field count of 'SdkCommandCreateUse'", 1, sdkCommandCreateUse.fields().list().size());
@@ -387,7 +387,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreCreate = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandIgnoreCreate");
     SdkAssert.assertHasFlags(sdkCommandIgnoreCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreCreate, "QAbstractValueFieldData<QString;>;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreCreate
     Assert.assertEquals("field count of 'SdkCommandIgnoreCreate'", 1, sdkCommandIgnoreCreate.fields().list().size());
@@ -405,7 +405,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreUse = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandIgnoreUse");
     SdkAssert.assertHasFlags(sdkCommandIgnoreUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreUse, "QUsingFormFieldData;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreUse
     Assert.assertEquals("field count of 'SdkCommandIgnoreUse'", 1, sdkCommandIgnoreUse.fields().list().size());
@@ -423,7 +423,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneCreate = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandNoneCreate");
     SdkAssert.assertHasFlags(sdkCommandNoneCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneCreate, "QSdkCommandNone;");
-    SdkAssert.assertAnnotation(sdkCommandNoneCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneCreate
     Assert.assertEquals("field count of 'SdkCommandNoneCreate'", 1, sdkCommandNoneCreate.fields().list().size());
@@ -441,7 +441,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneIgnore = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandNoneIgnore");
     SdkAssert.assertHasFlags(sdkCommandNoneIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneIgnore, "QSdkCommandNone;");
-    SdkAssert.assertAnnotation(sdkCommandNoneIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneIgnore
     Assert.assertEquals("field count of 'SdkCommandNoneIgnore'", 1, sdkCommandNoneIgnore.fields().list().size());
@@ -459,7 +459,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneNone = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandNoneNone");
     SdkAssert.assertHasFlags(sdkCommandNoneNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneNone, "QSdkCommandNone;");
-    SdkAssert.assertAnnotation(sdkCommandNoneNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneNone
     Assert.assertEquals("field count of 'SdkCommandNoneNone'", 1, sdkCommandNoneNone.fields().list().size());
@@ -477,7 +477,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneUse = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandNoneUse");
     SdkAssert.assertHasFlags(sdkCommandNoneUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneUse, "QSdkCommandNone;");
-    SdkAssert.assertAnnotation(sdkCommandNoneUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneUse
     Assert.assertEquals("field count of 'SdkCommandNoneUse'", 1, sdkCommandNoneUse.fields().list().size());
@@ -495,7 +495,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseCreate = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandUseCreate");
     SdkAssert.assertHasFlags(sdkCommandUseCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseCreate, "QSdkCommandUse;");
-    SdkAssert.assertAnnotation(sdkCommandUseCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseCreate
     Assert.assertEquals("field count of 'SdkCommandUseCreate'", 1, sdkCommandUseCreate.fields().list().size());
@@ -513,7 +513,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseIgnore = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandUseIgnore");
     SdkAssert.assertHasFlags(sdkCommandUseIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseIgnore, "QSdkCommandUse;");
-    SdkAssert.assertAnnotation(sdkCommandUseIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseIgnore
     Assert.assertEquals("field count of 'SdkCommandUseIgnore'", 1, sdkCommandUseIgnore.fields().list().size());
@@ -531,7 +531,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseNone = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandUseNone");
     SdkAssert.assertHasFlags(sdkCommandUseNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseNone, "QSdkCommandUse;");
-    SdkAssert.assertAnnotation(sdkCommandUseNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseNone
     Assert.assertEquals("field count of 'SdkCommandUseNone'", 1, sdkCommandUseNone.fields().list().size());
@@ -549,7 +549,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseUse = SdkAssert.assertTypeExists(extendedFormData, "SdkCommandUseUse");
     SdkAssert.assertHasFlags(sdkCommandUseUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseUse, "QSdkCommandUse;");
-    SdkAssert.assertAnnotation(sdkCommandUseUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseUse
     Assert.assertEquals("field count of 'SdkCommandUseUse'", 1, sdkCommandUseUse.fields().list().size());
@@ -567,7 +567,7 @@ public class ReplaceFormFieldTest {
     IType smartEx = SdkAssert.assertTypeExists(extendedFormData, "SmartEx");
     SdkAssert.assertHasFlags(smartEx, 9);
     SdkAssert.assertHasSuperTypeSignature(smartEx, "QSmart;");
-    SdkAssert.assertAnnotation(smartEx, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(smartEx, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SmartEx
     Assert.assertEquals("field count of 'SmartEx'", 1, smartEx.fields().list().size());
@@ -734,7 +734,7 @@ public class ReplaceFormFieldTest {
     IType ignoringGroupBoxExCreateNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "IgnoringGroupBoxExCreateNone");
     SdkAssert.assertHasFlags(ignoringGroupBoxExCreateNone, 9);
     SdkAssert.assertHasSuperTypeSignature(ignoringGroupBoxExCreateNone, "QIgnoringGroupBoxExCreate;");
-    SdkAssert.assertAnnotation(ignoringGroupBoxExCreateNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(ignoringGroupBoxExCreateNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of IgnoringGroupBoxExCreateNone
     Assert.assertEquals("field count of 'IgnoringGroupBoxExCreateNone'", 1, ignoringGroupBoxExCreateNone.fields().list().size());
@@ -752,7 +752,7 @@ public class ReplaceFormFieldTest {
     IType ignoringGroupBoxExNoneCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "IgnoringGroupBoxExNoneCreate");
     SdkAssert.assertHasFlags(ignoringGroupBoxExNoneCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(ignoringGroupBoxExNoneCreate, "QAbstractValueFieldData<QString;>;");
-    SdkAssert.assertAnnotation(ignoringGroupBoxExNoneCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(ignoringGroupBoxExNoneCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of IgnoringGroupBoxExNoneCreate
     Assert.assertEquals("field count of 'IgnoringGroupBoxExNoneCreate'", 1, ignoringGroupBoxExNoneCreate.fields().list().size());
@@ -770,7 +770,7 @@ public class ReplaceFormFieldTest {
     IType nameExEx = SdkAssert.assertTypeExists(extendedExtendedFormData, "NameExEx");
     SdkAssert.assertHasFlags(nameExEx, 9);
     SdkAssert.assertHasSuperTypeSignature(nameExEx, "QNameEx;");
-    SdkAssert.assertAnnotation(nameExEx, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(nameExEx, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of NameExEx
     Assert.assertEquals("field count of 'NameExEx'", 1, nameExEx.fields().list().size());
@@ -811,7 +811,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateCreateCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateCreateCreate");
     SdkAssert.assertHasFlags(sdkCommandCreateCreateCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateCreateCreate, "QSdkCommandCreateCreate;");
-    SdkAssert.assertAnnotation(sdkCommandCreateCreateCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateCreateCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateCreateCreate
     Assert.assertEquals("field count of 'SdkCommandCreateCreateCreate'", 1, sdkCommandCreateCreateCreate.fields().list().size());
@@ -829,7 +829,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateCreateIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateCreateIgnore");
     SdkAssert.assertHasFlags(sdkCommandCreateCreateIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateCreateIgnore, "QSdkCommandCreateCreate;");
-    SdkAssert.assertAnnotation(sdkCommandCreateCreateIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateCreateIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateCreateIgnore
     Assert.assertEquals("field count of 'SdkCommandCreateCreateIgnore'", 1, sdkCommandCreateCreateIgnore.fields().list().size());
@@ -847,7 +847,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateCreateNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateCreateNone");
     SdkAssert.assertHasFlags(sdkCommandCreateCreateNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateCreateNone, "QSdkCommandCreateCreate;");
-    SdkAssert.assertAnnotation(sdkCommandCreateCreateNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateCreateNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateCreateNone
     Assert.assertEquals("field count of 'SdkCommandCreateCreateNone'", 1, sdkCommandCreateCreateNone.fields().list().size());
@@ -865,7 +865,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateCreateUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateCreateUse");
     SdkAssert.assertHasFlags(sdkCommandCreateCreateUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateCreateUse, "QSdkCommandCreateCreate;");
-    SdkAssert.assertAnnotation(sdkCommandCreateCreateUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateCreateUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateCreateUse
     Assert.assertEquals("field count of 'SdkCommandCreateCreateUse'", 1, sdkCommandCreateCreateUse.fields().list().size());
@@ -883,7 +883,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateIgnoreCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateIgnoreCreate");
     SdkAssert.assertHasFlags(sdkCommandCreateIgnoreCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateIgnoreCreate, "QSdkCommandCreateIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandCreateIgnoreCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateIgnoreCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateIgnoreCreate
     Assert.assertEquals("field count of 'SdkCommandCreateIgnoreCreate'", 1, sdkCommandCreateIgnoreCreate.fields().list().size());
@@ -901,7 +901,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateIgnoreIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateIgnoreIgnore");
     SdkAssert.assertHasFlags(sdkCommandCreateIgnoreIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateIgnoreIgnore, "QSdkCommandCreateIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandCreateIgnoreIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateIgnoreIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateIgnoreIgnore
     Assert.assertEquals("field count of 'SdkCommandCreateIgnoreIgnore'", 1, sdkCommandCreateIgnoreIgnore.fields().list().size());
@@ -919,7 +919,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateIgnoreNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateIgnoreNone");
     SdkAssert.assertHasFlags(sdkCommandCreateIgnoreNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateIgnoreNone, "QSdkCommandCreateIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandCreateIgnoreNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateIgnoreNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateIgnoreNone
     Assert.assertEquals("field count of 'SdkCommandCreateIgnoreNone'", 1, sdkCommandCreateIgnoreNone.fields().list().size());
@@ -937,7 +937,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateIgnoreUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateIgnoreUse");
     SdkAssert.assertHasFlags(sdkCommandCreateIgnoreUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateIgnoreUse, "QSdkCommandCreateIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandCreateIgnoreUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateIgnoreUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateIgnoreUse
     Assert.assertEquals("field count of 'SdkCommandCreateIgnoreUse'", 1, sdkCommandCreateIgnoreUse.fields().list().size());
@@ -955,7 +955,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateNoneCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateNoneCreate");
     SdkAssert.assertHasFlags(sdkCommandCreateNoneCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateNoneCreate, "QSdkCommandCreateNone;");
-    SdkAssert.assertAnnotation(sdkCommandCreateNoneCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateNoneCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateNoneCreate
     Assert.assertEquals("field count of 'SdkCommandCreateNoneCreate'", 1, sdkCommandCreateNoneCreate.fields().list().size());
@@ -973,7 +973,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateNoneIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateNoneIgnore");
     SdkAssert.assertHasFlags(sdkCommandCreateNoneIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateNoneIgnore, "QSdkCommandCreateNone;");
-    SdkAssert.assertAnnotation(sdkCommandCreateNoneIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateNoneIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateNoneIgnore
     Assert.assertEquals("field count of 'SdkCommandCreateNoneIgnore'", 1, sdkCommandCreateNoneIgnore.fields().list().size());
@@ -991,7 +991,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateNoneNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateNoneNone");
     SdkAssert.assertHasFlags(sdkCommandCreateNoneNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateNoneNone, "QSdkCommandCreateNone;");
-    SdkAssert.assertAnnotation(sdkCommandCreateNoneNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateNoneNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateNoneNone
     Assert.assertEquals("field count of 'SdkCommandCreateNoneNone'", 1, sdkCommandCreateNoneNone.fields().list().size());
@@ -1009,7 +1009,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateNoneUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateNoneUse");
     SdkAssert.assertHasFlags(sdkCommandCreateNoneUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateNoneUse, "QSdkCommandCreateNone;");
-    SdkAssert.assertAnnotation(sdkCommandCreateNoneUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateNoneUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateNoneUse
     Assert.assertEquals("field count of 'SdkCommandCreateNoneUse'", 1, sdkCommandCreateNoneUse.fields().list().size());
@@ -1027,7 +1027,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateUseCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateUseCreate");
     SdkAssert.assertHasFlags(sdkCommandCreateUseCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateUseCreate, "QSdkCommandCreateUse;");
-    SdkAssert.assertAnnotation(sdkCommandCreateUseCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateUseCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateUseCreate
     Assert.assertEquals("field count of 'SdkCommandCreateUseCreate'", 1, sdkCommandCreateUseCreate.fields().list().size());
@@ -1045,7 +1045,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateUseIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateUseIgnore");
     SdkAssert.assertHasFlags(sdkCommandCreateUseIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateUseIgnore, "QSdkCommandCreateUse;");
-    SdkAssert.assertAnnotation(sdkCommandCreateUseIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateUseIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateUseIgnore
     Assert.assertEquals("field count of 'SdkCommandCreateUseIgnore'", 1, sdkCommandCreateUseIgnore.fields().list().size());
@@ -1063,7 +1063,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateUseNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateUseNone");
     SdkAssert.assertHasFlags(sdkCommandCreateUseNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateUseNone, "QSdkCommandCreateUse;");
-    SdkAssert.assertAnnotation(sdkCommandCreateUseNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateUseNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateUseNone
     Assert.assertEquals("field count of 'SdkCommandCreateUseNone'", 1, sdkCommandCreateUseNone.fields().list().size());
@@ -1081,7 +1081,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandCreateUseUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandCreateUseUse");
     SdkAssert.assertHasFlags(sdkCommandCreateUseUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandCreateUseUse, "QSdkCommandCreateUse;");
-    SdkAssert.assertAnnotation(sdkCommandCreateUseUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandCreateUseUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandCreateUseUse
     Assert.assertEquals("field count of 'SdkCommandCreateUseUse'", 1, sdkCommandCreateUseUse.fields().list().size());
@@ -1099,7 +1099,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreCreateCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreCreateCreate");
     SdkAssert.assertHasFlags(sdkCommandIgnoreCreateCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreCreateCreate, "QSdkCommandIgnoreCreate;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreCreateCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreCreateCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreCreateCreate
     Assert.assertEquals("field count of 'SdkCommandIgnoreCreateCreate'", 1, sdkCommandIgnoreCreateCreate.fields().list().size());
@@ -1117,7 +1117,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreCreateIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreCreateIgnore");
     SdkAssert.assertHasFlags(sdkCommandIgnoreCreateIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreCreateIgnore, "QSdkCommandIgnoreCreate;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreCreateIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreCreateIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreCreateIgnore
     Assert.assertEquals("field count of 'SdkCommandIgnoreCreateIgnore'", 1, sdkCommandIgnoreCreateIgnore.fields().list().size());
@@ -1135,7 +1135,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreCreateNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreCreateNone");
     SdkAssert.assertHasFlags(sdkCommandIgnoreCreateNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreCreateNone, "QSdkCommandIgnoreCreate;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreCreateNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreCreateNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreCreateNone
     Assert.assertEquals("field count of 'SdkCommandIgnoreCreateNone'", 1, sdkCommandIgnoreCreateNone.fields().list().size());
@@ -1153,7 +1153,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreCreateUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreCreateUse");
     SdkAssert.assertHasFlags(sdkCommandIgnoreCreateUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreCreateUse, "QSdkCommandIgnoreCreate;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreCreateUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreCreateUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreCreateUse
     Assert.assertEquals("field count of 'SdkCommandIgnoreCreateUse'", 1, sdkCommandIgnoreCreateUse.fields().list().size());
@@ -1171,7 +1171,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreIgnoreCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreIgnoreCreate");
     SdkAssert.assertHasFlags(sdkCommandIgnoreIgnoreCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreIgnoreCreate, "QAbstractValueFieldData<QString;>;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreIgnoreCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreIgnoreCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreIgnoreCreate
     Assert.assertEquals("field count of 'SdkCommandIgnoreIgnoreCreate'", 1, sdkCommandIgnoreIgnoreCreate.fields().list().size());
@@ -1189,7 +1189,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreIgnoreUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreIgnoreUse");
     SdkAssert.assertHasFlags(sdkCommandIgnoreIgnoreUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreIgnoreUse, "QUsingFormFieldData;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreIgnoreUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreIgnoreUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreIgnoreUse
     Assert.assertEquals("field count of 'SdkCommandIgnoreIgnoreUse'", 1, sdkCommandIgnoreIgnoreUse.fields().list().size());
@@ -1207,7 +1207,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreNoneCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreNoneCreate");
     SdkAssert.assertHasFlags(sdkCommandIgnoreNoneCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreNoneCreate, "QAbstractValueFieldData<QString;>;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreNoneCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreNoneCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreNoneCreate
     Assert.assertEquals("field count of 'SdkCommandIgnoreNoneCreate'", 1, sdkCommandIgnoreNoneCreate.fields().list().size());
@@ -1225,7 +1225,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreNoneUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreNoneUse");
     SdkAssert.assertHasFlags(sdkCommandIgnoreNoneUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreNoneUse, "QUsingFormFieldData;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreNoneUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreNoneUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreNoneUse
     Assert.assertEquals("field count of 'SdkCommandIgnoreNoneUse'", 1, sdkCommandIgnoreNoneUse.fields().list().size());
@@ -1243,7 +1243,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreUseCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreUseCreate");
     SdkAssert.assertHasFlags(sdkCommandIgnoreUseCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreUseCreate, "QSdkCommandIgnoreUse;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreUseCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreUseCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreUseCreate
     Assert.assertEquals("field count of 'SdkCommandIgnoreUseCreate'", 1, sdkCommandIgnoreUseCreate.fields().list().size());
@@ -1261,7 +1261,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreUseIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreUseIgnore");
     SdkAssert.assertHasFlags(sdkCommandIgnoreUseIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreUseIgnore, "QSdkCommandIgnoreUse;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreUseIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreUseIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreUseIgnore
     Assert.assertEquals("field count of 'SdkCommandIgnoreUseIgnore'", 1, sdkCommandIgnoreUseIgnore.fields().list().size());
@@ -1279,7 +1279,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreUseNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreUseNone");
     SdkAssert.assertHasFlags(sdkCommandIgnoreUseNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreUseNone, "QSdkCommandIgnoreUse;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreUseNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreUseNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreUseNone
     Assert.assertEquals("field count of 'SdkCommandIgnoreUseNone'", 1, sdkCommandIgnoreUseNone.fields().list().size());
@@ -1297,7 +1297,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandIgnoreUseUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandIgnoreUseUse");
     SdkAssert.assertHasFlags(sdkCommandIgnoreUseUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandIgnoreUseUse, "QSdkCommandIgnoreUse;");
-    SdkAssert.assertAnnotation(sdkCommandIgnoreUseUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandIgnoreUseUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandIgnoreUseUse
     Assert.assertEquals("field count of 'SdkCommandIgnoreUseUse'", 1, sdkCommandIgnoreUseUse.fields().list().size());
@@ -1315,7 +1315,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneCreateCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneCreateCreate");
     SdkAssert.assertHasFlags(sdkCommandNoneCreateCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneCreateCreate, "QSdkCommandNoneCreate;");
-    SdkAssert.assertAnnotation(sdkCommandNoneCreateCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneCreateCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneCreateCreate
     Assert.assertEquals("field count of 'SdkCommandNoneCreateCreate'", 1, sdkCommandNoneCreateCreate.fields().list().size());
@@ -1333,7 +1333,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneCreateIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneCreateIgnore");
     SdkAssert.assertHasFlags(sdkCommandNoneCreateIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneCreateIgnore, "QSdkCommandNoneCreate;");
-    SdkAssert.assertAnnotation(sdkCommandNoneCreateIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneCreateIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneCreateIgnore
     Assert.assertEquals("field count of 'SdkCommandNoneCreateIgnore'", 1, sdkCommandNoneCreateIgnore.fields().list().size());
@@ -1351,7 +1351,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneCreateNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneCreateNone");
     SdkAssert.assertHasFlags(sdkCommandNoneCreateNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneCreateNone, "QSdkCommandNoneCreate;");
-    SdkAssert.assertAnnotation(sdkCommandNoneCreateNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneCreateNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneCreateNone
     Assert.assertEquals("field count of 'SdkCommandNoneCreateNone'", 1, sdkCommandNoneCreateNone.fields().list().size());
@@ -1369,7 +1369,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneCreateUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneCreateUse");
     SdkAssert.assertHasFlags(sdkCommandNoneCreateUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneCreateUse, "QSdkCommandNoneCreate;");
-    SdkAssert.assertAnnotation(sdkCommandNoneCreateUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneCreateUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneCreateUse
     Assert.assertEquals("field count of 'SdkCommandNoneCreateUse'", 1, sdkCommandNoneCreateUse.fields().list().size());
@@ -1387,7 +1387,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneIgnoreCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneIgnoreCreate");
     SdkAssert.assertHasFlags(sdkCommandNoneIgnoreCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneIgnoreCreate, "QSdkCommandNoneIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandNoneIgnoreCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneIgnoreCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneIgnoreCreate
     Assert.assertEquals("field count of 'SdkCommandNoneIgnoreCreate'", 1, sdkCommandNoneIgnoreCreate.fields().list().size());
@@ -1405,7 +1405,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneIgnoreIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneIgnoreIgnore");
     SdkAssert.assertHasFlags(sdkCommandNoneIgnoreIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneIgnoreIgnore, "QSdkCommandNoneIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandNoneIgnoreIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneIgnoreIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneIgnoreIgnore
     Assert.assertEquals("field count of 'SdkCommandNoneIgnoreIgnore'", 1, sdkCommandNoneIgnoreIgnore.fields().list().size());
@@ -1423,7 +1423,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneIgnoreNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneIgnoreNone");
     SdkAssert.assertHasFlags(sdkCommandNoneIgnoreNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneIgnoreNone, "QSdkCommandNoneIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandNoneIgnoreNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneIgnoreNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneIgnoreNone
     Assert.assertEquals("field count of 'SdkCommandNoneIgnoreNone'", 1, sdkCommandNoneIgnoreNone.fields().list().size());
@@ -1441,7 +1441,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneIgnoreUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneIgnoreUse");
     SdkAssert.assertHasFlags(sdkCommandNoneIgnoreUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneIgnoreUse, "QSdkCommandNoneIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandNoneIgnoreUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneIgnoreUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneIgnoreUse
     Assert.assertEquals("field count of 'SdkCommandNoneIgnoreUse'", 1, sdkCommandNoneIgnoreUse.fields().list().size());
@@ -1460,7 +1460,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(sdkCommandNoneNoneCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneNoneCreate, "QSdkCommandNoneNone;");
     SdkAssert.assertHasSuperIntefaceSignatures(sdkCommandNoneNoneCreate, new String[]{"QIFormDataInterface03;"});
-    SdkAssert.assertAnnotation(sdkCommandNoneNoneCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneNoneCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneNoneCreate
     Assert.assertEquals("field count of 'SdkCommandNoneNoneCreate'", 1, sdkCommandNoneNoneCreate.fields().list().size());
@@ -1478,7 +1478,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneNoneIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneNoneIgnore");
     SdkAssert.assertHasFlags(sdkCommandNoneNoneIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneNoneIgnore, "QSdkCommandNoneNone;");
-    SdkAssert.assertAnnotation(sdkCommandNoneNoneIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneNoneIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneNoneIgnore
     Assert.assertEquals("field count of 'SdkCommandNoneNoneIgnore'", 1, sdkCommandNoneNoneIgnore.fields().list().size());
@@ -1496,7 +1496,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneNoneNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneNoneNone");
     SdkAssert.assertHasFlags(sdkCommandNoneNoneNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneNoneNone, "QSdkCommandNoneNone;");
-    SdkAssert.assertAnnotation(sdkCommandNoneNoneNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneNoneNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneNoneNone
     Assert.assertEquals("field count of 'SdkCommandNoneNoneNone'", 1, sdkCommandNoneNoneNone.fields().list().size());
@@ -1514,7 +1514,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneNoneUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneNoneUse");
     SdkAssert.assertHasFlags(sdkCommandNoneNoneUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneNoneUse, "QSdkCommandNoneNone;");
-    SdkAssert.assertAnnotation(sdkCommandNoneNoneUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneNoneUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneNoneUse
     Assert.assertEquals("field count of 'SdkCommandNoneNoneUse'", 1, sdkCommandNoneNoneUse.fields().list().size());
@@ -1532,7 +1532,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneUseCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneUseCreate");
     SdkAssert.assertHasFlags(sdkCommandNoneUseCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneUseCreate, "QSdkCommandNoneUse;");
-    SdkAssert.assertAnnotation(sdkCommandNoneUseCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneUseCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneUseCreate
     Assert.assertEquals("field count of 'SdkCommandNoneUseCreate'", 1, sdkCommandNoneUseCreate.fields().list().size());
@@ -1550,7 +1550,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneUseIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneUseIgnore");
     SdkAssert.assertHasFlags(sdkCommandNoneUseIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneUseIgnore, "QSdkCommandNoneUse;");
-    SdkAssert.assertAnnotation(sdkCommandNoneUseIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneUseIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneUseIgnore
     Assert.assertEquals("field count of 'SdkCommandNoneUseIgnore'", 1, sdkCommandNoneUseIgnore.fields().list().size());
@@ -1568,7 +1568,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneUseNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneUseNone");
     SdkAssert.assertHasFlags(sdkCommandNoneUseNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneUseNone, "QSdkCommandNoneUse;");
-    SdkAssert.assertAnnotation(sdkCommandNoneUseNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneUseNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneUseNone
     Assert.assertEquals("field count of 'SdkCommandNoneUseNone'", 1, sdkCommandNoneUseNone.fields().list().size());
@@ -1586,7 +1586,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneUseUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneUseUse");
     SdkAssert.assertHasFlags(sdkCommandNoneUseUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneUseUse, "QSdkCommandNoneUse;");
-    SdkAssert.assertAnnotation(sdkCommandNoneUseUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandNoneUseUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneUseUse
     Assert.assertEquals("field count of 'SdkCommandNoneUseUse'", 1, sdkCommandNoneUseUse.fields().list().size());
@@ -1604,7 +1604,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseCreateCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseCreateCreate");
     SdkAssert.assertHasFlags(sdkCommandUseCreateCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseCreateCreate, "QSdkCommandUseCreate;");
-    SdkAssert.assertAnnotation(sdkCommandUseCreateCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseCreateCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseCreateCreate
     Assert.assertEquals("field count of 'SdkCommandUseCreateCreate'", 1, sdkCommandUseCreateCreate.fields().list().size());
@@ -1622,7 +1622,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseCreateIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseCreateIgnore");
     SdkAssert.assertHasFlags(sdkCommandUseCreateIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseCreateIgnore, "QSdkCommandUseCreate;");
-    SdkAssert.assertAnnotation(sdkCommandUseCreateIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseCreateIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseCreateIgnore
     Assert.assertEquals("field count of 'SdkCommandUseCreateIgnore'", 1, sdkCommandUseCreateIgnore.fields().list().size());
@@ -1640,7 +1640,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseCreateNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseCreateNone");
     SdkAssert.assertHasFlags(sdkCommandUseCreateNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseCreateNone, "QSdkCommandUseCreate;");
-    SdkAssert.assertAnnotation(sdkCommandUseCreateNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseCreateNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseCreateNone
     Assert.assertEquals("field count of 'SdkCommandUseCreateNone'", 1, sdkCommandUseCreateNone.fields().list().size());
@@ -1658,7 +1658,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseCreateUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseCreateUse");
     SdkAssert.assertHasFlags(sdkCommandUseCreateUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseCreateUse, "QSdkCommandUseCreate;");
-    SdkAssert.assertAnnotation(sdkCommandUseCreateUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseCreateUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseCreateUse
     Assert.assertEquals("field count of 'SdkCommandUseCreateUse'", 1, sdkCommandUseCreateUse.fields().list().size());
@@ -1676,7 +1676,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseIgnoreCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseIgnoreCreate");
     SdkAssert.assertHasFlags(sdkCommandUseIgnoreCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseIgnoreCreate, "QSdkCommandUseIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandUseIgnoreCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseIgnoreCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseIgnoreCreate
     Assert.assertEquals("field count of 'SdkCommandUseIgnoreCreate'", 1, sdkCommandUseIgnoreCreate.fields().list().size());
@@ -1694,7 +1694,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseIgnoreIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseIgnoreIgnore");
     SdkAssert.assertHasFlags(sdkCommandUseIgnoreIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseIgnoreIgnore, "QSdkCommandUseIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandUseIgnoreIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseIgnoreIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseIgnoreIgnore
     Assert.assertEquals("field count of 'SdkCommandUseIgnoreIgnore'", 1, sdkCommandUseIgnoreIgnore.fields().list().size());
@@ -1712,7 +1712,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseIgnoreNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseIgnoreNone");
     SdkAssert.assertHasFlags(sdkCommandUseIgnoreNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseIgnoreNone, "QSdkCommandUseIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandUseIgnoreNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseIgnoreNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseIgnoreNone
     Assert.assertEquals("field count of 'SdkCommandUseIgnoreNone'", 1, sdkCommandUseIgnoreNone.fields().list().size());
@@ -1730,7 +1730,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseIgnoreUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseIgnoreUse");
     SdkAssert.assertHasFlags(sdkCommandUseIgnoreUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseIgnoreUse, "QSdkCommandUseIgnore;");
-    SdkAssert.assertAnnotation(sdkCommandUseIgnoreUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseIgnoreUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseIgnoreUse
     Assert.assertEquals("field count of 'SdkCommandUseIgnoreUse'", 1, sdkCommandUseIgnoreUse.fields().list().size());
@@ -1748,7 +1748,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseNoneCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseNoneCreate");
     SdkAssert.assertHasFlags(sdkCommandUseNoneCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseNoneCreate, "QSdkCommandUseNone;");
-    SdkAssert.assertAnnotation(sdkCommandUseNoneCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseNoneCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseNoneCreate
     Assert.assertEquals("field count of 'SdkCommandUseNoneCreate'", 1, sdkCommandUseNoneCreate.fields().list().size());
@@ -1766,7 +1766,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseNoneIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseNoneIgnore");
     SdkAssert.assertHasFlags(sdkCommandUseNoneIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseNoneIgnore, "QSdkCommandUseNone;");
-    SdkAssert.assertAnnotation(sdkCommandUseNoneIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseNoneIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseNoneIgnore
     Assert.assertEquals("field count of 'SdkCommandUseNoneIgnore'", 1, sdkCommandUseNoneIgnore.fields().list().size());
@@ -1784,7 +1784,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseNoneNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseNoneNone");
     SdkAssert.assertHasFlags(sdkCommandUseNoneNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseNoneNone, "QSdkCommandUseNone;");
-    SdkAssert.assertAnnotation(sdkCommandUseNoneNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseNoneNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseNoneNone
     Assert.assertEquals("field count of 'SdkCommandUseNoneNone'", 1, sdkCommandUseNoneNone.fields().list().size());
@@ -1802,7 +1802,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseNoneUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseNoneUse");
     SdkAssert.assertHasFlags(sdkCommandUseNoneUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseNoneUse, "QSdkCommandUseNone;");
-    SdkAssert.assertAnnotation(sdkCommandUseNoneUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseNoneUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseNoneUse
     Assert.assertEquals("field count of 'SdkCommandUseNoneUse'", 1, sdkCommandUseNoneUse.fields().list().size());
@@ -1820,7 +1820,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseUseCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseUseCreate");
     SdkAssert.assertHasFlags(sdkCommandUseUseCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseUseCreate, "QSdkCommandUseUse;");
-    SdkAssert.assertAnnotation(sdkCommandUseUseCreate, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseUseCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseUseCreate
     Assert.assertEquals("field count of 'SdkCommandUseUseCreate'", 1, sdkCommandUseUseCreate.fields().list().size());
@@ -1838,7 +1838,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseUseIgnore = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseUseIgnore");
     SdkAssert.assertHasFlags(sdkCommandUseUseIgnore, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseUseIgnore, "QSdkCommandUseUse;");
-    SdkAssert.assertAnnotation(sdkCommandUseUseIgnore, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseUseIgnore, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseUseIgnore
     Assert.assertEquals("field count of 'SdkCommandUseUseIgnore'", 1, sdkCommandUseUseIgnore.fields().list().size());
@@ -1856,7 +1856,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseUseNone = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseUseNone");
     SdkAssert.assertHasFlags(sdkCommandUseUseNone, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseUseNone, "QSdkCommandUseUse;");
-    SdkAssert.assertAnnotation(sdkCommandUseUseNone, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseUseNone, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseUseNone
     Assert.assertEquals("field count of 'SdkCommandUseUseNone'", 1, sdkCommandUseUseNone.fields().list().size());
@@ -1874,7 +1874,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandUseUseUse = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandUseUseUse");
     SdkAssert.assertHasFlags(sdkCommandUseUseUse, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandUseUseUse, "QSdkCommandUseUse;");
-    SdkAssert.assertAnnotation(sdkCommandUseUseUse, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(sdkCommandUseUseUse, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandUseUseUse
     Assert.assertEquals("field count of 'SdkCommandUseUseUse'", 1, sdkCommandUseUseUse.fields().list().size());

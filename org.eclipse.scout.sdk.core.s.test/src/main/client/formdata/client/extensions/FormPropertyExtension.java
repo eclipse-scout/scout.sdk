@@ -10,7 +10,7 @@
  ******************************************************************************/
 package formdata.client.extensions;
 
-import org.eclipse.scout.commons.annotations.Data;
+import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
 
 import formdata.client.ui.forms.ListBoxForm;

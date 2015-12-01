@@ -449,7 +449,7 @@ public class PageBeanDataTest {
     // type PageWithTableExtensionData
     SdkAssert.assertHasFlags(pageWithTableExtensionData, 1);
     SdkAssert.assertHasSuperIntefaceSignatures(pageWithTableExtensionData, new String[]{"QSerializable;"});
-    SdkAssert.assertAnnotation(pageWithTableExtensionData, "org.eclipse.scout.commons.annotations.Extends");
+    SdkAssert.assertAnnotation(pageWithTableExtensionData, "org.eclipse.scout.rt.platform.extension.Extends");
     SdkAssert.assertAnnotation(pageWithTableExtensionData, "javax.annotation.Generated");
 
     // fields of PageWithTableExtensionData

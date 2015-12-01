@@ -39,7 +39,7 @@ public class ReplacingFormTest {
     SdkAssert.assertHasFlags(replacingFormData, 1);
     SdkAssert.assertHasSuperTypeSignature(replacingFormData, "Lformdata.shared.ui.forms.AnnotationCopyTestFormData;");
     Assert.assertEquals("annotation count", 2, replacingFormData.annotations().list().size());
-    SdkAssert.assertAnnotation(replacingFormData, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(replacingFormData, "org.eclipse.scout.rt.platform.Replace");
     SdkAssert.assertAnnotation(replacingFormData, "javax.annotation.Generated");
 
     // fields of ReplacingFormData

@@ -92,8 +92,11 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           // add interfaces specified on the formdata annotation
           DtoUtils.addFormDataAdditionalInterfaces(fieldAnnotation, fieldSourceBuilder, getJavaEnvironment());
 
+          // Scout RT requires the first char to be upper-case for a getter.
+          // See org.eclipse.scout.rt.platform.reflect.FastBeanUtility.BEAN_METHOD_PAT.
+          String methodName = CoreUtils.ensureStartWithUpperCase(formDataTypeName);
+
           // getter for field
-          String methodName = CoreUtils.ensureStartWithUpperCase(formDataTypeName); // Scout RT requires the first char to be upper-case for a getter. See org.eclipse.scout.commons.beans.FastBeanUtility.BEAN_METHOD_PAT.
           IMethodSourceBuilder getterBuilder = new MethodSourceBuilder("get" + methodName);
           getterBuilder.setFlags(Flags.AccPublic);
           getterBuilder.setReturnTypeSignature(Signature.createTypeSignature(formDataTypeName, false));

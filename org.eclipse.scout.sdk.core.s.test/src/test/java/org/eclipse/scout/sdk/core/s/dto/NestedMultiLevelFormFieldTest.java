@@ -188,7 +188,7 @@ public class NestedMultiLevelFormFieldTest {
     IType secondInnerBox = SdkAssert.assertTypeExists(secondLevelFormData, "SecondInnerBox");
     SdkAssert.assertHasFlags(secondInnerBox, 9);
     SdkAssert.assertHasSuperTypeSignature(secondInnerBox, "QFirstInnerBox;");
-    SdkAssert.assertAnnotation(secondInnerBox, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(secondInnerBox, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SecondInnerBox
     Assert.assertEquals("field count of 'SecondInnerBox'", 1, secondInnerBox.fields().list().size());
@@ -208,7 +208,7 @@ public class NestedMultiLevelFormFieldTest {
     IType secondLevel = SdkAssert.assertTypeExists(secondInnerBox, "SecondLevel");
     SdkAssert.assertHasFlags(secondLevel, 9);
     SdkAssert.assertHasSuperTypeSignature(secondLevel, "QFirstLevel;");
-    SdkAssert.assertAnnotation(secondLevel, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(secondLevel, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SecondLevel
     Assert.assertEquals("field count of 'SecondLevel'", 1, secondLevel.fields().list().size());
@@ -248,7 +248,7 @@ public class NestedMultiLevelFormFieldTest {
     IType thirdInnerBox = SdkAssert.assertTypeExists(thirdLevelFormData, "ThirdInnerBox");
     SdkAssert.assertHasFlags(thirdInnerBox, 9);
     SdkAssert.assertHasSuperTypeSignature(thirdInnerBox, "QSecondInnerBox;");
-    SdkAssert.assertAnnotation(thirdInnerBox, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(thirdInnerBox, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of ThirdInnerBox
     Assert.assertEquals("field count of 'ThirdInnerBox'", 1, thirdInnerBox.fields().list().size());
@@ -268,7 +268,7 @@ public class NestedMultiLevelFormFieldTest {
     IType thirdLevel = SdkAssert.assertTypeExists(thirdInnerBox, "ThirdLevel");
     SdkAssert.assertHasFlags(thirdLevel, 9);
     SdkAssert.assertHasSuperTypeSignature(thirdLevel, "QSecondLevel;");
-    SdkAssert.assertAnnotation(thirdLevel, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(thirdLevel, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of ThirdLevel
     Assert.assertEquals("field count of 'ThirdLevel'", 1, thirdLevel.fields().list().size());

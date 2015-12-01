@@ -74,7 +74,7 @@ public class ExtensionFormDataTest {
     SdkAssert.assertHasFlags(simpleTableFormExtensionData, 1);
     SdkAssert.assertHasSuperIntefaceSignatures(simpleTableFormExtensionData, new String[]{"Ljava.io.Serializable;"});
     Assert.assertEquals("annotation count", 2, simpleTableFormExtensionData.annotations().list().size());
-    SdkAssert.assertAnnotation(simpleTableFormExtensionData, "org.eclipse.scout.commons.annotations.Extends");
+    SdkAssert.assertAnnotation(simpleTableFormExtensionData, "org.eclipse.scout.rt.platform.extension.Extends");
     SdkAssert.assertAnnotation(simpleTableFormExtensionData, "javax.annotation.Generated");
 
     // fields of SimpleTableFormExtensionData
@@ -110,7 +110,7 @@ public class ExtensionFormDataTest {
     // type MultiColumnExtensionData
     SdkAssert.assertHasFlags(multiColumnExtensionData, 1);
     SdkAssert.assertHasSuperIntefaceSignatures(multiColumnExtensionData, new String[]{"QSerializable;"});
-    SdkAssert.assertAnnotation(multiColumnExtensionData, "org.eclipse.scout.commons.annotations.Extends");
+    SdkAssert.assertAnnotation(multiColumnExtensionData, "org.eclipse.scout.rt.platform.extension.Extends");
     SdkAssert.assertAnnotation(multiColumnExtensionData, "javax.annotation.Generated");
 
     // fields of MultiColumnExtensionData
@@ -151,7 +151,7 @@ public class ExtensionFormDataTest {
     // type PropertyExtensionData
     SdkAssert.assertHasFlags(propertyExtensionData, 1);
     SdkAssert.assertHasSuperTypeSignature(propertyExtensionData, "QAbstractFormFieldData;");
-    SdkAssert.assertAnnotation(propertyExtensionData, "org.eclipse.scout.commons.annotations.Extends");
+    SdkAssert.assertAnnotation(propertyExtensionData, "org.eclipse.scout.rt.platform.extension.Extends");
     SdkAssert.assertAnnotation(propertyExtensionData, "javax.annotation.Generated");
 
     // fields of PropertyExtensionData
@@ -195,7 +195,7 @@ public class ExtensionFormDataTest {
     // type ThirdIntegerColumnData
     SdkAssert.assertHasFlags(thirdIntegerColumnData, 1);
     SdkAssert.assertHasSuperIntefaceSignatures(thirdIntegerColumnData, new String[]{"QSerializable;"});
-    SdkAssert.assertAnnotation(thirdIntegerColumnData, "org.eclipse.scout.commons.annotations.Extends");
+    SdkAssert.assertAnnotation(thirdIntegerColumnData, "org.eclipse.scout.rt.platform.extension.Extends");
     SdkAssert.assertAnnotation(thirdIntegerColumnData, "javax.annotation.Generated");
 
     // fields of ThirdIntegerColumnData
@@ -226,7 +226,7 @@ public class ExtensionFormDataTest {
     // type MultipleExtGroupBoxExtensionData
     SdkAssert.assertHasFlags(multipleExtGroupBoxExtensionData, 1);
     SdkAssert.assertHasSuperTypeSignature(multipleExtGroupBoxExtensionData, "QAbstractFormFieldData;");
-    SdkAssert.assertAnnotation(multipleExtGroupBoxExtensionData, "org.eclipse.scout.commons.annotations.Extends");
+    SdkAssert.assertAnnotation(multipleExtGroupBoxExtensionData, "org.eclipse.scout.rt.platform.extension.Extends");
     SdkAssert.assertAnnotation(multipleExtGroupBoxExtensionData, "javax.annotation.Generated");
 
     // fields of MultipleExtGroupBoxExtensionData

@@ -10,9 +10,9 @@
  ******************************************************************************/
 package formdata.client.ui.template.formfield;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.platform.Order;
 
 import formdata.client.ui.template.formfield.AbstractLoremTableField.Table;
 

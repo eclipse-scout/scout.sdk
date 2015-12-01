@@ -10,12 +10,12 @@
  ******************************************************************************/
 package formdata.client.ui.desktop.outline.pages;
 
-import org.eclipse.scout.commons.annotations.ColumnData;
-import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.PageData;
-import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.client.dto.ColumnData;
+import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
+import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
 
 import formdata.shared.services.pages.ExtendedTablePageData;
 

@@ -89,7 +89,7 @@ public class TableFieldWithIgnoredColumnsTest {
     IType tableDefaultEx = SdkAssert.assertTypeExists(tableFieldWithIgnoredColumnsDefaultExFormData, "TableDefaultEx");
     SdkAssert.assertHasFlags(tableDefaultEx, 9);
     SdkAssert.assertHasSuperTypeSignature(tableDefaultEx, "QTableBase;");
-    SdkAssert.assertAnnotation(tableDefaultEx, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(tableDefaultEx, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of TableDefaultEx
     Assert.assertEquals("field count of 'TableDefaultEx'", 1, tableDefaultEx.fields().list().size());
@@ -268,7 +268,7 @@ public class TableFieldWithIgnoredColumnsTest {
     IType tableIgnoreEx = SdkAssert.assertTypeExists(tableFieldWithIgnoredColumnsIgnoreExFormData, "TableIgnoreEx");
     SdkAssert.assertHasFlags(tableIgnoreEx, 9);
     SdkAssert.assertHasSuperTypeSignature(tableIgnoreEx, "QTableBase;");
-    SdkAssert.assertAnnotation(tableIgnoreEx, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(tableIgnoreEx, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of TableIgnoreEx
     Assert.assertEquals("field count of 'TableIgnoreEx'", 1, tableIgnoreEx.fields().list().size());
@@ -348,7 +348,7 @@ public class TableFieldWithIgnoredColumnsTest {
     IType tableDefaultCreateEx = SdkAssert.assertTypeExists(tableFieldWithIgnoredColumnsDefaultCreateExFormData, "TableDefaultCreateEx");
     SdkAssert.assertHasFlags(tableDefaultCreateEx, 9);
     SdkAssert.assertHasSuperTypeSignature(tableDefaultCreateEx, "QTableBase;");
-    SdkAssert.assertAnnotation(tableDefaultCreateEx, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(tableDefaultCreateEx, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of TableDefaultCreateEx
     Assert.assertEquals("field count of 'TableDefaultCreateEx'", 1, tableDefaultCreateEx.fields().list().size());
@@ -438,7 +438,7 @@ public class TableFieldWithIgnoredColumnsTest {
     IType tableCreateEx = SdkAssert.assertTypeExists(tableFieldWithIgnoredColumnsCreateExFormData, "TableCreateEx");
     SdkAssert.assertHasFlags(tableCreateEx, 9);
     SdkAssert.assertHasSuperTypeSignature(tableCreateEx, "QTableBase;");
-    SdkAssert.assertAnnotation(tableCreateEx, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(tableCreateEx, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of TableCreateEx
     Assert.assertEquals("field count of 'TableCreateEx'", 1, tableCreateEx.fields().list().size());

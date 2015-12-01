@@ -4,30 +4,27 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package formdata.client.ui.forms;
 
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 import formdata.shared.services.ChildWithExtendedTableFormData;
 
 /**
- * 
+ *
  */
 @FormData(value = ChildWithExtendedTableFormData.class, sdkCommand = SdkCommand.CREATE)
 public class ChildWithExtendedTableForm extends BaseWithExtendedTableForm {
 
-  /**
-   * @throws org.eclipse.scout.commons.exception.ProcessingException
-   */
   public ChildWithExtendedTableForm() throws ProcessingException {
     super();
   }

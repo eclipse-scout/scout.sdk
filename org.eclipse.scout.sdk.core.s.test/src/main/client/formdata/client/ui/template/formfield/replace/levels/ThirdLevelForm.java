@@ -1,8 +1,8 @@
 package formdata.client.ui.template.formfield.replace.levels;
 
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 import formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData;
 

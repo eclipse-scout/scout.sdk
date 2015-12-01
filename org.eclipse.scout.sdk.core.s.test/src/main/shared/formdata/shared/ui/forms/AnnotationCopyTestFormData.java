@@ -12,7 +12,7 @@ package formdata.shared.ui.forms;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 

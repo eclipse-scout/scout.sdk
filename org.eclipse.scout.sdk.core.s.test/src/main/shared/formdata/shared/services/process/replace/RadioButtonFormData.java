@@ -12,7 +12,7 @@ package formdata.shared.services.process.replace;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 

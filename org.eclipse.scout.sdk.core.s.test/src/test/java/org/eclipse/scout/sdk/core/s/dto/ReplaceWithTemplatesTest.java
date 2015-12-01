@@ -275,7 +275,7 @@ public class ReplaceWithTemplatesTest {
     IType usageTwoTemplateTable = SdkAssert.assertTypeExists(usageTwoBox, "UsageTwoTemplateTable");
     SdkAssert.assertHasFlags(usageTwoTemplateTable, 9);
     SdkAssert.assertHasSuperTypeSignature(usageTwoTemplateTable, "QTemplateTable;");
-    SdkAssert.assertAnnotation(usageTwoTemplateTable, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(usageTwoTemplateTable, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of UsageTwoTemplateTable
     Assert.assertEquals("field count of 'UsageTwoTemplateTable'", 1, usageTwoTemplateTable.fields().list().size());
@@ -432,7 +432,7 @@ public class ReplaceWithTemplatesTest {
     IType inputExString = SdkAssert.assertTypeExists(radioButtonFormData, "InputExString");
     SdkAssert.assertHasFlags(inputExString, 9);
     SdkAssert.assertHasSuperTypeSignature(inputExString, "QInputString;");
-    SdkAssert.assertAnnotation(inputExString, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(inputExString, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of InputExString
     Assert.assertEquals("field count of 'InputExString'", 1, inputExString.fields().list().size());

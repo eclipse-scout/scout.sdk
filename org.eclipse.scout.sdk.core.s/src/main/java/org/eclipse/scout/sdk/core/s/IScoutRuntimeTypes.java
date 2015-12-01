@@ -20,17 +20,18 @@ public interface IScoutRuntimeTypes {
   int TYPE_PARAM_COLUMN_VALUE_TYPE = 0;
 
   // annotations
-  String FormData = "org.eclipse.scout.commons.annotations.FormData";
-  String Order = "org.eclipse.scout.commons.annotations.Order";
-  String PageData = "org.eclipse.scout.commons.annotations.PageData";
-  String Data = "org.eclipse.scout.commons.annotations.Data";
-  String ClassId = "org.eclipse.scout.commons.annotations.ClassId";
-  String DtoRelevant = "org.eclipse.scout.commons.annotations.DtoRelevant";
-  String Replace = "org.eclipse.scout.commons.annotations.Replace";
-  String ColumnData = "org.eclipse.scout.commons.annotations.ColumnData";
-  String Extends = "org.eclipse.scout.commons.annotations.Extends";
-  String ConfigOperation = "org.eclipse.scout.commons.annotations.ConfigOperation";
-  String ConfigProperty = "org.eclipse.scout.commons.annotations.ConfigProperty";
+  String FormData = "org.eclipse.scout.rt.client.dto.FormData";
+  String Order = "org.eclipse.scout.rt.platform.Order";
+  String PageData = "org.eclipse.scout.rt.client.dto.PageData";
+  String Data = "org.eclipse.scout.rt.client.dto.Data";
+
+  String ClassId = "org.eclipse.scout.rt.platform.classid.ClassId";
+  String DtoRelevant = "org.eclipse.scout.rt.platform.annotations.DtoRelevant";
+  String Replace = "org.eclipse.scout.rt.platform.Replace";
+  String ColumnData = "org.eclipse.scout.rt.client.dto.ColumnData";
+  String Extends = "org.eclipse.scout.rt.platform.extension.Extends";
+  String ConfigOperation = "org.eclipse.scout.rt.platform.annotations.ConfigOperation";
+  String ConfigProperty = "org.eclipse.scout.rt.platform.annotations.ConfigProperty";
 
   // abstract implementations
   String AbstractPropertyData = "org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData";
@@ -81,5 +82,7 @@ public interface IScoutRuntimeTypes {
   String ITree = "org.eclipse.scout.rt.client.ui.basic.tree.ITree";
   String ICalendarItemProvider = "org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider";
   String IPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage";
-  String ITypeWithClassId = "org.eclipse.scout.commons.ITypeWithClassId";
+  String ITypeWithClassId = "org.eclipse.scout.rt.platform.classid.ITypeWithClassId";
+
+  String DynamicNls = "org.eclipse.scout.rt.platform.nls.DynamicNls";
 }

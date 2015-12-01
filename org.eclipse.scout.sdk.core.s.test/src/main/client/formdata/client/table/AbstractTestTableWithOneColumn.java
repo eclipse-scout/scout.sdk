@@ -10,9 +10,9 @@
  ******************************************************************************/
 package formdata.client.table;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.platform.Order;
 
 public abstract class AbstractTestTableWithOneColumn extends AbstractTable {
   @Order(10.0)

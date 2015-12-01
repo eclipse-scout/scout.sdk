@@ -31,7 +31,7 @@ public interface ISdkProperties {
    * for example, would not be the case for {@link Double#MAX_VALUE}). As a rule of thumb, this number should be smaller
    * than {@link Long#MAX_VALUE}.<br>
    * Must match the default order number used in the Scout runtime. See
-   * org.eclipse.scout.commons.annotations.IOrdered.DEFAULT_ORDER
+   * org.eclipse.scout.rt.platform.IOrdered.DEFAULT_ORDER
    */
   double DEFAULT_VIEW_ORDER = 98765432123456789d;
 

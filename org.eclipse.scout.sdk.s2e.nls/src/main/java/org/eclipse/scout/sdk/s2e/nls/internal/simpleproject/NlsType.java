@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.util.BasicPropertySupport;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -35,7 +36,6 @@ import org.eclipse.scout.sdk.s2e.util.WeakResourceChangeListener;
  */
 public class NlsType implements INlsType {
 
-  public static final String DYNAMIC_NLS_NAME = "org.eclipse.scout.commons.nls.DynamicNls";
   public static final char FOLDER_SEGMENT_SEPARATOR = '/';
   public static final String RESOURCE_BUNDLE_FIELD_NAME = "RESOURCE_BUNDLE_NAME";
   public static final String PROP_TRANSLATION_FOLDER_NAME = "translationFolderName";
@@ -82,7 +82,7 @@ public class NlsType implements INlsType {
     IType firstType = superTypeHierarchy.getSuperclass(m_type);
     if (S2eUtils.exists(firstType)) {
       String superTypeFqn = firstType.getFullyQualifiedName();
-      if (!DYNAMIC_NLS_NAME.equals(superTypeFqn) && !Object.class.getName().equals(superTypeFqn)) {
+      if (!IScoutRuntimeTypes.DynamicNls.equals(superTypeFqn) && !Object.class.getName().equals(superTypeFqn)) {
         m_propertySupport.setProperty(PROP_SUPER_TYPE, firstType);
       }
     }

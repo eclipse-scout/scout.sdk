@@ -81,7 +81,7 @@ public final class CoreUtils {
   /**
    * Creates a new key pair (private and public key) compatible with the Scout Runtime.<br>
    * <b>This method must behave exactly like the one implemented in
-   * org.eclipse.scout.commons.SecurityUtility.generateKeyPair().</b>
+   * org.eclipse.scout.rt.platform.security.SecurityUtility.generateKeyPair().</b>
    *
    * @return A {@link String} array of length=2 containing the base64 encoded private key at index zero and the base64
    *         encoded public key at index 1.

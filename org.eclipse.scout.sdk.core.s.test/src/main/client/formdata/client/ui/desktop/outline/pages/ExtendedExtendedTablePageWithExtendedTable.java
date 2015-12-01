@@ -10,9 +10,9 @@
  ******************************************************************************/
 package formdata.client.ui.desktop.outline.pages;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.PageData;
+import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
+import org.eclipse.scout.rt.platform.Order;
 
 import formdata.shared.services.pages.ExtendedExtendedTablePageWithExtendedTableData;
 

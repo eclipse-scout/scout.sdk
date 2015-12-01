@@ -10,11 +10,11 @@
  ******************************************************************************/
 package formdata.client.extensions;
 
-import org.eclipse.scout.commons.annotations.Data;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.AbstractTableExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
+import org.eclipse.scout.rt.platform.Order;
 
 import formdata.client.ui.desktop.outline.pages.ExtendedEmptyTablePage;
 import formdata.client.ui.desktop.outline.pages.ExtendedEmptyTablePage.Table;

@@ -2,10 +2,10 @@ package formdata.client.ui.template.formfield.replace.levels;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.platform.holders.IHolder;
 
 import formdata.shared.ui.template.formfield.replace.levels.AbstractTemplateFieldData;
 

@@ -10,10 +10,8 @@
  ******************************************************************************/
 package formdata.client.ui.forms;
 
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -21,6 +19,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 import formdata.client.ui.forms.MasterFieldTestForm.MainBox.CancelButton;
 import formdata.client.ui.forms.MasterFieldTestForm.MainBox.OkButton;
@@ -36,16 +36,10 @@ import formdata.shared.services.MasterFieldTestFormData;
 @FormData(value = MasterFieldTestFormData.class, sdkCommand = SdkCommand.CREATE)
 public class MasterFieldTestForm extends AbstractForm {
 
-  /**
-   * @throws org.eclipse.scout.commons.exception.ProcessingException
-   */
   public MasterFieldTestForm() throws ProcessingException {
     super();
   }
 
-  /**
-   * @throws org.eclipse.scout.commons.exception.ProcessingException
-   */
   public void startNew() throws ProcessingException {
     startInternal(new NewHandler());
   }

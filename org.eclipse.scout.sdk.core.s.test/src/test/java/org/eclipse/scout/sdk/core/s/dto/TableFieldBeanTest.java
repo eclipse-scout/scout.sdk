@@ -491,7 +491,7 @@ public class TableFieldBeanTest {
     IType emptyTableExtended = SdkAssert.assertTypeExists(tableFieldExFormData, "EmptyTableExtended");
     SdkAssert.assertHasFlags(emptyTableExtended, 9);
     SdkAssert.assertHasSuperTypeSignature(emptyTableExtended, "QEmptyTable;");
-    SdkAssert.assertAnnotation(emptyTableExtended, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(emptyTableExtended, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of EmptyTableExtended
     Assert.assertEquals("field count of 'EmptyTableExtended'", 1, emptyTableExtended.fields().list().size());
@@ -556,7 +556,7 @@ public class TableFieldBeanTest {
     IType extendedAddress = SdkAssert.assertTypeExists(tableFieldExFormData, "ExtendedAddress");
     SdkAssert.assertHasFlags(extendedAddress, 9);
     SdkAssert.assertHasSuperTypeSignature(extendedAddress, "QAddressTable;");
-    SdkAssert.assertAnnotation(extendedAddress, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(extendedAddress, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of ExtendedAddress
     Assert.assertEquals("field count of 'ExtendedAddress'", 1, extendedAddress.fields().list().size());
@@ -621,7 +621,7 @@ public class TableFieldBeanTest {
     IType extendedPersonTable = SdkAssert.assertTypeExists(tableFieldExFormData, "ExtendedPersonTable");
     SdkAssert.assertHasFlags(extendedPersonTable, 9);
     SdkAssert.assertHasSuperTypeSignature(extendedPersonTable, "QPersonTable;");
-    SdkAssert.assertAnnotation(extendedPersonTable, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(extendedPersonTable, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of ExtendedPersonTable
     Assert.assertEquals("field count of 'ExtendedPersonTable'", 1, extendedPersonTable.fields().list().size());
@@ -686,7 +686,7 @@ public class TableFieldBeanTest {
     IType noTableExtended = SdkAssert.assertTypeExists(tableFieldExFormData, "NoTableExtended");
     SdkAssert.assertHasFlags(noTableExtended, 9);
     SdkAssert.assertHasSuperTypeSignature(noTableExtended, "QNoTable;");
-    SdkAssert.assertAnnotation(noTableExtended, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(noTableExtended, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of NoTableExtended
     Assert.assertEquals("field count of 'NoTableExtended'", 1, noTableExtended.fields().list().size());
@@ -751,7 +751,7 @@ public class TableFieldBeanTest {
     IType tableExtended = SdkAssert.assertTypeExists(tableFieldExFormData, "TableExtended");
     SdkAssert.assertHasFlags(tableExtended, 9);
     SdkAssert.assertHasSuperTypeSignature(tableExtended, "QTable;");
-    SdkAssert.assertAnnotation(tableExtended, "org.eclipse.scout.commons.annotations.Replace");
+    SdkAssert.assertAnnotation(tableExtended, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of TableExtended
     Assert.assertEquals("field count of 'TableExtended'", 1, tableExtended.fields().list().size());

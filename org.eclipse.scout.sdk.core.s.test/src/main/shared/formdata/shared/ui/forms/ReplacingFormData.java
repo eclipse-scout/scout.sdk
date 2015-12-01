@@ -12,7 +12,7 @@ package formdata.shared.ui.forms;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.platform.Replace;
 
 /**
  * <b>NOTE:</b><br>

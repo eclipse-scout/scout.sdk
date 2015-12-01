@@ -4,18 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package formdata.client.ui.forms.replace;
 
-import org.eclipse.scout.commons.annotations.ColumnData;
-import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.dto.ColumnData;
+import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 import formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData;
 

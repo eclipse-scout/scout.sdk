@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.commons.annotations.Extends;
+import org.eclipse.scout.rt.platform.extension.Extends;
 
 import formdata.shared.services.pages.ExtendedEmptyTablePageData.ExtendedEmptyTableRowData;
 

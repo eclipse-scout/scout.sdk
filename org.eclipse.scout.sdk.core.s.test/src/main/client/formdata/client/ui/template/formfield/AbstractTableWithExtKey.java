@@ -10,9 +10,9 @@
  ******************************************************************************/
 package formdata.client.ui.template.formfield;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
+import org.eclipse.scout.rt.platform.Order;
 
 public class AbstractTableWithExtKey<KEY_TYPE> extends AbstractTable {
 
