@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.ui.action;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -66,7 +65,8 @@ public abstract class AbstractWorkspaceAction extends Action {
         return Status.OK_STATUS;
       }
     };
-    m_job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+    m_job.setSystem(true);
+    m_job.setUser(false);
     m_job.schedule();
   }
 

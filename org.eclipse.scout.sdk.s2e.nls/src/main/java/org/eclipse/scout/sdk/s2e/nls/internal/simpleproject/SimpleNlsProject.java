@@ -12,9 +12,9 @@ package org.eclipse.scout.sdk.s2e.nls.internal.simpleproject;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +51,7 @@ import org.eclipse.scout.sdk.s2e.nls.project.AbstractNlsProject;
 import org.eclipse.scout.sdk.s2e.nls.project.NlsProjectEvent;
 import org.eclipse.scout.sdk.s2e.nls.resource.ITranslationResource;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
 import org.eclipse.swt.widgets.Shell;
 
 public class SimpleNlsProject extends AbstractNlsProject {
@@ -124,7 +125,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
     String fileName = getLocalizedPropertiesFileName(getNlsType().getTranslationsPrefix(), language);
     IFile file = folder.getFolder().getFile(new Path(fileName));
     if (!file.exists()) {
-      file.create(new ByteArrayInputStream("".getBytes()), true, monitor);
+      S2eUtils.writeResources(Collections.singletonList(new ResourceWriteOperation(file, "")), monitor, true);
     }
     addTranslationResource(new WorkspaceTranslationFile(file), monitor);
   }
