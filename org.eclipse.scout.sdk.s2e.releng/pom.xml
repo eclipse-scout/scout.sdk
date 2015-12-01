@@ -72,7 +72,7 @@
         <plugin>
           <groupId>org.eclipse.tycho.extras</groupId>
           <artifactId>tycho-p2-extras-plugin</artifactId>
-          <version>${tycho-extras.version}</version>
+          <version>${master_plugin_tycho-extras_version}</version>
         </plugin>
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -1038,12 +1038,25 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.4</version>
+            <version>1.7.0.MGPG-53</version>
             <configuration>
               <repositoryId>${forgeReleaseId}</repositoryId>
               <url>${forgeReleaseUrl}</url>
             </configuration>
             <executions>
+              <execution>
+                <id>deploy-ecj</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/ecj_${ecj}.jar</file>
+                  <sources>${downloaded}/ecj.source_${ecj}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/ecj.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
               <execution>
                 <id>deploy-jdt-core</id>
                 <goals>
@@ -1054,6 +1067,7 @@
                   <file>${downloaded}/org.eclipse.jdt.core_${org.eclipse.jdt.core}.jar</file>
                   <sources>${downloaded}/org.eclipse.jdt.core.source_${org.eclipse.jdt.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1066,6 +1080,7 @@
                   <file>${downloaded}/org.eclipse.jdt.core.manipulation_${org.eclipse.jdt.core.manipulation}.jar</file>
                   <sources>${downloaded}/org.eclipse.jdt.core.manipulation.source_${org.eclipse.jdt.core.manipulation}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.manipulation.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1078,6 +1093,7 @@
                   <file>${downloaded}/org.eclipse.jdt.ui_${org.eclipse.jdt.ui}.jar</file>
                   <sources>${downloaded}/org.eclipse.jdt.ui.source_${org.eclipse.jdt.ui}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.ui.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1090,6 +1106,7 @@
                   <file>${downloaded}/org.eclipse.jdt.launching_${org.eclipse.jdt.launching}.jar</file>
                   <sources>${downloaded}/org.eclipse.jdt.launching.source_${org.eclipse.jdt.launching}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.launching.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1102,6 +1119,7 @@
                   <file>${downloaded}/org.eclipse.jdt.debug.ui_${org.eclipse.jdt.debug.ui}.jar</file>
                   <sources>${downloaded}/org.eclipse.jdt.debug.ui.source_${org.eclipse.jdt.debug.ui}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.debug.ui.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1114,6 +1132,7 @@
                   <file>${downloaded}/org.eclipse.ui.workbench_${org.eclipse.ui.workbench}.jar</file>
                   <sources>${downloaded}/org.eclipse.ui.workbench.source_${org.eclipse.ui.workbench}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1126,6 +1145,7 @@
                   <file>${downloaded}/org.eclipse.ui.workbench.texteditor_${org.eclipse.ui.workbench.texteditor}.jar</file>
                   <sources>${downloaded}/org.eclipse.ui.workbench.texteditor.source_${org.eclipse.ui.workbench.texteditor}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.texteditor.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1138,6 +1158,7 @@
                   <file>${downloaded}/org.eclipse.jface_${org.eclipse.jface}.jar</file>
                   <sources>${downloaded}/org.eclipse.jface.source_${org.eclipse.jface}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jface.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1150,6 +1171,7 @@
                   <file>${downloaded}/org.eclipse.jface.text_${org.eclipse.jface.text}.jar</file>
                   <sources>${downloaded}/org.eclipse.jface.text.source_${org.eclipse.jface.text}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jface.text.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1162,6 +1184,7 @@
                   <file>${downloaded}/org.eclipse.swt.win32.win32.x86_${org.eclipse.swt.win32.win32.x86}.jar</file>
                   <sources>${downloaded}/org.eclipse.swt.win32.win32.x86.source_${org.eclipse.swt.win32.win32.x86}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.swt.win32.win32.x86.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1174,6 +1197,7 @@
                   <file>${downloaded}/org.eclipse.ui.ide_${org.eclipse.ui.ide}.jar</file>
                   <sources>${downloaded}/org.eclipse.ui.ide.source_${org.eclipse.ui.ide}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.ide.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1186,6 +1210,7 @@
                   <file>${downloaded}/org.eclipse.ui.editors_${org.eclipse.ui.editors}.jar</file>
                   <sources>${downloaded}/org.eclipse.ui.editors.source_${org.eclipse.ui.editors}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.editors.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1198,6 +1223,7 @@
                   <file>${downloaded}/org.eclipse.ui.console_${org.eclipse.ui.console}.jar</file>
                   <sources>${downloaded}/org.eclipse.ui.console.source_${org.eclipse.ui.console}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.console.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1210,6 +1236,7 @@
                   <file>${downloaded}/org.eclipse.ui_${org.eclipse.ui}.jar</file>
                   <sources>${downloaded}/org.eclipse.ui.source_${org.eclipse.ui}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1222,6 +1249,7 @@
                   <file>${downloaded}/org.eclipse.ui.views_${org.eclipse.ui.views}.jar</file>
                   <sources>${downloaded}/org.eclipse.ui.views.source_${org.eclipse.ui.views}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.views.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1234,6 +1262,7 @@
                   <file>${downloaded}/org.eclipse.ui.forms_${org.eclipse.ui.forms}.jar</file>
                   <sources>${downloaded}/org.eclipse.ui.forms.source_${org.eclipse.ui.forms}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.forms.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1246,6 +1275,7 @@
                   <file>${downloaded}/org.eclipse.osgi_${org.eclipse.osgi}.jar</file>
                   <sources>${downloaded}/org.eclipse.osgi.source_${org.eclipse.osgi}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.osgi.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1258,6 +1288,7 @@
                   <file>${downloaded}/org.eclipse.equinox.common_${org.eclipse.equinox.common}.jar</file>
                   <sources>${downloaded}/org.eclipse.equinox.common.source_${org.eclipse.equinox.common}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.common.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1270,6 +1301,7 @@
                   <file>${downloaded}/org.eclipse.equinox.security_${org.eclipse.equinox.security}.jar</file>
                   <sources>${downloaded}/org.eclipse.equinox.security.source_${org.eclipse.equinox.security}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.security.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1282,6 +1314,7 @@
                   <file>${downloaded}/org.eclipse.equinox.registry_${org.eclipse.equinox.registry}.jar</file>
                   <sources>${downloaded}/org.eclipse.equinox.registry.source_${org.eclipse.equinox.registry}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.registry.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1294,6 +1327,7 @@
                   <file>${downloaded}/org.eclipse.equinox.preferences_${org.eclipse.equinox.preferences}.jar</file>
                   <sources>${downloaded}/org.eclipse.equinox.preferences.source_${org.eclipse.equinox.preferences}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.preferences.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1306,6 +1340,7 @@
                   <file>${downloaded}/org.eclipse.core.resources_${org.eclipse.core.resources}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.resources.source_${org.eclipse.core.resources}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.resources.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1318,6 +1353,7 @@
                   <file>${downloaded}/org.eclipse.core.commands_${org.eclipse.core.commands}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.commands.source_${org.eclipse.core.commands}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.commands.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1330,6 +1366,7 @@
                   <file>${downloaded}/org.eclipse.core.contenttype_${org.eclipse.core.contenttype}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.contenttype.source_${org.eclipse.core.contenttype}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.contenttype.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1342,6 +1379,7 @@
                   <file>${downloaded}/org.eclipse.core.expressions_${org.eclipse.core.expressions}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.expressions.source_${org.eclipse.core.expressions}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.expressions.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1354,6 +1392,7 @@
                   <file>${downloaded}/org.eclipse.core.filesystem_${org.eclipse.core.filesystem}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.filesystem.source_${org.eclipse.core.filesystem}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.filesystem.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1366,6 +1405,7 @@
                   <file>${downloaded}/org.eclipse.core.runtime_${org.eclipse.core.runtime}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.runtime.source_${org.eclipse.core.runtime}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.runtime.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1378,6 +1418,7 @@
                   <file>${downloaded}/org.eclipse.core.jobs_${org.eclipse.core.jobs}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.jobs.source_${org.eclipse.core.jobs}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.jobs.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1390,6 +1431,7 @@
                   <file>${downloaded}/org.eclipse.text_${org.eclipse.text}.jar</file>
                   <sources>${downloaded}/org.eclipse.text.source_${org.eclipse.text}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.text.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1402,6 +1444,7 @@
                   <file>${downloaded}/org.eclipse.search_${org.eclipse.search}.jar</file>
                   <sources>${downloaded}/org.eclipse.search.source_${org.eclipse.search}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.search.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1414,6 +1457,7 @@
                   <file>${downloaded}/org.eclipse.ltk.core.refactoring_${org.eclipse.ltk.core.refactoring}.jar</file>
                   <sources>${downloaded}/org.eclipse.ltk.core.refactoring.source_${org.eclipse.ltk.core.refactoring}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ltk.core.refactoring.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1426,6 +1470,7 @@
                   <file>${downloaded}/org.eclipse.ltk.ui.refactoring_${org.eclipse.ltk.ui.refactoring}.jar</file>
                   <sources>${downloaded}/org.eclipse.ltk.ui.refactoring.source_${org.eclipse.ltk.ui.refactoring}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ltk.ui.refactoring.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1438,6 +1483,7 @@
                   <file>${downloaded}/org.eclipse.pde.core_${org.eclipse.pde.core}.jar</file>
                   <sources>${downloaded}/org.eclipse.pde.core.source_${org.eclipse.pde.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.pde.core.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1450,6 +1496,7 @@
                   <file>${downloaded}/org.eclipse.pde.ui_${org.eclipse.pde.ui}.jar</file>
                   <sources>${downloaded}/org.eclipse.pde.ui.source_${org.eclipse.pde.ui}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.pde.ui.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
               <execution>
@@ -1462,6 +1509,7 @@
                   <file>${downloaded}/org.eclipse.m2e.core_${org.eclipse.m2e.core}.jar</file>
                   <sources>${downloaded}/org.eclipse.m2e.core.source_${org.eclipse.m2e.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
             </executions>
