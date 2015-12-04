@@ -1,4 +1,5 @@
-#!/usr/local/bin/bash
+#!/bin/bash
+
 BASEDIR=$(dirname $0)
 . $BASEDIR/_functions.sh
 
@@ -59,6 +60,8 @@ if [[ "$TAG" ]]; then
 fi
 _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
+mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f updatesite-maven-plugin -N $_MAVEN_OPTS
+processError
 mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f org.eclipse.scout.sdk -N $_MAVEN_OPTS
 processError
 mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f scout-helloworld-app -N $_MAVEN_OPTS
