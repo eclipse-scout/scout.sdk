@@ -87,17 +87,26 @@ public final class DtoUtility {
       IType extendedType = ScoutTypeUtility.getExtendedType((IType) element, modelLocalHierarchy);
       if (extendedType != null) {
         IType primaryType = TypeUtility.getPrimaryType(extendedType);
-        ITypeHierarchy extendedTypeSuperHierarchy = TypeUtility.getSupertypeHierarchy(primaryType);
-        if (extendedTypeSuperHierarchy != null) {
+        ITypeHierarchy primaryTypeSuperHierarchy = TypeUtility.getSupertypeHierarchy(primaryType);
+        if (primaryTypeSuperHierarchy != null) {
           IType extendedDto = null;
-          if (extendedTypeSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm)) || extendedTypeSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IFormField))) {
-            extendedDto = ScoutTypeUtility.findDtoForForm(primaryType);
+          if (primaryTypeSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm)) || primaryTypeSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IFormField))) {
+            ITypeHierarchy extendedTypeSuperHierarchy = TypeUtility.getSupertypeHierarchy(extendedType);
+            if (extendedTypeSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable)) && extendedType.getDeclaringType() != null) {
+              IType tableFieldDto = getFormDataType(extendedType.getDeclaringType(), extendedTypeSuperHierarchy);
+              extendedDto = getRowDataFor(tableFieldDto);
+            }
+            else {
+              extendedDto = ScoutTypeUtility.findDtoForForm(primaryType);
+            }
           }
-          else if (extendedTypeSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable))) {
+          else if (primaryTypeSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IExtension))) {
+            extendedDto = ScoutTypeUtility.findDtoForPage(primaryType);
+          }
+          else if (primaryTypeSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable))) {
             IType pageDto = ScoutTypeUtility.findDtoForPage(primaryType);
-
-            Set<IType> rowDataInPageDto = TypeUtility.getInnerTypes(pageDto, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.AbstractTableRowData)));
-            extendedDto = CollectionUtility.firstElement(rowDataInPageDto);
+            Set<IType> innerTypes = TypeUtility.getInnerTypes(pageDto, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
+            extendedDto = CollectionUtility.firstElement(innerTypes);
           }
 
           if (extendedDto != null) {
@@ -116,6 +125,14 @@ public final class DtoUtility {
       }
     }
     return null;
+  }
+
+  private static IType getRowDataFor(IType tableDto) {
+    if (tableDto == null) {
+      return null;
+    }
+    Set<IType> innerTypes = TypeUtility.getInnerTypes(tableDto, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
+    return CollectionUtility.firstElement(innerTypes);
   }
 
   public static void addFormDataAdditionalInterfaces(FormDataAnnotation formDataAnnotation, ITypeSourceBuilder sourceBuilder, IJavaProject formDataJavaProject) {
