@@ -44,8 +44,6 @@ public class ScoutSdk extends Plugin {
     plugin = this;
     logManager = new SdkLogManager(this);
 
-    logInfo("Starting SCOUT SDK Plugin.");
-
     // ensure the caches and emitters are initialized.
     ScoutSdkCore.getHierarchyCache();
     ScoutSdkCore.getTypeCache();
