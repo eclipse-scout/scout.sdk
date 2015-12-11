@@ -52,6 +52,9 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
   private List<MethodSpi> m_methods;
   private List<FieldSpi> m_fields;
   private int m_flags;
+  private ISourceRange m_source;
+  private ISourceRange m_javaDocSource;
+  private ISourceRange m_staticInitSource;
 
   DeclarationTypeWithJdt(JavaEnvironmentWithJdt env, CompilationUnitSpi cu, DeclarationTypeWithJdt declaringType, TypeDeclaration astNode) {
     super(env);
@@ -332,29 +335,43 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public ISourceRange getSource() {
-    TypeDeclaration decl = m_astNode;
-    return m_env.getSource(m_cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      TypeDeclaration decl = m_astNode;
+      m_source = m_env.getSource(m_cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    }
+    return m_source;
   }
 
   @Override
   public ISourceRange getSourceOfStaticInitializer() {
-    TypeDeclaration decl = m_astNode;
-    for (FieldDeclaration fieldDecl : decl.fields) {
-      if (fieldDecl.type == null && fieldDecl.name == null) {
-        return m_env.getSource(m_cu, fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd);
+    if (m_staticInitSource == null) {
+      TypeDeclaration decl = m_astNode;
+      for (FieldDeclaration fieldDecl : decl.fields) {
+        if (fieldDecl.type == null && fieldDecl.name == null) {
+          m_staticInitSource = m_env.getSource(m_cu, fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd);
+          break;
+        }
+      }
+      if (m_staticInitSource == null) {
+        m_staticInitSource = ISourceRange.NO_SOURCE;
       }
     }
-    return null;
+    return m_staticInitSource;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    TypeDeclaration decl = m_astNode;
-    Javadoc doc = decl.javadoc;
-    if (doc != null) {
-      return m_env.getSource(m_cu, doc.sourceStart, doc.sourceEnd);
+    if (m_javaDocSource == null) {
+      TypeDeclaration decl = m_astNode;
+      Javadoc doc = decl.javadoc;
+      if (doc != null) {
+        m_javaDocSource = m_env.getSource(m_cu, doc.sourceStart, doc.sourceEnd);
+      }
+      else {
+        m_javaDocSource = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_javaDocSource;
   }
 
   @Override

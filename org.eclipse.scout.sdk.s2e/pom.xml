@@ -64,6 +64,21 @@
       <artifactId>org.eclipse.m2e.core</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.m2e.archetype.common</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.archetype</groupId>
+      <artifactId>archetype-catalog</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.archetype</groupId>
+      <artifactId>archetype-common</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -82,6 +97,7 @@
               !org.eclipse.jface.text*,
               !org.codehaus.plexus*,
               !org.eclipse.text*,
+              !org.eclipse.m2e.core*,
               !org.apache.maven.*,
               *
             </Import-Package>
@@ -90,7 +106,9 @@
               org.eclipse.core.resources;bundle-version="[3.10.0,4)";visibility:=reexport,
               org.eclipse.jdt.core;bundle-version="[3.11,4)";visibility:=reexport,
               org.eclipse.jface.text;bundle-version="[3.7.2,4)";visibility:=reexport,
-              org.eclipse.m2e.maven.runtime;bundle-version="[1.6.0,2)";visibility:=reexport
+              org.eclipse.m2e.maven.runtime;bundle-version="[1.6.0,2)";visibility:=reexport,
+              org.eclipse.m2e.archetype.common;bundle-version="[1.6.0,2)";visibility:=reexport,
+              org.eclipse.m2e.core;bundle-version="[1.6.0,2)";visibility:=reexport
             </Require-Bundle>
 
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator</Bundle-Activator>
@@ -100,7 +118,6 @@
             <Embed-Transitive>false</Embed-Transitive>
             <_exportcontents>
               !org.apache.commons.*,
-              !scoutProjectTemplate.zip,
               org.eclipse.scout.sdk.core.*;version="${bundle.version}",
             </_exportcontents>
 

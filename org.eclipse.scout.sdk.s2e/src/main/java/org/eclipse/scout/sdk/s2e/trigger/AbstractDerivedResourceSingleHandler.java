@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2e.trigger;
 
 import org.apache.commons.lang3.Validate;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.core.model.api.IType;
 
 /**
@@ -22,7 +21,7 @@ public abstract class AbstractDerivedResourceSingleHandler extends AbstractDeriv
   private final org.eclipse.jdt.core.IType m_jdtType;
   private final IType m_modelType;
 
-  protected AbstractDerivedResourceSingleHandler(org.eclipse.jdt.core.IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
+  protected AbstractDerivedResourceSingleHandler(org.eclipse.jdt.core.IType jdtType, IJavaEnvironmentProvider envProvider) {
     m_jdtType = Validate.notNull(jdtType);
     m_envProvider = envProvider;
     m_modelType = m_envProvider.jdtTypeToScoutType(jdtType);

@@ -44,6 +44,9 @@ public class DeclarationMethodWithJdt extends AbstractMemberWithJdt<IMethod> imp
   private String m_name;
   private List<TypeSpi> m_exceptions;
   private List<TypeParameterSpi> m_typeParameters;
+  private ISourceRange m_source;
+  private ISourceRange m_bodySource;
+  private ISourceRange m_javaDocSource;
 
   DeclarationMethodWithJdt(JavaEnvironmentWithJdt env, DeclarationTypeWithJdt declaringType, AbstractMethodDeclaration astNode) {
     super(env);
@@ -213,27 +216,38 @@ public class DeclarationMethodWithJdt extends AbstractMemberWithJdt<IMethod> imp
 
   @Override
   public ISourceRange getSource() {
-    CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-    AbstractMethodDeclaration decl = m_astNode;
-    return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+      AbstractMethodDeclaration decl = m_astNode;
+      m_source = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    }
+    return m_source;
   }
 
   @Override
   public ISourceRange getSourceOfBody() {
-    CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-    AbstractMethodDeclaration decl = m_astNode;
-    return m_env.getSource(cu, decl.bodyStart, decl.bodyEnd);
+    if (m_bodySource == null) {
+      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+      AbstractMethodDeclaration decl = m_astNode;
+      m_bodySource = m_env.getSource(cu, decl.bodyStart, decl.bodyEnd);
+    }
+    return m_bodySource;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-    AbstractMethodDeclaration decl = m_astNode;
-    Javadoc doc = decl.javadoc;
-    if (doc != null) {
-      return m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+    if (m_javaDocSource == null) {
+      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+      AbstractMethodDeclaration decl = m_astNode;
+      Javadoc doc = decl.javadoc;
+      if (doc != null) {
+        m_javaDocSource = m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+      }
+      else {
+        m_javaDocSource = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_javaDocSource;
   }
 
 }

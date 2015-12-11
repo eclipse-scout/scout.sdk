@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.AnnotationElementImplementor;
+import org.eclipse.scout.sdk.core.model.api.internal.SourceRange;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 
@@ -29,6 +30,8 @@ public class DeclarationAnnotationElementWithJdt extends AbstractJavaElementWith
   private final String m_name;
   private final boolean m_syntheticDefaultValue;
   private IMetaValue m_value;
+  private ISourceRange m_source;
+  private ISourceRange m_expressionSource;
 
   DeclarationAnnotationElementWithJdt(JavaEnvironmentWithJdt env, DeclarationAnnotationWithJdt declaringAnnotation, MemberValuePair astNode, boolean syntheticDefaultValue) {
     super(env);
@@ -75,26 +78,23 @@ public class DeclarationAnnotationElementWithJdt extends AbstractJavaElementWith
 
   @Override
   public ISourceRange getSource() {
-    return new ISourceRange() {
-      @Override
-      public String toString() {
-        return m_astNode.toString();
-      }
-    };
+    if (m_source == null) {
+      m_source = new SourceRange(m_astNode.toString(), m_astNode.sourceStart, m_astNode.sourceEnd);
+    }
+    return m_source;
   }
 
   @Override
   public ISourceRange getSourceOfExpression() {
-    final Expression expr = m_astNode.value;
-    if (expr != null) {
-      return new ISourceRange() {
-        @Override
-        public String toString() {
-          return expr.toString();
-        }
-      };
+    if (m_expressionSource == null) {
+      Expression expr = m_astNode.value;
+      if (expr == null) {
+        m_expressionSource = ISourceRange.NO_SOURCE;
+      }
+      else {
+        m_expressionSource = new SourceRange(expr.toString(), expr.sourceStart, expr.sourceEnd);
+      }
     }
-    return null;
+    return m_expressionSource;
   }
-
 }

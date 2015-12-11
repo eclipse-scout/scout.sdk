@@ -59,7 +59,10 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.jdt.core.search.TypeNameMatch;
+import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 import org.eclipse.jdt.internal.core.util.Util;
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
@@ -89,7 +92,7 @@ public final class S2eUtils {
   }
 
   /**
-   * Converts the {@link org.eclipse.jdt.core.IType} to {@link org.eclipse.scout.sdk.core.model.api.IType}
+   * Converts the {@link IType} to {@link org.eclipse.scout.sdk.core.model.api.IType}
    *
    * @param jdtType
    *          The input jdt {@link IType}
@@ -134,7 +137,7 @@ public final class S2eUtils {
   }
 
   /**
-   * Converts the given {@link org.eclipse.jdt.core.IType} to {@link org.eclipse.scout.sdk.core.model.api.IType}
+   * Converts the given {@link IType} to {@link org.eclipse.scout.sdk.core.model.api.IType}
    *
    * @param jdtType
    *          The jdt {@link IType} to convert.
@@ -144,8 +147,74 @@ public final class S2eUtils {
    * @return The {@link org.eclipse.scout.sdk.core.model.api.IType} matching the given JDT {@link IType}.
    * @throws CoreException
    */
-  public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType, IJavaEnvironment env) throws CoreException {
+  public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType, IJavaEnvironment env) {
     return env.findType(jdtType.getFullyQualifiedName('$'));
+  }
+
+  /**
+   * Gets all fully qualified type names of abstract public classes existing on the classpath of the given project and
+   * implementing the given baseTypeFqn.
+   *
+   * @param sourceProject
+   *          The {@link IJavaProject} defining the classpath.
+   * @param baseTypeFqn
+   *          The fully qualified name of the base class. The sub classes of this class are searched.
+   * @param monitor
+   *          The monitor or <code>null</code>.
+   * @return A {@link Set} sorted ascending holding the fully qualified names.
+   * @throws CoreException
+   */
+  public static Set<String> findAbstractClassesInHierarchy(final IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor) throws CoreException {
+    IFilter<TypeNameMatch> filter = new IFilter<TypeNameMatch>() {
+      @Override
+      public boolean evaluate(TypeNameMatch match) {
+        int modifiers = match.getModifiers();
+        if (Flags.isAbstract(modifiers) && Flags.isPublic(modifiers) && !Flags.isDeprecated(modifiers) && !Flags.isInterface(modifiers)) {
+          boolean isPrimaryType = match.getPackageName().equals(match.getTypeContainerName());
+          return isPrimaryType;
+        }
+        return false;
+      }
+    };
+    return findClassesInStrictHierarchy(sourceProject, baseTypeFqn, monitor, filter);
+  }
+
+  /**
+   * Gets all fully qualified type names of sub classes of the given baseTypeFqn that are on the classpath of the given
+   * project and fulfill the given filter.
+   *
+   * @param sourceProject
+   *          The {@link IJavaProject} defining the classpath.
+   * @param baseTypeFqn
+   *          The fully qualified name of the base class of the hierarchy.
+   * @param monitor
+   *          The monitor or <code>null</code>.
+   * @param filter
+   *          A filter to decide which matches are accepted or <code>null</code> if all matches should be accepted.
+   * @return A {@link Set} sorted ascending holding the fully qualified names.
+   * @throws CoreException
+   */
+  public static Set<String> findClassesInStrictHierarchy(final IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor, final IFilter<TypeNameMatch> filter) throws CoreException {
+    final Set<String> collector = new TreeSet<>();
+    TypeNameMatchRequestor nameMatchRequestor = new TypeNameMatchRequestor() {
+      @Override
+      public void acceptTypeNameMatch(TypeNameMatch match) {
+        if (filter == null || filter.evaluate(match)) {
+          collector.add(match.getFullyQualifiedName());
+        }
+      }
+    };
+
+    SearchEngine e = new SearchEngine(JavaCore.getWorkingCopies(null));
+    IType baseType = sourceProject.findType(baseTypeFqn.replace('$', '.'));
+    if (!exists(baseType)) {
+      return collector;
+    }
+
+    IJavaSearchScope strictHierarchyScope = SearchEngine.createStrictHierarchyScope(sourceProject, baseType, true, false, null);
+    e.searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, null, SearchPattern.R_EXACT_MATCH, IJavaSearchConstants.CLASS, strictHierarchyScope,
+        nameMatchRequestor, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, monitor);
+    return collector;
   }
 
   /**
@@ -169,36 +238,6 @@ public final class S2eUtils {
   }
 
   /**
-   * Searches for an {@link IType} with a specific name within the given type recursively checking all inner types. The
-   * given {@link IType} itself is checked as well.
-   *
-   * @param type
-   *          The {@link IType} to start searching. All nested inner {@link IType}s are visited recursively.
-   * @param innerTypeName
-   *          The simple name (case sensitive) to search for.
-   * @return The first {@link IType} found in the nested {@link IType} tree below the given start type that has the
-   *         given simple name or <code>null</code> if nothing could be found.
-   * @throws JavaModelException
-   */
-  public static IType findInnerType(IType type, String innerTypeName) throws JavaModelException {
-    if (!exists(type)) {
-      return null;
-    }
-    else if (Objects.equals(type.getElementName(), innerTypeName)) {
-      return type;
-    }
-    else {
-      for (IType innerType : type.getTypes()) {
-        IType found = findInnerType(innerType, innerTypeName);
-        if (found != null) {
-          return found;
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
    * Gets all {@link IType}s that are accessible in the current workspace having the given fully qualified name.
    *
    * @param fqn
@@ -207,12 +246,27 @@ public final class S2eUtils {
    * @return
    * @throws CoreException
    */
-  public static Set<org.eclipse.jdt.core.IType> resolveJdtTypes(final String fqn) throws CoreException {
+  public static Set<IType> resolveJdtTypes(final String fqn) throws CoreException {
+    return resolveJdtTypes(fqn, SearchEngine.createWorkspaceScope());
+  }
+
+  /**
+   * Gets all {@link IType}s that are accessible in the given scope having the given fully qualified name.
+   *
+   * @param fqn
+   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator
+   *          (e.g. <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
+   * @param scope
+   *          The {@link IJavaSearchScope} that defines where to search.
+   * @return A {@link Set} with all {@link IType}s
+   * @throws CoreException
+   */
+  public static Set<IType> resolveJdtTypes(final String fqn, IJavaSearchScope scope) throws CoreException {
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
     String fastPat = Signature.getSimpleName(fqn);
     final Set<IType> matchList = new TreeSet<>(COMPARATOR);
     new SearchEngine().search(SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH), new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
-        SearchEngine.createWorkspaceScope(), new SearchRequestor() {
+        scope, new SearchRequestor() {
           @Override
           public void acceptSearchMatch(SearchMatch match) throws CoreException {
             Object element = match.getElement();
@@ -281,34 +335,74 @@ public final class S2eUtils {
     }
   }
 
+  /**
+   * Checks whether the given {@link ITypeHierarchy} contains an element with the given fully qualified name.
+   *
+   * @param h
+   *          The hierarchy to search in.
+   * @param fqn
+   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator
+   *          (e.g. <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
+   * @return <code>true</code> if it is part of the given {@link ITypeHierarchy}, <code>false</code> otherwise.
+   */
+  public static boolean contains(ITypeHierarchy h, String fqn) {
+    for (IType t : h.getAllTypes()) {
+      if (fqn.equals(t.getFullyQualifiedName('$'))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Gets the first {@link IAnnotation} on the given {@link IType} or its super types that has one of the given fully
+   * qualified names.
+   *
+   * @param type
+   *          The {@link IType} where to start the search.
+   * @param fullyQualifiedAnnotations
+   *          The fully qualified names of the annotations to search.
+   * @return The first of the annotations found in the super hierarchy of the given {@link IType} or <code>null</code>
+   *         if it could not be found.
+   * @throws CoreException
+   */
   public static IAnnotation getFirstAnnotationInSupertypeHierarchy(IType type, String... fullyQualifiedAnnotations) throws CoreException {
     if (type == null) {
       return null;
     }
     IAnnotation ann = getFirstDeclaredAnnotation(type, fullyQualifiedAnnotations);
-    if (ann != null) {
+    if (exists(ann)) {
       return ann;
     }
     ITypeHierarchy h = type.newSupertypeHierarchy(null);
     for (IType t : h.getAllSuperclasses(type)) {
       ann = getFirstDeclaredAnnotation(t, fullyQualifiedAnnotations);
-      if (ann != null && ann.exists()) {
+      if (exists(ann)) {
         return ann;
       }
     }
     for (IType t : h.getAllSuperInterfaces(type)) {
       ann = getFirstDeclaredAnnotation(t, fullyQualifiedAnnotations);
-      if (ann != null && ann.exists()) {
+      if (exists(ann)) {
         return ann;
       }
     }
     return null;
   }
 
+  /**
+   * Gets the first {@link IAnnotation} of the given fully qualified names that exist on the given {@link IAnnotatable}.
+   * 
+   * @param element
+   *          The owner to search in.
+   * @param fullyQualifiedAnnotations
+   *          The annotations to search.
+   * @return the first of the given annotations that was found or <code>null</code>.
+   */
   public static IAnnotation getFirstDeclaredAnnotation(IAnnotatable element, String... fullyQualifiedAnnotations) {
     for (String fqn : fullyQualifiedAnnotations) {
       IAnnotation ann = getAnnotation(element, fqn);
-      if (ann != null) {
+      if (exists(ann)) {
         return ann;
       }
     }
@@ -415,7 +509,7 @@ public final class S2eUtils {
         }
       }
     };
-    for (IType annotationType : resolveJdtTypes(annotationName)) {
+    for (IType annotationType : resolveJdtTypes(annotationName, scope)) {
       SearchPattern pattern = SearchPattern.createPattern(annotationType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE);
       new SearchEngine().search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, scope, collector, monitor);
     }

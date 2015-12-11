@@ -23,7 +23,8 @@ public interface PackageSpi extends JavaElementSpi {
   /**
    * @return The name of the package or <code>null</code> if it is the default package.
    */
-  String getName();
+  @Override
+  String getElementName();
 
   @Override
   IPackage wrap();

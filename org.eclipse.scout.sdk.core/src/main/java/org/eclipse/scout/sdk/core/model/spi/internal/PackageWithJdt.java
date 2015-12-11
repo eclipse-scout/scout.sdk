@@ -29,17 +29,12 @@ public class PackageWithJdt extends AbstractJavaElementWithJdt<IPackage> impleme
 
   @Override
   protected JavaElementSpi internalFindNewElement(JavaEnvironmentWithJdt newEnv) {
-    return newEnv.getPackage(getName());
+    return newEnv.getPackage(getElementName());
   }
 
   @Override
   protected IPackage internalCreateApi() {
     return new PackageImplementor(this);
-  }
-
-  @Override
-  public String getName() {
-    return m_name;
   }
 
   @Override
@@ -49,14 +44,6 @@ public class PackageWithJdt extends AbstractJavaElementWithJdt<IPackage> impleme
 
   @Override
   public ISourceRange getSource() {
-    return new ISourceRange() {
-      @Override
-      public String toString() {
-        if (m_name == null) {
-          return "";
-        }
-        return "package " + m_name + ";";
-      }
-    };
+    return ISourceRange.NO_SOURCE;
   }
 }

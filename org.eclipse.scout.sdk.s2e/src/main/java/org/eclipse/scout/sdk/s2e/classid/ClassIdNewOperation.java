@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IBuffer;
@@ -85,7 +85,7 @@ public class ClassIdNewOperation implements IOperation {
           IType[] allSubtypes = hierarchy.getAllSubtypes(startType);
           hierarchy = null;
 
-          SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 3);
+          SubMonitor subMonitor = SubMonitor.convert(monitor, 3);
           subMonitor.beginTask(null, allSubtypes.length);
           Map<ICompilationUnit, Set<IType>> typesWithClassId = new HashMap<>();
 
@@ -112,7 +112,7 @@ public class ClassIdNewOperation implements IOperation {
           }
           allSubtypes = null;
 
-          subMonitor = new SubProgressMonitor(monitor, 6);
+          subMonitor = SubMonitor.convert(monitor, 6);
           subMonitor.beginTask(null, numTypes);
           monitor.setTaskName("Create new annotations...");
           CachingJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();

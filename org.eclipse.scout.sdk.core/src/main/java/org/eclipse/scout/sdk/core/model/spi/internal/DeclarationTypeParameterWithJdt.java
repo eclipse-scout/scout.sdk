@@ -40,6 +40,7 @@ public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<
   private final int m_index;
   private final String m_name;
   private List<TypeSpi> m_bounds;
+  private ISourceRange m_source;
 
   DeclarationTypeParameterWithJdt(JavaEnvironmentWithJdt env, AbstractMemberWithJdt<?> declaringMember, org.eclipse.jdt.internal.compiler.ast.TypeParameter astNode, int index) {
     super(env);
@@ -142,8 +143,11 @@ public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<
 
   @Override
   public ISourceRange getSource() {
-    CompilationUnitSpi cu = SpiWithJdtUtils.declaringTypeOf(this).getCompilationUnit();
-    org.eclipse.jdt.internal.compiler.ast.TypeParameter decl = m_astNode;
-    return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      CompilationUnitSpi cu = SpiWithJdtUtils.declaringTypeOf(this).getCompilationUnit();
+      org.eclipse.jdt.internal.compiler.ast.TypeParameter decl = m_astNode;
+      m_source = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    }
+    return m_source;
   }
 }

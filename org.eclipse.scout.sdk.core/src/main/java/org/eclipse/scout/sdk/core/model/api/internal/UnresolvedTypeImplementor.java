@@ -28,7 +28,7 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
   UnresolvedTypeImplementor(IType type) {
     m_type = type;
     m_name = type.name();
-    m_package = type.containingPackage();
+    m_package = type.compilationUnit().containingPackage();
     m_simpleName = type.elementName();
     m_env = type.javaEnvironment();
   }
@@ -116,7 +116,7 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
     if (type() != null) {
       return type().source();
     }
-    return null;
+    return ISourceRange.NO_SOURCE;
   }
 
   @Override

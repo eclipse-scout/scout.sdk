@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.sourcebuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.scout.sdk.core.fixture.ClassWithMembers;
 import org.eclipse.scout.sdk.core.importcollector.EmptyImportCollector;
@@ -39,11 +40,10 @@ public class SourceModelRoundtripTest {
     IJavaEnvironment env = CoreTestingUtils.createJavaEnvironment();
     IType type = env.findType(ClassWithMembers.class.getName());
 
-    String src1 = CoreUtils.inputStreamToString(ClassWithMembers.class.getResourceAsStream("/ClassWithMembers_source.txt"), "UTF-8").toString();
+    String src1 = CoreUtils.inputStreamToString(ClassWithMembers.class.getResourceAsStream("/ClassWithMembers_source.txt"), StandardCharsets.UTF_8).toString();
 
     StringBuilder buf = new StringBuilder();
     IImportValidator validator = new ImportValidator(new ImportCollector());
-    //v.addImport(type.getName());
     new CompilationUnitSourceBuilder(type.compilationUnit()).createSource(buf, "\n", new PropertyMap(), validator);
     String src2 = buf.toString();
     Assert.assertEquals(CoreTestingUtils.removeWhitespace(src1), CoreTestingUtils.removeWhitespace(src2));
@@ -54,7 +54,7 @@ public class SourceModelRoundtripTest {
     IJavaEnvironment env = CoreTestingUtils.createJavaEnvironmentWithBinaries();
     IType type = env.findType(ClassWithMembers.class.getName());
 
-    String src1 = CoreUtils.inputStreamToString(ClassWithMembers.class.getResourceAsStream("/ClassWithMembers_binary.txt"), "UTF-8").toString();
+    String src1 = CoreUtils.inputStreamToString(ClassWithMembers.class.getResourceAsStream("/ClassWithMembers_binary.txt"), StandardCharsets.UTF_8).toString();
 
     StringBuilder buf = new StringBuilder();
     new CompilationUnitSourceBuilder(type.compilationUnit()).createSource(buf, "\n", new PropertyMap(), new ImportValidator(new EmptyImportCollector()));

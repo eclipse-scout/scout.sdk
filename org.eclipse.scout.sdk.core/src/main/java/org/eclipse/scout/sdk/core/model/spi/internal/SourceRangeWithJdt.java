@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.model.api.internal.SourceRange;
 
 /**
  * <h3>{@link SourceRangeWithJdt}</h3>
@@ -18,15 +18,8 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
  * @author Ivan Motsch
  * @since 5.1.0
  */
-public class SourceRangeWithJdt implements ISourceRange {
-  private final String m_content;
-
+public class SourceRangeWithJdt extends SourceRange {
   public SourceRangeWithJdt(org.eclipse.jdt.internal.compiler.env.ICompilationUnit sourceUnit, int start, int end) {
-    m_content = new String(sourceUnit.getContents(), start, end - start + 1);
-  }
-
-  @Override
-  public String toString() {
-    return m_content;
+    super(new String(sourceUnit.getContents(), start, end - start + 1), start, end);
   }
 }

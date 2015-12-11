@@ -39,7 +39,7 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
   public FieldSourceBuilder(IField element) {
     super(element);
     setSignature(SignatureUtils.getTypeSignature(element.dataType()));
-    if (element.sourceOfInitializer() != null) {
+    if (element.sourceOfInitializer().isAvailable()) {
       setValue(new RawSourceBuilder(element.sourceOfInitializer().toString()));
     }
     else if (element.constantValue() != null) {

@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.s2e.structuredtype;
+package org.eclipse.scout.sdk.core.s.structured;
 
 import java.util.List;
 
-import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 
 /**
  * <h3>{@link IStructuredType}</h3>
@@ -23,9 +23,38 @@ import org.eclipse.jdt.core.IJavaElement;
 public interface IStructuredType {
 
   enum Categories {
-    FIELD_LOGGER, FIELD_STATIC, FIELD_MEMBER, FIELD_UNKNOWN, ENUM, METHOD_CONSTRUCTOR, METHOD_CONFIG_PROPERTY, METHOD_CONFIG_EXEC, METHOD_FORM_DATA_BEAN, METHOD_OVERRIDDEN, METHOD_START_HANDLER, METHOD_INNER_TYPE_GETTER, METHOD_LOCAL_BEAN,
-    METHOD_UNCATEGORIZED, TYPE_FORM_FIELD, TYPE_COLUMN, TYPE_CODE, TYPE_FORM, TYPE_TABLE, TYPE_ACTIVITY_MAP, TYPE_TREE, TYPE_CALENDAR, TYPE_CALENDAR_ITEM_PROVIDER, TYPE_WIZARD, TYPE_WIZARD_STEP, TYPE_MENU, TYPE_VIEW_BUTTON,
-    TYPE_TOOL_BUTTON, TYPE_KEYSTROKE, TYPE_COMPOSER_ATTRIBUTE, TYPE_COMPOSER_ENTRY, TYPE_FORM_HANDLER, TYPE_UNCATEGORIZED
+    FIELD_LOGGER,
+    FIELD_STATIC,
+    FIELD_MEMBER,
+    FIELD_UNKNOWN,
+    ENUM,
+    METHOD_CONSTRUCTOR,
+    METHOD_CONFIG_PROPERTY,
+    METHOD_CONFIG_EXEC,
+    METHOD_FORM_DATA_BEAN,
+    METHOD_OVERRIDDEN,
+    METHOD_START_HANDLER,
+    METHOD_INNER_TYPE_GETTER,
+    METHOD_LOCAL_BEAN,
+    METHOD_UNCATEGORIZED,
+    TYPE_FORM_FIELD,
+    TYPE_COLUMN,
+    TYPE_CODE,
+    TYPE_FORM,
+    TYPE_TABLE,
+    TYPE_TREE,
+    TYPE_CALENDAR,
+    TYPE_CALENDAR_ITEM_PROVIDER,
+    TYPE_WIZARD,
+    TYPE_WIZARD_STEP,
+    TYPE_MENU,
+    TYPE_VIEW_BUTTON,
+    TYPE_TOOL_BUTTON,
+    TYPE_KEYSTROKE,
+    TYPE_COMPOSER_ATTRIBUTE,
+    TYPE_COMPOSER_ENTRY,
+    TYPE_FORM_HANDLER,
+    TYPE_UNCATEGORIZED
   }
 
   /**

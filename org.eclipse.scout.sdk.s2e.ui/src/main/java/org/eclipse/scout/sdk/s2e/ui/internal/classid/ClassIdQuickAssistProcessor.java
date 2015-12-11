@@ -10,29 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.classid;
 
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotation;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.MarkerAnnotation;
-import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
-import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jdt.internal.core.DefaultWorkingCopyOwner;
@@ -47,11 +35,10 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
-import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
-import org.eclipse.scout.sdk.s2e.util.DefaultAstVisitor;
+import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 import org.eclipse.text.edits.TextEdit;
-import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * <h3>{@link ClassIdQuickAssistProcessor}</h3>
@@ -79,100 +66,28 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     return null;
   }
 
-  private static CompilationUnitRewrite createRewrite(IType type, TypeDeclaration td) throws JavaModelException {
+  private static CompilationUnitRewrite createRewrite(IType type, TypeDeclaration td) {
     CompilationUnitRewrite cuRewrite = new CompilationUnitRewrite(DefaultWorkingCopyOwner.PRIMARY, type.getCompilationUnit(), (CompilationUnit) td.getRoot());
 
     ListRewrite listRewrite = cuRewrite.getASTRewrite().getListRewrite(td, td.getModifiersProperty());
 
     // annotation
-    SingleMemberAnnotation newAnnotation = td.getAST().newSingleMemberAnnotation();
-    newAnnotation.setTypeName(td.getAST().newSimpleName(Signature.getSimpleName(IScoutRuntimeTypes.ClassId)));
-
-    // value
-    StringLiteral id = td.getAST().newStringLiteral();
-    String newId = ClassIdGenerators.generateNewId(new ClassIdGenerationContext(type));
-    if (StringUtils.isBlank(newId)) {
-      return null;
-    }
-    id.setLiteralValue(newId);
-    newAnnotation.setValue(id);
+    AstNodeFactory factory = new AstNodeFactory(td, type.getCompilationUnit());
+    SingleMemberAnnotation classIdAnnotation = factory.newClassIdAnnotation(new ClassIdGenerationContext(type));
 
     // imports
-    if (!isClassIdImportPresent(type.getCompilationUnit())) {
-      cuRewrite.getImportRewrite().addImport(IScoutRuntimeTypes.ClassId);
-    }
+    cuRewrite.getImportRewrite().addImport(IScoutRuntimeTypes.ClassId);
 
     // add the annotation
-    TextEditGroup group = cuRewrite.createGroupDescription("");
-    ASTNode sibling = getSibling(td, id.getEscapedValue(), newAnnotation);
+    ASTNode sibling = AstUtils.getAnnotationSibling(td, classIdAnnotation);
     if (sibling == null) {
-      listRewrite.insertLast(newAnnotation, group);
+      listRewrite.insertLast(classIdAnnotation, null);
     }
     else {
-      listRewrite.insertBefore(newAnnotation, sibling, group);
+      listRewrite.insertBefore(classIdAnnotation, sibling, null);
     }
 
     return cuRewrite;
-  }
-
-  private static ASTNode getSibling(final TypeDeclaration td, String newAnnotValue, SingleMemberAnnotation newAnnotation) {
-    final ArrayList<Annotation> annotations = new ArrayList<>();
-    td.accept(new DefaultAstVisitor() {
-      @Override
-      public boolean visitNode(ASTNode node) {
-        return false;
-      }
-
-      @Override
-      public boolean visit(TypeDeclaration node) {
-        return node == td;
-      }
-
-      @Override
-      public boolean visit(MarkerAnnotation node) {
-        annotations.add(node);
-        return super.visit(node);
-      }
-
-      @Override
-      public boolean visit(NormalAnnotation node) {
-        annotations.add(node);
-        return super.visit(node);
-      }
-
-      @Override
-      public boolean visit(SingleMemberAnnotation node) {
-        annotations.add(node);
-        return super.visit(node);
-      }
-    });
-
-    if (annotations.size() > 0) {
-      // there are already annotations. find the best sibling
-      int newAnnotLen = newAnnotation.getTypeName().getFullyQualifiedName().length() + newAnnotValue.length() + 3;
-      Annotation[] orderedAnnotations = annotations.toArray(new Annotation[annotations.size()]);
-      for (int i = orderedAnnotations.length - 1; i >= 0; i--) {
-        int len = orderedAnnotations[i].getLength();
-        if (len > 0 && len >= newAnnotLen) {
-          return orderedAnnotations[i];
-        }
-      }
-    }
-    for (Object o : td.modifiers()) {
-      if (o instanceof Modifier) {
-        return (Modifier) o;
-      }
-    }
-    return null;
-  }
-
-  private static boolean isClassIdImportPresent(ICompilationUnit icu) throws JavaModelException {
-    for (IImportDeclaration importDecl : icu.getImports()) {
-      if (IScoutRuntimeTypes.ClassId.equals(importDecl.getElementName())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private static ClassIdTarget getTarget(ASTNode selectedNode) {
@@ -197,13 +112,9 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
             try {
               if (!t.isBinary() && !t.isAnonymous()) {
                 ITypeHierarchy superTypeHierarchy = t.newSupertypeHierarchy(null);
-
-                Set<IType> jdtTypes = S2eUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
-                for (IType iTypeWithClassId : jdtTypes) {
-                  if (S2eUtils.exists(iTypeWithClassId) && superTypeHierarchy.contains(iTypeWithClassId)) {
-                    IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
-                    return new ClassIdTarget(typeDecl, t, annotation);
-                  }
+                if (S2eUtils.contains(superTypeHierarchy, IScoutRuntimeTypes.ITypeWithClassId)) {
+                  IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
+                  return new ClassIdTarget(typeDecl, t, annotation);
                 }
               }
             }
@@ -222,7 +133,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     private final CompilationUnitRewrite m_rewrite;
 
     private ClassIdAddProposal(CompilationUnitRewrite cur) {
-      super("Add @ClassId annotation", cur.getCu(), 100, JavaPluginImages.get(JavaPluginImages.IMG_CORRECTION_CHANGE));
+      super("Add @ClassId annotation", cur.getCu(), 1000, JavaPluginImages.get(JavaPluginImages.IMG_CORRECTION_CHANGE));
       m_rewrite = cur;
     }
 

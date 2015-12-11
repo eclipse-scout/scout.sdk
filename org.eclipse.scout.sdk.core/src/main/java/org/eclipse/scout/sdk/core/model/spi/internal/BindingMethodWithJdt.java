@@ -44,6 +44,9 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
   private List<MethodParameterSpi> m_arguments;
   private List<TypeParameterSpi> m_typeParameters;
   private MethodSpi m_originalMethod;
+  private ISourceRange m_source;
+  private ISourceRange m_bodySource;
+  private ISourceRange m_javaDocSource;
 
   BindingMethodWithJdt(JavaEnvironmentWithJdt env, BindingTypeWithJdt declaringType, MethodBinding binding) {
     super(env);
@@ -95,7 +98,12 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
   @Override
   public String getElementName() {
     if (m_name == null) {
-      m_name = new String(m_binding.selector);
+      if (m_binding.isConstructor()) {
+        m_name = m_declaringType.getElementName();
+      }
+      else {
+        m_name = new String(m_binding.selector);
+      }
     }
     return m_name;
   }
@@ -218,35 +226,50 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
 
   @Override
   public ISourceRange getSource() {
-    AbstractMethodDeclaration decl = m_binding.sourceMethod();
-    if (decl != null) {
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-      return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      AbstractMethodDeclaration decl = m_binding.sourceMethod();
+      if (decl != null) {
+        CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+        m_source = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+      }
+      else {
+        m_source = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_source;
   }
 
   @Override
   public ISourceRange getSourceOfBody() {
-    AbstractMethodDeclaration decl = m_binding.sourceMethod();
-    if (decl != null) {
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-      return m_env.getSource(cu, decl.bodyStart, decl.bodyEnd);
+    if (m_bodySource == null) {
+      AbstractMethodDeclaration decl = m_binding.sourceMethod();
+      if (decl != null) {
+        CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+        m_bodySource = m_env.getSource(cu, decl.bodyStart, decl.bodyEnd);
+      }
+      else {
+        m_bodySource = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_bodySource;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    AbstractMethodDeclaration decl = m_binding.sourceMethod();
-    if (decl != null) {
-      Javadoc doc = decl.javadoc;
-      if (doc != null) {
-        CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-        return m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+    if (m_javaDocSource == null) {
+      AbstractMethodDeclaration decl = m_binding.sourceMethod();
+      if (decl != null) {
+        Javadoc doc = decl.javadoc;
+        if (doc != null) {
+          CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+          m_javaDocSource = m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+        }
+      }
+      if (m_javaDocSource == null) {
+        m_javaDocSource = ISourceRange.NO_SOURCE;
       }
     }
-    return null;
+    return m_javaDocSource;
   }
 
 }

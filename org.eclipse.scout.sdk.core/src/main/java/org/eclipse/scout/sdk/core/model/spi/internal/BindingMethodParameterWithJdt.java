@@ -36,6 +36,7 @@ public class BindingMethodParameterWithJdt extends AbstractJavaElementWithJdt<IM
   private final int m_index;
   private final char[] m_name;
   private TypeSpi m_dataType;
+  private ISourceRange m_source;
 
   private String m_nameS;
   private List<BindingAnnotationWithJdt> m_annotations;
@@ -103,13 +104,17 @@ public class BindingMethodParameterWithJdt extends AbstractJavaElementWithJdt<IM
 
   @Override
   public ISourceRange getSource() {
-    AbstractMethodDeclaration declMethod = m_declaringMethod.getInternalBinding().sourceMethod();
-    if (declMethod != null) {
-      CompilationUnitSpi cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
-      Argument decl = declMethod.arguments[m_index];
-      return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      AbstractMethodDeclaration declMethod = m_declaringMethod.getInternalBinding().sourceMethod();
+      if (declMethod != null) {
+        CompilationUnitSpi cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
+        Argument decl = declMethod.arguments[m_index];
+        m_source = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+      }
+      else {
+        m_source = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_source;
   }
-
 }

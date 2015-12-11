@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,6 +18,7 @@ import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
  * @since 5.1.0
  */
 public class BindingArrayTypeWithJdt extends AbstractTypeWithJdt {
-  private static final FieldBinding LENGTH_FIELD = new FieldBinding("length".toCharArray(), TypeBinding.INT, Modifier.PUBLIC | Modifier.FINAL, null, null);
+  private static final FieldBinding LENGTH_FIELD = new FieldBinding("length".toCharArray(), TypeBinding.INT, Flags.AccPublic | Flags.AccFinal, null, null);
 
   private final ArrayBinding m_binding;
   private final boolean m_isWildcard;
@@ -203,17 +203,16 @@ public class BindingArrayTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public ISourceRange getSource() {
-    return null;
+    return ISourceRange.NO_SOURCE;
   }
 
   @Override
   public ISourceRange getSourceOfStaticInitializer() {
-    return null;
+    return ISourceRange.NO_SOURCE;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    return null;
+    return ISourceRange.NO_SOURCE;
   }
-
 }

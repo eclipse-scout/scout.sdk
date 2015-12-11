@@ -169,22 +169,16 @@ public final class VoidTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public ISourceRange getSource() {
-    return new ISourceRange() {
-      @Override
-      public String toString() {
-        return IJavaRuntimeTypes._void;
-      }
-    };
+    return ISourceRange.NO_SOURCE;
   }
 
   @Override
   public ISourceRange getSourceOfStaticInitializer() {
-    return null;
+    return ISourceRange.NO_SOURCE;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    return null;
+    return ISourceRange.NO_SOURCE;
   }
-
 }

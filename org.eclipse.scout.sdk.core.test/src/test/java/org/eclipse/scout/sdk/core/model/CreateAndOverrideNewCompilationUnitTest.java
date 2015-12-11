@@ -53,7 +53,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
     ICompilationUnit cu = env.findType("a.b.c.BaseClass").compilationUnit();
     String expected = "" +
         "package a.b.c;\n" +
-        "public class BaseClass{\n" +
+        "public class BaseClass {\n" +
         "  public FooBar run(){\n" +
         "    System.out.println(\"base class\");\n" +
         "  }\n" +
@@ -85,7 +85,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
 
     String expected = "" +
         "package a.b.c;\n" +
-        "public class BaseClass{\n" +
+        "public class BaseClass {\n" +
         "  public void run(){\n" +
         "    System.out.println(\"base class\");\n" +
         "  }\n" +
@@ -118,7 +118,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
     String expected = "" +
         "package a.b.c.d;\n" +
         "import a.b.c.BaseClass;\n" +
-        "public class SubClass extends BaseClass{\n" +
+        "public class SubClass extends BaseClass {\n" +
         "  @Override\n" +
         "  public void run(){\n" +
         "    super.run();\n" +
@@ -158,7 +158,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
 
     String expected = "" +
         "package a.b.c;\n" +
-        "public class BaseClass{\n" +
+        "public class BaseClass {\n" +
         "  public void run(){\n" +
         "    System.out.println(\"modified base class\");\n" +
         "  }\n" +
@@ -181,7 +181,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
 
     expected = "" +
         "package a.b.c;\n" +
-        "public class BaseClass{\n" +
+        "public class BaseClass {\n" +
         "  public void run(){\n" +
         "    System.out.println(\"again modified base class\");\n" +
         "  }\n" +

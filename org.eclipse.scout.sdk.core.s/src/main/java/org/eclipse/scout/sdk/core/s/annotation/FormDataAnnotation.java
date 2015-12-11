@@ -24,6 +24,12 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
  */
 public class FormDataAnnotation extends AbstractManagedAnnotation {
 
+  public static final String VALUE_ELEMENT_NAME = "value";
+  public static final String INTERFACES_ELEMENT_NAME = "interfaces";
+  public static final String GENERIC_ORDINAL_ELEMENT_NAME = "genericOrdinal";
+  public static final String DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME = "defaultSubtypeSdkCommand";
+  public static final String SDK_COMMAND_ELEMENT_NAME = "sdkCommand";
+
   public static final String TYPE_NAME = IScoutRuntimeTypes.FormData;
 
   public enum SdkCommand {
@@ -35,11 +41,11 @@ public class FormDataAnnotation extends AbstractManagedAnnotation {
   }
 
   public IType value() {
-    return getValue("value", IType.class, null);
+    return getValue(VALUE_ELEMENT_NAME, IType.class, null);
   }
 
   public SdkCommand sdkCommand() {
-    IField enumValueField = getValue("sdkCommand", IField.class, null);
+    IField enumValueField = getValue(SDK_COMMAND_ELEMENT_NAME, IField.class, null);
     if (enumValueField != null && StringUtils.isNotBlank(enumValueField.elementName())) {
       SdkCommand cmd = SdkCommand.valueOf(enumValueField.elementName());
       if (cmd != null) {
@@ -50,7 +56,7 @@ public class FormDataAnnotation extends AbstractManagedAnnotation {
   }
 
   public DefaultSubtypeSdkCommand defaultSubtypeSdkCommand() {
-    IField enumValueField = getValue("defaultSubtypeSdkCommand", IField.class, null);
+    IField enumValueField = getValue(DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME, IField.class, null);
     if (enumValueField != null && StringUtils.isNotBlank(enumValueField.elementName())) {
       DefaultSubtypeSdkCommand cmd = DefaultSubtypeSdkCommand.valueOf(enumValueField.elementName());
       if (cmd != null) {
@@ -61,30 +67,30 @@ public class FormDataAnnotation extends AbstractManagedAnnotation {
   }
 
   public int genericOrdinal() {
-    return getValue("genericOrdinal", int.class, null);
+    return getValue(GENERIC_ORDINAL_ELEMENT_NAME, int.class, null);
   }
 
   public IType[] interfaces() {
-    return getValue("interfaces", IType[].class, null);
+    return getValue(INTERFACES_ELEMENT_NAME, IType[].class, null);
   }
 
   public boolean isValueDefault() {
-    return isDefault("value");
+    return isDefault(VALUE_ELEMENT_NAME);
   }
 
   public boolean isSdkCommandDefault() {
-    return isDefault("sdkCommand");
+    return isDefault(SDK_COMMAND_ELEMENT_NAME);
   }
 
   public boolean isDefaultSubtypeSdkCommandDefault() {
-    return isDefault("defaultSubtypeSdkCommand");
+    return isDefault(DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME);
   }
 
   public boolean isGenericOrdinalDefault() {
-    return isDefault("genericOrdinal");
+    return isDefault(GENERIC_ORDINAL_ELEMENT_NAME);
   }
 
   public boolean isInterfacesDefault() {
-    return isDefault("interfaces");
+    return isDefault(INTERFACES_ELEMENT_NAME);
   }
 }

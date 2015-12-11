@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.trigger;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 
@@ -28,7 +28,7 @@ public interface IJavaEnvironmentProvider {
    * @param jdtType
    * @return the scout sdk model type
    */
-  IType jdtTypeToScoutType(org.eclipse.jdt.core.IType jdtType) throws CoreException;
+  IType jdtTypeToScoutType(org.eclipse.jdt.core.IType jdtType);
 
-  IJavaEnvironment get(org.eclipse.jdt.core.IJavaProject jdtProject) throws CoreException;
+  IJavaEnvironment get(IJavaProject jdtProject);
 }

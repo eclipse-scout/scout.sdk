@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -48,6 +49,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  */
 public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements ITypeSourceBuilder {
   private String m_superTypeSignature;
+  private String m_parentFullyQualifiedName;
   private ISourceBuilder m_declaringElement;
   private final List<ITypeParameterSourceBuilder> m_typeParameters = new ArrayList<>();
   private final List<String> m_interfaceSignatures = new ArrayList<>();
@@ -130,7 +132,7 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
         source.append(", ").append(validator.useSignature(interfaceSigIterator.next()));
       }
     }
-    source.append('{');
+    source.append(" {");
     createTypeContent(source, lineDelimiter, context, validator);
     source.append(lineDelimiter);
     source.append('}');
@@ -392,13 +394,28 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
   @Override
   public String getFullyQualifiedName() {
     ISourceBuilder parent = getDeclaringElement();
+    StringBuilder sb = new StringBuilder();
     if (parent instanceof ITypeSourceBuilder) {
-      return ((ITypeSourceBuilder) parent).getFullyQualifiedName() + "$" + getElementName();
+      sb.append(((ITypeSourceBuilder) parent).getFullyQualifiedName()).append('$');
     }
-    if (parent instanceof ICompilationUnitSourceBuilder) {
-      return ((ICompilationUnitSourceBuilder) parent).getPackageName() + "." + getElementName();
+    else if (parent instanceof ICompilationUnitSourceBuilder) {
+      sb.append(((ICompilationUnitSourceBuilder) parent).getPackageName()).append('.');
     }
-    return null;
+    else {
+      sb.append(Validate.notNull(getParentFullyQualifiedName())).append('$');
+    }
+    sb.append(getElementName());
+    return sb.toString();
+  }
+
+  @Override
+  public String getParentFullyQualifiedName() {
+    return m_parentFullyQualifiedName;
+  }
+
+  @Override
+  public void setParentFullyQualifiedName(String parentFullyQualifiedName) {
+    m_parentFullyQualifiedName = parentFullyQualifiedName;
   }
 
 }

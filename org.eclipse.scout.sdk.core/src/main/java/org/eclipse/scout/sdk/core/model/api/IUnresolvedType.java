@@ -72,7 +72,8 @@ public interface IUnresolvedType extends IJavaElement {
 
   /**
    * @return The {@link ISourceRange} of this {@link IUnresolvedType} if it {@link #exists()} and the underlying
-   *         {@link #type()} has source attached. <code>null</code> otherwise.
+   *         {@link #type()} has source attached. Never returns <code>null</code>. Use
+   *         {@link ISourceRange#isAvailable()} to check if source is actually available for this element.
    */
   @Override
   ISourceRange source();

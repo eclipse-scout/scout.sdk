@@ -24,12 +24,25 @@
       </page>
    </extension>
    <extension
-         id="org.eclipse.scout.sdk.ui.proposalCategory"
-         name="Scout Items"
+         id="org.eclipse.scout.sdk.s2e.ui.templateComputer.category"
+         name="Eclipse Scout Templates"
          point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
       <proposalCategory
             icon="icons/eclipse_scout.gif">
       </proposalCategory>
+   </extension>
+   <extension
+         id="org.eclipse.scout.sdk.s2e.ui.templateComputer"
+         name="Eclipse Scout Templates"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.templateComputer.category"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.template.ScoutTemplateCompletionProposalComputer">
+         <partition
+               type="__dftl_partition_content_type">
+         </partition>
+      </javaCompletionProposalComputer>
    </extension>
    <extension
       point="org.eclipse.ui.menus">

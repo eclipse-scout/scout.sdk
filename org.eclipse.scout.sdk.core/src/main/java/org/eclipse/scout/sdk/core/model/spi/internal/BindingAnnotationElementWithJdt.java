@@ -18,6 +18,7 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.AnnotationElementImplementor;
+import org.eclipse.scout.sdk.core.model.api.internal.SourceRange;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 
@@ -31,6 +32,8 @@ public class BindingAnnotationElementWithJdt extends AbstractJavaElementWithJdt<
   private final boolean m_syntheticDefaultValue;
   private Expression m_sourceExpression;
   private IMetaValue m_value;
+  private ISourceRange m_source;
+  private ISourceRange m_expressionSource;
 
   BindingAnnotationElementWithJdt(JavaEnvironmentWithJdt env, BindingAnnotationWithJdt owner, ElementValuePair bindingPair, boolean syntheticDefaultValue) {
     super(env);
@@ -81,16 +84,16 @@ public class BindingAnnotationElementWithJdt extends AbstractJavaElementWithJdt<
 
   @Override
   public ISourceRange getSource() {
-    final MemberValuePair pairDecl = SpiWithJdtUtils.findAnnotationValueDeclaration(this);
-    if (pairDecl != null) {
-      return new ISourceRange() {
-        @Override
-        public String toString() {
-          return pairDecl.toString();
-        }
-      };
+    if (m_source == null) {
+      MemberValuePair pairDecl = SpiWithJdtUtils.findAnnotationValueDeclaration(this);
+      if (pairDecl == null) {
+        m_source = ISourceRange.NO_SOURCE;
+      }
+      else {
+        m_source = new SourceRange(pairDecl.toString(), pairDecl.sourceStart, pairDecl.sourceEnd);
+      }
     }
-    return null;
+    return m_source;
   }
 
   protected Expression getSourceExpression() {
@@ -105,16 +108,15 @@ public class BindingAnnotationElementWithJdt extends AbstractJavaElementWithJdt<
 
   @Override
   public ISourceRange getSourceOfExpression() {
-    final Expression expr = getSourceExpression();
-    if (expr != null) {
-      return new ISourceRange() {
-        @Override
-        public String toString() {
-          return expr.toString();
-        }
-      };
+    if (m_expressionSource == null) {
+      Expression expr = getSourceExpression();
+      if (expr == null) {
+        m_expressionSource = ISourceRange.NO_SOURCE;
+      }
+      else {
+        m_expressionSource = new SourceRange(expr.toString(), expr.sourceStart, expr.sourceEnd);
+      }
     }
-    return null;
+    return m_expressionSource;
   }
-
 }

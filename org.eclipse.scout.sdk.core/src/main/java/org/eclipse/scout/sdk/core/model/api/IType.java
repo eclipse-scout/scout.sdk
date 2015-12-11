@@ -93,8 +93,8 @@ public interface IType extends IMember {
   List<IType> superInterfaces();
 
   /**
-   * @return the source of the static initializer without the { and } brackets or <code>null</code> if no source is
-   *         available.
+   * @return the source of the static initializer without the { and } brackets. Never returns <code>null</code>. Use
+   *         {@link ISourceRange#isAvailable()} to check if source is actually available for this element.
    */
   ISourceRange sourceOfStaticInitializer();
 

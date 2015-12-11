@@ -77,4 +77,9 @@ public class EmptyImportCollector implements IImportCollector {
   public Collection<String> getImports() {
     return Collections.emptyList();
   }
+
+  @Override
+  public List<String> createImportDeclarations(boolean includeExisting) {
+    return Collections.emptyList();
+  }
 }

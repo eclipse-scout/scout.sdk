@@ -51,4 +51,32 @@ public final class ScoutTypeComparators {
       }
     };
   }
+
+  /**
+   * Creates and returns a new {@link Comparator} that compares {@link IType}s according to their simple name (
+   * {@link IType#elementName()}) first and fully qualified name ({@link IType#name()}) second.
+   * 
+   * @return The new comparator
+   */
+  public static Comparator<IType> getTypeNameComparator() {
+    return new Comparator<IType>() {
+      @Override
+      public int compare(IType o1, IType o2) {
+        if (o1 == o2) {
+          return 0;
+        }
+        if (o1 == null) {
+          return -1;
+        }
+        if (o2 == null) {
+          return 1;
+        }
+        int result = o1.elementName().compareTo(o2.elementName());
+        if (result != 0) {
+          return result;
+        }
+        return o1.name().compareTo(o2.name());
+      }
+    };
+  }
 }

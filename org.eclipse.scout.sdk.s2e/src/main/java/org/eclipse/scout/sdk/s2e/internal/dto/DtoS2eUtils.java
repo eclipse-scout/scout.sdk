@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.internal.dto;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
@@ -31,16 +32,15 @@ public final class DtoS2eUtils {
   }
 
   public static CompilationUnitWriteOperation newDtoOp(org.eclipse.jdt.core.IType jdtType, IType modelType, IJavaEnvironmentProvider envProvider, IProgressMonitor monitor) throws CoreException {
+
     //FormData
     FormDataAnnotationDescriptor a1 = findDataAnnotationForFormData(modelType);
     if (a1 != null) {
-      if (modelType.equals(a1.getFormDataType())) {
-        SdkLog.error("FormData annotation points to itself. DTO generation not possible.", new Exception("Wrong @FormData annotation value."));
+      org.eclipse.jdt.core.IType derivedJdtType = getDerivedJdtType(modelType, a1.getFormDataType(), jdtType);
+      if (derivedJdtType == null) {
         return null;
       }
-      org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a1.getFormDataType().name());
       IJavaProject derivedProject = derivedJdtType.getJavaProject();
-
       IJavaEnvironment sharedEnv = envProvider.get(derivedProject);
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, a1, sharedEnv);
 
@@ -51,11 +51,10 @@ public final class DtoS2eUtils {
     //PageData
     DataAnnotationDescriptor a2 = findDataAnnotationForPageData(modelType);
     if (a2 != null) {
-      if (modelType.equals(a2.getDataType())) {
-        SdkLog.error("Data annotation points to itself. DTO generation not possible.", new Exception("Wrong @Data annotation value"));
+      org.eclipse.jdt.core.IType derivedJdtType = getDerivedJdtType(modelType, a2.getDataType(), jdtType);
+      if (derivedJdtType == null) {
         return null;
       }
-      org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a2.getDataType().name());
       IJavaProject derivedProject = derivedJdtType.getJavaProject();
 
       IJavaEnvironment sharedEnv = envProvider.get(derivedProject);
@@ -68,11 +67,10 @@ public final class DtoS2eUtils {
     //RowData
     DataAnnotationDescriptor a3 = findDataAnnotationForRowData(modelType);
     if (a3 != null) {
-      if (modelType.equals(a3.getDataType())) {
-        SdkLog.error("Data annotation points to itself. DTO generation not possible.", new Exception("Wrong @FormData annotation value."));
+      org.eclipse.jdt.core.IType derivedJdtType = getDerivedJdtType(modelType, a3.getDataType(), jdtType);
+      if (derivedJdtType == null) {
         return null;
       }
-      org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a3.getDataType().name());
       IJavaProject derivedProject = derivedJdtType.getJavaProject();
 
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
@@ -83,6 +81,24 @@ public final class DtoS2eUtils {
     }
 
     return null;
+  }
+
+  private static org.eclipse.jdt.core.IType getDerivedJdtType(IType modelType, IType derivedType, org.eclipse.jdt.core.IType modelJdtType) throws JavaModelException {
+    String message = "Wrong derived resource annotation value.";
+    if (modelType.equals(derivedType)) {
+      SdkLog.error("Model type declares itself as derived target. DTO generation not possible.", new Exception(message));
+      return null;
+    }
+    org.eclipse.jdt.core.IType derivedJdtType = modelJdtType.getJavaProject().findType(derivedType.name().replace('$', '.'));
+    if (derivedJdtType == null) {
+      SdkLog.error("Derived resource type '" + derivedType.name() + "' not found.", new Exception(message));
+      return null;
+    }
+    if (derivedJdtType.isBinary()) {
+      SdkLog.error("Derived resource type '" + derivedJdtType.getFullyQualifiedName() + "' is binary.", new Exception(message));
+      return null;
+    }
+    return derivedJdtType;
   }
 
   private static FormDataAnnotationDescriptor findDataAnnotationForFormData(IType modelType) {

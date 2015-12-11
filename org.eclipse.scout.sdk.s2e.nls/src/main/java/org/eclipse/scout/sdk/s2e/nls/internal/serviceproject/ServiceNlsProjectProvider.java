@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.nls.internal.serviceproject;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -27,12 +26,13 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
+import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsProjectProvider;
@@ -50,7 +50,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    * @return
    * @throws CoreException
    */
-  private static Set<IType> getRegisteredTextProviderTypes(final Set<String> projectFilter) throws CoreException {
+  private static Set<IType> getRegisteredTextProviderTypes(IJavaProject javaProject) throws CoreException {
 
     final class TextProviderServiceDeclaration {
       private final IType svc;
@@ -78,24 +78,29 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     };
 
-    Set<TextProviderServiceDeclaration> result = new TreeSet<>(comparator);
-    Set<IType> baseTypes = S2eUtils.resolveJdtTypes("org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService");
-    for (IType t : baseTypes) {
-      ITypeHierarchy typeHierarchy = t.newTypeHierarchy(null);
-      for (IType candidate : typeHierarchy.getAllSubtypes(t)) {
-        try {
-          if (!Flags.isAbstract(candidate.getFlags()) && SourceRange.isAvailable(candidate.getSourceRange()) && acceptsFilter(projectFilter, candidate)) {
-            // only accept non-abstract types with source available and fulfills the given project filter
-            TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(candidate, getOrder(candidate));
-            result.add(d);
+    final Set<TextProviderServiceDeclaration> result = new TreeSet<>(comparator);
+    IFilter<TypeNameMatch> filter = new IFilter<TypeNameMatch>() {
+      @Override
+      public boolean evaluate(TypeNameMatch match) {
+        if (!Flags.isAbstract(match.getModifiers())) {
+          IType candidate = match.getType();
+          try {
+            if (SourceRange.isAvailable(candidate.getSourceRange())) {
+              // only accept non-abstract types with source available
+              TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(candidate, getOrder(candidate));
+              result.add(d);
+            }
+          }
+          catch (JavaModelException e) {
+            // this element seems to be corrupt -> ignore
+            SdkLog.warning("Attempt to access source range of type '" + candidate.getFullyQualifiedName() + "' failed. Type will be skipped.", e);
           }
         }
-        catch (JavaModelException e) {
-          // this element seems to be corrupt -> ignore
-          SdkLog.warning("Attempt to access source range of type '" + candidate.getFullyQualifiedName() + "' failed. Type will be skipped.", e);
-        }
+        return false;
       }
-    }
+    };
+
+    S2eUtils.findClassesInStrictHierarchy(javaProject, IScoutRuntimeTypes.AbstractDynamicNlsTextProviderService, null, filter);
 
     // return the types of the services ordered by priority
     Set<IType> returnValueSorted = new LinkedHashSet<>(result.size());
@@ -105,28 +110,14 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return returnValueSorted;
   }
 
-  private static boolean acceptsFilter(Set<String> projects, IType candidate) {
-    if (candidate == null) {
-      return false;
-    }
-    if (candidate.isReadOnly()) {
-      return true; // always include all text services from the platform
-    }
-    if (projects == null) {
-      return true; // no project filter and doc filter is valid -> filter matches
-    }
-
-    // check project filter
-    return projects.contains(candidate.getJavaProject().getProject().getName());
-  }
-
   private static double getOrder(IType registration) {
-    // check class annotation
     try {
       IAnnotation a = S2eUtils.getAnnotation(registration, IScoutRuntimeTypes.Order);
-      BigDecimal val = S2eUtils.getAnnotationValueNumeric(a, "value");
-      if (val != null) {
-        return val.doubleValue();
+      if (S2eUtils.exists(a)) {
+        BigDecimal val = S2eUtils.getAnnotationValueNumeric(a, "value");
+        if (val != null) {
+          return val.doubleValue();
+        }
       }
     }
     catch (Exception e) {
@@ -157,12 +148,12 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return new ServiceNlsProject(type);
   }
 
-  private static INlsProject getNlsProjectTreeProjectName(Set<String> projectFilter) throws CoreException {
+  private static INlsProject getNlsProjectTree(IJavaProject projectFilter) throws CoreException {
     Set<IType> registeredTextProviderTypes = getRegisteredTextProviderTypes(projectFilter);
-    return getNlsProjectTree(registeredTextProviderTypes);
+    return textProviderTypesToNlsProject(registeredTextProviderTypes);
   }
 
-  private static INlsProject getNlsProjectTree(Set<IType> textProviderServices) throws CoreException {
+  private static INlsProject textProviderTypesToNlsProject(Set<IType> textProviderServices) throws CoreException {
     ServiceNlsProject previous = null;
     ServiceNlsProject root = null;
     for (IType type : textProviderServices) {
@@ -190,23 +181,8 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return root;
   }
 
-  private static Set<String> getScoutProjectNamesForProject(IJavaProject p) throws JavaModelException {
-    String[] requiredProjectNames = p.getRequiredProjectNames();
-    Set<String> result = new HashSet<>(requiredProjectNames.length + 1);
-    result.add(p.getElementName());
-    for (String s : requiredProjectNames) {
-      result.add(s);
-    }
-    return result;
-  }
-
-  private static Set<String> getScoutProjectNamesForType(IType type) throws JavaModelException {
-    IJavaProject javaProject = type.getJavaProject();
-    return getScoutProjectNamesForProject(javaProject);
-  }
-
   private static INlsProject getNlsProjectTree(IType type) throws CoreException {
-    Set<IType> nlsProviders = getRegisteredTextProviderTypes(getScoutProjectNamesForType(type));
+    Set<IType> nlsProviders = getRegisteredTextProviderTypes(type.getJavaProject());
     String searchString = getTypeIdentifyer(type);
     Set<IType> filtered = new LinkedHashSet<>(nlsProviders.size());
     boolean minFound = false;
@@ -220,7 +196,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     }
 
-    return getNlsProjectTree(filtered);
+    return textProviderTypesToNlsProject(filtered);
   }
 
   private static String getTypeIdentifyer(IType t) {
@@ -243,30 +219,21 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       else if (args.length == 2 && args[0] instanceof IType) {
         if (args[1] instanceof IJavaProject || args[1] == null) {
           // all text services in the given project with given kind (texts or normal)
-          try {
-            return getAllProjects(getScoutProjectNamesForProject((IJavaProject) args[1]));
-          }
-          catch (CoreException e) {
-            SdkLog.warning("Could not load text provider services.", e);
-          }
+          return getAllProjects((IJavaProject) args[1]);
         }
         else if (args[1] instanceof IType) {
-          try {
-            // all text services with given kind available in the plugins defining the given type
-            return getAllProjects(getScoutProjectNamesForType((IType) args[1]));
-          }
-          catch (CoreException e) {
-            SdkLog.warning("Could not load text provider services for type '" + args[1].toString() + "'.", e);
-          }
+          // all text services with given kind available in the plugins defining the given type
+          IType iType = (IType) args[1];
+          return getAllProjects(iType.getJavaProject());
         }
       }
     }
     return null;
   }
 
-  private static INlsProject getAllProjects(Set<String> wsBundles) {
+  private static INlsProject getAllProjects(IJavaProject javaProject) {
     try {
-      return getNlsProjectTreeProjectName(wsBundles);
+      return getNlsProjectTree(javaProject);
     }
     catch (CoreException e) {
       SdkLog.warning("Could not load full text provider service tree.", e);

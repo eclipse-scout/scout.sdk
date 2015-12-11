@@ -49,6 +49,11 @@
       <artifactId>org.eclipse.jdt.ui</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.m2e.core.ui</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -70,12 +75,15 @@
               !org.eclipse.scout.sdk.s2e*,
               !org.eclipse.jface.text*,
               !org.eclipse.text*,
+              !org.eclipse.m2e.core.*,
+              org.eclipse.ltk.core.refactoring,<!-- indirectly referenced -->
               *
             </Import-Package>
             <Require-Bundle>
               org.eclipse.scout.sdk.s2e;bundle-version="[5.2,5.3)";visibility:=reexport,
               org.eclipse.jdt.ui;bundle-version="[3.11,4)";visibility:=reexport,
-              org.eclipse.jdt.launching;bundle-version="[3.8.0,4)";visibility:=reexport
+              org.eclipse.jdt.launching;bundle-version="[3.8.0,4)";visibility:=reexport,
+              org.eclipse.m2e.core.ui;bundle-version="[1.6.0,2)";visibility:=reexport
             </Require-Bundle>
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator</Bundle-Activator>
           </instructions>

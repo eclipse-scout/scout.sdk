@@ -52,7 +52,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
    */
   public CompilationUnitSourceBuilder(ICompilationUnit element) {
     super(element);
-    m_packageName = element.containingPackage().name();
+    m_packageName = element.containingPackage().elementName();
     for (IImport imp : element.imports()) {
       if (imp.isStatic()) {
         addDeclaredStaticImport(imp.elementName());
@@ -61,7 +61,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
         addDeclaredImport(imp.elementName());
       }
     }
-    if (element.javaDoc() != null) {
+    if (element.javaDoc().isAvailable()) {
       setComment(new RawSourceBuilder(element.javaDoc().toString()));
     }
     for (IType type : element.types().list()) {

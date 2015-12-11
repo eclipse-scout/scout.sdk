@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
@@ -67,7 +67,7 @@ public class WellformAllOperation implements IOperation {
     monitor.setTaskName("Wellform classes...");
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(types, true);
     op.validate();
-    op.run(new SubProgressMonitor(monitor, numTicks - (searchStepTicks * roots.length)), workingCopyManager);
+    op.run(SubMonitor.convert(monitor, numTicks - (searchStepTicks * roots.length)), workingCopyManager);
 
     monitor.done();
   }

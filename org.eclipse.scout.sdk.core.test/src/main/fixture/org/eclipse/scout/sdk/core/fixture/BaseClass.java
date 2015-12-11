@@ -53,6 +53,9 @@ public class BaseClass<T, Z> implements InterfaceLevel1<Z> {
 
   protected class InnerClass2 extends ArrayList<BigDecimal[]> {
     private static final long serialVersionUID = 1L;
+
+    protected InnerClass2() {
+    }
   }
 
 }

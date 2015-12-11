@@ -83,4 +83,9 @@ public class WrappedImportCollector implements IImportCollector {
   public Collection<String> getImports() {
     return m_inner.getImports();
   }
+
+  @Override
+  public List<String> createImportDeclarations(boolean includeExisting) {
+    return m_inner.createImportDeclarations(includeExisting);
+  }
 }

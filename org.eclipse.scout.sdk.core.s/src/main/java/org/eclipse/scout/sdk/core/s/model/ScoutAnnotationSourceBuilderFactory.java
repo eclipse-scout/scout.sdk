@@ -104,7 +104,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
     };
   }
 
-  public static IAnnotationSourceBuilder createReplaceAnnotationBuilder() {
+  public static IAnnotationSourceBuilder createReplaceAnnotation() {
     AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.Replace);
     return sourceBuilder;
   }

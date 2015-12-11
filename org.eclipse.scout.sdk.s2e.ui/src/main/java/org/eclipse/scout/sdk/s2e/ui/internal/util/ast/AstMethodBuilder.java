@@ -1,0 +1,147 @@
+/*******************************************************************************
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.sdk.s2e.ui.internal.util.ast;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.Javadoc;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.ui.CodeGeneration;
+import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
+
+/**
+ * <h3>{@link AstMethodBuilder}</h3>
+ *
+ * @author Matthias Villiger
+ * @since 5.2.0
+ */
+@SuppressWarnings("unchecked")
+public class AstMethodBuilder<INSTANCE extends AstMethodBuilder<INSTANCE>> extends AbstractAstBuilder<INSTANCE> {
+
+  private final INSTANCE m_return;
+
+  private String m_methodName;
+  private Type m_returnType;
+  private Block m_body;
+  private boolean m_createOverride;
+
+  // out
+  private MethodDeclaration m_resultMethod;
+
+  protected AstMethodBuilder(AstNodeFactory owner) {
+    super(owner);
+    m_return = (INSTANCE) this;
+  }
+
+  public INSTANCE withName(String name) {
+    m_methodName = name;
+    return m_return;
+  }
+
+  public INSTANCE withReturnType(Type returnType) {
+    m_returnType = returnType;
+    return m_return;
+  }
+
+  public INSTANCE withBody(Block body) {
+    m_body = body;
+    return m_return;
+  }
+
+  public INSTANCE withOverride(boolean createOverride) {
+    m_createOverride = createOverride;
+    return m_return;
+  }
+
+  public MethodDeclaration get() {
+    return m_resultMethod;
+  }
+
+  public String getMethodName() {
+    return m_methodName;
+  }
+
+  public boolean isCreateOverride() {
+    return m_createOverride;
+  }
+
+  public Type getReturnType() {
+    return m_returnType;
+  }
+
+  public Block getBody() {
+    return m_body;
+  }
+
+  /**
+   * @throws CoreException
+   */
+  protected void insertMethod() {
+    if (getDeclaringType() != null) {
+      getDeclaringType().bodyDeclarations().add(m_resultMethod);
+    }
+  }
+
+  @Override
+  public INSTANCE insert() {
+    Validate.notNull(getMethodName());
+    AST ast = getFactory().getAst();
+    Block body = getBody();
+    if (body == null) {
+      body = ast.newBlock();
+    }
+
+    m_resultMethod = ast.newMethodDeclaration();
+    m_resultMethod.setConstructor(false);
+    for (ModifierKeyword mod : getModifiers()) {
+      m_resultMethod.modifiers().add(ast.newModifier(mod));
+    }
+
+    SimpleName methodName = ast.newSimpleName(getMethodName());
+    m_resultMethod.setName(methodName);
+    Type returnType = getReturnType();
+    if (returnType != null) {
+      m_resultMethod.setReturnType2(returnType);
+    }
+
+    m_resultMethod.setBody(body);
+
+    if (getFactory().isCreateCommentsSetting() && getModifiers().contains(ModifierKeyword.PUBLIC_KEYWORD)) {
+      try {
+        String declaringTypeFqn = AstUtils.getFullyQualifiedName(getDeclaringType(), getFactory().getType(), '.');
+        String javadocText = CodeGeneration.getMethodComment(getFactory().getIcu(), declaringTypeFqn, m_resultMethod, null, getFactory().getIcu().findRecommendedLineSeparator());
+        if (StringUtils.isNotBlank(javadocText)) {
+          Javadoc javadoc = (Javadoc) getFactory().getRewrite().createStringPlaceholder(javadocText, ASTNode.JAVADOC);
+          m_resultMethod.setJavadoc(javadoc);
+        }
+      }
+      catch (CoreException e) {
+        SdkLog.warning("Unable to add default javadoc to form field getter.", e);
+      }
+    }
+
+    if (isCreateOverride() && getFactory().isCreateOverrideAnnotationSetting()) {
+      AstUtils.addAnnotationTo(getFactory().newOverrideAnnotation(), m_resultMethod);
+    }
+
+    insertMethod();
+
+    return (INSTANCE) this;
+  }
+}

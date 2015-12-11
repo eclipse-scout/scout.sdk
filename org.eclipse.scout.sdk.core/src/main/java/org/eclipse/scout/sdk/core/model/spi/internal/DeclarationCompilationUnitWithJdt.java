@@ -44,6 +44,8 @@ public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJd
   private TypeSpi m_mainType;
   private List<DeclarationTypeWithJdt> m_types;
   private List<DeclarationImportWithJdt> m_imports;
+  private ISourceRange m_source;
+  private ISourceRange m_javaDocSource;
 
   DeclarationCompilationUnitWithJdt(JavaEnvironmentWithJdt env, CompilationUnitDeclaration astNode) {
     super(env);
@@ -199,15 +201,23 @@ public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJd
 
   @Override
   public ISourceRange getSource() {
-    return m_env.getSource(this, m_astNode.sourceStart, m_astNode.sourceEnd);
+    if (m_source == null) {
+      m_source = m_env.getSource(this, m_astNode.sourceStart, m_astNode.sourceEnd);
+    }
+    return m_source;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    Javadoc doc = m_astNode.javadoc;
-    if (doc != null) {
-      return m_env.getSource(this, doc.sourceStart, doc.sourceEnd);
+    if (m_javaDocSource == null) {
+      Javadoc doc = m_astNode.javadoc;
+      if (doc != null) {
+        m_javaDocSource = m_env.getSource(this, doc.sourceStart, doc.sourceEnd);
+      }
+      else {
+        m_javaDocSource = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_javaDocSource;
   }
 }

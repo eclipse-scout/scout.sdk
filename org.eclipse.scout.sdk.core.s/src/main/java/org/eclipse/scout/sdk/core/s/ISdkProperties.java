@@ -19,6 +19,17 @@ public interface ISdkProperties {
   String SUFFIX_TABLE_COLUMN = "Column";
   String SUFFIX_OUTLINE_PAGE = "Page";
   String SUFFIX_FORM_HANDLER = "Handler";
+  String SUFFIX_COMPOSITE_FIELD = "Box";
+  String SUFFIX_MENU = "Menu";
+  String SUFFIX_KEY_STROKE = "KeyStroke";
+  String SUFFIX_CODE = "Code";
+  String SUFFIX_COLUMN = "Column";
+  String SUFFIX_EXTENSION = "Extension";
+  String SUFFIX_CALENDAR_ITEM_PROVIDER = "Provider";
+
+  String INNER_TABLE_TYPE_NAME = "Table";
+  String INNER_TREE_TYPE_NAME = "Tree";
+  String INNER_CALENDAR_TYPE_NAME = "Calendar";
 
   String CONTEXT_PROPERTY_JAVA_PROJECT = "JavaProject";
 
@@ -39,4 +50,9 @@ public interface ISdkProperties {
    * The default bean order if no @Order annotation is present (according to the Scout Runtime)
    */
   double DEFAULT_BEAN_ORDER = 5000d;
+
+  /**
+   * Value to add to view orders for new elements.
+   */
+  int VIEW_ORDER_ANNOTATION_VALUE_STEP = 1000;
 }

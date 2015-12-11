@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.importcollector;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
@@ -100,6 +101,8 @@ public interface IImportCollector {
 
   /**
    * Gets the list of imports to be created (sorted and grouped, including empty lines).<br>
+   * If the {@link IImportCollector} is based on an existing {@link ICompilationUnit}, the already existing imports are
+   * part of the result as well!
    *
    * @return A {@link Collection} containing all fully qualified <code>import</code> declarations (including import
    *         keyword and flags) that needs to be created (e.g. <code>import (static)? $qualifiedName;</code>) as well as
@@ -108,15 +111,27 @@ public interface IImportCollector {
   List<String> createImportDeclarations();
 
   /**
-   * Gets all fully qualified static imports of this collector.
+   * Gets the list of imports to be created (sorted and grouped, including empty lines).
    * 
+   * @param includeExisting
+   *          Specifies if imports that already exist on the underlying {@link ICompilationUnit} should be returned as
+   *          well.
+   * @return A {@link Collection} containing all fully qualified <code>import</code> declarations (including import
+   *         keyword and flags) that needs to be created (e.g. <code>import (static)? $qualifiedName;</code>) as well as
+   *         empty string group separators.
+   */
+  List<String> createImportDeclarations(boolean includeExisting);
+
+  /**
+   * Gets all fully qualified static imports of this collector.
+   *
    * @return A {@link Collection} with all fully qualified static imports.
    */
   Collection<String> getStaticImports();
 
   /**
    * Gets all fully qualified non-static imports of this collector.
-   * 
+   *
    * @return A {@link Collection} with all fully qualified non-static imports.
    */
   Collection<String> getImports();

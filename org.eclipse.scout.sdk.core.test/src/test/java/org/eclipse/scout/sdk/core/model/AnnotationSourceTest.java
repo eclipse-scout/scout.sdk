@@ -230,7 +230,7 @@ public class AnnotationSourceTest {
     ExpressionSourceBuilderFactory.createFromMetaValue(mv).createSource(buf, "\n", new PropertyMap(), new ImportValidator(new EmptyImportCollector()));
     Assert.assertEquals(removeWhitespace(aptSource), removeWhitespace(buf.toString()));
     ISourceRange range = av.sourceOfExpression();
-    Assert.assertEquals(removeWhitespace(expressionSource), removeWhitespace(range != null ? range.toString() : null));
+    Assert.assertEquals(removeWhitespace(expressionSource), removeWhitespace(range.toString()));
   }
 
   private static void assertAnnotationArrayValues(IAnnotation a, String key, MetaValueType elementValueType, Class<?> elementModelType, String[] aptSources, String expressionSource) {
@@ -250,7 +250,7 @@ public class AnnotationSourceTest {
       }
     }
     ISourceRange range = av.sourceOfExpression();
-    Assert.assertEquals(removeWhitespace(expressionSource), removeWhitespace(range != null ? range.toString() : null));
+    Assert.assertEquals(removeWhitespace(expressionSource), removeWhitespace(range.toString()));
   }
 
 }

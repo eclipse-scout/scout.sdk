@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFact
 import org.eclipse.scout.sdk.core.util.SdkConsole;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
+import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.ui.internal.util.JdtSettingsCommentSourceBuilderDelegate;
@@ -72,6 +73,10 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     // start DTO auto-update manager if required
     getPreferenceStore().setDefault(IDerivedResourceManager.PROP_AUTO_UPDATE, true);
     ScoutSdkCore.getDerivedResourceManager().setEnabled(getPreferenceStore().getBoolean(IDerivedResourceManager.PROP_AUTO_UPDATE));
+
+    // class id generation
+    getPreferenceStore().setDefault(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION, false);
+    ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(getPreferenceStore().getBoolean(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION));
 
     // start class id validation
     ClassIdValidationJob.install();
@@ -169,6 +174,10 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
       if (IDerivedResourceManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
         boolean autoUpdate = Boolean.parseBoolean(newValue.toString());
         ScoutSdkCore.getDerivedResourceManager().setEnabled(autoUpdate);
+      }
+      else if (ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION.equals(event.getProperty())) {
+        boolean automaticallyCreate = Boolean.parseBoolean(newValue.toString());
+        ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(automaticallyCreate);
       }
     }
   }

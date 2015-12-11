@@ -186,7 +186,7 @@ public class TypeTest {
     Assert.assertTrue(innerClass2.compilationUnit().isSynthetic());
     Assert.assertEquals(CoreTestingUtils.getBaseClassType().name(), innerClass2.declaringType().name());
     Assert.assertEquals(1, innerClass2.fields().list().size());
-    Assert.assertEquals(0, innerClass2.methods().list().size());
+    Assert.assertEquals(1, innerClass2.methods().list().size());
     Assert.assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerClass2.name());
     Assert.assertEquals("InnerClass2", innerClass2.elementName());
     Assert.assertEquals(ArrayList.class.getName(), innerClass2.superClass().name());

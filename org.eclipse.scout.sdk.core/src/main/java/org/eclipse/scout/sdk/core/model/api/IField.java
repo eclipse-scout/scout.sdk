@@ -46,8 +46,9 @@ public interface IField extends IMember {
 
   /**
    * Gets the source of this {@link IField} behind the equals character.
-   * 
-   * @return The initializer source or <code>null</code> if no source is available.
+   *
+   * @return The initializer source. Never returns <code>null</code>. Use {@link ISourceRange#isAvailable()} to check if
+   *         source is actually available for this element.
    */
   ISourceRange sourceOfInitializer();
 

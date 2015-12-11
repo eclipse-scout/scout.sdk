@@ -34,13 +34,15 @@ public interface ICompilationUnit extends IJavaElement {
   /**
    * Gets the {@link IPackage} of this {@link ICompilationUnit}.
    *
-   * @return The {@link IPackage} of this {@link ICompilationUnit} or {@link IPackage#DEFAULT_PACKAGE} for the default
-   *         package.
+   * @return The {@link IPackage} of this {@link ICompilationUnit}.
    */
   IPackage containingPackage();
 
   /**
-   * @return All imports in the order as they appear in the source. Never returns <code>null</code>.
+   * Gets all import declarations in this {@link ICompilationUnit}.
+   *
+   * @return A {@link List} containing all imports in the order as they appear in the source. Never returns
+   *         <code>null</code>.
    */
   List<IImport> imports();
 
@@ -72,9 +74,9 @@ public interface ICompilationUnit extends IJavaElement {
   /**
    * Gets the java doc source of this {@link ICompilationUnit}. This is the java doc added on top of the java file
    * (before the imports).
-   * 
-   * @return The {@link ISourceRange} for the java doc of this {@link ICompilationUnit} or <code>null</code> if no
-   *         source is attached.
+   *
+   * @return The {@link ISourceRange} for the java doc of this {@link ICompilationUnit}. Never returns <code>null</code>
+   *         . Use {@link ISourceRange#isAvailable()} to check if source is actually available for this element.
    */
   ISourceRange javaDoc();
 

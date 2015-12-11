@@ -92,8 +92,8 @@ public final class DtoUtils {
   }
 
   public static String getColumnValueTypeSignature(IType columnContainer) {
-    List<String> resolvedTypeParamValues = CoreUtils.getResolvedTypeParamValueSignature(columnContainer, IScoutRuntimeTypes.IColumn, IScoutRuntimeTypes.TYPE_PARAM_COLUMN_VALUE_TYPE);
-    if (resolvedTypeParamValues == null || resolvedTypeParamValues.isEmpty()) {
+    List<String> resolvedTypeParamValues = CoreUtils.getResolvedTypeParamValueSignature(columnContainer, IScoutRuntimeTypes.IColumn, IScoutRuntimeTypes.TYPE_PARAM_COLUMN__VALUE_TYPE);
+    if (resolvedTypeParamValues.isEmpty()) {
       return null;
     }
     return resolvedTypeParamValues.get(0); // only use first
@@ -177,7 +177,7 @@ public final class DtoUtils {
       if (replacedFormFieldDataType != null) {
         superTypeSignature = SignatureUtils.getTypeSignature(replacedFormFieldDataType);
       }
-      sourceBuilder.addAnnotation(ScoutAnnotationSourceBuilderFactory.createReplaceAnnotationBuilder());
+      sourceBuilder.addAnnotation(ScoutAnnotationSourceBuilderFactory.createReplaceAnnotation());
     }
     if (superTypeSignature == null) {
       superTypeSignature = DtoUtils.computeSuperTypeSignatureForFormData(modelType, formDataAnnotation);
@@ -219,7 +219,7 @@ public final class DtoUtils {
       throw new SdkException("Invalid genericOrdinal value on class '" + annotationOwnerType.name() + "': " + genericOrdinal + ". This class has only " + numTypeParams + " type parameters.");
     }
     List<IType> resolvedTypeParamValue = CoreUtils.getResolvedTypeParamValue(contextType, annotationOwnerType, genericOrdinal);
-    if (resolvedTypeParamValue == null || resolvedTypeParamValue.isEmpty()) {
+    if (resolvedTypeParamValue.isEmpty()) {
       return null;
     }
     return resolvedTypeParamValue.get(0);
@@ -666,7 +666,7 @@ public final class DtoUtils {
     boolean isExtension = modelType.isInstanceOf(IScoutRuntimeTypes.IExtension);
     if (isExtension) {
       List<IType> owner = CoreUtils.getResolvedTypeParamValue(modelType, IScoutRuntimeTypes.IExtension, IScoutRuntimeTypes.TYPE_PARAM_EXTENSION__OWNER);
-      if (owner != null && !owner.isEmpty()) {
+      if (!owner.isEmpty()) {
         return owner.get(0);
       }
     }

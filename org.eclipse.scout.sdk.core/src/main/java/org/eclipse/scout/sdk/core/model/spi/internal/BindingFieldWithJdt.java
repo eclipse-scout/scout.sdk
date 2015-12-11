@@ -43,6 +43,9 @@ public class BindingFieldWithJdt extends AbstractMemberWithJdt<IField> implement
   private List<BindingAnnotationWithJdt> m_annotations;
   private AtomicReference<IMetaValue> m_constRef;
   private FieldSpi m_originalField;
+  private ISourceRange m_source;
+  private ISourceRange m_initializerSource;
+  private ISourceRange m_javaDocSource;
 
   BindingFieldWithJdt(JavaEnvironmentWithJdt env, AbstractTypeWithJdt declaringType, FieldBinding binding) {
     super(env);
@@ -162,38 +165,53 @@ public class BindingFieldWithJdt extends AbstractMemberWithJdt<IField> implement
 
   @Override
   public ISourceRange getSource() {
-    FieldDeclaration decl = m_binding.sourceField();
-    if (decl != null) {
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-      return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      FieldDeclaration decl = m_binding.sourceField();
+      if (decl != null) {
+        CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+        m_source = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+      }
+      else {
+        m_source = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_source;
   }
 
   @Override
   public ISourceRange getSourceOfInitializer() {
-    FieldDeclaration decl = m_binding.sourceField();
-    if (decl != null) {
-      Expression expr = decl.initialization;
-      if (expr != null) {
-        CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-        return m_env.getSource(cu, expr.sourceStart, expr.sourceEnd);
+    if (m_initializerSource == null) {
+      FieldDeclaration decl = m_binding.sourceField();
+      if (decl != null) {
+        Expression expr = decl.initialization;
+        if (expr != null) {
+          CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+          m_initializerSource = m_env.getSource(cu, expr.sourceStart, expr.sourceEnd);
+        }
+      }
+      if (m_initializerSource == null) {
+        m_initializerSource = ISourceRange.NO_SOURCE;
       }
     }
-    return null;
+    return m_initializerSource;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    FieldDeclaration decl = m_binding.sourceField();
-    if (decl != null) {
-      Javadoc doc = decl.javadoc;
-      if (doc != null) {
-        CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-        return m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+    if (m_javaDocSource == null) {
+      FieldDeclaration decl = m_binding.sourceField();
+      if (decl != null) {
+        Javadoc doc = decl.javadoc;
+        if (doc != null) {
+          CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+          m_javaDocSource = m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+        }
+      }
+      if (m_javaDocSource == null) {
+        m_javaDocSource = ISourceRange.NO_SOURCE;
       }
     }
-    return null;
+    return m_javaDocSource;
   }
 
 }

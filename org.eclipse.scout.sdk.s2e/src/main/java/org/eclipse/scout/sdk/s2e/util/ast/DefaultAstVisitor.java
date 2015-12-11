@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.s2e.util;
+package org.eclipse.scout.sdk.s2e.util.ast;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -104,7 +104,14 @@ import org.eclipse.jdt.core.dom.WildcardType;
  */
 public class DefaultAstVisitor extends ASTVisitor {
 
-  public boolean visitNode(ASTNode node) {
+  public DefaultAstVisitor() {
+  }
+
+  public DefaultAstVisitor(boolean visitDocTags) {
+    super(visitDocTags);
+  }
+
+  protected boolean visitNode(ASTNode node) {
     return true;
   }
 

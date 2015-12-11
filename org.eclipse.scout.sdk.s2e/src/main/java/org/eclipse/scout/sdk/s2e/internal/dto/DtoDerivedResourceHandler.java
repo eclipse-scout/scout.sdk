@@ -14,6 +14,8 @@ import java.util.Collections;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.sdk.core.model.api.MissingTypeException;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.trigger.AbstractDerivedResourceSingleHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -24,7 +26,7 @@ import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
  */
 public class DtoDerivedResourceHandler extends AbstractDerivedResourceSingleHandler {
 
-  public DtoDerivedResourceHandler(org.eclipse.jdt.core.IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
+  public DtoDerivedResourceHandler(org.eclipse.jdt.core.IType jdtType, IJavaEnvironmentProvider envProvider) {
     super(jdtType, envProvider);
   }
 
@@ -43,6 +45,9 @@ public class DtoDerivedResourceHandler extends AbstractDerivedResourceSingleHand
       }
 
       S2eUtils.writeTypes(Collections.singletonList(op), monitor, false);
+    }
+    catch (MissingTypeException e) {
+      SdkLog.info("Unable to update DTO for '" + getModelFullyQualifiedName() + "' because there are compile errors in the compilation unit.", e);
     }
     finally {
       monitor.done();

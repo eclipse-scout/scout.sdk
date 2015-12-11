@@ -13,12 +13,15 @@ package org.eclipse.scout.sdk.s2e.workspace.newproject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
@@ -44,6 +47,7 @@ public class ScoutProjectNewOperation implements IOperation {
   private String m_displayName;
   private String m_javaVersion;
   private File m_targetDirectory;
+  private List<IProject> m_createdProjects;
 
   @Override
   public String getOperationName() {
@@ -77,7 +81,7 @@ public class ScoutProjectNewOperation implements IOperation {
       ScoutProjectNewHelper.createProject(getTargetDirectory(), getSymbolicName(), getDisplayName(), getJavaVersion(), groupId, artifactId, version, globalSettings, settings);
       monitor.worked(10);
 
-      importIntoWorkspace(new SubProgressMonitor(monitor, 90));
+      m_createdProjects = importIntoWorkspace(SubMonitor.convert(monitor, 90));
     }
     catch (Exception e) {
       throw new CoreException(new ScoutStatus("Unable to create Scout Project.", e));
@@ -104,7 +108,7 @@ public class ScoutProjectNewOperation implements IOperation {
    *
    * @throws CoreException
    */
-  protected void importIntoWorkspace(IProgressMonitor monitor) throws CoreException {
+  protected List<IProject> importIntoWorkspace(IProgressMonitor monitor) throws CoreException {
     File baseFolder = new File(getTargetDirectory(), getSymbolicName());
     File[] subFolders = baseFolder.listFiles();
     Collection<MavenProjectInfo> projects = new ArrayList<>(subFolders.length);
@@ -115,7 +119,16 @@ public class ScoutProjectNewOperation implements IOperation {
       }
     }
 
-    MavenPlugin.getProjectConfigurationManager().importProjects(projects, new ProjectImportConfiguration(), monitor);
+    List<IMavenProjectImportResult> importedProjects = MavenPlugin.getProjectConfigurationManager()
+        .importProjects(projects, new ProjectImportConfiguration(), monitor);
+
+    List<IProject> result = new ArrayList<>(importedProjects.size());
+    for (IMavenProjectImportResult mavenProject : importedProjects) {
+      if (mavenProject.getProject() != null) {
+        result.add(mavenProject.getProject());
+      }
+    }
+    return result;
   }
 
   public String getSymbolicName() {
@@ -148,5 +161,9 @@ public class ScoutProjectNewOperation implements IOperation {
 
   public void setJavaVersion(String javaVersion) {
     m_javaVersion = javaVersion;
+  }
+
+  public List<IProject> getCreatedProjects() {
+    return m_createdProjects;
   }
 }

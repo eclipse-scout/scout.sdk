@@ -20,8 +20,8 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.AnnotationImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
@@ -35,6 +35,7 @@ public class DeclarationAnnotationWithJdt extends AbstractJavaElementWithJdt<IAn
   private final TypeBinding m_typeBinding;
   private Map<String, AnnotationElementSpi> m_values;//sorted
   private TypeSpi m_type;
+  private ISourceRange m_source;
 
   DeclarationAnnotationWithJdt(JavaEnvironmentWithJdt env, AnnotatableSpi owner, org.eclipse.jdt.internal.compiler.ast.Annotation astNode) {
     super(env);
@@ -111,9 +112,12 @@ public class DeclarationAnnotationWithJdt extends AbstractJavaElementWithJdt<IAn
 
   @Override
   public ISourceRange getSource() {
-    CompilationUnitSpi cu = SpiWithJdtUtils.declaringTypeOf(this).getCompilationUnit();
-    org.eclipse.jdt.internal.compiler.ast.Annotation decl = m_astNode;
-    return m_env.getSource(cu, decl.sourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      CompilationUnitSpi cu = SpiWithJdtUtils.declaringTypeOf(this).getCompilationUnit();
+      org.eclipse.jdt.internal.compiler.ast.Annotation decl = m_astNode;
+      m_source = m_env.getSource(cu, decl.sourceStart, decl.declarationSourceEnd);
+    }
+    return m_source;
   }
 
 }

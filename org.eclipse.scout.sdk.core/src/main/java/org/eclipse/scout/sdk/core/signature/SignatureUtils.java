@@ -86,7 +86,7 @@ public final class SignatureUtils {
    *          The parameter signatures of the method.
    * @return The created identifier
    */
-  public static String createMethodIdentifier(String methodName, List<String> resolvedParamSignatures) {
+  public static String createMethodIdentifier(String methodName, Iterable<String> resolvedParamSignatures) {
     StringBuilder methodIdBuilder = new StringBuilder();
     methodIdBuilder.append(methodName);
     methodIdBuilder.append('(');

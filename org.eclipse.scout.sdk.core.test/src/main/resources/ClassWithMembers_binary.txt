@@ -21,6 +21,8 @@ public class ClassWithMembers<T> {
 
   private Map<T, String> e1;
 
+  public ClassWithMembers(){}
+
   @TestAnnotation(en = TestEnum.A)
   public String m1(@TestAnnotation(en = TestEnum.B) String type) {
   }
@@ -34,9 +36,11 @@ public class ClassWithMembers<T> {
   }
 
   public class InnerMemberClass {
+    public InnerMemberClass(){}
   }
 
   public static class InnerStaticClass {
+    public InnerStaticClass(){}
   }
 
 }

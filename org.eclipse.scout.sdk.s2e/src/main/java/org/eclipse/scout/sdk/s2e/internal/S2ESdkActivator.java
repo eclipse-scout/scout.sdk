@@ -10,7 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.internal;
 
+import org.apache.maven.archetype.ArchetypeManager;
+import org.apache.maven.archetype.catalog.Archetype;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.dto.DtoDerivedResourceHandlerFactory;
 import org.eclipse.scout.sdk.s2e.internal.trigger.DerivedResourceManager;
 import org.osgi.framework.BundleContext;
@@ -35,6 +44,22 @@ public class S2ESdkActivator extends Plugin {
     // DTO auto update
     m_derivedResourceManager = new DerivedResourceManager();
     m_derivedResourceManager.addDerivedResourceHandlerFactory(new DtoDerivedResourceHandlerFactory());
+
+    Job j = new Job("register scout archetype") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        try {
+          registerScoutArcheType();
+        }
+        catch (Exception e) {
+          SdkLog.info(e);
+        }
+        return Status.OK_STATUS;
+      }
+    };
+    j.setUser(false);
+    j.setSystem(true);
+    j.schedule(1000);
   }
 
   @Override
@@ -52,5 +77,21 @@ public class S2ESdkActivator extends Plugin {
 
   public DerivedResourceManager getDerivedResourceManager() {
     return m_derivedResourceManager;
+  }
+
+  private static void registerScoutArcheType() {
+    try {
+      Archetype archetype = new Archetype();
+      archetype.setGroupId(ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID);
+      archetype.setArtifactId(ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID);
+      archetype.setVersion(ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_VERSION);
+      archetype.setDescription("Creates a new Scout helloworld application. Instead of using the 'Maven Project' wizard you may also use the 'Scout Project' wizard which already prefills all properties with correct values.");
+      archetype.setRepository("http://repo1.maven.org/maven2/");
+      ArchetypeManager archetyper = MavenPluginActivator.getDefault().getArchetypeManager().getArchetyper();
+      archetyper.updateLocalCatalog(archetype);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }

@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.trigger;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -28,7 +27,7 @@ public class CachingJavaEnvironmentProvider implements IJavaEnvironmentProvider 
   }
 
   @Override
-  public IType jdtTypeToScoutType(org.eclipse.jdt.core.IType jdtType) throws CoreException {
+  public IType jdtTypeToScoutType(org.eclipse.jdt.core.IType jdtType) {
     if (jdtType == null) {
       return null;
     }
@@ -36,11 +35,11 @@ public class CachingJavaEnvironmentProvider implements IJavaEnvironmentProvider 
   }
 
   @Override
-  public IJavaEnvironment get(IJavaProject jdtProject) throws CoreException {
+  public IJavaEnvironment get(IJavaProject jdtProject) {
     return getOrCreateEnv(jdtProject);
   }
 
-  private IJavaEnvironment getOrCreateEnv(IJavaProject jdtProject) throws CoreException {
+  private IJavaEnvironment getOrCreateEnv(IJavaProject jdtProject) {
     if (jdtProject == null) {
       return null;
     }

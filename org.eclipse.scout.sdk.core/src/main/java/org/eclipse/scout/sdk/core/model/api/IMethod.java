@@ -62,7 +62,8 @@ public interface IMethod extends IMember {
   /**
    * Gets the method body source.
    *
-   * @return The source of the method body or <code>null</code> if no source is available.
+   * @return The source of the method body. Never returns <code>null</code>. Use {@link ISourceRange#isAvailable()} to
+   *         check if source is actually available for this element.
    */
   ISourceRange sourceOfBody();
 

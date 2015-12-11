@@ -153,4 +153,13 @@ public interface ITypeSourceBuilder extends IMemberSourceBuilder {
 
   boolean removeTypeParameter(String elementName);
 
+  /**
+   * @return
+   */
+  String getParentFullyQualifiedName();
+
+  /**
+   * @param parentFullyQualifiedName
+   */
+  void setParentFullyQualifiedName(String parentFullyQualifiedName);
 }

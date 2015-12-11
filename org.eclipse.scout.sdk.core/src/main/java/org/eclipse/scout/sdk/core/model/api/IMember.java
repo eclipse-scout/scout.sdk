@@ -67,9 +67,9 @@ public interface IMember extends IAnnotatable {
 
   /**
    * Gets the java doc source for this {@link IMember}.
-   * 
-   * @return The {@link ISourceRange} for the java doc of this {@link IMember} or <code>null</code> if no source is
-   *         attached.
+   *
+   * @return The {@link ISourceRange} for the java doc of this {@link IMember}. Never returns <code>null</code>. Use
+   *         {@link ISourceRange#isAvailable()} to check if source is actually available for this element.
    */
   ISourceRange javaDoc();
 

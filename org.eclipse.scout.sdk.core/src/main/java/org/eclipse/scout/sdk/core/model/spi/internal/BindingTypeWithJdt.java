@@ -24,6 +24,7 @@ import org.eclipse.jdt.internal.compiler.ast.Javadoc;
 import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
 import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
 import org.eclipse.jdt.internal.compiler.lookup.CompilationUnitScope;
+import org.eclipse.jdt.internal.compiler.lookup.ExtraCompilerModifiers;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
 import org.eclipse.jdt.internal.compiler.lookup.MissingTypeBinding;
@@ -67,6 +68,9 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
   private List<FieldSpi> m_fields;
   private AtomicReference<SourceTypeBinding> m_sourceTypeBindingRef;
   private CompilationUnitSpi m_unit;
+  private ISourceRange m_source;
+  private ISourceRange m_javaDocSource;
+  private ISourceRange m_staticInitSource;
 
   BindingTypeWithJdt(JavaEnvironmentWithJdt env, ReferenceBinding binding, BindingTypeWithJdt declaringType, boolean isWildcard) {
     super(env);
@@ -243,10 +247,10 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
 
         List<MethodSpi> result = new ArrayList<>(methods.length);
         for (MethodBinding a : methods) {
-          if (a.isBridge() || a.isSynthetic() || a.isDefaultAbstract()) {
+          if ((a.modifiers & ExtraCompilerModifiers.AccIsDefaultConstructor) != 0) {
             continue;
           }
-          if ("<init>".equals(new String(a.selector))) {
+          if (a.isBridge() || a.isSynthetic() || a.isDefaultAbstract()) {
             continue;
           }
           //bug in jdt: default constructors are not reported as 'isSynthetic'
@@ -470,39 +474,56 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public ISourceRange getSource() {
-    if (m_binding instanceof SourceTypeBinding) {
-      TypeDeclaration decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
-      CompilationUnitSpi cu = getCompilationUnit();
-      return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      if (m_binding instanceof SourceTypeBinding) {
+        TypeDeclaration decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
+        CompilationUnitSpi cu = getCompilationUnit();
+        m_source = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+      }
+      else {
+        m_source = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_source;
+
   }
 
   @Override
   public ISourceRange getSourceOfStaticInitializer() {
-    if (m_binding instanceof SourceTypeBinding) {
-      TypeDeclaration decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
-      for (FieldDeclaration fieldDecl : decl.fields) {
-        if (fieldDecl.type == null && fieldDecl.name == null) {
-          CompilationUnitSpi cu = getCompilationUnit();
-          return m_env.getSource(cu, fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd);
+    if (m_staticInitSource == null) {
+      if (m_binding instanceof SourceTypeBinding) {
+        TypeDeclaration decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
+        for (FieldDeclaration fieldDecl : decl.fields) {
+          if (fieldDecl.type == null && fieldDecl.name == null) {
+            CompilationUnitSpi cu = getCompilationUnit();
+            m_staticInitSource = m_env.getSource(cu, fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd);
+            break;
+          }
         }
       }
+      if (m_staticInitSource == null) {
+        m_staticInitSource = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_staticInitSource;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    if (m_binding instanceof SourceTypeBinding) {
-      TypeDeclaration decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
-      Javadoc doc = decl.javadoc;
-      if (doc != null) {
-        CompilationUnitSpi cu = getCompilationUnit();
-        return m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+    if (m_javaDocSource == null) {
+      if (m_binding instanceof SourceTypeBinding) {
+        TypeDeclaration decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
+        Javadoc doc = decl.javadoc;
+        if (doc != null) {
+          CompilationUnitSpi cu = getCompilationUnit();
+          m_javaDocSource = m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+        }
+      }
+      if (m_javaDocSource == null) {
+        m_javaDocSource = ISourceRange.NO_SOURCE;
       }
     }
-    return null;
+    return m_javaDocSource;
   }
 
 }

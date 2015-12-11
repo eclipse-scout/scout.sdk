@@ -53,8 +53,9 @@ public interface IAnnotationElement extends IJavaElement {
    * <li>@Annotation(anno = @Generated("g3")) -> sourceOfExpression() = "@Generated("g1")"</li>
    * </ul>
    *
-   * @return The {@link ISourceRange} of the value expression of this {@link IAnnotationElement} or <code>null</code> if
-   *         no source code is available.
+   * @return The {@link ISourceRange} of the value expression of this {@link IAnnotationElement}. Never returns
+   *         <code>null</code>. Use {@link ISourceRange#isAvailable()} to check if source is actually available for this
+   *         element.
    */
   ISourceRange sourceOfExpression();
 

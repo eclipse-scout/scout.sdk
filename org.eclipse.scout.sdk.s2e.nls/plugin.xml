@@ -32,23 +32,24 @@
       <provider class="org.eclipse.scout.sdk.s2e.nls.internal.serviceproject.ServiceNlsProjectProvider"></provider>
    </extension>
    <extension
-         id="NlsTextCompletionProposalComputer"
+         id="org.eclipse.scout.sdk.s2e.nls.category"
+         name="Eclipse Scout NLS Text Proposals"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <proposalCategory
+            icon="icons/comment.png">
+      </proposalCategory>
+   </extension>
+   <extension
+         id="org.eclipse.scout.sdk.s2e.nls"
+         name="Eclipse Scout NLS Text Proposals"
          point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
       <javaCompletionProposalComputer
             activate="true"
-            categoryId="org.eclipse.scout.sdk.s2e.nls.nlsTextProposalCategory"
+            categoryId="org.eclipse.scout.sdk.s2e.nls.category"
             class="org.eclipse.scout.sdk.s2e.nls.internal.ui.proposal.NlsTextCompletionProposalComputer">
          <partition
                type="__java_string">
          </partition>
       </javaCompletionProposalComputer>
-   </extension>
-   <extension
-         id="nlsTextProposalCategory"
-         name="NLS Text Proposals"
-         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
-      <proposalCategory
-            icon="icons/comment.png">
-      </proposalCategory>
    </extension>
 </plugin>

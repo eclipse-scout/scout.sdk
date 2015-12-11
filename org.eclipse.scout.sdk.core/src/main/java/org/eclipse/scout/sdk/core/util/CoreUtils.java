@@ -375,7 +375,6 @@ public final class CoreUtils {
       // not a primitive type
       return "null";
     }
-
     switch (parameter.charAt(0)) {
       case ISignatureConstants.C_BOOLEAN:
         return Boolean.FALSE.toString();
@@ -383,9 +382,10 @@ public final class CoreUtils {
       case ISignatureConstants.C_CHAR:
       case ISignatureConstants.C_DOUBLE:
       case ISignatureConstants.C_INT:
-      case ISignatureConstants.C_LONG:
       case ISignatureConstants.C_SHORT:
         return "0";
+      case ISignatureConstants.C_LONG:
+        return "0L";
       case ISignatureConstants.C_FLOAT:
         return "0.0f";
       default: // e.g. void
@@ -472,14 +472,14 @@ public final class CoreUtils {
    *          The fully qualified name of the class on which the value of a type parameter should be extracted.
    * @param typeParamIndex
    *          The index of the type parameter on the given level type whose value should be extracted.
-   * @return A {@link List} holding all type arguments of the given type parameter or <code>null</code> if the given
+   * @return A {@link List} holding all type arguments of the given type parameter or an empty {@link List} if the given
    *         levelFqn could not be found in the super hierarchy.
    * @see #getResolvedTypeParamValueSignature(IType, String, int)
    */
   public static List<IType> getResolvedTypeParamValue(IType focusType, String levelFqn, int typeParamIndex) {
     IType levelType = focusType.superTypes().withName(levelFqn).first();
     if (levelType == null) {
-      return null;
+      return Collections.emptyList();
     }
     return getResolvedTypeParamValue(focusType, levelType, typeParamIndex);
   }
@@ -493,11 +493,12 @@ public final class CoreUtils {
    *          The {@link IType} on which the value of a type parameter should be extracted.
    * @param typeParamIndex
    *          The index of the type parameter on the given level type whose value should be extracted.
-   * @return A {@link List} holding all type arguments of the given type parameter.
+   * @return A {@link List} holding all type arguments of the given type parameter. Returns an empty {@link List} if the
+   *         given levelType is <code>null</code>.
    */
   public static List<IType> getResolvedTypeParamValue(IType focusType, IType levelType, int typeParamIndex) {
     if (levelType == null) {
-      return null;
+      return Collections.emptyList();
     }
     IType item = levelType.typeArguments().get(typeParamIndex);
     if (!item.isParameterType()) {
@@ -686,5 +687,85 @@ public final class CoreUtils {
     }
 
     return result;
+  }
+
+  /**
+   * Tries to box a primitive type to its corresponding complex type.
+   * 
+   * @param name
+   *          The primitive name (e.g. 'int' or 'boolean')
+   * @return The corresponding fully qualified complex type name (e.g. java.lang.Long) or <code>null</code> if the given
+   *         input could not be boxed.
+   */
+  public static String boxPrimitive(String name) {
+    switch (name) {
+      case IJavaRuntimeTypes._boolean:
+        return IJavaRuntimeTypes.java_lang_Boolean;
+      case IJavaRuntimeTypes._char:
+        return IJavaRuntimeTypes.java_lang_Character;
+      case IJavaRuntimeTypes._byte:
+        return IJavaRuntimeTypes.java_lang_Byte;
+      case IJavaRuntimeTypes._short:
+        return IJavaRuntimeTypes.java_lang_Short;
+      case IJavaRuntimeTypes._int:
+        return IJavaRuntimeTypes.java_lang_Integer;
+      case IJavaRuntimeTypes._long:
+        return IJavaRuntimeTypes.java_lang_Long;
+      case IJavaRuntimeTypes._float:
+        return IJavaRuntimeTypes.java_lang_Float;
+      case IJavaRuntimeTypes._double:
+        return IJavaRuntimeTypes.java_lang_Double;
+      case IJavaRuntimeTypes._void:
+        return IJavaRuntimeTypes.java_lang_Void;
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * @param fqn
+   * @return
+   */
+  public static String unboxToPrimitive(String fqn) {
+    switch (fqn) {
+      case IJavaRuntimeTypes.java_lang_Boolean:
+        return IJavaRuntimeTypes._boolean;
+      case IJavaRuntimeTypes.java_lang_Character:
+        return IJavaRuntimeTypes._char;
+      case IJavaRuntimeTypes.java_lang_Byte:
+        return IJavaRuntimeTypes._byte;
+      case IJavaRuntimeTypes.java_lang_Short:
+        return IJavaRuntimeTypes._short;
+      case IJavaRuntimeTypes.java_lang_Integer:
+        return IJavaRuntimeTypes._int;
+      case IJavaRuntimeTypes.java_lang_Long:
+        return IJavaRuntimeTypes._long;
+      case IJavaRuntimeTypes.java_lang_Float:
+        return IJavaRuntimeTypes._float;
+      case IJavaRuntimeTypes.java_lang_Double:
+        return IJavaRuntimeTypes._double;
+      case IJavaRuntimeTypes.java_lang_Void:
+        return IJavaRuntimeTypes._void;
+      case IJavaRuntimeTypes._boolean:
+        return fqn;
+      case IJavaRuntimeTypes._char:
+        return fqn;
+      case IJavaRuntimeTypes._byte:
+        return fqn;
+      case IJavaRuntimeTypes._short:
+        return fqn;
+      case IJavaRuntimeTypes._int:
+        return fqn;
+      case IJavaRuntimeTypes._long:
+        return fqn;
+      case IJavaRuntimeTypes._float:
+        return fqn;
+      case IJavaRuntimeTypes._double:
+        return fqn;
+      case IJavaRuntimeTypes._void:
+        return fqn;
+      default:
+        return null;
+    }
   }
 }

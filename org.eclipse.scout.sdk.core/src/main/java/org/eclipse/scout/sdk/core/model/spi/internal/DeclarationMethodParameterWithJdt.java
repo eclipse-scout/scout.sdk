@@ -37,6 +37,7 @@ public class DeclarationMethodParameterWithJdt extends AbstractJavaElementWithJd
   private TypeSpi m_dataType;
   private int m_flags;
   private List<DeclarationAnnotationWithJdt> m_annotations;
+  private ISourceRange m_source;
 
   DeclarationMethodParameterWithJdt(JavaEnvironmentWithJdt env, DeclarationMethodWithJdt declaringMethod, Argument astNode, int index) {
     super(env);
@@ -106,9 +107,12 @@ public class DeclarationMethodParameterWithJdt extends AbstractJavaElementWithJd
 
   @Override
   public ISourceRange getSource() {
-    CompilationUnitSpi cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
-    Argument decl = m_astNode;
-    return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      CompilationUnitSpi cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
+      Argument decl = m_astNode;
+      m_source = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    }
+    return m_source;
   }
 
 }

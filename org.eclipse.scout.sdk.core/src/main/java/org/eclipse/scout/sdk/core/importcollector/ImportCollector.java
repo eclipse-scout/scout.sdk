@@ -41,10 +41,10 @@ public class ImportCollector implements IImportCollector {
     this(icu.javaEnvironment());
     for (IImport imp : icu.imports()) {
       if (imp.isStatic()) {
-        addStaticImport(imp.elementName());
+        addStaticImport(imp.elementName(), true);
       }
       else {
-        addImport(imp.elementName());
+        addImport(imp.elementName(), true);
       }
     }
   }
@@ -76,10 +76,10 @@ public class ImportCollector implements IImportCollector {
   protected String registerElementInternal(SignatureDescriptor cand, boolean markAsUsed) {
     ImportElement elem = m_imports.get(cand.getSimpleName());
     if (elem == null) {
-      m_imports.put(cand.getSimpleName(), new ImportElement(false, cand.getQualifier(), cand.getSimpleName(), markAsUsed));
+      m_imports.put(cand.getSimpleName(), new ImportElement(false, cand.getQualifier(), cand.getSimpleName(), markAsUsed, false));
     }
     else {
-      m_imports.put(cand.getSimpleName(), new ImportElement(false, cand.getQualifier(), cand.getSimpleName(), markAsUsed || elem.m_used));
+      m_imports.put(cand.getSimpleName(), new ImportElement(false, cand.getQualifier(), cand.getSimpleName(), markAsUsed || elem.m_used, false));
     }
     return cand.getSimpleName();
   }
@@ -115,16 +115,24 @@ public class ImportCollector implements IImportCollector {
 
   @Override
   public void addImport(String fqn) {
+    addImport(fqn, false);
+  }
+
+  public void addImport(String fqn, boolean fromExisting) {
     String packageName = Signature.getQualifier(fqn);
     String simpleName = Signature.getSimpleName(fqn);
-    m_imports.put(simpleName, new ImportElement(false, packageName, simpleName, true));
+    m_imports.put(simpleName, new ImportElement(false, packageName, simpleName, true, fromExisting));
   }
 
   @Override
   public void addStaticImport(String fqn) {
+    addStaticImport(fqn, false);
+  }
+
+  protected void addStaticImport(String fqn, boolean fromExisting) {
     String packageName = Signature.getQualifier(fqn);
     String simpleName = Signature.getSimpleName(fqn);
-    m_staticImports.put(simpleName, new ImportElement(true, packageName, simpleName, true));
+    m_staticImports.put(simpleName, new ImportElement(true, packageName, simpleName, true, fromExisting));
   }
 
   @Override
@@ -147,10 +155,15 @@ public class ImportCollector implements IImportCollector {
 
   @Override
   public List<String> createImportDeclarations() {
-    return organizeImports(m_staticImports.values(), m_imports.values());
+    return createImportDeclarations(true);
   }
 
-  protected List<String> organizeImports(Collection<ImportElement> unsortedList1, Collection<ImportElement> unsortedList2) {
+  @Override
+  public List<String> createImportDeclarations(boolean includeExisting) {
+    return organizeImports(m_staticImports.values(), m_imports.values(), includeExisting);
+  }
+
+  protected List<String> organizeImports(Collection<ImportElement> unsortedList1, Collection<ImportElement> unsortedList2, boolean includeExisting) {
     List<ImportElement> workList = new LinkedList<>();
     workList.addAll(unsortedList1);
     workList.addAll(unsortedList2);
@@ -158,6 +171,10 @@ public class ImportCollector implements IImportCollector {
     //filter
     for (Iterator<ImportElement> it = workList.iterator(); it.hasNext();) {
       ImportElement e = it.next();
+      if (!includeExisting && e.m_fromExisting) {
+        it.remove();
+        continue;
+      }
       if (e.m_static) {
         //keep
         continue;
@@ -203,14 +220,17 @@ public class ImportCollector implements IImportCollector {
     private final boolean m_static;
     private final String m_packageName;
     private final String m_simpleName;
+    private final boolean m_fromExisting;
+
     private String m_group;
     private boolean m_used;
 
-    private ImportElement(boolean isStatic, String packageName, String simpleName, boolean used) {
+    private ImportElement(boolean isStatic, String packageName, String simpleName, boolean used, boolean fromExisting) {
       m_static = isStatic;
       m_packageName = packageName;
       m_simpleName = simpleName;
       m_used = used;
+      m_fromExisting = fromExisting;
       calculateGroup();
     }
 

@@ -37,6 +37,7 @@ public class BindingTypeParameterWithJdt extends AbstractJavaElementWithJdt<ITyp
   private final int m_index;
   private String m_name;
   private List<TypeSpi> m_bounds;
+  private ISourceRange m_source;
 
   BindingTypeParameterWithJdt(JavaEnvironmentWithJdt env, AbstractMemberWithJdt<?> declaringMember, TypeVariableBinding binding, int index) {
     super(env);
@@ -114,11 +115,16 @@ public class BindingTypeParameterWithJdt extends AbstractJavaElementWithJdt<ITyp
 
   @Override
   public ISourceRange getSource() {
-    TypeParameter decl = SpiWithJdtUtils.classScopeOf(this).referenceContext.typeParameters[m_index];
-    if (decl != null) {
-      CompilationUnitSpi cu = SpiWithJdtUtils.declaringTypeOf(this).getCompilationUnit();
-      return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      TypeParameter decl = SpiWithJdtUtils.classScopeOf(this).referenceContext.typeParameters[m_index];
+      if (decl != null) {
+        CompilationUnitSpi cu = SpiWithJdtUtils.declaringTypeOf(this).getCompilationUnit();
+        m_source = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+      }
+      else {
+        m_source = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_source;
   }
 }

@@ -76,11 +76,11 @@ public final class JavaModelPrinter {
   }
 
   public static void print(IPackage p, StringBuilder sb) {
-    if (p.name() == null) {
+    if (p.elementName() == null) {
       sb.append("(default-package)");
       return;
     }
-    sb.append("package ").append(p.name());
+    sb.append("package ").append(p.elementName());
   }
 
   public static void print(IMethodParameter mp, StringBuilder sb) {

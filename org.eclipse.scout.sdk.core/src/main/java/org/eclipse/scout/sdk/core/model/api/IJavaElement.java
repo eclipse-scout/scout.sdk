@@ -33,7 +33,8 @@ public interface IJavaElement {
   String elementName();
 
   /**
-   * @return The source of the element or <code>null</code>.<br>
+   * @return The source of the element. Never returns <code>null</code>. Use {@link ISourceRange#isAvailable()} to check
+   *         if source is actually available for this element.<br>
    *         The source is only available if the compilation unit is one of the following:
    *         <ul>
    *         <li>source in workspace</li>

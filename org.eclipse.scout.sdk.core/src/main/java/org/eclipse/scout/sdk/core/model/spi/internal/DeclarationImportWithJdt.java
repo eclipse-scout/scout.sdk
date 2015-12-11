@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 public class DeclarationImportWithJdt extends AbstractJavaElementWithJdt<IImport> implements ImportSpi {
   private final ImportReference m_astNode;
   private final DeclarationCompilationUnitWithJdt m_cu;
+  private ISourceRange m_source;
 
   DeclarationImportWithJdt(JavaEnvironmentWithJdt env, DeclarationCompilationUnitWithJdt owner, ImportReference astNode) {
     super(env);
@@ -93,8 +94,11 @@ public class DeclarationImportWithJdt extends AbstractJavaElementWithJdt<IImport
 
   @Override
   public ISourceRange getSource() {
-    ImportReference decl = m_astNode;
-    return m_env.getSource(m_cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      ImportReference decl = m_astNode;
+      m_source = m_env.getSource(m_cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    }
+    return m_source;
   }
 
 }

@@ -17,7 +17,6 @@ import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -30,6 +29,7 @@ import org.eclipse.scout.sdk.core.model.sugar.SuperTypeQuery;
 import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implements IType {
   private String m_signature;
@@ -234,38 +234,11 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     if (!isPrimitive()) {
       return this;
     }
-    IJavaEnvironment env = javaEnvironment();
-    switch (name()) {
-      case IJavaRuntimeTypes._boolean: {
-        return env.findType(IJavaRuntimeTypes.java_lang_Boolean);
-      }
-      case IJavaRuntimeTypes._char: {
-        return env.findType(IJavaRuntimeTypes.java_lang_Character);
-      }
-      case IJavaRuntimeTypes._byte: {
-        return env.findType(IJavaRuntimeTypes.java_lang_Byte);
-      }
-      case IJavaRuntimeTypes._short: {
-        return env.findType(IJavaRuntimeTypes.java_lang_Short);
-      }
-      case IJavaRuntimeTypes._int: {
-        return env.findType(IJavaRuntimeTypes.java_lang_Integer);
-      }
-      case IJavaRuntimeTypes._long: {
-        return env.findType(IJavaRuntimeTypes.java_lang_Long);
-      }
-      case IJavaRuntimeTypes._float: {
-        return env.findType(IJavaRuntimeTypes.java_lang_Float);
-      }
-      case IJavaRuntimeTypes._double: {
-        return env.findType(IJavaRuntimeTypes.java_lang_Double);
-      }
-      case IJavaRuntimeTypes._void: {
-        return env.findType(IJavaRuntimeTypes.java_lang_Void);
-      }
-      default:
-        throw new IllegalStateException("unknown primitive type: " + name());
+    String boxedFqn = CoreUtils.boxPrimitive(name());
+    if (boxedFqn == null) {
+      return this;
     }
+    return javaEnvironment().findType(boxedFqn);
   }
 
   @Override
@@ -274,38 +247,11 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     if (s.length() > 19) {
       return null;
     }
-    IJavaEnvironment env = javaEnvironment();
-    switch (s) {
-      case IJavaRuntimeTypes.java_lang_Boolean: {
-        return env.findType(IJavaRuntimeTypes._boolean);
-      }
-      case IJavaRuntimeTypes.java_lang_Character: {
-        return env.findType(IJavaRuntimeTypes._char);
-      }
-      case IJavaRuntimeTypes.java_lang_Byte: {
-        return env.findType(IJavaRuntimeTypes._byte);
-      }
-      case IJavaRuntimeTypes.java_lang_Short: {
-        return env.findType(IJavaRuntimeTypes._short);
-      }
-      case IJavaRuntimeTypes.java_lang_Integer: {
-        return env.findType(IJavaRuntimeTypes._int);
-      }
-      case IJavaRuntimeTypes.java_lang_Long: {
-        return env.findType(IJavaRuntimeTypes._long);
-      }
-      case IJavaRuntimeTypes.java_lang_Float: {
-        return env.findType(IJavaRuntimeTypes._float);
-      }
-      case IJavaRuntimeTypes.java_lang_Double: {
-        return env.findType(IJavaRuntimeTypes._double);
-      }
-      case IJavaRuntimeTypes.java_lang_Void: {
-        return env.findType(IJavaRuntimeTypes._void);
-      }
-      default:
-        return null;
+    String unboxed = CoreUtils.unboxToPrimitive(s);
+    if (unboxed == null) {
+      return null;
     }
+    return javaEnvironment().findType(unboxed);
   }
 
 }

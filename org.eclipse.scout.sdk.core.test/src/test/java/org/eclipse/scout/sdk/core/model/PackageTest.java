@@ -35,7 +35,7 @@ public class PackageTest {
     IPackage pck = childClassIcu.containingPackage();
     Assert.assertNotNull(pck);
 
-    Assert.assertEquals(FIXTURE_PACKAGE, pck.name());
+    Assert.assertEquals(FIXTURE_PACKAGE, pck.elementName());
     Assert.assertEquals("package " + FIXTURE_PACKAGE, pck.toString());
   }
 
@@ -56,7 +56,7 @@ public class PackageTest {
     IPackage pck = childClass.containingPackage();
     Assert.assertNotNull(pck);
 
-    Assert.assertEquals(FIXTURE_PACKAGE, pck.name());
+    Assert.assertEquals(FIXTURE_PACKAGE, pck.elementName());
     Assert.assertEquals("package " + FIXTURE_PACKAGE, pck.toString());
   }
 
@@ -68,7 +68,7 @@ public class PackageTest {
     IPackage pck = childClass.containingPackage();
     Assert.assertNotNull(pck);
 
-    Assert.assertEquals(FIXTURE_PACKAGE, pck.name());
+    Assert.assertEquals(FIXTURE_PACKAGE, pck.elementName());
     Assert.assertEquals("package " + FIXTURE_PACKAGE, pck.toString());
   }
 }

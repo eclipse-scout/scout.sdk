@@ -8,16 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.s2e.ui.internal;
+package org.eclipse.scout.sdk.s2e.ui.internal.template;
+
+import org.eclipse.jdt.core.ICompilationUnit;
 
 /**
+ * <h3>{@link TabBoxProposal}</h3>
  *
+ * @author Matthias Villiger
+ * @since 5.2.0
  */
-public interface ISdkIcons {
+public class TabBoxProposal extends FormFieldProposal {
 
-  String EclipseScout = "eclipse_scout.gif";
-  String FieldProtected = "field_protected_obj.gif";
-  String DoubleFieldAdd = "doublefield_add.gif";
-  String File = "file.gif";
-  String ScoutProjectNewWizBanner = "newscoutprj_wiz.png";
+  public TabBoxProposal(String name, int relevance, String imageId, ICompilationUnit cu, TypeProposalContext context) {
+    super(name, relevance, imageId, cu, context);
+  }
+
+  @Override
+  protected String getNlsMethodName() {
+    return null;
+  }
 }

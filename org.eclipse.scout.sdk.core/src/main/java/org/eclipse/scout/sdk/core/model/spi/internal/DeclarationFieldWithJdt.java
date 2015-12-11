@@ -39,6 +39,9 @@ public class DeclarationFieldWithJdt extends AbstractMemberWithJdt<IField> imple
   private TypeSpi m_type;
   private List<DeclarationAnnotationWithJdt> m_annotations;
   private AtomicReference<IMetaValue> m_constRef;
+  private ISourceRange m_source;
+  private ISourceRange m_initSource;
+  private ISourceRange m_javaDocSource;
 
   DeclarationFieldWithJdt(JavaEnvironmentWithJdt env, DeclarationTypeWithJdt declaringType, FieldDeclaration astNode) {
     super(env);
@@ -149,36 +152,49 @@ public class DeclarationFieldWithJdt extends AbstractMemberWithJdt<IField> imple
 
   @Override
   public ISourceRange getSource() {
-    CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-    FieldDeclaration decl = m_astNode;
-    return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_source == null) {
+      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+      FieldDeclaration decl = m_astNode;
+      m_source = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    }
+    return m_source;
   }
 
   @Override
   public ISourceRange getSourceOfInitializer() {
-    CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-    if (m_astNode instanceof Initializer) {
-      //static{ }
-      Initializer decl = (Initializer) m_astNode;
-      return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+    if (m_initSource == null) {
+      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+      if (m_astNode instanceof Initializer) {
+        //static{ }
+        Initializer decl = (Initializer) m_astNode;
+        m_initSource = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+      }
+      else {
+        Expression decl = m_astNode.initialization;
+        if (decl != null) {
+          m_initSource = m_env.getSource(cu, decl.sourceStart, decl.sourceEnd);
+        }
+        else {
+          m_initSource = ISourceRange.NO_SOURCE;
+        }
+      }
     }
-
-    Expression decl = m_astNode.initialization;
-    if (decl != null) {
-      return m_env.getSource(cu, decl.sourceStart, decl.sourceEnd);
-    }
-    return null;
+    return m_initSource;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    FieldDeclaration decl = m_astNode;
-    Javadoc doc = decl.javadoc;
-    if (doc != null) {
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-      return m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+    if (m_javaDocSource == null) {
+      FieldDeclaration decl = m_astNode;
+      Javadoc doc = decl.javadoc;
+      if (doc != null) {
+        CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+        m_javaDocSource = m_env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+      }
+      else {
+        m_javaDocSource = ISourceRange.NO_SOURCE;
+      }
     }
-    return null;
+    return m_javaDocSource;
   }
-
 }

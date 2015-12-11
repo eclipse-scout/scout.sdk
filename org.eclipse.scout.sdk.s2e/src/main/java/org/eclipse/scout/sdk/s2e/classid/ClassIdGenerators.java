@@ -41,6 +41,9 @@ public final class ClassIdGenerators {
   private static final Object LOCK = new Object();
   private static volatile Collection<IClassIdGenerator> allGeneratorsOrdered = null;
 
+  private static boolean automaticallyCreateClassIdAnnotation = false;
+  public static final String PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION = "org.eclipse.scout.sdk.propAutoCreateClassId";
+
   private ClassIdGenerators() {
   }
 
@@ -110,5 +113,26 @@ public final class ClassIdGenerators {
       }
     }
     return null;
+  }
+
+  /**
+   * @return true if the {@link ClassId} annotation should be generated automatically, false otherwise.
+   */
+  public static boolean isAutomaticallyCreateClassIdAnnotation() {
+    synchronized (LOCK) {
+      return automaticallyCreateClassIdAnnotation;
+    }
+  }
+
+  /**
+   * Sets if the {@link ClassId} annotation should automatically be created.
+   *
+   * @param newValue
+   *          true if it should be created automatically, false otherwise.
+   */
+  public static void setAutomaticallyCreateClassIdAnnotation(boolean newValue) {
+    synchronized (LOCK) {
+      automaticallyCreateClassIdAnnotation = newValue;
+    }
   }
 }

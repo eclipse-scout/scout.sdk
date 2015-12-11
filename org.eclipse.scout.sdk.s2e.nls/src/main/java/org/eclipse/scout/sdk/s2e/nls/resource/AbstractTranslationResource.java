@@ -23,9 +23,7 @@ import javax.swing.event.EventListenerList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 
 public abstract class AbstractTranslationResource implements ITranslationResource {
@@ -75,7 +73,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
     Map<String, String> newEntries = new HashMap<>(entrySet.size());
     for (Entry<Object, Object> entry : entrySet) {
       if (newEntries.get(entry.getKey()) != null) {
-        NlsCore.getDefault().getLog().log(new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, "Doubled entry for key: " + entry.getKey() + " skipping this entry", new Exception()));
+        SdkLog.error("Doubled entry for key: " + entry.getKey() + " skipping this entry", new Exception());
       }
       else {
         String key = (String) entry.getKey();

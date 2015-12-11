@@ -25,7 +25,7 @@ public abstract class AbstractMemberSourceBuilder extends AbstractAnnotatableSou
   public AbstractMemberSourceBuilder(IMember element) {
     super(element);
     setFlags(element.flags());
-    if (element.javaDoc() != null) {
+    if (element.javaDoc().isAvailable()) {
       setComment(new RawSourceBuilder(element.javaDoc().toString()));
     }
   }

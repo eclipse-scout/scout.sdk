@@ -92,4 +92,18 @@ public interface IJavaEnvironment {
    * @return The service provider interface that belongs to this {@link IJavaEnvironment}.
    */
   JavaEnvironmentSpi unwrap();
+
+  /**
+   * Returns a {@link String} describing all compile errors of the compilation unit containing the type with the given
+   * fully qualified name. <br>
+   *
+   * @param fqn
+   *          The fully qualified name of the type. See {@link #findType(String)} for details.
+   * @return A {@link String} with the compile errors of the compilation unit that contains the type with the given name
+   *         or <code>null</code> if there are no compilation errors in the compilation unit.
+   * @throws IllegalArgumentException
+   *           if the given fully qualified name cannot be found in this {@link IJavaEnvironment} or it is a binary
+   *           type.
+   */
+  String compileErrors(String fqn);
 }

@@ -24,7 +24,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ElementChangedEvent;
@@ -204,7 +204,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         m_javaDeltaCheckJob.cancel();
         thread.interrupt();
         try {
-          m_javaDeltaCheckJob.join(3000);
+          m_javaDeltaCheckJob.join(3000, null);
         }
         catch (InterruptedException e) {
           // nop
@@ -523,7 +523,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
 
           long start = System.currentTimeMillis();
           try {
-            handler.run(new SubProgressMonitor(monitor, 1));
+            handler.run(SubMonitor.convert(monitor, 1));
           }
           finally {
             SdkLog.debug("Derived Resource Handler '" + handler.getName() + "' took " + (System.currentTimeMillis() - start) + "ms to execute.");
@@ -584,7 +584,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
             monitor.setTaskName(handler.getName());
             monitor.subTask("");
             handler.validate();
-            handler.run(new SubProgressMonitor(monitor, 1));
+            handler.run(SubMonitor.convert(monitor, 1));
           }
           catch (Exception e) {
             SdkLog.error("Error while '" + handler.getName() + "'.", e);

@@ -23,15 +23,9 @@ public class PackageImplementor extends AbstractJavaElementImplementor<PackageSp
   }
 
   @Override
-  public String name() {
-    return m_spi.getName();
-  }
-
-  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     JavaModelPrinter.print(this, sb);
     return sb.toString();
   }
-
 }

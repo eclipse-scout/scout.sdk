@@ -10,13 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.wizard.newproject;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.m2e.core.ui.internal.wizards.MappingDiscoveryJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
-import org.eclipse.scout.sdk.s2e.ui.internal.ISdkIcons;
+import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizard;
 import org.eclipse.scout.sdk.s2e.workspace.newproject.ScoutProjectNewOperation;
@@ -49,7 +55,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
   @Override
   public boolean performFinish() {
     // prepare operation
-    ScoutProjectNewOperation op = new ScoutProjectNewOperation();
+    final ScoutProjectNewOperation op = new ScoutProjectNewOperation();
     op.setDisplayName(m_page1.getDisplayName());
     op.setSymbolicName(m_page1.getSymbolicName());
     op.setJavaVersion(Double.toString(getExecEnvVersion(getDefaultJvmExecutionEnvironment())));
@@ -68,9 +74,28 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
     getDialogSettings().put(ScoutProjectNewWizardPage.SETTINGS_TARGET_DIR, path);
 
     // run operation
-    new ResourceBlockingOperationJob(op).schedule();
+    final ResourceBlockingOperationJob projectCreationJob = new ResourceBlockingOperationJob(op);
+
+    // append mapping discovery
+    projectCreationJob.addJobChangeListener(new JobChangeAdapter() {
+      @Override
+      public void done(IJobChangeEvent event) {
+        if (projectCreationJob.getResult().isOK()) {
+          List<IProject> createdProjects = op.getCreatedProjects();
+          if (createdProjects != null && !createdProjects.isEmpty()) {
+            discoverMapping(createdProjects);
+          }
+        }
+      }
+    });
+    projectCreationJob.schedule();
 
     return true;
+  }
+
+  protected void discoverMapping(List<IProject> projects) {
+    MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(projects);
+    discoveryJob.schedule();
   }
 
   /**

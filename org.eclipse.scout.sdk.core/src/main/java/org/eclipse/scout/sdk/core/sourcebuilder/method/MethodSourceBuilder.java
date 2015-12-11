@@ -61,7 +61,7 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
       addExceptionSignature(SignatureUtils.getTypeSignature(t));
     }
     ISourceRange body = element.sourceOfBody();
-    if (body != null) {
+    if (body.isAvailable()) {
       setBody(new RawSourceBuilder(body.toString()));
     }
   }

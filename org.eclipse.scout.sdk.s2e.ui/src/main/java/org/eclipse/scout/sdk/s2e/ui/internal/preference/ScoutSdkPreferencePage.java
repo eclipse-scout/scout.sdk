@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.preference;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.ui.IWorkbench;
@@ -20,6 +21,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
   private BooleanFieldEditor m_updateFormDataAutomaticallyField;
+  private BooleanFieldEditor m_createClassIdAnnotationAutomaticallyField;
 
   public ScoutSdkPreferencePage() {
     super(GRID);
@@ -31,6 +33,9 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
   public void createFieldEditors() {
     m_updateFormDataAutomaticallyField = new BooleanFieldEditor(IDerivedResourceManager.PROP_AUTO_UPDATE, "Automatically update generated classes", getFieldEditorParent());
     addField(m_updateFormDataAutomaticallyField);
+
+    m_createClassIdAnnotationAutomaticallyField = new BooleanFieldEditor(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION, "Automatically create the @ClassId annotation for new classes.", getFieldEditorParent());
+    addField(m_createClassIdAnnotationAutomaticallyField);
   }
 
   @Override

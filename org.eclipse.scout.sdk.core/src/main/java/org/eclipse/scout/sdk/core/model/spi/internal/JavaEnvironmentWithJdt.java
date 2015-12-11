@@ -108,8 +108,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     return (TypeSpi) elem;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public synchronized JavaEnvironmentSpi reload() {
     JavaEnvironmentWithJdt oldEnv = this;
     Collection<ClasspathSpi> oldClasspath = oldEnv.getClasspath();
@@ -155,11 +155,11 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
   public String getCompileErrors(String fqn) {
     TypeSpi typeSpi = findType(fqn);
     if (typeSpi == null) {
-      return "Cannot find type " + fqn;
+      throw new IllegalArgumentException("Cannot find type '" + fqn + "'.");
     }
     CompilationUnitSpi cuSpi = typeSpi.getCompilationUnit();
     if (!(cuSpi instanceof DeclarationCompilationUnitWithJdt)) {
-      return "Type " + fqn + " is not a source type";
+      throw new IllegalArgumentException("Type '" + fqn + "' is not a source type.");
     }
     CompilationUnitDeclaration decl = ((DeclarationCompilationUnitWithJdt) cuSpi).getInternalCompilationUnitDeclaration();
     return m_compiler.getCompileErrors(decl);
@@ -192,9 +192,11 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
   public ISourceRange getSource(CompilationUnitSpi cu, int start, int end) {
     if (cu instanceof DeclarationCompilationUnitWithJdt) {
       org.eclipse.jdt.internal.compiler.env.ICompilationUnit sourceUnit = m_compiler.getSource(((DeclarationCompilationUnitWithJdt) cu).getInternalCompilationUnitDeclaration());
-      return sourceUnit != null ? new SourceRangeWithJdt(sourceUnit, start, end) : null;
+      if (sourceUnit != null) {
+        return new SourceRangeWithJdt(sourceUnit, start, end);
+      }
     }
-    return null;
+    return ISourceRange.NO_SOURCE;
   }
 
   public Map<Object, Object> getPerformanceCache() {

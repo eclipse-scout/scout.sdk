@@ -89,11 +89,11 @@ public class SyntheticCompilationUnitWithJdt extends AbstractJavaElementWithJdt<
 
   @Override
   public ISourceRange getSource() {
-    return null;
+    return ISourceRange.NO_SOURCE;
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    return null;
+    return ISourceRange.NO_SOURCE;
   }
 }

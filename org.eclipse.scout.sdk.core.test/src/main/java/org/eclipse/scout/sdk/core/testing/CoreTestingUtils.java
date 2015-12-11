@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
@@ -28,6 +29,7 @@ import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
  * helpers used for general core unit tests (not specific to scout generated code)
  */
 public final class CoreTestingUtils {
+  private static final Pattern WHITESPACE_PAT = Pattern.compile("\\s+");
   private static ICompilationUnit baseClassIcu;
   private static ICompilationUnit childClassIcu;
 
@@ -90,14 +92,14 @@ public final class CoreTestingUtils {
     if (s == null) {
       return null;
     }
-    return s.replaceAll("\\s+", "");
+    return WHITESPACE_PAT.matcher(s).replaceAll("");
   }
 
   public static String normalizeWhitespace(String s) {
     if (s == null) {
       return null;
     }
-    return s.replaceAll("\\s+", " ").trim();
+    return WHITESPACE_PAT.matcher(s).replaceAll(" ").trim();
   }
 
   public static IJavaEnvironment importJavaEnvironment(InputStream in) throws IOException {

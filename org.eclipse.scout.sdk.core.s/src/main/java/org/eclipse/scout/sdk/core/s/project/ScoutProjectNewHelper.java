@@ -46,6 +46,10 @@ import org.xml.sax.SAXException;
  */
 public final class ScoutProjectNewHelper {
 
+  public static final String SCOUT_ARCHETYPES_HELLOWORLD_VERSION = "5.2.0-SNAPSHOT";
+  public static final String SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID = "scout-helloworld-app";
+  public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
+
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"\\/<>=:]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
   public static final String DEFAULT_JAVA_VERSION = "1.8";
@@ -82,9 +86,9 @@ public final class ScoutProjectNewHelper {
     }
     if (StringUtils.isBlank(groupId) || StringUtils.isBlank(artifactId) || StringUtils.isBlank(version)) {
       // use default
-      groupId = "org.eclipse.scout.archetypes";
-      artifactId = "scout-helloworld-app";
-      version = "5.2.0-SNAPSHOT";
+      groupId = SCOUT_ARCHETYPES_GROUP_ID;
+      artifactId = SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID;
+      version = SCOUT_ARCHETYPES_HELLOWORLD_VERSION;
     }
 
     // create command
