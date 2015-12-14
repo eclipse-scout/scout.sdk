@@ -48,13 +48,15 @@ import org.eclipse.swt.widgets.Label;
  */
 public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
-  public static final String PROP_SYMBOLIC_NAME = "symbName";
+  public static final String PROP_GROUP_ID = "groupId";
+  public static final String PROP_ARTIFACT_ID = "artifactId";
   public static final String PROP_DISPLAY_NAME = "dispName";
   public static final String PROP_DIR = "dir";
   public static final String PROP_USE_WORKSPACE_LOC = "useWorkspaceLoc";
   public static final String SETTINGS_TARGET_DIR = "targetDirSetting";
 
-  protected StyledTextField m_symbolicNameField;
+  protected StyledTextField m_groupIdField;
+  protected StyledTextField m_artifactIdField;
   protected StyledTextField m_displayNameField;
   protected Button m_useWsLoc;
   protected FileSelectionField m_targetDirectoryField;
@@ -63,12 +65,11 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     super(ScoutProjectNewWizardPage.class.getName());
     setTitle("Create a Scout Project");
     setDescription("Create a new Scout Project");
+    initDefaultValues();
   }
 
   @Override
   protected void createContent(Composite parent) {
-    initDefaultValues();
-
     parent.setLayout(new GridLayout(1, true));
 
     createProjectNameGroup(parent);
@@ -81,24 +82,41 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     nameGroup.setLayout(new GridLayout(1, true));
     nameGroup.setText("Project Name");
 
-    // symbolic name
-    m_symbolicNameField = getFieldToolkit().createStyledTextField(nameGroup, "Symbolic Name");
-    m_symbolicNameField.setText(getSymbolicName());
-    m_symbolicNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_symbolicNameField.addModifyListener(new ModifyListener() {
+    // group id
+    m_groupIdField = getFieldToolkit().createStyledTextField(nameGroup, "Group Id");
+    m_groupIdField.setText(getGroupId());
+    m_groupIdField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_groupIdField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
         try {
           setStateChanging(true);
-          setSymbolicNameInternal(m_symbolicNameField.getText());
+          setGroupIdInternal(m_groupIdField.getText());
         }
         finally {
           setStateChanging(false);
         }
       }
     });
-    m_symbolicNameField.setSelection(new Point(0, m_symbolicNameField.getText().length()));
-    m_symbolicNameField.setFocus();
+    m_groupIdField.setSelection(new Point(0, m_groupIdField.getText().length()));
+    m_groupIdField.setFocus();
+
+    // artifact id
+    m_artifactIdField = getFieldToolkit().createStyledTextField(nameGroup, "Artifact Id");
+    m_artifactIdField.setText(getArtifactId());
+    m_artifactIdField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_artifactIdField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        try {
+          setStateChanging(true);
+          setArtifactIdInternal(m_artifactIdField.getText());
+        }
+        finally {
+          setStateChanging(false);
+        }
+      }
+    });
 
     // display name
     m_displayNameField = getFieldToolkit().createStyledTextField(nameGroup, "Display Name");
@@ -177,8 +195,11 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   }
 
   protected void initDefaultValues() {
-    // symbolic name
-    setSymbolicNameInternal("org.eclipse.scout.myapp");
+    // group id
+    setGroupIdInternal("org.eclipse.scout.apps");
+
+    // artifact id
+    setArtifactIdInternal("helloworld");
 
     // display name
     setDisplayNameInternal("My Application");
@@ -223,14 +244,24 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    multiStatus.add(getStatusSymbolicName());
+    multiStatus.add(getStatusGroupId());
+    multiStatus.add(getStatusArtifactId());
     multiStatus.add(getStatusDisplayName());
     multiStatus.add(getStatusTargetDirectory());
   }
 
-  protected IStatus getStatusSymbolicName() {
+  protected IStatus getStatusGroupId() {
     // check name pattern
-    String msg = ScoutProjectNewHelper.getSymbolicNameErrorMessage(getSymbolicName());
+    String msg = ScoutProjectNewHelper.getMavenNameErrorMessage(getGroupId(), "Group Id");
+    if (msg != null) {
+      return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
+    }
+    return Status.OK_STATUS;
+  }
+
+  protected IStatus getStatusArtifactId() {
+    // check name pattern
+    String msg = ScoutProjectNewHelper.getMavenNameErrorMessage(getArtifactId(), "Artifact Id");
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }
@@ -243,14 +274,14 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     else {
       folder = getTargetDirectory();
     }
-    if (folder != null && new File(folder, getSymbolicName()).exists()) {
-      return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Symbolic Name already exists in this target directory.");
+    if (folder != null && new File(folder, getArtifactId()).exists()) {
+      return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Artifact Id already exists in this target directory.");
     }
 
     // check project existence in workspace
     for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-      if (p.getName().startsWith(getSymbolicName() + '.')) {
-        return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Symbolic Name already exists in the workspace.");
+      if (p.getName().startsWith(getArtifactId() + '.')) {
+        return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Artifact Id already exists in the workspace.");
       }
     }
     return Status.OK_STATUS;
@@ -295,16 +326,16 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     setPropertyString(PROP_DISPLAY_NAME, s);
   }
 
-  public String getSymbolicName() {
-    return getPropertyString(PROP_SYMBOLIC_NAME);
+  public String getGroupId() {
+    return getPropertyString(PROP_GROUP_ID);
   }
 
-  public void setSymbolicName(String s) {
+  public void setGroupId(String s) {
     try {
       setStateChanging(true);
-      setSymbolicNameInternal(s);
+      setGroupIdInternal(s);
       if (isControlCreated()) {
-        m_symbolicNameField.setText(s);
+        m_groupIdField.setText(s);
       }
     }
     finally {
@@ -312,8 +343,29 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     }
   }
 
-  protected void setSymbolicNameInternal(String s) {
-    setPropertyString(PROP_SYMBOLIC_NAME, s);
+  protected void setGroupIdInternal(String s) {
+    setPropertyString(PROP_GROUP_ID, s);
+  }
+
+  public String getArtifactId() {
+    return getPropertyString(PROP_ARTIFACT_ID);
+  }
+
+  public void setArtifactId(String s) {
+    try {
+      setStateChanging(true);
+      setArtifactIdInternal(s);
+      if (isControlCreated()) {
+        m_artifactIdField.setText(s);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setArtifactIdInternal(String s) {
+    setPropertyString(PROP_ARTIFACT_ID, s);
   }
 
   public boolean isUseWorkspaceLocation() {

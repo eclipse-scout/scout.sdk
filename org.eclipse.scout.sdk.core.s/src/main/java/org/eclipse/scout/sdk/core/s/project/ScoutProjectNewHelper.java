@@ -57,25 +57,31 @@ public final class ScoutProjectNewHelper {
   private ScoutProjectNewHelper() {
   }
 
-  public static void createProject(File targetDirectory, String symbolicName, String displayName) throws IOException, GeneralSecurityException {
-    createProject(targetDirectory, symbolicName, displayName, null);
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName) throws IOException, GeneralSecurityException {
+    createProject(targetDirectory, groupId, artifactId, displayName, null);
   }
 
-  public static void createProject(File targetDirectory, String symbolicName, String displayName, String javaVersion) throws IOException, GeneralSecurityException {
-    createProject(targetDirectory, symbolicName, displayName, javaVersion, null, null, null);
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion) throws IOException, GeneralSecurityException {
+    createProject(targetDirectory, groupId, artifactId, displayName, javaVersion, null, null, null);
   }
 
-  public static void createProject(File targetDirectory, String symbolicName, String displayName, String javaVersion, String groupId, String artifactId, String version) throws IOException, GeneralSecurityException {
-    createProject(targetDirectory, symbolicName, displayName, javaVersion, groupId, artifactId, javaVersion, null, null);
-  }
-
-  public static void createProject(File targetDirectory, String symbolicName, String displayName, String javaVersion, String groupId, String artifactId, String version, String mavenGlobalSettings, String mavenSettings)
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion, String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion)
       throws IOException, GeneralSecurityException {
+    createProject(targetDirectory, groupId, artifactId, displayName, javaVersion, archetypeGroupId, archeTypeArtifactId, archetypeVersion, null, null);
+  }
+
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion,
+      String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion, String mavenGlobalSettings, String mavenSettings)
+          throws IOException, GeneralSecurityException {
     // validate input
     Validate.notNull(targetDirectory);
-    String symbolicNameMsg = getSymbolicNameErrorMessage(symbolicName);
-    if (symbolicNameMsg != null) {
-      throw new IllegalArgumentException(symbolicNameMsg);
+    String groupIdMsg = getMavenNameErrorMessage(groupId, "groupId");
+    if (groupIdMsg != null) {
+      throw new IllegalArgumentException(groupIdMsg);
+    }
+    String artifactIdMsg = getMavenNameErrorMessage(artifactId, "artifactId");
+    if (artifactIdMsg != null) {
+      throw new IllegalArgumentException(artifactIdMsg);
     }
     String displayNameMsg = getDisplayNameErrorMEssage(displayName);
     if (displayNameMsg != null) {
@@ -84,19 +90,19 @@ public final class ScoutProjectNewHelper {
     if (StringUtils.isEmpty(javaVersion)) {
       javaVersion = DEFAULT_JAVA_VERSION;
     }
-    if (StringUtils.isBlank(groupId) || StringUtils.isBlank(artifactId) || StringUtils.isBlank(version)) {
+    if (StringUtils.isBlank(archetypeGroupId) || StringUtils.isBlank(archeTypeArtifactId) || StringUtils.isBlank(archetypeVersion)) {
       // use default
-      groupId = SCOUT_ARCHETYPES_GROUP_ID;
-      artifactId = SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID;
-      version = SCOUT_ARCHETYPES_HELLOWORLD_VERSION;
+      archetypeGroupId = SCOUT_ARCHETYPES_GROUP_ID;
+      archeTypeArtifactId = SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID;
+      archetypeVersion = SCOUT_ARCHETYPES_HELLOWORLD_VERSION;
     }
 
     // create command
     String[] authKeysForWar = CoreUtils.generateKeyPair();
     String[] authKeysForDev = CoreUtils.generateKeyPair();
     String[] args = new String[]{"archetype:generate", "-B", "-X",
-        "-DarchetypeGroupId=" + groupId, "-DarchetypeArtifactId=" + artifactId, "-DarchetypeVersion=" + version,
-        "-DgroupId=" + symbolicName, "-DartifactId=" + symbolicName, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + symbolicName,
+        "-DarchetypeGroupId=" + archetypeGroupId, "-DarchetypeArtifactId=" + archeTypeArtifactId, "-DarchetypeVersion=" + archetypeVersion,
+        "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + groupId + '.' + artifactId,
         "-DdisplayName=" + displayName, "-DscoutAuthPublicKey=" + authKeysForWar[1], "-DscoutAuthPrivateKey=" + authKeysForWar[0], "-DscoutAuthPublicKeyDev=" + authKeysForDev[1], "-DscoutAuthPrivateKeyDev=" + authKeysForDev[0],
         "-DjavaVersion=" + javaVersion, "-DuserName=" + CoreUtils.getUsername(),
         "-Dmaven.ext.class.path=''"};
@@ -104,7 +110,7 @@ public final class ScoutProjectNewHelper {
     // execute archetype generation
     new MavenCliRunner().execute(targetDirectory, args, mavenGlobalSettings, mavenSettings);
 
-    postProcessRootPom(new File(targetDirectory, symbolicName));
+    postProcessRootPom(new File(targetDirectory, artifactId));
   }
 
   /**
@@ -165,7 +171,7 @@ public final class ScoutProjectNewHelper {
 
   public static String getDisplayNameErrorMEssage(String displayNameCandidate) {
     if (StringUtils.isEmpty(displayNameCandidate)) {
-      return "Display Name is not set";
+      return "Display Name is not set.";
     }
     if (!DISPLAY_NAME_PATTERN.matcher(displayNameCandidate).matches()) {
       return "The Display Name must not contain these characters: \\\"/<>:=";
@@ -173,17 +179,17 @@ public final class ScoutProjectNewHelper {
     return null;
   }
 
-  public static String getSymbolicNameErrorMessage(String symbolicNameCandidate) {
+  public static String getMavenNameErrorMessage(String symbolicNameCandidate, String attribName) {
     if (StringUtils.isEmpty(symbolicNameCandidate)) {
-      return "Project Name is not set";
+      return attribName + " is not set.";
     }
     if (!SYMBOLIC_NAME_PATTERN.matcher(symbolicNameCandidate).matches()) {
-      return "The symbolic name is invalid. Use e.g. 'org.eclipse.scout.test'.";
+      return "The " + attribName + " value is not valid.";
     }
     // reserved java keywords
     String jkw = getContainingJavaKeyWord(symbolicNameCandidate);
     if (jkw != null) {
-      return "The Symbolic Name must not contain the Java keyword '" + jkw + "'.";
+      return "The " + attribName + " must not contain the Java keyword '" + jkw + "'.";
     }
     return null;
   }

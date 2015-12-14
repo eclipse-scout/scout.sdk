@@ -26,14 +26,15 @@ import org.junit.Test;
  * @since 5.2.0
  */
 public class ScoutProjectNewTest {
-  private static final String PROJECT_SYMBOLIC_NAME = "sdk.test.app";
+  private static final String PROJECT_GROUP_ID = "group";
+  private static final String PROJECT_ARTIFACT_ID = "artifact";
 
   @Test
   public void testProjectCreation() throws IOException, GeneralSecurityException {
     File targetDirectory = Files.createTempDirectory(ScoutProjectNewTest.class.getSimpleName() + "-projectDir").toFile();
     try {
-      ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_SYMBOLIC_NAME, "test", getJavaVersion());
-      File pomDir = new File(targetDirectory, PROJECT_SYMBOLIC_NAME + File.separatorChar + PROJECT_SYMBOLIC_NAME);
+      ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", getJavaVersion());
+      File pomDir = new File(targetDirectory, PROJECT_ARTIFACT_ID);
       new MavenCliRunner().execute(pomDir, new String[]{"clean", "test", "-B", "-X", "-Dmaven.ext.class.path=''", "-Dmaster_test_forkCount=1", "-Dmaster_test_runOrder=filesystem"}, null, null);
     }
     finally {

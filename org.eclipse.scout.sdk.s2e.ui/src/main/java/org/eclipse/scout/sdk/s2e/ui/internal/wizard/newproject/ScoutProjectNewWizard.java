@@ -57,7 +57,8 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
     // prepare operation
     final ScoutProjectNewOperation op = new ScoutProjectNewOperation();
     op.setDisplayName(m_page1.getDisplayName());
-    op.setSymbolicName(m_page1.getSymbolicName());
+    op.setGroupId(m_page1.getGroupId());
+    op.setArtifactId(m_page1.getArtifactId());
     op.setJavaVersion(Double.toString(getExecEnvVersion(getDefaultJvmExecutionEnvironment())));
     if (m_page1.isUseWorkspaceLocation()) {
       op.setTargetDirectory(ScoutProjectNewWizardPage.getWorkspaceLocation());

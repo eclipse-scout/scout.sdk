@@ -43,7 +43,8 @@ public class ScoutProjectNewOperation implements IOperation {
   public static final String TEMPLATE_ARTIFACT_ID = "org.eclipse.scout.archetype.artifactId";
   public static final String TEMPLATE_VERSION = "org.eclipse.scout.archetype.version";
 
-  private String m_symbolicName;
+  private String m_groupId;
+  private String m_artifactId;
   private String m_displayName;
   private String m_javaVersion;
   private File m_targetDirectory;
@@ -78,7 +79,7 @@ public class ScoutProjectNewOperation implements IOperation {
       String settings = getMavenSettings(MavenPlugin.getMavenConfiguration().getUserSettingsFile());
 
       monitor.beginTask(getOperationName(), 100);
-      ScoutProjectNewHelper.createProject(getTargetDirectory(), getSymbolicName(), getDisplayName(), getJavaVersion(), groupId, artifactId, version, globalSettings, settings);
+      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getJavaVersion(), groupId, artifactId, version, globalSettings, settings);
       monitor.worked(10);
 
       m_createdProjects = importIntoWorkspace(SubMonitor.convert(monitor, 90));
@@ -109,7 +110,7 @@ public class ScoutProjectNewOperation implements IOperation {
    * @throws CoreException
    */
   protected List<IProject> importIntoWorkspace(IProgressMonitor monitor) throws CoreException {
-    File baseFolder = new File(getTargetDirectory(), getSymbolicName());
+    File baseFolder = new File(getTargetDirectory(), getArtifactId());
     File[] subFolders = baseFolder.listFiles();
     Collection<MavenProjectInfo> projects = new ArrayList<>(subFolders.length);
     for (File subFolder : subFolders) {
@@ -129,14 +130,6 @@ public class ScoutProjectNewOperation implements IOperation {
       }
     }
     return result;
-  }
-
-  public String getSymbolicName() {
-    return m_symbolicName;
-  }
-
-  public void setSymbolicName(String symbolicName) {
-    m_symbolicName = symbolicName;
   }
 
   public String getDisplayName() {
@@ -165,5 +158,21 @@ public class ScoutProjectNewOperation implements IOperation {
 
   public List<IProject> getCreatedProjects() {
     return m_createdProjects;
+  }
+
+  public String getGroupId() {
+    return m_groupId;
+  }
+
+  public void setGroupId(String groupId) {
+    m_groupId = groupId;
+  }
+
+  public String getArtifactId() {
+    return m_artifactId;
+  }
+
+  public void setArtifactId(String artifactId) {
+    m_artifactId = artifactId;
   }
 }
