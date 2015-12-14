@@ -310,10 +310,8 @@ public final class AstUtils {
     }
 
     ITypeBinding superclass = type.getSuperclass();
-    if (superclass != null) {
-      if (!visitBindingRec(superclass, visitor, visited)) {
-        return false;
-      }
+    if (superclass != null && !visitBindingRec(superclass, visitor, visited)) {
+      return false;
     }
 
     for (ITypeBinding ifc : type.getInterfaces()) {
@@ -533,7 +531,7 @@ public final class AstUtils {
   private static final class P_ChildrenCollector extends DefaultAstVisitor {
     private Deque<ASTNode> m_result;
 
-    public P_ChildrenCollector() {
+    private P_ChildrenCollector() {
       super(true);
       m_result = null;
     }

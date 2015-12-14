@@ -250,7 +250,7 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
   private static final class P_EnsureElementInRewriteFilter implements IFilter<ASTNode> {
     private final Set<Object> m_elements;
 
-    public P_EnsureElementInRewriteFilter(ListRewrite declaringTypeRewrite) {
+    private P_EnsureElementInRewriteFilter(ListRewrite declaringTypeRewrite) {
       List<?> originalList = declaringTypeRewrite.getOriginalList();
       m_elements = new HashSet<>(originalList.size());
       for (Object element : originalList) {

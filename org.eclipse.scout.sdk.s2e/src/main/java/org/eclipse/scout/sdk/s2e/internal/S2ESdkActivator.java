@@ -91,7 +91,7 @@ public class S2ESdkActivator extends Plugin {
       archetyper.updateLocalCatalog(archetype);
     }
     catch (Exception e) {
-      e.printStackTrace();
+      SdkLog.info("Unable to register Scout HelloWorld archetype.", e);
     }
   }
 }

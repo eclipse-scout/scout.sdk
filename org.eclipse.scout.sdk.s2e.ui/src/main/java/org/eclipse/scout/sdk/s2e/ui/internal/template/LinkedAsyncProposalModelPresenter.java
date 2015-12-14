@@ -13,16 +13,12 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalModel;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.PositionInformation;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorHighlightingSynchronizer;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -43,7 +39,6 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
@@ -156,80 +151,56 @@ public class LinkedAsyncProposalModelPresenter {
 
   static class LinkedPositionProposalImpl implements ICompletionProposalExtension2, IJavaCompletionProposal {
 
-    private final LinkedProposalPositionGroup.Proposal fProposal;
-    private final LinkedModeModel fLinkedPositionModel;
+    private final LinkedProposalPositionGroup.Proposal m_proposal;
+    private final LinkedModeModel m_linkedPositionModel;
 
-    public LinkedPositionProposalImpl(LinkedProposalPositionGroup.Proposal proposal, LinkedModeModel model) {
-      fProposal = proposal;
-      fLinkedPositionModel = model;
+    LinkedPositionProposalImpl(LinkedProposalPositionGroup.Proposal proposal, LinkedModeModel model) {
+      m_proposal = proposal;
+      m_linkedPositionModel = model;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension2#apply(org.eclipse.jface.text.ITextViewer, char, int, int)
-     */
     @Override
     public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
       IDocument doc = viewer.getDocument();
-      LinkedPosition position = fLinkedPositionModel.findPosition(new LinkedPosition(doc, offset, 0));
-      if (position != null) {
-        try {
-          try {
-            TextEdit edit = fProposal.computeEdits(offset, position, trigger, stateMask, fLinkedPositionModel);
-            if (edit != null) {
-              edit.apply(position.getDocument(), 0);
-            }
-          }
-          catch (MalformedTreeException e) {
-            throw new CoreException(new Status(IStatus.ERROR, JavaUI.ID_PLUGIN, IStatus.ERROR, "Unexpected exception applying edit", e)); //$NON-NLS-1$
-          }
-          catch (BadLocationException e) {
-            throw new CoreException(new Status(IStatus.ERROR, JavaUI.ID_PLUGIN, IStatus.ERROR, "Unexpected exception applying edit", e)); //$NON-NLS-1$
-          }
+      LinkedPosition position = m_linkedPositionModel.findPosition(new LinkedPosition(doc, offset, 0));
+      if (position == null) {
+        return;
+      }
+
+      try {
+        TextEdit edit = m_proposal.computeEdits(offset, position, trigger, stateMask, m_linkedPositionModel);
+        if (edit != null) {
+          edit.apply(position.getDocument(), 0);
         }
-        catch (CoreException e) {
-          JavaPlugin.log(e);
-        }
+      }
+      catch (Exception e) {
+        SdkLog.info("Unable to apply text edit.", e);
       }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getDisplayString()
-     */
     @Override
     public String getDisplayString() {
-      return fProposal.getDisplayString();
+      return m_proposal.getDisplayString();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getImage()
-     */
     @Override
     public Image getImage() {
-      return fProposal.getImage();
+      return m_proposal.getImage();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jdt.ui.text.java.IJavaCompletionProposal#getRelevance()
-     */
     @Override
     public int getRelevance() {
-      return fProposal.getRelevance();
+      return m_proposal.getRelevance();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#apply(org.eclipse.jface.text.IDocument)
-     */
     @Override
     public void apply(IDocument document) {
       // not called
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getAdditionalProposalInfo()
-     */
     @Override
     public String getAdditionalProposalInfo() {
-      return fProposal.getAdditionalProposalInfo();
+      return m_proposal.getAdditionalProposalInfo();
     }
 
     @Override
@@ -250,16 +221,13 @@ public class LinkedAsyncProposalModelPresenter {
     public void unselected(ITextViewer viewer) {
     }
 
-    /*
-     * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension2#validate(org.eclipse.jface.text.IDocument, int, org.eclipse.jface.text.DocumentEvent)
-     */
     @Override
     public boolean validate(IDocument document, int offset, DocumentEvent event) {
       // ignore event
       String insert = getDisplayString();
 
       int off;
-      LinkedPosition pos = fLinkedPositionModel.findPosition(new LinkedPosition(document, offset, 0));
+      LinkedPosition pos = m_linkedPositionModel.findPosition(new LinkedPosition(document, offset, 0));
       if (pos != null) {
         off = pos.getOffset();
       }
@@ -284,7 +252,7 @@ public class LinkedAsyncProposalModelPresenter {
     }
   }
 
-  private static class LinkedModeExitPolicy implements LinkedModeUI.IExitPolicy {
+  private static final class LinkedModeExitPolicy implements LinkedModeUI.IExitPolicy {
     @Override
     public ExitFlags doExit(LinkedModeModel model, VerifyEvent event, int offset, int length) {
       if (event.character == '=') {
@@ -293,5 +261,4 @@ public class LinkedAsyncProposalModelPresenter {
       return null;
     }
   }
-
 }

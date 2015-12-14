@@ -74,13 +74,21 @@ public abstract class AbstractTypeProposal extends ASTRewriteCorrectionProposal 
     AstNodeFactory createFactoryFor(AbstractTypeProposal proposal);
   }
 
-  public static volatile IAstNodeFactoryProvider AST_NODE_FACTORY_PROVIDER = new IAstNodeFactoryProvider() {
+  private static volatile IAstNodeFactoryProvider astNodeFactoryProvider = new IAstNodeFactoryProvider() {
     @Override
     public AstNodeFactory createFactoryFor(AbstractTypeProposal proposal) {
       return new AstNodeFactory(proposal.getProposalContext().getDeclaringType(), proposal.getProposalContext().getIcu(), proposal.getProposalContext().getProvider(),
           proposal.getProposalContext().getDeclaringTypeBinding(), proposal.getImportRewrite(), proposal);
     }
   };
+
+  public static IAstNodeFactoryProvider getAstNodeFactoryProvider() {
+    return astNodeFactoryProvider;
+  }
+
+  public static void setAstNodeFactoryProvider(IAstNodeFactoryProvider provider) {
+    astNodeFactoryProvider = Validate.notNull(provider);
+  }
 
   public AbstractTypeProposal(String displayName, int relevance, String imageId, ICompilationUnit cu, TypeProposalContext context) {
     super(displayName, cu, null, relevance, S2ESdkUiActivator.getImage(imageId));
@@ -124,7 +132,7 @@ public abstract class AbstractTypeProposal extends ASTRewriteCorrectionProposal 
 
   protected synchronized AstNodeFactory getFactory() {
     if (m_nodeFactory == null) {
-      m_nodeFactory = AST_NODE_FACTORY_PROVIDER.createFactoryFor(this);
+      m_nodeFactory = astNodeFactoryProvider.createFactoryFor(this);
     }
     return m_nodeFactory;
   }
@@ -234,14 +242,14 @@ public abstract class AbstractTypeProposal extends ASTRewriteCorrectionProposal 
   }
 
   private static final class P_JavaLinkedModeProposal extends Proposal {
-    private final ITypeBinding fTypeProposal;
-    private final ICompilationUnit fCompilationUnit;
+    private final ITypeBinding m_typeProposal;
+    private final ICompilationUnit m_compilationUnit;
 
-    public P_JavaLinkedModeProposal(ICompilationUnit unit, ITypeBinding typeProposal, int relevance) {
+    private P_JavaLinkedModeProposal(ICompilationUnit unit, ITypeBinding typeProposal, int relevance) {
       super(BindingLabelProvider.getBindingLabel(typeProposal, JavaElementLabels.ALL_DEFAULT | JavaElementLabels.ALL_POST_QUALIFIED), null, relevance);
-      fTypeProposal = typeProposal;
-      fCompilationUnit = unit;
-      ImageDescriptor desc = BindingLabelProvider.getBindingImageDescriptor(fTypeProposal, BindingLabelProvider.DEFAULT_IMAGEFLAGS);
+      m_typeProposal = typeProposal;
+      m_compilationUnit = unit;
+      ImageDescriptor desc = BindingLabelProvider.getBindingImageDescriptor(m_typeProposal, BindingLabelProvider.DEFAULT_IMAGEFLAGS);
       if (desc != null) {
         setImage(JavaPlugin.getImageDescriptorRegistry().get(desc));
       }
@@ -249,8 +257,8 @@ public abstract class AbstractTypeProposal extends ASTRewriteCorrectionProposal 
 
     @Override
     public TextEdit computeEdits(int offset, LinkedPosition position, char trigger, int stateMask, LinkedModeModel model) throws CoreException {
-      ImportRewrite impRewrite = StubUtility.createImportRewrite(fCompilationUnit, true);
-      String replaceString = impRewrite.addImport(fTypeProposal);
+      ImportRewrite impRewrite = StubUtility.createImportRewrite(m_compilationUnit, true);
+      String replaceString = impRewrite.addImport(m_typeProposal);
 
       MultiTextEdit composedEdit = new MultiTextEdit();
       composedEdit.addChild(new ReplaceEdit(position.getOffset(), position.getLength(), replaceString));

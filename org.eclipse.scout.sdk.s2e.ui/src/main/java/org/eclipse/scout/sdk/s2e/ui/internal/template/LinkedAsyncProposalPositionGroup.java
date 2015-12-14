@@ -51,7 +51,7 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
   @Override
   public Proposal[] getProposals() {
     try {
-      return m_future.get(300, TimeUnit.MILLISECONDS);
+      return m_future.get(100, TimeUnit.MILLISECONDS);
     }
     catch (InterruptedException | TimeoutException e) {
       return new Proposal[]{new Proposal("Loading...", null, 10)};
@@ -80,7 +80,7 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
 
     private final Runnable m_futureToRun;
 
-    public P_RunnableJob(Runnable future) {
+    private P_RunnableJob(Runnable future) {
       super("execute runnable");
       setUser(false);
       setSystem(true);
