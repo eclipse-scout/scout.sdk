@@ -431,10 +431,6 @@
               <version>${org.eclipse.m2e.archetype.common}</version>
             </iu>
             <iu>
-              <id>org.eclipse.m2e.archetype.common.source</id>
-              <version>${org.eclipse.m2e.archetype.common}</version>
-            </iu>
-            <iu>
               <id>org.eclipse.m2e.core.ui</id>
               <version>${org.eclipse.m2e.core.ui}</version>
             </iu>
@@ -838,7 +834,6 @@
                 <phase>deploy</phase>
                 <configuration>
                   <file>${downloaded}/org.eclipse.m2e.archetype.common_${org.eclipse.m2e.archetype.common}.jar</file>
-                  <sources>${downloaded}/org.eclipse.m2e.archetype.common.source_${org.eclipse.m2e.archetype.common}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.archetype.common.pom</pomFile>
                 </configuration>
               </execution>
@@ -1573,7 +1568,6 @@
                 <phase>deploy</phase>
                 <configuration>
                   <file>${downloaded}/org.eclipse.m2e.archetype.common_${org.eclipse.m2e.archetype.common}.jar</file>
-                  <sources>${downloaded}/org.eclipse.m2e.archetype.common.source_${org.eclipse.m2e.archetype.common}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.archetype.common.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
