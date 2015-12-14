@@ -426,6 +426,22 @@
               <id>org.eclipse.m2e.core.source</id>
               <version>${org.eclipse.m2e.core}</version>
             </iu>
+            <iu>
+              <id>org.eclipse.m2e.archetype.common</id>
+              <version>${org.eclipse.m2e.archetype.common}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.m2e.archetype.common.source</id>
+              <version>${org.eclipse.m2e.archetype.common}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.m2e.core.ui</id>
+              <version>${org.eclipse.m2e.core.ui}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.m2e.core.ui.source</id>
+              <version>${org.eclipse.m2e.core.ui}</version>
+            </iu>
           </ius>
           <followStrictOnly>true</followStrictOnly>
         </configuration>
@@ -800,6 +816,30 @@
                   <file>${downloaded}/org.eclipse.m2e.core_${org.eclipse.m2e.core}.jar</file>
                   <sources>${downloaded}/org.eclipse.m2e.core.source_${org.eclipse.m2e.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-m2e-ui</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.m2e.core.ui_${org.eclipse.m2e.core.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.m2e.core.ui.source_${org.eclipse.m2e.core.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.ui.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-m2e-archetype-common</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.m2e.archetype.common_${org.eclipse.m2e.archetype.common}.jar</file>
+                  <sources>${downloaded}/org.eclipse.m2e.archetype.common.source_${org.eclipse.m2e.archetype.common}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.archetype.common.pom</pomFile>
                 </configuration>
               </execution>
             </executions>
@@ -1509,6 +1549,32 @@
                   <file>${downloaded}/org.eclipse.m2e.core_${org.eclipse.m2e.core}.jar</file>
                   <sources>${downloaded}/org.eclipse.m2e.core.source_${org.eclipse.m2e.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-m2e-ui</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.m2e.core.ui_${org.eclipse.m2e.core.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.m2e.core.ui.source_${org.eclipse.m2e.core.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.ui.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-m2e-archetype-common</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.m2e.archetype.common_${org.eclipse.m2e.archetype.common}.jar</file>
+                  <sources>${downloaded}/org.eclipse.m2e.archetype.common.source_${org.eclipse.m2e.archetype.common}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.archetype.common.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>

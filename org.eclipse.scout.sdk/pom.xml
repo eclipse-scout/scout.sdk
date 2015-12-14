@@ -199,7 +199,16 @@
 
     <org.eclipse.m2e.core>1.6.0.20150526-2032</org.eclipse.m2e.core>
     <org.eclipse.m2e.core-maven>${org.eclipse.m2e.core}</org.eclipse.m2e.core-maven>
-    <org.eclipse.m2e.core-range>[1.6.0,1.6.1)</org.eclipse.m2e.core-range>
+    <org.eclipse.m2e.core-range>[1.6.0,1.8)</org.eclipse.m2e.core-range>
+
+    <org.eclipse.m2e.core.ui>1.6.0.20150526-2032</org.eclipse.m2e.core.ui>
+    <org.eclipse.m2e.core.ui-maven>${org.eclipse.m2e.core.ui}</org.eclipse.m2e.core.ui-maven>
+    <org.eclipse.m2e.core.ui-range>[1.6.0,1.8)</org.eclipse.m2e.core.ui-range>
+
+    <org.eclipse.m2e.archetype.common>1.6.0.20150526-2031</org.eclipse.m2e.archetype.common>
+    <org.eclipse.m2e.archetype.common-maven>${org.eclipse.m2e.archetype.common}</org.eclipse.m2e.archetype.common-maven>
+    <org.eclipse.m2e.archetype.common-range>[1.6.0,1.8)</org.eclipse.m2e.archetype.common-range>
+
     <maven.model.dependency.version>3.3.3</maven.model.dependency.version>
   </properties>
 
@@ -389,6 +398,18 @@
         <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.m2e.core</artifactId>
         <version>${org.eclipse.m2e.core-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
+        <artifactId>org.eclipse.m2e.core.ui</artifactId>
+        <version>${org.eclipse.m2e.core.ui-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
+        <artifactId>org.eclipse.m2e.archetype.common</artifactId>
+        <version>${org.eclipse.m2e.archetype.common-maven}</version>
       </dependency>
 
       <dependency>
