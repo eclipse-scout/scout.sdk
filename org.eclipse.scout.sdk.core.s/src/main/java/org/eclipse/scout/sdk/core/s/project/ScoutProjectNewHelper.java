@@ -97,12 +97,20 @@ public final class ScoutProjectNewHelper {
       archetypeVersion = SCOUT_ARCHETYPES_HELLOWORLD_VERSION;
     }
 
+    String pck = null;
+    if (groupId.equals(artifactId)) {
+      pck = artifactId;
+    }
+    else {
+      pck = new StringBuilder(groupId).append('.').append(artifactId).toString();
+    }
+
     // create command
     String[] authKeysForWar = CoreUtils.generateKeyPair();
     String[] authKeysForDev = CoreUtils.generateKeyPair();
     String[] args = new String[]{"archetype:generate", "-B", "-X",
         "-DarchetypeGroupId=" + archetypeGroupId, "-DarchetypeArtifactId=" + archeTypeArtifactId, "-DarchetypeVersion=" + archetypeVersion,
-        "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + groupId + '.' + artifactId,
+        "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + pck,
         "-DdisplayName=" + displayName, "-DscoutAuthPublicKey=" + authKeysForWar[1], "-DscoutAuthPrivateKey=" + authKeysForWar[0], "-DscoutAuthPublicKeyDev=" + authKeysForDev[1], "-DscoutAuthPrivateKeyDev=" + authKeysForDev[0],
         "-DjavaVersion=" + javaVersion, "-DuserName=" + CoreUtils.getUsername(),
         "-Dmaven.ext.class.path=''"};
