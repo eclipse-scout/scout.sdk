@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
@@ -44,8 +45,12 @@ public abstract class AbstractJavaElementSourceBuilder implements IJavaElementSo
 
   protected void createComment(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     if (getComment() != null) {
-      getComment().createSource(source, lineDelimiter, context, validator);
-      source.append(lineDelimiter);
+      StringBuilder commentBuilder = new StringBuilder();
+      getComment().createSource(commentBuilder, lineDelimiter, context, validator);
+      if (StringUtils.isNotBlank(commentBuilder)) {
+        source.append(commentBuilder);
+        source.append(lineDelimiter);
+      }
     }
   }
 

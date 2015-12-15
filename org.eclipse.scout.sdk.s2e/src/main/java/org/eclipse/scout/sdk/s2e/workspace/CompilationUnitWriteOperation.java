@@ -161,9 +161,22 @@ public class CompilationUnitWriteOperation implements IOperation {
     else if (source2 == null) {
       return false;
     }
+
+    // only compare contents starting from the package declaration
+    // ignore file headers in comparing the content
+    source1 = getSourceStartingAtPackage(source1);
+    source2 = getSourceStartingAtPackage(source2);
     if (source1.length() != source2.length()) {
       return false;
     }
     return source1.equals(source2);
+  }
+
+  protected static String getSourceStartingAtPackage(String fullSource) {
+    int packagePos = fullSource.indexOf("package ");
+    if (packagePos <= 0) {
+      return fullSource;
+    }
+    return fullSource.substring(packagePos);
   }
 }
