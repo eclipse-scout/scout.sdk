@@ -25,6 +25,7 @@
   <artifactId>updatesite-maven-plugin</artifactId>
   <version>5.2.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>

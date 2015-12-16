@@ -21,6 +21,7 @@
 
   <artifactId>org.eclipse.scout.sdk.s2e.releng</artifactId>
   <packaging>pom</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <!--
     To update the Eclipse artifacts needed by the Maven class-loader side of Eclipse Scout SDK:

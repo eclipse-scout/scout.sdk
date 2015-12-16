@@ -24,6 +24,7 @@
   <groupId>org.eclipse.scout.sdk.s2e</groupId>
   <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
   <packaging>bundle</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
     <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
