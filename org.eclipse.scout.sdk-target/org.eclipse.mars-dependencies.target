@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="Scout SDK Eclipse Mars Dependencies" sequenceNumber="1441890189">
+<target name="Scout SDK Eclipse Mars Dependencies" sequenceNumber="1450256654">
   <locations>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.platform.feature.group" version="4.5.0.v20150603-2358"/>
-      <unit id="org.eclipse.jdt.feature.group" version="3.11.0.v20150603-2000"/>
-      <unit id="org.eclipse.emf.common.feature.group" version="2.11.0.v20150512-0501"/>
-      <unit id="org.eclipse.rcp.feature.group" version="4.5.0.v20150603-2331"/>
-      <unit id="org.eclipse.e4.rcp.feature.group" version="1.4.0.v20150603-0857"/>
-      <unit id="org.eclipse.emf.ecore.feature.group" version="2.11.0.v20150512-0501"/>
-      <unit id="org.eclipse.pde.feature.group" version="3.11.0.v20150603-2000"/>
+      <unit id="org.eclipse.platform.feature.group" version="4.5.1.v20150904-0015"/>
+      <unit id="org.eclipse.jdt.feature.group" version="3.11.1.v20150904-0015"/>
+      <unit id="org.eclipse.emf.common.feature.group" version="2.11.0.v20150805-0538"/>
+      <unit id="org.eclipse.rcp.feature.group" version="4.5.1.v20150904-0015"/>
+      <unit id="org.eclipse.e4.rcp.feature.group" version="1.4.0.v20150903-1804"/>
+      <unit id="org.eclipse.emf.ecore.feature.group" version="2.11.1.v20150805-0538"/>
+      <unit id="org.eclipse.pde.feature.group" version="3.11.1.v20150904-0345"/>
       <unit id="org.apache.commons.lang3" version="3.1.0.v201403281430"/>
       <unit id="org.apache.commons.io" version="2.2.0.v201405211200"/>
       <unit id="org.apache.commons.collections" version="3.2.0.v2013030210310"/>
-      <unit id="org.eclipse.m2e.feature.feature.group" version="1.6.0.20150526-2032"/>
-      <unit id="org.eclipse.equinox.core.sdk.feature.group" version="3.11.0.v20150529-1857"/>
-      <unit id="org.eclipse.wst.common_core.feature.feature.group" version="3.7.0.v201505132009"/>
+      <unit id="org.eclipse.m2e.feature.feature.group" version="1.6.2.20150902-0002"/>
+      <unit id="org.eclipse.equinox.core.sdk.feature.group" version="3.11.1.v20150831-1342"/>
+      <unit id="org.eclipse.wst.common_core.feature.feature.group" version="3.7.1.v201508262220"/>
       <unit id="org.eclipse.wst.common.fproj.feature.group" version="3.7.0.v201505072140"/>
       <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.7.0.v201502261749"/>
-      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.7.0.v201505141512"/>
-      <unit id="org.eclipse.emf.edit.feature.group" version="2.11.0.v20150601-0402"/>
-      <unit id="org.eclipse.emf.ecore.edit.feature.group" version="2.9.0.v20150601-0402"/>
+      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.7.1.v201508271605"/>
+      <unit id="org.eclipse.emf.edit.feature.group" version="2.11.1.v20150806-0404"/>
+      <unit id="org.eclipse.emf.ecore.edit.feature.group" version="2.9.0.v20150806-0404"/>
       <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.0.300.v20150430-1836"/>
-      <unit id="org.eclipse.ecf.core.feature.feature.group" version="1.1.0.v20150512-1727"/>
-      <unit id="org.eclipse.ecf.filetransfer.feature.feature.group" version="3.10.0.v20150512-1727"/>
-      <unit id="org.eclipse.xsd.feature.group" version="2.11.0.v20150601-0402"/>
+      <unit id="org.eclipse.ecf.core.feature.feature.group" version="1.1.0.v20150810-1719"/>
+      <unit id="org.eclipse.ecf.filetransfer.feature.feature.group" version="3.10.1.v20150810-1719"/>
+      <unit id="org.eclipse.xsd.feature.group" version="2.11.0.v20150806-0404"/>
       <unit id="com.google.guava" version="15.0.0.v201403281430"/>
       <repository id="eclipse_mars" location="http://download.eclipse.org/releases/mars/"/>
     </location>
