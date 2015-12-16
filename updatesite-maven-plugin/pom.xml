@@ -27,6 +27,11 @@
   <packaging>maven-plugin</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
+  <properties>
+    <scout.base.version>5.2.0</scout.base.version>
+    <base.version>${scout.base.version}</base.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
