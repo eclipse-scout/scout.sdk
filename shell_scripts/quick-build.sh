@@ -39,6 +39,6 @@ echo ''
 echo ''
 echo ''
 
-mvn clean install -B -e -DskipTests=true -Pdev -f org.eclipse.scout.sdk $*
+mvn install -B -e -DskipTests=true -Pdev -f org.eclipse.scout.sdk $*
 processError
-mvn clean install -B -e -T0.5C -DskipTests=true -Pdev -f org.eclipse.scout.sdk.p2 $*
+mvn install -B -e -T0.5C -DskipTests=true -Pdev -f org.eclipse.scout.sdk.p2 $*

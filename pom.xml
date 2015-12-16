@@ -56,5 +56,12 @@
         <module>org.eclipse.scout.sdk.p2</module>
       </modules>
     </profile>
+
+    <profile>
+      <id>releng-build</id>
+      <modules>
+        <module>org.eclipse.scout.sdk.s2e.releng</module>
+      </modules>
+    </profile>
   </profiles>
 </project>

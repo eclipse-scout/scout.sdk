@@ -6,8 +6,6 @@
 
 # Package Files #
 *.jar
-*.war
-*.ear
 *.zip
 
 # Eclipse #
@@ -21,8 +19,7 @@ target/
 .flattened-pom.xml
 
 # settings files are handled in rt-feature project and settings files should not be changed (can be enforecd with 'git add .settings -f')
-.settings
+/.settings
 /.project
-**/.settings/org.sonar.ide.eclipse.core.prefs
 
 org.eclipse.scout.sdk.s2e*/META-INF/MANIFEST.MF
