@@ -255,7 +255,7 @@
                     <include>*/category.xml</include>
                   </includes>
                   <token>[0-9A-Z\\.]*.qualifier</token>
-                  <value>${master_release_tagName}</value>
+                  <value>${master_release_newVersion}</value>
                   <unescape>true</unescape>
                 </configuration>
               </execution>
