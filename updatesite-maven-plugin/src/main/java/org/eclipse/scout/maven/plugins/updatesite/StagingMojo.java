@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -243,12 +244,11 @@ public class StagingMojo extends AbstractStagingMojo {
   private static File downloadJar(String url, String jarName, String outputDir) throws MojoExecutionException {
     try {
       URL u = new URL(url + "/" + jarName);
-      InputStream inputStream = u.openConnection().getInputStream();
+      URLConnection conn = u.openConnection();
       File outfile = new File(outputDir, jarName);
-      FileOutputStream f = new FileOutputStream(outfile);
-      f.write(FileUtility.getContent(inputStream));
-      f.flush();
-      f.close();
+      try (InputStream inputStream = conn.getInputStream(); FileOutputStream f = new FileOutputStream(outfile)) {
+        f.write(FileUtility.getContent(inputStream, false));
+      }
       return outfile;
     }
     catch (MalformedURLException e) {
