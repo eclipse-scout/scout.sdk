@@ -24,9 +24,6 @@ public class TableFieldWithIgnoredColumnsIgnoreExFormData extends TableFieldWith
 
   private static final long serialVersionUID = 1L;
 
-  public TableFieldWithIgnoredColumnsIgnoreExFormData() {
-  }
-
   public TableIgnoreEx getTableIgnoreEx() {
     return getFieldByClass(TableIgnoreEx.class);
   }
@@ -35,9 +32,6 @@ public class TableFieldWithIgnoredColumnsIgnoreExFormData extends TableFieldWith
   public static class TableIgnoreEx extends TableBase {
 
     private static final long serialVersionUID = 1L;
-
-    public TableIgnoreEx() {
-    }
 
     @Override
     public TableIgnoreExRowData addRow() {
@@ -76,9 +70,6 @@ public class TableFieldWithIgnoredColumnsIgnoreExFormData extends TableFieldWith
     public static class TableIgnoreExRowData extends formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData.TableBase.TableBaseRowData {
 
       private static final long serialVersionUID = 1L;
-
-      public TableIgnoreExRowData() {
-      }
     }
   }
 }

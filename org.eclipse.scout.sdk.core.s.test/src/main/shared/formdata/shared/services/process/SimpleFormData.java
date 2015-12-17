@@ -33,9 +33,6 @@ public class SimpleFormData extends AbstractFormData implements IFormDataInterfa
 
   private static final long serialVersionUID = 1L;
 
-  public SimpleFormData() {
-  }
-
   public Date getDate() {
     return getFieldByClass(Date.class);
   }
@@ -87,64 +84,40 @@ public class SimpleFormData extends AbstractFormData implements IFormDataInterfa
   public static class Date extends AbstractValueFieldData<Integer> {
 
     private static final long serialVersionUID = 1L;
-
-    public Date() {
-    }
   }
 
   public static class Double extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
-
-    public Double() {
-    }
   }
 
   public static class MultiTypeArgsBox extends AbstractValueFieldData<TestRunnable> {
 
     private static final long serialVersionUID = 1L;
-
-    public MultiTypeArgsBox() {
-    }
   }
 
   public static class SampleComposer extends AbstractComposerData {
 
     private static final long serialVersionUID = 1L;
-
-    public SampleComposer() {
-    }
   }
 
   public static class SampleDate extends AbstractValueFieldData<java.util.Date> {
 
     private static final long serialVersionUID = 1L;
-
-    public SampleDate() {
-    }
   }
 
   public static class SampleSmart extends AbstractValueFieldData<Long> {
 
     private static final long serialVersionUID = 1L;
-
-    public SampleSmart() {
-    }
   }
 
   public static class SampleString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public SampleString() {
-    }
   }
 
   public static class SimpleNrProperty extends AbstractPropertyData<Long> {
 
     private static final long serialVersionUID = 1L;
-
-    public SimpleNrProperty() {
-    }
   }
 }

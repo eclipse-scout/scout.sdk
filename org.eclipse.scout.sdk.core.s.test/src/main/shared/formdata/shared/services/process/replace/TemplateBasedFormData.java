@@ -26,9 +26,6 @@ public class TemplateBasedFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public TemplateBasedFormData() {
-  }
-
   public UsageOneBox getUsageOneBox() {
     return getFieldByClass(UsageOneBox.class);
   }
@@ -45,9 +42,6 @@ public class TemplateBasedFormData extends AbstractFormData {
 
     private static final long serialVersionUID = 1L;
 
-    public UsageOneBox() {
-    }
-
     public UsageOneString getUsageOneString() {
       return getFieldByClass(UsageOneString.class);
     }
@@ -55,18 +49,12 @@ public class TemplateBasedFormData extends AbstractFormData {
     public static class UsageOneString extends AbstractValueFieldData<String> {
 
       private static final long serialVersionUID = 1L;
-
-      public UsageOneString() {
-      }
     }
   }
 
   public static class UsageTwoBox extends AbstractTemplateForReplaceBoxData {
 
     private static final long serialVersionUID = 1L;
-
-    public UsageTwoBox() {
-    }
 
     public UsageTwoTemplateTable getUsageTwoTemplateTable() {
       return getFieldByClass(UsageTwoTemplateTable.class);
@@ -76,9 +64,6 @@ public class TemplateBasedFormData extends AbstractFormData {
     public static class UsageTwoTemplateTable extends TemplateTable {
 
       private static final long serialVersionUID = 1L;
-
-      public UsageTwoTemplateTable() {
-      }
 
       @Override
       public UsageTwoTemplateTableRowData addRow() {
@@ -120,9 +105,6 @@ public class TemplateBasedFormData extends AbstractFormData {
         public static final String third = "third";
         private String m_third;
 
-        public UsageTwoTemplateTableRowData() {
-        }
-
         public String getThird() {
           return m_third;
         }
@@ -137,8 +119,5 @@ public class TemplateBasedFormData extends AbstractFormData {
   public static class UsualString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public UsualString() {
-    }
   }
 }

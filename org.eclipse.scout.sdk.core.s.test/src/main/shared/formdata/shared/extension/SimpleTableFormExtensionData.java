@@ -31,9 +31,6 @@ public class SimpleTableFormExtensionData implements Serializable {
   public static final String myExtension = "myExtension";
   private BigDecimal m_myExtension;
 
-  public SimpleTableFormExtensionData() {
-  }
-
   public BigDecimal getMyExtension() {
     return m_myExtension;
   }

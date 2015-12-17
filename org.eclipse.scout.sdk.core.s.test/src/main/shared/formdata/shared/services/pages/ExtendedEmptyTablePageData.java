@@ -23,9 +23,6 @@ public class ExtendedEmptyTablePageData extends EmptyTablePageData {
 
   private static final long serialVersionUID = 1L;
 
-  public ExtendedEmptyTablePageData() {
-  }
-
   @Override
   public ExtendedEmptyTableRowData addRow() {
     return (ExtendedEmptyTableRowData) super.addRow();
@@ -65,9 +62,6 @@ public class ExtendedEmptyTablePageData extends EmptyTablePageData {
     private static final long serialVersionUID = 1L;
     public static final String name = "name";
     private String m_name;
-
-    public ExtendedEmptyTableRowData() {
-    }
 
     public String getName() {
       return m_name;

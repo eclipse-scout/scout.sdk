@@ -26,9 +26,6 @@ public class ExtendedTablePageData extends BaseTablePageData {
 
   private static final long serialVersionUID = 1L;
 
-  public ExtendedTablePageData() {
-  }
-
   @Override
   public ExtendedTableRowData addRow() {
     return (ExtendedTableRowData) super.addRow();
@@ -70,9 +67,6 @@ public class ExtendedTablePageData extends BaseTablePageData {
     public static final String ignoredColumnEx = "ignoredColumnEx";
     private BigDecimal m_intermediate;
     private Date m_ignoredColumnEx;
-
-    public ExtendedTableRowData() {
-    }
 
     public BigDecimal getIntermediate() {
       return m_intermediate;

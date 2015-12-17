@@ -28,9 +28,6 @@ public class AnnotationCopyTestFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public AnnotationCopyTestFormData() {
-  }
-
   public First getFirst() {
     return getFieldByClass(First.class);
   }
@@ -40,8 +37,5 @@ public class AnnotationCopyTestFormData extends AbstractFormData {
   public static class First extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public First() {
-    }
   }
 }

@@ -24,9 +24,6 @@ public class ExtendedFormData extends BaseFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public ExtendedFormData() {
-  }
-
   public FirstName getFirstName() {
     return getFieldByClass(FirstName.class);
   }
@@ -106,170 +103,113 @@ public class ExtendedFormData extends BaseFormData {
   public static class FirstName extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public FirstName() {
-    }
   }
 
   @Replace
   public static class IgnoringGroupBoxExCreate extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public IgnoringGroupBoxExCreate() {
-    }
   }
 
   @Replace
   public static class IgnoringGroupBoxExUse extends UsingFormFieldData {
 
     private static final long serialVersionUID = 1L;
-
-    public IgnoringGroupBoxExUse() {
-    }
   }
 
   @Replace
   public static class NameEx extends Name {
 
     private static final long serialVersionUID = 1L;
-
-    public NameEx() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateCreate extends SdkCommandCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateIgnore extends SdkCommandCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateNone extends SdkCommandCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateUse extends SdkCommandCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreCreate extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreUse extends UsingFormFieldData {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneCreate extends SdkCommandNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneIgnore extends SdkCommandNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneNone extends SdkCommandNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneUse extends SdkCommandNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseCreate extends SdkCommandUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseIgnore extends SdkCommandUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseNone extends SdkCommandUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseUse extends SdkCommandUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseUse() {
-    }
   }
 
   @Replace
   public static class SmartEx extends Smart {
 
     private static final long serialVersionUID = 1L;
-
-    public SmartEx() {
-    }
   }
 }

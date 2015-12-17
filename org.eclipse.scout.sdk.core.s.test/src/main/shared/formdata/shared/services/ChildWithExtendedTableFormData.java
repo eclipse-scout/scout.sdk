@@ -24,9 +24,6 @@ public class ChildWithExtendedTableFormData extends BaseWithExtendedTableFormDat
 
   private static final long serialVersionUID = 1L;
 
-  public ChildWithExtendedTableFormData() {
-  }
-
   public ChildTable getChildTable() {
     return getFieldByClass(ChildTable.class);
   }
@@ -34,9 +31,6 @@ public class ChildWithExtendedTableFormData extends BaseWithExtendedTableFormDat
   public static class ChildTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public ChildTable() {
-    }
 
     @Override
     public ChildTableRowData addRow() {
@@ -81,9 +75,6 @@ public class ChildWithExtendedTableFormData extends BaseWithExtendedTableFormDat
       private String m_col1InChildForm;
       private String m_colInAbstractTable;
       private String m_colInDesktopForm;
-
-      public ChildTableRowData() {
-      }
 
       public String getCol1InChildForm() {
         return m_col1InChildForm;

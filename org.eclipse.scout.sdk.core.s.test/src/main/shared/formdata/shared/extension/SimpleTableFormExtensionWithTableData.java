@@ -10,12 +10,16 @@
  ******************************************************************************/
 package formdata.shared.extension;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
 import formdata.shared.services.process.SimpleTableFormData;
+import formdata.shared.services.process.SimpleTableFormData.TestTable.TestTableRowData;
 
 /**
  * <b>NOTE:</b><br>
@@ -27,6 +31,19 @@ public class SimpleTableFormExtensionWithTableData extends AbstractFormFieldData
 
   private static final long serialVersionUID = 1L;
 
-  public SimpleTableFormExtensionWithTableData() {
+  @Extends(TestTableRowData.class)
+  public static class TestTableFieldExtensionRowData implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    public static final String contributed = "contributed";
+    private BigDecimal m_contributed;
+
+    public BigDecimal getContributed() {
+      return m_contributed;
+    }
+
+    public void setContributed(BigDecimal contributed) {
+      m_contributed = contributed;
+    }
   }
 }

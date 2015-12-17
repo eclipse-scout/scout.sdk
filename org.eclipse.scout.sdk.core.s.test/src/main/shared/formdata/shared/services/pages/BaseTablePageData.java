@@ -26,9 +26,6 @@ public class BaseTablePageData extends AbstractTablePageData {
 
   private static final long serialVersionUID = 1L;
 
-  public BaseTablePageData() {
-  }
-
   @Override
   public BaseTableRowData addRow() {
     return (BaseTableRowData) super.addRow();
@@ -70,9 +67,6 @@ public class BaseTablePageData extends AbstractTablePageData {
     public static final String second = "second";
     private String m_first;
     private Date m_second;
-
-    public BaseTableRowData() {
-    }
 
     public String getFirst() {
       return m_first;

@@ -23,9 +23,6 @@ public class ThirdLevelFormData extends SecondLevelFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public ThirdLevelFormData() {
-  }
-
   public ThirdInnerBox getThirdInnerBox() {
     return getFieldByClass(ThirdInnerBox.class);
   }
@@ -35,9 +32,6 @@ public class ThirdLevelFormData extends SecondLevelFormData {
 
     private static final long serialVersionUID = 1L;
 
-    public ThirdInnerBox() {
-    }
-
     public ThirdLevel getThirdLevel() {
       return getFieldByClass(ThirdLevel.class);
     }
@@ -46,9 +40,6 @@ public class ThirdLevelFormData extends SecondLevelFormData {
     public static class ThirdLevel extends formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData.SecondInnerBox.SecondLevel {
 
       private static final long serialVersionUID = 1L;
-
-      public ThirdLevel() {
-      }
     }
   }
 }

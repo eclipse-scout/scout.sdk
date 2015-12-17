@@ -24,9 +24,6 @@ public class MasterFieldTestFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public MasterFieldTestFormData() {
-  }
-
   public MyMaster getMyMaster() {
     return getFieldByClass(MyMaster.class);
   }
@@ -38,16 +35,10 @@ public class MasterFieldTestFormData extends AbstractFormData {
   public static class MyMaster extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public MyMaster() {
-    }
   }
 
   public static class MySlave extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public MySlave() {
-    }
   }
 }

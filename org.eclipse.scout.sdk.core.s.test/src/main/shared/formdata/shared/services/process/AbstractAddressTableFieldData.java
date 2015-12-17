@@ -24,9 +24,6 @@ public abstract class AbstractAddressTableFieldData extends AbstractTableFieldBe
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractAddressTableFieldData() {
-  }
-
   @Override
   public AbstractAddressTableRowData addRow() {
     return (AbstractAddressTableRowData) super.addRow();
@@ -68,9 +65,6 @@ public abstract class AbstractAddressTableFieldData extends AbstractTableFieldBe
     private String m_addressId;
     private String m_street;
     private Boolean m_poBoxAddress;
-
-    public AbstractAddressTableRowData() {
-    }
 
     public String getAddressId() {
       return m_addressId;

@@ -24,9 +24,6 @@ public class FormWithGroupBoxesFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public FormWithGroupBoxesFormData() {
-  }
-
   public FlatString getFlatString() {
     return getFieldByClass(FlatString.class);
   }
@@ -38,16 +35,10 @@ public class FormWithGroupBoxesFormData extends AbstractFormData {
   public static class FlatString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public FlatString() {
-    }
   }
 
   public static class InnerInteger extends AbstractValueFieldData<Integer> {
 
     private static final long serialVersionUID = 1L;
-
-    public InnerInteger() {
-    }
   }
 }

@@ -23,9 +23,6 @@ public abstract class AbstractMainBoxData extends AbstractFormFieldData {
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractMainBoxData() {
-  }
-
   public FirstLevel getFirstLevel() {
     return getFieldByClass(FirstLevel.class);
   }
@@ -33,8 +30,5 @@ public abstract class AbstractMainBoxData extends AbstractFormFieldData {
   public static class FirstLevel extends AbstractTemplateFieldData<Number> {
 
     private static final long serialVersionUID = 1L;
-
-    public FirstLevel() {
-    }
   }
 }

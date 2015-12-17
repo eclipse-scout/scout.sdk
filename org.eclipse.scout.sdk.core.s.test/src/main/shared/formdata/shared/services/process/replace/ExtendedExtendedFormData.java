@@ -27,9 +27,6 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public ExtendedExtendedFormData() {
-  }
-
   public IgnoringGroupBoxExCreateNone getIgnoringGroupBoxExCreateNone() {
     return getFieldByClass(IgnoringGroupBoxExCreateNone.class);
   }
@@ -286,27 +283,18 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   public static class IgnoringGroupBoxExCreateNone extends IgnoringGroupBoxExCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public IgnoringGroupBoxExCreateNone() {
-    }
   }
 
   @Replace
   public static class IgnoringGroupBoxExNoneCreate extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public IgnoringGroupBoxExNoneCreate() {
-    }
   }
 
   @Replace
   public static class NameExEx extends NameEx {
 
     private static final long serialVersionUID = 1L;
-
-    public NameExEx() {
-    }
 
     /**
      * access method for property StringProperty.
@@ -329,9 +317,6 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
     public static class StringPropertyProperty extends AbstractPropertyData<String> {
 
       private static final long serialVersionUID = 1L;
-
-      public StringPropertyProperty() {
-      }
     }
   }
 
@@ -339,539 +324,359 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   public static class SdkCommandCreateCreateCreate extends SdkCommandCreateCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateCreateCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateCreateIgnore extends SdkCommandCreateCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateCreateIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateCreateNone extends SdkCommandCreateCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateCreateNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateCreateUse extends SdkCommandCreateCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateCreateUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateIgnoreCreate extends SdkCommandCreateIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateIgnoreCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateIgnoreIgnore extends SdkCommandCreateIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateIgnoreIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateIgnoreNone extends SdkCommandCreateIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateIgnoreNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateIgnoreUse extends SdkCommandCreateIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateIgnoreUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateNoneCreate extends SdkCommandCreateNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateNoneCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateNoneIgnore extends SdkCommandCreateNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateNoneIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateNoneNone extends SdkCommandCreateNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateNoneNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateNoneUse extends SdkCommandCreateNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateNoneUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateUseCreate extends SdkCommandCreateUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateUseCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateUseIgnore extends SdkCommandCreateUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateUseIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateUseNone extends SdkCommandCreateUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateUseNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandCreateUseUse extends SdkCommandCreateUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreateUseUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreCreateCreate extends SdkCommandIgnoreCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreCreateCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreCreateIgnore extends SdkCommandIgnoreCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreCreateIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreCreateNone extends SdkCommandIgnoreCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreCreateNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreCreateUse extends SdkCommandIgnoreCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreCreateUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreIgnoreCreate extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreIgnoreCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreIgnoreUse extends UsingFormFieldData {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreIgnoreUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreNoneCreate extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreNoneCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreNoneUse extends UsingFormFieldData {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreNoneUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreUseCreate extends SdkCommandIgnoreUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreUseCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreUseIgnore extends SdkCommandIgnoreUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreUseIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreUseNone extends SdkCommandIgnoreUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreUseNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandIgnoreUseUse extends SdkCommandIgnoreUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandIgnoreUseUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneCreateCreate extends SdkCommandNoneCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneCreateCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneCreateIgnore extends SdkCommandNoneCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneCreateIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneCreateNone extends SdkCommandNoneCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneCreateNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneCreateUse extends SdkCommandNoneCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneCreateUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneIgnoreCreate extends SdkCommandNoneIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneIgnoreCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneIgnoreIgnore extends SdkCommandNoneIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneIgnoreIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneIgnoreNone extends SdkCommandNoneIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneIgnoreNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneIgnoreUse extends SdkCommandNoneIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneIgnoreUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneNoneCreate extends SdkCommandNoneNone implements IFormDataInterface03 {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneNoneCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneNoneIgnore extends SdkCommandNoneNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneNoneIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneNoneNone extends SdkCommandNoneNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneNoneNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneNoneUse extends SdkCommandNoneNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneNoneUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneUseCreate extends SdkCommandNoneUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneUseCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneUseIgnore extends SdkCommandNoneUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneUseIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneUseNone extends SdkCommandNoneUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneUseNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandNoneUseUse extends SdkCommandNoneUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNoneUseUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseCreateCreate extends SdkCommandUseCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseCreateCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseCreateIgnore extends SdkCommandUseCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseCreateIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseCreateNone extends SdkCommandUseCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseCreateNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseCreateUse extends SdkCommandUseCreate {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseCreateUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseIgnoreCreate extends SdkCommandUseIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseIgnoreCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseIgnoreIgnore extends SdkCommandUseIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseIgnoreIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseIgnoreNone extends SdkCommandUseIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseIgnoreNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseIgnoreUse extends SdkCommandUseIgnore {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseIgnoreUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseNoneCreate extends SdkCommandUseNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseNoneCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseNoneIgnore extends SdkCommandUseNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseNoneIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseNoneNone extends SdkCommandUseNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseNoneNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseNoneUse extends SdkCommandUseNone {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseNoneUse() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseUseCreate extends SdkCommandUseUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseUseCreate() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseUseIgnore extends SdkCommandUseUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseUseIgnore() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseUseNone extends SdkCommandUseUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseUseNone() {
-    }
   }
 
   @Replace
   public static class SdkCommandUseUseUse extends SdkCommandUseUse {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUseUseUse() {
-    }
   }
 }

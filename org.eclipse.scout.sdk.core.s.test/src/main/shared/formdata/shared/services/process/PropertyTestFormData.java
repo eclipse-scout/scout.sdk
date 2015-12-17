@@ -30,9 +30,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public PropertyTestFormData() {
-  }
-
   /**
    * access method for property BoolObject.
    */
@@ -238,65 +235,41 @@ public class PropertyTestFormData extends AbstractFormData {
   public static class BoolObjectProperty extends AbstractPropertyData<Boolean> {
 
     private static final long serialVersionUID = 1L;
-
-    public BoolObjectProperty() {
-    }
   }
 
   public static class BoolPrimitiveProperty extends AbstractPropertyData<Boolean> {
 
     private static final long serialVersionUID = 1L;
-
-    public BoolPrimitiveProperty() {
-    }
   }
 
   public static class ByteArrayProperty extends AbstractPropertyData<byte[]> {
 
     private static final long serialVersionUID = 1L;
-
-    public ByteArrayProperty() {
-    }
   }
 
   public static class ComplexArrayProperty extends AbstractPropertyData<ArrayList<List<String>>[]> {
 
     private static final long serialVersionUID = 1L;
-
-    public ComplexArrayProperty() {
-    }
   }
 
   public static class ComplexInnerArrayProperty extends AbstractPropertyData<ArrayList<List<String[]>>> {
 
     private static final long serialVersionUID = 1L;
-
-    public ComplexInnerArrayProperty() {
-    }
   }
 
   public static class DoubleArrayPropertyProperty extends AbstractPropertyData<String[][]> {
 
     private static final long serialVersionUID = 1L;
-
-    public DoubleArrayPropertyProperty() {
-    }
   }
 
   public static class IntPrimitiveProperty extends AbstractPropertyData<Integer> {
 
     private static final long serialVersionUID = 1L;
-
-    public IntPrimitiveProperty() {
-    }
   }
 
   public static class Name extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public Name() {
-    }
 
     /**
      * access method for property IntProperty.
@@ -319,41 +292,26 @@ public class PropertyTestFormData extends AbstractFormData {
     public static class IntPropertyProperty extends AbstractPropertyData<Integer> {
 
       private static final long serialVersionUID = 1L;
-
-      public IntPropertyProperty() {
-      }
     }
   }
 
   public static class ObjectPropertyProperty extends AbstractPropertyData<Object> {
 
     private static final long serialVersionUID = 1L;
-
-    public ObjectPropertyProperty() {
-    }
   }
 
   public static class PropertyTestNrProperty extends AbstractPropertyData<Long> {
 
     private static final long serialVersionUID = 1L;
-
-    public PropertyTestNrProperty() {
-    }
   }
 
   public static class SingleArrayPropertyProperty extends AbstractPropertyData<String[]> {
 
     private static final long serialVersionUID = 1L;
-
-    public SingleArrayPropertyProperty() {
-    }
   }
 
   public static class WizardsProperty extends AbstractPropertyData<HashMap<String, List<IService>>> {
 
     private static final long serialVersionUID = 1L;
-
-    public WizardsProperty() {
-    }
   }
 }

@@ -28,9 +28,6 @@ public class PropertyExtensionData extends AbstractFormFieldData {
 
   private static final long serialVersionUID = 1L;
 
-  public PropertyExtensionData() {
-  }
-
   /**
    * access method for property LongValue.
    */
@@ -52,8 +49,5 @@ public class PropertyExtensionData extends AbstractFormFieldData {
   public static class LongValueProperty extends AbstractPropertyData<Long> {
 
     private static final long serialVersionUID = 1L;
-
-    public LongValueProperty() {
-    }
   }
 }

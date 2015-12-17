@@ -23,9 +23,6 @@ public class ExtendedTablePageWithoutExtendedTableData extends BaseTablePageData
 
   private static final long serialVersionUID = 1L;
 
-  public ExtendedTablePageWithoutExtendedTableData() {
-  }
-
   @Override
   public ExtendedTablePageWithoutExtendedTableRowData addRow() {
     return (ExtendedTablePageWithoutExtendedTableRowData) super.addRow();
@@ -63,8 +60,5 @@ public class ExtendedTablePageWithoutExtendedTableData extends BaseTablePageData
   public static class ExtendedTablePageWithoutExtendedTableRowData extends BaseTableRowData {
 
     private static final long serialVersionUID = 1L;
-
-    public ExtendedTablePageWithoutExtendedTableRowData() {
-    }
   }
 }

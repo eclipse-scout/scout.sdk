@@ -28,9 +28,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public TableFieldBaseFormData() {
-  }
-
   public AddressTable getAddressTable() {
     return getFieldByClass(AddressTable.class);
   }
@@ -54,9 +51,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
   public static class AddressTable extends AbstractAddressTableFieldData {
 
     private static final long serialVersionUID = 1L;
-
-    public AddressTable() {
-    }
 
     @Override
     public AddressTableRowData addRow() {
@@ -98,9 +92,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
       public static final String city = "city";
       private String m_city;
 
-      public AddressTableRowData() {
-      }
-
       public String getCity() {
         return m_city;
       }
@@ -114,9 +105,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
   public static class EmptyTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public EmptyTable() {
-    }
 
     @Override
     public EmptyTableRowData addRow() {
@@ -155,18 +143,12 @@ public class TableFieldBaseFormData extends AbstractFormData {
     public static class EmptyTableRowData extends AbstractTableRowData {
 
       private static final long serialVersionUID = 1L;
-
-      public EmptyTableRowData() {
-      }
     }
   }
 
   public static class NoTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public NoTable() {
-    }
 
     @Override
     public AbstractTableRowData createRow() {
@@ -184,9 +166,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
   public static class PersonTable extends AbstractPersonTableFieldData {
 
     private static final long serialVersionUID = 1L;
-
-    public PersonTable() {
-    }
 
     @Override
     public PersonTableRowData addRow() {
@@ -225,18 +204,12 @@ public class TableFieldBaseFormData extends AbstractFormData {
     public static class PersonTableRowData extends AbstractPersonTableRowData {
 
       private static final long serialVersionUID = 1L;
-
-      public PersonTableRowData() {
-      }
     }
   }
 
   public static class Table extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public Table() {
-    }
 
     @Override
     public TableRowData addRow() {
@@ -279,9 +252,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
       public static final String second = "second";
       private String m_first;
       private String m_second;
-
-      public TableRowData() {
-      }
 
       public String getFirst() {
         return m_first;

@@ -31,9 +31,6 @@ public class PageWithTableExtensionData implements Serializable {
   public static final String bigDecimalTest = "bigDecimalTest";
   private BigDecimal m_bigDecimalTest;
 
-  public PageWithTableExtensionData() {
-  }
-
   public BigDecimal getBigDecimalTest() {
     return m_bigDecimalTest;
   }

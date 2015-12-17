@@ -23,9 +23,6 @@ public class ExtendedExtendedTablePageWithExtendedTableData extends ExtendedTabl
 
   private static final long serialVersionUID = 1L;
 
-  public ExtendedExtendedTablePageWithExtendedTableData() {
-  }
-
   @Override
   public ExtendedExtendedTablePageWithExtendedTableRowData addRow() {
     return (ExtendedExtendedTablePageWithExtendedTableRowData) super.addRow();
@@ -65,9 +62,6 @@ public class ExtendedExtendedTablePageWithExtendedTableData extends ExtendedTabl
     private static final long serialVersionUID = 1L;
     public static final String boolean_ = "boolean";
     private Boolean m_boolean;
-
-    public ExtendedExtendedTablePageWithExtendedTableRowData() {
-    }
 
     public Boolean getBoolean() {
       return m_boolean;

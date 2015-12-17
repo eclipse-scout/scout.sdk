@@ -24,9 +24,6 @@ public abstract class AbstractExternalGroupBoxData extends AbstractFormFieldData
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractExternalGroupBoxData() {
-  }
-
   public ExternalString getExternalString() {
     return getFieldByClass(ExternalString.class);
   }
@@ -34,8 +31,5 @@ public abstract class AbstractExternalGroupBoxData extends AbstractFormFieldData
   public static class ExternalString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public ExternalString() {
-    }
   }
 }

@@ -28,9 +28,6 @@ public class TableFieldFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public TableFieldFormData() {
-  }
-
   public CompanyTable getCompanyTable() {
     return getFieldByClass(CompanyTable.class);
   }
@@ -50,9 +47,6 @@ public class TableFieldFormData extends AbstractFormData {
   public static class CompanyTable extends AbstractCompanyTableFieldData {
 
     private static final long serialVersionUID = 1L;
-
-    public CompanyTable() {
-    }
 
     @Override
     public CompanyTableRowData addRow() {
@@ -91,18 +85,12 @@ public class TableFieldFormData extends AbstractFormData {
     public static class CompanyTableRowData extends AbstractCompanyTableRowData {
 
       private static final long serialVersionUID = 1L;
-
-      public CompanyTableRowData() {
-      }
     }
   }
 
   public static class ConcreteTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public ConcreteTable() {
-    }
 
     @Override
     public ConcreteTableRowData addRow() {
@@ -146,9 +134,6 @@ public class TableFieldFormData extends AbstractFormData {
       private String m_name;
       private Integer m_extKey;
 
-      public ConcreteTableRowData() {
-      }
-
       public String getName() {
         return m_name;
       }
@@ -170,9 +155,6 @@ public class TableFieldFormData extends AbstractFormData {
   public static class PersonTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public PersonTable() {
-    }
 
     @Override
     public PersonTableRowData addRow() {
@@ -222,9 +204,6 @@ public class TableFieldFormData extends AbstractFormData {
       private Long m_smartLong;
       private Set<Map<String, Integer>> m_custom;
 
-      public PersonTableRowData() {
-      }
-
       public Long getPersonNr() {
         return m_personNr;
       }
@@ -271,9 +250,6 @@ public class TableFieldFormData extends AbstractFormData {
 
     private static final long serialVersionUID = 1L;
 
-    public TableFieldWithExternalTable() {
-    }
-
     @Override
     public TableFieldWithExternalTableRowData addRow() {
       return (TableFieldWithExternalTableRowData) super.addRow();
@@ -317,9 +293,6 @@ public class TableFieldFormData extends AbstractFormData {
       private String m_aa;
       private String m_xx;
       private String m_bb;
-
-      public TableFieldWithExternalTableRowData() {
-      }
 
       public String getAa() {
         return m_aa;

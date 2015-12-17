@@ -27,9 +27,6 @@ public class RadioButtonFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public RadioButtonFormData() {
-  }
-
   public InputExString getInputExString() {
     return getFieldByClass(InputExString.class);
   }
@@ -54,40 +51,25 @@ public class RadioButtonFormData extends AbstractFormData {
   public static class InputExString extends InputString {
 
     private static final long serialVersionUID = 1L;
-
-    public InputExString() {
-    }
   }
 
   public static class UsageOneUsualString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public UsageOneUsualString() {
-    }
   }
 
   public static class UsedRadioButtonGroup extends AbstractRadioButtonGroupWithFieldsData {
 
     private static final long serialVersionUID = 1L;
-
-    public UsedRadioButtonGroup() {
-    }
   }
 
   public static class UsualRadioButtonGroup extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public UsualRadioButtonGroup() {
-    }
   }
 
   public static class UsualString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public UsualString() {
-    }
   }
 }

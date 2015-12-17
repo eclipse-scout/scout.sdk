@@ -24,9 +24,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public TableFieldExFormData() {
-  }
-
   public EmptyTableExtended getEmptyTableExtended() {
     return getFieldByClass(EmptyTableExtended.class);
   }
@@ -51,9 +48,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
   public static class EmptyTableExtended extends EmptyTable {
 
     private static final long serialVersionUID = 1L;
-
-    public EmptyTableExtended() {
-    }
 
     @Override
     public EmptyTableExtendedRowData addRow() {
@@ -95,9 +89,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       public static final String single = "single";
       private String m_single;
 
-      public EmptyTableExtendedRowData() {
-      }
-
       public String getSingle() {
         return m_single;
       }
@@ -112,9 +103,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
   public static class ExtendedAddress extends AddressTable {
 
     private static final long serialVersionUID = 1L;
-
-    public ExtendedAddress() {
-    }
 
     @Override
     public ExtendedAddressRowData addRow() {
@@ -156,9 +144,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       public static final String state = "state";
       private String m_state;
 
-      public ExtendedAddressRowData() {
-      }
-
       public String getState() {
         return m_state;
       }
@@ -173,9 +158,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
   public static class ExtendedPersonTable extends PersonTable {
 
     private static final long serialVersionUID = 1L;
-
-    public ExtendedPersonTable() {
-    }
 
     @Override
     public ExtendedPersonTableRowData addRow() {
@@ -217,9 +199,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       public static final String lastName = "lastName";
       private String m_lastName;
 
-      public ExtendedPersonTableRowData() {
-      }
-
       public String getLastName() {
         return m_lastName;
       }
@@ -234,9 +213,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
   public static class NoTableExtended extends NoTable {
 
     private static final long serialVersionUID = 1L;
-
-    public NoTableExtended() {
-    }
 
     @Override
     public NoTableExtendedRowData addRow() {
@@ -278,9 +254,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       public static final String new_ = "new";
       private String m_new;
 
-      public NoTableExtendedRowData() {
-      }
-
       public String getNew() {
         return m_new;
       }
@@ -295,9 +268,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
   public static class TableExtended extends Table {
 
     private static final long serialVersionUID = 1L;
-
-    public TableExtended() {
-    }
 
     @Override
     public TableExtendedRowData addRow() {
@@ -338,9 +308,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       private static final long serialVersionUID = 1L;
       public static final String boolean_ = "boolean";
       private Boolean m_boolean;
-
-      public TableExtendedRowData() {
-      }
 
       public Boolean getBoolean() {
         return m_boolean;

@@ -31,9 +31,6 @@ public class MultipleExtGroupBoxExtensionData extends AbstractFormFieldData {
 
   private static final long serialVersionUID = 1L;
 
-  public MultipleExtGroupBoxExtensionData() {
-  }
-
   public SecondDouble getSecondDouble() {
     return getFieldByClass(SecondDouble.class);
   }
@@ -45,16 +42,10 @@ public class MultipleExtGroupBoxExtensionData extends AbstractFormFieldData {
   public static class SecondDouble extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
-
-    public SecondDouble() {
-    }
   }
 
   public static class ThirdDate extends AbstractValueFieldData<Date> {
 
     private static final long serialVersionUID = 1L;
-
-    public ThirdDate() {
-    }
   }
 }

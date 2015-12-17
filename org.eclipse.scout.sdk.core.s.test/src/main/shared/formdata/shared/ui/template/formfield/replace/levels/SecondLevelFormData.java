@@ -23,9 +23,6 @@ public class SecondLevelFormData extends FirstLevelFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public SecondLevelFormData() {
-  }
-
   public SecondInnerBox getSecondInnerBox() {
     return getFieldByClass(SecondInnerBox.class);
   }
@@ -35,9 +32,6 @@ public class SecondLevelFormData extends FirstLevelFormData {
 
     private static final long serialVersionUID = 1L;
 
-    public SecondInnerBox() {
-    }
-
     public SecondLevel getSecondLevel() {
       return getFieldByClass(SecondLevel.class);
     }
@@ -46,9 +40,6 @@ public class SecondLevelFormData extends FirstLevelFormData {
     public static class SecondLevel extends FirstLevel {
 
       private static final long serialVersionUID = 1L;
-
-      public SecondLevel() {
-      }
     }
   }
 }

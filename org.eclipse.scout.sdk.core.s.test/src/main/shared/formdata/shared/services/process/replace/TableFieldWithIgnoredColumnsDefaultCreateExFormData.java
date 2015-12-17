@@ -24,9 +24,6 @@ public class TableFieldWithIgnoredColumnsDefaultCreateExFormData extends TableFi
 
   private static final long serialVersionUID = 1L;
 
-  public TableFieldWithIgnoredColumnsDefaultCreateExFormData() {
-  }
-
   public TableDefaultCreateEx getTableDefaultCreateEx() {
     return getFieldByClass(TableDefaultCreateEx.class);
   }
@@ -35,9 +32,6 @@ public class TableFieldWithIgnoredColumnsDefaultCreateExFormData extends TableFi
   public static class TableDefaultCreateEx extends TableBase {
 
     private static final long serialVersionUID = 1L;
-
-    public TableDefaultCreateEx() {
-    }
 
     @Override
     public TableDefaultCreateExRowData addRow() {
@@ -78,9 +72,6 @@ public class TableFieldWithIgnoredColumnsDefaultCreateExFormData extends TableFi
       private static final long serialVersionUID = 1L;
       public static final String ignoreDefaultCreate = "ignoreDefaultCreate";
       private String m_ignoreDefaultCreate;
-
-      public TableDefaultCreateExRowData() {
-      }
 
       public String getIgnoreDefaultCreate() {
         return m_ignoreDefaultCreate;

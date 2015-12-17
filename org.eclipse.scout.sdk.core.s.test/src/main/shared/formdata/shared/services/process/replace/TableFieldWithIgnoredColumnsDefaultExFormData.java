@@ -24,9 +24,6 @@ public class TableFieldWithIgnoredColumnsDefaultExFormData extends TableFieldWit
 
   private static final long serialVersionUID = 1L;
 
-  public TableFieldWithIgnoredColumnsDefaultExFormData() {
-  }
-
   public TableDefaultEx getTableDefaultEx() {
     return getFieldByClass(TableDefaultEx.class);
   }
@@ -35,9 +32,6 @@ public class TableFieldWithIgnoredColumnsDefaultExFormData extends TableFieldWit
   public static class TableDefaultEx extends TableBase {
 
     private static final long serialVersionUID = 1L;
-
-    public TableDefaultEx() {
-    }
 
     @Override
     public TableDefaultExRowData addRow() {
@@ -76,9 +70,6 @@ public class TableFieldWithIgnoredColumnsDefaultExFormData extends TableFieldWit
     public static class TableDefaultExRowData extends formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData.TableBase.TableBaseRowData {
 
       private static final long serialVersionUID = 1L;
-
-      public TableDefaultExRowData() {
-      }
     }
   }
 }

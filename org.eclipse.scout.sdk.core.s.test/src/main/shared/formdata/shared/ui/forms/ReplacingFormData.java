@@ -23,7 +23,4 @@ import org.eclipse.scout.rt.platform.Replace;
 public class ReplacingFormData extends AnnotationCopyTestFormData {
 
   private static final long serialVersionUID = 1L;
-
-  public ReplacingFormData() {
-  }
 }

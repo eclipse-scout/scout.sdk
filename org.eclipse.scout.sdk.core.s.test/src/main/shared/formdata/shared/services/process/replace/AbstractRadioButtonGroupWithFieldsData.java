@@ -23,9 +23,6 @@ public abstract class AbstractRadioButtonGroupWithFieldsData extends AbstractVal
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractRadioButtonGroupWithFieldsData() {
-  }
-
   public InputString getInputString() {
     return getFieldByClass(InputString.class);
   }
@@ -33,8 +30,5 @@ public abstract class AbstractRadioButtonGroupWithFieldsData extends AbstractVal
   public static class InputString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public InputString() {
-    }
   }
 }

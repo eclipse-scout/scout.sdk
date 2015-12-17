@@ -24,9 +24,6 @@ public class EmptyTablePageData extends AbstractTablePageData {
 
   private static final long serialVersionUID = 1L;
 
-  public EmptyTablePageData() {
-  }
-
   @Override
   public AbstractTableRowData createRow() {
     return new AbstractTableRowData() {

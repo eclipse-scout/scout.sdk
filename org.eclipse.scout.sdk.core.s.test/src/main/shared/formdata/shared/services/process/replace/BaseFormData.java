@@ -24,9 +24,6 @@ public class BaseFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public BaseFormData() {
-  }
-
   public Lookup getLookup() {
     return getFieldByClass(Lookup.class);
   }
@@ -54,48 +51,30 @@ public class BaseFormData extends AbstractFormData {
   public static class Lookup extends AbstractValueFieldData<Long> {
 
     private static final long serialVersionUID = 1L;
-
-    public Lookup() {
-    }
   }
 
   public static class Name extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public Name() {
-    }
   }
 
   public static class SdkCommandCreate extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandCreate() {
-    }
   }
 
   public static class SdkCommandNone extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandNone() {
-    }
   }
 
   public static class SdkCommandUse extends UsingFormFieldData {
 
     private static final long serialVersionUID = 1L;
-
-    public SdkCommandUse() {
-    }
   }
 
   public static class Smart extends AbstractValueFieldData<Long> {
 
     private static final long serialVersionUID = 1L;
-
-    public Smart() {
-    }
   }
 }

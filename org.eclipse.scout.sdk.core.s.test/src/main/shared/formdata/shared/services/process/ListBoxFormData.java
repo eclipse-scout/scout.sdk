@@ -26,9 +26,6 @@ public class ListBoxFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public ListBoxFormData() {
-  }
-
   public ListBox getListBox() {
     return getFieldByClass(ListBox.class);
   }
@@ -36,8 +33,5 @@ public class ListBoxFormData extends AbstractFormData {
   public static class ListBox extends AbstractValueFieldData<Set<Long>> {
 
     private static final long serialVersionUID = 1L;
-
-    public ListBox() {
-    }
   }
 }

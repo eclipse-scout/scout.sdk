@@ -26,9 +26,6 @@ public abstract class AbstractTemplateForReplaceBoxData extends AbstractFormFiel
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractTemplateForReplaceBoxData() {
-  }
-
   public TemplateBoxString getTemplateBoxString() {
     return getFieldByClass(TemplateBoxString.class);
   }
@@ -44,25 +41,16 @@ public abstract class AbstractTemplateForReplaceBoxData extends AbstractFormFiel
   public static class TemplateBoxString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public TemplateBoxString() {
-    }
   }
 
   public static class TemplateString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public TemplateString() {
-    }
   }
 
   public static class TemplateTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public TemplateTable() {
-    }
 
     @Override
     public TemplateTableRowData addRow() {
@@ -105,9 +93,6 @@ public abstract class AbstractTemplateForReplaceBoxData extends AbstractFormFiel
       public static final String second = "second";
       private String m_first;
       private String m_second;
-
-      public TemplateTableRowData() {
-      }
 
       public String getFirst() {
         return m_first;

@@ -25,9 +25,6 @@ public class TableFieldWithIgnoredColumnsBaseFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public TableFieldWithIgnoredColumnsBaseFormData() {
-  }
-
   public TableBase getTableBase() {
     return getFieldByClass(TableBase.class);
   }
@@ -35,9 +32,6 @@ public class TableFieldWithIgnoredColumnsBaseFormData extends AbstractFormData {
   public static class TableBase extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public TableBase() {
-    }
 
     @Override
     public TableBaseRowData addRow() {
@@ -80,9 +74,6 @@ public class TableFieldWithIgnoredColumnsBaseFormData extends AbstractFormData {
       public static final String create = "create";
       private String m_default;
       private String m_create;
-
-      public TableBaseRowData() {
-      }
 
       public String getDefault() {
         return m_default;

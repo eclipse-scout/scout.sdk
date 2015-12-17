@@ -25,9 +25,6 @@ public class BaseWithExtendedTableFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public BaseWithExtendedTableFormData() {
-  }
-
   public TableInForm getTableInForm() {
     return getFieldByClass(TableInForm.class);
   }
@@ -35,9 +32,6 @@ public class BaseWithExtendedTableFormData extends AbstractFormData {
   public static class TableInForm extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public TableInForm() {
-    }
 
     @Override
     public TableInFormRowData addRow() {
@@ -80,9 +74,6 @@ public class BaseWithExtendedTableFormData extends AbstractFormData {
       public static final String colInDesktopForm = "colInDesktopForm";
       private String m_colInAbstractTable;
       private String m_colInDesktopForm;
-
-      public TableInFormRowData() {
-      }
 
       public String getColInAbstractTable() {
         return m_colInAbstractTable;

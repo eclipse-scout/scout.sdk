@@ -24,9 +24,6 @@ public abstract class AbstractCompanyTableFieldData extends AbstractTableFieldBe
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractCompanyTableFieldData() {
-  }
-
   @Override
   public AbstractCompanyTableRowData addRow() {
     return (AbstractCompanyTableRowData) super.addRow();
@@ -64,9 +61,6 @@ public abstract class AbstractCompanyTableFieldData extends AbstractTableFieldBe
     private static final long serialVersionUID = 1L;
     public static final String name = "name";
     private String m_name;
-
-    public AbstractCompanyTableRowData() {
-    }
 
     public String getName() {
       return m_name;

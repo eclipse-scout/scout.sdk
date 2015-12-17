@@ -24,9 +24,6 @@ public class BaseWithExtendedTableTablePageData extends AbstractTablePageData {
 
   private static final long serialVersionUID = 1L;
 
-  public BaseWithExtendedTableTablePageData() {
-  }
-
   @Override
   public BaseWithExtendedTableTableRowData addRow() {
     return (BaseWithExtendedTableTableRowData) super.addRow();
@@ -68,9 +65,6 @@ public class BaseWithExtendedTableTablePageData extends AbstractTablePageData {
     public static final String colInTable = "colInTable";
     private String m_colInAbstractTable;
     private String m_colInTable;
-
-    public BaseWithExtendedTableTableRowData() {
-    }
 
     public String getColInAbstractTable() {
       return m_colInAbstractTable;

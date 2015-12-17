@@ -24,9 +24,6 @@ public class IgnoredFieldsFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public IgnoredFieldsFormData() {
-  }
-
   public NotIgnored getNotIgnored() {
     return getFieldByClass(NotIgnored.class);
   }
@@ -34,8 +31,5 @@ public class IgnoredFieldsFormData extends AbstractFormData {
   public static class NotIgnored extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public NotIgnored() {
-    }
   }
 }

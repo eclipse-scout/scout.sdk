@@ -24,9 +24,6 @@ public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBea
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractPersonTableFieldData() {
-  }
-
   @Override
   public AbstractPersonTableRowData addRow() {
     return (AbstractPersonTableRowData) super.addRow();
@@ -74,9 +71,6 @@ public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBea
     private Boolean m_boolean;
     private Boolean m_assert;
     private Boolean m_switch;
-
-    public AbstractPersonTableRowData() {
-    }
 
     public String getPersonId() {
       return m_personId;

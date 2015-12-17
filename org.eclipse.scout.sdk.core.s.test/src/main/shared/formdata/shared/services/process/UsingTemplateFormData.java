@@ -24,9 +24,6 @@ public class UsingTemplateFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public UsingTemplateFormData() {
-  }
-
   public ExternalGroupBox getExternalGroupBox() {
     return getFieldByClass(ExternalGroupBox.class);
   }
@@ -46,32 +43,20 @@ public class UsingTemplateFormData extends AbstractFormData {
   public static class ExternalGroupBox extends AbstractExternalGroupBoxData {
 
     private static final long serialVersionUID = 1L;
-
-    public ExternalGroupBox() {
-    }
   }
 
   public static class InternalHtml extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public InternalHtml() {
-    }
   }
 
   public static class TestCheckbox extends AbstractTestCheckboxFieldData {
 
     private static final long serialVersionUID = 1L;
-
-    public TestCheckbox() {
-    }
   }
 
   public static class TestLimitedString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public TestLimitedString() {
-    }
   }
 }

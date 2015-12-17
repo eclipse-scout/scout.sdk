@@ -30,9 +30,6 @@ public class ThirdIntegerColumnData implements Serializable {
   public static final String thirdInteger = "thirdInteger";
   private Integer m_thirdInteger;
 
-  public ThirdIntegerColumnData() {
-  }
-
   public Integer getThirdInteger() {
     return m_thirdInteger;
   }

@@ -25,9 +25,6 @@ public class SimpleTableFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public SimpleTableFormData() {
-  }
-
   public TestTable getTestTable() {
     return getFieldByClass(TestTable.class);
   }
@@ -35,9 +32,6 @@ public class SimpleTableFormData extends AbstractFormData {
   public static class TestTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-
-    public TestTable() {
-    }
 
     @Override
     public TestTableRowData addRow() {
@@ -78,9 +72,6 @@ public class SimpleTableFormData extends AbstractFormData {
       private static final long serialVersionUID = 1L;
       public static final String name = "name";
       private String m_name;
-
-      public TestTableRowData() {
-      }
 
       public String getName() {
         return m_name;
