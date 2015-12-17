@@ -127,7 +127,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
     if (!file.exists()) {
       S2eUtils.writeResources(Collections.singletonList(new ResourceWriteOperation(file, "")), monitor, true);
     }
-    addTranslationResource(new WorkspaceTranslationFile(file), monitor);
+    addTranslationResource(new WorkspaceTranslationFile(file));
   }
 
   @Override

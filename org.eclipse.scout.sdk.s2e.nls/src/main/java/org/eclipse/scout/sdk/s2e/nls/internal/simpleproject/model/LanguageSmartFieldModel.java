@@ -22,14 +22,15 @@ import org.eclipse.swt.graphics.Image;
 
 public class LanguageSmartFieldModel implements ISmartFieldModel {
 
-  private Locale[] m_locales;
+  private final List<Locale> m_locales;
 
   public LanguageSmartFieldModel() {
-    ArrayList<Locale> locs = new ArrayList<>();
-    for (String isoLang : Locale.getISOLanguages()) {
+    String[] isoLanguages = Locale.getISOLanguages();
+    ArrayList<Locale> locs = new ArrayList<>(isoLanguages.length);
+    for (String isoLang : isoLanguages) {
       locs.add(new Locale(isoLang));
     }
-    m_locales = locs.toArray(new Locale[locs.size()]);
+    m_locales = locs;
   }
 
   @Override
@@ -56,8 +57,4 @@ public class LanguageSmartFieldModel implements ISmartFieldModel {
     Locale l = (Locale) item;
     return l.getDisplayLanguage() + " (" + l.getLanguage() + ")";
   }
-
-  public void itemSelected(Object item) {
-  }
-
 }

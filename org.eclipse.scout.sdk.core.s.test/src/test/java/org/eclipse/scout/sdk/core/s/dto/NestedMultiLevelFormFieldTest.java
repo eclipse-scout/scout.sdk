@@ -81,10 +81,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'AbstractMainBoxData'", 2, abstractMainBoxData.methods().list().size());
-    IMethod abstractMainBoxData1 = SdkAssert.assertMethodExist(abstractMainBoxData, "AbstractMainBoxData", new String[]{});
-    Assert.assertTrue(abstractMainBoxData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(abstractMainBoxData1, null);
+    Assert.assertEquals("method count of 'AbstractMainBoxData'", 1, abstractMainBoxData.methods().list().size());
     IMethod getFirstLevel = SdkAssert.assertMethodExist(abstractMainBoxData, "getFirstLevel", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getFirstLevel, "QFirstLevel;");
 
@@ -100,10 +97,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'FirstLevel'", 1, firstLevel.methods().list().size());
-    IMethod firstLevel1 = SdkAssert.assertMethodExist(firstLevel, "FirstLevel", new String[]{});
-    Assert.assertTrue(firstLevel1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(firstLevel1, null);
+    Assert.assertEquals("method count of 'FirstLevel'", 0, firstLevel.methods().list().size());
 
     Assert.assertEquals("inner types count of 'FirstLevel'", 0, firstLevel.innerTypes().list().size());
   }
@@ -137,10 +131,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'FirstLevelFormData'", 2, firstLevelFormData.methods().list().size());
-    IMethod firstLevelFormData1 = SdkAssert.assertMethodExist(firstLevelFormData, "FirstLevelFormData", new String[]{});
-    Assert.assertTrue(firstLevelFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(firstLevelFormData1, null);
+    Assert.assertEquals("method count of 'FirstLevelFormData'", 1, firstLevelFormData.methods().list().size());
     IMethod getFirstInnerBox = SdkAssert.assertMethodExist(firstLevelFormData, "getFirstInnerBox", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getFirstInnerBox, "QFirstInnerBox;");
 
@@ -156,10 +147,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'FirstInnerBox'", 1, firstInnerBox.methods().list().size());
-    IMethod firstInnerBox1 = SdkAssert.assertMethodExist(firstInnerBox, "FirstInnerBox", new String[]{});
-    Assert.assertTrue(firstInnerBox1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(firstInnerBox1, null);
+    Assert.assertEquals("method count of 'FirstInnerBox'", 0, firstInnerBox.methods().list().size());
 
     Assert.assertEquals("inner types count of 'FirstInnerBox'", 0, firstInnerBox.innerTypes().list().size());
   }
@@ -176,10 +164,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'SecondLevelFormData'", 2, secondLevelFormData.methods().list().size());
-    IMethod secondLevelFormData1 = SdkAssert.assertMethodExist(secondLevelFormData, "SecondLevelFormData", new String[]{});
-    Assert.assertTrue(secondLevelFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(secondLevelFormData1, null);
+    Assert.assertEquals("method count of 'SecondLevelFormData'", 1, secondLevelFormData.methods().list().size());
     IMethod getSecondInnerBox = SdkAssert.assertMethodExist(secondLevelFormData, "getSecondInnerBox", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getSecondInnerBox, "QSecondInnerBox;");
 
@@ -196,10 +181,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'SecondInnerBox'", 2, secondInnerBox.methods().list().size());
-    IMethod secondInnerBox1 = SdkAssert.assertMethodExist(secondInnerBox, "SecondInnerBox", new String[]{});
-    Assert.assertTrue(secondInnerBox1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(secondInnerBox1, null);
+    Assert.assertEquals("method count of 'SecondInnerBox'", 1, secondInnerBox.methods().list().size());
     IMethod getSecondLevel = SdkAssert.assertMethodExist(secondInnerBox, "getSecondLevel", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getSecondLevel, "QSecondLevel;");
 
@@ -216,10 +198,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'SecondLevel'", 1, secondLevel.methods().list().size());
-    IMethod secondLevel1 = SdkAssert.assertMethodExist(secondLevel, "SecondLevel", new String[]{});
-    Assert.assertTrue(secondLevel1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(secondLevel1, null);
+    Assert.assertEquals("method count of 'SecondLevel'", 0, secondLevel.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SecondLevel'", 0, secondLevel.innerTypes().list().size());
   }
@@ -236,10 +215,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'ThirdLevelFormData'", 2, thirdLevelFormData.methods().list().size());
-    IMethod thirdLevelFormData1 = SdkAssert.assertMethodExist(thirdLevelFormData, "ThirdLevelFormData", new String[]{});
-    Assert.assertTrue(thirdLevelFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(thirdLevelFormData1, null);
+    Assert.assertEquals("method count of 'ThirdLevelFormData'", 1, thirdLevelFormData.methods().list().size());
     IMethod getThirdInnerBox = SdkAssert.assertMethodExist(thirdLevelFormData, "getThirdInnerBox", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getThirdInnerBox, "QThirdInnerBox;");
 
@@ -256,10 +232,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'ThirdInnerBox'", 2, thirdInnerBox.methods().list().size());
-    IMethod thirdInnerBox1 = SdkAssert.assertMethodExist(thirdInnerBox, "ThirdInnerBox", new String[]{});
-    Assert.assertTrue(thirdInnerBox1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(thirdInnerBox1, null);
+    Assert.assertEquals("method count of 'ThirdInnerBox'", 1, thirdInnerBox.methods().list().size());
     IMethod getThirdLevel = SdkAssert.assertMethodExist(thirdInnerBox, "getThirdLevel", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getThirdLevel, "QThirdLevel;");
 
@@ -276,10 +249,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'ThirdLevel'", 1, thirdLevel.methods().list().size());
-    IMethod thirdLevel1 = SdkAssert.assertMethodExist(thirdLevel, "ThirdLevel", new String[]{});
-    Assert.assertTrue(thirdLevel1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(thirdLevel1, null);
+    Assert.assertEquals("method count of 'ThirdLevel'", 0, thirdLevel.methods().list().size());
 
     Assert.assertEquals("inner types count of 'ThirdLevel'", 0, thirdLevel.innerTypes().list().size());
   }

@@ -28,7 +28,6 @@ import javax.swing.event.EventListenerList;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.util.OptimisticLock;
@@ -130,7 +129,7 @@ public abstract class AbstractNlsProject implements INlsProject {
         // inherited entries
         if (getParent() != null) {
           for (String parentKey : getParent().getAllKeys()) {
-            entries.put(parentKey, new InheritedNlsEntry(getParent().getEntry(parentKey), this));
+            entries.put(parentKey, new InheritedNlsEntry(getParent().getEntry(parentKey)));
           }
         }
 
@@ -484,7 +483,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       try {
         NlsEntry entry = m_entries.get(superRow.getKey());
         if (entry == null || entry.getType() == INlsEntry.TYPE_INHERITED) {
-          entry = new InheritedNlsEntry(superRow, this);
+          entry = new InheritedNlsEntry(superRow);
           m_entries.put(entry.getKey(), entry);
           fireNlsProjectEvent(new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_ADDED));
         }
@@ -540,7 +539,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       List<ITranslationResource> translationResources = loadTranslationResources();
       for (ITranslationResource r : translationResources) {
         if (r.getLanguage() != null) {
-          addTranslationResource(r, new NullProgressMonitor());
+          addTranslationResource(r);
         }
       }
     }
@@ -549,7 +548,7 @@ public abstract class AbstractNlsProject implements INlsProject {
     }
   }
 
-  protected void addTranslationResource(ITranslationResource r, IProgressMonitor monitor) {
+  protected void addTranslationResource(ITranslationResource r) {
     r.getLanguage().setLocal(true);
     r.addTranslationResourceListener(m_translationResourceListener);
     m_resourceProvider.addResource(r);
@@ -697,7 +696,7 @@ public abstract class AbstractNlsProject implements INlsProject {
                 if (m_parent != null) {
                   INlsEntry e = m_parent.getEntry(entry.getKey());
                   if (e != null) {
-                    m_entries.put(entry.getKey(), new InheritedNlsEntry(e, this));
+                    m_entries.put(entry.getKey(), new InheritedNlsEntry(e));
                   }
                 }
               }

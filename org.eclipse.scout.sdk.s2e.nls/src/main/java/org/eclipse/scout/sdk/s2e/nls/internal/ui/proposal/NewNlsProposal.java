@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link NewNlsProposal}</h3>
@@ -38,10 +37,11 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class NewNlsProposal extends AbstractNlsProposal {
   private final Image m_image = NlsCore.getImage(INlsIcons.TEXT_ADD);
-  private INlsEntry m_nlsEntry;
-  private INlsProject m_project;
+  private final INlsProject m_project;
 
-  public NewNlsProposal(INlsProject project, Shell shell, String prefix, int initialOffset) {
+  private INlsEntry m_nlsEntry;
+
+  public NewNlsProposal(INlsProject project, String prefix, int initialOffset) {
     super(prefix, initialOffset);
     m_project = project;
   }

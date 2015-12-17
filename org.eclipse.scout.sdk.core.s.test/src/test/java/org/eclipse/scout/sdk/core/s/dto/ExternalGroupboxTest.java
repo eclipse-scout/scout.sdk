@@ -41,10 +41,7 @@ public class ExternalGroupboxTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'AbstractExternalGroupBoxData'", 2, abstractExternalGroupBoxData.methods().list().size());
-    IMethod abstractExternalGroupBoxData1 = SdkAssert.assertMethodExist(abstractExternalGroupBoxData, "AbstractExternalGroupBoxData", new String[]{});
-    Assert.assertTrue(abstractExternalGroupBoxData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(abstractExternalGroupBoxData1, null);
+    Assert.assertEquals("method count of 'AbstractExternalGroupBoxData'", 1, abstractExternalGroupBoxData.methods().list().size());
     IMethod getExternalString = SdkAssert.assertMethodExist(abstractExternalGroupBoxData, "getExternalString", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getExternalString, "QExternalString;");
 
@@ -60,10 +57,7 @@ public class ExternalGroupboxTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'ExternalString'", 1, externalString.methods().list().size());
-    IMethod externalString1 = SdkAssert.assertMethodExist(externalString, "ExternalString", new String[]{});
-    Assert.assertTrue(externalString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(externalString1, null);
+    Assert.assertEquals("method count of 'ExternalString'", 0, externalString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'ExternalString'", 0, externalString.innerTypes().list().size());
   }

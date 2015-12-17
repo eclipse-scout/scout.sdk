@@ -37,7 +37,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.MethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
@@ -94,16 +93,12 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
   }
 
   protected void createContent() {
-    // constructor
-    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructor(getElementName());
-    addSortedMethod(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
-
     // serial version uid
     IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
     addSortedField(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
 
     // copy annotations over to the DTO
-    copyAnnotations(getModelType(), getModelType(), this, getJavaEnvironment());
+    copyAnnotations(getModelType(), this, getJavaEnvironment());
   }
 
   /**
@@ -122,7 +117,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
     }
   }
 
-  protected static void copyAnnotations(IAnnotatable annotationOwner, final IType declaringType, ITypeSourceBuilder sourceBuilder, final IJavaEnvironment env) {
+  protected static void copyAnnotations(IAnnotatable annotationOwner, ITypeSourceBuilder sourceBuilder, final IJavaEnvironment env) {
     List<IAnnotation> annotations = annotationOwner.annotations().list();
     for (IAnnotation a : annotations) {
       final IAnnotation annotation = a;
@@ -173,8 +168,6 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
       propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
       IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
       propertyTypeBuilder.addSortedField(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
-      IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructor(propName);
-      propertyTypeBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
       addSortedType(SortedMemberKeyFactory.createTypeFormDataPropertyKey(propertyTypeBuilder), propertyTypeBuilder);
 
       // copy annotations over to the DTO
@@ -183,7 +176,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
         propertyMethod = desc.writeMethod();
       }
       if (propertyMethod != null) {
-        copyAnnotations(propertyMethod, propertyMethod.declaringType(), propertyTypeBuilder, getJavaEnvironment());
+        copyAnnotations(propertyMethod, propertyTypeBuilder, getJavaEnvironment());
       }
 
       // getter

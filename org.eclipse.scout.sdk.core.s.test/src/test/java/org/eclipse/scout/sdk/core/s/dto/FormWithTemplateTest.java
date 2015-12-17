@@ -41,10 +41,7 @@ public class FormWithTemplateTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'UsingTemplateFormData'", 5, usingTemplateFormData.methods().list().size());
-    IMethod usingTemplateFormData1 = SdkAssert.assertMethodExist(usingTemplateFormData, "UsingTemplateFormData", new String[]{});
-    Assert.assertTrue(usingTemplateFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usingTemplateFormData1, null);
+    Assert.assertEquals("method count of 'UsingTemplateFormData'", 4, usingTemplateFormData.methods().list().size());
     IMethod getExternalGroupBox = SdkAssert.assertMethodExist(usingTemplateFormData, "getExternalGroupBox", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getExternalGroupBox, "QExternalGroupBox;");
     IMethod getInternalHtml = SdkAssert.assertMethodExist(usingTemplateFormData, "getInternalHtml", new String[]{});
@@ -66,10 +63,7 @@ public class FormWithTemplateTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'ExternalGroupBox'", 1, externalGroupBox.methods().list().size());
-    IMethod externalGroupBox1 = SdkAssert.assertMethodExist(externalGroupBox, "ExternalGroupBox", new String[]{});
-    Assert.assertTrue(externalGroupBox1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(externalGroupBox1, null);
+    Assert.assertEquals("method count of 'ExternalGroupBox'", 0, externalGroupBox.methods().list().size());
 
     Assert.assertEquals("inner types count of 'ExternalGroupBox'", 0, externalGroupBox.innerTypes().list().size());
     // type InternalHtml
@@ -83,10 +77,7 @@ public class FormWithTemplateTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'InternalHtml'", 1, internalHtml.methods().list().size());
-    IMethod internalHtml1 = SdkAssert.assertMethodExist(internalHtml, "InternalHtml", new String[]{});
-    Assert.assertTrue(internalHtml1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(internalHtml1, null);
+    Assert.assertEquals("method count of 'InternalHtml'", 0, internalHtml.methods().list().size());
 
     Assert.assertEquals("inner types count of 'InternalHtml'", 0, internalHtml.innerTypes().list().size());
     // type TestCheckbox
@@ -100,10 +91,7 @@ public class FormWithTemplateTest {
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'TestCheckbox'", 1, testCheckbox.methods().list().size());
-    IMethod testCheckbox1 = SdkAssert.assertMethodExist(testCheckbox, "TestCheckbox", new String[]{});
-    Assert.assertTrue(testCheckbox1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(testCheckbox1, null);
+    Assert.assertEquals("method count of 'TestCheckbox'", 0, testCheckbox.methods().list().size());
 
     Assert.assertEquals("inner types count of 'TestCheckbox'", 0, testCheckbox.innerTypes().list().size());
     // type TestLimitedString
@@ -117,10 +105,7 @@ public class FormWithTemplateTest {
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    Assert.assertEquals("method count of 'TestLimitedString'", 1, testLimitedString.methods().list().size());
-    IMethod testLimitedString1 = SdkAssert.assertMethodExist(testLimitedString, "TestLimitedString", new String[]{});
-    Assert.assertTrue(testLimitedString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(testLimitedString1, null);
+    Assert.assertEquals("method count of 'TestLimitedString'", 0, testLimitedString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'TestLimitedString'", 0, testLimitedString.innerTypes().list().size());
   }

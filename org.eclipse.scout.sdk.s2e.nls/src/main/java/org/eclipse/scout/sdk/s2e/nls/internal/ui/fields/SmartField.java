@@ -233,7 +233,7 @@ public class SmartField extends Composite {
     m_smartButton.setImage(image);
   }
 
-  public ISmartFieldModel getSmartFieldModel(ISmartFieldModel model) {
+  public ISmartFieldModel getSmartFieldModel() {
     return m_smartFieldModel;
   }
 

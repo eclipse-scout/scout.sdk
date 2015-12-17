@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.s.dto;
 
 import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
@@ -49,10 +48,7 @@ public class ReplacingFormTest {
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
     Assert.assertEquals("annotation count", 0, serialVersionUID.annotations().list().size());
 
-    Assert.assertEquals("method count of 'formdata.shared.ui.forms.ReplacingFormData'", 1, replacingFormData.methods().list().size());
-    IMethod replacingFormData1 = SdkAssert.assertMethodExist(replacingFormData, "ReplacingFormData", new String[]{});
-    Assert.assertTrue(replacingFormData1.isConstructor());
-    Assert.assertEquals("annotation count", 0, replacingFormData1.annotations().list().size());
+    Assert.assertEquals("method count of 'formdata.shared.ui.forms.ReplacingFormData'", 0, replacingFormData.methods().list().size());
 
     Assert.assertEquals("inner types count of 'ReplacingFormData'", 0, replacingFormData.innerTypes().list().size());
   }

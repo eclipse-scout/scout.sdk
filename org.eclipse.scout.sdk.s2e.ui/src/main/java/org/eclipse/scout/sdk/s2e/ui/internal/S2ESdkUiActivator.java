@@ -53,13 +53,22 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     // shared instance
     plugin = this;
 
+    // init Sdk log level
+    getPreferenceStore().setDefault(SdkLog.LOG_LEVEL_PROPERTY_NAME, SdkLog.DEFAULT_LOG_LEVEL.getName());
+    boolean isLoggingConfiguredInSystem = StringUtils.isNotBlank(System.getProperty(SdkLog.LOG_LEVEL_PROPERTY_NAME));
+    boolean isLoggingConfiguredInWorkspace = !getPreferenceStore().isDefault(SdkLog.LOG_LEVEL_PROPERTY_NAME);
+    if (!isLoggingConfiguredInWorkspace && !isLoggingConfiguredInSystem && (Platform.inDebugMode() || Platform.inDevelopmentMode())) {
+      // nothing is specified in the workspace and in the system: use full logging in debug mode by default
+      // note: This value is not stored in the workspace preferences! Therefore not shown in the preference page.
+      //       This is because it is only valid for this one debug launch and should not touch the actual workspace setting
+      SdkLog.setLogLevel(Level.ALL);
+    }
+    else if (isLoggingConfiguredInWorkspace) {
+      SdkLog.setLogLevel(getPreferenceStore().getString(SdkLog.LOG_LEVEL_PROPERTY_NAME));
+    }
+
     //attach sdk console to workbench
     SdkConsole.spi = new WorkbenchSdkConsoleSpi();
-
-    // init Sdk log level to all logs if running in dev mode
-    if (StringUtils.isBlank(System.getProperty(SdkLog.LOG_LEVEL_PROPERTY_NAME)) && (Platform.inDebugMode() || Platform.inDevelopmentMode())) {
-      System.setProperty(SdkLog.LOG_LEVEL_PROPERTY_NAME, Level.ALL.getName());
-    }
 
     // comment source builder
     CommentSourceBuilderFactory.commentSourceBuilderSpi = new JdtSettingsCommentSourceBuilderDelegate();
@@ -154,7 +163,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + fileName);
   }
 
-  public IDialogSettings getDialogSettingsSection(String name, boolean createIfNotExist) {
+  public IDialogSettings getDialogSettingsSection(String name) {
     IDialogSettings dialogSettings = getDialogSettings();
     IDialogSettings section = dialogSettings.getSection(name);
     if (section == null) {
@@ -167,17 +176,22 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
       Object newValue = event.getNewValue();
-      if (newValue == null) {
-        return;
-      }
 
       if (IDerivedResourceManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
-        boolean autoUpdate = Boolean.parseBoolean(newValue.toString());
+        boolean autoUpdate = newValue == null || Boolean.parseBoolean(newValue.toString());
         ScoutSdkCore.getDerivedResourceManager().setEnabled(autoUpdate);
       }
       else if (ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION.equals(event.getProperty())) {
-        boolean automaticallyCreate = Boolean.parseBoolean(newValue.toString());
+        boolean automaticallyCreate = newValue != null && Boolean.parseBoolean(newValue.toString());
         ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(automaticallyCreate);
+      }
+      else if (SdkLog.LOG_LEVEL_PROPERTY_NAME.equals(event.getProperty())) {
+        if (newValue == null) {
+          SdkLog.setDefaultLogLevel();
+        }
+        else {
+          SdkLog.setLogLevel(newValue.toString());
+        }
       }
     }
   }

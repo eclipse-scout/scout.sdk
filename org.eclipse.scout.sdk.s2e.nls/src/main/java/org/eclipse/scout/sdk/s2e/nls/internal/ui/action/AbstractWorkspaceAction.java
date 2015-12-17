@@ -54,6 +54,9 @@ public abstract class AbstractWorkspaceAction extends Action {
     return true;
   }
 
+  /**
+   * @param monitor
+   */
   protected void execute(IProgressMonitor monitor) {
   }
 

@@ -49,7 +49,7 @@ public class DtoDerivedResourceBatchHandler extends AbstractDerivedResourceBatch
         try {
           monitor.subTask("process " + jdtType.getFullyQualifiedName());
           IType modelType = envProvider.jdtTypeToScoutType(jdtType);
-          CompilationUnitWriteOperation op = DtoS2eUtils.newDtoOp(jdtType, modelType, getJavaEnvironmentProvider(), monitor);
+          CompilationUnitWriteOperation op = DtoS2eUtils.newDtoOp(jdtType, modelType, getJavaEnvironmentProvider());
           if (op != null) {
             S2eUtils.writeTypes(Collections.singletonList(op), monitor, false);
           }

@@ -12,19 +12,28 @@ package formdata.client.extensions;
 
 import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.AbstractTableExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
+import org.eclipse.scout.rt.platform.Order;
 
 import formdata.client.ui.forms.SimpleTableForm;
-import formdata.client.ui.forms.SimpleTableForm.MainBox.TestTableField.Table;
-import formdata.shared.extension.SimpleTableFormExtensionData;
+import formdata.client.ui.forms.SimpleTableForm.MainBox.TestTableField;
+import formdata.shared.extension.SimpleTableFormExtensionWithTableData;
 
-@Data(SimpleTableFormExtensionData.class)
-public class SimpleTableFormExtension extends AbstractTableExtension<SimpleTableForm.MainBox.TestTableField.Table> {
+@Data(SimpleTableFormExtensionWithTableData.class)
+public class SimpleTableFormExtensionWithTable extends AbstractFormExtension<SimpleTableForm> {
 
-  public SimpleTableFormExtension(Table owner) {
-    super(owner);
+  public SimpleTableFormExtensionWithTable(SimpleTableForm ownerForm) {
+    super(ownerForm);
   }
 
-  public class MyExtensionColumn extends AbstractBigDecimalColumn {
+  public class TestTableFieldExtension extends AbstractTableExtension<TestTableField.Table> {
+    public TestTableFieldExtension(TestTableField.Table owner) {
+      super(owner);
+    }
+
+    @Order(1000.0)
+    public class ContributedColumn extends AbstractBigDecimalColumn {
+    }
   }
 }

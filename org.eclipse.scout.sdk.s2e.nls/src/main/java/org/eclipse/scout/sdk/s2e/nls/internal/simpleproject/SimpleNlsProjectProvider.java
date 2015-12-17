@@ -46,7 +46,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
       INlsProject nlsProject = m_projects.get(type.getFullyQualifiedName());
       if (nlsProject == null) {
         NlsType t = new NlsType(type);
-        if (t != null && t.getTranslationsFolderName() != null) {
+        if (t.getTranslationsFolderName() != null) {
           nlsProject = new SimpleNlsProject(t);
           m_projects.put(type.getFullyQualifiedName(), nlsProject);
         }

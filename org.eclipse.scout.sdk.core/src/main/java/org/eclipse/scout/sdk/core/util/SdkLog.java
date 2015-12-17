@@ -13,11 +13,13 @@ package org.eclipse.scout.sdk.core.util;
 import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 public final class SdkLog {
 
-  public static final String LOG_LEVEL_PROPERTY_NAME = "scout.sdk.loglevel";
-  private static final Level DEFAULT_LOG_LEVEL = Level.WARNING;
+  public static final String LOG_LEVEL_PROPERTY_NAME = "org.eclipse.scout.sdk.propLogLevel";
+  public static final Level DEFAULT_LOG_LEVEL = Level.WARNING;
+  private static volatile Level curLevel = getInitialLogLevel();
 
   private SdkLog() {
   }
@@ -27,7 +29,7 @@ public final class SdkLog {
       level = DEFAULT_LOG_LEVEL;
     }
 
-    if (level.intValue() < getLogLevel() || level.intValue() == Level.OFF.intValue()) {
+    if (level.intValue() < curLevel.intValue() || level.intValue() == Level.OFF.intValue()) {
       return;
     }
 
@@ -78,22 +80,44 @@ public final class SdkLog {
     log(Level.SEVERE, message, throwables);
   }
 
-  public static int getLogLevel() {
-    String lvl = System.getProperty(LOG_LEVEL_PROPERTY_NAME);
+  public static Level getLogLevel() {
+    return curLevel;
+  }
+
+  public static void setLogLevel(Level newLevel) {
+    curLevel = Validate.notNull(newLevel);
+  }
+
+  public static void setLogLevel(String newLevelName) {
+    curLevel = parseLevel(newLevelName);
+  }
+
+  public static void setDefaultLogLevel() {
+    setLogLevel(getInitialLogLevel());
+  }
+
+  private static Level parseLevel(String lvl) {
     if (StringUtils.isBlank(lvl)) {
-      return DEFAULT_LOG_LEVEL.intValue();
+      return DEFAULT_LOG_LEVEL;
     }
 
     try {
       Level parsedLevel = Level.parse(lvl);
       if (parsedLevel != null) {
-        return parsedLevel.intValue();
+        return parsedLevel;
       }
     }
     catch (Exception e) {
       SdkConsole.println("Unable to parse log level '" + lvl + "'. Fallback to default: '" + DEFAULT_LOG_LEVEL.getName() + "'.", e);
     }
+    return DEFAULT_LOG_LEVEL;
+  }
 
-    return DEFAULT_LOG_LEVEL.intValue();
+  private static Level getInitialLogLevel() {
+    String lvl = System.getProperty(LOG_LEVEL_PROPERTY_NAME);
+    if (StringUtils.isBlank(lvl)) {
+      return DEFAULT_LOG_LEVEL;
+    }
+    return parseLevel(lvl);
   }
 }

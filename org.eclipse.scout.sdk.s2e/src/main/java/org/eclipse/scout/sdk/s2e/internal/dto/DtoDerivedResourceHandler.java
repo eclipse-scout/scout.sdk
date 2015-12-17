@@ -39,7 +39,7 @@ public class DtoDerivedResourceHandler extends AbstractDerivedResourceSingleHand
   protected void runImpl(IProgressMonitor monitor) throws CoreException {
     monitor.beginTask(getName(), 1);
     try {
-      CompilationUnitWriteOperation op = DtoS2eUtils.newDtoOp(getJdtType(), getModelType(), getJavaEnvironmentProvider(), monitor);
+      CompilationUnitWriteOperation op = DtoS2eUtils.newDtoOp(getJdtType(), getModelType(), getJavaEnvironmentProvider());
       if (op == null) {
         return;
       }

@@ -37,7 +37,7 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
         .insert();
 
     // column getter
-    addColumnGetter(AstUtils.getFullyQualifiedName(getDeclaringType()));
+    addColumnGetter();
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
@@ -47,7 +47,7 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
     return this;
   }
 
-  protected void addColumnGetter(String declaringTypeFqn) {
+  protected void addColumnGetter() {
     MethodInvocation getColumnSet = getFactory().getAst().newMethodInvocation();
     getColumnSet.setName(getFactory().getAst().newSimpleName("getColumnSet"));
 

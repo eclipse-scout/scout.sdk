@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableFieldBeanFormDataSourceBuilder;
+import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableRowDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
@@ -116,6 +117,14 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
     // step into extensions
     for (IType formFieldExtension : compositeType.innerTypes().withInstanceOf(IScoutRuntimeTypes.ICompositeFieldExtension).list()) {
       createCompositeFieldFormData(formFieldExtension);
+    }
+
+    // step into table extensions of table-fields
+    for (IType tableExtension : compositeType.innerTypes().withRecursiveInnerTypes(true).withInstanceOf(IScoutRuntimeTypes.ITableExtension).list()) {
+      String rowDataName = DtoUtils.getRowDataName(tableExtension.elementName());
+      TableRowDataTypeSourceBuilder rowDataSourceBuilder = new TableRowDataTypeSourceBuilder(rowDataName, tableExtension, tableExtension, getJavaEnvironment());
+      addSortedType(SortedMemberKeyFactory.createTypeFormDataPropertyKey(rowDataSourceBuilder), rowDataSourceBuilder);
+      DtoUtils.addDtoExtendsAnnotation(rowDataSourceBuilder, tableExtension);
     }
   }
 }

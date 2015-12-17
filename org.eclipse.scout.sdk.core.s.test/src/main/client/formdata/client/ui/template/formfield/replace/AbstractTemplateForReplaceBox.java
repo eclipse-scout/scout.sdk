@@ -17,9 +17,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
 
-import formdata.client.ui.template.formfield.AbstractBeanTableField;
 import formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData;
 
 /**
@@ -53,7 +53,7 @@ public abstract class AbstractTemplateForReplaceBox extends AbstractGroupBox {
   }
 
   @Order(30)
-  public class TemplateTableField extends AbstractBeanTableField<TemplateTableField.Table> {
+  public class TemplateTableField extends AbstractTableField<TemplateTableField.Table> {
 
     public class Table extends AbstractTable {
 

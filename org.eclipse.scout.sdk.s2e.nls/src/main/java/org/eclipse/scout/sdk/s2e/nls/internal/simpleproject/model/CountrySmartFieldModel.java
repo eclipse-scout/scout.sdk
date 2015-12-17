@@ -22,14 +22,15 @@ import org.eclipse.swt.graphics.Image;
 
 public class CountrySmartFieldModel implements ISmartFieldModel {
 
-  private Locale[] m_locales;
+  private final List<Locale> m_locales;
 
   public CountrySmartFieldModel() {
-    ArrayList<Locale> locs = new ArrayList<>();
-    for (String isoCountry : Locale.getISOCountries()) {
+    String[] isoCountries = Locale.getISOCountries();
+    List<Locale> locs = new ArrayList<>(isoCountries.length);
+    for (String isoCountry : isoCountries) {
       locs.add(new Locale("", isoCountry));
     }
-    m_locales = locs.toArray(new Locale[locs.size()]);
+    m_locales = locs;
   }
 
   @Override
@@ -56,8 +57,4 @@ public class CountrySmartFieldModel implements ISmartFieldModel {
     Locale l = (Locale) item;
     return l.getDisplayCountry() + " (" + l.getCountry() + ")";
   }
-
-  public void itemSelected(Object item) {
-  }
-
 }

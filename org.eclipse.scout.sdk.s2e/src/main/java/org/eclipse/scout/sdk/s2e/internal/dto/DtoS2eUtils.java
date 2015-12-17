@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2e.internal.dto;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -31,7 +30,7 @@ public final class DtoS2eUtils {
   private DtoS2eUtils() {
   }
 
-  public static CompilationUnitWriteOperation newDtoOp(org.eclipse.jdt.core.IType jdtType, IType modelType, IJavaEnvironmentProvider envProvider, IProgressMonitor monitor) throws CoreException {
+  public static CompilationUnitWriteOperation newDtoOp(org.eclipse.jdt.core.IType jdtType, IType modelType, IJavaEnvironmentProvider envProvider) throws CoreException {
 
     //FormData
     FormDataAnnotationDescriptor a1 = findDataAnnotationForFormData(modelType);

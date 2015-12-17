@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.editor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
@@ -58,7 +60,7 @@ public class NlsFilterComponent extends Composite {
         }
       }
     });
-    updateFilterFields(this);
+    updateFilterFields();
     setLayout(new P_FilterComponentLayout());
   }
 
@@ -70,15 +72,15 @@ public class NlsFilterComponent extends Composite {
         layout();
       }
     });
-    updateFilterFields(this);
+    updateFilterFields();
   }
 
   public void columnsChanged() {
-    updateFilterFields(this);
+    updateFilterFields();
   }
 
-  protected void updateFilterFields(Composite parent) {
-    HashMap<Language, String> oldContents = new HashMap<>(m_filterFields.size());
+  protected void updateFilterFields() {
+    Map<Language, String> oldContents = new HashMap<>(m_filterFields.size());
     if (!m_filterFields.isEmpty()) {
       // dispose old text fields and backup the filter text to restore it afterwards in the new fields
       for (Entry<Language, Text> entry : m_filterFields.entrySet()) {
@@ -93,7 +95,7 @@ public class NlsFilterComponent extends Composite {
       for (int i = NlsTable.INDEX_COLUMN_KEYS; i < columns.length; i++) {
         Language l = (Language) columns[i].getData(NlsTable.LANGUAGE_COLUMN_ID);
         Text filterField = new Text(this, SWT.BORDER);
-        filterField.addModifyListener(new P_FilterModifyListener(i));
+        filterField.addModifyListener(new P_FilterModifyListener());
 
         // restore old filter text
         String oldText = oldContents.get(l);
@@ -106,9 +108,9 @@ public class NlsFilterComponent extends Composite {
     }
   }
 
-  protected void handleFilterModified(int index) {
+  protected void handleFilterModified() {
     // update filters
-    ArrayList<ViewerFilter> filters = new ArrayList<>();
+    List<ViewerFilter> filters = new ArrayList<>();
     // backup old filters
     for (ViewerFilter filter : m_tableViewer.getFilters()) {
       if (!(filter instanceof P_ViewerFilter)) {
@@ -130,17 +132,11 @@ public class NlsFilterComponent extends Composite {
   }
 
   private final class P_FilterModifyListener implements ModifyListener {
-    private int m_columnIndex;
-
-    private P_FilterModifyListener(int columnIndex) {
-      m_columnIndex = columnIndex;
-    }
-
     @Override
     public void modifyText(ModifyEvent e) {
-      handleFilterModified(m_columnIndex);
+      handleFilterModified();
     }
-  } // end class P_FilterModifyListener
+  }
 
   private final class P_ViewerFilter extends ViewerFilter {
 

@@ -40,10 +40,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'PropertyTestFormData'", 35, propertyTestFormData.methods().list().size());
-    IMethod propertyTestFormData1 = SdkAssert.assertMethodExist(propertyTestFormData, "PropertyTestFormData", new String[]{});
-    Assert.assertTrue(propertyTestFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(propertyTestFormData1, null);
+    Assert.assertEquals("method count of 'PropertyTestFormData'", 34, propertyTestFormData.methods().list().size());
     IMethod getBoolObject = SdkAssert.assertMethodExist(propertyTestFormData, "getBoolObject", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getBoolObject, "QBoolean;");
     IMethod setBoolObject = SdkAssert.assertMethodExist(propertyTestFormData, "setBoolObject", new String[]{"QBoolean;"});
@@ -125,10 +122,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'BoolObjectProperty'", 1, boolObjectProperty.methods().list().size());
-    IMethod boolObjectProperty1 = SdkAssert.assertMethodExist(boolObjectProperty, "BoolObjectProperty", new String[]{});
-    Assert.assertTrue(boolObjectProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(boolObjectProperty1, null);
+    Assert.assertEquals("method count of 'BoolObjectProperty'", 0, boolObjectProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'BoolObjectProperty'", 0, boolObjectProperty.innerTypes().list().size());
     // type BoolPrimitiveProperty
@@ -142,10 +136,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'BoolPrimitiveProperty'", 1, boolPrimitiveProperty.methods().list().size());
-    IMethod boolPrimitiveProperty1 = SdkAssert.assertMethodExist(boolPrimitiveProperty, "BoolPrimitiveProperty", new String[]{});
-    Assert.assertTrue(boolPrimitiveProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(boolPrimitiveProperty1, null);
+    Assert.assertEquals("method count of 'BoolPrimitiveProperty'", 0, boolPrimitiveProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'BoolPrimitiveProperty'", 0, boolPrimitiveProperty.innerTypes().list().size());
     // type ByteArrayProperty
@@ -159,10 +150,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'ByteArrayProperty'", 1, byteArrayProperty.methods().list().size());
-    IMethod byteArrayProperty1 = SdkAssert.assertMethodExist(byteArrayProperty, "ByteArrayProperty", new String[]{});
-    Assert.assertTrue(byteArrayProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(byteArrayProperty1, null);
+    Assert.assertEquals("method count of 'ByteArrayProperty'", 0, byteArrayProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'ByteArrayProperty'", 0, byteArrayProperty.innerTypes().list().size());
     // type ComplexArrayProperty
@@ -176,10 +164,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    Assert.assertEquals("method count of 'ComplexArrayProperty'", 1, complexArrayProperty.methods().list().size());
-    IMethod complexArrayProperty1 = SdkAssert.assertMethodExist(complexArrayProperty, "ComplexArrayProperty", new String[]{});
-    Assert.assertTrue(complexArrayProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(complexArrayProperty1, null);
+    Assert.assertEquals("method count of 'ComplexArrayProperty'", 0, complexArrayProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'ComplexArrayProperty'", 0, complexArrayProperty.innerTypes().list().size());
     // type ComplexInnerArrayProperty
@@ -193,10 +178,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    Assert.assertEquals("method count of 'ComplexInnerArrayProperty'", 1, complexInnerArrayProperty.methods().list().size());
-    IMethod complexInnerArrayProperty1 = SdkAssert.assertMethodExist(complexInnerArrayProperty, "ComplexInnerArrayProperty", new String[]{});
-    Assert.assertTrue(complexInnerArrayProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(complexInnerArrayProperty1, null);
+    Assert.assertEquals("method count of 'ComplexInnerArrayProperty'", 0, complexInnerArrayProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'ComplexInnerArrayProperty'", 0, complexInnerArrayProperty.innerTypes().list().size());
     // type DoubleArrayPropertyProperty
@@ -210,10 +192,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
 
-    Assert.assertEquals("method count of 'DoubleArrayPropertyProperty'", 1, doubleArrayPropertyProperty.methods().list().size());
-    IMethod doubleArrayPropertyProperty1 = SdkAssert.assertMethodExist(doubleArrayPropertyProperty, "DoubleArrayPropertyProperty", new String[]{});
-    Assert.assertTrue(doubleArrayPropertyProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(doubleArrayPropertyProperty1, null);
+    Assert.assertEquals("method count of 'DoubleArrayPropertyProperty'", 0, doubleArrayPropertyProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'DoubleArrayPropertyProperty'", 0, doubleArrayPropertyProperty.innerTypes().list().size());
     // type IntPrimitiveProperty
@@ -227,10 +206,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID7, 26);
     SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
-    Assert.assertEquals("method count of 'IntPrimitiveProperty'", 1, intPrimitiveProperty.methods().list().size());
-    IMethod intPrimitiveProperty1 = SdkAssert.assertMethodExist(intPrimitiveProperty, "IntPrimitiveProperty", new String[]{});
-    Assert.assertTrue(intPrimitiveProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(intPrimitiveProperty1, null);
+    Assert.assertEquals("method count of 'IntPrimitiveProperty'", 0, intPrimitiveProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'IntPrimitiveProperty'", 0, intPrimitiveProperty.innerTypes().list().size());
     // type Name
@@ -244,10 +220,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID8, 26);
     SdkAssert.assertFieldSignature(serialVersionUID8, "J");
 
-    Assert.assertEquals("method count of 'Name'", 4, name.methods().list().size());
-    IMethod name1 = SdkAssert.assertMethodExist(name, "Name", new String[]{});
-    Assert.assertTrue(name1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(name1, null);
+    Assert.assertEquals("method count of 'Name'", 3, name.methods().list().size());
     IMethod getIntProperty = SdkAssert.assertMethodExist(name, "getIntProperty", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getIntProperty, "I");
     IMethod setIntProperty = SdkAssert.assertMethodExist(name, "setIntProperty", new String[]{"I"});
@@ -267,10 +240,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID9, 26);
     SdkAssert.assertFieldSignature(serialVersionUID9, "J");
 
-    Assert.assertEquals("method count of 'IntPropertyProperty'", 1, intPropertyProperty.methods().list().size());
-    IMethod intPropertyProperty1 = SdkAssert.assertMethodExist(intPropertyProperty, "IntPropertyProperty", new String[]{});
-    Assert.assertTrue(intPropertyProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(intPropertyProperty1, null);
+    Assert.assertEquals("method count of 'IntPropertyProperty'", 0, intPropertyProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'IntPropertyProperty'", 0, intPropertyProperty.innerTypes().list().size());
     // type ObjectPropertyProperty
@@ -284,10 +254,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID10, 26);
     SdkAssert.assertFieldSignature(serialVersionUID10, "J");
 
-    Assert.assertEquals("method count of 'ObjectPropertyProperty'", 1, objectPropertyProperty.methods().list().size());
-    IMethod objectPropertyProperty1 = SdkAssert.assertMethodExist(objectPropertyProperty, "ObjectPropertyProperty", new String[]{});
-    Assert.assertTrue(objectPropertyProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(objectPropertyProperty1, null);
+    Assert.assertEquals("method count of 'ObjectPropertyProperty'", 0, objectPropertyProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'ObjectPropertyProperty'", 0, objectPropertyProperty.innerTypes().list().size());
     // type PropertyTestNrProperty
@@ -301,10 +268,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID11, 26);
     SdkAssert.assertFieldSignature(serialVersionUID11, "J");
 
-    Assert.assertEquals("method count of 'PropertyTestNrProperty'", 1, propertyTestNrProperty.methods().list().size());
-    IMethod propertyTestNrProperty1 = SdkAssert.assertMethodExist(propertyTestNrProperty, "PropertyTestNrProperty", new String[]{});
-    Assert.assertTrue(propertyTestNrProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(propertyTestNrProperty1, null);
+    Assert.assertEquals("method count of 'PropertyTestNrProperty'", 0, propertyTestNrProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'PropertyTestNrProperty'", 0, propertyTestNrProperty.innerTypes().list().size());
     // type SingleArrayPropertyProperty
@@ -318,10 +282,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID12, 26);
     SdkAssert.assertFieldSignature(serialVersionUID12, "J");
 
-    Assert.assertEquals("method count of 'SingleArrayPropertyProperty'", 1, singleArrayPropertyProperty.methods().list().size());
-    IMethod singleArrayPropertyProperty1 = SdkAssert.assertMethodExist(singleArrayPropertyProperty, "SingleArrayPropertyProperty", new String[]{});
-    Assert.assertTrue(singleArrayPropertyProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(singleArrayPropertyProperty1, null);
+    Assert.assertEquals("method count of 'SingleArrayPropertyProperty'", 0, singleArrayPropertyProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SingleArrayPropertyProperty'", 0, singleArrayPropertyProperty.innerTypes().list().size());
     // type WizardsProperty
@@ -335,10 +296,7 @@ public class FormPropertiesTest {
     SdkAssert.assertHasFlags(serialVersionUID13, 26);
     SdkAssert.assertFieldSignature(serialVersionUID13, "J");
 
-    Assert.assertEquals("method count of 'WizardsProperty'", 1, wizardsProperty.methods().list().size());
-    IMethod wizardsProperty1 = SdkAssert.assertMethodExist(wizardsProperty, "WizardsProperty", new String[]{});
-    Assert.assertTrue(wizardsProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(wizardsProperty1, null);
+    Assert.assertEquals("method count of 'WizardsProperty'", 0, wizardsProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'WizardsProperty'", 0, wizardsProperty.innerTypes().list().size());
   }

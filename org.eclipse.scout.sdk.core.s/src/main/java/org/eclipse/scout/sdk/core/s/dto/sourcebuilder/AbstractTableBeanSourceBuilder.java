@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 
-import java.util.regex.Pattern;
-
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -19,6 +17,7 @@ import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableRowDataTypeSourceBuilder;
+import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
@@ -41,8 +40,6 @@ import org.eclipse.scout.sdk.core.util.TypeFilters;
  */
 public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
-  private static final Pattern DATA_SUFFIX_PATTERN = Pattern.compile("(PageData|FieldData|Data)$");
-
   /**
    * @param elementName
    */
@@ -64,7 +61,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
 
   protected void visitTableBean(IType table) {
     // inner row data class
-    String rowDataName = DATA_SUFFIX_PATTERN.matcher(getElementName()).replaceAll("") + "RowData";
+    String rowDataName = DtoUtils.getRowDataName(getElementName());
     ITypeSourceBuilder tableRowDataBuilder = new TableRowDataTypeSourceBuilder(rowDataName, table, getModelType(), getJavaEnvironment());
     addSortedType(SortedMemberKeyFactory.createTypeTableKey(tableRowDataBuilder), tableRowDataBuilder);
 

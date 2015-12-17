@@ -67,10 +67,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'AbstractTemplateForReplaceBoxData'", 4, abstractTemplateForReplaceBoxData.methods().list().size());
-    IMethod abstractTemplateForReplaceBoxData1 = SdkAssert.assertMethodExist(abstractTemplateForReplaceBoxData, "AbstractTemplateForReplaceBoxData", new String[]{});
-    Assert.assertTrue(abstractTemplateForReplaceBoxData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(abstractTemplateForReplaceBoxData1, null);
+    Assert.assertEquals("method count of 'AbstractTemplateForReplaceBoxData'", 3, abstractTemplateForReplaceBoxData.methods().list().size());
     IMethod getTemplateBoxString = SdkAssert.assertMethodExist(abstractTemplateForReplaceBoxData, "getTemplateBoxString", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTemplateBoxString, "QTemplateBoxString;");
     IMethod getTemplateString = SdkAssert.assertMethodExist(abstractTemplateForReplaceBoxData, "getTemplateString", new String[]{});
@@ -90,10 +87,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'TemplateBoxString'", 1, templateBoxString.methods().list().size());
-    IMethod templateBoxString1 = SdkAssert.assertMethodExist(templateBoxString, "TemplateBoxString", new String[]{});
-    Assert.assertTrue(templateBoxString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(templateBoxString1, null);
+    Assert.assertEquals("method count of 'TemplateBoxString'", 0, templateBoxString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'TemplateBoxString'", 0, templateBoxString.innerTypes().list().size());
     // type TemplateString
@@ -107,10 +101,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'TemplateString'", 1, templateString.methods().list().size());
-    IMethod templateString1 = SdkAssert.assertMethodExist(templateString, "TemplateString", new String[]{});
-    Assert.assertTrue(templateString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(templateString1, null);
+    Assert.assertEquals("method count of 'TemplateString'", 0, templateString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'TemplateString'", 0, templateString.innerTypes().list().size());
     // type TemplateTable
@@ -124,10 +115,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'TemplateTable'", 8, templateTable.methods().list().size());
-    IMethod templateTable1 = SdkAssert.assertMethodExist(templateTable, "TemplateTable", new String[]{});
-    Assert.assertTrue(templateTable1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(templateTable1, null);
+    Assert.assertEquals("method count of 'TemplateTable'", 7, templateTable.methods().list().size());
     IMethod addRow = SdkAssert.assertMethodExist(templateTable, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QTemplateTableRowData;");
     SdkAssert.assertAnnotation(addRow, "java.lang.Override");
@@ -173,10 +161,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(m_second, 2);
     SdkAssert.assertFieldSignature(m_second, "QString;");
 
-    Assert.assertEquals("method count of 'TemplateTableRowData'", 5, templateTableRowData.methods().list().size());
-    IMethod templateTableRowData1 = SdkAssert.assertMethodExist(templateTableRowData, "TemplateTableRowData", new String[]{});
-    Assert.assertTrue(templateTableRowData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(templateTableRowData1, null);
+    Assert.assertEquals("method count of 'TemplateTableRowData'", 4, templateTableRowData.methods().list().size());
     IMethod getFirst = SdkAssert.assertMethodExist(templateTableRowData, "getFirst", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getFirst, "QString;");
     IMethod setFirst = SdkAssert.assertMethodExist(templateTableRowData, "setFirst", new String[]{"QString;"});
@@ -204,10 +189,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'TemplateBasedFormData'", 4, templateBasedFormData.methods().list().size());
-    IMethod templateBasedFormData1 = SdkAssert.assertMethodExist(templateBasedFormData, "TemplateBasedFormData", new String[]{});
-    Assert.assertTrue(templateBasedFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(templateBasedFormData1, null);
+    Assert.assertEquals("method count of 'TemplateBasedFormData'", 3, templateBasedFormData.methods().list().size());
     IMethod getUsageOneBox = SdkAssert.assertMethodExist(templateBasedFormData, "getUsageOneBox", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getUsageOneBox, "QUsageOneBox;");
     IMethod getUsageTwoBox = SdkAssert.assertMethodExist(templateBasedFormData, "getUsageTwoBox", new String[]{});
@@ -227,10 +209,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'UsageOneBox'", 2, usageOneBox.methods().list().size());
-    IMethod usageOneBox1 = SdkAssert.assertMethodExist(usageOneBox, "UsageOneBox", new String[]{});
-    Assert.assertTrue(usageOneBox1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usageOneBox1, null);
+    Assert.assertEquals("method count of 'UsageOneBox'", 1, usageOneBox.methods().list().size());
     IMethod getUsageOneString = SdkAssert.assertMethodExist(usageOneBox, "getUsageOneString", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getUsageOneString, "QUsageOneString;");
 
@@ -246,10 +225,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'UsageOneString'", 1, usageOneString.methods().list().size());
-    IMethod usageOneString1 = SdkAssert.assertMethodExist(usageOneString, "UsageOneString", new String[]{});
-    Assert.assertTrue(usageOneString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usageOneString1, null);
+    Assert.assertEquals("method count of 'UsageOneString'", 0, usageOneString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'UsageOneString'", 0, usageOneString.innerTypes().list().size());
     // type UsageTwoBox
@@ -263,10 +239,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'UsageTwoBox'", 2, usageTwoBox.methods().list().size());
-    IMethod usageTwoBox1 = SdkAssert.assertMethodExist(usageTwoBox, "UsageTwoBox", new String[]{});
-    Assert.assertTrue(usageTwoBox1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usageTwoBox1, null);
+    Assert.assertEquals("method count of 'UsageTwoBox'", 1, usageTwoBox.methods().list().size());
     IMethod getUsageTwoTemplateTable = SdkAssert.assertMethodExist(usageTwoBox, "getUsageTwoTemplateTable", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getUsageTwoTemplateTable, "QUsageTwoTemplateTable;");
 
@@ -283,10 +256,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    Assert.assertEquals("method count of 'UsageTwoTemplateTable'", 8, usageTwoTemplateTable.methods().list().size());
-    IMethod usageTwoTemplateTable1 = SdkAssert.assertMethodExist(usageTwoTemplateTable, "UsageTwoTemplateTable", new String[]{});
-    Assert.assertTrue(usageTwoTemplateTable1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usageTwoTemplateTable1, null);
+    Assert.assertEquals("method count of 'UsageTwoTemplateTable'", 7, usageTwoTemplateTable.methods().list().size());
     IMethod addRow = SdkAssert.assertMethodExist(usageTwoTemplateTable, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QUsageTwoTemplateTableRowData;");
     SdkAssert.assertAnnotation(addRow, "java.lang.Override");
@@ -326,10 +296,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(m_third, 2);
     SdkAssert.assertFieldSignature(m_third, "QString;");
 
-    Assert.assertEquals("method count of 'UsageTwoTemplateTableRowData'", 3, usageTwoTemplateTableRowData.methods().list().size());
-    IMethod usageTwoTemplateTableRowData1 = SdkAssert.assertMethodExist(usageTwoTemplateTableRowData, "UsageTwoTemplateTableRowData", new String[]{});
-    Assert.assertTrue(usageTwoTemplateTableRowData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usageTwoTemplateTableRowData1, null);
+    Assert.assertEquals("method count of 'UsageTwoTemplateTableRowData'", 2, usageTwoTemplateTableRowData.methods().list().size());
     IMethod getThird = SdkAssert.assertMethodExist(usageTwoTemplateTableRowData, "getThird", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getThird, "QString;");
     IMethod setThird = SdkAssert.assertMethodExist(usageTwoTemplateTableRowData, "setThird", new String[]{"QString;"});
@@ -347,10 +314,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
 
-    Assert.assertEquals("method count of 'UsualString'", 1, usualString.methods().list().size());
-    IMethod usualString1 = SdkAssert.assertMethodExist(usualString, "UsualString", new String[]{});
-    Assert.assertTrue(usualString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usualString1, null);
+    Assert.assertEquals("method count of 'UsualString'", 0, usualString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'UsualString'", 0, usualString.innerTypes().list().size());
   }
@@ -370,10 +334,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'AbstractRadioButtonGroupWithFieldsData'", 2, abstractRadioButtonGroupWithFieldsData.methods().list().size());
-    IMethod abstractRadioButtonGroupWithFieldsData1 = SdkAssert.assertMethodExist(abstractRadioButtonGroupWithFieldsData, "AbstractRadioButtonGroupWithFieldsData", new String[]{});
-    Assert.assertTrue(abstractRadioButtonGroupWithFieldsData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(abstractRadioButtonGroupWithFieldsData1, null);
+    Assert.assertEquals("method count of 'AbstractRadioButtonGroupWithFieldsData'", 1, abstractRadioButtonGroupWithFieldsData.methods().list().size());
     IMethod getInputString = SdkAssert.assertMethodExist(abstractRadioButtonGroupWithFieldsData, "getInputString", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getInputString, "QInputString;");
 
@@ -389,10 +350,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'InputString'", 1, inputString.methods().list().size());
-    IMethod inputString1 = SdkAssert.assertMethodExist(inputString, "InputString", new String[]{});
-    Assert.assertTrue(inputString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(inputString1, null);
+    Assert.assertEquals("method count of 'InputString'", 0, inputString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'InputString'", 0, inputString.innerTypes().list().size());
   }
@@ -412,10 +370,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'RadioButtonFormData'", 6, radioButtonFormData.methods().list().size());
-    IMethod radioButtonFormData1 = SdkAssert.assertMethodExist(radioButtonFormData, "RadioButtonFormData", new String[]{});
-    Assert.assertTrue(radioButtonFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(radioButtonFormData1, null);
+    Assert.assertEquals("method count of 'RadioButtonFormData'", 5, radioButtonFormData.methods().list().size());
     IMethod getInputExString = SdkAssert.assertMethodExist(radioButtonFormData, "getInputExString", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getInputExString, "QInputExString;");
     IMethod getUsageOneUsualString = SdkAssert.assertMethodExist(radioButtonFormData, "getUsageOneUsualString", new String[]{});
@@ -440,10 +395,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'InputExString'", 1, inputExString.methods().list().size());
-    IMethod inputExString1 = SdkAssert.assertMethodExist(inputExString, "InputExString", new String[]{});
-    Assert.assertTrue(inputExString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(inputExString1, null);
+    Assert.assertEquals("method count of 'InputExString'", 0, inputExString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'InputExString'", 0, inputExString.innerTypes().list().size());
     // type UsageOneUsualString
@@ -457,10 +409,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'UsageOneUsualString'", 1, usageOneUsualString.methods().list().size());
-    IMethod usageOneUsualString1 = SdkAssert.assertMethodExist(usageOneUsualString, "UsageOneUsualString", new String[]{});
-    Assert.assertTrue(usageOneUsualString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usageOneUsualString1, null);
+    Assert.assertEquals("method count of 'UsageOneUsualString'", 0, usageOneUsualString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'UsageOneUsualString'", 0, usageOneUsualString.innerTypes().list().size());
     // type UsedRadioButtonGroup
@@ -474,10 +423,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'UsedRadioButtonGroup'", 1, usedRadioButtonGroup.methods().list().size());
-    IMethod usedRadioButtonGroup1 = SdkAssert.assertMethodExist(usedRadioButtonGroup, "UsedRadioButtonGroup", new String[]{});
-    Assert.assertTrue(usedRadioButtonGroup1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usedRadioButtonGroup1, null);
+    Assert.assertEquals("method count of 'UsedRadioButtonGroup'", 0, usedRadioButtonGroup.methods().list().size());
 
     Assert.assertEquals("inner types count of 'UsedRadioButtonGroup'", 0, usedRadioButtonGroup.innerTypes().list().size());
     // type UsualRadioButtonGroup
@@ -491,10 +437,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    Assert.assertEquals("method count of 'UsualRadioButtonGroup'", 1, usualRadioButtonGroup.methods().list().size());
-    IMethod usualRadioButtonGroup1 = SdkAssert.assertMethodExist(usualRadioButtonGroup, "UsualRadioButtonGroup", new String[]{});
-    Assert.assertTrue(usualRadioButtonGroup1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usualRadioButtonGroup1, null);
+    Assert.assertEquals("method count of 'UsualRadioButtonGroup'", 0, usualRadioButtonGroup.methods().list().size());
 
     Assert.assertEquals("inner types count of 'UsualRadioButtonGroup'", 0, usualRadioButtonGroup.innerTypes().list().size());
     // type UsualString
@@ -508,10 +451,7 @@ public class ReplaceWithTemplatesTest {
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    Assert.assertEquals("method count of 'UsualString'", 1, usualString.methods().list().size());
-    IMethod usualString1 = SdkAssert.assertMethodExist(usualString, "UsualString", new String[]{});
-    Assert.assertTrue(usualString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(usualString1, null);
+    Assert.assertEquals("method count of 'UsualString'", 0, usualString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'UsualString'", 0, usualString.innerTypes().list().size());
   }

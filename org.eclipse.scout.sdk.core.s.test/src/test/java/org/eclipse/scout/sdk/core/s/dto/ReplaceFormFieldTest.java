@@ -60,10 +60,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'BaseFormData'", 7, baseFormData.methods().list().size());
-    IMethod baseFormData1 = SdkAssert.assertMethodExist(baseFormData, "BaseFormData", new String[]{});
-    Assert.assertTrue(baseFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(baseFormData1, null);
+    Assert.assertEquals("method count of 'BaseFormData'", 6, baseFormData.methods().list().size());
     IMethod getLookup = SdkAssert.assertMethodExist(baseFormData, "getLookup", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getLookup, "QLookup;");
     IMethod getName = SdkAssert.assertMethodExist(baseFormData, "getName", new String[]{});
@@ -89,10 +86,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'Lookup'", 1, lookup.methods().list().size());
-    IMethod lookup1 = SdkAssert.assertMethodExist(lookup, "Lookup", new String[]{});
-    Assert.assertTrue(lookup1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(lookup1, null);
+    Assert.assertEquals("method count of 'Lookup'", 0, lookup.methods().list().size());
 
     Assert.assertEquals("inner types count of 'Lookup'", 0, lookup.innerTypes().list().size());
     // type Name
@@ -106,10 +100,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'Name'", 1, name.methods().list().size());
-    IMethod name1 = SdkAssert.assertMethodExist(name, "Name", new String[]{});
-    Assert.assertTrue(name1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(name1, null);
+    Assert.assertEquals("method count of 'Name'", 0, name.methods().list().size());
 
     Assert.assertEquals("inner types count of 'Name'", 0, name.innerTypes().list().size());
     // type SdkCommandCreate
@@ -123,10 +114,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreate'", 1, sdkCommandCreate.methods().list().size());
-    IMethod sdkCommandCreate1 = SdkAssert.assertMethodExist(sdkCommandCreate, "SdkCommandCreate", new String[]{});
-    Assert.assertTrue(sdkCommandCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreate'", 0, sdkCommandCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreate'", 0, sdkCommandCreate.innerTypes().list().size());
     // type SdkCommandNone
@@ -140,10 +128,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNone'", 1, sdkCommandNone.methods().list().size());
-    IMethod sdkCommandNone1 = SdkAssert.assertMethodExist(sdkCommandNone, "SdkCommandNone", new String[]{});
-    Assert.assertTrue(sdkCommandNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandNone'", 0, sdkCommandNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNone'", 0, sdkCommandNone.innerTypes().list().size());
     // type SdkCommandUse
@@ -157,10 +142,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUse'", 1, sdkCommandUse.methods().list().size());
-    IMethod sdkCommandUse1 = SdkAssert.assertMethodExist(sdkCommandUse, "SdkCommandUse", new String[]{});
-    Assert.assertTrue(sdkCommandUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandUse'", 0, sdkCommandUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUse'", 0, sdkCommandUse.innerTypes().list().size());
     // type Smart
@@ -174,10 +156,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
 
-    Assert.assertEquals("method count of 'Smart'", 1, smart.methods().list().size());
-    IMethod smart1 = SdkAssert.assertMethodExist(smart, "Smart", new String[]{});
-    Assert.assertTrue(smart1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(smart1, null);
+    Assert.assertEquals("method count of 'Smart'", 0, smart.methods().list().size());
 
     Assert.assertEquals("inner types count of 'Smart'", 0, smart.innerTypes().list().size());
   }
@@ -196,10 +175,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'ExtendedFormData'", 20, extendedFormData.methods().list().size());
-    IMethod extendedFormData1 = SdkAssert.assertMethodExist(extendedFormData, "ExtendedFormData", new String[]{});
-    Assert.assertTrue(extendedFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(extendedFormData1, null);
+    Assert.assertEquals("method count of 'ExtendedFormData'", 19, extendedFormData.methods().list().size());
     IMethod getFirstName = SdkAssert.assertMethodExist(extendedFormData, "getFirstName", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getFirstName, "QFirstName;");
     IMethod getIgnoringGroupBoxExCreate = SdkAssert.assertMethodExist(extendedFormData, "getIgnoringGroupBoxExCreate", new String[]{});
@@ -251,10 +227,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'FirstName'", 1, firstName.methods().list().size());
-    IMethod firstName1 = SdkAssert.assertMethodExist(firstName, "FirstName", new String[]{});
-    Assert.assertTrue(firstName1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(firstName1, null);
+    Assert.assertEquals("method count of 'FirstName'", 0, firstName.methods().list().size());
 
     Assert.assertEquals("inner types count of 'FirstName'", 0, firstName.innerTypes().list().size());
     // type IgnoringGroupBoxExCreate
@@ -269,10 +242,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'IgnoringGroupBoxExCreate'", 1, ignoringGroupBoxExCreate.methods().list().size());
-    IMethod ignoringGroupBoxExCreate1 = SdkAssert.assertMethodExist(ignoringGroupBoxExCreate, "IgnoringGroupBoxExCreate", new String[]{});
-    Assert.assertTrue(ignoringGroupBoxExCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(ignoringGroupBoxExCreate1, null);
+    Assert.assertEquals("method count of 'IgnoringGroupBoxExCreate'", 0, ignoringGroupBoxExCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'IgnoringGroupBoxExCreate'", 0, ignoringGroupBoxExCreate.innerTypes().list().size());
     // type IgnoringGroupBoxExUse
@@ -287,10 +257,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'IgnoringGroupBoxExUse'", 1, ignoringGroupBoxExUse.methods().list().size());
-    IMethod ignoringGroupBoxExUse1 = SdkAssert.assertMethodExist(ignoringGroupBoxExUse, "IgnoringGroupBoxExUse", new String[]{});
-    Assert.assertTrue(ignoringGroupBoxExUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(ignoringGroupBoxExUse1, null);
+    Assert.assertEquals("method count of 'IgnoringGroupBoxExUse'", 0, ignoringGroupBoxExUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'IgnoringGroupBoxExUse'", 0, ignoringGroupBoxExUse.innerTypes().list().size());
     // type NameEx
@@ -305,10 +272,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    Assert.assertEquals("method count of 'NameEx'", 1, nameEx.methods().list().size());
-    IMethod nameEx1 = SdkAssert.assertMethodExist(nameEx, "NameEx", new String[]{});
-    Assert.assertTrue(nameEx1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(nameEx1, null);
+    Assert.assertEquals("method count of 'NameEx'", 0, nameEx.methods().list().size());
 
     Assert.assertEquals("inner types count of 'NameEx'", 0, nameEx.innerTypes().list().size());
     // type SdkCommandCreateCreate
@@ -323,10 +287,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateCreate'", 1, sdkCommandCreateCreate.methods().list().size());
-    IMethod sdkCommandCreateCreate1 = SdkAssert.assertMethodExist(sdkCommandCreateCreate, "SdkCommandCreateCreate", new String[]{});
-    Assert.assertTrue(sdkCommandCreateCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateCreate'", 0, sdkCommandCreateCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateCreate'", 0, sdkCommandCreateCreate.innerTypes().list().size());
     // type SdkCommandCreateIgnore
@@ -341,10 +302,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateIgnore'", 1, sdkCommandCreateIgnore.methods().list().size());
-    IMethod sdkCommandCreateIgnore1 = SdkAssert.assertMethodExist(sdkCommandCreateIgnore, "SdkCommandCreateIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandCreateIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateIgnore'", 0, sdkCommandCreateIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateIgnore'", 0, sdkCommandCreateIgnore.innerTypes().list().size());
     // type SdkCommandCreateNone
@@ -359,10 +317,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID7, 26);
     SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateNone'", 1, sdkCommandCreateNone.methods().list().size());
-    IMethod sdkCommandCreateNone1 = SdkAssert.assertMethodExist(sdkCommandCreateNone, "SdkCommandCreateNone", new String[]{});
-    Assert.assertTrue(sdkCommandCreateNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateNone'", 0, sdkCommandCreateNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateNone'", 0, sdkCommandCreateNone.innerTypes().list().size());
     // type SdkCommandCreateUse
@@ -377,10 +332,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID8, 26);
     SdkAssert.assertFieldSignature(serialVersionUID8, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateUse'", 1, sdkCommandCreateUse.methods().list().size());
-    IMethod sdkCommandCreateUse1 = SdkAssert.assertMethodExist(sdkCommandCreateUse, "SdkCommandCreateUse", new String[]{});
-    Assert.assertTrue(sdkCommandCreateUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateUse'", 0, sdkCommandCreateUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateUse'", 0, sdkCommandCreateUse.innerTypes().list().size());
     // type SdkCommandIgnoreCreate
@@ -395,10 +347,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID9, 26);
     SdkAssert.assertFieldSignature(serialVersionUID9, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreCreate'", 1, sdkCommandIgnoreCreate.methods().list().size());
-    IMethod sdkCommandIgnoreCreate1 = SdkAssert.assertMethodExist(sdkCommandIgnoreCreate, "SdkCommandIgnoreCreate", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreCreate'", 0, sdkCommandIgnoreCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreCreate'", 0, sdkCommandIgnoreCreate.innerTypes().list().size());
     // type SdkCommandIgnoreUse
@@ -413,10 +362,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID10, 26);
     SdkAssert.assertFieldSignature(serialVersionUID10, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreUse'", 1, sdkCommandIgnoreUse.methods().list().size());
-    IMethod sdkCommandIgnoreUse1 = SdkAssert.assertMethodExist(sdkCommandIgnoreUse, "SdkCommandIgnoreUse", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreUse'", 0, sdkCommandIgnoreUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreUse'", 0, sdkCommandIgnoreUse.innerTypes().list().size());
     // type SdkCommandNoneCreate
@@ -431,10 +377,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID11, 26);
     SdkAssert.assertFieldSignature(serialVersionUID11, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneCreate'", 1, sdkCommandNoneCreate.methods().list().size());
-    IMethod sdkCommandNoneCreate1 = SdkAssert.assertMethodExist(sdkCommandNoneCreate, "SdkCommandNoneCreate", new String[]{});
-    Assert.assertTrue(sdkCommandNoneCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneCreate'", 0, sdkCommandNoneCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneCreate'", 0, sdkCommandNoneCreate.innerTypes().list().size());
     // type SdkCommandNoneIgnore
@@ -449,10 +392,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID12, 26);
     SdkAssert.assertFieldSignature(serialVersionUID12, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneIgnore'", 1, sdkCommandNoneIgnore.methods().list().size());
-    IMethod sdkCommandNoneIgnore1 = SdkAssert.assertMethodExist(sdkCommandNoneIgnore, "SdkCommandNoneIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandNoneIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneIgnore'", 0, sdkCommandNoneIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneIgnore'", 0, sdkCommandNoneIgnore.innerTypes().list().size());
     // type SdkCommandNoneNone
@@ -467,10 +407,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID13, 26);
     SdkAssert.assertFieldSignature(serialVersionUID13, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneNone'", 1, sdkCommandNoneNone.methods().list().size());
-    IMethod sdkCommandNoneNone1 = SdkAssert.assertMethodExist(sdkCommandNoneNone, "SdkCommandNoneNone", new String[]{});
-    Assert.assertTrue(sdkCommandNoneNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneNone'", 0, sdkCommandNoneNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneNone'", 0, sdkCommandNoneNone.innerTypes().list().size());
     // type SdkCommandNoneUse
@@ -485,10 +422,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID14, 26);
     SdkAssert.assertFieldSignature(serialVersionUID14, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneUse'", 1, sdkCommandNoneUse.methods().list().size());
-    IMethod sdkCommandNoneUse1 = SdkAssert.assertMethodExist(sdkCommandNoneUse, "SdkCommandNoneUse", new String[]{});
-    Assert.assertTrue(sdkCommandNoneUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneUse'", 0, sdkCommandNoneUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneUse'", 0, sdkCommandNoneUse.innerTypes().list().size());
     // type SdkCommandUseCreate
@@ -503,10 +437,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID15, 26);
     SdkAssert.assertFieldSignature(serialVersionUID15, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseCreate'", 1, sdkCommandUseCreate.methods().list().size());
-    IMethod sdkCommandUseCreate1 = SdkAssert.assertMethodExist(sdkCommandUseCreate, "SdkCommandUseCreate", new String[]{});
-    Assert.assertTrue(sdkCommandUseCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseCreate'", 0, sdkCommandUseCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseCreate'", 0, sdkCommandUseCreate.innerTypes().list().size());
     // type SdkCommandUseIgnore
@@ -521,10 +452,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID16, 26);
     SdkAssert.assertFieldSignature(serialVersionUID16, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseIgnore'", 1, sdkCommandUseIgnore.methods().list().size());
-    IMethod sdkCommandUseIgnore1 = SdkAssert.assertMethodExist(sdkCommandUseIgnore, "SdkCommandUseIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandUseIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseIgnore'", 0, sdkCommandUseIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseIgnore'", 0, sdkCommandUseIgnore.innerTypes().list().size());
     // type SdkCommandUseNone
@@ -539,10 +467,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID17, 26);
     SdkAssert.assertFieldSignature(serialVersionUID17, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseNone'", 1, sdkCommandUseNone.methods().list().size());
-    IMethod sdkCommandUseNone1 = SdkAssert.assertMethodExist(sdkCommandUseNone, "SdkCommandUseNone", new String[]{});
-    Assert.assertTrue(sdkCommandUseNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseNone'", 0, sdkCommandUseNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseNone'", 0, sdkCommandUseNone.innerTypes().list().size());
     // type SdkCommandUseUse
@@ -557,10 +482,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID18, 26);
     SdkAssert.assertFieldSignature(serialVersionUID18, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseUse'", 1, sdkCommandUseUse.methods().list().size());
-    IMethod sdkCommandUseUse1 = SdkAssert.assertMethodExist(sdkCommandUseUse, "SdkCommandUseUse", new String[]{});
-    Assert.assertTrue(sdkCommandUseUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseUse'", 0, sdkCommandUseUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseUse'", 0, sdkCommandUseUse.innerTypes().list().size());
     // type SmartEx
@@ -575,10 +497,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID19, 26);
     SdkAssert.assertFieldSignature(serialVersionUID19, "J");
 
-    Assert.assertEquals("method count of 'SmartEx'", 1, smartEx.methods().list().size());
-    IMethod smartEx1 = SdkAssert.assertMethodExist(smartEx, "SmartEx", new String[]{});
-    Assert.assertTrue(smartEx1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(smartEx1, null);
+    Assert.assertEquals("method count of 'SmartEx'", 0, smartEx.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SmartEx'", 0, smartEx.innerTypes().list().size());
   }
@@ -598,10 +517,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'ExtendedExtendedFormData'", 64, extendedExtendedFormData.methods().list().size());
-    IMethod extendedExtendedFormData1 = SdkAssert.assertMethodExist(extendedExtendedFormData, "ExtendedExtendedFormData", new String[]{});
-    Assert.assertTrue(extendedExtendedFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(extendedExtendedFormData1, null);
+    Assert.assertEquals("method count of 'ExtendedExtendedFormData'", 63, extendedExtendedFormData.methods().list().size());
     IMethod getIgnoringGroupBoxExCreateNone = SdkAssert.assertMethodExist(extendedExtendedFormData, "getIgnoringGroupBoxExCreateNone", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getIgnoringGroupBoxExCreateNone, "QIgnoringGroupBoxExCreateNone;");
     IMethod getIgnoringGroupBoxExNoneCreate = SdkAssert.assertMethodExist(extendedExtendedFormData, "getIgnoringGroupBoxExNoneCreate", new String[]{});
@@ -742,10 +658,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'IgnoringGroupBoxExCreateNone'", 1, ignoringGroupBoxExCreateNone.methods().list().size());
-    IMethod ignoringGroupBoxExCreateNone1 = SdkAssert.assertMethodExist(ignoringGroupBoxExCreateNone, "IgnoringGroupBoxExCreateNone", new String[]{});
-    Assert.assertTrue(ignoringGroupBoxExCreateNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(ignoringGroupBoxExCreateNone1, null);
+    Assert.assertEquals("method count of 'IgnoringGroupBoxExCreateNone'", 0, ignoringGroupBoxExCreateNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'IgnoringGroupBoxExCreateNone'", 0, ignoringGroupBoxExCreateNone.innerTypes().list().size());
     // type IgnoringGroupBoxExNoneCreate
@@ -760,10 +673,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'IgnoringGroupBoxExNoneCreate'", 1, ignoringGroupBoxExNoneCreate.methods().list().size());
-    IMethod ignoringGroupBoxExNoneCreate1 = SdkAssert.assertMethodExist(ignoringGroupBoxExNoneCreate, "IgnoringGroupBoxExNoneCreate", new String[]{});
-    Assert.assertTrue(ignoringGroupBoxExNoneCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(ignoringGroupBoxExNoneCreate1, null);
+    Assert.assertEquals("method count of 'IgnoringGroupBoxExNoneCreate'", 0, ignoringGroupBoxExNoneCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'IgnoringGroupBoxExNoneCreate'", 0, ignoringGroupBoxExNoneCreate.innerTypes().list().size());
     // type NameExEx
@@ -778,10 +688,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'NameExEx'", 4, nameExEx.methods().list().size());
-    IMethod nameExEx1 = SdkAssert.assertMethodExist(nameExEx, "NameExEx", new String[]{});
-    Assert.assertTrue(nameExEx1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(nameExEx1, null);
+    Assert.assertEquals("method count of 'NameExEx'", 3, nameExEx.methods().list().size());
     IMethod getStringProperty = SdkAssert.assertMethodExist(nameExEx, "getStringProperty", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getStringProperty, "QString;");
     IMethod setStringProperty = SdkAssert.assertMethodExist(nameExEx, "setStringProperty", new String[]{"QString;"});
@@ -801,10 +708,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    Assert.assertEquals("method count of 'StringPropertyProperty'", 1, stringPropertyProperty.methods().list().size());
-    IMethod stringPropertyProperty1 = SdkAssert.assertMethodExist(stringPropertyProperty, "StringPropertyProperty", new String[]{});
-    Assert.assertTrue(stringPropertyProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(stringPropertyProperty1, null);
+    Assert.assertEquals("method count of 'StringPropertyProperty'", 0, stringPropertyProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'StringPropertyProperty'", 0, stringPropertyProperty.innerTypes().list().size());
     // type SdkCommandCreateCreateCreate
@@ -819,10 +723,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateCreateCreate'", 1, sdkCommandCreateCreateCreate.methods().list().size());
-    IMethod sdkCommandCreateCreateCreate1 = SdkAssert.assertMethodExist(sdkCommandCreateCreateCreate, "SdkCommandCreateCreateCreate", new String[]{});
-    Assert.assertTrue(sdkCommandCreateCreateCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateCreateCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateCreateCreate'", 0, sdkCommandCreateCreateCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateCreateCreate'", 0, sdkCommandCreateCreateCreate.innerTypes().list().size());
     // type SdkCommandCreateCreateIgnore
@@ -837,10 +738,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateCreateIgnore'", 1, sdkCommandCreateCreateIgnore.methods().list().size());
-    IMethod sdkCommandCreateCreateIgnore1 = SdkAssert.assertMethodExist(sdkCommandCreateCreateIgnore, "SdkCommandCreateCreateIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandCreateCreateIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateCreateIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateCreateIgnore'", 0, sdkCommandCreateCreateIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateCreateIgnore'", 0, sdkCommandCreateCreateIgnore.innerTypes().list().size());
     // type SdkCommandCreateCreateNone
@@ -855,10 +753,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID7, 26);
     SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateCreateNone'", 1, sdkCommandCreateCreateNone.methods().list().size());
-    IMethod sdkCommandCreateCreateNone1 = SdkAssert.assertMethodExist(sdkCommandCreateCreateNone, "SdkCommandCreateCreateNone", new String[]{});
-    Assert.assertTrue(sdkCommandCreateCreateNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateCreateNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateCreateNone'", 0, sdkCommandCreateCreateNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateCreateNone'", 0, sdkCommandCreateCreateNone.innerTypes().list().size());
     // type SdkCommandCreateCreateUse
@@ -873,10 +768,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID8, 26);
     SdkAssert.assertFieldSignature(serialVersionUID8, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateCreateUse'", 1, sdkCommandCreateCreateUse.methods().list().size());
-    IMethod sdkCommandCreateCreateUse1 = SdkAssert.assertMethodExist(sdkCommandCreateCreateUse, "SdkCommandCreateCreateUse", new String[]{});
-    Assert.assertTrue(sdkCommandCreateCreateUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateCreateUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateCreateUse'", 0, sdkCommandCreateCreateUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateCreateUse'", 0, sdkCommandCreateCreateUse.innerTypes().list().size());
     // type SdkCommandCreateIgnoreCreate
@@ -891,10 +783,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID9, 26);
     SdkAssert.assertFieldSignature(serialVersionUID9, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateIgnoreCreate'", 1, sdkCommandCreateIgnoreCreate.methods().list().size());
-    IMethod sdkCommandCreateIgnoreCreate1 = SdkAssert.assertMethodExist(sdkCommandCreateIgnoreCreate, "SdkCommandCreateIgnoreCreate", new String[]{});
-    Assert.assertTrue(sdkCommandCreateIgnoreCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateIgnoreCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateIgnoreCreate'", 0, sdkCommandCreateIgnoreCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateIgnoreCreate'", 0, sdkCommandCreateIgnoreCreate.innerTypes().list().size());
     // type SdkCommandCreateIgnoreIgnore
@@ -909,10 +798,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID10, 26);
     SdkAssert.assertFieldSignature(serialVersionUID10, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateIgnoreIgnore'", 1, sdkCommandCreateIgnoreIgnore.methods().list().size());
-    IMethod sdkCommandCreateIgnoreIgnore1 = SdkAssert.assertMethodExist(sdkCommandCreateIgnoreIgnore, "SdkCommandCreateIgnoreIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandCreateIgnoreIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateIgnoreIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateIgnoreIgnore'", 0, sdkCommandCreateIgnoreIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateIgnoreIgnore'", 0, sdkCommandCreateIgnoreIgnore.innerTypes().list().size());
     // type SdkCommandCreateIgnoreNone
@@ -927,10 +813,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID11, 26);
     SdkAssert.assertFieldSignature(serialVersionUID11, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateIgnoreNone'", 1, sdkCommandCreateIgnoreNone.methods().list().size());
-    IMethod sdkCommandCreateIgnoreNone1 = SdkAssert.assertMethodExist(sdkCommandCreateIgnoreNone, "SdkCommandCreateIgnoreNone", new String[]{});
-    Assert.assertTrue(sdkCommandCreateIgnoreNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateIgnoreNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateIgnoreNone'", 0, sdkCommandCreateIgnoreNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateIgnoreNone'", 0, sdkCommandCreateIgnoreNone.innerTypes().list().size());
     // type SdkCommandCreateIgnoreUse
@@ -945,10 +828,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID12, 26);
     SdkAssert.assertFieldSignature(serialVersionUID12, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateIgnoreUse'", 1, sdkCommandCreateIgnoreUse.methods().list().size());
-    IMethod sdkCommandCreateIgnoreUse1 = SdkAssert.assertMethodExist(sdkCommandCreateIgnoreUse, "SdkCommandCreateIgnoreUse", new String[]{});
-    Assert.assertTrue(sdkCommandCreateIgnoreUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateIgnoreUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateIgnoreUse'", 0, sdkCommandCreateIgnoreUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateIgnoreUse'", 0, sdkCommandCreateIgnoreUse.innerTypes().list().size());
     // type SdkCommandCreateNoneCreate
@@ -963,10 +843,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID13, 26);
     SdkAssert.assertFieldSignature(serialVersionUID13, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateNoneCreate'", 1, sdkCommandCreateNoneCreate.methods().list().size());
-    IMethod sdkCommandCreateNoneCreate1 = SdkAssert.assertMethodExist(sdkCommandCreateNoneCreate, "SdkCommandCreateNoneCreate", new String[]{});
-    Assert.assertTrue(sdkCommandCreateNoneCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateNoneCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateNoneCreate'", 0, sdkCommandCreateNoneCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateNoneCreate'", 0, sdkCommandCreateNoneCreate.innerTypes().list().size());
     // type SdkCommandCreateNoneIgnore
@@ -981,10 +858,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID14, 26);
     SdkAssert.assertFieldSignature(serialVersionUID14, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateNoneIgnore'", 1, sdkCommandCreateNoneIgnore.methods().list().size());
-    IMethod sdkCommandCreateNoneIgnore1 = SdkAssert.assertMethodExist(sdkCommandCreateNoneIgnore, "SdkCommandCreateNoneIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandCreateNoneIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateNoneIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateNoneIgnore'", 0, sdkCommandCreateNoneIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateNoneIgnore'", 0, sdkCommandCreateNoneIgnore.innerTypes().list().size());
     // type SdkCommandCreateNoneNone
@@ -999,10 +873,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID15, 26);
     SdkAssert.assertFieldSignature(serialVersionUID15, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateNoneNone'", 1, sdkCommandCreateNoneNone.methods().list().size());
-    IMethod sdkCommandCreateNoneNone1 = SdkAssert.assertMethodExist(sdkCommandCreateNoneNone, "SdkCommandCreateNoneNone", new String[]{});
-    Assert.assertTrue(sdkCommandCreateNoneNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateNoneNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateNoneNone'", 0, sdkCommandCreateNoneNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateNoneNone'", 0, sdkCommandCreateNoneNone.innerTypes().list().size());
     // type SdkCommandCreateNoneUse
@@ -1017,10 +888,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID16, 26);
     SdkAssert.assertFieldSignature(serialVersionUID16, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateNoneUse'", 1, sdkCommandCreateNoneUse.methods().list().size());
-    IMethod sdkCommandCreateNoneUse1 = SdkAssert.assertMethodExist(sdkCommandCreateNoneUse, "SdkCommandCreateNoneUse", new String[]{});
-    Assert.assertTrue(sdkCommandCreateNoneUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateNoneUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateNoneUse'", 0, sdkCommandCreateNoneUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateNoneUse'", 0, sdkCommandCreateNoneUse.innerTypes().list().size());
     // type SdkCommandCreateUseCreate
@@ -1035,10 +903,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID17, 26);
     SdkAssert.assertFieldSignature(serialVersionUID17, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateUseCreate'", 1, sdkCommandCreateUseCreate.methods().list().size());
-    IMethod sdkCommandCreateUseCreate1 = SdkAssert.assertMethodExist(sdkCommandCreateUseCreate, "SdkCommandCreateUseCreate", new String[]{});
-    Assert.assertTrue(sdkCommandCreateUseCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateUseCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateUseCreate'", 0, sdkCommandCreateUseCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateUseCreate'", 0, sdkCommandCreateUseCreate.innerTypes().list().size());
     // type SdkCommandCreateUseIgnore
@@ -1053,10 +918,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID18, 26);
     SdkAssert.assertFieldSignature(serialVersionUID18, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateUseIgnore'", 1, sdkCommandCreateUseIgnore.methods().list().size());
-    IMethod sdkCommandCreateUseIgnore1 = SdkAssert.assertMethodExist(sdkCommandCreateUseIgnore, "SdkCommandCreateUseIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandCreateUseIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateUseIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateUseIgnore'", 0, sdkCommandCreateUseIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateUseIgnore'", 0, sdkCommandCreateUseIgnore.innerTypes().list().size());
     // type SdkCommandCreateUseNone
@@ -1071,10 +933,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID19, 26);
     SdkAssert.assertFieldSignature(serialVersionUID19, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateUseNone'", 1, sdkCommandCreateUseNone.methods().list().size());
-    IMethod sdkCommandCreateUseNone1 = SdkAssert.assertMethodExist(sdkCommandCreateUseNone, "SdkCommandCreateUseNone", new String[]{});
-    Assert.assertTrue(sdkCommandCreateUseNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateUseNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateUseNone'", 0, sdkCommandCreateUseNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateUseNone'", 0, sdkCommandCreateUseNone.innerTypes().list().size());
     // type SdkCommandCreateUseUse
@@ -1089,10 +948,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID20, 26);
     SdkAssert.assertFieldSignature(serialVersionUID20, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandCreateUseUse'", 1, sdkCommandCreateUseUse.methods().list().size());
-    IMethod sdkCommandCreateUseUse1 = SdkAssert.assertMethodExist(sdkCommandCreateUseUse, "SdkCommandCreateUseUse", new String[]{});
-    Assert.assertTrue(sdkCommandCreateUseUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandCreateUseUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandCreateUseUse'", 0, sdkCommandCreateUseUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandCreateUseUse'", 0, sdkCommandCreateUseUse.innerTypes().list().size());
     // type SdkCommandIgnoreCreateCreate
@@ -1107,10 +963,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID21, 26);
     SdkAssert.assertFieldSignature(serialVersionUID21, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreCreateCreate'", 1, sdkCommandIgnoreCreateCreate.methods().list().size());
-    IMethod sdkCommandIgnoreCreateCreate1 = SdkAssert.assertMethodExist(sdkCommandIgnoreCreateCreate, "SdkCommandIgnoreCreateCreate", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreCreateCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreCreateCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreCreateCreate'", 0, sdkCommandIgnoreCreateCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreCreateCreate'", 0, sdkCommandIgnoreCreateCreate.innerTypes().list().size());
     // type SdkCommandIgnoreCreateIgnore
@@ -1125,10 +978,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID22, 26);
     SdkAssert.assertFieldSignature(serialVersionUID22, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreCreateIgnore'", 1, sdkCommandIgnoreCreateIgnore.methods().list().size());
-    IMethod sdkCommandIgnoreCreateIgnore1 = SdkAssert.assertMethodExist(sdkCommandIgnoreCreateIgnore, "SdkCommandIgnoreCreateIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreCreateIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreCreateIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreCreateIgnore'", 0, sdkCommandIgnoreCreateIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreCreateIgnore'", 0, sdkCommandIgnoreCreateIgnore.innerTypes().list().size());
     // type SdkCommandIgnoreCreateNone
@@ -1143,10 +993,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID23, 26);
     SdkAssert.assertFieldSignature(serialVersionUID23, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreCreateNone'", 1, sdkCommandIgnoreCreateNone.methods().list().size());
-    IMethod sdkCommandIgnoreCreateNone1 = SdkAssert.assertMethodExist(sdkCommandIgnoreCreateNone, "SdkCommandIgnoreCreateNone", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreCreateNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreCreateNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreCreateNone'", 0, sdkCommandIgnoreCreateNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreCreateNone'", 0, sdkCommandIgnoreCreateNone.innerTypes().list().size());
     // type SdkCommandIgnoreCreateUse
@@ -1161,10 +1008,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID24, 26);
     SdkAssert.assertFieldSignature(serialVersionUID24, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreCreateUse'", 1, sdkCommandIgnoreCreateUse.methods().list().size());
-    IMethod sdkCommandIgnoreCreateUse1 = SdkAssert.assertMethodExist(sdkCommandIgnoreCreateUse, "SdkCommandIgnoreCreateUse", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreCreateUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreCreateUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreCreateUse'", 0, sdkCommandIgnoreCreateUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreCreateUse'", 0, sdkCommandIgnoreCreateUse.innerTypes().list().size());
     // type SdkCommandIgnoreIgnoreCreate
@@ -1179,10 +1023,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID25, 26);
     SdkAssert.assertFieldSignature(serialVersionUID25, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreIgnoreCreate'", 1, sdkCommandIgnoreIgnoreCreate.methods().list().size());
-    IMethod sdkCommandIgnoreIgnoreCreate1 = SdkAssert.assertMethodExist(sdkCommandIgnoreIgnoreCreate, "SdkCommandIgnoreIgnoreCreate", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreIgnoreCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreIgnoreCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreIgnoreCreate'", 0, sdkCommandIgnoreIgnoreCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreIgnoreCreate'", 0, sdkCommandIgnoreIgnoreCreate.innerTypes().list().size());
     // type SdkCommandIgnoreIgnoreUse
@@ -1197,10 +1038,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID26, 26);
     SdkAssert.assertFieldSignature(serialVersionUID26, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreIgnoreUse'", 1, sdkCommandIgnoreIgnoreUse.methods().list().size());
-    IMethod sdkCommandIgnoreIgnoreUse1 = SdkAssert.assertMethodExist(sdkCommandIgnoreIgnoreUse, "SdkCommandIgnoreIgnoreUse", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreIgnoreUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreIgnoreUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreIgnoreUse'", 0, sdkCommandIgnoreIgnoreUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreIgnoreUse'", 0, sdkCommandIgnoreIgnoreUse.innerTypes().list().size());
     // type SdkCommandIgnoreNoneCreate
@@ -1215,10 +1053,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID27, 26);
     SdkAssert.assertFieldSignature(serialVersionUID27, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreNoneCreate'", 1, sdkCommandIgnoreNoneCreate.methods().list().size());
-    IMethod sdkCommandIgnoreNoneCreate1 = SdkAssert.assertMethodExist(sdkCommandIgnoreNoneCreate, "SdkCommandIgnoreNoneCreate", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreNoneCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreNoneCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreNoneCreate'", 0, sdkCommandIgnoreNoneCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreNoneCreate'", 0, sdkCommandIgnoreNoneCreate.innerTypes().list().size());
     // type SdkCommandIgnoreNoneUse
@@ -1233,10 +1068,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID28, 26);
     SdkAssert.assertFieldSignature(serialVersionUID28, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreNoneUse'", 1, sdkCommandIgnoreNoneUse.methods().list().size());
-    IMethod sdkCommandIgnoreNoneUse1 = SdkAssert.assertMethodExist(sdkCommandIgnoreNoneUse, "SdkCommandIgnoreNoneUse", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreNoneUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreNoneUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreNoneUse'", 0, sdkCommandIgnoreNoneUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreNoneUse'", 0, sdkCommandIgnoreNoneUse.innerTypes().list().size());
     // type SdkCommandIgnoreUseCreate
@@ -1251,10 +1083,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID29, 26);
     SdkAssert.assertFieldSignature(serialVersionUID29, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreUseCreate'", 1, sdkCommandIgnoreUseCreate.methods().list().size());
-    IMethod sdkCommandIgnoreUseCreate1 = SdkAssert.assertMethodExist(sdkCommandIgnoreUseCreate, "SdkCommandIgnoreUseCreate", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreUseCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreUseCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreUseCreate'", 0, sdkCommandIgnoreUseCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreUseCreate'", 0, sdkCommandIgnoreUseCreate.innerTypes().list().size());
     // type SdkCommandIgnoreUseIgnore
@@ -1269,10 +1098,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID30, 26);
     SdkAssert.assertFieldSignature(serialVersionUID30, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreUseIgnore'", 1, sdkCommandIgnoreUseIgnore.methods().list().size());
-    IMethod sdkCommandIgnoreUseIgnore1 = SdkAssert.assertMethodExist(sdkCommandIgnoreUseIgnore, "SdkCommandIgnoreUseIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreUseIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreUseIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreUseIgnore'", 0, sdkCommandIgnoreUseIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreUseIgnore'", 0, sdkCommandIgnoreUseIgnore.innerTypes().list().size());
     // type SdkCommandIgnoreUseNone
@@ -1287,10 +1113,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID31, 26);
     SdkAssert.assertFieldSignature(serialVersionUID31, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreUseNone'", 1, sdkCommandIgnoreUseNone.methods().list().size());
-    IMethod sdkCommandIgnoreUseNone1 = SdkAssert.assertMethodExist(sdkCommandIgnoreUseNone, "SdkCommandIgnoreUseNone", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreUseNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreUseNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreUseNone'", 0, sdkCommandIgnoreUseNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreUseNone'", 0, sdkCommandIgnoreUseNone.innerTypes().list().size());
     // type SdkCommandIgnoreUseUse
@@ -1305,10 +1128,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID32, 26);
     SdkAssert.assertFieldSignature(serialVersionUID32, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandIgnoreUseUse'", 1, sdkCommandIgnoreUseUse.methods().list().size());
-    IMethod sdkCommandIgnoreUseUse1 = SdkAssert.assertMethodExist(sdkCommandIgnoreUseUse, "SdkCommandIgnoreUseUse", new String[]{});
-    Assert.assertTrue(sdkCommandIgnoreUseUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandIgnoreUseUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandIgnoreUseUse'", 0, sdkCommandIgnoreUseUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandIgnoreUseUse'", 0, sdkCommandIgnoreUseUse.innerTypes().list().size());
     // type SdkCommandNoneCreateCreate
@@ -1323,10 +1143,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID33, 26);
     SdkAssert.assertFieldSignature(serialVersionUID33, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneCreateCreate'", 1, sdkCommandNoneCreateCreate.methods().list().size());
-    IMethod sdkCommandNoneCreateCreate1 = SdkAssert.assertMethodExist(sdkCommandNoneCreateCreate, "SdkCommandNoneCreateCreate", new String[]{});
-    Assert.assertTrue(sdkCommandNoneCreateCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneCreateCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneCreateCreate'", 0, sdkCommandNoneCreateCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneCreateCreate'", 0, sdkCommandNoneCreateCreate.innerTypes().list().size());
     // type SdkCommandNoneCreateIgnore
@@ -1341,10 +1158,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID34, 26);
     SdkAssert.assertFieldSignature(serialVersionUID34, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneCreateIgnore'", 1, sdkCommandNoneCreateIgnore.methods().list().size());
-    IMethod sdkCommandNoneCreateIgnore1 = SdkAssert.assertMethodExist(sdkCommandNoneCreateIgnore, "SdkCommandNoneCreateIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandNoneCreateIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneCreateIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneCreateIgnore'", 0, sdkCommandNoneCreateIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneCreateIgnore'", 0, sdkCommandNoneCreateIgnore.innerTypes().list().size());
     // type SdkCommandNoneCreateNone
@@ -1359,10 +1173,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID35, 26);
     SdkAssert.assertFieldSignature(serialVersionUID35, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneCreateNone'", 1, sdkCommandNoneCreateNone.methods().list().size());
-    IMethod sdkCommandNoneCreateNone1 = SdkAssert.assertMethodExist(sdkCommandNoneCreateNone, "SdkCommandNoneCreateNone", new String[]{});
-    Assert.assertTrue(sdkCommandNoneCreateNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneCreateNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneCreateNone'", 0, sdkCommandNoneCreateNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneCreateNone'", 0, sdkCommandNoneCreateNone.innerTypes().list().size());
     // type SdkCommandNoneCreateUse
@@ -1377,10 +1188,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID36, 26);
     SdkAssert.assertFieldSignature(serialVersionUID36, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneCreateUse'", 1, sdkCommandNoneCreateUse.methods().list().size());
-    IMethod sdkCommandNoneCreateUse1 = SdkAssert.assertMethodExist(sdkCommandNoneCreateUse, "SdkCommandNoneCreateUse", new String[]{});
-    Assert.assertTrue(sdkCommandNoneCreateUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneCreateUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneCreateUse'", 0, sdkCommandNoneCreateUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneCreateUse'", 0, sdkCommandNoneCreateUse.innerTypes().list().size());
     // type SdkCommandNoneIgnoreCreate
@@ -1395,10 +1203,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID37, 26);
     SdkAssert.assertFieldSignature(serialVersionUID37, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneIgnoreCreate'", 1, sdkCommandNoneIgnoreCreate.methods().list().size());
-    IMethod sdkCommandNoneIgnoreCreate1 = SdkAssert.assertMethodExist(sdkCommandNoneIgnoreCreate, "SdkCommandNoneIgnoreCreate", new String[]{});
-    Assert.assertTrue(sdkCommandNoneIgnoreCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneIgnoreCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneIgnoreCreate'", 0, sdkCommandNoneIgnoreCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneIgnoreCreate'", 0, sdkCommandNoneIgnoreCreate.innerTypes().list().size());
     // type SdkCommandNoneIgnoreIgnore
@@ -1413,10 +1218,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID38, 26);
     SdkAssert.assertFieldSignature(serialVersionUID38, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneIgnoreIgnore'", 1, sdkCommandNoneIgnoreIgnore.methods().list().size());
-    IMethod sdkCommandNoneIgnoreIgnore1 = SdkAssert.assertMethodExist(sdkCommandNoneIgnoreIgnore, "SdkCommandNoneIgnoreIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandNoneIgnoreIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneIgnoreIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneIgnoreIgnore'", 0, sdkCommandNoneIgnoreIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneIgnoreIgnore'", 0, sdkCommandNoneIgnoreIgnore.innerTypes().list().size());
     // type SdkCommandNoneIgnoreNone
@@ -1431,10 +1233,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID39, 26);
     SdkAssert.assertFieldSignature(serialVersionUID39, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneIgnoreNone'", 1, sdkCommandNoneIgnoreNone.methods().list().size());
-    IMethod sdkCommandNoneIgnoreNone1 = SdkAssert.assertMethodExist(sdkCommandNoneIgnoreNone, "SdkCommandNoneIgnoreNone", new String[]{});
-    Assert.assertTrue(sdkCommandNoneIgnoreNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneIgnoreNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneIgnoreNone'", 0, sdkCommandNoneIgnoreNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneIgnoreNone'", 0, sdkCommandNoneIgnoreNone.innerTypes().list().size());
     // type SdkCommandNoneIgnoreUse
@@ -1449,10 +1248,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID40, 26);
     SdkAssert.assertFieldSignature(serialVersionUID40, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneIgnoreUse'", 1, sdkCommandNoneIgnoreUse.methods().list().size());
-    IMethod sdkCommandNoneIgnoreUse1 = SdkAssert.assertMethodExist(sdkCommandNoneIgnoreUse, "SdkCommandNoneIgnoreUse", new String[]{});
-    Assert.assertTrue(sdkCommandNoneIgnoreUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneIgnoreUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneIgnoreUse'", 0, sdkCommandNoneIgnoreUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneIgnoreUse'", 0, sdkCommandNoneIgnoreUse.innerTypes().list().size());
     // type SdkCommandNoneNoneCreate
@@ -1468,10 +1264,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID41, 26);
     SdkAssert.assertFieldSignature(serialVersionUID41, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneNoneCreate'", 1, sdkCommandNoneNoneCreate.methods().list().size());
-    IMethod sdkCommandNoneNoneCreate1 = SdkAssert.assertMethodExist(sdkCommandNoneNoneCreate, "SdkCommandNoneNoneCreate", new String[]{});
-    Assert.assertTrue(sdkCommandNoneNoneCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneNoneCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneNoneCreate'", 0, sdkCommandNoneNoneCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneNoneCreate'", 0, sdkCommandNoneNoneCreate.innerTypes().list().size());
     // type SdkCommandNoneNoneIgnore
@@ -1486,10 +1279,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID42, 26);
     SdkAssert.assertFieldSignature(serialVersionUID42, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneNoneIgnore'", 1, sdkCommandNoneNoneIgnore.methods().list().size());
-    IMethod sdkCommandNoneNoneIgnore1 = SdkAssert.assertMethodExist(sdkCommandNoneNoneIgnore, "SdkCommandNoneNoneIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandNoneNoneIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneNoneIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneNoneIgnore'", 0, sdkCommandNoneNoneIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneNoneIgnore'", 0, sdkCommandNoneNoneIgnore.innerTypes().list().size());
     // type SdkCommandNoneNoneNone
@@ -1504,10 +1294,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID43, 26);
     SdkAssert.assertFieldSignature(serialVersionUID43, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneNoneNone'", 1, sdkCommandNoneNoneNone.methods().list().size());
-    IMethod sdkCommandNoneNoneNone1 = SdkAssert.assertMethodExist(sdkCommandNoneNoneNone, "SdkCommandNoneNoneNone", new String[]{});
-    Assert.assertTrue(sdkCommandNoneNoneNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneNoneNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneNoneNone'", 0, sdkCommandNoneNoneNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneNoneNone'", 0, sdkCommandNoneNoneNone.innerTypes().list().size());
     // type SdkCommandNoneNoneUse
@@ -1522,10 +1309,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID44, 26);
     SdkAssert.assertFieldSignature(serialVersionUID44, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneNoneUse'", 1, sdkCommandNoneNoneUse.methods().list().size());
-    IMethod sdkCommandNoneNoneUse1 = SdkAssert.assertMethodExist(sdkCommandNoneNoneUse, "SdkCommandNoneNoneUse", new String[]{});
-    Assert.assertTrue(sdkCommandNoneNoneUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneNoneUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneNoneUse'", 0, sdkCommandNoneNoneUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneNoneUse'", 0, sdkCommandNoneNoneUse.innerTypes().list().size());
     // type SdkCommandNoneUseCreate
@@ -1540,10 +1324,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID45, 26);
     SdkAssert.assertFieldSignature(serialVersionUID45, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneUseCreate'", 1, sdkCommandNoneUseCreate.methods().list().size());
-    IMethod sdkCommandNoneUseCreate1 = SdkAssert.assertMethodExist(sdkCommandNoneUseCreate, "SdkCommandNoneUseCreate", new String[]{});
-    Assert.assertTrue(sdkCommandNoneUseCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneUseCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneUseCreate'", 0, sdkCommandNoneUseCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneUseCreate'", 0, sdkCommandNoneUseCreate.innerTypes().list().size());
     // type SdkCommandNoneUseIgnore
@@ -1558,10 +1339,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID46, 26);
     SdkAssert.assertFieldSignature(serialVersionUID46, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneUseIgnore'", 1, sdkCommandNoneUseIgnore.methods().list().size());
-    IMethod sdkCommandNoneUseIgnore1 = SdkAssert.assertMethodExist(sdkCommandNoneUseIgnore, "SdkCommandNoneUseIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandNoneUseIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneUseIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneUseIgnore'", 0, sdkCommandNoneUseIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneUseIgnore'", 0, sdkCommandNoneUseIgnore.innerTypes().list().size());
     // type SdkCommandNoneUseNone
@@ -1576,10 +1354,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID47, 26);
     SdkAssert.assertFieldSignature(serialVersionUID47, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneUseNone'", 1, sdkCommandNoneUseNone.methods().list().size());
-    IMethod sdkCommandNoneUseNone1 = SdkAssert.assertMethodExist(sdkCommandNoneUseNone, "SdkCommandNoneUseNone", new String[]{});
-    Assert.assertTrue(sdkCommandNoneUseNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneUseNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneUseNone'", 0, sdkCommandNoneUseNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneUseNone'", 0, sdkCommandNoneUseNone.innerTypes().list().size());
     // type SdkCommandNoneUseUse
@@ -1594,10 +1369,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID48, 26);
     SdkAssert.assertFieldSignature(serialVersionUID48, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandNoneUseUse'", 1, sdkCommandNoneUseUse.methods().list().size());
-    IMethod sdkCommandNoneUseUse1 = SdkAssert.assertMethodExist(sdkCommandNoneUseUse, "SdkCommandNoneUseUse", new String[]{});
-    Assert.assertTrue(sdkCommandNoneUseUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandNoneUseUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandNoneUseUse'", 0, sdkCommandNoneUseUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandNoneUseUse'", 0, sdkCommandNoneUseUse.innerTypes().list().size());
     // type SdkCommandUseCreateCreate
@@ -1612,10 +1384,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID49, 26);
     SdkAssert.assertFieldSignature(serialVersionUID49, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseCreateCreate'", 1, sdkCommandUseCreateCreate.methods().list().size());
-    IMethod sdkCommandUseCreateCreate1 = SdkAssert.assertMethodExist(sdkCommandUseCreateCreate, "SdkCommandUseCreateCreate", new String[]{});
-    Assert.assertTrue(sdkCommandUseCreateCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseCreateCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseCreateCreate'", 0, sdkCommandUseCreateCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseCreateCreate'", 0, sdkCommandUseCreateCreate.innerTypes().list().size());
     // type SdkCommandUseCreateIgnore
@@ -1630,10 +1399,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID50, 26);
     SdkAssert.assertFieldSignature(serialVersionUID50, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseCreateIgnore'", 1, sdkCommandUseCreateIgnore.methods().list().size());
-    IMethod sdkCommandUseCreateIgnore1 = SdkAssert.assertMethodExist(sdkCommandUseCreateIgnore, "SdkCommandUseCreateIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandUseCreateIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseCreateIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseCreateIgnore'", 0, sdkCommandUseCreateIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseCreateIgnore'", 0, sdkCommandUseCreateIgnore.innerTypes().list().size());
     // type SdkCommandUseCreateNone
@@ -1648,10 +1414,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID51, 26);
     SdkAssert.assertFieldSignature(serialVersionUID51, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseCreateNone'", 1, sdkCommandUseCreateNone.methods().list().size());
-    IMethod sdkCommandUseCreateNone1 = SdkAssert.assertMethodExist(sdkCommandUseCreateNone, "SdkCommandUseCreateNone", new String[]{});
-    Assert.assertTrue(sdkCommandUseCreateNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseCreateNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseCreateNone'", 0, sdkCommandUseCreateNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseCreateNone'", 0, sdkCommandUseCreateNone.innerTypes().list().size());
     // type SdkCommandUseCreateUse
@@ -1666,10 +1429,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID52, 26);
     SdkAssert.assertFieldSignature(serialVersionUID52, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseCreateUse'", 1, sdkCommandUseCreateUse.methods().list().size());
-    IMethod sdkCommandUseCreateUse1 = SdkAssert.assertMethodExist(sdkCommandUseCreateUse, "SdkCommandUseCreateUse", new String[]{});
-    Assert.assertTrue(sdkCommandUseCreateUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseCreateUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseCreateUse'", 0, sdkCommandUseCreateUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseCreateUse'", 0, sdkCommandUseCreateUse.innerTypes().list().size());
     // type SdkCommandUseIgnoreCreate
@@ -1684,10 +1444,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID53, 26);
     SdkAssert.assertFieldSignature(serialVersionUID53, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseIgnoreCreate'", 1, sdkCommandUseIgnoreCreate.methods().list().size());
-    IMethod sdkCommandUseIgnoreCreate1 = SdkAssert.assertMethodExist(sdkCommandUseIgnoreCreate, "SdkCommandUseIgnoreCreate", new String[]{});
-    Assert.assertTrue(sdkCommandUseIgnoreCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseIgnoreCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseIgnoreCreate'", 0, sdkCommandUseIgnoreCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseIgnoreCreate'", 0, sdkCommandUseIgnoreCreate.innerTypes().list().size());
     // type SdkCommandUseIgnoreIgnore
@@ -1702,10 +1459,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID54, 26);
     SdkAssert.assertFieldSignature(serialVersionUID54, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseIgnoreIgnore'", 1, sdkCommandUseIgnoreIgnore.methods().list().size());
-    IMethod sdkCommandUseIgnoreIgnore1 = SdkAssert.assertMethodExist(sdkCommandUseIgnoreIgnore, "SdkCommandUseIgnoreIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandUseIgnoreIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseIgnoreIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseIgnoreIgnore'", 0, sdkCommandUseIgnoreIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseIgnoreIgnore'", 0, sdkCommandUseIgnoreIgnore.innerTypes().list().size());
     // type SdkCommandUseIgnoreNone
@@ -1720,10 +1474,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID55, 26);
     SdkAssert.assertFieldSignature(serialVersionUID55, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseIgnoreNone'", 1, sdkCommandUseIgnoreNone.methods().list().size());
-    IMethod sdkCommandUseIgnoreNone1 = SdkAssert.assertMethodExist(sdkCommandUseIgnoreNone, "SdkCommandUseIgnoreNone", new String[]{});
-    Assert.assertTrue(sdkCommandUseIgnoreNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseIgnoreNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseIgnoreNone'", 0, sdkCommandUseIgnoreNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseIgnoreNone'", 0, sdkCommandUseIgnoreNone.innerTypes().list().size());
     // type SdkCommandUseIgnoreUse
@@ -1738,10 +1489,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID56, 26);
     SdkAssert.assertFieldSignature(serialVersionUID56, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseIgnoreUse'", 1, sdkCommandUseIgnoreUse.methods().list().size());
-    IMethod sdkCommandUseIgnoreUse1 = SdkAssert.assertMethodExist(sdkCommandUseIgnoreUse, "SdkCommandUseIgnoreUse", new String[]{});
-    Assert.assertTrue(sdkCommandUseIgnoreUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseIgnoreUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseIgnoreUse'", 0, sdkCommandUseIgnoreUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseIgnoreUse'", 0, sdkCommandUseIgnoreUse.innerTypes().list().size());
     // type SdkCommandUseNoneCreate
@@ -1756,10 +1504,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID57, 26);
     SdkAssert.assertFieldSignature(serialVersionUID57, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseNoneCreate'", 1, sdkCommandUseNoneCreate.methods().list().size());
-    IMethod sdkCommandUseNoneCreate1 = SdkAssert.assertMethodExist(sdkCommandUseNoneCreate, "SdkCommandUseNoneCreate", new String[]{});
-    Assert.assertTrue(sdkCommandUseNoneCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseNoneCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseNoneCreate'", 0, sdkCommandUseNoneCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseNoneCreate'", 0, sdkCommandUseNoneCreate.innerTypes().list().size());
     // type SdkCommandUseNoneIgnore
@@ -1774,10 +1519,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID58, 26);
     SdkAssert.assertFieldSignature(serialVersionUID58, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseNoneIgnore'", 1, sdkCommandUseNoneIgnore.methods().list().size());
-    IMethod sdkCommandUseNoneIgnore1 = SdkAssert.assertMethodExist(sdkCommandUseNoneIgnore, "SdkCommandUseNoneIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandUseNoneIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseNoneIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseNoneIgnore'", 0, sdkCommandUseNoneIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseNoneIgnore'", 0, sdkCommandUseNoneIgnore.innerTypes().list().size());
     // type SdkCommandUseNoneNone
@@ -1792,10 +1534,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID59, 26);
     SdkAssert.assertFieldSignature(serialVersionUID59, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseNoneNone'", 1, sdkCommandUseNoneNone.methods().list().size());
-    IMethod sdkCommandUseNoneNone1 = SdkAssert.assertMethodExist(sdkCommandUseNoneNone, "SdkCommandUseNoneNone", new String[]{});
-    Assert.assertTrue(sdkCommandUseNoneNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseNoneNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseNoneNone'", 0, sdkCommandUseNoneNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseNoneNone'", 0, sdkCommandUseNoneNone.innerTypes().list().size());
     // type SdkCommandUseNoneUse
@@ -1810,10 +1549,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID60, 26);
     SdkAssert.assertFieldSignature(serialVersionUID60, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseNoneUse'", 1, sdkCommandUseNoneUse.methods().list().size());
-    IMethod sdkCommandUseNoneUse1 = SdkAssert.assertMethodExist(sdkCommandUseNoneUse, "SdkCommandUseNoneUse", new String[]{});
-    Assert.assertTrue(sdkCommandUseNoneUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseNoneUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseNoneUse'", 0, sdkCommandUseNoneUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseNoneUse'", 0, sdkCommandUseNoneUse.innerTypes().list().size());
     // type SdkCommandUseUseCreate
@@ -1828,10 +1564,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID61, 26);
     SdkAssert.assertFieldSignature(serialVersionUID61, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseUseCreate'", 1, sdkCommandUseUseCreate.methods().list().size());
-    IMethod sdkCommandUseUseCreate1 = SdkAssert.assertMethodExist(sdkCommandUseUseCreate, "SdkCommandUseUseCreate", new String[]{});
-    Assert.assertTrue(sdkCommandUseUseCreate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseUseCreate1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseUseCreate'", 0, sdkCommandUseUseCreate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseUseCreate'", 0, sdkCommandUseUseCreate.innerTypes().list().size());
     // type SdkCommandUseUseIgnore
@@ -1846,10 +1579,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID62, 26);
     SdkAssert.assertFieldSignature(serialVersionUID62, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseUseIgnore'", 1, sdkCommandUseUseIgnore.methods().list().size());
-    IMethod sdkCommandUseUseIgnore1 = SdkAssert.assertMethodExist(sdkCommandUseUseIgnore, "SdkCommandUseUseIgnore", new String[]{});
-    Assert.assertTrue(sdkCommandUseUseIgnore1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseUseIgnore1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseUseIgnore'", 0, sdkCommandUseUseIgnore.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseUseIgnore'", 0, sdkCommandUseUseIgnore.innerTypes().list().size());
     // type SdkCommandUseUseNone
@@ -1864,10 +1594,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID63, 26);
     SdkAssert.assertFieldSignature(serialVersionUID63, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseUseNone'", 1, sdkCommandUseUseNone.methods().list().size());
-    IMethod sdkCommandUseUseNone1 = SdkAssert.assertMethodExist(sdkCommandUseUseNone, "SdkCommandUseUseNone", new String[]{});
-    Assert.assertTrue(sdkCommandUseUseNone1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseUseNone1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseUseNone'", 0, sdkCommandUseUseNone.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseUseNone'", 0, sdkCommandUseUseNone.innerTypes().list().size());
     // type SdkCommandUseUseUse
@@ -1882,10 +1609,7 @@ public class ReplaceFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID64, 26);
     SdkAssert.assertFieldSignature(serialVersionUID64, "J");
 
-    Assert.assertEquals("method count of 'SdkCommandUseUseUse'", 1, sdkCommandUseUseUse.methods().list().size());
-    IMethod sdkCommandUseUseUse1 = SdkAssert.assertMethodExist(sdkCommandUseUseUse, "SdkCommandUseUseUse", new String[]{});
-    Assert.assertTrue(sdkCommandUseUseUse1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sdkCommandUseUseUse1, null);
+    Assert.assertEquals("method count of 'SdkCommandUseUseUse'", 0, sdkCommandUseUseUse.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SdkCommandUseUseUse'", 0, sdkCommandUseUseUse.innerTypes().list().size());
   }

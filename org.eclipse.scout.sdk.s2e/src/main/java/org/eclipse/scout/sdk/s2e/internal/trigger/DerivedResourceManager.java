@@ -278,7 +278,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       m_eventCollector = eventCollector;
     }
 
-    private static boolean acceptUpdateEvent(ElementChangedEvent icu) {
+    private static boolean acceptUpdateEvent() {
       final String[] excludedJobNamePrefixes = new String[]{"org.eclipse.team.", // excludes svn updates
           "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
           "org.eclipse.egit.", // excludes git updates
@@ -326,7 +326,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
 
     @Override
     public void elementChanged(ElementChangedEvent event) {
-      if (event != null && acceptUpdateEvent(event) && !addElementToQueueSecure(m_eventCollector, event, event.toString(), 10, TimeUnit.SECONDS)) {
+      if (event != null && acceptUpdateEvent() && !addElementToQueueSecure(m_eventCollector, event, event.toString(), 10, TimeUnit.SECONDS)) {
         // element could not be added within the given timeout
         SdkLog.info("Unable to queue more java element changes. Queue is already full. Skipping event.");
       }

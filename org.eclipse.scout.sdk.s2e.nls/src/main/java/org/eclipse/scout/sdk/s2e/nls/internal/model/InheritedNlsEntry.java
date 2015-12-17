@@ -14,11 +14,10 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.model.NlsEntry;
-import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 
 public class InheritedNlsEntry extends NlsEntry {
 
-  public InheritedNlsEntry(INlsEntry row, INlsProject project) {
+  public InheritedNlsEntry(INlsEntry row) {
     super(row);
   }
 

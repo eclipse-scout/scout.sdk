@@ -55,7 +55,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 
   protected static final int ROW_DATA_FIELD_FLAGS = Flags.AccPublic | Flags.AccFinal | Flags.AccStatic;
 
-  private final IType m_columnContainer; // e.g. ITable or ITableExtension
+  private final IType m_columnContainer; // e.g. ITable or ITableExtension or IColumn
   private final IType m_modelType; // e.g. IPageWithTable, ITableField, ITableExtension
   private final IJavaEnvironment m_lookpEnvironment;
 
@@ -97,10 +97,6 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     // serialVersionUidBuilder
     IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
     addSortedField(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
-
-    // constructor
-    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructor(getElementName());
-    addSortedMethod(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
 
     // get all columns
     Set<IType> columns = getColumns(getColumnContainer(), rowDataSuperClassType);
@@ -213,7 +209,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
   }
 
   protected String computeTableRowDataSuperClassSignature() {
-    if (!(getDeclaringElement() instanceof ITypeSourceBuilder)) {
+    if (m_columnContainer.isInstanceOf(IScoutRuntimeTypes.IExtension) || !(getDeclaringElement() instanceof ITypeSourceBuilder)) {
       // row data extension. no super class
       return null;
     }

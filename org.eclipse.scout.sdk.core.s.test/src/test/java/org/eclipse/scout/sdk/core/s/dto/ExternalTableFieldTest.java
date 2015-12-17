@@ -41,9 +41,7 @@ public class ExternalTableFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData'", 8, abstractCompanyTableFieldData.methods().list().size());
-    IMethod abstractCompanyTableFieldData1 = SdkAssert.assertMethodExist(abstractCompanyTableFieldData, "AbstractCompanyTableFieldData", new String[]{});
-    Assert.assertTrue(abstractCompanyTableFieldData1.isConstructor());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData'", 7, abstractCompanyTableFieldData.methods().list().size());
     IMethod addRow = SdkAssert.assertMethodExist(abstractCompanyTableFieldData, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "Lformdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData;");
     SdkAssert.assertAnnotation(addRow, "java.lang.Override");
@@ -83,9 +81,7 @@ public class ExternalTableFieldTest {
     SdkAssert.assertHasFlags(m_name, 2);
     SdkAssert.assertFieldSignature(m_name, "Ljava.lang.String;");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData'", 3, abstractCompanyTableRowData.methods().list().size());
-    IMethod abstractCompanyTableRowData1 = SdkAssert.assertMethodExist(abstractCompanyTableRowData, "AbstractCompanyTableRowData", new String[]{});
-    Assert.assertTrue(abstractCompanyTableRowData1.isConstructor());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData'", 2, abstractCompanyTableRowData.methods().list().size());
     IMethod getName = SdkAssert.assertMethodExist(abstractCompanyTableRowData, "getName", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getName, "Ljava.lang.String;");
     IMethod setName = SdkAssert.assertMethodExist(abstractCompanyTableRowData, "setName", new String[]{"Ljava.lang.String;"});

@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
@@ -25,7 +26,6 @@ import formdata.client.ui.forms.BaseWithExtendedTableForm.MainBox.CancelButton;
 import formdata.client.ui.forms.BaseWithExtendedTableForm.MainBox.OkButton;
 import formdata.client.ui.forms.BaseWithExtendedTableForm.MainBox.TableInFormField;
 import formdata.client.ui.forms.BaseWithExtendedTableForm.MainBox.TableInFormField.Table;
-import formdata.client.ui.template.formfield.AbstractBeanTableField;
 import formdata.shared.services.BaseWithExtendedTableFormData;
 
 /**
@@ -58,7 +58,7 @@ public class BaseWithExtendedTableForm extends AbstractForm {
   public class MainBox extends AbstractGroupBox {
 
     @Order(10.0)
-    public class TableInFormField extends AbstractBeanTableField<Table> {
+    public class TableInFormField extends AbstractTableField<Table> {
       @Order(10.0)
       public class Table extends AbstractTestTableWithOneColumn {
         @Order(20.0)

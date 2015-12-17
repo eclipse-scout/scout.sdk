@@ -15,12 +15,13 @@ import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
 
 import formdata.shared.services.process.AbstractPersonTableFieldData;
 
 @FormData(value = AbstractPersonTableFieldData.class, sdkCommand = SdkCommand.CREATE)
-public abstract class AbstractPersonTableField extends AbstractBeanTableField<AbstractPersonTableField.Table> {
+public abstract class AbstractPersonTableField extends AbstractTableField<AbstractPersonTableField.Table> {
 
   public class Table extends AbstractTable {
 

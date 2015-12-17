@@ -42,10 +42,7 @@ public class ListBoxFormTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'ListBoxFormData'", 2, listBoxFormData.methods().list().size());
-    IMethod listBoxFormData1 = SdkAssert.assertMethodExist(listBoxFormData, "ListBoxFormData", new String[]{});
-    Assert.assertTrue(listBoxFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(listBoxFormData1, null);
+    Assert.assertEquals("method count of 'ListBoxFormData'", 1, listBoxFormData.methods().list().size());
     IMethod getListBox = SdkAssert.assertMethodExist(listBoxFormData, "getListBox", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getListBox, "QListBox;");
 
@@ -61,10 +58,7 @@ public class ListBoxFormTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'ListBox'", 1, listBox.methods().list().size());
-    IMethod listBox1 = SdkAssert.assertMethodExist(listBox, "ListBox", new String[]{});
-    Assert.assertTrue(listBox1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(listBox1, null);
+    Assert.assertEquals("method count of 'ListBox'", 0, listBox.methods().list().size());
 
     Assert.assertEquals("inner types count of 'ListBox'", 0, listBox.innerTypes().list().size());
   }

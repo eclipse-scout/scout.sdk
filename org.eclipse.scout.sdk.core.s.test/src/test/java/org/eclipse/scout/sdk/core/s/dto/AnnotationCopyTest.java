@@ -47,10 +47,7 @@ public class AnnotationCopyTest {
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
     Assert.assertEquals("annotation count", 0, serialVersionUID.annotations().list().size());
 
-    Assert.assertEquals("method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'", 2, annotationCopyTestFormData.methods().list().size());
-    IMethod annotationCopyTestFormData1 = SdkAssert.assertMethodExist(annotationCopyTestFormData, "AnnotationCopyTestFormData", new String[]{});
-    Assert.assertTrue(annotationCopyTestFormData1.isConstructor());
-    Assert.assertEquals("annotation count", 0, annotationCopyTestFormData1.annotations().list().size());
+    Assert.assertEquals("method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'", 1, annotationCopyTestFormData.methods().list().size());
     IMethod getFirst = SdkAssert.assertMethodExist(annotationCopyTestFormData, "getFirst", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getFirst, "Lformdata.shared.ui.forms.AnnotationCopyTestFormData$First;");
     Assert.assertEquals("annotation count", 0, getFirst.annotations().list().size());
@@ -70,10 +67,7 @@ public class AnnotationCopyTest {
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
     Assert.assertEquals("annotation count", 0, serialVersionUID1.annotations().list().size());
 
-    Assert.assertEquals("method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData$First'", 1, first.methods().list().size());
-    IMethod first1 = SdkAssert.assertMethodExist(first, "First", new String[]{});
-    Assert.assertTrue(first1.isConstructor());
-    Assert.assertEquals("annotation count", 0, first1.annotations().list().size());
+    Assert.assertEquals("method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData$First'", 0, first.methods().list().size());
 
     Assert.assertEquals("inner types count of 'First'", 0, first.innerTypes().list().size());
   }

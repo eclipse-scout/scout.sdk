@@ -11,7 +11,9 @@
 package org.eclipse.scout.sdk.s2e.nls.internal.serviceproject;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -62,19 +64,31 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     }
 
+    final Set<String> duplicateOrders = new HashSet<>(0);
+
     Comparator<TextProviderServiceDeclaration> comparator = new Comparator<TextProviderServiceDeclaration>() {
       @Override
       public int compare(TextProviderServiceDeclaration o1, TextProviderServiceDeclaration o2) {
-        if (o2.prio != o1.prio) {
-          return Double.valueOf(o1.prio).compareTo(Double.valueOf(o2.prio));
+        if (o1 == o2) {
+          return 0;
         }
 
-        if (o1.svc.isBinary() != o2.svc.isBinary()) {
+        int compare = Double.compare(o1.prio, o2.prio);
+        if (compare != 0) {
+          return compare;
+        }
+
+        // log duplicate orders
+        String[] duplicateOrdersFqn = new String[]{o1.svc.getFullyQualifiedName(), o2.svc.getFullyQualifiedName()};
+        Arrays.sort(duplicateOrdersFqn);
+        duplicateOrders.add(Arrays.toString(duplicateOrdersFqn));
+
+        compare = Boolean.compare(o1.svc.isBinary(), o2.svc.isBinary());
+        if (compare != 0) {
           // prefer source types
-          return Boolean.valueOf(o1.svc.isBinary()).compareTo(Boolean.valueOf(o2.svc.isBinary()));
+          return compare;
         }
-
-        return o1.svc.getElementName().compareTo(o2.svc.getElementName());
+        return o1.svc.getFullyQualifiedName().compareTo(o2.svc.getFullyQualifiedName());
       }
     };
 
@@ -101,6 +115,12 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     };
 
     S2eUtils.findClassesInStrictHierarchy(javaProject, IScoutRuntimeTypes.AbstractDynamicNlsTextProviderService, null, filter);
+
+    if (!duplicateOrders.isEmpty()) {
+      for (String duplicates : duplicateOrders) {
+        SdkLog.warning("There are TextProviderServices with the same @Order value: " + duplicates);
+      }
+    }
 
     // return the types of the services ordered by priority
     Set<IType> returnValueSorted = new LinkedHashSet<>(result.size());

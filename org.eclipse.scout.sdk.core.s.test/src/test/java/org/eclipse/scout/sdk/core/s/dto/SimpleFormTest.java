@@ -42,10 +42,7 @@ public class SimpleFormTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'SimpleFormData'", 11, simpleFormData.methods().list().size());
-    IMethod simpleFormData1 = SdkAssert.assertMethodExist(simpleFormData, "SimpleFormData", new String[]{});
-    Assert.assertTrue(simpleFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(simpleFormData1, null);
+    Assert.assertEquals("method count of 'SimpleFormData'", 10, simpleFormData.methods().list().size());
     IMethod getDate = SdkAssert.assertMethodExist(simpleFormData, "getDate", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getDate, "QDate;");
     IMethod getDouble = SdkAssert.assertMethodExist(simpleFormData, "getDouble", new String[]{});
@@ -80,10 +77,7 @@ public class SimpleFormTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'Date'", 1, date.methods().list().size());
-    IMethod date1 = SdkAssert.assertMethodExist(date, "Date", new String[]{});
-    Assert.assertTrue(date1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(date1, null);
+    Assert.assertEquals("method count of 'Date'", 0, date.methods().list().size());
 
     Assert.assertEquals("inner types count of 'Date'", 0, date.innerTypes().list().size());
     // type Double
@@ -97,10 +91,7 @@ public class SimpleFormTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'Double'", 1, doubleT.methods().list().size());
-    IMethod double1 = SdkAssert.assertMethodExist(doubleT, "Double", new String[]{});
-    Assert.assertTrue(double1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(double1, null);
+    Assert.assertEquals("method count of 'Double'", 0, doubleT.methods().list().size());
 
     Assert.assertEquals("inner types count of 'Double'", 0, doubleT.innerTypes().list().size());
     // type MultiTypeArgsBox
@@ -114,10 +105,7 @@ public class SimpleFormTest {
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'MultiTypeArgsBox'", 1, multiTypeArgsBox.methods().list().size());
-    IMethod multiTypeArgsBox1 = SdkAssert.assertMethodExist(multiTypeArgsBox, "MultiTypeArgsBox", new String[]{});
-    Assert.assertTrue(multiTypeArgsBox1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(multiTypeArgsBox1, null);
+    Assert.assertEquals("method count of 'MultiTypeArgsBox'", 0, multiTypeArgsBox.methods().list().size());
 
     Assert.assertEquals("inner types count of 'MultiTypeArgsBox'", 0, multiTypeArgsBox.innerTypes().list().size());
     // type SampleComposer
@@ -131,10 +119,7 @@ public class SimpleFormTest {
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    Assert.assertEquals("method count of 'SampleComposer'", 1, sampleComposer.methods().list().size());
-    IMethod sampleComposer1 = SdkAssert.assertMethodExist(sampleComposer, "SampleComposer", new String[]{});
-    Assert.assertTrue(sampleComposer1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sampleComposer1, null);
+    Assert.assertEquals("method count of 'SampleComposer'", 0, sampleComposer.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SampleComposer'", 0, sampleComposer.innerTypes().list().size());
     // type SampleDate
@@ -148,10 +133,7 @@ public class SimpleFormTest {
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    Assert.assertEquals("method count of 'SampleDate'", 1, sampleDate.methods().list().size());
-    IMethod sampleDate1 = SdkAssert.assertMethodExist(sampleDate, "SampleDate", new String[]{});
-    Assert.assertTrue(sampleDate1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sampleDate1, null);
+    Assert.assertEquals("method count of 'SampleDate'", 0, sampleDate.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SampleDate'", 0, sampleDate.innerTypes().list().size());
     // type SampleSmart
@@ -165,10 +147,7 @@ public class SimpleFormTest {
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
 
-    Assert.assertEquals("method count of 'SampleSmart'", 1, sampleSmart.methods().list().size());
-    IMethod sampleSmart1 = SdkAssert.assertMethodExist(sampleSmart, "SampleSmart", new String[]{});
-    Assert.assertTrue(sampleSmart1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sampleSmart1, null);
+    Assert.assertEquals("method count of 'SampleSmart'", 0, sampleSmart.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SampleSmart'", 0, sampleSmart.innerTypes().list().size());
     // type SampleString
@@ -182,10 +161,7 @@ public class SimpleFormTest {
     SdkAssert.assertHasFlags(serialVersionUID7, 26);
     SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
-    Assert.assertEquals("method count of 'SampleString'", 1, sampleString.methods().list().size());
-    IMethod sampleString1 = SdkAssert.assertMethodExist(sampleString, "SampleString", new String[]{});
-    Assert.assertTrue(sampleString1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sampleString1, null);
+    Assert.assertEquals("method count of 'SampleString'", 0, sampleString.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SampleString'", 0, sampleString.innerTypes().list().size());
     // type SimpleNrProperty
@@ -199,10 +175,7 @@ public class SimpleFormTest {
     SdkAssert.assertHasFlags(serialVersionUID8, 26);
     SdkAssert.assertFieldSignature(serialVersionUID8, "J");
 
-    Assert.assertEquals("method count of 'SimpleNrProperty'", 1, simpleNrProperty.methods().list().size());
-    IMethod simpleNrProperty1 = SdkAssert.assertMethodExist(simpleNrProperty, "SimpleNrProperty", new String[]{});
-    Assert.assertTrue(simpleNrProperty1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(simpleNrProperty1, null);
+    Assert.assertEquals("method count of 'SimpleNrProperty'", 0, simpleNrProperty.methods().list().size());
 
     Assert.assertEquals("inner types count of 'SimpleNrProperty'", 0, simpleNrProperty.innerTypes().list().size());
   }

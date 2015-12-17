@@ -26,6 +26,10 @@ public class PropertyMap {
     m_props = new HashMap<>();
   }
 
+  /**
+   * @param type
+   *          defines the returned data type
+   */
   @SuppressWarnings("unchecked")
   public <T extends Object> T getProperty(String key, Class<T> type) {
     return (T) m_props.get(key);

@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.s.dto;
 
 import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
@@ -41,10 +40,7 @@ public class ExternalCheckboxFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'AbstractTestCheckboxFieldData'", 1, abstractTestCheckboxFieldData.methods().list().size());
-    IMethod abstractTestCheckboxFieldData1 = SdkAssert.assertMethodExist(abstractTestCheckboxFieldData, "AbstractTestCheckboxFieldData", new String[]{});
-    Assert.assertTrue(abstractTestCheckboxFieldData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(abstractTestCheckboxFieldData1, null);
+    Assert.assertEquals("method count of 'AbstractTestCheckboxFieldData'", 0, abstractTestCheckboxFieldData.methods().list().size());
 
     Assert.assertEquals("inner types count of 'AbstractTestCheckboxFieldData'", 0, abstractTestCheckboxFieldData.innerTypes().list().size());
   }

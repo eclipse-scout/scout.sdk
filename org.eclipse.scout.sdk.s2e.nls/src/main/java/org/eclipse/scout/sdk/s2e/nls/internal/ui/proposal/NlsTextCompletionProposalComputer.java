@@ -35,7 +35,7 @@ public class NlsTextCompletionProposalComputer extends AbstractNlsTextCompletion
     for (INlsEntry e : nlsProject.getEntries(prefix, false)) {
       proposals.add(new NlsProposal(e, prefix, offset, m_image));
     }
-    proposals.add(new NewNlsProposal(nlsProject, null, prefix, offset));
+    proposals.add(new NewNlsProposal(nlsProject, prefix, offset));
   }
 
 }

@@ -77,10 +77,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsDefaultExFormData'", 2, tableFieldWithIgnoredColumnsDefaultExFormData.methods().list().size());
-    IMethod tableFieldWithIgnoredColumnsDefaultExFormData1 = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsDefaultExFormData, "TableFieldWithIgnoredColumnsDefaultExFormData", new String[]{});
-    Assert.assertTrue(tableFieldWithIgnoredColumnsDefaultExFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableFieldWithIgnoredColumnsDefaultExFormData1, null);
+    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsDefaultExFormData'", 1, tableFieldWithIgnoredColumnsDefaultExFormData.methods().list().size());
     IMethod getTableDefaultEx = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsDefaultExFormData, "getTableDefaultEx", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTableDefaultEx, "QTableDefaultEx;");
 
@@ -97,10 +94,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'TableDefaultEx'", 8, tableDefaultEx.methods().list().size());
-    IMethod tableDefaultEx1 = SdkAssert.assertMethodExist(tableDefaultEx, "TableDefaultEx", new String[]{});
-    Assert.assertTrue(tableDefaultEx1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableDefaultEx1, null);
+    Assert.assertEquals("method count of 'TableDefaultEx'", 7, tableDefaultEx.methods().list().size());
     IMethod addRow = SdkAssert.assertMethodExist(tableDefaultEx, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QTableDefaultExRowData;");
     SdkAssert.assertAnnotation(addRow, "java.lang.Override");
@@ -134,10 +128,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'TableDefaultExRowData'", 1, tableDefaultExRowData.methods().list().size());
-    IMethod tableDefaultExRowData1 = SdkAssert.assertMethodExist(tableDefaultExRowData, "TableDefaultExRowData", new String[]{});
-    Assert.assertTrue(tableDefaultExRowData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableDefaultExRowData1, null);
+    Assert.assertEquals("method count of 'TableDefaultExRowData'", 0, tableDefaultExRowData.methods().list().size());
 
     Assert.assertEquals("inner types count of 'TableDefaultExRowData'", 0, tableDefaultExRowData.innerTypes().list().size());
   }
@@ -157,10 +148,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsBaseFormData'", 2, tableFieldWithIgnoredColumnsBaseFormData.methods().list().size());
-    IMethod tableFieldWithIgnoredColumnsBaseFormData1 = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsBaseFormData, "TableFieldWithIgnoredColumnsBaseFormData", new String[]{});
-    Assert.assertTrue(tableFieldWithIgnoredColumnsBaseFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableFieldWithIgnoredColumnsBaseFormData1, null);
+    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsBaseFormData'", 1, tableFieldWithIgnoredColumnsBaseFormData.methods().list().size());
     IMethod getTableBase = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsBaseFormData, "getTableBase", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTableBase, "QTableBase;");
 
@@ -176,10 +164,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'TableBase'", 8, tableBase.methods().list().size());
-    IMethod tableBase1 = SdkAssert.assertMethodExist(tableBase, "TableBase", new String[]{});
-    Assert.assertTrue(tableBase1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableBase1, null);
+    Assert.assertEquals("method count of 'TableBase'", 7, tableBase.methods().list().size());
     IMethod addRow = SdkAssert.assertMethodExist(tableBase, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QTableBaseRowData;");
     SdkAssert.assertAnnotation(addRow, "java.lang.Override");
@@ -225,10 +210,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(m_create, 2);
     SdkAssert.assertFieldSignature(m_create, "QString;");
 
-    Assert.assertEquals("method count of 'TableBaseRowData'", 5, tableBaseRowData.methods().list().size());
-    IMethod tableBaseRowData1 = SdkAssert.assertMethodExist(tableBaseRowData, "TableBaseRowData", new String[]{});
-    Assert.assertTrue(tableBaseRowData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableBaseRowData1, null);
+    Assert.assertEquals("method count of 'TableBaseRowData'", 4, tableBaseRowData.methods().list().size());
     IMethod getDefault = SdkAssert.assertMethodExist(tableBaseRowData, "getDefault", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getDefault, "QString;");
     IMethod setDefault = SdkAssert.assertMethodExist(tableBaseRowData, "setDefault", new String[]{"QString;"});
@@ -256,10 +238,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsIgnoreExFormData'", 2, tableFieldWithIgnoredColumnsIgnoreExFormData.methods().list().size());
-    IMethod tableFieldWithIgnoredColumnsIgnoreExFormData1 = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsIgnoreExFormData, "TableFieldWithIgnoredColumnsIgnoreExFormData", new String[]{});
-    Assert.assertTrue(tableFieldWithIgnoredColumnsIgnoreExFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableFieldWithIgnoredColumnsIgnoreExFormData1, null);
+    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsIgnoreExFormData'", 1, tableFieldWithIgnoredColumnsIgnoreExFormData.methods().list().size());
     IMethod getTableIgnoreEx = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsIgnoreExFormData, "getTableIgnoreEx", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTableIgnoreEx, "QTableIgnoreEx;");
 
@@ -276,10 +255,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'TableIgnoreEx'", 8, tableIgnoreEx.methods().list().size());
-    IMethod tableIgnoreEx1 = SdkAssert.assertMethodExist(tableIgnoreEx, "TableIgnoreEx", new String[]{});
-    Assert.assertTrue(tableIgnoreEx1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableIgnoreEx1, null);
+    Assert.assertEquals("method count of 'TableIgnoreEx'", 7, tableIgnoreEx.methods().list().size());
     IMethod addRow = SdkAssert.assertMethodExist(tableIgnoreEx, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QTableIgnoreExRowData;");
     SdkAssert.assertAnnotation(addRow, "java.lang.Override");
@@ -313,10 +289,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'TableIgnoreExRowData'", 1, tableIgnoreExRowData.methods().list().size());
-    IMethod tableIgnoreExRowData1 = SdkAssert.assertMethodExist(tableIgnoreExRowData, "TableIgnoreExRowData", new String[]{});
-    Assert.assertTrue(tableIgnoreExRowData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableIgnoreExRowData1, null);
+    Assert.assertEquals("method count of 'TableIgnoreExRowData'", 0, tableIgnoreExRowData.methods().list().size());
 
     Assert.assertEquals("inner types count of 'TableIgnoreExRowData'", 0, tableIgnoreExRowData.innerTypes().list().size());
   }
@@ -336,10 +309,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsDefaultCreateExFormData'", 2, tableFieldWithIgnoredColumnsDefaultCreateExFormData.methods().list().size());
-    IMethod tableFieldWithIgnoredColumnsDefaultCreateExFormData1 = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsDefaultCreateExFormData, "TableFieldWithIgnoredColumnsDefaultCreateExFormData", new String[]{});
-    Assert.assertTrue(tableFieldWithIgnoredColumnsDefaultCreateExFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableFieldWithIgnoredColumnsDefaultCreateExFormData1, null);
+    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsDefaultCreateExFormData'", 1, tableFieldWithIgnoredColumnsDefaultCreateExFormData.methods().list().size());
     IMethod getTableDefaultCreateEx = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsDefaultCreateExFormData, "getTableDefaultCreateEx", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTableDefaultCreateEx, "QTableDefaultCreateEx;");
 
@@ -356,10 +326,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'TableDefaultCreateEx'", 8, tableDefaultCreateEx.methods().list().size());
-    IMethod tableDefaultCreateEx1 = SdkAssert.assertMethodExist(tableDefaultCreateEx, "TableDefaultCreateEx", new String[]{});
-    Assert.assertTrue(tableDefaultCreateEx1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableDefaultCreateEx1, null);
+    Assert.assertEquals("method count of 'TableDefaultCreateEx'", 7, tableDefaultCreateEx.methods().list().size());
     IMethod addRow = SdkAssert.assertMethodExist(tableDefaultCreateEx, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QTableDefaultCreateExRowData;");
     SdkAssert.assertAnnotation(addRow, "java.lang.Override");
@@ -399,10 +366,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(m_ignoreDefaultCreate, 2);
     SdkAssert.assertFieldSignature(m_ignoreDefaultCreate, "QString;");
 
-    Assert.assertEquals("method count of 'TableDefaultCreateExRowData'", 3, tableDefaultCreateExRowData.methods().list().size());
-    IMethod tableDefaultCreateExRowData1 = SdkAssert.assertMethodExist(tableDefaultCreateExRowData, "TableDefaultCreateExRowData", new String[]{});
-    Assert.assertTrue(tableDefaultCreateExRowData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableDefaultCreateExRowData1, null);
+    Assert.assertEquals("method count of 'TableDefaultCreateExRowData'", 2, tableDefaultCreateExRowData.methods().list().size());
     IMethod getIgnoreDefaultCreate = SdkAssert.assertMethodExist(tableDefaultCreateExRowData, "getIgnoreDefaultCreate", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getIgnoreDefaultCreate, "QString;");
     IMethod setIgnoreDefaultCreate = SdkAssert.assertMethodExist(tableDefaultCreateExRowData, "setIgnoreDefaultCreate", new String[]{"QString;"});
@@ -426,10 +390,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsCreateExFormData'", 2, tableFieldWithIgnoredColumnsCreateExFormData.methods().list().size());
-    IMethod tableFieldWithIgnoredColumnsCreateExFormData1 = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsCreateExFormData, "TableFieldWithIgnoredColumnsCreateExFormData", new String[]{});
-    Assert.assertTrue(tableFieldWithIgnoredColumnsCreateExFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableFieldWithIgnoredColumnsCreateExFormData1, null);
+    Assert.assertEquals("method count of 'TableFieldWithIgnoredColumnsCreateExFormData'", 1, tableFieldWithIgnoredColumnsCreateExFormData.methods().list().size());
     IMethod getTableCreateEx = SdkAssert.assertMethodExist(tableFieldWithIgnoredColumnsCreateExFormData, "getTableCreateEx", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTableCreateEx, "QTableCreateEx;");
 
@@ -446,10 +407,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'TableCreateEx'", 8, tableCreateEx.methods().list().size());
-    IMethod tableCreateEx1 = SdkAssert.assertMethodExist(tableCreateEx, "TableCreateEx", new String[]{});
-    Assert.assertTrue(tableCreateEx1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableCreateEx1, null);
+    Assert.assertEquals("method count of 'TableCreateEx'", 7, tableCreateEx.methods().list().size());
     IMethod addRow = SdkAssert.assertMethodExist(tableCreateEx, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QTableCreateExRowData;");
     SdkAssert.assertAnnotation(addRow, "java.lang.Override");
@@ -489,10 +447,7 @@ public class TableFieldWithIgnoredColumnsTest {
     SdkAssert.assertHasFlags(m_ignoreCreate, 2);
     SdkAssert.assertFieldSignature(m_ignoreCreate, "QString;");
 
-    Assert.assertEquals("method count of 'TableCreateExRowData'", 3, tableCreateExRowData.methods().list().size());
-    IMethod tableCreateExRowData1 = SdkAssert.assertMethodExist(tableCreateExRowData, "TableCreateExRowData", new String[]{});
-    Assert.assertTrue(tableCreateExRowData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(tableCreateExRowData1, null);
+    Assert.assertEquals("method count of 'TableCreateExRowData'", 2, tableCreateExRowData.methods().list().size());
     IMethod getIgnoreCreate = SdkAssert.assertMethodExist(tableCreateExRowData, "getIgnoreCreate", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getIgnoreCreate, "QString;");
     IMethod setIgnoreCreate = SdkAssert.assertMethodExist(tableCreateExRowData, "setIgnoreCreate", new String[]{"QString;"});

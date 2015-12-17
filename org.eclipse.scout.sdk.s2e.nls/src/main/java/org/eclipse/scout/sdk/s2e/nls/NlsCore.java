@@ -179,10 +179,6 @@ public class NlsCore extends AbstractUIPlugin {
   }
 
   public IDialogSettings getDialogSettingsSection(String name) {
-    return getDialogSettingsSection(name, true);
-  }
-
-  public IDialogSettings getDialogSettingsSection(String name, boolean createIfNotExist) {
     IDialogSettings dialogSettings = getDialogSettings();
     IDialogSettings section = dialogSettings.getSection(name);
     if (section == null) {

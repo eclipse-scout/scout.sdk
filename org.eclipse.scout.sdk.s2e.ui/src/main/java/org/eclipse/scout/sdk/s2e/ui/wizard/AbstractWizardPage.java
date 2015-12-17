@@ -228,6 +228,10 @@ public abstract class AbstractWizardPage extends WizardPage {
     getControl().setFocus();
   }
 
+  /**
+   * @param type
+   *          defines the data type returned
+   */
   @SuppressWarnings("unchecked")
   public <T extends Object> T getProperty(String key, Class<T> type) {
     return (T) m_propertySupport.getProperty(key);

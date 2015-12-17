@@ -111,6 +111,9 @@ public class DefaultAstVisitor extends ASTVisitor {
     super(visitDocTags);
   }
 
+  /**
+   * @param node
+   */
   protected boolean visitNode(ASTNode node) {
     return true;
   }

@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.ui.wizard;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
@@ -21,10 +20,10 @@ import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 /**
  * <h3>AbstractWizard</h3>
  */
-public abstract class AbstractWizard extends Wizard implements IWizard {
+public abstract class AbstractWizard extends Wizard {
 
   public AbstractWizard() {
-    setDialogSettings(S2ESdkUiActivator.getDefault().getDialogSettingsSection(getDialogSettingsKey(), true));
+    setDialogSettings(S2ESdkUiActivator.getDefault().getDialogSettingsSection(getDialogSettingsKey()));
   }
 
   /**

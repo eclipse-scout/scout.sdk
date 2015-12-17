@@ -46,10 +46,7 @@ public class MasterFieldFormDataTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'MasterFieldTestFormData'", 3, masterFieldTestFormData.methods().list().size());
-    IMethod masterFieldTestFormData1 = SdkAssert.assertMethodExist(masterFieldTestFormData, "MasterFieldTestFormData", new String[]{});
-    Assert.assertTrue(masterFieldTestFormData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(masterFieldTestFormData1, null);
+    Assert.assertEquals("method count of 'MasterFieldTestFormData'", 2, masterFieldTestFormData.methods().list().size());
     IMethod getMyMaster = SdkAssert.assertMethodExist(masterFieldTestFormData, "getMyMaster", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getMyMaster, "QMyMaster;");
     IMethod getMySlave = SdkAssert.assertMethodExist(masterFieldTestFormData, "getMySlave", new String[]{});
@@ -67,10 +64,7 @@ public class MasterFieldFormDataTest {
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'MyMaster'", 1, myMaster.methods().list().size());
-    IMethod myMaster1 = SdkAssert.assertMethodExist(myMaster, "MyMaster", new String[]{});
-    Assert.assertTrue(myMaster1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(myMaster1, null);
+    Assert.assertEquals("method count of 'MyMaster'", 0, myMaster.methods().list().size());
 
     Assert.assertEquals("inner types count of 'MyMaster'", 0, myMaster.innerTypes().list().size());
     // type MySlave
@@ -84,10 +78,7 @@ public class MasterFieldFormDataTest {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'MySlave'", 1, mySlave.methods().list().size());
-    IMethod mySlave1 = SdkAssert.assertMethodExist(mySlave, "MySlave", new String[]{});
-    Assert.assertTrue(mySlave1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(mySlave1, null);
+    Assert.assertEquals("method count of 'MySlave'", 0, mySlave.methods().list().size());
 
     Assert.assertEquals("inner types count of 'MySlave'", 0, mySlave.innerTypes().list().size());
   }

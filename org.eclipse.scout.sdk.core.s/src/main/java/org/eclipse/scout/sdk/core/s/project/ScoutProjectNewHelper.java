@@ -108,7 +108,7 @@ public final class ScoutProjectNewHelper {
     // create command
     String[] authKeysForWar = CoreUtils.generateKeyPair();
     String[] authKeysForDev = CoreUtils.generateKeyPair();
-    String[] args = new String[]{"archetype:generate", "-B", "-X",
+    String[] args = new String[]{"archetype:generate", "-B",
         "-DarchetypeGroupId=" + archetypeGroupId, "-DarchetypeArtifactId=" + archeTypeArtifactId, "-DarchetypeVersion=" + archetypeVersion,
         "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + pck,
         "-DdisplayName=" + displayName, "-DscoutAuthPublicKey=" + authKeysForWar[1], "-DscoutAuthPrivateKey=" + authKeysForWar[0], "-DscoutAuthPublicKeyDev=" + authKeysForDev[1], "-DscoutAuthPrivateKeyDev=" + authKeysForDev[0],
