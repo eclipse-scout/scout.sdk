@@ -79,9 +79,10 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           else {
             fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getJavaEnvironment());
 
-            // special case if a boolean (primitive!) property has the same name as a form field -> show warning
+            // special case if a property has the same name as a form field -> show warning
             for (IMethodSourceBuilder msb : getMethods()) {
-              if (SIG_FOR_IS_METHOD_NAME.equals(msb.getReturnTypeSignature()) && ("is" + formDataTypeName).equals(msb.getElementName())) {
+              String methodName = CoreUtils.getGetterMethodPrefix(msb.getReturnTypeSignature()) + formDataTypeName;
+              if (methodName.equals(msb.getElementName())) {
                 fieldSourceBuilder.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder("TODO [everyone] Duplicate names '" + formDataTypeName + "'. Rename property or form field."));
                 break;
               }

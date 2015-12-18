@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.sourcebuilder.method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
@@ -38,6 +39,8 @@ import org.eclipse.scout.sdk.core.util.IFilter;
  * @since 3.10.0 07.03.2013
  */
 public final class MethodSourceBuilderFactory {
+  private static final String FIELD_PREFIX = "m_";
+
   private MethodSourceBuilderFactory() {
   }
 
@@ -174,26 +177,14 @@ public final class MethodSourceBuilderFactory {
   }
 
   public static IMethodSourceBuilder createGetter(String fieldName, String signature, int flags, boolean autoCreateBody) {
-    StringBuilder methodName = new StringBuilder();
-    if (ISignatureConstants.SIG_BOOLEAN.equals(signature)) {
-      methodName.append("is");
-    }
-    else {
-      methodName.append("get");
-    }
-    String field = fieldName.replaceFirst("m\\_", "");
-    if (field.length() > 0) {
-      methodName.append(Character.toUpperCase(field.charAt(0)));
-    }
-    if (field.length() > 1) {
-      methodName.append(field.substring(1));
-    }
+    StringBuilder methodName = new StringBuilder(CoreUtils.getGetterMethodPrefix(signature));
+    methodName.append(getGetterSetterBaseName(fieldName));
     IMethodSourceBuilder getterBuilder = new MethodSourceBuilder(methodName.toString());
     getterBuilder.setReturnTypeSignature(signature);
     getterBuilder.setFlags(flags);
     getterBuilder.setComment(CommentSourceBuilderFactory.createDefaultGetterMethodComment(getterBuilder));
     if (autoCreateBody) {
-      getterBuilder.setBody(new RawSourceBuilder("return " + fieldName + ";"));
+      getterBuilder.setBody(new RawSourceBuilder(new StringBuilder("return ").append(fieldName).append(';').toString()));
     }
     return getterBuilder;
   }
@@ -206,19 +197,47 @@ public final class MethodSourceBuilderFactory {
     return createSetter(fieldName, signature, Flags.AccPublic, true);
   }
 
+  private static String getGetterSetterBaseName(String fieldName) {
+    String name = fieldName;
+    if (name.startsWith(FIELD_PREFIX)) {
+      name = name.substring(FIELD_PREFIX.length());
+    }
+    return CoreUtils.ensureStartWithUpperCase(name);
+  }
+
   public static IMethodSourceBuilder createSetter(String fieldName, String signature, int flags, boolean autoCreateBody) {
-    StringBuilder methodName = new StringBuilder();
-    methodName.append("set");
-    String field = fieldName.replaceFirst("m\\_", "");
-    String paramName = CoreUtils.ensureValidParameterName(field);
-    methodName.append(CoreUtils.ensureStartWithUpperCase(field));
-    IMethodSourceBuilder setterBuilder = new MethodSourceBuilder(methodName.toString());
+    return createSetter(fieldName, signature, flags, autoCreateBody, null);
+  }
+
+  public static IMethodSourceBuilder createSetter(String fieldName, String signature, int flags, boolean autoCreateBody, String paramNamePrefix) {
+    String name = getGetterSetterBaseName(fieldName);
+
+    IMethodSourceBuilder setterBuilder = new MethodSourceBuilder(new StringBuilder("set").append(name).toString());
     setterBuilder.setFlags(flags);
     setterBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
+
+    // parameter
+    StringBuilder paramNameBuilder = new StringBuilder();
+    if (StringUtils.isNotBlank(paramNamePrefix)) {
+      paramNameBuilder.append(paramNamePrefix);
+      paramNameBuilder.append(name);
+    }
+    else {
+      paramNameBuilder.append(CoreUtils.ensureStartWithLowerCase(name));
+    }
+    String paramName = CoreUtils.ensureValidParameterName(paramNameBuilder.toString());
     setterBuilder.addParameter(new MethodParameterSourceBuilder(paramName, signature));
+
+    // comment
     setterBuilder.setComment(CommentSourceBuilderFactory.createDefaultSetterMethodComment(setterBuilder));
+
+    // body
     if (autoCreateBody) {
-      setterBuilder.setBody(new RawSourceBuilder(fieldName + " = " + paramName + ";"));
+      StringBuilder body = new StringBuilder(fieldName);
+      body.append(" = ");
+      body.append(paramName);
+      body.append(';');
+      setterBuilder.setBody(new RawSourceBuilder(body.toString()));
     }
     return setterBuilder;
   }

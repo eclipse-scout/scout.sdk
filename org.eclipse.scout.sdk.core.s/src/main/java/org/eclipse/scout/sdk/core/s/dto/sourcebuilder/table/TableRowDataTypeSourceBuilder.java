@@ -129,7 +129,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
       addSortedMethod(new CompositeObject(SortedMemberKeyFactory.METHOD_PROPERTY_ACCESS, i, 1, getterBuilder), getterBuilder);
 
       // setter
-      IMethodSourceBuilder setterBuilder = MethodSourceBuilderFactory.createSetter(memberFieldBuilder);
+      IMethodSourceBuilder setterBuilder = MethodSourceBuilderFactory.createSetter(memberFieldBuilder.getElementName(), memberFieldBuilder.getSignature(), Flags.AccPublic, true, "new");
       addSortedMethod(new CompositeObject(SortedMemberKeyFactory.METHOD_PROPERTY_ACCESS, i, 2, setterBuilder), setterBuilder);
 
       i++;

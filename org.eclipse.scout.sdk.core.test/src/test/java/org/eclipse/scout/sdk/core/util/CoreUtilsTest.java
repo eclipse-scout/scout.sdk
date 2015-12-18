@@ -11,17 +11,21 @@
 package org.eclipse.scout.sdk.core.util;
 
 import java.io.Serializable;
+import java.security.GeneralSecurityException;
 import java.util.AbstractList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel1;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel2;
 import org.eclipse.scout.sdk.core.fixture.MarkerAnnotation;
 import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
@@ -49,6 +53,94 @@ public class CoreUtilsTest {
     Assert.assertNull(CoreUtils.fromStringLiteral("a"));
     Assert.assertEquals("a\nb", CoreUtils.fromStringLiteral("\"a\\nb\""));
     Assert.assertEquals("a\"b", CoreUtils.fromStringLiteral("\"a\\\"b\""));
+  }
+
+  @Test
+  public void testGenerateKeyPair() throws GeneralSecurityException {
+    String[] generateKeyPair = CoreUtils.generateKeyPair();
+    Assert.assertEquals(2, generateKeyPair.length);
+    Assert.assertTrue(StringUtils.isNotBlank(generateKeyPair[0]));
+    Assert.assertTrue(StringUtils.isNotBlank(generateKeyPair[1]));
+  }
+
+  @Test
+  public void testGetPrimaryType() {
+    IType baseClassType = CoreTestingUtils.getBaseClassType();
+    Assert.assertSame(baseClassType, CoreUtils.getPrimaryType(baseClassType));
+    Assert.assertSame(baseClassType, CoreUtils.getPrimaryType(baseClassType.innerTypes().first()));
+    Assert.assertSame(null, CoreUtils.getPrimaryType(null));
+  }
+
+  @Test
+  public void testBoxPrimitive() {
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Boolean, CoreUtils.boxPrimitive(IJavaRuntimeTypes._boolean));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Byte, CoreUtils.boxPrimitive(IJavaRuntimeTypes._byte));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Character, CoreUtils.boxPrimitive(IJavaRuntimeTypes._char));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Double, CoreUtils.boxPrimitive(IJavaRuntimeTypes._double));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Float, CoreUtils.boxPrimitive(IJavaRuntimeTypes._float));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Integer, CoreUtils.boxPrimitive(IJavaRuntimeTypes._int));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Long, CoreUtils.boxPrimitive(IJavaRuntimeTypes._long));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Short, CoreUtils.boxPrimitive(IJavaRuntimeTypes._short));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Void, CoreUtils.boxPrimitive(IJavaRuntimeTypes._void));
+
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Boolean, CoreUtils.boxPrimitive(IJavaRuntimeTypes.java_lang_Boolean));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Byte, CoreUtils.boxPrimitive(IJavaRuntimeTypes.java_lang_Byte));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Character, CoreUtils.boxPrimitive(IJavaRuntimeTypes.java_lang_Character));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Double, CoreUtils.boxPrimitive(IJavaRuntimeTypes.java_lang_Double));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Float, CoreUtils.boxPrimitive(IJavaRuntimeTypes.java_lang_Float));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Integer, CoreUtils.boxPrimitive(IJavaRuntimeTypes.java_lang_Integer));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Long, CoreUtils.boxPrimitive(IJavaRuntimeTypes.java_lang_Long));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Short, CoreUtils.boxPrimitive(IJavaRuntimeTypes.java_lang_Short));
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Void, CoreUtils.boxPrimitive(IJavaRuntimeTypes.java_lang_Void));
+  }
+
+  @Test
+  public void testUnboxToPrimitive() {
+    Assert.assertEquals(IJavaRuntimeTypes._boolean, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes._boolean));
+    Assert.assertEquals(IJavaRuntimeTypes._byte, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes._byte));
+    Assert.assertEquals(IJavaRuntimeTypes._char, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes._char));
+    Assert.assertEquals(IJavaRuntimeTypes._double, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes._double));
+    Assert.assertEquals(IJavaRuntimeTypes._float, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes._float));
+    Assert.assertEquals(IJavaRuntimeTypes._int, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes._int));
+    Assert.assertEquals(IJavaRuntimeTypes._long, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes._long));
+    Assert.assertEquals(IJavaRuntimeTypes._short, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes._short));
+    Assert.assertEquals(IJavaRuntimeTypes._void, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes._void));
+
+    Assert.assertEquals(IJavaRuntimeTypes._boolean, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes.java_lang_Boolean));
+    Assert.assertEquals(IJavaRuntimeTypes._byte, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes.java_lang_Byte));
+    Assert.assertEquals(IJavaRuntimeTypes._char, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes.java_lang_Character));
+    Assert.assertEquals(IJavaRuntimeTypes._double, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes.java_lang_Double));
+    Assert.assertEquals(IJavaRuntimeTypes._float, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes.java_lang_Float));
+    Assert.assertEquals(IJavaRuntimeTypes._int, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes.java_lang_Integer));
+    Assert.assertEquals(IJavaRuntimeTypes._long, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes.java_lang_Long));
+    Assert.assertEquals(IJavaRuntimeTypes._short, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes.java_lang_Short));
+    Assert.assertEquals(IJavaRuntimeTypes._void, CoreUtils.unboxToPrimitive(IJavaRuntimeTypes.java_lang_Void));
+  }
+
+  @Test
+  public void testUserName() {
+    String testUserName = "testuser";
+    String backup = CoreUtils.getUsername();
+    CoreUtils.setUsernameForThread(testUserName);
+    try {
+      Assert.assertEquals(testUserName, CoreUtils.getUsername());
+      String content = "testcontent";
+      String commentBlock = CoreUtils.getCommentBlock(content);
+      Assert.assertTrue(commentBlock.contains("[" + testUserName + "] "));
+      Assert.assertTrue(commentBlock.contains(content));
+    }
+    finally {
+      CoreUtils.setUsernameForThread(backup);
+    }
+  }
+
+  @Test
+  public void testGetGetterMethodPrefix() {
+    Assert.assertEquals("is", CoreUtils.getGetterMethodPrefix(ISignatureConstants.SIG_BOOLEAN));
+    Assert.assertEquals("get", CoreUtils.getGetterMethodPrefix(Signature.createTypeSignature(IJavaRuntimeTypes.java_lang_Boolean))); // must be get for java bean specification compliance!
+    Assert.assertEquals("is", CoreUtils.getGetterMethodPrefix(Signature.createTypeSignature(IJavaRuntimeTypes._boolean)));
+    Assert.assertEquals("get", CoreUtils.getGetterMethodPrefix(Signature.createTypeSignature(IJavaRuntimeTypes.java_lang_Object)));
+    Assert.assertEquals("get", CoreUtils.getGetterMethodPrefix(null));
   }
 
   @Test
@@ -142,10 +234,32 @@ public class CoreUtilsTest {
   }
 
   @Test
+  public void testGetDefaultValueOf() {
+    Assert.assertEquals(null, CoreUtils.getDefaultValueOf(null));
+    Assert.assertEquals(Boolean.FALSE.toString(), CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_BOOLEAN));
+    Assert.assertEquals("0", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_BYTE));
+    Assert.assertEquals("0", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_CHAR));
+    Assert.assertEquals("0.0", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_DOUBLE));
+    Assert.assertEquals("0.0f", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_FLOAT));
+    Assert.assertEquals("0", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_INT));
+    Assert.assertEquals("0L", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_LONG));
+    Assert.assertEquals("0", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_SHORT));
+    Assert.assertEquals(null, CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_VOID));
+    Assert.assertEquals("null", CoreUtils.getDefaultValueOf(Signature.createTypeSignature(IJavaRuntimeTypes.java_lang_Boolean)));
+    Assert.assertEquals("null", CoreUtils.getDefaultValueOf(Signature.createTypeSignature(IJavaRuntimeTypes.java_lang_Object)));
+  }
+
+  @Test
   public void testIsOnClasspath() {
-    Assert.assertTrue(CoreUtils.isOnClasspath(CoreTestingUtils.getChildClassIcu().javaEnvironment(), IJavaRuntimeTypes.java_lang_Long));
-    Assert.assertTrue(CoreUtils.isOnClasspath(CoreTestingUtils.getChildClassIcu().javaEnvironment(), org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
-    Assert.assertFalse(CoreUtils.isOnClasspath(CoreTestingUtils.getChildClassIcu().javaEnvironment(), "not.existing.Type"));
+    IType baseClassType = CoreTestingUtils.getBaseClassType();
+    IJavaEnvironment environment = baseClassType.javaEnvironment();
+    Assert.assertTrue(CoreUtils.isOnClasspath(environment, baseClassType));
+    Assert.assertFalse(CoreUtils.isOnClasspath(environment, (IType) null));
+
+    Assert.assertTrue(CoreUtils.isOnClasspath(environment, IJavaRuntimeTypes.java_lang_Long));
+    Assert.assertTrue(CoreUtils.isOnClasspath(environment, org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
+    Assert.assertFalse(CoreUtils.isOnClasspath(environment, "not.existing.Type"));
+    Assert.assertFalse(CoreUtils.isOnClasspath(environment, (String) null));
   }
 
   @Test

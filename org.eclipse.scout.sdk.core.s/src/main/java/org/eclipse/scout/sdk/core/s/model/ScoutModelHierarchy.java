@@ -120,6 +120,7 @@ public final class ScoutModelHierarchy {
     addContainerElement(IScoutRuntimeTypes.AbstractForm, IScoutRuntimeTypes.IToolButton);
     addContainerElement(IScoutRuntimeTypes.AbstractForm, IScoutRuntimeTypes.IFormHandler);
     addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IToolButton);
+    addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IFormField);
     addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IFormHandler);
     addContainerElement(IScoutRuntimeTypes.AbstractWizard, IScoutRuntimeTypes.IWizardStep);
     addContainerElement(IScoutRuntimeTypes.AbstractWizardExtension, IScoutRuntimeTypes.IWizardStep);
@@ -222,7 +223,7 @@ public final class ScoutModelHierarchy {
 
   /**
    * Checks if scoutTypeFqn is a subtype of scoutSuperTypeFqn.
-   * 
+   *
    * @param scoutTypeFqn
    *          The fully qualified interface name of the possible sub type.
    * @param scoutSuperTypeFqn

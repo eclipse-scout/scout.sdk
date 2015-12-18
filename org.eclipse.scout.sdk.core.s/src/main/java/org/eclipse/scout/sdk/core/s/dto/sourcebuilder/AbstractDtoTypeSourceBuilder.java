@@ -53,7 +53,6 @@ import org.eclipse.scout.sdk.core.util.IFilter;
 public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder implements IDtoSourceBuilder {
 
   private static final Pattern ENDING_SEMICOLON_PATTERN = Pattern.compile("\\;$");
-  protected static final String SIG_FOR_IS_METHOD_NAME = ISignatureConstants.SIG_BOOLEAN;
 
   private final IType m_modelType;
   private final IJavaEnvironment m_env;
@@ -187,7 +186,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
       addSortedMethod(SortedMemberKeyFactory.createMethodPropertyKey(propertyGetterBuilder), propertyGetterBuilder);
 
       // legacy getter
-      IMethodSourceBuilder legacyPropertyGetterBuilder = new MethodSourceBuilder((SIG_FOR_IS_METHOD_NAME.equals(resolvedSignature) ? "is" : "get") + upperCaseBeanName);
+      IMethodSourceBuilder legacyPropertyGetterBuilder = new MethodSourceBuilder(CoreUtils.getGetterMethodPrefix(resolvedSignature) + upperCaseBeanName);
       legacyPropertyGetterBuilder.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
       legacyPropertyGetterBuilder.setFlags(Flags.AccPublic);
       legacyPropertyGetterBuilder.setReturnTypeSignature(resolvedSignature);
@@ -211,28 +210,28 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
     StringBuilder source = new StringBuilder();
     source.append("return ");
     if (ISignatureConstants.SIG_BOOLEAN.equals(nonArraySig)) {
-      source.append("(get" + propertyName + "().getValue() == null) ? (false) : (get" + propertyName + "().getValue());");
+      source.append("get" + propertyName + "().getValue() == null ? false : get" + propertyName + "().getValue();");
     }
     else if (ISignatureConstants.SIG_BYTE.equals(nonArraySig)) {
-      source.append("(get" + propertyName + "().getValue() == null) ? (0) : (get" + propertyName + "().getValue());");
+      source.append("get" + propertyName + "().getValue() == null ? 0 : get" + propertyName + "().getValue();");
     }
     else if (ISignatureConstants.SIG_CHAR.equals(nonArraySig)) {
-      source.append("(get" + propertyName + "().getValue() == null) ? ('\u0000') : (get" + propertyName + "().getValue());");
+      source.append("get" + propertyName + "().getValue() == null ? '\u0000' : get" + propertyName + "().getValue();");
     }
     else if (ISignatureConstants.SIG_DOUBLE.equals(nonArraySig)) {
-      source.append("(get" + propertyName + "().getValue() == null) ? (0.0d) : (get" + propertyName + "().getValue());");
+      source.append("get" + propertyName + "().getValue() == null ? 0.0 : get" + propertyName + "().getValue();");
     }
     else if (ISignatureConstants.SIG_FLOAT.equals(nonArraySig)) {
-      source.append("(get" + propertyName + "().getValue() == null) ? (0.0f) : (get" + propertyName + "().getValue());");
+      source.append("get" + propertyName + "().getValue() == null ? 0.0f : get" + propertyName + "().getValue();");
     }
     else if (ISignatureConstants.SIG_INT.equals(nonArraySig)) {
-      source.append("(get" + propertyName + "().getValue() == null) ? (0) : (get" + propertyName + "().getValue());");
+      source.append("get" + propertyName + "().getValue() == null ? 0 : get" + propertyName + "().getValue();");
     }
     else if (ISignatureConstants.SIG_LONG.equals(nonArraySig)) {
-      source.append("(get" + propertyName + "().getValue() == null) ? (0L) : (get" + propertyName + "().getValue());");
+      source.append("get" + propertyName + "().getValue() == null ? 0L : get" + propertyName + "().getValue();");
     }
     else if (ISignatureConstants.SIG_SHORT.equals(nonArraySig)) {
-      source.append("(get" + propertyName + "().getValue() == null) ? (0) : (get" + propertyName + "().getValue());");
+      source.append("get" + propertyName + "().getValue() == null ? 0 : get" + propertyName + "().getValue();");
     }
     else {
       source.append("get" + propertyName + "().getValue();");

@@ -164,6 +164,21 @@ public final class CoreUtils {
   }
 
   /**
+   * Gets the method prefix to use for getter methods having the given return type.
+   *
+   * @param returnTypeSignature
+   *          The return type signature of the method this prefix belongs to
+   * @return "is" if the return type is <code>boolean</code>. "get" otherwise. Note: <code>java.lang.Boolean</code> does
+   *         also return "get" to ensure bean specification compliance.
+   */
+  public static String getGetterMethodPrefix(String returnTypeSignature) {
+    if (ISignatureConstants.SIG_BOOLEAN.equals(returnTypeSignature)) {
+      return "is";
+    }
+    return "get";
+  }
+
+  /**
    * Reads all bytes from the given {@link InputStream} and converts them into a {@link StringBuilder} using the given
    * {@link Charset}.<br>
    *
@@ -365,25 +380,29 @@ public final class CoreUtils {
   /**
    * Gets the default value for the given signature data type.
    *
-   * @param parameter
+   * @param signature
    *          The signature data type for which the default return value should be returned.
-   * @return A {@link String} or <code>null</code> (for the void signature) holding the default value for the given data
-   *         type.
+   * @return A {@link String} holding the default value for the given signature. Returns <code>null</code> if the given
+   *         signature is the void type or <code>null</code>.
    */
-  public static String getDefaultValueOf(String parameter) {
-    if (parameter.length() != 1) {
+  public static String getDefaultValueOf(String signature) {
+    if (signature == null) {
+      return null;
+    }
+    if (signature.length() != 1) {
       // not a primitive type
       return "null";
     }
-    switch (parameter.charAt(0)) {
+    switch (signature.charAt(0)) {
       case ISignatureConstants.C_BOOLEAN:
         return Boolean.FALSE.toString();
       case ISignatureConstants.C_BYTE:
       case ISignatureConstants.C_CHAR:
-      case ISignatureConstants.C_DOUBLE:
       case ISignatureConstants.C_INT:
       case ISignatureConstants.C_SHORT:
         return "0";
+      case ISignatureConstants.C_DOUBLE:
+        return "0.0";
       case ISignatureConstants.C_LONG:
         return "0L";
       case ISignatureConstants.C_FLOAT:
@@ -690,8 +709,9 @@ public final class CoreUtils {
   }
 
   /**
-   * Tries to box a primitive type to its corresponding complex type.
-   * 
+   * Tries to box a primitive type to its corresponding complex type.<br>
+   * If the given name is already a boxed type (e.g. java.lang.Long), this method returns the input name.
+   *
    * @param name
    *          The primitive name (e.g. 'int' or 'boolean')
    * @return The corresponding fully qualified complex type name (e.g. java.lang.Long) or <code>null</code> if the given
@@ -717,14 +737,36 @@ public final class CoreUtils {
         return IJavaRuntimeTypes.java_lang_Double;
       case IJavaRuntimeTypes._void:
         return IJavaRuntimeTypes.java_lang_Void;
+      case IJavaRuntimeTypes.java_lang_Boolean:
+        return name;
+      case IJavaRuntimeTypes.java_lang_Character:
+        return name;
+      case IJavaRuntimeTypes.java_lang_Byte:
+        return name;
+      case IJavaRuntimeTypes.java_lang_Short:
+        return name;
+      case IJavaRuntimeTypes.java_lang_Integer:
+        return name;
+      case IJavaRuntimeTypes.java_lang_Long:
+        return name;
+      case IJavaRuntimeTypes.java_lang_Float:
+        return name;
+      case IJavaRuntimeTypes.java_lang_Double:
+        return name;
+      case IJavaRuntimeTypes.java_lang_Void:
+        return name;
       default:
         return null;
     }
   }
 
   /**
+   * Tries to unbox the given name to its corresponding primitive.<br>
+   * If the given fqn is already a primitive (e.g. "boolean"), this method returns the input fqn.
+   *
    * @param fqn
-   * @return
+   *          The fully qualified complex type name (e.g. java.lang.Long)
+   * @return The primitive type name or <code>null</code> if no primitive exists.
    */
   public static String unboxToPrimitive(String fqn) {
     switch (fqn) {
