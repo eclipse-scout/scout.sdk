@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.JavaEnvironmentImplementor;
@@ -37,12 +38,22 @@ public final class CoreTestingUtils {
   }
 
   /**
-   * @return a {@link IJavaEnvironment} containing the source folder <code>src/main/fixture</code>
+   * @return a {@link IJavaEnvironment} containing the source folder <code>src/main/fixture</code> and using a
+   *         {@link IFileLocator} with the test module itself as root
    */
   public static IJavaEnvironment createJavaEnvironment() {
+    return createJavaEnvironment(null);
+  }
+
+  /**
+   * @return a {@link IJavaEnvironment} containing the source folder <code>src/main/fixture</code> and the specified
+   *         fileLocator
+   */
+  public static IJavaEnvironment createJavaEnvironment(IFileLocator fileLocator) {
     return new JavaEnvironmentBuilder()
         .withoutScoutSdk()
         .withSourceFolder("src/main/fixture")
+        .withFileLocator(fileLocator)
         .build();
   }
 

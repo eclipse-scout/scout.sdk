@@ -58,6 +58,13 @@ public interface IJavaEnvironment {
   IUnresolvedType findUnresolvedType(String fqn);
 
   /**
+   * @return the resource file locator used to read files from the workspace module.
+   *         <p>
+   *         This method returns null if this {@link IJavaEnvironment} is not a workspace module.
+   */
+  IFileLocator getFileLocator();
+
+  /**
    * When file system changes occurred and the current {@link IType}, {@link ICompilationUnit} should not be lost, this
    * method can be called in order to reload the SPI core of the {@link IJavaEnvironment} and replace all SPI cores of
    * the wrapped classes with the updated version.

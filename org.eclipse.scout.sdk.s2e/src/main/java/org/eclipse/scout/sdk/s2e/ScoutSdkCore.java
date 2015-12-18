@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
+import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.internal.ClasspathEntry;
 import org.eclipse.scout.sdk.core.model.spi.internal.JavaEnvironmentWithJdt;
@@ -75,14 +77,22 @@ public final class ScoutSdkCore {
    */
   public static IJavaEnvironment createJavaEnvironment(IJavaProject javaProject) {
     Validate.notNull(javaProject);
-    return new JavaEnvironmentWithJdt(createClasspaths(javaProject)).wrap();
+    return new JavaEnvironmentWithJdt(createFileLocator(javaProject), createClasspaths(javaProject)).wrap();
   }
 
-  private static ClasspathEntry[] createClasspaths(IJavaProject... projects) {
+  private static IFileLocator createFileLocator(IJavaProject javaProject) {
+    final IProject project = javaProject.getProject();
+    return new IFileLocator() {
+      @Override
+      public File getFile(String path) {
+        return project.getFile(path).getFullPath().toFile();
+      }
+    };
+  }
+
+  private static ClasspathEntry[] createClasspaths(IJavaProject javaProject) {
     Set<ClasspathEntry> paths = new LinkedHashSet<>();
-    for (IJavaProject project : projects) {
-      appendPaths(paths, project);
-    }
+    appendPaths(paths, javaProject);
     return paths.toArray(new ClasspathEntry[paths.size()]);
   }
 

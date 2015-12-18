@@ -36,6 +36,7 @@ import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.AbstractJavaElementImplementor;
 import org.eclipse.scout.sdk.core.model.api.internal.JavaEnvironmentImplementor;
@@ -57,6 +58,7 @@ import org.eclipse.scout.sdk.core.util.SameCompositeObject;
  * @since 5.1.0
  */
 public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
+  private final IFileLocator m_fileLocator;
   private final ClasspathEntry[] m_classpaths;
   private final AstCompiler m_compiler;
   private final WorkspaceFileSystem m_nameEnv;
@@ -66,7 +68,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
 
   private IJavaEnvironment m_api;
 
-  public JavaEnvironmentWithJdt(ClasspathEntry[] classpaths) {
+  public JavaEnvironmentWithJdt(IFileLocator fileLocator, ClasspathEntry[] classpaths) {
+    m_fileLocator = fileLocator;
     m_classpaths = classpaths;
     m_nameEnv = new WorkspaceFileSystem(ClasspathEntry.toClassPaths(classpaths));
     m_compiler = new AstCompiler(m_nameEnv);
@@ -109,6 +112,11 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
   }
 
   @Override
+  public IFileLocator getFileLocator() {
+    return m_fileLocator;
+  }
+
+  @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public synchronized JavaEnvironmentSpi reload() {
     JavaEnvironmentWithJdt oldEnv = this;
@@ -119,7 +127,7 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
       newClasspath.add(entry);
     }
 
-    JavaEnvironmentWithJdt newEnv = new JavaEnvironmentWithJdt(newClasspath.toArray(new ClasspathEntry[newClasspath.size()]));
+    JavaEnvironmentWithJdt newEnv = new JavaEnvironmentWithJdt(m_fileLocator, newClasspath.toArray(new ClasspathEntry[newClasspath.size()]));
     for (org.eclipse.jdt.internal.compiler.env.ICompilationUnit cu : oldEnv.m_nameEnv.getOverrideCompilationUnits()) {
       newEnv.m_nameEnv.addOverrideCompilationUnit(cu);
     }

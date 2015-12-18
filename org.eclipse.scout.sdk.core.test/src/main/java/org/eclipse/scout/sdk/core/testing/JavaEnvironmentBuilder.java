@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
+import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.internal.ClasspathEntry;
 import org.eclipse.scout.sdk.core.model.spi.internal.JavaEnvironmentWithJdt;
@@ -44,6 +45,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
  */
 public final class JavaEnvironmentBuilder {
   private final File m_curDir = new File("").getAbsoluteFile();
+  private IFileLocator m_fileLocator;
   private boolean m_includeRunningClasspath = true;
   private boolean m_includeSources = true;
   private final List<Pattern> m_sourceExcludes = new ArrayList<>();
@@ -140,6 +142,11 @@ public final class JavaEnvironmentBuilder {
     if (sourcePath != null) {
       appendSourcePath(new File(sourcePath));
     }
+    return this;
+  }
+
+  public JavaEnvironmentBuilder withFileLocator(IFileLocator fileLocator) {
+    m_fileLocator = fileLocator;
     return this;
   }
 
@@ -288,6 +295,19 @@ public final class JavaEnvironmentBuilder {
     }
   }
 
+  protected IFileLocator createFileLocator() {
+    if (m_fileLocator != null) {
+      return m_fileLocator;
+    }
+    final File projectDir = currentDirectory();
+    return new IFileLocator() {
+      @Override
+      public File getFile(String path) {
+        return new File(projectDir, path);
+      }
+    };
+  }
+
   public IJavaEnvironment build() {
     if (m_includeRunningClasspath) {
       collectBootstrapClassPath();
@@ -300,7 +320,7 @@ public final class JavaEnvironmentBuilder {
     Collection<ClasspathEntry> all = new ArrayList<>();
     all.addAll(m_srcPaths.values());
     all.addAll(m_binPaths.values());
-    return new JavaEnvironmentWithJdt(all.toArray(new ClasspathEntry[all.size()])).wrap();
+    return new JavaEnvironmentWithJdt(createFileLocator(), all.toArray(new ClasspathEntry[all.size()])).wrap();
   }
 
 }

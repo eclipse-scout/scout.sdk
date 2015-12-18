@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.model.spi;
 
 import java.util.Collection;
 
+import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 
 /**
@@ -36,6 +37,13 @@ public interface JavaEnvironmentSpi {
    * @return The {@link Iype} matching the given fully qualified name or <code>null</code> if it could not be found.
    */
   TypeSpi findType(String fqn);
+
+  /**
+   * @return the file locator used to read files from the workspace module.
+   *         <p>
+   *         This method returns null if this {@link IJavaEnvironment} is not a workspace module.
+   */
+  IFileLocator getFileLocator();
 
   /**
    * @return the new {@link JavaEnvironmentSpi}. This new environment is automatically published to all existing api

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model.api.internal;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.IUnresolvedType;
 import org.eclipse.scout.sdk.core.model.api.MissingTypeException;
@@ -51,6 +52,11 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
       //nop
     }
     return new UnresolvedTypeImplementor(this, fqn);
+  }
+
+  @Override
+  public IFileLocator getFileLocator() {
+    return m_spi.getFileLocator();
   }
 
   @Override
