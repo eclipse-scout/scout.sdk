@@ -85,7 +85,7 @@ public final class ScoutSdkCore {
     return new IFileLocator() {
       @Override
       public File getFile(String path) {
-        return project.getFile(path).getFullPath().toFile();
+        return project.getFile(path).getRawLocation().toFile();
       }
     };
   }
