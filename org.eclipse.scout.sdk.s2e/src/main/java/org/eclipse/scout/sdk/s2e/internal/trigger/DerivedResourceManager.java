@@ -68,7 +68,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   // queue that buffers all trigger operations that need to be executed
   private final ArrayBlockingQueue<IDerivedResourceHandler> m_triggerHandlers;
   // job that executes all the buffered trigger operations (visible to the user)
-  private final P_RunQueuedTriggerHandlersJob m_runTriggerOperationsJob;
+  private final P_RunQueuedTriggerHandlersJob m_runQueuedTriggerHandlersJob;
 
   public DerivedResourceManager() {
     m_enabled = new AtomicBoolean(true);
@@ -77,8 +77,8 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     m_javaChangeEventsToCheck = new ArrayBlockingQueue<>(5000, true);
     m_triggerHandlers = new ArrayBlockingQueue<>(2000, true);
 
-    m_runTriggerOperationsJob = new P_RunQueuedTriggerHandlersJob(m_triggerHandlers);
-    m_javaDeltaCheckJob = new P_JavaChangeEventCheckJob(this, m_javaChangeEventsToCheck, m_triggerHandlers, m_runTriggerOperationsJob);
+    m_runQueuedTriggerHandlersJob = new P_RunQueuedTriggerHandlersJob(m_triggerHandlers);
+    m_javaDeltaCheckJob = new P_JavaChangeEventCheckJob(this, m_javaChangeEventsToCheck, m_triggerHandlers, m_runQueuedTriggerHandlersJob);
   }
 
   /**
@@ -111,6 +111,8 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         SdkLog.info("Unable to trigger more derived resource updates. Queue is already full. Skipping.");
       }
     }
+    m_runQueuedTriggerHandlersJob.abort();
+    m_runQueuedTriggerHandlersJob.schedule(200); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
   }
 
   @Override
@@ -341,7 +343,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     private final DerivedResourceManager m_manager;
     private final ArrayBlockingQueue<ElementChangedEvent> m_queueToConsume;
     private final ArrayBlockingQueue<IDerivedResourceHandler> m_handlerCollector;
-    private final P_RunQueuedTriggerHandlersJob m_runTriggerOperationsJob;
+    private final P_RunQueuedTriggerHandlersJob m_runQueuedTriggerHandlersJob;
 
     private P_JavaChangeEventCheckJob(DerivedResourceManager manager, ArrayBlockingQueue<ElementChangedEvent> queueToConsume, ArrayBlockingQueue<IDerivedResourceHandler> handlerCollector,
         P_RunQueuedTriggerHandlersJob runtriggerOperationsJob) {
@@ -352,7 +354,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       m_manager = manager;
       m_queueToConsume = queueToConsume;
       m_handlerCollector = handlerCollector;
-      m_runTriggerOperationsJob = runtriggerOperationsJob;
+      m_runQueuedTriggerHandlersJob = runtriggerOperationsJob;
     }
 
     @Override
@@ -378,8 +380,8 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           Set<ICompilationUnit> icus = new HashSet<>();
           collectCompilationUnitsFromDelta(event.getDelta(), icus);
           if (addElementsToQueue(icus)) {
-            m_runTriggerOperationsJob.abort();
-            m_runTriggerOperationsJob.schedule(1000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
+            m_runQueuedTriggerHandlersJob.abort();
+            m_runQueuedTriggerHandlersJob.schedule(1000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
           }
         }
       }
