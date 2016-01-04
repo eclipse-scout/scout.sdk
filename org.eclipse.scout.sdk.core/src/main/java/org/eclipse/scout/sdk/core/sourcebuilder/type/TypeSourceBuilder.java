@@ -20,6 +20,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -65,7 +66,7 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
     for (ITypeParameter p : element.typeParameters()) {
       addTypeParameter(new TypeParameterSourceBuilder(p));
     }
-    if (element.superClass() != null && !"java.lang.Object".equals(element.superClass().name())) {
+    if (element.superClass() != null && !IJavaRuntimeTypes.java_lang_Object.equals(element.superClass().name())) {
       setSuperTypeSignature(SignatureUtils.getTypeSignature(element.superClass()));
     }
     for (IType i : element.superInterfaces()) {

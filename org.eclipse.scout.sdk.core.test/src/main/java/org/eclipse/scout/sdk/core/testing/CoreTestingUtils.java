@@ -17,6 +17,7 @@ import java.io.Writer;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
@@ -25,6 +26,8 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.JavaEnvironmentImplementor;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
+import org.eclipse.scout.sdk.core.signature.Signature;
+import org.junit.Assert;
 
 /**
  * helpers used for general core unit tests (not specific to scout generated code)
@@ -83,6 +86,20 @@ public final class CoreTestingUtils {
       return ((JavaEnvironmentImplementor) env).compileErrors(fqn);
     }
     throw new UnsupportedOperationException(IJavaEnvironment.class.getName() + " implementation '" + env.getClass().getName() + "' is not supported.");
+  }
+
+  public static IType assertNoCompileErrors(IJavaEnvironment env, String fqn, String source) {
+    String pck = Signature.getQualifier(fqn);
+    String simpleName = Signature.getSimpleName(fqn);
+    return assertNoCompileErrors(env, pck, simpleName, source);
+  }
+
+  public static IType assertNoCompileErrors(IJavaEnvironment env, String qualifier, String simpleName, String source) {
+    env.registerCompilationUnitOverride(qualifier, simpleName + SuffixConstants.SUFFIX_STRING_java, new StringBuilder(source));
+    env.reload();
+    IType t = env.findType(qualifier + '.' + simpleName);
+    Assert.assertNull(getCompileErrors(env, t.name()));
+    return t;
   }
 
   public static synchronized ICompilationUnit getChildClassIcu() {

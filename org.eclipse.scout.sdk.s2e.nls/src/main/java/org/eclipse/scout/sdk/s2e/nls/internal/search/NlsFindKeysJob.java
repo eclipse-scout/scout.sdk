@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
@@ -120,7 +121,7 @@ public class NlsFindKeysJob extends Job {
               return FileVisitResult.CONTINUE;
             }
             String fileName = path.toString().toLowerCase();
-            if (attrs.isRegularFile() && (fileName.endsWith(".java") || fileName.endsWith(".html"))) {
+            if (attrs.isRegularFile() && (fileName.endsWith(SuffixConstants.SUFFIX_STRING_java) || fileName.endsWith(".html"))) {
               searchInFile(file, charset, monitor);
             }
             if (monitor.isCanceled()) {

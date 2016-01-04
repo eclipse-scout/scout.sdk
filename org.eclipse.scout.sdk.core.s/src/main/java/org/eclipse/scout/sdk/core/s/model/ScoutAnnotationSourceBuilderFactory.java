@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.DefaultSubtypeSdkCommand;
@@ -72,7 +73,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
         source.append("@").append(formDataTypeRef);
         List<String> args = new ArrayList<>(3);
         if (formDataSignature != null) {
-          args.add("value = " + validator.useSignature(formDataSignature) + ".class");
+          args.add("value = " + validator.useSignature(formDataSignature) + SuffixConstants.SUFFIX_STRING_class);
         }
         if (sdkCommand != null) {
           StringBuilder b = new StringBuilder();

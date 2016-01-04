@@ -157,13 +157,13 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
 
       String propName = upperCaseBeanName + "Property";
       String resolvedSignature = SignatureUtils.getTypeSignature(desc.type());
-      String unboxedSignature = SignatureUtils.boxPrimitiveSignature(resolvedSignature);
+      String boxedSignature = SignatureUtils.boxPrimitiveSignature(resolvedSignature);
 
       // property class
       TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
       propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
       String superTypeSig = Signature.createTypeSignature(IScoutRuntimeTypes.AbstractPropertyData);
-      superTypeSig = ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll(ISignatureConstants.C_GENERIC_START + Matcher.quoteReplacement(unboxedSignature) + ISignatureConstants.C_GENERIC_END + ISignatureConstants.C_SEMICOLON);
+      superTypeSig = ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll(ISignatureConstants.C_GENERIC_START + Matcher.quoteReplacement(boxedSignature) + ISignatureConstants.C_GENERIC_END + ISignatureConstants.C_SEMICOLON);
       propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
       IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
       propertyTypeBuilder.addSortedField(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);

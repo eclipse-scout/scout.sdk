@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.Validate;
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
@@ -505,7 +506,7 @@ public final class DtoUtils {
     //@Generated annotation
     rowDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated(modelType.name(), GENERATED_MSG));
 
-    ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(rowDataTypeSrc.getElementName() + ".java", targetPackage);
+    ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(rowDataTypeSrc.getElementName() + SuffixConstants.SUFFIX_STRING_java, targetPackage);
     cuSrc.addType(rowDataTypeSrc);
     cuSrc.setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(cuSrc));
     return cuSrc;
@@ -528,7 +529,7 @@ public final class DtoUtils {
     //@Generated annotation
     pageDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated(modelType.name(), GENERATED_MSG));
 
-    ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(pageDataTypeSrc.getElementName() + ".java", targetPackage);
+    ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(pageDataTypeSrc.getElementName() + SuffixConstants.SUFFIX_STRING_java, targetPackage);
     cuSrc.addType(pageDataTypeSrc);
     cuSrc.setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(cuSrc));
     return cuSrc;
@@ -566,7 +567,7 @@ public final class DtoUtils {
       // add interfaces and @Override annotation for all methods that exist in the given interfaces
       addFormDataAdditionalInterfaces(formDataAnnotation, formDataTypeSrc, sharedEnv);
 
-      ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(formDataTypeSrc.getElementName() + ".java", targetPackage);
+      ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(formDataTypeSrc.getElementName() + SuffixConstants.SUFFIX_STRING_java, targetPackage);
       cuSrc.addType(formDataTypeSrc);
       cuSrc.setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(cuSrc));
       return cuSrc;

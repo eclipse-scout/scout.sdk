@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.s.testing;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
@@ -80,12 +79,7 @@ public final class CoreScoutTestingUtils {
     String source = DtoUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
 
     // ensure it compiles and get model of dto
-    sharedEnv.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), new StringBuilder(source));
-    sharedEnv.reload();
-    ICompilationUnit dtoIcu = sharedEnv.findType(cuSrc.getMainType().getFullyQualifiedName()).compilationUnit();
-    Assert.assertNull(CoreTestingUtils.getCompileErrors(sharedEnv, dtoIcu.mainType().name()));
-
-    return dtoIcu.mainType();
+    return CoreTestingUtils.assertNoCompileErrors(sharedEnv, cuSrc.getPackageName(), cuSrc.getMainType().getElementName(), source);
   }
 
   public static IType createFormDataAssertNoCompileErrors(String modelFqn) {
@@ -101,12 +95,7 @@ public final class CoreScoutTestingUtils {
     String source = DtoUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
 
     // ensure it compiles and get model of dto
-    sharedEnv.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), new StringBuilder(source));
-    sharedEnv.reload();
-    ICompilationUnit dtoIcu = sharedEnv.findType(cuSrc.getMainType().getFullyQualifiedName()).compilationUnit();
-    Assert.assertNull(CoreTestingUtils.getCompileErrors(sharedEnv, dtoIcu.mainType().name()));
-
-    return dtoIcu.mainType();
+    return CoreTestingUtils.assertNoCompileErrors(sharedEnv, cuSrc.getPackageName(), cuSrc.getMainType().getElementName(), source);
   }
 
   /**

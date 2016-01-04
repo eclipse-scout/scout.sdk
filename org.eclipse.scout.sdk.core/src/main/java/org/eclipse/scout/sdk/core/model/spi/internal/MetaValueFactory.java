@@ -14,6 +14,7 @@ import java.lang.reflect.Array;
 
 import org.eclipse.jdt.internal.compiler.impl.Constant;
 import org.eclipse.jdt.internal.compiler.lookup.TypeIds;
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IArrayMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IField;
@@ -191,7 +192,7 @@ public final class MetaValueFactory {
 
       @Override
       public String toString() {
-        return type.getElementName() + ".class";
+        return type.getElementName() + SuffixConstants.SUFFIX_STRING_class;
       }
     };
   }

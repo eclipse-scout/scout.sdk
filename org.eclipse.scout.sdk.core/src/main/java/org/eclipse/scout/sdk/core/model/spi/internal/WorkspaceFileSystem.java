@@ -60,14 +60,24 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
 
   public void addOverrideCompilationUnit(ICompilationUnit cu) {
     char[][] packageName0 = cu.getPackageName();
+
     //register compilation unit with normalized class name
-    String packageName = CharOperation.toString(packageName0);
     String fileName = new String(cu.getFileName());
-    if (fileName.endsWith(".java")) {
-      fileName = fileName.substring(0, fileName.length() - 5) + ".class";
+    if (fileName.toLowerCase().endsWith(SuffixConstants.SUFFIX_STRING_java)) {
+      fileName = fileName.substring(0, fileName.length() - SuffixConstants.SUFFIX_STRING_java.length()) + SuffixConstants.SUFFIX_STRING_class;
     }
-    String key = (packageName.isEmpty() ? "" : packageName.replace('.', '/') + '/') + fileName;
-    m_overrideCompilationUnits.put(key, cu);
+
+    // build key
+    StringBuilder keyBuilder = new StringBuilder();
+    if (packageName0 != null && packageName0.length > 0) {
+      char[] pck = CharOperation.concatWith(packageName0, '/');
+      keyBuilder.append(pck);
+      keyBuilder.append('/');
+    }
+    keyBuilder.append(fileName);
+
+    m_overrideCompilationUnits.put(keyBuilder.toString(), cu);
+
     //register additional packages
     if (packageName0 != null && packageName0.length > 0) {
       for (int i = 1; i < packageName0.length; i++) {

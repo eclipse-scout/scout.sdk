@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IArrayMetaValue;
@@ -40,8 +41,8 @@ public final class ExpressionSourceBuilderFactory {
     return new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        String typeName = validator.useSignature(signature);
-        source.append(typeName + ".class");
+        source.append(validator.useSignature(signature));
+        source.append(SuffixConstants.SUFFIX_STRING_class);
       }
     };
   }
@@ -51,7 +52,9 @@ public final class ExpressionSourceBuilderFactory {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         String typeName = validator.useSignature(enumSignature);
-        source.append(typeName + '.' + enumField);
+        source.append(typeName);
+        source.append('.');
+        source.append(enumField);
       }
     };
   }

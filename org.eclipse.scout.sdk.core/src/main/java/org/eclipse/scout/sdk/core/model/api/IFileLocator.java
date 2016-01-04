@@ -17,7 +17,7 @@ import java.io.File;
  * <p>
  * Used in {@link IJavaEnvironment#getFileLocator()}
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.2.0
  */
 public interface IFileLocator {

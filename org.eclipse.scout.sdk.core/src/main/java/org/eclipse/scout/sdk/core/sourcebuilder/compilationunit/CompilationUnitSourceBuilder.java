@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
@@ -40,6 +41,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * @since 3.10.0 07.03.2013
  */
 public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuilder implements ICompilationUnitSourceBuilder {
+
   private final String m_packageName;
   private final List<String> m_declaredImports = new ArrayList<>();
   private final List<String> m_declaredStaticImports = new ArrayList<>();
@@ -217,7 +219,20 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   @Override
   public ITypeSourceBuilder getMainType() {
     List<ITypeSourceBuilder> list = getTypes();
-    return list.isEmpty() ? null : list.get(0);
+    if (list.isEmpty()) {
+      return null;
+    }
+
+    String mainTypeName = getElementName();
+    if (mainTypeName.toLowerCase().endsWith(SuffixConstants.SUFFIX_STRING_java)) {
+      mainTypeName = mainTypeName.substring(0, mainTypeName.length() - SuffixConstants.SUFFIX_STRING_java.length());
+    }
+    for (ITypeSourceBuilder sb : list) {
+      if (mainTypeName.equals(sb.getElementName())) {
+        return sb;
+      }
+    }
+    return null;
   }
 
   @Override

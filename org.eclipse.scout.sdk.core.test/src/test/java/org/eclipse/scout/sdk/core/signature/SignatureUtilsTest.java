@@ -49,6 +49,17 @@ public class SignatureUtilsTest {
   }
 
   @Test
+  public void testToFullyQualifiedName() {
+    Assert.assertNull(SignatureUtils.toFullyQualifiedName(null));
+    Assert.assertEquals("java.lang.String", SignatureUtils.toFullyQualifiedName("Ljava.lang.String;"));
+    Assert.assertEquals("MyClassInDefaultPackage", SignatureUtils.toFullyQualifiedName("LMyClassInDefaultPackage;"));
+    Assert.assertEquals("java.lang.String$Inner$InnerTwo", SignatureUtils.toFullyQualifiedName("Ljava.lang.String$Inner$InnerTwo;"));
+    Assert.assertEquals("java.lang.String[]", SignatureUtils.toFullyQualifiedName("[Ljava.lang.String;"));
+    Assert.assertEquals("int", SignatureUtils.toFullyQualifiedName("I"));
+    Assert.assertEquals("? extends Object", SignatureUtils.toFullyQualifiedName("+QObject;"));
+  }
+
+  @Test
   public void testGetResolvedSignature_Long() {
     IImportValidator validator = new ImportValidator(new ImportCollector());
     Assert.assertEquals("Long", validator.useName(Long.class.getName()));

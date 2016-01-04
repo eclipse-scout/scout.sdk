@@ -48,7 +48,7 @@ public interface IJavaEnvironment {
    * (see {@link IUnresolvedType#exists()}). Otherwise a non-existing {@link IUnresolvedType} will be returned.<br>
    * <br>
    * <b>Note:</b><br>
-   * {@link IUnresolvedType}s are never cached in the {@link IJavaEnvironment}. Calls to this methdo will always create
+   * {@link IUnresolvedType}s are never cached in the {@link IJavaEnvironment}. Calls to this method will always create
    * new instances. This allows to get a resolved version later on.
    *
    * @param fqn

@@ -50,7 +50,7 @@ public final class SignatureUtils {
   }
 
   private static boolean startsWith(String stringToSearchIn, char charToFind) {
-    return stringToSearchIn != null && !stringToSearchIn.isEmpty() && stringToSearchIn.charAt(0) == charToFind;
+    return !stringToSearchIn.isEmpty() && stringToSearchIn.charAt(0) == charToFind;
   }
 
   /**
@@ -105,13 +105,26 @@ public final class SignatureUtils {
   }
 
   /**
-   * Same as {@link Signature#toString()} but it preserves the dollar sign ($) for inner types.
+   * Same as {@link Signature#toString()} but it preserves the dollar sign ($) for inner types. <br>
+   * <br>
+   * <b>Example:</b>
+   *
+   * <pre>
+   * toFullyQualifiedName("[Ljava.lang.String;") -> "java.lang.String[]"
+   * toFullyQualifiedName("Lorg.eclipse.scout.TopLevelClass$InnerOne$InnerTwo;") -> "org.eclipse.scout.TopLevelClass$InnerOne$InnerTwo"
+   * toFullyQualifiedName("I") -> "int"
+   * toFullyQualifiedName("+QObject;") -> "? extends Object"
+   * </pre>
    *
    * @param sig
    *          The signature to convert to a fully qualified name.
-   * @return The fully qualified name of the given signature.
+   * @return The fully qualified name of the given signature or <code>null</code> if the given signature is
+   *         <code>null</code>.
    */
   public static String toFullyQualifiedName(String sig) {
+    if (sig == null) {
+      return null;
+    }
     String nameUpToPrimaryType = Signature.getSignatureSimpleName(sig).replace(ISignatureConstants.C_DOT, ISignatureConstants.C_DOLLAR); // ensure to keep $ for inner types.
     String pck = Signature.getSignatureQualifier(sig);
     StringBuilder buf = new StringBuilder(nameUpToPrimaryType.length() + 1 + pck.length());

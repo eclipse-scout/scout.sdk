@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.CompilationUnitImplementor;
@@ -69,7 +70,7 @@ public class SyntheticCompilationUnitWithJdt extends AbstractJavaElementWithJdt<
 
   @Override
   public String getElementName() {
-    return m_mainType.getElementName() + ".java";
+    return m_mainType.getElementName() + SuffixConstants.SUFFIX_STRING_java;
   }
 
   @Override
