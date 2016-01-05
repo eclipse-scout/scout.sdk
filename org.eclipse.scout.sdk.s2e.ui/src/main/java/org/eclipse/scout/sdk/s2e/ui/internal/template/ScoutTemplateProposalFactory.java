@@ -11,42 +11,35 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeRoot;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.NodeFinder;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.ui.SharedASTProvider;
+import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.model.ScoutModelHierarchy;
 import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.job.AbstractJob;
+import org.eclipse.scout.sdk.s2e.job.RunnableJob;
 import org.eclipse.scout.sdk.s2e.trigger.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
 /**
  * <h3>{@link ScoutTemplateProposalFactory}</h3>
@@ -63,17 +56,17 @@ public final class ScoutTemplateProposalFactory {
 
   static {
     TEMPLATES.put(IScoutRuntimeTypes.IStringField, new TemplateProposalDescriptor(IScoutRuntimeTypes.IStringField, IScoutRuntimeTypes.AbstractStringField, "MyString",
-        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.StringFieldAdd, 1000, StringFieldProposal.class));
+        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.StringFieldAdd, 1000, StringFieldProposal.class, Arrays.asList("textfield")));
     TEMPLATES.put(IScoutRuntimeTypes.IBigDecimalField, new TemplateProposalDescriptor(IScoutRuntimeTypes.IBigDecimalField, IScoutRuntimeTypes.AbstractBigDecimalField, "MyBigDecimal",
-        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.DoubleFieldAdd, 1000, BigDecimalFieldProposal.class));
+        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.DoubleFieldAdd, 1000, BigDecimalFieldProposal.class, Arrays.asList("numberfield", "doublefield", "floatfield")));
     TEMPLATES.put(IScoutRuntimeTypes.IBooleanField, new TemplateProposalDescriptor(IScoutRuntimeTypes.IBooleanField, IScoutRuntimeTypes.AbstractBooleanField, "MyBoolean",
-        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.FormFieldAdd, 1000, FormFieldProposal.class));
+        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.FormFieldAdd, 1000, FormFieldProposal.class, Arrays.asList("checkboxfield")));
     TEMPLATES.put(IScoutRuntimeTypes.IButton, new TemplateProposalDescriptor(IScoutRuntimeTypes.IButton, IScoutRuntimeTypes.AbstractButton, "My",
         ISdkProperties.SUFFIX_BUTTON, ISdkIcons.ButtonAdd, 1000, ButtonProposal.class));
     TEMPLATES.put(IScoutRuntimeTypes.ICalendarField, new TemplateProposalDescriptor(IScoutRuntimeTypes.ICalendarField, IScoutRuntimeTypes.AbstractCalendarField, "MyCalendar",
         ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.FormFieldAdd, 1000, CalendarFieldProposal.class));
     TEMPLATES.put(IScoutRuntimeTypes.IDateField, new TemplateProposalDescriptor(IScoutRuntimeTypes.IDateField, IScoutRuntimeTypes.AbstractDateField, "MyDate",
-        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.DateFieldAdd, 1000, DateFieldProposal.class));
+        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.DateFieldAdd, 1000, DateFieldProposal.class, Arrays.asList("datetimefield")));
     TEMPLATES.put(IScoutRuntimeTypes.IFileChooserField, new TemplateProposalDescriptor(IScoutRuntimeTypes.IFileChooserField, IScoutRuntimeTypes.AbstractFileChooserField, "MyFileChooser",
         ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.FileChooserFieldAdd, 1000, FormFieldProposal.class));
     TEMPLATES.put(IScoutRuntimeTypes.IGroupBox, new TemplateProposalDescriptor(IScoutRuntimeTypes.IGroupBox, IScoutRuntimeTypes.AbstractGroupBox, "MyGroup",
@@ -89,7 +82,7 @@ public final class ScoutTemplateProposalFactory {
     TEMPLATES.put(IScoutRuntimeTypes.ISmartField, new TemplateProposalDescriptor(IScoutRuntimeTypes.ISmartField, IScoutRuntimeTypes.AbstractSmartField, "MySmart",
         ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.SmartFieldAdd, 1000, ValueTypeFieldProposal.class));
     TEMPLATES.put(IScoutRuntimeTypes.ILongField, new TemplateProposalDescriptor(IScoutRuntimeTypes.ILongField, IScoutRuntimeTypes.AbstractLongField, "MyLong",
-        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.IntegerFieldAdd, 1000, LongFieldProposal.class));
+        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.IntegerFieldAdd, 1000, LongFieldProposal.class, Arrays.asList("integerfield", "numberfield")));
     TEMPLATES.put(IScoutRuntimeTypes.IRadioButtonGroup, new TemplateProposalDescriptor(IScoutRuntimeTypes.IRadioButtonGroup, IScoutRuntimeTypes.AbstractRadioButtonGroup, "MyRadioButtonGroup",
         ISdkProperties.SUFFIX_COMPOSITE_FIELD, ISdkIcons.RadioButtonGroupAdd, 1000, ValueTypeFieldProposal.class));
     TEMPLATES.put(IScoutRuntimeTypes.ISequenceBox, new TemplateProposalDescriptor(IScoutRuntimeTypes.ISequenceBox, IScoutRuntimeTypes.AbstractSequenceBox, "MySequence",
@@ -116,50 +109,47 @@ public final class ScoutTemplateProposalFactory {
         ISdkProperties.SUFFIX_EXTENSION, ISdkIcons.ExtensionsAdd, 1000, ExtensionProposal.class));
   }
 
-  public static List<ICompletionProposal> createTemplateProposals(IType surroundingType, int offset) {
-    ITypeRoot typeRoot = surroundingType.getTypeRoot();
-    CompilationUnit cu = SharedASTProvider.getAST(typeRoot, SharedASTProvider.WAIT_ACTIVE_ONLY, null);
-    if (cu == null) {
-      return Collections.emptyList();
-    }
-
-    NodeFinder finder = new NodeFinder(cu, offset, 0);
-    ASTNode coveringNode = finder.getCoveringNode();
-    if (!(coveringNode instanceof TypeDeclaration)) {
-      return Collections.emptyList();
-    }
-    TypeDeclaration declaringType = (TypeDeclaration) coveringNode;
-    ITypeBinding resolveBinding = declaringType.resolveBinding();
-    if (resolveBinding == null) {
-      return Collections.emptyList();
-    }
-
+  public static List<ICompletionProposal> createTemplateProposals(IType surroundingType, int offset, String prefix) {
     Set<String> possibleChildrenIfcFqn = new HashSet<>();
-    if (AstUtils.isInstanceOf(resolveBinding, IScoutRuntimeTypes.AbstractTabBox)
-        || AstUtils.isInstanceOf(resolveBinding, IScoutRuntimeTypes.AbstractTabBoxExtension)) {
+    Set<String> superTypesOfSurroundingType = null;
+    try {
+      ITypeHierarchy supertypeHierarchy = surroundingType.newSupertypeHierarchy(null);
+      IType[] allTypes = supertypeHierarchy.getAllTypes();
+      superTypesOfSurroundingType = new HashSet<>(allTypes.length);
+      for (IType superType : allTypes) {
+        superTypesOfSurroundingType.add(superType.getFullyQualifiedName());
+      }
+    }
+    catch (JavaModelException e) {
+      SdkLog.error("Unable to calculate supertype hierarchy for '" + surroundingType.getFullyQualifiedName() + "'.", e);
+      return Collections.emptyList();
+    }
+
+    if (superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractTabBox)
+        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractTabBoxExtension)) {
       // special case for tab boxes
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IGroupBox);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IMenu);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IKeyStroke);
     }
-    else if (AstUtils.isInstanceOf(resolveBinding, IScoutRuntimeTypes.AbstractListBox)
-        || AstUtils.isInstanceOf(resolveBinding, IScoutRuntimeTypes.AbstractTreeBox)
-        || AstUtils.isInstanceOf(resolveBinding, IScoutRuntimeTypes.AbstractListBoxExtension)
-        || AstUtils.isInstanceOf(resolveBinding, IScoutRuntimeTypes.AbstractTreeBoxExtension)) {
+    else if (superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractListBox)
+        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractTreeBox)
+        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractListBoxExtension)
+        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractTreeBoxExtension)) {
       // special case for list boxes & tree boxes
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IMenu);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IKeyStroke);
     }
-    else if (AstUtils.isInstanceOf(resolveBinding, IScoutRuntimeTypes.AbstractRadioButtonGroup)
-        || AstUtils.isInstanceOf(resolveBinding, IScoutRuntimeTypes.AbstractRadioButtonGroupExtension)) {
+    else if (superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractRadioButtonGroup)
+        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractRadioButtonGroupExtension)) {
       // special case for radio button groups
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IRadioButton);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IMenu);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IKeyStroke);
     }
     else {
-      for (ITypeBinding superType : AstUtils.getAllSuperTypes(resolveBinding)) {
-        Set<String> possibleChildren = ScoutModelHierarchy.getPossibleChildren(superType.getTypeDeclaration().getQualifiedName());
+      for (String superType : superTypesOfSurroundingType) {
+        Set<String> possibleChildren = ScoutModelHierarchy.getPossibleChildren(superType);
         if (!possibleChildren.isEmpty()) {
           possibleChildrenIfcFqn.addAll(possibleChildren);
         }
@@ -169,71 +159,60 @@ public final class ScoutTemplateProposalFactory {
       return Collections.emptyList();
     }
 
-    // create env
     ICompilationUnit compilationUnit = surroundingType.getCompilationUnit();
-    IJavaEnvironmentProvider provider = new CachingJavaEnvironmentProvider();
-    CountDownLatch l = new CountDownLatch(1); // latch to wait until the P_JavaEnvInitJob has started an acquired the lock on the provider
-    new P_JavaEnvInitJob(declaringType, provider, compilationUnit, l).schedule();
-    try {
-      l.await(100, TimeUnit.MILLISECONDS);
-    }
-    catch (InterruptedException e) {
-      SdkLog.debug("Interrupted while waiting for the java environemnt preparation latch.", e);
-      return Collections.emptyList();
-    }
+
+    // start java environment creation
+    RunnableFuture<IJavaEnvironmentProvider> javaEnvProviderCreator = new FutureTask<>(new P_JavaEnvironmentInitCallable(compilationUnit, prefix != null, offset));
+    RunnableJob javaEnvCreatorJob = new RunnableJob("Init Java Environment", javaEnvProviderCreator);
+    javaEnvCreatorJob.setUser(false);
+    javaEnvCreatorJob.setSystem(true);
+    javaEnvCreatorJob.setPriority(Job.SHORT);
+    javaEnvCreatorJob.schedule();
 
     // create proposals
     IJavaProject javaProject = surroundingType.getJavaProject();
     List<ICompletionProposal> result = new ArrayList<>();
-    TemplateProposalDescriptor[] templates = TEMPLATES.values().toArray(new TemplateProposalDescriptor[TEMPLATES.size()]);
+    TemplateProposalDescriptor[] templates = null;
+    synchronized (ScoutTemplateProposalFactory.TEMPLATES) {
+      templates = TEMPLATES.values().toArray(new TemplateProposalDescriptor[TEMPLATES.size()]);
+    }
     for (TemplateProposalDescriptor candidate : templates) {
-      if (candidate.isActiveFor(possibleChildrenIfcFqn, javaProject)) {
-        result.add(candidate.createProposal(compilationUnit, declaringType, offset, resolveBinding, provider));
+      if (candidate.isActiveFor(possibleChildrenIfcFqn, javaProject, prefix)) {
+        result.add(candidate.createProposal(compilationUnit, offset, javaEnvProviderCreator, prefix));
       }
     }
     return result;
   }
 
-  private static final class P_JavaEnvInitJob extends AbstractJob {
+  private static final class P_JavaEnvironmentInitCallable implements Callable<IJavaEnvironmentProvider> {
 
-    private final TypeDeclaration m_decl;
-    private final IJavaEnvironmentProvider m_envProvider;
     private final ICompilationUnit m_icu;
-    private final CountDownLatch m_notifyLatch;
+    private final boolean m_hasSearchString;
+    private final int m_pos;
 
-    private P_JavaEnvInitJob(TypeDeclaration decl, IJavaEnvironmentProvider envProvider, ICompilationUnit icu, CountDownLatch notifyLatch) {
-      super("Init Java Environment");
-      m_decl = decl;
-      m_envProvider = envProvider;
+    private P_JavaEnvironmentInitCallable(ICompilationUnit icu, boolean hasSearchString, int pos) {
       m_icu = icu;
-      m_notifyLatch = notifyLatch;
-      setUser(false);
-      setSystem(true);
-      setPriority(Job.INTERACTIVE);
+      m_hasSearchString = hasSearchString;
+      m_pos = pos;
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      try {
-        synchronized (m_envProvider) {
-          m_notifyLatch.countDown();
-
-          String pck = S2eUtils.getPackage(m_icu);
-          if (StringUtils.isBlank(pck)) {
-            pck = null;
-          }
-          IJavaEnvironment env = m_envProvider.get(m_icu.getJavaProject());
-          env.registerCompilationUnitOverride(pck, m_icu.getElementName(), new StringBuilder(m_icu.getSource()));
-
-          TypeDeclaration primary = AstUtils.getDeclaringTypes(m_decl).getLast();
-          String qualifiedName = AstUtils.getFullyQualifiedName(primary);
-          env.findType(qualifiedName);
-        }
+    public IJavaEnvironmentProvider call() throws Exception {
+      IJavaEnvironmentProvider provider = new CachingJavaEnvironmentProvider();
+      String pck = S2eUtils.getPackage(m_icu);
+      if (StringUtils.isBlank(pck)) {
+        pck = null;
       }
-      catch (Exception e) {
-        SdkLog.info("Unable to preload java environment.", e);
+      IJavaEnvironment env = provider.get(m_icu.getJavaProject());
+
+      StringBuilder buf = new StringBuilder(m_icu.getSource());
+      if (m_hasSearchString) {
+        buf.insert(m_pos, AbstractTypeProposal.SEARCH_STRING_END_FIX);
       }
-      return Status.OK_STATUS;
+      env.registerCompilationUnitOverride(pck, m_icu.getElementName(), buf);
+
+      env.findType(m_icu.findPrimaryType().getFullyQualifiedName());
+      return provider;
     }
   }
 }

@@ -18,13 +18,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.Validate;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.s2e.job.AbstractJob;
+import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.job.RunnableJob;
 
 /**
  * <h3>{@link LinkedAsyncProposalPositionGroup}</h3>
@@ -73,26 +74,23 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
 
   @Override
   public void load() {
-    new P_RunnableJob(m_future).schedule();
-  }
-
-  private final class P_RunnableJob extends AbstractJob {
-
-    private final Runnable m_futureToRun;
-
-    private P_RunnableJob(Runnable future) {
-      super("execute runnable");
-      setUser(false);
-      setSystem(true);
-      setPriority(Job.INTERACTIVE);
-      m_futureToRun = future;
-    }
-
-    @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      m_futureToRun.run();
-      fireLoaded();
-      return Status.OK_STATUS;
-    }
+    final RunnableJob job = new RunnableJob("Load template proposals", m_future);
+    job.setUser(false);
+    job.setSystem(true);
+    job.setPriority(Job.INTERACTIVE);
+    job.addJobChangeListener(new JobChangeAdapter() {
+      @Override
+      public void done(IJobChangeEvent event) {
+        job.removeJobChangeListener(this);
+        IStatus result = event.getResult();
+        if (result.isOK()) {
+          fireLoaded();
+        }
+        else if (result.getSeverity() != IStatus.CANCEL) {
+          SdkLog.error(result.getMessage(), result.getException());
+        }
+      }
+    });
+    job.schedule();
   }
 }

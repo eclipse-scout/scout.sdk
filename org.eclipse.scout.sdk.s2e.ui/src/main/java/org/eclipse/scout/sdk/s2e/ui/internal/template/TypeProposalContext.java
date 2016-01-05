@@ -13,11 +13,18 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 
 /**
@@ -34,23 +41,27 @@ public class TypeProposalContext {
   private List<String> m_defaultSuperClasses;
   private String m_defaultName;
   private String m_suffix;
+  private String m_searchString;
   private ITypeBinding m_declaringTypeBinding;
-  private IJavaEnvironmentProvider m_provider;
+  private Future<IJavaEnvironmentProvider> m_provider;
+  private Future<CompilationUnit> m_compilationUnit;
   private ICompilationUnit m_icu;
 
   public TypeDeclaration getDeclaringType() {
+    if (m_declaringType == null) {
+      CompilationUnit cu = Validate.notNull(getCompilationUnit(), "No AST found for '%s'.", m_icu.getElementName());
+      ASTNode coveringNode = NodeFinder.perform(cu, m_pos, 0);
+      Validate.isTrue(coveringNode instanceof TypeDeclaration, "No valid covering node found.");
+      m_declaringType = (TypeDeclaration) coveringNode;
+    }
     return m_declaringType;
-  }
-
-  public void setDeclaringType(TypeDeclaration declaringType) {
-    m_declaringType = declaringType;
   }
 
   public int getInsertPosition() {
     return m_pos;
   }
 
-  public void setPosition(int pos) {
+  void setPosition(int pos) {
     m_pos = pos;
   }
 
@@ -58,21 +69,19 @@ public class TypeProposalContext {
     return m_defaultSuperClasses;
   }
 
-  public void setDefaultSuperClass(Collection<String> defaultSuperClasses) {
+  void setDefaultSuperClasses(Collection<String> defaultSuperClasses) {
     m_defaultSuperClasses = new ArrayList<>(defaultSuperClasses);
   }
 
   public IJavaEnvironment getJavaEnvironment() {
-    synchronized (m_provider) {
-      return m_provider.get(m_icu.getJavaProject());
-    }
+    return getProvider().get(m_icu.getJavaProject());
   }
 
   public String getDefaultName() {
     return m_defaultName;
   }
 
-  public void setDefaultName(String defaultName) {
+  void setDefaultName(String defaultName) {
     m_defaultName = defaultName;
   }
 
@@ -80,23 +89,28 @@ public class TypeProposalContext {
     return m_suffix;
   }
 
-  public void setSuffix(String suffix) {
+  void setSuffix(String suffix) {
     m_suffix = suffix;
   }
 
   public ITypeBinding getDeclaringTypeBinding() {
+    if (m_declaringTypeBinding == null) {
+      TypeDeclaration declaringType = getDeclaringType();
+      m_declaringTypeBinding = Validate.notNull(declaringType.resolveBinding(), "No type binding available for '%s'.", declaringType.getName().getFullyQualifiedName());
+    }
     return m_declaringTypeBinding;
   }
 
-  public void setDeclaringTypeBinding(ITypeBinding declaringTypeBinding) {
-    m_declaringTypeBinding = declaringTypeBinding;
-  }
-
   public IJavaEnvironmentProvider getProvider() {
-    return m_provider;
+    try {
+      return m_provider.get();
+    }
+    catch (InterruptedException | ExecutionException e) {
+      throw new SdkException(e);
+    }
   }
 
-  public void setProvider(IJavaEnvironmentProvider provider) {
+  void setProvider(Future<IJavaEnvironmentProvider> provider) {
     m_provider = provider;
   }
 
@@ -104,7 +118,7 @@ public class TypeProposalContext {
     return m_proposalIfcTypeFqn;
   }
 
-  public void setProposalInterfaceFqn(String proposalIfcTypeFqn) {
+  void setProposalInterfaceFqn(String proposalIfcTypeFqn) {
     m_proposalIfcTypeFqn = proposalIfcTypeFqn;
   }
 
@@ -112,7 +126,28 @@ public class TypeProposalContext {
     return m_icu;
   }
 
-  public void setIcu(ICompilationUnit icu) {
+  void setIcu(ICompilationUnit icu) {
     m_icu = icu;
+  }
+
+  public String getSearchString() {
+    return m_searchString;
+  }
+
+  void setSearchString(String searchString) {
+    m_searchString = searchString;
+  }
+
+  public CompilationUnit getCompilationUnit() {
+    try {
+      return Validate.notNull(m_compilationUnit).get();
+    }
+    catch (InterruptedException | ExecutionException e) {
+      throw new SdkException(e);
+    }
+  }
+
+  void setCompilationUnit(Future<CompilationUnit> compilationUnit) {
+    m_compilationUnit = compilationUnit;
   }
 }

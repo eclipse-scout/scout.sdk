@@ -124,11 +124,7 @@ public class AstNodeFactory {
     this(type, icu, envProvider, declaringTypeBinding, null);
   }
 
-  public AstNodeFactory(TypeDeclaration type, ICompilationUnit icu, IJavaEnvironmentProvider envProvider, ITypeBinding declaringTypeBinding, ImportRewrite importRewrite) {
-    this(type, icu, envProvider, declaringTypeBinding, importRewrite, null);
-  }
-
-  public AstNodeFactory(TypeDeclaration type, ICompilationUnit icu, IJavaEnvironmentProvider envProvider, ITypeBinding declaringTypeBinding, ImportRewrite importRewrite, ILinkedPositionHolder linkHolder) {
+  public AstNodeFactory(TypeDeclaration type, ICompilationUnit icu, IJavaEnvironmentProvider envProvider, ITypeBinding declaringTypeBinding, ILinkedPositionHolder linkHolder) {
     m_declaringType = Validate.notNull(type);
     m_declaringTypeBinding = Validate.notNull(declaringTypeBinding);
     m_javaEnvProvider = Validate.notNull(envProvider);
@@ -137,12 +133,7 @@ public class AstNodeFactory {
     m_ast = m_declaringType.getAST();
     m_rewrite = ASTRewrite.create(m_ast);
     m_root = (CompilationUnit) type.getRoot();
-    if (importRewrite == null) {
-      m_importRewrite = StubUtility.createImportRewrite(m_root, true);
-    }
-    else {
-      m_importRewrite = importRewrite;
-    }
+    m_importRewrite = StubUtility.createImportRewrite(m_root, true);
     m_importsRewrite = m_rewrite.getListRewrite(m_root, CompilationUnit.IMPORTS_PROPERTY);
     m_context = new ContextSensitiveImportRewriteContext(m_root, m_importRewrite);
     m_javaProject = m_icu.getJavaProject();

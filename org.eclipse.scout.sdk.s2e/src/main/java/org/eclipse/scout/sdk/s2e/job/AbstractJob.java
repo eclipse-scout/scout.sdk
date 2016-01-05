@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.jobs.Job;
 /**
  * Extended job which adds the following features:
  * <ul>
- * <li>join method that waits until a timeout elapses</li>
  * <li>helper method to wait for a certain job family</li>
  * </ul>
  */

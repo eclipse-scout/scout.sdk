@@ -11,15 +11,17 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.scout.sdk.core.s.model.ScoutModelHierarchy;
 import org.eclipse.scout.sdk.core.signature.Signature;
@@ -37,61 +39,110 @@ public class TemplateProposalDescriptor {
   private static final Pattern CAMEL_PAT = Pattern.compile("([A-Z]{1})");
 
   private final String m_proposalIfcTypeFqn;
-  private Deque<String> m_defaultSuperTypeFqns;
+  private final Deque<String> m_defaultSuperTypeFqns;
+  private final Set<String> m_aliasNames;
+  private final Class<? extends AbstractTypeProposal> m_proposalClass;
+
   private String m_defaultNameOfNewType;
   private String m_typeSuffix;
   private String m_imgId;
   private int m_relevance;
   private String m_displayName;
-  private Class<? extends AbstractTypeProposal> m_proposal;
 
-  protected TemplateProposalDescriptor(String proposalIfcTypeFqn, String defaultSuperTypeFqn, String defaultNameOfNewType, String typeSuffix, String imgId, int relevance, Class<? extends AbstractTypeProposal> proposal) {
-    this(proposalIfcTypeFqn, defaultSuperTypeFqn, defaultNameOfNewType, typeSuffix, imgId, relevance, proposal, createDisplayNameFromIfc(proposalIfcTypeFqn));
+  protected TemplateProposalDescriptor(String proposalIfcTypeFqn, String defaultSuperTypeFqn, String defaultNameOfNewType, String typeSuffix, String imgId,
+      int relevance, Class<? extends AbstractTypeProposal> proposal) {
+    this(proposalIfcTypeFqn, defaultSuperTypeFqn, defaultNameOfNewType, typeSuffix, imgId, relevance, proposal, null);
   }
 
-  protected TemplateProposalDescriptor(String proposalIfcTypeFqn, String defaultSuperTypeFqn, String defaultNameOfNewType, String typeSuffix, String imgId, int relevance, Class<? extends AbstractTypeProposal> proposal,
-      String displayName) {
+  protected TemplateProposalDescriptor(String proposalIfcTypeFqn, String defaultSuperTypeFqn, String defaultNameOfNewType, String typeSuffix, String imgId,
+      int relevance, Class<? extends AbstractTypeProposal> proposal, Collection<String> alias) {
+    this(proposalIfcTypeFqn, defaultSuperTypeFqn, defaultNameOfNewType, typeSuffix, imgId, relevance, proposal, alias, createDisplayNameFromIfc(proposalIfcTypeFqn));
+  }
+
+  protected TemplateProposalDescriptor(String proposalIfcTypeFqn, String defaultSuperTypeFqn, String defaultNameOfNewType, String typeSuffix, String imgId,
+      int relevance, Class<? extends AbstractTypeProposal> proposal, Collection<String> alias, String displayName) {
     m_proposalIfcTypeFqn = proposalIfcTypeFqn;
     m_defaultSuperTypeFqns = new LinkedList<>();
     m_defaultSuperTypeFqns.add(defaultSuperTypeFqn);
+    if (alias == null || alias.isEmpty()) {
+      m_aliasNames = new HashSet<>(0);
+    }
+    else {
+      m_aliasNames = new HashSet<>(alias);
+    }
     m_defaultNameOfNewType = defaultNameOfNewType;
     m_typeSuffix = typeSuffix;
     m_imgId = imgId;
     m_relevance = relevance;
     m_displayName = displayName;
-    m_proposal = proposal;
+    m_proposalClass = proposal;
   }
 
-  public boolean isActiveFor(Set<String> possibleChildren, IJavaProject context) {
+  public boolean isActiveFor(Set<String> possibleChildren, IJavaProject context, String searchString) {
     if (context == null) {
+      return false;
+    }
+    if (possibleChildren == null || possibleChildren.isEmpty()) {
       return false;
     }
 
     for (String possibleChild : possibleChildren) {
-      if (ScoutModelHierarchy.isSubtypeOf(m_proposalIfcTypeFqn, possibleChild)) {
+      if (ScoutModelHierarchy.isSubtypeOf(m_proposalIfcTypeFqn, possibleChild) && acceptSearchString(searchString)) {
         return true;
       }
     }
     return false;
   }
 
-  public ICompletionProposal createProposal(ICompilationUnit icu, TypeDeclaration declaringType, int pos, ITypeBinding declaringTypeBinding, IJavaEnvironmentProvider provider) {
+  protected boolean acceptSearchString(String searchString) {
+    if (StringUtils.isBlank(searchString)) {
+      return true; // no filter
+    }
+
+    searchString = searchString.toLowerCase();
+    if (Signature.getSimpleName(m_proposalIfcTypeFqn).toLowerCase().contains(searchString)) {
+      return true;
+    }
+
+    if (m_displayName.toLowerCase().contains(searchString)) {
+      return true;
+    }
+
+    for (String defaultSuperType : m_defaultSuperTypeFqns) {
+      String simpleName = Signature.getSimpleName(defaultSuperType);
+      final String abstrPrefix = "Abstract";
+      if (simpleName.startsWith(abstrPrefix)) {
+        simpleName = simpleName.substring(abstrPrefix.length());
+      }
+      if (simpleName.toLowerCase().contains(searchString)) {
+        return true;
+      }
+    }
+
+    for (String alias : m_aliasNames) {
+      if (alias.toLowerCase().contains(searchString)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public ICompletionProposal createProposal(ICompilationUnit icu, int pos, Future<IJavaEnvironmentProvider> provider, String searchString) {
     try {
       TypeProposalContext context = new TypeProposalContext();
-      context.setDeclaringType(declaringType);
-      context.setDeclaringTypeBinding(declaringTypeBinding);
-      context.setDefaultName(getDefaultNameOfNewType());
-      context.setDefaultSuperClass(getDefaultSuperTypeFqns());
-      context.setPosition(pos);
       context.setProvider(provider);
+      context.setDefaultName(getDefaultNameOfNewType());
+      context.setDefaultSuperClasses(getDefaultSuperTypeFqns());
+      context.setPosition(pos);
       context.setSuffix(getTypeSuffix());
       context.setProposalInterfaceFqn(getProposalInterfaceFqn());
       context.setIcu(icu);
+      context.setSearchString(searchString);
 
-      return (ICompletionProposal) m_proposal.getConstructors()[0].newInstance(getDisplayName(), getRelevance(), getImageId(), icu, context);
+      return (ICompletionProposal) m_proposalClass.getConstructors()[0].newInstance(getDisplayName(), getRelevance(), getImageId(), icu, context);
     }
     catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
-      throw new SdkException("Unable to create proposal '" + m_proposal.getName() + "'.", e);
+      throw new SdkException("Unable to create proposal '" + m_proposalClass.getName() + "'.", e);
     }
   }
 
@@ -100,7 +151,7 @@ public class TemplateProposalDescriptor {
     if (!simpleName.isEmpty() && simpleName.charAt(0) == 'I') {
       simpleName = simpleName.substring(1);
     }
-    return "New" + CAMEL_PAT.matcher(simpleName).replaceAll(" $1");
+    return CAMEL_PAT.matcher(simpleName).replaceAll(" $1");
   }
 
   public Deque<String> getDefaultSuperTypeFqns() {
@@ -148,14 +199,14 @@ public class TemplateProposalDescriptor {
   }
 
   public Class<? extends AbstractTypeProposal> getProposal() {
-    return m_proposal;
-  }
-
-  public void setProposal(Class<? extends AbstractTypeProposal> proposal) {
-    m_proposal = proposal;
+    return m_proposalClass;
   }
 
   public String getProposalInterfaceFqn() {
     return m_proposalIfcTypeFqn;
+  }
+
+  public Set<String> getAliasNames() {
+    return m_aliasNames;
   }
 }

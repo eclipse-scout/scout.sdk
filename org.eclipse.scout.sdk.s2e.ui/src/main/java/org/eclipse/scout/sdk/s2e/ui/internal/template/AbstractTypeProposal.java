@@ -16,12 +16,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
@@ -37,7 +40,8 @@ import org.eclipse.jdt.internal.ui.JavaUIStatus;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.internal.ui.viewsupport.BindingLabelProvider;
 import org.eclipse.jdt.ui.JavaElementLabels;
-import org.eclipse.jdt.ui.text.java.correction.ASTRewriteCorrectionProposal;
+import org.eclipse.jdt.ui.SharedASTProvider;
+import org.eclipse.jdt.ui.text.java.correction.CUCorrectionProposal;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -45,13 +49,18 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.s2e.job.RunnableJob;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory;
 import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.ILinkedPositionHolder;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.text.edits.DeleteEdit;
+import org.eclipse.text.edits.InsertEdit;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.TextEditProcessor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -61,13 +70,22 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * @author Matthias Villiger
  * @since 5.2.0
  */
-public abstract class AbstractTypeProposal extends ASTRewriteCorrectionProposal implements ILinkedPositionHolder {
+public abstract class AbstractTypeProposal extends CUCorrectionProposal implements ILinkedPositionHolder {
+
+  /**
+   * Workaround to have a complete, valid AST even if there has been a prefix typed by the user. <br>
+   * Detail: If the user writes "abc" on an empty line before an annotation, this annotation is no longer part of the
+   * AST. This is because "abc@annot" is no valid pattern and gets excluded by the parser. As a workaround a semicolon
+   * is added: "abc;@annot". This way the parser recognizes the annotation because the text written by the user looks
+   * like another, wrong statement. The semicolon is removed again if the proposal is applied.
+   */
+  static final char SEARCH_STRING_END_FIX = ';';
 
   private final TypeProposalContext m_context;
   private final LinkedProposalModel m_linkedProposalModel;
   private final List<ICompletionProposalProvider> m_asyncProposalProviders;
 
-  private ASTRewrite m_rewrite;
+  private ASTRewrite m_rewrite; // to prevent duplicate calculations
   private AstNodeFactory m_nodeFactory;
 
   public interface IAstNodeFactoryProvider {
@@ -78,7 +96,7 @@ public abstract class AbstractTypeProposal extends ASTRewriteCorrectionProposal 
     @Override
     public AstNodeFactory createFactoryFor(AbstractTypeProposal proposal) {
       return new AstNodeFactory(proposal.getProposalContext().getDeclaringType(), proposal.getProposalContext().getIcu(), proposal.getProposalContext().getProvider(),
-          proposal.getProposalContext().getDeclaringTypeBinding(), proposal.getImportRewrite(), proposal);
+          proposal.getProposalContext().getDeclaringTypeBinding(), proposal);
     }
   };
 
@@ -100,20 +118,21 @@ public abstract class AbstractTypeProposal extends ASTRewriteCorrectionProposal 
   protected abstract void fillRewrite(AstNodeFactory factory, Type superType) throws CoreException;
 
   @Override
-  public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
+  public String getAdditionalProposalInfo() {
     return null; // disable preview
   }
 
   @Override
+  public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
+    return null; // disable async preview
+  }
+
   protected ASTRewrite getRewrite() throws CoreException {
     if (m_rewrite == null) {
       AstNodeFactory factory = getFactory();
-      if (factory.getImportRewrite() != getImportRewrite()) {
-        setImportRewrite(factory.getImportRewrite());
-      }
-
       Type superType = getBestMatchingSuperType(m_context.getDefaultSuperClasses());
       m_rewrite = factory.getRewrite();
+
       fillRewrite(factory, superType);
     }
     return m_rewrite;
@@ -142,7 +161,46 @@ public abstract class AbstractTypeProposal extends ASTRewriteCorrectionProposal 
   }
 
   @Override
+  protected void addEdits(IDocument document, TextEdit editRoot) throws CoreException {
+    try {
+      ASTRewrite rewrite = getRewrite();
+      MultiTextEdit edit = (MultiTextEdit) rewrite.rewriteAST();
+      String searchString = m_context.getSearchString();
+      if (searchString != null) {
+        // remove the search prefix
+        int len = searchString.length();
+        edit.addChild(new DeleteEdit(m_context.getInsertPosition() - len, len + String.valueOf(SEARCH_STRING_END_FIX).length()));
+      }
+      editRoot.addChild(edit);
+      editRoot.addChild(m_nodeFactory.getImportRewrite().rewriteImports(null));
+    }
+    catch (IllegalArgumentException e) {
+      throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
+    }
+  }
+
+  @Override
   protected void performChange(IEditorPart part, IDocument document) throws CoreException {
+    if (m_context.getSearchString() != null) {
+      try {
+        InsertEdit insertFixEdit = new InsertEdit(m_context.getInsertPosition(), String.valueOf(SEARCH_STRING_END_FIX));
+        TextEditProcessor proc = new TextEditProcessor(document, insertFixEdit, TextEdit.UPDATE_REGIONS);
+        proc.performEdits();
+      }
+      catch (MalformedTreeException | BadLocationException e) {
+        throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
+      }
+    }
+
+    // start AST retrieval
+    RunnableFuture<CompilationUnit> astInitializer = new FutureTask<>(new P_AstInitCallable(m_context.getIcu()));
+    RunnableJob astInitializerJob = new RunnableJob("Get AST", astInitializer);
+    astInitializerJob.setUser(false);
+    astInitializerJob.setSystem(true);
+    astInitializerJob.setPriority(Job.INTERACTIVE);
+    astInitializerJob.schedule();
+    m_context.setCompilationUnit(astInitializer);
+
     getRewrite(); // trigger rewrite creation
 
     // start proposal calculation
@@ -217,6 +275,20 @@ public abstract class AbstractTypeProposal extends ASTRewriteCorrectionProposal 
    */
   public void setEndPosition(ITrackedNodePosition position) {
     m_linkedProposalModel.setEndPosition(position);
+  }
+
+  private static final class P_AstInitCallable implements Callable<CompilationUnit> {
+
+    private final ICompilationUnit m_icu;
+
+    private P_AstInitCallable(ICompilationUnit icu) {
+      m_icu = icu;
+    }
+
+    @Override
+    public CompilationUnit call() throws Exception {
+      return SharedASTProvider.getAST(m_icu, SharedASTProvider.WAIT_ACTIVE_ONLY, null);
+    }
   }
 
   private final class P_HierarchyCallable implements Callable<Proposal[]> {

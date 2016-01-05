@@ -48,11 +48,11 @@ public abstract class AbstractDerivedResourceSingleHandler extends AbstractDeriv
 
   @Override
   public void validate() {
-    if (m_jdtType == null || !m_jdtType.exists()) {
-      throw new IllegalArgumentException("jdt type must exist: [" + (m_jdtType != null ? m_jdtType.getFullyQualifiedName() : null) + "]");
+    if (m_jdtType == null) {
+      throw new IllegalArgumentException("jdt type must exist.");
     }
     if (m_modelType == null) {
-      throw new IllegalArgumentException("model type must exist: [" + getModelFullyQualifiedName() + "]");
+      throw new IllegalArgumentException("model type must exist: [" + getModelFullyQualifiedName() + "].");
     }
   }
 

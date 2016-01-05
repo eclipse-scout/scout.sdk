@@ -102,7 +102,6 @@ public class ResourceWriteOperation implements IOperation {
           IStatus result = S2eUtils.makeCommittable(Collections.<IResource> singletonList(m_file));
           if (result.isOK()) {
             m_file.setContents(stream, true, true, monitor);
-            m_file.refreshLocal(IResource.DEPTH_ONE, monitor);
           }
           else {
             SdkLog.warning("Unable to make all resources committable. Save will be skipped.", new CoreException(result));

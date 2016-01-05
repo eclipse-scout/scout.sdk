@@ -532,7 +532,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           }
         }
         catch (Exception e) {
-          SdkLog.error("Error while '" + handler.getName() + "'.", e);
+          SdkLog.error("Error while: " + handler.getName(), e);
         }
       }
       return Status.OK_STATUS;
@@ -589,7 +589,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
             handler.run(SubMonitor.convert(monitor, 1));
           }
           catch (Exception e) {
-            SdkLog.error("Error while '" + handler.getName() + "'.", e);
+            SdkLog.error("Error while: " + handler.getName(), e);
           }
         }
       }

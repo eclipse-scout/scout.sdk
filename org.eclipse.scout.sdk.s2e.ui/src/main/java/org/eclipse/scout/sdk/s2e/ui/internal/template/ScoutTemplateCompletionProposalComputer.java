@@ -65,16 +65,18 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
         return Collections.emptyList();
       }
 
-      if (StringUtils.isNotEmpty(javaContext.computeIdentifierPrefix())) {
-        return Collections.emptyList();
-      }
-
       IType t = (IType) element;
       if (t.isBinary()) {
         return Collections.emptyList();
       }
 
-      return ScoutTemplateProposalFactory.createTemplateProposals(t, offset);
+      String prefix = null;
+      CharSequence computedPrefix = javaContext.computeIdentifierPrefix();
+      if (StringUtils.isNotEmpty(computedPrefix)) {
+        prefix = computedPrefix.toString();
+      }
+
+      return ScoutTemplateProposalFactory.createTemplateProposals(t, offset, prefix);
     }
     catch (Exception e) {
       SdkLog.error("Error calculating Scout template proposals.", e);

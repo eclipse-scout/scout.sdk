@@ -47,8 +47,11 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
     }
 
     // dev mode: also log to Eclipse log
-    if (Platform.inDebugMode() || Platform.inDevelopmentMode()) {
-      S2ESdkActivator.getDefault().getLog().log(new Status(parseSeverity(s), S2ESdkActivator.PLUGIN_ID, s));
+    if (Platform.isRunning() && (Platform.inDebugMode() || Platform.inDevelopmentMode())) {
+      S2ESdkActivator activator = S2ESdkActivator.getDefault();
+      if (activator != null) {
+        activator.getLog().log(new Status(parseSeverity(s), S2ESdkActivator.PLUGIN_ID, s));
+      }
     }
   }
 

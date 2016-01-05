@@ -83,6 +83,11 @@ public final class DtoS2eUtils {
   }
 
   private static org.eclipse.jdt.core.IType getDerivedJdtType(IType modelType, IType derivedType, org.eclipse.jdt.core.IType modelJdtType) throws JavaModelException {
+    if (!S2eUtils.exists(modelJdtType) || !S2eUtils.exists(modelJdtType.getJavaProject())) {
+      SdkLog.info("Model jdt type '" + modelType.name() + "' does not exist.", new Exception());
+      return null;
+    }
+
     String message = "Wrong derived resource annotation value.";
     if (modelType.equals(derivedType)) {
       SdkLog.error("Model type declares itself as derived target. DTO generation not possible.", new Exception(message));

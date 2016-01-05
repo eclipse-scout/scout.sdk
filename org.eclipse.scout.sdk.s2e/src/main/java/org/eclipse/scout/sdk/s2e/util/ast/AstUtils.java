@@ -258,33 +258,6 @@ public final class AstUtils {
   }
 
   /**
-   * Returns all super types (classes and interfaces) for the given type. The given type itself is not part of the
-   * result.
-   *
-   * @param type
-   *          The type to get the supertypes of.
-   * @return all super types (excluding <code>type</code>)
-   */
-  public static Set<ITypeBinding> getAllSuperTypes(ITypeBinding type) {
-    Set<ITypeBinding> result = new HashSet<>();
-    collectSuperTypes(type, result);
-    result.remove(type);
-    return result;
-  }
-
-  private static void collectSuperTypes(ITypeBinding curr, Set<ITypeBinding> collection) {
-    if (collection.add(curr)) {
-      for (ITypeBinding tb : curr.getInterfaces()) {
-        collectSuperTypes(tb, collection);
-      }
-      ITypeBinding superClass = curr.getSuperclass();
-      if (superClass != null) {
-        collectSuperTypes(superClass, collection);
-      }
-    }
-  }
-
-  /**
    * Method to visit a type hierarchy defined by a given type. The given type itself is not visited.
    *
    * @param type

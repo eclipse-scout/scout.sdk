@@ -46,7 +46,6 @@ import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -126,14 +125,16 @@ public final class S2eUtils {
    * @throws JavaModelException
    */
   public static String getPackage(ICompilationUnit icu) throws JavaModelException {
-    String pck = "";
-    if (icu != null) {
-      IPackageDeclaration[] packageDeclarations = icu.getPackageDeclarations();
-      if (packageDeclarations.length > 0) {
-        pck = packageDeclarations[0].getElementName();
-      }
+    if (!exists(icu)) {
+      return "";
     }
-    return pck;
+
+    IPackageDeclaration[] packageDeclarations = icu.getPackageDeclarations();
+    if (packageDeclarations.length < 1) {
+      return "";
+    }
+
+    return packageDeclarations[0].getElementName();
   }
 
   /**
@@ -336,25 +337,6 @@ public final class S2eUtils {
   }
 
   /**
-   * Checks whether the given {@link ITypeHierarchy} contains an element with the given fully qualified name.
-   *
-   * @param h
-   *          The hierarchy to search in.
-   * @param fqn
-   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator
-   *          (e.g. <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
-   * @return <code>true</code> if it is part of the given {@link ITypeHierarchy}, <code>false</code> otherwise.
-   */
-  public static boolean contains(ITypeHierarchy h, String fqn) {
-    for (IType t : h.getAllTypes()) {
-      if (fqn.equals(t.getFullyQualifiedName('$'))) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Gets the first {@link IAnnotation} on the given {@link IType} or its super types that has one of the given fully
    * qualified names.
    *
@@ -392,7 +374,7 @@ public final class S2eUtils {
 
   /**
    * Gets the first {@link IAnnotation} of the given fully qualified names that exist on the given {@link IAnnotatable}.
-   * 
+   *
    * @param element
    *          The owner to search in.
    * @param fullyQualifiedAnnotations
@@ -625,58 +607,6 @@ public final class S2eUtils {
       }
     }
     return null;
-  }
-
-  /**
-   * To get a type hierarchy with the given elements as scope.
-   *
-   * @param elements
-   * @return
-   * @throws JavaModelException
-   */
-  public static ITypeHierarchy getLocalTypeHierarchy(Collection<? extends IJavaElement> elements) throws JavaModelException {
-    IRegion region = JavaCore.newRegion();
-    if (elements != null && !elements.isEmpty()) {
-      for (IJavaElement e : elements) {
-        if (exists(e)) {
-          if (e.getElementType() == IJavaElement.TYPE) {
-            IType t = (IType) e;
-            if (t.isBinary()) {
-              // binary types do not include their inner types because these inner types belong to their own class file
-              // solution: add them manually
-              addBinaryInnerTypesToRegionRec(t, region);
-            }
-          }
-          region.add(e);
-        }
-      }
-    }
-    return JavaCore.newTypeHierarchy(region, null, null);
-  }
-
-  private static void addBinaryInnerTypesToRegionRec(IType declaringType, IRegion region) throws JavaModelException {
-    for (IType child : declaringType.getTypes()) {
-      region.add(child);
-      addBinaryInnerTypesToRegionRec(child, region);
-    }
-  }
-
-  /**
-   * To get a type hierarchy with the given elements as scope.
-   *
-   * @param elements
-   * @return
-   * @throws JavaModelException
-   */
-  public static ITypeHierarchy getLocalTypeHierarchy(IJavaElement... elements) throws JavaModelException {
-    if (elements == null || elements.length < 1) {
-      return null;
-    }
-    Set<IJavaElement> el = new HashSet<>(elements.length);
-    for (IJavaElement e : elements) {
-      el.add(e);
-    }
-    return getLocalTypeHierarchy(el);
   }
 
   /**
