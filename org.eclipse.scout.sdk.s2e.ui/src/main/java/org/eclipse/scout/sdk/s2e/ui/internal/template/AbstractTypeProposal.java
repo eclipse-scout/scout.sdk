@@ -172,7 +172,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
         edit.addChild(new DeleteEdit(m_context.getInsertPosition() - len, len + String.valueOf(SEARCH_STRING_END_FIX).length()));
       }
       editRoot.addChild(edit);
-      editRoot.addChild(m_nodeFactory.getImportRewrite().rewriteImports(null));
+      editRoot.addChild(getFactory().getImportRewrite().rewriteImports(null));
     }
     catch (IllegalArgumentException e) {
       throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));

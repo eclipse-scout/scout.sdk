@@ -12,10 +12,9 @@ package org.eclipse.scout.sdk.s2e.workspace;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.ToolFactory;
@@ -23,6 +22,7 @@ import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
@@ -33,18 +33,10 @@ public class SourceFormatOperation implements IOperation {
   private final IJavaProject m_project;
   private Document m_document;
   private ISourceRange m_range;
-  private int m_indent = 0;
+  private int m_indent;
 
-  public SourceFormatOperation(IJavaProject project) {
-    m_project = project;
-  }
-
-  public SourceFormatOperation(IType type) throws JavaModelException {
-    this(type.getJavaProject(), new Document(type.getCompilationUnit().getSource()), type.getSourceRange());
-  }
-
-  public SourceFormatOperation(IMethod method) throws JavaModelException {
-    this(method.getJavaProject(), new Document(method.getCompilationUnit().getSource()), method.getSourceRange());
+  public SourceFormatOperation(ICompilationUnit icu) throws JavaModelException {
+    this(icu.getJavaProject(), new Document(icu.getSource()), icu.getSourceRange());
   }
 
   public SourceFormatOperation(IJavaProject project, Document document) {
@@ -52,6 +44,7 @@ public class SourceFormatOperation implements IOperation {
   }
 
   public SourceFormatOperation(IJavaProject project, Document document, ISourceRange range) {
+    m_indent = 0;
     m_project = project;
     m_document = document;
     m_range = range;
@@ -86,13 +79,13 @@ public class SourceFormatOperation implements IOperation {
       }
       CodeFormatter formatter = ToolFactory.createCodeFormatter(getProject().getOptions(true));
       int kind = CodeFormatter.F_INCLUDE_COMMENTS | CodeFormatter.K_UNKNOWN;
-      String defaultLineDelimiter = getDocument().getDefaultLineDelimiter();
+      String defaultLineDelimiter = document.getDefaultLineDelimiter();
       if (defaultLineDelimiter == null) {
-        defaultLineDelimiter = "\n";
+        defaultLineDelimiter = S2eUtils.lineSeparator(getProject());
       }
       TextEdit te = formatter.format(kind, document.get(), range.getOffset(), range.getLength(), m_indent, defaultLineDelimiter);
       if (te != null) {
-        te.apply(getDocument());
+        te.apply(document);
       }
     }
     catch (MalformedTreeException e) {

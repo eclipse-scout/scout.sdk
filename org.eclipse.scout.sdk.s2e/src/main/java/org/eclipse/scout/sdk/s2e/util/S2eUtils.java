@@ -611,13 +611,14 @@ public final class S2eUtils {
 
   /**
    * Returns the line separator for the given project.<br>
-   * If the project is null, returns the line separator for the workspace.<br>
-   * If still null, return the system line separator.
+   * If the project is <code>null</code>, returns the line separator as specified in the current workspace.<br>
+   * If there is nothing specified in the project or the workspace, the system line separator is returned:
+   * <code>System.getProperty("line.separator")</code>.
    *
    * @param p
    *          The {@link IJavaProject} for which the line separator should be returned or <code>null</code> if the
    *          workspace preference should be returned.
-   * @return The preferred line separator.
+   * @return The preferred line separator. Is never <code>null</code>.
    */
   public static String lineSeparator(IJavaProject p) {
     return Util.getLineSeparator(null, p);

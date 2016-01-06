@@ -20,6 +20,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
@@ -28,6 +32,8 @@ import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
 import org.eclipse.scout.sdk.s2e.workspace.IOperation;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
 
@@ -63,7 +69,7 @@ public class ScoutProjectNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
-      // archetype settings
+      // get archetype settings
       String groupId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_GROUP_ID);
       String artifactId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_ARTIFACT_ID);
       String version = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_VERSION);
@@ -74,15 +80,24 @@ public class ScoutProjectNewOperation implements IOperation {
         version = null;
       }
 
-      // maven settings
+      // get maven settings from workspace
       String globalSettings = getMavenSettings(MavenPlugin.getMavenConfiguration().getGlobalSettingsFile());
       String settings = getMavenSettings(MavenPlugin.getMavenConfiguration().getUserSettingsFile());
 
+      if (monitor.isCanceled()) {
+        return;
+      }
+
+      // create project on disk (using archetype)
       monitor.beginTask(getOperationName(), 100);
       ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getJavaVersion(), groupId, artifactId, version, globalSettings, settings);
-      monitor.worked(10);
+      monitor.worked(5);
 
+      // import into workspace
       m_createdProjects = importIntoWorkspace(SubMonitor.convert(monitor, 90));
+
+      // format all compilation units with current workspace settings
+      formatCreatedProjects(SubMonitor.convert(monitor, 5), workingCopyManager);
     }
     catch (Exception e) {
       throw new CoreException(new ScoutStatus("Unable to create Scout Project.", e));
@@ -92,16 +107,43 @@ public class ScoutProjectNewOperation implements IOperation {
     }
   }
 
-  protected static String getMavenSettings(String in) {
-    if (StringUtils.isNotBlank(in)) {
-      File p = new File(in);
-      String absolutePath = p.getAbsolutePath();
-      if (p.isFile()) {
-        return absolutePath;
+  protected void formatCreatedProjects(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    monitor.beginTask("Format created projects", m_createdProjects.size());
+    for (IProject createdProject : m_createdProjects) {
+      if (createdProject.isAccessible() && createdProject.hasNature(JavaCore.NATURE_ID)) {
+        IJavaProject jp = JavaCore.create(createdProject);
+        if (S2eUtils.exists(jp)) {
+          formatProject(monitor, workingCopyManager, jp);
+        }
       }
-      SdkLog.warning("Maven settings file '" + absolutePath + "' not found. Using empty settings.");
+      monitor.worked(1);
     }
-    return null;
+  }
+
+  protected static void formatProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, IJavaProject p) throws CoreException {
+    for (IPackageFragment pck : p.getPackageFragments()) {
+      for (ICompilationUnit u : pck.getCompilationUnits()) {
+        // the cu write operation also formats the unit. just overwrite with itself.
+        CompilationUnitWriteOperation w = new CompilationUnitWriteOperation(u, u.getSource());
+        w.validate();
+        w.run(monitor, workingCopyManager);
+      }
+    }
+  }
+
+  protected static String getMavenSettings(String in) {
+    if (StringUtils.isBlank(in)) {
+      return null;
+    }
+
+    File p = new File(in);
+    String absolutePath = p.getAbsolutePath();
+    if (!p.isFile()) {
+      SdkLog.warning("Maven settings file '" + absolutePath + "' not found. Using empty settings.");
+      return null;
+    }
+
+    return absolutePath;
   }
 
   /**
