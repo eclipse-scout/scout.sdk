@@ -107,7 +107,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
           }
           catch (JavaModelException e) {
             // this element seems to be corrupt -> ignore
-            SdkLog.warning("Attempt to access source range of type '" + candidate.getFullyQualifiedName() + "' failed. Type will be skipped.", e);
+            SdkLog.warning("Attempt to access source range of type '{}' failed. Type will be skipped.", candidate.getFullyQualifiedName(), e);
           }
         }
         return false;
@@ -117,9 +117,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     S2eUtils.findClassesInStrictHierarchy(javaProject, IScoutRuntimeTypes.AbstractDynamicNlsTextProviderService, null, filter);
 
     if (!duplicateOrders.isEmpty()) {
-      for (String duplicates : duplicateOrders) {
-        SdkLog.warning("There are TextProviderServices with the same @Order value: " + duplicates);
-      }
+      SdkLog.warning("There are TextProviderServices with the same @Order value: {}", duplicateOrders);
     }
 
     // return the types of the services ordered by priority
@@ -154,14 +152,14 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       return null;
     }
     if (!S2eUtils.exists(serviceType)) {
-      SdkLog.error("nls service type '" + serviceType.getFullyQualifiedName() + "' does not exist.");
+      SdkLog.error("nls service type '{}' does not exist.", serviceType.getFullyQualifiedName());
       return null;
     }
 
     NlsServiceType type = new NlsServiceType(serviceType);
     if (type.getTranslationsFolderName() == null) {
-      SdkLog.warning("The NLS Service for Type '" + serviceType.getFullyQualifiedName() + "' could not be parsed. Ensure that the method '" + NlsServiceType.DYNAMIC_NLS_BASE_NAME_GETTER
-          + "' is available and returns a String literal like \"resources.texts.Texts\" directly.");
+      SdkLog.warning("The NLS Service for Type '{}' could not be parsed. Ensure that the method '{}' is available and returns a String literal like \"resources.texts.Texts\" directly.",
+          serviceType.getFullyQualifiedName(), NlsServiceType.DYNAMIC_NLS_BASE_NAME_GETTER);
       return null;
     }
 
@@ -269,7 +267,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     }
     catch (CoreException e) {
-      SdkLog.warning("Could not load text provider services for file: " + f.getFullPath().toString(), e);
+      SdkLog.warning("Could not load text provider services for file: {}", f.getFullPath().toString(), e);
     }
     return null;
   }
@@ -296,7 +294,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       return getNlsProjectTree(textservice);
     }
     catch (CoreException e) {
-      SdkLog.warning("Could not load text provider services for " + textservice.getFullyQualifiedName(), e);
+      SdkLog.warning("Could not load text provider services for {}", textservice.getFullyQualifiedName(), e);
       return null;
     }
   }

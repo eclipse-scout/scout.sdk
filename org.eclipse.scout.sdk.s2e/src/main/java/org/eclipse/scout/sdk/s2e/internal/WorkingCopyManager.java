@@ -87,14 +87,14 @@ public class WorkingCopyManager implements IWorkingCopyManager {
       }
     }
     catch (Exception e) {
-      SdkLog.warning("Unable to commit working copy '" + icu.getElementName() + "'.", e);
+      SdkLog.warning("Unable to commit working copy '{}'.", icu.getElementName(), e);
     }
     finally {
       try {
         icu.discardWorkingCopy();
       }
       catch (JavaModelException e) {
-        SdkLog.warning("Unable to discard working copy '" + icu.getElementName() + "'.", e);
+        SdkLog.warning("Unable to discard working copy '{}'.", icu.getElementName(), e);
       }
     }
   }

@@ -88,14 +88,8 @@ public class SourceFormatOperation implements IOperation {
         te.apply(document);
       }
     }
-    catch (MalformedTreeException e) {
-      SdkLog.error(e);
-    }
-    catch (IllegalArgumentException e) {
-      SdkLog.error(e);
-    }
-    catch (BadLocationException e) {
-      SdkLog.error(e);
+    catch (MalformedTreeException | IllegalArgumentException | BadLocationException e) {
+      SdkLog.error("Unable to format source.", e);
     }
   }
 

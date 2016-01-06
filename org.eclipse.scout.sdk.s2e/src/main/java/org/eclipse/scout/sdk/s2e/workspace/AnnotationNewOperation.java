@@ -93,7 +93,7 @@ public class AnnotationNewOperation implements IOperation {
       new ImportsCreateOperation(icu, collector).run(monitor, workingCopyManager);
     }
     catch (Exception e) {
-      SdkLog.warning("could not add annotation to '" + m_declaringMember.getElementName() + "'.", e);
+      SdkLog.warning("could not add annotation to '{}'.", m_declaringMember.getElementName(), e);
     }
   }
 

@@ -28,14 +28,14 @@ public final class SdkConsole {
   /**
    * Clears the console contents.
    */
-  public static void clear() {
+  public static synchronized void clear() {
     spi.clear();
   }
 
   /**
    * write an empty line to the console.
    */
-  public static void println() {
+  static synchronized void println() {
     spi.println("");
   }
 
@@ -47,7 +47,7 @@ public final class SdkConsole {
    * @param exceptions
    *          Optional {@link Throwable}s to write to the console.
    */
-  public static void println(String msg, Throwable... exceptions) {
+  static synchronized void println(String msg, Throwable... exceptions) {
     if (msg != null) {
       spi.println(msg);
     }
@@ -65,6 +65,7 @@ public final class SdkConsole {
 
   public static String getStackTrace(Throwable t) {
     try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
+      p.println();
       t.printStackTrace(p);
       return w.toString();
     }
@@ -72,8 +73,6 @@ public final class SdkConsole {
       return '[' + e.toString() + ']' + t.toString();
     }
   }
-
-  // service provider interface (spi)
 
   private SdkConsole() {
   }

@@ -121,7 +121,7 @@ public final class ScoutTemplateProposalFactory {
       }
     }
     catch (JavaModelException e) {
-      SdkLog.error("Unable to calculate supertype hierarchy for '" + surroundingType.getFullyQualifiedName() + "'.", e);
+      SdkLog.error("Unable to calculate supertype hierarchy for '{}'.", surroundingType.getFullyQualifiedName(), e);
       return Collections.emptyList();
     }
 

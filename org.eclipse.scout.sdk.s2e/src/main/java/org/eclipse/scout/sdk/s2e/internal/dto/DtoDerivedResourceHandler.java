@@ -47,7 +47,7 @@ public class DtoDerivedResourceHandler extends AbstractDerivedResourceSingleHand
       S2eUtils.writeTypes(Collections.singletonList(op), monitor, false);
     }
     catch (MissingTypeException e) {
-      SdkLog.info("Unable to update DTO for '" + getModelFullyQualifiedName() + "' because there are compile errors in the compilation unit.", e);
+      SdkLog.info("Unable to update DTO for '{}' because there are compile errors in the compilation unit.", getModelFullyQualifiedName(), e);
     }
     finally {
       monitor.done();

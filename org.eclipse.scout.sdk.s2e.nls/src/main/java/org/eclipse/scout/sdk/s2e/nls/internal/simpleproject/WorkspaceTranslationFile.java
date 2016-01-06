@@ -69,14 +69,14 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
       m_file.refreshLocal(IResource.DEPTH_ZERO, monitor);
     }
     catch (CoreException e) {
-      SdkLog.warning("Could not refresh file '" + m_file.getLocation().toOSString() + "'.", e);
+      SdkLog.warning("Could not refresh file '{}'.", m_file.getLocation().toOSString(), e);
     }
 
     try (InputStream io = m_file.getContents()) {
       parseResource(io);
     }
     catch (Exception e) {
-      SdkLog.error("cold not reload translation file: " + m_file.getName(), e);
+      SdkLog.error("cold not reload translation file: {}", m_file.getName(), e);
     }
   }
 
@@ -105,7 +105,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
   public void commitChanges(IProgressMonitor monitor) {
     synchronized (m_file) {
       if (!m_file.exists()) {
-        SdkLog.error("File: " + m_file.getName() + " not found!");
+        SdkLog.error("File: {} not found!", m_file.getName());
       }
 
       Properties prop = new Properties();
@@ -136,7 +136,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
         S2eUtils.writeResources(Collections.singletonList(new ResourceWriteOperation(m_file, builder.toString())), monitor, true);
       }
       catch (IOException | CoreException e) {
-        SdkLog.error("could not refresh file: " + m_file.getName(), e);
+        SdkLog.error("could not refresh file: {}", m_file.getName(), e);
       }
     }
   }

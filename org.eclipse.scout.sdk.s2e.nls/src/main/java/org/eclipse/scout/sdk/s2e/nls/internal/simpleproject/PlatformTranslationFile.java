@@ -25,7 +25,7 @@ public class PlatformTranslationFile extends AbstractTranslationResource {
       parseResource(is);
     }
     catch (Exception e) {
-      SdkLog.error("could not parse translation file: " + getLanguage().getDispalyName(), e);
+      SdkLog.error("could not parse translation file: {}", getLanguage().getDispalyName(), e);
     }
   }
 

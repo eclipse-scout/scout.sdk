@@ -171,7 +171,7 @@ public final class ScoutSdkCore {
       if (Charset.isSupported(encoding)) {
         return true;
       }
-      SdkLog.warning("Charset '" + encoding + "' of classpath entry '" + root.getElementName() + "' is not supported by this platform. Trying to decode using default charset.");
+      SdkLog.warning("Charset '{}' of classpath entry '{}' is not supported by this platform. Trying to decode using default charset.", encoding, root.getElementName());
     }
     return false;
   }

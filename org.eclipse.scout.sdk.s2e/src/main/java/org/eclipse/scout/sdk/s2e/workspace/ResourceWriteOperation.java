@@ -110,7 +110,7 @@ public class ResourceWriteOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      SdkLog.error("could not store '" + m_file.getProjectRelativePath() + "'.", e);
+      SdkLog.error("could not store '{}'.", m_file.getProjectRelativePath(), e);
     }
   }
 

@@ -111,11 +111,11 @@ public class WellformScoutTypeOperation implements IOperation {
         icuBuffer.setContents(sourceDoc.get());
       }
       catch (Exception e) {
-        SdkLog.warning("Could not wellform type '" + type.getFullyQualifiedName() + "'.", e);
+        SdkLog.warning("Could not wellform type '{}'.", type.getFullyQualifiedName(), e);
       }
     }
     else {
-      SdkLog.warning("Unable to get source of type '" + type.getFullyQualifiedName() + "'. Skipping wellform for this type.");
+      SdkLog.warning("Unable to get source of type '{}'. Skipping wellform for this type.", type.getFullyQualifiedName());
     }
   }
 

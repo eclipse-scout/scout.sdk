@@ -38,7 +38,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
       return null;
     }
     if (!type.exists()) {
-      SdkLog.error("NLS type '" + type.getFullyQualifiedName() + "' does not exist.");
+      SdkLog.error("NLS type '{}' does not exist.", type.getFullyQualifiedName());
       return null;
     }
 
@@ -83,12 +83,12 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
                   // also give the other providers a chance to parse
                   return NlsCore.getNlsWorkspace().getNlsProject(new Object[]{type});
                 }
-                SdkLog.warning("Could not find type '" + nlsFile.getNlsTypeName() + "'.");
+                SdkLog.warning("Could not find type '{}'.", nlsFile.getNlsTypeName());
               }
             }
           }
           catch (CoreException e) {
-            SdkLog.warning("Could not load NlsFile: " + f.getFullPath().toString(), e);
+            SdkLog.warning("Could not load NlsFile: {}", f.getFullPath().toString(), e);
           }
         }
       }

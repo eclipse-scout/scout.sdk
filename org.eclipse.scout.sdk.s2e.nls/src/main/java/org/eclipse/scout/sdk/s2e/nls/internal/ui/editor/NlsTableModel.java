@@ -166,7 +166,7 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
         return numA.compareTo(numB);
       }
       catch (NumberFormatException e) {
-        SdkLog.info("no valid number '" + a + "' or '" + b + "'", e);
+        SdkLog.info("no valid number '{}' or '{}'.", a, b, e);
       }
     }
 

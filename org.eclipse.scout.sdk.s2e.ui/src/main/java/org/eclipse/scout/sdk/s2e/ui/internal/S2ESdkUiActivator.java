@@ -187,7 +187,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
       }
       else if (SdkLog.LOG_LEVEL_PROPERTY_NAME.equals(event.getProperty())) {
         if (newValue == null) {
-          SdkLog.setDefaultLogLevel();
+          SdkLog.setInitialLogLevel();
         }
         else {
           SdkLog.setLogLevel(newValue.toString());

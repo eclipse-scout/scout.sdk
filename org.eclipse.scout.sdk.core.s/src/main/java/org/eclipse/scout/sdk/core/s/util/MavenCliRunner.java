@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -84,7 +83,7 @@ public class MavenCliRunner {
       try (ByteArrayOutputStream bOut = new ByteArrayOutputStream(); PrintStream out = new PrintStream(bOut, true, charset); ByteArrayOutputStream bErr = new ByteArrayOutputStream(); PrintStream err = new PrintStream(bErr, true, charset)) {
 
         String[] mavenArgs = getMavenArgs(args, globalSettings, settings);
-        SdkLog.debug("Executing embedded maven with arguments:  " + Arrays.toString(mavenArgs));
+        SdkLog.debug("Executing embedded maven with arguments: {}", new Object[]{mavenArgs});
 
         MavenCli cli = new MavenCli();
         int result = cli.doMain(mavenArgs, workingDirectory.getAbsolutePath(), out, err);

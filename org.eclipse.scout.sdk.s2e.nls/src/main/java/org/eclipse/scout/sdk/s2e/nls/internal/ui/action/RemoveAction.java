@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.action;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -57,24 +56,8 @@ public class RemoveAction extends Action {
       m_status = job.getResult();
     }
     catch (InterruptedException e) {
-      SdkLog.error("cold not remove the row key: " + getVerbose(m_entries) + " in translation resources", e);
+      SdkLog.error("cold not remove the row key: {} in translation resources", m_entries, e);
     }
-  }
-
-  private static String getVerbose(List<INlsEntry> entries) {
-    if (entries == null) {
-      return "[no entries]";
-    }
-    StringBuilder builder = new StringBuilder('[');
-    Iterator<INlsEntry> iterator = entries.iterator();
-    if (iterator.hasNext()) {
-      builder.append('\'').append(iterator.next()).append('\'');
-      while (iterator.hasNext()) {
-        builder.append(", ").append('\'').append(iterator.next()).append('\'');
-      }
-    }
-    builder.append(']');
-    return builder.toString();
   }
 
   public IStatus getStatus() {

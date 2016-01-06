@@ -58,7 +58,7 @@ public final class UniqueIdExtensionPoint {
                   providers.put(new CompositeObject(getPriority(providerElememt), provider.getClass().getName()), provider);
                 }
                 catch (Exception t) {
-                  SdkLog.error("Error registering code id provider '" + providerElememt.getNamespaceIdentifier() + "'.", t);
+                  SdkLog.error("Error registering code id provider '{}'.", providerElememt.getNamespaceIdentifier(), t);
                 }
               }
             }
@@ -77,7 +77,7 @@ public final class UniqueIdExtensionPoint {
       priority = Integer.MAX_VALUE - Integer.parseInt(prio); /* descending order: highest prio first */
     }
     catch (Exception e) {
-      SdkLog.warning("could not parse priority of " + EXTENSION_POINT_NAME + " extension '" + element.getName() + "'", e);
+      SdkLog.warning("could not parse priority of {} extension '{}'.", EXTENSION_POINT_NAME, element.getName(), e);
     }
     return priority;
   }
@@ -85,7 +85,7 @@ public final class UniqueIdExtensionPoint {
   /**
    * Gets the next unique id from the first {@link IUniqueIdProvider} which provides a non-null value for the given
    * input.
-   * 
+   *
    * @param context
    *          Properties describing the calling context.
    * @param genericSignature
@@ -101,7 +101,7 @@ public final class UniqueIdExtensionPoint {
         }
       }
       catch (Exception e) {
-        SdkLog.warning("Exception in codeIdExtension '" + p.getClass().getName() + "'.", e);
+        SdkLog.warning("Exception in codeIdExtension '{}'.", p.getClass().getName(), e);
       }
     }
     return null;

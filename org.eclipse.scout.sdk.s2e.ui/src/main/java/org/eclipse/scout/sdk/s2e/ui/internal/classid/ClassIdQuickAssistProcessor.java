@@ -138,7 +138,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
               }
             }
             catch (CoreException e) {
-              SdkLog.error("Unable to check if type '" + t.getFullyQualifiedName() + "' is anonymous.", e);
+              SdkLog.error("Unable to check if type '{}' is anonymous.", t.getFullyQualifiedName(), e);
             }
           }
         }

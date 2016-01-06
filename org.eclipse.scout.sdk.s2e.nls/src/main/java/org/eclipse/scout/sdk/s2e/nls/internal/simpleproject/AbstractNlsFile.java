@@ -48,7 +48,7 @@ public abstract class AbstractNlsFile {
       props.load(io);
     }
     catch (Exception e) {
-      SdkLog.warning("could not open stream to read NLS file :'" + file.getFullPath() + "'", e);
+      SdkLog.warning("could not open stream to read NLS file '{}'.", file.getFullPath(), e);
     }
     m_nlsTypeName = props.getProperty(MANIFEST_CLASS);
   }

@@ -48,12 +48,7 @@ public class S2ESdkActivator extends Plugin {
     Job j = new Job("register scout archetype") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        try {
-          registerScoutArcheType();
-        }
-        catch (Exception e) {
-          SdkLog.info(e);
-        }
+        registerScoutArchetype();
         return Status.OK_STATUS;
       }
     };
@@ -79,7 +74,7 @@ public class S2ESdkActivator extends Plugin {
     return m_derivedResourceManager;
   }
 
-  private static void registerScoutArcheType() {
+  private static void registerScoutArchetype() {
     try {
       Archetype archetype = new Archetype();
       archetype.setGroupId(ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID);

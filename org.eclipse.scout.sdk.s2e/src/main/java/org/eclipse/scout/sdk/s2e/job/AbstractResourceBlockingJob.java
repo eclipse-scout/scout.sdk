@@ -75,7 +75,7 @@ public abstract class AbstractResourceBlockingJob extends AbstractJob {
       return doRun(monitor);
     }
     finally {
-      SdkLog.debug("Operation job '" + getName() + "' took " + (System.currentTimeMillis() - start) + "ms to execute.");
+      SdkLog.debug("Operation job '{}' took {}ms to execute.", getName(), System.currentTimeMillis() - start);
     }
   }
 

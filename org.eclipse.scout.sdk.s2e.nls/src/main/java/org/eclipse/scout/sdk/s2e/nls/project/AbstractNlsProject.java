@@ -379,11 +379,11 @@ public abstract class AbstractNlsProject implements INlsProject {
       monitor.beginTask("update Key", IProgressMonitor.UNKNOWN);
       NlsEntry originalEntry = m_entries.remove(entry.getKey());
       if (originalEntry == null) {
-        SdkLog.error("The nls entry with the key '" + entry.getKey() + "' can not be found");
+        SdkLog.error("The nls entry with the key '{}' can not be found.", entry.getKey());
         return;
       }
       else if (originalEntry.getType() == INlsEntry.TYPE_INHERITED) {
-        SdkLog.error("The inherited NLS entry '" + originalEntry.getKey() + "' can not be modified");
+        SdkLog.error("The inherited NLS entry '{}' can not be modified.", originalEntry.getKey());
         return;
       }
       else {
@@ -518,7 +518,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       try {
         NlsEntry entry = m_entries.get(superRow.getKey());
         if (entry == null) {
-          SdkLog.error("NLS entry with key:'" + superRow.getKey() + "' not found");
+          SdkLog.error("NLS entry with key:'{}' not found.", superRow.getKey());
           return;
         }
         if (entry.getType() == INlsEntry.TYPE_INHERITED) {
@@ -544,7 +544,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       }
     }
     catch (CoreException e) {
-      SdkLog.error("could not load tranlstion property resources.", e);
+      SdkLog.error("could not load translation property resources.", e);
     }
   }
 

@@ -139,7 +139,7 @@ public class ScoutProjectNewOperation implements IOperation {
     File p = new File(in);
     String absolutePath = p.getAbsolutePath();
     if (!p.isFile()) {
-      SdkLog.warning("Maven settings file '" + absolutePath + "' not found. Using empty settings.");
+      SdkLog.warning("Maven settings file '{}' not found. Using empty settings.", absolutePath);
       return null;
     }
 

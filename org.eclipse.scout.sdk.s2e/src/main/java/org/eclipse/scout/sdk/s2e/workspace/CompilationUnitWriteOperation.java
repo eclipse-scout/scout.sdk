@@ -134,7 +134,7 @@ public class CompilationUnitWriteOperation implements IOperation {
       buffer.setContents(newSource);
     }
     catch (Exception e) {
-      SdkLog.error("Could not store '" + m_cu.getPath() + "'.", e);
+      SdkLog.error("Could not store '{}'.", m_cu.getPath(), e);
     }
   }
 

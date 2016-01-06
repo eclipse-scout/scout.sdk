@@ -164,7 +164,7 @@ public class ClassIdNewOperation implements IOperation {
       new ImportsCreateOperation(icu, collector).run(new NullProgressMonitor(), workingCopyManager);
     }
     catch (BadLocationException e) {
-      SdkLog.warning("Could not update @ClassId annotations for compilation unit '" + icu.getElementName() + "'.", e);
+      SdkLog.warning("Could not update @ClassId annotations for compilation unit '{}'.", icu.getElementName(), e);
     }
   }
 }

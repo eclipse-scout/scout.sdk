@@ -439,7 +439,7 @@ public class StructuredType implements IStructuredType {
           it.remove();
         }
         else {
-          SdkLog.warning("could not parse property method '" + method.elementName() + "'.");
+          SdkLog.warning("could not parse property method '{}'.", method.elementName());
         }
       }
     }

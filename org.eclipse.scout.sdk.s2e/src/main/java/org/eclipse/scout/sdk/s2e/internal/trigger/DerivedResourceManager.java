@@ -108,7 +108,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     IJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
     for (IDerivedResourceHandler handler : createOperations(jdtType, envProvider)) {
       if (!addElementToQueueSecure(m_triggerHandlers, handler, handler.getName(), -1, null)) {
-        SdkLog.info("Unable to trigger more derived resource updates. Queue is already full. Skipping.");
+        SdkLog.warning("Unable to trigger more derived resource updates. Queue is already full. Skipping.");
       }
     }
     m_runQueuedTriggerHandlersJob.abort();
@@ -138,7 +138,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         }
       }
       catch (Exception e) {
-        SdkLog.error("Unable to create operation with handler '" + factory.getClass() + "'.", e);
+        SdkLog.error("Unable to create operation with handler '{}'.", factory.getClass(), e);
       }
     }
     return all != null ? all : Collections.<IDerivedResourceHandler> emptyList();
@@ -166,7 +166,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
             }
           }
           catch (Exception e) {
-            SdkLog.error("Error while collecting all types from '" + handler.getClass() + "'.", e);
+            SdkLog.error("Error while collecting all types from '{}'.", handler.getClass(), e);
           }
         }
         return Status.OK_STATUS;
@@ -265,7 +265,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       }
     }
     while (interrupted);
-    SdkLog.warning("Too many thread interrupts while waiting for space in the scout trigger queue. Skipping '" + name + "'.");
+    SdkLog.warning("Too many thread interrupts while waiting for space in the trigger queue. Skipping '{}'.", name);
     return false; // we had too many interrupts. we don't want to wait any longer (no endless looping).
   }
 
@@ -330,7 +330,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     public void elementChanged(ElementChangedEvent event) {
       if (event != null && acceptUpdateEvent() && !addElementToQueueSecure(m_eventCollector, event, event.toString(), 10, TimeUnit.SECONDS)) {
         // element could not be added within the given timeout
-        SdkLog.info("Unable to queue more java element changes. Queue is already full. Skipping event.");
+        SdkLog.warning("Unable to queue more java element changes. Queue is already full. Skipping event.");
       }
     }
   }
@@ -429,14 +429,14 @@ public class DerivedResourceManager implements IDerivedResourceManager {
                   added = true;
                 }
                 else {
-                  SdkLog.info("Unable to queue more derived resource update events. Queue is already full. Skipping event.");
+                  SdkLog.warning("Unable to queue more derived resource update events. Queue is already full. Skipping event.");
                 }
               }
             }
           }
         }
         catch (Exception e) {
-          SdkLog.error("Unable to handle event for compilation unit '" + icu.getElementName() + "'.", e);
+          SdkLog.error("Unable to handle event for compilation unit '{}'.", icu.getElementName(), e);
         }
       }
       return added;
@@ -528,11 +528,11 @@ public class DerivedResourceManager implements IDerivedResourceManager {
             handler.run(SubMonitor.convert(monitor, 1));
           }
           finally {
-            SdkLog.debug("Derived Resource Handler '" + handler.getName() + "' took " + (System.currentTimeMillis() - start) + "ms to execute.");
+            SdkLog.debug("Derived Resource Handler ({}) took {}ms to execute.", handler.getName(), System.currentTimeMillis() - start);
           }
         }
         catch (Exception e) {
-          SdkLog.error("Error while: " + handler.getName(), e);
+          SdkLog.error("Error while: {}", handler.getName(), e);
         }
       }
       return Status.OK_STATUS;
@@ -589,13 +589,13 @@ public class DerivedResourceManager implements IDerivedResourceManager {
             handler.run(SubMonitor.convert(monitor, 1));
           }
           catch (Exception e) {
-            SdkLog.error("Error while: " + handler.getName(), e);
+            SdkLog.error("Error while: {}", handler.getName(), e);
           }
         }
       }
       finally {
         monitor.done();
-        SdkLog.debug("Update all derived resources in scope '" + m_scope + "' took " + (System.currentTimeMillis() - start) + "ms to execute.");
+        SdkLog.debug("Update all derived resources in scope '{}' took {}ms to execute.", m_scope, System.currentTimeMillis() - start);
       }
       return Status.OK_STATUS;
     }

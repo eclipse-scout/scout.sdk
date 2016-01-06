@@ -430,7 +430,7 @@ public final class S2eUtils {
       }
     }
     catch (Exception e) {
-      SdkLog.warning("Could not get source of annotation '" + name + "' in element '" + element.toString() + "'.", e);
+      SdkLog.warning("Could not get source of annotation '{}' in element '{}'.", name, element, e);
     }
 
     if (annotSource == null || annotSource.startsWith(startSimple) || annotSource.startsWith(startFq)) {
@@ -465,7 +465,7 @@ public final class S2eUtils {
       }
     }
     catch (JavaModelException e) {
-      SdkLog.warning("Unable to find source for annotation '" + annotation.getElementName() + "' in '" + member.getElementName() + "'.", e);
+      SdkLog.warning("Unable to find source for annotation '{}' in '{}'.", annotation.getElementName(), member.getElementName(), e);
     }
     return null;
   }

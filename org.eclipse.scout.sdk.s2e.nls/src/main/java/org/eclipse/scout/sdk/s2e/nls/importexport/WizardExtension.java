@@ -38,7 +38,7 @@ public class WizardExtension {
       return m_wizard.newInstance();
     }
     catch (Exception e) {
-      SdkLog.error("could not create a new instance of wizard '" + getName() + "'.", e);
+      SdkLog.error("could not create a new instance of wizard '{}'.", getName(), e);
       return null;
     }
   }

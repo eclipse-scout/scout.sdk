@@ -69,14 +69,14 @@ public final class ClassIdGenerators {
                     priority = parseDouble(prio);
                   }
                   else {
-                    SdkLog.warning("No priority found for extension '" + element.getNamespaceIdentifier() + "'. Using 0.0");
+                    SdkLog.warning("No priority found for extension '{}'. Using 0.0", element.getNamespaceIdentifier());
                     priority = Double.valueOf(0.0);
                   }
 
                   tmp.put(new CompositeObject(-priority, generator.getClass().getName(), generator), generator);
                 }
                 catch (Exception e) {
-                  SdkLog.warning("Could not load classIdGenerator extension '" + element.getNamespaceIdentifier() + "'.", e);
+                  SdkLog.warning("Could not load classIdGenerator extension '{}'.", element.getNamespaceIdentifier(), e);
                 }
               }
             }

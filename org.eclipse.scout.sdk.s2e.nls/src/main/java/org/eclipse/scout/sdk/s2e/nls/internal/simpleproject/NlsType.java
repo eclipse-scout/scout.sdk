@@ -105,7 +105,7 @@ public class NlsType implements INlsType {
       loadSuperTypeHierarchy();
     }
     catch (JavaModelException e) {
-      SdkLog.error("could not reload NLS type '" + m_type.getFullyQualifiedName() + "'.", e);
+      SdkLog.error("could not reload NLS type '{}'.", m_type.getFullyQualifiedName(), e);
     }
   }
 

@@ -84,7 +84,7 @@ public final class DtoS2eUtils {
 
   private static org.eclipse.jdt.core.IType getDerivedJdtType(IType modelType, IType derivedType, org.eclipse.jdt.core.IType modelJdtType) throws JavaModelException {
     if (!S2eUtils.exists(modelJdtType) || !S2eUtils.exists(modelJdtType.getJavaProject())) {
-      SdkLog.info("Model jdt type '" + modelType.name() + "' does not exist.", new Exception());
+      SdkLog.info("Model jdt type '{}' does not exist.", modelType.name(), new Exception());
       return null;
     }
 
@@ -95,11 +95,11 @@ public final class DtoS2eUtils {
     }
     org.eclipse.jdt.core.IType derivedJdtType = modelJdtType.getJavaProject().findType(derivedType.name().replace('$', '.'));
     if (derivedJdtType == null) {
-      SdkLog.error("Derived resource type '" + derivedType.name() + "' not found.", new Exception(message));
+      SdkLog.error("Derived resource type '{}' not found.", derivedType.name(), new Exception(message));
       return null;
     }
     if (derivedJdtType.isBinary()) {
-      SdkLog.error("Derived resource type '" + derivedJdtType.getFullyQualifiedName() + "' is binary.", new Exception(message));
+      SdkLog.error("Derived resource type '{}' is binary.", derivedJdtType.getFullyQualifiedName(), new Exception(message));
       return null;
     }
     return derivedJdtType;

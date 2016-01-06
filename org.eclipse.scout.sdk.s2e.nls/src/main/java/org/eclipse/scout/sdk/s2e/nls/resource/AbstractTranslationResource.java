@@ -73,7 +73,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
     Map<String, String> newEntries = new HashMap<>(entrySet.size());
     for (Entry<Object, Object> entry : entrySet) {
       if (newEntries.get(entry.getKey()) != null) {
-        SdkLog.error("Doubled entry for key: " + entry.getKey() + " skipping this entry", new Exception());
+        SdkLog.error("Doubled entry for key: {}. Skipping this entry.", entry.getKey(), new Exception());
       }
       else {
         String key = (String) entry.getKey();
@@ -176,12 +176,12 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
   }
 
   /**
-   * should be overwritten when a resource is not read only
+   * should be overwritten when a resource is not read only.
    */
   @Override
   public void reload(IProgressMonitor monitor) {
     if (!isReadOnly()) {
-      SdkLog.warning("reload should be overwritten in writeable resources! " + this.getClass().getName());
+      SdkLog.warning("reload should be overwritten in writable resources! {}", this.getClass().getName());
     }
   }
 

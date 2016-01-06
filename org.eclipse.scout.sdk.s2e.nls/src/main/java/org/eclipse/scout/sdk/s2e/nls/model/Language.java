@@ -14,7 +14,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.apache.commons.lang3.Validate;
 
 public class Language {
 
@@ -27,12 +27,7 @@ public class Language {
   private final Locale m_locale;
 
   public Language(Locale locale) {
-    if (locale == null) {
-      IllegalArgumentException e = new IllegalArgumentException("locale cannot be null!");
-      SdkLog.error(e.getMessage(), e);
-      throw e;
-    }
-    m_locale = locale;
+    m_locale = Validate.notNull(locale);
   }
 
   public Locale getLocale() {

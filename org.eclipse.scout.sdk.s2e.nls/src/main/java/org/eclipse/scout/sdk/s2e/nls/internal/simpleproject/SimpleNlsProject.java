@@ -72,7 +72,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
     if (getNlsType().getType().isReadOnly()) {
       IPackageFragmentRoot r = (IPackageFragmentRoot) getNlsType().getType().getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
       if (r == null) {
-        SdkLog.warning("Could not find text resource for type '" + getNlsType().getType().getFullyQualifiedName() + "'.");
+        SdkLog.warning("Could not find text resource for type '{}'.", getNlsType().getType().getFullyQualifiedName());
         return new ArrayList<>(0);
       }
       return loadTranslationFilesFromPlatform(getNlsType(), r);
@@ -103,7 +103,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
 
     IPackageFragment textFolder = r.getPackageFragment(path);
     if (textFolder == null) {
-      SdkLog.warning("Folder '" + nlsType.getTranslationsFolderName() + "' could not be found in '" + r.getElementName() + "'. Will be ignored.");
+      SdkLog.warning("Folder '{}' could not be found in '{}'. Will be ignored.", nlsType.getTranslationsFolderName(), r.getElementName());
     }
     else {
       for (Object o : textFolder.getNonJavaResources()) {
@@ -113,7 +113,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
             translationFiles.add(new PlatformTranslationFile(is, getLanguage(f.getName())));
           }
           catch (Exception e) {
-            SdkLog.error("Could not load NLS files of bundle '" + r.getElementName() + "'.", e);
+            SdkLog.error("Could not load NLS files of entry '{}'.", r.getElementName(), e);
           }
         }
       }
@@ -165,7 +165,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
         setParent(NlsCore.getNlsWorkspace().getNlsProject(new Object[]{superType}));
       }
       catch (CoreException e) {
-        SdkLog.error("parent of NLS project could not be found. Looked for type '" + superType.getFullyQualifiedName() + "'", e);
+        SdkLog.error("parent of NLS project could not be found. Looked for type '{}'.", superType.getFullyQualifiedName(), e);
       }
     }
   }

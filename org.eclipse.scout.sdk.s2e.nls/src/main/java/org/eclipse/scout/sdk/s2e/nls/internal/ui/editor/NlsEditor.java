@@ -90,7 +90,7 @@ public class NlsEditor extends MultiPageEditorPart {
       setPageText(m_tablePageIndex, "Translations");
     }
     catch (CoreException e) {
-      SdkLog.error("could not load file: " + input.getName(), e);
+      SdkLog.error("could not load file: {}", input.getName(), e);
     }
   }
 

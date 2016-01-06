@@ -71,7 +71,7 @@ public final class NlsExportImportExtensionPoints {
               wizardExt.setWizard((Class<? extends AbstractImportExportWizard>) wizard);
             }
             else {
-              SdkLog.error("extension '" + extension.getExtensionPointUniqueIdentifier() + "' has a wizard not instance of '" + AbstractImportExportWizard.class.getName() + "'. Ignoring extension.");
+              SdkLog.error("extension '{}' has a wizard not instance of '{}'. Ignoring extension.", extension.getExtensionPointUniqueIdentifier(), AbstractImportExportWizard.class.getName());
               continue;
             }
           }
@@ -88,7 +88,7 @@ public final class NlsExportImportExtensionPoints {
           wizardExtensions.add(wizardExt);
         }
         catch (ClassNotFoundException e) {
-          SdkLog.error("could not create an executable extension of point '" + extension.getExtensionPointUniqueIdentifier() + "'.", e);
+          SdkLog.error("could not create an executable extension of point '{}'.", extension.getExtensionPointUniqueIdentifier(), e);
         }
       }
     }
