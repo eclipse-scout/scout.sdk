@@ -31,6 +31,7 @@ import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.jdt.internal.compiler.util.Util;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.core.util.compat.CompatibilityLayer;
 
 public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
@@ -202,7 +203,7 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
         return classpath;
       }
       catch (IOException e) {
-        throw new SdkException("Unable to initialize classpath '" + f.getAbsolutePath() + "'.", e);
+        SdkLog.warning("Unable to initialize classpath '{}' because: {} ", f.getAbsolutePath(), e.getMessage());
       }
     }
     return null;
