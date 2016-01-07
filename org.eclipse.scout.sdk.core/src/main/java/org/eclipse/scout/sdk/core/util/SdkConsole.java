@@ -35,7 +35,7 @@ public final class SdkConsole {
   /**
    * write an empty line to the console.
    */
-  static synchronized void println() {
+  public static synchronized void println() {
     spi.println("");
   }
 
@@ -47,7 +47,7 @@ public final class SdkConsole {
    * @param exceptions
    *          Optional {@link Throwable}s to write to the console.
    */
-  static synchronized void println(String msg, Throwable... exceptions) {
+  public static synchronized void println(String msg, Throwable... exceptions) {
     if (msg != null) {
       spi.println(msg);
     }
