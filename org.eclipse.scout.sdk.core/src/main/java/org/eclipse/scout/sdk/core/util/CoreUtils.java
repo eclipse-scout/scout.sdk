@@ -14,7 +14,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -808,6 +810,17 @@ public final class CoreUtils {
         return fqn;
       default:
         return null;
+    }
+  }
+
+  public static String getStackTrace(Throwable t) {
+    try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
+      p.println();
+      t.printStackTrace(p);
+      return w.toString();
+    }
+    catch (IOException e) {
+      return '[' + e.toString() + ']' + t.toString();
     }
   }
 }

@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -35,7 +31,7 @@ public final class SdkConsole {
   /**
    * write an empty line to the console.
    */
-  public static synchronized void println() {
+  static synchronized void println() {
     spi.println("");
   }
 
@@ -47,7 +43,7 @@ public final class SdkConsole {
    * @param exceptions
    *          Optional {@link Throwable}s to write to the console.
    */
-  public static synchronized void println(String msg, Throwable... exceptions) {
+  static synchronized void println(String msg, Throwable... exceptions) {
     if (msg != null) {
       spi.println(msg);
     }
@@ -58,19 +54,8 @@ public final class SdkConsole {
 
     for (Throwable t : exceptions) {
       if (t != null) {
-        spi.println(getStackTrace(t));
+        spi.println(CoreUtils.getStackTrace(t));
       }
-    }
-  }
-
-  public static String getStackTrace(Throwable t) {
-    try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
-      p.println();
-      t.printStackTrace(p);
-      return w.toString();
-    }
-    catch (IOException e) {
-      return '[' + e.toString() + ']' + t.toString();
     }
   }
 

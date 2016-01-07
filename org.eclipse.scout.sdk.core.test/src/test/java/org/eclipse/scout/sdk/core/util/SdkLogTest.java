@@ -111,11 +111,11 @@ public class SdkLogTest {
 
         Exception exception = new Exception();
         SdkLog.warning("hello {} there", "test", exception);
-        Assert.assertEquals("[WARNING]: hello test there" + SdkConsole.getStackTrace(exception), logContent.toString());
+        Assert.assertEquals("[WARNING]: hello test there" + CoreUtils.getStackTrace(exception), logContent.toString());
         SdkConsole.clear();
 
         SdkLog.error(exception);
-        Assert.assertEquals("[SEVERE]: " + SdkConsole.getStackTrace(exception), logContent.toString());
+        Assert.assertEquals("[SEVERE]: " + CoreUtils.getStackTrace(exception), logContent.toString());
         SdkConsole.clear();
 
         SdkLog.warning(null, (Object[]) null);
