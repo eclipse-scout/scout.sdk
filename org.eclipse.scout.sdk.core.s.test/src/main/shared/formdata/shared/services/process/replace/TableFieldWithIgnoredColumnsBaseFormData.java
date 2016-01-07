@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -79,16 +79,16 @@ public class TableFieldWithIgnoredColumnsBaseFormData extends AbstractFormData {
         return m_default;
       }
 
-      public void setDefault(String defaultValue) {
-        m_default = defaultValue;
+      public void setDefault(String newDefault) {
+        m_default = newDefault;
       }
 
       public String getCreate() {
         return m_create;
       }
 
-      public void setCreate(String create) {
-        m_create = create;
+      public void setCreate(String newCreate) {
+        m_create = newCreate;
       }
     }
   }

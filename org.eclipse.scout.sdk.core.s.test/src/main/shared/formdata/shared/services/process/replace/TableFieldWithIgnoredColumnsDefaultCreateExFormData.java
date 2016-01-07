@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,8 +77,8 @@ public class TableFieldWithIgnoredColumnsDefaultCreateExFormData extends TableFi
         return m_ignoreDefaultCreate;
       }
 
-      public void setIgnoreDefaultCreate(String ignoreDefaultCreate) {
-        m_ignoreDefaultCreate = ignoreDefaultCreate;
+      public void setIgnoreDefaultCreate(String newIgnoreDefaultCreate) {
+        m_ignoreDefaultCreate = newIgnoreDefaultCreate;
       }
     }
   }

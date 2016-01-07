@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property BoolPrimitive.
    */
   public boolean isBoolPrimitive() {
-    return (getBoolPrimitiveProperty().getValue() == null) ? (false) : (getBoolPrimitiveProperty().getValue());
+    return getBoolPrimitiveProperty().getValue() == null ? false : getBoolPrimitiveProperty().getValue();
   }
 
   /**
@@ -142,7 +142,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property IntPrimitive.
    */
   public int getIntPrimitive() {
-    return (getIntPrimitiveProperty().getValue() == null) ? (0) : (getIntPrimitiveProperty().getValue());
+    return getIntPrimitiveProperty().getValue() == null ? 0 : getIntPrimitiveProperty().getValue();
   }
 
   /**
@@ -275,7 +275,7 @@ public class PropertyTestFormData extends AbstractFormData {
      * access method for property IntProperty.
      */
     public int getIntProperty() {
-      return (getIntPropertyProperty().getValue() == null) ? (0) : (getIntPropertyProperty().getValue());
+      return getIntPropertyProperty().getValue() == null ? 0 : getIntPropertyProperty().getValue();
     }
 
     /**

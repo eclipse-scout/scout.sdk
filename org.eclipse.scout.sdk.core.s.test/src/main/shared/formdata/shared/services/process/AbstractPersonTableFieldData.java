@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,48 +76,48 @@ public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBea
       return m_personId;
     }
 
-    public void setPersonId(String personId) {
-      m_personId = personId;
+    public void setPersonId(String newPersonId) {
+      m_personId = newPersonId;
     }
 
     public String getName() {
       return m_name;
     }
 
-    public void setName(String name) {
-      m_name = name;
+    public void setName(String newName) {
+      m_name = newName;
     }
 
     public Boolean getFemale() {
       return m_female;
     }
 
-    public void setFemale(Boolean female) {
-      m_female = female;
+    public void setFemale(Boolean newFemale) {
+      m_female = newFemale;
     }
 
     public Boolean getBoolean() {
       return m_boolean;
     }
 
-    public void setBoolean(Boolean booleanValue) {
-      m_boolean = booleanValue;
+    public void setBoolean(Boolean newBoolean) {
+      m_boolean = newBoolean;
     }
 
     public Boolean getAssert() {
       return m_assert;
     }
 
-    public void setAssert(Boolean assertValue) {
-      m_assert = assertValue;
+    public void setAssert(Boolean newAssert) {
+      m_assert = newAssert;
     }
 
     public Boolean getSwitch() {
       return m_switch;
     }
 
-    public void setSwitch(Boolean switchValue) {
-      m_switch = switchValue;
+    public void setSwitch(Boolean newSwitch) {
+      m_switch = newSwitch;
     }
   }
 }

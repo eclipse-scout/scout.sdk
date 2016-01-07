@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -80,24 +80,24 @@ public class ChildWithExtendedTableFormData extends BaseWithExtendedTableFormDat
         return m_col1InChildForm;
       }
 
-      public void setCol1InChildForm(String col1InChildForm) {
-        m_col1InChildForm = col1InChildForm;
+      public void setCol1InChildForm(String newCol1InChildForm) {
+        m_col1InChildForm = newCol1InChildForm;
       }
 
       public String getColInAbstractTable() {
         return m_colInAbstractTable;
       }
 
-      public void setColInAbstractTable(String colInAbstractTable) {
-        m_colInAbstractTable = colInAbstractTable;
+      public void setColInAbstractTable(String newColInAbstractTable) {
+        m_colInAbstractTable = newColInAbstractTable;
       }
 
       public String getColInDesktopForm() {
         return m_colInDesktopForm;
       }
 
-      public void setColInDesktopForm(String colInDesktopForm) {
-        m_colInDesktopForm = colInDesktopForm;
+      public void setColInDesktopForm(String newColInDesktopForm) {
+        m_colInDesktopForm = newColInDesktopForm;
       }
     }
   }

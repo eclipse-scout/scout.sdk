@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -138,16 +138,16 @@ public class TableFieldFormData extends AbstractFormData {
         return m_name;
       }
 
-      public void setName(String name) {
-        m_name = name;
+      public void setName(String newName) {
+        m_name = newName;
       }
 
       public Integer getExtKey() {
         return m_extKey;
       }
 
-      public void setExtKey(Integer extKey) {
-        m_extKey = extKey;
+      public void setExtKey(Integer newExtKey) {
+        m_extKey = newExtKey;
       }
     }
   }
@@ -208,40 +208,40 @@ public class TableFieldFormData extends AbstractFormData {
         return m_personNr;
       }
 
-      public void setPersonNr(Long personNr) {
-        m_personNr = personNr;
+      public void setPersonNr(Long newPersonNr) {
+        m_personNr = newPersonNr;
       }
 
       public String getName() {
         return m_name;
       }
 
-      public void setName(String name) {
-        m_name = name;
+      public void setName(String newName) {
+        m_name = newName;
       }
 
       public Object getAnObject() {
         return m_anObject;
       }
 
-      public void setAnObject(Object anObject) {
-        m_anObject = anObject;
+      public void setAnObject(Object newAnObject) {
+        m_anObject = newAnObject;
       }
 
       public Long getSmartLong() {
         return m_smartLong;
       }
 
-      public void setSmartLong(Long smartLong) {
-        m_smartLong = smartLong;
+      public void setSmartLong(Long newSmartLong) {
+        m_smartLong = newSmartLong;
       }
 
       public Set<Map<String, Integer>> getCustom() {
         return m_custom;
       }
 
-      public void setCustom(Set<Map<String, Integer>> custom) {
-        m_custom = custom;
+      public void setCustom(Set<Map<String, Integer>> newCustom) {
+        m_custom = newCustom;
       }
     }
   }
@@ -298,24 +298,24 @@ public class TableFieldFormData extends AbstractFormData {
         return m_aa;
       }
 
-      public void setAa(String aa) {
-        m_aa = aa;
+      public void setAa(String newAa) {
+        m_aa = newAa;
       }
 
       public String getXx() {
         return m_xx;
       }
 
-      public void setXx(String xx) {
-        m_xx = xx;
+      public void setXx(String newXx) {
+        m_xx = newXx;
       }
 
       public String getBb() {
         return m_bb;
       }
 
-      public void setBb(String bb) {
-        m_bb = bb;
+      public void setBb(String newBb) {
+        m_bb = newBb;
       }
     }
   }

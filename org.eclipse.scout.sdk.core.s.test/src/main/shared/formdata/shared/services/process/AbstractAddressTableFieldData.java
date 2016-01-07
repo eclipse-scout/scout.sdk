@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,24 +70,24 @@ public abstract class AbstractAddressTableFieldData extends AbstractTableFieldBe
       return m_addressId;
     }
 
-    public void setAddressId(String addressId) {
-      m_addressId = addressId;
+    public void setAddressId(String newAddressId) {
+      m_addressId = newAddressId;
     }
 
     public String getStreet() {
       return m_street;
     }
 
-    public void setStreet(String street) {
-      m_street = street;
+    public void setStreet(String newStreet) {
+      m_street = newStreet;
     }
 
     public Boolean getPoBoxAddress() {
       return m_poBoxAddress;
     }
 
-    public void setPoBoxAddress(Boolean poBoxAddress) {
-      m_poBoxAddress = poBoxAddress;
+    public void setPoBoxAddress(Boolean newPoBoxAddress) {
+      m_poBoxAddress = newPoBoxAddress;
     }
   }
 }

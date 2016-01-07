@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,8 +93,8 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
         return m_single;
       }
 
-      public void setSingle(String single) {
-        m_single = single;
+      public void setSingle(String newSingle) {
+        m_single = newSingle;
       }
     }
   }
@@ -148,8 +148,8 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
         return m_state;
       }
 
-      public void setState(String state) {
-        m_state = state;
+      public void setState(String newState) {
+        m_state = newState;
       }
     }
   }
@@ -203,8 +203,8 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
         return m_lastName;
       }
 
-      public void setLastName(String lastName) {
-        m_lastName = lastName;
+      public void setLastName(String newLastName) {
+        m_lastName = newLastName;
       }
     }
   }
@@ -258,8 +258,8 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
         return m_new;
       }
 
-      public void setNew(String newValue) {
-        m_new = newValue;
+      public void setNew(String newNew) {
+        m_new = newNew;
       }
     }
   }
@@ -313,8 +313,8 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
         return m_boolean;
       }
 
-      public void setBoolean(Boolean booleanValue) {
-        m_boolean = booleanValue;
+      public void setBoolean(Boolean newBoolean) {
+        m_boolean = newBoolean;
       }
     }
   }

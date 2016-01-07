@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,8 +67,8 @@ public class ExtendedExtendedTablePageWithExtendedTableData extends ExtendedTabl
       return m_boolean;
     }
 
-    public void setBoolean(Boolean booleanValue) {
-      m_boolean = booleanValue;
+    public void setBoolean(Boolean newBoolean) {
+      m_boolean = newBoolean;
     }
   }
 }

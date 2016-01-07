@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,16 +72,16 @@ public class ExtendedTablePageData extends BaseTablePageData {
       return m_intermediate;
     }
 
-    public void setIntermediate(BigDecimal intermediate) {
-      m_intermediate = intermediate;
+    public void setIntermediate(BigDecimal newIntermediate) {
+      m_intermediate = newIntermediate;
     }
 
     public Date getIgnoredColumnEx() {
       return m_ignoredColumnEx;
     }
 
-    public void setIgnoredColumnEx(Date ignoredColumnEx) {
-      m_ignoredColumnEx = ignoredColumnEx;
+    public void setIgnoredColumnEx(Date newIgnoredColumnEx) {
+      m_ignoredColumnEx = newIgnoredColumnEx;
     }
   }
 }

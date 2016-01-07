@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -98,16 +98,16 @@ public abstract class AbstractTemplateForReplaceBoxData extends AbstractFormFiel
         return m_first;
       }
 
-      public void setFirst(String first) {
-        m_first = first;
+      public void setFirst(String newFirst) {
+        m_first = newFirst;
       }
 
       public String getSecond() {
         return m_second;
       }
 
-      public void setSecond(String second) {
-        m_second = second;
+      public void setSecond(String newSecond) {
+        m_second = newSecond;
       }
     }
   }
