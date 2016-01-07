@@ -491,7 +491,7 @@ public final class S2eUtils {
         }
       }
     };
-    for (IType annotationType : resolveJdtTypes(annotationName, scope)) {
+    for (IType annotationType : resolveJdtTypes(annotationName, SearchEngine.createWorkspaceScope())) {
       SearchPattern pattern = SearchPattern.createPattern(annotationType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE);
       new SearchEngine().search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, scope, collector, monitor);
     }
