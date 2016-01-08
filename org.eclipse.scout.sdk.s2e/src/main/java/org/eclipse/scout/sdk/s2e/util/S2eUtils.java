@@ -60,6 +60,7 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
+import org.eclipse.jdt.internal.core.search.BasicSearchEngine;
 import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -893,5 +894,20 @@ public final class S2eUtils {
       curResource = curResource.getParent();
     }
     return curResource;
+  }
+
+  /**
+   * Returns a Java search scope limited to the given Java elements. The Java elements resulting from a search with this
+   * scope will be children of the given elements.
+   * <p>
+   * If an element is an {@link IJavaProject}, then only project's source folders will be included.
+   * </p>
+   * <p>
+   * Otherwise the same rules as for {@link BasicSearchEngine#createJavaSearchScope(IJavaElement[], boolean)} should
+   * apply.
+   * </p>
+   */
+  public static IJavaSearchScope createJavaSearchScope(IJavaElement[] elements) {
+    return BasicSearchEngine.createJavaSearchScope(elements, IJavaSearchScope.SOURCES);
   }
 }

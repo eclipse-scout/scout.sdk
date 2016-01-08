@@ -21,10 +21,10 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkingSet;
@@ -49,7 +49,7 @@ public class TriggerSelectedDerivedResourceHandler extends AbstractHandler {
     if (answer == SWT.YES) {
       IJavaElement[] searchInElements = createJavaSeachScope(event);
       if (searchInElements.length > 0) {
-        IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(searchInElements, false);
+        IJavaSearchScope searchScope = S2eUtils.createJavaSearchScope(searchInElements);
         ScoutSdkCore.getDerivedResourceManager().triggerAll(searchScope);
       }
     }
