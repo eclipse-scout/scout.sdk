@@ -18,13 +18,9 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkingSet;
@@ -47,20 +43,19 @@ public class TriggerSelectedDerivedResourceHandler extends AbstractHandler {
     messageBox.setText("Do you really want to update the derived resources in the selected scope?");
     int answer = messageBox.open();
     if (answer == SWT.YES) {
-      IJavaElement[] searchInElements = createJavaSeachScope(event);
-      if (searchInElements.length > 0) {
-        IJavaSearchScope searchScope = S2eUtils.createJavaSearchScope(searchInElements);
-        ScoutSdkCore.getDerivedResourceManager().triggerAll(searchScope);
+      Set<IResource> resourcesFromSelection = getResourcesFromSelection(event);
+      if (!resourcesFromSelection.isEmpty()) {
+        ScoutSdkCore.getDerivedResourceManager().trigger(resourcesFromSelection);
       }
     }
     return null;
   }
 
-  private static IJavaElement[] createJavaSeachScope(ExecutionEvent event) {
+  protected Set<IResource> getResourcesFromSelection(ExecutionEvent event) {
     Set<IResource> resourceSet = new LinkedHashSet<>();
-    ISelection selection0 = HandlerUtil.getCurrentSelection(event);
-    if (!selection0.isEmpty() && selection0 instanceof IStructuredSelection) {
-      for (Object selElem : ((IStructuredSelection) selection0).toArray()) {
+    ISelection selection = HandlerUtil.getCurrentSelection(event);
+    if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
+      for (Object selElem : ((IStructuredSelection) selection).toArray()) {
         if (selElem instanceof IWorkingSet) {
           IWorkingSet workingSet = (IWorkingSet) selElem;
           if (workingSet.isEmpty() && workingSet.isAggregateWorkingSet()) {
@@ -87,14 +82,6 @@ public class TriggerSelectedDerivedResourceHandler extends AbstractHandler {
         }
       }
     }
-    Set<IJavaElement> jset = new LinkedHashSet<>();
-    for (IResource r : resourceSet) {
-      IJavaElement e = JavaCore.create(r);
-      if (e != null && e.exists()) {
-        jset.add(e);
-      }
-    }
-    return jset.toArray(new IJavaElement[jset.size()]);
+    return resourceSet;
   }
-
 }

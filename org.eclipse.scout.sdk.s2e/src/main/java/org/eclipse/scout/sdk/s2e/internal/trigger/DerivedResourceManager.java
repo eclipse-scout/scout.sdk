@@ -17,23 +17,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.ElementChangedEvent;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IElementChangedListener;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaElementDelta;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandlerFactory;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
  * <h3>{@link DerivedResourceManager}</h3>
@@ -55,40 +56,40 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   public static final String TYPE_CHANGED_TRIGGER_JOB_FAMILY = "AUTO_UPDATE_JOB_FAMILY";
   public static final String JAVA_DELTA_CHECK_JOB_FAMILY = "JAVA_DELTA_CHECK_JOB_FAMILY";
 
-  private final AtomicBoolean m_enabled;
+  private boolean m_enabled;
   private final List<IDerivedResourceHandlerFactory> m_updateHandlerFactories;
 
-  private P_JavaChangeListener m_javaChangeListener;
+  private IResourceChangeListener m_resourceChangeListener;
 
   // queue that buffers all java change events that need processing
-  private final ArrayBlockingQueue<ElementChangedEvent> m_javaChangeEventsToCheck;
+  private final BlockingQueue<IResourceChangeEvent> m_javaChangeEventsToCheck;
   // job that works through all buffered java change events and checks if they contain trigger relevant compilation units
-  private final P_JavaChangeEventCheckJob m_javaDeltaCheckJob;
+  private final P_ResourceChangeEventCheckJob m_javaDeltaCheckJob;
 
   // queue that buffers all trigger operations that need to be executed
-  private final ArrayBlockingQueue<IDerivedResourceHandler> m_triggerHandlers;
+  private final BlockingQueue<IDerivedResourceHandler> m_triggerHandlers;
   // job that executes all the buffered trigger operations (visible to the user)
   private final P_RunQueuedTriggerHandlersJob m_runQueuedTriggerHandlersJob;
 
   public DerivedResourceManager() {
-    m_enabled = new AtomicBoolean(true);
+    m_enabled = false;
     m_updateHandlerFactories = new ArrayList<>();
 
     m_javaChangeEventsToCheck = new ArrayBlockingQueue<>(5000, true);
     m_triggerHandlers = new ArrayBlockingQueue<>(2000, true);
 
     m_runQueuedTriggerHandlersJob = new P_RunQueuedTriggerHandlersJob(m_triggerHandlers);
-    m_javaDeltaCheckJob = new P_JavaChangeEventCheckJob(this, m_javaChangeEventsToCheck, m_triggerHandlers, m_runQueuedTriggerHandlersJob);
+    m_javaDeltaCheckJob = new P_ResourceChangeEventCheckJob(this, m_javaChangeEventsToCheck);
   }
 
   /**
-   * Shutdown the manager. Afterwards no auto updates are performed. All listeners are removed and all jobs will be
-   * cancelled.
+   * Shutdown the manager. Afterwards no auto updates are performed. All listeners are removed. Waits until all derived
+   * resources have finished updating.
    */
   public void dispose() {
     setEnabled(false);
 
-    // wait until all form datas have been generated. otherwise the user ends up with invalid form datas.
+    // wait until all derived resources have been generated. otherwise the user ends up with invalid derived resources.
     // the user still can cancel the job if desired.
     AbstractJob.waitForJobFamily(TYPE_CHANGED_TRIGGER_JOB_FAMILY);
   }
@@ -104,32 +105,88 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   }
 
   @Override
-  public void trigger(IType jdtType) {
-    IJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
-    for (IDerivedResourceHandler handler : createOperations(jdtType, envProvider)) {
-      if (!addElementToQueueSecure(m_triggerHandlers, handler, handler.getName(), -1, null)) {
-        SdkLog.warning("Unable to trigger more derived resource updates. Queue is already full. Skipping.");
+  public void trigger(final Set<IResource> resources) {
+    AbstractJob triggerJob = new AbstractJob("Searching base resources for derived resources update...") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        triggerSync(resources);
+        return Status.OK_STATUS;
+      }
+    };
+    triggerJob.setPriority(Job.DECORATE);
+    triggerJob.schedule();
+  }
+
+  protected void triggerSync(Set<IResource> resources) {
+    Set<IResource> cleanResources = cleanCopy(resources); // remove non-accessible, containing and null resources
+    if (enqueueFiles(cleanResources)) {
+      m_runQueuedTriggerHandlersJob.abort();
+      m_runQueuedTriggerHandlersJob.schedule(1000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
+    }
+  }
+
+  /**
+   * @return true if elements were added and job can be scheduled.
+   */
+  protected boolean enqueueFiles(Set<IResource> resources) {
+    if (resources.isEmpty()) {
+      return false;
+    }
+
+    boolean added = false;
+    try {
+      CachingJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
+      IJavaSearchScope searchScope = S2eUtils.createJavaSearchScope(resources);
+      for (IDerivedResourceHandler handler : createOperations(resources, envProvider, searchScope)) {
+        if (!m_triggerHandlers.contains(handler)) {
+          if (addElementToQueueSecure(m_triggerHandlers, handler, handler.getName(), -1, null)) {
+            //ok, continue
+            added = true;
+          }
+          else {
+            SdkLog.warning("Unable to queue more derived resource update events. Queue is already full. Skipping event: {}", handler.getName());
+          }
+        }
       }
     }
-    m_runQueuedTriggerHandlersJob.abort();
-    m_runQueuedTriggerHandlersJob.schedule(200); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
+    catch (CoreException e) {
+      SdkLog.warning("Unable to create java search scope", e);
+    }
+    return added;
   }
 
-  @Override
-  public void triggerAll(IJavaSearchScope scope) {
-    new P_RunAllTriggerHandlerJob(this, scope, false).schedule();
+  protected static Set<IResource> cleanCopy(Set<IResource> resources) {
+    if (resources == null) {
+      return Collections.emptySet();
+    }
+
+    Set<IResource> cleanSet = new HashSet<>(resources.size());
+    for (IResource r : resources) {
+      if (r != null && r.isAccessible() && !existsParentIn(resources, r)) {
+        cleanSet.add(r);
+      }
+    }
+    return cleanSet;
   }
 
-  @Override
-  public void triggerCleanup(IJavaSearchScope scope) {
-    new P_RunAllTriggerHandlerJob(this, scope, true).schedule();
+  protected static boolean existsParentIn(Collection<IResource> searchList, IResource resource) {
+    IPath path = resource.getFullPath();
+    for (IResource r : searchList) {
+      if (r == null || !r.isAccessible()) {
+        continue;
+      }
+      if (r != resource && r.getFullPath().isPrefixOf(path)) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  protected Collection<IDerivedResourceHandler> createOperations(IType t, IJavaEnvironmentProvider envProvider) {
+  protected Collection<IDerivedResourceHandler> createOperations(Set<IResource> resources, IJavaEnvironmentProvider envProvider, IJavaSearchScope searchScope) {
     List<IDerivedResourceHandler> all = null;
     for (IDerivedResourceHandlerFactory factory : m_updateHandlerFactories) {
       try {
-        List<IDerivedResourceHandler> ops = factory.createHandlersFor(t, envProvider);
+        List<IDerivedResourceHandler> ops = factory.createHandlersFor(resources, envProvider, searchScope);
         if (ops != null && !ops.isEmpty()) {
           if (all == null) {
             all = new ArrayList<>();
@@ -141,63 +198,26 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         SdkLog.error("Unable to create operation with handler '{}'.", factory.getClass(), e);
       }
     }
-    return all != null ? all : Collections.<IDerivedResourceHandler> emptyList();
-  }
-
-  protected Collection<IDerivedResourceHandler> createAllOperations(final IJavaSearchScope scope, final IJavaEnvironmentProvider envProvider, final boolean cleanup) {
-    final List<IDerivedResourceHandler> all = new ArrayList<>();
-
-    // execute in a dedicated job because it triggers a search engine which requires no scheduling rule to be active!
-    AbstractJob searchForUpdateHandlersJob = new AbstractJob("Search for update handlers") {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        for (IDerivedResourceHandlerFactory handler : m_updateHandlerFactories) {
-          try {
-            List<IDerivedResourceHandler> ops = null;
-            if (cleanup) {
-              ops = handler.createCleanupHandlersIn(scope, envProvider);
-            }
-            else {
-              ops = handler.createAllHandlersIn(scope, envProvider);
-            }
-
-            if (ops != null && !ops.isEmpty()) {
-              all.addAll(ops);
-            }
-          }
-          catch (Exception e) {
-            SdkLog.error("Error while collecting all types from '{}'.", handler.getClass(), e);
-          }
-        }
-        return Status.OK_STATUS;
-      }
-    };
-    searchForUpdateHandlersJob.setUser(false);
-    searchForUpdateHandlersJob.setSystem(true);
-    searchForUpdateHandlersJob.schedule();
-    try {
-      searchForUpdateHandlersJob.join();
-    }
-    catch (InterruptedException e) {
-      SdkLog.error("Unable to wait until all derived resource update handlers have been calculated.", e);
+    if (all == null) {
+      return Collections.<IDerivedResourceHandler> emptyList();
     }
     return all;
   }
 
   @Override
   public synchronized void setEnabled(boolean enabled) {
-    m_enabled.set(enabled);
+    m_enabled = enabled;
     if (enabled) {
-      if (m_javaChangeListener == null) {
-        m_javaChangeListener = new P_JavaChangeListener(m_javaChangeEventsToCheck);
-        JavaCore.addElementChangedListener(m_javaChangeListener, ElementChangedEvent.POST_CHANGE);
+      if (m_resourceChangeListener == null) {
+        m_resourceChangeListener = new P_ResourceChangeListener(m_javaChangeEventsToCheck);
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceChangeListener, IResourceChangeEvent.POST_CHANGE);
       }
       m_javaDeltaCheckJob.schedule();
     }
     else {
-      if (m_javaChangeListener != null) {
-        JavaCore.removeElementChangedListener(m_javaChangeListener);
-        m_javaChangeListener = null;
+      if (m_resourceChangeListener != null) {
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_resourceChangeListener);
+        m_resourceChangeListener = null;
       }
 
       // cancel the job that checks the java deltas
@@ -216,8 +236,8 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   }
 
   @Override
-  public boolean isEnabled() {
-    return m_enabled.get();
+  public synchronized boolean isEnabled() {
+    return m_enabled;
   }
 
   /**
@@ -240,7 +260,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
    *          The {@link TimeUnit} that defines the meaning of timeout
    * @return true if the element has been added to the queue within the given timeout range. false otherwise.
    */
-  private static <T> boolean addElementToQueueSecure(ArrayBlockingQueue<T> queue, T element, String name, long timeout, TimeUnit unit) {
+  private static <T> boolean addElementToQueueSecure(BlockingQueue<T> queue, T element, String name, long timeout, TimeUnit unit) {
     boolean interrupted;
     int numInterrupted = 0;
     do {
@@ -272,24 +292,15 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   /**
    * The java change listener that adds the given event to the queue to execute later on
    */
-  private static final class P_JavaChangeListener implements IElementChangedListener {
+  private static final class P_ResourceChangeListener implements IResourceChangeListener {
 
-    private final ArrayBlockingQueue<ElementChangedEvent> m_eventCollector;
+    private final BlockingQueue<IResourceChangeEvent> m_eventCollector;
 
-    private P_JavaChangeListener(ArrayBlockingQueue<ElementChangedEvent> eventCollector) {
+    private P_ResourceChangeListener(BlockingQueue<IResourceChangeEvent> eventCollector) {
       m_eventCollector = eventCollector;
     }
 
     private static boolean acceptUpdateEvent() {
-      final String[] excludedJobNamePrefixes = new String[]{"org.eclipse.team.", // excludes svn updates
-          "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
-          "org.eclipse.egit.", // excludes git updates
-          "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
-          "org.eclipse.m2e.", // maven updates
-          "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob", // refresh of external folders after svn update
-          "org.eclipse.core.internal.refresh.RefreshJob" // refresh after git import
-      };
-
       Job curJob = Job.getJobManager().currentJob();
       if (curJob == null) {
         return false;
@@ -304,6 +315,17 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         // ignore build changes (annotation processing)
         return false;
       }
+
+      final String[] excludedJobNamePrefixes = new String[]{"org.eclipse.team.", // excludes svn updates
+          "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
+          "org.eclipse.egit.", // excludes git updates
+          "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
+          "org.eclipse.m2e.", // maven updates
+          "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob", // refresh of external folders after svn update
+          "org.eclipse.core.internal.refresh.RefreshJob", // refresh after git import
+          "org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob", // workspace init job
+          "org.eclipse.wst.jsdt.internal.ui.InitializeAfterLoadJob.RealJob"
+      };
 
       String jobFqn = curJob.getClass().getName().replace('$', '.');
       for (String excludedPrefix : excludedJobNamePrefixes) {
@@ -327,7 +349,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     }
 
     @Override
-    public void elementChanged(ElementChangedEvent event) {
+    public void resourceChanged(IResourceChangeEvent event) {
       if (event != null && acceptUpdateEvent() && !addElementToQueueSecure(m_eventCollector, event, event.toString(), 10, TimeUnit.SECONDS)) {
         // element could not be added within the given timeout
         SdkLog.warning("Unable to queue more java element changes. Queue is already full. Skipping event.");
@@ -338,23 +360,18 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   /**
    * Job that iterates over all java change events and checks if they require a update.
    */
-  private static final class P_JavaChangeEventCheckJob extends AbstractJob {
+  private static final class P_ResourceChangeEventCheckJob extends AbstractJob {
 
     private final DerivedResourceManager m_manager;
-    private final ArrayBlockingQueue<ElementChangedEvent> m_queueToConsume;
-    private final ArrayBlockingQueue<IDerivedResourceHandler> m_handlerCollector;
-    private final P_RunQueuedTriggerHandlersJob m_runQueuedTriggerHandlersJob;
+    private final BlockingQueue<IResourceChangeEvent> m_queueToConsume;
 
-    private P_JavaChangeEventCheckJob(DerivedResourceManager manager, ArrayBlockingQueue<ElementChangedEvent> queueToConsume, ArrayBlockingQueue<IDerivedResourceHandler> handlerCollector,
-        P_RunQueuedTriggerHandlersJob runtriggerOperationsJob) {
-      super("Check if java deltas triggers a " + IDerivedResourceHandlerFactory.class.getSimpleName());
+    private P_ResourceChangeEventCheckJob(DerivedResourceManager manager, BlockingQueue<IResourceChangeEvent> queueToConsume) {
+      super("Check if resource delta triggers a derived resource update");
       setSystem(true);
       setUser(false);
       setPriority(DECORATE);
       m_manager = manager;
       m_queueToConsume = queueToConsume;
-      m_handlerCollector = handlerCollector;
-      m_runQueuedTriggerHandlersJob = runtriggerOperationsJob;
     }
 
     @Override
@@ -365,7 +382,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     @Override
     protected IStatus run(IProgressMonitor monitor) {
       while (!monitor.isCanceled()) {
-        ElementChangedEvent event = null;
+        IResourceChangeEvent event = null;
         try {
           event = m_queueToConsume.take(); // blocks until deltas are available
         }
@@ -376,82 +393,46 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           return Status.CANCEL_STATUS;
         }
         if (event != null && event.getDelta() != null) {
-          // collect all operations for the compilation units within the delta
-          Set<ICompilationUnit> icus = new HashSet<>();
-          collectCompilationUnitsFromDelta(event.getDelta(), icus);
-          if (addElementsToQueue(icus)) {
-            m_runQueuedTriggerHandlersJob.abort();
-            m_runQueuedTriggerHandlersJob.schedule(1000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
-          }
+          // collect all files that have been changed as part of this delta
+          Set<IResource> resources = collectFilesFromDelta(event.getDelta());
+          m_manager.triggerSync(resources);
         }
       }
       return Status.CANCEL_STATUS;
     }
 
-    private void collectCompilationUnitsFromDelta(IJavaElementDelta delta, Set<ICompilationUnit> collector) {
-      IJavaElement curElement = delta.getElement();
-      if (curElement == null) {
-        return;
-      }
-
-      int elementType = curElement.getElementType();
-      if (elementType == IJavaElement.COMPILATION_UNIT && delta.getKind() != IJavaElementDelta.REMOVED && curElement.exists()) {
-        collector.add((ICompilationUnit) curElement);
-      }
-
-      boolean hasChildren = (delta.getFlags() & IJavaElementDelta.F_CHILDREN) != 0;
-      boolean processChildren = hasChildren && curElement.getElementType() < IJavaElement.COMPILATION_UNIT; // stop at compilation unit level
-      if (processChildren) {
-        IJavaElementDelta[] affectedChildren = delta.getAffectedChildren();
-        for (IJavaElementDelta childDelta : affectedChildren) {
-          collectCompilationUnitsFromDelta(childDelta, collector);
-        }
-      }
-    }
-
-    /**
-     * @param icus
-     * @return true if elements were added and job can be scheduled, false if the system is too busy
-     */
-    private boolean addElementsToQueue(Set<ICompilationUnit> icus) {
-      CachingJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
-      boolean added = false;
-      for (ICompilationUnit icu : icus) {
-        try {
-          if (!icu.exists()) {
-            continue;
-          }
-          for (IType t : icu.getTypes()) {
-            for (IDerivedResourceHandler handler : m_manager.createOperations(t, envProvider)) {
-              if (!m_handlerCollector.contains(handler)) {
-                if (addElementToQueueSecure(m_handlerCollector, handler, handler.getName(), -1, null)) {
-                  //ok, continue
-                  added = true;
-                }
-                else {
-                  SdkLog.warning("Unable to queue more derived resource update events. Queue is already full. Skipping event.");
-                }
-              }
+    private static Set<IResource> collectFilesFromDelta(IResourceDelta d) {
+      final Set<IResource> scope = new HashSet<>();
+      try {
+        d.accept(new IResourceDeltaVisitor() {
+          @Override
+          public boolean visit(IResourceDelta delta) throws CoreException {
+            IResource resource = delta.getResource();
+            if (resource != null && resource.getType() == IResource.FILE && resource.exists()) {
+              scope.add(resource);
+              return false;
             }
+            return true;
           }
-        }
-        catch (Exception e) {
-          SdkLog.error("Unable to handle event for compilation unit '{}'.", icu.getElementName(), e);
-        }
+        });
       }
-      return added;
+      catch (CoreException e) {
+        SdkLog.error("Could not calculate the resources affected by a change event.", e);
+      }
+
+      return scope;
     }
   }
 
   /**
    * Job that executes all trigger operations that have been enqueued, with lowest priority.
    */
-  private static final class P_RunQueuedTriggerHandlersJob extends Job {
+  private static final class P_RunQueuedTriggerHandlersJob extends AbstractJob {
 
-    private final ArrayBlockingQueue<IDerivedResourceHandler> m_queueToConsume;
+    private final BlockingQueue<IDerivedResourceHandler> m_queueToConsume;
     private boolean m_isAborted;
 
-    private P_RunQueuedTriggerHandlersJob(ArrayBlockingQueue<IDerivedResourceHandler> queueToConsume) {
+    private P_RunQueuedTriggerHandlersJob(BlockingQueue<IDerivedResourceHandler> queueToConsume) {
       super("Auto-updating derived resources");
       setRule(RunTriggerHandlersJobRule.INSTANCE);
       setPriority(Job.DECORATE);
@@ -534,68 +515,6 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         catch (Exception e) {
           SdkLog.error("Error while: {}", handler.getName(), e);
         }
-      }
-      return Status.OK_STATUS;
-    }
-  }
-
-  /**
-   * Job that executes some trigger operations with normal prio, not enqueued, immediately, cancellable.
-   */
-  private static final class P_RunAllTriggerHandlerJob extends Job {
-    private final DerivedResourceManager m_manager;
-    private final IJavaSearchScope m_scope;
-    private final boolean m_cleanup;
-
-    private P_RunAllTriggerHandlerJob(DerivedResourceManager manager, IJavaSearchScope scope, boolean cleanup) {
-      super("Update derived resources.");
-      m_manager = manager;
-      m_scope = scope;
-      m_cleanup = cleanup;
-      setUser(true);
-      setRule(RunTriggerHandlersJobRule.INSTANCE);
-    }
-
-    @Override
-    public boolean belongsTo(Object family) {
-      return TYPE_CHANGED_TRIGGER_JOB_FAMILY.equals(family);
-    }
-
-    @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      if (monitor.isCanceled()) {
-        return Status.CANCEL_STATUS;
-      }
-
-      long start = System.currentTimeMillis();
-      try {
-        monitor.setTaskName("Searching base classes...");
-        IJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
-        Collection<IDerivedResourceHandler> handlers = m_manager.createAllOperations(m_scope, envProvider, m_cleanup);
-
-        if (handlers.size() < 1) {
-          return Status.OK_STATUS;
-        }
-
-        monitor.beginTask(getName(), handlers.size());
-        for (IDerivedResourceHandler handler : handlers) {
-          if (monitor.isCanceled()) {
-            return Status.CANCEL_STATUS;
-          }
-          try {
-            monitor.setTaskName(handler.getName());
-            monitor.subTask("");
-            handler.validate();
-            handler.run(SubMonitor.convert(monitor, 1));
-          }
-          catch (Exception e) {
-            SdkLog.error("Error while: {}", handler.getName(), e);
-          }
-        }
-      }
-      finally {
-        monitor.done();
-        SdkLog.debug("Update all derived resources in scope '{}' took {}ms to execute.", m_scope, System.currentTimeMillis() - start);
       }
       return Status.OK_STATUS;
     }

@@ -11,56 +11,40 @@
 package org.eclipse.scout.sdk.s2e.trigger;
 
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 
 /**
  * <h3>{@link IDerivedResourceHandlerFactory}</h3>
  *
  * @author Ivan Motsch
+ * @author Matthias Villiger
  * @since 5.2
  */
 public interface IDerivedResourceHandlerFactory {
 
   /**
-   * Creates all {@link IDerivedResourceHandler}s to update the given {@link IType}.
+   * Creates all {@link IDerivedResourceHandler}s to update the resources derived from the given resource {@link Set}.
    *
-   * @param jdtType
-   *          The type for which the derived resources should be updated.
+   * @param resources
+   *          The {@link Set} of {@link IResource}s for which the derived resources should be updated. Such an
+   *          {@link IResource} can be of any type ({@link IResource#PROJECT}, {@link IResource#FOLDER},
+   *          {@link IResource#FILE}, {@link IResource#ROOT}). If a resource is <code>instanceof</code>
+   *          {@link IContainer}, all resources inside this container and all of its sub-containers should update its
+   *          derived resources.
    * @param envProvider
    *          The {@link IJavaEnvironmentProvider} to use.
-   * @return All {@link IDerivedResourceHandler}s that are based on the given {@link IType}.
+   * @param searchScope
+   *          The {@link IJavaSearchScope} covering the given resources or <code>null</code> if no {@link IJavaElement}s
+   *          are in the given resources. Note: The searchScope may not contain all resources given. Only the ones that
+   *          belong to an {@link IJavaElement} are part of the search scope.
+   * @return All {@link IDerivedResourceHandler}s that are based on the given resources.
    * @throws CoreException
    */
-  List<IDerivedResourceHandler> createHandlersFor(IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException;
-
-  /**
-   * Creates all {@link IDerivedResourceHandler}s to update all derived resources based on {@link IType}s in the given
-   * {@link IJavaSearchScope}.
-   *
-   * @param scope
-   *          The {@link IJavaSearchScope} defining all base {@link IType}s for which the derived resources should be
-   *          updated.
-   * @param envProvider
-   *          The {@link IJavaEnvironmentProvider} to use.
-   * @return All {@link IDerivedResourceHandler}s necessary to execute to update all derived resources based on a
-   *         {@link IType} in the given {@link IJavaSearchScope}.
-   * @throws CoreException
-   */
-  List<IDerivedResourceHandler> createAllHandlersIn(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) throws CoreException;
-
-  /**
-   * Creates all {@link IDerivedResourceHandler}s that cleanup the given scope.
-   * 
-   * @param scope
-   *          The scope to clean
-   * @param envProvider
-   *          The {@link IJavaEnvironmentProvider} to use.
-   * @return All {@link IDerivedResourceHandler}s necessary to execute to clean all derived resources based on a
-   *         {@link IType} in the given {@link IJavaSearchScope}.
-   * @throws CoreException
-   */
-  List<IDerivedResourceHandler> createCleanupHandlersIn(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) throws CoreException;
+  List<IDerivedResourceHandler> createHandlersFor(Set<IResource> resources, IJavaEnvironmentProvider envProvider, IJavaSearchScope searchScope) throws CoreException;
 }

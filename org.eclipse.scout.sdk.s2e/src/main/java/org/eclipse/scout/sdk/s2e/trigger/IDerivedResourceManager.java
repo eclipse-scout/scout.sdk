@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.trigger;
 
+import java.util.Set;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
 
 /**
  * <h3>{@link IDerivedResourceManager}</h3> Manages the life cycle of any resources that are to be generated based on an
@@ -58,24 +61,15 @@ public interface IDerivedResourceManager {
   void removeDerivedResourceHandlerFactory(IDerivedResourceHandlerFactory handler);
 
   /**
-   * Trigger a change on an observed type
+   * Trigger an update of all resources that are derived from the given resources.<br>
+   * This method enqueues a new derived resources update event and returns immediately. The update process itself is
+   * executed asynchronously.<br>
+   * If the given resources contain {@link IContainer}s, all children are searched recursively for base classes.
    *
-   * @param jdtType
-   *          The type for which the derived resources should be updated.
+   * @param resources
+   *          A {@link Set} with the base resources that should update its derived resources. The resources may be of
+   *          type {@link IResource#PROJECT}, {@link IResource#FOLDER}, {@link IResource#FILE}, {@link IResource#ROOT}.
    */
-  void trigger(IType jdtType);
-
-  /**
-   * Trigger changes on all observed types in the given scope
-   */
-  void triggerAll(IJavaSearchScope scope);
-
-  /**
-   * Trigger a derived resource cleanup for the given scope.
-   * 
-   * @param scope
-   *          The scope that should be cleaned.
-   */
-  void triggerCleanup(IJavaSearchScope scope);
+  void trigger(Set<IResource> resources);
 
 }

@@ -26,8 +26,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceProxy;
+import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -38,13 +43,16 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageDeclaration;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
@@ -60,7 +68,6 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
-import org.eclipse.jdt.internal.core.search.BasicSearchEngine;
 import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -472,13 +479,15 @@ public final class S2eUtils {
   }
 
   /**
-   * Find all types annotated with this annotation
+   * Find all types annotated with the given annotation.
    *
    * @param annotationName
    *          fully qualified name of annotation
    * @param scope
-   *          SearchEngine.createJavaSearchScope
+   *          A search scope. Use {@link #createJavaSearchScope(Collection)} or
+   *          {@link SearchEngine#createJavaSearchScope(IJavaElement[])}.
    * @param monitor
+   *          The progress monitor or <code>null</code>.
    * @throws CoreException
    */
   public static Set<IType> findAllTypesAnnotatedWith(String annotationName, IJavaSearchScope scope, IProgressMonitor monitor) throws CoreException {
@@ -902,12 +911,87 @@ public final class S2eUtils {
    * <p>
    * If an element is an {@link IJavaProject}, then only project's source folders will be included.
    * </p>
-   * <p>
-   * Otherwise the same rules as for {@link BasicSearchEngine#createJavaSearchScope(IJavaElement[], boolean)} should
-   * apply.
-   * </p>
+   *
+   * @see SearchEngine#createJavaSearchScope(IJavaElement[], int)
    */
   public static IJavaSearchScope createJavaSearchScope(IJavaElement[] elements) {
-    return BasicSearchEngine.createJavaSearchScope(elements, IJavaSearchScope.SOURCES);
+    return SearchEngine.createJavaSearchScope(elements, IJavaSearchScope.SOURCES);
+  }
+
+  /**
+   * Creates a {@link IJavaSearchScope} based on the given {@link IResource}s.<br>
+   * The search scope contains the following items depending on the resource type:
+   * <ul>
+   * <li>{@link IResource#PROJECT}: If the project has the java nature ({@link JavaCore#NATURE_ID}) and is open all
+   * source folders of the project are added (no libraries or dependent projects).</li>
+   * <li>{@link IResource#FOLDER}: The {@link IPackageFragment} or {@link IPackageFragmentRoot} is added if the folder
+   * belongs to one. All sub-packages are included as well!</li>
+   * <li>{@link IResource#FILE}: If the file is a java file, the corresponding {@link ICompilationUnit} is added. If the
+   * resource is a class file, the corresponding {@link IClassFile} is added. If the file is a jar file, the
+   * corresponding {@link IPackageFragmentRoot} is added.</li>
+   * <li>{@link IResource#ROOT}: All source folders of all {@link IJavaProject}s in the workspace are added.</li>
+   * <ul>
+   *
+   * @param resources
+   *          The resources that should be added to the {@link IJavaSearchScope}.
+   * @return A new {@link IJavaSearchScope} that contains all {@link IJavaElement}s that could be matched by the given
+   *         resources or <code>null</code> if no {@link IJavaElement} is part of the given resources.
+   * @throws CoreException
+   */
+  public static IJavaSearchScope createJavaSearchScope(Collection<IResource> resources) throws CoreException {
+    if (resources == null || resources.isEmpty()) {
+      return null;
+    }
+
+    final Set<IJavaElement> jset = new HashSet<>(resources.size());
+    for (IResource resource : resources) {
+      if (resource == null || !resource.isAccessible()) {
+        continue;
+      }
+
+      int type = resource.getType();
+      switch (type) {
+        case IResource.PROJECT:
+          IProject project = (IProject) resource;
+          if (project.isAccessible() && project.hasNature(JavaCore.NATURE_ID)) {
+            addJavaElement(jset, JavaCore.create(project));
+          }
+          break;
+        case IResource.FILE:
+          addJavaElement(jset, JavaCore.create((IFile) resource));
+          break;
+        case IResource.FOLDER:
+          resource.accept(new IResourceProxyVisitor() {
+            @Override
+            public boolean visit(IResourceProxy proxy) throws CoreException {
+              if (proxy.getType() == IResource.FOLDER) {
+                IFolder folder = (IFolder) proxy.requestResource();
+                addJavaElement(jset, JavaCore.create(folder));
+                return true;
+              }
+              return false;
+            }
+          }, IResource.NONE);
+          break;
+        case IResource.ROOT:
+          IJavaModel model = JavaCore.create((IWorkspaceRoot) resource);
+          if (exists(model)) {
+            for (IJavaProject jp : model.getJavaProjects()) {
+              addJavaElement(jset, jp);
+            }
+          }
+          break;
+      }
+    }
+    if (jset.isEmpty()) {
+      return null;
+    }
+    return createJavaSearchScope(jset.toArray(new IJavaElement[jset.size()]));
+  }
+
+  private static void addJavaElement(Collection<IJavaElement> collector, IJavaElement elementToAdd) {
+    if (exists(elementToAdd)) {
+      collector.add(elementToAdd);
+    }
   }
 }

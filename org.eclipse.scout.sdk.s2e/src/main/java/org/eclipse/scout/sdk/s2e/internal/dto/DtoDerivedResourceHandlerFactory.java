@@ -10,14 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.internal.dto;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
@@ -33,31 +34,34 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandlerFactory {
 
   @Override
-  public List<IDerivedResourceHandler> createHandlersFor(IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
-    if (!acceptType(jdtType)) {
+  public List<IDerivedResourceHandler> createHandlersFor(Set<IResource> resources, IJavaEnvironmentProvider envProvider, IJavaSearchScope searchScope) throws CoreException {
+    Collection<IType> baseTypes = findAllCandidates(searchScope);
+    if (baseTypes.isEmpty()) {
       return Collections.emptyList();
     }
-    return Collections.<IDerivedResourceHandler> singletonList(new DtoDerivedResourceHandler(jdtType, envProvider));
-  }
-
-  @Override
-  public List<IDerivedResourceHandler> createAllHandlersIn(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) throws CoreException {
-    return Collections.<IDerivedResourceHandler> singletonList(new DtoDerivedResourceBatchHandler(findAllCandidates(scope), envProvider));
+    List<IDerivedResourceHandler> handlers = new ArrayList<>(baseTypes.size());
+    for (IType t : baseTypes) {
+      handlers.add(new DtoDerivedResourceHandler(t, envProvider));
+    }
+    return handlers;
   }
 
   protected Collection<IType> findAllCandidates(IJavaSearchScope scope) throws CoreException {
     Set<IType> collector = new HashSet<>();
-    for (org.eclipse.jdt.core.IType candidate : S2eUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.Data, scope, new NullProgressMonitor())) {
+    if (scope == null) {
+      return collector;
+    }
+    for (org.eclipse.jdt.core.IType candidate : S2eUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.Data, scope, null)) {
       if (acceptType(candidate)) {
         collector.add(candidate);
       }
     }
-    for (org.eclipse.jdt.core.IType candidate : S2eUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.FormData, scope, new NullProgressMonitor())) {
+    for (org.eclipse.jdt.core.IType candidate : S2eUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.FormData, scope, null)) {
       if (acceptType(candidate)) {
         collector.add(candidate);
       }
     }
-    for (org.eclipse.jdt.core.IType candidate : S2eUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.PageData, scope, new NullProgressMonitor())) {
+    for (org.eclipse.jdt.core.IType candidate : S2eUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.PageData, scope, null)) {
       if (acceptType(candidate)) {
         collector.add(candidate);
       }
@@ -74,11 +78,6 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
         && jdtType.getDeclaringType() == null
         && Flags.isPublic(jdtType.getFlags())
         && S2eUtils.getFirstAnnotationInSupertypeHierarchy(jdtType, IScoutRuntimeTypes.Data, IScoutRuntimeTypes.FormData, IScoutRuntimeTypes.PageData) != null;
-  }
-
-  @Override
-  public List<IDerivedResourceHandler> createCleanupHandlersIn(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) throws CoreException {
-    return null;
   }
 
 }

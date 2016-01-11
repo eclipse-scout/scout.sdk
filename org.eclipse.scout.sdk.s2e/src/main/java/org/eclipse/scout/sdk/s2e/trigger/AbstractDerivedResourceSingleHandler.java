@@ -69,6 +69,9 @@ public abstract class AbstractDerivedResourceSingleHandler extends AbstractDeriv
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+    if (obj == this) {
+      return true;
+    }
 
     // do not use the model type because they may come from different IJavaEnvironments!
     return m_jdtType.equals(((AbstractDerivedResourceSingleHandler) obj).m_jdtType);

@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.handler;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -34,7 +38,8 @@ public class TriggerAllDerivedResourceHandlers extends AbstractHandler {
     messageBox.setText("Do you really want to update all derived resources?");
     int answer = messageBox.open();
     if (answer == SWT.YES) {
-      ScoutSdkCore.getDerivedResourceManager().triggerAll(SearchEngine.createWorkspaceScope());
+      Set<IResource> workspaceroot = Collections.<IResource> singleton(ResourcesPlugin.getWorkspace().getRoot());
+      ScoutSdkCore.getDerivedResourceManager().trigger(workspaceroot);
     }
     return null;
   }
