@@ -76,13 +76,25 @@ public class S2ESdkActivator extends Plugin {
 
   private static void registerScoutArchetype() {
     try {
+      MavenPluginActivator mavenPlugin = MavenPluginActivator.getDefault();
+      if (mavenPlugin == null) {
+        return;
+      }
+      org.eclipse.m2e.core.internal.archetype.ArchetypeManager archetypeManager = mavenPlugin.getArchetypeManager();
+      if (archetypeManager == null) {
+        return;
+      }
+      ArchetypeManager archetyper = archetypeManager.getArchetyper();
+      if (archetyper == null) {
+        return;
+      }
+
       Archetype archetype = new Archetype();
       archetype.setGroupId(ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID);
       archetype.setArtifactId(ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID);
       archetype.setVersion(ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_VERSION);
       archetype.setDescription("Creates a new Scout helloworld application. Instead of using the 'Maven Project' wizard you may also use the 'Scout Project' wizard which already prefills all properties with correct values.");
       archetype.setRepository("http://repo1.maven.org/maven2/");
-      ArchetypeManager archetyper = MavenPluginActivator.getDefault().getArchetypeManager().getArchetyper();
       archetyper.updateLocalCatalog(archetype);
     }
     catch (Exception e) {
