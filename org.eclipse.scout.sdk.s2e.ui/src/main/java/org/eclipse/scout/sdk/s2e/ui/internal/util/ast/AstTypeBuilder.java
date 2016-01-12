@@ -211,7 +211,11 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
         newOrder = CoreScoutUtils.getNewViewOrderValue(getFactory().getJavaEnvironment().findType(declaringTypeFqn), getOrderDefinitionType(), getInsertPosition());
       }
 
+      final String zeroSuffix = ".0";
       String newOrderStr = Double.toString(newOrder);
+      if (newOrderStr.endsWith(zeroSuffix)) {
+        newOrderStr = newOrderStr.substring(0, newOrderStr.length() - zeroSuffix.length());
+      }
       SingleMemberAnnotation order = ast.newSingleMemberAnnotation();
       String orderRef = getFactory().getImportRewrite().addImport(IScoutRuntimeTypes.Order);
       order.setTypeName(ast.newName(orderRef));
