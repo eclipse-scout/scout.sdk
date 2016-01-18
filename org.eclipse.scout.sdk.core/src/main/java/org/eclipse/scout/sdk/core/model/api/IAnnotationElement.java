@@ -23,7 +23,8 @@ public interface IAnnotationElement extends IJavaElement {
   /**
    * Gets the value of this annotation element.
    *
-   * @return The {@link IMetaValue} of this element.
+   * @return The {@link IMetaValue} of this element. Never returns <code>null</code>. Returns a value of
+   *         {@link MetaValueType#Unknown} if the value cannot be computed.
    */
   IMetaValue value();
 

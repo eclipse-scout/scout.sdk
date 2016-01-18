@@ -148,9 +148,6 @@ public final class MetaValueFactory {
   }
 
   public static IMetaValue createUnknown(final Object o) {
-    if (o == null) {
-      return createNull();
-    }
     return new AbstractValue() {
       @Override
       public MetaValueType type() {
@@ -164,7 +161,14 @@ public final class MetaValueFactory {
 
       @Override
       public String toString() {
-        return "UNKNOWN(" + o.toString() + ")";
+        String s = null;
+        if (o == null) {
+          s = "null";
+        }
+        else {
+          s = o.toString();
+        }
+        return "UNKNOWN(" + s + ')';
       }
     };
   }
@@ -330,7 +334,7 @@ public final class MetaValueFactory {
 
   public static IMetaValue createFromConstant(Constant c) {
     if (c == null) {
-      return createNull();
+      return createUnknown(c);
     }
     switch (c.typeID()) {
       case TypeIds.T_int: {
@@ -345,6 +349,9 @@ public final class MetaValueFactory {
             return Integer.toString(getInternalConstant().intValue());
           }
         };
+      }
+      case TypeIds.T_null: {
+        return createNull();
       }
       case TypeIds.T_byte: {
         return new AbstractConstantMetaValue(c) {
@@ -446,9 +453,7 @@ public final class MetaValueFactory {
           }
         };
       }
-      case TypeIds.T_JavaLangString:
-
-      {
+      case TypeIds.T_JavaLangString: {
         return new AbstractConstantMetaValue(c) {
           @Override
           public MetaValueType type() {

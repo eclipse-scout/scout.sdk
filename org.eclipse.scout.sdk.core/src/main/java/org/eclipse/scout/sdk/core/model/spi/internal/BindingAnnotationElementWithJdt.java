@@ -66,7 +66,12 @@ public class BindingAnnotationElementWithJdt extends AbstractJavaElementWithJdt<
   @Override
   public IMetaValue getMetaValue() {
     if (m_value == null) {
-      m_value = SpiWithJdtUtils.resolveCompiledValue(m_env, m_declaringAnnotation.getOwner(), m_binding.getValue());
+      Object value = m_binding.getValue();
+      m_value = SpiWithJdtUtils.resolveCompiledValue(m_env, m_declaringAnnotation.getOwner(), value);
+      if (m_value == null) {
+        // value cannot be determined. use unknown because annotation values cannot be null.
+        m_value = MetaValueFactory.createUnknown(value);
+      }
     }
     return m_value;
   }

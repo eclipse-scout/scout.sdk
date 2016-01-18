@@ -10,12 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
+import org.eclipse.scout.sdk.core.fixture.ConstantTestClass;
 import org.eclipse.scout.sdk.core.fixture.TestAnnotation;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.MetaValueType;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,7 +62,7 @@ public class FieldTest {
     IField mTestField = childClassType.fields().list().get(1);
     Assert.assertNotNull(mTestField);
 
-    Assert.assertNull(mTestField.constantValue());
+    Assert.assertEquals(MetaValueType.Null, mTestField.constantValue().type());
     Assert.assertEquals(int.class.getName(), mTestField.dataType().leafComponentType().name());
     Assert.assertEquals(2, mTestField.dataType().arrayDimension());
     Assert.assertEquals(childClassType, mTestField.declaringType());
@@ -102,6 +106,20 @@ public class FieldTest {
     Assert.assertEquals(baseClassType, myLongField.declaringType());
     Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myLongField.flags());
     Assert.assertEquals("myLong", myLongField.elementName());
+  }
+
+  @Test
+  public void testConstantValues() {
+    IType constantTestClass = CoreTestingUtils.createJavaEnvironment().findType(ConstantTestClass.class.getName());
+    Assert.assertNotNull(constantTestClass);
+
+    List<IField> fields = constantTestClass.fields().list();
+    Assert.assertEquals(4, fields.size());
+
+    Assert.assertNull(fields.get(0).constantValue());
+    Assert.assertEquals(MetaValueType.String, fields.get(1).constantValue().type());
+    Assert.assertEquals(MetaValueType.Null, fields.get(2).constantValue().type());
+    Assert.assertNull(fields.get(3).constantValue());
   }
 
   @Test

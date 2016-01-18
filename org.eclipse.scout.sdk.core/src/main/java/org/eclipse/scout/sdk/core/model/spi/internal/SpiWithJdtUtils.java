@@ -419,6 +419,9 @@ public final class SpiWithJdtUtils {
     if (expression == null) {
       return null;
     }
+    if (expression instanceof NullLiteral) {
+      return expression;
+    }
     else if (expression instanceof Literal) {
       if (expression.constant == null) {
         ((Literal) expression).computeConstant();

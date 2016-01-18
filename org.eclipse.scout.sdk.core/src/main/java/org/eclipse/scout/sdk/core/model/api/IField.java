@@ -24,7 +24,8 @@ public interface IField extends IMember {
    * Gets the constant value of this {@link IField}.<br>
    * Please note: The field must be initialized with a constant value so that it can be retrieved using this method.
    *
-   * @return The constant value of this {@link IField} if it can be computed or <code>null</code> otherwise.
+   * @return The constant value of this {@link IField} if it can be computed or <code>null</code> if it cannot be
+   *         computed or the field has no constant value.
    */
   IMetaValue constantValue();
 

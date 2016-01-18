@@ -61,7 +61,12 @@ public class DeclarationAnnotationElementWithJdt extends AbstractJavaElementWith
   public IMetaValue getMetaValue() {
     if (m_value == null) {
       ClassScope scope = SpiWithJdtUtils.classScopeOf(m_declaringAnnotation.getOwner());
-      m_value = SpiWithJdtUtils.resolveCompiledValue(m_env, m_declaringAnnotation.getOwner(), SpiWithJdtUtils.compileExpression(m_astNode.value, scope));
+      Object compiledValue = SpiWithJdtUtils.compileExpression(m_astNode.value, scope);
+      m_value = SpiWithJdtUtils.resolveCompiledValue(m_env, m_declaringAnnotation.getOwner(), compiledValue);
+      if (m_value == null) {
+        // value cannot be determined. use unknown because annotation values cannot be null.
+        m_value = MetaValueFactory.createUnknown(compiledValue);
+      }
     }
     return m_value;
   }
