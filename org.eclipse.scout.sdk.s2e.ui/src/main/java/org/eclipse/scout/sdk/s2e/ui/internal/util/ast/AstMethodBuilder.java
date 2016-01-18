@@ -40,6 +40,7 @@ public class AstMethodBuilder<INSTANCE extends AstMethodBuilder<INSTANCE>> exten
   private Type m_returnType;
   private Block m_body;
   private boolean m_createOverride;
+  private boolean m_createJavaDoc;
 
   // out
   private MethodDeclaration m_resultMethod;
@@ -69,6 +70,11 @@ public class AstMethodBuilder<INSTANCE extends AstMethodBuilder<INSTANCE>> exten
     return m_return;
   }
 
+  public INSTANCE withJavaDoc(boolean createJavaDoc) {
+    m_createJavaDoc = createJavaDoc;
+    return m_return;
+  }
+
   public MethodDeclaration get() {
     return m_resultMethod;
   }
@@ -79,6 +85,10 @@ public class AstMethodBuilder<INSTANCE extends AstMethodBuilder<INSTANCE>> exten
 
   public boolean isCreateOverride() {
     return m_createOverride;
+  }
+
+  public boolean isCreateJavaDoc() {
+    return m_createJavaDoc;
   }
 
   public Type getReturnType() {
@@ -122,7 +132,7 @@ public class AstMethodBuilder<INSTANCE extends AstMethodBuilder<INSTANCE>> exten
 
     m_resultMethod.setBody(body);
 
-    if (getFactory().isCreateCommentsSetting() && getModifiers().contains(ModifierKeyword.PUBLIC_KEYWORD)) {
+    if (isCreateJavaDoc() && getFactory().isCreateCommentsSetting() && getModifiers().contains(ModifierKeyword.PUBLIC_KEYWORD)) {
       try {
         String declaringTypeFqn = AstUtils.getFullyQualifiedName(getDeclaringType(), getFactory().getType(), '.');
         String javadocText = CodeGeneration.getMethodComment(getFactory().getIcu(), declaringTypeFqn, m_resultMethod, null, getFactory().getIcu().findRecommendedLineSeparator());
