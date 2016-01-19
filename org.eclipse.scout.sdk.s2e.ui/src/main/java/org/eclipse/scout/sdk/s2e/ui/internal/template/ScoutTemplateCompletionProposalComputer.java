@@ -22,6 +22,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -67,6 +69,14 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
 
       IType t = (IType) element;
       if (t.isBinary()) {
+        return Collections.emptyList();
+      }
+
+      // check if we are in the middle of a statement. This may happen e.g. on annotations. The enclosing element is even though the IType holding the annotation
+      Document d = new Document(t.getCompilationUnit().getSource());
+      IRegion lineInformationOfOffset = d.getLineInformationOfOffset(offset);
+      String lineSource = d.get(lineInformationOfOffset.getOffset(), lineInformationOfOffset.getLength());
+      if (lineSource.indexOf('@') >= 0 || lineSource.indexOf('.') >= 0 || lineSource.indexOf('(') >= 0 || lineSource.indexOf(')') >= 0 || lineSource.indexOf(' ') >= 0) {
         return Collections.emptyList();
       }
 
