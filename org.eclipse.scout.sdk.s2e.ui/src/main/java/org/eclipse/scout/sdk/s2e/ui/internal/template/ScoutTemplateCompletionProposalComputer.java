@@ -76,7 +76,7 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
       Document d = new Document(t.getCompilationUnit().getSource());
       IRegion lineInformationOfOffset = d.getLineInformationOfOffset(offset);
       String lineSource = d.get(lineInformationOfOffset.getOffset(), lineInformationOfOffset.getLength());
-      if (lineSource.indexOf('@') >= 0 || lineSource.indexOf('.') >= 0 || lineSource.indexOf('(') >= 0 || lineSource.indexOf(')') >= 0 || lineSource.indexOf(' ') >= 0) {
+      if (lineSource.indexOf('@') >= 0 || lineSource.indexOf('.') >= 0 || lineSource.indexOf('(') >= 0 || lineSource.indexOf(')') >= 0) {
         return Collections.emptyList();
       }
 
