@@ -334,7 +334,7 @@ public final class MetaValueFactory {
 
   public static IMetaValue createFromConstant(Constant c) {
     if (c == null) {
-      return createUnknown(c);
+      return createUnknown(null);
     }
     switch (c.typeID()) {
       case TypeIds.T_int: {

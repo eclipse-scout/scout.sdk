@@ -203,7 +203,7 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
         return classpath;
       }
       catch (IOException e) {
-        SdkLog.warning("Unable to initialize classpath '{}' because: {} ", f.getAbsolutePath(), e.getMessage());
+        SdkLog.warning("Unable to initialize classpath '{}'.", f.getAbsolutePath(), e);
       }
     }
     return null;

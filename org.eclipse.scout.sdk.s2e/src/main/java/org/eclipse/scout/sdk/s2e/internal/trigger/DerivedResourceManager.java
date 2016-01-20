@@ -175,7 +175,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       if (r == null || !r.isAccessible()) {
         continue;
       }
-      if (r != resource && r.getFullPath().isPrefixOf(path)) {
+      if (!r.equals(resource) && r.getFullPath().isPrefixOf(path)) {
         return true;
       }
     }
