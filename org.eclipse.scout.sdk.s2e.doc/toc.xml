@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<toc topic="html/scout_user_guide.html" label="Eclipse Scout User Guide">
+	<topic href="html/tutorial.html" label="Getting Started">
+		<topic href="html/tutorial_existingdemo.html" label="Import the Scout Demo Applications Tutorial">
+			<topic href="html/tutorial_existingdemo.html#install-the-scout-demo-application" label="Install the Scout Demo Application">
+				<topic href="html/tutorial_existingdemo.html#import-the-scout-demo-projects" label="Import the Scout demo projects"></topic>
+			</topic>
+			<topic href="html/tutorial_existingdemo.html#run-the-demo-application" label="Run the Demo Application">
+				<topic href="html/tutorial_existingdemo.html#start-the-application-in-the-ide" label="Start the application in the IDE"></topic>
+				<topic href="html/tutorial_existingdemo.html#use-the-contacts-demo-in-a-browser" label="Use the Contacts Demo in a Browser"></topic>
+				<topic href="html/tutorial_existingdemo.html#what-s-next" label="What’s Next?"></topic>
+			</topic>
+		</topic>
+		<topic href="html/tutorial_helloworld.html" label="Hello world Tutorial">
+			<topic href="html/tutorial_helloworld.html#create-a-scout-project" label="Create a Scout Project"></topic>
+			<topic href="html/tutorial_helloworld.html#run-the-application" label="Run the Application"></topic>
+			<topic href="html/tutorial_helloworld.html#what-s-next" label="What’s Next?"></topic>
+		</topic>
+	</topic>
+	<topic href="html/sdk.html" label="Scout Tooling">
+		<topic href="html/sdk_editor.html" label="Scout Editors">
+			<topic href="html/sdk_editor_java.html" label="Additions to the Java Editor"></topic>
+			<topic href="html/sdk_editor_nls.html" label="NLS Editor"></topic>
+		</topic>
+		<topic href="html/sdk_wizard.html" label="Scout Wizards">
+			<topic href="html/sdk_wizard_project.html" label="New Scout Project Wizard"></topic>
+			<topic href="html/sdk_wizard_nls-entry.html" label="New NLS Entry Wizard"></topic>
+			<topic href="html/sdk_wizard_language.html" label="Add a Language Wizard"></topic>
+		</topic>
+	</topic>
+</toc>

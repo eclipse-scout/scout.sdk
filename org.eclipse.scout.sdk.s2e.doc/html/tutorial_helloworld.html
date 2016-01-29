@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head> 
+  <meta charset="UTF-8" /> 
+  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]--> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+  <meta name="generator" content="Asciidoctor 1.5.2" /> 
+  <title>Hello world Tutorial</title> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400" /> 
+  <link rel="stylesheet" href="css/eclipse.css" /> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" /> 
+  <link rel="stylesheet" href="css/coderay-eclipse.css" /> 
+ </head> 
+ <body class="article">
+  <table border="0" class="navigation" style="width: 100%;" summary="navigation">
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_existingdemo.html" shape="rect" title="Import the Scout Demo Applications Tutorial"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+   </tr>
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Import the Scout Demo Applications Tutorial</td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
+   </tr>
+  </table> 
+  <div id="header"> 
+  </div> 
+  <div id="content"> 
+   <div class="sect2"> 
+    <h3 id="hello-world-tutorial"><a class="anchor" href="#hello-world-tutorial"></a>Hello world Tutorial</h3> 
+    <div class="paragraph"> 
+     <p>With this tutorial you will learn how to create your first Scout application.</p> 
+    </div> 
+    <div class="sect3"> 
+     <h4 id="create-a-scout-project"><a class="anchor" href="#create-a-scout-project"></a>Create a Scout Project</h4> 
+     <div class="paragraph"> 
+      <p>Start your Eclipse IDE and select an empty directory for your workspace. This workspace directory will then hold all the project code for the <code>Hello World</code> application. Once the Eclipse IDE is running it will show the Java perspective. To create a new Scout project select the menu <span class="menu">File &#x2192; New &#x2192; Project&#x2026;&#x200b;</span> and type &#x201c;Scout Project&#x201d; in the wizard search field. Select the Scout Project wizard and press <b class="button">Next</b>.</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>In the <em class="wizard">New Scout Project</em> wizard you have to enter a <code>group id</code>, <code>artifact id</code> and a <code>display name</code> for your Scout project. As the created project will make use of <a href="https://maven.apache.org/">Apache Maven</a> please refer to the <a href="https://maven.apache.org/guides/mini/guide-naming-conventions.html">Maven naming conventions</a> to choose <code>group id</code> and <code>artifact id</code> for your project. The <code>artifact id</code> will then also be the project name in the Eclipse workspace. The <code>display name</code> is used as the application name presented to the user (e.g. in the Browser title bar).</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>For the <code>Hello World</code> application just use the already prefilled values as sown in <a href="#img-sdk_new_project_wizard">Figure 1</a>. Then, click the <b class="button">Finish</b> button to let the Scout SDK create the initial project code for you.</p> 
+     </div> 
+     <div id="img-sdk_new_project_wizard" class="imageblock"> 
+      <div class="content"> 
+       <img src="images/sdk_new_project.png" alt="sdk new project" /> 
+      </div> 
+      <div class="title">
+       Figure 1. The new Scout project wizard.
+      </div> 
+     </div> 
+     <div class="paragraph"> 
+      <p>Depending on your Eclipse installation some <code>Maven plugin connectors</code> may be missing initially. In that case a dialog as shown in <a href="#img-sdk_new_project_connector">Figure 2</a> may be shown. Please choose the desired actions from the combo box in the <code>Action</code> column until all mappings are green. E.g. for the <code>compiler-plugin</code> choose <code>Install M2E connector for the Eclipse JDT Compiler</code> from the combo box. Afterwards the selected connectors are resolved and you need to confirm the installation, accept the license, accept that some content has not been signed and restart Eclipse afterwards. To read more about <code>Maven plugin connectors</code> please refer to the <a href="https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html">m2e documentation</a>.</p> 
+     </div> 
+     <div id="img-sdk_new_project_connector" class="imageblock"> 
+      <div class="content"> 
+       <img src="images/sdk_new_project_connectors.png" alt="sdk new project connectors" /> 
+      </div> 
+      <div class="title">
+       Figure 2. The Maven plugin connector installation dialog.
+      </div> 
+     </div> 
+    </div> 
+    <div class="sect3"> 
+     <h4 id="run-the-application"><a class="anchor" href="#run-the-application"></a>Run the Application</h4> 
+     <div class="paragraph"> 
+      <p>After the initial project creation step we can start the Scout application for the first time. For this, we use the <code>Run</code> toolbar button as shown in <a href="#img-start_client">Figure 3</a>. Two launch configurations have already been created. One for the backend server and one for the HTML user interface server. Please launch the server first and the HTML UI afterwards.</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>In case the launch configurations are not shown in the toolbar under the debug/run icons, you may find the <code>server-dev.launch</code> launch file under project <code>helloworld.server.app.dev</code> and the <code>ui-html-dev.launch</code> launch file under <code>helloworld.ui.html.app.dev</code>. These launch files can be started using the context menu <code>Run As</code>. This will also add them to the <code>Run</code> toolbar button for the next time.</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>During startup of the Scout applications you should see console output providing information about the startup. After both have been started successfully the HTML user interface can be accessed by navigating to <a href="http://localhost:8082/" class="bare">http://localhost:8082/</a> in your favorite web browser.</p> 
+     </div> 
+     <div id="img-start_client" class="imageblock"> 
+      <div class="content"> 
+       <img src="images/sdk_start_client_product.png" alt="sdk start client product" /> 
+      </div> 
+      <div class="title">
+       Figure 3. Starting the Hello World application.
+      </div> 
+     </div> 
+    </div> 
+    <div class="sect3"> 
+     <h4 id="what-s-next"><a class="anchor" href="#what-s-next"></a>What&#x2019;s Next?</h4> 
+     <div class="paragraph"> 
+      <p>In the next tutorial, you will learn how to import existing scout applications into your workspace.</p> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <table border="0" class="navigation" style="width: 100%;" summary="navigation">
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_existingdemo.html" shape="rect" title="Import the Scout Demo Applications Tutorial"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"><a href="scout_user_guide.html" shape="rect" title="Eclipse Scout User Guide"><img alt="Eclipse Scout User Guide" border="0" src="images/home.gif" /></a></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+   </tr>
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Import the Scout Demo Applications Tutorial</td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
+   </tr>
+  </table>
+  <div id="footer"> 
+   <div id="footer-text">
+     Version 5.2.0-SNAPSHOT
+    <br /> Last updated 2016-01-13 08:04:05 CET 
+   </div> 
+  </div>  
+ </body>
+</html>
