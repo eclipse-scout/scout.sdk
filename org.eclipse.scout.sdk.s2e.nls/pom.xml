@@ -73,7 +73,7 @@
               *
             </Import-Package>
             <Require-Bundle>
-              org.eclipse.scout.sdk.s2e;bundle-version="[5.2,5.3)";visibility:=reexport,
+              org.eclipse.scout.sdk.s2e;bundle-version="[6.0,6.1)";visibility:=reexport,
               org.eclipse.jdt.ui;bundle-version="[3.11,4)";visibility:=reexport,
               org.eclipse.ui.editors;bundle-version="[3.5.0,4.0.0)";visibility:=reexport,
               org.eclipse.jface;bundle-version="[3.11.0,4.0.0)";visibility:=reexport
