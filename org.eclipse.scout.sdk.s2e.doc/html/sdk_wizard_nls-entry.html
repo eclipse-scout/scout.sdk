@@ -5,7 +5,7 @@
   <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]--> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
   <meta name="generator" content="Asciidoctor 1.5.2" /> 
-  <title>New NLS Entry Wizard</title> 
+  <title>NLS Entry Wizard</title> 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400" /> 
   <link rel="stylesheet" href="css/eclipse.css" /> 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" /> 
@@ -28,9 +28,29 @@
   </div> 
   <div id="content"> 
    <div class="sect3"> 
-    <h4 id="new-nls-entry-wizard"><a class="anchor" href="#new-nls-entry-wizard"></a>New NLS Entry Wizard</h4> 
+    <h4 id="nls-entry-wizard"><a class="anchor" href="#nls-entry-wizard"></a>NLS Entry Wizard</h4> 
     <div class="paragraph"> 
-     <p>Text is missing</p> 
+     <p>The NLS Entry wizard can be used to create or to modify a text entry that will be displayed to the user and the needs to be localized. It can be opened from:</p> 
+    </div> 
+    <div class="ulist"> 
+     <ul> 
+      <li> <p><a href="sdk_editor_nls.html">The NLS Editor</a> by selecting &quot;New Entry&quot; or &quot;Modify Entry&quot;.</p> </li> 
+      <li> <p><a href="sdk_editor_java.html">The Java Editor</a> by using the proposal editor inside the string parameter of the <code>TEXTS.get(&quot;&quot;)</code> code.</p> </li> 
+     </ul> 
+    </div> 
+    <div class="imageblock"> 
+     <div class="content"> 
+      <img src="images/sdk_wizard_nls_entry.png" alt="sdk wizard nls entry" /> 
+     </div> 
+    </div> 
+    <div class="paragraph"> 
+     <p>The <em class="field">Key Name</em> field holds the text key that is used to access translated text.</p> 
+    </div> 
+    <div class="paragraph"> 
+     <p>In the tabs below the key name field, the text translations for the registered languages can be provided. Make sure to at least provide a text in the <em class="element">default</em> tab.</p> 
+    </div> 
+    <div class="paragraph"> 
+     <p>With the <em class="element">copy key to the clipboard</em> you can copy the key name to the clipboard and paste it later in your code.</p> 
     </div> 
    </div> 
   </div> 
@@ -49,7 +69,7 @@
   <div id="footer"> 
    <div id="footer-text">
      Version 5.2.0-SNAPSHOT
-    <br /> Last updated 2016-01-22 16:07:42 CET 
+    <br /> Last updated 2016-01-29 18:24:22 CET 
    </div> 
   </div>  
  </body>

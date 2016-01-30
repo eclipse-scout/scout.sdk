@@ -56,45 +56,15 @@
         Figure 1. The Import Wizard in Eclipse.
        </div> 
       </div> 
-      <div class="admonitionblock warning"> 
-       <table> 
-        <tbody>
-         <tr> 
-          <td class="icon"> <i class="fa icon-warning" title="Warning"></i> </td> 
-          <td class="content"> As long as the Eclipse Scout project is not integrated in the default catalog, you need to import the setup file manually. </td> 
-         </tr> 
-        </tbody>
-       </table> 
-      </div> 
       <div class="paragraph"> 
-       <p>To import the setup file manually click on the green plus icon <b class="button">Add user projects</b> which opens dialog <em class="wizard">Add User Projects</em> as shown in <a href="#img-oomph_add_user_projects">Figure 2</a>.</p> 
-      </div> 
-      <div id="img-oomph_add_user_projects" class="imageblock"> 
-       <div class="content"> 
-        <img src="images/oomph_add_user_projects.png" alt="oomph add user projects" /> 
-       </div> 
-       <div class="title">
-        Figure 2. Add User Projects Dialog.
-       </div> 
-      </div> 
-      <div class="paragraph"> 
-       <p>In this dialog fill in the elements provided below.</p> 
-      </div> 
-      <div class="ulist"> 
-       <ul> 
-        <li> <p>For field <code>Catalog</code> select option &#x201c;Eclipse Projects&#x201d;</p> </li> 
-        <li> <p>For field <code>Resource URIs</code> enter our our Setup File: <code><a href="https://git.eclipse.org/c/scout/oomph.git/plain/Scout.setup" class="bare">https://git.eclipse.org/c/scout/oomph.git/plain/Scout.setup</a></code></p> </li> 
-       </ul> 
-      </div> 
-      <div class="paragraph"> 
-       <p>To close the dialog click the <b class="button">OK</b> button. The <em class="wizard">Eclipse Importer</em> should then contain the folder hierarchy <em class="folder">Eclipse Projects</em>, <em class="folder">&lt;User&gt;</em>, <em class="folder">Scout</em> and <em class="folder">Scout Demo App</em> as shown in <a href="#img-oomph_exiting_projects1">Figure 3</a>.</p> 
+       <p>The <em class="wizard">Eclipse Importer</em> contains the folder hierarchy <em class="folder">Eclipse Projects</em>, <em class="folder">Scout</em> and <em class="folder">Scout Demo App</em> as shown in <a href="#img-oomph_exiting_projects1">Figure 2</a>. You can enter &quot;Scout Demo&quot; in the search filter to find the project easily.</p> 
       </div> 
       <div id="img-oomph_exiting_projects1" class="imageblock"> 
        <div class="content"> 
         <img src="images/oomph_exiting_projects1.png" alt="oomph exiting projects1" /> 
        </div> 
        <div class="title">
-        Figure 3. Top part of the &quot;Projects&quot; Step of the Importer.
+        Figure 2. Top part of the &quot;Projects&quot; Step of the Importer.
        </div> 
       </div> 
       <div class="paragraph"> 
@@ -112,24 +82,24 @@
         <img src="images/oomph_exiting_projects2.png" alt="oomph exiting projects2" /> 
        </div> 
        <div class="title">
-        Figure 4. Bottom part of the &quot;Projects&quot; Step of the Importer.
+        Figure 3. Bottom part of the &quot;Projects&quot; Step of the Importer.
        </div> 
       </div> 
       <div class="paragraph"> 
-       <p>Once the project selection in your Eclipse importer looks as shown in <a href="#img-oomph_exiting_projects2">Figure 4</a> Click on the <b class="button">Next</b> button.</p> 
+       <p>Once the project selection in your Eclipse importer looks as shown in <a href="#img-oomph_exiting_projects2">Figure 3</a> Click on the <b class="button">Next</b> button.</p> 
       </div> 
       <div class="paragraph"> 
        <p>On the <em class="wizard">Variables</em> dialog of the Eclipse importer a number of Oomph variables have to be specified. In case you have used already used Oomph for other purposes, this step might look different or empty (for example when all variables have been set in a previous Oomph session).</p> 
       </div> 
       <div class="paragraph"> 
-       <p>Make sure to display all variables by activating checkbox <code>Show all Variables</code> in the bottom left corner as shown in <a href="#img-oomph_exiting_variables">Figure 5</a>.</p> 
+       <p>Make sure to display all variables by activating checkbox <code>Show all Variables</code> in the bottom left corner as shown in <a href="#img-oomph_exiting_variables">Figure 4</a>.</p> 
       </div> 
       <div id="img-oomph_exiting_variables" class="imageblock"> 
        <div class="content"> 
         <img src="images/oomph_exiting_variables.png" alt="oomph exiting variables" /> 
        </div> 
        <div class="title">
-        Figure 5. &quot;Variables&quot; Step of the Importer.
+        Figure 4. &quot;Variables&quot; Step of the Importer.
        </div> 
       </div> 
       <div class="admonitionblock warning"> 
@@ -137,7 +107,7 @@
         <tbody>
          <tr> 
           <td class="icon"> <i class="fa icon-warning" title="Warning"></i> </td> 
-          <td class="content"> The variables in <a href="#img-oomph_exiting_variables">Figure 5</a> may be shown in a different order in your case. </td> 
+          <td class="content"> The variables in <a href="#img-oomph_exiting_variables">Figure 4</a> may be shown in a different order in your case. </td> 
          </tr> 
         </tbody>
        </table> 
@@ -158,14 +128,14 @@
        <p>Once the setting of the variables is completed click <b class="button">Next</b>. This leads to the <em class="wizard">Confirmation</em> dialog. This last step can be completed by clicking on <b class="button">Finish</b>.</p> 
       </div> 
       <div class="paragraph"> 
-       <p>The Oomph installer first makes sure that all necessary Scout components and M2E connectors are available. In case one or more components are missing, Oomph will first download and install them. This triggers a restart request as shown in <a href="#img-oomph_restart">Figure 6</a>.</p> 
+       <p>The Oomph installer first makes sure that all necessary Scout components and M2E connectors are available. In case one or more components are missing, Oomph will first download and install them. This triggers a restart request as shown in <a href="#img-oomph_restart">Figure 5</a>.</p> 
       </div> 
       <div id="img-oomph_restart" class="imageblock"> 
        <div class="content"> 
         <img src="images/oomph_restart.png" alt="oomph restart" /> 
        </div> 
        <div class="title">
-        Figure 6. Restart of the IDE after installation.
+        Figure 5. Restart of the IDE after installation.
        </div> 
       </div> 
       <div class="paragraph"> 
@@ -184,39 +154,39 @@
      <div class="sect4"> 
       <h5 id="start-the-application-in-the-ide"><a class="anchor" href="#start-the-application-in-the-ide"></a>Start the application in the IDE</h5> 
       <div class="paragraph"> 
-       <p>In the <em class="wizard">Package Explorer</em> view of the IDE open the Maven module <code>org.eclipse.scout.contacts.all.app.dev</code>. To run the Contacts application use the <em class="menu">Run As</em> context menu on file <code>contacts-all-dev.launch</code> as shown in <a href="#img-oomph_run_contacts_all">Figure 7</a>.</p> 
+       <p>In the <em class="wizard">Package Explorer</em> view of the IDE open the Maven module <code>org.eclipse.scout.contacts.all.app.dev</code>. To run the Contacts application use the <em class="menu">Run As</em> context menu on file <code>contacts-all-dev.launch</code> as shown in <a href="#img-oomph_run_contacts_all">Figure 6</a>.</p> 
       </div> 
       <div id="img-oomph_run_contacts_all" class="imageblock"> 
        <div class="content"> 
         <img src="images/run_contracts_all_dev.png" alt="run contracts all dev" /> 
        </div> 
        <div class="title">
-        Figure 7. Start the Contacts application.
+        Figure 6. Start the Contacts application.
        </div> 
       </div> 
       <div class="paragraph"> 
-       <p>Once the startup sequence of the Contacts application has completed the console view in your Eclipse IDE should look like <a href="#img-oomph_contacts_console">Figure 8</a>.</p> 
+       <p>Once the startup sequence of the Contacts application has completed the console view in your Eclipse IDE should look like <a href="#img-oomph_contacts_console">Figure 7</a>.</p> 
       </div> 
       <div id="img-oomph_contacts_console" class="imageblock"> 
        <div class="content"> 
         <img src="images/oomph_contacts_console.png" alt="oomph contacts console" /> 
        </div> 
        <div class="title">
-        Figure 8. Console view after starting the Contacts demo.
+        Figure 7. Console view after starting the Contacts demo.
        </div> 
       </div> 
      </div> 
      <div class="sect4"> 
       <h5 id="use-the-contacts-demo-in-a-browser"><a class="anchor" href="#use-the-contacts-demo-in-a-browser"></a>Use the Contacts Demo in a Browser</h5> 
       <div class="paragraph"> 
-       <p>With the Contacts demo running in the IDE open the application in your favorite browser via URL <a href="http://localhost:8082/" class="bare">http://localhost:8082/</a>. To get the screen shown in <a href="#img-contacts_persons_alice">Figure 9</a> first click on the <em class="folder">Persons</em> node and then double click on the ''Alice'' row.</p> 
+       <p>With the Contacts demo running in the IDE open the application in your favorite browser via URL <a href="http://localhost:8082/" class="bare">http://localhost:8082/</a>. To get the screen shown in <a href="#img-contacts_persons_alice">Figure 8</a> first click on the <em class="folder">Persons</em> node and then double click on the ''Alice'' row.</p> 
       </div> 
       <div id="img-contacts_persons_alice" class="imageblock"> 
        <div class="content"> 
         <img src="images/contacts_persons_alice.png" alt="contacts persons alice" /> 
        </div> 
        <div class="title">
-        Figure 9. The Contacts application.
+        Figure 8. The Contacts application.
        </div> 
       </div> 
      </div> 
@@ -278,7 +248,7 @@
   <div id="footer"> 
    <div id="footer-text">
      Version 5.2.0-SNAPSHOT
-    <br /> Last updated 2016-01-22 16:35:56 CET 
+    <br /> Last updated 2016-01-30 13:12:42 CET 
    </div> 
   </div>  
  </body>

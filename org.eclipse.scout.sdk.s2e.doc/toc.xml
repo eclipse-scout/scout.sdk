@@ -19,12 +19,20 @@
 	</topic>
 	<topic href="html/sdk.html" label="Scout Tooling">
 		<topic href="html/sdk_editor.html" label="Scout Editors">
-			<topic href="html/sdk_editor_java.html" label="Additions to the Java Editor"></topic>
-			<topic href="html/sdk_editor_nls.html" label="NLS Editor"></topic>
+			<topic href="html/sdk_editor_java.html" label="Additions to the Java Editor">
+				<topic href="html/sdk_editor_java.html#create-new-scout-elements" label="Create new Scout Elements"></topic>
+				<topic href="html/sdk_editor_java.html#nls-entry-support" label="NLS-Entry support"></topic>
+			</topic>
+			<topic href="html/sdk_editor_nls.html" label="NLS Editor">
+				<topic href="html/sdk_editor_nls.html#open-the-editor" label="Open the editor"></topic>
+				<topic href="html/sdk_editor_nls.html#screenshot" label="Screenshot"></topic>
+				<topic href="html/sdk_editor_nls.html#description" label="Description"></topic>
+				<topic href="html/sdk_editor_nls.html#modified-files" label="Modified files"></topic>
+			</topic>
 		</topic>
 		<topic href="html/sdk_wizard.html" label="Scout Wizards">
 			<topic href="html/sdk_wizard_project.html" label="New Scout Project Wizard"></topic>
-			<topic href="html/sdk_wizard_nls-entry.html" label="New NLS Entry Wizard"></topic>
+			<topic href="html/sdk_wizard_nls-entry.html" label="NLS Entry Wizard"></topic>
 			<topic href="html/sdk_wizard_language.html" label="Add a Language Wizard"></topic>
 		</topic>
 	</topic>

@@ -42,9 +42,6 @@
       <resource>
         <directory>.</directory>
         <includes>
-          <include>plugin.xml</include>
-          <include>about.html</include>
-          <include>epl-v10.html</include>
           <include>toc.xml</include>
           <include>html/**</include>
         </includes>

@@ -30,7 +30,127 @@
    <div class="sect3"> 
     <h4 id="nls-editor"><a class="anchor" href="#nls-editor"></a>NLS Editor</h4> 
     <div class="paragraph"> 
-     <p>Text is missing</p> 
+     <p>The NLS Editor allows to edit the different properties files containing the translated text entries. It is a efficient way to edit all the property files for multilingual texts in one go.</p> 
+    </div> 
+    <div class="sect4"> 
+     <h5 id="open-the-editor"><a class="anchor" href="#open-the-editor"></a>Open the editor</h5> 
+     <div class="paragraph"> 
+      <p>Search for the <code>*.nls</code> files in the <code>shared</code> projects. Select <span class="menuseq"><span class="menu">Open With</span>&nbsp;&#x25b8; <span class="menuitem">NLS Editor</span></span> in the context menu</p> 
+     </div> 
+    </div> 
+    <div class="sect4"> 
+     <h5 id="screenshot"><a class="anchor" href="#screenshot"></a>Screenshot</h5> 
+     <div class="imageblock"> 
+      <div class="content"> 
+       <img src="images/sdk_editor_nls.png" alt="sdk editor nls" /> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="sect4"> 
+     <h5 id="description"><a class="anchor" href="#description"></a>Description</h5> 
+     <div class="paragraph"> 
+      <p>Actions on the top right corner:</p> 
+     </div> 
+     <table class="tableblock frame-all grid-all spread"> 
+      <colgroup> 
+       <col style="width: 10%;" /> 
+       <col style="width: 45%;" /> 
+       <col style="width: 45%;" /> 
+      </colgroup> 
+      <tbody> 
+       <tr> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_refresh.gif" alt="icon_refresh" /></span></p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Refresh NLS Project</p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Reload the content of the editor.</p></td> 
+       </tr> 
+       <tr> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_find_obj.gif" alt="icon_find_obj" /></span></p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Show NLS entry usage</p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Search in the Java code where the NLS Key is used.</p></td> 
+       </tr> 
+       <tr> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_text_add.png" alt="icon_text_add" /></span></p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">New entry&#x2026;&#x200b;</p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Opens the <a href="sdk_wizard_nls-entry.html">New Text Entry Wizard</a></p></td> 
+       </tr> 
+       <tr> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_fileadd_pending.gif" alt="icon_fileadd_pending" /></span></p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">New language&#x2026;&#x200b;</p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Opens the <a href="sdk_wizard_language.html">Add a Language Wizard</a></p></td> 
+       </tr> 
+       <tr> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_import.gif" alt="icon_import" /></span></p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Import&#x2026;&#x200b;</p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Import the NLS entries of an external file</p></td> 
+       </tr> 
+       <tr> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_export.gif" alt="icon_export" /></span></p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Export&#x2026;&#x200b;</p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Export the NLS entries to an external file</p></td> 
+       </tr> 
+      </tbody> 
+     </table> 
+     <div class="paragraph"> 
+      <p>Import and Export requires additional components.</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>Hide inherited rows checkbox</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>On the top of each columns, the text fields allow you to filter the entries in the table. With the <b class="button">Reset</b> button on the right you will empty those filters.</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>The entries in the table can be directly edited by pressing F2 or double-clicking into a text cell.</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>On each row it is possible to call following context menu:</p> 
+     </div> 
+     <table class="tableblock frame-all grid-all spread"> 
+      <colgroup> 
+       <col style="width: 10%;" /> 
+       <col style="width: 45%;" /> 
+       <col style="width: 45%;" /> 
+      </colgroup> 
+      <tbody> 
+       <tr> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_text.png" alt="icon_text" /></span></p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Modify Entry</p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Opens the <a href="sdk_wizard_nls-entry.html">NLS Entry Wizard</a></p></td> 
+       </tr> 
+       <tr> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_find_obj.gif" alt="icon_find_obj" /></span></p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Find references to 'Xxx'</p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Search in the Java code where the NLS Key is used.</p></td> 
+       </tr> 
+       <tr> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_text_remove.png" alt="icon_text_remove" /></span></p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Remove Xxx</p></td> 
+        <td class="tableblock halign-left valign-top"><p class="tableblock">Delete the NLS Entry from the files</p></td> 
+       </tr> 
+      </tbody> 
+     </table> 
+    </div> 
+    <div class="sect4"> 
+     <h5 id="modified-files"><a class="anchor" href="#modified-files"></a>Modified files</h5> 
+     <div class="paragraph"> 
+      <p>The mapping between the properties files is registered in the &quot;Text Provider Service&quot; class. Per default the files follow this pattern: <code>&lt;your application&gt;.shared/src/main/resources/&lt;identifier of the project&gt;/texts/Texts&lt;language&gt;.properties</code></p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>where:</p> 
+     </div> 
+     <div class="ulist"> 
+      <ul> 
+       <li> <p><code>&lt;identifier of the project&gt;</code> is a chain of folders following the same convention as the Java source files with the package name. For example the <code>org.eclipse.contacts.shared</code> project uses <code>org/eclipse/scout/contacts/shared</code> as path.</p> </li> 
+       <li> <p><code>&lt;language&gt;</code> is an identifier of the language and the country. Some possible file names:</p> 
+        <div class="ulist"> 
+         <ul> 
+          <li> <p><code>Texts.properties</code> is the default language</p> </li> 
+          <li> <p><code>Texts_de.properties</code> is for german</p> </li> 
+          <li> <p><code>Texts_fr_BE</code> will be for french in Belgium</p> </li> 
+         </ul> 
+        </div> </li> 
+      </ul> 
+     </div> 
     </div> 
    </div> 
   </div> 
@@ -49,7 +169,7 @@
   <div id="footer"> 
    <div id="footer-text">
      Version 5.2.0-SNAPSHOT
-    <br /> Last updated 2016-01-22 16:35:56 CET 
+    <br /> Last updated 2016-01-29 18:42:09 CET 
    </div> 
   </div>  
  </body>
