@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
+import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.file.FileSelectionField;
 import org.eclipse.scout.sdk.s2e.ui.fields.file.IFileSelectionListener;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.StyledTextField;
@@ -39,6 +40,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>{@link ScoutProjectNewWizardPage}</h3>
@@ -74,6 +76,8 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
     createProjectNameGroup(parent);
     createProjectLocationGroup(parent);
+
+    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PROJECT_NEW_WIZARD_PAGE);
   }
 
   protected void createProjectNameGroup(Composite parent) {

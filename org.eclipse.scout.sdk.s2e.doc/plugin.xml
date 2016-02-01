@@ -20,4 +20,11 @@
             primary="true">
       </toc>
    </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts_scout.xml"
+            plugin="org.eclipse.scout.sdk.s2e.ui">
+      </contexts>
+   </extension>
 </plugin>
