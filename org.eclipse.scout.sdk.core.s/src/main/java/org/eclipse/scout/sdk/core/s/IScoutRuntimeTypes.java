@@ -19,7 +19,9 @@ public interface IScoutRuntimeTypes {
   int TYPE_PARAM_EXTENSION__OWNER = 0;
   int TYPE_PARAM_COLUMN__VALUE_TYPE = 0;
   int TYPE_PARAM_CODETYPE__CODE_ID = 1;
+  int TYPE_PARAM_CODETYPE__CODE_TYPE_ID = 0;
   int TYPE_PARAM_VALUEFIELD__VALUE = 0;
+  int TYPE_PARAM_LOOKUP_SERVICE_KEY_TYPE = 0;
 
   // annotations
   String FormData = "org.eclipse.scout.rt.client.dto.FormData";
@@ -33,6 +35,10 @@ public interface IScoutRuntimeTypes {
   String Extends = "org.eclipse.scout.rt.platform.extension.Extends";
   String ConfigOperation = "org.eclipse.scout.rt.platform.annotations.ConfigOperation";
   String ConfigProperty = "org.eclipse.scout.rt.platform.annotations.ConfigProperty";
+  String TunnelToServer = "org.eclipse.scout.rt.shared.TunnelToServer";
+
+  // UI classes
+  String UiServlet = "org.eclipse.scout.rt.ui.html.UiServlet";
 
   // abstract implementations
   String AbstractActionNode = "org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode";
@@ -42,7 +48,9 @@ public interface IScoutRuntimeTypes {
   String AbstractCalendar = "org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar";
   String AbstractCalendarField = "org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendarField";
   String AbstractCalendarItemProvider = "org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider";
+  String AbstractCancelButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton";
   String AbstractCode = "org.eclipse.scout.rt.shared.services.common.code.AbstractCode";
+  String AbstractCodeType = "org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType";
   String AbstractCodeTypeWithGeneric = "org.eclipse.scout.rt.shared.services.common.code.AbstractCodeTypeWithGeneric";
   String AbstractColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn";
   String AbstractComposerField = "org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField";
@@ -59,6 +67,7 @@ public interface IScoutRuntimeTypes {
   String AbstractForm = "org.eclipse.scout.rt.client.ui.form.AbstractForm";
   String AbstractFormField = "org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField";
   String AbstractFormFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData";
+  String AbstractFormData = "org.eclipse.scout.rt.shared.data.form.AbstractFormData";
   String AbstractFormHandler = "org.eclipse.scout.rt.client.ui.form.AbstractFormHandler";
   String AbstractGroupBox = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox";
   String AbstractHtmlField = "org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField";
@@ -67,7 +76,10 @@ public interface IScoutRuntimeTypes {
   String AbstractLabelField = "org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField";
   String AbstractListBox = "org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox";
   String AbstractLongField = "org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField";
+  String AbstractLookupService = "org.eclipse.scout.rt.server.services.lookup.AbstractLookupService";
   String AbstractMenu = "org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu";
+  String AbstractOkButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton";
+  String AbstractPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes";
   String AbstractPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable";
   String AbstractPlanner = "org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner";
   String AbstractPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField";
@@ -128,6 +140,7 @@ public interface IScoutRuntimeTypes {
   String IListBox = "org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox";
   String ILongField = "org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField";
   String ILookupCall = "org.eclipse.scout.rt.shared.services.lookup.ILookupCall";
+  String ILookupService = "org.eclipse.scout.rt.shared.services.lookup.ILookupService";
   String IMenu = "org.eclipse.scout.rt.client.ui.action.menu.IMenu";
   String IMenuType = "org.eclipse.scout.rt.client.ui.action.menu.IMenuType";
   String IOutline = "org.eclipse.scout.rt.client.ui.desktop.outline.IOutline";
@@ -142,6 +155,9 @@ public interface IScoutRuntimeTypes {
   String IRadioButtonGroup = "org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup";
   String IRadioButton = "org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton";
   String ISequenceBox = "org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox";
+  String ISession = "org.eclipse.scout.rt.shared.ISession";
+  String IServerSession = "org.eclipse.scout.rt.server.IServerSession";
+  String IService = "org.eclipse.scout.rt.platform.service.IService";
   String ISmartField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField";
   String IStringField = "org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField";
   String ITabBox = "org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox";
@@ -160,9 +176,14 @@ public interface IScoutRuntimeTypes {
   String IWizardStep = "org.eclipse.scout.rt.client.ui.wizard.IWizardStep";
 
   // other runtime classes
+  String ACCESS = "org.eclipse.scout.rt.shared.services.common.security.ACCESS";
+  String BEANS = "org.eclipse.scout.rt.platform.BEANS";
   String TEXTS = "org.eclipse.scout.rt.shared.TEXTS";
   String Logger = "org.slf4j.Logger";
   String CollectionUtility = "org.eclipse.scout.rt.platform.util.CollectionUtility";
+  String VetoException = "org.eclipse.scout.rt.platform.exception.VetoException";
+  String SearchFilter = "org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter";
+  String LookupCall = "org.eclipse.scout.rt.shared.services.lookup.LookupCall";
 
   // Menu Types
   String TableMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TableMenuType";

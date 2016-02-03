@@ -44,19 +44,7 @@ public final class SdkConsole {
    *          Optional {@link Throwable}s to write to the console.
    */
   static synchronized void println(String msg, Throwable... exceptions) {
-    if (msg != null) {
-      spi.println(msg);
-    }
-
-    if (exceptions == null) {
-      return;
-    }
-
-    for (Throwable t : exceptions) {
-      if (t != null) {
-        spi.println(CoreUtils.getStackTrace(t));
-      }
-    }
+    spi.println(msg, exceptions);
   }
 
   private SdkConsole() {
@@ -71,7 +59,7 @@ public final class SdkConsole {
   public interface SdkConsoleSpi {
     void clear();
 
-    void println(String s);
+    void println(String s, Throwable... exceptions);
   }
 
   private static final SdkConsole.SdkConsoleSpi DEFAULT_SPI = new SdkConsole.SdkConsoleSpi() {
@@ -81,8 +69,20 @@ public final class SdkConsole {
     }
 
     @Override
-    public void println(String s) {
-      System.out.println(s);
+    public void println(String s, Throwable... exceptions) {
+      if (s != null) {
+        System.out.println(s);
+      }
+
+      if (exceptions == null || exceptions.length < 1) {
+        return;
+      }
+
+      for (Throwable t : exceptions) {
+        if (t != null) {
+          t.printStackTrace();
+        }
+      }
     }
   };
 

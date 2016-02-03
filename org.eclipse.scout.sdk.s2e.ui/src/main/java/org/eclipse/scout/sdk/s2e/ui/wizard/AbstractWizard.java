@@ -53,7 +53,7 @@ public abstract class AbstractWizard extends Wizard {
   @Override
   public IWizardPage getStartingPage() {
     AbstractWizardPage startingPage = (AbstractWizardPage) super.getStartingPage();
-    if (startingPage.isExcludePage()) {
+    if (startingPage != null && startingPage.isExcludePage()) {
       return getNextPage(startingPage);
     }
     return startingPage;
@@ -96,9 +96,11 @@ public abstract class AbstractWizard extends Wizard {
   @Override
   public boolean performFinish() {
     for (IWizardPage page : getPages()) {
-      AbstractWizardPage bcPage = (AbstractWizardPage) page;
-      if (!bcPage.performFinish()) {
-        return false;
+      if (page instanceof AbstractWizardPage) {
+        AbstractWizardPage wizPage = (AbstractWizardPage) page;
+        if (!wizPage.performFinish()) {
+          return false;
+        }
       }
     }
     return true;

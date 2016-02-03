@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkConsole;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
@@ -37,21 +38,38 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
   }
 
   @Override
-  public void println(String s) {
+  public void println(String s, Throwable... exceptions) {
     try (IOConsoleOutputStream out = currentConsole(true).newOutputStream()) {
       out.write(s);
-      out.write('\n');
+      if (exceptions == null) {
+        out.write('\n');
+      }
+      else {
+        for (Throwable t : exceptions) {
+          if (t != null) {
+            String trace = CoreUtils.getStackTrace(t);
+            out.write(trace);
+          }
+        }
+      }
+      out.flush();
     }
     catch (IOException e) {
-      //nop
+      System.out.println("Unable to write to console:");
+      System.out.println(s);
     }
 
     // dev mode: also log to Eclipse log
     if (Platform.isRunning() && (Platform.inDebugMode() || Platform.inDevelopmentMode())) {
       S2ESdkActivator activator = S2ESdkActivator.getDefault();
-      if (activator != null) {
-        activator.getLog().log(new Status(parseSeverity(s), S2ESdkActivator.PLUGIN_ID, s));
+      if (activator == null) {
+        return;
       }
+      Throwable t = null;
+      if (exceptions != null && exceptions.length > 0) {
+        t = exceptions[0];
+      }
+      activator.getLog().log(new Status(parseSeverity(s), S2ESdkActivator.PLUGIN_ID, s, t));
     }
   }
 

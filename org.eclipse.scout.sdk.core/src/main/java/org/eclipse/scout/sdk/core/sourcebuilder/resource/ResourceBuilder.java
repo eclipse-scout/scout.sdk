@@ -77,6 +77,6 @@ public class ResourceBuilder implements IResourceBuilder {
 
   @Override
   public List<IResourceFragmentBuilder> getFooters() {
-    return new ArrayList<>(m_footerSourceBuilders);
+    return Collections.unmodifiableList(m_footerSourceBuilders);
   }
 }

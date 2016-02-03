@@ -37,7 +37,7 @@ public interface IDerivedResourceManager {
   /**
    * Starts or stops the auto update.<br>
    * <br>
-   * If a derived resource update is in progress, this update is not cancelled even if the manager is disabled.
+   * If a derived resource update is in progress, this update is not canceled even if the manager is disabled.
    *
    * @param enabled
    *          <code>true</code> if the manager should automatically update derived resources, <code>false</code>

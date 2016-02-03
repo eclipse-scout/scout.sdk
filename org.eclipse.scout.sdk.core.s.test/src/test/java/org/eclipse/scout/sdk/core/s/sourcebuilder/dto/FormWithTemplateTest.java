@@ -1,0 +1,112 @@
+/*******************************************************************************
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.sdk.core.s.sourcebuilder.dto;
+
+import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
+import org.eclipse.scout.sdk.core.testing.SdkAssert;
+import org.junit.Assert;
+import org.junit.Test;
+
+public class FormWithTemplateTest {
+
+  @Test
+  public void testCreateFormData() {
+    String formName = "UsingTemplateForm";
+    IType dto = CoreScoutTestingUtils.createFormDataAssertNoCompileErrors("formdata.client.ui.forms." + formName);
+    testApiOfUsingTemplateFormData(dto);
+  }
+
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private static void testApiOfUsingTemplateFormData(IType usingTemplateFormData) {
+    // type UsingTemplateFormData
+    SdkAssert.assertHasFlags(usingTemplateFormData, 1);
+    SdkAssert.assertHasSuperTypeSignature(usingTemplateFormData, "QAbstractFormData;");
+
+    // fields of UsingTemplateFormData
+    Assert.assertEquals("field count of 'UsingTemplateFormData'", 1, usingTemplateFormData.fields().list().size());
+    IField serialVersionUID = SdkAssert.assertFieldExist(usingTemplateFormData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+
+    Assert.assertEquals("method count of 'UsingTemplateFormData'", 4, usingTemplateFormData.methods().list().size());
+    IMethod getExternalGroupBox = SdkAssert.assertMethodExist(usingTemplateFormData, "getExternalGroupBox", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getExternalGroupBox, "QExternalGroupBox;");
+    IMethod getInternalHtml = SdkAssert.assertMethodExist(usingTemplateFormData, "getInternalHtml", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getInternalHtml, "QInternalHtml;");
+    IMethod getTestCheckbox = SdkAssert.assertMethodExist(usingTemplateFormData, "getTestCheckbox", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getTestCheckbox, "QTestCheckbox;");
+    IMethod getTestLimitedString = SdkAssert.assertMethodExist(usingTemplateFormData, "getTestLimitedString", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getTestLimitedString, "QTestLimitedString;");
+
+    Assert.assertEquals("inner types count of 'UsingTemplateFormData'", 4, usingTemplateFormData.innerTypes().list().size());
+    // type ExternalGroupBox
+    IType externalGroupBox = SdkAssert.assertTypeExists(usingTemplateFormData, "ExternalGroupBox");
+    SdkAssert.assertHasFlags(externalGroupBox, 9);
+    SdkAssert.assertHasSuperTypeSignature(externalGroupBox, "QAbstractExternalGroupBoxData;");
+
+    // fields of ExternalGroupBox
+    Assert.assertEquals("field count of 'ExternalGroupBox'", 1, externalGroupBox.fields().list().size());
+    IField serialVersionUID1 = SdkAssert.assertFieldExist(externalGroupBox, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID1, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID1, "J");
+
+    Assert.assertEquals("method count of 'ExternalGroupBox'", 0, externalGroupBox.methods().list().size());
+
+    Assert.assertEquals("inner types count of 'ExternalGroupBox'", 0, externalGroupBox.innerTypes().list().size());
+    // type InternalHtml
+    IType internalHtml = SdkAssert.assertTypeExists(usingTemplateFormData, "InternalHtml");
+    SdkAssert.assertHasFlags(internalHtml, 9);
+    SdkAssert.assertHasSuperTypeSignature(internalHtml, "QAbstractValueFieldData<QString;>;");
+
+    // fields of InternalHtml
+    Assert.assertEquals("field count of 'InternalHtml'", 1, internalHtml.fields().list().size());
+    IField serialVersionUID2 = SdkAssert.assertFieldExist(internalHtml, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID2, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID2, "J");
+
+    Assert.assertEquals("method count of 'InternalHtml'", 0, internalHtml.methods().list().size());
+
+    Assert.assertEquals("inner types count of 'InternalHtml'", 0, internalHtml.innerTypes().list().size());
+    // type TestCheckbox
+    IType testCheckbox = SdkAssert.assertTypeExists(usingTemplateFormData, "TestCheckbox");
+    SdkAssert.assertHasFlags(testCheckbox, 9);
+    SdkAssert.assertHasSuperTypeSignature(testCheckbox, "QAbstractTestCheckboxFieldData;");
+
+    // fields of TestCheckbox
+    Assert.assertEquals("field count of 'TestCheckbox'", 1, testCheckbox.fields().list().size());
+    IField serialVersionUID3 = SdkAssert.assertFieldExist(testCheckbox, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID3, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID3, "J");
+
+    Assert.assertEquals("method count of 'TestCheckbox'", 0, testCheckbox.methods().list().size());
+
+    Assert.assertEquals("inner types count of 'TestCheckbox'", 0, testCheckbox.innerTypes().list().size());
+    // type TestLimitedString
+    IType testLimitedString = SdkAssert.assertTypeExists(usingTemplateFormData, "TestLimitedString");
+    SdkAssert.assertHasFlags(testLimitedString, 9);
+    SdkAssert.assertHasSuperTypeSignature(testLimitedString, "QAbstractValueFieldData<QString;>;");
+
+    // fields of TestLimitedString
+    Assert.assertEquals("field count of 'TestLimitedString'", 1, testLimitedString.fields().list().size());
+    IField serialVersionUID4 = SdkAssert.assertFieldExist(testLimitedString, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID4, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID4, "J");
+
+    Assert.assertEquals("method count of 'TestLimitedString'", 0, testLimitedString.methods().list().size());
+
+    Assert.assertEquals("inner types count of 'TestLimitedString'", 0, testLimitedString.innerTypes().list().size());
+  }
+}

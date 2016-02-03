@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.sourcebuilder.compilationunit;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -80,18 +81,13 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   }
 
   @Override
-  public final void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+  public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     // add CU scope to import validator chain
     IImportCollector collector = new CompilationUnitScopedImportCollector(validator.getImportCollector(), getPackageName());
     validator.setImportCollector(collector);
 
     // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
     consumeAllTypeNamesRec(m_types, collector);
-
-    // empty package name is default package
-    if (getPackageName() == null) {
-      throw new IllegalArgumentException("package name is null!");
-    }
 
     //declared imports
     for (String s : m_declaredImports) {
@@ -107,7 +103,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
 
     // package declaration
     if (!StringUtils.isEmpty(getPackageName())) {
-      headerSourceBuilder.append("package ").append(getPackageName()).append(";").append(lineDelimiter).append(lineDelimiter);
+      headerSourceBuilder.append("package ").append(getPackageName()).append(';').append(lineDelimiter).append(lineDelimiter);
     }
 
     // type sources
@@ -162,12 +158,12 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
 
   @Override
   public List<String> getDeclaredImports() {
-    return m_declaredImports;
+    return Collections.unmodifiableList(m_declaredImports);
   }
 
   @Override
   public List<String> getDeclaredStaticImports() {
-    return m_declaredStaticImports;
+    return Collections.unmodifiableList(m_declaredStaticImports);
   }
 
   @Override
@@ -240,7 +236,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
     List<ITypeSourceBuilder> builders = new ArrayList<>(m_types.size() + m_sortedTypes.size());
     builders.addAll(m_types);
     builders.addAll(m_sortedTypes.values());
-    return builders;
+    return Collections.unmodifiableList(builders);
   }
 
   @Override
@@ -250,6 +246,6 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
 
   @Override
   public List<ISourceBuilder> getFooters() {
-    return new ArrayList<>(m_footerSourceBuilders);
+    return Collections.unmodifiableList(m_footerSourceBuilders);
   }
 }

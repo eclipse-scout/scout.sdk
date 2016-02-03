@@ -24,10 +24,11 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
  */
 public class DataAnnotation extends AbstractManagedAnnotation {
 
+  public static final String VALUE_ELEMENT_NAME = "value";
   public static final String TYPE_NAME = IScoutRuntimeTypes.Data;
 
   public IType value() {
-    return getValue("value", IType.class, null);
+    return getValue(VALUE_ELEMENT_NAME, IType.class, null);
   }
 
   public static IType valueOf(IAnnotatable owner) {

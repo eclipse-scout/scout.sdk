@@ -59,10 +59,10 @@ import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
-import org.eclipse.scout.sdk.s2e.trigger.CachingJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.uniqueid.UniqueIdExtensionPoint;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 

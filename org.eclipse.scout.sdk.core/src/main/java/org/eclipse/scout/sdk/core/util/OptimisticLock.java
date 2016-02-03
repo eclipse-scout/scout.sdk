@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Optimistic locking with one accepted writer in critical section.<br>
  * <br>
@@ -21,36 +23,42 @@ package org.eclipse.scout.sdk.core.util;
  * <br>
  * Usage for writers with no access check is as follows:<br>
  * <code>try{ lock.acquire() ... } finally{ lock.release(); }</code> <br>
+ * <br>
  * Usage for tester is as follows:<br>
  * <code>
  *  if(lock.isAcquired()){ ... } or if(lock.isReleased()){ ... }
  * </code>
  */
-public final class OptimisticLock {
-  private int m_lockCount = 0;
+public class OptimisticLock {
+
+  private final AtomicInteger m_lockCount = new AtomicInteger(0);
 
   /**
    * @return true if lock was acquired as first monitor
    */
   public synchronized boolean acquire() {
-    m_lockCount++;
-    if (m_lockCount == 1) {
+    int count = m_lockCount.incrementAndGet();
+    if (count == 1) {
       // this is the first
       return true;
+    }
+    if (count > 10) {
+      SdkLog.error("potential programming problem; lock was 10 times acquired and not released", new Exception("origin"));
     }
     return false;
   }
 
-  public synchronized void release() {
-    m_lockCount--;
+  public void release() {
+    if (m_lockCount.decrementAndGet() < 0) {
+      SdkLog.error("potential programming problem. lock is negative", new Exception("origin"));
+    }
   }
 
-  public synchronized boolean isAcquired() {
-    return m_lockCount > 0;
+  public boolean isAcquired() {
+    return m_lockCount.get() > 0;
   }
 
-  public synchronized boolean isReleased() {
-    return m_lockCount <= 0;
+  public boolean isReleased() {
+    return !isAcquired();
   }
-
 }

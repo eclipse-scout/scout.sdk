@@ -90,25 +90,6 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     return cuRewrite;
   }
 
-  /**
-   * Checks whether the given {@link ITypeHierarchy} contains an element with the given fully qualified name.
-   *
-   * @param h
-   *          The hierarchy to search in.
-   * @param fqn
-   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator
-   *          (e.g. <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
-   * @return <code>true</code> if it is part of the given {@link ITypeHierarchy}, <code>false</code> otherwise.
-   */
-  private static boolean contains(ITypeHierarchy h, String fqn) {
-    for (IType t : h.getAllTypes()) {
-      if (fqn.equals(t.getFullyQualifiedName('$'))) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private static ClassIdTarget getTarget(ASTNode selectedNode) {
     if (selectedNode != null && selectedNode.getParent() != null) {
       if (selectedNode.getNodeType() == ASTNode.SIMPLE_NAME || selectedNode.getNodeType() == ASTNode.QUALIFIED_NAME || selectedNode.getNodeType() == ASTNode.MODIFIER || selectedNode.getNodeType() == ASTNode.TYPE_DECLARATION) {
@@ -131,7 +112,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
             try {
               if (!t.isBinary() && !t.isAnonymous()) {
                 ITypeHierarchy superTypeHierarchy = t.newSupertypeHierarchy(null);
-                if (contains(superTypeHierarchy, IScoutRuntimeTypes.ITypeWithClassId)) {
+                if (S2eUtils.hierarchyContains(superTypeHierarchy, IScoutRuntimeTypes.ITypeWithClassId)) {
                   IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
                   return new ClassIdTarget(typeDecl, t, annotation);
                 }

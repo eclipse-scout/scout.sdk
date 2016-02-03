@@ -79,7 +79,7 @@ public class ImportCollector implements IImportCollector {
       m_imports.put(cand.getSimpleName(), new ImportElement(false, cand.getQualifier(), cand.getSimpleName(), markAsUsed, false));
     }
     else {
-      m_imports.put(cand.getSimpleName(), new ImportElement(false, cand.getQualifier(), cand.getSimpleName(), markAsUsed || elem.m_used, false));
+      elem.m_used = markAsUsed || elem.m_used;
     }
     return cand.getSimpleName();
   }

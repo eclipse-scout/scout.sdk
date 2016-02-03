@@ -82,12 +82,52 @@
             name="Scout"/>
       <wizard
             category="org.eclipse.scout.sdk.s2e"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.newproject.ScoutProjectNewWizard"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.project.ScoutProjectNewWizard"
             hasPages="true"
             icon="icons/eclipse_scout.gif"
             id="org.eclipse.scout.sdk.s2e.ui.newScoutProjectWizard"
             name="Scout Project"
             project="true"/>
+     <wizard
+            category="org.eclipse.scout.sdk.s2e"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.code.CodeTypeNewWizard"
+            hasPages="true"
+            icon="icons/codeType_add.png"
+            id="org.eclipse.scout.sdk.s2e.ui.newCodeTypeWizard"
+            name="Scout CodeType"
+            project="false"/>
+     <wizard
+            category="org.eclipse.scout.sdk.s2e"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.form.FormNewWizard"
+            hasPages="true"
+            icon="icons/form_add.png"
+            id="org.eclipse.scout.sdk.s2e.ui.newFormWizard"
+            name="Scout Form"
+            project="false"/>
+     <wizard
+            category="org.eclipse.scout.sdk.s2e"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.page.PageNewWizard"
+            hasPages="true"
+            icon="icons/page_add.png"
+            id="org.eclipse.scout.sdk.s2e.ui.newPageWizard"
+            name="Scout Page"
+            project="false"/>
+     <wizard
+            category="org.eclipse.scout.sdk.s2e"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.permission.PermissionNewWizard"
+            hasPages="true"
+            icon="icons/permission_add.png"
+            id="org.eclipse.scout.sdk.s2e.ui.newPermissionWizard"
+            name="Scout Permission"
+            project="false"/>
+     <wizard
+            category="org.eclipse.scout.sdk.s2e"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.lookupcall.LookupCallNewWizard"
+            hasPages="true"
+            icon="icons/lookupCall_add.png"
+            id="org.eclipse.scout.sdk.s2e.ui.newLookupCallWizard"
+            name="Scout LookupCall"
+            project="false"/>
    </extension>
    <extension
          point="org.eclipse.jdt.ui.quickAssistProcessors">
@@ -146,7 +186,7 @@
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateMissingClassIdsHandler">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.MissingClassIdsNewHandler">
       </handler>
    </extension>
 </plugin>

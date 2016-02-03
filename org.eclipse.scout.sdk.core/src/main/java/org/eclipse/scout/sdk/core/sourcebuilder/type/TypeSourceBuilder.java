@@ -400,7 +400,10 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
       sb.append(((ITypeSourceBuilder) parent).getFullyQualifiedName()).append('$');
     }
     else if (parent instanceof ICompilationUnitSourceBuilder) {
-      sb.append(((ICompilationUnitSourceBuilder) parent).getPackageName()).append('.');
+      String packageName = ((ICompilationUnitSourceBuilder) parent).getPackageName();
+      if (StringUtils.isNotBlank(packageName)) {
+        sb.append(packageName).append('.');
+      }
     }
     else {
       sb.append(Validate.notNull(getParentFullyQualifiedName())).append('$');

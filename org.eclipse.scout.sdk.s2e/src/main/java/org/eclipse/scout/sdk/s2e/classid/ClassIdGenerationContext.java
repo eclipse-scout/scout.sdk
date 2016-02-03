@@ -35,7 +35,7 @@ public class ClassIdGenerationContext {
   }
 
   public ClassIdGenerationContext(IType declaringType) {
-    m_declaringTypeFqn = declaringType.getFullyQualifiedName('$');
+    m_declaringTypeFqn = declaringType.getFullyQualifiedName();
     m_declaringType = declaringType;
     m_parentTypeSourceBuilder = null;
   }

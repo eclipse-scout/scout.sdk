@@ -43,14 +43,11 @@ public final class SignatureUtils {
     if (signature == null) {
       return false;
     }
-    if (startsWith(signature, ISignatureConstants.C_EXTENDS)) {
-      signature = signature.substring(1);
+    int pos = 0;
+    if (!signature.isEmpty() && signature.charAt(0) == ISignatureConstants.C_EXTENDS) {
+      pos = 1;
     }
-    return startsWith(signature, ISignatureConstants.C_UNRESOLVED);
-  }
-
-  private static boolean startsWith(String stringToSearchIn, char charToFind) {
-    return !stringToSearchIn.isEmpty() && stringToSearchIn.charAt(0) == charToFind;
+    return signature.length() > pos && signature.charAt(pos) == ISignatureConstants.C_UNRESOLVED;
   }
 
   /**
@@ -61,24 +58,45 @@ public final class SignatureUtils {
   }
 
   /**
-   * Returns a unique identifier of a method. The identifier looks like 'methodname(param1Signature,param2Signature)'.
+   * Returns a unique identifier of the given {@link IMethod}. The identifier looks like
+   * 'methodName(param1Signature,param2Signature)'.
    *
    * @param method
-   *          The method for which the identifier should be created
+   *          The {@link IMethod} for which the identifier should be created
    * @return The created identifier
    */
   public static String createMethodIdentifier(IMethod method) {
+    return createMethodIdentifier(method, false);
+  }
+
+  /**
+   * Returns a unique identifier of the given {@link IMethod}. The identifier looks like
+   * 'methodName(param1Signature,param2Signature)'.
+   *
+   * @param method
+   *          The {@link IMethod} for which the identifier should be created
+   * @param useErasureOnly
+   *          If <code>true</code> only the type erasure is used for all method parameter signatures.
+   * @return The created identifier
+   */
+  public static String createMethodIdentifier(IMethod method, boolean useErasureOnly) {
     List<IMethodParameter> parameters = method.parameters().list();
     List<String> signatures = new ArrayList<>(parameters.size());
     for (IMethodParameter mp : parameters) {
-      signatures.add(getTypeSignature(mp.dataType()));
+      String typeSignature = getTypeSignature(mp.dataType());
+      if (typeSignature != null) {
+        if (useErasureOnly) {
+          typeSignature = Signature.getTypeErasure(typeSignature);
+        }
+        signatures.add(typeSignature);
+      }
     }
     return createMethodIdentifier(method.elementName(), signatures);
   }
 
   /**
    * Returns an unique identifier for a method with given name and given parameter signatures. The identifier looks like
-   * 'methodname(sigOfParam1,sigOfParam2)'.
+   * 'methodName(sigOfParam1,sigOfParam2)'.
    *
    * @param methodName
    *          The method name.
@@ -140,8 +158,8 @@ public final class SignatureUtils {
    * Converts the given base type signature (primitive types) to the corresponding wrapper class signature.
    *
    * @param signature
-   *          The primitive signature.
-   * @return The boxed version of the given primitive signature or the input.
+   *          The primitive signature. Must be a valid signature (not <code>null</code>).
+   * @return The boxed version of the given primitive signature or the input if it cannot be boxed.
    */
   public static String boxPrimitiveSignature(String signature) {
     if (Signature.getTypeSignatureKind(signature) != ISignatureConstants.BASE_TYPE_SIGNATURE) {
@@ -171,6 +189,45 @@ public final class SignatureUtils {
     }
     if (ISignatureConstants.SIG_SHORT.equals(signature)) {
       return ISignatureConstants.SIG_JAVA_LANG_SHORT;
+    }
+    return signature;
+  }
+
+  /**
+   * Converts the given complex signature (e.g. Ljava.lang.Long;) to the corresponding primitive signature.
+   *
+   * @param signature
+   *          The complex input signature. Must be a valid signature (not <code>null</code>).
+   * @return The primitive signature if it can be unboxed, the input signature otherwise.
+   */
+  public static String unboxToPrimitiveSignature(String signature) {
+    if (Signature.getTypeSignatureKind(signature) == ISignatureConstants.BASE_TYPE_SIGNATURE) {
+      return signature;
+    }
+
+    if (ISignatureConstants.SIG_JAVA_LANG_BOOLEAN.equals(signature)) {
+      return ISignatureConstants.SIG_BOOLEAN;
+    }
+    if (ISignatureConstants.SIG_JAVA_LANG_BYTE.equals(signature)) {
+      return ISignatureConstants.SIG_BYTE;
+    }
+    if (ISignatureConstants.SIG_JAVA_LANG_CHARACTER.equals(signature)) {
+      return ISignatureConstants.SIG_CHAR;
+    }
+    if (ISignatureConstants.SIG_JAVA_LANG_DOUBLE.equals(signature)) {
+      return ISignatureConstants.SIG_DOUBLE;
+    }
+    if (ISignatureConstants.SIG_JAVA_LANG_FLOAT.equals(signature)) {
+      return ISignatureConstants.SIG_FLOAT;
+    }
+    if (ISignatureConstants.SIG_JAVA_LANG_INTEGER.equals(signature)) {
+      return ISignatureConstants.SIG_INT;
+    }
+    if (ISignatureConstants.SIG_JAVA_LANG_LONG.equals(signature)) {
+      return ISignatureConstants.SIG_LONG;
+    }
+    if (ISignatureConstants.SIG_JAVA_LANG_SHORT.equals(signature)) {
+      return ISignatureConstants.SIG_SHORT;
     }
     return signature;
   }

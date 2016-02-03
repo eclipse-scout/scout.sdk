@@ -416,6 +416,7 @@ public abstract class AbstractNlsProject implements INlsProject {
     for (ITranslationResource r : m_resourceProvider.getResources()) {
       r.commitChanges(monitor);
     }
+    fireNlsProjectEvent(new NlsProjectEvent(this, (ITranslationResource) null, NlsProjectEvent.TYPE_FULL_REFRESH));
   }
 
   @Override
@@ -456,7 +457,9 @@ public abstract class AbstractNlsProject implements INlsProject {
         r.updateText(newRow.getKey(), entry.getValue(), flush, monitor);
       }
     }
-    fireNlsProjectEvent(new NlsProjectEvent(this, newRow, NlsProjectEvent.TYPE_ENTRY_ADDED));
+    if (flush) {
+      fireNlsProjectEvent(new NlsProjectEvent(this, newRow, NlsProjectEvent.TYPE_ENTRY_ADDED));
+    }
   }
 
   private void updateExistingRowInternal(NlsEntry existingRow, INlsEntry row, boolean flush, IProgressMonitor monitor) {
@@ -472,7 +475,7 @@ public abstract class AbstractNlsProject implements INlsProject {
         }
       }
     }
-    if (updated) {
+    if (updated && flush) {
       fireNlsProjectEvent(new NlsProjectEvent(this, existingRow, NlsProjectEvent.TYPE_ENTRY_MODIFYED));
     }
   }

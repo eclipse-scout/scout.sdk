@@ -17,9 +17,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
-import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
@@ -36,11 +33,11 @@ import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.CompositeFormDataTypeSourceBuilder;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableBeanDataSourceBuilder;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableFieldBeanFormDataSourceBuilder;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableRowDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.s.sourcebuilder.dto.CompositeFormDataTypeSourceBuilder;
+import org.eclipse.scout.sdk.core.s.sourcebuilder.dto.table.TableBeanDataSourceBuilder;
+import org.eclipse.scout.sdk.core.s.sourcebuilder.dto.table.TableFieldBeanFormDataSourceBuilder;
+import org.eclipse.scout.sdk.core.s.sourcebuilder.dto.table.TableRowDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
@@ -53,7 +50,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnit
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
@@ -184,7 +180,7 @@ public final class DtoUtils {
       if (replacedFormFieldDataType != null) {
         superTypeSignature = SignatureUtils.getTypeSignature(replacedFormFieldDataType);
       }
-      sourceBuilder.addAnnotation(ScoutAnnotationSourceBuilderFactory.createReplaceAnnotation());
+      sourceBuilder.addAnnotation(ScoutAnnotationSourceBuilderFactory.createReplace());
     }
     if (superTypeSignature == null) {
       superTypeSignature = DtoUtils.computeSuperTypeSignatureForFormData(modelType, formDataAnnotation);
@@ -573,19 +569,6 @@ public final class DtoUtils {
       return cuSrc;
     }
     return null;
-  }
-
-  public static String createJavaCode(ICompilationUnitSourceBuilder cuSrc, IJavaEnvironment env, String lineDelimiter, PropertyMap context) {
-    if (cuSrc == null) {
-      return null;
-    }
-    if (lineDelimiter == null) {
-      lineDelimiter = System.getProperty("line.separator");
-    }
-    IImportValidator validator = new ImportValidator(new ImportCollector(env));
-    StringBuilder sourceBuilder = new StringBuilder();
-    cuSrc.createSource(sourceBuilder, lineDelimiter, context, validator);
-    return sourceBuilder.toString();
   }
 
   public static void addDtoExtendsAnnotation(ITypeSourceBuilder target, IAnnotatable extendsAnnotationHolder) {

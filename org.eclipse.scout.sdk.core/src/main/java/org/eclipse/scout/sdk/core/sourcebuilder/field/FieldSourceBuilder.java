@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.sourcebuilder.field;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
@@ -54,11 +53,6 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
     super(elementName);
   }
 
-  /**
-   * when overridden to assign a specific value to the field, use
-   * {@link SignatureUtils#useSignature(String, IImportCollector)} to determ class references (fully qualified vs.
-   * simple name).
-   */
   @Override
   public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     super.createSource(source, lineDelimiter, context, validator);
@@ -75,7 +69,7 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
 
     source.append(Flags.toString(getFlags()));
     if (getFlags() != 0) {
-      source.append(" ");
+      source.append(' ');
     }
     // field type
     source.append(validator.useSignature(getSignature())).append(" ");
@@ -85,7 +79,7 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
       source.append(" = ");
       getValue().createSource(source, lineDelimiter, context, validator);
     }
-    source.append(";");
+    source.append(';');
   }
 
   @Override

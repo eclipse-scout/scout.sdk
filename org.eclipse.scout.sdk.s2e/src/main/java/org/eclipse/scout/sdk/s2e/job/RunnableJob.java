@@ -14,7 +14,7 @@ import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
+import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 
 /**
  * <h3>{@link RunnableJob}</h3> Eclipse Job to execute a java {@link Runnable}.

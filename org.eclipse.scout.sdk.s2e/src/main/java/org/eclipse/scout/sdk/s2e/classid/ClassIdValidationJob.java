@@ -53,8 +53,8 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
-import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 
 /**
  * <h3>{@link ClassIdValidationJob}</h3>
@@ -89,7 +89,7 @@ public final class ClassIdValidationJob extends AbstractJob {
         @Override
         public void acceptSearchMatch(SearchMatch match) throws CoreException {
           if (monitor.isCanceled()) {
-            throw new OperationCanceledException();
+            throw new OperationCanceledException("ClassId annotation search canceled by monitor.");
           }
           Object owner = match.getElement();
           if (owner instanceof IType) {
@@ -119,10 +119,10 @@ public final class ClassIdValidationJob extends AbstractJob {
       }
     }
     catch (IllegalStateException ise) {
-      // nop (workspace closed)
+      SdkLog.debug("@ClassId Validation Job canceled because workspace is closing.", ise);
     }
     catch (OperationCanceledException oce) {
-      //nop
+      SdkLog.debug("@ClassId Validation Job canceled because monitor was canceled.", oce);
     }
     catch (ZipError ze) {
       // can happen if the search engine is running and a e.g. maven update changes the underlying runtime zip file
@@ -132,7 +132,7 @@ public final class ClassIdValidationJob extends AbstractJob {
       SdkLog.error("unable to find @ClassId annotation references in workspace.", ex);
     }
     catch (IllegalArgumentException iae) {
-      SdkLog.info("@ClassId validation job cancelled.", iae);
+      SdkLog.info("@ClassId validation job canceled.", iae);
     }
     catch (Exception e) {
       SdkLog.error("unable to find @ClassId annotation references in workspace.", e);

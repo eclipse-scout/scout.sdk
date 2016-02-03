@@ -157,11 +157,17 @@ public class NlsTablePage extends Composite {
 
   private void handleProjectChangedEvent(NlsProjectEvent event) {
     try {
+      if (m_table.isDisposed()) {
+        return;
+      }
       m_table.setRedraw(false);
       boolean fullRefresh = handleProjectChangedEventInternalRec(event);
       m_table.refreshAll(fullRefresh);
     }
     finally {
+      if (m_table.isDisposed()) {
+        return;
+      }
       m_table.setRedraw(true);
     }
   }

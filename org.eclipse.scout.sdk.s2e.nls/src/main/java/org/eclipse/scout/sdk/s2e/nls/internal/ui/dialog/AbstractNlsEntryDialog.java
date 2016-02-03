@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * <h4>AbstractNlsEntryDialog</h4>
@@ -83,11 +84,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     m_rootProject = project;
     m_translationFields = new HashMap<>();
     m_showProjectList = showProjectList;
-  }
-
-  @Override
-  public boolean isHelpAvailable() {
-    return false;
+    setHelpAvailable(true);
   }
 
   @Override
@@ -114,6 +111,9 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
 
     getButton(IDialogConstants.OK_ID).setText("&Ok");
     getDefaultTranslationField().setFocus();
+
+    // as defined in IScoutHelpContextIds.SCOUT_ENTRY_WIZARD_PAGE
+    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, "org.eclipse.scout.sdk.s2e.ui.scout_wizard_nls-entry_page_context");
     return contents;
   }
 

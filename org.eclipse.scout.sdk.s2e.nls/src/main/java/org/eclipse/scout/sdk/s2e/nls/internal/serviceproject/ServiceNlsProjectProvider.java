@@ -31,7 +31,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
-import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.util.IFilter;
@@ -40,6 +39,7 @@ import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsProjectProvider;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils.PublicPrimaryTypeFilter;
 
 public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
@@ -93,22 +93,29 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     };
 
     final Set<TextProviderServiceDeclaration> result = new TreeSet<>(comparator);
-    IFilter<TypeNameMatch> filter = new IFilter<TypeNameMatch>() {
+    IFilter<IType> filter = new PublicPrimaryTypeFilter() {
       @Override
-      public boolean evaluate(TypeNameMatch match) {
-        if (!Flags.isAbstract(match.getModifiers())) {
-          IType candidate = match.getType();
-          try {
-            if (SourceRange.isAvailable(candidate.getSourceRange())) {
-              // only accept non-abstract types with source available
-              TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(candidate, getOrder(candidate));
-              result.add(d);
-            }
+      public boolean evaluate(IType candidate) {
+        boolean accept = super.evaluate(candidate);
+        if (!accept) {
+          return false;
+        }
+
+        try {
+          int flags = candidate.getFlags();
+          if (Flags.isAbstract(flags)) {
+            return false;
           }
-          catch (JavaModelException e) {
-            // this element seems to be corrupt -> ignore
-            SdkLog.warning("Attempt to access source range of type '{}' failed. Type will be skipped.", candidate.getFullyQualifiedName(), e);
+
+          if (SourceRange.isAvailable(candidate.getSourceRange())) {
+            // only accept non-abstract types with source available
+            TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(candidate, getOrder(candidate));
+            result.add(d);
           }
+        }
+        catch (JavaModelException e) {
+          // this element seems to be corrupt -> ignore
+          SdkLog.warning("Attempt to access source range of type '{}' failed. Type will be skipped.", candidate.getFullyQualifiedName(), e);
         }
         return false;
       }

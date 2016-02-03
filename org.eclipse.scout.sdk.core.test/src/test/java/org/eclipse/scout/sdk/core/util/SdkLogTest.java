@@ -95,8 +95,16 @@ public class SdkLogTest {
         SdkConsole.spi = new SdkConsoleSpi() {
 
           @Override
-          public void println(String s) {
+          public void println(String s, Throwable... exceptions) {
             logContent.append(s);
+            if (exceptions == null) {
+              return;
+            }
+            for (Throwable t : exceptions) {
+              if (t != null) {
+                logContent.append(CoreUtils.getStackTrace(t));
+              }
+            }
           }
 
           @Override

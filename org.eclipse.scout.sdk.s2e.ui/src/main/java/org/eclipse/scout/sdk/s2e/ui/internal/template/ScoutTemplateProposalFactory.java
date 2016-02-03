@@ -35,9 +35,9 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.model.ScoutModelHierarchy;
 import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.job.RunnableJob;
-import org.eclipse.scout.sdk.s2e.trigger.CachingJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 

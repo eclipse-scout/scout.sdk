@@ -29,9 +29,9 @@ import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
-import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
+import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
+import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 
 /**
  * <h3>WorkingCopyManager</h3>
@@ -56,7 +56,7 @@ public class WorkingCopyManager implements IWorkingCopyManager {
 
   @Override
   public synchronized void unregisterAll(final IProgressMonitor monitor, final boolean save) {
-    boolean tryToSave = save && !monitor.isCanceled(); // only save if asked for save and not cancelled yet.
+    boolean tryToSave = save && !monitor.isCanceled(); // only save if asked for save and not canceled yet.
     if (tryToSave) {
       List<IResource> resourcesToSave = new ArrayList<>(m_workingCopies.size());
       for (ICompilationUnit icu : m_workingCopies) {

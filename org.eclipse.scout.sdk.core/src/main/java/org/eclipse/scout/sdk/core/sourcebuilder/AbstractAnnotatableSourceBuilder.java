@@ -11,17 +11,16 @@
 package org.eclipse.scout.sdk.core.sourcebuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
-import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
@@ -32,7 +31,6 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  */
 public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaElementSourceBuilder implements IAnnotatableSourceBuilder {
   private final List<IAnnotationSourceBuilder> m_annotations = new ArrayList<>();
-  private final Map<CompositeObject, IAnnotationSourceBuilder> m_sortedAnnotations = new TreeMap<>();
 
   public AbstractAnnotatableSourceBuilder(IAnnotatable element) {
     super(element);
@@ -52,12 +50,34 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
     createAnnotations(source, lineDelimiter, context, validator);
   }
 
-  protected void createAnnotations(StringBuilder sourceBuilder, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-    for (IAnnotationSourceBuilder sb : getAnnotations()) {
+  protected void createAnnotations(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+    List<IAnnotationSourceBuilder> annotations = getAnnotations();
+    if (annotations.isEmpty()) {
+      return;
+    }
+
+    // collect sources of all annotations
+    List<String> annotationSources = new ArrayList<>(annotations.size());
+    for (IAnnotationSourceBuilder sb : annotations) {
       if (sb != null) {
-        sb.createSource(sourceBuilder, lineDelimiter, context, validator);
-        sourceBuilder.append(lineDelimiter);
+        StringBuilder annotBuilder = new StringBuilder();
+        sb.createSource(annotBuilder, lineDelimiter, context, validator);
+        annotationSources.add(annotBuilder.toString());
       }
+    }
+
+    // sort annotations by source length
+    Collections.sort(annotationSources, new Comparator<String>() {
+      @Override
+      public int compare(String o1, String o2) {
+        return Integer.compare(o1.length(), o2.length());
+      }
+    });
+
+    // add annotation sources
+    for (String annotSource : annotationSources) {
+      source.append(annotSource);
+      source.append(lineDelimiter);
     }
   }
 
@@ -66,24 +86,7 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
     if (builder == null) {
       throw new IllegalArgumentException("annotation source builder can not be null.");
     }
-    if (!m_sortedAnnotations.isEmpty()) {
-      throw new IllegalStateException("This operation has already sorted annotation source builders. A mix between sorted and unsorted annotation source buiders is not supported.");
-    }
     m_annotations.add(builder);
-  }
-
-  @Override
-  public void addSortedAnnotation(CompositeObject sortKey, IAnnotationSourceBuilder builder) {
-    if (builder == null) {
-      throw new IllegalArgumentException("annotation source builder can not be null.");
-    }
-    if (sortKey == null) {
-      throw new IllegalArgumentException("Sort key can not be null.");
-    }
-    if (!m_annotations.isEmpty()) {
-      throw new IllegalStateException("This operation has already unsorted annotation source builders. A mix between sorted and unsorted annotation builders is not supported.");
-    }
-    m_sortedAnnotations.put(sortKey, builder);
   }
 
   @Override
@@ -99,9 +102,6 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
 
   @Override
   public List<IAnnotationSourceBuilder> getAnnotations() {
-    List<IAnnotationSourceBuilder> ops = new ArrayList<>(m_annotations.size() + m_sortedAnnotations.size());
-    ops.addAll(m_annotations);
-    ops.addAll(m_sortedAnnotations.values());
-    return ops;
+    return Collections.unmodifiableList(m_annotations);
   }
 }

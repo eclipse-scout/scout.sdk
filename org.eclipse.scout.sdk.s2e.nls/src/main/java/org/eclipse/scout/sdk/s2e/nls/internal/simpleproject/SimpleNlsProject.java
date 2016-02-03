@@ -50,8 +50,8 @@ import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.project.AbstractNlsProject;
 import org.eclipse.scout.sdk.s2e.nls.project.NlsProjectEvent;
 import org.eclipse.scout.sdk.s2e.nls.resource.ITranslationResource;
+import org.eclipse.scout.sdk.s2e.operation.ResourceWriteOperation;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
 import org.eclipse.swt.widgets.Shell;
 
 public class SimpleNlsProject extends AbstractNlsProject {

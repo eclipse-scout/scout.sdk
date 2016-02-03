@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.editor;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableColorProvider;
@@ -113,7 +114,11 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
             }
           }
         }
-        return text.replace("\n", " ").replace("\r", "");
+        return StringUtils.replaceEach(text, new String[]{
+            "\n", "\r"
+        }, new String[]{
+            " ", ""
+        });
       }
     }
   }

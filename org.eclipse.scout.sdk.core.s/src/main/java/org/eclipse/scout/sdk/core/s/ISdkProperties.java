@@ -15,6 +15,10 @@ package org.eclipse.scout.sdk.core.s;
  */
 public interface ISdkProperties {
   String SUFFIX_FORM_FIELD = "Field";
+  String SUFFIX_LOOKUP_CALL = "LookupCall";
+  String SUFFIX_FORM = "Form";
+  String SUFFIX_PAGE = "Page";
+  String SUFFIX_DTO = "Data";
   String SUFFIX_BUTTON = "Button";
   String SUFFIX_TABLE_COLUMN = "Column";
   String SUFFIX_OUTLINE_PAGE = "Page";
@@ -26,6 +30,9 @@ public interface ISdkProperties {
   String SUFFIX_COLUMN = "Column";
   String SUFFIX_EXTENSION = "Extension";
   String SUFFIX_CALENDAR_ITEM_PROVIDER = "Provider";
+  String SUFFIX_SERVICE = "Service";
+  String SUFFIX_PERMISSION = "Permission";
+  String SUFFIX_CODE_TYPE = "CodeType";
 
   String INNER_TABLE_TYPE_NAME = "Table";
   String INNER_TREE_TYPE_NAME = "Tree";
@@ -55,4 +62,9 @@ public interface ISdkProperties {
    * Value to add to view orders for new elements.
    */
   int VIEW_ORDER_ANNOTATION_VALUE_STEP = 1000;
+
+  /**
+   * Default source folder for generated sources
+   */
+  String GENERATED_SOURCE_FOLDER_NAME = "src/generated/java";
 }

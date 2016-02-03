@@ -30,5 +30,4 @@ public interface IScoutHelpContextIds {
   String SCOUT_CODETYPE_NEW_WIZARD_PAGE = PREFIX + "scout_wizard_code-type_page_context";
   String SCOUT_PERMISSION_NEW_WIZARD_PAGE = PREFIX + "scout_wizard_permission_page_context";
   String SCOUT_LANGUAGE_NEW_WIZARD_PAGE = PREFIX + "scout_wizard_language_page_context";
-
 }

@@ -17,30 +17,37 @@ package org.eclipse.scout.sdk.s2e.ui;
  * @since 5.2.0
  */
 public interface ISdkIcons {
+  String ButtonAdd = "button_add.gif";
+  String CodeAdd = "code_add.png";
+  String CodeTypeAdd = "codeType_add.png";
+  String ContentAssist = "content_assist_cue.gif";
+  String DateFieldAdd = "datefield_add.gif";
+  String DoubleFieldAdd = "doublefield_add.gif";
+  String ToolDropdown = "down.gif";
   String EclipseScout = "eclipse_scout.gif";
+  String ExtensionsAdd = "extension_add.png";
   String FieldProtected = "field_protected_obj.gif";
   String File = "file.gif";
-  String ScoutProjectNewWizBanner = "newscoutprj_wiz.png";
-
-  String DoubleFieldAdd = "doublefield_add.gif";
-  String StringFieldAdd = "stringfield_add.gif";
-  String FormFieldAdd = "formField_add.png";
-  String ButtonAdd = "button_add.gif";
-  String DateFieldAdd = "datefield_add.gif";
   String FileChooserFieldAdd = "filechooserfield_add.gif";
+  String FormAdd = "form_add.png";
+  String FormFieldAdd = "formField_add.png";
+  String FormHandler = "formHandler.png";
   String GroupBoxAdd = "groupbox_add.png";
-  String SmartFieldAdd = "smartfield_add.gif";
   String IntegerFieldAdd = "integerfield_add.gif";
+  String KeyStrokeAdd = "keystroke_add.png";
+  String LookupCallAdd = "lookupCall_add.png";
+  String MenuAdd = "menu_add.png";
+  String ScoutProjectNewWizBanner = "newscoutprj_wiz.png";
+  String PageAdd = "page_add.png";
+  String PermissionAdd = "permission_add.png";
+  String RadioButtonAdd = "radiobutton_add.gif";
   String RadioButtonGroupAdd = "radiobuttonGroup_add.gif";
   String SequenceBoxAdd = "sequencebox_add.gif";
+  String SmartFieldAdd = "smartfield_add.gif";
+  String StringFieldAdd = "stringfield_add.gif";
   String TabBoxAdd = "tabbox_add.gif";
+  String ColumnAdd = "tableColumn_add.png";
   String TableFieldAdd = "tablefield_add.gif";
   String TreeFieldAdd = "treefield_add.gif";
-  String RadioButtonAdd = "radiobutton_add.gif";
-  String MenuAdd = "menu_add.png";
-  String KeyStrokeAdd = "keystroke_add.png";
-  String CodeAdd = "code_add.png";
-  String FormHandler = "formHandler.png";
-  String ColumnAdd = "tableColumn_add.png";
-  String ExtensionsAdd = "extension_add.png";
+  String Separator = "type_separator.gif";
 }

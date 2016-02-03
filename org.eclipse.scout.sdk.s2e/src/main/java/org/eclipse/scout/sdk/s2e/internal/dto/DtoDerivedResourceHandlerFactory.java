@@ -23,9 +23,9 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandlerFactory;
-import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**

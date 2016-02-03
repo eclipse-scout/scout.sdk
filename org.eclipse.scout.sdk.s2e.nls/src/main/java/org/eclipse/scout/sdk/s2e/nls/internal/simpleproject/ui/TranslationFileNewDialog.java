@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 public class TranslationFileNewDialog extends TitleAreaDialog {
 
@@ -53,6 +54,7 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
         revalidate();
       }
     });
+    setHelpAvailable(true);
   }
 
   @Override
@@ -66,6 +68,10 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
     Control contents = super.createContents(parent);
     setTitle(m_title);
     revalidate();
+
+    // as defined in IScoutHelpContextIds.SCOUT_LANGUAGE_NEW_WIZARD_PAGE
+    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, "org.eclipse.scout.sdk.s2e.ui.scout_wizard_language_page_context");
+
     return contents;
   }
 

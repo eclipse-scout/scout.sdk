@@ -40,7 +40,13 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.client</artifactId>
+      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.server</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

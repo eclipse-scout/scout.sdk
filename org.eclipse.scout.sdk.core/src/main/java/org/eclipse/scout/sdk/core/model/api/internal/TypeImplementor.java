@@ -221,7 +221,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   @Override
   public boolean isAssignableFrom(IType specificClass) {
     if ((this.isPrimitive() || specificClass.isPrimitive())) {
-      return PRIMITIVE_TYPE_ASSIGNABLE_PAT.matcher(this.elementName() + "=" + specificClass.elementName()).matches();
+      return PRIMITIVE_TYPE_ASSIGNABLE_PAT.matcher(this.elementName() + '=' + specificClass.elementName()).matches();
     }
     if ((this.isArray() || specificClass.isArray())) {
       return this.name().equals(specificClass.name());

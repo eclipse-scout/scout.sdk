@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
-import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
+import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 
 /**
  * <h3>{@link AbstractResourceBlockingJob}</h3> Job which runs with a specific resource lock.
@@ -83,19 +83,16 @@ public abstract class AbstractResourceBlockingJob extends AbstractJob {
     IWorkingCopyManager workingCopyManager = ScoutSdkCore.createWorkingCopyManager();
     boolean save = true;
     try {
-      try {
-        validate();
-        run(monitor, workingCopyManager);
+      validate();
+      run(monitor, workingCopyManager);
+    }
+    catch (Exception e) {
+      save = false;
+      if (e.getCause() == e || e.getCause() == null) {
+        e.initCause(m_callerTrace);
       }
-      catch (Exception e) {
-        save = false;
-        if (e.getCause() == e || e.getCause() == null) {
-          e.initCause(m_callerTrace);
-        }
-        Status errorStatus = new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, e.getMessage(), e);
-        SdkLog.error(e.getMessage(), e);
-        return errorStatus;
-      }
+      SdkLog.error(e.getMessage(), e);
+      return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, e.getMessage(), e);
     }
     finally {
       workingCopyManager.unregisterAll(monitor, save);

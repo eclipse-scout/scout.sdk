@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.trigger;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 
 /**
  *

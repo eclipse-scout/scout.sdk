@@ -13,9 +13,11 @@ package org.eclipse.scout.sdk.core.sourcebuilder.method;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.IMethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
@@ -82,8 +84,12 @@ public final class MethodBodySourceBuilderFactory {
     return new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return ").append(validator.useSignature(typeSignature)).append(".class;");
+        source.append("return ").append(validator.useSignature(typeSignature)).append(SuffixConstants.SUFFIX_STRING_class).append(';');
       }
     };
+  }
+
+  public static ISourceBuilder createSimpleMethodBody(String content) {
+    return new RawSourceBuilder(content);
   }
 }

@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.wizard;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -39,30 +36,18 @@ public abstract class AbstractWizardPage extends WizardPage {
   private int m_stateChangingCounter = 0;
   private boolean m_excludePage;
 
-  private final List<IStatusProvider> m_statusProvider;
   private final FieldToolkit m_fieldToolkit;
   private final BasicPropertySupport m_propertySupport;
 
-  public AbstractWizardPage(String pageName, String title, ImageDescriptor titleImage) {
-    super(pageName, title, titleImage);
-    m_fieldToolkit = new FieldToolkit();
-    m_statusProvider = new ArrayList<>();
-    m_propertySupport = new BasicPropertySupport(this);
-  }
-
   public AbstractWizardPage(String pageName) {
-    this(pageName, null, (ImageDescriptor) null);
+    super(pageName, null, (ImageDescriptor) null);
 
+    m_fieldToolkit = new FieldToolkit();
+    m_propertySupport = new BasicPropertySupport(this);
   }
 
   public FieldToolkit getFieldToolkit() {
     return m_fieldToolkit;
-  }
-
-  /**
-   * Override to handle each page activate.
-   */
-  public void postActivate() {
   }
 
   @Override
@@ -94,14 +79,6 @@ public abstract class AbstractWizardPage extends WizardPage {
   @Override
   public void setVisible(boolean visible) {
     m_content.setVisible(visible);
-  }
-
-  public boolean addStatusProvider(IStatusProvider provider) {
-    return m_statusProvider.add(provider);
-  }
-
-  public boolean removeStatusProvider(IStatusProvider provider) {
-    return m_statusProvider.remove(provider);
   }
 
   protected void setStatus(IStatus status) {
@@ -190,9 +167,6 @@ public abstract class AbstractWizardPage extends WizardPage {
   protected final MultiStatus computePageStatus() {
     MultiStatus multiStatus = new MultiStatus(S2ESdkUiActivator.PLUGIN_ID, -1, "multi status", null);
     validatePage(multiStatus);
-    for (IStatusProvider p : m_statusProvider) {
-      p.validate(this, multiStatus);
-    }
     return multiStatus;
   }
 
@@ -219,13 +193,6 @@ public abstract class AbstractWizardPage extends WizardPage {
 
   public boolean isExcludePage() {
     return m_excludePage;
-  }
-
-  /**
-   * sets the focus when the page is activated. Can be overridden.
-   */
-  public void setFocus() {
-    getControl().setFocus();
   }
 
   /**
