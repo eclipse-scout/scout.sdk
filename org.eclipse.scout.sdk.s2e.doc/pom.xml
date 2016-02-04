@@ -42,6 +42,10 @@
       <resource>
         <directory>.</directory>
         <includes>
+          <include>about.html</include>
+          <include>contexts_scout.xml</include>
+          <include>epl-v10.html</include>
+          <include>plugin.xml</include>
           <include>toc.xml</include>
           <include>html/**</include>
         </includes>
