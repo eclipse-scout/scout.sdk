@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.workspace;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -73,7 +74,19 @@ public class CompilationUnitWriteOperation implements IOperation {
       m_cu = null;
     }
     else {
-      IFolder folder = (IFolder) (packageName != null ? srcFolder.getPackageFragment(packageName).getResource() : srcFolder.getResource());
+      IFolder folder = null;
+      if (StringUtils.isBlank(packageName)) {
+        folder = (IFolder) srcFolder.getResource();
+      }
+      else {
+        folder = (IFolder) srcFolder.getPackageFragment(packageName).getResource();
+      }
+
+      // check for binary package for better error message than NPE
+      if (folder == null) {
+        throw new IllegalArgumentException("Binary package fragment root not supported " + srcFolder.getElementName());
+      }
+
       IFile file = folder.getFile(fileName);
       m_cu = JavaCore.createCompilationUnitFrom(file);
     }

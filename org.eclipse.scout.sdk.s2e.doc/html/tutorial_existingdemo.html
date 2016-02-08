@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head> 
+  <meta charset="UTF-8" /> 
+  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]--> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+  <meta name="generator" content="Asciidoctor 1.5.2" /> 
+  <title>Import the Scout Demo Applications Tutorial</title> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400" /> 
+  <link rel="stylesheet" href="css/eclipse.css" /> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" /> 
+  <link rel="stylesheet" href="css/coderay-eclipse.css" /> 
+ </head> 
+ <body class="article">
+  <table border="0" class="navigation" style="width: 100%;" summary="navigation">
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial.html" shape="rect" title="Getting Started"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_helloworld.html" shape="rect" title="Hello world Tutorial"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+   </tr>
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Getting Started</td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Hello world Tutorial</td>
+   </tr>
+  </table> 
+  <div id="header"> 
+  </div> 
+  <div id="content"> 
+   <div class="sect2"> 
+    <h3 id="import-the-scout-demo-applications-tutorial"><a class="anchor" href="#import-the-scout-demo-applications-tutorial"></a>Import the Scout Demo Applications Tutorial</h3> 
+    <div class="paragraph"> 
+     <p>With this tutorial you will learn how to import the Scout Demo Application into your workspace. The tutorial consists of the following two parts:</p> 
+    </div> 
+    <div class="ulist"> 
+     <ul> 
+      <li> <p>Install the Scout Demo application</p> </li> 
+      <li> <p>Run the Scout demo from your IDE</p> </li> 
+     </ul> 
+    </div> 
+    <div class="sect3"> 
+     <h4 id="install-the-scout-demo-application"><a class="anchor" href="#install-the-scout-demo-application"></a>Install the Scout Demo Application</h4> 
+     <div class="paragraph"> 
+      <p>In the first part of the tutorial we import the demo applications using the <a href="https://wiki.eclipse.org/Eclipse_Installer">Oomph Eclipse installer</a> tool.</p> 
+     </div> 
+     <div class="sect4"> 
+      <h5 id="import-the-scout-demo-projects"><a class="anchor" href="#import-the-scout-demo-projects"></a>Import the Scout demo projects</h5> 
+      <div class="paragraph"> 
+       <p>In the Eclipse IDE open the <em class="wizard">Import</em> wizard with menu <span class="menu">File &#x2192; Import&#x2026;&#x200b;</span>. This opens the dialog shown in <a href="#img-oomph_existing_project">Figure 1</a>. Next, under folder <em class="folder">Oomph</em> select the node <em class="folder">Projects into Workspace</em> and click the <b class="button">Next</b> button.</p> 
+      </div> 
+      <div id="img-oomph_existing_project" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/oomph_existing_project.png" alt="oomph existing project" /> 
+       </div> 
+       <div class="title">
+        Figure 1. The Import Wizard in Eclipse.
+       </div> 
+      </div> 
+      <div class="paragraph"> 
+       <p>The <em class="wizard">Eclipse Importer</em> contains the folder hierarchy <em class="folder">Eclipse Projects</em>, <em class="folder">Scout</em> and <em class="folder">Scout Demo App</em> as shown in <a href="#img-oomph_exiting_projects1">Figure 2</a>. You can enter &quot;Scout Demo&quot; in the search filter to find the project easily.</p> 
+      </div> 
+      <div id="img-oomph_exiting_projects1" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/oomph_exiting_projects1.png" alt="oomph exiting projects1" /> 
+       </div> 
+       <div class="title">
+        Figure 2. Top part of the &quot;Projects&quot; Step of the Importer.
+       </div> 
+      </div> 
+      <div class="paragraph"> 
+       <p>Now, add the desired project to the list to import according to the following steps.</p> 
+      </div> 
+      <div class="ulist"> 
+       <ul> 
+        <li> <p>[1] Select the &quot;Scout Demo App&quot; element.</p> </li> 
+        <li> <p>[2] Add it to the list of projects using the <b class="button">&quot;Add Projects&quot;</b> (down arrow) button.</p> </li> 
+        <li> <p>[3] Adjust the Stream to the milestone build matching your Eclipse IDE, eg. &#x201c;Neon (M4 release)&#x201d; for January 2016.</p> </li> 
+       </ul> 
+      </div> 
+      <div id="img-oomph_exiting_projects2" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/oomph_exiting_projects2.png" alt="oomph exiting projects2" /> 
+       </div> 
+       <div class="title">
+        Figure 3. Bottom part of the &quot;Projects&quot; Step of the Importer.
+       </div> 
+      </div> 
+      <div class="paragraph"> 
+       <p>Once the project selection in your Eclipse importer looks as shown in <a href="#img-oomph_exiting_projects2">Figure 3</a> Click on the <b class="button">Next</b> button.</p> 
+      </div> 
+      <div class="paragraph"> 
+       <p>On the <em class="wizard">Variables</em> dialog of the Eclipse importer a number of Oomph variables have to be specified. In case you have used already used Oomph for other purposes, this step might look different or empty (for example when all variables have been set in a previous Oomph session).</p> 
+      </div> 
+      <div class="paragraph"> 
+       <p>Make sure to display all variables by activating checkbox <code>Show all Variables</code> in the bottom left corner as shown in <a href="#img-oomph_exiting_variables">Figure 4</a>.</p> 
+      </div> 
+      <div id="img-oomph_exiting_variables" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/oomph_exiting_variables.png" alt="oomph exiting variables" /> 
+       </div> 
+       <div class="title">
+        Figure 4. &quot;Variables&quot; Step of the Importer.
+       </div> 
+      </div> 
+      <div class="admonitionblock warning"> 
+       <table> 
+        <tbody>
+         <tr> 
+          <td class="icon"> <i class="fa icon-warning" title="Warning"></i> </td> 
+          <td class="content"> The variables in <a href="#img-oomph_exiting_variables">Figure 4</a> may be shown in a different order in your case. </td> 
+         </tr> 
+        </tbody>
+       </table> 
+      </div> 
+      <div class="paragraph"> 
+       <p>Before you proceed make sure that all shown variables are set appropriately for your use case. For the settings proposed below we assume that we only need read access for the git repository hosting the Scout demo application.</p> 
+      </div> 
+      <div class="ulist"> 
+       <ul> 
+        <li> <p><code>Git clone location rule</code>: &#x201c;Located in a folder named '.git/&lt;repo&gt;' within the workspace folder&#x201d;</p> </li> 
+        <li> <p><code>Target Platform</code>: &#x201c;None&#x201d;</p> </li> 
+        <li> <p><code>JRE 1.7 Location</code>: Path to your Java 7 JRE</p> </li> 
+        <li> <p><code>JRE 1.8 Location</code>: Path to your Java 8 JRE</p> </li> 
+        <li> <p><code>Scout Demo App Github repository</code>: &#x201c;HTTPS (read-write)&#x201d; if you already have a GitHub account. Otherwise use &#x201c;HTTPS (read-only, anonymous)&#x201d;</p> </li> 
+       </ul> 
+      </div> 
+      <div class="paragraph"> 
+       <p>Once the setting of the variables is completed click <b class="button">Next</b>. This leads to the <em class="wizard">Confirmation</em> dialog. This last step can be completed by clicking on <b class="button">Finish</b>.</p> 
+      </div> 
+      <div class="paragraph"> 
+       <p>The Oomph installer first makes sure that all necessary Scout components and M2E connectors are available. In case one or more components are missing, Oomph will first download and install them. This triggers a restart request as shown in <a href="#img-oomph_restart">Figure 5</a>.</p> 
+      </div> 
+      <div id="img-oomph_restart" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/oomph_restart.png" alt="oomph restart" /> 
+       </div> 
+       <div class="title">
+        Figure 5. Restart of the IDE after installation.
+       </div> 
+      </div> 
+      <div class="paragraph"> 
+       <p>To complete the installation click <b class="button">Finish</b>. If your IDE needs to be restarted, select the same workspace in the <em class="wizard">Eclipse Launcher</em> dialog.</p> 
+      </div> 
+      <div class="paragraph"> 
+       <p>After the restart Oomph will continue to download and install the Scout demo application showing the progress in the Eclipse importer dialog. Once the download and installation has completed you may close the dialog with clicking the <b class="button">Finish</b> button.</p> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="sect3"> 
+     <h4 id="run-the-demo-application"><a class="anchor" href="#run-the-demo-application"></a>Run the Demo Application</h4> 
+     <div class="paragraph"> 
+      <p>With the Scout demo installed in our workspace we are now ready to start the application from within our IDE.</p> 
+     </div> 
+     <div class="sect4"> 
+      <h5 id="start-the-application-in-the-ide"><a class="anchor" href="#start-the-application-in-the-ide"></a>Start the application in the IDE</h5> 
+      <div class="paragraph"> 
+       <p>In the <em class="wizard">Package Explorer</em> view of the IDE open the Maven module <code>org.eclipse.scout.contacts.all.app.dev</code>. To run the Contacts application use the <em class="menu">Run As</em> context menu on file <code>contacts-all-dev.launch</code> as shown in <a href="#img-oomph_run_contacts_all">Figure 6</a>.</p> 
+      </div> 
+      <div id="img-oomph_run_contacts_all" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/run_contracts_all_dev.png" alt="run contracts all dev" /> 
+       </div> 
+       <div class="title">
+        Figure 6. Start the Contacts application.
+       </div> 
+      </div> 
+      <div class="paragraph"> 
+       <p>Once the startup sequence of the Contacts application has completed the console view in your Eclipse IDE should look like <a href="#img-oomph_contacts_console">Figure 7</a>.</p> 
+      </div> 
+      <div id="img-oomph_contacts_console" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/oomph_contacts_console.png" alt="oomph contacts console" /> 
+       </div> 
+       <div class="title">
+        Figure 7. Console view after starting the Contacts demo.
+       </div> 
+      </div> 
+     </div> 
+     <div class="sect4"> 
+      <h5 id="use-the-contacts-demo-in-a-browser"><a class="anchor" href="#use-the-contacts-demo-in-a-browser"></a>Use the Contacts Demo in a Browser</h5> 
+      <div class="paragraph"> 
+       <p>With the Contacts demo running in the IDE open the application in your favorite browser via URL <a href="http://localhost:8082/" class="bare">http://localhost:8082/</a>. To get the screen shown in <a href="#img-contacts_persons_alice">Figure 8</a> first click on the <em class="folder">Persons</em> node and then double click on the ''Alice'' row.</p> 
+      </div> 
+      <div id="img-contacts_persons_alice" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/contacts_persons_alice.png" alt="contacts persons alice" /> 
+       </div> 
+       <div class="title">
+        Figure 8. The Contacts application.
+       </div> 
+      </div> 
+     </div> 
+     <div class="sect4"> 
+      <h5 id="what-s-next"><a class="anchor" href="#what-s-next"></a>What&#x2019;s Next?</h5> 
+      <div class="paragraph"> 
+       <p>Play with the Contacts application. This provides a good overview of a typical Scout application. You can browse through the data, open different forms and add/change entities.</p> 
+      </div> 
+      <div class="paragraph"> 
+       <p>Also have a quick look at the code. The list on the left side of the application containing the nodes <em class="folder">Persons</em> and <em class="folder">Organizations</em> is implemented in class <span class="java">ContactOutline</span> as shown in <a href="#lst-contacts_outline">Listing 1</a>.</p> 
+      </div> 
+      <div id="lst-contacts_outline" class="listingblock"> 
+       <div class="title">
+        Listing 1. ContactOutline implementation.
+       </div> 
+       <div class="content"> 
+        <pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">ContactOutline</span> <span class="directive">extends</span> AbstractOutline {
+
+  <span class="annotation">@Override</span>
+  <span class="directive">protected</span> <span class="predefined-type">String</span> getConfiguredTitle() {
+    <span class="keyword">return</span> TEXTS.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">Contacts</span><span class="delimiter">&quot;</span></span>);
+  }
+
+  <span class="annotation">@Override</span>
+  <span class="directive">protected</span> <span class="type">void</span> execCreateChildPages(<span class="predefined-type">List</span>&lt;IPage&lt;?&gt;&gt; pageList) {
+    pageList.add(<span class="keyword">new</span> PersonTablePage());
+    pageList.add(<span class="keyword">new</span> OrganizationTablePage());
+  }
+
+  <span class="annotation">@Override</span>
+  <span class="directive">protected</span> <span class="predefined-type">String</span> getConfiguredIconId() {
+    <span class="keyword">return</span> Icons.Contacts;
+  }
+}</code></pre> 
+       </div> 
+      </div> 
+      <div class="paragraph"> 
+       <p>If you have clicked on the <em class="folder">Persons</em> node a page with all available persons is shown. This page is implemented in class <span class="java">PersonTablePage</span> and the dialog to show/edit persons is implemented in class <span class="java">PersonForm</span>.</p> 
+      </div> 
+      <div class="paragraph"> 
+       <p>And as always, the Scout Team welcomes pull requests with improvements.</p> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <table border="0" class="navigation" style="width: 100%;" summary="navigation">
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial.html" shape="rect" title="Getting Started"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"><a href="scout_user_guide.html" shape="rect" title="Eclipse Scout User Guide"><img alt="Eclipse Scout User Guide" border="0" src="images/home.gif" /></a></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_helloworld.html" shape="rect" title="Hello world Tutorial"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+   </tr>
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Getting Started</td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Hello world Tutorial</td>
+   </tr>
+  </table>
+  <div id="footer"> 
+   <div id="footer-text">
+     Version 5.2.0-SNAPSHOT
+    <br /> Last updated 2016-01-30 13:12:42 CET 
+   </div> 
+  </div>  
+ </body>
+</html>

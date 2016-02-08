@@ -45,7 +45,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     setWindowTitle("New Scout Project");
-    setHelpAvailable(false);
+    setHelpAvailable(true);
     setDefaultPageImageDescriptor(S2ESdkUiActivator.getImageDescriptor(ISdkIcons.ScoutProjectNewWizBanner));
 
     m_page1 = new ScoutProjectNewWizardPage();
