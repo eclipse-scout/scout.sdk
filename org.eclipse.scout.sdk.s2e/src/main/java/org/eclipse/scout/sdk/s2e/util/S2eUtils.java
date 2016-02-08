@@ -214,7 +214,7 @@ public final class S2eUtils {
       }
     };
 
-    SearchEngine e = new SearchEngine(JavaCore.getWorkingCopies(null));
+    SearchEngine e = new SearchEngine();
     IType baseType = sourceProject.findType(baseTypeFqn.replace('$', '.'));
     if (!exists(baseType)) {
       return collector;
