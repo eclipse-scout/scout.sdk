@@ -1,8 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.contexts"?>
 <contexts>
-    <context id="scout_project_new_wizard_page_context" title="New Scout Project Wizard">
-        <description>This wizard creates a new Scout helloworld project. See the tutorial below for details.</description>
+    <context id="scout_wizard_new_project_page_context" title="New Scout Project Wizard">
+        <description>This wizard creates a new Scout helloworld project.</description>
+        <topic label="New Scout Project Wizard" href="html/sdk_wizard_project.html"/>
         <topic label="Hello world Tutorial" href="html/tutorial_helloworld.html"/>
+    </context>
+    <context id="scout_wizard_form_page_context" title="New Form Wizard">
+        <description>This wizard creates a new Scout Form.</description>
+        <topic label="New Form Wizard" href="html/sdk_wizard_form.html"/>
+    </context>
+    <context id="scout_wizard_page_page_context" title="New Page Wizard">
+        <description>This wizard creates a new Scout Page.</description>
+        <topic label="New Page Wizard" href="html/sdk_wizard_page.html"/>
+    </context>
+    <context id="scout_wizard_nls-entry_page_context" title="NLS Entry Wizard">
+        <description>This wizard creates or modifies a nls entry to localize the user interface.</description>
+        <topic label="NLS Entry Wizard" href="html/sdk_wizard_nls-entry.html"/>
+    </context>
+    <context id="scout_wizard_lookupcall_page_context" title="New LookupCall Wizard">
+        <description>This wizard creates a new Scout Lookup Call.</description>
+        <topic label="New LookupCall Wizard" href="html/sdk_wizard_lookupcall.html"/>
+    </context>
+    <context id="scout_wizard_code-type_page_context" title="New CodeType Wizard">
+        <description>This wizard creates a new Scout Code Type.</description>
+        <topic label="New CodeType Wizard" href="html/sdk_wizard_code-type.html"/>
+    </context>
+    <context id="scout_wizard_permission_page_context" title="New Permission Wizard">
+        <description>This wizard creates a new Scout Permission.</description>
+        <topic label="New Permission Wizard" href="html/sdk_wizard_permission.html"/>
+    </context>
+    <context id="scout_wizard_language_page_context" title="Add a Language Wizard">
+        <description>This wizard creates an additional translation file in order to localize the user interface.</description>
+        <topic label="Add a Language Wizard" href="html/sdk_wizard_language.html"/>
     </context>
 </contexts>
