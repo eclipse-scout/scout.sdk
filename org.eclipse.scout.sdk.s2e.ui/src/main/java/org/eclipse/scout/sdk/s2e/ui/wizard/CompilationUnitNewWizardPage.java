@@ -369,13 +369,13 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
     if (folder.exists()) {
       try {
         folder.accept(new IResourceProxyVisitor() {
-          boolean selfVisited = false;
+          boolean m_selfVisited = false;
 
           @Override
           public boolean visit(IResourceProxy proxy) throws CoreException {
             if (proxy.getType() == IResource.FOLDER) {
-              if (!selfVisited) {
-                selfVisited = true;
+              if (!m_selfVisited) {
+                m_selfVisited = true;
                 return true;
               }
               return false;

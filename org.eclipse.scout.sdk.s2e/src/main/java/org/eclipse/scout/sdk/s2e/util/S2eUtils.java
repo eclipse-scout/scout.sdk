@@ -599,17 +599,23 @@ public final class S2eUtils {
       if (Objects.equals(name, p.getMemberName())) {
         switch (p.getValueKind()) {
           case IMemberValuePair.K_DOUBLE:
-            return new BigDecimal(((Double) p.getValue()).doubleValue());
+            Double doubleValue = (Double) p.getValue();
+            return BigDecimal.valueOf(doubleValue.doubleValue());
           case IMemberValuePair.K_FLOAT:
-            return new BigDecimal(((Float) p.getValue()).doubleValue());
+            Float floatValue = (Float) p.getValue();
+            return BigDecimal.valueOf(floatValue.doubleValue());
           case IMemberValuePair.K_INT:
-            return new BigDecimal(((Integer) p.getValue()).intValue());
+            Integer intValue = (Integer) p.getValue();
+            return BigDecimal.valueOf(intValue.longValue());
           case IMemberValuePair.K_BYTE:
-            return new BigDecimal(((Byte) p.getValue()).intValue());
+            Byte byteValue = (Byte) p.getValue();
+            return BigDecimal.valueOf(byteValue.longValue());
           case IMemberValuePair.K_LONG:
-            return new BigDecimal(((Long) p.getValue()).longValue());
+            Long longValue = (Long) p.getValue();
+            return BigDecimal.valueOf(longValue.longValue());
           case IMemberValuePair.K_SHORT:
-            return new BigDecimal(((Short) p.getValue()).intValue());
+            Short shortValue = (Short) p.getValue();
+            return BigDecimal.valueOf(shortValue.longValue());
         }
         break;
       }

@@ -53,7 +53,7 @@ public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
 
   private final IJavaEnvironmentProvider m_provider;
   private final ProposalTextField[] m_typeArgFields;
-  private final static int NUM_ARG_FIELDS = 3;
+  private static final int NUM_ARG_FIELDS = 3;
 
   public CodeTypeNewWizardPage(PackageContainer packageContainer) {
     super(CodeTypeNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_CODE_TYPE, IScoutRuntimeTypes.ICodeType, IScoutRuntimeTypes.AbstractCodeType, ScoutTier.Shared);

@@ -399,10 +399,8 @@ public class ProposalTextField extends TextField {
         return true;
       }
     }
-    if (getTextComponent() != null && !getTextComponent().isDisposed()) {
-      if (getTextComponent().isFocusControl()) {
-        return true;
-      }
+    if (getTextComponent() != null && !getTextComponent().isDisposed() && getTextComponent().isFocusControl()) {
+      return true;
     }
     if (m_popupButton != null && !m_popupButton.isDisposed()) {
       return m_popupButton.isFocusControl();
@@ -491,10 +489,8 @@ public class ProposalTextField extends TextField {
           getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
-              if (m_popupButton != null && !m_popupButton.isDisposed()) {
-                if (Objects.equals(getDisplay().getFocusControl(), m_popupButton)) {
-                  return;
-                }
+              if (m_popupButton != null && !m_popupButton.isDisposed() && Objects.equals(getDisplay().getFocusControl(), m_popupButton)) {
+                return;
               }
               if (!isProposalFieldFocusOwner() && !isDisposed()) {
                 String text = getText();

@@ -241,11 +241,6 @@ public class TextField<T> extends Composite {
     super.setToolTipText(string);
   }
 
-  @Override
-  public String getToolTipText() {
-    return super.getToolTipText();
-  }
-
   public void setValue(T value) {
     m_text.setText(m_inputFormatter.format(this, value));
   }

@@ -138,10 +138,8 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
       if (matchRegions != null) {
         try {
           IType type = javaProject.findType(fqn);
-          if (filter == null || filter.evaluate(type)) {
-            if (!addProposalCandidate(type, candidates)) {
-              return;
-            }
+          if ((filter == null || filter.evaluate(type)) && !addProposalCandidate(type, candidates)) {
+            return;
           }
         }
         catch (JavaModelException e) {
@@ -209,7 +207,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
     private final Set<IType> m_collector;
     private final IFilter<IType> m_typeProposalFilter;
 
-    public P_SearchRequestor(Set<IType> collector, IProgressMonitor monitor) {
+    private P_SearchRequestor(Set<IType> collector, IProgressMonitor monitor) {
       m_collector = collector;
       m_monitor = monitor;
       m_typeProposalFilter = getTypeProposalFilter();

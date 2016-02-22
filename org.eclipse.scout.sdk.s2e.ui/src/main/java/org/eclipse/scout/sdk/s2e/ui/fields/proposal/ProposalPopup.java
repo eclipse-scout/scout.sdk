@@ -116,7 +116,7 @@ class ProposalPopup extends Window {
   private IDialogSettings m_dialogSettings;
   private Point m_shellSizeDif;
 
-  public ProposalPopup(StyledTextEx proposalField) {
+  ProposalPopup(StyledTextEx proposalField) {
     super(proposalField.getShell());
     m_uiLock = new OptimisticLock();
     m_lazyLoaderJobLock = new Object();
@@ -194,10 +194,8 @@ class ProposalPopup extends Window {
       public void doubleClick(DoubleClickEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
         if (!selection.isEmpty()) {
-          if (selection.size() == 1) {
-            if (selection.getFirstElement() instanceof ISeparatorProposal) {
-              return;
-            }
+          if (selection.size() == 1 && selection.getFirstElement() instanceof ISeparatorProposal) {
+            return;
           }
           fireProposalAccepted(selection, true);
         }
@@ -714,7 +712,7 @@ class ProposalPopup extends Window {
 
     private final IProposalContentProvider m_wrappedProvider;
 
-    public P_LazyContentProvider(IProposalContentProvider wrappedProvider) {
+    private P_LazyContentProvider(IProposalContentProvider wrappedProvider) {
       m_wrappedProvider = wrappedProvider;
     }
 
@@ -756,7 +754,7 @@ class ProposalPopup extends Window {
 
     private final Object m_proposal;
 
-    public P_DescriptionLoader(Object proposal) {
+    private P_DescriptionLoader(Object proposal) {
       super(P_DescriptionLoader.class.getName());
       setSystem(true);
       setUser(false);
@@ -803,7 +801,7 @@ class ProposalPopup extends Window {
 
     private SearchPatternInput m_searchPatternInput;
 
-    public P_LazyLoader() {
+    private P_LazyLoader() {
       super(P_LazyLoader.class.getName());
       setSystem(true);
       setUser(false);
@@ -873,17 +871,15 @@ class ProposalPopup extends Window {
     public void update(ViewerCell cell) {
       Object element = cell.getElement();
       StyledString text = new StyledString(getText(element, Objects.equals(m_selectedProposal, element)));
-      if (cell.getColumnIndex() == 0) {
-        if (m_wrappedLabelProvider instanceof ISearchRangeConsumer) {
-          ISearchRangeConsumer labelProvider = (ISearchRangeConsumer) m_wrappedLabelProvider;
-          int[] matchingRegions = labelProvider.getMatchRanges(element);
-          if (matchingRegions != null && matchingRegions.length > 0) {
-            for (int i = 0; i < matchingRegions.length - 1; i += 2) {
-              int offset = matchingRegions[i];
-              int length = matchingRegions[i + 1];
-              if (offset >= 0 && (offset + length) <= text.length()) {
-                text.setStyle(offset, length, m_boldStyler);
-              }
+      if (cell.getColumnIndex() == 0 && m_wrappedLabelProvider instanceof ISearchRangeConsumer) {
+        ISearchRangeConsumer labelProvider = (ISearchRangeConsumer) m_wrappedLabelProvider;
+        int[] matchingRegions = labelProvider.getMatchRanges(element);
+        if (matchingRegions != null && matchingRegions.length > 0) {
+          for (int i = 0; i < matchingRegions.length - 1; i += 2) {
+            int offset = matchingRegions[i];
+            int length = matchingRegions[i + 1];
+            if (offset >= 0 && (offset + length) <= text.length()) {
+              text.setStyle(offset, length, m_boldStyler);
             }
           }
         }
@@ -928,7 +924,7 @@ class ProposalPopup extends Window {
     private final Object m_input;
     private Collection<Object> m_proposals;
 
-    public SearchPatternInput(Object input, String pattern) {
+    protected SearchPatternInput(Object input, String pattern) {
       m_input = input;
       m_pattern = pattern;
     }

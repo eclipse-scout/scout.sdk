@@ -165,10 +165,9 @@ public class NlsTablePage extends Composite {
       m_table.refreshAll(fullRefresh);
     }
     finally {
-      if (m_table.isDisposed()) {
-        return;
+      if (!m_table.isDisposed()) {
+        m_table.setRedraw(true);
       }
-      m_table.setRedraw(true);
     }
   }
 

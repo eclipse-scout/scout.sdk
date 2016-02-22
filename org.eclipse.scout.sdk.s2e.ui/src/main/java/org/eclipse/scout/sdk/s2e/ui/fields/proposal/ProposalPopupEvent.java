@@ -27,20 +27,20 @@ class ProposalPopupEvent {
   private final int m_type;
   private final Map<String, Object> m_values;
 
-  public ProposalPopupEvent(int type) {
+  ProposalPopupEvent(int type) {
     m_type = type;
     m_values = new HashMap<>();
   }
 
-  public void setData(String identifier, Object data) {
+  void setData(String identifier, Object data) {
     m_values.put(identifier, data);
   }
 
-  public Object getData(String identifier) {
+  Object getData(String identifier) {
     return m_values.get(identifier);
   }
 
-  public int getType() {
+  int getType() {
     return m_type;
   }
 

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.operation.project;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -151,6 +152,10 @@ public class ScoutProjectNewOperation implements IOperation {
   protected List<IProject> importIntoWorkspace(IProgressMonitor monitor) throws CoreException {
     File baseFolder = new File(getTargetDirectory(), getArtifactId());
     File[] subFolders = baseFolder.listFiles();
+    if (subFolders == null) {
+      return Collections.emptyList();
+    }
+
     Collection<MavenProjectInfo> projects = new ArrayList<>(subFolders.length);
     for (File subFolder : subFolders) {
       File pom = new File(subFolder, "pom.xml");

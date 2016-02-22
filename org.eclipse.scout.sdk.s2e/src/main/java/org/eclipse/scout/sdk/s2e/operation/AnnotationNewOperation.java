@@ -122,19 +122,17 @@ public class AnnotationNewOperation implements IOperation {
             isInBlockComment = false;
           }
 
-          if (!isInBlockComment) {
-            if (lineSource.charAt(0) == '@') {
-              // if the existing annotation is longer than the one to insert (to ensure the annotations get from short to long)
-              if (lineSource.length() > newAnnotationLen) {
-                result = lineInfo;
-              }
+          if (!isInBlockComment && lineSource.charAt(0) == '@') {
+            // if the existing annotation is longer than the one to insert (to ensure the annotations get from short to long)
+            if (lineSource.length() > newAnnotationLen) {
+              result = lineInfo;
+            }
 
-              if (lineSource.startsWith("@" + sn) || lineSource.startsWith("@" + fqn)) {
-                // the annotation that should be created already exists -> replace it
-                result = lineInfo;
-                isReplaceExisting = true;
-                break;
-              }
+            if (lineSource.startsWith("@" + sn) || lineSource.startsWith("@" + fqn)) {
+              // the annotation that should be created already exists -> replace it
+              result = lineInfo;
+              isReplaceExisting = true;
+              break;
             }
           }
         }
