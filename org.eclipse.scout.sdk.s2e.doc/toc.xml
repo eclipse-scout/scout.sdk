@@ -32,7 +32,12 @@
 		</topic>
 		<topic href="html/sdk_wizard.html" label="Scout Wizards">
 			<topic href="html/sdk_wizard_project.html" label="New Scout Project Wizard"></topic>
+			<topic href="html/sdk_wizard_form.html" label="New Form Wizard"></topic>
+			<topic href="html/sdk_wizard_page.html" label="New Page Wizard"></topic>
 			<topic href="html/sdk_wizard_nls-entry.html" label="NLS Entry Wizard"></topic>
+			<topic href="html/sdk_wizard_lookupcall.html" label="New LookupCall Wizard"></topic>
+			<topic href="html/sdk_wizard_code-type.html" label="New CodeType Wizard"></topic>
+			<topic href="html/sdk_wizard_permission.html" label="New Permission Wizard"></topic>
 			<topic href="html/sdk_wizard_language.html" label="Add a Language Wizard"></topic>
 		</topic>
 	</topic>
