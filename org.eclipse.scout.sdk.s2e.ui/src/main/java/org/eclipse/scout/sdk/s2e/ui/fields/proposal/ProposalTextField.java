@@ -489,7 +489,7 @@ public class ProposalTextField extends TextField {
           getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
-              if (m_popupButton != null && !m_popupButton.isDisposed() && Objects.equals(getDisplay().getFocusControl(), m_popupButton)) {
+              if (m_popupButton != null && !m_popupButton.isDisposed() && m_popupButton.equals(getDisplay().getFocusControl())) {
                 return;
               }
               if (!isProposalFieldFocusOwner() && !isDisposed()) {
