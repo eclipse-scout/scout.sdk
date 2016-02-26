@@ -365,7 +365,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   private class P_ProjectSmartfieldModel implements ISmartFieldModel {
     @Override
     public List<Object> getProposals(String pattern) {
-      ArrayList<Object> collector = new ArrayList<>();
+      List<Object> collector = new ArrayList<>();
       INlsProject p = m_rootProject;
       do {
         List<Language> languages = p.getAllLanguages();

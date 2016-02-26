@@ -13,11 +13,11 @@ package org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model;
 import java.beans.PropertyChangeListener;
 import java.util.Locale;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.sdk.core.util.BasicPropertySupport;
-import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.INlsFolder;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.SimpleNlsProject;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.ui.TranslationFileNewDialog;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
@@ -104,11 +104,11 @@ public class TranslationFileNewModel implements ITranslationLocationChooserModel
   }
 
   @Override
-  public INlsFolder getFolder() {
-    return (INlsFolder) m_propertySupport.getProperty(PROP_FOLDER);
+  public IFolder getFolder() {
+    return (IFolder) m_propertySupport.getProperty(PROP_FOLDER);
   }
 
-  public void setFolder(INlsFolder folder) {
+  public void setFolder(IFolder folder) {
     m_propertySupport.setProperty(PROP_FOLDER, folder);
   }
 

@@ -13,17 +13,15 @@ package org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.INlsFolder;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.SimpleNlsProject;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.fields.ISmartFieldModel;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 public class TranslationLocationSmartFieldModel implements ISmartFieldModel {
 
@@ -36,10 +34,10 @@ public class TranslationLocationSmartFieldModel implements ISmartFieldModel {
     m_path = path;
 
     m_folders = new LinkedList<>();
-    List<INlsFolder> folds = new LinkedList<>();
+    List<IFolder> folds = new LinkedList<>();
     try {
       folds.addAll(SimpleNlsProject.getFoldersOfProject(m_project, m_path));
-      for (INlsFolder folder : folds) {
+      for (IFolder folder : folds) {
         m_folders.add(folder);
       }
     }
@@ -50,14 +48,7 @@ public class TranslationLocationSmartFieldModel implements ISmartFieldModel {
 
   @Override
   public Image getImage(Object item) {
-    switch (((INlsFolder) item).getType()) {
-      case INlsFolder.TYPE_PACKAGE_FOLDER:
-        return JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_PACKAGE);
-      case INlsFolder.TYPE_SIMPLE_FOLDER:
-        return PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
-      default:
-        return null;
-    }
+    return WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(item);
   }
 
   @Override
@@ -67,6 +58,7 @@ public class TranslationLocationSmartFieldModel implements ISmartFieldModel {
 
   @Override
   public String getText(Object item) {
-    return ((INlsFolder) item).getFolder().getProject().getName() + "/" + ((INlsFolder) item).getFolder().getProjectRelativePath();
+    IFolder fld = (IFolder) item;
+    return fld.getFullPath().toString();
   }
 }

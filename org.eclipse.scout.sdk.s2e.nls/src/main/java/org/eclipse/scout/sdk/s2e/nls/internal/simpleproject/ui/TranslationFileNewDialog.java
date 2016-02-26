@@ -15,10 +15,10 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.INlsFolder;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model.CountrySmartFieldModel;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model.LanguageSmartFieldModel;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model.TranslationFileNewModel;
@@ -114,7 +114,7 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
     m_folderSelection.addSmartFieldListener(new ISmartFieldListener() {
       @Override
       public void itemSelected(Object item) {
-        m_model.setFolder((INlsFolder) item);
+        m_model.setFolder((IFolder) item);
       }
     });
     List<Object> folders = m.getProposals(null);
@@ -161,7 +161,7 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
       setMessage("Specify a folder where to create the translation file.", IMessageProvider.WARNING);
       return;
     }
-    else if (!m_model.getFolder().getFolder().exists()) {
+    else if (!m_model.getFolder().exists()) {
       setMessage("The folder could not be found.", IMessageProvider.WARNING);
       return;
     }

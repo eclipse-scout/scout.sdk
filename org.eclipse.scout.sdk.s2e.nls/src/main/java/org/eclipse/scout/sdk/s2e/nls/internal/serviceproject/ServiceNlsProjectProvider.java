@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.SimpleNlsProject;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsProjectProvider;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -153,7 +154,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return ISdkProperties.DEFAULT_BEAN_ORDER;
   }
 
-  private static ServiceNlsProject getServiceNlsProject(IType serviceType) throws JavaModelException {
+  private static SimpleNlsProject getServiceNlsProject(IType serviceType) {
     if (serviceType == null) {
       SdkLog.error("nls service type cannot be null.");
       return null;
@@ -170,7 +171,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       return null;
     }
 
-    return new ServiceNlsProject(type);
+    return new SimpleNlsProject(type);
   }
 
   private static INlsProject getNlsProjectTree(IJavaProject projectFilter) throws CoreException {
@@ -179,10 +180,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static INlsProject textProviderTypesToNlsProject(Set<IType> textProviderServices) throws CoreException {
-    ServiceNlsProject previous = null;
-    ServiceNlsProject root = null;
+    SimpleNlsProject previous = null;
+    SimpleNlsProject root = null;
     for (IType type : textProviderServices) {
-      ServiceNlsProject p = getServiceNlsProject(type);
+      SimpleNlsProject p = getServiceNlsProject(type);
       if (p != null) {
         // remember the first project (the one with the highest prio)
         if (root == null) {
