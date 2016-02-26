@@ -79,10 +79,11 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
     blockedFolders.add(m_page1.getSourceFolder().getResource());
     op.setPackage(m_page1.getTargetPackage());
     op.setPageName(m_page1.getIcuName());
-    IPackageFragmentRoot sharedSourceFolder = m_page1.getSharedSourceFolder();
-    op.setSharedSourceFolder(sharedSourceFolder);
-    if (S2eUtils.exists(sharedSourceFolder)) {
-      blockedFolders.add(sharedSourceFolder.getResource());
+    IPackageFragmentRoot selectedSharedFolder = m_page1.getSharedSourceFolder();
+    if (S2eUtils.exists(selectedSharedFolder)) {
+      IPackageFragmentRoot dtoSourceFolder = S2eUtils.getDtoSourceFolder(selectedSharedFolder);
+      op.setSharedSourceFolder(dtoSourceFolder);
+      blockedFolders.add(dtoSourceFolder.getResource());
     }
     op.setSuperType(m_page1.getSuperType());
 

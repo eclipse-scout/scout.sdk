@@ -152,8 +152,8 @@ public final class S2eUiUtils {
           ScoutTier foundTier = ScoutTier.valueOf(unacceptedResult.getProject());
           if (foundTier != null) {
             result.setProject(foundTier.convert(expected, unacceptedResult.getProject()));
-            result.setSrcFolder(foundTier.convert(expected, unacceptedResult.getSrcFolder(), false));
-            result.setPackage(foundTier.convert(expected, unacceptedResult.getPackage(), false));
+            result.setSrcFolder(foundTier.convert(expected, unacceptedResult.getSrcFolder()));
+            result.setPackage(foundTier.convert(expected, unacceptedResult.getPackage()));
           }
         }
       }

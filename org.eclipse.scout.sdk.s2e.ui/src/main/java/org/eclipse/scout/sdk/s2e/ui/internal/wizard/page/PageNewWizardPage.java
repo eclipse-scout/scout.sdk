@@ -76,7 +76,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
     }
 
     try {
-      setSharedSourceFolder(ScoutTier.Client.convert(ScoutTier.Shared, getSourceFolder(), true));
+      setSharedSourceFolder(ScoutTier.Client.convert(ScoutTier.Shared, getSourceFolder()));
     }
     catch (JavaModelException e) {
       SdkLog.info("Unable to calculate shared source folder.", e);

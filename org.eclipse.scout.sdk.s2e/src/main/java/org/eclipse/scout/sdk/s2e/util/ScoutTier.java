@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -20,7 +19,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -182,20 +180,16 @@ public enum ScoutTier implements IFilter<IJavaElement> {
    *          Specifies the target {@link ScoutTier} to which the given {@link IPackageFragment} should be converted.
    * @param origin
    *          The original {@link IPackageFragment} to convert.
-   * @param includeGeneratedFolder
-   *          Specifies if the 'generated' source folder as specified by
-   *          {@link ISdkProperties#GENERATED_SOURCE_FOLDER_NAME} should be used as target {@link IPackageFragmentRoot}
-   *          if available. This flag is only used if the target is {@link ScoutTier#Shared}.
    * @return The converted {@link IPackageFragment} or <code>null</code> if no matching {@link IPackageFragment} could
    *         be found.
    * @throws JavaModelException
    */
-  public IPackageFragment convert(ScoutTier to, IPackageFragment origin, boolean includeGeneratedFolder) throws JavaModelException {
+  public IPackageFragment convert(ScoutTier to, IPackageFragment origin) throws JavaModelException {
     if (!S2eUtils.exists(origin)) {
       return null;
     }
 
-    IPackageFragmentRoot targetSrcFolder = convert(to, (IPackageFragmentRoot) origin.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT), includeGeneratedFolder);
+    IPackageFragmentRoot targetSrcFolder = convert(to, (IPackageFragmentRoot) origin.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT));
     if (targetSrcFolder == null) {
       return null;
     }
@@ -219,15 +213,11 @@ public enum ScoutTier implements IFilter<IJavaElement> {
    *          converted.
    * @param origin
    *          The original {@link IPackageFragmentRoot} to convert.
-   * @param includeGeneratedFolder
-   *          Specifies if the 'generated' source folder as specified by
-   *          {@link ISdkProperties#GENERATED_SOURCE_FOLDER_NAME} should be used as target if available. This flag is
-   *          only used if the target is {@link ScoutTier#Shared}.
    * @return The converted {@link IPackageFragmentRoot} or <code>null</code> if no matching {@link IPackageFragmentRoot}
    *         could be found.
    * @throws JavaModelException
    */
-  public IPackageFragmentRoot convert(ScoutTier to, IPackageFragmentRoot origin, boolean includeGeneratedFolder) throws JavaModelException {
+  public IPackageFragmentRoot convert(ScoutTier to, IPackageFragmentRoot origin) throws JavaModelException {
     if (!S2eUtils.exists(origin)) {
       return null;
     }
@@ -237,20 +227,8 @@ public enum ScoutTier implements IFilter<IJavaElement> {
       return null;
     }
 
-    IProject project = targetProject.getProject();
-    IFolder folder = null;
-    if (includeGeneratedFolder && Shared.equals(to)) {
-      IFolder generated = project.getFolder(ISdkProperties.GENERATED_SOURCE_FOLDER_NAME);
-      if (generated != null && generated.exists()) {
-        folder = generated;
-      }
-    }
-
-    if (folder == null) {
-      String projectRelResourcePath = origin.getPath().removeFirstSegments(1).toString();
-      folder = project.getFolder(projectRelResourcePath);
-    }
-
+    String projectRelResourcePath = origin.getPath().removeFirstSegments(1).toString();
+    IFolder folder = targetProject.getProject().getFolder(projectRelResourcePath);
     if (folder != null && folder.exists()) {
       IJavaElement element = JavaCore.create(folder);
       if (S2eUtils.exists(element) && element.getElementType() == IJavaElement.PACKAGE_FRAGMENT_ROOT) {

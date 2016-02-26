@@ -119,14 +119,14 @@ public class FormNewWizardPage extends CompilationUnitNewWizardPage {
     }
 
     try {
-      setServerSourceFolder(ScoutTier.Client.convert(ScoutTier.Server, clientSourceFolder, false));
+      setServerSourceFolder(ScoutTier.Client.convert(ScoutTier.Server, clientSourceFolder));
     }
     catch (JavaModelException e) {
       SdkLog.info("Unable to calculate server source folder.", e);
     }
 
     try {
-      setSharedSourceFolder(ScoutTier.Client.convert(ScoutTier.Shared, clientSourceFolder, true));
+      setSharedSourceFolder(ScoutTier.Client.convert(ScoutTier.Shared, clientSourceFolder));
     }
     catch (JavaModelException e) {
       SdkLog.info("Unable to calculate shared source folder.", e);

@@ -92,7 +92,7 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
       blockingFolders.add(m_page1.getServerSourceFolder().getResource());
     }
     if (m_page1.isCreateFormData()) {
-      IPackageFragmentRoot sharedSourceFolder = m_page1.getSharedSourceFolder();
+      IPackageFragmentRoot sharedSourceFolder = S2eUtils.getDtoSourceFolder(m_page1.getSharedSourceFolder());
       op.setFormDataSourceFolder(sharedSourceFolder);
       blockingFolders.add(sharedSourceFolder.getResource());
     }

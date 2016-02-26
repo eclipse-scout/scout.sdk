@@ -75,7 +75,6 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
   public String checkCurrentScope(SignatureDescriptor cand) {
     //same qualifier
     if (m_enclosingQualifiers.contains(cand.getQualifier())) {
-      registerElement(cand); // ensure it is registered as used
       return cand.getSimpleName();
     }
 

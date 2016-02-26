@@ -171,7 +171,7 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
     }
 
     try {
-      setServerSourceFolder(ScoutTier.Shared.convert(ScoutTier.Server, sharedSourceFolder, false));
+      setServerSourceFolder(ScoutTier.Shared.convert(ScoutTier.Server, sharedSourceFolder));
     }
     catch (JavaModelException e) {
       SdkLog.info("Unable to calculate server source folder.", e);

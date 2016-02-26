@@ -1282,4 +1282,31 @@ public final class S2eUtils {
       return o1.toString().compareTo(o2.toString());
     }
   }
+
+  /**
+   * Gets the preferred source folder for DTOs created in the {@link IJavaProject} of the given source folder.
+   * 
+   * @param selectedSourceFolder
+   *          The default source folder.
+   * @return The given selectedSourceFolder or the src/generated/java folder within the same {@link IJavaProject} if it
+   *         exists.
+   */
+  public static IPackageFragmentRoot getDtoSourceFolder(IPackageFragmentRoot selectedSourceFolder) {
+    if (!exists(selectedSourceFolder)) {
+      return selectedSourceFolder;
+    }
+    IJavaProject targetProject = selectedSourceFolder.getJavaProject();
+    if (!exists(targetProject)) {
+      return selectedSourceFolder;
+    }
+    IFolder generatedFolder = targetProject.getProject().getFolder(ISdkProperties.GENERATED_SOURCE_FOLDER_NAME);
+    if (generatedFolder == null || !generatedFolder.exists()) {
+      return selectedSourceFolder;
+    }
+    IPackageFragmentRoot generatedSourceFolder = targetProject.getPackageFragmentRoot(generatedFolder);
+    if (!exists(generatedSourceFolder)) {
+      return selectedSourceFolder;
+    }
+    return generatedSourceFolder;
+  }
 }
