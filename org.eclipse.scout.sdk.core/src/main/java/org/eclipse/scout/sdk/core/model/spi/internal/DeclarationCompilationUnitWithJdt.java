@@ -214,6 +214,9 @@ public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJd
       if (doc != null) {
         m_javaDocSource = m_env.getSource(this, doc.sourceStart, doc.sourceEnd);
       }
+      else if (m_astNode.currentPackage != null && m_astNode.currentPackage.declarationSourceStart > 0) {
+        m_javaDocSource = m_env.getSource(this, 0, m_astNode.currentPackage.declarationSourceStart - 1);
+      }
       else {
         m_javaDocSource = ISourceRange.NO_SOURCE;
       }
