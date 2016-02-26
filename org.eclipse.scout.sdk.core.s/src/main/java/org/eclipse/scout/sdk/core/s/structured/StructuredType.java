@@ -332,13 +332,7 @@ public class StructuredType implements IStructuredType {
           m_visitedCategories.add(Categories.TYPE_FORM_HANDLER);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
           break;
-        case FIELD_UNKNOWN:
-          break;
-        case METHOD_UNCATEGORIZED:
-          break;
-        case TYPE_UNCATEGORIZED:
-          break;
-        case ENUM:
+        default:
           break;
       }
     }

@@ -183,13 +183,10 @@ public class CompilationUnitWriteOperation implements IOperation {
   }
 
   protected static boolean isSourceEqual(String source1, String source2) {
-    if (source1 == null && source2 == null) {
+    if (source1 == source2) {
       return true;
     }
-    else if (source1 == null) {
-      return false;
-    }
-    else if (source2 == null) {
+    if (source1 == null || source2 == null) {
       return false;
     }
 

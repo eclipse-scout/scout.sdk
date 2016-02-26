@@ -206,37 +206,15 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
   }
 
   private static String getLegacyGetterMethodBody(String propertySignature, String propertyName) {
-    String nonArraySig = propertySignature;
-
-    StringBuilder source = new StringBuilder();
-    source.append("return ");
-    if (ISignatureConstants.SIG_BOOLEAN.equals(nonArraySig)) {
-      source.append("get" + propertyName + "().getValue() == null ? false : get" + propertyName + "().getValue();");
+    String suffix = "().getValue()";
+    StringBuilder source = new StringBuilder("return get");
+    source.append(propertyName).append(suffix);
+    if (Signature.getTypeSignatureKind(propertySignature) == ISignatureConstants.BASE_TYPE_SIGNATURE) {
+      source.append(" == null ? ");
+      source.append(CoreUtils.getDefaultValueOf(propertySignature));
+      source.append(" : get").append(propertyName).append(suffix);
     }
-    else if (ISignatureConstants.SIG_BYTE.equals(nonArraySig)) {
-      source.append("get" + propertyName + "().getValue() == null ? 0 : get" + propertyName + "().getValue();");
-    }
-    else if (ISignatureConstants.SIG_CHAR.equals(nonArraySig)) {
-      source.append("get" + propertyName + "().getValue() == null ? '\u0000' : get" + propertyName + "().getValue();");
-    }
-    else if (ISignatureConstants.SIG_DOUBLE.equals(nonArraySig)) {
-      source.append("get" + propertyName + "().getValue() == null ? 0.0 : get" + propertyName + "().getValue();");
-    }
-    else if (ISignatureConstants.SIG_FLOAT.equals(nonArraySig)) {
-      source.append("get" + propertyName + "().getValue() == null ? 0.0f : get" + propertyName + "().getValue();");
-    }
-    else if (ISignatureConstants.SIG_INT.equals(nonArraySig)) {
-      source.append("get" + propertyName + "().getValue() == null ? 0 : get" + propertyName + "().getValue();");
-    }
-    else if (ISignatureConstants.SIG_LONG.equals(nonArraySig)) {
-      source.append("get" + propertyName + "().getValue() == null ? 0L : get" + propertyName + "().getValue();");
-    }
-    else if (ISignatureConstants.SIG_SHORT.equals(nonArraySig)) {
-      source.append("get" + propertyName + "().getValue() == null ? 0 : get" + propertyName + "().getValue();");
-    }
-    else {
-      source.append("get" + propertyName + "().getValue();");
-    }
+    source.append(';');
     return source.toString();
   }
 

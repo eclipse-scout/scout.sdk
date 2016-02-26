@@ -548,7 +548,7 @@ public class ProposalTextField extends TextField {
           break;
       }
     }
-  } // end class P_ProposalFieldListener
+  }
 
   private class P_PopupListener implements IProposalPopupListener {
     @Override
@@ -574,11 +574,9 @@ public class ProposalTextField extends TextField {
         case ProposalPopupEvent.TYPE_SEARCH_SHORTENED:
           updateProposals();
           break;
-        case ProposalPopupEvent.TYPE_PROPOSAL_SELECTED:
-          break;
         default:
           break;
       }
     }
-  } // end class P_PopupListener
+  }
 }

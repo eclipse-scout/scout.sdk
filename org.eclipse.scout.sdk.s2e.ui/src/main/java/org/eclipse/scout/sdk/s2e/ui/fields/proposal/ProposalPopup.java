@@ -204,20 +204,12 @@ class ProposalPopup extends Window {
     table.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(KeyEvent e) {
-        switch (e.keyCode) {
-          case SWT.CR:
-            break;
-          case ' ':
-            IStructuredSelection selection = (IStructuredSelection) m_tableViewer.getSelection();
-            if (!selection.isEmpty()) {
-              fireProposalAccepted(selection, true);
-            }
-            break;
-
-          default:
-            break;
+        if (' ' == e.keyCode) {
+          IStructuredSelection selection = m_tableViewer.getStructuredSelection();
+          if (!selection.isEmpty()) {
+            fireProposalAccepted(selection, true);
+          }
         }
-        super.keyReleased(e);
       }
     });
     table.setHeaderVisible(false);
