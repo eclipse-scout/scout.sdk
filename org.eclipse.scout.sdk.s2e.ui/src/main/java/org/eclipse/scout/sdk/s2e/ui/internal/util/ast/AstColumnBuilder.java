@@ -48,18 +48,24 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
   }
 
   protected void addColumnGetter() {
+
     MethodInvocation getColumnSet = getFactory().getAst().newMethodInvocation();
     getColumnSet.setName(getFactory().getAst().newSimpleName("getColumnSet"));
 
-    if (!AstUtils.isInstanceOf(getFactory().getDeclaringTypeBinding(), IScoutRuntimeTypes.IExtension)) {
-      getFactory().newInnerTypeGetter()
-          .withMethodNameToFindInnerType("getColumnByClass")
-          .withMethodToFindInnerTypeExpression(getColumnSet)
-          .withName(getTypeName())
-          .withReadOnlySuffix(getReadOnlySuffix())
-          .withReturnType(getFactory().getAst().newSimpleType(getFactory().getAst().newSimpleName(getTypeName() + getReadOnlySuffix())))
-          .in(getDeclaringType())
-          .insert();
+    if (AstUtils.isInstanceOf(getFactory().getDeclaringTypeBinding(), IScoutRuntimeTypes.IExtension)) {
+      // column in table extension
+      MethodInvocation getOwner = getFactory().getAst().newMethodInvocation();
+      getOwner.setName(getFactory().getAst().newSimpleName("getOwner"));
+      getColumnSet.setExpression(getOwner);
     }
+
+    getFactory().newInnerTypeGetter()
+        .withMethodNameToFindInnerType("getColumnByClass")
+        .withMethodToFindInnerTypeExpression(getColumnSet)
+        .withName(getTypeName())
+        .withReadOnlySuffix(getReadOnlySuffix())
+        .withReturnType(getFactory().getAst().newSimpleType(getFactory().getAst().newSimpleName(getTypeName() + getReadOnlySuffix())))
+        .in(getDeclaringType())
+        .insert();
   }
 }
