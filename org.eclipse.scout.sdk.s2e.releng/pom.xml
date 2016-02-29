@@ -212,6 +212,14 @@
               <version>${org.eclipse.core.filesystem}</version>
             </iu>
             <iu>
+              <id>org.eclipse.core.variables</id>
+              <version>${org.eclipse.core.variables}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.core.variables.source</id>
+              <version>${org.eclipse.core.variables}</version>
+            </iu>
+            <iu>
               <id>org.eclipse.core.runtime</id>
               <version>${org.eclipse.core.runtime}</version>
             </iu>
@@ -689,6 +697,18 @@
                   <file>${downloaded}/org.eclipse.core.filesystem_${org.eclipse.core.filesystem}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.filesystem.source_${org.eclipse.core.filesystem}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.filesystem.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-core-variables</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.variables_${org.eclipse.core.variables}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.variables.source_${org.eclipse.core.variables}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.variables.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -1419,7 +1439,7 @@
                 </configuration>
               </execution>
               <execution>
-                <id>deploy-core-filesystems</id>
+                <id>deploy-core-filesystem</id>
                 <goals>
                   <goal>sign-and-deploy-file</goal>
                 </goals>
@@ -1428,6 +1448,19 @@
                   <file>${downloaded}/org.eclipse.core.filesystem_${org.eclipse.core.filesystem}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.filesystem.source_${org.eclipse.core.filesystem}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.filesystem.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-core-variables</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.variables_${org.eclipse.core.variables}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.variables.source_${org.eclipse.core.variables}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.variables.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
