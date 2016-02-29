@@ -158,7 +158,13 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
     ASTNode methodSibling = getSiblingForGetter(get().getName().getIdentifier(), getDeclaringType(), getFactory().getJavaEnvironment());
     ListRewrite rewrite = getFactory().getRewrite().getListRewrite(getDeclaringType(), getDeclaringType().getBodyDeclarationsProperty());
     if (methodSibling == null) {
-      rewrite.insertFirst(get(), null);
+      List<?> originalList = rewrite.getOriginalList();
+      if (originalList.isEmpty()) {
+        rewrite.insertFirst(get(), null);
+      }
+      else {
+        rewrite.insertAfter(get(), (ASTNode) originalList.get(originalList.size() - 1), null);
+      }
     }
     else {
       rewrite.insertBefore(get(), methodSibling, null);

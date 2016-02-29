@@ -12,9 +12,10 @@ package org.eclipse.scout.sdk.core.util;
 
 /**
  * Contains {@link IFilter} helper methods.
- * 
+ *
  * @see #or(IFilter...)
  * @see #and(IFilter...)
+ * @see #not(IFilter)
  */
 public final class Filters {
 
@@ -51,6 +52,49 @@ public final class Filters {
     return unionAndOr(false, filters);
   }
 
+  /**
+   * Creates a new {@link IFilter} that is the inversion (negation) of the given {@link IFilter}.<br>
+   * So if the given original {@link IFilter} evaluates to <code>true</code> the resulting {@link IFilter} will evaluate
+   * to <code>false</code> and vice versa.<br>
+   * If the given original is <code>null</code>, an {@link IFilter} which always evaluates to <code>false</code> is
+   * returned.
+   *
+   * @param original
+   *          The original {@link IFilter} that should be negated.
+   * @return The inversion {@link IFilter} of the given original {@link IFilter}.
+   */
+  public static <T> IFilter<T> not(final IFilter<T> original) {
+    if (original == null) {
+      // no filter is passed. Inversion is an always false filter.
+      return new IFilter<T>() {
+        @Override
+        public boolean evaluate(T element) {
+          return false;
+        }
+
+        @Override
+        public String toString() {
+          return "always false filter";
+        }
+      };
+    }
+
+    return new IFilter<T>() {
+      @Override
+      public boolean evaluate(T element) {
+        return !original.evaluate(element);
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder sb = new StringBuilder("!(");
+        sb.append(original);
+        sb.append(')');
+        return sb.toString();
+      }
+    };
+  }
+
   @SafeVarargs
   private static <T> IFilter<T> unionAndOr(final boolean or, final IFilter<T>... filters) {
     if (filters == null || filters.length < 1) {
@@ -77,13 +121,15 @@ public final class Filters {
       @Override
       public String toString() {
         StringBuilder text = new StringBuilder();
-        text.append((or ? "OR" : "AND") + "{");
-        for (int i = 0; i < filters.length; i++) {
-          text.append(filters[i]);
-          if (i < filters.length - 1) {
-            text.append(", ");
+        text.append((or ? "OR" : "AND")).append('{');
+        if (filters.length > 0) {
+          text.append(filters[0]);
+          for (int i = 1; i < filters.length; i++) {
+            text.append(',');
+            text.append(filters[i]);
           }
         }
+        text.append('}');
         return text.toString();
       }
     };

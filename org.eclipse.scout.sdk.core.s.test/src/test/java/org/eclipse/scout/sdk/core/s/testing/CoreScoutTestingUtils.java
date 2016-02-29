@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.junit.Assert;
 
 /**
@@ -76,7 +77,7 @@ public final class CoreScoutTestingUtils {
     else {
       cuSrc = DtoUtils.createPageDataBuilder(modelType, dataAnnotation, sharedEnv);
     }
-    String source = DtoUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
+    String source = CoreUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
 
     // ensure it compiles and get model of dto
     return CoreTestingUtils.assertNoCompileErrors(sharedEnv, cuSrc.getPackageName(), cuSrc.getMainType().getElementName(), source);
@@ -92,7 +93,7 @@ public final class CoreScoutTestingUtils {
     // build source
     FormDataAnnotationDescriptor formDataAnnotation = DtoUtils.getFormDataAnnotationDescriptor(modelType);
     ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, formDataAnnotation, sharedEnv);
-    String source = DtoUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
+    String source = CoreUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
 
     // ensure it compiles and get model of dto
     return CoreTestingUtils.assertNoCompileErrors(sharedEnv, cuSrc.getPackageName(), cuSrc.getMainType().getElementName(), source);

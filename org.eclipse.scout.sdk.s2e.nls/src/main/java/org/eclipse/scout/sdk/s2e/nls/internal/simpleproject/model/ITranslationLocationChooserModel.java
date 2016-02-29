@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.INlsFolder;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 
 /**
@@ -25,6 +25,6 @@ public interface ITranslationLocationChooserModel {
 
   IPath getPath();
 
-  INlsFolder getFolder();
+  IFolder getFolder();
 
 }

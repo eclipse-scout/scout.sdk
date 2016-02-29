@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,6 +47,9 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
+import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
+import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
+import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
@@ -57,6 +59,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.PropertyBean;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 
 /**
  * <h3>{@link CoreUtils}</h3> Holds core utilities.
@@ -221,32 +224,17 @@ public final class CoreUtils {
       return null;
     }
 
-    String result = s.substring(1, len - 1);
-    for (Entry<Character, String> a : getLiteralEscapeMap().entrySet()) {
-      result = result.replace(a.getValue(), a.getKey().toString());
-    }
-
-    return result;
+    return replaceLiterals(s.substring(1, len - 1), true);
   }
 
-  private static Map<Character, String> getLiteralEscapeMap() {
-    Map<Character, String> escapeMap = new HashMap<>(15);
-    escapeMap.put(Character.valueOf('\b'), "\\b");
-    escapeMap.put(Character.valueOf('\t'), "\\t");
-    escapeMap.put(Character.valueOf('\n'), "\\n");
-    escapeMap.put(Character.valueOf('\f'), "\\f");
-    escapeMap.put(Character.valueOf('\r'), "\\r");
-    escapeMap.put(Character.valueOf('"'), "\\\"");
-    escapeMap.put(Character.valueOf('\\'), "\\\\");
-    escapeMap.put(Character.valueOf('\0'), "\\0");
-    escapeMap.put(Character.valueOf('\1'), "\\1");
-    escapeMap.put(Character.valueOf('\2'), "\\2");
-    escapeMap.put(Character.valueOf('\3'), "\\3");
-    escapeMap.put(Character.valueOf('\4'), "\\4");
-    escapeMap.put(Character.valueOf('\5'), "\\5");
-    escapeMap.put(Character.valueOf('\6'), "\\6");
-    escapeMap.put(Character.valueOf('\7'), "\\7");
-    return escapeMap;
+  private static String replaceLiterals(String result, boolean fromLiteral) {
+    String[] a = new String[]{"\b", "\t", "\n", "\f", "\r", "\"", "\\", "\0", "\1", "\2", "\3", "\4", "\5", "\6", "\7"};
+    String[] b = new String[]{"\\b", "\\t", "\\n", "\\f", "\\r", "\\\"", "\\\\", "\\0", "\\1", "\\2", "\\3", "\\4", "\\5", "\\6", "\\7"};
+
+    if (fromLiteral) {
+      return StringUtils.replaceEach(result, b, a);
+    }
+    return StringUtils.replaceEach(result, a, b);
   }
 
   /**
@@ -263,20 +251,9 @@ public final class CoreUtils {
       return null;
     }
 
-    int len = s.length();
-    Map<Character, String> literalEscapeMap = getLiteralEscapeMap();
-    StringBuilder b = new StringBuilder(len * 2);
+    StringBuilder b = new StringBuilder(s.length() * 2);
     b.append('"'); // opening delimiter
-    for (int i = 0; i < len; i++) {
-      Character c = Character.valueOf(s.charAt(i));
-      String replacement = literalEscapeMap.get(c);
-      if (replacement != null) {
-        b.append(replacement);
-      }
-      else {
-        b.append(c.charValue());
-      }
-    }
+    b.append(replaceLiterals(s, false));
     b.append('"'); // closing delimiter
     return b.toString();
   }
@@ -344,7 +321,7 @@ public final class CoreUtils {
     builder.append("// TODO ");
     String username = getUsername();
     if (StringUtils.isNotBlank(username)) {
-      builder.append("[" + username + "] ");
+      builder.append('[').append(username).append("] ");
     }
     builder.append(content);
     return builder.toString();
@@ -499,9 +476,6 @@ public final class CoreUtils {
    */
   public static List<IType> getResolvedTypeParamValue(IType focusType, String levelFqn, int typeParamIndex) {
     IType levelType = focusType.superTypes().withName(levelFqn).first();
-    if (levelType == null) {
-      return Collections.emptyList();
-    }
     return getResolvedTypeParamValue(focusType, levelType, typeParamIndex);
   }
 
@@ -537,11 +511,7 @@ public final class CoreUtils {
     else {
       result = new ArrayList<>(superIfcGenerics.size());
     }
-
-    for (IType ifcGeneric : superIfcGenerics) {
-      result.add(ifcGeneric);
-    }
-
+    result.addAll(superIfcGenerics);
     return result;
   }
 
@@ -813,6 +783,14 @@ public final class CoreUtils {
     }
   }
 
+  /**
+   * Converts the stack trace of the given {@link Throwable} into a {@link String}. The resulting string includes a
+   * leading new line.
+   *
+   * @param t
+   *          The {@link Throwable} from which the stack trace should be extracted. Must not be <code>null</code>.
+   * @return The {@link String} containing the stack trace.
+   */
   public static String getStackTrace(Throwable t) {
     try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
       p.println();
@@ -822,5 +800,51 @@ public final class CoreUtils {
     catch (IOException e) {
       return '[' + e.toString() + ']' + t.toString();
     }
+  }
+
+  /**
+   * Creates the java source code for the given {@link ISourceBuilder} and returns the resulting source.
+   *
+   * @param srcBuilder
+   *          The {@link ISourceBuilder} that should create the source.
+   * @param env
+   *          The {@link IJavaEnvironment} to be used to resolve fully qualified names vs. simple names.
+   * @param lineSeparator
+   *          The line separator to use.
+   * @param context
+   *          Optional context information.
+   * @return The created java source code as {@link String}. Returns <code>null</code> if the {@link ISourceBuilder} or
+   *         the {@link IJavaEnvironment} is <code>null</code>.
+   */
+  public static String createJavaCode(ISourceBuilder srcBuilder, IJavaEnvironment env, String lineSeparator, PropertyMap context) {
+    if (srcBuilder == null || env == null) {
+      return null;
+    }
+    if (lineSeparator == null) {
+      lineSeparator = "\n";
+    }
+
+    IImportValidator validator = new ImportValidator(new ImportCollector(env));
+    StringBuilder sourceBuilder = new StringBuilder();
+    srcBuilder.createSource(sourceBuilder, lineSeparator, context, validator);
+    return sourceBuilder.toString();
+  }
+
+  /**
+   * Returns the given input HTML with all characters escaped.
+   * 
+   * @param html
+   *          The input HTML.
+   * @return The escaped version.
+   */
+  public static String escapeHtml(String html) {
+    if (StringUtils.isBlank(html)) {
+      return html;
+    }
+    return StringUtils.replaceEach(html, new String[]{
+        "&", "<", ">", "\"", "/", "'"
+    }, new String[]{
+        "&amp;", "&lt;", "&gt;", "&quot;", "&#47;", "&#39;"
+    });
   }
 }

@@ -16,7 +16,6 @@ package org.eclipse.scout.sdk.core;
 public interface IJavaRuntimeTypes {
 
   // primitive types
-
   String _boolean = "boolean";
   String _byte = "byte";
   String _char = "char";
@@ -28,10 +27,10 @@ public interface IJavaRuntimeTypes {
   String _void = "void";
 
   // common types
-
   String java_lang_Boolean = "java.lang.Boolean";
   String java_lang_Byte = "java.lang.Byte";
   String java_lang_Character = "java.lang.Character";
+  String java_lang_Class = "java.lang.Class";
   String java_lang_Double = "java.lang.Double";
   String java_lang_Exception = "java.lang.Exception";
   String java_lang_Float = "java.lang.Float";
@@ -61,10 +60,12 @@ public interface IJavaRuntimeTypes {
   String java_util_Set = "java.util.Set";
 
   // common annotations
-
   String java_lang_CharSequence = "java.lang.CharSequence";
   String java_lang_Deprecated = "java.lang.Deprecated";
   String java_lang_Override = "java.lang.Override";
   String java_lang_SuppressWarnings = "java.lang.SuppressWarnings";
   String javax_annotation_Generated = "javax.annotation.Generated";
+
+  String java_security_BasicPermission = "java.security.BasicPermission";
+  String java_security_Permission = "java.security.Permission";
 }

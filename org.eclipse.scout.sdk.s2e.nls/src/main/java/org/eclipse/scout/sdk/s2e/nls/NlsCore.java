@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.internal.model.NlsWorkspace;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsWorkspace;
 import org.eclipse.swt.graphics.Color;
@@ -146,7 +147,7 @@ public class NlsCore extends AbstractUIPlugin {
         desc = imageDescriptorFromPlugin(PLUGIN_ID, imagePath + name + ".jpg");
       }
       if (desc == null) {
-        System.err.println("could not find image for plugin: " + PLUGIN_ID + " under: " + imagePath + name);
+        SdkLog.warning("Could not find image for plugin: {} under: {}", PLUGIN_ID, imagePath + name);
       }
       plugin.getImageRegistry().put(name, desc);
     }

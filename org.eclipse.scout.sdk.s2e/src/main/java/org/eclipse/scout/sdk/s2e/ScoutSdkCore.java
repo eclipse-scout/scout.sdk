@@ -42,8 +42,8 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.internal.WorkingCopyManager;
+import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
-import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
 
 /**
  * Main class to access Scout2Eclipse core components.

@@ -29,10 +29,8 @@ import org.eclipse.scout.sdk.s2e.nls.model.Language;
 public abstract class AbstractTranslationResource implements ITranslationResource {
 
   private Map<String/* key */, String/* translation */> m_entries;
-
   private final Language m_language;
-
-  private EventListenerList m_eventListeners;
+  private final EventListenerList m_eventListeners;
 
   /**
    * the language of the resource

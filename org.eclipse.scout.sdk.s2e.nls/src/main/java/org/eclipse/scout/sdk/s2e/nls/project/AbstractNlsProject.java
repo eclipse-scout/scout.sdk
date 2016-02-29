@@ -47,7 +47,7 @@ public abstract class AbstractNlsProject implements INlsProject {
   private final P_ParentListener m_parentProjectListener;
   private final OptimisticLock m_translationResourceEventLock;
   private final NlsResourceProvider m_resourceProvider;
-  private final IType m_nlsAccessorType;
+  private final String m_name;
   private final ReadWriteLock m_lock;
   private volatile Map<String, NlsEntry> m_entries;
   private Language m_developerLanguage;
@@ -67,17 +67,12 @@ public abstract class AbstractNlsProject implements INlsProject {
     m_lock = new ReentrantReadWriteLock();
     m_entries = null;
     m_developerLanguage = null;
-    m_nlsAccessorType = type;
-  }
-
-  @Override
-  public IType getNlsAccessorType() {
-    return m_nlsAccessorType;
+    m_name = type.getElementName();
   }
 
   @Override
   public String getName() {
-    return m_nlsAccessorType.getElementName();
+    return m_name;
   }
 
   protected void resetCache() {
@@ -124,36 +119,38 @@ public abstract class AbstractNlsProject implements INlsProject {
     if (m_entries == null) {
       m_lock.writeLock().lock();
       try {
-        Map<String, NlsEntry> entries = new HashMap<>();
+        if (m_entries == null) {
+          Map<String, NlsEntry> entries = new HashMap<>();
 
-        // inherited entries
-        if (getParent() != null) {
-          for (String parentKey : getParent().getAllKeys()) {
-            entries.put(parentKey, new InheritedNlsEntry(getParent().getEntry(parentKey)));
-          }
-        }
-
-        // local rows
-        for (ITranslationResource r : getAllTranslationResources()) {
-          for (String key : r.getAllKeys()) {
-            NlsEntry nlsEntry = entries.get(key);
-            if (nlsEntry == null) {
-              nlsEntry = new NlsEntry(key, this);
-              entries.put(key, nlsEntry);
+          // inherited entries
+          if (getParent() != null) {
+            for (String parentKey : getParent().getAllKeys()) {
+              entries.put(parentKey, new InheritedNlsEntry(getParent().getEntry(parentKey)));
             }
-
-            if (nlsEntry.getType() == INlsEntry.TYPE_INHERITED) {
-              // the key exists in a parent project and here -> change the type from inherited to local
-              entries.remove(key);
-              nlsEntry = new NlsEntry(nlsEntry);
-              entries.put(key, nlsEntry);
-            }
-
-            nlsEntry.addTranslation(r.getLanguage(), r.getTranslation(key));
           }
-        }
 
-        m_entries = entries;
+          // local rows
+          for (ITranslationResource r : getAllTranslationResources()) {
+            for (String key : r.getAllKeys()) {
+              NlsEntry nlsEntry = entries.get(key);
+              if (nlsEntry == null) {
+                nlsEntry = new NlsEntry(key, this);
+                entries.put(key, nlsEntry);
+              }
+
+              if (nlsEntry.getType() == INlsEntry.TYPE_INHERITED) {
+                // the key exists in a parent project and here -> change the type from inherited to local
+                entries.remove(key);
+                nlsEntry = new NlsEntry(nlsEntry);
+                entries.put(key, nlsEntry);
+              }
+
+              nlsEntry.addTranslation(r.getLanguage(), r.getTranslation(key));
+            }
+          }
+
+          m_entries = entries;
+        }
       }
       finally {
         m_lock.writeLock().unlock();
@@ -343,7 +340,7 @@ public abstract class AbstractNlsProject implements INlsProject {
     return result;
   }
 
-  protected void setParent(INlsProject newParent) {
+  public void setParent(INlsProject newParent) {
     if (m_parent != null) {
       m_parent.removeProjectListener(m_parentProjectListener);
     }
@@ -416,6 +413,7 @@ public abstract class AbstractNlsProject implements INlsProject {
     for (ITranslationResource r : m_resourceProvider.getResources()) {
       r.commitChanges(monitor);
     }
+    fireNlsProjectEvent(new NlsProjectEvent(this, (ITranslationResource) null, NlsProjectEvent.TYPE_FULL_REFRESH));
   }
 
   @Override
@@ -456,7 +454,9 @@ public abstract class AbstractNlsProject implements INlsProject {
         r.updateText(newRow.getKey(), entry.getValue(), flush, monitor);
       }
     }
-    fireNlsProjectEvent(new NlsProjectEvent(this, newRow, NlsProjectEvent.TYPE_ENTRY_ADDED));
+    if (flush) {
+      fireNlsProjectEvent(new NlsProjectEvent(this, newRow, NlsProjectEvent.TYPE_ENTRY_ADDED));
+    }
   }
 
   private void updateExistingRowInternal(NlsEntry existingRow, INlsEntry row, boolean flush, IProgressMonitor monitor) {
@@ -472,7 +472,7 @@ public abstract class AbstractNlsProject implements INlsProject {
         }
       }
     }
-    if (updated) {
+    if (updated && flush) {
       fireNlsProjectEvent(new NlsProjectEvent(this, existingRow, NlsProjectEvent.TYPE_ENTRY_MODIFYED));
     }
   }

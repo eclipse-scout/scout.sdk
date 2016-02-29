@@ -52,19 +52,23 @@ public class ImportValidator implements IImportValidator {
 
   @Override
   public String useSignature(String signature) {
+    return useSignatureInternal(signature, false);
+  }
+
+  protected String useSignatureInternal(String signature, boolean isTypeArg) {
     StringBuilder sigBuilder = new StringBuilder();
     int arrayCount = 0;
     switch (Signature.getTypeSignatureKind(signature)) {
       case ISignatureConstants.WILDCARD_TYPE_SIGNATURE:
-        sigBuilder.append("?");
+        sigBuilder.append('?');
         if (signature.length() > 1) {
           sigBuilder.append(" extends ");
-          sigBuilder.append(useSignature(signature.substring(1)));
+          sigBuilder.append(useSignatureInternal(signature.substring(1), false));
         }
         break;
       case ISignatureConstants.ARRAY_TYPE_SIGNATURE:
         arrayCount = Signature.getArrayCount(signature);
-        sigBuilder.append(useSignature(signature.substring(arrayCount)));
+        sigBuilder.append(useSignatureInternal(signature.substring(arrayCount), false));
         break;
       case ISignatureConstants.BASE_TYPE_SIGNATURE:
         sigBuilder.append(Signature.getSignatureSimpleName(signature));
@@ -82,6 +86,9 @@ public class ImportValidator implements IImportValidator {
         String use = collector.checkExistingImports(cand);
         if (use == null) {
           use = collector.checkCurrentScope(cand);
+          if (isTypeArg) {
+            collector.registerElement(cand); // ensure it is registered as used so that it appears in the imports (for type arguments only)
+          }
         }
         if (use == null) {
           use = collector.registerElement(cand);
@@ -90,10 +97,10 @@ public class ImportValidator implements IImportValidator {
 
         if (typeArguments != null && typeArguments.length > 0) {
           sigBuilder.append(ISignatureConstants.C_GENERIC_START);
-          sigBuilder.append(useSignature(typeArguments[0]));
+          sigBuilder.append(useSignatureInternal(typeArguments[0], true));
           for (int i = 1; i < typeArguments.length; i++) {
             sigBuilder.append(", ");
-            sigBuilder.append(useSignature(typeArguments[i]));
+            sigBuilder.append(useSignatureInternal(typeArguments[i], true));
           }
           sigBuilder.append(ISignatureConstants.C_GENERIC_END);
         }

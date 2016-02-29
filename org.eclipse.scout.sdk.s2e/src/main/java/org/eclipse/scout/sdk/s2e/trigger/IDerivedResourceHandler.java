@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.scout.sdk.s2e.job.AbstractResourceBlockingJob;
-import org.eclipse.scout.sdk.s2e.workspace.IOperation;
+import org.eclipse.scout.sdk.s2e.operation.IOperation;
 
 /**
  * <h3>{@link IDerivedResourceHandler}</h3><br>

@@ -118,11 +118,6 @@ public class TextField extends Composite {
   }
 
   @Override
-  public String getToolTipText() {
-    return super.getToolTipText();
-  }
-
-  @Override
   public Menu getMenu() {
     return m_text.getMenu();
   }

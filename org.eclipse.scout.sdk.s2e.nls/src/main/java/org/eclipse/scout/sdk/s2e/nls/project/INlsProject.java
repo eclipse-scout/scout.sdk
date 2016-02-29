@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.s2e.nls.model.INewLanguageContext;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
@@ -58,7 +57,8 @@ public interface INlsProject {
   Set<String> getAllKeys();
 
   /**
-   * Gets the name of the nls project. This e.g. used in the editor to display which project is displayed.
+   * Gets the name of the nls project. This e.g. used in the editor to display which project is shown or in the projects
+   * smartfield in the NLS entry dialog to choose in which project an entry should be created.
    *
    * @return The project name.
    */
@@ -178,13 +178,6 @@ public interface INlsProject {
    * @return
    */
   Language getDevelopmentLanguage();
-
-  /**
-   * Gets the type that is used to access translations at runtime (e.g. Texts or TEXTS)
-   *
-   * @return
-   */
-  IType getNlsAccessorType();
 
   /**
    * gets the translation resource for the given language.

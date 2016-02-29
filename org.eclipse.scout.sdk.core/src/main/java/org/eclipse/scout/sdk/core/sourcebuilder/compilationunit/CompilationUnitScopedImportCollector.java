@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
 
 /**
  * Do not instantiate this class directly, it is automatically created in
- * {@link ICompilationUnitSourceBuilder#createSource(StringBuilder, String, org.eclipse.scout.sdk.core.util.PropertyMap, IImportCollector)}
+ * {@link ICompilationUnitSourceBuilder#createSource(StringBuilder, String, org.eclipse.scout.sdk.core.util.PropertyMap, org.eclipse.scout.sdk.core.importvalidator.IImportValidator)}
  * <p>
  * ignore imports when in same package or types in same compilation unit
  */

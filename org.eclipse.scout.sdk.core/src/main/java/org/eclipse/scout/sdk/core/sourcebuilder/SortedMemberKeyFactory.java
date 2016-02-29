@@ -42,7 +42,6 @@ public final class SortedMemberKeyFactory {
   public static final int METHOD_START_FORM = 50;
   public static final int METHOD_FIELD_GETTER = 60;
   public static final int METHOD_FORM_DATA_COLUMN_ACCESS = 70;
-  public static final int METHOD_FORM_DATA_VALIDATION_RULE = 80;
   public static final int METHOD_ANY = Integer.MAX_VALUE;
 
   public static final int TYPE_FORM_FIELD = 10;
@@ -104,10 +103,6 @@ public final class SortedMemberKeyFactory {
   public static CompositeObject createMethodFormDataColumnAccessKey(IMethodSourceBuilder sourceBuilder) {
     String key2 = sourceBuilder.getElementName().replaceFirst("(get|set|is)", "");
     return new CompositeObject(METHOD_FORM_DATA_COLUMN_ACCESS, key2, sourceBuilder.getElementName(), sourceBuilder);
-  }
-
-  public static CompositeObject createMethodFormDataValidationKey(IMethodSourceBuilder sourceBuilder) {
-    return new CompositeObject(METHOD_FORM_DATA_VALIDATION_RULE, sourceBuilder.getElementName(), sourceBuilder);
   }
 
   public static CompositeObject createMethodAnyKey(IMethodSourceBuilder sourceBuilder) {

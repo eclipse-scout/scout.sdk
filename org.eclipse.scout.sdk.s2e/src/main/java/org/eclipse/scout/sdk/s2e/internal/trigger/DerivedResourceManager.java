@@ -36,12 +36,12 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
-import org.eclipse.scout.sdk.s2e.trigger.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandlerFactory;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
-import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
@@ -488,9 +488,9 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         return Status.OK_STATUS;
       }
 
-      monitor.beginTask(getName(), numOperations);
+      SubMonitor progress = SubMonitor.convert(monitor, getName(), numOperations);
       for (int i = 1; i <= numOperations; i++) {
-        if (monitor.isCanceled()) {
+        if (progress.isCanceled()) {
           return doCancel();
         }
         if (isAborted()) {
@@ -500,13 +500,13 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         // already remove the operation here. if there is a problem with this operation we don't want to keep trying
         IDerivedResourceHandler handler = m_queueToConsume.poll();
         try {
-          monitor.setTaskName(handler.getName() + " [" + i + " of " + numOperations + "]");
-          monitor.subTask("");
+          progress.setTaskName(handler.getName() + " [" + i + " of " + numOperations + "]");
+          progress.subTask("");
           handler.validate();
 
           long start = System.currentTimeMillis();
           try {
-            handler.run(SubMonitor.convert(monitor, 1));
+            handler.run(progress.newChild(1));
           }
           finally {
             SdkLog.debug("Derived Resource Handler ({}) took {}ms to execute.", handler.getName(), System.currentTimeMillis() - start);

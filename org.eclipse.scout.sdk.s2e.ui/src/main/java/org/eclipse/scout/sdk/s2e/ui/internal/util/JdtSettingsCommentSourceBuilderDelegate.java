@@ -85,7 +85,13 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         if (template != null) {
           CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
           context.setVariable(CodeTemplateContextType.FILENAME, target.getElementName());
-          context.setVariable(CodeTemplateContextType.PACKAGENAME, target.getPackageName());
+
+          String packageName = target.getPackageName();
+          if (packageName == null) {
+            packageName = "";
+          }
+          context.setVariable(CodeTemplateContextType.PACKAGENAME, packageName);
+
           context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
           context.setVariable(CodeTemplateContextType.TYPENAME, JavaCore.removeJavaLikeExtension(target.getElementName()));
           String comment = evaluateTemplate(context, template);

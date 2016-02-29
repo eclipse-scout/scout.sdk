@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -162,7 +163,7 @@ public class NlsFilterComponent extends Composite {
       if (text == null) {
         text = "";
       }
-      text = text.replace("&", "");
+      text = StringUtils.remove(text, '&');
       return CharOperation.match(m_pattern.toCharArray(), text.toCharArray(), false);
 
     }

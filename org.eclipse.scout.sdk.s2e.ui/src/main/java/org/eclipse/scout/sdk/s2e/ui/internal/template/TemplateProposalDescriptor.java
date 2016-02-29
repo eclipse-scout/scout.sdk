@@ -26,7 +26,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.scout.sdk.core.s.model.ScoutModelHierarchy;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 
 /**
  * <h3>{@link TemplateProposalDescriptor}</h3>

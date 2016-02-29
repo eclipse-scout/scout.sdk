@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 
 /**
  * <h3>{@link IDerivedResourceHandlerFactory}</h3>

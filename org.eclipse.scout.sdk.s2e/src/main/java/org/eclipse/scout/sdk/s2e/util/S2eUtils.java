@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,10 +22,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -41,6 +45,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IClassFile;
@@ -73,16 +79,21 @@ import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.util.CompositeObject;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
-import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
-import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
-import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
+import org.eclipse.scout.sdk.s2e.operation.CompilationUnitWriteOperation;
+import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
+import org.eclipse.scout.sdk.s2e.operation.ResourceWriteOperation;
 
 /**
  * <h3>{@link S2eUtils}</h3>
@@ -154,75 +165,77 @@ public final class S2eUtils {
    *          The {@link IJavaEnvironment} to use to find the matching
    *          {@link org.eclipse.scout.sdk.core.model.api.IType}.
    * @return The {@link org.eclipse.scout.sdk.core.model.api.IType} matching the given JDT {@link IType}.
-   * @throws CoreException
    */
   public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType, IJavaEnvironment env) {
-    return env.findType(jdtType.getFullyQualifiedName('$'));
+    return env.findType(jdtType.getFullyQualifiedName());
   }
 
   /**
-   * Gets all fully qualified type names of abstract public classes existing on the classpath of the given project and
-   * implementing the given baseTypeFqn.
+   * Gets {@link IType}s for all public abstract classes existing on the classpath of the given project and implementing
+   * the given baseTypeFqn.
    *
    * @param sourceProject
    *          The {@link IJavaProject} defining the classpath.
    * @param baseTypeFqn
    *          The fully qualified name of the base class. The sub classes of this class are searched.
    * @param monitor
-   *          The monitor or <code>null</code>.
-   * @return A {@link Set} sorted ascending holding the fully qualified names.
+   *          The monitor or <code>null</code>. If the monitor becomes canceled, the search is aborted and an incomplete
+   *          result may be returned. The caller of this method is responsible to react on this fact based on the
+   *          monitor state ({@link IProgressMonitor#isCanceled()}).
+   * @return A {@link Set} containing all {@link IType}s sorted ascending by fully qualified name.
    * @throws CoreException
    */
-  public static Set<String> findAbstractClassesInHierarchy(final IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor) throws CoreException {
-    IFilter<TypeNameMatch> filter = new IFilter<TypeNameMatch>() {
-      @Override
-      public boolean evaluate(TypeNameMatch match) {
-        int modifiers = match.getModifiers();
-        if (Flags.isAbstract(modifiers) && Flags.isPublic(modifiers) && !Flags.isDeprecated(modifiers) && !Flags.isInterface(modifiers)) {
-          boolean isPrimaryType = match.getPackageName().equals(match.getTypeContainerName());
-          return isPrimaryType;
-        }
-        return false;
-      }
-    };
-    return findClassesInStrictHierarchy(sourceProject, baseTypeFqn, monitor, filter);
+  public static Set<IType> findAbstractClassesInHierarchy(final IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor) throws CoreException {
+    return findClassesInStrictHierarchy(sourceProject, baseTypeFqn, monitor, new PublicAbstractPrimaryTypeFilter());
   }
 
   /**
-   * Gets all fully qualified type names of sub classes of the given baseTypeFqn that are on the classpath of the given
-   * project and fulfill the given filter.
+   * Gets all {@link IType}s of sub classes of the given baseTypeFqn that are on the classpath of the given project and
+   * fulfill the given filter.
    *
    * @param sourceProject
    *          The {@link IJavaProject} defining the classpath.
    * @param baseTypeFqn
    *          The fully qualified name of the base class of the hierarchy.
    * @param monitor
-   *          The monitor or <code>null</code>.
+   *          The monitor or <code>null</code>. If the monitor becomes canceled, the search is aborted and an incomplete
+   *          result may be returned. The caller of this method is responsible to react on this fact based on the
+   *          monitor state ({@link IProgressMonitor#isCanceled()}).
    * @param filter
    *          A filter to decide which matches are accepted or <code>null</code> if all matches should be accepted.
-   * @return A {@link Set} sorted ascending holding the fully qualified names.
+   * @return A {@link Set} containing the {@link IType}s sorted ascending by simple name and fully qualified name
+   *         afterwards.
    * @throws CoreException
    */
-  public static Set<String> findClassesInStrictHierarchy(final IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor, final IFilter<TypeNameMatch> filter) throws CoreException {
-    final Set<String> collector = new TreeSet<>();
+  public static Set<IType> findClassesInStrictHierarchy(final IJavaProject sourceProject, String baseTypeFqn, final IProgressMonitor monitor, final IFilter<IType> filter) throws CoreException {
+    final Set<IType> collector = new TreeSet<>(new ElementNameComparator());
+
     TypeNameMatchRequestor nameMatchRequestor = new TypeNameMatchRequestor() {
       @Override
       public void acceptTypeNameMatch(TypeNameMatch match) {
-        if (filter == null || filter.evaluate(match)) {
-          collector.add(match.getFullyQualifiedName());
+        if (monitor != null && monitor.isCanceled()) {
+          throw new OperationCanceledException("strict hierarchy search canceled by monitor.");
+        }
+        if (filter == null || filter.evaluate(match.getType())) {
+          collector.add(match.getType());
         }
       }
     };
 
-    SearchEngine e = new SearchEngine();
     IType baseType = sourceProject.findType(baseTypeFqn.replace('$', '.'));
     if (!exists(baseType)) {
       return collector;
     }
 
     IJavaSearchScope strictHierarchyScope = SearchEngine.createStrictHierarchyScope(sourceProject, baseType, true, false, null);
-    e.searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, null, SearchPattern.R_EXACT_MATCH, IJavaSearchConstants.CLASS, strictHierarchyScope,
-        nameMatchRequestor, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, monitor);
+
+    try {
+      new SearchEngine().searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, null, SearchPattern.R_EXACT_MATCH, IJavaSearchConstants.CLASS, strictHierarchyScope,
+          nameMatchRequestor, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, monitor);
+    }
+    catch (OperationCanceledException oce) {
+      SdkLog.debug("Strict hierarchy search has been canceled. An incomplete result will be returned.", oce);
+    }
     return collector;
   }
 
@@ -281,7 +294,7 @@ public final class S2eUtils {
             Object element = match.getElement();
             if (element instanceof IType) {
               IType t = (IType) element;
-              if (t.getFullyQualifiedName('$').indexOf(fqn) >= 0) {
+              if (t.getFullyQualifiedName().indexOf(fqn) >= 0) {
                 matchList.add(t);
               }
             }
@@ -487,14 +500,19 @@ public final class S2eUtils {
    *          A search scope. Use {@link #createJavaSearchScope(Collection)} or
    *          {@link SearchEngine#createJavaSearchScope(IJavaElement[])}.
    * @param monitor
-   *          The progress monitor or <code>null</code>.
+   *          The monitor or <code>null</code>. If the monitor becomes canceled, the search is aborted and an incomplete
+   *          result may be returned. The caller of this method is responsible to react on this fact based on the
+   *          monitor state ({@link IProgressMonitor#isCanceled()}).
    * @throws CoreException
    */
-  public static Set<IType> findAllTypesAnnotatedWith(String annotationName, IJavaSearchScope scope, IProgressMonitor monitor) throws CoreException {
+  public static Set<IType> findAllTypesAnnotatedWith(String annotationName, IJavaSearchScope scope, final IProgressMonitor monitor) throws CoreException {
     final Set<IType> result = new LinkedHashSet<>();
     SearchRequestor collector = new SearchRequestor() {
       @Override
       public void acceptSearchMatch(SearchMatch match) throws CoreException {
+        if (monitor != null && monitor.isCanceled()) {
+          throw new OperationCanceledException("annotated types search canceled.");
+        }
         if (match.getElement() instanceof IType) {
           IType t = (IType) match.getElement();
           result.add(t);
@@ -502,8 +520,16 @@ public final class S2eUtils {
       }
     };
     for (IType annotationType : resolveJdtTypes(annotationName, SearchEngine.createWorkspaceScope())) {
+      if (monitor != null && monitor.isCanceled()) {
+        return result;
+      }
       SearchPattern pattern = SearchPattern.createPattern(annotationType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE);
-      new SearchEngine().search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, scope, collector, monitor);
+      try {
+        new SearchEngine().search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, scope, collector, monitor);
+      }
+      catch (OperationCanceledException oce) {
+        SdkLog.debug("Search for all types annotated with '{}' has been canceled.", annotationName, oce);
+      }
     }
     return result;
   }
@@ -573,17 +599,23 @@ public final class S2eUtils {
       if (Objects.equals(name, p.getMemberName())) {
         switch (p.getValueKind()) {
           case IMemberValuePair.K_DOUBLE:
-            return new BigDecimal(((Double) p.getValue()).doubleValue());
+            Double doubleValue = (Double) p.getValue();
+            return BigDecimal.valueOf(doubleValue.doubleValue());
           case IMemberValuePair.K_FLOAT:
-            return new BigDecimal(((Float) p.getValue()).doubleValue());
+            Float floatValue = (Float) p.getValue();
+            return BigDecimal.valueOf(floatValue.doubleValue());
           case IMemberValuePair.K_INT:
-            return new BigDecimal(((Integer) p.getValue()).intValue());
+            Integer intValue = (Integer) p.getValue();
+            return BigDecimal.valueOf(intValue.longValue());
           case IMemberValuePair.K_BYTE:
-            return new BigDecimal(((Byte) p.getValue()).intValue());
+            Byte byteValue = (Byte) p.getValue();
+            return BigDecimal.valueOf(byteValue.longValue());
           case IMemberValuePair.K_LONG:
-            return new BigDecimal(((Long) p.getValue()).longValue());
+            Long longValue = (Long) p.getValue();
+            return BigDecimal.valueOf(longValue.longValue());
           case IMemberValuePair.K_SHORT:
-            return new BigDecimal(((Short) p.getValue()).intValue());
+            Short shortValue = (Short) p.getValue();
+            return BigDecimal.valueOf(shortValue.longValue());
         }
         break;
       }
@@ -771,7 +803,7 @@ public final class S2eUtils {
       return null;
     }
 
-    ICompilationUnit compilationUnit = op.getCompilationUnit();
+    ICompilationUnit compilationUnit = op.getCreatedCompilationUnit();
     if (compilationUnit == null) {
       return null;
     }
@@ -808,12 +840,9 @@ public final class S2eUtils {
     Set<IResource> lockedResources = new HashSet<>(ops.size());
     for (CompilationUnitWriteOperation op : ops) {
       if (op != null) {
-        ICompilationUnit icu = op.getCompilationUnit();
-        if (icu != null) {
-          IResource r = getExistingParent(icu.getResource());
-          if (r != null) {
-            lockedResources.add(r);
-          }
+        IResource r = op.getAffectedResource();
+        if (r != null) {
+          lockedResources.add(r);
         }
       }
     }
@@ -892,7 +921,7 @@ public final class S2eUtils {
         job.join(0L, monitor);
       }
       catch (OperationCanceledException | InterruptedException e) {
-        throw new CoreException(new ScoutStatus(e));
+        SdkLog.info("Unable to wait until resources have been written.", e);
       }
     }
   }
@@ -993,5 +1022,291 @@ public final class S2eUtils {
     if (exists(elementToAdd)) {
       collector.add(elementToAdd);
     }
+  }
+
+  /**
+   * Gets the mostly used {@link IPackageFragmentRoot} of the given {@link IJavaProject}.
+   *
+   * @param project
+   *          The {@link IJavaProject} for which the source folder should be returned.
+   * @return The primary {@link IPackageFragmentRoot} (which will always be of kind
+   *         {@link IPackageFragmentRoot#K_SOURCE}).
+   * @throws JavaModelException
+   */
+  public static IPackageFragmentRoot getPrimarySourceFolder(IJavaProject project) throws JavaModelException {
+    Collection<IPackageFragmentRoot> sourceFolders = getSourceFolders(project);
+    if (sourceFolders.isEmpty()) {
+      return null;
+    }
+    return sourceFolders.iterator().next();
+  }
+
+  /**
+   * Gets all source folders of the given {@link IJavaProject}.
+   *
+   * @param project
+   *          The {@link IJavaProject} for which the source folders should be returned.
+   * @return All {@link IPackageFragmentRoot}s of kind {@link IPackageFragmentRoot#K_SOURCE} in the given
+   *         {@link IJavaProject} sorted by relevance.
+   * @throws JavaModelException
+   */
+  public static Set<IPackageFragmentRoot> getSourceFolders(IJavaProject project) throws JavaModelException {
+    return getSourceFolders(Collections.singletonList(project), null);
+  }
+
+  /**
+   * Gets all source folders of the given {@link IJavaProject}s.
+   *
+   * @param projects
+   *          The {@link IJavaProject}s in which the source folders should be searched.
+   * @param monitor
+   *          The {@link IProgressMonitor} to use. The search aborts if the given {@link IProgressMonitor} is canceled.
+   *          In this case an empty {@link Set} is returned.
+   * @return A {@link Set} with all source folders ({@link IPackageFragmentRoot}s of kind
+   *         {@link IPackageFragmentRoot#K_SOURCE}) of the given {@link IJavaProject}s ordered by relevance and project.
+   * @throws JavaModelException
+   */
+  public static Set<IPackageFragmentRoot> getSourceFolders(Collection<IJavaProject> projects, IProgressMonitor monitor) throws JavaModelException {
+    return getSourceFolders(projects, null, monitor);
+  }
+
+  /**
+   * Gets all source folders of the given {@link IJavaProject}s that fulfill the given {@link IFilter}.
+   *
+   * @param projects
+   *          The {@link IJavaProject}s in which the source folders should be searched.
+   * @param filter
+   *          The {@link IFilter} the {@link IPackageFragmentRoot} candidates must fulfill.
+   * @param monitor
+   *          The {@link IProgressMonitor} to use. The search aborts if the given {@link IProgressMonitor} is canceled.
+   *          In this case an empty {@link Set} is returned.
+   * @return A {@link Set} with all source folders ({@link IPackageFragmentRoot}s of kind
+   *         {@link IPackageFragmentRoot#K_SOURCE}) of the given {@link IJavaProject}s that accept the given
+   *         {@link IFilter} ordered by relevance and project.
+   * @throws JavaModelException
+   */
+  public static Set<IPackageFragmentRoot> getSourceFolders(Collection<IJavaProject> projects, IFilter<IPackageFragmentRoot> filter, IProgressMonitor monitor) throws JavaModelException {
+    if (projects == null || projects.isEmpty()) {
+      return Collections.emptySet();
+    }
+
+    NavigableMap<CompositeObject, IPackageFragmentRoot> prioMap = new TreeMap<>();
+    for (IJavaProject project : projects) {
+      if (S2eUtils.exists(project)) {
+        for (IPackageFragmentRoot root : project.getPackageFragmentRoots()) {
+          if (monitor != null && monitor.isCanceled()) {
+            return Collections.emptySet();
+          }
+          if (root.getKind() == IPackageFragmentRoot.K_SOURCE && (filter == null || filter.evaluate(root))) {
+            String s = root.getPath().removeFirstSegments(1).toString().toLowerCase();
+            if (root.getResource().isDerived()) {
+              prioMap.put(new CompositeObject(100, project, s), root);
+            }
+            else if ("src/main/java".equals(s)) {
+              prioMap.put(new CompositeObject(1, project, s), root);
+            }
+            else if ("src".equals(s)) {
+              prioMap.put(new CompositeObject(11, project, s), root);
+            }
+            else if (s.startsWith("src/main/")) {
+              prioMap.put(new CompositeObject(12, project, s), root);
+            }
+            else if ("src/test/java".equals(s)) {
+              prioMap.put(new CompositeObject(20, project, s), root);
+            }
+            else if (s.startsWith("src/test/")) {
+              prioMap.put(new CompositeObject(21, project, s), root);
+            }
+            else {
+              prioMap.put(new CompositeObject(30, project, s), root);
+            }
+          }
+        }
+      }
+    }
+    return new LinkedHashSet<>(prioMap.values());
+  }
+
+  /**
+   * Creates the source for the given {@link ISourceBuilder} created in the given {@link IJavaProject}.
+   *
+   * @param srcBuilder
+   *          The {@link ISourceBuilder} that should create the code.
+   * @param targetProject
+   *          The {@link IJavaProject} in which the source should be created.
+   * @return The created source as {@link String} or <code>null</code> if the {@link ISourceBuilder} or the target
+   *         {@link IJavaProject} is <code>null</code>.
+   */
+  public static String createJavaCode(ISourceBuilder srcBuilder, IJavaProject targetProject) {
+    return createJavaCode(srcBuilder, targetProject, null);
+  }
+
+  /**
+   * Creates the source for the given {@link ISourceBuilder} created in the given {@link IJavaProject}.
+   *
+   * @param srcBuilder
+   *          The {@link ISourceBuilder} that should create the code.
+   * @param targetProject
+   *          The {@link IJavaProject} in which the source should be created.
+   * @param env
+   *          The optional {@link IJavaEnvironment} to use.
+   * @return The created source as {@link String} or <code>null</code> if the {@link ISourceBuilder} or the target
+   *         {@link IJavaProject} is <code>null</code>.
+   */
+  public static String createJavaCode(ISourceBuilder srcBuilder, IJavaProject targetProject, IJavaEnvironment env) {
+    if (srcBuilder == null) {
+      return null;
+    }
+    if (!S2eUtils.exists(targetProject)) {
+      return null;
+    }
+    if (env == null) {
+      env = ScoutSdkCore.createJavaEnvironment(targetProject);
+    }
+    return CoreUtils.createJavaCode(srcBuilder, env, S2eUtils.lineSeparator(targetProject), S2eUtils.propertyMap(targetProject));
+  }
+
+  /**
+   * Checks whether the given {@link ITypeHierarchy} contains an element with the given fully qualified name.
+   *
+   * @param h
+   *          The hierarchy to search in.
+   * @param fqn
+   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator
+   *          (e.g. <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
+   * @return <code>true</code> if it is part of the given {@link ITypeHierarchy}, <code>false</code> otherwise.
+   */
+  public static boolean hierarchyContains(ITypeHierarchy h, String fqn) {
+    for (IType t : h.getAllTypes()) {
+      if (fqn.equals(t.getFullyQualifiedName())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Writes the given {@link ICompilationUnitSourceBuilder} into the given source folder.<br>
+   * <br>
+   * <b>Important Note: </b>The write operation is directly executed in the current thread! This means the current
+   * {@link Job} must already hold a {@link ISchedulingRule} that contains the folder in which should be written!
+   *
+   * @param srcFolder
+   *          The source folder that will hold the new compilation unit. Must be of type
+   *          {@link IPackageFragmentRoot#K_SOURCE}.
+   * @param sb
+   *          The source builder that creates the compilation unit contents.
+   * @param monitor
+   *          The {@link IProgressMonitor} of the surrounding job. Must not be <code>null</code>.
+   * @param workingCopyManager
+   *          The {@link IWorkingCopyManager} of the surrounding job. Must not be <code>null</code>.
+   * @return The primary {@link IType} of the compilation unit written.
+   */
+  public static IType writeType(IPackageFragmentRoot srcFolder, ICompilationUnitSourceBuilder sb, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    CompilationUnitWriteOperation writeIcu = new CompilationUnitWriteOperation(srcFolder, sb);
+    writeIcu.validate();
+    writeIcu.run(Validate.notNull(monitor), Validate.notNull(workingCopyManager));
+    ICompilationUnit compilationUnit = writeIcu.getCreatedCompilationUnit();
+    return compilationUnit.getType(sb.getMainType().getElementName());
+  }
+
+  /**
+   * {@link IFilter} that only accepts public primary {@link IType}. Furthermore enum types and deprecated types are
+   * excluded.
+   *
+   * @author Matthias Villiger
+   * @since 5.2.0
+   */
+  public static class PublicPrimaryTypeFilter implements IFilter<IType> {
+    @Override
+    public boolean evaluate(IType candidate) {
+      try {
+        if (candidate.isMember() || candidate.isAnonymous() || candidate.isEnum() || candidate.isLocal()) {
+          return false;
+        }
+        int modifiers = candidate.getFlags();
+        return Flags.isPublic(modifiers) && !Flags.isDeprecated(modifiers);
+      }
+      catch (JavaModelException e) {
+        throw new SdkException(e);
+      }
+    }
+  }
+
+  /**
+   * {@link IFilter} that only accepts public abstract primary types that are no enums, not deprecated and no
+   * interfaces.
+   *
+   * @author Matthias Villiger
+   * @since 5.2.0
+   */
+  public static class PublicAbstractPrimaryTypeFilter extends PublicPrimaryTypeFilter {
+    @Override
+    public boolean evaluate(IType candidate) {
+      boolean accept = super.evaluate(candidate);
+      if (!accept) {
+        return false;
+      }
+
+      try {
+        int modifiers = candidate.getFlags();
+        return Flags.isAbstract(modifiers) && !Flags.isInterface(modifiers);
+      }
+      catch (JavaModelException e) {
+        throw new SdkException(e);
+      }
+    }
+  }
+
+  /**
+   * {@link Comparator} that sorts {@link IType}s by simple name first and fully qualified name second.
+   *
+   * @author Matthias Villiger
+   * @since 5.2.0
+   */
+  public static final class ElementNameComparator implements Comparator<IType> {
+    @Override
+    public int compare(IType o1, IType o2) {
+      if (o1 == o2) {
+        return 0;
+      }
+
+      int res = o1.getElementName().compareTo(o2.getElementName());
+      if (res != 0) {
+        return res;
+      }
+      res = o1.getFullyQualifiedName().compareTo(o2.getFullyQualifiedName());
+      if (res != 0) {
+        return res;
+      }
+      return o1.toString().compareTo(o2.toString());
+    }
+  }
+
+  /**
+   * Gets the preferred source folder for DTOs created in the {@link IJavaProject} of the given source folder.
+   * 
+   * @param selectedSourceFolder
+   *          The default source folder.
+   * @return The given selectedSourceFolder or the src/generated/java folder within the same {@link IJavaProject} if it
+   *         exists.
+   */
+  public static IPackageFragmentRoot getDtoSourceFolder(IPackageFragmentRoot selectedSourceFolder) {
+    if (!exists(selectedSourceFolder)) {
+      return selectedSourceFolder;
+    }
+    IJavaProject targetProject = selectedSourceFolder.getJavaProject();
+    if (!exists(targetProject)) {
+      return selectedSourceFolder;
+    }
+    IFolder generatedFolder = targetProject.getProject().getFolder(ISdkProperties.GENERATED_SOURCE_FOLDER_NAME);
+    if (generatedFolder == null || !generatedFolder.exists()) {
+      return selectedSourceFolder;
+    }
+    IPackageFragmentRoot generatedSourceFolder = targetProject.getPackageFragmentRoot(generatedFolder);
+    if (!exists(generatedSourceFolder)) {
+      return selectedSourceFolder;
+    }
+    return generatedSourceFolder;
   }
 }

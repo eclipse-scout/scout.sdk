@@ -14,7 +14,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
-import org.eclipse.scout.sdk.s2e.workspace.wellform.WellformAllOperation;
+import org.eclipse.scout.sdk.s2e.operation.wellform.WellformAllOperation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.handlers.HandlerUtil;

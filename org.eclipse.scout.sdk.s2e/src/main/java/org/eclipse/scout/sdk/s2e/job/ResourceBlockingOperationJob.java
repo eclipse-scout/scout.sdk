@@ -11,17 +11,17 @@
 package org.eclipse.scout.sdk.s2e.job;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.workspace.IOperation;
-import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
+import org.eclipse.scout.sdk.s2e.operation.IOperation;
+import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 
 /**
  * <h3>OperationJob</h3> Use this class to ensure an operation is executed with the scheduling rule of workspace root.
@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
  */
 public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
 
-  private final List<? extends IOperation> m_operations;
+  private final Iterable<? extends IOperation> m_operations;
 
   public ResourceBlockingOperationJob(IOperation operation) {
     this(operation, (IResource[]) null);
@@ -39,42 +39,46 @@ public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
     this(Collections.singletonList(operation), resources);
   }
 
-  public ResourceBlockingOperationJob(Collection<? extends IOperation> operations) {
+  public ResourceBlockingOperationJob(Iterable<? extends IOperation> operations) {
     this(operations, (IResource[]) null);
   }
 
-  public ResourceBlockingOperationJob(Collection<? extends IOperation> operations, IResource... resources) {
-    this(new ArrayList<>(operations), resources);
-  }
-
-  private ResourceBlockingOperationJob(List<? extends IOperation> operations, IResource... resources) {
+  public ResourceBlockingOperationJob(Iterable<? extends IOperation> operations, IResource... resources) {
     super(getJobName(operations), resources);
-    m_operations = operations;
-    for (Iterator<? extends IOperation> it = m_operations.iterator(); it.hasNext();) {
-      if (it.next() == null) {
-        it.remove();
+
+    List<IOperation> ops = new ArrayList<>();
+    if (operations != null) {
+      Iterator<? extends IOperation> it = operations.iterator();
+      while (it.hasNext()) {
+        IOperation op = it.next();
+        if (op != null) {
+          ops.add(op);
+        }
       }
     }
+    m_operations = new ArrayList<>(ops);
   }
 
-  private static String getJobName(List<? extends IOperation> operations) {
-    StringBuilder nameBuilder = new StringBuilder();
-    if (operations != null) {
-      for (IOperation op : operations) {
-        if (op == null) {
-          continue;
-        }
+  private static String getJobName(Iterable<? extends IOperation> operations) {
+    if (operations == null) {
+      return "";
+    }
 
-        String itOpName = op.getOperationName();
-        if (itOpName == null) {
-          SdkLog.warning("operation '{}' does not have a name.", op.getClass().getName());
-          itOpName = "Missing operation name.";
-        }
-        if (nameBuilder.length() > 0) {
-          nameBuilder.append(", ");
-        }
-        nameBuilder.append(itOpName);
+    StringBuilder nameBuilder = new StringBuilder();
+    for (IOperation op : operations) {
+      if (op == null) {
+        continue;
       }
+
+      String itOpName = op.getOperationName();
+      if (StringUtils.isBlank(itOpName)) {
+        SdkLog.warning("operation '{}' does not have a name.", op.getClass().getName());
+        itOpName = "Missing operation name.";
+      }
+      if (nameBuilder.length() > 0) {
+        nameBuilder.append(", ");
+      }
+      nameBuilder.append(itOpName);
     }
     return nameBuilder.toString();
   }

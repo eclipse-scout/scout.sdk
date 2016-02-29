@@ -52,7 +52,7 @@ public class NlsImportAction extends Action {
 
     List<WizardExtension> wizExts = NlsExportImportExtensionPoints.getExtensions(NlsExportImportExtensionPoints.EXTENSION_POINT_ID_NLS_IMPORTER);
 
-    setEnabled(nlsProject != null && wizExts.size() > 0);
+    setEnabled(nlsProject != null && wizExts.size() > 0 && !nlsProject.isReadOnly());
   }
 
   @Override

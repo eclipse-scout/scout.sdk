@@ -13,10 +13,12 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.proposal;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
@@ -47,16 +49,25 @@ public class NlsProposal extends AbstractNlsProposal {
 
   @Override
   public String getAdditionalProposalInfo() {
-    // html
     Map<Language, String> allTranslations = m_nlsEntry.getAllTranslations();
-    if (allTranslations != null && allTranslations.size() > 0) {
-      StringBuilder b = new StringBuilder();
-      for (Entry<Language, String> e : allTranslations.entrySet()) {
-        b.append("'<b>" + e.getValue().replace("\n", "<br>") + "</b>' [" + e.getKey().getDispalyName() + "]<br>");
-      }
-      return b.toString();
+    if (allTranslations == null || allTranslations.isEmpty()) {
+      return null;
     }
-    return null;
+
+    StringBuilder b = new StringBuilder();
+    for (Entry<Language, String> e : allTranslations.entrySet()) {
+      String text = e.getValue();
+      if (text != null) {
+        text = StringUtils.replaceEach(CoreUtils.escapeHtml(text), new String[]{
+            "\n", "\r"
+        }, new String[]{
+            "<br>", ""
+        });
+
+        b.append("<b>").append(text).append("</b> [").append(e.getKey().getDispalyName()).append("]<br>");
+      }
+    }
+    return b.toString();
   }
 
   @Override

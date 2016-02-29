@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -50,8 +51,8 @@ import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.project.AbstractNlsProject;
 import org.eclipse.scout.sdk.s2e.nls.project.NlsProjectEvent;
 import org.eclipse.scout.sdk.s2e.nls.resource.ITranslationResource;
+import org.eclipse.scout.sdk.s2e.operation.ResourceWriteOperation;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
 import org.eclipse.swt.widgets.Shell;
 
 public class SimpleNlsProject extends AbstractNlsProject {
@@ -121,9 +122,9 @@ public class SimpleNlsProject extends AbstractNlsProject {
     return translationFiles;
   }
 
-  private void createTranslationFile(Language language, INlsFolder folder, IProgressMonitor monitor) throws CoreException {
+  private void createTranslationFile(Language language, IFolder folder, IProgressMonitor monitor) throws CoreException {
     String fileName = getLocalizedPropertiesFileName(getNlsType().getTranslationsPrefix(), language);
-    IFile file = folder.getFolder().getFile(new Path(fileName));
+    IFile file = folder.getFile(new Path(fileName));
     if (!file.exists()) {
       S2eUtils.writeResources(Collections.singletonList(new ResourceWriteOperation(file, "")), monitor, true);
     }
@@ -187,36 +188,38 @@ public class SimpleNlsProject extends AbstractNlsProject {
    * @throws CoreException
    */
   public static List<IFile> getAllTranslations(IProject toLookAt, IPath path, String fileNamePrefix) throws CoreException {
-    List<IFolder> folders = new LinkedList<>();
-    List<INlsFolder> nlsFolders = getFoldersOfProject(toLookAt, path);
-    for (INlsFolder folder : nlsFolders) {
-      folders.add(folder.getFolder());
-    }
-
-    return getAllTranslations(folders, fileNamePrefix);
+    return getAllTranslations(getFoldersOfProject(toLookAt, path), fileNamePrefix);
   }
 
-  public static List<INlsFolder> getFoldersOfProject(IProject project, IPath path) throws CoreException {
-    List<INlsFolder> folders = new LinkedList<>();
-    if (project.isOpen() && project.hasNature(JavaCore.NATURE_ID)) {
-      // check runtime dir
-      IJavaProject jp = JavaCore.create(project);
-      IClasspathEntry[] clEntries = jp.getRawClasspath();
-      for (IClasspathEntry entry : clEntries) {
-        if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-          IPath toCheck = entry.getPath().append(path);
-          IFolder folder = ResourcesPlugin.getWorkspace().getRoot().getFolder(toCheck);
-          if (folder.exists()) {
-            folders.add(new NlsFolder(folder, INlsFolder.TYPE_PACKAGE_FOLDER));
-          }
+  public static List<IFolder> getFoldersOfProject(IProject project, IPath path) throws CoreException {
+    if (!project.isAccessible() || !project.hasNature(JavaCore.NATURE_ID)) {
+      return Collections.emptyList();
+    }
+
+    IJavaProject jp = JavaCore.create(project);
+    if (jp == null || !jp.exists()) {
+      return Collections.emptyList();
+    }
+
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+    // check runtime dir
+    IClasspathEntry[] clEntries = jp.getRawClasspath();
+    List<IFolder> folders = new ArrayList<>();
+    for (IClasspathEntry entry : clEntries) {
+      if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+        IPath toCheck = entry.getPath().append(path);
+        IFolder folder = root.getFolder(toCheck);
+        if (folder != null && folder.exists()) {
+          folders.add(folder);
         }
       }
+    }
 
-      // check path relative to project
-      IFolder foundFolder = project.getFolder(path);
-      if (foundFolder != null && foundFolder.exists()) {
-        folders.add(new NlsFolder(foundFolder, INlsFolder.TYPE_SIMPLE_FOLDER));
-      }
+    // check path relative to project
+    IFolder foundFolder = project.getFolder(path);
+    if (foundFolder != null && foundFolder.exists()) {
+      folders.add(foundFolder);
     }
     return folders;
   }

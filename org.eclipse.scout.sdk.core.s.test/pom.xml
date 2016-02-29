@@ -40,7 +40,11 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.client</artifactId>
+      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.server</artifactId>
     </dependency>
   </dependencies>
 

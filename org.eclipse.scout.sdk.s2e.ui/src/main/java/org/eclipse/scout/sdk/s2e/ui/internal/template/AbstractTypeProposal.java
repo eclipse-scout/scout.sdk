@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Type;
@@ -301,10 +302,10 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
     @Override
     public Proposal[] call() throws Exception {
-      Set<String> abstractClassesInHierarchy = S2eUtils.findAbstractClassesInHierarchy(getFactory().getJavaProject(), m_hierarchyBaseTypeFqn, null);
+      Set<IType> abstractClassesInHierarchy = S2eUtils.findAbstractClassesInHierarchy(getFactory().getJavaProject(), m_hierarchyBaseTypeFqn, null);
       List<Proposal> result = new ArrayList<>(abstractClassesInHierarchy.size());
-      for (String fqn : abstractClassesInHierarchy) {
-        ITypeBinding binding = getFactory().resolveTypeBinding(fqn);
+      for (IType type : abstractClassesInHierarchy) {
+        ITypeBinding binding = getFactory().resolveTypeBinding(type.getFullyQualifiedName());
         if (binding != null) {
           result.add(new P_JavaLinkedModeProposal(getFactory().getIcu(), binding, 10));
         }

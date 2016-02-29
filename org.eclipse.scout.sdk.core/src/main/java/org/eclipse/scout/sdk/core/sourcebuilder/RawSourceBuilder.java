@@ -38,7 +38,12 @@ public class RawSourceBuilder implements ISourceBuilder {
   @Override
   public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     if (m_content != null) {
-      source.append(m_content.replace("\n", lineDelimiter));
+      String content = StringUtils.replaceEach(m_content, new String[]{
+          "\n", "\r"
+      }, new String[]{
+          lineDelimiter, ""
+      });
+      source.append(content);
     }
     else {
       source.append("null");

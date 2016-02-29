@@ -26,9 +26,9 @@ import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
+import org.eclipse.scout.sdk.s2e.operation.AnnotationNewOperation;
+import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.workspace.AnnotationNewOperation;
-import org.eclipse.scout.sdk.s2e.workspace.IOperation;
 import org.eclipse.ui.IMarkerResolution;
 
 /**
@@ -80,6 +80,6 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
   }
 
   private static IOperation createUpdateAnnotationInJavaSourceOperation(IType annotationOwner, String newId) {
-    return new AnnotationNewOperation(ScoutAnnotationSourceBuilderFactory.createClassIdAnnotation(newId), annotationOwner);
+    return new AnnotationNewOperation(ScoutAnnotationSourceBuilderFactory.createClassId(newId), annotationOwner);
   }
 }

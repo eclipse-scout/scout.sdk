@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -36,9 +37,9 @@ import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.resource.AbstractTranslationResource;
 import org.eclipse.scout.sdk.s2e.nls.resource.TranslationResourceEvent;
+import org.eclipse.scout.sdk.s2e.operation.ResourceWriteOperation;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.WeakResourceChangeListener;
-import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
 
 /**
  * <h4>WorkspaceTranslationFile</h4>
@@ -129,7 +130,12 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
         for (; i < lines.length; i++) {
           // remove all newline characters because java.lang.Properties class uses OS dependent line delimiters.
           // but we would like to use project dependent line delimiters -> remove all first, add project dependent delimiter afterwards.
-          builder.append(lines[i].replace("\n", "").replace("\r", ""));
+          String lineContent = StringUtils.replaceEach(lines[i], new String[]{
+              "\n", "\r"
+          }, new String[]{
+              "", ""
+          });
+          builder.append(lineContent);
           builder.append(nl);
         }
 
