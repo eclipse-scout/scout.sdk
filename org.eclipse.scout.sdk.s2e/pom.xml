@@ -99,6 +99,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <Bundle-Name>Scout SDK</Bundle-Name>
             <Import-Package>
               !javax.*,
               !org.eclipse.core.runtime*,
