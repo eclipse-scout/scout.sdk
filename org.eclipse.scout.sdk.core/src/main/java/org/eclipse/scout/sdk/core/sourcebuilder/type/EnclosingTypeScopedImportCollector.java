@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importcollector.WrappedImportCollector;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 
@@ -38,20 +39,22 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
     m_enclosingQualifier = enclosingTypeSrc.getFullyQualifiedName();
     //self
     m_enclosingQualifiers.add(m_enclosingQualifier);
+
     //declared inner types
     for (ITypeSourceBuilder typeSrc : enclosingTypeSrc.getTypes()) {
       m_enclosedSimpleNames.add(typeSrc.getElementName());
     }
+
     //super types
     IJavaEnvironment env = getJavaEnvironment();
     if (env != null) {
-      Set<String> superSignatures = new HashSet<>();
+      Set<String> superSignatures = new HashSet<>(enclosingTypeSrc.getInterfaceSignatures().size() + 1);
       superSignatures.addAll(enclosingTypeSrc.getInterfaceSignatures());
       if (enclosingTypeSrc.getSuperTypeSignature() != null) {
         superSignatures.add(enclosingTypeSrc.getSuperTypeSignature());
       }
       for (String sig : superSignatures) {
-        String qname = SignatureUtils.toFullyQualifiedName(sig);
+        String qname = SignatureUtils.toFullyQualifiedName(Signature.getTypeErasure(sig));
         m_enclosingQualifiers.add(qname);
         IType t = env.findType(qname);
         if (t != null) {

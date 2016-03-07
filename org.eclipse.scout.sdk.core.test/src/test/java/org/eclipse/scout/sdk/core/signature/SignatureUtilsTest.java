@@ -57,6 +57,12 @@ public class SignatureUtilsTest {
     Assert.assertEquals("java.lang.String[]", SignatureUtils.toFullyQualifiedName("[Ljava.lang.String;"));
     Assert.assertEquals("int", SignatureUtils.toFullyQualifiedName("I"));
     Assert.assertEquals("? extends Object", SignatureUtils.toFullyQualifiedName("+QObject;"));
+
+    String fqnWithTypeArg = "a.b.MyClass<a.b.MyClass$Inner>";
+    Assert.assertEquals(fqnWithTypeArg, SignatureUtils.toFullyQualifiedName(Signature.createTypeSignature(fqnWithTypeArg)));
+
+    String fqnWithTypeArgs = "a.b.MyClass<a.b.MyClass$Inner,c.d.e.OtherClass>";
+    Assert.assertEquals(fqnWithTypeArgs, SignatureUtils.toFullyQualifiedName(Signature.createTypeSignature(fqnWithTypeArgs)));
   }
 
   @Test

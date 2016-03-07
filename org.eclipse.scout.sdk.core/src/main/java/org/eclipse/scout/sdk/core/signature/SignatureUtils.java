@@ -134,23 +134,37 @@ public final class SignatureUtils {
    * toFullyQualifiedName("+QObject;") -> "? extends Object"
    * </pre>
    *
-   * @param sig
+   * @param signature
    *          The signature to convert to a fully qualified name.
    * @return The fully qualified name of the given signature or <code>null</code> if the given signature is
    *         <code>null</code>.
    */
-  public static String toFullyQualifiedName(String sig) {
-    if (sig == null) {
+  public static String toFullyQualifiedName(String signature) {
+    if (signature == null) {
       return null;
     }
+
+    String[] typeArguments = Signature.getTypeArguments(signature);
+    String sig = Signature.getTypeErasure(signature);
+
     String nameUpToPrimaryType = Signature.getSignatureSimpleName(sig).replace(ISignatureConstants.C_DOT, ISignatureConstants.C_DOLLAR); // ensure to keep $ for inner types.
     String pck = Signature.getSignatureQualifier(sig);
-    StringBuilder buf = new StringBuilder(nameUpToPrimaryType.length() + 1 + pck.length());
+
+    StringBuilder buf = new StringBuilder(signature.length());
     if (pck.length() > 0) {
       buf.append(pck);
       buf.append('.');
     }
     buf.append(nameUpToPrimaryType);
+    if (typeArguments.length > 0) {
+      buf.append(ISignatureConstants.C_GENERIC_START);
+      buf.append(toFullyQualifiedName(typeArguments[0]));
+      for (int i = 1; i < typeArguments.length; i++) {
+        buf.append(',');
+        buf.append(toFullyQualifiedName(typeArguments[i]));
+      }
+      buf.append(ISignatureConstants.C_GENERIC_END);
+    }
     return buf.toString();
   }
 
