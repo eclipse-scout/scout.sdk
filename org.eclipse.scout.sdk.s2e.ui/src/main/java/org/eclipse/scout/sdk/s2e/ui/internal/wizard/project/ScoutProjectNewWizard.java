@@ -10,16 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.wizard.project;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
 import org.eclipse.m2e.core.ui.internal.wizards.MappingDiscoveryJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.operation.project.ScoutProjectNewOperation;
@@ -99,8 +108,39 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
   }
 
   protected void discoverMapping(List<IProject> projects) {
-    MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(projects);
+    P_MappingDiscoveryJob discoveryJob = new P_MappingDiscoveryJob(projects);
     discoveryJob.schedule();
+  }
+
+  protected static final class P_MappingDiscoveryJob extends MappingDiscoveryJob {
+
+    public P_MappingDiscoveryJob(Collection<IProject> projects) {
+      super(projects);
+    }
+
+    @Override
+    protected void discoverProposals(LifecycleMappingDiscoveryRequest discoveryRequest, IProgressMonitor monitor) throws CoreException {
+      super.discoverProposals(discoveryRequest, monitor);
+
+      // by default remove all wrong proposals so that only one proposal by execution-id remains -> default selection can choose and is correct by default.
+      for (Entry<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> entry : discoveryRequest.getAllProposals().entrySet()) {
+        if (entry.getKey() instanceof MojoExecutionMappingRequirement) {
+          MojoExecutionMappingRequirement req = (MojoExecutionMappingRequirement) entry.getKey();
+          if ("default-compile".equals(req.getExecutionId()) || "default-testCompile".equals(req.getExecutionId())) {
+            List<IMavenDiscoveryProposal> proposals = entry.getValue();
+            if (proposals != null && proposals.size() > 1) {
+              Iterator<IMavenDiscoveryProposal> iterator = proposals.iterator();
+              while (iterator.hasNext()) {
+                IMavenDiscoveryProposal proposal = iterator.next();
+                if (proposal == null || !proposal.toString().endsWith("Eclipse JDT Compiler")) {
+                  iterator.remove();
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   /**

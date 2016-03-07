@@ -58,6 +58,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <Bundle-Name>Scout SDK Documentation</Bundle-Name>
             <Require-Bundle>
               org.eclipse.help;bundle-version="[3.2.0,4.0.0)"
             </Require-Bundle>

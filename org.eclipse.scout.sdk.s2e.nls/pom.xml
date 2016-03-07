@@ -59,6 +59,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <Bundle-Name>Scout SDK National Language Support</Bundle-Name>
             <Import-Package>
               !javax.*,
               !org.eclipse.core.runtime*,

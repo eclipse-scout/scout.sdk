@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.operation.codetype;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -24,7 +25,6 @@ import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.uniqueid.UniqueIdExtensionPoint;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.jsoup.helper.Validate;
 
 /**
  * <h3>{@link CodeTypeNewOperation}</h3>

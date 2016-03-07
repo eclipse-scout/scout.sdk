@@ -37,6 +37,8 @@
     - Make sure that ${org.eclipse.jdt.core-maven}, ${org.eclipse.equinox.common-maven}, ${org.eclipse.osgi-maven},... in the parent POM don't have a '-SNAPSHOT' suffix
     - In org.eclipse.scout.sdk.s2e.releng/, execute
     mvn clean deploy -Pdeploy-releases -DforgeReleaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DforgeReleaseId=forge-releases -Dgpg.passphrase=<your_passphrase>
+    - For single additional deps: In org.eclipse.scout.sdk.s2e.releng/, execute
+    mvn clean deploy -Pdeploy-releases-addNewDeps -DforgeReleaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DforgeReleaseId=forge-releases -Dgpg.passphrase=<your_passphrase>
     - Close and release staged artifacts into repository 'Releases'
   -->
   <properties>
@@ -46,30 +48,8 @@
   </properties>
 
   <build>
-    <resources>
-      <resource>
-        <filtering>true</filtering>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**/*.pom</include>
-        </includes>
-      </resource>
-      <resource>
-        <filtering>false</filtering>
-        <directory>src/main/resources</directory>
-        <excludes>
-          <exclude>**/*.pom</exclude>
-        </excludes>
-      </resource>
-    </resources>
-
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.7</version>
-        </plugin>
         <plugin>
           <groupId>org.eclipse.tycho.extras</groupId>
           <artifactId>tycho-p2-extras-plugin</artifactId>
@@ -107,10 +87,17 @@
         <configuration>
           <resources>
             <resource>
-              <directory>${project.source.dircetory}</directory>
+              <directory>src/main/resources</directory>
               <filtering>true</filtering>
               <includes>
                 <include>*.pom</include>
+              </includes>
+            </resource>
+            <resource>
+              <directory>src/main/resources</directory>
+              <filtering>false</filtering>
+              <includes>
+                <include>*.jar</include>
               </includes>
             </resource>
           </resources>
@@ -210,6 +197,14 @@
             <iu>
               <id>org.eclipse.core.filesystem.source</id>
               <version>${org.eclipse.core.filesystem}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.core.variables</id>
+              <version>${org.eclipse.core.variables}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.core.variables.source</id>
+              <version>${org.eclipse.core.variables}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.runtime</id>
@@ -689,6 +684,18 @@
                   <file>${downloaded}/org.eclipse.core.filesystem_${org.eclipse.core.filesystem}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.filesystem.source_${org.eclipse.core.filesystem}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.filesystem.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-core-variables</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.variables_${org.eclipse.core.variables}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.variables.source_${org.eclipse.core.variables}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.variables.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -1419,7 +1426,7 @@
                 </configuration>
               </execution>
               <execution>
-                <id>deploy-core-filesystems</id>
+                <id>deploy-core-filesystem</id>
                 <goals>
                   <goal>sign-and-deploy-file</goal>
                 </goals>
@@ -1428,6 +1435,19 @@
                   <file>${downloaded}/org.eclipse.core.filesystem_${org.eclipse.core.filesystem}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.filesystem.source_${org.eclipse.core.filesystem}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.filesystem.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-core-variables</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.variables_${org.eclipse.core.variables}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.variables.source_${org.eclipse.core.variables}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.variables.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
@@ -1570,6 +1590,37 @@
                 <configuration>
                   <file>${downloaded}/org.eclipse.m2e.archetype.common_${org.eclipse.m2e.archetype.common}.jar</file>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.archetype.common.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>deploy-releases-addNewDeps</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.7.0.MGPG-53</version>
+            <configuration>
+              <repositoryId>${forgeReleaseId}</repositoryId>
+              <url>${forgeReleaseUrl}</url>
+            </configuration>
+            <executions>
+              <execution>
+                <id>deploy-core-variables</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.variables_${org.eclipse.core.variables}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.variables.source_${org.eclipse.core.variables}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.variables.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>

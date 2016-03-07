@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -24,8 +25,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-
-import com.google.common.base.Objects;
 
 /**
  * <h3>{@link PackageContentProvider}</h3>
@@ -85,7 +84,7 @@ public class PackageContentProvider extends AbstractContentProviderAdapter {
   }
 
   public void setJavaProject(IJavaProject javaProject) {
-    if (Objects.equal(javaProject, getJavaProject())) {
+    if (Objects.equals(javaProject, getJavaProject())) {
       return;
     }
 

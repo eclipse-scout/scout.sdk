@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -41,8 +42,6 @@ import org.eclipse.scout.sdk.s2e.util.NormalizedPattern;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils.ElementNameComparator;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils.PublicPrimaryTypeFilter;
-
-import com.google.common.base.Objects;
 
 /**
  * <h3>{@link TypeContentProvider}</h3>
@@ -87,7 +86,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
 
   @Override
   public Collection<Object> getProposals(NormalizedPattern searchPattern, IProgressMonitor monitor) {
-    if (!Objects.equal(m_lastPattern, searchPattern)) {
+    if (!Objects.equals(m_lastPattern, searchPattern)) {
       m_lastPattern = searchPattern;
       clearCache();
     }

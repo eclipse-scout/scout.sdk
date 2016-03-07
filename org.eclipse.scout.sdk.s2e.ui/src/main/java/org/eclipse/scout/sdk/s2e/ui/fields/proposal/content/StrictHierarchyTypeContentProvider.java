@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
@@ -21,8 +22,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-
-import com.google.common.base.Objects;
 
 /**
  * <h3>{@link StrictHierarchyTypeContentProvider}</h3>
@@ -78,7 +77,7 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
   }
 
   public void setJavaProject(IJavaProject javaProject) {
-    if (Objects.equal(javaProject, getJavaProject())) {
+    if (Objects.equals(javaProject, getJavaProject())) {
       return;
     }
 
@@ -91,7 +90,7 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
   }
 
   public void setBaseClassFqn(String baseClassFqn) {
-    if (Objects.equal(baseClassFqn, getBaseClassFqn())) {
+    if (Objects.equals(baseClassFqn, getBaseClassFqn())) {
       return;
     }
     m_baseClassFqn = baseClassFqn;
@@ -103,7 +102,7 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
   }
 
   public void setTypeProposalFilter(IFilter<IType> typeProposalFilter) {
-    if (Objects.equal(typeProposalFilter, getTypeProposalFilter())) {
+    if (Objects.equals(typeProposalFilter, getTypeProposalFilter())) {
       return;
     }
     m_typeProposalFilter = typeProposalFilter;
