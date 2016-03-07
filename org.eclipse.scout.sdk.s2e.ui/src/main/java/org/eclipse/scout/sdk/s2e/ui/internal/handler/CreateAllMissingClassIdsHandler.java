@@ -20,12 +20,12 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * <h3>{@link WellformAllHandler}</h3>
+ * <h3>{@link CreateAllMissingClassIdsHandler}</h3>
  *
  * @author Matthias Villiger
  * @since 5.2.0
  */
-public class MissingClassIdsNewHandler extends AbstractHandler {
+public class CreateAllMissingClassIdsHandler extends AbstractHandler {
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
     MessageBox messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);

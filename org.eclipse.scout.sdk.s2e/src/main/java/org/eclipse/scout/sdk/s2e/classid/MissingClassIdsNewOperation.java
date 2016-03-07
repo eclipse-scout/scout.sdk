@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.classid;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,6 +58,9 @@ import org.eclipse.text.edits.TextEdit;
  */
 public class MissingClassIdsNewOperation implements IOperation {
 
+  public MissingClassIdsNewOperation() {
+  }
+
   @Override
   public String getOperationName() {
     return "Create missing @ClassId annotations";
@@ -67,54 +72,65 @@ public class MissingClassIdsNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    SubMonitor progress = SubMonitor.convert(monitor, 10);
     try {
-      Set<IType> startTypes = S2eUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
-      if (monitor.isCanceled()) {
+      Collection<IType> candidates = findCandidates(progress.newChild(2));
+      if (candidates.isEmpty()) {
         return;
       }
-
-      int workByType = 10;
-      SubMonitor progress = SubMonitor.convert(monitor, startTypes.size() * workByType);
-      for (IType startType : startTypes) {
-        if (S2eUtils.exists(startType)) {
-          processBaseType(startType, progress.newChild(workByType), workingCopyManager);
-        }
-        if (monitor.isCanceled()) {
-          return;
-        }
-      }
+      processCandidates(candidates, progress.newChild(8), workingCopyManager);
     }
     catch (OperationCanceledException e) {
       SdkLog.debug("Creation of missing @ClassId annotations has been cancelled.", e);
     }
   }
 
-  protected void processBaseType(IType startType, SubMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  protected ITypeHierarchy createHierarchy(IType iTypeWithClassId, SubMonitor monitor) throws CoreException {
+    return iTypeWithClassId.newTypeHierarchy(monitor);
+  }
+
+  protected Collection<IType> findCandidates(SubMonitor monitor) throws CoreException {
+    Set<IType> result = new HashSet<>();
+    Set<IType> startTypes = S2eUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
+    monitor.setWorkRemaining(startTypes.size());
     monitor.setTaskName("Search for classes...");
-    ITypeHierarchy hierarchy = startType.newTypeHierarchy(null);
-    monitor.worked(1);
-    if (monitor.isCanceled()) {
-      return;
+    if (startTypes.isEmpty()) {
+      return Collections.emptyList();
     }
 
-    IType[] allSubtypes = hierarchy.getAllSubtypes(startType);
-    hierarchy = null;
+    for (IType startType : startTypes) {
+      ITypeHierarchy hierarchy = createHierarchy(startType, monitor.newChild(1));
+      if (hierarchy == null || monitor.isCanceled()) {
+        return Collections.emptyList();
+      }
 
-    SubMonitor subMonitor = monitor.newChild(3);
-    subMonitor.beginTask(null, allSubtypes.length);
+      for (IType t : hierarchy.getAllSubtypes(startType)) {
+        result.add(t);
+      }
+
+      if (monitor.isCanceled()) {
+        return Collections.emptyList();
+      }
+    }
+    return result;
+  }
+
+  protected void processCandidates(Collection<IType> candidates, SubMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    SubMonitor subMonitor = monitor.newChild(2);
+    subMonitor.setWorkRemaining(candidates.size());
     subMonitor.setTaskName("Search for missing annotations...");
-    Map<ICompilationUnit, Set<IType>> typesWithClassId = new HashMap<>();
 
     int numTypes = 0;
-    for (IType t : allSubtypes) {
+    Map<ICompilationUnit, Set<IType>> typesWithoutClassId = new HashMap<>();
+    for (IType t : candidates) {
       if (S2eUtils.exists(t) && !t.isBinary() && t.isClass() && !t.isAnonymous() && !t.isReadOnly() && !Flags.isAbstract(t.getFlags())) {
         IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
         if (annotation == null) {
           ICompilationUnit icu = t.getCompilationUnit();
-          Set<IType> listByIcu = typesWithClassId.get(icu);
+          Set<IType> listByIcu = typesWithoutClassId.get(icu);
           if (listByIcu == null) {
             listByIcu = new HashSet<>();
-            typesWithClassId.put(icu, listByIcu);
+            typesWithoutClassId.put(icu, listByIcu);
           }
           if (listByIcu.add(t)) {
             numTypes++;
@@ -126,13 +142,12 @@ public class MissingClassIdsNewOperation implements IOperation {
       }
       subMonitor.worked(1);
     }
-    allSubtypes = null;
 
     subMonitor = monitor.newChild(6);
-    subMonitor.beginTask(null, numTypes);
-    monitor.setTaskName("Create new annotations...");
+    subMonitor.setWorkRemaining(numTypes);
+    subMonitor.setTaskName("Create new annotations...");
     CachingJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
-    for (Entry<ICompilationUnit, Set<IType>> e : typesWithClassId.entrySet()) {
+    for (Entry<ICompilationUnit, Set<IType>> e : typesWithoutClassId.entrySet()) {
       createClassIdsForIcu(e.getKey(), e.getValue(), subMonitor, workingCopyManager, envProvider);
       if (monitor.isCanceled()) {
         return;
@@ -140,7 +155,7 @@ public class MissingClassIdsNewOperation implements IOperation {
     }
   }
 
-  private static void createClassIdsForIcu(ICompilationUnit icu, Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, IJavaEnvironmentProvider envProvider) throws CoreException {
+  public static void createClassIdsForIcu(ICompilationUnit icu, Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, IJavaEnvironmentProvider envProvider) throws CoreException {
     workingCopyManager.register(icu, null);
 
     IJavaEnvironment environment = envProvider.get(icu.getJavaProject());
