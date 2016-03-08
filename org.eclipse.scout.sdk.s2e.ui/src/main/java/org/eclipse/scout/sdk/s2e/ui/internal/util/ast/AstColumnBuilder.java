@@ -10,14 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.util.ast;
 
-import java.util.Deque;
-import java.util.Iterator;
-
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
@@ -54,15 +49,6 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
     return this;
   }
 
-  protected static boolean hasTypeArgsInDeclaringTypes(Deque<TypeDeclaration> declaringTypes) {
-    for (TypeDeclaration td : declaringTypes) {
-      if (!td.typeParameters().isEmpty()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   protected void addColumnGetter() {
     MethodInvocation getColumnSet = getFactory().getAst().newMethodInvocation();
     getColumnSet.setName(getFactory().getAst().newSimpleName("getColumnSet"));
@@ -74,26 +60,8 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
       getColumnSet.setExpression(getOwner);
     }
 
-    Type columnGetterReturnType = null;
-    Deque<TypeDeclaration> declaringTypes = AstUtils.getDeclaringTypes(getDeclaringType());
     SimpleName columnSimpleName = getFactory().getAst().newSimpleName(getTypeName() + getReadOnlySuffix());
-
-    // return type with type-parameters in the declaring types
-    if (hasTypeArgsInDeclaringTypes(declaringTypes)) {
-      Type type = null;
-      Iterator<TypeDeclaration> topDownIterator = declaringTypes.descendingIterator();
-      while (topDownIterator.hasNext()) {
-        type = wrapParameterizedIfRequired(topDownIterator.next(), type);
-      }
-      if (type != null) {
-        columnGetterReturnType = getFactory().getAst().newQualifiedType(type, columnSimpleName);
-      }
-    }
-
-    // return type without type-parameters in the declaring types (default case)
-    if (columnGetterReturnType == null) {
-      columnGetterReturnType = getFactory().getAst().newSimpleType(columnSimpleName);
-    }
+    Type columnGetterReturnType = AstUtils.getInnerTypeReturnType(columnSimpleName, getDeclaringType());
 
     getFactory().newInnerTypeGetter()
         .withMethodNameToFindInnerType("getColumnByClass")
@@ -103,26 +71,5 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
         .withReturnType(columnGetterReturnType)
         .in(getDeclaringType())
         .insert();
-  }
-
-  @SuppressWarnings("unchecked")
-  protected Type wrapParameterizedIfRequired(TypeDeclaration template, Type type) {
-    SimpleName sn = getFactory().getAst().newSimpleName(template.getName().getIdentifier());
-    if (type == null) {
-      type = getFactory().getAst().newSimpleType(sn);
-    }
-    else {
-      type = getFactory().getAst().newQualifiedType(type, sn);
-    }
-
-    if (template.typeParameters().isEmpty()) {
-      return type;
-    }
-
-    ParameterizedType parameterizedType = getFactory().getAst().newParameterizedType(type);
-    for (int i = 0; i < template.typeParameters().size(); i++) {
-      parameterizedType.typeArguments().add(getFactory().getAst().newWildcardType());
-    }
-    return parameterizedType;
   }
 }

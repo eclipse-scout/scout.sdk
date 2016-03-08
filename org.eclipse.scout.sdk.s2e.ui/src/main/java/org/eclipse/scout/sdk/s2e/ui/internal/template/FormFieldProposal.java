@@ -54,11 +54,15 @@ public class FormFieldProposal extends AbstractTypeProposal {
     // import to not yet created form field type
     addFormFieldImport(parentTypes);
 
+    //
+    SimpleName formFieldSimpleName = factory.getAst().newSimpleName(getProposalContext().getDefaultName() + getProposalContext().getSuffix());
+    Type formFieldGetterReturnType = AstUtils.getInnerTypeReturnType(formFieldSimpleName, getProposalContext().getDeclaringType());
+
     AstInnerTypeGetterBuilder formFieldGetter = factory.newInnerTypeGetter()
         .withMethodNameToFindInnerType("getFieldByClass")
         .withName(getProposalContext().getDefaultName())
         .withReadOnlySuffix(getProposalContext().getSuffix())
-        .withReturnType(factory.getAst().newSimpleType(factory.getAst().newSimpleName(getProposalContext().getDefaultName() + getProposalContext().getSuffix())));
+        .withReturnType(formFieldGetterReturnType);
 
     if (AstUtils.isInstanceOf(getFactory().getDeclaringTypeBinding(), IScoutRuntimeTypes.IExtension)) {
       MethodInvocation getOwner = getFactory().getAst().newMethodInvocation();

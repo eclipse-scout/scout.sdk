@@ -58,9 +58,6 @@ import org.eclipse.text.edits.TextEdit;
  */
 public class MissingClassIdsNewOperation implements IOperation {
 
-  public MissingClassIdsNewOperation() {
-  }
-
   @Override
   public String getOperationName() {
     return "Create missing @ClassId annotations";

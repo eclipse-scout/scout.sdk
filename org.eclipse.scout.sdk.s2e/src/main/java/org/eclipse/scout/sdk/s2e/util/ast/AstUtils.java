@@ -31,6 +31,8 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.ParameterizedType;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -81,6 +83,70 @@ public final class AstUtils {
       return null;
     }
     return (IType) javaElement;
+  }
+
+  /**
+   * Gets the return {@link Type} for a new inner type with given {@link SimpleName} created in the given declaring
+   * {@link TypeDeclaration}.<br>
+   * This method respects type parameters existing in the declaring types of the new inner type and depending on the
+   * existence of such type parameters creates the return type as qualified including type parameter wildcards or as
+   * simple type.
+   *
+   * @param innerTypeSimpleName
+   *          The {@link SimpleName} of the new inner type.
+   * @param innerTypeDeclaringType
+   *          The {@link TypeDeclaration} in which the new inner type will be created.
+   * @return A {@link Type} to be used as return type for a getter method returning the given type.
+   */
+  public static Type getInnerTypeReturnType(SimpleName innerTypeSimpleName, TypeDeclaration innerTypeDeclaringType) {
+    AST ast = innerTypeSimpleName.getAST();
+    Deque<TypeDeclaration> declaringTypes = AstUtils.getDeclaringTypes(innerTypeDeclaringType);
+
+    if (hasTypeParametersInDeclaringTypes(declaringTypes)) {
+      // return type with type-parameters in the declaring types
+      Type type = null;
+      Iterator<TypeDeclaration> topDownIterator = declaringTypes.descendingIterator();
+      while (topDownIterator.hasNext()) {
+        type = wrapParameterizedIfRequired(topDownIterator.next(), type);
+      }
+      if (type != null) {
+        return ast.newQualifiedType(type, innerTypeSimpleName);
+      }
+    }
+
+    // return type without type-parameters in the declaring types (default case)
+    return ast.newSimpleType(innerTypeSimpleName);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Type wrapParameterizedIfRequired(TypeDeclaration template, Type type) {
+    AST ast = template.getAST();
+    SimpleName sn = ast.newSimpleName(template.getName().getIdentifier());
+    if (type == null) {
+      type = ast.newSimpleType(sn);
+    }
+    else {
+      type = ast.newQualifiedType(type, sn);
+    }
+
+    if (template.typeParameters().isEmpty()) {
+      return type;
+    }
+
+    ParameterizedType parameterizedType = ast.newParameterizedType(type);
+    for (int i = 0; i < template.typeParameters().size(); i++) {
+      parameterizedType.typeArguments().add(ast.newWildcardType());
+    }
+    return parameterizedType;
+  }
+
+  private static boolean hasTypeParametersInDeclaringTypes(Deque<TypeDeclaration> declaringTypes) {
+    for (TypeDeclaration td : declaringTypes) {
+      if (!td.typeParameters().isEmpty()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
