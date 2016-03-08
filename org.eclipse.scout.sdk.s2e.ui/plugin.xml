@@ -68,8 +68,22 @@
                style="push">
             </command>
             <command
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.wellformSelected"
+               style="push">
+            </command>
+            <separator
+               name="org.eclipse.scout.sdk.s2e.ui.menu.separator02"
+               visible="true">
+            </separator>
+            <command
                commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
                id="org.eclipse.scout.sdk.s2e.ui.menu.missingClassId"
+               style="push">
+            </command>
+            <command
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.missingClassIdSelected"
                style="push">
             </command>
          </menu>
@@ -166,8 +180,18 @@
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
       <command
-            name="Create missing @ClassId Annotations..."
+            name="Wellform classes in selected scope"
+            id="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </command>
+      <command
+            name="Create all missing @ClassId Annotations..."
             id="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </command>
+      <command
+            name="Create missing @ClassId Annotations in selected scope"
+            id="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
    </extension>
@@ -185,8 +209,16 @@
             class="org.eclipse.scout.sdk.s2e.ui.internal.handler.WellformAllHandler">
       </handler>
       <handler
+          commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
+          class="org.eclipse.scout.sdk.s2e.ui.internal.handler.WellformSelectedHandler">
+      </handler>
+      <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.MissingClassIdsNewHandler">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateAllMissingClassIdsHandler">
+      </handler>
+      <handler
+            commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateMissingClassIdsSelectedHandler">
       </handler>
    </extension>
 </plugin>

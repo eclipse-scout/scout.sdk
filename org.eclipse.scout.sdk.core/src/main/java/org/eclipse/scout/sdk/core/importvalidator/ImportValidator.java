@@ -86,8 +86,10 @@ public class ImportValidator implements IImportValidator {
         String use = collector.checkExistingImports(cand);
         if (use == null) {
           use = collector.checkCurrentScope(cand);
-          if (isTypeArg) {
-            collector.registerElement(cand); // ensure it is registered as used so that it appears in the imports (for type arguments only)
+          boolean foundInCurrentScope = use != null && use.indexOf(ISignatureConstants.C_DOT) < 0;
+          if (isTypeArg && foundInCurrentScope && collector.getQualifier().equals(cand.getQualifier())) {
+            // special case for type argument signature which are simple qualified because in same scope
+            collector.registerElement(cand); // ensure it is registered as used so that it appears in the imports for inner types only
           }
         }
         if (use == null) {
@@ -95,7 +97,7 @@ public class ImportValidator implements IImportValidator {
         }
         sigBuilder.append(use);
 
-        if (typeArguments != null && typeArguments.length > 0) {
+        if (typeArguments.length > 0) {
           sigBuilder.append(ISignatureConstants.C_GENERIC_START);
           sigBuilder.append(useSignatureInternal(typeArguments[0], true));
           for (int i = 1; i < typeArguments.length; i++) {

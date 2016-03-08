@@ -21,12 +21,15 @@ import org.eclipse.scout.sdk.core.fixture.ImportTestClass;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitScopedImportCollector;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.EnclosingTypeScopedImportCollector;
+import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,6 +56,41 @@ public class ImportValidatorTest {
 
     Collection<String> importsToCreate = iv.createImportDeclarations();
     Assert.assertEquals(Arrays.asList("import " + ownClassFqn + ";"), importsToCreate);
+  }
+
+  @Test
+  public void testTypeArgToTypeInSamePackage() {
+    CompilationUnitSourceBuilder cu = new CompilationUnitSourceBuilder("MyClass.java", "test");
+    ITypeSourceBuilder t = new TypeSourceBuilder("MyClass");
+    t.setSuperTypeSignature(Signature.createTypeSignature("a.b.SuperClass<test.External>"));
+    cu.addType(t);
+
+    IImportValidator validator = new ImportValidator(new ImportCollector((IJavaEnvironment) null));
+    StringBuilder sourceBuilder = new StringBuilder();
+    cu.createSource(sourceBuilder, "\n", null, validator);
+
+    Collection<String> imports = validator.getImportCollector().getImports();
+    Assert.assertEquals(2, imports.size());
+    Assert.assertTrue(imports.contains("test.MyClass"));
+    Assert.assertTrue(imports.contains("a.b.SuperClass"));
+  }
+
+  @Test
+  public void testTypeArgToInnerType() {
+    CompilationUnitSourceBuilder cu = new CompilationUnitSourceBuilder("MyClass.java", "test");
+    ITypeSourceBuilder t = new TypeSourceBuilder("MyClass");
+    t.setSuperTypeSignature(Signature.createTypeSignature("a.b.SuperClass<test.MyClass.Inner>"));
+    cu.addType(t);
+
+    IImportValidator validator = new ImportValidator(new ImportCollector((IJavaEnvironment) null));
+    StringBuilder sourceBuilder = new StringBuilder();
+    cu.createSource(sourceBuilder, "\n", null, validator);
+
+    Collection<String> imports = validator.getImportCollector().getImports();
+    Assert.assertEquals(3, imports.size());
+    Assert.assertTrue(imports.contains("test.MyClass.Inner"));
+    Assert.assertTrue(imports.contains("test.MyClass"));
+    Assert.assertTrue(imports.contains("a.b.SuperClass"));
   }
 
   @Test

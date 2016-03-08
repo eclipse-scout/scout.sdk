@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
+import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -142,7 +143,12 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       ITrackedNodePosition methodPos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(get().getName()), getReadOnlyPrefix().length(), -getReadOnlyPrefix().length() - getReadOnlySuffix().length());
-      ITrackedNodePosition returnNamePos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(getReturnType()), 0, -getReadOnlySuffix().length());
+      ASTNode returnTypeNode = getReturnType();
+      if (returnTypeNode instanceof QualifiedType) {
+        QualifiedType t = (QualifiedType) returnTypeNode;
+        returnTypeNode = t.getName();
+      }
+      ITrackedNodePosition returnNamePos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(returnTypeNode), 0, -getReadOnlySuffix().length());
       ITrackedNodePosition typeLiteralPos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(m_typeLiteralName), 0, -getReadOnlySuffix().length());
 
       links.addLinkedPosition(returnNamePos, false, AstNodeFactory.TYPE_NAME_GROUP);

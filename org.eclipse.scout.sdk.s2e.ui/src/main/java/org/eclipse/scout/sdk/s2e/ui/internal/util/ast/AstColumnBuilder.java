@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.util.ast;
 
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
@@ -48,7 +50,6 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
   }
 
   protected void addColumnGetter() {
-
     MethodInvocation getColumnSet = getFactory().getAst().newMethodInvocation();
     getColumnSet.setName(getFactory().getAst().newSimpleName("getColumnSet"));
 
@@ -59,12 +60,15 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
       getColumnSet.setExpression(getOwner);
     }
 
+    SimpleName columnSimpleName = getFactory().getAst().newSimpleName(getTypeName() + getReadOnlySuffix());
+    Type columnGetterReturnType = AstUtils.getInnerTypeReturnType(columnSimpleName, getDeclaringType());
+
     getFactory().newInnerTypeGetter()
         .withMethodNameToFindInnerType("getColumnByClass")
         .withMethodToFindInnerTypeExpression(getColumnSet)
         .withName(getTypeName())
         .withReadOnlySuffix(getReadOnlySuffix())
-        .withReturnType(getFactory().getAst().newSimpleType(getFactory().getAst().newSimpleName(getTypeName() + getReadOnlySuffix())))
+        .withReturnType(columnGetterReturnType)
         .in(getDeclaringType())
         .insert();
   }
