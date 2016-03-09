@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -131,8 +131,7 @@ public final class ScoutProjectNewHelper {
         return;
       }
 
-      DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+      DocumentBuilder docBuilder = CoreUtils.createDocumentBuilder();
       Document doc = docBuilder.parse(pom);
 
       Element modules = getFirstChildElement(doc.getDocumentElement(), "modules");
@@ -144,7 +143,7 @@ public final class ScoutProjectNewHelper {
         if (n.getNodeType() == Node.TEXT_NODE) {
           nodesToRemove.add(n);
         }
-        else if (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !n.getTextContent().trim().endsWith(".parent")) {
+        else if (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !targetDirectory.getName().equals(n.getTextContent().trim())) {
           nodesToRemove.add(n);
         }
       }
@@ -161,8 +160,12 @@ public final class ScoutProjectNewHelper {
 
   protected static void writeDocument(Document document, Result result) throws TransformerException {
     TransformerFactory tf = TransformerFactory.newInstance();
+    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
     Transformer transformer = tf.newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "no");
+
     transformer.transform(new DOMSource(document), result);
   }
 

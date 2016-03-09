@@ -15,6 +15,8 @@ import java.security.GeneralSecurityException;
 import java.util.AbstractList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
@@ -291,5 +293,18 @@ public class CoreUtilsTest {
     Assert.assertEquals("int a = 4;", CoreUtils.removeComments("// my comment\nint a = 4;"));
     Assert.assertEquals(" int a = 4; ", CoreUtils.removeComments("/* my comment*/ int a = 4; "));
     Assert.assertEquals("int a = 4;", CoreUtils.removeComments("/** my comment*/int a = 4;"));
+  }
+
+  @Test
+  public void testEscapeHtml() {
+
+    Assert.assertEquals("", CoreUtils.escapeHtml(""));
+    Assert.assertEquals("a&amp;&lt;&gt;&quot;&#47;&#39;&#39;b", CoreUtils.escapeHtml("a&<>\"/''b"));
+    Assert.assertNull(CoreUtils.escapeHtml(null));
+  }
+
+  @Test
+  public void testCreateDocumentBuilder() throws ParserConfigurationException {
+    CoreUtils.createDocumentBuilder();
   }
 }

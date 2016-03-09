@@ -39,11 +39,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
@@ -60,6 +64,7 @@ import org.eclipse.scout.sdk.core.model.api.internal.PropertyBean;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.w3c.dom.Document;
 
 /**
  * <h3>{@link CoreUtils}</h3> Holds core utilities.
@@ -832,7 +837,7 @@ public final class CoreUtils {
 
   /**
    * Returns the given input HTML with all characters escaped.
-   * 
+   *
    * @param html
    *          The input HTML.
    * @return The escaped version.
@@ -846,5 +851,36 @@ public final class CoreUtils {
     }, new String[]{
         "&amp;", "&lt;", "&gt;", "&quot;", "&#47;", "&#39;"
     });
+  }
+
+  /**
+   * Creates a new {@link DocumentBuilder} to create a DOM of an XML file.<br>
+   * Use {@link DocumentBuilder#parse()} to create a new {@link Document}.
+   *
+   * @return The created builder. All external entities are disabled to prevent XXE.
+   * @throws ParserConfigurationException
+   *           if a {@link DocumentBuilder} cannot be created which satisfies the configuration requested.
+   */
+  public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    Map<String, Boolean> features = new HashMap<>(4);
+    features.put("http://apache.org/xml/features/disallow-doctype-decl", Boolean.TRUE);
+    features.put("http://xml.org/sax/features/external-general-entities", Boolean.FALSE);
+    features.put("http://xml.org/sax/features/external-parameter-entities", Boolean.FALSE);
+    features.put("http://apache.org/xml/features/nonvalidating/load-external-dtd", Boolean.FALSE);
+    dbf.setXIncludeAware(false);
+    dbf.setExpandEntityReferences(false);
+
+    for (Entry<String, Boolean> a : features.entrySet()) {
+      String feature = a.getKey();
+      boolean enabled = a.getValue().booleanValue();
+      try {
+        dbf.setFeature(feature, enabled);
+      }
+      catch (ParserConfigurationException e) {
+        SdkLog.debug("Feature '{}' is not supported in the current XML parser. Skipping.", feature, e);
+      }
+    }
+    return dbf.newDocumentBuilder();
   }
 }
