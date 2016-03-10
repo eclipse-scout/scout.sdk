@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,22 +58,20 @@ public final class ScoutProjectNewHelper {
   private ScoutProjectNewHelper() {
   }
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName) throws IOException, GeneralSecurityException {
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName) throws IOException {
     createProject(targetDirectory, groupId, artifactId, displayName, null);
   }
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion) throws IOException, GeneralSecurityException {
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion) throws IOException {
     createProject(targetDirectory, groupId, artifactId, displayName, javaVersion, null, null, null);
   }
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion, String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion)
-      throws IOException, GeneralSecurityException {
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion, String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion) throws IOException {
     createProject(targetDirectory, groupId, artifactId, displayName, javaVersion, archetypeGroupId, archeTypeArtifactId, archetypeVersion, null, null);
   }
 
   public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion,
-      String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion, String mavenGlobalSettings, String mavenSettings)
-          throws IOException, GeneralSecurityException {
+      String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion, String mavenGlobalSettings, String mavenSettings) throws IOException {
     // validate input
     Validate.notNull(targetDirectory);
     String groupIdMsg = getMavenNameErrorMessage(groupId, "groupId");
@@ -106,8 +105,8 @@ public final class ScoutProjectNewHelper {
     }
 
     // create command
-    String[] authKeysForWar = CoreUtils.generateKeyPair();
-    String[] authKeysForDev = CoreUtils.generateKeyPair();
+    String[] authKeysForWar = generateKeyPair();
+    String[] authKeysForDev = generateKeyPair();
     String[] args = new String[]{"archetype:generate", "-B",
         "-DarchetypeGroupId=" + archetypeGroupId, "-DarchetypeArtifactId=" + archeTypeArtifactId, "-DarchetypeVersion=" + archetypeVersion,
         "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + pck,
@@ -119,6 +118,17 @@ public final class ScoutProjectNewHelper {
     new MavenCliRunner().execute(targetDirectory, args, mavenGlobalSettings, mavenSettings);
 
     postProcessRootPom(new File(targetDirectory, artifactId));
+  }
+
+  protected static String[] generateKeyPair() {
+    try {
+      return CoreUtils.generateKeyPair();
+    }
+    catch (GeneralSecurityException e) {
+      SdkLog.warning("Could not generate a new key pair.", e);
+      String keyPlaceholder = "TODO_use_org.eclipse.scout.rt.platform.security.SecurityUtility.main(String[]))";
+      return new String[]{keyPlaceholder, keyPlaceholder};
+    }
   }
 
   /**
@@ -151,6 +161,7 @@ public final class ScoutProjectNewHelper {
         modules.removeChild(n);
       }
 
+      Validate.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");
       writeDocument(doc, new StreamResult(pom));
     }
     catch (ParserConfigurationException | SAXException | TransformerException e) {
