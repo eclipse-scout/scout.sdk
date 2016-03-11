@@ -57,15 +57,12 @@ public class FormSourceBuilderTest {
 
     // Service interface
     ServiceInterfaceSourceBuilder svcIfcBuilder = new ServiceInterfaceSourceBuilder("IMyFormService", "org.eclispe.scout.sdk.core.s.test");
-    svcIfcBuilder.setDtoSignature(Signature.createTypeSignature(createdFormData.name()));
     svcIfcBuilder.setup();
     source = CoreUtils.createJavaCode(svcIfcBuilder, clientEnv, "\n", null);
     IType createdSvcIfc = CoreTestingUtils.assertNoCompileErrors(clientEnv, svcIfcBuilder.getPackageName(), svcIfcBuilder.getMainType().getElementName(), source);
 
     // Service Impl
     ServiceImplSourceBuilder svcImplBuilder = new ServiceImplSourceBuilder("MyFormService", "org.eclispe.scout.sdk.core.s.test", svcIfcBuilder.getMainType());
-    svcImplBuilder.setReadPermissionSignature(Signature.createTypeSignature(createdPermission.name()));
-    svcImplBuilder.setUpdatePermissionSignature(Signature.createTypeSignature(createdPermission.name()));
     svcImplBuilder.setup();
     source = CoreUtils.createJavaCode(svcImplBuilder, clientEnv, "\n", null);
     CoreTestingUtils.assertNoCompileErrors(clientEnv, svcImplBuilder.getPackageName(), svcImplBuilder.getMainType().getElementName(), source);

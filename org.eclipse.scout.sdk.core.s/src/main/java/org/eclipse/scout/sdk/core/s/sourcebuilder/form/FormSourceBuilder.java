@@ -21,7 +21,6 @@ import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.s.model.ScoutMethodSourceBuilderFactory;
-import org.eclipse.scout.sdk.core.s.sourcebuilder.service.ServiceInterfaceSourceBuilder;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.IAnnotatableSourceBuilder;
@@ -45,7 +44,9 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  */
 public class FormSourceBuilder extends CompilationUnitSourceBuilder {
 
-  private static final String MODIFY_HANDLER_NAME = "ModifyHandler";
+  public static final String SERVICE_LOAD_METHOD_NAME = "load";
+  public static final String SERVICE_STORE_METHOD_NAME = "store";
+  public static final String MODIFY_HANDLER_NAME = "ModifyHandler";
   public static final int NUM_CLASS_IDS = 4;
 
   private String m_formDataSignature;
@@ -221,10 +222,10 @@ public class FormSourceBuilder extends CompilationUnitSourceBuilder {
         }
         source.append(serviceVarName).append('.');
         if (isLoad()) {
-          source.append(ServiceInterfaceSourceBuilder.SERVICE_LOAD_METHOD_NAME);
+          source.append(SERVICE_LOAD_METHOD_NAME);
         }
         else {
-          source.append(ServiceInterfaceSourceBuilder.SERVICE_STORE_METHOD_NAME);
+          source.append(SERVICE_STORE_METHOD_NAME);
         }
         source.append('(');
         if (getMethodArgSourceBuilder() != null) {

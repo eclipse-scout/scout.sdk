@@ -45,7 +45,7 @@ public class NlsFilterComponent extends Composite {
 
   private TableViewer m_tableViewer;
   private final Button m_resetButton;
-  private final HashMap<Language, Text> m_filterFields;
+  private final Map<Language, Text> m_filterFields;
 
   public NlsFilterComponent(Composite parent) {
     super(parent, SWT.DOUBLE_BUFFERED);

@@ -44,7 +44,7 @@ public class NlsResourceProvider {
 
   @SuppressWarnings("rawtypes")
   private static List<Language> getOrderedLanguages(Set<Language> languages) {
-    TreeMap<Comparable[], Language> orderedLanguages = new TreeMap<>(new Comparator<Comparable[]>() {
+    Map<Comparable[], Language> orderedLanguages = new TreeMap<>(new Comparator<Comparable[]>() {
       @Override
       public int compare(Comparable[] o1, Comparable[] o2) {
         for (int i = 0; i < o1.length; i++) {

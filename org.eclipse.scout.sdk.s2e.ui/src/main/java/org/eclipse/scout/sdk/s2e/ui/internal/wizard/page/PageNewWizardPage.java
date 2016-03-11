@@ -37,8 +37,10 @@ import org.eclipse.ui.PlatformUI;
 public class PageNewWizardPage extends CompilationUnitNewWizardPage {
 
   public static final String PROP_SHARED_SOURCE_FOLDER = "sharedSourceFolder";
+  public static final String PROP_SERVER_SOURCE_FOLDER = "serverSourceFolder";
 
-  private ProposalTextField m_sharedSourceFolder;
+  protected ProposalTextField m_sharedSourceFolder;
+  protected ProposalTextField m_serverSourceFolder;
 
   public PageNewWizardPage(PackageContainer packageContainer) {
     super(PageNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_PAGE, IScoutRuntimeTypes.IPage, IScoutRuntimeTypes.AbstractPageWithTable, ScoutTier.Client);
@@ -58,7 +60,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
 
     guessSharedFolders();
 
-    createSharedSourceFolderGroup(parent);
+    createPageServcieGroup(parent);
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PAGE_NEW_WIZARD_PAGE);
   }
@@ -76,15 +78,22 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
     }
 
     try {
-      setSharedSourceFolder(ScoutTier.Client.convert(ScoutTier.Shared, getSourceFolder()));
+      setServerSourceFolder(ScoutTier.Client.convert(ScoutTier.Server, clientSourceFolder));
+    }
+    catch (JavaModelException e) {
+      SdkLog.info("Unable to calculate server source folder.", e);
+    }
+
+    try {
+      setSharedSourceFolder(ScoutTier.Client.convert(ScoutTier.Shared, clientSourceFolder));
     }
     catch (JavaModelException e) {
       SdkLog.info("Unable to calculate shared source folder.", e);
     }
   }
 
-  protected void createSharedSourceFolderGroup(Composite p) {
-    Group parent = getFieldToolkit().createGroupBox(p, "PageData");
+  protected void createPageServcieGroup(Composite p) {
+    Group parent = getFieldToolkit().createGroupBox(p, "PageData & Service Source Folders");
     parent.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     parent.setLayout(new GridLayout(1, true));
 
@@ -99,6 +108,18 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
       @Override
       public void proposalAccepted(Object proposal) {
         setSharedSourceFolderInternal((IPackageFragmentRoot) proposal);
+        pingStateChanging();
+      }
+    });
+
+    // server source folder
+    m_serverSourceFolder = getFieldToolkit().createSourceFolderTextField(parent, "Server Source Folder", ScoutTier.Server, 20);
+    m_serverSourceFolder.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_serverSourceFolder.acceptProposal(getServerSourceFolder());
+    m_serverSourceFolder.addProposalListener(new IProposalListener() {
+      @Override
+      public void proposalAccepted(Object proposal) {
+        setServerSourceFolderInternal((IPackageFragmentRoot) proposal);
         pingStateChanging();
       }
     });
@@ -123,5 +144,26 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
 
   protected void setSharedSourceFolderInternal(IPackageFragmentRoot sharedSourceFolder) {
     setProperty(PROP_SHARED_SOURCE_FOLDER, sharedSourceFolder);
+  }
+
+  public IPackageFragmentRoot getServerSourceFolder() {
+    return getProperty(PROP_SERVER_SOURCE_FOLDER, IPackageFragmentRoot.class);
+  }
+
+  public void setServerSourceFolder(IPackageFragmentRoot serverSourceFolder) {
+    try {
+      setStateChanging(true);
+      setServerSourceFolderInternal(serverSourceFolder);
+      if (isControlCreated() && m_serverSourceFolder != null) {
+        m_serverSourceFolder.acceptProposal(serverSourceFolder);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setServerSourceFolderInternal(IPackageFragmentRoot serverSourceFolder) {
+    setProperty(PROP_SERVER_SOURCE_FOLDER, serverSourceFolder);
   }
 }

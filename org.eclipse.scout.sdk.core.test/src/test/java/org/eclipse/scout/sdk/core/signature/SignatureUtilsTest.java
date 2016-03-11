@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.core.signature;
 
 import java.util.Collection;
 
-import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.Long;
 import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class SignatureUtilsTest {
 
   @Test
   public void testGetResolvedSignature() {
-    IType type = CoreTestingUtils.createJavaEnvironment().findType(ChildClass.class.getName());
+    IType type = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(type);
 
     String expected = Signature.createTypeSignature("java.util.Set<java.util.HashMap<org.eclipse.scout.sdk.core.fixture.Long, java.util.List<java.lang.Object>[]>>[][][]");
@@ -133,5 +133,17 @@ public class SignatureUtilsTest {
     Collection<String> imports = collector.createImportDeclarations();
     Assert.assertTrue(imports.remove("import com.bsiag.scout.client.ui.desktop.outline.IOutline;"));
     Assert.assertTrue(imports.isEmpty());
+  }
+
+  @Test
+  public void testCreateMethodIdentifier() {
+    IType type = CoreTestingUtils.getChildClassType();
+    Assert.assertNotNull(type);
+
+    IMethod method = type.methods().list().get(1);
+    Assert.assertEquals("methodInChildClass(Ljava.lang.String;,Ljava.util.List<Ljava.lang.Runnable;>;)", SignatureUtils.createMethodIdentifier(method));
+    Assert.assertEquals("methodInChildClass(Ljava.lang.String;,Ljava.util.List;)", SignatureUtils.createMethodIdentifier(method, true));
+    Assert.assertEquals("methodInChildClass(Ljava.lang.String;,Ljava.util.List<Ljava.lang.Runnable;>;)", new MethodSourceBuilder(method).getMethodIdentifier());
+    Assert.assertEquals("methodInChildClass()", SignatureUtils.createMethodIdentifier("methodInChildClass", null));
   }
 }

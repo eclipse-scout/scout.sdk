@@ -648,7 +648,7 @@ public final class SpiWithJdtUtils {
     Map<Object, Object> cache = env.getPerformanceCache();
     SameCompositeObject key = new SameCompositeObject(annotationType, "defaultEvp");
     @SuppressWarnings("unchecked")
-    Map<String, ElementValuePair> defaultValues = (LinkedHashMap<String, ElementValuePair>) cache.get(key);
+    Map<String, ElementValuePair> defaultValues = (Map<String, ElementValuePair>) cache.get(key);
     if (defaultValues == null) {
       MethodBinding[] valueMethods = annotationType.methods();
       //sort
@@ -684,7 +684,7 @@ public final class SpiWithJdtUtils {
     Map<Object, Object> cache = env.getPerformanceCache();
     SameCompositeObject key = new SameCompositeObject(typeBinding, "defaultMvp");
     @SuppressWarnings("unchecked")
-    Map<String, MemberValuePair> defaultValues = (LinkedHashMap<String, MemberValuePair>) cache.get(key);
+    Map<String, MemberValuePair> defaultValues = (Map<String, MemberValuePair>) cache.get(key);
     if (defaultValues == null) {
       MethodBinding[] valueMethods = ((ReferenceBinding) typeBinding).methods();
       defaultValues = new LinkedHashMap<>(valueMethods.length);

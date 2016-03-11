@@ -10,25 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.maven.plugins.updatesite;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringWriter;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,47 +45,25 @@ import org.xml.sax.SAXException;
 
 public class FileUtility {
 
-  private final static int BUFFER_SIZE = 1024;
-
   public static void copy(File inputFile, File outputFile) throws IOException {
     if (inputFile.isDirectory()) {
-      if (!outputFile.exists()) {
-        outputFile.mkdirs();
-      }
+      ensureDirExists(outputFile);
       for (File f : inputFile.listFiles()) {
         copyToDir(f, outputFile);
       }
+      return;
     }
-    else {
-      InputStream in = null;
-      OutputStream out = null;
-      try {
-        in = new FileInputStream(inputFile);
-        out = new FileOutputStream(outputFile);
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int read;
-        while ((read = in.read(buffer)) != -1) {
-          out.write(buffer, 0, read);
-        }
-      }
-      finally {
-        if (in != null) {
-          try {
-            in.close();
-          }
-          catch (IOException e) {
-            // void
-          }
-        }
-        if (out != null) {
-          try {
-            out.close();
-          }
-          catch (IOException e) {
-            // void
-          }
-        }
-      }
+
+    try (InputStream in = new FileInputStream(inputFile); OutputStream out = new FileOutputStream(outputFile)) {
+      copy(in, out);
+    }
+  }
+
+  public static void copy(InputStream in, OutputStream out) throws IOException {
+    byte[] buffer = new byte[8192];
+    int read;
+    while ((read = in.read(buffer)) != -1) {
+      out.write(buffer, 0, read);
     }
   }
 
@@ -94,47 +72,20 @@ public class FileUtility {
   }
 
   public static void copyToDir(File input, File toDir, URI relPath) throws IOException {
+    // folder
     if (input.isDirectory()) {
       for (File f : input.listFiles()) {
         copyToDir(f, toDir, relPath);
       }
+      return;
     }
-    else {
-      InputStream in = null;
-      OutputStream out = null;
-      try {
-        in = new FileInputStream(input);
-        File outFile = new File(toDir.getAbsolutePath()
-            + File.separator
-            + relPath.relativize(input.toURI()).toString());
-        if (!outFile.exists()) {
-          outFile.getParentFile().mkdirs();
-        }
-        out = new FileOutputStream(outFile);
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int read;
-        while ((read = in.read(buffer)) != -1) {
-          out.write(buffer, 0, read);
-        }
-      }
-      finally {
-        if (in != null) {
-          try {
-            in.close();
-          }
-          catch (IOException e) {
-            // void
-          }
-        }
-        if (out != null) {
-          try {
-            out.close();
-          }
-          catch (IOException e) {
-            // void
-          }
-        }
-      }
+
+    // file
+    File outFile = new File(toDir.getAbsolutePath() + File.separator + relPath.relativize(input.toURI()).toString());
+    ensureDirExists(outFile);
+
+    try (InputStream in = new FileInputStream(input); OutputStream out = new FileOutputStream(outFile)) {
+      copy(in, out);
     }
   }
 
@@ -150,96 +101,15 @@ public class FileUtility {
     return file.delete();
   }
 
-  /**
-   * retrieve content as raw bytes
-   */
-  public static byte[] getContent(InputStream stream) throws IOException {
-    return getContent(stream, true);
-  }
-
-  public static byte[] getContent(InputStream stream, boolean autoClose) throws IOException {
-    BufferedInputStream in = null;
-    try {
-      in = new BufferedInputStream(stream);
-      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-      byte[] b = new byte[10240];
-      int len;
-      while ((len = in.read(b)) > 0) {
-        buffer.write(b, 0, len);
-      }
-      buffer.close();
-      byte[] data = buffer.toByteArray();
-      return data;
-    }
-    finally {
-      if (autoClose) {
-        if (in != null) {
-          in.close();
-        }
-      }
-    }
-  }
-
-  public static byte[] getContent(String filename) throws IOException {
-    try (FileInputStream stream = new FileInputStream(filename)) {
-      return getContent(stream, true);
-    }
-    catch (FileNotFoundException e) {
-      IOException io = new IOException("filename: " + filename);
-      io.initCause(e);
-      throw io;
-    }
-  }
-
-  /**
-   * retrieve content as string (correct charcter conversion)
-   */
-  public static String getContent(Reader stream) throws IOException {
-    return getContent(stream, true);
-  }
-
-  public static String getContent(Reader stream, boolean autoClose) throws IOException {
-    BufferedReader in = null;
-    try {
-      in = new BufferedReader(stream);
-      StringWriter buffer = new StringWriter();
-      char[] b = new char[10240];
-      int len;
-      while ((len = in.read(b)) > 0) {
-        buffer.write(b, 0, len);
-      }
-      buffer.close();
-      return buffer.toString();
-    }
-    finally {
-      if (autoClose) {
-        if (in != null) {
-          in.close();
-        }
-      }
-    }
-  }
-
   public static void compressArchive(File srcDir, File archiveFile) throws IOException {
-    JarOutputStream zOut = null;
-    try {
-      archiveFile.delete();
-      zOut = new JarOutputStream(new FileOutputStream(archiveFile));
+    archiveFile.delete();
+    try (JarOutputStream zOut = new JarOutputStream(new FileOutputStream(archiveFile))) {
       addFolderToJar(srcDir, srcDir, zOut);
-    }
-    finally {
-      if (zOut != null) {
-        try {
-          zOut.close();
-        }
-        catch (Throwable t) {
-        }
-      }
     }
   }
 
   private static void addFolderToJar(File baseDir, File srcdir, JarOutputStream zOut) throws IOException {
-    if ((!srcdir.exists()) || (!srcdir.isDirectory())) {
+    if (!srcdir.exists() || !srcdir.isDirectory()) {
       throw new IOException("source directory " + srcdir + " does not exist or is not a folder");
     }
     for (File f : srcdir.listFiles()) {
@@ -276,41 +146,17 @@ public class FileUtility {
   }
 
   public static byte[] readFile(File source) throws IOException {
-    if (!source.exists()) {
-      throw new FileNotFoundException(source.getAbsolutePath());
-    }
-    if (!source.canRead()) {
-      throw new IOException("cannot read " + source);
-    }
-    if (source.isDirectory()) {
-      // source can not be a directory
-      throw new IOException("source is a directory: " + source);
-    }
-    FileInputStream input = null;
-    try {
-      input = new FileInputStream(source);
-      byte[] data = new byte[(int) source.length()];
-      int n = 0;
-      while (n < data.length) {
-        n += input.read(data, n, data.length - n);
-      }
-      return data;
-    }
-    finally {
-      if (input != null) {
-        try {
-          input.close();
-        }
-        catch (Throwable e) {
-        }
-      }
-    }
+    return Files.readAllBytes(Paths.get(source.toURI()));
   }
 
   public static void writeDOM(Document doc, File file) throws MojoExecutionException {
     try {
-      Transformer transFormer = TransformerFactory.newInstance().newTransformer();
-      transFormer.transform(new DOMSource(doc), new StreamResult(file));
+      TransformerFactory tf = TransformerFactory.newInstance();
+      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+      Transformer transformer = tf.newTransformer();
+
+      transformer.transform(new DOMSource(doc), new StreamResult(file));
     }
     catch (TransformerConfigurationException e) {
       throw new MojoExecutionException("Could not write XML file ", e);
@@ -320,12 +166,23 @@ public class FileUtility {
     }
   }
 
+  public static void ensureDirExists(File dir) throws IOException {
+    if (dir == null) {
+      return;
+    }
+    if (!dir.isDirectory()) {
+      dir = dir.getParentFile();
+    }
+    if (!dir.exists() && !dir.mkdirs()) {
+      throw new IOException("Unable to create directory '" + dir.getAbsolutePath() + "'.");
+    }
+  }
+
   public static void extractArchive(File archiveFile, File destinationDir) throws IOException {
     destinationDir.mkdirs();
     destinationDir.setLastModified(archiveFile.lastModified());
     String localFile = destinationDir.getName();
-    JarFile jar = new JarFile(archiveFile);
-    try {
+    try (JarFile jar = new JarFile(archiveFile)) {
       Enumeration<JarEntry> entries = jar.entries();
       while (entries.hasMoreElements()) {
         JarEntry file = entries.nextElement();
@@ -336,33 +193,15 @@ public class FileUtility {
         while (name.startsWith("/") || name.startsWith("\\")) {
           name = name.substring(1);
         }
+
         File f = new File(destinationDir, name);
         if (file.isDirectory()) { // if its a directory, create it
-          f.mkdirs();
-          if (file.getTime() >= 0) {
-            f.setLastModified(file.getTime());
-          }
-          continue;
+          ensureDirExists(f);
         }
-        f.getParentFile().mkdirs();
-        InputStream is = null;
-        FileOutputStream fos = null;
-        try {
-          is = jar.getInputStream(file);
-          fos = new FileOutputStream(f);
-          // Copy the bits from instream to outstream
-          byte[] buf = new byte[102400];
-          int len;
-          while ((len = is.read(buf)) > 0) {
-            fos.write(buf, 0, len);
-          }
-        }
-        finally {
-          if (fos != null) {
-            fos.close();
-          }
-          if (is != null) {
-            is.close();
+        else {
+          ensureDirExists(f.getParentFile());
+          try (InputStream is = jar.getInputStream(file); FileOutputStream fos = new FileOutputStream(f)) {
+            copy(is, fos);
           }
         }
         if (file.getTime() >= 0) {
@@ -370,21 +209,43 @@ public class FileUtility {
         }
       }
     }
-    finally {
-      if (jar != null) {
-        try {
-          jar.close();
-        }
-        catch (Throwable t) {
-        }
-      }
-    }
   }
 
   public static Document readDOM(File xmlFile) throws ParserConfigurationException, SAXException, IOException {
-    DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder builder = builderFactory.newDocumentBuilder();
+    DocumentBuilder builder = createDocumentBuilder();
     Document doc = builder.parse(xmlFile);
     return doc;
+  }
+
+  /**
+   * Creates a new {@link DocumentBuilder} to create a DOM of an XML file.<br>
+   * Use {@link DocumentBuilder#parse()} to create a new {@link Document}.
+   *
+   * @return The created builder. All external entities are disabled to prevent XXE.
+   * @throws ParserConfigurationException
+   *           if a {@link DocumentBuilder} cannot be created which satisfies the configuration requested.
+   */
+  public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    Map<String, Boolean> features = new HashMap<>(5);
+    features.put("http://apache.org/xml/features/disallow-doctype-decl", Boolean.TRUE);
+    features.put("http://xml.org/sax/features/external-general-entities", Boolean.FALSE);
+    features.put("http://xml.org/sax/features/external-parameter-entities", Boolean.FALSE);
+    features.put("http://apache.org/xml/features/nonvalidating/load-external-dtd", Boolean.FALSE);
+    features.put(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+    dbf.setXIncludeAware(false);
+    dbf.setExpandEntityReferences(false);
+
+    for (Entry<String, Boolean> a : features.entrySet()) {
+      String feature = a.getKey();
+      boolean enabled = a.getValue().booleanValue();
+      try {
+        dbf.setFeature(feature, enabled);
+      }
+      catch (ParserConfigurationException e) {
+        // nop
+      }
+    }
+    return dbf.newDocumentBuilder();
   }
 }

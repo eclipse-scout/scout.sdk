@@ -152,7 +152,7 @@ public final class ExpressionSourceBuilderFactory {
         int n = metaArray.length;
         //use newlines on multi-dimensional arrays and annotation arrays only
         boolean useNewlines = (n > 0 && (metaArray[0].type() == MetaValueType.Array || metaArray[0].type() == MetaValueType.Annotation));
-        ArrayList<ISourceBuilder> sourceBuilderList = new ArrayList<>(n);
+        List<ISourceBuilder> sourceBuilderList = new ArrayList<>(n);
         for (IMetaValue metaElement : metaArray) {
           sourceBuilderList.add(createFromMetaValue(metaElement));
         }

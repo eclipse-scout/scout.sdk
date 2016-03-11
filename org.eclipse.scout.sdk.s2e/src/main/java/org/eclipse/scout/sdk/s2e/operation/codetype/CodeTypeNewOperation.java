@@ -19,6 +19,8 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.codetype.CodeTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
+import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
@@ -34,6 +36,8 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  */
 public class CodeTypeNewOperation implements IOperation {
 
+  private final IJavaEnvironmentProvider m_javaEnvironmentProvider;
+
   // in
   private String m_codeTypeName;
   private IPackageFragmentRoot m_sharedSourceFolder;
@@ -43,6 +47,10 @@ public class CodeTypeNewOperation implements IOperation {
 
   //out
   private IType m_createdCodeType;
+
+  public CodeTypeNewOperation() {
+    m_javaEnvironmentProvider = new CachingJavaEnvironmentProvider();
+  }
 
   @Override
   public String getOperationName() {
@@ -79,7 +87,7 @@ public class CodeTypeNewOperation implements IOperation {
 
     codeTypeBuilder.setup();
 
-    return S2eUtils.writeType(getSharedSourceFolder(), codeTypeBuilder, monitor, workingCopyManager);
+    return S2eUtils.writeType(getSharedSourceFolder(), codeTypeBuilder, getEnvProvider().get(getSharedSourceFolder().getJavaProject()), monitor, workingCopyManager);
   }
 
   public String getCodeTypeName() {
@@ -130,4 +138,7 @@ public class CodeTypeNewOperation implements IOperation {
     m_codeTypeIdSignature = codeTypeIdSignature;
   }
 
+  protected IJavaEnvironmentProvider getEnvProvider() {
+    return m_javaEnvironmentProvider;
+  }
 }

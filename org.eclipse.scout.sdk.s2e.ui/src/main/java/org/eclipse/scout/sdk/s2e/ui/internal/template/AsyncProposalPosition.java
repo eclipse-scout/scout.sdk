@@ -47,7 +47,11 @@ public class AsyncProposalPosition extends ProposalPosition {
 
   @Override
   public int hashCode() {
-    return 31 * super.hashCode() + m_provider.hashCode();
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + m_model.hashCode();
+    result = prime * result + m_provider.hashCode();
+    return result;
   }
 
   @Override
@@ -58,10 +62,11 @@ public class AsyncProposalPosition extends ProposalPosition {
     if (!super.equals(obj)) {
       return false;
     }
-    if (!(obj instanceof AsyncProposalPosition)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     AsyncProposalPosition other = (AsyncProposalPosition) obj;
-    return m_provider.equals(other.m_provider);
+    return m_model.equals(other.m_model)
+        && m_provider.equals(other.m_provider);
   }
 }

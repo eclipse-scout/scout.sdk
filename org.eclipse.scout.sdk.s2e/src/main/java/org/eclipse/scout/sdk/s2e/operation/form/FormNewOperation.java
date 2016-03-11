@@ -20,23 +20,34 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
+import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.form.FormSourceBuilder;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.permission.PermissionSourceBuilder;
-import org.eclipse.scout.sdk.core.s.sourcebuilder.service.ServiceImplSourceBuilder;
-import org.eclipse.scout.sdk.core.s.sourcebuilder.service.ServiceInterfaceSourceBuilder;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.IMethodParameterSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.MethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
+import org.eclipse.scout.sdk.s2e.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.ScoutTier;
 
@@ -48,7 +59,8 @@ import org.eclipse.scout.sdk.s2e.util.ScoutTier;
  */
 public class FormNewOperation implements IOperation {
 
-  private ITypeSourceBuilder m_serviceIfcBuilder;
+  private final IJavaEnvironmentProvider m_javaEnvironmentProvider;
+  private static final String TEXT_AUTHORIZATION_FAILED = "AuthorizationFailed";
 
   // in
   private String m_formName;
@@ -69,6 +81,10 @@ public class FormNewOperation implements IOperation {
   private IType m_createdServiceImpl;
   private IType m_createdReadPermission;
   private IType m_createdUpdatePermission;
+
+  public FormNewOperation() {
+    m_javaEnvironmentProvider = new CachingJavaEnvironmentProvider();
+  }
 
   @Override
   public String getOperationName() {
@@ -108,40 +124,140 @@ public class FormNewOperation implements IOperation {
 
     // calc names
     String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getClientPackage());
-    String serverPackage = ScoutTier.Client.convert(ScoutTier.Server, getClientPackage());
     String baseName = getFormName();
     if (baseName.endsWith(ISdkProperties.SUFFIX_FORM)) {
       baseName = baseName.substring(0, baseName.length() - ISdkProperties.SUFFIX_FORM.length());
     }
-    String svcName = baseName + ISdkProperties.SUFFIX_SERVICE;
-    String permissionBaseName = baseName + ISdkProperties.SUFFIX_PERMISSION;
 
     // DTO
     if (isCreateFormData()) {
       setCreatedFormData(createFormData(sharedPackage, progress.newChild(1), workingCopyManager));
     }
 
-    // Service interface
-    if (isCreateService()) {
-      setCreatedServiceInterface(createServiceIfc(svcName, sharedPackage, progress.newChild(1), workingCopyManager));
-    }
-
     // permissions
     if (isCreatePermissions()) {
+      String permissionBaseName = baseName + ISdkProperties.SUFFIX_PERMISSION;
       setCreatedReadPermission(createReadPermission(permissionBaseName, sharedPackage, progress.newChild(1), workingCopyManager));
       setCreatedUpdatePermission(createUpdatePermission(permissionBaseName, sharedPackage, progress.newChild(1), workingCopyManager));
     }
 
-    // service impl
+    // Service
     if (isCreateService()) {
-      setCreatedServiceImpl(createServiceImpl(svcName, serverPackage, progress.newChild(1), workingCopyManager));
+      createService(sharedPackage, baseName, progress.newChild(2), workingCopyManager);
     }
 
     // form
     setCreatedForm(createForm(progress.newChild(1), workingCopyManager));
 
     // schedule DTO update because the formData has been created as empty java file
-    ScoutSdkCore.getDerivedResourceManager().trigger(Collections.singleton(getCreatedForm().getResource()));
+    if (isCreateFormData()) {
+      ScoutSdkCore.getDerivedResourceManager().trigger(Collections.singleton(getCreatedForm().getResource()));
+    }
+  }
+
+  protected void createService(String sharedPackage, String baseName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    ServiceNewOperation serviceNewOperation = createServiceOperation();
+    serviceNewOperation.setServiceName(baseName);
+    serviceNewOperation.setSharedPackage(sharedPackage);
+    serviceNewOperation.setSharedSourceFolder(getSharedSourceFolder());
+    serviceNewOperation.setServerSourceFolder(getServerSourceFolder());
+
+    // add store & load methods to service
+    serviceNewOperation.addMethod(createServiceMethod(FormSourceBuilder.SERVICE_LOAD_METHOD_NAME));
+    serviceNewOperation.addMethod(createServiceMethod(FormSourceBuilder.SERVICE_STORE_METHOD_NAME));
+
+    serviceNewOperation.validate();
+    serviceNewOperation.run(monitor, workingCopyManager);
+
+    setCreatedServiceImpl(serviceNewOperation.getCreatedServiceImpl());
+    setCreatedServiceInterface(serviceNewOperation.getCreatedServiceInterface());
+  }
+
+  protected IMethodSourceBuilder createServiceMethod(String name) {
+    final IMethodSourceBuilder methodBuilder = new MethodSourceBuilder(name);
+    methodBuilder.setFlags(Flags.AccPublic);
+    methodBuilder.setComment(CommentSourceBuilderFactory.createDefaultMethodComment(methodBuilder));
+    if (isCreateFormData()) {
+      String formDataSig = Signature.createTypeSignature(getCreatedFormData().getFullyQualifiedName());
+      methodBuilder.setReturnTypeSignature(formDataSig);
+      methodBuilder.addParameter(new MethodParameterSourceBuilder("input", formDataSig));
+    }
+    else {
+      methodBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
+    }
+    methodBuilder.setBody(new ISourceBuilder() {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        // permission check
+        String permissionSig = null;
+        if (isCreatePermissions() && FormSourceBuilder.SERVICE_LOAD_METHOD_NAME.equals(methodBuilder.getElementName())) {
+          permissionSig = Signature.createTypeSignature(getCreatedReadPermission().getFullyQualifiedName());
+        }
+        else if (isCreatePermissions() && FormSourceBuilder.SERVICE_STORE_METHOD_NAME.equals(methodBuilder.getElementName())) {
+          permissionSig = Signature.createTypeSignature(getCreatedUpdatePermission().getFullyQualifiedName());
+        }
+
+        if (permissionSig != null) {
+          createPermissionCheckSource(source, lineDelimiter, validator, permissionSig);
+        }
+
+        createMethodContentSource(source, lineDelimiter, validator, methodBuilder);
+      }
+    });
+    return methodBuilder;
+  }
+
+  protected void createPermissionCheckSource(StringBuilder source, String lineDelimiter, IImportValidator validator, String permissionSig) {
+    source.append("if(!").append(validator.useName(IScoutRuntimeTypes.ACCESS));
+    source.append(".check(new ").append(validator.useSignature(permissionSig)).append("())) {").append(lineDelimiter);
+
+    source.append("  throw new ").append(validator.useName(IScoutRuntimeTypes.VetoException)).append('(');
+    source.append(validator.useName(IScoutRuntimeTypes.TEXTS));
+    source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
+    source.append(");").append(lineDelimiter);
+
+    source.append('}').append(lineDelimiter);
+  }
+
+  /**
+   * @param source
+   * @param lineDelimiter
+   * @param validator
+   * @param parentMethod
+   */
+  protected void createMethodContentSource(StringBuilder source, String lineDelimiter, IImportValidator validator, IMethodSourceBuilder parentMethod) {
+    // add todo
+    source.append(CoreUtils.getCommentBlock("add business logic here.")).append(lineDelimiter);
+
+    // return clause
+    String paramToReturn = getParamNameOfReturnType(parentMethod);
+    String returnSig = parentMethod.getReturnTypeSignature();
+
+    if (paramToReturn == null) {
+      String returnValue = CoreUtils.getDefaultValueOf(returnSig);
+      if (returnValue != null) {
+        source.append("return ").append(returnValue).append(';');
+      }
+    }
+    else {
+      source.append("return ").append(paramToReturn).append(';');
+    }
+  }
+
+  protected String getParamNameOfReturnType(IMethodSourceBuilder msb) {
+    if (msb.getReturnTypeSignature() == null || ISignatureConstants.SIG_VOID.equals(msb.getReturnTypeSignature())) {
+      return null;
+    }
+    for (IMethodParameterSourceBuilder mpsb : msb.getParameters()) {
+      if (msb.getReturnTypeSignature().equals(mpsb.getDataTypeSignature())) {
+        return mpsb.getElementName();
+      }
+    }
+    return null;
+  }
+
+  protected ServiceNewOperation createServiceOperation() {
+    return new ServiceNewOperation(getEnvProvider());
   }
 
   protected IType createFormData(String sharedPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
@@ -153,55 +269,24 @@ public class FormNewOperation implements IOperation {
     formDataTypeBuilder.setSuperTypeSignature(Signature.createTypeSignature(IScoutRuntimeTypes.AbstractFormData));
     formDataBuilder.addType(formDataTypeBuilder);
 
-    return S2eUtils.writeType(getFormDataSourceFolder(), formDataBuilder, monitor, workingCopyManager);
-  }
-
-  protected ServiceImplSourceBuilder createServiceImplBuilder(String svcName, String serverPackage) {
-    ServiceImplSourceBuilder implBuilder = new ServiceImplSourceBuilder(svcName, serverPackage, getServiceIfcBuilder());
-    if (isCreatePermissions()) {
-      implBuilder.setReadPermissionSignature(Signature.createTypeSignature(getCreatedReadPermission().getFullyQualifiedName()));
-      implBuilder.setUpdatePermissionSignature(Signature.createTypeSignature(getCreatedUpdatePermission().getFullyQualifiedName()));
-    }
-    implBuilder.setup();
-    return implBuilder;
-  }
-
-  protected IType createServiceImpl(String svcName, String serverPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    ServiceImplSourceBuilder implBuilder = createServiceImplBuilder(svcName, serverPackage);
-    return S2eUtils.writeType(getServerSourceFolder(), implBuilder, monitor, workingCopyManager);
-  }
-
-  protected ServiceInterfaceSourceBuilder createServiceIfcBuilder(String svcName, String sharedPackage) {
-    ServiceInterfaceSourceBuilder ifcBuilder = new ServiceInterfaceSourceBuilder('I' + svcName, sharedPackage);
-    if (isCreateFormData()) {
-      ifcBuilder.setDtoSignature(Signature.createTypeSignature(getCreatedFormData().getFullyQualifiedName()));
-    }
-    ifcBuilder.setup();
-    return ifcBuilder;
-  }
-
-  protected IType createServiceIfc(String svcName, String sharedPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    ServiceInterfaceSourceBuilder ifcBuilder = createServiceIfcBuilder(svcName, sharedPackage);
-    IType createdIfc = S2eUtils.writeType(getSharedSourceFolder(), ifcBuilder, monitor, workingCopyManager);
-    setServiceIfcBuilder(ifcBuilder.getMainType());
-    return createdIfc;
+    return S2eUtils.writeType(getFormDataSourceFolder(), formDataBuilder, getEnvProvider().get(getFormDataSourceFolder().getJavaProject()), monitor, workingCopyManager);
   }
 
   protected IType createReadPermission(String permissionBaseName, String sharedPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     PermissionSourceBuilder psb = new PermissionSourceBuilder("Read" + permissionBaseName, sharedPackage);
     psb.setup();
-    return S2eUtils.writeType(getSharedSourceFolder(), psb, monitor, workingCopyManager);
+    return S2eUtils.writeType(getSharedSourceFolder(), psb, getEnvProvider().get(getSharedSourceFolder().getJavaProject()), monitor, workingCopyManager);
   }
 
   protected IType createUpdatePermission(String permissionBaseName, String sharedPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     PermissionSourceBuilder psb = new PermissionSourceBuilder("Update" + permissionBaseName, sharedPackage);
     psb.setup();
-    return S2eUtils.writeType(getSharedSourceFolder(), psb, monitor, workingCopyManager);
+    return S2eUtils.writeType(getSharedSourceFolder(), psb, getEnvProvider().get(getSharedSourceFolder().getJavaProject()), monitor, workingCopyManager);
   }
 
   protected IType createForm(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     FormSourceBuilder formBuilder = createFormBuilder();
-    return S2eUtils.writeType(getClientSourceFolder(), formBuilder, monitor, workingCopyManager);
+    return S2eUtils.writeType(getClientSourceFolder(), formBuilder, getEnvProvider().get(getClientSourceFolder().getJavaProject()), monitor, workingCopyManager);
   }
 
   protected FormSourceBuilder createFormBuilderInstance() {
@@ -362,11 +447,7 @@ public class FormNewOperation implements IOperation {
     m_formDataSourceFolder = formDataSourceFolder;
   }
 
-  protected ITypeSourceBuilder getServiceIfcBuilder() {
-    return m_serviceIfcBuilder;
-  }
-
-  protected void setServiceIfcBuilder(ITypeSourceBuilder serviceIfcBuilder) {
-    m_serviceIfcBuilder = serviceIfcBuilder;
+  protected IJavaEnvironmentProvider getEnvProvider() {
+    return m_javaEnvironmentProvider;
   }
 }

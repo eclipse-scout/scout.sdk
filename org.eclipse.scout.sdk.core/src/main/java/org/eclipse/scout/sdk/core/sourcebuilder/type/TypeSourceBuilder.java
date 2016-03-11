@@ -321,6 +321,16 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
   }
 
   @Override
+  public IMethodSourceBuilder getMethod(String methodId) {
+    for (IMethodSourceBuilder msb : getMethods()) {
+      if (methodId.equals(msb.getMethodIdentifier())) {
+        return msb;
+      }
+    }
+    return null;
+  }
+
+  @Override
   public List<IMethodSourceBuilder> getMethods() {
     List<IMethodSourceBuilder> builders = new ArrayList<>(m_methods.size() + m_sortedMethods.size());
     builders.addAll(m_methods);

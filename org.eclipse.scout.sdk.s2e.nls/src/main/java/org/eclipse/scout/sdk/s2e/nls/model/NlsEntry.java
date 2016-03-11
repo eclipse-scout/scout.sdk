@@ -64,11 +64,17 @@ public class NlsEntry implements INlsEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof NlsEntry)) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
       return false;
     }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    
     NlsEntry other = (NlsEntry) obj;
-
     try {
       m_lock.readLock().lock();
       return Objects.equals(m_key, other.m_key)
@@ -84,13 +90,12 @@ public class NlsEntry implements INlsEntry {
   public int hashCode() {
     try {
       m_lock.readLock().lock();
-      int hash = 0;
-      if (m_key != null) {
-        hash ^= m_key.hashCode();
-      }
-      hash ^= m_translations.hashCode();
-      hash ^= getType();
-      return hash;
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((m_key == null) ? 0 : m_key.hashCode());
+      result = prime * result + ((m_translations == null) ? 0 : m_translations.hashCode());
+      result = prime * result + getType();
+      return result;
     }
     finally {
       m_lock.readLock().unlock();

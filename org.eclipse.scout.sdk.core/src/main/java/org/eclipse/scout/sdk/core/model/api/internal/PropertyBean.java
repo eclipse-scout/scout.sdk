@@ -97,7 +97,7 @@ public class PropertyBean implements IPropertyBean {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof PropertyBean)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     PropertyBean other = (PropertyBean) obj;
@@ -119,4 +119,5 @@ public class PropertyBean implements IPropertyBean {
     }
     return true;
   }
+
 }

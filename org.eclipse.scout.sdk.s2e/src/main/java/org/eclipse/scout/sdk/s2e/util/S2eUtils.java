@@ -1196,14 +1196,17 @@ public final class S2eUtils {
    *          {@link IPackageFragmentRoot#K_SOURCE}.
    * @param sb
    *          The source builder that creates the compilation unit contents.
+   * @param env
+   *          The {@link IJavaEnvironment} of the {@link IJavaProject} that belongs to the given
+   *          {@link IPackageFragmentRoot} or <code>null</code> if a new {@link IJavaEnvironment} should be created.
    * @param monitor
    *          The {@link IProgressMonitor} of the surrounding job. Must not be <code>null</code>.
    * @param workingCopyManager
    *          The {@link IWorkingCopyManager} of the surrounding job. Must not be <code>null</code>.
    * @return The primary {@link IType} of the compilation unit written.
    */
-  public static IType writeType(IPackageFragmentRoot srcFolder, ICompilationUnitSourceBuilder sb, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    CompilationUnitWriteOperation writeIcu = new CompilationUnitWriteOperation(srcFolder, sb);
+  public static IType writeType(IPackageFragmentRoot srcFolder, ICompilationUnitSourceBuilder sb, IJavaEnvironment env, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    CompilationUnitWriteOperation writeIcu = new CompilationUnitWriteOperation(srcFolder, sb, env);
     writeIcu.validate();
     writeIcu.run(Validate.notNull(monitor), Validate.notNull(workingCopyManager));
     ICompilationUnit compilationUnit = writeIcu.getCreatedCompilationUnit();
@@ -1285,7 +1288,7 @@ public final class S2eUtils {
 
   /**
    * Gets the preferred source folder for DTOs created in the {@link IJavaProject} of the given source folder.
-   * 
+   *
    * @param selectedSourceFolder
    *          The default source folder.
    * @return The given selectedSourceFolder or the src/generated/java folder within the same {@link IJavaProject} if it

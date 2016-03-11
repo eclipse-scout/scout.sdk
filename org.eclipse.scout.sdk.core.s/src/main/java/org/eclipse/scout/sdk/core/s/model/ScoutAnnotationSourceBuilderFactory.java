@@ -34,7 +34,12 @@ public final class ScoutAnnotationSourceBuilderFactory {
 
   public static IAnnotationSourceBuilder createOrder(double orderNr) {
     AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(IScoutRuntimeTypes.Order);
-    orderAnnoation.putElement("value", Double.toString(orderNr));
+    String orderStr = Double.toString(orderNr);
+    final String zeroSuffix = ".0";
+    if (orderStr.endsWith(zeroSuffix)) {
+      orderStr = orderStr.substring(0, orderStr.length() - zeroSuffix.length());
+    }
+    orderAnnoation.putElement("value", orderStr);
     return orderAnnoation;
   }
 

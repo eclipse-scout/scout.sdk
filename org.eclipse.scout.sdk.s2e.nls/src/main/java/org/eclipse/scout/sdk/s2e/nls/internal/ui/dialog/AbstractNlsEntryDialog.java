@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.dialog;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.core.runtime.IStatus;
@@ -66,7 +67,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   private boolean m_keyToClipboard;
 
   private final String m_title;
-  private final HashMap<Language, TextField<String>> m_translationFields;
+  private final Map<Language, TextField<String>> m_translationFields;
   private final INlsProject m_rootProject;
 
   private TextField<String> m_keyField;

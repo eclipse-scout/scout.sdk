@@ -154,7 +154,7 @@ public class NormalizedPattern {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof NormalizedPattern)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     NormalizedPattern other = (NormalizedPattern) obj;

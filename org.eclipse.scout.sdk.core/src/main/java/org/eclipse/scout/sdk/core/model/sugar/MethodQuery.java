@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
+import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.util.Filters;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
@@ -34,6 +35,7 @@ public class MethodQuery {
   private boolean m_includeSuperInterfaces = false;
   private String m_name;
   private String m_annotationFqn;
+  private String m_methodId;
   private int m_flags = -1;
   private Pattern m_methodNamePattern;
   private IFilter<IMethod> m_filter;
@@ -121,6 +123,19 @@ public class MethodQuery {
   }
 
   /**
+   * Limit the {@link IMethod}s to the given method identifier.
+   * 
+   * @param id
+   *          The id of the {@link IMethod}. Use {@link SignatureUtils#createMethodIdentifier(IMethod)} to create a
+   *          method identifier.
+   * @return this
+   */
+  public MethodQuery withMethodIdentifier(String id) {
+    m_methodId = id;
+    return this;
+  }
+
+  /**
    * Limit to the {@link IMethod}s whose name ({@link IMethod#elementName()}) matches the given regular expression
    * pattern.
    *
@@ -161,6 +176,9 @@ public class MethodQuery {
 
   protected boolean accept(IMethod f) {
     if (m_name != null && !m_name.equals(f.elementName())) {
+      return false;
+    }
+    if (m_methodId != null && !m_methodId.equals(SignatureUtils.createMethodIdentifier(f))) {
       return false;
     }
     if (m_filter != null && !m_filter.evaluate(f)) {

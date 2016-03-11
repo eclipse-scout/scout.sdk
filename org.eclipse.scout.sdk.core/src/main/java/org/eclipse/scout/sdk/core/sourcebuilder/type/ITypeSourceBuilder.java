@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.sourcebuilder.type;
 
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.IMemberSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
@@ -162,4 +163,16 @@ public interface ITypeSourceBuilder extends IMemberSourceBuilder {
    * @param parentFullyQualifiedName
    */
   void setParentFullyQualifiedName(String parentFullyQualifiedName);
+
+  /**
+   * Gets the {@link IMethodSourceBuilder} directly contained in this {@link ITypeSourceBuilder} having the given
+   * methodId.
+   * 
+   * @param methodId
+   *          The methodId of the {@link IMethodSourceBuilder} to return.
+   * @return The {@link IMethodSourceBuilder} with the given identifier or <code>null</code> if no such builder exists
+   *         in this {@link ITypeSourceBuilder}.
+   * @see SignatureUtils#createMethodIdentifier(String, Iterable)
+   */
+  IMethodSourceBuilder getMethod(String methodId);
 }

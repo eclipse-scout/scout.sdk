@@ -123,7 +123,7 @@ public class SignatureDescriptor {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof SignatureDescriptor)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     SignatureDescriptor other = (SignatureDescriptor) obj;
