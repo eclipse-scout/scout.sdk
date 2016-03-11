@@ -54,7 +54,6 @@
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt_version>5.2.0-SNAPSHOT</org.eclipse.scout.rt_version>
 
-    <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <!-- Sonar properties -->
     <sonar.branch>releases_5.2.x</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
