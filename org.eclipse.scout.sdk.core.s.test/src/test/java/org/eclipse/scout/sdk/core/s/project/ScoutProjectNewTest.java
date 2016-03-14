@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.s.project;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.security.GeneralSecurityException;
 
 import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
@@ -30,7 +29,7 @@ public class ScoutProjectNewTest {
   private static final String PROJECT_ARTIFACT_ID = "artifact";
 
   @Test
-  public void testProjectCreation() throws IOException, GeneralSecurityException {
+  public void testProjectCreation() throws IOException {
     File targetDirectory = Files.createTempDirectory(ScoutProjectNewTest.class.getSimpleName() + "-projectDir").toFile();
     try {
       ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", getJavaVersion());

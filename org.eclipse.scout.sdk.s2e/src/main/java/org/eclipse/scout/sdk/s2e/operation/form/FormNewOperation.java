@@ -109,12 +109,12 @@ public class FormNewOperation implements IOperation {
     // calc names
     String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getClientPackage());
     String serverPackage = ScoutTier.Client.convert(ScoutTier.Server, getClientPackage());
-    String svcName = getFormName() + ISdkProperties.SUFFIX_SERVICE;
-    String permissionBaseName = getFormName();
-    if (permissionBaseName.endsWith(ISdkProperties.SUFFIX_FORM)) {
-      permissionBaseName = permissionBaseName.substring(0, permissionBaseName.length() - ISdkProperties.SUFFIX_FORM.length());
+    String baseName = getFormName();
+    if (baseName.endsWith(ISdkProperties.SUFFIX_FORM)) {
+      baseName = baseName.substring(0, baseName.length() - ISdkProperties.SUFFIX_FORM.length());
     }
-    permissionBaseName += ISdkProperties.SUFFIX_PERMISSION;
+    String svcName = baseName + ISdkProperties.SUFFIX_SERVICE;
+    String permissionBaseName = baseName + ISdkProperties.SUFFIX_PERMISSION;
 
     // DTO
     if (isCreateFormData()) {

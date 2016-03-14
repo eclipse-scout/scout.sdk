@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,22 +58,20 @@ public final class ScoutProjectNewHelper {
   private ScoutProjectNewHelper() {
   }
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName) throws IOException, GeneralSecurityException {
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName) throws IOException {
     createProject(targetDirectory, groupId, artifactId, displayName, null);
   }
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion) throws IOException, GeneralSecurityException {
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion) throws IOException {
     createProject(targetDirectory, groupId, artifactId, displayName, javaVersion, null, null, null);
   }
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion, String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion)
-      throws IOException, GeneralSecurityException {
+  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion, String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion) throws IOException {
     createProject(targetDirectory, groupId, artifactId, displayName, javaVersion, archetypeGroupId, archeTypeArtifactId, archetypeVersion, null, null);
   }
 
   public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion,
-      String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion, String mavenGlobalSettings, String mavenSettings)
-          throws IOException, GeneralSecurityException {
+      String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion, String mavenGlobalSettings, String mavenSettings) throws IOException {
     // validate input
     Validate.notNull(targetDirectory);
     String groupIdMsg = getMavenNameErrorMessage(groupId, "groupId");
@@ -106,8 +105,8 @@ public final class ScoutProjectNewHelper {
     }
 
     // create command
-    String[] authKeysForWar = CoreUtils.generateKeyPair();
-    String[] authKeysForDev = CoreUtils.generateKeyPair();
+    String[] authKeysForWar = generateKeyPair();
+    String[] authKeysForDev = generateKeyPair();
     String[] args = new String[]{"archetype:generate", "-B",
         "-DarchetypeGroupId=" + archetypeGroupId, "-DarchetypeArtifactId=" + archeTypeArtifactId, "-DarchetypeVersion=" + archetypeVersion,
         "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + pck,
@@ -121,6 +120,17 @@ public final class ScoutProjectNewHelper {
     postProcessRootPom(new File(targetDirectory, artifactId));
   }
 
+  protected static String[] generateKeyPair() {
+    try {
+      return CoreUtils.generateKeyPair();
+    }
+    catch (GeneralSecurityException e) {
+      SdkLog.warning("Could not generate a new key pair.", e);
+      String keyPlaceholder = "TODO_use_org.eclipse.scout.rt.platform.security.SecurityUtility.main(String[]))";
+      return new String[]{keyPlaceholder, keyPlaceholder};
+    }
+  }
+
   /**
    * Workaround so that only the parent module is referenced in the root (remove non-parent modules)
    */
@@ -131,8 +141,7 @@ public final class ScoutProjectNewHelper {
         return;
       }
 
-      DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+      DocumentBuilder docBuilder = CoreUtils.createDocumentBuilder();
       Document doc = docBuilder.parse(pom);
 
       Element modules = getFirstChildElement(doc.getDocumentElement(), "modules");
@@ -144,7 +153,7 @@ public final class ScoutProjectNewHelper {
         if (n.getNodeType() == Node.TEXT_NODE) {
           nodesToRemove.add(n);
         }
-        else if (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !n.getTextContent().trim().endsWith(".parent")) {
+        else if (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !targetDirectory.getName().equals(n.getTextContent().trim())) {
           nodesToRemove.add(n);
         }
       }
@@ -152,6 +161,7 @@ public final class ScoutProjectNewHelper {
         modules.removeChild(n);
       }
 
+      Validate.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");
       writeDocument(doc, new StreamResult(pom));
     }
     catch (ParserConfigurationException | SAXException | TransformerException e) {
@@ -161,8 +171,12 @@ public final class ScoutProjectNewHelper {
 
   protected static void writeDocument(Document document, Result result) throws TransformerException {
     TransformerFactory tf = TransformerFactory.newInstance();
+    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
     Transformer transformer = tf.newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "no");
+
     transformer.transform(new DOMSource(document), result);
   }
 
