@@ -30,7 +30,121 @@
    <div class="sect3"> 
     <h4 id="new-lookupcall-wizard"><a class="anchor" href="#new-lookupcall-wizard"></a>New LookupCall Wizard</h4> 
     <div class="paragraph"> 
-     <p>Text is missing</p> 
+     <p>The <em>New Scout Lookup Call</em> wizard can be used to create a lookup call and a corresponding lookup service. To start the wizard use <span class="menuseq"><span class="menu">File</span>&nbsp;&#x25b8; <span class="submenu">New</span>&nbsp;&#x25b8; <span class="menuitem">Other&#x2026;&#x200b;</span></span> or press <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>N</kbd></span> as described in section <a href="sdk_wizard.html">Scout Wizards</a>.</p> 
+    </div> 
+    <div id="img-sdk_wizard_lookupcall" class="imageblock"> 
+     <div class="content"> 
+      <img src="images/sdk_new_lookupcall.png" alt="sdk new lookupcall" /> 
+     </div> 
+     <div class="title">
+      Figure 1. The new LookupCall wizard
+     </div> 
+    </div> 
+    <div class="paragraph"> 
+     <p>In the case of <a href="#img-sdk_wizard_lookupcall">Figure 1</a> the package <code>org.eclipse.scout.apps.helloworld.shared.helloworld</code> has been selected in the Package Explorer. The only wizard fields that then needs to be filled in manually are the <strong>Name</strong> and the <strong>Key Class</strong> fields.</p> 
+    </div> 
+    <div class="paragraph"> 
+     <p>By clicking on the <b class="button">Finish</b> button the wizard is started and the specified components are created.</p> 
+    </div> 
+    <div class="sect4"> 
+     <h5 id="wizard-fields-and-default-values"><a class="anchor" href="#wizard-fields-and-default-values"></a>Wizard Fields and Default Values</h5> 
+     <div class="paragraph"> 
+      <p>Most of the fields of the <a href="#img-sdk_wizard_lookupcall">Figure 1</a> will be filled with default values depending on the current context of the IDE. The context can be derived from a package selected in the Package Explorer or from the class in the active Java Editor.</p> 
+     </div> 
+     <div class="dlist"> 
+      <dl> 
+       <dt class="hdlist1">
+        Source Folder
+       </dt> 
+       <dd> 
+        <p>The source folder of the Maven shared module used for the creation of the lookup call class. The default value is the <code>src/main/java</code> folder in the Maven shared module.</p> 
+       </dd> 
+       <dt class="hdlist1">
+        Package
+       </dt> 
+       <dd> 
+        <p>The Java package that will contain the lookup call class. The Scout SDK will try to guess the package name from the current context and derive a matching package names for the Maven server module.</p> 
+       </dd> 
+       <dt class="hdlist1">
+        Name
+       </dt> 
+       <dd> 
+        <p>The name of the lookup call class. According to Scout conventions the class name ends with the suffix <code>LookupCall</code>.</p> 
+       </dd> 
+       <dt class="hdlist1">
+        Super Class
+       </dt> 
+       <dd> 
+        <p>The super class for the form. <code>LookupCall</code> is the default value.</p> 
+       </dd> 
+       <dt class="hdlist1">
+        Key Class
+       </dt> 
+       <dd> 
+        <p>The class to be used for key values of the lookup call.</p> 
+       </dd> 
+       <dt class="hdlist1">
+        Server Source Folder
+       </dt> 
+       <dd> 
+        <p>The source folder of the Maven server module used for the service class creation. The default value is the <code>src/main/java</code> folder in the Maven server module.</p> 
+       </dd> 
+       <dt class="hdlist1">
+        Service Super Class
+       </dt> 
+       <dd> 
+        <p>The super class for the lookup service associated with this lookup call. The default value is <code>AbstractLookupService</code>.</p> 
+       </dd> 
+      </dl> 
+     </div> 
+    </div> 
+    <div class="sect4"> 
+     <h5 id="created-components"><a class="anchor" href="#created-components"></a>Created Components</h5> 
+     <div class="paragraph"> 
+      <p>In the <a href="#img-sdk_wizard_lookupcall">Figure 1</a> example shown above the Scout SDK will create the following components.</p> 
+     </div> 
+     <div class="ulist"> 
+      <ul> 
+       <li> <p>In Maven module <strong>helloworld.shared</strong></p> 
+        <div class="ulist"> 
+         <ul> 
+          <li> <p>In folder <code>src/main/java</code> and package <code>org.eclipse.scout.apps.helloworld.shared.helloworld</code></p> 
+           <div class="ulist"> 
+            <ul> 
+             <li> <p>The <code>MyLookupCall</code> class</p> </li> 
+             <li> <p>The <code>IMyLookupService</code> interface</p> </li> 
+            </ul> 
+           </div> </li> 
+         </ul> 
+        </div> </li> 
+       <li> <p>In Maven module <strong>helloworld.server</strong></p> 
+        <div class="ulist"> 
+         <ul> 
+          <li> <p>The <code>MyLookupService</code> service class in folder <code>src/generated/java</code> and package <code>org.eclipse.scout.apps.helloworld.server.helloworld</code></p> </li> 
+         </ul> 
+        </div> </li> 
+      </ul> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="sect3"> 
+    <h4 id="scout-wizards"><a class="anchor" href="#scout-wizards"></a>Scout Wizards</h4> 
+    <div class="paragraph"> 
+     <p>Go back to the <a href="sdk_wizard.html">Scout Wizards</a>.</p> 
+    </div> 
+    <div class="exampleblock"> 
+     <div class="content"> 
+      <div class="admonitionblock tip"> 
+       <table> 
+        <tbody>
+         <tr> 
+          <td class="icon"> <i class="fa icon-tip" title="Tip"></i> </td> 
+          <td class="content"> Do you want to improve this document? Please <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/edit/releases/5.2.x/docs/build/eclipse_help/src/docs/sdk_wizard_lookupcall.adoc">edit this page</a> on GitHub. </td> 
+         </tr> 
+        </tbody>
+       </table> 
+      </div> 
+     </div> 
     </div> 
    </div> 
   </div> 
@@ -49,7 +163,7 @@
   <div id="footer"> 
    <div id="footer-text">
      Version 5.2.0-SNAPSHOT
-    <br /> Last updated 2016-02-10 14:28:16 CET 
+    <br /> Last updated 2016-03-16 13:14:32 CET 
    </div> 
   </div>  
  </body>
