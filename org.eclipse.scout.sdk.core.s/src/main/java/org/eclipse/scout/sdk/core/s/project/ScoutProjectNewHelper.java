@@ -47,13 +47,13 @@ import org.xml.sax.SAXException;
  */
 public final class ScoutProjectNewHelper {
 
-  public static final String SCOUT_ARCHETYPES_HELLOWORLD_VERSION = "6.0.0-SNAPSHOT";
+  public static final String SCOUT_ARCHETYPES_HELLOWORLD_VERSION = "6.0.0.M6_RelengTest3";
   public static final String SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID = "scout-helloworld-app";
   public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"\\/<>=:]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
-  public static final String DEFAULT_JAVA_VERSION = "1.8";
+  public static final String DEFAULT_JAVA_VERSION = "6.0.0.M6_RelengTest3";
 
   private ScoutProjectNewHelper() {
   }
