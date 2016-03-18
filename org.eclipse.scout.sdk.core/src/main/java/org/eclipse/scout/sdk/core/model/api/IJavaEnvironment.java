@@ -65,11 +65,11 @@ public interface IJavaEnvironment {
   IFileLocator getFileLocator();
 
   /**
-   * When file system changes occurred and the current {@link IType}, {@link ICompilationUnit} should not be lost, this
-   * method can be called in order to reload the SPI core of the {@link IJavaEnvironment} and replace all SPI cores of
-   * the wrapped classes with the updated version.
+   * When file system changes occurred and the current {@link IJavaElement}s should not be lost, this method can be
+   * called in order to reload the SPI core of the {@link IJavaEnvironment} and replace all SPI cores of the wrapped
+   * classes with the updated version.
    * <p>
-   * All {@link IType}, {@link ICompilationUnit} etc. remain valid and are updated with the new state of the file system
+   * All {@link IJavaElement}s remain valid (if they still exist) and are updated with the new state of the file system
    * including optional overrides that were registered using
    * {@link #registerCompilationUnitOverride(String, String, StringBuilder)}
    */
@@ -90,8 +90,11 @@ public interface IJavaEnvironment {
    *          The filename of the compilation unit (e.g. MyClass.java).
    * @param buf
    *          A {@link StringBuilder} holding the content of the compilation unit.
+   * @return <code>true</code> if a type with given fully qualified name was already loaded and a call to
+   *         {@link #reload()} would therefore be necessary so that the given type becomes active. <code>false</code> if
+   *         the given type has not been used yet.
    */
-  void registerCompilationUnitOverride(String packageName, String fileName, StringBuilder buf);
+  boolean registerCompilationUnitOverride(String packageName, String fileName, StringBuilder buf);
 
   /**
    * Unwraps the {@link IJavaEnvironment} into its underlying SPI class.

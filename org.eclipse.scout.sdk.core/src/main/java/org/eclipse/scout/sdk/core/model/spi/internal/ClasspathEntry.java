@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
 
 /**
@@ -36,14 +40,14 @@ public class ClasspathEntry {
     return m_encoding;
   }
 
-  public static Classpath[] toClassPaths(ClasspathEntry... entries) {
-    if (entries == null || entries.length < 1) {
-      return new Classpath[0];
+  public static Collection<Classpath> toClassPaths(Collection<ClasspathEntry> entries) {
+    if (entries == null || entries.isEmpty()) {
+      return Collections.emptyList();
     }
 
-    Classpath[] result = new Classpath[entries.length];
-    for (int i = 0; i < entries.length; i++) {
-      result[i] = entries[i].getClasspath();
+    Collection<Classpath> result = new ArrayList<>(entries.size());
+    for (ClasspathEntry entry : entries) {
+      result.add(entry.getClasspath());
     }
     return result;
   }

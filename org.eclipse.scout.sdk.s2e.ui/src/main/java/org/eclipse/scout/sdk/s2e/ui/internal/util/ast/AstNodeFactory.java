@@ -460,7 +460,7 @@ public class AstNodeFactory {
     return newMethod(methodName)
         .withModifiers(ModifierKeyword.PROTECTED_KEYWORD)
         .withOverride(true)
-        .withReturnType(newTypeReference(IJavaRuntimeTypes.java_lang_String))
+        .withReturnType(newTypeReference(IJavaRuntimeTypes.String))
         .withBody(body);
   }
 
@@ -511,7 +511,7 @@ public class AstNodeFactory {
   }
 
   public MarkerAnnotation newOverrideAnnotation() {
-    String overrideRef = getImportRewrite().addImport(IJavaRuntimeTypes.java_lang_Override, getContext());
+    String overrideRef = getImportRewrite().addImport(IJavaRuntimeTypes.Override, getContext());
     MarkerAnnotation marker = getAst().newMarkerAnnotation();
     marker.setTypeName(getAst().newName(overrideRef));
     return marker;
@@ -533,7 +533,7 @@ public class AstNodeFactory {
       getTypeBinding.setAccessible(true);
       return (ITypeBinding) getTypeBinding.invoke(resolver, reference);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       throw new SdkException(t);
     }
   }

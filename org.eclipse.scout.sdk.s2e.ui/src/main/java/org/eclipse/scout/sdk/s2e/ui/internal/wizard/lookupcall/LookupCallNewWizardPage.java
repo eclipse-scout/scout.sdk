@@ -250,7 +250,7 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
       List<org.eclipse.scout.sdk.core.model.api.IType> superClassKeyValue = CoreUtils.getResolvedTypeParamValue(scoutSuperType, IScoutRuntimeTypes.ILookupService, IScoutRuntimeTypes.TYPE_PARAM_LOOKUP_SERVICE_KEY_TYPE);
       if (!superClassKeyValue.isEmpty()) {
         org.eclipse.scout.sdk.core.model.api.IType bound = superClassKeyValue.get(0);
-        if (!IJavaRuntimeTypes.java_lang_Object.equals(bound.name())) {
+        if (!IJavaRuntimeTypes.Object.equals(bound.name())) {
           org.eclipse.scout.sdk.core.model.api.IType keyType = S2eUtils.jdtTypeToScoutType(getKeyType(), getEnvironment());
           if (!bound.isAssignableFrom(keyType)) {
             return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "The selected service super class cannot be used with the selected key class");

@@ -91,8 +91,7 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
     opts.analyseResourceLeaks = false;
     opts.ignoreMethodBodies = true;
     opts.docCommentSupport = true; //we want javadoc start and end positions
-
-    opts.isAnnotationBasedNullAnalysisEnabled = true;
+    opts.isAnnotationBasedNullAnalysisEnabled = false; // do not enable (performance and NPE in JDT compiler)
     opts.storeAnnotations = true; // also parse annotations
     return opts;
   }
@@ -113,13 +112,13 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
       if ((severity & (ProblemSeverities.Error | ProblemSeverities.Fatal | ProblemSeverities.InternalError)) != 0) {
         StringBuilder msg = new StringBuilder();
         if (originatingFileName != null) {
-          msg.append(originatingFileName).append(":");
+          msg.append(originatingFileName).append(':');
         }
         if (lineNumber > 0) {
           msg.append(lineNumber);
         }
         if (msg.length() > 0) {
-          msg.append(" ");
+          msg.append(' ');
         }
         String txt = getLocalizedMessage(problemId, elaborationId, messageArguments);
         if (txt != null) {

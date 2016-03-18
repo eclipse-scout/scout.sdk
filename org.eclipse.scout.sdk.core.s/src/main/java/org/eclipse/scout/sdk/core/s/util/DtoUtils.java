@@ -579,37 +579,41 @@ public final class DtoUtils {
   }
 
   private static AnnotationSourceBuilder getExtendsAnnotationSourceBuilder(IAnnotatable element) {
-    if (element instanceof IType) {
-      IType extendedType = getExtendedType((IType) element);
-      if (extendedType != null) {
-        IType primaryType = CoreUtils.getPrimaryType(extendedType);
-        IType extendedDto = null;
-        if (primaryType.isInstanceOf(IScoutRuntimeTypes.IForm) || primaryType.isInstanceOf(IScoutRuntimeTypes.IFormField)) {
-          if (extendedType.isInstanceOf(IScoutRuntimeTypes.ITable) && extendedType.declaringType() != null) {
-            IType tableFieldDto = getFormDataType(extendedType.declaringType());
-            extendedDto = getRowDataFor(tableFieldDto);
-          }
-          else {
-            extendedDto = findDtoForForm(primaryType);
-          }
-        }
-        else if (primaryType.isInstanceOf(IScoutRuntimeTypes.IExtension)) {
-          extendedDto = findDtoForPage(primaryType);
-        }
-        else if (primaryType.isInstanceOf(IScoutRuntimeTypes.IPageWithTable)) {
-          IType pageDto = findDtoForPage(primaryType);
-          extendedDto = pageDto.innerTypes().withInstanceOf(IScoutRuntimeTypes.AbstractTableRowData).first();
-        }
+    if (!(element instanceof IType)) {
+      return null;
+    }
 
-        if (extendedDto != null) {
-          final IType dto = extendedDto;
-          AnnotationSourceBuilder asb = new AnnotationSourceBuilder(IScoutRuntimeTypes.Extends);
-          asb.putElement("value", ExpressionSourceBuilderFactory.createClassLiteral(SignatureUtils.getTypeSignature(dto)));
-          return asb;
-        }
+    IType extendedType = getExtendedType((IType) element);
+    if (extendedType == null) {
+      return null;
+    }
+
+    IType primaryType = CoreUtils.getPrimaryType(extendedType);
+    IType extendedDto = null;
+    if (primaryType.isInstanceOf(IScoutRuntimeTypes.IForm) || primaryType.isInstanceOf(IScoutRuntimeTypes.IFormField)) {
+      if (extendedType.isInstanceOf(IScoutRuntimeTypes.ITable) && extendedType.declaringType() != null) {
+        IType tableFieldDto = getFormDataType(extendedType.declaringType());
+        extendedDto = getRowDataFor(tableFieldDto);
+      }
+      else {
+        extendedDto = findDtoForForm(primaryType);
       }
     }
-    return null;
+    else if (primaryType.isInstanceOf(IScoutRuntimeTypes.IExtension)) {
+      extendedDto = findDtoForPage(primaryType);
+    }
+    else if (primaryType.isInstanceOf(IScoutRuntimeTypes.IPageWithTable)) {
+      IType pageDto = findDtoForPage(primaryType);
+      extendedDto = pageDto.innerTypes().withInstanceOf(IScoutRuntimeTypes.AbstractTableRowData).first();
+    }
+
+    if (extendedDto == null) {
+      return null;
+    }
+
+    AnnotationSourceBuilder asb = new AnnotationSourceBuilder(IScoutRuntimeTypes.Extends);
+    asb.putElement("value", ExpressionSourceBuilderFactory.createClassLiteral(SignatureUtils.getTypeSignature(extendedDto)));
+    return asb;
   }
 
   private static IType getRowDataFor(IType tableDto) {

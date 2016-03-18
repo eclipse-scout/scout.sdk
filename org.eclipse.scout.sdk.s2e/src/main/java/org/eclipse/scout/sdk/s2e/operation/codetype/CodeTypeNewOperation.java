@@ -17,8 +17,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.codetype.CodeTypeSourceBuilder;
+import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
@@ -49,7 +52,11 @@ public class CodeTypeNewOperation implements IOperation {
   private IType m_createdCodeType;
 
   public CodeTypeNewOperation() {
-    m_javaEnvironmentProvider = new CachingJavaEnvironmentProvider();
+    this(new CachingJavaEnvironmentProvider());
+  }
+
+  protected CodeTypeNewOperation(IJavaEnvironmentProvider provider) {
+    m_javaEnvironmentProvider = provider;
   }
 
   @Override
@@ -73,13 +80,18 @@ public class CodeTypeNewOperation implements IOperation {
   }
 
   protected IType createCodeType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    CodeTypeSourceBuilder codeTypeBuilder = new CodeTypeSourceBuilder(getCodeTypeName(), getPackage());
+    IJavaEnvironment env = getEnvProvider().get(getSharedSourceFolder().getJavaProject());
+
+    CodeTypeSourceBuilder codeTypeBuilder = new CodeTypeSourceBuilder(getCodeTypeName(), getPackage(), env);
     codeTypeBuilder.setSuperTypeSignature(getSuperTypeSignature());
     codeTypeBuilder.setCodeTypeIdSignature(getCodeTypeIdSignature());
 
-    String uniqueId = UniqueIdExtensionPoint.getNextUniqueId(null, getCodeTypeIdSignature());
-    if (StringUtils.isNotBlank(uniqueId)) {
-      codeTypeBuilder.setIdValueBuilder(new RawSourceBuilder(uniqueId));
+    String idValue = UniqueIdExtensionPoint.getNextUniqueId(null, getCodeTypeIdSignature());
+    if (StringUtils.isBlank(idValue)) {
+      idValue = CoreUtils.getDefaultValueOf(SignatureUtils.unboxToPrimitiveSignature(getCodeTypeIdSignature()));
+    }
+    if (StringUtils.isNotBlank(idValue) && !"null".equals(idValue)) {
+      codeTypeBuilder.setIdValueBuilder(new RawSourceBuilder(idValue));
     }
     if (ClassIdGenerators.isAutomaticallyCreateClassIdAnnotation()) {
       codeTypeBuilder.setClassIdValue(ClassIdGenerators.generateNewId(new ClassIdGenerationContext(getPackage() + '.' + getCodeTypeName())));
@@ -87,7 +99,7 @@ public class CodeTypeNewOperation implements IOperation {
 
     codeTypeBuilder.setup();
 
-    return S2eUtils.writeType(getSharedSourceFolder(), codeTypeBuilder, getEnvProvider().get(getSharedSourceFolder().getJavaProject()), monitor, workingCopyManager);
+    return S2eUtils.writeType(getSharedSourceFolder(), codeTypeBuilder, env, monitor, workingCopyManager);
   }
 
   public String getCodeTypeName() {

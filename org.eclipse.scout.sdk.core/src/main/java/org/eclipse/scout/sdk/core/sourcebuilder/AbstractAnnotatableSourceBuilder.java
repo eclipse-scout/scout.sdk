@@ -94,9 +94,9 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
   }
 
   @Override
-  public boolean removeAnnotation(String elementName) {
+  public boolean removeAnnotation(String annotationFqn) {
     for (Iterator<IAnnotationSourceBuilder> it = m_annotations.iterator(); it.hasNext();) {
-      if (elementName.equals(it.next().getElementName())) {
+      if (annotationFqn.equals(it.next().getName())) {
         it.remove();
         return true;
       }

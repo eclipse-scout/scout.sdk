@@ -54,20 +54,21 @@ public final class CoreScoutTestingUtils {
   }
 
   public static IType createPageDataAssertNoCompileErrors(String modelFqn) {
-    return createDtoAssertNoCompileErrors(modelFqn, false);
+    return createPageDataAssertNoCompileErrors(modelFqn, createClientJavaEnvironment(), createSharedJavaEnvironment());
+  }
+
+  public static IType createPageDataAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
+    return createDtoAssertNoCompileErrors(modelFqn, false, clientEnv, sharedEnv);
   }
 
   public static IType createRowDataAssertNoCompileErrors(String modelFqn) {
-    return createDtoAssertNoCompileErrors(modelFqn, true);
+    return createDtoAssertNoCompileErrors(modelFqn, true, createClientJavaEnvironment(), createSharedJavaEnvironment());
   }
 
-  private static IType createDtoAssertNoCompileErrors(String modelFqn, boolean rowData) {
+  private static IType createDtoAssertNoCompileErrors(String modelFqn, boolean rowData, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
     // get model type
-    IType modelType = createClientJavaEnvironment().findType(modelFqn);
+    IType modelType = clientEnv.findType(modelFqn);
     DataAnnotationDescriptor dataAnnotation = DtoUtils.getDataAnnotationDescriptor(modelType);
-
-    // build classpath for shared project
-    IJavaEnvironment sharedEnv = createSharedJavaEnvironment();
 
     // build source
     ICompilationUnitSourceBuilder cuSrc;
@@ -84,11 +85,12 @@ public final class CoreScoutTestingUtils {
   }
 
   public static IType createFormDataAssertNoCompileErrors(String modelFqn) {
-    // get model type
-    IType modelType = createClientJavaEnvironment().findType(modelFqn);
+    return createFormDataAssertNoCompileErrors(modelFqn, createClientJavaEnvironment(), createSharedJavaEnvironment());
+  }
 
-    // build classpath for shared project
-    IJavaEnvironment sharedEnv = createSharedJavaEnvironment();
+  public static IType createFormDataAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
+    // get model type
+    IType modelType = clientEnv.findType(modelFqn);
 
     // build source
     FormDataAnnotationDescriptor formDataAnnotation = DtoUtils.getFormDataAnnotationDescriptor(modelType);

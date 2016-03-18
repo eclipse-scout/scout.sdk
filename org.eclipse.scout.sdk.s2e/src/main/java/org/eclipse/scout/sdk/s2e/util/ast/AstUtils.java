@@ -164,7 +164,7 @@ public final class AstUtils {
       getBindingResolver.setAccessible(true);
       return getBindingResolver.invoke(ast);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       throw new SdkException(t);
     }
   }
@@ -187,7 +187,7 @@ public final class AstUtils {
       scope.setAccessible(true);
       return (CompilationUnitScope) scope.invoke(resolver);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       throw new SdkException(t);
     }
   }

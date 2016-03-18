@@ -70,36 +70,50 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
   }
 
   public void schedulePageCreation(final PageNewOperation op) {
+    schedulePageCreation(op, null);
+  }
+
+  public void schedulePageCreation(final PageNewOperation op, Set<IResource> blockingFolders) {
     if (isExecuted()) {
       return; // no double runs
     }
 
-    Set<IResource> blockedFolders = new HashSet<>(4);
+    if (blockingFolders == null) {
+      blockingFolders = new HashSet<>(5);
+    }
     op.setClientSourceFolder(m_page1.getSourceFolder());
-    blockedFolders.add(m_page1.getSourceFolder().getResource());
+    blockingFolders.add(m_page1.getSourceFolder().getResource());
     op.setPackage(m_page1.getTargetPackage());
     op.setPageName(m_page1.getIcuName());
     IPackageFragmentRoot selectedSharedFolder = m_page1.getSharedSourceFolder();
     if (S2eUtils.exists(selectedSharedFolder)) {
       op.setSharedSourceFolder(selectedSharedFolder);
-      blockedFolders.add(selectedSharedFolder.getResource());
+      blockingFolders.add(selectedSharedFolder.getResource());
 
       IPackageFragmentRoot dtoSourceFolder = S2eUtils.getDtoSourceFolder(selectedSharedFolder);
       op.setPageDataSourceFolder(dtoSourceFolder);
-      blockedFolders.add(dtoSourceFolder.getResource());
+      blockingFolders.add(dtoSourceFolder.getResource());
     }
 
     IPackageFragmentRoot selectedServerFolder = m_page1.getServerSourceFolder();
     if (S2eUtils.exists(selectedServerFolder)) {
       op.setServerSourceFolder(selectedServerFolder);
-      blockedFolders.add(selectedServerFolder.getResource());
+      blockingFolders.add(selectedServerFolder.getResource());
+
+      if (!S2eUtils.exists(op.getTestSourceFolder())) {
+        IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(selectedServerFolder);
+        if (serviceTestSourceFolder != null) {
+          op.setTestSourceFolder(serviceTestSourceFolder);
+          blockingFolders.add(serviceTestSourceFolder.getResource());
+        }
+      }
     }
 
     op.setSuperType(m_page1.getSuperType());
 
     final Display d = getContainer().getShell().getDisplay();
 
-    ResourceBlockingOperationJob job = new ResourceBlockingOperationJob(op, blockedFolders.toArray(new IResource[blockedFolders.size()]));
+    ResourceBlockingOperationJob job = new ResourceBlockingOperationJob(op, blockingFolders.toArray(new IResource[blockingFolders.size()]));
     job.addJobChangeListener(new JobChangeAdapter() {
       @Override
       public void done(IJobChangeEvent event) {

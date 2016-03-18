@@ -33,6 +33,7 @@ public interface ISdkProperties {
   String SUFFIX_SERVICE = "Service";
   String SUFFIX_PERMISSION = "Permission";
   String SUFFIX_CODE_TYPE = "CodeType";
+  String SUFFIX_TEST = "Test";
 
   String INNER_TABLE_TYPE_NAME = "Table";
   String INNER_TREE_TYPE_NAME = "Tree";

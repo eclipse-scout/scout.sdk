@@ -72,7 +72,7 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
       source.append(' ');
     }
     // field type
-    source.append(validator.useSignature(getSignature())).append(" ");
+    source.append(validator.useSignature(getSignature())).append(' ');
     source.append(getElementName());
     // init value
     if (getValue() != null) {

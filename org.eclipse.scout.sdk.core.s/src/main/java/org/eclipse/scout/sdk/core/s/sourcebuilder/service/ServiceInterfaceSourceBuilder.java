@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.sourcebuilder.service;
 
-import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.AbstractEntitySourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 
@@ -27,27 +27,24 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
  * @author Matthias Villiger
  * @since 5.2.0
  */
-public class ServiceInterfaceSourceBuilder extends CompilationUnitSourceBuilder {
+public class ServiceInterfaceSourceBuilder extends AbstractEntitySourceBuilder {
 
-  private final String m_elementName;
-
-  public ServiceInterfaceSourceBuilder(String elementName, String packageName) {
-    super(elementName + SuffixConstants.SUFFIX_STRING_java, packageName);
-    m_elementName = elementName;
+  public ServiceInterfaceSourceBuilder(String elementName, String packageName, IJavaEnvironment env) {
+    super(elementName, packageName, env);
   }
 
   public ServiceInterfaceSourceBuilder(ICompilationUnit existingInterface) {
     super(existingInterface);
-    m_elementName = existingInterface.mainType().elementName();
   }
 
+  @Override
   public void setup() {
     if (getMainType() == null) {
       // CU comment
       setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(this));
 
       // new interface type
-      ITypeSourceBuilder interfaceBuilder = new TypeSourceBuilder(m_elementName);
+      ITypeSourceBuilder interfaceBuilder = new TypeSourceBuilder(getEntityName());
 
       interfaceBuilder.setFlags(Flags.AccPublic | Flags.AccInterface);
       interfaceBuilder.setComment(CommentSourceBuilderFactory.createDefaultTypeComment(interfaceBuilder));

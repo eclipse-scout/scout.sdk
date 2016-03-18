@@ -65,8 +65,10 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
-  public void registerCompilationUnitOverride(String packageName, String fileName, StringBuilder buf) {
-    m_spi.registerCompilationUnitOverride(packageName, fileName, buf);
+  public boolean registerCompilationUnitOverride(String packageName, String fileName, StringBuilder buf) {
+    char[] src = new char[buf.length()];
+    buf.getChars(0, buf.length(), src, 0);
+    return m_spi.registerCompilationUnitOverride(packageName, fileName, src);
   }
 
   @Override

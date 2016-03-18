@@ -173,7 +173,7 @@ public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
             param = selectedProposal.getFullyQualifiedName();
           }
           else {
-            param = IJavaRuntimeTypes.java_lang_Object;
+            param = IJavaRuntimeTypes.Object;
           }
           superTypeBuilder.append(param);
           if (appendCodeGeneric) {
@@ -225,7 +225,7 @@ public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
       // the super class specifies the code type id data type
       return codeTypeIdArg.signature();
     }
-    return Signature.createTypeSignature(IJavaRuntimeTypes.java_lang_Object);
+    return Signature.createTypeSignature(IJavaRuntimeTypes.Object);
   }
 
   @Override

@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
  * @since 5.2.0
  */
 public class GeneratedAnnotation extends AbstractManagedAnnotation {
-  public static final String TYPE_NAME = IJavaRuntimeTypes.javax_annotation_Generated;
+  public static final String TYPE_NAME = IJavaRuntimeTypes.Generated;
 
   public String[] value() {
     return getValue("value", String[].class, null);

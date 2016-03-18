@@ -14,6 +14,7 @@ import java.util.Collection;
 
 import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.spi.internal.JavaEnvironmentWithJdt;
 
 /**
  * <h3>{@link JavaEnvironmentSpi}</h3> Represents a Java lookup environment (classpath) capable to resolve
@@ -57,9 +58,10 @@ public interface JavaEnvironmentSpi {
    *
    * @param packageName
    * @param fileName
-   * @param buf
+   * @param src
+   * @return
    */
-  void registerCompilationUnitOverride(String packageName, String fileName, StringBuilder buf);
+  boolean registerCompilationUnitOverride(String packageName, String fileName, char[] src);
 
   /**
    * @param fqn
@@ -71,5 +73,10 @@ public interface JavaEnvironmentSpi {
   Collection<ClasspathSpi> getClasspath();
 
   IJavaEnvironment wrap();
+
+  /**
+   * @return
+   */
+  JavaEnvironmentWithJdt emptyCopy();
 
 }

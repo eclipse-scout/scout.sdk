@@ -11,15 +11,16 @@
 package org.eclipse.scout.sdk.core.s.model;
 
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.MethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
@@ -43,24 +44,25 @@ public final class ScoutMethodSourceBuilderFactory {
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         source.append("return getFieldByClass(")
             .append(validator.useSignature(fieldSignature))
-            .append(SuffixConstants.SUFFIX_STRING_class)
+            .append(SuffixConstants.SUFFIX_class)
             .append(");");
       }
     });
     return getterBuilder;
   }
 
-  public static IMethodSourceBuilder createFormServiceIfcMethod(String name, String dtoSignature) {
-    IMethodSourceBuilder methodBuilder = new MethodSourceBuilder(name);
-    methodBuilder.setFlags(Flags.AccInterface);
-    methodBuilder.setComment(CommentSourceBuilderFactory.createDefaultMethodComment(methodBuilder));
-    if (dtoSignature != null) {
-      methodBuilder.setReturnTypeSignature(dtoSignature);
-      methodBuilder.addParameter(new MethodParameterSourceBuilder("input", dtoSignature));
-    }
-    else {
-      methodBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
-    }
-    return methodBuilder;
+  public static IMethodSourceBuilder createNlsMethod(String methodName, final String nlsKeyName) {
+    IMethodSourceBuilder nlsMethod = new MethodSourceBuilder(methodName);
+    nlsMethod.setFlags(Flags.AccProtected);
+    nlsMethod.setReturnTypeSignature(Signature.createTypeSignature(IJavaRuntimeTypes.String));
+    nlsMethod.setBody(new ISourceBuilder() {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append(CoreUtils.getCommentBlock("verify translation")).append(lineDelimiter);
+        source.append("return ").append(validator.useName(IScoutRuntimeTypes.TEXTS)).append(".get(").append(CoreUtils.toStringLiteral(nlsKeyName)).append(");");
+      }
+    });
+    nlsMethod.addAnnotation(AnnotationSourceBuilderFactory.createOverride());
+    return nlsMethod;
   }
 }

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,19 +24,17 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.batch.ClasspathJar;
-import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
-import org.eclipse.jdt.internal.compiler.util.Util;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.core.util.compat.CompatibilityLayer;
 
-public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
-  private Classpath[] m_classpaths;
+public class WorkspaceFileSystem implements INameEnvironment {
+  private static final char SEPARATOR = '/';
+  private Collection<Classpath> m_classpaths;
   private final Map<String, ICompilationUnit> m_overrideCompilationUnits = new HashMap<>();
   private final Set<String> m_additionalPackages = new HashSet<>();
 
@@ -44,47 +43,52 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
    * @param overrideCompilationUnits
    *          is a map of "a/b/c/JavaClass.class" to its content
    */
-  public WorkspaceFileSystem(Classpath[] paths) {
-    final int length = paths.length;
-    this.m_classpaths = new FileSystem.Classpath[length];
+  public WorkspaceFileSystem(Collection<Classpath> paths) {
     try {
-      for (int i = 0; i < length; i++) {
-        final Classpath classpath = paths[i];
-        classpath.initialize();
-        this.m_classpaths[i] = classpath;
+      for (Classpath cp : paths) {
+        cp.initialize();
       }
     }
-    catch (IOException exception) {
-      throw new SdkException("Unable to initialize classpath.", exception);
+    catch (IOException e) {
+      throw new SdkException(e);
     }
+    m_classpaths = paths;
   }
 
-  public void addOverrideCompilationUnit(ICompilationUnit cu) {
+  /**
+   * adds a compilation unit override
+   *
+   * @param cu
+   *          The override
+   * @return <code>true</code> if there was a previous mapping which has been updated with this call. <code>false</code>
+   *         if this is the first override for this compilation unit.
+   */
+  public boolean addOverrideCompilationUnit(ICompilationUnit cu) {
     char[][] packageName0 = cu.getPackageName();
-
-    //register compilation unit with normalized class name
-    String fileName = new String(cu.getFileName());
-    if (fileName.toLowerCase().endsWith(SuffixConstants.SUFFIX_STRING_java)) {
-      fileName = fileName.substring(0, fileName.length() - SuffixConstants.SUFFIX_STRING_java.length()) + SuffixConstants.SUFFIX_STRING_class;
-    }
 
     // build key
     StringBuilder keyBuilder = new StringBuilder();
     if (packageName0 != null && packageName0.length > 0) {
-      char[] pck = CharOperation.concatWith(packageName0, '/');
-      keyBuilder.append(pck);
-      keyBuilder.append('/');
+      for (char[] segment : packageName0) {
+        keyBuilder.append(segment);
+        keyBuilder.append(SEPARATOR);
+      }
     }
-    keyBuilder.append(fileName);
+    keyBuilder.append(cu.getMainTypeName());
 
-    m_overrideCompilationUnits.put(keyBuilder.toString(), cu);
+    boolean updatedExistingEntry = false;
+    ICompilationUnit existingIcu = m_overrideCompilationUnits.put(keyBuilder.toString(), cu);
+    if (existingIcu != null) {
+      updatedExistingEntry = !Arrays.equals(existingIcu.getContents(), cu.getContents());
+    }
 
     //register additional packages
     if (packageName0 != null && packageName0.length > 0) {
       for (int i = 1; i < packageName0.length; i++) {
-        m_additionalPackages.add(new String(CharOperation.concatWith(CharOperation.subarray(packageName0, 0, i), '/')));
+        m_additionalPackages.add(new String(CharOperation.concatWith(CharOperation.subarray(packageName0, 0, i), SEPARATOR)));
       }
     }
+    return updatedExistingEntry;
   }
 
   public Collection<ICompilationUnit> getOverrideCompilationUnits() {
@@ -93,27 +97,31 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
 
   @Override
   public void cleanup() {
+    for (Classpath cp : m_classpaths) {
+      cp.reset();
+    }
+    m_additionalPackages.clear();
+    m_overrideCompilationUnits.clear();
   }
 
   @Override
   public boolean isPackage(char[][] compoundName, char[] packageName) {
-    String qualifiedPackageName = new String(CharOperation.concatWith(compoundName, packageName, '/'));
+    String qualifiedPackageName = new String(CharOperation.concatWith(compoundName, packageName, SEPARATOR));
     if (m_additionalPackages.contains(qualifiedPackageName)) {
       return true;
     }
 
-    String qp2 = File.separatorChar == '/' ? qualifiedPackageName : qualifiedPackageName.replace('/', File.separatorChar);
+    String qp2 = File.separatorChar == SEPARATOR ? qualifiedPackageName : qualifiedPackageName.replace(SEPARATOR, File.separatorChar);
     if (qualifiedPackageName.equals(qp2)) {
-      for (int i = 0, length = this.m_classpaths.length; i < length; i++) {
-        if (this.m_classpaths[i].isPackage(qualifiedPackageName)) {
+      for (Classpath cp : m_classpaths) {
+        if (cp.isPackage(qualifiedPackageName)) {
           return true;
         }
       }
     }
     else {
-      for (int i = 0, length = this.m_classpaths.length; i < length; i++) {
-        Classpath p = this.m_classpaths[i];
-        if ((p instanceof ClasspathJar) ? p.isPackage(qualifiedPackageName) : p.isPackage(qp2)) {
+      for (Classpath cp : m_classpaths) {
+        if ((cp instanceof ClasspathJar) ? cp.isPackage(qualifiedPackageName) : cp.isPackage(qp2)) {
           return true;
         }
       }
@@ -123,50 +131,54 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
 
   @Override
   public NameEnvironmentAnswer findType(char[][] compoundName) {
-    if (compoundName != null) {
-      return findInternal(new String(CharOperation.concatWith(compoundName, '/')), compoundName[compoundName.length - 1]);
+    if (compoundName == null) {
+      return null;
     }
-    return null;
+    return findTypeInternal(compoundName, null, null);
   }
 
   @Override
   public NameEnvironmentAnswer findType(char[] typeName, char[][] packageName) {
-    if (typeName != null) {
-      return findInternal(new String(CharOperation.concatWith(packageName, typeName, '/')), typeName);
+    if (typeName == null) {
+      return null;
     }
-    return null;
+    return findTypeInternal(null, typeName, packageName);
   }
 
   /**
    * @return best answer where source types takes precedence over binary types
    */
-  private NameEnvironmentAnswer findInternal(String qualifiedName, char[] simpleName) {
-    String qualifiedFileName = qualifiedName + SUFFIX_STRING_class;
-    String qualifiedPackageName = qualifiedName.length() == simpleName.length ? Util.EMPTY_STRING : qualifiedFileName.substring(0, qualifiedName.length() - simpleName.length - 1);
+  protected NameEnvironmentAnswer findTypeInternal(char[][] compoundName, char[] typeName, char[][] packageName) {
+    if (compoundName == null) {
+      compoundName = CharOperation.arrayConcat(packageName, typeName);
+    }
+    else {
+      packageName = CharOperation.subarray(compoundName, 0, compoundName.length - 1);
+      typeName = compoundName[compoundName.length - 1];
+    }
 
-    ICompilationUnit overrideCu = m_overrideCompilationUnits.get(qualifiedFileName);
+    String fqnUnix = new String(CharOperation.concatWith(compoundName, SEPARATOR));
+    ICompilationUnit overrideCu = m_overrideCompilationUnits.get(fqnUnix);
     if (overrideCu != null) {
       return new NameEnvironmentAnswer(overrideCu, null);
     }
 
-    String qualifiedFileNameLocalized;
-    String qualifiedPackageNameLocalized;
-    if (File.separatorChar == '/') {
-      qualifiedFileNameLocalized = qualifiedFileName;
-      qualifiedPackageNameLocalized = qualifiedPackageName;
-    }
-    else {
-      qualifiedFileNameLocalized = qualifiedFileName.replace('/', File.separatorChar);
-      qualifiedPackageNameLocalized = qualifiedPackageName.replace('/', File.separatorChar);
+    String fileNameUnix = fqnUnix + SuffixConstants.SUFFIX_STRING_class;
+    String pckUnix = new String(CharOperation.concatWith(packageName, SEPARATOR));
+    String pckPlatform = pckUnix;
+    String fileNamePlatform = fileNameUnix;
+    if (SEPARATOR != File.separatorChar) {
+      pckPlatform = new String(CharOperation.concatWith(packageName, File.separatorChar));
+      fileNamePlatform = new String(CharOperation.concat(CharOperation.concatWith(compoundName, File.separatorChar), SuffixConstants.SUFFIX_class));
     }
 
     for (Classpath cp : m_classpaths) {
       NameEnvironmentAnswer answer;
       if (cp instanceof ClasspathJar) {
-        answer = cp.findClass(simpleName, qualifiedPackageName, qualifiedFileName, false);
+        answer = cp.findClass(typeName, pckUnix, fileNameUnix, false);
       }
       else {
-        answer = cp.findClass(simpleName, qualifiedPackageNameLocalized, qualifiedFileNameLocalized, false);
+        answer = cp.findClass(typeName, pckPlatform, fileNamePlatform, false);
       }
       if (answer != null) {
         //prio 1: source type
@@ -186,27 +198,30 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
     return null;
   }
 
-  public static Classpath createClasspath(File f, boolean source, String encoding) {
-    if (f.exists()) {
-      if (encoding == null) {
-        encoding = StandardCharsets.UTF_8.name();
-      }
-
-      Classpath classpath = CompatibilityLayer.getFileSystemClasspath(f, source, encoding, new Callable<Map<?, ?>>() {
-        @Override
-        public Map<?, ?> call() throws Exception {
-          return AstCompiler.createDefaultOptions().getMap();
-        }
-      });
-      try {
-        classpath.initialize();
-        return classpath;
-      }
-      catch (IOException e) {
-        SdkLog.warning("Unable to initialize classpath '{}'.", f.getAbsolutePath(), e);
-      }
+  @Override
+  protected void finalize() throws Throwable {
+    try {
+      cleanup();
     }
-    return null;
+    finally {
+      super.finalize();
+    }
   }
 
+  public static Classpath createClasspath(File f, boolean source, String encoding) {
+    if (f == null || !f.canRead()) {
+      return null;
+    }
+
+    if (encoding == null) {
+      encoding = StandardCharsets.UTF_8.name();
+    }
+
+    return CompatibilityLayer.getFileSystemClasspath(f, source, encoding, new Callable<Map<?, ?>>() {
+      @Override
+      public Map<?, ?> call() throws Exception {
+        return AstCompiler.createDefaultOptions().getMap();
+      }
+    });
+  }
 }

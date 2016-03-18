@@ -36,9 +36,13 @@ public interface IScoutRuntimeTypes {
   String ConfigOperation = "org.eclipse.scout.rt.platform.annotations.ConfigOperation";
   String ConfigProperty = "org.eclipse.scout.rt.platform.annotations.ConfigProperty";
   String TunnelToServer = "org.eclipse.scout.rt.shared.TunnelToServer";
-
-  // UI classes
-  String UiServlet = "org.eclipse.scout.rt.ui.html.UiServlet";
+  String RunWithSubject = "org.eclipse.scout.rt.testing.platform.runner.RunWithSubject";
+  String RunWithClientSession = "org.eclipse.scout.rt.testing.client.runner.RunWithClientSession";
+  String RunWithServerSession = "org.eclipse.scout.rt.testing.server.runner.RunWithServerSession";
+  String Test = "org.junit.Test";
+  String BeanMock = "org.eclipse.scout.rt.testing.platform.mock.BeanMock";
+  String RunWith = "org.junit.runner.RunWith";
+  String Before = "org.junit.Before";
 
   // abstract implementations
   String AbstractActionNode = "org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode";
@@ -140,6 +144,7 @@ public interface IScoutRuntimeTypes {
   String IListBox = "org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox";
   String ILongField = "org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField";
   String ILookupCall = "org.eclipse.scout.rt.shared.services.lookup.ILookupCall";
+  String ILookupRow = "org.eclipse.scout.rt.shared.services.lookup.ILookupRow";
   String ILookupService = "org.eclipse.scout.rt.shared.services.lookup.ILookupService";
   String IMenu = "org.eclipse.scout.rt.client.ui.action.menu.IMenu";
   String IMenuType = "org.eclipse.scout.rt.client.ui.action.menu.IMenuType";
@@ -184,6 +189,13 @@ public interface IScoutRuntimeTypes {
   String VetoException = "org.eclipse.scout.rt.platform.exception.VetoException";
   String SearchFilter = "org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter";
   String LookupCall = "org.eclipse.scout.rt.shared.services.lookup.LookupCall";
+  String TestEnvironmentClientSession = "org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession";
+  String ClientTestRunner = "org.eclipse.scout.rt.testing.client.runner.ClientTestRunner";
+  String ServerTestRunner = "org.eclipse.scout.rt.testing.server.runner.ServerTestRunner";
+  String UiServlet = "org.eclipse.scout.rt.ui.html.UiServlet";
+  String TriState = "org.eclipse.scout.rt.platform.util.TriState";
+  String Mockito = "org.mockito.Mockito";
+  String Matchers = "org.mockito.Matchers";
 
   // Menu Types
   String TableMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TableMenuType";

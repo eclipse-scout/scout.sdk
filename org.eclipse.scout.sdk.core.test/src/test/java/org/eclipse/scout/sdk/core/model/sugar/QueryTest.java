@@ -118,7 +118,7 @@ public class QueryTest {
     Assert.assertEquals(1, baseClass.fields().withFilter(new IFilter<IField>() {
       @Override
       public boolean evaluate(IField element) {
-        return element.dataType().name().equals(IJavaRuntimeTypes.java_lang_Long);
+        return element.dataType().name().equals(IJavaRuntimeTypes.Long);
       }
     }).list().size());
     Assert.assertEquals(1, childClass.fields().withFlags(Flags.AccProtected).list().size());

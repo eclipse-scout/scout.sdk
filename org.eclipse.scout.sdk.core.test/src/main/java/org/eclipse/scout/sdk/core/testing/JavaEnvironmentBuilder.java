@@ -317,10 +317,10 @@ public final class JavaEnvironmentBuilder {
       findSourceAttachments();
     }
 
-    Collection<ClasspathEntry> all = new ArrayList<>();
+    Collection<ClasspathEntry> all = new ArrayList<>(m_srcPaths.size() + m_binPaths.size());
     all.addAll(m_srcPaths.values());
     all.addAll(m_binPaths.values());
-    return new JavaEnvironmentWithJdt(createFileLocator(), all.toArray(new ClasspathEntry[all.size()])).wrap();
+    return new JavaEnvironmentWithJdt(createFileLocator(), all).wrap();
   }
 
 }

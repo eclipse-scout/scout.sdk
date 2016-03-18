@@ -95,9 +95,13 @@ public final class CoreTestingUtils {
   }
 
   public static IType assertNoCompileErrors(IJavaEnvironment env, String qualifier, String simpleName, String source) {
-    env.registerCompilationUnitOverride(qualifier, simpleName + SuffixConstants.SUFFIX_STRING_java, new StringBuilder(source));
-    env.reload();
-    IType t = env.findType(qualifier + '.' + simpleName);
+    boolean reloadRequired = env.registerCompilationUnitOverride(qualifier, simpleName + SuffixConstants.SUFFIX_STRING_java, new StringBuilder(source));
+    if (reloadRequired) {
+      env.reload();
+    }
+    String fqn = qualifier + '.' + simpleName;
+    IType t = env.findType(fqn);
+    Assert.assertNotNull("Generated type '" + fqn + "' could not be found.", t);
     Assert.assertNull(getCompileErrors(env, t.name()));
     return t;
   }

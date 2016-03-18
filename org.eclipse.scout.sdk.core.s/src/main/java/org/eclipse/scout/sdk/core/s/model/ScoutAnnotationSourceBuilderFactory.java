@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.DefaultSubtype
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
@@ -56,8 +57,86 @@ public final class ScoutAnnotationSourceBuilderFactory {
     return classIdAnnoation;
   }
 
+  public static IAnnotationSourceBuilder createBefore() {
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.Before);
+    return sourceBuilder;
+  }
+
+  public static IAnnotationSourceBuilder createBeanMock() {
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.BeanMock);
+    return sourceBuilder;
+  }
+
   public static IAnnotationSourceBuilder createTunnelToServer() {
     AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.TunnelToServer);
+    return sourceBuilder;
+  }
+
+  public static IAnnotationSourceBuilder createTest() {
+    return new AnnotationSourceBuilder(IScoutRuntimeTypes.Test);
+  }
+
+  /**
+   * Creates a new {@link IAnnotationSourceBuilder} creating an @RunWithSubject annotation.
+   *
+   * @param valueBuilder
+   *          The {@link ISourceBuilder} creating the value part of the annotation. Can be <code>null</code> in which an
+   *          anonymous subject is used.
+   * @return
+   */
+  public static IAnnotationSourceBuilder createRunWithSubject(ISourceBuilder valueBuilder) {
+    if (valueBuilder == null) {
+      valueBuilder = new RawSourceBuilder(CoreUtils.toStringLiteral("anonymous"));
+    }
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.RunWithSubject);
+    sourceBuilder.putElement("value", valueBuilder);
+    return sourceBuilder;
+  }
+
+  /**
+   * Creates a new {@link IAnnotationSourceBuilder} creating a @RunWithClientSession annotation using the given client
+   * session signature.
+   *
+   * @param clientSessionSignature
+   *          The client session signature to use or <code>null</code> if the default client session should be used.
+   * @return The created {@link IAnnotationSourceBuilder}.
+   */
+  public static IAnnotationSourceBuilder createRunWithClientSession(final String clientSessionSignature) {
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.RunWithClientSession);
+    sourceBuilder.putElement("value", new ISourceBuilder() {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        if (clientSessionSignature == null) {
+          source.append(validator.useName(IScoutRuntimeTypes.TestEnvironmentClientSession));
+        }
+        else {
+          source.append(validator.useSignature(clientSessionSignature));
+        }
+        source.append(SuffixConstants.SUFFIX_class);
+      }
+    });
+    return sourceBuilder;
+  }
+
+  public static IAnnotationSourceBuilder createRunWithServerSession(final String serverSessionSignature) {
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.RunWithServerSession);
+    sourceBuilder.putElement("value", new ISourceBuilder() {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append(validator.useSignature(serverSessionSignature)).append(SuffixConstants.SUFFIX_class);
+      }
+    });
+    return sourceBuilder;
+  }
+
+  public static IAnnotationSourceBuilder createRunWith(final String runnerSignature) {
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.RunWith);
+    sourceBuilder.putElement("value", new ISourceBuilder() {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append(validator.useSignature(runnerSignature)).append(SuffixConstants.SUFFIX_class);
+      }
+    });
     return sourceBuilder;
   }
 
@@ -66,7 +145,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
     asb.putElement(DataAnnotation.VALUE_ELEMENT_NAME, new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append(validator.useSignature(pageDataTypeSignature)).append(SuffixConstants.SUFFIX_STRING_class);
+        source.append(validator.useSignature(pageDataTypeSignature)).append(SuffixConstants.SUFFIX_class);
       }
     });
     return asb;
@@ -82,7 +161,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
       formDataAnnot.putElement(FormDataAnnotation.VALUE_ELEMENT_NAME, new ISourceBuilder() {
         @Override
         public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-          source.append(validator.useSignature(formDataSignature)).append(SuffixConstants.SUFFIX_STRING_class);
+          source.append(validator.useSignature(formDataSignature)).append(SuffixConstants.SUFFIX_class);
         }
       });
     }

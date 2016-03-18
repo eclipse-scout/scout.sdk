@@ -133,7 +133,7 @@ public class NormalizedPattern {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("NormalizedPattern [Pattern=").append(getPattern()).append(", MatchRule=").append(getMatchRule()).append("]");
+    builder.append("NormalizedPattern [Pattern=").append(getPattern()).append(", MatchRule=").append(getMatchRule()).append(']');
     return builder.toString();
   }
 

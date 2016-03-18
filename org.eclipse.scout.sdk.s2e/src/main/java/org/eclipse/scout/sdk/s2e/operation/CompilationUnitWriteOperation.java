@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
@@ -30,10 +27,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 
 /**
  * <h3>{@link CompilationUnitWriteOperation}</h3>
@@ -152,7 +147,7 @@ public class CompilationUnitWriteOperation implements IOperation {
       }
       else {
         // only write if changed
-        String oldSource = getContentOfFile((IFile) m_createdCompilationUnit.getResource());
+        String oldSource = S2eUtils.getContentOfFile((IFile) m_createdCompilationUnit.getResource());
         progress.worked(1);
 
         if (!isSourceEqual(oldSource, newSource)) {
@@ -166,19 +161,6 @@ public class CompilationUnitWriteOperation implements IOperation {
     }
     catch (Exception e) {
       SdkLog.error("Could not {}", getOperationName(), e);
-    }
-  }
-
-  protected static String getContentOfFile(IFile targetFile) throws CoreException {
-    if (!targetFile.exists()) {
-      return null;
-    }
-    String charsetName = targetFile.getCharset();
-    try (InputStream contents = targetFile.getContents()) {
-      return CoreUtils.inputStreamToString(contents, charsetName).toString();
-    }
-    catch (IOException e) {
-      throw new CoreException(new ScoutStatus("Unable to read file '" + targetFile.getFullPath().toOSString() + "'.", e));
     }
   }
 

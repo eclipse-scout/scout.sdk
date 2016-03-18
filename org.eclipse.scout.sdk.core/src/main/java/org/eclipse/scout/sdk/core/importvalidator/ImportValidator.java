@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.importvalidator;
 
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
@@ -87,7 +90,8 @@ public class ImportValidator implements IImportValidator {
         if (use == null) {
           use = collector.checkCurrentScope(cand);
           boolean foundInCurrentScope = use != null && use.indexOf(ISignatureConstants.C_DOT) < 0;
-          if (isTypeArg && foundInCurrentScope && collector.getQualifier().equals(cand.getQualifier())) {
+          boolean inSamePackage = Objects.equals(collector.getQualifier(), cand.getQualifier()) || (StringUtils.isBlank(collector.getQualifier()) && StringUtils.isBlank(cand.getQualifier()));
+          if (isTypeArg && foundInCurrentScope && inSamePackage) {
             // special case for type argument signature which are simple qualified because in same scope
             collector.registerElement(cand); // ensure it is registered as used so that it appears in the imports for inner types only
           }

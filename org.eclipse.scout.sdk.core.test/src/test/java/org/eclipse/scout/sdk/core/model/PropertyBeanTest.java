@@ -49,14 +49,14 @@ public class PropertyBeanTest {
 
     IPropertyBean falseProp = propertyBeans.get(1);
     Assert.assertEquals("False", falseProp.name());
-    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Boolean, falseProp.type().name());
+    Assert.assertEquals(IJavaRuntimeTypes.Boolean, falseProp.type().name());
     Assert.assertEquals(propTestClass, falseProp.declaringType());
     Assert.assertNotNull(falseProp.readMethod());
     Assert.assertNotNull(falseProp.writeMethod());
 
     IPropertyBean onlyProp = propertyBeans.get(2);
     Assert.assertEquals("Only", onlyProp.name());
-    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Integer, onlyProp.type().name());
+    Assert.assertEquals(IJavaRuntimeTypes.Integer, onlyProp.type().name());
     Assert.assertEquals(propTestClass, onlyProp.declaringType());
     Assert.assertNotNull(onlyProp.readMethod());
     Assert.assertNull(onlyProp.writeMethod());

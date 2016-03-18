@@ -47,22 +47,25 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
 
     //super types
     IJavaEnvironment env = getJavaEnvironment();
-    if (env != null) {
-      Set<String> superSignatures = new HashSet<>(enclosingTypeSrc.getInterfaceSignatures().size() + 1);
-      superSignatures.addAll(enclosingTypeSrc.getInterfaceSignatures());
-      if (enclosingTypeSrc.getSuperTypeSignature() != null) {
-        superSignatures.add(enclosingTypeSrc.getSuperTypeSignature());
-      }
-      for (String sig : superSignatures) {
-        String qname = SignatureUtils.toFullyQualifiedName(Signature.getTypeErasure(sig));
-        m_enclosingQualifiers.add(qname);
-        IType t = env.findType(qname);
-        if (t != null) {
-          for (IType s : t.superTypes().withSuperTypes(true).list()) {
-            m_enclosingQualifiers.add(s.name());
-            for (IType i : s.innerTypes().list()) {
-              m_enclosedSimpleNames.add(i.elementName());
-            }
+    if (env == null) {
+      return;
+    }
+
+    Set<String> superSignatures = new HashSet<>(enclosingTypeSrc.getInterfaceSignatures().size() + 1);
+    superSignatures.addAll(enclosingTypeSrc.getInterfaceSignatures());
+    if (enclosingTypeSrc.getSuperTypeSignature() != null) {
+      superSignatures.add(enclosingTypeSrc.getSuperTypeSignature());
+    }
+
+    for (String sig : superSignatures) {
+      String qname = SignatureUtils.toFullyQualifiedName(Signature.getTypeErasure(sig));
+      m_enclosingQualifiers.add(qname);
+      IType t = env.findType(qname);
+      if (t != null) {
+        for (IType s : t.superTypes().withSuperTypes(true).list()) {
+          m_enclosingQualifiers.add(s.name());
+          for (IType i : s.innerTypes().list()) {
+            m_enclosedSimpleNames.add(i.elementName());
           }
         }
       }

@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
@@ -28,7 +29,6 @@ import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
-import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
@@ -48,6 +48,8 @@ import org.eclipse.scout.sdk.core.util.IFilter;
  * @since 3.10.0 07.03.2013
  */
 public final class MethodSourceBuilderFactory {
+
+  private static final AtomicLong tempTypeCounter = new AtomicLong(0L);
 
   private MethodSourceBuilderFactory() {
   }
@@ -69,23 +71,9 @@ public final class MethodSourceBuilderFactory {
 
   public static List<IMethodSourceBuilder> createUnimplementedMethods(String superTypeSignature, Collection<String> superInterfacesSignatures, IJavaEnvironment env) {
     // build temporary type to calculate the fully resolved signatures
-    String typeName = "TempClass" + System.currentTimeMillis();
-    ICompilationUnitSourceBuilder tmpCuBuilder = new CompilationUnitSourceBuilder(typeName + SuffixConstants.SUFFIX_STRING_java, "org.eclipse.scout.not.existing");
-    ITypeSourceBuilder mainType = new TypeSourceBuilder(typeName);
+    IType tmpType = createTmpType(superTypeSignature, superInterfacesSignatures, env);
 
-    if (StringUtils.isNotBlank(superTypeSignature) && !ISignatureConstants.SIG_JAVA_LANG_OBJECT.equals(superTypeSignature)) {
-      mainType.setSuperTypeSignature(superTypeSignature);
-    }
-    if (superInterfacesSignatures != null && !superInterfacesSignatures.isEmpty()) {
-      for (String ifcSig : superInterfacesSignatures) {
-        mainType.addInterfaceSignature(ifcSig);
-      }
-    }
-    tmpCuBuilder.addType(mainType);
-
-    StringBuilder newSrc = new StringBuilder(CoreUtils.createJavaCode(tmpCuBuilder, env, "\n", null)); // create temporary source
-    env.registerCompilationUnitOverride(tmpCuBuilder.getPackageName(), tmpCuBuilder.getElementName(), newSrc);
-    List<IMethod> unimplementedMehtods = getUnimplementedMehtods(env.findType(mainType.getFullyQualifiedName()));
+    List<IMethod> unimplementedMehtods = getUnimplementedMehtods(tmpType);
     if (unimplementedMehtods.isEmpty()) {
       return Collections.emptyList();
     }
@@ -97,6 +85,26 @@ public final class MethodSourceBuilderFactory {
       result.add(unimplMethodBuilder);
     }
     return result;
+  }
+
+  private static IType createTmpType(String superTypeSignature, Collection<String> superInterfacesSignatures, IJavaEnvironment env) {
+    String typeName = "ScoutSdkTempDummyClass" + tempTypeCounter.incrementAndGet() + "__";
+    ICompilationUnitSourceBuilder tmpCuBuilder = new CompilationUnitSourceBuilder(typeName + SuffixConstants.SUFFIX_STRING_java, "org.eclipse.scout.sdk.not.existing");
+    ITypeSourceBuilder mainType = new TypeSourceBuilder(typeName);
+    if (StringUtils.isNotBlank(superTypeSignature) && !ISignatureConstants.SIG_JAVA_LANG_OBJECT.equals(superTypeSignature)) {
+      mainType.setSuperTypeSignature(superTypeSignature);
+    }
+    if (superInterfacesSignatures != null && !superInterfacesSignatures.isEmpty()) {
+      for (String ifcSig : superInterfacesSignatures) {
+        mainType.addInterfaceSignature(ifcSig);
+      }
+    }
+    tmpCuBuilder.addType(mainType);
+
+    IJavaEnvironment emptyCopy = env.unwrap().emptyCopy().wrap();
+    StringBuilder newSrc = new StringBuilder(CoreUtils.createJavaCode(tmpCuBuilder, emptyCopy, "\n", null)); // create temporary source
+    emptyCopy.registerCompilationUnitOverride(tmpCuBuilder.getPackageName(), tmpCuBuilder.getElementName(), newSrc);
+    return emptyCopy.findType(mainType.getFullyQualifiedName());
   }
 
   private static List<IMethod> getUnimplementedMehtods(IType type) {
@@ -132,28 +140,11 @@ public final class MethodSourceBuilderFactory {
   }
 
   private static IMethod getMethodToOverride(ITypeSourceBuilder typeSourceBuilder, IJavaEnvironment lookupContext, IFilter<IMethod> methodFilter) {
-    List<String> interfaceSignatures = typeSourceBuilder.getInterfaceSignatures();
-
-    List<String> superSignatures = new ArrayList<>(interfaceSignatures.size() + 1);
-    superSignatures.add(typeSourceBuilder.getSuperTypeSignature());
-    superSignatures.addAll(interfaceSignatures);
-
-    return getMethodToOverride(superSignatures, lookupContext, methodFilter);
-  }
-
-  private static IMethod getMethodToOverride(List<String> superSignatures, IJavaEnvironment lookupContext, IFilter<IMethod> filter) {
-    for (String superCandidate : superSignatures) {
-      if (superCandidate != null) {
-        IType superType = lookupContext.findType(SignatureUtils.toFullyQualifiedName(superCandidate));
-        if (superType != null) {
-          IMethod methodToOverride = superType.methods().withSuperTypes(true).withFilter(filter).first();
-          if (methodToOverride != null) {
-            return methodToOverride;
-          }
-        }
-      }
+    IType tmpType = createTmpType(typeSourceBuilder.getSuperTypeSignature(), typeSourceBuilder.getInterfaceSignatures(), lookupContext);
+    if (tmpType == null) {
+      return null;
     }
-    return null;
+    return tmpType.methods().withSuperTypes(true).withFilter(methodFilter).first();
   }
 
   public static IMethodSourceBuilder createOverride(ITypeSourceBuilder typeSourceBuilder, IJavaEnvironment lookupContext, String methodName) {
@@ -197,7 +188,7 @@ public final class MethodSourceBuilderFactory {
    * @return a new method source builder that overrides the parameter method
    */
   public static IMethodSourceBuilder createOverride(IMethod method) {
-    final MethodSourceBuilder builder = new MethodSourceBuilder(method);
+    final IMethodSourceBuilder builder = new MethodSourceBuilder(method);
 
     // add default body
     if (!(Flags.isInterface(method.declaringType().flags()) || Flags.isAbstract(method.flags()))) {
@@ -211,14 +202,7 @@ public final class MethodSourceBuilderFactory {
     builder.setComment(null);
 
     //Override annotation
-    boolean overrideAnnotationPresent = false;
-    for (IAnnotationSourceBuilder annot : builder.getAnnotations()) {
-      if (IJavaRuntimeTypes.java_lang_Override.equals(annot.getName())) {
-        overrideAnnotationPresent = true;
-        break;
-      }
-    }
-    if (!overrideAnnotationPresent) {
+    if (!method.annotations().withName(IJavaRuntimeTypes.Override).existsAny()) {
       builder.addAnnotation(AnnotationSourceBuilderFactory.createOverride());
     }
 

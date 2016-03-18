@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.service.ServiceImplSourceBuilder;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.service.ServiceInterfaceSourceBuilder;
@@ -95,12 +96,13 @@ public class ServiceNewOperation implements IOperation {
     IType existingServiceImpl = getServerSourceFolder().getJavaProject().findType(serverPackage, svcName);
     ServiceImplSourceBuilder implBuilder = null;
     ICompilationUnit compilationUnit = null;
+    IJavaEnvironment env = getEnvProvider().get(getServerSourceFolder().getJavaProject());
     if (S2eUtils.exists(existingServiceImpl) && !existingServiceImpl.isBinary()) {
-      compilationUnit = S2eUtils.jdtTypeToScoutType(existingServiceImpl, getEnvProvider().get(existingServiceImpl.getJavaProject())).compilationUnit();
+      compilationUnit = S2eUtils.jdtTypeToScoutType(existingServiceImpl, env).compilationUnit();
       implBuilder = new ServiceImplSourceBuilder(compilationUnit, getServiceIfcBuilder());
     }
     else {
-      implBuilder = new ServiceImplSourceBuilder(svcName, serverPackage, getServiceIfcBuilder());
+      implBuilder = new ServiceImplSourceBuilder(svcName, serverPackage, env, getServiceIfcBuilder());
     }
 
     implBuilder.setup();
@@ -129,12 +131,13 @@ public class ServiceNewOperation implements IOperation {
     IType existingServiceIfc = getSharedSourceFolder().getJavaProject().findType(sharedPackage, ifcName);
     ServiceInterfaceSourceBuilder ifcBuilder = null;
     ICompilationUnit compilationUnit = null;
+    IJavaEnvironment env = getEnvProvider().get(getSharedSourceFolder().getJavaProject());
     if (S2eUtils.exists(existingServiceIfc) && !existingServiceIfc.isBinary()) {
-      compilationUnit = S2eUtils.jdtTypeToScoutType(existingServiceIfc, getEnvProvider().get(existingServiceIfc.getJavaProject())).compilationUnit();
+      compilationUnit = S2eUtils.jdtTypeToScoutType(existingServiceIfc, env).compilationUnit();
       ifcBuilder = new ServiceInterfaceSourceBuilder(compilationUnit);
     }
     else {
-      ifcBuilder = new ServiceInterfaceSourceBuilder(ifcName, sharedPackage);
+      ifcBuilder = new ServiceInterfaceSourceBuilder(ifcName, sharedPackage, env);
     }
 
     ifcBuilder.setup();

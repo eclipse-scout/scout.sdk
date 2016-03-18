@@ -183,7 +183,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
       IMethodSourceBuilder propertyGetterBuilder = new MethodSourceBuilder("get" + propName);
       propertyGetterBuilder.setFlags(Flags.AccPublic);
       propertyGetterBuilder.setReturnTypeSignature(Signature.createTypeSignature(propName, false));
-      propertyGetterBuilder.setBody(new RawSourceBuilder(new StringBuilder("return getPropertyByClass(").append(propName).append(SuffixConstants.SUFFIX_STRING_class).append(");").toString()));
+      propertyGetterBuilder.setBody(new RawSourceBuilder(new StringBuilder("return getPropertyByClass(").append(propName).append(SuffixConstants.SUFFIX_class).append(");").toString()));
       addSortedMethod(SortedMemberKeyFactory.createMethodPropertyKey(propertyGetterBuilder), propertyGetterBuilder);
 
       // legacy getter

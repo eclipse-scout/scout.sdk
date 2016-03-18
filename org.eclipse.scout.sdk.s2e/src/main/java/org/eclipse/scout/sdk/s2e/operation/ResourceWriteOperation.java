@@ -80,7 +80,7 @@ public class ResourceWriteOperation implements IOperation {
 
     try {
       // compare
-      String oldSource = CompilationUnitWriteOperation.getContentOfFile(m_file);
+      String oldSource = S2eUtils.getContentOfFile(m_file);
       if (CompilationUnitWriteOperation.isSourceEqual(oldSource, newSource)) {
         oldSource = null;
         return;

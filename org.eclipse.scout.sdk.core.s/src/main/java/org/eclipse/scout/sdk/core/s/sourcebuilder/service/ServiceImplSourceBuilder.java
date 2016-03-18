@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.sourcebuilder.service;
 
-import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.AbstractEntitySourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 
@@ -25,15 +26,13 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
  * @author Matthias Villiger
  * @since 5.2.0
  */
-public class ServiceImplSourceBuilder extends CompilationUnitSourceBuilder {
+public class ServiceImplSourceBuilder extends AbstractEntitySourceBuilder {
 
-  private final String m_elementName;
   private final ITypeSourceBuilder m_interfaceBuilder;
   private final IType m_existingServiceType;
 
-  public ServiceImplSourceBuilder(String elementName, String packageName, ITypeSourceBuilder ifcBuilder) {
-    super(elementName + SuffixConstants.SUFFIX_STRING_java, packageName);
-    m_elementName = elementName;
+  public ServiceImplSourceBuilder(String elementName, String packageName, IJavaEnvironment env, ITypeSourceBuilder ifcBuilder) {
+    super(elementName, packageName, env);
     m_interfaceBuilder = ifcBuilder;
     m_existingServiceType = null;
   }
@@ -41,14 +40,16 @@ public class ServiceImplSourceBuilder extends CompilationUnitSourceBuilder {
   public ServiceImplSourceBuilder(ICompilationUnit existingIcu, ITypeSourceBuilder ifcBuilder) {
     super(existingIcu);
     m_existingServiceType = existingIcu.mainType();
-    m_elementName = m_existingServiceType.elementName();
     m_interfaceBuilder = ifcBuilder;
   }
 
+  @Override
   public void setup() {
     if (m_existingServiceType == null) {
       // new service type
-      ITypeSourceBuilder implBuilder = new TypeSourceBuilder(m_elementName);
+      setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(this));
+
+      ITypeSourceBuilder implBuilder = new TypeSourceBuilder(getEntityName());
       implBuilder.setFlags(Flags.AccPublic);
       implBuilder.addInterfaceSignature(Signature.createTypeSignature(m_interfaceBuilder.getFullyQualifiedName()));
       addType(implBuilder);

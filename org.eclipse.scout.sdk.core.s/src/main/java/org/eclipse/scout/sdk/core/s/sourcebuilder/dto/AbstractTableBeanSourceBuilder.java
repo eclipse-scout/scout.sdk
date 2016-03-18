@@ -161,7 +161,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     getRowTypeMethodBuilder.setBody(new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return ").append(validator.useSignature(tableRowSignature)).append(SuffixConstants.SUFFIX_STRING_class).append(';');
+        source.append("return ").append(validator.useSignature(tableRowSignature)).append(SuffixConstants.SUFFIX_class).append(';');
       }
     });
     addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(getRowTypeMethodBuilder), getRowTypeMethodBuilder);
@@ -188,7 +188,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
 
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return ").append(validator.useName(IScoutRuntimeTypes.AbstractTableRowData)).append(SuffixConstants.SUFFIX_STRING_class).append(';');
+        source.append("return ").append(validator.useName(IScoutRuntimeTypes.AbstractTableRowData)).append(SuffixConstants.SUFFIX_class).append(';');
       }
     });
     addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(getRowTypeSourceBuilder), getRowTypeSourceBuilder);

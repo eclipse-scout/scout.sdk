@@ -22,9 +22,11 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.page.PageSourceBuilder;
+import org.eclipse.scout.sdk.core.s.sourcebuilder.testcase.TestSourceBuilder;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
@@ -64,6 +66,7 @@ public class PageNewOperation implements IOperation {
   private IPackageFragmentRoot m_pageDataSourceFolder;
   private IPackageFragmentRoot m_sharedSourceFolder;
   private IPackageFragmentRoot m_serverSourceFolder;
+  private IPackageFragmentRoot m_testSourceFolder;
   private String m_package;
   private IType m_superType;
 
@@ -72,9 +75,14 @@ public class PageNewOperation implements IOperation {
   private IType m_createdPageData;
   private IType m_createdServiceIfc;
   private IType m_createdServiceImpl;
+  private IType m_createdServiceTest;
 
   public PageNewOperation() {
-    m_javaEnvironmentProvider = new CachingJavaEnvironmentProvider();
+    this(new CachingJavaEnvironmentProvider());
+  }
+
+  protected PageNewOperation(IJavaEnvironmentProvider provider) {
+    m_javaEnvironmentProvider = provider;
   }
 
   @Override
@@ -92,7 +100,7 @@ public class PageNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 4);
+    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 5);
 
     // calc names
     String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getPackage());
@@ -103,12 +111,18 @@ public class PageNewOperation implements IOperation {
       setCreatedPageData(createPageData(sharedPackage, progress.newChild(1), workingCopyManager));
     }
 
-    if (isCreatePageData && S2eUtils.exists(getSharedSourceFolder()) && S2eUtils.exists(getServerSourceFolder())) {
+    boolean isCreateService = isCreatePageData && S2eUtils.exists(getSharedSourceFolder()) && S2eUtils.exists(getServerSourceFolder());
+    if (isCreateService) {
       createService(sharedPackage, calcServiceBaseName(), progress.newChild(2), workingCopyManager);
     }
-    progress.setWorkRemaining(1);
+    progress.setWorkRemaining(2);
 
     setCreatedPage(createPage(isPageWithTable, progress.newChild(1), workingCopyManager));
+
+    if (isCreateService && S2eUtils.exists(getTestSourceFolder())) {
+      setCreatedServiceTest(createServiceTest(progress.newChild(1), workingCopyManager));
+    }
+    progress.setWorkRemaining(0);
 
     // schedule DTO update because the pageData has been created as empty java file
     if (isCreatePageData) {
@@ -122,6 +136,30 @@ public class PageNewOperation implements IOperation {
       svcBaseName = svcBaseName.substring(0, svcBaseName.length() - ISdkProperties.SUFFIX_PAGE.length());
     }
     return svcBaseName;
+  }
+
+  protected IType createServiceTest(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    String serverPackage = Signature.getQualifier(getCreatedServiceImpl().getFullyQualifiedName());
+    String baseName = getCreatedServiceImpl().getElementName();
+    String elementName = baseName + ISdkProperties.SUFFIX_TEST;
+
+    IType existingServiceTest = getTestSourceFolder().getJavaProject().findType(serverPackage, elementName);
+    if (S2eUtils.exists(existingServiceTest)) {
+      // service test class already exists
+      return existingServiceTest;
+    }
+
+    IJavaEnvironment env = getEnvProvider().get(getTestSourceFolder().getJavaProject());
+    TestSourceBuilder testBuilder = new TestSourceBuilder(elementName, serverPackage, env);
+    testBuilder.setRunnerSignature(Signature.createTypeSignature(IScoutRuntimeTypes.ServerTestRunner));
+    testBuilder.setClientTest(false);
+    IType session = S2eUtils.getSession(getServerSourceFolder().getJavaProject(), ScoutTier.Server, monitor);
+    if (S2eUtils.exists(session)) {
+      testBuilder.setSessionSignature(Signature.createTypeSignature(session.getFullyQualifiedName()));
+    }
+    testBuilder.setup();
+
+    return S2eUtils.writeType(getTestSourceFolder(), testBuilder, env, monitor, workingCopyManager);
   }
 
   protected void createService(String sharedPackage, String baseName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
@@ -164,7 +202,7 @@ public class PageNewOperation implements IOperation {
   }
 
   protected PageSourceBuilder createPageBuilder(boolean isPageWithTable) {
-    PageSourceBuilder pageBuilder = new PageSourceBuilder(getPageName(), getPackage());
+    PageSourceBuilder pageBuilder = new PageSourceBuilder(getPageName(), getPackage(), getEnvProvider().get(getClientSourceFolder().getJavaProject()));
     if (ClassIdGenerators.isAutomaticallyCreateClassIdAnnotation()) {
       pageBuilder.setClassIdValue(ClassIdGenerators.generateNewId(new ClassIdGenerationContext(getPackage() + '.' + getPageName())));
     }
@@ -183,7 +221,7 @@ public class PageNewOperation implements IOperation {
 
   protected IType createPage(boolean isPageWithTable, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     PageSourceBuilder pageBuilder = createPageBuilder(isPageWithTable);
-    return S2eUtils.writeType(getClientSourceFolder(), pageBuilder, getEnvProvider().get(getClientSourceFolder().getJavaProject()), monitor, workingCopyManager);
+    return S2eUtils.writeType(getClientSourceFolder(), pageBuilder, pageBuilder.getJavaEnvironment(), monitor, workingCopyManager);
   }
 
   protected IType createPageData(String sharedPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
@@ -288,5 +326,21 @@ public class PageNewOperation implements IOperation {
 
   public void setPageDataSourceFolder(IPackageFragmentRoot pageDataSourceFolder) {
     m_pageDataSourceFolder = pageDataSourceFolder;
+  }
+
+  public IPackageFragmentRoot getTestSourceFolder() {
+    return m_testSourceFolder;
+  }
+
+  public void setTestSourceFolder(IPackageFragmentRoot testSourceFolder) {
+    m_testSourceFolder = testSourceFolder;
+  }
+
+  public IType getCreatedServiceTest() {
+    return m_createdServiceTest;
+  }
+
+  protected void setCreatedServiceTest(IType createdServiceTest) {
+    m_createdServiceTest = createdServiceTest;
   }
 }

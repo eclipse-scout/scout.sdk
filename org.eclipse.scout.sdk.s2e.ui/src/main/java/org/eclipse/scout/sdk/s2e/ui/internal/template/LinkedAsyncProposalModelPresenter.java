@@ -70,7 +70,7 @@ public class LinkedAsyncProposalModelPresenter {
               m.setAccessible(true);
               m.invoke(ui);
             }
-            catch (Throwable t) {
+            catch (Exception t) {
               SdkLog.debug(t);
             }
           }

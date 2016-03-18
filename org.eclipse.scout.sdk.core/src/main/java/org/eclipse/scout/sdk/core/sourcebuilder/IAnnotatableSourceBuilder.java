@@ -30,10 +30,11 @@ public interface IAnnotatableSourceBuilder extends IJavaElementSourceBuilder {
   void addAnnotation(IAnnotationSourceBuilder builder);
 
   /**
-   * @param childOp
+   * @param annotationFqn
+   *          The fully qualified name of the {@link IAnnotationSourceBuilder} to remove.
    * @return
    */
-  boolean removeAnnotation(String elementName);
+  boolean removeAnnotation(String annotationFqn);
 
   /**
    * @return

@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.core.sourcebuilder.type;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -66,7 +66,7 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
     for (ITypeParameter p : element.typeParameters()) {
       addTypeParameter(new TypeParameterSourceBuilder(p));
     }
-    if (element.superClass() != null && !IJavaRuntimeTypes.java_lang_Object.equals(element.superClass().name())) {
+    if (element.superClass() != null && !IJavaRuntimeTypes.Object.equals(element.superClass().name())) {
       setSuperTypeSignature(SignatureUtils.getTypeSignature(element.superClass()));
     }
     for (IType i : element.superInterfaces()) {
@@ -224,9 +224,9 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
   }
 
   @Override
-  public void setInterfaceSignatures(String[] interfaceSignatures) {
+  public void setInterfaceSignatures(Collection<String> interfaceSignatures) {
     m_interfaceSignatures.clear();
-    m_interfaceSignatures.addAll(Arrays.asList(interfaceSignatures));
+    m_interfaceSignatures.addAll(interfaceSignatures);
   }
 
   @Override
