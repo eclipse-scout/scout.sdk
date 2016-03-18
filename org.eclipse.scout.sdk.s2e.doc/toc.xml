@@ -1,17 +1,14 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <toc topic="html/scout_user_guide.html" label="Eclipse Scout User Guide">
 	<topic href="html/tutorial.html" label="Getting Started">
-		<topic href="html/tutorial.html#eclipse-scout-user-guide" label="Eclipse Scout User Guide"></topic>
+		<topic href="html/tutorial.html#back-to-scout-user-guide" label="Back to Scout User Guide"></topic>
 		<topic href="html/tutorial_existingdemo.html" label="Import the Scout Demo Applications">
-			<topic href="html/tutorial_existingdemo.html#install-the-scout-demo-application" label="Install the Scout Demo Application">
-				<topic href="html/tutorial_existingdemo.html#import-the-scout-demo-projects" label="Import the Scout demo projects"></topic>
-			</topic>
+			<topic href="html/tutorial_existingdemo.html#install-the-scout-demo-application" label="Install the Scout Demo Application"></topic>
 			<topic href="html/tutorial_existingdemo.html#run-the-demo-application" label="Run the Demo Application">
 				<topic href="html/tutorial_existingdemo.html#start-the-application-in-the-ide" label="Start the application in the IDE"></topic>
 				<topic href="html/tutorial_existingdemo.html#use-the-contacts-demo-in-a-browser" label="Use the Contacts Demo in a Browser"></topic>
-				<topic href="html/tutorial_existingdemo.html#what-s-next" label="What’s Next?"></topic>
 			</topic>
-			<topic href="html/tutorial_existingdemo.html#what-s-next-2" label="What’s Next?"></topic>
+			<topic href="html/tutorial_existingdemo.html#what-s-next" label="What’s Next?"></topic>
 		</topic>
 		<topic href="html/tutorial_helloworld.html" label="Hello World Tutorial">
 			<topic href="html/tutorial_helloworld.html#create-a-scout-project" label="Create a Scout Project"></topic>
@@ -22,58 +19,57 @@
 	<topic href="html/sdk.html" label="Scout Tooling">
 		<topic href="html/sdk.html#effects-on-productivity-and-code-quality" label="Effects on Productivity and Code Quality"></topic>
 		<topic href="html/sdk.html#learn-more" label="Learn More"></topic>
-		<topic href="html/sdk.html#eclipse-scout-user-guide" label="Eclipse Scout User Guide"></topic>
-		<topic href="html/sdk_editor.html" label="Scout Editors"></topic>
+		<topic href="html/sdk.html#back-to-scout-user-guide" label="Back to Scout User Guide"></topic>
 		<topic href="html/sdk_editor_java.html" label="Additions to the Java Editor">
 			<topic href="html/sdk_editor_java.html#create-new-form-fields" label="Create new Form Fields"></topic>
 			<topic href="html/sdk_editor_java.html#create-new-table-columns" label="Create new Table Columns"></topic>
 			<topic href="html/sdk_editor_java.html#create-new-codes" label="Create new Codes"></topic>
 			<topic href="html/sdk_editor_java.html#nls-entry-support" label="NLS-Entry support"></topic>
-			<topic href="html/sdk_editor_java.html#scout-tooling" label="Scout Tooling"></topic>
+			<topic href="html/sdk_editor_java.html#back-to-scout-tooling" label="Back to Scout Tooling"></topic>
 		</topic>
 		<topic href="html/sdk_editor_nls.html" label="NLS Editor">
-			<topic href="html/sdk_editor_nls.html#open-the-editor" label="Open the editor"></topic>
-			<topic href="html/sdk_editor_nls.html#screenshot" label="Screenshot"></topic>
-			<topic href="html/sdk_editor_nls.html#description" label="Description"></topic>
-			<topic href="html/sdk_editor_nls.html#modified-files" label="Modified files"></topic>
-			<topic href="html/sdk_editor_nls.html#scout-tooling" label="Scout Tooling"></topic>
+			<topic href="html/sdk_editor_nls.html#accessing-the-nls-editor" label="Accessing the NLS Editor"></topic>
+			<topic href="html/sdk_editor_nls.html#the-nls-editor" label="The NLS Editor"></topic>
+			<topic href="html/sdk_editor_nls.html#action-buttons" label="Action Buttons"></topic>
+			<topic href="html/sdk_editor_nls.html#default-mapping-to-property-files" label="Default Mapping to Property Files"></topic>
+			<topic href="html/sdk_editor_nls.html#back-to-scout-tooling" label="Back to Scout Tooling"></topic>
 		</topic>
 		<topic href="html/sdk_wizard.html" label="Scout Wizards">
 			<topic href="html/sdk_wizard.html#new-project-wizard" label="New Project Wizard"></topic>
 			<topic href="html/sdk_wizard.html#wizards-for-scout-components" label="Wizards for Scout Components"></topic>
 			<topic href="html/sdk_wizard.html#nls-wizards" label="NLS Wizards"></topic>
-			<topic href="html/sdk_wizard.html#scout-tooling" label="Scout Tooling"></topic>
+			<topic href="html/sdk_wizard.html#back-to-scout-tooling" label="Back to Scout Tooling"></topic>
 			<topic href="html/sdk_wizard_project.html" label="New Scout Project Wizard">
 				<topic href="html/sdk_wizard_project.html#wizard-fields-and-default-values" label="Wizard Fields and Default Values"></topic>
 				<topic href="html/sdk_wizard_project.html#created-components" label="Created Components"></topic>
+				<topic href="html/sdk_wizard_project.html#back-to-scout-wizards" label="Back to Scout Wizards"></topic>
 			</topic>
-			<topic href="html/sdk_wizard_project.html#scout-wizards" label="Scout Wizards"></topic>
 			<topic href="html/sdk_wizard_form.html" label="New Form Wizard">
 				<topic href="html/sdk_wizard_form.html#wizard-fields-and-default-values" label="Wizard Fields and Default Values"></topic>
 				<topic href="html/sdk_wizard_form.html#created-components" label="Created Components"></topic>
+				<topic href="html/sdk_wizard_form.html#back-to-scout-wizards" label="Back to Scout Wizards"></topic>
 			</topic>
-			<topic href="html/sdk_wizard_form.html#scout-wizards" label="Scout Wizards"></topic>
 			<topic href="html/sdk_wizard_page.html" label="New Page Wizard">
 				<topic href="html/sdk_wizard_page.html#wizard-fields-and-default-values" label="Wizard Fields and Default Values"></topic>
 				<topic href="html/sdk_wizard_page.html#created-components" label="Created Components"></topic>
+				<topic href="html/sdk_wizard_page.html#back-to-scout-wizards" label="Back to Scout Wizards"></topic>
 			</topic>
-			<topic href="html/sdk_wizard_page.html#scout-wizards" label="Scout Wizards"></topic>
 			<topic href="html/sdk_wizard_nls-entry.html" label="NLS Entry Wizard"></topic>
 			<topic href="html/sdk_wizard_lookupcall.html" label="New LookupCall Wizard">
 				<topic href="html/sdk_wizard_lookupcall.html#wizard-fields-and-default-values" label="Wizard Fields and Default Values"></topic>
 				<topic href="html/sdk_wizard_lookupcall.html#created-components" label="Created Components"></topic>
+				<topic href="html/sdk_wizard_lookupcall.html#back-to-scout-wizards" label="Back to Scout Wizards"></topic>
 			</topic>
-			<topic href="html/sdk_wizard_lookupcall.html#scout-wizards" label="Scout Wizards"></topic>
 			<topic href="html/sdk_wizard_code-type.html" label="New CodeType Wizard">
 				<topic href="html/sdk_wizard_code-type.html#wizard-fields-and-default-values" label="Wizard Fields and Default Values"></topic>
 				<topic href="html/sdk_wizard_code-type.html#created-components" label="Created Components"></topic>
+				<topic href="html/sdk_wizard_code-type.html#back-to-scout-wizards" label="Back to Scout Wizards"></topic>
 			</topic>
-			<topic href="html/sdk_wizard_code-type.html#scout-wizards" label="Scout Wizards"></topic>
 			<topic href="html/sdk_wizard_permission.html" label="New Permission Wizard">
 				<topic href="html/sdk_wizard_permission.html#wizard-fields-and-default-values" label="Wizard Fields and Default Values"></topic>
 				<topic href="html/sdk_wizard_permission.html#created-components" label="Created Components"></topic>
+				<topic href="html/sdk_wizard_permission.html#back-to-scout-wizards" label="Back to Scout Wizards"></topic>
 			</topic>
-			<topic href="html/sdk_wizard_permission.html#scout-wizards" label="Scout Wizards"></topic>
 			<topic href="html/sdk_wizard_language.html" label="Add a Language Wizard"></topic>
 		</topic>
 	</topic>
