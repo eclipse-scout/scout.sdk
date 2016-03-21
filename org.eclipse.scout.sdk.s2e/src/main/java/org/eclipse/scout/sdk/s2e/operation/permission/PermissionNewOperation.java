@@ -19,6 +19,8 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.permission.PermissionSourceBuilder;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -31,6 +33,8 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  */
 public class PermissionNewOperation implements IOperation {
 
+  private final IJavaEnvironmentProvider m_javaEnvironmentProvider;
+
   // in
   private String m_permissionName;
   private IPackageFragmentRoot m_sharedSourceFolder;
@@ -39,6 +43,10 @@ public class PermissionNewOperation implements IOperation {
 
   // out
   private IType m_createdPermission;
+
+  public PermissionNewOperation() {
+    m_javaEnvironmentProvider = new CachingJavaEnvironmentProvider();
+  }
 
   @Override
   public String getOperationName() {
@@ -64,7 +72,7 @@ public class PermissionNewOperation implements IOperation {
     PermissionSourceBuilder psb = new PermissionSourceBuilder(getPermissionName(), getPackage());
     psb.setup();
     psb.getMainType().setSuperTypeSignature(Signature.createTypeSignature(getSuperType().getFullyQualifiedName()));
-    return S2eUtils.writeType(getSharedSourceFolder(), psb, monitor, workingCopyManager);
+    return S2eUtils.writeType(getSharedSourceFolder(), psb, getEnvProvider().get(getSharedSourceFolder().getJavaProject()), monitor, workingCopyManager);
   }
 
   public IType getCreatedPermission() {
@@ -107,4 +115,7 @@ public class PermissionNewOperation implements IOperation {
     m_superType = superType;
   }
 
+  protected IJavaEnvironmentProvider getEnvProvider() {
+    return m_javaEnvironmentProvider;
+  }
 }

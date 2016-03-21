@@ -26,7 +26,7 @@ public class LanguageSmartFieldModel implements ISmartFieldModel {
 
   public LanguageSmartFieldModel() {
     String[] isoLanguages = Locale.getISOLanguages();
-    ArrayList<Locale> locs = new ArrayList<>(isoLanguages.length);
+    List<Locale> locs = new ArrayList<>(isoLanguages.length);
     for (String isoLang : isoLanguages) {
       locs.add(new Locale(isoLang));
     }

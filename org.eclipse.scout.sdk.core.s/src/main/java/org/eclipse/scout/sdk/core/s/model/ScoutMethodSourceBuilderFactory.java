@@ -16,8 +16,10 @@ import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.MethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
@@ -46,5 +48,19 @@ public final class ScoutMethodSourceBuilderFactory {
       }
     });
     return getterBuilder;
+  }
+
+  public static IMethodSourceBuilder createFormServiceIfcMethod(String name, String dtoSignature) {
+    IMethodSourceBuilder methodBuilder = new MethodSourceBuilder(name);
+    methodBuilder.setFlags(Flags.AccInterface);
+    methodBuilder.setComment(CommentSourceBuilderFactory.createDefaultMethodComment(methodBuilder));
+    if (dtoSignature != null) {
+      methodBuilder.setReturnTypeSignature(dtoSignature);
+      methodBuilder.addParameter(new MethodParameterSourceBuilder("input", dtoSignature));
+    }
+    else {
+      methodBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
+    }
+    return methodBuilder;
   }
 }

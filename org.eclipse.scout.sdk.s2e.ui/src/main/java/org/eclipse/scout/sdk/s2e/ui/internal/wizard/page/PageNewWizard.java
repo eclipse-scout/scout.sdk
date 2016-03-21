@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.wizard.page;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -74,17 +74,27 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
       return; // no double runs
     }
 
-    List<IResource> blockedFolders = new ArrayList<>(2);
+    Set<IResource> blockedFolders = new HashSet<>(4);
     op.setClientSourceFolder(m_page1.getSourceFolder());
     blockedFolders.add(m_page1.getSourceFolder().getResource());
     op.setPackage(m_page1.getTargetPackage());
     op.setPageName(m_page1.getIcuName());
     IPackageFragmentRoot selectedSharedFolder = m_page1.getSharedSourceFolder();
     if (S2eUtils.exists(selectedSharedFolder)) {
+      op.setSharedSourceFolder(selectedSharedFolder);
+      blockedFolders.add(selectedSharedFolder.getResource());
+
       IPackageFragmentRoot dtoSourceFolder = S2eUtils.getDtoSourceFolder(selectedSharedFolder);
-      op.setSharedSourceFolder(dtoSourceFolder);
+      op.setPageDataSourceFolder(dtoSourceFolder);
       blockedFolders.add(dtoSourceFolder.getResource());
     }
+
+    IPackageFragmentRoot selectedServerFolder = m_page1.getServerSourceFolder();
+    if (S2eUtils.exists(selectedServerFolder)) {
+      op.setServerSourceFolder(selectedServerFolder);
+      blockedFolders.add(selectedServerFolder.getResource());
+    }
+
     op.setSuperType(m_page1.getSuperType());
 
     final Display d = getContainer().getShell().getDisplay();

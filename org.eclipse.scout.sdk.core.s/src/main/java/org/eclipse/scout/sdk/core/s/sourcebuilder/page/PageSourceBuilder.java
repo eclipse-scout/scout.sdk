@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.sourcebuilder.page;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
@@ -40,11 +41,14 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
 public class PageSourceBuilder extends CompilationUnitSourceBuilder {
 
   public static final String INNER_TABLE_NAME = "Table";
+  public static final String DATA_FETCH_METHOD_NAME = "getTableData";
+  public static final String EXEC_LOAD_DATA_FILTER_ARG_NAME = "filter";
 
   private final String m_pageName;
   private boolean m_isPageWithTable;
   private String m_pageDataSignature;
   private String m_superTypeSignature;
+  private String m_pageServiceIfcSignature;
   private String m_classIdValue;
 
   public PageSourceBuilder(String elementName, String packageName) {
@@ -84,20 +88,48 @@ public class PageSourceBuilder extends CompilationUnitSourceBuilder {
       IMethodSourceBuilder execLoadData = createExecLoadData();
       pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execLoadData), execLoadData);
     }
+    else {
+      IMethodSourceBuilder execCreateChildPages = createExecCreateChildPages();
+      pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execCreateChildPages), execCreateChildPages);
+    }
+  }
+
+  protected IMethodSourceBuilder createExecCreateChildPages() {
+    IMethodSourceBuilder execCreateChildPages = new MethodSourceBuilder("execCreateChildPages");
+    execCreateChildPages.addAnnotation(AnnotationSourceBuilderFactory.createOverride());
+    execCreateChildPages.setFlags(Flags.AccProtected);
+    execCreateChildPages.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
+    String paramType = new StringBuilder(IJavaRuntimeTypes.java_util_List).append(ISignatureConstants.C_GENERIC_START).append(IScoutRuntimeTypes.IPage)
+        .append(ISignatureConstants.C_GENERIC_START).append('?').append(ISignatureConstants.C_GENERIC_END).append(ISignatureConstants.C_GENERIC_END).toString();
+    execCreateChildPages.addParameter(new MethodParameterSourceBuilder("pageList", Signature.createTypeSignature(paramType)));
+    execCreateChildPages.setBody(new ISourceBuilder() {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append(CoreUtils.getCommentBlock("add child pages"));
+      }
+    });
+    return execCreateChildPages;
   }
 
   protected IMethodSourceBuilder createExecLoadData() {
+
     IMethodSourceBuilder execLoadData = new MethodSourceBuilder("execLoadData");
     execLoadData.addAnnotation(AnnotationSourceBuilderFactory.createOverride());
     execLoadData.setFlags(Flags.AccProtected);
     execLoadData.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
-    execLoadData.addParameter(new MethodParameterSourceBuilder("filter", Signature.createTypeSignature(IScoutRuntimeTypes.SearchFilter)));
+    execLoadData.addParameter(new MethodParameterSourceBuilder(EXEC_LOAD_DATA_FILTER_ARG_NAME, Signature.createTypeSignature(IScoutRuntimeTypes.SearchFilter)));
 
     execLoadData.setBody(new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append(CoreUtils.getCommentBlock("implement data load")).append(lineDelimiter);
-        source.append("// e.g.: importPageData(BEANS.get(IMyService.class).getTableData(filter));");
+        if (getPageServiceIfcSignature() == null) {
+          source.append(CoreUtils.getCommentBlock("implement data load")).append(lineDelimiter);
+          source.append("// e.g.: importPageData(BEANS.get(IMyService.class).getTableData(").append(EXEC_LOAD_DATA_FILTER_ARG_NAME).append("));");
+        }
+        else {
+          source.append("importPageData(").append(validator.useName(IScoutRuntimeTypes.BEANS)).append(".get(")
+              .append(validator.useSignature(getPageServiceIfcSignature())).append(SuffixConstants.SUFFIX_STRING_class).append(").").append(DATA_FETCH_METHOD_NAME).append("(").append(EXEC_LOAD_DATA_FILTER_ARG_NAME).append("));");
+        }
       }
     });
     return execLoadData;
@@ -144,5 +176,13 @@ public class PageSourceBuilder extends CompilationUnitSourceBuilder {
 
   public void setClassIdValue(String classIdValue) {
     m_classIdValue = classIdValue;
+  }
+
+  public String getPageServiceIfcSignature() {
+    return m_pageServiceIfcSignature;
+  }
+
+  public void setPageServiceIfcSignature(String pageServiceIfcSignature) {
+    m_pageServiceIfcSignature = pageServiceIfcSignature;
   }
 }

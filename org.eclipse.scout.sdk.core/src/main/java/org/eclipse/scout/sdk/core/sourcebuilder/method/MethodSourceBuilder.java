@@ -64,6 +64,11 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
     if (body.isAvailable()) {
       setBody(new RawSourceBuilder(body.toString()));
     }
+
+    // add interface flag on method if declaring type is an interface
+    if (element.declaringType().isInterface()) {
+      setFlags(getFlags() | Flags.AccInterface);
+    }
   }
 
   /**

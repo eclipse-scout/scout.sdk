@@ -204,8 +204,8 @@ public final class MethodSourceBuilderFactory {
       builder.setBody(MethodBodySourceBuilderFactory.createSuperCall(builder, true));
     }
 
-    // remove abstract flag because we provide an implementation
-    builder.setFlags(builder.getFlags() & ~Flags.AccAbstract);
+    // remove abstract & interface flag because we provide an implementation
+    builder.setFlags(builder.getFlags() & ~Flags.AccAbstract & ~Flags.AccInterface);
 
     // reset comment
     builder.setComment(null);

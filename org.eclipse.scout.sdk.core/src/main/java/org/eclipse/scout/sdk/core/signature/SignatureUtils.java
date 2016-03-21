@@ -99,7 +99,7 @@ public final class SignatureUtils {
    * 'methodName(sigOfParam1,sigOfParam2)'.
    *
    * @param methodName
-   *          The method name.
+   *          The method name. Must not be <code>null</code.>
    * @param resolvedParamSignatures
    *          The parameter signatures of the method.
    * @return The created identifier
@@ -109,12 +109,14 @@ public final class SignatureUtils {
     methodIdBuilder.append(methodName);
     methodIdBuilder.append('(');
 
-    Iterator<String> iterator = resolvedParamSignatures.iterator();
-    if (iterator.hasNext()) {
-      methodIdBuilder.append(iterator.next());
-      while (iterator.hasNext()) {
-        methodIdBuilder.append(',');
+    if (resolvedParamSignatures != null) {
+      Iterator<String> iterator = resolvedParamSignatures.iterator();
+      if (iterator.hasNext()) {
         methodIdBuilder.append(iterator.next());
+        while (iterator.hasNext()) {
+          methodIdBuilder.append(',');
+          methodIdBuilder.append(iterator.next());
+        }
       }
     }
 

@@ -11,7 +11,6 @@
 package org.eclipse.scout.maven.plugins.updatesite;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -110,10 +109,15 @@ public class StagingMojo extends AbstractStagingMojo {
     File compositeRepo = createCompositeRepo();
     updateCompositeJars(compositeRepo);
     File stageTargetDir = getStageTargetDir();
-    stageTargetDir.mkdirs();
-    String timestamp = createTimestamp();
-    File zipFile = createStageZip(getStageDir(), timestamp);
-    createDoStageFile(zipFile, timestamp);
+    try {
+      FileUtility.ensureDirExists(stageTargetDir);
+      String timestamp = createTimestamp();
+      File zipFile = createStageZip(getStageDir(), timestamp);
+      createDoStageFile(zipFile, timestamp);
+    }
+    catch (IOException e) {
+      throw new MojoExecutionException("Could not create directory '" + stageTargetDir.getAbsolutePath() + "'.", e);
+    }
   }
 
   public File createCompositeRepo() throws MojoExecutionException {
@@ -124,7 +128,7 @@ public class StagingMojo extends AbstractStagingMojo {
     try {
       File compositeRepo = new File(getStageDir(), getCompositeDirName());
       File p2Dir = new File(compositeRepo.getPath(), getUpdatesiteDir());
-      p2Dir.mkdirs();
+      FileUtility.ensureDirExists(p2Dir);
       File p2InputDir = new File(getP2InputDirectory());
       FileUtility.copy(p2InputDir, p2Dir);
       return compositeRepo;
@@ -150,7 +154,7 @@ public class StagingMojo extends AbstractStagingMojo {
       appendChild(contentXML, getUpdatesiteDir());
       truncateChildren(contentXML, getMaxSize());
       File contentFolder = new File(outputDir, folderName);
-      contentFolder.mkdir();
+      FileUtility.ensureDirExists(contentFolder);
       FileUtility.copyToDir(contentXML, contentFolder);
       File newContentJar = new File(outputDir, jarName);
       FileUtility.compressArchive(contentFolder, newContentJar);
@@ -247,7 +251,7 @@ public class StagingMojo extends AbstractStagingMojo {
       URLConnection conn = u.openConnection();
       File outfile = new File(outputDir, jarName);
       try (InputStream inputStream = conn.getInputStream(); FileOutputStream f = new FileOutputStream(outfile)) {
-        f.write(FileUtility.getContent(inputStream, false));
+        FileUtility.copy(inputStream, f);
       }
       return outfile;
     }
@@ -278,14 +282,10 @@ public class StagingMojo extends AbstractStagingMojo {
     try {
       File out = new File(getStageTargetDir(), "doStage_" + timestamp);
       String md5 = createMD5(zipInputFile) + "  " + zipInputFile.getName();
-      FileWriter writer = new FileWriter(out);
-      writer.write(md5);
-      writer.flush();
-      writer.close();
+      try (FileWriter writer = new FileWriter(out)) {
+        writer.write(md5);
+      }
       return out;
-    }
-    catch (FileNotFoundException e) {
-      throw new MojoExecutionException("Could not create doStage file", e);
     }
     catch (IOException e) {
       throw new MojoExecutionException("Could not create doStage file", e);
@@ -294,10 +294,10 @@ public class StagingMojo extends AbstractStagingMojo {
 
   public String createMD5(File data) throws MojoExecutionException {
     try {
-      byte[] content = FileUtility.getContent(data.getPath());
+      byte[] content = FileUtility.readFile(data);
       java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
       byte[] array = md.digest(content);
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       for (byte element : array) {
         sb.append(Integer.toHexString((element & 0xFF) | 0x100).substring(1, 3));
       }

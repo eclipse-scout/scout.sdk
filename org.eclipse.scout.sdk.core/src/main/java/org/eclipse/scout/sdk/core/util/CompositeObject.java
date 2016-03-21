@@ -64,7 +64,7 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof CompositeObject)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     CompositeObject other = (CompositeObject) obj;

@@ -61,7 +61,7 @@ class ProposalPopupEvent {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof ProposalPopupEvent)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     ProposalPopupEvent other = (ProposalPopupEvent) obj;

@@ -147,6 +147,7 @@ public class QueryTest {
     Assert.assertEquals(2, childClassType.methods().withName(Pattern.compile("[a-z0-9_]+class", Pattern.CASE_INSENSITIVE)).list().size());
     Assert.assertEquals(1, childClassType.methods().withName("firstCase").list().size());
     Assert.assertEquals(1, childClassType.methods().withSuperClasses(true).withName("method2InBaseClass").list().size());
+    Assert.assertEquals(1, childClassType.methods().withSuperClasses(true).withMethodIdentifier("methodInChildClass(Ljava.lang.String;,Ljava.util.List<Ljava.lang.Runnable;>;)").list().size());
 
     IType abstractBaseClass = CoreTestingUtils.createJavaEnvironment().findType(AbstractBaseClass.class.getName());
     Assert.assertEquals(1, abstractBaseClass.methods().withSuperInterfaces(true).withName("close").list().size());

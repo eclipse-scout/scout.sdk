@@ -4,7 +4,7 @@
     <context id="scout_wizard_new_project_page_context" title="New Scout Project Wizard">
         <description>This wizard creates a new Scout helloworld project.</description>
         <topic label="New Scout Project Wizard" href="html/sdk_wizard_project.html"/>
-        <topic label="Hello world Tutorial" href="html/tutorial_helloworld.html"/>
+        <topic label="Hello World Tutorial" href="html/tutorial_helloworld.html"/>
     </context>
     <context id="scout_wizard_form_page_context" title="New Form Wizard">
         <description>This wizard creates a new Scout Form.</description>

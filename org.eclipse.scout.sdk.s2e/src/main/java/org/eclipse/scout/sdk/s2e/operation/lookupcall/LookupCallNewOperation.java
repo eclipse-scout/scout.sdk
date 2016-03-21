@@ -35,6 +35,8 @@ import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
@@ -49,6 +51,8 @@ import org.eclipse.scout.sdk.s2e.util.ScoutTier;
  */
 public class LookupCallNewOperation implements IOperation {
 
+  private final IJavaEnvironmentProvider m_javaEnvironmentProvider;
+
   // in
   private String m_lookupCallName;
   private IPackageFragmentRoot m_sharedSourceFolder;
@@ -62,6 +66,10 @@ public class LookupCallNewOperation implements IOperation {
   private IType m_createdLookupCall;
   private IType m_createdLookupServiceIfc;
   private IType m_createdLookupServiceImpl;
+
+  public LookupCallNewOperation() {
+    m_javaEnvironmentProvider = new CachingJavaEnvironmentProvider();
+  }
 
   @Override
   public String getOperationName() {
@@ -118,7 +126,7 @@ public class LookupCallNewOperation implements IOperation {
     // @TunnelToServer
     lookupSvcIfcBuilder.addAnnotation(ScoutAnnotationSourceBuilderFactory.createTunnelToServer());
 
-    return S2eUtils.writeType(getSharedSourceFolder(), ifcBuilder, monitor, workingCopyManager);
+    return S2eUtils.writeType(getSharedSourceFolder(), ifcBuilder, getEnvProvider().get(getSharedSourceFolder().getJavaProject()), monitor, workingCopyManager);
   }
 
   protected IType createLookupServiceImpl(String svcName, String serverPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
@@ -143,7 +151,7 @@ public class LookupCallNewOperation implements IOperation {
       lookupSvcImplBuilder.addMethod(methodSourceBuilder);
     }
 
-    return S2eUtils.writeType(getServerSourceFolder(), implBuilder, monitor, workingCopyManager);
+    return S2eUtils.writeType(getServerSourceFolder(), implBuilder, getEnvProvider().get(getServerSourceFolder().getJavaProject()), monitor, workingCopyManager);
   }
 
   protected IType createLookupCall(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
@@ -162,7 +170,7 @@ public class LookupCallNewOperation implements IOperation {
       lcsb.getMainType().addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(methodSourceBuilder), methodSourceBuilder);
     }
 
-    return S2eUtils.writeType(getSharedSourceFolder(), lcsb, monitor, workingCopyManager);
+    return S2eUtils.writeType(getSharedSourceFolder(), lcsb, getEnvProvider().get(getSharedSourceFolder().getJavaProject()), monitor, workingCopyManager);
   }
 
   public IType getCreatedLookupCall() {
@@ -245,4 +253,7 @@ public class LookupCallNewOperation implements IOperation {
     m_lookupServiceSuperType = lookupServiceSuperType;
   }
 
+  protected IJavaEnvironmentProvider getEnvProvider() {
+    return m_javaEnvironmentProvider;
+  }
 }

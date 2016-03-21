@@ -68,7 +68,7 @@ public class PackageContainer {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof PackageContainer)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     PackageContainer other = (PackageContainer) obj;

@@ -41,6 +41,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.scout.sdk.s2e</groupId>
+      <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jdt.launching</artifactId>
       <scope>provided</scope>
@@ -83,6 +88,7 @@
             </Import-Package>
             <Require-Bundle>
               org.eclipse.scout.sdk.s2e;bundle-version="[6.0,6.1)";visibility:=reexport,
+              org.eclipse.scout.sdk.s2e.doc;bundle-version="[6.0,6.1)";visibility:=reexport,
               org.eclipse.jdt.ui;bundle-version="[3.11,4)";visibility:=reexport,
               org.eclipse.jdt.launching;bundle-version="[3.8.0,4)";visibility:=reexport,
               org.eclipse.m2e.core.ui;bundle-version="[1.6.0,2)";visibility:=reexport

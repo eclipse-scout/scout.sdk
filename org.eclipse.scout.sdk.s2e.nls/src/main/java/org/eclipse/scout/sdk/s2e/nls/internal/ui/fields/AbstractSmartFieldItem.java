@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.fields;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.google.common.base.Objects;
+
 public abstract class AbstractSmartFieldItem implements Comparable<AbstractSmartFieldItem> {
 
   public abstract String getText();
@@ -25,10 +27,17 @@ public abstract class AbstractSmartFieldItem implements Comparable<AbstractSmart
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof AbstractSmartFieldItem) {
-      return getText().equals(((AbstractSmartFieldItem) obj).getText());
+    if (this == obj) {
+      return true;
     }
-    return false;
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    AbstractSmartFieldItem other = (AbstractSmartFieldItem) obj;
+    return Objects.equal(getText(), other.getText());
   }
 
   @Override

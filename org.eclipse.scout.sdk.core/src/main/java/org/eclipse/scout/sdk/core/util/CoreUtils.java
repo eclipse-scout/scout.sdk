@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -863,11 +864,12 @@ public final class CoreUtils {
    */
   public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    Map<String, Boolean> features = new HashMap<>(4);
+    Map<String, Boolean> features = new HashMap<>(5);
     features.put("http://apache.org/xml/features/disallow-doctype-decl", Boolean.TRUE);
     features.put("http://xml.org/sax/features/external-general-entities", Boolean.FALSE);
     features.put("http://xml.org/sax/features/external-parameter-entities", Boolean.FALSE);
     features.put("http://apache.org/xml/features/nonvalidating/load-external-dtd", Boolean.FALSE);
+    features.put(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
     dbf.setXIncludeAware(false);
     dbf.setExpandEntityReferences(false);
 

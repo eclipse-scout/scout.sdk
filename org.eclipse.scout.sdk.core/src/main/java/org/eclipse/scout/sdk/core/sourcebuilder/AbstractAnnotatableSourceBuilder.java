@@ -70,7 +70,11 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
     Collections.sort(annotationSources, new Comparator<String>() {
       @Override
       public int compare(String o1, String o2) {
-        return Integer.compare(o1.length(), o2.length());
+        int result = Integer.compare(o1.length(), o2.length());
+        if (result != 0) {
+          return result;
+        }
+        return o1.compareTo(o2);
       }
     });
 

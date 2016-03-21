@@ -47,7 +47,7 @@ public class SameCompositeObject {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof SameCompositeObject)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     SameCompositeObject other = (SameCompositeObject) obj;
