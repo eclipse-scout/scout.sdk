@@ -44,7 +44,7 @@ import org.eclipse.ui.PartInitException;
  */
 public class PageNewWizard extends AbstractWizard implements INewWizard {
 
-  public static Class<? extends PageNewWizardPage> pageClass = PageNewWizardPage.class;
+  public static volatile Class<? extends PageNewWizardPage> pageClass = PageNewWizardPage.class;
 
   private PageNewWizardPage m_page1;
   private boolean m_executed = false;

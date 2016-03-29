@@ -66,14 +66,14 @@ public final class CoreScoutUtils {
     return ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
   }
 
-  protected static Double getOrderAnnotationValue(IType sibling) {
+  static Double getOrderAnnotationValue(IType sibling) {
     if (sibling == null) {
       return null;
     }
     return Double.valueOf(OrderAnnotation.valueOf(sibling, false));
   }
 
-  protected static IType[] findSiblings(IType declaringType, int pos, String orderDefinitionType) {
+  static IType[] findSiblings(IType declaringType, int pos, String orderDefinitionType) {
     IType prev = null;
     for (IType t : declaringType.innerTypes().withInstanceOf(orderDefinitionType).list()) {
       if (t.source().start() > pos) {
@@ -96,7 +96,7 @@ public final class CoreScoutUtils {
    *          Second value
    * @return A value in between a and b.
    */
-  protected static double getOrderValueInBetween(double a, double b) {
+  static double getOrderValueInBetween(double a, double b) {
     double low = Math.min(a, b);
     double high = Math.max(a, b);
     double dif = high - low;

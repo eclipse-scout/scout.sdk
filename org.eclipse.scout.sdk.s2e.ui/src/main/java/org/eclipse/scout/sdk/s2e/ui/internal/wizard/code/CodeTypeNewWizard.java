@@ -40,7 +40,7 @@ import org.eclipse.ui.PartInitException;
  */
 public class CodeTypeNewWizard extends AbstractWizard implements INewWizard {
 
-  public static Class<? extends CodeTypeNewWizardPage> pageClass = CodeTypeNewWizardPage.class;
+  public static volatile Class<? extends CodeTypeNewWizardPage> pageClass = CodeTypeNewWizardPage.class;
 
   private CodeTypeNewWizardPage m_page1;
   private boolean m_executed = false;

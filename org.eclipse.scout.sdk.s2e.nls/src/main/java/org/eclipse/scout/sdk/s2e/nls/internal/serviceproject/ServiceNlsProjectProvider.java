@@ -56,12 +56,12 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   private static Set<IType> getRegisteredTextProviderTypes(IJavaProject javaProject) throws CoreException {
 
     final class TextProviderServiceDeclaration {
-      private final IType svc;
-      private final double prio;
+      private final IType m_svc;
+      private final double m_prio;
 
       private TextProviderServiceDeclaration(IType s, double p) {
-        svc = s;
-        prio = p;
+        m_svc = s;
+        m_prio = p;
       }
     }
 
@@ -74,22 +74,22 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
           return 0;
         }
 
-        int compare = Double.compare(o1.prio, o2.prio);
+        int compare = Double.compare(o1.m_prio, o2.m_prio);
         if (compare != 0) {
           return compare;
         }
 
         // log duplicate orders
-        String[] duplicateOrdersFqn = new String[]{o1.svc.getFullyQualifiedName(), o2.svc.getFullyQualifiedName()};
+        String[] duplicateOrdersFqn = new String[]{o1.m_svc.getFullyQualifiedName(), o2.m_svc.getFullyQualifiedName()};
         Arrays.sort(duplicateOrdersFqn);
         duplicateOrders.add(Arrays.toString(duplicateOrdersFqn));
 
-        compare = Boolean.compare(o1.svc.isBinary(), o2.svc.isBinary());
+        compare = Boolean.compare(o1.m_svc.isBinary(), o2.m_svc.isBinary());
         if (compare != 0) {
           // prefer source types
           return compare;
         }
-        return o1.svc.getFullyQualifiedName().compareTo(o2.svc.getFullyQualifiedName());
+        return o1.m_svc.getFullyQualifiedName().compareTo(o2.m_svc.getFullyQualifiedName());
       }
     };
 
@@ -131,7 +131,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     // return the types of the services ordered by priority
     Set<IType> returnValueSorted = new LinkedHashSet<>(result.size());
     for (TextProviderServiceDeclaration d : result) {
-      returnValueSorted.add(d.svc);
+      returnValueSorted.add(d.m_svc);
     }
     return returnValueSorted;
   }
@@ -147,7 +147,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     }
     catch (Exception e) {
-      //nop
+      SdkLog.debug("Unable to parse order annotation value for type '{}'. Using default bean order instead.", registration.getFullyQualifiedName(), e);
     }
 
     // if nothing defined: default order

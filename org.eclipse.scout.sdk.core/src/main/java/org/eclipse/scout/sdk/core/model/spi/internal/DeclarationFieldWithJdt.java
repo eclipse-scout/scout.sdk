@@ -165,7 +165,7 @@ public class DeclarationFieldWithJdt extends AbstractMemberWithJdt<IField> imple
     if (m_initSource == null) {
       CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
       if (m_astNode instanceof Initializer) {
-        //static{ }
+        // static initializer
         Initializer decl = (Initializer) m_astNode;
         m_initSource = m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
       }

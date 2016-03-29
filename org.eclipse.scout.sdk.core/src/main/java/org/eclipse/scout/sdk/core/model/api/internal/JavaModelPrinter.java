@@ -33,14 +33,14 @@ public final class JavaModelPrinter {
   private JavaModelPrinter() {
   }
 
-  protected static void printAnnotations(IAnnotatable anotatable, StringBuilder sb, boolean includeDetails) {
+  static void printAnnotations(IAnnotatable anotatable, StringBuilder sb, boolean includeDetails) {
     for (IAnnotation a : anotatable.annotations().list()) {
       printAnnotation(a, sb, includeDetails);
       sb.append(includeDetails ? '\n' : ' ');
     }
   }
 
-  protected static void printAnnotation(IAnnotation a, StringBuilder sb, boolean includeDetails) {
+  static void printAnnotation(IAnnotation a, StringBuilder sb, boolean includeDetails) {
     sb.append('@');
     sb.append(a.type().elementName());
     Map<String, IAnnotationElement> values = a.elements();

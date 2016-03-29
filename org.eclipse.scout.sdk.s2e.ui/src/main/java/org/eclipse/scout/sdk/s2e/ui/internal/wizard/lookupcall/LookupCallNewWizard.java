@@ -44,7 +44,7 @@ import org.eclipse.ui.PartInitException;
  */
 public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
 
-  public static Class<? extends LookupCallNewWizardPage> pageClass = LookupCallNewWizardPage.class;
+  public static volatile Class<? extends LookupCallNewWizardPage> pageClass = LookupCallNewWizardPage.class;
 
   private LookupCallNewWizardPage m_page1;
   private boolean m_executed = false;

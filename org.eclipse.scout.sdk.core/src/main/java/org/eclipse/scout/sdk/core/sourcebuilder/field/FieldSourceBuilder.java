@@ -62,7 +62,7 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
     }
 
     if (getElementName().isEmpty()) {
-      //static{ }
+      // for a static constructor
       getValue().createSource(source, lineDelimiter, context, validator);
       return;
     }

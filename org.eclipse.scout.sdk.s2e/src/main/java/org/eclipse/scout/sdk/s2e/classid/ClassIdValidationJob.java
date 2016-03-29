@@ -202,26 +202,23 @@ public final class ClassIdValidationJob extends AbstractJob {
       if (matchesById.size() > 1) {
         for (IAnnotation duplicate : matchesById) {
           IType parent = (IType) duplicate.getAncestor(IJavaElement.TYPE);
-          if (S2eUtils.exists(parent)) {
-            // duplicate found: check if they can see each others
-            if (hasVisibleClassIds(duplicate, matchesById)) {
-              ISourceRange sourceRange = duplicate.getSourceRange();
-              if (sourceRange != null && sourceRange.getOffset() >= 0) {
-                IMarker marker = duplicate.getResource().createMarker(CLASS_ID_DUPLICATE_MARKER_ID);
-                marker.setAttribute(IMarker.MESSAGE, "Duplicate @ClassId value '" + matches.getKey() + "' in type '" + parent.getFullyQualifiedName() + "'.");
-                marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
-                marker.setAttribute(IMarker.CHAR_START, sourceRange.getOffset());
-                marker.setAttribute(IMarker.CHAR_END, sourceRange.getOffset() + sourceRange.getLength());
-                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-                try {
-                  Document doc = new Document(parent.getCompilationUnit().getSource());
-                  marker.setAttribute(IMarker.LINE_NUMBER, doc.getLineOfOffset(sourceRange.getOffset()) + 1);
-                }
-                catch (BadLocationException e) {
-                  //nop
-                }
-                marker.setAttribute(CLASS_ID_ATTR_ANNOTATION, duplicate);
+          if (S2eUtils.exists(parent) && hasVisibleClassIds(duplicate, matchesById)) {
+            ISourceRange sourceRange = duplicate.getSourceRange();
+            if (sourceRange != null && sourceRange.getOffset() >= 0) {
+              IMarker marker = duplicate.getResource().createMarker(CLASS_ID_DUPLICATE_MARKER_ID);
+              marker.setAttribute(IMarker.MESSAGE, "Duplicate @ClassId value '" + matches.getKey() + "' in type '" + parent.getFullyQualifiedName() + "'.");
+              marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
+              marker.setAttribute(IMarker.CHAR_START, sourceRange.getOffset());
+              marker.setAttribute(IMarker.CHAR_END, sourceRange.getOffset() + sourceRange.getLength());
+              marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+              try {
+                Document doc = new Document(parent.getCompilationUnit().getSource());
+                marker.setAttribute(IMarker.LINE_NUMBER, doc.getLineOfOffset(sourceRange.getOffset()) + 1);
               }
+              catch (BadLocationException e) {
+                throw new CoreException(new ScoutStatus(e));
+              }
+              marker.setAttribute(CLASS_ID_ATTR_ANNOTATION, duplicate);
             }
           }
         }

@@ -57,8 +57,8 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
   @Override
   public IJavaCompletionProposal[] getAssists(final IInvocationContext context, IProblemLocation[] locations) throws CoreException {
     final ClassIdTarget selectedType = getTarget(context.getCoveringNode());
-    if (selectedType != null && !S2eUtils.exists(selectedType.annotation)) {
-      CompilationUnitRewrite rewrite = createRewrite(selectedType.type, selectedType.td);
+    if (selectedType != null && !S2eUtils.exists(selectedType.m_annotation)) {
+      CompilationUnitRewrite rewrite = createRewrite(selectedType.m_type, selectedType.m_td);
       if (rewrite != null) {
         return new IJavaCompletionProposal[]{new ClassIdAddProposal(rewrite)};
       }
@@ -149,14 +149,14 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
   private static final class ClassIdTarget {
 
-    private final TypeDeclaration td;
-    private final IType type;
-    private final IAnnotation annotation;
+    private final TypeDeclaration m_td;
+    private final IType m_type;
+    private final IAnnotation m_annotation;
 
     private ClassIdTarget(TypeDeclaration td, IType type, IAnnotation annotation) {
-      this.td = td;
-      this.type = type;
-      this.annotation = annotation;
+      this.m_td = td;
+      this.m_type = type;
+      this.m_annotation = annotation;
     }
   }
 }

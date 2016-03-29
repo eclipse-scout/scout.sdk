@@ -370,10 +370,10 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
       INlsProject p = m_rootProject;
       do {
         List<Language> languages = p.getAllLanguages();
-        if (languages.size() > 0 && !p.getTranslationResource(languages.get(0)).isReadOnly()) {
-          if (pattern == null || pattern.length() < 1 || p.getName().toLowerCase().startsWith(pattern.toLowerCase())) {
-            collector.add(p);
-          }
+        boolean writeableLangAvailable = languages.size() > 0 && !p.getTranslationResource(languages.get(0)).isReadOnly();
+        boolean patternMatches = pattern == null || pattern.length() < 1 || p.getName().toLowerCase().startsWith(pattern.toLowerCase());
+        if (writeableLangAvailable && patternMatches) {
+          collector.add(p);
         }
       }
       while ((p = p.getParent()) != null);

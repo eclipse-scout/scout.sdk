@@ -91,7 +91,7 @@ public final class JavaDocBrowser {
     return browser;
   }
 
-  protected static String getJavaDocHtml(IJavaElement element) {
+  static String getJavaDocHtml(IJavaElement element) {
     try {
       String javaDoc = JavadocContentAccess2.getHTMLContent(element, true);
       if (StringUtils.isBlank(javaDoc)) {
@@ -101,7 +101,7 @@ public final class JavaDocBrowser {
       StringBuffer buffer = new StringBuffer();
 
       // header
-      HTMLPrinter.insertPageProlog(buffer, 0, getCSSStyles());
+      HTMLPrinter.insertPageProlog(buffer, 0, getCssStyles());
 
       // content
       buffer.append(javaDoc);
@@ -120,7 +120,7 @@ public final class JavaDocBrowser {
     return null;
   }
 
-  private static void insertBaseUrl(String javaDoc, IJavaElement element, StringBuffer buffer) {
+  static void insertBaseUrl(String javaDoc, IJavaElement element, StringBuffer buffer) {
     try {
       String base = JavadocContentAccess2.extractBaseURL(javaDoc);
       if (base == null) {
@@ -137,7 +137,7 @@ public final class JavaDocBrowser {
     }
   }
 
-  private static String getCSSStyles() {
+  static String getCssStyles() {
     Bundle bundle = Platform.getBundle(JavaUI.ID_PLUGIN);
     if (bundle == null) {
       return null;

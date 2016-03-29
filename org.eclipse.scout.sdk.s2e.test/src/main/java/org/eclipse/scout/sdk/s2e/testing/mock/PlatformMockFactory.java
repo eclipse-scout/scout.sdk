@@ -273,15 +273,19 @@ public class PlatformMockFactory {
   protected void initMock(Object element, Class<?> type) {
     try {
       Method method = getClass().getDeclaredMethod("initMock", type);
-      try {
-        method.invoke(this, element);
-      }
-      catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        throw new SdkException(e);
-      }
+      invokeMethod(element, method);
     }
     catch (NoSuchMethodException | SecurityException e1) {
       // nop
+    }
+  }
+
+  protected void invokeMethod(Object element, Method method) {
+    try {
+      method.invoke(this, element);
+    }
+    catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new SdkException(e);
     }
   }
 

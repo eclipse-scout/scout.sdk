@@ -40,7 +40,7 @@ import org.eclipse.ui.PartInitException;
  */
 public class PermissionNewWizard extends AbstractWizard implements INewWizard {
 
-  public static Class<? extends PermissionNewWizardPage> pageClass = PermissionNewWizardPage.class;
+  public static volatile Class<? extends PermissionNewWizardPage> pageClass = PermissionNewWizardPage.class;
 
   private PermissionNewWizardPage m_page1;
   private boolean m_executed = false;

@@ -54,7 +54,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.translate.AggregateTranslator;
 import org.apache.commons.lang3.text.translate.EntityArrays;
 import org.apache.commons.lang3.text.translate.LookupTranslator;
-import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
@@ -746,21 +745,13 @@ public final class CoreUtils {
       case IJavaRuntimeTypes._void:
         return IJavaRuntimeTypes.Void;
       case IJavaRuntimeTypes.Boolean:
-        return name;
       case IJavaRuntimeTypes.Character:
-        return name;
       case IJavaRuntimeTypes.Byte:
-        return name;
       case IJavaRuntimeTypes.Short:
-        return name;
       case IJavaRuntimeTypes.Integer:
-        return name;
       case IJavaRuntimeTypes.Long:
-        return name;
       case IJavaRuntimeTypes.Float:
-        return name;
       case IJavaRuntimeTypes.Double:
-        return name;
       case IJavaRuntimeTypes.Void:
         return name;
       default:
@@ -797,21 +788,13 @@ public final class CoreUtils {
       case IJavaRuntimeTypes.Void:
         return IJavaRuntimeTypes._void;
       case IJavaRuntimeTypes._boolean:
-        return fqn;
       case IJavaRuntimeTypes._char:
-        return fqn;
       case IJavaRuntimeTypes._byte:
-        return fqn;
       case IJavaRuntimeTypes._short:
-        return fqn;
       case IJavaRuntimeTypes._int:
-        return fqn;
       case IJavaRuntimeTypes._long:
-        return fqn;
       case IJavaRuntimeTypes._float:
-        return fqn;
       case IJavaRuntimeTypes._double:
-        return fqn;
       case IJavaRuntimeTypes._void:
         return fqn;
       default:
@@ -867,7 +850,7 @@ public final class CoreUtils {
   }
 
   /**
-   * Returns the given input HTML with all characters escaped.
+   * Returns the given input HTML with all necessary characters escaped.
    *
    * @param html
    *          The input HTML.
@@ -879,12 +862,9 @@ public final class CoreUtils {
             new String[][]{
                 {"/", "&#47;"}
             }),
-        UnicodeEscaper.outsideOf(32, 0x7f),
         new LookupTranslator(EntityArrays.BASIC_ESCAPE()),
-        new LookupTranslator(EntityArrays.APOS_ESCAPE()),
-        new LookupTranslator(EntityArrays.ISO8859_1_ESCAPE()),
-        new LookupTranslator(EntityArrays.HTML40_EXTENDED_ESCAPE()))
-            .translate(html);
+        new LookupTranslator(EntityArrays.APOS_ESCAPE())//,
+    ).translate(html);
   }
 
   /**
