@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Image;
  * unselected state.
  *
  * @author Andreas Hoegger
- * @since 3.8.0 07.02.2012
+ * @since 3.8.0 2012-02-07
  */
 public interface ISelectionStateLabelProvider {
 

@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.core.util.TypeFilters;
  * <h3>{@link AbstractTableBeanSourceBuilder}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 27.08.2013
+ * @since 3.10.0 2013-08-27
  */
 public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSourceBuilder {
 

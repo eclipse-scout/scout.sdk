@@ -54,7 +54,7 @@ import org.eclipse.text.edits.TextEdit;
  * <h3>{@link MissingClassIdsNewOperation}</h3>
  *
  * @author Matthias Villiger
- * @since 3.10.0 05.01.2014
+ * @since 3.10.0 2014-01-05
  */
 public class MissingClassIdsNewOperation implements IOperation {
 

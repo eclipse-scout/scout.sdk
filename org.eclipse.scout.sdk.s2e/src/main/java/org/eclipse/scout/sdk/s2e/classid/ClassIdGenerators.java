@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
  * <h3>{@link ClassIdGenerators}</h3> Provides a single access point to get class id values.
  *
  * @author Matthias Villiger
- * @since 3.10.0 02.01.2014
+ * @since 3.10.0 2014-01-02
  * @see IClassIdGenerator
  */
 public final class ClassIdGenerators {

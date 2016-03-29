@@ -60,7 +60,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
  * <h3>{@link JavaElementCommentBuilderService}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 12.07.2013
+ * @since 3.10.0 2013-07-12
  */
 public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBuilderSpi {
   private static final String[] EMPTY = new String[0];

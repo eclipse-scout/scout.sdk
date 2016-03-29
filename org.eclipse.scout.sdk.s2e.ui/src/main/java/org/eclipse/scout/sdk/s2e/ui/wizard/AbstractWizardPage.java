@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>AbstractScoutWizardPage</h3>
  *
  * @author Andreas Hoegger
- * @since 1.0.0 11.01.2008
+ * @since 1.0.0 2008-01-11
  */
 public abstract class AbstractWizardPage extends WizardPage {
 

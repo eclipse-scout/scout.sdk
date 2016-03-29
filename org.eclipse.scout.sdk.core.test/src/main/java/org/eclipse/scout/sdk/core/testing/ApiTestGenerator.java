@@ -34,7 +34,7 @@ import org.junit.Assert;
  * <h3>{@link ApiTestGenerator}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 26.08.2013
+ * @since 3.10.0 2013-08-26
  */
 public class ApiTestGenerator {
   public static final String NL = "\n";

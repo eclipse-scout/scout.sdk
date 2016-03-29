@@ -21,7 +21,7 @@ import org.eclipse.jdt.core.IType;
  * existing resource.<br>
  *
  * @author Andreas Hoegger, Matthias Villiger, Ivan Motsch
- * @since 3.10.0 21.08.2013
+ * @since 3.10.0 2013-08-21
  * @noinstantiate This class is not intended to be instantiated by clients.
  */
 public interface IDerivedResourceManager {

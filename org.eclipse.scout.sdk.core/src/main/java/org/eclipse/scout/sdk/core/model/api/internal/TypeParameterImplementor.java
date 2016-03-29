@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.signature.Signature;
  * <h3>{@link TypeParameterImplementor}</h3>
  *
  * @author Ivan Motsch
- * @since 4.1.0 09.11.2014
+ * @since 4.1.0 2014-11-09
  */
 public class TypeParameterImplementor extends AbstractJavaElementImplementor<TypeParameterSpi> implements ITypeParameter {
 

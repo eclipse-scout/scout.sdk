@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.util.CompositeObject;
  * <h3>{@link SortedMemberKeyFactory}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.9.0 10.04.2013
+ * @since 3.9.0 2013-04-10
  */
 public final class SortedMemberKeyFactory {
 

@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * <h3>{@link ExpressionSourceBuilderFactory}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 07.03.2013
+ * @since 3.10.0 2013-03-07
  */
 public final class ExpressionSourceBuilderFactory {
   private ExpressionSourceBuilderFactory() {

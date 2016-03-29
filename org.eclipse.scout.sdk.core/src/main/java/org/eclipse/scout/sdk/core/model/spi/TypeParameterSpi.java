@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
  * <h3>{@link TypeParameterSpi}</h3> Represents a type parameter.
  *
  * @author Ivan Motsch
- * @since 4.1.0 09.11.2014
+ * @since 4.1.0 2014-11-09
  */
 public interface TypeParameterSpi extends JavaElementSpi {
 

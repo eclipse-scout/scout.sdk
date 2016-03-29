@@ -60,7 +60,7 @@ import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
  * <h3>{@link ClassIdValidationJob}</h3>
  *
  * @author Matthias Villiger
- * @since 4.0.0 20.05.2014
+ * @since 4.0.0 2014-05-20
  */
 public final class ClassIdValidationJob extends AbstractJob {
 

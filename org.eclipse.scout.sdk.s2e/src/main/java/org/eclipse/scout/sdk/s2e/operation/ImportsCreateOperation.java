@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  * <h3>{@link ImportsCreateOperation}</h3>
  *
  * @author Matthias Villiger
- * @since 4.0.0 27.03.2014
+ * @since 4.0.0 2014-03-27
  */
 public class ImportsCreateOperation implements IOperation {
 

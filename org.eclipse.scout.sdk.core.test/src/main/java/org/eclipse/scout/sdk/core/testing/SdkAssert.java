@@ -42,7 +42,7 @@ import org.junit.Assert;
  * <h3>{@link SdkAssert}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.9.0 05.04.2013
+ * @since 3.9.0 2013-04-05
  */
 public class SdkAssert extends Assert {
 

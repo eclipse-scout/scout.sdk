@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.core.signature.SignatureUtils;
  * <h3>{@link TableBeanDataSourceBuilder}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 28.08.2013
+ * @since 3.10.0 2013-08-28
  */
 public class TableBeanDataSourceBuilder extends AbstractTableBeanSourceBuilder {
 

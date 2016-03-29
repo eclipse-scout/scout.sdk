@@ -18,7 +18,7 @@ import java.util.EventListener;
  * of a {@link FileSelectionField}.
  *
  * @author Andreas Hoegger
- * @since 1.0.8 06.02.2011
+ * @since 1.0.8 2011-02-06
  * @see FileSelectionField
  */
 public interface IFileSelectionListener extends EventListener {
