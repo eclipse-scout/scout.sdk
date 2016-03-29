@@ -59,6 +59,8 @@
     <!-- Sonar properties -->
     <sonar.branch>releases_5.2.x</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
+    <sonar.exclusions>**/src/main/fixture/**,**/src/main/client/**,**/src/main/shared/**</sonar.exclusions> <!-- exclude fixtures -->
+    <sonar.coverage.exclusions>**/src/main/fixture/**,**/src/main/client/**,**/src/main/shared/**</sonar.coverage.exclusions> <!-- exclude fixtures -->
 
     <!-- dependencies to Eclipse artifacts deployed by org.eclipse.scout.sdk.core.releng/ -->
     <ecj>4.5</ecj>
