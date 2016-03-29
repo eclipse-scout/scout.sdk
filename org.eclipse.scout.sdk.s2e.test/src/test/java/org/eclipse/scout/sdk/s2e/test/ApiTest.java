@@ -41,6 +41,8 @@ public class ApiTest {
     AST ast = node.getAST();
     Object resolver = Validate.notNull(AstUtils.getBindingResolver(ast));
     AstUtils.getCompilationUnitScope(ast, resolver);
+
+    // test for org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory.resolveTypeBinding(String)
     Method m = resolver.getClass().getDeclaredMethod("getTypeBinding", TypeBinding.class);
     Validate.notNull(m);
   }
