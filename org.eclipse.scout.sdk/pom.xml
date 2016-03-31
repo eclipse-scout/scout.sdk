@@ -119,6 +119,14 @@
     <org.eclipse.core.jobs-maven>${org.eclipse.core.jobs}</org.eclipse.core.jobs-maven>
     <org.eclipse.core.jobs-range>[3.7.0,3.7.1)</org.eclipse.core.jobs-range>
 
+    <org.eclipse.debug.core>3.10.0.v20150303-1130</org.eclipse.debug.core>
+    <org.eclipse.debug.core-maven>${org.eclipse.debug.core}</org.eclipse.debug.core-maven>
+    <org.eclipse.debug.core-range>[3.10.0,3.10.1)</org.eclipse.debug.core-range>
+
+    <org.eclipse.debug.ui>3.11.0.v20150514-0917</org.eclipse.debug.ui>
+    <org.eclipse.debug.ui-maven>${org.eclipse.debug.ui}</org.eclipse.debug.ui-maven>
+    <org.eclipse.debug.ui-range>[3.11.0,3.11.1)</org.eclipse.debug.ui-range>
+
     <org.eclipse.text>3.5.400.v20150505-1044</org.eclipse.text>
     <org.eclipse.text-maven>${org.eclipse.text}</org.eclipse.text-maven>
     <org.eclipse.text-range>[3.5.400,3.5.401)</org.eclipse.text-range>
@@ -150,6 +158,10 @@
     <org.eclipse.jdt.debug.ui>3.7.0.v20150505-1916</org.eclipse.jdt.debug.ui>
     <org.eclipse.jdt.debug.ui-maven>${org.eclipse.jdt.debug.ui}</org.eclipse.jdt.debug.ui-maven>
     <org.eclipse.jdt.debug.ui-range>[3.7.0,3.7.1)</org.eclipse.jdt.debug.ui-range>
+
+    <org.eclipse.jdt.junit>3.8.0.v20150428-1340</org.eclipse.jdt.junit>
+    <org.eclipse.jdt.junit-maven>${org.eclipse.jdt.junit}</org.eclipse.jdt.junit-maven>
+    <org.eclipse.jdt.junit-range>[3.8.0,3.8.1)</org.eclipse.jdt.junit-range>
 
     <org.eclipse.ui.workbench>3.107.0.v20150510-1732</org.eclipse.ui.workbench>
     <org.eclipse.ui.workbench-maven>${org.eclipse.ui.workbench}</org.eclipse.ui.workbench-maven>
