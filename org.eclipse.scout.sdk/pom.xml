@@ -406,6 +406,24 @@
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.deps</groupId>
+        <artifactId>org.eclipse.debug.core</artifactId>
+        <version>${org.eclipse.debug.core-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
+        <artifactId>org.eclipse.debug.ui</artifactId>
+        <version>${org.eclipse.debug.ui-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
+        <artifactId>org.eclipse.jdt.junit</artifactId>
+        <version>${org.eclipse.jdt.junit-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.jdt.debug.ui</artifactId>
         <version>${org.eclipse.jdt.debug.ui-maven}</version>
       </dependency>
