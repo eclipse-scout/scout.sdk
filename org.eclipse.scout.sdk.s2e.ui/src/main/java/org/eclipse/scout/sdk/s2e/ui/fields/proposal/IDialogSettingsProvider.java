@@ -19,7 +19,7 @@ import org.eclipse.jface.dialogs.PopupDialog;
  * settings, the {@link ProposalPopup} remembers its size.
  *
  * @author Andreas Hoegger
- * @since 3.8.0 22.02.2012
+ * @since 3.8.0 2012-02-22
  * @see IProposalContentProvider
  */
 public interface IDialogSettingsProvider {

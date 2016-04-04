@@ -30,7 +30,7 @@ import org.eclipse.text.edits.ReplaceEdit;
  * <h3>{@link AbstractNlsProposal}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 24.10.2013
+ * @since 3.10.0 2013-10-24
  */
 public abstract class AbstractNlsProposal implements IJavaCompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {
 

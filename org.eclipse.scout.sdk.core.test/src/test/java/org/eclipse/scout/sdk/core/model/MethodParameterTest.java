@@ -70,10 +70,10 @@ public class MethodParameterTest {
     Assert.assertEquals(1, methodInBaseClassParams.size());
 
     IMethodParameter runnableParam = methodInBaseClassParams.get(0);
-    Assert.assertEquals("arg0", runnableParam.elementName()); // parameter names not supported for binary types
+    Assert.assertEquals("runnableParam", runnableParam.elementName());
     Assert.assertEquals(Flags.AccDefault, runnableParam.flags()); // final not supported for binary types
     Assert.assertEquals(method, runnableParam.declaringMethod());
-    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Double, runnableParam.dataType().leafComponentType().name());
+    Assert.assertEquals(IJavaRuntimeTypes.Double, runnableParam.dataType().leafComponentType().name());
     Assert.assertTrue(runnableParam.dataType().isArray());
     Assert.assertEquals(1, runnableParam.dataType().arrayDimension());
   }

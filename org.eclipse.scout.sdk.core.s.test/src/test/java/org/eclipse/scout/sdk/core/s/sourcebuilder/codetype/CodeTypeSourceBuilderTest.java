@@ -32,11 +32,11 @@ public class CodeTypeSourceBuilderTest {
   @Test
   public void testCodeTypeAllParams() {
     IJavaEnvironment sharedEnv = CoreScoutTestingUtils.createSharedJavaEnvironment();
-    CodeTypeSourceBuilder sb = new CodeTypeSourceBuilder("MyCodeType", "org.eclispe.scout.sdk.core.s.test");
+    CodeTypeSourceBuilder sb = new CodeTypeSourceBuilder("MyCodeType", "org.eclipse.scout.sdk.core.s.test", sharedEnv);
     sb.setClassIdValue("whocares");
     sb.setCodeTypeIdSignature(ISignatureConstants.SIG_JAVA_LANG_STRING);
     sb.setIdValueBuilder(new RawSourceBuilder("\"id_value\""));
-    String superType = IScoutRuntimeTypes.AbstractCodeType + ISignatureConstants.C_GENERIC_START + IJavaRuntimeTypes.java_lang_String + "," + IJavaRuntimeTypes.java_lang_Long + ISignatureConstants.C_GENERIC_END;
+    String superType = IScoutRuntimeTypes.AbstractCodeType + ISignatureConstants.C_GENERIC_START + IJavaRuntimeTypes.String + "," + IJavaRuntimeTypes.Long + ISignatureConstants.C_GENERIC_END;
     sb.setSuperTypeSignature(Signature.createTypeSignature(superType));
     sb.setup();
 

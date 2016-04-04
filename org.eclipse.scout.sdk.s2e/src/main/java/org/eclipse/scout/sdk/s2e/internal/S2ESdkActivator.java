@@ -31,7 +31,7 @@ public class S2ESdkActivator extends Plugin {
 
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.s2e";
 
-  private static S2ESdkActivator plugin;
+  private static volatile S2ESdkActivator plugin;
 
   private DerivedResourceManager m_derivedResourceManager;
 

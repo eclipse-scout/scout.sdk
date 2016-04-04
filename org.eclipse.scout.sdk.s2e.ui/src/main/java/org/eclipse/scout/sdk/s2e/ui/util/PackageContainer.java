@@ -104,7 +104,7 @@ public class PackageContainer {
     StringBuilder builder = new StringBuilder();
     builder.append("PackageContainer [src_folder=").append(toStringElement(m_srcFolder))
         .append(", package=").append(toStringElement(m_package))
-        .append(", project=").append(toStringElement(m_project)).append("]");
+        .append(", project=").append(toStringElement(m_project)).append(']');
     return builder.toString();
   }
 

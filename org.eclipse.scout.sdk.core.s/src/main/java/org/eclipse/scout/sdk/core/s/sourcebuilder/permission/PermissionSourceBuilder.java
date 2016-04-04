@@ -14,9 +14,11 @@ import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.AbstractEntitySourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
@@ -30,19 +32,19 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * @author Matthias Villiger
  * @since 5.2.0
  */
-public class PermissionSourceBuilder extends CompilationUnitSourceBuilder {
+public class PermissionSourceBuilder extends AbstractEntitySourceBuilder {
 
-  private final String m_elementName;
-
-  public PermissionSourceBuilder(String elementName, String packageName) {
-    super(elementName + SuffixConstants.SUFFIX_STRING_java, packageName);
-    m_elementName = elementName;
+  public PermissionSourceBuilder(String elementName, String packageName, IJavaEnvironment env) {
+    super(elementName, packageName, env);
   }
 
+  @Override
   public void setup() {
-    TypeSourceBuilder permissionBuilder = new TypeSourceBuilder(m_elementName);
+    setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(this));
+
+    TypeSourceBuilder permissionBuilder = new TypeSourceBuilder(getEntityName());
     permissionBuilder.setFlags(Flags.AccPublic);
-    permissionBuilder.setSuperTypeSignature(Signature.createTypeSignature(IJavaRuntimeTypes.java_security_BasicPermission));
+    permissionBuilder.setSuperTypeSignature(Signature.createTypeSignature(IJavaRuntimeTypes.BasicPermission));
     addType(permissionBuilder);
 
     // serialVersionUID
@@ -53,11 +55,11 @@ public class PermissionSourceBuilder extends CompilationUnitSourceBuilder {
   }
 
   protected IMethodSourceBuilder createConstructor(final ITypeSourceBuilder constructorOwner) {
-    IMethodSourceBuilder constructor = MethodSourceBuilderFactory.createConstructor(m_elementName);
+    IMethodSourceBuilder constructor = MethodSourceBuilderFactory.createConstructor(getEntityName());
     constructor.setBody(new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("super(").append(validator.useName(constructorOwner.getFullyQualifiedName())).append(SuffixConstants.SUFFIX_STRING_class).append(".getSimpleName());");
+        source.append("super(").append(validator.useName(constructorOwner.getFullyQualifiedName())).append(SuffixConstants.SUFFIX_class).append(".getSimpleName());");
       }
     });
     return constructor;

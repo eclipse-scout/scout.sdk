@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.typeparameter.ITypeParameterSour
  * <h3>{@link IMethodSourceBuilder}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 07.03.2013
+ * @since 3.10.0 2013-03-07
  */
 public interface IMethodSourceBuilder extends IMemberSourceBuilder {
 

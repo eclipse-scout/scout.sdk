@@ -11,21 +11,20 @@
 package org.eclipse.scout.sdk.core.s.sourcebuilder.codetype;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.AbstractEntitySourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.FieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodBodySourceBuilderFactory;
-import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
@@ -37,23 +36,25 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * @author Matthias Villiger
  * @since 5.2.0
  */
-public class CodeTypeSourceBuilder extends CompilationUnitSourceBuilder {
+public class CodeTypeSourceBuilder extends AbstractEntitySourceBuilder {
 
   private static final String ID_CONSTANT_NAME = "ID";
 
-  private final String m_codeTypeName;
   private String m_superTypeSignature;
   private String m_codeTypeIdSignature;
   private String m_classIdValue;
   private ISourceBuilder m_idValueBuilder;
 
-  public CodeTypeSourceBuilder(String elementName, String packageName) {
-    super(elementName + SuffixConstants.SUFFIX_STRING_java, packageName);
-    m_codeTypeName = elementName;
+  public CodeTypeSourceBuilder(String elementName, String packageName, IJavaEnvironment env) {
+    super(elementName, packageName, env);
   }
 
+  @Override
   public void setup() {
-    ITypeSourceBuilder codeTypeBuilder = new TypeSourceBuilder(getCodeTypeName());
+    setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(this));
+
+    ITypeSourceBuilder codeTypeBuilder = new TypeSourceBuilder(getEntityName());
+    codeTypeBuilder.setComment(CommentSourceBuilderFactory.createDefaultTypeComment(codeTypeBuilder));
     codeTypeBuilder.setFlags(Flags.AccPublic);
     codeTypeBuilder.setSuperTypeSignature(getSuperTypeSignature());
 
@@ -65,18 +66,11 @@ public class CodeTypeSourceBuilder extends CompilationUnitSourceBuilder {
     codeTypeBuilder.addField(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
     codeTypeBuilder.addField(createId());
 
-    codeTypeBuilder.addMethod(createGetId());
+    IMethodSourceBuilder getId = MethodSourceBuilderFactory.createOverride(codeTypeBuilder, getJavaEnvironment(), "getId");
+    getId.setBody(new RawSourceBuilder("return " + ID_CONSTANT_NAME + ';'));
+    codeTypeBuilder.addMethod(getId);
 
     addType(codeTypeBuilder);
-  }
-
-  protected IMethodSourceBuilder createGetId() {
-    IMethodSourceBuilder getId = new MethodSourceBuilder("getId");
-    getId.addAnnotation(AnnotationSourceBuilderFactory.createOverride());
-    getId.setFlags(Flags.AccPublic);
-    getId.setReturnTypeSignature(getCodeTypeIdSignature());
-    getId.setBody(MethodBodySourceBuilderFactory.createSimpleMethodBody("return " + ID_CONSTANT_NAME + ";"));
-    return getId;
   }
 
   protected IFieldSourceBuilder createId() {
@@ -85,7 +79,7 @@ public class CodeTypeSourceBuilder extends CompilationUnitSourceBuilder {
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         super.createSource(source, lineDelimiter, context, validator);
         if (getIdValueBuilder() == null) {
-          source.append(" // XXX [").append(CoreUtils.getUsername()).append("] set id value");
+          source.append(CoreUtils.getCommentBlock("set id value"));
         }
       }
     };
@@ -106,10 +100,6 @@ public class CodeTypeSourceBuilder extends CompilationUnitSourceBuilder {
 
   public void setSuperTypeSignature(String superTypeSignature) {
     m_superTypeSignature = superTypeSignature;
-  }
-
-  public String getCodeTypeName() {
-    return m_codeTypeName;
   }
 
   public String getCodeTypeIdSignature() {
@@ -135,5 +125,4 @@ public class CodeTypeSourceBuilder extends CompilationUnitSourceBuilder {
   public void setClassIdValue(String classIdValue) {
     m_classIdValue = classIdValue;
   }
-
 }

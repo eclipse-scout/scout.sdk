@@ -60,7 +60,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
  * <h3>{@link JavaElementCommentBuilderService}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 12.07.2013
+ * @since 3.10.0 2013-07-12
  */
 public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBuilderSpi {
   private static final String[] EMPTY = new String[0];
@@ -185,7 +185,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
 
           // @see
           StringBuilder seeBuilder = new StringBuilder("@see ");
-          seeBuilder.append(interfaceFqn).append("#").append(target.getElementName()).append("(");
+          seeBuilder.append(interfaceFqn).append('#').append(target.getElementName()).append('(');
           Iterator<IMethodParameterSourceBuilder> parameterIterator = target.getParameters().iterator();
           if (parameterIterator.hasNext()) {
             seeBuilder.append(SignatureUtils.toFullyQualifiedName(parameterIterator.next().getDataTypeSignature()));
@@ -193,7 +193,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
               seeBuilder.append(", ").append(SignatureUtils.toFullyQualifiedName(parameterIterator.next().getDataTypeSignature()));
             }
           }
-          seeBuilder.append(")");
+          seeBuilder.append(')');
           context.setVariable(CodeTemplateContextType.SEE_TO_OVERRIDDEN_TAG, seeBuilder.toString());
           String comment = evaluateTemplate(context, template);
           if (comment != null) {

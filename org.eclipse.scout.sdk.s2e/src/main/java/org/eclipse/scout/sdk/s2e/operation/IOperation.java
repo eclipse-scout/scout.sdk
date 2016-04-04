@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
  * call validate first and execute only on succeeded validation.
  *
  * @author Andreas Hoegger
- * @since 3.8.0 23.02.2012
+ * @since 3.8.0 2012-02-23
  * @see ResourceBlockingOperationJob
  */
 public interface IOperation {

@@ -44,7 +44,7 @@ import org.eclipse.ui.PartInitException;
  */
 public class FormNewWizard extends AbstractWizard implements INewWizard {
 
-  public static Class<? extends FormNewWizardPage> pageClass = FormNewWizardPage.class;
+  public static volatile Class<? extends FormNewWizardPage> pageClass = FormNewWizardPage.class;
 
   private FormNewWizardPage m_page1;
   private boolean m_executed = false;
@@ -78,11 +78,16 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
       return; // no double runs
     }
     if (blockingFolders == null) {
-      blockingFolders = new HashSet<>(4);
+      blockingFolders = new HashSet<>(6);
     }
     op.setClientPackage(m_page1.getTargetPackage());
     op.setClientSourceFolder(m_page1.getSourceFolder());
     blockingFolders.add(m_page1.getSourceFolder().getResource());
+    IPackageFragmentRoot formTestSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getSourceFolder());
+    if (formTestSourceFolder != null) {
+      op.setClientTestSourceFolder(formTestSourceFolder);
+      blockingFolders.add(formTestSourceFolder.getResource());
+    }
     op.setCreateFormData(m_page1.isCreateFormData());
     op.setCreatePermissions(m_page1.isCreatePermissions());
     op.setCreateService(m_page1.isCreateService());
@@ -90,6 +95,11 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     if (m_page1.isCreateService()) {
       op.setServerSourceFolder(m_page1.getServerSourceFolder());
       blockingFolders.add(m_page1.getServerSourceFolder().getResource());
+      IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getServerSourceFolder());
+      if (serviceTestSourceFolder != null) {
+        op.setServerTestSourceFolder(serviceTestSourceFolder);
+        blockingFolders.add(serviceTestSourceFolder.getResource());
+      }
     }
     if (m_page1.isCreateFormData()) {
       IPackageFragmentRoot sharedSourceFolder = S2eUtils.getDtoSourceFolder(m_page1.getSharedSourceFolder());

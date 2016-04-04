@@ -20,7 +20,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
  * <h3>{@link WeakResourceChangeListener}</h3>
  *
  * @author Matthias Villiger
- * @since 3.9.0 16.05.2013
+ * @since 3.9.0 2013-05-16
  */
 public class WeakResourceChangeListener implements IResourceChangeListener {
 

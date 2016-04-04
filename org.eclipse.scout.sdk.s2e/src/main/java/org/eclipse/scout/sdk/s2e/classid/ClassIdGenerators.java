@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.classid;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -19,7 +20,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
@@ -28,7 +29,7 @@ import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
  * <h3>{@link ClassIdGenerators}</h3> Provides a single access point to get class id values.
  *
  * @author Matthias Villiger
- * @since 3.10.0 02.01.2014
+ * @since 3.10.0 2014-01-02
  * @see IClassIdGenerator
  */
 public final class ClassIdGenerators {
@@ -53,35 +54,37 @@ public final class ClassIdGenerators {
         if (allGeneratorsOrdered == null) {
           Map<CompositeObject, IClassIdGenerator> tmp = new TreeMap<>();
 
-          IExtensionRegistry reg = Platform.getExtensionRegistry();
-          IExtensionPoint xp = reg.getExtensionPoint(S2ESdkActivator.PLUGIN_ID, EXTENSION_POINT_NAME);
-          IExtension[] extensions = xp.getExtensions();
-          for (IExtension extension : extensions) {
-            IConfigurationElement[] elements = extension.getConfigurationElements();
-            for (IConfigurationElement element : elements) {
-              if (TAG_NAME.equals(element.getName())) {
-                try {
-                  IClassIdGenerator generator = (IClassIdGenerator) element.createExecutableExtension(ATTRIB_CLASS);
+          IExtensionRegistry reg = RegistryFactory.getRegistry();
+          if (reg != null) {
+            IExtensionPoint xp = reg.getExtensionPoint(S2ESdkActivator.PLUGIN_ID, EXTENSION_POINT_NAME);
+            IExtension[] extensions = xp.getExtensions();
+            for (IExtension extension : extensions) {
+              IConfigurationElement[] elements = extension.getConfigurationElements();
+              for (IConfigurationElement element : elements) {
+                if (TAG_NAME.equals(element.getName())) {
+                  try {
+                    IClassIdGenerator generator = (IClassIdGenerator) element.createExecutableExtension(ATTRIB_CLASS);
 
-                  String prio = element.getAttribute(ATTRIB_PRIO);
-                  Double priority = null;
-                  if (!StringUtils.isBlank(prio)) {
-                    priority = parseDouble(prio);
-                  }
-                  else {
-                    SdkLog.warning("No priority found for extension '{}'. Using 0.0", element.getNamespaceIdentifier());
-                    priority = Double.valueOf(0.0);
-                  }
+                    String prio = element.getAttribute(ATTRIB_PRIO);
+                    Double priority = null;
+                    if (!StringUtils.isBlank(prio)) {
+                      priority = parseDouble(prio);
+                    }
+                    else {
+                      SdkLog.warning("No priority found for extension '{}'. Using 0.0", element.getNamespaceIdentifier());
+                      priority = Double.valueOf(0.0);
+                    }
 
-                  tmp.put(new CompositeObject(-priority, generator.getClass().getName(), generator), generator);
-                }
-                catch (Exception e) {
-                  SdkLog.warning("Could not load classIdGenerator extension '{}'.", element.getNamespaceIdentifier(), e);
+                    tmp.put(new CompositeObject(-priority, generator.getClass().getName(), generator), generator);
+                  }
+                  catch (Exception e) {
+                    SdkLog.warning("Could not load classIdGenerator extension '{}'.", element.getNamespaceIdentifier(), e);
+                  }
                 }
               }
             }
           }
-          allGeneratorsOrdered = tmp.values();
+          allGeneratorsOrdered = new ArrayList<>(tmp.values());
         }
       }
     }

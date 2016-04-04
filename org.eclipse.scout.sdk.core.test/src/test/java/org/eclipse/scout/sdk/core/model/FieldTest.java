@@ -102,7 +102,7 @@ public class FieldTest {
     IField myLongField = baseClassType.fields().first();
     Assert.assertNotNull(myLongField);
 
-    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Long, myLongField.dataType().name());
+    Assert.assertEquals(IJavaRuntimeTypes.Long, myLongField.dataType().name());
     Assert.assertEquals(baseClassType, myLongField.declaringType());
     Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myLongField.flags());
     Assert.assertEquals("myLong", myLongField.elementName());

@@ -32,10 +32,10 @@ public class AstValueFieldBuilder<INSTANCE extends AstValueFieldBuilder<INSTANCE
   public static final Set<String> PROPOSAL_VALUE_DATA_TYPES = Collections.synchronizedSortedSet(new TreeSet<String>());
 
   static {
-    PROPOSAL_VALUE_DATA_TYPES.add(IJavaRuntimeTypes.java_lang_Long);
-    PROPOSAL_VALUE_DATA_TYPES.add(IJavaRuntimeTypes.java_lang_Boolean);
-    PROPOSAL_VALUE_DATA_TYPES.add(IJavaRuntimeTypes.java_math_BigDecimal);
-    PROPOSAL_VALUE_DATA_TYPES.add(IJavaRuntimeTypes.java_lang_String);
+    PROPOSAL_VALUE_DATA_TYPES.add(IJavaRuntimeTypes.Long);
+    PROPOSAL_VALUE_DATA_TYPES.add(IJavaRuntimeTypes.Boolean);
+    PROPOSAL_VALUE_DATA_TYPES.add(IJavaRuntimeTypes.BigDecimal);
+    PROPOSAL_VALUE_DATA_TYPES.add(IJavaRuntimeTypes.String);
   }
 
   protected AstValueFieldBuilder(AstNodeFactory owner) {
@@ -47,7 +47,7 @@ public class AstValueFieldBuilder<INSTANCE extends AstValueFieldBuilder<INSTANCE
     Type typeArg = null;
     // calc super type
     ParameterizedType parameterizedType = getFactory().getAst().newParameterizedType(getSuperType());
-    typeArg = getFactory().newTypeReference(IJavaRuntimeTypes.java_lang_Long);
+    typeArg = getFactory().newTypeReference(IJavaRuntimeTypes.Long);
     parameterizedType.typeArguments().add(typeArg);
     withSuperType(parameterizedType);
 

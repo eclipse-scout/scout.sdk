@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * <h3>{@link FieldSourceBuilder}</h3> static section in type is the field with element name "" and type null
  *
  * @author Andreas Hoegger
- * @since 3.10.0 07.03.2013
+ * @since 3.10.0 2013-03-07
  */
 public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements IFieldSourceBuilder {
 
@@ -62,7 +62,7 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
     }
 
     if (getElementName().isEmpty()) {
-      //static{ }
+      // for a static constructor
       getValue().createSource(source, lineDelimiter, context, validator);
       return;
     }
@@ -72,7 +72,7 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
       source.append(' ');
     }
     // field type
-    source.append(validator.useSignature(getSignature())).append(" ");
+    source.append(validator.useSignature(getSignature())).append(' ');
     source.append(getElementName());
     // init value
     if (getValue() != null) {

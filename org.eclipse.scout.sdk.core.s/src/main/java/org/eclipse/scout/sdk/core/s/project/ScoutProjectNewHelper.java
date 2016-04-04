@@ -120,7 +120,7 @@ public final class ScoutProjectNewHelper {
     postProcessRootPom(new File(targetDirectory, artifactId));
   }
 
-  protected static String[] generateKeyPair() {
+  static String[] generateKeyPair() {
     try {
       return CoreUtils.generateKeyPair();
     }
@@ -134,7 +134,7 @@ public final class ScoutProjectNewHelper {
   /**
    * Workaround so that only the parent module is referenced in the root (remove non-parent modules)
    */
-  protected static void postProcessRootPom(File targetDirectory) throws IOException {
+  static void postProcessRootPom(File targetDirectory) throws IOException {
     try {
       File pom = new File(targetDirectory, "pom.xml");
       if (!pom.isFile()) {
@@ -169,7 +169,7 @@ public final class ScoutProjectNewHelper {
     }
   }
 
-  protected static void writeDocument(Document document, Result result) throws TransformerException {
+  static void writeDocument(Document document, Result result) throws TransformerException {
     TransformerFactory tf = TransformerFactory.newInstance();
     tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
     tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
@@ -180,7 +180,7 @@ public final class ScoutProjectNewHelper {
     transformer.transform(new DOMSource(document), result);
   }
 
-  protected static Element getFirstChildElement(Element parent, String tagName) {
+  static Element getFirstChildElement(Element parent, String tagName) {
     NodeList children = parent.getElementsByTagName(tagName);
     for (int i = 0; i < children.getLength(); ++i) {
       Node n = children.item(i);

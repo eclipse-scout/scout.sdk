@@ -28,7 +28,7 @@ import org.eclipse.ui.PlatformUI;
 public class PermissionNewWizardPage extends CompilationUnitNewWizardPage {
   public PermissionNewWizardPage(PackageContainer packageContainer) {
     super(PermissionNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_PERMISSION,
-        IJavaRuntimeTypes.java_security_Permission, IJavaRuntimeTypes.java_security_BasicPermission, ScoutTier.Shared);
+        IJavaRuntimeTypes.Permission, IJavaRuntimeTypes.BasicPermission, ScoutTier.Shared);
     setTitle("Create a new Permission");
     setDescription(getTitle());
     setIcuGroupName("New Permission Details");

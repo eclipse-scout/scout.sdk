@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * <h3>{@link ExpressionSourceBuilderFactory}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 07.03.2013
+ * @since 3.10.0 2013-03-07
  */
 public final class ExpressionSourceBuilderFactory {
   private ExpressionSourceBuilderFactory() {
@@ -42,7 +42,7 @@ public final class ExpressionSourceBuilderFactory {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         source.append(validator.useSignature(signature));
-        source.append(SuffixConstants.SUFFIX_STRING_class);
+        source.append(SuffixConstants.SUFFIX_class);
       }
     };
   }
@@ -91,7 +91,7 @@ public final class ExpressionSourceBuilderFactory {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         //use newlines on multi-dimensional arrays and annotation arrays only
-        char blockSeparator = (formatWithNewlines ? '\n' : ' ');
+        char blockSeparator = formatWithNewlines ? '\n' : ' ';
         source.append('{');
         source.append(blockSeparator);
         int n = elements.size();

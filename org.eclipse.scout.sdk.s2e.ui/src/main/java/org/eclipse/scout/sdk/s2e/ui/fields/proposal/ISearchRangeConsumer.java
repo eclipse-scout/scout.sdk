@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.s2e.util.NormalizedPattern;
  * For this {@link ISearchRangeConsumer} can collect all match ranges for each proposal.
  *
  * @author Andreas Hoegger
- * @since 3.8.0 17.02.2012
+ * @since 3.8.0 2012-02-17
  * @see SearchPattern#getMatchingRegions(String, String, int)
  * @see NormalizedPattern#getMatchingRegions(String)
  */

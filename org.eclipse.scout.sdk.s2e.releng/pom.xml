@@ -223,6 +223,22 @@
               <version>${org.eclipse.core.jobs}</version>
             </iu>
             <iu>
+              <id>org.eclipse.debug.core</id>
+              <version>${org.eclipse.debug.core}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.debug.core.source</id>
+              <version>${org.eclipse.debug.core}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.debug.ui</id>
+              <version>${org.eclipse.debug.ui}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.debug.ui.source</id>
+              <version>${org.eclipse.debug.ui}</version>
+            </iu>
+            <iu>
               <id>org.eclipse.text</id>
               <version>${org.eclipse.text}</version>
             </iu>
@@ -269,6 +285,14 @@
             <iu>
               <id>org.eclipse.jdt.core.manipulation.source</id>
               <version>${org.eclipse.jdt.core.manipulation}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jdt.junit</id>
+              <version>${org.eclipse.jdt.junit}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jdt.junit.source</id>
+              <version>${org.eclipse.jdt.junit}</version>
             </iu>
             <iu>
               <id>org.eclipse.jdt.ui</id>
@@ -373,22 +397,6 @@
             <iu>
               <id>org.eclipse.ui.forms.source</id>
               <version>${org.eclipse.ui.forms}</version>
-            </iu>
-            <iu>
-              <id>org.eclipse.pde.core</id>
-              <version>${org.eclipse.pde.core}</version>
-            </iu>
-            <iu>
-              <id>org.eclipse.pde.core.source</id>
-              <version>${org.eclipse.pde.core}</version>
-            </iu>
-            <iu>
-              <id>org.eclipse.pde.ui</id>
-              <version>${org.eclipse.pde.ui}</version>
-            </iu>
-            <iu>
-              <id>org.eclipse.pde.ui.source</id>
-              <version>${org.eclipse.pde.ui}</version>
             </iu>
             <iu>
               <id>org.eclipse.pde.core</id>
@@ -723,6 +731,30 @@
                 </configuration>
               </execution>
               <execution>
+                <id>deploy-debug-core</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.debug.core_${org.eclipse.debug.core}.jar</file>
+                  <sources>${downloaded}/org.eclipse.debug.core.source_${org.eclipse.debug.core}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.debug.core.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-debug-ui</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.debug.ui_${org.eclipse.debug.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.debug.ui.source_${org.eclipse.debug.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.debug.ui.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
                 <id>deploy-eclipse-text</id>
                 <goals>
                   <goal>deploy-file</goal>
@@ -883,6 +915,18 @@
                   <file>${downloaded}/org.eclipse.jdt.core.manipulation_${org.eclipse.jdt.core.manipulation}.jar</file>
                   <sources>${downloaded}/org.eclipse.jdt.core.manipulation.source_${org.eclipse.jdt.core.manipulation}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.manipulation.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-jdt-junit</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.junit_${org.eclipse.jdt.junit}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.junit.source_${org.eclipse.jdt.junit}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.junit.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -1110,6 +1154,19 @@
                   <file>${downloaded}/org.eclipse.jdt.core_${org.eclipse.jdt.core}.jar</file>
                   <sources>${downloaded}/org.eclipse.jdt.core.source_${org.eclipse.jdt.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-jdt-junit</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.junit_${org.eclipse.jdt.junit}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.junit.source_${org.eclipse.jdt.junit}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.junit.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
@@ -1474,6 +1531,32 @@
                   <file>${downloaded}/org.eclipse.core.jobs_${org.eclipse.core.jobs}.jar</file>
                   <sources>${downloaded}/org.eclipse.core.jobs.source_${org.eclipse.core.jobs}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.jobs.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-eclipse-debug-core</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.debug.core_${org.eclipse.debug.core}.jar</file>
+                  <sources>${downloaded}/org.eclipse.debug.core.source_${org.eclipse.debug.core}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.debug.core.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-eclipse-debug-ui</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.debug.ui_${org.eclipse.debug.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.debug.ui.source_${org.eclipse.debug.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.debug.ui.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>

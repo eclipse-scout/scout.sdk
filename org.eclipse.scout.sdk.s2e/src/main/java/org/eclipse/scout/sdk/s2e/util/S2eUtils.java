@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -77,6 +79,7 @@ import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
@@ -223,7 +226,7 @@ public final class S2eUtils {
     };
 
     IType baseType = sourceProject.findType(baseTypeFqn.replace('$', '.'));
-    if (!exists(baseType)) {
+    if (!exists(baseType) || !exists(baseType.getParent())) {
       return collector;
     }
 
@@ -1287,6 +1290,56 @@ public final class S2eUtils {
   }
 
   /**
+   * Tries to find a test {@link IPackageFragmentRoot} in the given {@link IJavaProject} or an associated test
+   * {@link IJavaProject}.
+   *
+   * @param orig
+   *          The {@link IJavaProject} for which the primary test source folder should be found.
+   * @return The test source folder or <code>null</code>.
+   * @throws JavaModelException
+   */
+  public static IPackageFragmentRoot getTestSourceFolder(IJavaProject orig) throws JavaModelException {
+    IPackageFragmentRoot sourceFolder = getTestSourceFolderInProject(orig);
+    if (S2eUtils.exists(sourceFolder)) {
+      return sourceFolder;
+    }
+
+    // search for a test project
+    String[] testProjectSuffixes = new String[]{".test", ".tests", ".testing"};
+    for (String suffix : testProjectSuffixes) {
+      IJavaProject testProject = orig.getJavaModel().getJavaProject(orig.getElementName() + suffix);
+      sourceFolder = getTestSourceFolderInProject(testProject);
+      if (S2eUtils.exists(sourceFolder)) {
+        return sourceFolder;
+      }
+    }
+    return null;
+  }
+
+  private static IPackageFragmentRoot getTestSourceFolderInProject(IJavaProject project) throws JavaModelException {
+    if (!S2eUtils.exists(project)) {
+      return null;
+    }
+
+    // search for a source folder in same project
+    IFilter<IPackageFragmentRoot> filter = new IFilter<IPackageFragmentRoot>() {
+      @Override
+      public boolean evaluate(IPackageFragmentRoot element) {
+        if (!S2eUtils.exists(element)) {
+          return false;
+        }
+        String s = element.getPath().removeFirstSegments(1).toString().toLowerCase();
+        return s.contains("test");
+      }
+    };
+    Set<IPackageFragmentRoot> testSourceFolders = getSourceFolders(Collections.singletonList(project), filter, null);
+    if (!testSourceFolders.isEmpty()) {
+      return testSourceFolders.iterator().next();
+    }
+    return null;
+  }
+
+  /**
    * Gets the preferred source folder for DTOs created in the {@link IJavaProject} of the given source folder.
    *
    * @param selectedSourceFolder
@@ -1311,5 +1364,78 @@ public final class S2eUtils {
       return selectedSourceFolder;
     }
     return generatedSourceFolder;
+  }
+
+  /**
+   * Gets the best scout session type on the classpath of the given {@link IJavaProject}.
+   *
+   * @param project
+   *          The {@link IJavaProject} for which the accessible session should be searched.
+   * @param tier
+   *          The type of session.
+   * @param monitor
+   * @return The session {@link IType} or <code>null</code> if no session could be found.
+   * @throws CoreException
+   */
+  public static IType getSession(IJavaProject project, ScoutTier tier, IProgressMonitor monitor) throws CoreException {
+    IFilter<IType> filter = new IFilter<IType>() {
+      @Override
+      public boolean evaluate(IType element) {
+        try {
+          return element.getDeclaringType() == null && !element.isBinary() && !element.isAnonymous() && element.isClass() && Flags.isPublic(element.getFlags());
+        }
+        catch (JavaModelException e) {
+          SdkLog.warning("Unable to calculate flags of type '{}'. Skipping.", element.getFullyQualifiedName(), e);
+          return false;
+        }
+      }
+    };
+    String sessionToFind = null;
+    switch (tier) {
+      case Server:
+        sessionToFind = IScoutRuntimeTypes.IServerSession;
+        break;
+      case Client:
+      case HtmlUi:
+        sessionToFind = IScoutRuntimeTypes.IClientSession;
+        break;
+      default:
+        sessionToFind = IScoutRuntimeTypes.ISession;
+        break;
+    }
+    Set<IType> sessions = S2eUtils.findClassesInStrictHierarchy(project, sessionToFind, monitor, filter);
+    if (sessions.isEmpty()) {
+      return null;
+    }
+    return sessions.iterator().next();
+  }
+
+  /**
+   * Gets the content of the given {@link IFile} as {@link String}.
+   * 
+   * @param file
+   *          The {@link IFile} whose content should be returned.
+   * @return The content of the given {@link IFile}.
+   * @throws CoreException
+   *           If there is an error reading the file content. Reasons include:
+   *           <ul>
+   *           <li>This resource does not exist.</li>
+   *           <li>This resource is not local.</li>
+   *           <li>The file-system resource is not a file.</li>
+   *           <li>The workspace is not in sync with the corresponding location in the local file system (and
+   *           {@link ResourcesPlugin#PREF_LIGHTWEIGHT_AUTO_REFRESH} is disabled).</li>
+   *           </ul>
+   */
+  public static String getContentOfFile(IFile file) throws CoreException {
+    if (file == null || !file.exists()) {
+      return null;
+    }
+    String charsetName = file.getCharset();
+    try (InputStream contents = file.getContents()) {
+      return CoreUtils.inputStreamToString(contents, charsetName).toString();
+    }
+    catch (IOException e) {
+      throw new CoreException(new ScoutStatus("Unable to read file '" + file.getFullPath().toOSString() + "'.", e));
+    }
   }
 }

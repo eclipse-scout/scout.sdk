@@ -97,7 +97,7 @@ public class ManagedAnnotationTest {
     Assert.assertEquals(5, a.num(5));
     Assert.assertEquals("two", a.string("two"));
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_EVEN").first(), a.enumValue(env.findType(RoundingMode.class.getName()).fields().withName("HALF_EVEN").first()));
-    Assert.assertEquals(env.findType(IJavaRuntimeTypes.java_lang_Integer), a.type(env.findType(IJavaRuntimeTypes.java_lang_Integer)));
+    Assert.assertEquals(env.findType(IJavaRuntimeTypes.Integer), a.type(env.findType(IJavaRuntimeTypes.Integer)));
   }
 
   @Test
@@ -108,7 +108,7 @@ public class ManagedAnnotationTest {
     Assert.assertEquals(Integer.MIN_VALUE, a.num(5));
     Assert.assertEquals("alpha", a.string("two"));
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first(), a.enumValue(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first()));
-    Assert.assertEquals(env.findType(String.class.getName()), a.type(env.findType(IJavaRuntimeTypes.java_lang_Integer)));
+    Assert.assertEquals(env.findType(String.class.getName()), a.type(env.findType(IJavaRuntimeTypes.Integer)));
   }
 
   /**

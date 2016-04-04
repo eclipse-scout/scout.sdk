@@ -77,7 +77,7 @@ public class AstMenuBuilder extends AstTypeBuilder<AstMenuBuilder> {
     AST ast = getFactory().getAst();
 
     Type iMenuTypeType = getFactory().newTypeReference(IScoutRuntimeTypes.IMenuType);
-    Type setType = getFactory().newTypeReference(IJavaRuntimeTypes.java_util_Set);
+    Type setType = getFactory().newTypeReference(IJavaRuntimeTypes.Set);
 
     ParameterizedType returnType = ast.newParameterizedType(setType);
     WildcardType extendsIMenuType = ast.newWildcardType();

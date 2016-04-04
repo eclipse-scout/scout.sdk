@@ -42,6 +42,7 @@
     <module>../org.eclipse.scout.sdk.core.s.test</module>
 
     <module>../org.eclipse.scout.sdk.s2e</module>
+    <module>../org.eclipse.scout.sdk.s2e.test</module>
     <module>../org.eclipse.scout.sdk.s2e.doc</module>
     <module>../org.eclipse.scout.sdk.s2e.nls</module>
     <module>../org.eclipse.scout.sdk.s2e.ui</module>
@@ -58,12 +59,8 @@
     <!-- Sonar properties -->
     <sonar.branch>releases_6.0.x</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
-
-    <!-- exclude the unit tests from sonar -->
-    <sonar.exclusions>*.test/**</sonar.exclusions>
-
-    <!-- exclude the unit tests and UI (we have no UI tests anyway) from sonar -->
-    <sonar.coverage.exclusions>*.test/**</sonar.coverage.exclusions>
+    <sonar.exclusions>**/src/main/fixture/**,**/src/main/client/**,**/src/main/shared/**</sonar.exclusions> <!-- exclude fixtures -->
+    <sonar.coverage.exclusions>**/src/main/fixture/**,**/src/main/client/**,**/src/main/shared/**</sonar.coverage.exclusions> <!-- exclude fixtures -->
 
     <!-- dependencies to Eclipse artifacts deployed by org.eclipse.scout.sdk.core.releng/ -->
     <ecj>4.5</ecj>
@@ -122,6 +119,14 @@
     <org.eclipse.core.jobs-maven>${org.eclipse.core.jobs}</org.eclipse.core.jobs-maven>
     <org.eclipse.core.jobs-range>[3.7.0,3.7.1)</org.eclipse.core.jobs-range>
 
+    <org.eclipse.debug.core>3.10.0.v20150303-1130</org.eclipse.debug.core>
+    <org.eclipse.debug.core-maven>${org.eclipse.debug.core}</org.eclipse.debug.core-maven>
+    <org.eclipse.debug.core-range>[3.10.0,3.10.1)</org.eclipse.debug.core-range>
+
+    <org.eclipse.debug.ui>3.11.0.v20150514-0917</org.eclipse.debug.ui>
+    <org.eclipse.debug.ui-maven>${org.eclipse.debug.ui}</org.eclipse.debug.ui-maven>
+    <org.eclipse.debug.ui-range>[3.11.0,3.11.1)</org.eclipse.debug.ui-range>
+
     <org.eclipse.text>3.5.400.v20150505-1044</org.eclipse.text>
     <org.eclipse.text-maven>${org.eclipse.text}</org.eclipse.text-maven>
     <org.eclipse.text-range>[3.5.400,3.5.401)</org.eclipse.text-range>
@@ -153,6 +158,10 @@
     <org.eclipse.jdt.debug.ui>3.7.0.v20150505-1916</org.eclipse.jdt.debug.ui>
     <org.eclipse.jdt.debug.ui-maven>${org.eclipse.jdt.debug.ui}</org.eclipse.jdt.debug.ui-maven>
     <org.eclipse.jdt.debug.ui-range>[3.7.0,3.7.1)</org.eclipse.jdt.debug.ui-range>
+
+    <org.eclipse.jdt.junit>3.8.0.v20150428-1340</org.eclipse.jdt.junit>
+    <org.eclipse.jdt.junit-maven>${org.eclipse.jdt.junit}</org.eclipse.jdt.junit-maven>
+    <org.eclipse.jdt.junit-range>[3.8.0,3.8.1)</org.eclipse.jdt.junit-range>
 
     <org.eclipse.ui.workbench>3.107.0.v20150510-1732</org.eclipse.ui.workbench>
     <org.eclipse.ui.workbench-maven>${org.eclipse.ui.workbench}</org.eclipse.ui.workbench-maven>
@@ -298,6 +307,12 @@
         <classifier>sources</classifier>
       </dependency>
 
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e.test</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- Build Dependencies -->
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -387,6 +402,24 @@
         <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.jdt.core</artifactId>
         <version>${org.eclipse.jdt.core-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
+        <artifactId>org.eclipse.debug.core</artifactId>
+        <version>${org.eclipse.debug.core-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
+        <artifactId>org.eclipse.debug.ui</artifactId>
+        <version>${org.eclipse.debug.ui-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
+        <artifactId>org.eclipse.jdt.junit</artifactId>
+        <version>${org.eclipse.jdt.junit-maven}</version>
       </dependency>
 
       <dependency>

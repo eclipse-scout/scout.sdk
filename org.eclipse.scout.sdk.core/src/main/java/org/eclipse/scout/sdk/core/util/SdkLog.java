@@ -96,7 +96,7 @@ public final class SdkLog {
     SdkConsole.println(message.toString(), extractThrowables(argstartIndex, args));
   }
 
-  protected static Throwable[] extractThrowables(int startIndex, Object... args) {
+  static Throwable[] extractThrowables(int startIndex, Object... args) {
     if (args == null || args.length <= startIndex) {
       return null;
     }
@@ -133,7 +133,7 @@ public final class SdkLog {
     }
   }
 
-  protected static int handlePlaceholders(StringBuilder messageBuilder, Object[] args) {
+  static int handlePlaceholders(StringBuilder messageBuilder, Object[] args) {
     int nextIndex = 0;
     int lastPos = 0;
     int curIndex = -1;
@@ -302,7 +302,7 @@ public final class SdkLog {
     setLogLevel(getInitialLogLevel());
   }
 
-  protected static Level parseLevel(String lvl) {
+  static Level parseLevel(String lvl) {
     if (StringUtils.isBlank(lvl)) {
       return DEFAULT_LOG_LEVEL;
     }
@@ -319,7 +319,7 @@ public final class SdkLog {
     return DEFAULT_LOG_LEVEL;
   }
 
-  protected static Level getInitialLogLevel() {
+  static Level getInitialLogLevel() {
     String lvl = System.getProperty(LOG_LEVEL_PROPERTY_NAME);
     if (StringUtils.isBlank(lvl)) {
       return DEFAULT_LOG_LEVEL;

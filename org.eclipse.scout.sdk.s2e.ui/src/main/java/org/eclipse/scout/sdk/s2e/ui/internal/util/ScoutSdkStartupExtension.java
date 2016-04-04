@@ -19,7 +19,7 @@ import org.eclipse.ui.IStartup;
  * other scout sdk classes) would never be loaded (e.g. when only working in the java perspective).
  *
  * @author Matthias Villiger
- * @since 3.8.0 24.01.2012
+ * @since 3.8.0 2012-01-24
  */
 public class ScoutSdkStartupExtension implements IStartup {
 

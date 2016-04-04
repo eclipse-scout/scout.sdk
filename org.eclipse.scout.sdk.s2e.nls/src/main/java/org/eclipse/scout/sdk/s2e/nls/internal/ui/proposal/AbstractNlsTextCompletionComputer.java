@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  * <h3>{@link AbstractNlsTextCompletionComputer}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 23.10.2013
+ * @since 3.10.0 2013-10-23
  */
 public abstract class AbstractNlsTextCompletionComputer implements IJavaCompletionProposalComputer {
 

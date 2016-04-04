@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuil
  * <h3>{@link IAnnotatableSourceBuilder}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 07.03.2013
+ * @since 3.10.0 2013-03-07
  */
 public interface IAnnotatableSourceBuilder extends IJavaElementSourceBuilder {
 
@@ -30,10 +30,11 @@ public interface IAnnotatableSourceBuilder extends IJavaElementSourceBuilder {
   void addAnnotation(IAnnotationSourceBuilder builder);
 
   /**
-   * @param childOp
+   * @param annotationFqn
+   *          The fully qualified name of the {@link IAnnotationSourceBuilder} to remove.
    * @return
    */
-  boolean removeAnnotation(String elementName);
+  boolean removeAnnotation(String annotationFqn);
 
   /**
    * @return

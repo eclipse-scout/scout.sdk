@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
  * will hold the annotation after it has been created.
  *
  * @author Matthias Villiger
- * @since 3.10.0 05.01.2014
+ * @since 3.10.0 2014-01-05
  */
 public class ClassIdGenerationContext {
 

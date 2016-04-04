@@ -51,11 +51,11 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
   public static final Set<String> PROPOSAL_CODE_DATA_TYPES = Collections.synchronizedSortedSet(new TreeSet<String>());
 
   static {
-    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.java_lang_Long);
-    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.java_lang_Integer);
-    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.java_lang_String);
-    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.java_lang_Boolean);
-    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.java_math_BigDecimal);
+    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.Long);
+    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.Integer);
+    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.String);
+    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.Boolean);
+    PROPOSAL_CODE_DATA_TYPES.add(IJavaRuntimeTypes.BigDecimal);
   }
 
   protected AstCodeBuilder(AstNodeFactory owner) {
@@ -123,7 +123,7 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
     org.eclipse.scout.sdk.core.model.api.IType scoutType = S2eUtils.jdtTypeToScoutType(typeBinding, getFactory().getJavaEnvironment());
     List<org.eclipse.scout.sdk.core.model.api.IType> valueSignatures = CoreUtils.getResolvedTypeParamValue(scoutType, IScoutRuntimeTypes.ICodeType, IScoutRuntimeTypes.TYPE_PARAM_CODETYPE__CODE_ID);
     if (valueSignatures.isEmpty()) {
-      return IJavaRuntimeTypes.java_lang_Integer;
+      return IJavaRuntimeTypes.Integer;
     }
     return valueSignatures.get(0).name();
   }

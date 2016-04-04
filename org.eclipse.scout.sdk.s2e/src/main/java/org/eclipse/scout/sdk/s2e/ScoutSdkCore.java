@@ -13,9 +13,8 @@ package org.eclipse.scout.sdk.s2e;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -26,6 +25,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.IScopeContext;
@@ -49,6 +49,7 @@ import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
  * Main class to access Scout2Eclipse core components.
  */
 public final class ScoutSdkCore {
+
   private ScoutSdkCore() {
   }
 
@@ -58,7 +59,11 @@ public final class ScoutSdkCore {
    * @return
    */
   public static IDerivedResourceManager getDerivedResourceManager() {
-    return S2ESdkActivator.getDefault().getDerivedResourceManager();
+    S2ESdkActivator plugin = S2ESdkActivator.getDefault();
+    if (plugin == null) {
+      return null;
+    }
+    return plugin.getDerivedResourceManager();
   }
 
   /**
@@ -77,7 +82,7 @@ public final class ScoutSdkCore {
    */
   public static IJavaEnvironment createJavaEnvironment(IJavaProject javaProject) {
     Validate.notNull(javaProject);
-    return new JavaEnvironmentWithJdt(createFileLocator(javaProject), createClasspaths(javaProject)).wrap();
+    return new JavaEnvironmentWithJdt(createFileLocator(javaProject), getClasspathEntries(javaProject)).wrap();
   }
 
   private static IFileLocator createFileLocator(IJavaProject javaProject) {
@@ -90,28 +95,28 @@ public final class ScoutSdkCore {
     };
   }
 
-  private static ClasspathEntry[] createClasspaths(IJavaProject javaProject) {
-    Set<ClasspathEntry> paths = new LinkedHashSet<>();
-    appendPaths(paths, javaProject);
-    return paths.toArray(new ClasspathEntry[paths.size()]);
-  }
-
-  private static void appendPaths(Collection<ClasspathEntry> paths, IJavaProject javaProject) {
+  private static Collection<ClasspathEntry> getClasspathEntries(IJavaProject javaProject) {
     try {
       IPackageFragmentRoot[] allPackageFragmentRoots = javaProject.getAllPackageFragmentRoots();
+      Collection<ClasspathEntry> result = new ArrayList<>(allPackageFragmentRoots.length);
       for (IPackageFragmentRoot cpRoot : allPackageFragmentRoots) {
         String encoding = getEncoding(cpRoot);
-        if (cpRoot.getSourceAttachmentPath() != null) {
-          appendPath(paths, cpRoot.getSourceAttachmentPath().toFile(), true, encoding);
-        }
         if (cpRoot.getKind() == IPackageFragmentRoot.K_SOURCE) {
-          appendPath(paths, cpRoot.getResource().getLocation().toFile(), true, encoding);
+          appendPath(result, cpRoot.getResource().getLocation().toFile(), true, encoding);
         }
         else {
-          appendPath(paths, cpRoot.getPath().toFile(), true, encoding);//add also as source in case the .java files are in the same jar
-          appendPath(paths, cpRoot.getPath().toFile(), false, encoding);//and binary
+          IPath sourceAttachmentPath = cpRoot.getSourceAttachmentPath();
+          if (sourceAttachmentPath != null) {
+            appendPath(result, sourceAttachmentPath.toFile(), true, encoding);
+          }
+          else {
+            File cpLocation = cpRoot.getPath().toFile();
+            appendPath(result, cpLocation, true, encoding); // add also as source in case the .java files are in the same jar
+            appendPath(result, cpLocation, false, encoding); // and binary
+          }
         }
       }
+      return result;
     }
     catch (CoreException e) {
       throw new SdkException(e);

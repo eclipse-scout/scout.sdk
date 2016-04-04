@@ -241,4 +241,31 @@ public final class S2eUiUtils {
       }
     }
   }
+
+  /**
+   * Gets a test source folder that belongs to the given {@link IJavaElement}.
+   * 
+   * @param element
+   *          The {@link IJavaElement} for which the test source folder should be calculated.
+   * @return The test sourcer folder or <code>null</code> if it could not be found.
+   */
+  public static IPackageFragmentRoot getTestSourceFolder(IJavaElement element) {
+    if (!S2eUtils.exists(element)) {
+      return null;
+    }
+
+    IJavaProject javaProject = element.getJavaProject();
+    try {
+      IPackageFragmentRoot testSourceFolder = S2eUtils.getTestSourceFolder(javaProject);
+      if (!S2eUtils.exists(testSourceFolder)) {
+        SdkLog.warning("No test source folder could be found for project '{}'. No tests will be generated.", javaProject.getElementName());
+        return null;
+      }
+      return testSourceFolder;
+    }
+    catch (JavaModelException e) {
+      SdkLog.warning("Unable to calculate test source folder for project {}. No tests will be generated.", javaProject.getElementName(), e);
+      return null;
+    }
+  }
 }

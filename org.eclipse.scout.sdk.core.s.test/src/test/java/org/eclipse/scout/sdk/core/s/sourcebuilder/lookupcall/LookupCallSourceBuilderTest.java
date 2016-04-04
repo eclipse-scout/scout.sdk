@@ -40,7 +40,7 @@ public class LookupCallSourceBuilderTest {
 
     // lookup service interface
     String ifcName = "IMyLookupService";
-    CompilationUnitSourceBuilder ifcBuilder = new CompilationUnitSourceBuilder(ifcName + SuffixConstants.SUFFIX_STRING_java, "org.eclispe.scout.sdk.core.s.test");
+    CompilationUnitSourceBuilder ifcBuilder = new CompilationUnitSourceBuilder(ifcName + SuffixConstants.SUFFIX_STRING_java, "org.eclipse.scout.sdk.core.s.test");
     ifcBuilder.setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(ifcBuilder));
 
     ITypeSourceBuilder lookupSvcIfcBuilder = new TypeSourceBuilder(ifcName);
@@ -49,7 +49,7 @@ public class LookupCallSourceBuilderTest {
 
     StringBuilder superTypeBuilder = new StringBuilder(IScoutRuntimeTypes.ILookupService);
     superTypeBuilder.append(ISignatureConstants.C_GENERIC_START);
-    superTypeBuilder.append(IJavaRuntimeTypes.java_lang_String);
+    superTypeBuilder.append(IJavaRuntimeTypes.String);
     superTypeBuilder.append(ISignatureConstants.C_GENERIC_END);
     lookupSvcIfcBuilder.addInterfaceSignature(Signature.createTypeSignature(superTypeBuilder.toString()));
     ifcBuilder.addType(lookupSvcIfcBuilder);
@@ -57,7 +57,7 @@ public class LookupCallSourceBuilderTest {
     IType createdLookupSvcIfc = CoreTestingUtils.assertNoCompileErrors(sharedEnv, ifcBuilder.getPackageName(), ifcBuilder.getMainType().getElementName(), source);
 
     // lookup call
-    LookupCallSourceBuilder lookupCallBuilder = new LookupCallSourceBuilder("MyLookupCall", "org.eclispe.scout.sdk.core.s.test");
+    LookupCallSourceBuilder lookupCallBuilder = new LookupCallSourceBuilder("MyLookupCall", "org.eclipse.scout.sdk.core.s.test", sharedEnv);
     lookupCallBuilder.setKeyTypeSignature(ISignatureConstants.SIG_JAVA_LANG_STRING);
     lookupCallBuilder.setLookupServiceIfcSignature(Signature.createTypeSignature(createdLookupSvcIfc.name()));
     lookupCallBuilder.setSuperTypeSignature(Signature.createTypeSignature(IScoutRuntimeTypes.LookupCall));

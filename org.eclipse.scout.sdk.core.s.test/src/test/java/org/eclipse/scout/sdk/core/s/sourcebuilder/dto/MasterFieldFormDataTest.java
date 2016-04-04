@@ -22,7 +22,7 @@ import org.junit.Test;
  * <h3>{@link MasterFieldFormDataTest}</h3>
  *
  * @author Matthias Villiger
- * @since 3.10.0 04.11.2013
+ * @since 3.10.0 2013-11-04
  */
 public class MasterFieldFormDataTest {
   @Test

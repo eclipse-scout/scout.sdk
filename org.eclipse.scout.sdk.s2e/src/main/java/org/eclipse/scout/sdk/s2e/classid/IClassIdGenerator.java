@@ -21,7 +21,7 @@ package org.eclipse.scout.sdk.s2e.classid;
  * extension.
  *
  * @author Matthias Villiger
- * @since 3.10.0 02.01.2014
+ * @since 3.10.0 2014-01-02
  * @see ClassId
  * @see ITypeWithClassId
  * @see ClassIdGenerators

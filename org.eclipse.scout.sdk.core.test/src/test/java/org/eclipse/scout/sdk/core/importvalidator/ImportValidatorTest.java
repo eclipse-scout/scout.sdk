@@ -192,10 +192,10 @@ public class ImportValidatorTest {
 
     // long on foreign package
     String longName = validator.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG);
-    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Long, longName);
+    Assert.assertEquals(IJavaRuntimeTypes.Long, longName);
 
     longName = validator.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG);
-    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Long, longName);
+    Assert.assertEquals(IJavaRuntimeTypes.Long, longName);
 
     // long in own package
     longName = validator.useName(org.eclipse.scout.sdk.core.fixture.Long.class.getName());

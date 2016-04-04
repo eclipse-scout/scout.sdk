@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.uniqueid;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -19,7 +20,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -46,24 +47,26 @@ public final class UniqueIdExtensionPoint {
       synchronized (CODE_ID_PROV_LOCK) {
         if (uniqueIdProviderExtensions == null) {
           Map<CompositeObject, IUniqueIdProvider> providers = new TreeMap<>();
-          IExtensionRegistry reg = Platform.getExtensionRegistry();
-          IExtensionPoint xp = reg.getExtensionPoint(S2ESdkActivator.PLUGIN_ID, EXTENSION_POINT_NAME);
-          IExtension[] extensions = xp.getExtensions();
-          for (IExtension extension : extensions) {
-            IConfigurationElement[] providerElememts = extension.getConfigurationElements();
-            for (IConfigurationElement providerElememt : providerElememts) {
-              if (CODE_ID_PROVIDER_EXT_NAME.equals(providerElememt.getName())) {
-                try {
-                  IUniqueIdProvider provider = (IUniqueIdProvider) providerElememt.createExecutableExtension(ATTRIB_CLASS);
-                  providers.put(new CompositeObject(getPriority(providerElememt), provider.getClass().getName()), provider);
-                }
-                catch (Exception t) {
-                  SdkLog.error("Error registering code id provider '{}'.", providerElememt.getNamespaceIdentifier(), t);
+          IExtensionRegistry reg = RegistryFactory.getRegistry();
+          if (reg != null) {
+            IExtensionPoint xp = reg.getExtensionPoint(S2ESdkActivator.PLUGIN_ID, EXTENSION_POINT_NAME);
+            IExtension[] extensions = xp.getExtensions();
+            for (IExtension extension : extensions) {
+              IConfigurationElement[] providerElememts = extension.getConfigurationElements();
+              for (IConfigurationElement providerElememt : providerElememts) {
+                if (CODE_ID_PROVIDER_EXT_NAME.equals(providerElememt.getName())) {
+                  try {
+                    IUniqueIdProvider provider = (IUniqueIdProvider) providerElememt.createExecutableExtension(ATTRIB_CLASS);
+                    providers.put(new CompositeObject(getPriority(providerElememt), provider.getClass().getName()), provider);
+                  }
+                  catch (Exception t) {
+                    SdkLog.error("Error registering code id provider '{}'.", providerElememt.getNamespaceIdentifier(), t);
+                  }
                 }
               }
             }
           }
-          uniqueIdProviderExtensions = new ArrayList<>(providers.values());
+          uniqueIdProviderExtensions = Collections.unmodifiableList(new ArrayList<>(providers.values()));
         }
       }
     }

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder.type;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
@@ -25,7 +26,7 @@ import org.eclipse.scout.sdk.core.util.CompositeObject;
  * <h3>{@link ITypeSourceBuilder}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 07.03.2013
+ * @since 3.10.0 2013-03-07
  */
 public interface ITypeSourceBuilder extends IMemberSourceBuilder {
 
@@ -89,7 +90,7 @@ public interface ITypeSourceBuilder extends IMemberSourceBuilder {
   /**
    * @param interfaceSignatures
    */
-  void setInterfaceSignatures(String[] interfaceSignatures);
+  void setInterfaceSignatures(Collection<String> interfaceSignatures);
 
   /**
    * @param builder
@@ -167,7 +168,7 @@ public interface ITypeSourceBuilder extends IMemberSourceBuilder {
   /**
    * Gets the {@link IMethodSourceBuilder} directly contained in this {@link ITypeSourceBuilder} having the given
    * methodId.
-   * 
+   *
    * @param methodId
    *          The methodId of the {@link IMethodSourceBuilder} to return.
    * @return The {@link IMethodSourceBuilder} with the given identifier or <code>null</code> if no such builder exists

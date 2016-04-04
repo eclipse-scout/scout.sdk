@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
  * <h3>{@link CompositeFormDataTypeSourceBuilder}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 27.08.2013
+ * @since 3.10.0 2013-08-27
  */
 public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilder {
 
@@ -103,7 +103,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           IMethodSourceBuilder getterBuilder = new MethodSourceBuilder("get" + methodName);
           getterBuilder.setFlags(Flags.AccPublic);
           getterBuilder.setReturnTypeSignature(Signature.createTypeSignature(formDataTypeName, false));
-          getterBuilder.setBody(new RawSourceBuilder(new StringBuilder("return getFieldByClass(").append(formDataTypeName).append(SuffixConstants.SUFFIX_STRING_class).append(");").toString()));
+          getterBuilder.setBody(new RawSourceBuilder(new StringBuilder("return getFieldByClass(").append(formDataTypeName).append(SuffixConstants.SUFFIX_class).append(");").toString()));
           addSortedMethod(SortedMemberKeyFactory.createMethodPropertyKey(getterBuilder), getterBuilder);
         }
         else if (FormDataAnnotationDescriptor.isIgnore(fieldAnnotation)) {

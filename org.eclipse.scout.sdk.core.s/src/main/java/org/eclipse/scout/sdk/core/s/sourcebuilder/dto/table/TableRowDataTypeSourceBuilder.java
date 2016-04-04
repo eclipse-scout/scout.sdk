@@ -49,7 +49,7 @@ import org.eclipse.scout.sdk.core.util.TypeFilters;
  * <h3>{@link TableRowDataTypeSourceBuilder}</h3>
  *
  * @author Matthias Villiger
- * @since 4.1.0 19.11.2014
+ * @since 4.1.0 2014-11-19
  */
 public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 

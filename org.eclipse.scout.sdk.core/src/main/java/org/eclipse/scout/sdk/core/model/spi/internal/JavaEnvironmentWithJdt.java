@@ -17,7 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.Argument;
 import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
@@ -25,6 +27,8 @@ import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.ImportReference;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
+import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
+import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.lookup.AnnotationBinding;
 import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
 import org.eclipse.jdt.internal.compiler.lookup.BaseTypeBinding;
@@ -59,16 +63,19 @@ import org.eclipse.scout.sdk.core.util.SameCompositeObject;
  */
 public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
   private final IFileLocator m_fileLocator;
-  private final ClasspathEntry[] m_classpaths;
+  private final Collection<ClasspathEntry> m_classpaths;
   private final AstCompiler m_compiler;
   private final WorkspaceFileSystem m_nameEnv;
-  private final Map<Object, JavaElementSpi> m_compilerCache = new HashMap<>();
-  private final Map<Object, Object> m_performanceCache = new HashMap<>();
-  private final AtomicInteger m_hashSeq = new AtomicInteger();
+  private final Map<Object, JavaElementSpi> m_compilerCache;
+  private final Map<Object, Object> m_performanceCache;
+  private final AtomicInteger m_hashSeq;
 
   private IJavaEnvironment m_api;
 
-  public JavaEnvironmentWithJdt(IFileLocator fileLocator, ClasspathEntry[] classpaths) {
+  public JavaEnvironmentWithJdt(IFileLocator fileLocator, Collection<ClasspathEntry> classpaths) {
+    m_compilerCache = new HashMap<>();
+    m_performanceCache = new HashMap<>();
+    m_hashSeq = new AtomicInteger();
     m_fileLocator = fileLocator;
     m_classpaths = classpaths;
     m_nameEnv = new WorkspaceFileSystem(ClasspathEntry.toClassPaths(classpaths));
@@ -86,9 +93,13 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     return createPackage(name);
   }
 
+  protected CompositeObject createTypeKey(String fqn) {
+    return new CompositeObject(TypeSpi.class, fqn);
+  }
+
   @Override
   public synchronized TypeSpi findType(String fqn) {
-    CompositeObject key = new CompositeObject(TypeSpi.class, fqn);
+    final CompositeObject key = createTypeKey(fqn);
     Object elem = m_performanceCache.get(key);
     if (elem == null && !m_performanceCache.containsKey(key)) {
       TypeDescriptor desc = SpiWithJdtUtils.getTypeDescriptor(fqn);
@@ -117,20 +128,27 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
   }
 
   @Override
+  public JavaEnvironmentWithJdt emptyCopy() {
+    Collection<ClasspathSpi> classpath = getClasspath();
+    Collection<ClasspathEntry> newClasspath = new ArrayList<>(classpath.size());
+    for (ClasspathSpi spi : classpath) {
+      Classpath newCpEntry = WorkspaceFileSystem.createClasspath(new File(spi.getPath()), spi.isSource(), spi.getEncoding());
+      if (newCpEntry != null) {
+        newClasspath.add(new ClasspathEntry(newCpEntry, spi.getEncoding()));
+      }
+    }
+    JavaEnvironmentWithJdt newEnv = new JavaEnvironmentWithJdt(m_fileLocator, newClasspath);
+    for (org.eclipse.jdt.internal.compiler.env.ICompilationUnit cu : m_nameEnv.getOverrideCompilationUnits()) {
+      newEnv.registerCompilationUnitOverride(CharOperation.toString(cu.getPackageName()), new String(cu.getFileName()), cu.getContents());
+    }
+    return newEnv;
+  }
+
+  @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public synchronized JavaEnvironmentSpi reload() {
     JavaEnvironmentWithJdt oldEnv = this;
-    Collection<ClasspathSpi> oldClasspath = oldEnv.getClasspath();
-    Collection<ClasspathEntry> newClasspath = new ArrayList<>(oldClasspath.size());
-    for (ClasspathSpi cp : oldClasspath) {
-      ClasspathEntry entry = new ClasspathEntry(WorkspaceFileSystem.createClasspath(new File(cp.getPath()), cp.isSource(), cp.getEncoding()), cp.getEncoding());
-      newClasspath.add(entry);
-    }
-
-    JavaEnvironmentWithJdt newEnv = new JavaEnvironmentWithJdt(m_fileLocator, newClasspath.toArray(new ClasspathEntry[newClasspath.size()]));
-    for (org.eclipse.jdt.internal.compiler.env.ICompilationUnit cu : oldEnv.m_nameEnv.getOverrideCompilationUnits()) {
-      newEnv.m_nameEnv.addOverrideCompilationUnit(cu);
-    }
+    JavaEnvironmentWithJdt newEnv = emptyCopy();
 
     //reload spi of all objects that origin from this environment
     newEnv.m_api = oldEnv.m_api;
@@ -174,13 +192,35 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
   }
 
   @Override
-  public synchronized void registerCompilationUnitOverride(String packageName, String fileName, StringBuilder buf) {
+  public synchronized boolean registerCompilationUnitOverride(String packageName, String fileName, char[] src) {
     Validate.notNull(fileName);
-    Validate.notNull(buf);
+    Validate.notNull(src);
 
-    StringBasedJdtCompilationUnit cu = new StringBasedJdtCompilationUnit(packageName, fileName, buf);
-    m_nameEnv.addOverrideCompilationUnit(cu);
-    m_performanceCache.clear();
+    StringBasedJdtCompilationUnit cu = new StringBasedJdtCompilationUnit(packageName, fileName, src);
+    boolean reloadRequired = m_nameEnv.addOverrideCompilationUnit(cu);
+
+    String fqn = getFqn(packageName, cu);
+    m_performanceCache.remove(createTypeKey(fqn));// clear cache info for this element
+    if (!reloadRequired) {
+      // if not used in name-env: also check in compiler
+      reloadRequired = m_compiler.lookupEnvironment.getCachedType(CharOperation.splitOn('.', fqn.toCharArray())) != null;
+    }
+
+    // ensure the package of the new override CU exists. It may be in the lookupEnv cache as 'notExisting' from a call before where it really did not exist.
+    m_compiler.lookupEnvironment.createPackage(CharOperation.splitOn('.', packageName.toCharArray()));
+
+    return reloadRequired;
+  }
+
+  protected static String getFqn(String packageName, ICompilationUnit cu) {
+    StringBuilder fqnBuilder = new StringBuilder();
+    if (StringUtils.isNotBlank(packageName)) {
+      fqnBuilder.append(packageName);
+      fqnBuilder.append('.');
+    }
+    fqnBuilder.append(cu.getMainTypeName());
+
+    return fqnBuilder.toString();
   }
 
   public int nextHashCode() {
@@ -213,7 +253,7 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
 
   @Override
   public Collection<ClasspathSpi> getClasspath() {
-    Collection<ClasspathSpi> list = new ArrayList<>(m_classpaths.length);
+    Collection<ClasspathSpi> list = new ArrayList<>(m_classpaths.size());
     for (ClasspathEntry cp : m_classpaths) {
       list.add(new ClasspathWithJdt(cp));
     }

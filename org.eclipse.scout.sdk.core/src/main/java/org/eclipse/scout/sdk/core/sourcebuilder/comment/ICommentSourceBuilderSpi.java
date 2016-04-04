@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
  * methods, fields, ...
  *
  * @author Andreas Hoegger
- * @since 3.10.0 12.07.2013
+ * @since 3.10.0 2013-07-12
  */
 public interface ICommentSourceBuilderSpi {
 

@@ -106,7 +106,7 @@ class ProposalPopup extends Window {
 
   private Object m_selectedProposal;
 
-  private SearchPatternInput m_input;
+  private volatile SearchPatternInput m_input;
   private IProposalDescriptionProvider m_proposalDescriptionProvider;
   private IBaseLabelProvider m_labelProvider;
   private P_LazyContentProvider m_contentProvider;

@@ -55,8 +55,9 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
       out.flush();
     }
     catch (IOException e) {
-      System.out.println("Unable to write to console:");
-      System.out.println(s);
+      System.err.println("Unable to write to console:");
+      System.err.println(s);
+      e.printStackTrace();
     }
 
     // dev mode: also log to Eclipse log

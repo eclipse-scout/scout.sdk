@@ -22,7 +22,7 @@ import org.junit.Test;
  * <h3>{@link TableFieldWithIgnoredColumnsTest}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 19.08.2013
+ * @since 3.10.0 2013-08-19
  */
 public class TableFieldWithIgnoredColumnsTest {
 

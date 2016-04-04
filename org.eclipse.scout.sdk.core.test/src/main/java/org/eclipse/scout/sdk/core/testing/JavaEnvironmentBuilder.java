@@ -43,19 +43,17 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
  * @author Ivan Motsch
  * @since 5.2.0
  */
-public final class JavaEnvironmentBuilder {
+public class JavaEnvironmentBuilder {
   private final File m_curDir = new File("").getAbsoluteFile();
-  private IFileLocator m_fileLocator;
-  private boolean m_includeRunningClasspath = true;
-  private boolean m_includeSources = true;
   private final List<Pattern> m_sourceExcludes = new ArrayList<>();
   private final List<Pattern> m_binaryExcludes = new ArrayList<>();
   private final Map<CompositeObject, ClasspathEntry> m_srcPaths = new TreeMap<>();
   private final Map<CompositeObject, ClasspathEntry> m_binPaths = new TreeMap<>();
   private final Set<File> m_findSourceAttachmentFor = new LinkedHashSet<>();
 
-  public JavaEnvironmentBuilder() {
-  }
+  private IFileLocator m_fileLocator;
+  private boolean m_includeRunningClasspath = true;
+  private boolean m_includeSources = true;
 
   /**
    * Include current running classpath, default is true
@@ -317,10 +315,10 @@ public final class JavaEnvironmentBuilder {
       findSourceAttachments();
     }
 
-    Collection<ClasspathEntry> all = new ArrayList<>();
+    Collection<ClasspathEntry> all = new ArrayList<>(m_srcPaths.size() + m_binPaths.size());
     all.addAll(m_srcPaths.values());
     all.addAll(m_binPaths.values());
-    return new JavaEnvironmentWithJdt(createFileLocator(), all.toArray(new ClasspathEntry[all.size()])).wrap();
+    return new JavaEnvironmentWithJdt(createFileLocator(), all).wrap();
   }
 
 }

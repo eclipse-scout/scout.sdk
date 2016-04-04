@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.MultiStatus;
  * <h3>IStatusProvider</h3> Provides additional {@link IStatus} information
  *
  * @author Andreas Hoegger
- * @since 1.0.8 12.02.2010
+ * @since 1.0.8 2010-02-12
  */
 public interface IStatusProvider {
 

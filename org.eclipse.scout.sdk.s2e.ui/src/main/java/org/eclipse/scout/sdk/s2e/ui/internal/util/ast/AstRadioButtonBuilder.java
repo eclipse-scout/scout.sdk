@@ -44,9 +44,9 @@ public class AstRadioButtonBuilder extends AstTypeBuilder<AstRadioButtonBuilder>
   public static final Set<String> PROPOSAL_RADIO_DATA_TYPES = Collections.synchronizedSortedSet(new TreeSet<String>());
 
   static {
-    PROPOSAL_RADIO_DATA_TYPES.add(IJavaRuntimeTypes.java_lang_Long);
-    PROPOSAL_RADIO_DATA_TYPES.add(IJavaRuntimeTypes.java_lang_Boolean);
-    PROPOSAL_RADIO_DATA_TYPES.add(IJavaRuntimeTypes.java_math_BigDecimal);
+    PROPOSAL_RADIO_DATA_TYPES.add(IJavaRuntimeTypes.Long);
+    PROPOSAL_RADIO_DATA_TYPES.add(IJavaRuntimeTypes.Boolean);
+    PROPOSAL_RADIO_DATA_TYPES.add(IJavaRuntimeTypes.BigDecimal);
   }
 
   protected AstRadioButtonBuilder(AstNodeFactory owner) {
@@ -93,7 +93,7 @@ public class AstRadioButtonBuilder extends AstTypeBuilder<AstRadioButtonBuilder>
     org.eclipse.scout.sdk.core.model.api.IType scoutType = S2eUtils.jdtTypeToScoutType(typeBinding, getFactory().getJavaEnvironment());
     List<org.eclipse.scout.sdk.core.model.api.IType> valueSignatures = CoreUtils.getResolvedTypeParamValue(scoutType, IScoutRuntimeTypes.IValueField, IScoutRuntimeTypes.TYPE_PARAM_VALUEFIELD__VALUE);
     if (valueSignatures.isEmpty()) {
-      return IJavaRuntimeTypes.java_lang_Object;
+      return IJavaRuntimeTypes.Object;
     }
     return valueSignatures.get(0).name();
   }

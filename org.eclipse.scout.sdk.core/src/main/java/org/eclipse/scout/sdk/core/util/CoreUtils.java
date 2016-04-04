@@ -51,6 +51,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.translate.AggregateTranslator;
+import org.apache.commons.lang3.text.translate.EntityArrays;
+import org.apache.commons.lang3.text.translate.LookupTranslator;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
@@ -374,26 +377,52 @@ public final class CoreUtils {
     if (signature == null) {
       return null;
     }
-    if (signature.length() != 1) {
-      // not a primitive type
-      return "null";
+
+    // primitive types
+    if (signature.length() == 1) {
+      switch (signature.charAt(0)) {
+        case ISignatureConstants.C_BOOLEAN:
+          return Boolean.FALSE.toString();
+        case ISignatureConstants.C_BYTE:
+        case ISignatureConstants.C_CHAR:
+        case ISignatureConstants.C_INT:
+        case ISignatureConstants.C_SHORT:
+          return "0";
+        case ISignatureConstants.C_DOUBLE:
+          return "0.0";
+        case ISignatureConstants.C_LONG:
+          return "0L";
+        case ISignatureConstants.C_FLOAT:
+          return "0.0f";
+        default: // e.g. void
+          return null;
+      }
     }
-    switch (signature.charAt(0)) {
-      case ISignatureConstants.C_BOOLEAN:
-        return Boolean.FALSE.toString();
-      case ISignatureConstants.C_BYTE:
-      case ISignatureConstants.C_CHAR:
-      case ISignatureConstants.C_INT:
-      case ISignatureConstants.C_SHORT:
-        return "0";
-      case ISignatureConstants.C_DOUBLE:
-        return "0.0";
-      case ISignatureConstants.C_LONG:
-        return "0L";
-      case ISignatureConstants.C_FLOAT:
-        return "0.0f";
-      default: // e.g. void
+
+    // complex types
+    switch (signature) {
+      case ISignatureConstants.SIG_JAVA_LANG_BOOLEAN:
+        return "Boolean.FALSE";
+      case ISignatureConstants.SIG_JAVA_LANG_BYTE:
+        return "Byte.valueOf((byte)0)";
+      case ISignatureConstants.SIG_JAVA_LANG_CHARACTER:
+        return "Character.valueOf((char)0)";
+      case ISignatureConstants.SIG_JAVA_LANG_DOUBLE:
+        return "Double.valueOf(0.0)";
+      case ISignatureConstants.SIG_JAVA_LANG_FLOAT:
+        return "Float.valueOf(0.0f)";
+      case ISignatureConstants.SIG_JAVA_LANG_INTEGER:
+        return "Integer.valueOf(0)";
+      case ISignatureConstants.SIG_JAVA_LANG_LONG:
+        return "Long.valueOf(0L)";
+      case ISignatureConstants.SIG_JAVA_LANG_SHORT:
+        return "Short.valueOf((short)0)";
+      case ISignatureConstants.SIG_JAVA_LANG_STRING:
+        return "\"\"";
+      case ISignatureConstants.SIG_JAVA_LANG_VOID:
         return null;
+      default:
+        return "null";
     }
   }
 
@@ -590,7 +619,7 @@ public final class CoreUtils {
           }
         }
         else {
-          boolean isBool = IJavaRuntimeTypes.java_lang_Boolean.equals(returnType.name()) || IJavaRuntimeTypes._boolean.equals(returnType.name());
+          boolean isBool = IJavaRuntimeTypes.Boolean.equals(returnType.name()) || IJavaRuntimeTypes._boolean.equals(returnType.name());
           if ("is".equals(kind) && parameterTypes.size() == 0 && isBool) {
             PropertyBean desc = beans.get(name);
             if (desc == null) {
@@ -698,40 +727,32 @@ public final class CoreUtils {
   public static String boxPrimitive(String name) {
     switch (name) {
       case IJavaRuntimeTypes._boolean:
-        return IJavaRuntimeTypes.java_lang_Boolean;
+        return IJavaRuntimeTypes.Boolean;
       case IJavaRuntimeTypes._char:
-        return IJavaRuntimeTypes.java_lang_Character;
+        return IJavaRuntimeTypes.Character;
       case IJavaRuntimeTypes._byte:
-        return IJavaRuntimeTypes.java_lang_Byte;
+        return IJavaRuntimeTypes.Byte;
       case IJavaRuntimeTypes._short:
-        return IJavaRuntimeTypes.java_lang_Short;
+        return IJavaRuntimeTypes.Short;
       case IJavaRuntimeTypes._int:
-        return IJavaRuntimeTypes.java_lang_Integer;
+        return IJavaRuntimeTypes.Integer;
       case IJavaRuntimeTypes._long:
-        return IJavaRuntimeTypes.java_lang_Long;
+        return IJavaRuntimeTypes.Long;
       case IJavaRuntimeTypes._float:
-        return IJavaRuntimeTypes.java_lang_Float;
+        return IJavaRuntimeTypes.Float;
       case IJavaRuntimeTypes._double:
-        return IJavaRuntimeTypes.java_lang_Double;
+        return IJavaRuntimeTypes.Double;
       case IJavaRuntimeTypes._void:
-        return IJavaRuntimeTypes.java_lang_Void;
-      case IJavaRuntimeTypes.java_lang_Boolean:
-        return name;
-      case IJavaRuntimeTypes.java_lang_Character:
-        return name;
-      case IJavaRuntimeTypes.java_lang_Byte:
-        return name;
-      case IJavaRuntimeTypes.java_lang_Short:
-        return name;
-      case IJavaRuntimeTypes.java_lang_Integer:
-        return name;
-      case IJavaRuntimeTypes.java_lang_Long:
-        return name;
-      case IJavaRuntimeTypes.java_lang_Float:
-        return name;
-      case IJavaRuntimeTypes.java_lang_Double:
-        return name;
-      case IJavaRuntimeTypes.java_lang_Void:
+        return IJavaRuntimeTypes.Void;
+      case IJavaRuntimeTypes.Boolean:
+      case IJavaRuntimeTypes.Character:
+      case IJavaRuntimeTypes.Byte:
+      case IJavaRuntimeTypes.Short:
+      case IJavaRuntimeTypes.Integer:
+      case IJavaRuntimeTypes.Long:
+      case IJavaRuntimeTypes.Float:
+      case IJavaRuntimeTypes.Double:
+      case IJavaRuntimeTypes.Void:
         return name;
       default:
         return null;
@@ -748,40 +769,32 @@ public final class CoreUtils {
    */
   public static String unboxToPrimitive(String fqn) {
     switch (fqn) {
-      case IJavaRuntimeTypes.java_lang_Boolean:
+      case IJavaRuntimeTypes.Boolean:
         return IJavaRuntimeTypes._boolean;
-      case IJavaRuntimeTypes.java_lang_Character:
+      case IJavaRuntimeTypes.Character:
         return IJavaRuntimeTypes._char;
-      case IJavaRuntimeTypes.java_lang_Byte:
+      case IJavaRuntimeTypes.Byte:
         return IJavaRuntimeTypes._byte;
-      case IJavaRuntimeTypes.java_lang_Short:
+      case IJavaRuntimeTypes.Short:
         return IJavaRuntimeTypes._short;
-      case IJavaRuntimeTypes.java_lang_Integer:
+      case IJavaRuntimeTypes.Integer:
         return IJavaRuntimeTypes._int;
-      case IJavaRuntimeTypes.java_lang_Long:
+      case IJavaRuntimeTypes.Long:
         return IJavaRuntimeTypes._long;
-      case IJavaRuntimeTypes.java_lang_Float:
+      case IJavaRuntimeTypes.Float:
         return IJavaRuntimeTypes._float;
-      case IJavaRuntimeTypes.java_lang_Double:
+      case IJavaRuntimeTypes.Double:
         return IJavaRuntimeTypes._double;
-      case IJavaRuntimeTypes.java_lang_Void:
+      case IJavaRuntimeTypes.Void:
         return IJavaRuntimeTypes._void;
       case IJavaRuntimeTypes._boolean:
-        return fqn;
       case IJavaRuntimeTypes._char:
-        return fqn;
       case IJavaRuntimeTypes._byte:
-        return fqn;
       case IJavaRuntimeTypes._short:
-        return fqn;
       case IJavaRuntimeTypes._int:
-        return fqn;
       case IJavaRuntimeTypes._long:
-        return fqn;
       case IJavaRuntimeTypes._float:
-        return fqn;
       case IJavaRuntimeTypes._double:
-        return fqn;
       case IJavaRuntimeTypes._void:
         return fqn;
       default:
@@ -837,21 +850,21 @@ public final class CoreUtils {
   }
 
   /**
-   * Returns the given input HTML with all characters escaped.
+   * Returns the given input HTML with all necessary characters escaped.
    *
    * @param html
    *          The input HTML.
    * @return The escaped version.
    */
-  public static String escapeHtml(String html) {
-    if (StringUtils.isBlank(html)) {
-      return html;
-    }
-    return StringUtils.replaceEach(html, new String[]{
-        "&", "<", ">", "\"", "/", "'"
-    }, new String[]{
-        "&amp;", "&lt;", "&gt;", "&quot;", "&#47;", "&#39;"
-    });
+  public static String escapeHtml(CharSequence html) {
+    return new AggregateTranslator(
+        new LookupTranslator(
+            new String[][]{
+                {"/", "&#47;"}
+            }),
+        new LookupTranslator(EntityArrays.BASIC_ESCAPE()),
+        new LookupTranslator(EntityArrays.APOS_ESCAPE())//,
+    ).translate(html);
   }
 
   /**

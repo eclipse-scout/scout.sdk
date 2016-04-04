@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Listener;
  * <h3>{@link StyledTextEx}</h3> provides paste handling.
  *
  * @author Andreas Hoegger
- * @since 3.10.0 08.11.2013
+ * @since 3.10.0 2013-11-08
  */
 public class StyledTextEx extends StyledText {
 

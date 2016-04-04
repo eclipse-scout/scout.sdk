@@ -59,21 +59,21 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
     super(project, null);
     m_maxProposalCount = 100;
     m_mostlyUsedTypes = new ArrayList<>(Arrays.asList(
-        IJavaRuntimeTypes.java_lang_Boolean,
-        IJavaRuntimeTypes.java_lang_Byte,
-        IJavaRuntimeTypes.java_lang_Character,
-        IJavaRuntimeTypes.java_lang_CharSequence,
-        IJavaRuntimeTypes.java_lang_Integer,
-        IJavaRuntimeTypes.java_lang_Long,
-        IJavaRuntimeTypes.java_lang_Number,
-        IJavaRuntimeTypes.java_lang_String,
-        IJavaRuntimeTypes.java_math_BigDecimal,
-        IJavaRuntimeTypes.java_math_BigInteger,
-        IJavaRuntimeTypes.java_util_Collection,
-        IJavaRuntimeTypes.java_util_Date,
-        IJavaRuntimeTypes.java_util_List,
-        IJavaRuntimeTypes.java_util_Map,
-        IJavaRuntimeTypes.java_util_Set));
+        IJavaRuntimeTypes.Boolean,
+        IJavaRuntimeTypes.Byte,
+        IJavaRuntimeTypes.Character,
+        IJavaRuntimeTypes.CharSequence,
+        IJavaRuntimeTypes.Integer,
+        IJavaRuntimeTypes.Long,
+        IJavaRuntimeTypes.Number,
+        IJavaRuntimeTypes.String,
+        IJavaRuntimeTypes.BigDecimal,
+        IJavaRuntimeTypes.BigInteger,
+        IJavaRuntimeTypes.Collection,
+        IJavaRuntimeTypes.UtilDate,
+        IJavaRuntimeTypes.List,
+        IJavaRuntimeTypes.Map,
+        IJavaRuntimeTypes.Set));
     setTypeProposalFilter(new PublicPrimaryTypeFilter());
   }
 
@@ -106,7 +106,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
 
   @Override
   protected Collection<? extends Object> loadProposals(IProgressMonitor monitor) {
-    if (StringUtils.isNotBlank(getBaseClassFqn()) && !IJavaRuntimeTypes.java_lang_Object.equals(getBaseClassFqn())) {
+    if (StringUtils.isNotBlank(getBaseClassFqn()) && !IJavaRuntimeTypes.Object.equals(getBaseClassFqn())) {
       // we have a hierarchy base type: use super implementation to calculate all possible children
       return super.loadProposals(monitor);
     }

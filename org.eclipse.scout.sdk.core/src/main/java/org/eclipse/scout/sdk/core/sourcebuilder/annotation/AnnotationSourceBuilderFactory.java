@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
  * <h3>{@link AnnotationSourceBuilderFactory}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 07.03.2013
+ * @since 3.10.0 2013-03-07
  */
 public final class AnnotationSourceBuilderFactory {
 
@@ -28,22 +28,7 @@ public final class AnnotationSourceBuilderFactory {
   private static final String GENERATED_MSG = "This class is auto generated. No manual modifications recommended.";
 
   public static IAnnotationSourceBuilder createOverride() {
-    return new AnnotationSourceBuilder(IJavaRuntimeTypes.java_lang_Override);
-  }
-
-  public static IAnnotationSourceBuilder createDeprecated() {
-    return new AnnotationSourceBuilder(IJavaRuntimeTypes.java_lang_Deprecated);
-  }
-
-  /**
-   * @param text
-   *          without quotes
-   * @return
-   */
-  public static IAnnotationSourceBuilder createSupressWarnings(String text) {
-    AnnotationSourceBuilder a = new AnnotationSourceBuilder(IJavaRuntimeTypes.java_lang_SuppressWarnings);
-    a.putElement("value", CoreUtils.toStringLiteral(text));
-    return a;
+    return new AnnotationSourceBuilder(IJavaRuntimeTypes.Override);
   }
 
   /**
@@ -61,7 +46,7 @@ public final class AnnotationSourceBuilderFactory {
    *          the typeThatGeneratedTheCode does not exist anymore then all generated classes can be deleted as well.
    */
   public static IAnnotationSourceBuilder createGenerated(final String typeThatGeneratedTheCode, final String comments) {
-    AnnotationSourceBuilder a = new AnnotationSourceBuilder(IJavaRuntimeTypes.javax_annotation_Generated);
+    AnnotationSourceBuilder a = new AnnotationSourceBuilder(IJavaRuntimeTypes.Generated);
     a.putElement("value", CoreUtils.toStringLiteral(typeThatGeneratedTheCode));
     if (StringUtils.isNotBlank(comments)) {
       a.putElement("comments", CoreUtils.toStringLiteral(comments));

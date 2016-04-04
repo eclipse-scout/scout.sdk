@@ -47,7 +47,7 @@ public class AstLongFieldBuilder extends AstTypeBuilder<AstLongFieldBuilder> {
   protected void addGetConfigured(String name, String value, String group, TypeDeclaration newFormField) {
     AST ast = getFactory().getAst();
 
-    Type longType = getFactory().newTypeReference(IJavaRuntimeTypes.java_lang_Long);
+    Type longType = getFactory().newTypeReference(IJavaRuntimeTypes.Long);
     NumberLiteral literal = ast.newNumberLiteral(value);
     ReturnStatement returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(literal);

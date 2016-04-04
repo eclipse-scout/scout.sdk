@@ -49,13 +49,13 @@ public class AstBigDecimalFieldBuilder extends AstTypeBuilder<AstBigDecimalField
   protected void addGetConfigured(String name, String value, String group, TypeDeclaration newFormField) {
     AST ast = getFactory().getAst();
 
-    Type bigDecimalType = getFactory().newTypeReference(IJavaRuntimeTypes.java_math_BigDecimal);
+    Type bigDecimalType = getFactory().newTypeReference(IJavaRuntimeTypes.BigDecimal);
 
     StringLiteral constrArg = ast.newStringLiteral();
     constrArg.setLiteralValue(value);
 
     ClassInstanceCreation classInstanceCreation = ast.newClassInstanceCreation();
-    classInstanceCreation.setType(ast.newSimpleType(ast.newSimpleName(Signature.getSimpleName(IJavaRuntimeTypes.java_math_BigDecimal))));
+    classInstanceCreation.setType(ast.newSimpleType(ast.newSimpleName(Signature.getSimpleName(IJavaRuntimeTypes.BigDecimal))));
     classInstanceCreation.arguments().add(constrArg);
 
     ReturnStatement returnStatement = ast.newReturnStatement();

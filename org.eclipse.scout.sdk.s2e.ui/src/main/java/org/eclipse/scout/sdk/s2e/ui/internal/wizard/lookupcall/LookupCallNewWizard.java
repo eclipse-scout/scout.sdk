@@ -44,7 +44,7 @@ import org.eclipse.ui.PartInitException;
  */
 public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
 
-  public static Class<? extends LookupCallNewWizardPage> pageClass = LookupCallNewWizardPage.class;
+  public static volatile Class<? extends LookupCallNewWizardPage> pageClass = LookupCallNewWizardPage.class;
 
   private LookupCallNewWizardPage m_page1;
   private boolean m_executed = false;
@@ -70,11 +70,16 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
   }
 
   public void scheduleLookupCallCreation(final LookupCallNewOperation op) {
+    scheduleLookupCallCreation(op, null);
+  }
+
+  public void scheduleLookupCallCreation(final LookupCallNewOperation op, Set<IResource> blockingFolders) {
     if (isExecuted()) {
       return; // no double runs
     }
-
-    Set<IResource> blockingFolders = new HashSet<>(4);
+    if (blockingFolders == null) {
+      blockingFolders = new HashSet<>(3);
+    }
     op.setPackage(m_page1.getTargetPackage());
     op.setLookupCallName(m_page1.getIcuName());
     op.setSharedSourceFolder(m_page1.getSourceFolder());
@@ -87,6 +92,15 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
     }
     op.setServerSourceFolder(serverSourceFolder);
     op.setLookupServiceSuperType(m_page1.getServiceImplSuperType());
+
+    if (!S2eUtils.exists(op.getTestSourceFolder())) {
+      // calculate test source if not already set
+      IPackageFragmentRoot testSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getServerSourceFolder());
+      if (testSourceFolder != null) {
+        op.setTestSourceFolder(testSourceFolder);
+        blockingFolders.add(testSourceFolder.getResource());
+      }
+    }
 
     final Display d = getContainer().getShell().getDisplay();
 

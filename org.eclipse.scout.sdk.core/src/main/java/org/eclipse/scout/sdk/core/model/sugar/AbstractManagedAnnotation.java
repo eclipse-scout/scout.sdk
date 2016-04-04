@@ -55,10 +55,8 @@ public abstract class AbstractManagedAnnotation {
   @SuppressWarnings("unchecked")
   protected <T> T getValue(String name, Class<T> expectedType, Object optionalCustomDefaultValue) {
     IAnnotationElement av = m_ann.element(name);
-    if (av == null || av.isDefault()) {
-      if (optionalCustomDefaultValue != null && Array.getLength(optionalCustomDefaultValue) > 0) {
-        return (T) Array.get(optionalCustomDefaultValue, 0);
-      }
+    if ((av == null || av.isDefault()) && optionalCustomDefaultValue != null && Array.getLength(optionalCustomDefaultValue) > 0) {
+      return (T) Array.get(optionalCustomDefaultValue, 0);
     }
     if (av == null) {
       throw new SdkException("Annotation '" + m_ann.elementName() + "' has no attribute named '" + name + "'.");

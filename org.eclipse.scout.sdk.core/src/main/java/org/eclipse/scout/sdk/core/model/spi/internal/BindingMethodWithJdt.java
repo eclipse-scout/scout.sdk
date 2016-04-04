@@ -147,16 +147,12 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
       else {
         List<MethodParameterSpi> result = new ArrayList<>(arguments.length);
         for (int i = 0; i < arguments.length; i++) {
-          char[] name = null;
-          if (m_binding.parameterNames.length > i) {
-            name = m_binding.parameterNames[i];
-          }
-          else if (m_binding.sourceMethod() != null) {
-            name = m_binding.sourceMethod().arguments[i].name;
-          }
-          else {
-            // if no parameter name info is in the class file
-            name = ("arg" + i).toCharArray();
+          char[] name = getParamName(m_binding, i);
+          if (name == null) {
+            name = getParamName(m_binding.original(), i);
+            if (name == null) {
+              name = ("arg" + i).toCharArray();
+            }
           }
           result.add(m_env.createBindingMethodParameter(this, arguments[i], name, i));
         }
@@ -164,6 +160,20 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
       }
     }
     return m_arguments;
+  }
+
+  protected static char[] getParamName(MethodBinding b, int paramIndex) {
+    if (b.parameterNames.length > paramIndex) {
+      return b.parameterNames[paramIndex];
+    }
+
+    AbstractMethodDeclaration sourceMethod = b.sourceMethod();
+    if (sourceMethod != null && sourceMethod.arguments.length > paramIndex) {
+      return sourceMethod.arguments[paramIndex].name;
+    }
+
+    // if no parameter name info is in the class file
+    return null;
   }
 
   protected TypeVariableBinding[] getTypeVariables() {

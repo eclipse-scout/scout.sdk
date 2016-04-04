@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importcollector.WrappedImportCollector;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -41,8 +42,10 @@ public class CompilationUnitScopedImportCollector extends WrappedImportCollector
 
   @Override
   public String checkCurrentScope(SignatureDescriptor cand) {
+    String q = getQualifier();
+
     //same qualifier
-    if (Objects.equals(getQualifier(), cand.getQualifier())) {
+    if (Objects.equals(getQualifier(), cand.getQualifier()) || (StringUtils.isBlank(q) && StringUtils.isBlank(cand.getQualifier()))) {
       return cand.getSimpleName();
     }
 
@@ -52,8 +55,14 @@ public class CompilationUnitScopedImportCollector extends WrappedImportCollector
       Boolean existsInSamePackage = m_existsInSamePackageCache.get(cand.getSimpleName());
       if (existsInSamePackage == null) {
         // load to cache
-        String nameInOwnPackage = getQualifier() + '.' + cand.getSimpleName();
-        existsInSamePackage = env.findType(nameInOwnPackage) != null;
+        String name = null;
+        if (StringUtils.isEmpty(q)) {
+          name = cand.getSimpleName();
+        }
+        else {
+          name = new StringBuilder(getQualifier()).append('.').append(cand.getSimpleName()).toString();
+        }
+        existsInSamePackage = env.findType(name) != null;
         m_existsInSamePackageCache.put(cand.getSimpleName(), existsInSamePackage);
       }
       if (existsInSamePackage) {

@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -22,6 +23,7 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
@@ -35,7 +37,7 @@ import org.eclipse.ui.IMarkerResolution;
  * <h3>{@link ClassIdDuplicateResolution}</h3>
  *
  * @author Matthias Villiger
- * @since 4.0.0 21.05.2014
+ * @since 4.0.0 2014-05-21
  */
 public class ClassIdDuplicateResolution implements IMarkerResolution {
 
@@ -69,7 +71,13 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
               marker.delete();
             }
             catch (CoreException e) {
-              //nop
+              IResource resource = marker.getResource();
+              if (resource == null) {
+                SdkLog.debug("Unable to delete marker");
+              }
+              else {
+                SdkLog.debug("Unable to delete marker on '{}'.", resource.getFullPath().toOSString());
+              }
             }
             ClassIdValidationJob.executeAsync(0); // the modification of the annotation does not cause an annotation modify event to be triggered
           }

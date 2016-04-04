@@ -162,24 +162,22 @@ public class FileSelectionField extends TextField {
         dialog.setFilterExtensions(getFilterExtensions());
       }
       fileName = dialog.open();
-      if (StringUtils.isNotEmpty(fileName)) {
-        if (getFilterExtensions() != null && getFilterExtensions().length > 0) {
-          int extIndex = dialog.getFilterIndex();
-          Matcher m = Pattern.compile("\\.([^\\.]*)$").matcher(fileName);
-          String extension = null;
-          if (m.find()) {
-            for (String fExt : getFilterExtensions()) {
-              if (StringUtils.equalsIgnoreCase(fExt, "*." + m.group(1))) {
-                extension = m.group(1);
-                break;
-              }
+      if (StringUtils.isNotEmpty(fileName) && getFilterExtensions() != null && getFilterExtensions().length > 0) {
+        int extIndex = dialog.getFilterIndex();
+        Matcher m = Pattern.compile("\\.([^\\.]*)$").matcher(fileName);
+        String extension = null;
+        if (m.find()) {
+          for (String fExt : getFilterExtensions()) {
+            if (StringUtils.equalsIgnoreCase(fExt, "*." + m.group(1))) {
+              extension = m.group(1);
+              break;
             }
           }
-          if (extension == null && extIndex > -1 && extIndex < getFilterExtensions().length) {
-            extension = getFilterExtensions()[extIndex];
-            extension = extension.replaceFirst("\\**", "");
-            fileName = fileName + extension;
-          }
+        }
+        if (extension == null && extIndex > -1 && extIndex < getFilterExtensions().length) {
+          extension = getFilterExtensions()[extIndex];
+          extension = extension.replaceFirst("\\**", "");
+          fileName = fileName + extension;
         }
       }
     }

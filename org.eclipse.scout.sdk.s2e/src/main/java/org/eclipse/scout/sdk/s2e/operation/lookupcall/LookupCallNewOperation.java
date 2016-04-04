@@ -20,24 +20,32 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
+import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.lookupcall.LookupCallSourceBuilder;
+import org.eclipse.scout.sdk.core.s.sourcebuilder.testcase.TestSourceBuilder;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
+import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
+import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -57,6 +65,7 @@ public class LookupCallNewOperation implements IOperation {
   private String m_lookupCallName;
   private IPackageFragmentRoot m_sharedSourceFolder;
   private IPackageFragmentRoot m_serverSourceFolder;
+  private IPackageFragmentRoot m_testSourceFolder;
   private String m_package;
   private IType m_superType;
   private IType m_keyType;
@@ -66,9 +75,14 @@ public class LookupCallNewOperation implements IOperation {
   private IType m_createdLookupCall;
   private IType m_createdLookupServiceIfc;
   private IType m_createdLookupServiceImpl;
+  private IType m_createdLookupCallTest;
 
   public LookupCallNewOperation() {
-    m_javaEnvironmentProvider = new CachingJavaEnvironmentProvider();
+    this(new CachingJavaEnvironmentProvider());
+  }
+
+  protected LookupCallNewOperation(IJavaEnvironmentProvider provider) {
+    m_javaEnvironmentProvider = provider;
   }
 
   @Override
@@ -87,7 +101,7 @@ public class LookupCallNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 3);
+    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 4);
 
     String svcName = getLookupCallName();
     String suffix = "Call";
@@ -105,6 +119,78 @@ public class LookupCallNewOperation implements IOperation {
     progress.setWorkRemaining(1);
 
     setCreatedLookupCall(createLookupCall(progress.newChild(1), workingCopyManager));
+
+    setCreatedLookupCallTest(createLookupCallTest(progress.newChild(1), workingCopyManager));
+  }
+
+  protected IType createLookupCallTest(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    IPackageFragmentRoot testSourceFolder = getTestSourceFolder();
+    if (!S2eUtils.exists(testSourceFolder)) {
+      return null;
+    }
+
+    IJavaEnvironment env = getEnvProvider().get(testSourceFolder.getJavaProject());
+    ScoutTier targetTier = ScoutTier.valueOf(testSourceFolder);
+    String testPackage = ScoutTier.Shared.convert(targetTier, getPackage());
+    boolean isClient = ScoutTier.Client.equals(targetTier);
+
+    TestSourceBuilder lookupCallTestBuilder = new TestSourceBuilder(getLookupCallName() + ISdkProperties.SUFFIX_TEST, testPackage, env);
+    lookupCallTestBuilder.setClientTest(isClient);
+    if (isClient) {
+      lookupCallTestBuilder.setRunnerSignature(Signature.createTypeSignature(IScoutRuntimeTypes.ClientTestRunner));
+    }
+    else {
+      lookupCallTestBuilder.setRunnerSignature(Signature.createTypeSignature(IScoutRuntimeTypes.ServerTestRunner));
+      IType session = S2eUtils.getSession(testSourceFolder.getJavaProject(), ScoutTier.Server, monitor);
+      if (S2eUtils.exists(session)) {
+        lookupCallTestBuilder.setSessionSignature(Signature.createTypeSignature(session.getFullyQualifiedName()));
+      }
+    }
+    lookupCallTestBuilder.setup();
+
+    ITypeSourceBuilder mainType = lookupCallTestBuilder.getMainType();
+
+    // createLookupCall
+    IMethodSourceBuilder createLookupCall = new MethodSourceBuilder("createLookupCall");
+    createLookupCall.setFlags(Flags.AccProtected);
+    final String lookupCallSig = Signature.createTypeSignature(getCreatedLookupCall().getFullyQualifiedName());
+    createLookupCall.setReturnTypeSignature(lookupCallSig);
+    createLookupCall.setBody(new ISourceBuilder() {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append("return new ").append(validator.useSignature(lookupCallSig)).append("();");
+      }
+    });
+    mainType.addMethod(createLookupCall);
+    mainType.addMethod(createTestMethod(createLookupCall.getElementName(), "All"));
+    mainType.addMethod(createTestMethod(createLookupCall.getElementName(), "Key"));
+    mainType.addMethod(createTestMethod(createLookupCall.getElementName(), "Text"));
+
+    return S2eUtils.writeType(testSourceFolder, lookupCallTestBuilder, env, monitor, workingCopyManager);
+  }
+
+  protected IMethodSourceBuilder createTestMethod(final String lookupCallCreateMethodName, final String suffix) {
+    IMethodSourceBuilder testMethod = new MethodSourceBuilder("testLookupBy" + suffix);
+    testMethod.setFlags(Flags.AccPublic);
+    testMethod.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
+    testMethod.setBody(new ISourceBuilder() {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        String callVarName = "call";
+        source.append(validator.useName(getCreatedLookupCall().getFullyQualifiedName())).append(' ').append(callVarName).append(" = ")
+            .append(lookupCallCreateMethodName).append("();").append(lineDelimiter);
+        source.append(CoreUtils.getCommentBlock("fill call")).append(lineDelimiter);
+
+        String dataType = new StringBuilder(IJavaRuntimeTypes.List).append(ISignatureConstants.C_GENERIC_START)
+            .append("? extends ").append(IScoutRuntimeTypes.ILookupRow).append(ISignatureConstants.C_GENERIC_START).append(validator.useName(getKeyType().getFullyQualifiedName()))
+            .append(ISignatureConstants.C_GENERIC_END).append(ISignatureConstants.C_GENERIC_END).toString();
+
+        source.append(validator.useName(dataType)).append(" data = ").append(callVarName).append(".getDataBy").append(suffix).append("();").append(lineDelimiter);
+        source.append(CoreUtils.getCommentBlock("verify data"));
+      }
+    });
+    testMethod.addAnnotation(ScoutAnnotationSourceBuilderFactory.createTest());
+    return testMethod;
   }
 
   protected IType createLookupServiceIfc(String svcName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
@@ -130,8 +216,8 @@ public class LookupCallNewOperation implements IOperation {
   }
 
   protected IType createLookupServiceImpl(String svcName, String serverPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    String icuFileName = svcName + SuffixConstants.SUFFIX_STRING_java;
-    CompilationUnitSourceBuilder implBuilder = new CompilationUnitSourceBuilder(icuFileName, serverPackage);
+    CompilationUnitSourceBuilder implBuilder = new CompilationUnitSourceBuilder(svcName + SuffixConstants.SUFFIX_STRING_java, serverPackage);
+    implBuilder.setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(implBuilder));
 
     ITypeSourceBuilder lookupSvcImplBuilder = new TypeSourceBuilder(svcName);
     lookupSvcImplBuilder.setFlags(Flags.AccPublic);
@@ -145,7 +231,7 @@ public class LookupCallNewOperation implements IOperation {
     implBuilder.addType(lookupSvcImplBuilder);
 
     // add unimplemented methods
-    IJavaEnvironment env = ScoutSdkCore.createJavaEnvironment(getServerSourceFolder().getJavaProject());
+    IJavaEnvironment env = getEnvProvider().get(getServerSourceFolder().getJavaProject());
     List<IMethodSourceBuilder> unimplementedMethods = MethodSourceBuilderFactory.createUnimplementedMethods(lookupSvcImplBuilder.getSuperTypeSignature(), null, env);
     for (IMethodSourceBuilder methodSourceBuilder : unimplementedMethods) {
       lookupSvcImplBuilder.addMethod(methodSourceBuilder);
@@ -155,22 +241,26 @@ public class LookupCallNewOperation implements IOperation {
   }
 
   protected IType createLookupCall(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    LookupCallSourceBuilder lcsb = new LookupCallSourceBuilder(getLookupCallName(), getPackage());
+    IJavaEnvironment env = getEnvProvider().get(getSharedSourceFolder().getJavaProject());
+
+    LookupCallSourceBuilder lcsb = new LookupCallSourceBuilder(getLookupCallName(), getPackage(), env);
     lcsb.setSuperTypeSignature(Signature.createTypeSignature(getSuperType().getFullyQualifiedName()));
     if (S2eUtils.exists(getCreatedLookupServiceIfc())) {
       lcsb.setLookupServiceIfcSignature(Signature.createTypeSignature(getCreatedLookupServiceIfc().getFullyQualifiedName()));
     }
     lcsb.setKeyTypeSignature(Signature.createTypeSignature(getKeyType().getFullyQualifiedName()));
+    if (ClassIdGenerators.isAutomaticallyCreateClassIdAnnotation()) {
+      lcsb.setClassIdValue(ClassIdGenerators.generateNewId(new ClassIdGenerationContext(getPackage() + '.' + getLookupCallName())));
+    }
     lcsb.setup();
 
     // add unimplemented methods
-    IJavaEnvironment env = ScoutSdkCore.createJavaEnvironment(getSharedSourceFolder().getJavaProject());
     List<IMethodSourceBuilder> unimplementedMethods = MethodSourceBuilderFactory.createUnimplementedMethods(lcsb.getMainType().getSuperTypeSignature(), null, env);
     for (IMethodSourceBuilder methodSourceBuilder : unimplementedMethods) {
       lcsb.getMainType().addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(methodSourceBuilder), methodSourceBuilder);
     }
 
-    return S2eUtils.writeType(getSharedSourceFolder(), lcsb, getEnvProvider().get(getSharedSourceFolder().getJavaProject()), monitor, workingCopyManager);
+    return S2eUtils.writeType(getSharedSourceFolder(), lcsb, env, monitor, workingCopyManager);
   }
 
   public IType getCreatedLookupCall() {
@@ -255,5 +345,21 @@ public class LookupCallNewOperation implements IOperation {
 
   protected IJavaEnvironmentProvider getEnvProvider() {
     return m_javaEnvironmentProvider;
+  }
+
+  public IPackageFragmentRoot getTestSourceFolder() {
+    return m_testSourceFolder;
+  }
+
+  public void setTestSourceFolder(IPackageFragmentRoot testSourceFolder) {
+    m_testSourceFolder = testSourceFolder;
+  }
+
+  public IType getCreatedLookupCallTest() {
+    return m_createdLookupCallTest;
+  }
+
+  protected void setCreatedLookupCallTest(IType createdLookupCallTest) {
+    m_createdLookupCallTest = createdLookupCallTest;
   }
 }

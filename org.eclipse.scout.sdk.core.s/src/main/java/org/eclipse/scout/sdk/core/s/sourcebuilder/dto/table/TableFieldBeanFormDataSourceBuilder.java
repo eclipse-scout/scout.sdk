@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.s.util.DtoUtils;
  * <h3>{@link TableFieldBeanFormDataSourceBuilder}</h3>
  *
  * @author Andreas Hoegger
- * @since 3.10.0 27.08.2013
+ * @since 3.10.0 2013-08-27
  */
 public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSourceBuilder {
 

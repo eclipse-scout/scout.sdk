@@ -64,7 +64,7 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
     Block body = ast.newBlock();
     body.statements().add(returnStatement);
 
-    Type stringType = getFactory().newTypeReference(IJavaRuntimeTypes.java_lang_String);
+    Type stringType = getFactory().newTypeReference(IJavaRuntimeTypes.String);
     getFactory().newMethod("getConfiguredKeyStroke")
         .withModifiers(ModifierKeyword.PROTECTED_KEYWORD)
         .withOverride(true)

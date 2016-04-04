@@ -10,10 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.sourcebuilder.page;
 
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.sourcebuilder.service.ServiceInterfaceSourceBuilder;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.MethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.junit.Test;
@@ -31,16 +38,30 @@ public class PageSourceBuilderTest {
   @Test
   public void testPageWithTable() {
     IJavaEnvironment clientEnv = CoreScoutTestingUtils.createClientJavaEnvironment();
+    String pageDataSignature = Signature.createTypeSignature(BaseTablePageData.class.getName());
+
+    // page service
+    ServiceInterfaceSourceBuilder svcIfcBuilder = new ServiceInterfaceSourceBuilder("IMyPageService", "org.eclipse.scout.sdk.core.s.test", clientEnv);
+    svcIfcBuilder.setup();
+    final IMethodSourceBuilder methodBuilder = new MethodSourceBuilder(PageSourceBuilder.DATA_FETCH_METHOD_NAME);
+    methodBuilder.setFlags(Flags.AccPublic | Flags.AccInterface);
+    methodBuilder.setComment(CommentSourceBuilderFactory.createDefaultMethodComment(methodBuilder));
+    methodBuilder.setReturnTypeSignature(pageDataSignature);
+    methodBuilder.addParameter(new MethodParameterSourceBuilder("filter", Signature.createTypeSignature(IScoutRuntimeTypes.SearchFilter)));
+    svcIfcBuilder.getMainType().addMethod(methodBuilder);
+    String source = CoreUtils.createJavaCode(svcIfcBuilder, clientEnv, "\n", null);
+    IType createdSvcIfc = CoreTestingUtils.assertNoCompileErrors(clientEnv, svcIfcBuilder.getPackageName(), svcIfcBuilder.getMainType().getElementName(), source);
 
     // page
-    PageSourceBuilder pageBuilder = new PageSourceBuilder("MyPage", "org.eclispe.scout.sdk.core.s.test");
+    PageSourceBuilder pageBuilder = new PageSourceBuilder("MyPage", "org.eclipse.scout.sdk.core.s.test", clientEnv);
     pageBuilder.setClassIdValue("whatever");
-    pageBuilder.setPageDataSignature(Signature.createTypeSignature(BaseTablePageData.class.getName()));
+    pageBuilder.setPageDataSignature(pageDataSignature);
     pageBuilder.setPageWithTable(true);
     pageBuilder.setSuperTypeSignature(Signature.createTypeSignature(IScoutRuntimeTypes.AbstractPageWithTable));
+    pageBuilder.setPageServiceIfcSignature(Signature.createTypeSignature(createdSvcIfc.name()));
     pageBuilder.setup();
 
-    String source = CoreUtils.createJavaCode(pageBuilder, clientEnv, "\n", null);
+    source = CoreUtils.createJavaCode(pageBuilder, clientEnv, "\n", null);
     CoreTestingUtils.assertNoCompileErrors(clientEnv, pageBuilder.getPackageName(), pageBuilder.getMainType().getElementName(), source);
   }
 
@@ -49,7 +70,7 @@ public class PageSourceBuilderTest {
     IJavaEnvironment clientEnv = CoreScoutTestingUtils.createClientJavaEnvironment();
 
     // page
-    PageSourceBuilder pageBuilder = new PageSourceBuilder("MyPage", "org.eclispe.scout.sdk.core.s.test");
+    PageSourceBuilder pageBuilder = new PageSourceBuilder("MyPage", "org.eclipse.scout.sdk.core.s.test", clientEnv);
     pageBuilder.setClassIdValue("whatever");
     pageBuilder.setPageDataSignature(null);
     pageBuilder.setPageWithTable(false);

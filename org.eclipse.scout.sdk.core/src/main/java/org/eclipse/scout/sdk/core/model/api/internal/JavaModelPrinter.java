@@ -33,15 +33,15 @@ public final class JavaModelPrinter {
   private JavaModelPrinter() {
   }
 
-  protected static void printAnnotations(IAnnotatable anotatable, StringBuilder sb, boolean includeDetails) {
+  static void printAnnotations(IAnnotatable anotatable, StringBuilder sb, boolean includeDetails) {
     for (IAnnotation a : anotatable.annotations().list()) {
       printAnnotation(a, sb, includeDetails);
       sb.append(includeDetails ? '\n' : ' ');
     }
   }
 
-  protected static void printAnnotation(IAnnotation a, StringBuilder sb, boolean includeDetails) {
-    sb.append("@");
+  static void printAnnotation(IAnnotation a, StringBuilder sb, boolean includeDetails) {
+    sb.append('@');
     sb.append(a.type().elementName());
     Map<String, IAnnotationElement> values = a.elements();
     int n = 0;
@@ -51,23 +51,23 @@ public final class JavaModelPrinter {
       }
     }
     if (n > 0) {
-      sb.append("(");
+      sb.append('(');
       if (includeDetails) {
         for (Map.Entry<String, IAnnotationElement> e : values.entrySet()) {
           if (e.getValue().isDefault()) {
             continue;
           }
           sb.append(e.getKey());
-          sb.append("=");
+          sb.append('=');
           sb.append(e.getValue().value().toString());
-          sb.append(",");
+          sb.append(',');
         }
         sb.deleteCharAt(sb.length() - 1);
       }
       else {
         sb.append("...");
       }
-      sb.append(")");
+      sb.append(')');
     }
   }
 

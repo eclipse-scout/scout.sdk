@@ -25,15 +25,12 @@ class StringBasedJdtCompilationUnit implements ICompilationUnit {
   private final char[] m_src;
   private final char[] m_mainTypeName;
 
-  StringBasedJdtCompilationUnit(String packageName, String fileName, StringBuilder buf) {
+  StringBasedJdtCompilationUnit(String packageName, String fileName, char[] src) {
     int dot = fileName.indexOf('.');
     String mainTypeName = dot >= 0 ? fileName.substring(0, dot) : fileName;
-    char[] data = new char[buf.length()];
-    buf.getChars(0, buf.length(), data, 0);
-
     m_packageName = packageName != null ? CharOperation.splitOn('.', packageName.toCharArray()) : null;
     m_fileName = fileName.toCharArray();
-    m_src = data;
+    m_src = src;
     m_mainTypeName = mainTypeName.toCharArray();
   }
 

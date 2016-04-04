@@ -49,7 +49,7 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  *
  * @author Matthias Villiger
  * @author Andreas Hoegger
- * @since 3.10.0 15.08.2013
+ * @since 3.10.0 2013-08-15
  */
 public class DerivedResourceManager implements IDerivedResourceManager {
 
