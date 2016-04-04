@@ -44,7 +44,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
   @Override
   protected String computeSuperTypeSignature() {
-    return DtoUtils.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation(), this);
+    return DtoUtils.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation());
   }
 
   public FormDataAnnotationDescriptor getFormDataAnnotation() {

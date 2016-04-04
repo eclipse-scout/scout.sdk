@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IPropertyBean;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
@@ -99,6 +100,11 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
 
     // copy annotations over to the DTO
     copyAnnotations(getModelType(), this, getJavaEnvironment());
+
+    // add replace annotation to DTO if replace annotation is present on the model
+    if (getModelType().annotations().withName(IScoutRuntimeTypes.Replace).existsAny()) {
+      addAnnotation(ScoutAnnotationSourceBuilderFactory.createReplace());
+    }
   }
 
   /**
