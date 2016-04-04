@@ -885,6 +885,8 @@ public final class CoreUtils {
     features.put(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
     dbf.setXIncludeAware(false);
     dbf.setExpandEntityReferences(false);
+    dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 
     for (Entry<String, Boolean> a : features.entrySet()) {
       String feature = a.getKey();
