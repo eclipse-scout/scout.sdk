@@ -32,8 +32,58 @@
   <dependencies>
     <dependency>
       <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.core.resources</artifactId>
+      <version>${org.eclipse.core.resources-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.core.variables</artifactId>
+      <version>${org.eclipse.core.variables-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
       <version>${org.eclipse.core.runtime-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.core.filesystem</artifactId>
+      <version>${org.eclipse.core.filesystem-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.core.expressions</artifactId>
+      <version>${org.eclipse.core.expressions-range}</version>
+    </dependency>
+    <dependency><!-- org.eclipse.core.filesystem, org.eclipse.core.runtime -->
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.equinox.common</artifactId>
+      <version>${org.eclipse.equinox.common-range}</version>
+    </dependency>
+    <dependency><!-- org.eclipse.core.filesystem, org.eclipse.core.runtime -->
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.equinox.registry</artifactId>
+      <version>${org.eclipse.equinox.registry-range}</version>
+    </dependency>
+    <dependency><!-- org.eclipse.core.filesystem, org.eclipse.core.runtime -->
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.osgi</artifactId>
+      <version>${org.eclipse.osgi-range}</version>
+    </dependency>
+    <dependency><!-- org.eclipse.core.runtime -->
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.core.jobs</artifactId>
+      <version>${org.eclipse.core.jobs-range}</version>
+    </dependency>
+    <dependency><!-- org.eclipse.core.runtime -->
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.equinox.preferences</artifactId>
+      <version>${org.eclipse.equinox.preferences-range}</version>
+    </dependency>
+    <dependency><!-- org.eclipse.core.runtime -->
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.core.contenttype</artifactId>
+      <version>${org.eclipse.core.contenttype-range}</version>
     </dependency>
   </dependencies>
 </project>
