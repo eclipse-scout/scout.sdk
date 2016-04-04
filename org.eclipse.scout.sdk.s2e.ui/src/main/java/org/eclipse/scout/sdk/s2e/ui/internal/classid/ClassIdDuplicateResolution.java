@@ -73,10 +73,10 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
             catch (CoreException e) {
               IResource resource = marker.getResource();
               if (resource == null) {
-                SdkLog.debug("Unable to delete marker");
+                SdkLog.debug("Unable to delete marker", e);
               }
               else {
-                SdkLog.debug("Unable to delete marker on '{}'.", resource.getFullPath().toOSString());
+                SdkLog.debug("Unable to delete marker on '{}'.", resource.getFullPath().toOSString(), e);
               }
             }
             ClassIdValidationJob.executeAsync(0); // the modification of the annotation does not cause an annotation modify event to be triggered
