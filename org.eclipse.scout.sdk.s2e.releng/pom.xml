@@ -159,6 +159,14 @@
               <version>${org.eclipse.equinox.preferences}</version>
             </iu>
             <iu>
+              <id>org.eclipse.compare</id>
+              <version>${org.eclipse.compare}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.compare.source</id>
+              <version>${org.eclipse.compare}</version>
+            </iu>
+            <iu>
               <id>org.eclipse.core.resources</id>
               <version>${org.eclipse.core.resources}</version>
             </iu>
@@ -634,6 +642,18 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-deploy-plugin</artifactId>
             <executions>
+              <execution>
+                <id>deploy-compare</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.compare_${org.eclipse.compare}.jar</file>
+                  <sources>${downloaded}/org.eclipse.compare.source_${org.eclipse.compare}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.compare.pom</pomFile>
+                </configuration>
+              </execution>
               <execution>
                 <id>deploy-core-resources</id>
                 <goals>
@@ -1431,6 +1451,19 @@
                 </configuration>
               </execution>
               <execution>
+                <id>deploy-eclipse-compare</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.compare_${org.eclipse.compare}.jar</file>
+                  <sources>${downloaded}/org.eclipse.compare.source_${org.eclipse.compare}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.compare.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+              <execution>
                 <id>deploy-core-resources</id>
                 <goals>
                   <goal>sign-and-deploy-file</goal>
@@ -1695,44 +1728,16 @@
             </configuration>
             <executions>
               <execution>
-                <id>deploy-debug-core</id>
+                <id>deploy-compare</id>
                 <goals>
                   <goal>sign-and-deploy-file</goal>
                 </goals>
                 <phase>deploy</phase>
                 <inherited>true</inherited>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.debug.core_${org.eclipse.debug.core}.jar</file>
-                  <sources>${downloaded}/org.eclipse.debug.core.source_${org.eclipse.debug.core}.jar</sources>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.debug.core.pom</pomFile>
-                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
-                </configuration>
-              </execution>
-              <execution>
-                <id>deploy-debug-ui</id>
-                <goals>
-                  <goal>sign-and-deploy-file</goal>
-                </goals>
-                <phase>deploy</phase>
-                <inherited>true</inherited>
-                <configuration>
-                  <file>${downloaded}/org.eclipse.debug.ui_${org.eclipse.debug.ui}.jar</file>
-                  <sources>${downloaded}/org.eclipse.debug.ui.source_${org.eclipse.debug.ui}.jar</sources>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.debug.ui.pom</pomFile>
-                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
-                </configuration>
-              </execution>
-              <execution>
-                <id>deploy-jdt-junit</id>
-                <goals>
-                  <goal>sign-and-deploy-file</goal>
-                </goals>
-                <phase>deploy</phase>
-                <inherited>true</inherited>
-                <configuration>
-                  <file>${downloaded}/org.eclipse.jdt.junit_${org.eclipse.jdt.junit}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jdt.junit.source_${org.eclipse.jdt.junit}.jar</sources>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.junit.pom</pomFile>
+                  <file>${downloaded}/org.eclipse.compare_${org.eclipse.compare}.jar</file>
+                  <sources>${downloaded}/org.eclipse.compare.source_${org.eclipse.compare}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.compare.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>

@@ -65,11 +65,15 @@
       <artifactId>org.eclipse.ui</artifactId>
       <version>${org.eclipse.ui-range}</version>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.compare</artifactId>
+      <version>${org.eclipse.compare-range}</version>
+    </dependency>
 
-<!-- org.eclipse.core.filebuffers;bundle-version="[3.5.0,4.0.0)", -->
-<!-- org.eclipse.ui.navigator;bundle-version="[3.3.200,4.0.0)", -->
-<!-- org.eclipse.compare;bundle-version="[3.5.0,4.0.0)", -->
-<!-- org.eclipse.team.core;bundle-version="[3.4.100,4.0.0)", -->
-<!-- org.eclipse.team.ui;bundle-version="[3.4.100,4.0.0)" -->
+    <!-- org.eclipse.core.filebuffers;bundle-version="[3.5.0,4.0.0)", -->
+    <!-- org.eclipse.ui.navigator;bundle-version="[3.3.200,4.0.0)", -->
+    <!-- org.eclipse.team.core;bundle-version="[3.4.100,4.0.0)", -->
+    <!-- org.eclipse.team.ui;bundle-version="[3.4.100,4.0.0)" -->
   </dependencies>
 </project>

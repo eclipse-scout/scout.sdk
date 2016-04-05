@@ -86,6 +86,10 @@
     <org.eclipse.equinox.security-maven>${org.eclipse.equinox.security}</org.eclipse.equinox.security-maven>
     <org.eclipse.equinox.security-range>[1.2.100,1.2.101)</org.eclipse.equinox.security-range>
 
+    <org.eclipse.compare>3.5.600.v20150420-1449</org.eclipse.compare>
+    <org.eclipse.compare-maven>${org.eclipse.compare}</org.eclipse.compare-maven>
+    <org.eclipse.compare-range>[3.5.600,3.5.601)</org.eclipse.compare-range>
+
     <org.eclipse.core.resources>3.10.0.v20150423-0755</org.eclipse.core.resources>
     <org.eclipse.core.resources-maven>${org.eclipse.core.resources}</org.eclipse.core.resources-maven>
     <org.eclipse.core.resources-range>[3.10.0,3.10.1)</org.eclipse.core.resources-range>
@@ -360,6 +364,12 @@
         <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.equinox.security</artifactId>
         <version>${org.eclipse.equinox.security-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
+        <artifactId>org.eclipse.compare</artifactId>
+        <version>${org.eclipse.compare-maven}</version>
       </dependency>
 
       <dependency>
