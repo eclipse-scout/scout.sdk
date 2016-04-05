@@ -16,6 +16,7 @@ import java.util.AbstractList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
@@ -317,6 +318,11 @@ public class CoreUtilsTest {
 
   @Test
   public void testCreateDocumentBuilder() throws ParserConfigurationException {
-    CoreUtils.createDocumentBuilder();
+    Assert.assertNotNull(CoreUtils.createDocumentBuilder());
+  }
+
+  @Test
+  public void testCreateTransformer() throws TransformerConfigurationException {
+    Assert.assertNotNull(CoreUtils.createTransformer());
   }
 }

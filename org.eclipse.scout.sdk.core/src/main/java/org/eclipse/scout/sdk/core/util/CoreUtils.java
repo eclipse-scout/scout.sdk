@@ -49,6 +49,9 @@ import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.translate.AggregateTranslator;
@@ -885,8 +888,18 @@ public final class CoreUtils {
     features.put(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
     dbf.setXIncludeAware(false);
     dbf.setExpandEntityReferences(false);
-    dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-    dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    try {
+      dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    }
+    catch (IllegalArgumentException e) {
+      SdkLog.debug("Attribute '{}' is not supported in the current DocumentBuilderFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, dbf.getClass().getName(), e);
+    }
+    try {
+      dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    }
+    catch (IllegalArgumentException e) {
+      SdkLog.debug("Attribute '{}' is not supported in the current DocumentBuilderFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, dbf.getClass().getName(), e);
+    }
 
     for (Entry<String, Boolean> a : features.entrySet()) {
       String feature = a.getKey();
@@ -899,5 +912,39 @@ public final class CoreUtils {
       }
     }
     return dbf.newDocumentBuilder();
+  }
+
+  /**
+   * Creates a new {@link Transformer}.<br>
+   * Use {@link Transformer#transform(javax.xml.transform.Source, javax.xml.transform.Result)} to transform an XML
+   * document.
+   * 
+   * @return The created {@link Transformer}. All external entities are disabled to prevent XXE.
+   * @throws TransformerConfigurationException
+   *           When it is not possible to create a Transformer instance.
+   */
+  public static Transformer createTransformer() throws TransformerConfigurationException {
+    TransformerFactory tf = TransformerFactory.newInstance();
+
+    try {
+      tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    }
+    catch (TransformerConfigurationException e) {
+      SdkLog.debug("Feature '{}' is not supported in the current TransformerFactory: {}", XMLConstants.FEATURE_SECURE_PROCESSING, tf.getClass().getName(), e);
+    }
+    try {
+      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    }
+    catch (IllegalArgumentException e) {
+      SdkLog.debug("Attribute '{}' is not supported in the current TransformerFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, tf.getClass().getName(), e);
+    }
+    try {
+      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    }
+    catch (IllegalArgumentException e) {
+      SdkLog.debug("Attribute '{}' is not supported in the current TransformerFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, tf.getClass().getName(), e);
+    }
+
+    return tf.newTransformer();
   }
 }

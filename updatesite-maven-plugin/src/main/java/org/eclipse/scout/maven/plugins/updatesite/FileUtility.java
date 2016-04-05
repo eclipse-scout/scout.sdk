@@ -152,8 +152,21 @@ public class FileUtility {
   public static void writeDOM(Document doc, File file) throws MojoExecutionException {
     try {
       TransformerFactory tf = TransformerFactory.newInstance();
-      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+      try {
+        tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      }
+      catch (TransformerConfigurationException e) {
+      }
+      try {
+        tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+      }
+      catch (IllegalArgumentException e) {
+      }
+      try {
+        tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+      }
+      catch (IllegalArgumentException e) {
+      }
       Transformer transformer = tf.newTransformer();
 
       transformer.transform(new DOMSource(doc), new StreamResult(file));
