@@ -16,12 +16,12 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>org.eclipse.scout.parent</artifactId>
-    <version>5.0.200-SNAPSHOT</version>
+    <version>5.0.300-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.parent</relativePath>
   </parent>
 
   <artifactId>org.eclipse.scout.sdk</artifactId>
-  <version>5.0.200-SNAPSHOT</version>
+  <version>5.0.300-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <scm>

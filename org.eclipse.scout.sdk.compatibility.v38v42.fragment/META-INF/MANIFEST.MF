@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK Compatibility Fragment for Eclipse Juno
 Bundle-SymbolicName: org.eclipse.scout.sdk.compatibility.v38v42.fragment;singleton:=true
-Bundle-Version: 5.0.200.qualifier
+Bundle-Version: 5.0.300.qualifier
 Bundle-Vendor: Eclipse Scout Project
-Fragment-Host: org.eclipse.scout.sdk.compatibility;bundle-version="[5.0.200,5.1.0)"
+Fragment-Host: org.eclipse.scout.sdk.compatibility;bundle-version="[5.0.300,5.1.0)"
 Require-Bundle: org.eclipse.jdt.core,
  org.eclipse.jdt.ui,
  org.eclipse.jface.text,
