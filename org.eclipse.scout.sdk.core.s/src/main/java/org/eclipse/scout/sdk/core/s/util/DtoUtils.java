@@ -33,7 +33,6 @@ import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.dto.CompositeFormDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.dto.table.TableBeanDataSourceBuilder;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.dto.table.TableFieldBeanFormDataSourceBuilder;
@@ -172,23 +171,20 @@ public final class DtoUtils {
     return getFormFieldDataPrimaryTypeRec(declaringType);
   }
 
-  public static String computeSuperTypeSignatureForFormData(IType modelType, FormDataAnnotationDescriptor formDataAnnotation, ITypeSourceBuilder sourceBuilder) {
-    String superTypeSignature = null;
+  public static String computeSuperTypeSignatureForFormData(IType modelType, FormDataAnnotationDescriptor formDataAnnotation) {
+    // handle replace
     if (modelType.annotations().withName(IScoutRuntimeTypes.Replace).existsAny()) {
       IType replacedType = modelType.superClass();
       IType replacedFormFieldDataType = DtoUtils.getFormDataType(replacedType);
       if (replacedFormFieldDataType != null) {
-        superTypeSignature = SignatureUtils.getTypeSignature(replacedFormFieldDataType);
+        return replacedFormFieldDataType.signature();
       }
-      sourceBuilder.addAnnotation(ScoutAnnotationSourceBuilderFactory.createReplace());
     }
-    if (superTypeSignature == null) {
-      superTypeSignature = DtoUtils.computeSuperTypeSignatureForFormData(modelType, formDataAnnotation);
-    }
-    return superTypeSignature;
+
+    return DtoUtils.computeSuperTypeSignatureForFormDataIgnoringReplace(modelType, formDataAnnotation);
   }
 
-  private static String computeSuperTypeSignatureForFormData(IType formField, FormDataAnnotationDescriptor formDataAnnotation) {
+  private static String computeSuperTypeSignatureForFormDataIgnoringReplace(IType formField, FormDataAnnotationDescriptor formDataAnnotation) {
     IType superType = formDataAnnotation.getSuperType();
     if (formDataAnnotation.getGenericOrdinal() >= 0) {
       IType genericOrdinalDefinitionType = formDataAnnotation.getGenericOrdinalDefinitionType();

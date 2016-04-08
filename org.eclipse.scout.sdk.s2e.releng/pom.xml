@@ -33,7 +33,8 @@
     - In org.eclipse.scout.sdk.s2e.releng/, execute
     mvn clean deploy -DforgeSnapshotUrl=https://scout.bsiag.com/repository/org.eclipse.scout-snapshot-local -DforgeSnapshotId=bsi-tools-snapshot
     3b. For deploying releases (to be used by Tycho releases):
-    - Prerequisite: you need to have GPG properly set up, see https://docs.sonatype.org/display/Repository/How+To+Generate+PGP+Signatures+With+Maven
+    - Prerequisite: 1. you need to have GPG properly set up, see http://central.sonatype.org/pages/working-with-pgp-signatures.html
+                    2. if not already present: you need to add the server with id of property DforgeReleaseId into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
     - Make sure that ${org.eclipse.jdt.core-maven}, ${org.eclipse.equinox.common-maven}, ${org.eclipse.osgi-maven},... in the parent POM don't have a '-SNAPSHOT' suffix
     - In org.eclipse.scout.sdk.s2e.releng/, execute
     mvn clean deploy -Pdeploy-releases -DforgeReleaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DforgeReleaseId=forge-releases -Dgpg.passphrase=<your_passphrase>
@@ -72,6 +73,23 @@
       </plugins>
     </pluginManagement>
 
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>*.pom</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>*.pom</exclude>
+        </excludes>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -84,24 +102,6 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <resources>
-            <resource>
-              <directory>src/main/resources</directory>
-              <filtering>true</filtering>
-              <includes>
-                <include>*.pom</include>
-              </includes>
-            </resource>
-            <resource>
-              <directory>src/main/resources</directory>
-              <filtering>false</filtering>
-              <includes>
-                <include>*.jar</include>
-              </includes>
-            </resource>
-          </resources>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.eclipse.tycho.extras</groupId>
@@ -157,6 +157,14 @@
             <iu>
               <id>org.eclipse.equinox.preferences.source</id>
               <version>${org.eclipse.equinox.preferences}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.compare</id>
+              <version>${org.eclipse.compare}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.compare.source</id>
+              <version>${org.eclipse.compare}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.resources</id>
@@ -634,6 +642,18 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-deploy-plugin</artifactId>
             <executions>
+              <execution>
+                <id>deploy-compare</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.compare_${org.eclipse.compare}.jar</file>
+                  <sources>${downloaded}/org.eclipse.compare.source_${org.eclipse.compare}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.compare.pom</pomFile>
+                </configuration>
+              </execution>
               <execution>
                 <id>deploy-core-resources</id>
                 <goals>
@@ -1431,6 +1451,19 @@
                 </configuration>
               </execution>
               <execution>
+                <id>deploy-eclipse-compare</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.compare_${org.eclipse.compare}.jar</file>
+                  <sources>${downloaded}/org.eclipse.compare.source_${org.eclipse.compare}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.compare.pom</pomFile>
+                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                </configuration>
+              </execution>
+              <execution>
                 <id>deploy-core-resources</id>
                 <goals>
                   <goal>sign-and-deploy-file</goal>
@@ -1695,15 +1728,16 @@
             </configuration>
             <executions>
               <execution>
-                <id>deploy-core-variables</id>
+                <id>deploy-compare</id>
                 <goals>
                   <goal>sign-and-deploy-file</goal>
                 </goals>
                 <phase>deploy</phase>
+                <inherited>true</inherited>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.variables_${org.eclipse.core.variables}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.variables.source_${org.eclipse.core.variables}.jar</sources>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.variables.pom</pomFile>
+                  <file>${downloaded}/org.eclipse.compare_${org.eclipse.compare}.jar</file>
+                  <sources>${downloaded}/org.eclipse.compare.source_${org.eclipse.compare}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.compare.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
                 </configuration>
               </execution>
