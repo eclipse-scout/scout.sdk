@@ -116,6 +116,7 @@
                 <classifier>org.eclipse.mars-dependencies</classifier>
               </artifact>
             </target>
+            <includePackedArtifacts>true</includePackedArtifacts>
           </configuration>
         </plugin>
         <plugin>
