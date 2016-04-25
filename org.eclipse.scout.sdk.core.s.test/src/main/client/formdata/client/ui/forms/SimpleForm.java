@@ -44,6 +44,9 @@ import formdata.shared.services.process.SimpleFormData;
 @FormData(value = SimpleFormData.class, sdkCommand = SdkCommand.CREATE, interfaces = {IFormDataInterface01.class, IFormDataInterface02.class, IFormDataInterface03.class})
 public class SimpleForm extends AbstractForm {
 
+  /**
+   *
+   */
   private Long simpleNr;
 
   public SimpleForm() throws ProcessingException {

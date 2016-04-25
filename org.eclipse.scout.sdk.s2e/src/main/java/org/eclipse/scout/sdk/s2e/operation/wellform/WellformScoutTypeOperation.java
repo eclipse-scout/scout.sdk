@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.ISourceRange;
@@ -88,26 +87,32 @@ public class WellformScoutTypeOperation implements IOperation {
   }
 
   protected void wellformType(IType type, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ICompilationUnit icu = type.getCompilationUnit();
-    workingCopyManager.register(icu, null);
-    IBuffer icuBuffer = icu.getBuffer();
-
-    Document sourceDoc = new Document(icuBuffer.getContents());
-    String lineSeparator = icu.findRecommendedLineSeparator();
-
     ISourceRange typeRange = type.getSourceRange();
-    StringBuilder sourceBuilder = new StringBuilder();
+    if (!SourceRange.isAvailable(typeRange)) {
+      return;
+    }
 
+    ICompilationUnit icu = type.getCompilationUnit();
+    String lineSeparator = icu.findRecommendedLineSeparator();
     Wellformer w = new Wellformer(lineSeparator, isRecursive());
+
+    StringBuilder sourceBuilder = new StringBuilder(typeRange.getLength() * 2);
     boolean success = w.buildSource(m_envProvider.jdtTypeToScoutType(type), sourceBuilder);
     if (success) {
-      ReplaceEdit edit = new ReplaceEdit(typeRange.getOffset(), typeRange.getLength(), sourceBuilder.toString());
-      // format
       try {
+        workingCopyManager.register(icu, null);
+
+        // apply changes
+        ReplaceEdit edit = new ReplaceEdit(typeRange.getOffset(), typeRange.getLength(), sourceBuilder.toString());
+        IBuffer icuBuffer = icu.getBuffer();
+        Document sourceDoc = new Document(icuBuffer.getContents());
         edit.apply(sourceDoc);
-        SourceRange range = new SourceRange(0, sourceDoc.getLength());
-        SourceFormatOperation op = new SourceFormatOperation(type.getJavaProject(), sourceDoc, range);
-        op.run(new NullProgressMonitor(), workingCopyManager);
+
+        // format
+        SourceFormatOperation op = new SourceFormatOperation(type.getJavaProject(), sourceDoc);
+        op.run(null, workingCopyManager);
+
+        // write new content to file
         icuBuffer.setContents(sourceDoc.get());
       }
       catch (Exception e) {

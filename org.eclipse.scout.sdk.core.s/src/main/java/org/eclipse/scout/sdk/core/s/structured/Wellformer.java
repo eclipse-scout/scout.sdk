@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
+import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -28,6 +29,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
  */
 public class Wellformer {
 
+  protected static final Pattern EMPTY_COMMENT_REGEX = Pattern.compile("/\\*\\*[/\\*\\s]+", Pattern.DOTALL | Pattern.MULTILINE);
   private static final Pattern LEADING_SPACES_REGEX = Pattern.compile("\\s*$");
   private static final Pattern TRAILING_SPACES_REGEX = Pattern.compile("^\\s*");
 
@@ -41,13 +43,29 @@ public class Wellformer {
 
   protected void appendFields(List<IField> fields, StringBuilder builder) {
     for (IField f : fields) {
-      builder.append(m_lineDelimiter).append(f.source());
+      builder.append(m_lineDelimiter);
+      appendMemberSource(f, builder);
     }
+  }
+
+  protected void appendMemberSource(IMember m, StringBuilder builder) {
+    ISourceRange javaDoc = m.javaDoc();
+    ISourceRange source = m.source();
+
+    if (javaDoc.isAvailable() && EMPTY_COMMENT_REGEX.matcher(javaDoc.toString()).matches()) {
+      // workaround for a bug in the javadoc formatter. See bug 491387 for details.
+      int javaDocEndRel = javaDoc.end() - source.start() + 1 + m_lineDelimiter.length();
+      builder.append("/**").append(m_lineDelimiter).append(" *").append(m_lineDelimiter).append(" */"); // default empty comment
+      builder.append(source.toString().substring(javaDocEndRel));
+      return;
+    }
+    builder.append(source);
   }
 
   protected void appendMethods(List<IMethod> methods, StringBuilder builder) {
     for (IMethod m : methods) {
-      builder.append(m_lineDelimiter).append(m.source());
+      builder.append(m_lineDelimiter);
+      appendMemberSource(m, builder);
     }
   }
 
@@ -58,7 +76,8 @@ public class Wellformer {
         buildSource(t, builder);
       }
       else {
-        builder.append(m_lineDelimiter).append(t.source());
+        builder.append(m_lineDelimiter);
+        appendMemberSource(t, builder);
       }
     }
   }
