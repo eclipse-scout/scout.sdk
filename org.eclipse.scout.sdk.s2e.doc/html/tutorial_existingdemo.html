@@ -14,14 +14,14 @@
  <body class="article">
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial.html" shape="rect" title="Getting Started"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_helloworld.html" shape="rect" title="Hello World Tutorial"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
     <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_helloworld.html" shape="rect" title="Hello World Tutorial"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Next" border="0" src="images/next.gif" /></a></td>
    </tr>
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%">Getting Started</td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Hello World Tutorial</td>
     <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%">Hello World Tutorial</td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
    </tr>
   </table> 
   <div id="header"> 
@@ -41,10 +41,10 @@
     <div class="sect3"> 
      <h4 id="install-the-scout-demo-application"><a class="anchor" href="#install-the-scout-demo-application"></a>Install the Scout Demo Application</h4> 
      <div class="paragraph"> 
-      <p>In the first part of the tutorial we import the demo applications using the <a href="https://wiki.eclipse.org/Eclipse_Installer">Oomph Eclipse installer</a> tool.</p> 
+      <p>In the first part of the tutorial we import the demo applications using the <a href="https://wiki.eclipse.org/Eclipse_Installer" target="_blank">Oomph Eclipse installer</a> tool.</p> 
      </div> 
      <div class="paragraph"> 
-      <p>In the Eclipse IDE open the <em class="wizard">Import</em> wizard with menu <span class="menu">File &#x2192; Import&#x2026;&#x200b;</span>. This opens the dialog shown in <a href="#img-oomph_existing_project">Figure 1</a>. Next, under folder <em class="folder">Oomph</em> select the node <em class="folder">Projects into Workspace</em> and click the <b class="button">Next</b> button.</p> 
+      <p>In the Eclipse IDE open the <em class="wizard">Import</em> wizard with menu <span class="menuseq"><span class="menu">File</span>&nbsp;&#x25b8; <span class="menuitem">Import&#x2026;&#x200b;</span></span>. This opens the dialog shown in <a href="#img-oomph_existing_project">Figure 1</a>. Next, under folder <em class="folder">Oomph</em> select the node <em class="folder">Projects into Workspace</em> and click the <b class="button">Next</b> button.</p> 
      </div> 
      <div id="img-oomph_existing_project" class="imageblock"> 
       <div class="content"> 
@@ -142,48 +142,95 @@
      <div class="paragraph"> 
       <p>After the restart Oomph will continue to download and install the Scout demo application showing the progress in the Eclipse importer dialog. Once the download and installation has completed you may close the dialog with clicking the <b class="button">Finish</b> button.</p> 
      </div> 
+     <div class="sect4"> 
+      <h5 id="setup-result"><a class="anchor" href="#setup-result"></a>Setup result</h5> 
+      <div class="paragraph"> 
+       <p>After the Setup of the &quot;Scout Demo App&quot;, a lot of projects are materialized in the workspace (see the screenshot in <a href="#img-oomph_workingsets">Figure 6</a>). The projects are organized in three working sets:</p> 
+      </div> 
+      <div class="dlist"> 
+       <dl> 
+        <dt class="hdlist1">
+         Demo App: Contacts
+        </dt> 
+        <dd> 
+         <p>The projects corresponding to the Scout Demo Application &quot;Contacts&quot;.</p> 
+        </dd> 
+        <dt class="hdlist1">
+         Demo App: Widgets
+        </dt> 
+        <dd> 
+         <p>The projects corresponding to the Scout Demo Application &quot;Widgets&quot;.</p> 
+        </dd> 
+        <dt class="hdlist1">
+         Demo Docs
+        </dt> 
+        <dd> 
+         <p>The scout documentation and the project containing most of the code snippets included in the documentation.</p> 
+        </dd> 
+       </dl> 
+      </div> 
+      <div id="img-oomph_workingsets" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/oomph_workingsets.png" alt="oomph workingsets" /> 
+       </div> 
+       <div class="title">
+        Figure 6. Projects in the workspace after the &quot;Scout Demo App&quot; setup.
+       </div> 
+      </div> 
+      <div class="paragraph"> 
+       <p>If you do not see the workingsets, you might need to select &quot;<span class="menuseq"><span class="menu">Top Level Elements</span>&nbsp;&#x25b8; <span class="menuitem">Working Sets</span></span>&quot; from the Menu as displayed in <a href="#img-workingsets_top_level">Figure 7</a></p> 
+      </div> 
+      <div id="img-workingsets_top_level" class="imageblock"> 
+       <div class="content"> 
+        <img src="images/workingsets_top_level.png" alt="workingsets top level" /> 
+       </div> 
+       <div class="title">
+        Figure 7. Select &quot;Working Sets&quot; as &quot;Top Level Elements&quot; in the &quot;Package Explorer&quot;.
+       </div> 
+      </div> 
+     </div> 
     </div> 
     <div class="sect3"> 
-     <h4 id="run-the-demo-application"><a class="anchor" href="#run-the-demo-application"></a>Run the Demo Application</h4> 
+     <h4 id="run-the-contacts-demo-application"><a class="anchor" href="#run-the-contacts-demo-application"></a>Run the Contacts Demo Application</h4> 
      <div class="paragraph"> 
       <p>With the Scout demo installed in our workspace we are now ready to start the application from within our IDE.</p> 
      </div> 
      <div class="sect4"> 
       <h5 id="start-the-application-in-the-ide"><a class="anchor" href="#start-the-application-in-the-ide"></a>Start the application in the IDE</h5> 
       <div class="paragraph"> 
-       <p>In the <em class="wizard">Package Explorer</em> view of the IDE open the Maven module <code>org.eclipse.scout.contacts.all.app.dev</code>. To run the Contacts application use the <em class="menu">Run As</em> context menu on file <code>contacts-all-dev.launch</code> as shown in <a href="#img-oomph_run_contacts_all">Figure 6</a>.</p> 
+       <p>In the <em class="wizard">Package Explorer</em> view of the IDE open the Maven module <code>org.eclipse.scout.contacts.all.app.dev</code>. To run the Contacts application use the <em class="menu">Run As</em> context menu on file <code>contacts-all-dev.launch</code> as shown in <a href="#img-oomph_run_contacts_all">Figure 8</a>.</p> 
       </div> 
       <div id="img-oomph_run_contacts_all" class="imageblock"> 
        <div class="content"> 
         <img src="images/run_contracts_all_dev.png" alt="run contracts all dev" /> 
        </div> 
        <div class="title">
-        Figure 6. Start the Contacts application.
+        Figure 8. Start the Contacts application.
        </div> 
       </div> 
       <div class="paragraph"> 
-       <p>Once the startup sequence of the Contacts application has completed the console view in your Eclipse IDE should look like <a href="#img-oomph_contacts_console">Figure 7</a>.</p> 
+       <p>Once the startup sequence of the Contacts application has completed the console view in your Eclipse IDE should look like <a href="#img-oomph_contacts_console">Figure 9</a>.</p> 
       </div> 
       <div id="img-oomph_contacts_console" class="imageblock"> 
        <div class="content"> 
         <img src="images/oomph_contacts_console.png" alt="oomph contacts console" /> 
        </div> 
        <div class="title">
-        Figure 7. Console view after starting the Contacts demo.
+        Figure 9. Console view after starting the Contacts demo.
        </div> 
       </div> 
      </div> 
      <div class="sect4"> 
       <h5 id="use-the-contacts-demo-in-a-browser"><a class="anchor" href="#use-the-contacts-demo-in-a-browser"></a>Use the Contacts Demo in a Browser</h5> 
       <div class="paragraph"> 
-       <p>With the Contacts demo running in the IDE open the application in your favorite browser via URL <a href="http://localhost:8082/" class="bare">http://localhost:8082/</a>. To get the screen shown in <a href="#img-contacts_persons_alice">Figure 8</a> first click on the <em class="folder">Persons</em> node and then double click on the ''Alice'' row.</p> 
+       <p>With the Contacts demo running in the IDE open the application in your favorite browser via URL <a href="http://localhost:8082/" class="bare" target="_blank">http://localhost:8082/</a>. To get the screen shown in <a href="#img-contacts_persons_alice">Figure 10</a> first click on the <em class="folder">Persons</em> node and then double click on the ''Alice'' row.</p> 
       </div> 
       <div id="img-contacts_persons_alice" class="imageblock"> 
        <div class="content"> 
         <img src="images/contacts_persons_alice.png" alt="contacts persons alice" /> 
        </div> 
        <div class="title">
-        Figure 8. The Contacts application.
+        Figure 10. The Contacts application.
        </div> 
       </div> 
      </div> 
@@ -227,39 +274,29 @@
      <div class="paragraph"> 
       <p>This is the end of the <a href="tutorial.html#tutorial">getting started</a> guide.</p> 
      </div> 
-     <div class="exampleblock"> 
-      <div class="content"> 
-       <div class="admonitionblock tip"> 
-        <table> 
-         <tbody>
-          <tr> 
-           <td class="icon"> <i class="fa icon-tip" title="Tip"></i> </td> 
-           <td class="content"> Do you want to improve this document? Please <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/edit/releases/5.2.x/docs/build/eclipse_help/src/docs/tutorial_existingdemo.adoc">edit this page</a> on GitHub. </td> 
-          </tr> 
-         </tbody>
-        </table> 
-       </div> 
-      </div> 
+     <hr /> 
+     <div class="paragraph"> 
+      <p>Do you want to improve this document? Please <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/edit/releases/5.2.x/docs/build/eclipse_help/src/docs/tutorial_existingdemo.adoc" target="_blank">edit this page</a> on GitHub.</p> 
      </div> 
     </div> 
    </div> 
   </div> 
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial.html" shape="rect" title="Getting Started"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_helloworld.html" shape="rect" title="Hello World Tutorial"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
     <td align="center" colspan="1" rowspan="1" style="width: 40%"><a href="scout_user_guide.html" shape="rect" title="Eclipse Scout User Guide"><img alt="Eclipse Scout User Guide" border="0" src="images/home.gif" /></a></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_helloworld.html" shape="rect" title="Hello World Tutorial"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Next" border="0" src="images/next.gif" /></a></td>
    </tr>
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%">Getting Started</td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Hello World Tutorial</td>
     <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%">Hello World Tutorial</td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
    </tr>
   </table>
   <div id="footer"> 
    <div id="footer-text">
      Version 5.2.0-SNAPSHOT
-    <br /> Last updated 2016-03-18 16:51:33 CET 
+    <br /> Last updated 2016-04-15 06:35:17 CEST 
    </div> 
   </div>  
  </body>
