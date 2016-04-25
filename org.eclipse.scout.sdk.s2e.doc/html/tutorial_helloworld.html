@@ -14,14 +14,14 @@
  <body class="article">
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_existingdemo.html" shape="rect" title="Import the Scout Demo Applications"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial.html" shape="rect" title="Getting Started"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
     <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_existingdemo.html" shape="rect" title="Import the Scout Demo Applications"><img alt="Next" border="0" src="images/next.gif" /></a></td>
    </tr>
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%">Import the Scout Demo Applications</td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Getting Started</td>
     <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Import the Scout Demo Applications</td>
    </tr>
   </table> 
   <div id="header"> 
@@ -49,7 +49,7 @@
       <p>This workspace directory will then hold all the project code for the <code>Hello World</code> application. Once the Eclipse IDE is running it will show the Java perspective. To create a new Scout project select the menu <span class="menuseq"><span class="menu">File</span>&nbsp;&#x25b8; <span class="submenu">New</span>&nbsp;&#x25b8; <span class="menuitem">Project&#x2026;&#x200b;</span></span> and type &#x201c;Scout Project&#x201d; in the wizard search field. Select the Scout Project wizard and press <b class="button">Next</b>.</p> 
      </div> 
      <div class="paragraph"> 
-      <p>In the <em class="wizard">New Scout Project</em> wizard you have to enter a <code>group id</code>, <code>artifact id</code> and a <code>display name</code> for your Scout project. As the created project will make use of <a href="https://maven.apache.org/">Apache Maven</a> please refer to the <a href="https://maven.apache.org/guides/mini/guide-naming-conventions.html">Maven naming conventions</a> to choose <code>group id</code> and <code>artifact id</code> for your project. The <code>artifact id</code> will then also be the project name in the Eclipse workspace. The <code>display name</code> is used as the application name presented to the user (e.g. in the Browser title bar).</p> 
+      <p>In the <em class="wizard">New Scout Project</em> wizard you have to enter a <code>group id</code>, <code>artifact id</code> and a <code>display name</code> for your Scout project. As the created project will make use of <a href="https://maven.apache.org/" target="_blank">Apache Maven</a> please refer to the <a href="https://maven.apache.org/guides/mini/guide-naming-conventions.html" target="_blank">Maven naming conventions</a> to choose <code>group id</code> and <code>artifact id</code> for your project. The <code>artifact id</code> will then also be the project name in the Eclipse workspace. The <code>display name</code> is used as the application name presented to the user (e.g. in the Browser title bar).</p> 
      </div> 
      <div class="paragraph"> 
       <p>For the <code>Hello World</code> application just use the already prefilled values as sown in <a href="#img-sdk_new_project_wizard">Figure 2</a>. Then, click the <b class="button">Finish</b> button to let the Scout SDK create the initial project code for you.</p> 
@@ -63,7 +63,7 @@
       </div> 
      </div> 
      <div class="paragraph"> 
-      <p>Depending on your Eclipse installation some <code>Maven plugin connectors</code> may be missing initially. In that case a dialog as shown in <a href="#img-sdk_new_project_connector">Figure 3</a> may be shown. Please choose the desired actions from the combo box in the <code>Action</code> column until all mappings are green. E.g. for the <code>compiler-plugin</code> choose <code>Install M2E connector for the Eclipse JDT Compiler</code> from the combo box. Afterwards the selected connectors are resolved and you need to confirm the installation, accept the license, accept that some content has not been signed and restart Eclipse afterwards. To read more about <code>Maven plugin connectors</code> please refer to the <a href="https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html">m2e documentation</a>.</p> 
+      <p>Depending on your Eclipse installation some <code>Maven plugin connectors</code> may be missing initially. In that case a dialog as shown in <a href="#img-sdk_new_project_connector">Figure 3</a> may be shown. Please choose the desired actions from the combo box in the <code>Action</code> column until all mappings are green. E.g. for the <code>compiler-plugin</code> choose <code>Install M2E connector for the Eclipse JDT Compiler</code> from the combo box. Afterwards the selected connectors are resolved and you need to confirm the installation, accept the license, accept that some content has not been signed and restart Eclipse afterwards. To read more about <code>Maven plugin connectors</code> please refer to the <a href="https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html" target="_blank">m2e documentation</a>.</p> 
      </div> 
      <div id="img-sdk_new_project_connector" class="imageblock"> 
       <div class="content"> 
@@ -94,7 +94,7 @@
       <p>In case the launch configurations are not shown in the toolbar under the debug/run icons, you may find the <code>server-dev.launch</code> launch file under project <code>helloworld.server.app.dev</code> and the <code>ui-html-dev.launch</code> launch file under <code>helloworld.ui.html.app.dev</code>. These launch files can be started using the context menu <em class="menu">Run As</em> which will add the launch file to the <em class="button">Run</em> toolbar button.</p> 
      </div> 
      <div class="paragraph"> 
-      <p>During startup of the Scout applications you should see console output providing information about the startup. After both have been started successfully the HTML user interface can be accessed by navigating to <a href="http://localhost:8082/" class="bare">http://localhost:8082/</a> in your favorite web browser.</p> 
+      <p>During startup of the Scout applications you should see console output providing information about the startup. After both have been started successfully the HTML user interface can be accessed by navigating to <a href="http://localhost:8082/" class="bare" target="_blank">http://localhost:8082/</a> in your favorite web browser.</p> 
      </div> 
      <div id="img-start_client" class="imageblock"> 
       <div class="content"> 
@@ -110,39 +110,29 @@
      <div class="paragraph"> 
       <p>In the <a href="tutorial_existingdemo.html#import-the-scout-demo-applications-tutorial">next tutorial</a>, you will learn how to import the Scout demo applications into your workspace.</p> 
      </div> 
-     <div class="exampleblock"> 
-      <div class="content"> 
-       <div class="admonitionblock tip"> 
-        <table> 
-         <tbody>
-          <tr> 
-           <td class="icon"> <i class="fa icon-tip" title="Tip"></i> </td> 
-           <td class="content"> Do you want to improve this document? Please <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/edit/releases/5.2.x/docs/build/eclipse_help/src/docs/tutorial_helloworld.adoc">edit this page</a> on GitHub. </td> 
-          </tr> 
-         </tbody>
-        </table> 
-       </div> 
-      </div> 
+     <hr /> 
+     <div class="paragraph"> 
+      <p>Do you want to improve this document? Please <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/edit/releases/5.2.x/docs/build/eclipse_help/src/docs/tutorial_helloworld.adoc" target="_blank">edit this page</a> on GitHub.</p> 
      </div> 
     </div> 
    </div> 
   </div> 
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_existingdemo.html" shape="rect" title="Import the Scout Demo Applications"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial.html" shape="rect" title="Getting Started"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
     <td align="center" colspan="1" rowspan="1" style="width: 40%"><a href="scout_user_guide.html" shape="rect" title="Eclipse Scout User Guide"><img alt="Eclipse Scout User Guide" border="0" src="images/home.gif" /></a></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="tutorial_existingdemo.html" shape="rect" title="Import the Scout Demo Applications"><img alt="Next" border="0" src="images/next.gif" /></a></td>
    </tr>
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%">Import the Scout Demo Applications</td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Getting Started</td>
     <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Import the Scout Demo Applications</td>
    </tr>
   </table>
   <div id="footer"> 
    <div id="footer-text">
      Version 5.2.0-SNAPSHOT
-    <br /> Last updated 2016-03-16 13:14:32 CET 
+    <br /> Last updated 2016-04-15 06:35:17 CEST 
    </div> 
   </div>  
  </body>
