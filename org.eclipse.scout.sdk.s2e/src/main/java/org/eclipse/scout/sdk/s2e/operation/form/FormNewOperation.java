@@ -112,8 +112,11 @@ public class FormNewOperation implements IOperation {
     if (isCreateService()) {
       Validate.isTrue(S2eUtils.exists(getServerSourceFolder()), "No server source folder provided");
     }
-    if (isCreateService() || isCreateFormData() || isCreatePermissions()) {
+    if (isCreateService() || isCreatePermissions()) {
       Validate.isTrue(S2eUtils.exists(getSharedSourceFolder()), "No shared source folder provided");
+    }
+    if (isCreateFormData()) {
+      Validate.isTrue(S2eUtils.exists(getFormDataSourceFolder()), "No form data source folder provided");
     }
     Validate.isTrue(StringUtils.isNotBlank(getClientPackage()), "No package provided");
     Validate.isTrue(S2eUtils.exists(getSuperType()), "Super type does not exist");
