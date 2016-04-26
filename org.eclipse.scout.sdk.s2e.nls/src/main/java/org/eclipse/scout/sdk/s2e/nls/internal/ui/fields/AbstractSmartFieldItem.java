@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.ui.fields;
 
-import org.eclipse.swt.graphics.Image;
+import java.util.Objects;
 
-import com.google.common.base.Objects;
+import org.eclipse.swt.graphics.Image;
 
 public abstract class AbstractSmartFieldItem implements Comparable<AbstractSmartFieldItem> {
 
@@ -37,7 +37,7 @@ public abstract class AbstractSmartFieldItem implements Comparable<AbstractSmart
       return false;
     }
     AbstractSmartFieldItem other = (AbstractSmartFieldItem) obj;
-    return Objects.equal(getText(), other.getText());
+    return Objects.equals(getText(), other.getText());
   }
 
   @Override
