@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.ui.internal;
 import java.io.IOException;
 import java.util.logging.Level;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -21,6 +20,10 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkConsole;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
@@ -38,8 +41,24 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
   }
 
   @Override
-  public void println(String s, Throwable... exceptions) {
+  public void println(Level level, String s, Throwable... exceptions) {
     try (IOConsoleOutputStream out = currentConsole(true).newOutputStream()) {
+      if (Level.SEVERE.equals(level)) {
+        out.setActivateOnWrite(true);
+        if (PlatformUI.isWorkbenchRunning()) {
+          IWorkbench workbench = PlatformUI.getWorkbench();
+          if (workbench != null) {
+            final Display display = workbench.getDisplay();
+            display.syncExec(new Runnable() {
+              @Override
+              public void run() {
+                out.setColor(display.getSystemColor(SWT.COLOR_RED));
+              }
+            });
+          }
+        }
+      }
+
       out.write(s);
       if (exceptions == null) {
         out.write('\n');
@@ -70,46 +89,22 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
       if (exceptions != null && exceptions.length > 0) {
         t = exceptions[0];
       }
-      activator.getLog().log(new Status(parseSeverity(s), S2ESdkActivator.PLUGIN_ID, s, t));
+      activator.getLog().log(new Status(julToEclipseSeverity(level), S2ESdkActivator.PLUGIN_ID, s, t));
     }
   }
 
-  private static int parseSeverity(String s) {
-    if (StringUtils.length(s) < 1) {
-      return IStatus.OK;
+  private static int julToEclipseSeverity(Level l) {
+    if (l.intValue() == Level.SEVERE.intValue()) {
+      return IStatus.ERROR;
     }
-
-    if (s.charAt(0) != '[') {
-      return IStatus.OK;
+    if (l.intValue() == Level.WARNING.intValue()) {
+      return IStatus.WARNING;
     }
-
-    int endPos = s.indexOf(']');
-    if (endPos <= 0) {
-      return IStatus.OK;
-    }
-
-    String level = s.substring(1, endPos);
-    try {
-      Level l = Level.parse(level);
-      int num = l.intValue();
-      if (num == Level.SEVERE.intValue()) {
-        return IStatus.ERROR;
-      }
-      else if (num == Level.WARNING.intValue()) {
-        return IStatus.WARNING;
-      }
-      else {
-        return IStatus.INFO;
-      }
-    }
-    catch (IllegalArgumentException e) {
-      // cannot parse
-      return IStatus.OK;
-    }
+    return IStatus.INFO;
   }
 
-  private static final String CONSOLE_NAME = "Scout SDK";
-  private static final String CONSOLE_TYPE = "org.eclipse.scout.sdk";
+  public static final String CONSOLE_NAME = "Scout SDK";
+  public static final String CONSOLE_TYPE = "org.eclipse.scout.sdk";
 
   public static IOConsole currentConsole(boolean autoCreate) {
     IConsoleManager mgr = ConsolePlugin.getDefault().getConsoleManager();

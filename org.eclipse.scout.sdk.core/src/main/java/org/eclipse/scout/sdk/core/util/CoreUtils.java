@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
@@ -56,7 +57,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -64,6 +68,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.text.translate.AggregateTranslator;
 import org.apache.commons.lang3.text.translate.EntityArrays;
@@ -102,6 +107,7 @@ public final class CoreUtils {
   private static final Pattern REGEX_COMMENT_REMOVE_1 = Pattern.compile("\\/\\/.*?\\\r\\\n");
   private static final Pattern REGEX_COMMENT_REMOVE_2 = Pattern.compile("\\/\\/.*?\\\n");
   private static final Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)\\/\\*.*?\\*\\/");
+  private static final Pattern PATH_SEGMENT_SPLIT_PATTERN = Pattern.compile("\\/");
 
   private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<>();
   private static volatile Set<String> javaKeyWords = null;
@@ -141,7 +147,7 @@ public final class CoreUtils {
    *          The file or folder to delete.
    * @throws IOException
    */
-  public static void deleteFolder(File toDelete) throws IOException {
+  public static void deleteDirectory(File toDelete) throws IOException {
     Validate.notNull(toDelete);
     if (!toDelete.exists()) {
       return;
@@ -373,7 +379,7 @@ public final class CoreUtils {
   public static String getUsername() {
     String name = CURRENT_USER_NAME.get();
     if (name == null) {
-      name = System.getProperty("user.name");
+      name = SystemUtils.USER_NAME;
     }
     return name;
   }
@@ -748,6 +754,9 @@ public final class CoreUtils {
    *         input could not be boxed.
    */
   public static String boxPrimitive(String name) {
+    if (name == null) {
+      return null;
+    }
     switch (name) {
       case IJavaRuntimeTypes._boolean:
         return IJavaRuntimeTypes.Boolean;
@@ -791,6 +800,9 @@ public final class CoreUtils {
    * @return The primitive type name or <code>null</code> if no primitive exists.
    */
   public static String unboxToPrimitive(String fqn) {
+    if (fqn == null) {
+      return null;
+    }
     switch (fqn) {
       case IJavaRuntimeTypes.Boolean:
         return IJavaRuntimeTypes._boolean;
@@ -881,10 +893,7 @@ public final class CoreUtils {
    */
   public static String escapeHtml(CharSequence html) {
     return new AggregateTranslator(
-        new LookupTranslator(
-            new String[][]{
-                {"/", "&#47;"}
-            }),
+        new LookupTranslator(new String[][]{{"/", "&#47;"}}),
         new LookupTranslator(EntityArrays.BASIC_ESCAPE()),
         new LookupTranslator(EntityArrays.APOS_ESCAPE())//,
     ).translate(html);
@@ -908,6 +917,7 @@ public final class CoreUtils {
     features.put(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
     dbf.setXIncludeAware(false);
     dbf.setExpandEntityReferences(false);
+    dbf.setNamespaceAware(true); // required!
     try {
       dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
     }
@@ -931,7 +941,6 @@ public final class CoreUtils {
         SdkLog.debug("Feature '{}' is not supported in the current XML parser. Skipping.", feature, e);
       }
     }
-    dbf.setNamespaceAware(true);
     return dbf.newDocumentBuilder();
   }
 
@@ -1055,6 +1064,12 @@ public final class CoreUtils {
    * @return The first Element with this tag name or <code>null</code> if no such {@link Element} exists.
    */
   public static Element getFirstChildElement(Element parent, String tagName) {
+    if (parent == null) {
+      return null;
+    }
+    if (tagName == null) {
+      return null;
+    }
     NodeList children = parent.getChildNodes();
     for (int i = 0; i < children.getLength(); ++i) {
       Node n = children.item(i);
@@ -1068,7 +1083,7 @@ public final class CoreUtils {
 
   /**
    * Evaluates the given xPath string on the given {@link Document}.
-   * 
+   *
    * @param xPath
    *          The xPath expression
    * @param applyToDocument
@@ -1082,7 +1097,7 @@ public final class CoreUtils {
 
   /**
    * Evaluates the given xPath string on the given {@link Document}.
-   * 
+   *
    * @param xPath
    *          The xPath expression
    * @param applyToDocument
@@ -1162,5 +1177,95 @@ public final class CoreUtils {
       }
     }
     return elements;
+  }
+
+  /**
+   * Creates a relative {@link URI} which leads from base to child.<br>
+   * <br>
+   * <b>Note:</b>This method is capable to also construct relative {@link URI}s with parent references (/../) unlike
+   * {@link URI#relativize(URI)}.
+   *
+   * @param base
+   *          The base {@link URI} from which point the relative {@link URI} should be created. Must not be
+   *          <code>null</code>.
+   * @param child
+   *          The target {@link URI} that should be relatively expressed from the point of the base {@link URI}. Must
+   *          not be <code>null</code>.
+   * @return A new relative {@link URI} to get to the child {@link URI} from the base {@link URI}.
+   */
+  public static URI relativizeURI(URI base, URI child) {
+    if (!Objects.equals(base.getAuthority(), child.getAuthority())
+        || !Objects.equals(base.getScheme(), child.getScheme())) {
+      return child;
+    }
+
+    // Normalize paths to remove . and .. segments
+    base = base.normalize();
+    child = child.normalize();
+
+    String[] bParts = PATH_SEGMENT_SPLIT_PATTERN.split(base.getRawPath());
+    String[] cParts = PATH_SEGMENT_SPLIT_PATTERN.split(child.getRawPath());
+
+    // Discard trailing segment of base path
+    if (bParts.length > 0 && !base.getPath().endsWith("/")) {
+      bParts = Arrays.copyOf(bParts, bParts.length - 1);
+    }
+
+    // Remove common prefix segments
+    int i = 0;
+    while (i < bParts.length
+        && i < cParts.length
+        && bParts[i].equals(cParts[i])) {
+      i++;
+    }
+
+    // Construct the relative path
+    StringBuilder sb = new StringBuilder();
+    for (int j = 0; j < (bParts.length - i); j++) {
+      sb.append("../");
+    }
+    for (int j = i; j < cParts.length; j++) {
+      if (j != i) {
+        sb.append('/');
+      }
+      sb.append(cParts[j]);
+    }
+
+    return URI.create(sb.toString()).normalize();
+  }
+
+  /**
+   * Gets the parent of the given {@link URI}. This means it removes the last segment of the path of the given
+   * {@link URI}.
+   *
+   * @param uri
+   * @return A new {@link URI} pointing to the parent of the given {@link URI} or <code>null</code> if the given
+   *         {@link URI} is <code>null</code>.
+   */
+  public static URI getParentURI(URI uri) {
+    if (uri == null) {
+      return null;
+    }
+    if (uri.getPath().endsWith("/")) {
+      return uri.resolve("..");
+    }
+    return uri.resolve(".");
+  }
+
+  /**
+   * Transforms the given {@link Document} into a {@link String}.
+   *
+   * @param document
+   *          The document to transform.
+   * @param format
+   *          If the document should be formatted (<code>true</code>) or not (<code>false</code>).
+   * @return The given {@link Document} as {@link String} optionally formatted.
+   * @throws TransformerException
+   */
+  public static String xmlDocumentToString(Document document, boolean format) throws TransformerException {
+    StringWriter out = new StringWriter();
+    Transformer transformer = CoreUtils.createTransformer(format);
+    transformer.transform(new DOMSource(document), new StreamResult(out));
+    return out.toString();
   }
 }

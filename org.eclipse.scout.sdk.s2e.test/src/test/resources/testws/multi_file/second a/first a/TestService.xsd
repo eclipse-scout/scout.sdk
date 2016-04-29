@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+   xmlns:cmn="http://www.eclipse.org/schema/common"
+   xmlns:web="http://www.eclipse.org/scout/webservices"
+   xmlns:cor="http://www.eclipse.org/scout/webservices/scout"
+   targetNamespace="http://www.eclipse.org/scout/webservices/scout"
+   elementFormDefault="qualified"
+   attributeFormDefault="unqualified">
+
+   <xs:import namespace="http://www.eclipse.org/schema/common" schemaLocation="prt%20a/prt.xsd"/>
+
+   <xs:element name="errorMessage">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="ErrorId">
+               <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                     <xs:maxLength value="32"/>
+                  </xs:restriction>
+               </xs:simpleType>
+            </xs:element>
+            <xs:element name="Locale">
+               <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                     <xs:maxLength value="5"/>
+                  </xs:restriction>
+               </xs:simpleType>
+            </xs:element>
+            <xs:element name="ErrorText">
+               <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                     <xs:maxLength value="511"/>
+                  </xs:restriction>
+               </xs:simpleType>
+            </xs:element>
+            <xs:element name="ErrorDetail" type="cor:errorDetail" minOccurs="0" maxOccurs="10"></xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+
+   <xs:simpleType name="errorDetail">
+      <xs:restriction base="xs:string">
+         <xs:maxLength value="255"/>
+      </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="ContextType">
+      <xs:sequence>
+         <xs:element name="ContextDetail" type="cor:ContextDetailType" minOccurs="0" maxOccurs="50"></xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="ContextDetailType">
+      <xs:sequence>
+         <xs:element name="ContextInfo">
+            <xs:simpleType>
+               <xs:restriction base="xs:string"/>
+            </xs:simpleType>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="ValutaPartType">
+      <xs:sequence>
+         <xs:element name="Valuta" type="xs:dateTime" minOccurs="0"></xs:element>
+         <xs:element name="CreateDate" type="xs:dateTime" minOccurs="0"></xs:element>
+         <xs:element name="ValidUntil" type="xs:dateTime" minOccurs="0"></xs:element>
+         <xs:element name="ModificationDate" type="xs:dateTime" minOccurs="0"></xs:element>
+         <xs:element name="Version" type="xs:int" minOccurs="0"></xs:element>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="Operation01TypeResponse">
+      <xs:sequence>
+         <xs:element name="Protocol" type="cmn:ReturnDetailType"/>
+         <xs:element name="ScoutType" type="cor:WhateverType" minOccurs="0"></xs:element>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="Operation02TypeResponse">
+      <xs:sequence>
+         <xs:element name="Protocol" type="cmn:ReturnDetailType"/>
+         <xs:element name="PersonType" type="cor:WhateverType" minOccurs="0"></xs:element>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="WhateverType">
+      <xs:sequence>
+         <xs:element name="PersonName" type="xs:string"></xs:element>
+      </xs:sequence>
+   </xs:complexType>
+</xs:schema>

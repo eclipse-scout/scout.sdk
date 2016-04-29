@@ -15,12 +15,9 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.JavaPluginImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.operation.codetype.CodeTypeNewOperation;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
@@ -30,7 +27,6 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PartInitException;
 
 /**
  * <h3>{@link CodeTypeNewWizard}</h3>
@@ -90,12 +86,7 @@ public class CodeTypeNewWizard extends AbstractWizard implements INewWizard {
             if (!S2eUtils.exists(createdCodeType)) {
               return;
             }
-            try {
-              JavaUI.openInEditor(createdCodeType, true, true);
-            }
-            catch (PartInitException | JavaModelException e) {
-              SdkLog.info("Unable to open type {} in editor.", createdCodeType.getFullyQualifiedName(), e);
-            }
+            S2eUiUtils.openInEditor(createdCodeType);
           }
         });
       }

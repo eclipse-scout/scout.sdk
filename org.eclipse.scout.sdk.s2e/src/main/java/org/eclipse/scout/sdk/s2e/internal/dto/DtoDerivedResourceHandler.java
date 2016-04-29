@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.operation.CompilationUnitWriteOperation;
 import org.eclipse.scout.sdk.s2e.trigger.AbstractDerivedResourceSingleHandler;
@@ -53,7 +54,7 @@ public class DtoDerivedResourceHandler extends AbstractDerivedResourceSingleHand
         return;
       }
 
-      S2eUtils.writeTypes(Collections.singletonList(op), monitor, false);
+      S2eUtils.writeFiles(Collections.singletonList(op), monitor, false);
     }
     catch (MissingTypeException e) {
       SdkLog.info("Unable to update DTO for '{}' because there are compile errors in the compilation unit.", getModelFullyQualifiedName(), e);
@@ -63,6 +64,34 @@ public class DtoDerivedResourceHandler extends AbstractDerivedResourceSingleHand
     }
   }
 
+  /**
+   * Creates a new {@link CompilationUnitWriteOperation} for the given model {@link org.eclipse.jdt.core.IType}.
+   *
+   * @param jdtType
+   *          The {@link org.eclipse.jdt.core.IType} for which the update operation should be created.
+   * @return A {@link CompilationUnitWriteOperation} that would update the DTO of the given model {@link IType} or
+   *         <code>null</code> if no DTO is supported for the given {@link IType}.
+   * @throws CoreException
+   */
+  public static CompilationUnitWriteOperation newDtoOp(org.eclipse.jdt.core.IType jdtType) throws CoreException {
+    CachingJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
+    return newDtoOp(jdtType, envProvider.jdtTypeToScoutType(jdtType), envProvider);
+  }
+
+  /**
+   * Creates a new {@link CompilationUnitWriteOperation} for the given model {@link org.eclipse.jdt.core.IType}.
+   *
+   * @param jdtType
+   *          The {@link org.eclipse.jdt.core.IType} for which the update operation should be created.
+   * @param modelType
+   *          The {@link IType} that represents the given jdtType.
+   * @param envProvider
+   *          The {@link IJavaEnvironmentProvider} used to create new {@link IJavaEnvironment}s for this update
+   *          operation.
+   * @return A {@link CompilationUnitWriteOperation} that would update the DTO of the given model {@link IType} or
+   *         <code>null</code> if no DTO is supported for the given {@link IType}.
+   * @throws CoreException
+   */
   public static CompilationUnitWriteOperation newDtoOp(org.eclipse.jdt.core.IType jdtType, IType modelType, IJavaEnvironmentProvider envProvider) throws CoreException {
 
     //FormData

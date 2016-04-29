@@ -45,8 +45,8 @@ public class TextField<T> extends Composite {
   private Label m_label;
   private IInputFormatter<T> m_inputFormatter = new TextInputFormatter<>();
   private IInputValidator m_inputValidator = new TextValidator();
-  private List<IInputChangedListener<T>> m_inputChangedListener = new LinkedList<>();
-  private List<IValidationListener> m_validationListener = new LinkedList<>();
+  private final List<IInputChangedListener<T>> m_inputChangedListener = new LinkedList<>();
+  private final List<IValidationListener> m_validationListener = new LinkedList<>();
   private Object m_input;
   private IStatus m_status;
   private final int m_labelColWidth;
@@ -90,8 +90,7 @@ public class TextField<T> extends Composite {
   }
 
   private void createComposite(Composite parent, int style) {
-    m_label = new Label(parent, SWT.NONE);
-    m_label.setAlignment(SWT.RIGHT);
+    m_label = new Label(parent, SWT.TRAIL);
 
     int txtStyle = SWT.BORDER;
     boolean isMultiLineTextField = (style & MULTI_LINE_TEXT_FIELD) != 0;

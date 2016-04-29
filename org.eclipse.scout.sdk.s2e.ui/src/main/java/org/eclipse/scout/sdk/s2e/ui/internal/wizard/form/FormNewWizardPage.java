@@ -17,6 +17,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -28,10 +30,9 @@ import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
 import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.ScoutTier;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -158,19 +159,16 @@ public class FormNewWizardPage extends CompilationUnitNewWizardPage {
     return Status.OK_STATUS;
   }
 
+  @Override
+  protected int getLabelWidth() {
+    return 130;
+  }
+
   protected void createFormPropertiesGroup(Composite p) {
     Group parent = getFieldToolkit().createGroupBox(p, "Additional Components");
-    GridData layoutData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    layoutData.verticalIndent = 10;
-    parent.setLayoutData(layoutData);
-    parent.setLayout(new GridLayout(3, true));
 
     // create FormData
     m_createFormDataButton = getFieldToolkit().createCheckBox(parent, "Create FormData", isCreateFormData());
-    GridData formDataGridData = new GridData();
-    formDataGridData.verticalIndent = 8;
-    formDataGridData.horizontalIndent = 10;
-    m_createFormDataButton.setLayoutData(formDataGridData);
     m_createFormDataButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -182,7 +180,6 @@ public class FormNewWizardPage extends CompilationUnitNewWizardPage {
 
     // create Service
     m_createServiceButton = getFieldToolkit().createCheckBox(parent, "Create Service", isCreateService());
-    m_createServiceButton.setLayoutData(formDataGridData);
     m_createServiceButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -194,7 +191,6 @@ public class FormNewWizardPage extends CompilationUnitNewWizardPage {
 
     // create permissions
     m_createPermissionsButton = getFieldToolkit().createCheckBox(parent, "Create Permissions", isCreatePermissions());
-    m_createPermissionsButton.setLayoutData(formDataGridData);
     m_createPermissionsButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -205,11 +201,7 @@ public class FormNewWizardPage extends CompilationUnitNewWizardPage {
     });
 
     // shared source folder
-    m_sharedSourceFolder = getFieldToolkit().createSourceFolderTextField(parent, "Shared Source Folder", ScoutTier.Shared, 25);
-    GridData sharedGridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    sharedGridData.horizontalSpan = 3;
-    sharedGridData.verticalIndent = 8;
-    m_sharedSourceFolder.setLayoutData(sharedGridData);
+    m_sharedSourceFolder = getFieldToolkit().createSourceFolderField(parent, "Shared Source Folder", ScoutTier.Shared, getLabelWidth());
     m_sharedSourceFolder.acceptProposal(getSharedSourceFolder());
     m_sharedSourceFolder.addProposalListener(new IProposalListener() {
       @Override
@@ -220,10 +212,7 @@ public class FormNewWizardPage extends CompilationUnitNewWizardPage {
     });
 
     // server source folder
-    m_serverSourceFolder = getFieldToolkit().createSourceFolderTextField(parent, "Server Source Folder", ScoutTier.Server, 25);
-    GridData serverGridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    serverGridData.horizontalSpan = 3;
-    m_serverSourceFolder.setLayoutData(serverGridData);
+    m_serverSourceFolder = getFieldToolkit().createSourceFolderField(parent, "Server Source Folder", ScoutTier.Server, getLabelWidth());
     m_serverSourceFolder.acceptProposal(getServerSourceFolder());
     m_serverSourceFolder.addProposalListener(new IProposalListener() {
       @Override
@@ -232,6 +221,38 @@ public class FormNewWizardPage extends CompilationUnitNewWizardPage {
         pingStateChanging();
       }
     });
+
+    // layout
+    GridDataFactory
+        .defaultsFor(parent)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .indent(0, 10)
+        .applyTo(parent);
+    GridLayoutFactory
+        .swtDefaults()
+        .numColumns(3)
+        .equalWidth(true)
+        .applyTo(parent);
+    GridDataFactory optionsButtonGridDataFactory = GridDataFactory
+        .defaultsFor(parent)
+        .indent(10, 8);
+    GridDataFactory
+        .defaultsFor(m_sharedSourceFolder)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .span(3, 0)
+        .indent(0, 8)
+        .applyTo(m_sharedSourceFolder);
+    GridDataFactory
+        .defaultsFor(m_serverSourceFolder)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .span(3, 0)
+        .applyTo(m_serverSourceFolder);
+    optionsButtonGridDataFactory.applyTo(m_createFormDataButton);
+    optionsButtonGridDataFactory.applyTo(m_createServiceButton);
+    optionsButtonGridDataFactory.applyTo(m_createPermissionsButton);
 
     handleComponentsChanged();
   }

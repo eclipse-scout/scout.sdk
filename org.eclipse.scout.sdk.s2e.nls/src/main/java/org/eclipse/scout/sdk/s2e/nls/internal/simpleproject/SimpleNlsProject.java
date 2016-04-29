@@ -140,7 +140,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
     String fileName = getLocalizedPropertiesFileName(getNlsType().getTranslationsPrefix(), language);
     IFile file = folder.getFile(new Path(fileName));
     if (!file.exists()) {
-      S2eUtils.writeResources(Collections.singletonList(new ResourceWriteOperation(file, "")), monitor, true);
+      S2eUtils.writeFiles(Collections.singletonList(new ResourceWriteOperation(file, "")), monitor, true);
     }
     addTranslationResource(new WorkspaceTranslationFile(file));
   }

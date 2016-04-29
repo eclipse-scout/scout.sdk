@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -77,8 +76,8 @@ public class NlsFindKeysJob extends Job {
         monitor.setTaskName("Searching in '" + root.getElementName() + "'.");
 
         IProject p = root.getProject();
-        Path outputLocation = Paths.get(new java.io.File(p.getLocation().toOSString(), root.getOutputLocation().removeFirstSegments(1).toOSString()).toURI());
-        searchInFolder(Paths.get(p.getLocation().toFile().toURI()), p.getDefaultCharset(), outputLocation, monitor);
+        Path outputLocation = new java.io.File(p.getLocation().toOSString(), root.getOutputLocation().removeFirstSegments(1).toOSString()).toPath();
+        searchInFolder(p.getLocation().toFile().toPath(), p.getDefaultCharset(), outputLocation, monitor);
 
         if (monitor.isCanceled()) {
           return Status.OK_STATUS;

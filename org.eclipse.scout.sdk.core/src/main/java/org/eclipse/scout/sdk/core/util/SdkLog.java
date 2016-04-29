@@ -93,7 +93,7 @@ public final class SdkLog {
       message.append(messageBuilder);
     }
 
-    SdkConsole.println(message.toString(), extractThrowables(argstartIndex, args));
+    SdkConsole.println(level, message.toString(), extractThrowables(argstartIndex, args));
   }
 
   static Throwable[] extractThrowables(int startIndex, Object... args) {
@@ -314,7 +314,7 @@ public final class SdkLog {
       }
     }
     catch (Exception e) {
-      SdkConsole.println("Unable to parse log level '" + lvl + "'. Fallback to default: '" + DEFAULT_LOG_LEVEL.getName() + "'.", e);
+      SdkConsole.println(Level.SEVERE, "Unable to parse log level '" + lvl + "'. Fallback to default: '" + DEFAULT_LOG_LEVEL.getName() + "'.", e);
     }
     return DEFAULT_LOG_LEVEL;
   }

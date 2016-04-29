@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="PingWebService"
+	targetNamespace="http://ws.services.test.rt.scout.eclipse.org/PingWebService/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+	xmlns:tns="http://ws.services.test.rt.scout.eclipse.org/PingWebService/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://ws.services.test.rt.scout.eclipse.org/PingWebService/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><xsd:element name="inElement" type="xsd:string"/><xsd:element name="outElement" type="xsd:string"/></xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="pingResponse">
+    <wsdl:part name="out" element="tns:outElement"/>
+  </wsdl:message>
+  <wsdl:message name="pingRequest">
+    <wsdl:part name="in" element="tns:inElement"/>
+  </wsdl:message>
+  
+  <wsdl:portType name="FirstWebServiceOnePortType">
+    <wsdl:operation name="ping">
+      <wsdl:input message="tns:pingRequest"/>
+      <wsdl:output message="tns:pingResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+    <wsdl:portType name="FirstWebServiceTwoPortType">
+    <wsdl:operation name="ping">
+      <wsdl:input message="tns:pingRequest"/>
+      <wsdl:output message="tns:pingResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="FirstWebServiceOnePortBinding" type="tns:FirstWebServiceOnePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ping">
+      <soap:operation soapAction="http://ws.services.test.rt.scout.eclipse.org/PingWebService/ping"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="FirstWebServiceTwoPortBinding" type="tns:FirstWebServiceTwoPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ping">
+      <soap:operation soapAction="http://ws.services.test.rt.scout.eclipse.org/PingWebService/ping"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FirstWebService">
+    <wsdl:port name="FirstWebServiceOnePort" binding="tns:FirstWebServiceOnePortBinding">
+      <soap:address location="http://ws.services.test.rt.scout.eclipse.org/PingWebServiceOne"/>
+    </wsdl:port>
+	<wsdl:port name="FirstWebServiceTwoPort" binding="tns:FirstWebServiceTwoPortBinding">
+      <soap:address location="http://ws.services.test.rt.scout.eclipse.org/PingWebServiceTwo"/>
+    </wsdl:port>
+  </wsdl:service>
+  
+  <wsdl:portType name="SecondWebServiceOnePortType">
+    <wsdl:operation name="ping">
+      <wsdl:input message="tns:pingRequest"/>
+      <wsdl:output message="tns:pingResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+    <wsdl:portType name="SecondWebServiceTwoPortType">
+    <wsdl:operation name="ping">
+      <wsdl:input message="tns:pingRequest"/>
+      <wsdl:output message="tns:pingResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SecondWebServiceOnePortBinding" type="tns:SecondWebServiceOnePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ping">
+      <soap:operation soapAction="http://ws.services.test.rt.scout.eclipse.org/PingWebService/ping"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="SecondWebServiceTwoPortBinding" type="tns:SecondWebServiceTwoPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ping">
+      <soap:operation soapAction="http://ws.services.test.rt.scout.eclipse.org/PingWebService/ping"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SecondWebService">
+    <wsdl:port name="SecondWebServiceOnePort" binding="tns:SecondWebServiceOnePortBinding">
+      <soap:address location="http://ws.services.test.rt.scout.eclipse.org/PingWebServiceOne"/>
+    </wsdl:port>
+	<wsdl:port name="SecondWebServiceTwoPort" binding="tns:SecondWebServiceTwoPortBinding">
+      <soap:address location="http://ws.services.test.rt.scout.eclipse.org/PingWebServiceTwo"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

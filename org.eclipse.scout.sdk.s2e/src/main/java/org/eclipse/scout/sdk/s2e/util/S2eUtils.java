@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,10 +32,7 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -86,6 +82,9 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 import org.eclipse.jdt.internal.core.util.Util;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
+import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
@@ -105,6 +104,7 @@ import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.operation.CompilationUnitWriteOperation;
+import org.eclipse.scout.sdk.s2e.operation.IFileWriteOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.operation.ResourceWriteOperation;
 import org.w3c.dom.Document;
@@ -216,7 +216,8 @@ public final class S2eUtils {
 
   /**
    * Gets all {@link IType}s on the classpath of the give {@link IJavaProject} that are sub classes of the given
-   * baseType and fulfill the given filter.
+   * baseType and fulfill the given filter. If the base type itself fulfills the given filter, it is included in the
+   * result.
    *
    * @param sourceProject
    *          The {@link IJavaProject} defining the classpath.
@@ -249,7 +250,7 @@ public final class S2eUtils {
         }
       }
     };
-    IJavaSearchScope strictHierarchyScope = SearchEngine.createStrictHierarchyScope(sourceProject, baseType, true, false, null);
+    IJavaSearchScope strictHierarchyScope = SearchEngine.createStrictHierarchyScope(sourceProject, baseType, true, true, null);
 
     try {
       new SearchEngine().searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, null, SearchPattern.R_EXACT_MATCH, IJavaSearchConstants.CLASS, strictHierarchyScope,
@@ -798,20 +799,33 @@ public final class S2eUtils {
 
   /**
    * Executes the given {@link CompilationUnitWriteOperation}s in a new {@link ResourceBlockingOperationJob}, waits
-   * until all have finished and returns the resulting first {@link IType}s of each created {@link ICompilationUnit}.
+   * until all have finished and returns the resulting first {@link IType}s of each created or updated
+   * {@link ICompilationUnit}.<br>
+   * If you don't need the created or updated {@link IType}s it is faster to call
+   * {@link #writeFiles(Collection, IProgressMonitor, boolean)}.<br>
+   * <br>
+   * <b>Important:</b> If the {@link Job} invoking this method uses an {@link ISchedulingRule} that conflicts with one
+   * of the {@link IFile}s to be written, this will result in a deadlock! In that case use
+   * {@link #writeType(IPackageFragmentRoot, ICompilationUnitSourceBuilder, IJavaEnvironment, IProgressMonitor, IWorkingCopyManager)}
+   * instead or write the types sync using
+   * {@link CompilationUnitWriteOperation#run(IProgressMonitor, IWorkingCopyManager)}.
    *
    * @param ops
    *          The {@link CompilationUnitWriteOperation}s to execute.
    * @param monitor
    *          The {@link IProgressMonitor}
-   * @return The first {@link IType} of each created {@link ICompilationUnit}. The {@link List} contains the results in
-   *         the same order as the given {@link Collection} returns {@link CompilationUnitWriteOperation}s. Therefore
-   *         the first {@link IType} in the resulting {@link List} belongs to the first
+   * @return The first {@link IType} of each created or updated {@link ICompilationUnit}. The {@link List} contains the
+   *         results in the same order as the given {@link Collection} returns {@link CompilationUnitWriteOperation}s.
+   *         Therefore the first {@link IType} in the resulting {@link List} belongs to the first
    *         {@link CompilationUnitWriteOperation} in ops.
-   * @throws JavaModelException
+   * @throws CoreException
    */
-  public static List<IType> writeTypesWithResult(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws JavaModelException {
-    writeTypes(ops, monitor, true);
+  public static List<IType> writeTypes(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    if (ops == null || ops.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    writeFiles(ops, monitor);
 
     List<IType> result = new ArrayList<>(ops.size());
     for (CompilationUnitWriteOperation op : ops) {
@@ -843,62 +857,35 @@ public final class S2eUtils {
   }
 
   /**
-   * Executes the given {@link CompilationUnitWriteOperation}s in a new {@link ResourceBlockingOperationJob}.
+   * Executes the given {@link IFileWriteOperation}s in a new {@link ResourceBlockingOperationJob}, waits until all have
+   * finished and returns the created or updated {@link IFile}s.<br>
+   * If you don't need the created or updated {@link IFile}s it is faster to call
+   * {@link #writeFiles(Collection, IProgressMonitor, boolean)}.<br>
+   * <br>
+   * <b>Important:</b> If the {@link Job} invoking this method uses an {@link ISchedulingRule} that conflicts with one
+   * of the {@link IFile}s to be written, this will result in a deadlock! In that case use
+   * {@link #writeFiles(Collection, IProgressMonitor, boolean)} without waiting instead or write the files sync using
+   * {@link IFileWriteOperation#run(IProgressMonitor, IWorkingCopyManager)} if you need the resulting {@link IFile}
+   * after the invocation of this method.
    *
    * @param ops
-   *          The {@link CompilationUnitWriteOperation}s to execute.
+   *          The {@link IFileWriteOperation}s to execute
    * @param monitor
    *          The {@link IProgressMonitor}
-   * @param waitUntilWritten
-   *          <code>true</code> if this method should block until all operations have been executed. <code>false</code>
-   *          if this method should directly return after the {@link CompilationUnitWriteOperation}s have been
-   *          scheduled.
-   */
-  public static void writeTypes(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) {
-    if (ops == null || ops.isEmpty()) {
-      return;
-    }
-
-    Set<IResource> lockedResources = new HashSet<>(ops.size());
-    for (CompilationUnitWriteOperation op : ops) {
-      if (op != null) {
-        IResource r = op.getAffectedResource();
-        if (r != null) {
-          lockedResources.add(r);
-        }
-      }
-    }
-
-    ResourceBlockingOperationJob job = new ResourceBlockingOperationJob(ops, lockedResources.toArray(new IResource[lockedResources.size()]));
-    job.schedule();
-    if (waitUntilWritten) {
-      try {
-        job.join(0L, monitor);
-      }
-      catch (OperationCanceledException | InterruptedException e) {
-        SdkLog.info("Unable to wait until compilation units have been written.", e);
-      }
-    }
-  }
-
-  /**
-   * Executes the given {@link ResourceWriteOperation}s in a new {@link ResourceBlockingOperationJob}, waits until all
-   * have finished and returns the created {@link IFile}s.
-   *
-   * @param ops
-   *          The {@link ResourceWriteOperation}s to execute
-   * @param monitor
-   *          The {@link IProgressMonitor}
-   * @return A {@link List} containing all created {@link IFile}s in the same order as the given {@link Collection}
-   *         returns {@link ResourceWriteOperation}s. Therefore the first {@link IFile} in the resulting {@link List}
-   *         belongs to the first {@link ResourceWriteOperation} in ops.
+   * @return A {@link List} containing all created or updated {@link IFile}s in the same order as the given
+   *         {@link Collection} returns {@link IFileWriteOperation}s. Therefore the first {@link IFile} in the resulting
+   *         {@link List} belongs to the first {@link IFileWriteOperation} in ops.
    * @throws CoreException
    */
-  public static List<IFile> writeResourcesWithResult(Collection<ResourceWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
-    writeResources(ops, monitor, true);
+  public static List<IFile> writeFiles(Collection<? extends IFileWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    if (ops == null || ops.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    writeFiles(ops, monitor, true);
 
     List<IFile> result = new ArrayList<>(ops.size());
-    for (ResourceWriteOperation op : ops) {
+    for (IFileWriteOperation op : ops) {
       if (op == null) {
         result.add(null);
       }
@@ -910,26 +897,31 @@ public final class S2eUtils {
   }
 
   /**
-   * Executes the given {@link ResourceWriteOperation}s in a new {@link ResourceBlockingOperationJob}.
+   * Executes the given {@link IFileWriteOperation}s in a new {@link ResourceBlockingOperationJob}.<br>
    *
    * @param ops
-   *          The {@link ResourceWriteOperation}s to execute.
+   *          The {@link IFileWriteOperation}s to execute.
    * @param monitor
    *          The {@link IProgressMonitor}
    * @param waitUntilWritten
    *          <code>true</code> if this method should block until all operations have been executed. <code>false</code>
-   *          if this method should directly return after the {@link ResourceWriteOperation}s have been scheduled.
+   *          if this method should directly return after the {@link ResourceWriteOperation}s have been scheduled.<br>
+   *          Important: If this parameter is <code>true</code> and the {@link Job} invoking this method uses an
+   *          {@link ISchedulingRule} that conflicts with one of the {@link IFile}s to be written, this will result in a
+   *          deadlock! In that case consider writing the files sync using
+   *          {@link IFileWriteOperation#run(IProgressMonitor, IWorkingCopyManager)} if you need the resulting
+   *          {@link IFile} after the invocation of this method.
    * @throws CoreException
    */
-  public static void writeResources(Collection<ResourceWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) throws CoreException {
+  public static void writeFiles(Collection<? extends IFileWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) throws CoreException {
     if (ops == null || ops.isEmpty()) {
       return;
     }
 
     Set<IResource> lockedResources = new HashSet<>(ops.size());
-    for (ResourceWriteOperation op : ops) {
+    for (IFileWriteOperation op : ops) {
       if (op != null) {
-        IResource r = getExistingParent(op.getFile());
+        IResource r = op.getAffectedResource();
         if (r != null) {
           lockedResources.add(r);
         }
@@ -946,14 +938,6 @@ public final class S2eUtils {
         SdkLog.info("Unable to wait until resources have been written.", e);
       }
     }
-  }
-
-  private static IResource getExistingParent(IResource startResource) {
-    IResource curResource = startResource;
-    while (curResource != null && !curResource.exists()) {
-      curResource = curResource.getParent();
-    }
-    return curResource;
   }
 
   /**
@@ -1211,7 +1195,7 @@ public final class S2eUtils {
    * Writes the given {@link ICompilationUnitSourceBuilder} into the given source folder.<br>
    * <br>
    * <b>Important Note: </b>The write operation is directly executed in the current thread! This means the current
-   * {@link Job} must already hold a {@link ISchedulingRule} that contains the folder in which should be written!
+   * {@link Job} must already hold an {@link ISchedulingRule} that contains the target file.
    *
    * @param srcFolder
    *          The source folder that will hold the new compilation unit. Must be of type
@@ -1521,17 +1505,51 @@ public final class S2eUtils {
    * @throws CoreException
    */
   public static void writeXmlDocument(Document document, IFile file, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    StringWriter out = new StringWriter();
     try {
-      Transformer transformer = CoreUtils.createTransformer(true);
-      transformer.transform(new DOMSource(document), new StreamResult(out));
-
-      ResourceWriteOperation writeOp = new ResourceWriteOperation(file, out.toString());
+      ResourceWriteOperation writeOp = new ResourceWriteOperation(file, CoreUtils.xmlDocumentToString(document, true));
       writeOp.validate();
       writeOp.run(monitor, workingCopyManager);
     }
     catch (TransformerException e) {
       throw new CoreException(new ScoutStatus(e));
     }
+  }
+
+  /**
+   * Execute a Maven update on the given {@link IProject}s.
+   *
+   * @param projects
+   *          The projects for which a Maven update should be performed.
+   * @param updateSnapshots
+   *          Specifies if an update of snapshot dependencies should be enforced.
+   * @param updateConfig
+   *          Specifies if the Eclipse project configuration should be updated based on the pom.xml
+   * @param cleanProject
+   *          Specifies if the project should be cleaned.
+   * @param refreshFromDisk
+   *          Specifies if the project should be refreshed from disk.
+   * @param monitor
+   *          The {@link IProgressMonitor} for the update operation.
+   * @return A {@link Map} containing the project name as key and an {@link IStatus} describing the update result for
+   *         the corresponding project.
+   */
+  public static Map<String, IStatus> mavenUpdate(Set<IProject> projects, boolean updateSnapshots, boolean updateConfig, boolean cleanProject, boolean refreshFromDisk, IProgressMonitor monitor) {
+    if (projects == null || projects.isEmpty()) {
+      return Collections.emptyMap();
+    }
+    MavenPluginActivator mavenPlugin = MavenPluginActivator.getDefault();
+    if (mavenPlugin == null) {
+      return Collections.emptyMap();
+    }
+    ProjectConfigurationManager configurationManager = (ProjectConfigurationManager) mavenPlugin.getProjectConfigurationManager();
+    if (configurationManager == null) {
+      return Collections.emptyMap();
+    }
+    MavenUpdateRequest request = new MavenUpdateRequest(projects.toArray(new IProject[projects.size()]), false, updateSnapshots);
+    if (monitor != null && monitor.isCanceled()) {
+      return Collections.emptyMap();
+    }
+    Map<String, IStatus> result = configurationManager.updateProjectConfiguration(request, updateConfig, cleanProject, refreshFromDisk, monitor);
+    return result;
   }
 }

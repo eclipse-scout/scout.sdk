@@ -19,6 +19,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
@@ -37,9 +39,9 @@ import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.TypeContentProvider;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
 import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils.PublicAbstractPrimaryTypeFilter;
 import org.eclipse.scout.sdk.s2e.util.ScoutTier;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
@@ -82,6 +84,21 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
   protected void createContent(Composite parent) {
     super.createContent(parent);
 
+    // change the filter for the super types to also include the LookupCall class as proposal (which is not abstract and would be excluded otherwise)
+    StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
+    superTypeContentProvider.setTypeProposalFilter(new PublicAbstractPrimaryTypeFilter() {
+      @Override
+      public boolean evaluate(IType candidate) {
+        if (!S2eUtils.exists(candidate)) {
+          return false;
+        }
+        if (IScoutRuntimeTypes.LookupCall.equals(candidate.getFullyQualifiedName())) {
+          return true;
+        }
+        return super.evaluate(candidate);
+      }
+    });
+
     guessServerFolders();
     createLookupCallPropertiesGroup(parent);
 
@@ -94,16 +111,9 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
 
   protected void createLookupCallPropertiesGroup(Composite p) {
     Group parent = getFieldToolkit().createGroupBox(p, "Lookup Service");
-    GridData layoutData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    layoutData.verticalIndent = 10;
-    parent.setLayoutData(layoutData);
-    parent.setLayout(new GridLayout(1, true));
 
     // server source folder
-    m_serverSourceFolder = getFieldToolkit().createSourceFolderTextField(parent, "Server Source Folder", ScoutTier.Server, 20);
-    GridData serverGridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    serverGridData.horizontalSpan = 3;
-    m_serverSourceFolder.setLayoutData(serverGridData);
+    m_serverSourceFolder = getFieldToolkit().createSourceFolderField(parent, "Server Source Folder", ScoutTier.Server, getLabelWidth());
     m_serverSourceFolder.acceptProposal(getServerSourceFolder());
     m_serverSourceFolder.addProposalListener(new IProposalListener() {
       @Override
@@ -118,8 +128,7 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
     if (S2eUtils.exists(superType)) {
       setServiceImplSuperTypeInternal(superType);
     }
-    m_lookupServiceSuperTypeField = getFieldToolkit().createAbstractTypeProposalField(parent, "Service Super Class", getServerJavaProject(), getServiceImplSuperTypeBaseClass());
-    m_lookupServiceSuperTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_lookupServiceSuperTypeField = getFieldToolkit().createAbstractTypeProposalField(parent, "Service Super Class", getServerJavaProject(), getServiceImplSuperTypeBaseClass(), getLabelWidth());
     m_lookupServiceSuperTypeField.acceptProposal(getServiceImplSuperType());
     m_lookupServiceSuperTypeField.setEnabled(S2eUtils.exists(getServerJavaProject()));
     m_lookupServiceSuperTypeField.addProposalListener(new IProposalListener() {
@@ -130,8 +139,7 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
       }
     });
 
-    m_keyTypeField = getFieldToolkit().createTypeProposalField(getIcuGroupComposite(), "Key Class", getJavaProject());
-    m_keyTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_keyTypeField = getFieldToolkit().createTypeProposalField(getIcuGroupComposite(), "Key Class", getJavaProject(), getLabelWidth());
     m_keyTypeField.addProposalListener(new IProposalListener() {
       @Override
       public void proposalAccepted(Object proposal) {
@@ -139,7 +147,40 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
         pingStateChanging();
       }
     });
+
+    // layout
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(parent);
+    GridDataFactory
+        .defaultsFor(parent)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .indent(0, 10)
+        .applyTo(parent);
+    GridDataFactory
+        .defaultsFor(m_serverSourceFolder)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .span(3, 0)
+        .applyTo(m_serverSourceFolder);
+    GridDataFactory
+        .defaultsFor(m_lookupServiceSuperTypeField)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(m_lookupServiceSuperTypeField);
+    GridDataFactory
+        .defaultsFor(m_keyTypeField)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(m_keyTypeField);
+
     syncKeyTypeFieldToSuperType();
+  }
+
+  @Override
+  protected int getLabelWidth() {
+    return 120;
   }
 
   @Override

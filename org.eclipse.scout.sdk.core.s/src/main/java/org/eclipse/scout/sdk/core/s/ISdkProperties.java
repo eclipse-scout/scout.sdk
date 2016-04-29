@@ -35,6 +35,13 @@ public interface ISdkProperties {
   String SUFFIX_PERMISSION = "Permission";
   String SUFFIX_CODE_TYPE = "CodeType";
   String SUFFIX_TEST = "Test";
+  String SUFFIX_WS_CLIENT = "WebServiceClient";
+  String SUFFIX_WS_PROVIDER = "WebService";
+  String SUFFIX_WS_URL_PROPERTY = "WebServiceUrlProperty";
+  String SUFFIX_WS_PORT_TYPE = "PortType";
+  String SUFFIX_WS_SERVICE = "Service";
+  String SUFFIX_WS_ENTRY_POINT = "WebServiceEntryPoint";
+  String SUFFIX_WS_ENTRY_POINT_DEFINITION = SUFFIX_WS_ENTRY_POINT + "Definition";
 
   String INNER_TABLE_TYPE_NAME = "Table";
   String INNER_TREE_TYPE_NAME = "Tree";

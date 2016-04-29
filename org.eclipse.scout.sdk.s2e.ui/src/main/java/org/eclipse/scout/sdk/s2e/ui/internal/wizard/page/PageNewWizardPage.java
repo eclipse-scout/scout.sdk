@@ -14,6 +14,8 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -24,8 +26,7 @@ import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
 import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.ScoutTier;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
@@ -114,17 +115,16 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
     }
   }
 
+  @Override
+  protected int getLabelWidth() {
+    return 120;
+  }
+
   protected void createPageServcieGroup(Composite p) {
     Group parent = getFieldToolkit().createGroupBox(p, "PageData and Service Source Folders");
-    parent.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    parent.setLayout(new GridLayout(1, true));
 
     // shared source folder
-    m_sharedSourceFolder = getFieldToolkit().createSourceFolderTextField(parent, "Shared Source Folder", ScoutTier.Shared, 20);
-    GridData sharedGridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    sharedGridData.horizontalSpan = 3;
-    sharedGridData.verticalIndent = 8;
-    m_sharedSourceFolder.setLayoutData(sharedGridData);
+    m_sharedSourceFolder = getFieldToolkit().createSourceFolderField(parent, "Shared Source Folder", ScoutTier.Shared, getLabelWidth());
     m_sharedSourceFolder.acceptProposal(getSharedSourceFolder());
     m_sharedSourceFolder.addProposalListener(new IProposalListener() {
       @Override
@@ -135,8 +135,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
     });
 
     // server source folder
-    m_serverSourceFolder = getFieldToolkit().createSourceFolderTextField(parent, "Server Source Folder", ScoutTier.Server, 20);
-    m_serverSourceFolder.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_serverSourceFolder = getFieldToolkit().createSourceFolderField(parent, "Server Source Folder", ScoutTier.Server, getLabelWidth());
     m_serverSourceFolder.acceptProposal(getServerSourceFolder());
     m_serverSourceFolder.addProposalListener(new IProposalListener() {
       @Override
@@ -145,6 +144,28 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
         pingStateChanging();
       }
     });
+
+    // layout
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(parent);
+    GridDataFactory
+        .defaultsFor(parent)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(parent);
+    GridDataFactory
+        .defaultsFor(m_sharedSourceFolder)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .span(3, 0)
+        .indent(0, 8)
+        .applyTo(m_sharedSourceFolder);
+    GridDataFactory
+        .defaultsFor(m_serverSourceFolder)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(m_serverSourceFolder);
   }
 
   public IPackageFragmentRoot getSharedSourceFolder() {

@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.s2e.ui.fields.file;
+package org.eclipse.scout.sdk.s2e.ui.fields.resource;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,32 +27,28 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>FileSelectionField</h3> For selecting folders or files on the local disk.
+ * <h3>ResourceTextField</h3> For selecting folders and files on the local file system or URLs in general.
  *
  * @author Andreas Hoegger
  * @since 5.1.0
- * @see IFileSelectionListener
+ * @see IResourceChangedListener
  */
-public class FileSelectionField extends TextField {
+public class ResourceTextField extends TextField {
 
   private Button m_popupButton;
-  private File m_file;
+  private URL m_url;
 
   private boolean m_folderMode;
   private String[] m_filterExtensions;
@@ -57,12 +57,25 @@ public class FileSelectionField extends TextField {
   private final EventListenerList m_eventListeners;
   private final OptimisticLock m_inputLock;
 
-  public FileSelectionField(Composite parent) {
-    this(parent, DEFAULT_LABEL_PERCENTAGE);
+  /**
+   * @see TextField#TextField(Composite)
+   */
+  public ResourceTextField(Composite parent) {
+    this(parent, TYPE_LABEL);
   }
 
-  public FileSelectionField(Composite parent, int labelPercentage) {
-    super(parent, labelPercentage);
+  /**
+   * @see TextField#TextField(Composite, int)
+   */
+  public ResourceTextField(Composite parent, int type) {
+    this(parent, type, DEFAULT_LABEL_WIDTH);
+  }
+
+  /**
+   * @see TextField#TextField(Composite, int, int)
+   */
+  public ResourceTextField(Composite parent, int type, int labelWidth) {
+    super(parent, type, labelWidth);
     m_inputLock = new OptimisticLock();
     m_eventListeners = new EventListenerList();
   }
@@ -70,15 +83,23 @@ public class FileSelectionField extends TextField {
   @Override
   public void setEnabled(boolean enabled) {
     super.setEnabled(enabled);
-    m_popupButton.setEnabled(enabled);
+    if (m_popupButton != null && !m_popupButton.isDisposed()) {
+      m_popupButton.setEnabled(enabled);
+    }
+  }
+
+  @Override
+  public void setEditable(boolean editable) {
+    super.setEditable(editable);
+    if (m_popupButton != null && !m_popupButton.isDisposed()) {
+      m_popupButton.setEnabled(editable);
+    }
   }
 
   @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
 
-    Label label = getLabelComponent();
-    StyledText text = getTextComponent();
     m_popupButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_popupButton.setText("Browse...");
     m_popupButton.addSelectionListener(new SelectionAdapter() {
@@ -88,26 +109,32 @@ public class FileSelectionField extends TextField {
       }
     });
 
-    text.addModifyListener(new ModifyListener() {
+    StyledText text = getTextComponent();
+    text.addFocusListener(new FocusListener() {
       @Override
-      public void modifyText(ModifyEvent e) {
+      public void focusLost(FocusEvent e) {
         try {
           if (m_inputLock.acquire()) {
             String input = getText();
             if (StringUtils.isBlank(input)) {
-              setFileInternal(null);
+              setUrl(null);
             }
             else {
-              File newFile = new File(input);
-
               // validate path
               try {
+                File newFile = new File(input);
                 newFile.getCanonicalPath(); // fails on invalid path
-                setFileInternal(newFile);
+                setUrl(newFile.toURI().toURL());
               }
               catch (Exception ex) {
-                // the supplied string is no valid path for this OS.
-                setFileInternal(null);
+                // the supplied string is no valid path for this OS. Try as URL
+                try {
+                  URL url = new URL(input);
+                  setUrl(url);
+                }
+                catch (MalformedURLException e1) {
+                  setUrl(null);
+                }
               }
             }
           }
@@ -116,28 +143,19 @@ public class FileSelectionField extends TextField {
           m_inputLock.release();
         }
       }
+
+      @Override
+      public void focusGained(FocusEvent e) {
+      }
     });
-    parent.setTabList(new Control[]{text});
 
     // layout
-    parent.setLayout(new FormLayout());
-    FormData labelData = new FormData();
-    labelData.top = new FormAttachment(0, 4);
-    labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(getLabelPercentage(), 0);
-    labelData.bottom = new FormAttachment(100, 0);
-    label.setLayoutData(labelData);
-
-    FormData textData = new FormData();
-    textData.top = new FormAttachment(0, 0);
-    textData.left = new FormAttachment(label, 5);
+    FormData textData = (FormData) text.getLayoutData();
     textData.right = new FormAttachment(m_popupButton, -2);
-    textData.bottom = new FormAttachment(100, 0);
-    text.setLayoutData(textData);
 
     FormData buttonData = new FormData();
     buttonData.width = 70;
-    buttonData.top = new FormAttachment(0, 0);
+    buttonData.top = new FormAttachment(0, -1);
     buttonData.right = new FormAttachment(100, 0);
     buttonData.bottom = new FormAttachment(100, 0);
     m_popupButton.setLayoutData(buttonData);
@@ -147,8 +165,9 @@ public class FileSelectionField extends TextField {
     String fileName = null;
     if (isFolderMode()) {
       DirectoryDialog dialog = new DirectoryDialog(getShell());
-      if (getFile() != null) {
-        dialog.setFilterPath(getFile().getAbsolutePath());
+      File urlAsFile = getFile();
+      if (urlAsFile != null) {
+        dialog.setFilterPath(urlAsFile.getAbsolutePath());
       }
       fileName = dialog.open();
     }
@@ -163,17 +182,20 @@ public class FileSelectionField extends TextField {
       }
       fileName = dialog.open();
       if (StringUtils.isNotEmpty(fileName) && getFilterExtensions() != null && getFilterExtensions().length > 0) {
-        int extIndex = dialog.getFilterIndex();
+
         Matcher m = Pattern.compile("\\.([^\\.]*)$").matcher(fileName);
         String extension = null;
         if (m.find()) {
+          String fileNameExt = m.group(1);
           for (String fExt : getFilterExtensions()) {
-            if (StringUtils.equalsIgnoreCase(fExt, "*." + m.group(1))) {
-              extension = m.group(1);
+            if (StringUtils.equalsIgnoreCase(fExt, "*." + fileNameExt)) {
+              extension = fileNameExt;
               break;
             }
           }
         }
+
+        int extIndex = dialog.getFilterIndex();
         if (extension == null && extIndex > -1 && extIndex < getFilterExtensions().length) {
           extension = getFilterExtensions()[extIndex];
           extension = extension.replaceFirst("\\**", "");
@@ -181,8 +203,9 @@ public class FileSelectionField extends TextField {
         }
       }
     }
+
     File newFile = null;
-    if (StringUtils.isNotEmpty(fileName)) {
+    if (StringUtils.isNotBlank(fileName)) {
       newFile = new File(fileName);
       try {
         if (m_inputLock.acquire()) {
@@ -193,32 +216,23 @@ public class FileSelectionField extends TextField {
         m_inputLock.release();
       }
     }
-    setFileInternal(newFile);
-
+    setFile(newFile);
   }
 
-  public void addFileSelectionListener(IFileSelectionListener listener) {
-    m_eventListeners.add(IFileSelectionListener.class, listener);
+  public void addResourceChangedListener(IResourceChangedListener listener) {
+    m_eventListeners.add(IResourceChangedListener.class, listener);
   }
 
-  public void removeFileSelectionListener(IFileSelectionListener listener) {
-    m_eventListeners.remove(IFileSelectionListener.class, listener);
+  public void removeResourceChangedListener(IResourceChangedListener listener) {
+    m_eventListeners.remove(IResourceChangedListener.class, listener);
   }
 
-  @Override
-  public void addTraverseListener(TraverseListener listener) {
-    getTextComponent().addTraverseListener(listener);
-  }
-
-  @Override
-  public void removeTraverseListener(TraverseListener listener) {
-    getTextComponent().removeTraverseListener(listener);
-  }
-
-  private void fireFileSelected(File file) {
-    for (IFileSelectionListener l : m_eventListeners.getListeners(IFileSelectionListener.class)) {
+  private void fireValueChanged() {
+    File newFile = getFile();
+    URL newUrl = getUrl();
+    for (IResourceChangedListener l : m_eventListeners.getListeners(IResourceChangedListener.class)) {
       try {
-        l.fileSelected(file);
+        l.resourceChanged(newUrl, newFile);
       }
       catch (Exception t) {
         SdkLog.error("error during listener notification.", t);
@@ -264,11 +278,35 @@ public class FileSelectionField extends TextField {
     return m_filterExtensions;
   }
 
-  /**
-   * @return the file
-   */
   public File getFile() {
-    return m_file;
+    URL url = getUrl();
+    if (url == null) {
+      return null;
+    }
+    try {
+      URI uri = url.toURI();
+      if (!"file".equalsIgnoreCase(uri.getScheme())) {
+        return null;
+      }
+      File f = new File(uri);
+      return f;
+    }
+    catch (URISyntaxException e) {
+      return null;
+    }
+  }
+
+  public URL getUrl() {
+    return m_url;
+  }
+
+  public void setUrl(URL url) {
+    if (Objects.equals(url, m_url)) {
+      return;
+    }
+
+    m_url = url;
+    fireValueChanged();
   }
 
   /**
@@ -276,12 +314,22 @@ public class FileSelectionField extends TextField {
    *          the file to set
    */
   public void setFile(File file) {
-    m_file = file;
-    if (!isDisposed()) {
-      String text = "";
-      if (file != null) {
-        text = file.getAbsolutePath();
+    String text = null;
+    if (file == null) {
+      text = "";
+      setUrl(null);
+    }
+    else {
+      text = file.getAbsolutePath();
+      try {
+        setUrl(file.toURI().toURL());
       }
+      catch (MalformedURLException e) {
+        SdkLog.warning("Unable convert File to URL", e);
+      }
+    }
+
+    if (!isDisposed()) {
       try {
         if (m_inputLock.acquire()) {
           getTextComponent().setText(text);
@@ -290,13 +338,6 @@ public class FileSelectionField extends TextField {
       finally {
         m_inputLock.release();
       }
-    }
-  }
-
-  private void setFileInternal(File file) {
-    if (!Objects.equals(getFile(), file)) {
-      setFile(file);
-      fireFileSelected(file);
     }
   }
 }

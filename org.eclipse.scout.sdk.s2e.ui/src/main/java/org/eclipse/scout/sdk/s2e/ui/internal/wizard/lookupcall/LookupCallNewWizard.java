@@ -19,12 +19,9 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.JavaPluginImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.operation.lookupcall.LookupCallNewOperation;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
@@ -34,7 +31,6 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PartInitException;
 
 /**
  * <h3>{@link LookupCallNewWizard}</h3>
@@ -116,12 +112,7 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
             if (!S2eUtils.exists(createdLookupCallType)) {
               return;
             }
-            try {
-              JavaUI.openInEditor(createdLookupCallType, true, true);
-            }
-            catch (PartInitException | JavaModelException e) {
-              SdkLog.info("Unable to open type {} in editor.", createdLookupCallType.getFullyQualifiedName(), e);
-            }
+            S2eUiUtils.openInEditor(createdLookupCallType);
           }
         });
       }

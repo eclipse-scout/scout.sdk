@@ -12,9 +12,8 @@ package org.eclipse.scout.sdk.core.s.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
-import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
+import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.junit.Test;
 
@@ -25,26 +24,18 @@ import org.junit.Test;
  * @since 5.2.0
  */
 public class ScoutProjectNewTest {
-  private static final String PROJECT_GROUP_ID = "group";
-  private static final String PROJECT_ARTIFACT_ID = "artifact";
 
   @Test
   public void testProjectCreation() throws IOException {
-    File targetDirectory = Files.createTempDirectory(ScoutProjectNewTest.class.getSimpleName() + "-projectDir").toFile();
+    File targetDirectory = null;
     try {
-      ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", getJavaVersion());
-      File pomDir = new File(targetDirectory, PROJECT_ARTIFACT_ID);
-      new MavenCliRunner().execute(pomDir, new String[]{"clean", "test", "-B", "-X", "-Dmaven.ext.class.path=''", "-Dmaster_test_forkCount=1", "-Dmaster_test_runOrder=filesystem"}, null, null);
+      targetDirectory = CoreScoutTestingUtils.createTestProject();
+      CoreScoutTestingUtils.runMavenCleanTest(new File(targetDirectory, CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
     }
     finally {
-      CoreUtils.deleteFolder(targetDirectory);
+      if (targetDirectory != null) {
+        CoreUtils.deleteDirectory(targetDirectory);
+      }
     }
-  }
-
-  private static String getJavaVersion() {
-    String version = System.getProperty("java.version");
-    int pos = version.indexOf('.');
-    pos = version.indexOf('.', pos + 1);
-    return version.substring(0, pos);
   }
 }

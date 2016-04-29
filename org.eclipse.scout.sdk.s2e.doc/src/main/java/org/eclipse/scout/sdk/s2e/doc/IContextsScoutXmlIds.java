@@ -25,4 +25,6 @@ public interface IContextsScoutXmlIds {
   String SCOUT_CODETYPE_NEW_WIZARD_ID = "scout_wizard_code-type_page_context";
   String SCOUT_PERMISSION_NEW_WIZARD_ID = "scout_wizard_permission_page_context";
   String SCOUT_LANGUAGE_NEW_WIZARD_ID = "scout_wizard_language_page_context";
+  String SCOUT_WEB_SERVICE_NEW_WIZARD_ID = "scout_wizard_webservice_page_context";
+  String SCOUT_WEB_SERVICE_EDITOR_ID = "scout_editor_webservice_context";
 }

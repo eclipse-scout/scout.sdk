@@ -18,6 +18,8 @@ package org.eclipse.scout.sdk.core.s;
  */
 public interface IMavenConstants {
 
+  String POM_XML_NAMESPACE = "http://maven.apache.org/POM/4.0.0";
+
   String POM = "pom.xml";
   String PROJECT = "project";
   String DEPENDENCIES = "dependencies";
@@ -40,4 +42,5 @@ public interface IMavenConstants {
   String BUILD = "build";
   String PARENT = "parent";
   String NAME = "name";
+  String RELATIVE_PATH = "relativePath";
 }

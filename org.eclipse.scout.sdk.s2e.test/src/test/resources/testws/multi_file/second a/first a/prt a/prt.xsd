@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.eclipse.org/schema/common"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:rcmn="http://www.eclipse.org/schema/common"
+  targetNamespace="http://www.eclipse.org/schema/common"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+
+  <xs:include schemaLocation="cmn%20a/common_def.xsd" />
+
+  <xs:complexType name="ReturnDetailType">
+    <xs:sequence>
+      <xs:element name="ReturnCode" type="ReturnCodeType">
+        <xs:annotation>
+          <xs:documentation>doc</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ReturnCodeType" type="rcmn:CodeTypeType">
+        <xs:annotation>
+          <xs:documentation>doc</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ReturnCodeType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

@@ -239,7 +239,7 @@ public class NlsTable extends Composite {
       col.dispose();
     }
     // utility columns
-    TableColumn colRefs = new TableColumn(table, SWT.LEFT);
+    TableColumn colRefs = new TableColumn(table, SWT.LEAD);
     colRefs.setResizable(false);
     colRefs.setMoveable(false);
     colRefs.setWidth(45);
@@ -250,7 +250,7 @@ public class NlsTable extends Composite {
     int i = NlsTable.INDEX_COLUMN_KEYS;
     // nls java column
 
-    TableColumn jColumn = new TableColumn(table, SWT.LEFT);
+    TableColumn jColumn = new TableColumn(table, SWT.LEAD);
     jColumn.setText(Language.LANGUAGE_KEY.getDispalyName());
     jColumn.setData(LANGUAGE_COLUMN_ID, Language.LANGUAGE_KEY);
     jColumn.setMoveable(false);
@@ -266,7 +266,7 @@ public class NlsTable extends Composite {
   }
 
   public void createTableColumnInternal(Language language) {
-    TableColumn c = new TableColumn(m_table, SWT.LEFT);
+    TableColumn c = new TableColumn(m_table, SWT.LEAD);
     c.setData(LANGUAGE_COLUMN_ID, language);
     if (!language.isLocal()) {
       c.setToolTipText("this language is only in the parent defined!\nCreate a new language for " + language.getLocale().toString() + " to make it locally available.");

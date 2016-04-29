@@ -121,6 +121,7 @@ public final class ScoutModelHierarchy {
     addContainerElement(IScoutRuntimeTypes.AbstractForm, IScoutRuntimeTypes.IFormHandler);
     addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IToolButton);
     addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IFormHandler);
+    addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IFormField);
     addContainerElement(IScoutRuntimeTypes.AbstractWizard, IScoutRuntimeTypes.IWizardStep);
     addContainerElement(IScoutRuntimeTypes.AbstractWizardExtension, IScoutRuntimeTypes.IWizardStep);
     addContainerElement(IScoutRuntimeTypes.AbstractCodeTypeWithGeneric, IScoutRuntimeTypes.ICode);

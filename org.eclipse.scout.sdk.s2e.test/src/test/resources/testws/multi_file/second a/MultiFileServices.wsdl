@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<wsdl:definitions
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:web="http://www.eclipse.org/scout/webservices"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:cor="http://www.eclipse.org/scout/webservices/scout"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ns="http://www.eclipse.org/schema/common"
+  xmlns:ns1="http://schemas.xmlsoap.org/soap/encoding/"
+  name="ScoutWebservices"
+  targetNamespace="http://www.eclipse.org/scout/webservices"
+  xsi:schemaLocation="http://schemas.xmlsoap.org/wsdl/wsdl11.xsd">
+
+   <wsdl:types>
+      <xs:schema targetNamespace="http://www.eclipse.org/scout/webservices/scout" elementFormDefault="qualified" attributeFormDefault="unqualified">
+         <xs:include schemaLocation="first%20a/TestService.xsd"/>
+      </xs:schema>
+      <xs:schema elementFormDefault="qualified" targetNamespace="http://scout.eclipse.org" xmlns="http://www.w3.org/2001/XMLSchema">
+         <import namespace="java:scout.eclipse.org"/>
+      </xs:schema>
+   </wsdl:types>
+   <wsdl:message name="operation01Request">
+      <wsdl:part name="context" type="cor:ContextType"></wsdl:part>
+      <wsdl:part name="mandant" type="xs:short"></wsdl:part>
+      <wsdl:part name="personId" type="xs:long"></wsdl:part>
+      <wsdl:part name="desc" type="xs:string"></wsdl:part>
+      <wsdl:part name="valuta" type="cor:ValutaPartType"></wsdl:part>
+      <wsdl:part name="findDisabled" type="xs:boolean"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="operation01Response">
+      <wsdl:part name="response" type="cor:Operation01TypeResponse"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="operation02Request">
+      <wsdl:part name="context" type="cor:ContextType"></wsdl:part>
+      <wsdl:part name="mandant" type="xs:short"></wsdl:part>
+      <wsdl:part name="personId" type="xs:long"></wsdl:part>
+      <wsdl:part name="desc" type="xs:string"></wsdl:part>
+      <wsdl:part name="valuta" type="cor:ValutaPartType"></wsdl:part>
+      <wsdl:part name="findDisabled" type="xs:boolean"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="operation02Response">
+      <wsdl:part name="response" type="cor:Operation02TypeResponse"/>
+   </wsdl:message>
+
+   <wsdl:message name="errorResponse">
+      <wsdl:part name="errorMessage" element="cor:errorMessage"/>
+   </wsdl:message>
+
+   <wsdl:portType name="scoutQueryInterface2">
+      <wsdl:operation name="operation01">
+         <wsdl:input message="web:operation01Request"/>
+         <wsdl:output message="web:operation01Response"/>
+         <wsdl:fault name="errorOrWarning" message="web:errorResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="operation02">
+         <wsdl:input message="web:operation02Request"/>
+         <wsdl:output message="web:operation02Response"/>
+         <wsdl:fault name="errorOrWarning" message="web:errorResponse"/>
+      </wsdl:operation>
+   </wsdl:portType>
+</wsdl:definitions>

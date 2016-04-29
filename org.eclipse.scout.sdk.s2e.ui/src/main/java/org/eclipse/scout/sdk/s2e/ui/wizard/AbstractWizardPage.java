@@ -148,10 +148,11 @@ public abstract class AbstractWizardPage extends WizardPage {
     else {
       m_stateChangingCounter--;
     }
-    if (m_stateChangingCounter <= 0) {
-      m_stateChangingCounter = 0;
-      revalidate();
-    }
+    pingStateChanging();
+  }
+
+  protected boolean isStateChanging() {
+    return m_stateChangingCounter > 0;
   }
 
   /**
