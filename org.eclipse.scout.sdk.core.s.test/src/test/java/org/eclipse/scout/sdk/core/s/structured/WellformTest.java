@@ -14,6 +14,7 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import formdata.client.ui.desktop.outline.pages.ExtendedTablePage;
@@ -31,6 +32,20 @@ import formdata.client.ui.forms.TableFieldForm;
  * @since 5.2.0
  */
 public class WellformTest {
+
+  @Test
+  public void testEmptyCommentRegex() {
+    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   *\n   */").matches());
+    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n\t*\n\t*/").matches());
+
+    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   * \n   */").matches());
+    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n\t* \n\t*/").matches());
+
+    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   *\n   *\n   *\n   */").matches());
+    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n\t*\n\t*\n\t*/").matches());
+
+    Assert.assertFalse(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   * whatever \n   */").matches());
+  }
 
   @Test
   public void testWellform() {

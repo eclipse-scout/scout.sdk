@@ -65,7 +65,7 @@ public class SourceFormatOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    if (monitor.isCanceled()) {
+    if (monitor != null && monitor.isCanceled()) {
       return;
     }
     try {
