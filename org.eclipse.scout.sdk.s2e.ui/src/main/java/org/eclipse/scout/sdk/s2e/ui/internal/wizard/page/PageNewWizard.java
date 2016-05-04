@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.JavaPluginImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
@@ -101,7 +102,7 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
       blockingFolders.add(selectedServerFolder.getResource());
 
       if (!S2eUtils.exists(op.getTestSourceFolder())) {
-        IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(selectedServerFolder);
+        IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(selectedServerFolder, IScoutRuntimeTypes.ServerTestRunner, "service test");
         if (serviceTestSourceFolder != null) {
           op.setTestSourceFolder(serviceTestSourceFolder);
           blockingFolders.add(serviceTestSourceFolder.getResource());

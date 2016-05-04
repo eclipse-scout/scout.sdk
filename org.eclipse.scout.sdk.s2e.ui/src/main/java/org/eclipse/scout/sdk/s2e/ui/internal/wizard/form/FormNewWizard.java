@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.JavaPluginImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
@@ -83,7 +84,7 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     op.setClientPackage(m_page1.getTargetPackage());
     op.setClientSourceFolder(m_page1.getSourceFolder());
     blockingFolders.add(m_page1.getSourceFolder().getResource());
-    IPackageFragmentRoot formTestSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getSourceFolder());
+    IPackageFragmentRoot formTestSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getSourceFolder(), IScoutRuntimeTypes.ClientTestRunner, "form test");
     if (formTestSourceFolder != null) {
       op.setClientTestSourceFolder(formTestSourceFolder);
       blockingFolders.add(formTestSourceFolder.getResource());
@@ -95,7 +96,7 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     if (m_page1.isCreateService()) {
       op.setServerSourceFolder(m_page1.getServerSourceFolder());
       blockingFolders.add(m_page1.getServerSourceFolder().getResource());
-      IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getServerSourceFolder());
+      IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getServerSourceFolder(), IScoutRuntimeTypes.ServerTestRunner, "service test");
       if (serviceTestSourceFolder != null) {
         op.setServerTestSourceFolder(serviceTestSourceFolder);
         blockingFolders.add(serviceTestSourceFolder.getResource());

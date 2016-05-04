@@ -119,7 +119,7 @@ public class PageNewOperation implements IOperation {
 
     setCreatedPage(createPage(isPageWithTable, progress.newChild(1), workingCopyManager));
 
-    if (isCreateService && S2eUtils.exists(getTestSourceFolder())) {
+    if (isCreateService) {
       setCreatedServiceTest(createServiceTest(progress.newChild(1), workingCopyManager));
     }
     progress.setWorkRemaining(0);
@@ -139,6 +139,10 @@ public class PageNewOperation implements IOperation {
   }
 
   protected IType createServiceTest(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    if (!S2eUtils.exists(getTestSourceFolder())) {
+      return null;
+    }
+
     String serverPackage = Signature.getQualifier(getCreatedServiceImpl().getFullyQualifiedName());
     String baseName = getCreatedServiceImpl().getElementName();
     String elementName = baseName + ISdkProperties.SUFFIX_TEST;
