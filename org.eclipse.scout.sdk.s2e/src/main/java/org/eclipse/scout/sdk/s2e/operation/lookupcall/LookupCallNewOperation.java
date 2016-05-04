@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
@@ -133,14 +134,25 @@ public class LookupCallNewOperation implements IOperation {
     ScoutTier targetTier = ScoutTier.valueOf(testSourceFolder);
     String testPackage = ScoutTier.Shared.convert(targetTier, getPackage());
     boolean isClient = ScoutTier.Client.equals(targetTier);
+    String runnerFqn = null;
+    if (isClient) {
+      runnerFqn = IScoutRuntimeTypes.ClientTestRunner;
+    }
+    else {
+      runnerFqn = IScoutRuntimeTypes.ServerTestRunner;
+    }
+
+    // validate source folder
+    if (env.findType(runnerFqn) == null) {
+      // source folder cannot be used: required runner is not accessible
+      SdkLog.warning("Cannot generate a LookupCall test class because the class '{}' is not on the classpath of project '{}'. Consider adding the required dependency.", runnerFqn, testSourceFolder.getJavaProject().getElementName());
+      return null;
+    }
 
     TestSourceBuilder lookupCallTestBuilder = new TestSourceBuilder(getLookupCallName() + ISdkProperties.SUFFIX_TEST, testPackage, env);
     lookupCallTestBuilder.setClientTest(isClient);
-    if (isClient) {
-      lookupCallTestBuilder.setRunnerSignature(Signature.createTypeSignature(IScoutRuntimeTypes.ClientTestRunner));
-    }
-    else {
-      lookupCallTestBuilder.setRunnerSignature(Signature.createTypeSignature(IScoutRuntimeTypes.ServerTestRunner));
+    lookupCallTestBuilder.setRunnerSignature(Signature.createTypeSignature(runnerFqn));
+    if (!isClient) {
       IType session = S2eUtils.getSession(testSourceFolder.getJavaProject(), ScoutTier.Server, monitor);
       if (S2eUtils.exists(session)) {
         lookupCallTestBuilder.setSessionSignature(Signature.createTypeSignature(session.getFullyQualifiedName()));

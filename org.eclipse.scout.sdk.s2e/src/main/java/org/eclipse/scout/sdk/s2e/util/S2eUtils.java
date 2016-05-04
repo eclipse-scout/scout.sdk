@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -1095,7 +1096,7 @@ public final class S2eUtils {
 
     NavigableMap<CompositeObject, IPackageFragmentRoot> prioMap = new TreeMap<>();
     for (IJavaProject project : projects) {
-      if (S2eUtils.exists(project)) {
+      if (exists(project)) {
         for (IPackageFragmentRoot root : project.getPackageFragmentRoots()) {
           if (monitor != null && monitor.isCanceled()) {
             return Collections.emptySet();
@@ -1160,7 +1161,7 @@ public final class S2eUtils {
     if (srcBuilder == null) {
       return null;
     }
-    if (!S2eUtils.exists(targetProject)) {
+    if (!exists(targetProject)) {
       return null;
     }
     if (env == null) {
@@ -1295,29 +1296,39 @@ public final class S2eUtils {
    *
    * @param orig
    *          The {@link IJavaProject} for which the primary test source folder should be found.
-   * @return The test source folder or <code>null</code>.
+   * @param fqnOfRequiredType
+   *          Fully qualified name of a type that must be accessible in the resulting {@link IPackageFragmentRoot} to be
+   *          returned. May be <code>null</code> which means every {@link IPackageFragmentRoot} is accepted.
+   * @return The test source folder having the given fqnOfRequiredType on the classpath or <code>null</code> if no such
+   *         source folder could be found.
    * @throws JavaModelException
    */
-  public static IPackageFragmentRoot getTestSourceFolder(IJavaProject orig) throws JavaModelException {
-    IPackageFragmentRoot sourceFolder = getTestSourceFolderInProject(orig);
-    if (S2eUtils.exists(sourceFolder)) {
+  public static IPackageFragmentRoot getTestSourceFolder(IJavaProject orig, String fqnOfRequiredType) throws JavaModelException {
+    IPackageFragmentRoot sourceFolder = getTestSourceFolderInProject(orig, fqnOfRequiredType);
+    if (exists(sourceFolder)) {
       return sourceFolder;
     }
 
     // search for a test project
     String[] testProjectSuffixes = new String[]{".test", ".tests", ".testing"};
+    IJavaModel javaModel = orig.getJavaModel();
     for (String suffix : testProjectSuffixes) {
-      IJavaProject testProject = orig.getJavaModel().getJavaProject(orig.getElementName() + suffix);
-      sourceFolder = getTestSourceFolderInProject(testProject);
-      if (S2eUtils.exists(sourceFolder)) {
+      IJavaProject testProject = javaModel.getJavaProject(orig.getElementName() + suffix);
+      sourceFolder = getTestSourceFolderInProject(testProject, fqnOfRequiredType);
+      if (exists(sourceFolder)) {
         return sourceFolder;
       }
     }
     return null;
   }
 
-  private static IPackageFragmentRoot getTestSourceFolderInProject(IJavaProject project) throws JavaModelException {
-    if (!S2eUtils.exists(project)) {
+  private static IPackageFragmentRoot getTestSourceFolderInProject(IJavaProject project, String fqnOfRequiredType) throws JavaModelException {
+    if (!exists(project)) {
+      return null;
+    }
+
+    if (StringUtils.isNotBlank(fqnOfRequiredType) && !exists(project.findType(fqnOfRequiredType))) {
+      // it is not a test project (no dependency to required class)
       return null;
     }
 
@@ -1325,7 +1336,7 @@ public final class S2eUtils {
     IFilter<IPackageFragmentRoot> filter = new IFilter<IPackageFragmentRoot>() {
       @Override
       public boolean evaluate(IPackageFragmentRoot element) {
-        if (!S2eUtils.exists(element)) {
+        if (!exists(element)) {
           return false;
         }
         String s = element.getPath().removeFirstSegments(1).toString().toLowerCase();
@@ -1412,7 +1423,7 @@ public final class S2eUtils {
 
   /**
    * Gets the content of the given {@link IFile} as {@link String}.
-   * 
+   *
    * @param file
    *          The {@link IFile} whose content should be returned.
    * @return The content of the given {@link IFile}.

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation;
 
+import java.util.Objects;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
@@ -150,7 +152,7 @@ public class CompilationUnitWriteOperation implements IOperation {
         String oldSource = S2eUtils.getContentOfFile((IFile) m_createdCompilationUnit.getResource());
         progress.worked(1);
 
-        if (!isSourceEqual(oldSource, newSource)) {
+        if (!Objects.equals(oldSource, newSource)) {
           workingCopyManager.register(m_createdCompilationUnit, progress.newChild(0));
 
           IBuffer buffer = m_createdCompilationUnit.getBuffer();
@@ -163,31 +165,4 @@ public class CompilationUnitWriteOperation implements IOperation {
       SdkLog.error("Could not {}", getOperationName(), e);
     }
   }
-
-  protected static boolean isSourceEqual(String source1, String source2) {
-    if (source1 == source2) {
-      return true;
-    }
-    if (source1 == null || source2 == null) {
-      return false;
-    }
-
-    // only compare contents starting from the package declaration
-    // ignore file headers in comparing the content
-    source1 = getSourceStartingAtPackage(source1);
-    source2 = getSourceStartingAtPackage(source2);
-    if (source1.length() != source2.length()) {
-      return false;
-    }
-    return source1.equals(source2);
-  }
-
-  protected static String getSourceStartingAtPackage(String fullSource) {
-    int packagePos = fullSource.indexOf("package ");
-    if (packagePos <= 0) {
-      return fullSource;
-    }
-    return fullSource.substring(packagePos);
-  }
-
 }

@@ -95,7 +95,7 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
 
     if (!S2eUtils.exists(op.getTestSourceFolder())) {
       // calculate test source if not already set
-      IPackageFragmentRoot testSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getServerSourceFolder());
+      IPackageFragmentRoot testSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getServerSourceFolder(), null /* validation is done in the operation */, "LookupCall test");
       if (testSourceFolder != null) {
         op.setTestSourceFolder(testSourceFolder);
         blockingFolders.add(testSourceFolder.getResource());

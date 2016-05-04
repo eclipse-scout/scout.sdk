@@ -19,6 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.IJavaElement;
@@ -243,29 +244,45 @@ public final class S2eUiUtils {
   }
 
   /**
-   * Gets a test source folder that belongs to the given {@link IJavaElement}.
-   * 
-   * @param element
-   *          The {@link IJavaElement} for which the test source folder should be calculated.
-   * @return The test sourcer folder or <code>null</code> if it could not be found.
+   * @see S2eUtils#getTestSourceFolder(IJavaProject, String)
    */
-  public static IPackageFragmentRoot getTestSourceFolder(IJavaElement element) {
+  public static IPackageFragmentRoot getTestSourceFolder(IJavaElement element, String fqnOfRequiredType, String testName) {
     if (!S2eUtils.exists(element)) {
       return null;
     }
 
+    if (StringUtils.isBlank(testName)) {
+      testName = "tests";
+    }
     IJavaProject javaProject = element.getJavaProject();
     try {
-      IPackageFragmentRoot testSourceFolder = S2eUtils.getTestSourceFolder(javaProject);
+      IPackageFragmentRoot testSourceFolder = S2eUtils.getTestSourceFolder(javaProject, fqnOfRequiredType);
       if (!S2eUtils.exists(testSourceFolder)) {
-        SdkLog.warning("No test source folder could be found for project '{}'. No tests will be generated.", javaProject.getElementName());
+        // no result found. log message
+        logNoTestSourceFolderFound(javaProject, fqnOfRequiredType, testName);
         return null;
       }
       return testSourceFolder;
     }
     catch (JavaModelException e) {
-      SdkLog.warning("Unable to calculate test source folder for project {}. No tests will be generated.", javaProject.getElementName(), e);
+      SdkLog.warning("Unable to calculate test source folder for project {}. No {} will be generated.", javaProject.getElementName(), testName, e);
       return null;
     }
+  }
+
+  private static void logNoTestSourceFolderFound(IJavaProject javaProject, String fqnOfRequiredType, String testName) {
+    // check if it is because if the class requirement
+    try {
+      IPackageFragmentRoot sourceFolderIgnoringRequiredType = S2eUtils.getTestSourceFolder(javaProject, null);
+      if (S2eUtils.exists(sourceFolderIgnoringRequiredType)) {
+        SdkLog.warning("Could not find a test source folder for project '{}' having access to class '{}'. No {} will be generated.", javaProject.getElementName(), fqnOfRequiredType, testName);
+      }
+      return;
+    }
+    catch (JavaModelException e) {
+      SdkLog.debug("Unable to get source folders for project '{}'.", javaProject.getElementName(), e);
+    }
+
+    SdkLog.warning("No test source folder could be found for project '{}'. No {} will be generated.", javaProject.getElementName(), testName);
   }
 }

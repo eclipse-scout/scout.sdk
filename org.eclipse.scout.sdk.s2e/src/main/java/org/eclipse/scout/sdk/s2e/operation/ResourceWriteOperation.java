@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.operation;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IContainer;
@@ -81,8 +82,7 @@ public class ResourceWriteOperation implements IOperation {
     try {
       // compare
       String oldSource = S2eUtils.getContentOfFile(m_file);
-      if (CompilationUnitWriteOperation.isSourceEqual(oldSource, newSource)) {
-        oldSource = null;
+      if (Objects.equals(oldSource, newSource)) {
         return;
       }
       oldSource = null;
