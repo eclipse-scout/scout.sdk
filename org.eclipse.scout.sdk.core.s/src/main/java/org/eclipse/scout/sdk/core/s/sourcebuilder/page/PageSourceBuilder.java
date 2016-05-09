@@ -16,7 +16,6 @@ import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.s.model.ScoutMethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
@@ -42,7 +41,6 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
 public class PageSourceBuilder extends AbstractEntitySourceBuilder {
 
   public static final String INNER_TABLE_NAME = "Table";
-  public static final String DATA_FETCH_METHOD_NAME = "getTableData";
   public static final String EXEC_LOAD_DATA_FILTER_ARG_NAME = "filter";
 
   private boolean m_isPageWithTable;
@@ -50,6 +48,7 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
   private String m_superTypeSignature;
   private String m_pageServiceIfcSignature;
   private String m_classIdValue;
+  private String m_dataFetchMethodName;
 
   public PageSourceBuilder(String elementName, String packageName, IJavaEnvironment env) {
     super(elementName, packageName, env);
@@ -87,11 +86,7 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
     }
 
     // getConfiguredTitle
-    String nlsKeyName = getEntityName();
-    if (nlsKeyName.endsWith(ISdkProperties.SUFFIX_PAGE)) {
-      nlsKeyName = CoreUtils.ensureStartWithUpperCase(nlsKeyName.substring(0, nlsKeyName.length() - ISdkProperties.SUFFIX_PAGE.length()));
-    }
-    IMethodSourceBuilder getConfiguredTitle = ScoutMethodSourceBuilderFactory.createNlsMethod("getConfiguredTitle", nlsKeyName);
+    IMethodSourceBuilder getConfiguredTitle = ScoutMethodSourceBuilderFactory.createNlsMethod("getConfiguredTitle", getEntityName());
     pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredTitle), getConfiguredTitle);
 
     // execLoadData / execCreateChildPages
@@ -106,7 +101,7 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
           }
           else {
             source.append("importPageData(").append(validator.useName(IScoutRuntimeTypes.BEANS)).append(".get(")
-                .append(validator.useSignature(getPageServiceIfcSignature())).append(SuffixConstants.SUFFIX_class).append(").").append(DATA_FETCH_METHOD_NAME).append('(').append(EXEC_LOAD_DATA_FILTER_ARG_NAME).append("));");
+                .append(validator.useSignature(getPageServiceIfcSignature())).append(SuffixConstants.SUFFIX_class).append(").").append(getDataFetchMethodName()).append('(').append(EXEC_LOAD_DATA_FILTER_ARG_NAME).append("));");
           }
         }
       });
@@ -167,5 +162,13 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
 
   public void setPageServiceIfcSignature(String pageServiceIfcSignature) {
     m_pageServiceIfcSignature = pageServiceIfcSignature;
+  }
+
+  public String getDataFetchMethodName() {
+    return m_dataFetchMethodName;
+  }
+
+  public void setDataFetchMethodName(String dataFetchMethodName) {
+    m_dataFetchMethodName = dataFetchMethodName;
   }
 }

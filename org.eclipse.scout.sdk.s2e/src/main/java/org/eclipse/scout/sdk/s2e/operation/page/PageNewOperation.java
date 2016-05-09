@@ -77,6 +77,8 @@ public class PageNewOperation implements IOperation {
   private IType m_createdServiceImpl;
   private IType m_createdServiceTest;
 
+  private String m_dataFetchMethodName;
+
   public PageNewOperation() {
     this(new CachingJavaEnvironmentProvider());
   }
@@ -130,12 +132,24 @@ public class PageNewOperation implements IOperation {
     }
   }
 
-  protected String calcServiceBaseName() {
-    String svcBaseName = getPageName();
-    if (svcBaseName.endsWith(ISdkProperties.SUFFIX_PAGE)) {
-      svcBaseName = svcBaseName.substring(0, svcBaseName.length() - ISdkProperties.SUFFIX_PAGE.length());
+  protected String calcServiceMethodName() {
+    String name = calcPageBaseName();
+    return "get" + name + "TableData";
+  }
+
+  protected String calcPageBaseName() {
+    String name = getPageName();
+    String[] suffixes = new String[]{ISdkProperties.SUFFIX_PAGE_WITH_NODES, ISdkProperties.SUFFIX_PAGE_WITH_TABLE, "Page"};
+    for (String suffix : suffixes) {
+      if (StringUtils.endsWithIgnoreCase(name, suffix)) {
+        name = name.substring(0, name.length() - suffix.length());
+      }
     }
-    return svcBaseName;
+    return name;
+  }
+
+  protected String calcServiceBaseName() {
+    return calcPageBaseName();
   }
 
   protected IType createServiceTest(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
@@ -182,7 +196,8 @@ public class PageNewOperation implements IOperation {
   }
 
   protected IMethodSourceBuilder createServiceMethod() {
-    final IMethodSourceBuilder methodBuilder = new MethodSourceBuilder(PageSourceBuilder.DATA_FETCH_METHOD_NAME);
+    setDataFetchMethodName(calcServiceMethodName());
+    final IMethodSourceBuilder methodBuilder = new MethodSourceBuilder(getDataFetchMethodName());
     methodBuilder.setFlags(Flags.AccPublic);
     methodBuilder.setComment(CommentSourceBuilderFactory.createDefaultMethodComment(methodBuilder));
 
@@ -216,7 +231,7 @@ public class PageNewOperation implements IOperation {
     if (S2eUtils.exists(getCreatedServiceIfc())) {
       pageBuilder.setPageServiceIfcSignature(Signature.createTypeSignature(getCreatedServiceIfc().getFullyQualifiedName()));
     }
-
+    pageBuilder.setDataFetchMethodName(getDataFetchMethodName());
     pageBuilder.setPageWithTable(isPageWithTable);
     pageBuilder.setSuperTypeSignature(Signature.createTypeSignature(getSuperType().getFullyQualifiedName()));
     pageBuilder.setup();
@@ -346,5 +361,13 @@ public class PageNewOperation implements IOperation {
 
   protected void setCreatedServiceTest(IType createdServiceTest) {
     m_createdServiceTest = createdServiceTest;
+  }
+
+  protected String getDataFetchMethodName() {
+    return m_dataFetchMethodName;
+  }
+
+  protected void setDataFetchMethodName(String dataFetchMethodName) {
+    m_dataFetchMethodName = dataFetchMethodName;
   }
 }

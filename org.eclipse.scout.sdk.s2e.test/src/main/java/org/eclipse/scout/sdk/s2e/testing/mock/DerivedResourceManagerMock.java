@@ -81,7 +81,7 @@ public class DerivedResourceManagerMock {
         String modelTypeFqn = modelResource.getLocation().toString();
         IType createdDto = null;
         IJavaEnvironment javaEnvironment = getJavaEnvironment();
-        if (modelTypeFqn.endsWith(ISdkProperties.SUFFIX_PAGE)) {
+        if (modelTypeFqn.endsWith(ISdkProperties.SUFFIX_PAGE_WITH_TABLE)) {
           createdDto = CoreScoutTestingUtils.createPageDataAssertNoCompileErrors(modelTypeFqn, javaEnvironment, javaEnvironment);
         }
         else {
