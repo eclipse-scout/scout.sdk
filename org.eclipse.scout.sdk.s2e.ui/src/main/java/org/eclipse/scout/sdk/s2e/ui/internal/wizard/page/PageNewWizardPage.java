@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.wizard.page;
 
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
@@ -43,7 +45,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
   protected ProposalTextField m_serverSourceFolder;
 
   public PageNewWizardPage(PackageContainer packageContainer) {
-    super(PageNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_PAGE, IScoutRuntimeTypes.IPage, IScoutRuntimeTypes.AbstractPageWithTable, ScoutTier.Client);
+    super(PageNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_PAGE_WITH_TABLE, IScoutRuntimeTypes.IPage, IScoutRuntimeTypes.AbstractPageWithTable, ScoutTier.Client);
     setTitle("Create a new Page");
     setDescription(getTitle());
     setIcuGroupName("New Page Details");
@@ -69,6 +71,26 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
   protected void handleJavaProjectChanged() {
     super.handleJavaProjectChanged();
     guessSharedFolders();
+  }
+
+  @Override
+  protected void handleSuperTypeChanged() {
+    super.handleSuperTypeChanged();
+    IType superType = getSuperType();
+    if (S2eUtils.exists(superType)) {
+      try {
+        ITypeHierarchy supertypeHierarchy = superType.newSupertypeHierarchy(null);
+        if (S2eUtils.hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IPageWithTable)) {
+          setReadOnlySuffix(ISdkProperties.SUFFIX_PAGE_WITH_TABLE);
+        }
+        else {
+          setReadOnlySuffix(ISdkProperties.SUFFIX_PAGE_WITH_NODES);
+        }
+      }
+      catch (JavaModelException e) {
+        SdkLog.warning("Unable to calculate super type hierarchy for type '{}'.", superType.getFullyQualifiedName(), e);
+      }
+    }
   }
 
   protected void guessSharedFolders() {

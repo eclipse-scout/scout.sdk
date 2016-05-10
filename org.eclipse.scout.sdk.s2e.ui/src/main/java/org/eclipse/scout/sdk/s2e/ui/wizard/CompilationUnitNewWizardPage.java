@@ -66,11 +66,11 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
 
   public static final String PREF_SUPER_TYPE = "superType";
 
-  private final String m_readOnlySuffix;
   private final String m_superTypeDefaultBase;
   private final String m_defaultSuperType;
   private final ScoutTier m_sourceFolderTier;
 
+  private String m_readOnlySuffix;
   private String m_icuGroupName;
 
   // ui fields
@@ -575,6 +575,13 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
 
   public String getReadOnlySuffix() {
     return m_readOnlySuffix;
+  }
+
+  public void setReadOnlySuffix(String newSuffix) {
+    m_readOnlySuffix = newSuffix;
+    if (isControlCreated()) {
+      m_nameField.setReadOnlySuffix(newSuffix);
+    }
   }
 
   public String getIcuGroupName() {

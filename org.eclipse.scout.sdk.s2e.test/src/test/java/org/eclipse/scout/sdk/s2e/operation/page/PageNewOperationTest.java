@@ -129,7 +129,14 @@ public class PageNewOperationTest {
     PageNewOperation pno = new PageNewOperation(m_envProvider);
     pno.setClientSourceFolder(m_clientSourceFolder);
     pno.setPackage("org.eclipse.scout.sdk.s2e.client.test");
-    pno.setPageName("My" + ISdkProperties.SUFFIX_PAGE);
+    String suffix = null;
+    if (isPageWithTable) {
+      suffix = ISdkProperties.SUFFIX_PAGE_WITH_TABLE;
+    }
+    else {
+      suffix = ISdkProperties.SUFFIX_PAGE_WITH_NODES;
+    }
+    pno.setPageName("My" + suffix);
     pno.setSuperType(m_superType);
     pno.setPageDataSourceFolder(dtoSourceFolder);
     pno.setServerSourceFolder(serverSourceFolder);

@@ -17,7 +17,8 @@ public interface ISdkProperties {
   String SUFFIX_FORM_FIELD = "Field";
   String SUFFIX_LOOKUP_CALL = "LookupCall";
   String SUFFIX_FORM = "Form";
-  String SUFFIX_PAGE = "Page";
+  String SUFFIX_PAGE_WITH_TABLE = "TablePage";
+  String SUFFIX_PAGE_WITH_NODES = "NodePage";
   String SUFFIX_DTO = "Data";
   String SUFFIX_BUTTON = "Button";
   String SUFFIX_TABLE_COLUMN = "Column";

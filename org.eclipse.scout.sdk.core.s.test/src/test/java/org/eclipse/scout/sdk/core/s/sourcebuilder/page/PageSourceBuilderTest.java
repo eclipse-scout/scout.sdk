@@ -43,7 +43,7 @@ public class PageSourceBuilderTest {
     // page service
     ServiceInterfaceSourceBuilder svcIfcBuilder = new ServiceInterfaceSourceBuilder("IMyPageService", "org.eclipse.scout.sdk.core.s.test", clientEnv);
     svcIfcBuilder.setup();
-    final IMethodSourceBuilder methodBuilder = new MethodSourceBuilder(PageSourceBuilder.DATA_FETCH_METHOD_NAME);
+    final IMethodSourceBuilder methodBuilder = new MethodSourceBuilder("getTestTableData");
     methodBuilder.setFlags(Flags.AccPublic | Flags.AccInterface);
     methodBuilder.setComment(CommentSourceBuilderFactory.createDefaultMethodComment(methodBuilder));
     methodBuilder.setReturnTypeSignature(pageDataSignature);
@@ -56,6 +56,7 @@ public class PageSourceBuilderTest {
     PageSourceBuilder pageBuilder = new PageSourceBuilder("MyPage", "org.eclipse.scout.sdk.core.s.test", clientEnv);
     pageBuilder.setClassIdValue("whatever");
     pageBuilder.setPageDataSignature(pageDataSignature);
+    pageBuilder.setDataFetchMethodName(methodBuilder.getElementName());
     pageBuilder.setPageWithTable(true);
     pageBuilder.setSuperTypeSignature(Signature.createTypeSignature(IScoutRuntimeTypes.AbstractPageWithTable));
     pageBuilder.setPageServiceIfcSignature(Signature.createTypeSignature(createdSvcIfc.name()));
