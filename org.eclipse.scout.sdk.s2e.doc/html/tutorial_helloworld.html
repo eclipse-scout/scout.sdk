@@ -35,7 +35,7 @@
     <div class="sect3"> 
      <h4 id="create-a-scout-project"><a class="anchor" href="#create-a-scout-project"></a>Create a Scout Project</h4> 
      <div class="paragraph"> 
-      <p>Start your Eclipse IDE and select an empty directory for your workspace as shown in <a href="#img-sdk_start_new_workspace">Figure 1</a>.</p> 
+      <p>Start your Eclipse IDE and select an empty directory for your workspace as shown in <a href="#img-sdk_start_new_workspace">Figure 1</a>. This workspace directory will then hold all the project code for the <code>Hello World</code> application. Once the Eclipse IDE is running it will show the Java perspective.</p> 
      </div> 
      <div id="img-sdk_start_new_workspace" class="imageblock"> 
       <div class="content"> 
@@ -46,13 +46,7 @@
       </div> 
      </div> 
      <div class="paragraph"> 
-      <p>This workspace directory will then hold all the project code for the <code>Hello World</code> application. Once the Eclipse IDE is running it will show the Java perspective. To create a new Scout project select the menu <span class="menuseq"><span class="menu">File</span>&nbsp;&#x25b8; <span class="submenu">New</span>&nbsp;&#x25b8; <span class="menuitem">Project&#x2026;&#x200b;</span></span> and type &#x201c;Scout Project&#x201d; in the wizard search field. Select the Scout Project wizard and press <b class="button">Next</b>.</p> 
-     </div> 
-     <div class="paragraph"> 
-      <p>In the <em class="wizard">New Scout Project</em> wizard you have to enter a <code>group id</code>, <code>artifact id</code> and a <code>display name</code> for your Scout project. As the created project will make use of <a href="https://maven.apache.org/" target="_blank">Apache Maven</a> please refer to the <a href="https://maven.apache.org/guides/mini/guide-naming-conventions.html" target="_blank">Maven naming conventions</a> to choose <code>group id</code> and <code>artifact id</code> for your project. The <code>artifact id</code> will then also be the project name in the Eclipse workspace. The <code>display name</code> is used as the application name presented to the user (e.g. in the Browser title bar).</p> 
-     </div> 
-     <div class="paragraph"> 
-      <p>For the <code>Hello World</code> application just use the already prefilled values as sown in <a href="#img-sdk_new_project_wizard">Figure 2</a>. Then, click the <b class="button">Finish</b> button to let the Scout SDK create the initial project code for you.</p> 
+      <p>To create a new Scout project select the menu <span class="menuseq"><span class="menu">File</span>&nbsp;&#x25b8; <span class="submenu">New</span>&nbsp;&#x25b8; <span class="menuitem">Project&#x2026;&#x200b;</span></span> and type &#x201c;Scout Project&#x201d; in the wizard search field. Select the Scout Project wizard and press <b class="button">Next</b>. The <em class="wizard">New Scout Project</em> wizard is then started as shown in <a href="#img-sdk_new_project_wizard">Figure 2</a>.</p> 
      </div> 
      <div id="img-sdk_new_project_wizard" class="imageblock"> 
       <div class="content"> 
@@ -63,7 +57,13 @@
       </div> 
      </div> 
      <div class="paragraph"> 
-      <p>Depending on your Eclipse installation some <code>Maven plugin connectors</code> may be missing initially. In that case a dialog as shown in <a href="#img-sdk_new_project_connector">Figure 3</a> may be shown. Please choose the desired actions from the combo box in the <code>Action</code> column until all mappings are green. E.g. for the <code>compiler-plugin</code> choose <code>Install M2E connector for the Eclipse JDT Compiler</code> from the combo box. Afterwards the selected connectors are resolved and you need to confirm the installation, accept the license, accept that some content has not been signed and restart Eclipse afterwards. To read more about <code>Maven plugin connectors</code> please refer to the <a href="https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html" target="_blank">m2e documentation</a>.</p> 
+      <p>In the <em class="wizard">New Scout Project</em> wizard you have to enter a <code>group id</code>, <code>artifact id</code> and a <code>display name</code> for your Scout project. As the created project will make use of <a href="https://maven.apache.org/" target="_blank">Apache Maven</a> please refer to the <a href="https://maven.apache.org/guides/mini/guide-naming-conventions.html" target="_blank">Maven naming conventions</a> to choose <code>group id</code> and <code>artifact id</code> for your project. The <code>artifact id</code> will then also be the project name in the Eclipse workspace. The <code>display name</code> is used as the application name presented to the user (e.g. in the Browser title bar).</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>For the <code>Hello World</code> application just use the already prefilled values as sown in <a href="#img-sdk_new_project_wizard">Figure 2</a>. Then, click the <b class="button">Finish</b> button to let the Scout SDK create the initial project code for you.</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>Depending on your Eclipse installation some <code>Maven plugin connectors</code> may be missing initially. In that case a dialog as shown in <a href="#img-sdk_new_project_connector">Figure 3</a> may be shown. To continue click on <b class="button">Finish</b> to resolve the selected connectors. Afterwards confirm the installation, accept the license and the message that some content has not been signed. Finally, the installation of the maven plugin connectors requires a restart of the Eclipse IDE.</p> 
      </div> 
      <div id="img-sdk_new_project_connector" class="imageblock"> 
       <div class="content"> 
@@ -88,13 +88,17 @@
     <div class="sect3"> 
      <h4 id="run-the-application"><a class="anchor" href="#run-the-application"></a>Run the Application</h4> 
      <div class="paragraph"> 
-      <p>After the initial project creation step we can start the Scout application for the first time. For this, we use the <code>Run</code> toolbar button as shown in <a href="#img-start_client">Figure 5</a>. Two launch configurations have already been created. One for the backend server and one for the HTML user interface server. Please launch the server first and the HTML UI afterwards.</p> 
+      <p>After the initial project creation step we can start the Scout application for the first time. For this, the following three steps are necessary</p> 
+     </div> 
+     <div class="olist arabic"> 
+      <ol class="arabic"> 
+       <li> <p>Start the Scout backend server</p> </li> 
+       <li> <p>Start the Scout frontend server</p> </li> 
+       <li> <p>Open the application in the browser</p> </li> 
+      </ol> 
      </div> 
      <div class="paragraph"> 
-      <p>In case the launch configurations are not shown in the toolbar under the debug/run icons, you may find the <code>server-dev.launch</code> launch file under project <code>helloworld.server.app.dev</code> and the <code>ui-html-dev.launch</code> launch file under <code>helloworld.ui.html.app.dev</code>. These launch files can be started using the context menu <em class="menu">Run As</em> which will add the launch file to the <em class="button">Run</em> toolbar button.</p> 
-     </div> 
-     <div class="paragraph"> 
-      <p>During startup of the Scout applications you should see console output providing information about the startup. After both have been started successfully the HTML user interface can be accessed by navigating to <a href="http://localhost:8082/" class="bare" target="_blank">http://localhost:8082/</a> in your favorite web browser.</p> 
+      <p>To start the Scout backend server we first select the <code>[webapp] dev server.launch</code> file in the Package Explorer view of the Eclipse IDE and then use the <em class="menu">Run As</em> menu as shown in <a href="#img-start_client">Figure 5</a>.</p> 
      </div> 
      <div id="img-start_client" class="imageblock"> 
       <div class="content"> 
@@ -102,6 +106,23 @@
       </div> 
       <div class="title">
        Figure 5. Starting the Hello World application.
+      </div> 
+     </div> 
+     <div class="paragraph"> 
+      <p>Starting the Scout frontend server works exactely the same. But first select the <code>[webapp] dev ui.launch</code> file in the Eclipse IDE. This launch file is located under module <code>helloworld.ui.html.app.dev</code> in the Package Explorer.</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>During startup of the Scout applications you should see console output providing information about the startup. After having successfully started the Scout backend and frontend servers the Hello World application can then be accessed by navigating to <a href="http://localhost:8082/" class="bare" target="_blank">http://localhost:8082/</a> in your favorite web browser.</p> 
+     </div> 
+     <div class="paragraph"> 
+      <p>The running Hello World application should then be started in your browser as shown in <a href="#img-start_browser">Figure 6</a>.</p> 
+     </div> 
+     <div id="img-start_browser" class="imageblock"> 
+      <div class="content"> 
+       <img src="images/run_helloworld_in_browser.png" alt="run helloworld in browser" /> 
+      </div> 
+      <div class="title">
+       Figure 6. The Hello World application in the browser.
       </div> 
      </div> 
     </div> 
@@ -112,7 +133,7 @@
      </div> 
      <hr /> 
      <div class="paragraph"> 
-      <p>Do you want to improve this document? Please <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/edit/releases/5.2.x/docs/build/eclipse_help/src/docs/tutorial_helloworld.adoc" target="_blank">edit this page</a> on GitHub.</p> 
+      <p>Do you want to improve this document? Please <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/edit/releases/6.0.x/docs/build/eclipse_help/src/docs/tutorial_helloworld.adoc" target="_blank">edit this page</a> on GitHub.</p> 
      </div> 
     </div> 
    </div> 
@@ -131,7 +152,7 @@
   </table>
   <div id="footer"> 
    <div id="footer-text">
-     Version 5.2.0-SNAPSHOT
+     Version 6.0.0-SNAPSHOT
     <br /> Last updated 2016-04-15 06:35:17 CEST 
    </div> 
   </div>  
