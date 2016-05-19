@@ -18,11 +18,12 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
@@ -46,13 +47,12 @@ public class TypeProposalContext {
   private Future<IJavaEnvironmentProvider> m_provider;
   private Future<CompilationUnit> m_compilationUnit;
   private ICompilationUnit m_icu;
+  private ISourceRange m_surroundingTypeNameRange;
 
   public TypeDeclaration getDeclaringType() {
     if (m_declaringType == null) {
       CompilationUnit cu = Validate.notNull(getCompilationUnit(), "No AST found for '%s'.", m_icu.getElementName());
-      ASTNode coveringNode = NodeFinder.perform(cu, m_pos, 0);
-      Validate.isTrue(coveringNode instanceof TypeDeclaration, "No valid covering node found.");
-      m_declaringType = (TypeDeclaration) coveringNode;
+      m_declaringType = Validate.notNull((TypeDeclaration) ASTNodes.getParent(NodeFinder.perform(cu, getSurroundingTypeNameRange()), TypeDeclaration.class));
     }
     return m_declaringType;
   }
@@ -149,5 +149,13 @@ public class TypeProposalContext {
 
   void setCompilationUnit(Future<CompilationUnit> compilationUnit) {
     m_compilationUnit = compilationUnit;
+  }
+
+  public ISourceRange getSurroundingTypeNameRange() {
+    return m_surroundingTypeNameRange;
+  }
+
+  void setSurroundingTypeNameRange(ISourceRange surroundingTypeNameRange) {
+    m_surroundingTypeNameRange = surroundingTypeNameRange;
   }
 }

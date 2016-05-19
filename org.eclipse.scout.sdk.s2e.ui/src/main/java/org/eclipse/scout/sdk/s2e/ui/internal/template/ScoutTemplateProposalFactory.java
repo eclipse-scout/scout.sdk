@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
@@ -112,6 +113,7 @@ public final class ScoutTemplateProposalFactory {
   public static List<ICompletionProposal> createTemplateProposals(IType surroundingType, int offset, String prefix) {
     Set<String> possibleChildrenIfcFqn = new HashSet<>();
     Set<String> superTypesOfSurroundingType = null;
+    ISourceRange surroundingTypeNameRange = null;
     try {
       ITypeHierarchy supertypeHierarchy = surroundingType.newSupertypeHierarchy(null);
       IType[] allTypes = supertypeHierarchy.getAllTypes();
@@ -119,6 +121,8 @@ public final class ScoutTemplateProposalFactory {
       for (IType superType : allTypes) {
         superTypesOfSurroundingType.add(superType.getFullyQualifiedName());
       }
+      System.out.println("old: " + superTypesOfSurroundingType.size());
+      surroundingTypeNameRange = surroundingType.getNameRange();
     }
     catch (JavaModelException e) {
       SdkLog.error("Unable to calculate supertype hierarchy for '{}'.", surroundingType.getFullyQualifiedName(), e);
@@ -178,7 +182,7 @@ public final class ScoutTemplateProposalFactory {
     }
     for (TemplateProposalDescriptor candidate : templates) {
       if (candidate.isActiveFor(possibleChildrenIfcFqn, javaProject, prefix)) {
-        result.add(candidate.createProposal(compilationUnit, offset, javaEnvProviderCreator, prefix));
+        result.add(candidate.createProposal(compilationUnit, offset, surroundingTypeNameRange, javaEnvProviderCreator, prefix));
       }
     }
     return result;

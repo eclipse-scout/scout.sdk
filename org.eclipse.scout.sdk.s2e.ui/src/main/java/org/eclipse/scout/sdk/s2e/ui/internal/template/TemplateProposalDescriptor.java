@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.scout.sdk.core.s.model.ScoutModelHierarchy;
 import org.eclipse.scout.sdk.core.signature.Signature;
@@ -127,7 +128,7 @@ public class TemplateProposalDescriptor {
     return false;
   }
 
-  public ICompletionProposal createProposal(ICompilationUnit icu, int pos, Future<IJavaEnvironmentProvider> provider, String searchString) {
+  public ICompletionProposal createProposal(ICompilationUnit icu, int pos, ISourceRange surroundingTypeNameRange, Future<IJavaEnvironmentProvider> provider, String searchString) {
     try {
       TypeProposalContext context = new TypeProposalContext();
       context.setProvider(provider);
@@ -137,6 +138,7 @@ public class TemplateProposalDescriptor {
       context.setSuffix(getTypeSuffix());
       context.setProposalInterfaceFqn(getProposalInterfaceFqn());
       context.setIcu(icu);
+      context.setSurroundingTypeNameRange(surroundingTypeNameRange);
       context.setSearchString(searchString);
 
       return (ICompletionProposal) m_proposalClass.getConstructors()[0].newInstance(getDisplayName(), getRelevance(), getImageId(), icu, context);
