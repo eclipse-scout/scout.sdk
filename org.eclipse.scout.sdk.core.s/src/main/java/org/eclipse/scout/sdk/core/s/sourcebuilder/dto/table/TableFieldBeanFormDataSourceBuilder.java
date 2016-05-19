@@ -31,8 +31,8 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
    * @param elementName
    * @param setup
    */
-  public TableFieldBeanFormDataSourceBuilder(IType modelType, FormDataAnnotationDescriptor formDataAnnotation, String typeName, IJavaEnvironment env) {
-    super(modelType, typeName, env, false);
+  public TableFieldBeanFormDataSourceBuilder(IType modelType, FormDataAnnotationDescriptor formDataAnnotation, String targetPackageName, String typeName, IJavaEnvironment env) {
+    super(modelType, targetPackageName, typeName, env, false);
     m_formDataAnnotation = formDataAnnotation;
     setup();
   }

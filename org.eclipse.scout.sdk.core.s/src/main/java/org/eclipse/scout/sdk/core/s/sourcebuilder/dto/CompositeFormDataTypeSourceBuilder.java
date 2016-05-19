@@ -39,8 +39,8 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
  */
 public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilder {
 
-  public CompositeFormDataTypeSourceBuilder(IType modelType, FormDataAnnotationDescriptor formDataAnnotation, String typeName, IJavaEnvironment env) {
-    super(modelType, formDataAnnotation, typeName, env);
+  public CompositeFormDataTypeSourceBuilder(IType modelType, FormDataAnnotationDescriptor formDataAnnotation, String targetPackageName, String typeName, IJavaEnvironment env) {
+    super(modelType, formDataAnnotation, targetPackageName, typeName, env);
   }
 
   @Override
@@ -70,15 +70,15 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           ITypeSourceBuilder fieldSourceBuilder = null;
           if (fieldAnnotation.getSuperType().isInstanceOf(IScoutRuntimeTypes.AbstractTableFieldBeanData)) {
             // fill table bean
-            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, fieldAnnotation, formDataTypeName, getJavaEnvironment());
+            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, fieldAnnotation, getTargetPackage(), formDataTypeName, getJavaEnvironment());
           }
           else if (formField.isInstanceOf(IScoutRuntimeTypes.ICompositeField) && !formField.isInstanceOf(IScoutRuntimeTypes.IValueField)) {
             // field extends a field template.
             fieldExtendsTemplateField = true;
-            fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getJavaEnvironment());
+            fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, fieldAnnotation, getTargetPackage(), formDataTypeName, getJavaEnvironment());
           }
           else {
-            fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getJavaEnvironment());
+            fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, fieldAnnotation, getTargetPackage(), formDataTypeName, getJavaEnvironment());
 
             // special case if a property has the same name as a form field -> show warning
             for (IMethodSourceBuilder msb : getMethods()) {

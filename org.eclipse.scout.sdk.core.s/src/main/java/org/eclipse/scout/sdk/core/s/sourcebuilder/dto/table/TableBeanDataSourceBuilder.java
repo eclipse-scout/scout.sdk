@@ -33,8 +33,8 @@ public class TableBeanDataSourceBuilder extends AbstractTableBeanSourceBuilder {
    * @param elementName
    * @param setup
    */
-  public TableBeanDataSourceBuilder(IType modelType, DataAnnotationDescriptor dataAnnotation, String typeName, IJavaEnvironment env) {
-    super(modelType, typeName, env, false);
+  public TableBeanDataSourceBuilder(IType modelType, DataAnnotationDescriptor dataAnnotation, String targetPackageName, String typeName, IJavaEnvironment env) {
+    super(modelType, targetPackageName, typeName, env, false);
     m_dataAnnotation = dataAnnotation;
     setup();
   }

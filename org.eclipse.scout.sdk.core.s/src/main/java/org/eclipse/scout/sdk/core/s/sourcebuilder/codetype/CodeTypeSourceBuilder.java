@@ -66,7 +66,7 @@ public class CodeTypeSourceBuilder extends AbstractEntitySourceBuilder {
     codeTypeBuilder.addField(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
     codeTypeBuilder.addField(createId());
 
-    IMethodSourceBuilder getId = MethodSourceBuilderFactory.createOverride(codeTypeBuilder, getJavaEnvironment(), "getId");
+    IMethodSourceBuilder getId = MethodSourceBuilderFactory.createOverride(codeTypeBuilder, getPackageName(), getJavaEnvironment(), "getId");
     getId.setBody(new RawSourceBuilder("return " + ID_CONSTANT_NAME + ';'));
     codeTypeBuilder.addMethod(getId);
 

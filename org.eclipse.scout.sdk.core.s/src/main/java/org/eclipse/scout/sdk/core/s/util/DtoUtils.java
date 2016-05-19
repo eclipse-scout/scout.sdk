@@ -513,7 +513,7 @@ public final class DtoUtils {
 
     String targetPackage = Signature.getQualifier(dataAnnotation.getDataType().name());
 
-    ITypeSourceBuilder pageDataTypeSrc = new TableBeanDataSourceBuilder(modelType, dataAnnotation, dataAnnotation.getDataType().elementName(), sharedEnv);
+    ITypeSourceBuilder pageDataTypeSrc = new TableBeanDataSourceBuilder(modelType, dataAnnotation, targetPackage, dataAnnotation.getDataType().elementName(), sharedEnv);
 
     // primary class comment
     pageDataTypeSrc.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder(GENERATED_JAVADOC));
@@ -541,10 +541,10 @@ public final class DtoUtils {
       ITypeSourceBuilder formDataTypeSrc = null;
       if (superType.isInstanceOf(IScoutRuntimeTypes.AbstractTableFieldBeanData)) {
         // fill table bean
-        formDataTypeSrc = new TableFieldBeanFormDataSourceBuilder(modelType, formDataAnnotation, formDataAnnotation.getFormDataType().elementName(), sharedEnv);
+        formDataTypeSrc = new TableFieldBeanFormDataSourceBuilder(modelType, formDataAnnotation, targetPackage, formDataAnnotation.getFormDataType().elementName(), sharedEnv);
       }
       else {
-        formDataTypeSrc = new CompositeFormDataTypeSourceBuilder(modelType, formDataAnnotation, formDataAnnotation.getFormDataType().elementName(), sharedEnv);
+        formDataTypeSrc = new CompositeFormDataTypeSourceBuilder(modelType, formDataAnnotation, targetPackage, formDataAnnotation.getFormDataType().elementName(), sharedEnv);
       }
 
       // primary class comment

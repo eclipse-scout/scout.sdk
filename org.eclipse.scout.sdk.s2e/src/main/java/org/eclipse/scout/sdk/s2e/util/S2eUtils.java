@@ -233,7 +233,7 @@ public final class S2eUtils {
    * @throws CoreException
    */
   public static Set<IType> findClassesInStrictHierarchy(final IJavaProject sourceProject, IType baseType, final IProgressMonitor monitor, final IFilter<IType> filter) throws CoreException {
-    if (!exists(baseType) || !exists(baseType.getJavaProject()) || !exists(sourceProject)) {
+    if (!exists(baseType) || !exists(baseType.getParent()) || !exists(sourceProject)) {
       return Collections.emptySet();
     }
 

@@ -91,7 +91,7 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
 
     // execLoadData / execCreateChildPages
     if (isPageWithTable()) {
-      IMethodSourceBuilder execLoadData = MethodSourceBuilderFactory.createOverride(pageBuilder, getJavaEnvironment(), "execLoadData");
+      IMethodSourceBuilder execLoadData = MethodSourceBuilderFactory.createOverride(pageBuilder, getPackageName(), getJavaEnvironment(), "execLoadData");
       execLoadData.setBody(new ISourceBuilder() {
         @Override
         public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
@@ -110,7 +110,7 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
       pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execLoadData), execLoadData);
     }
     else {
-      IMethodSourceBuilder execCreateChildPages = MethodSourceBuilderFactory.createOverride(pageBuilder, getJavaEnvironment(), "execCreateChildPages");
+      IMethodSourceBuilder execCreateChildPages = MethodSourceBuilderFactory.createOverride(pageBuilder, getPackageName(), getJavaEnvironment(), "execCreateChildPages");
       execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.Order);
       execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.ConfigOperation);
       pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execCreateChildPages), execCreateChildPages);

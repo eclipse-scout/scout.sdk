@@ -244,7 +244,7 @@ public class LookupCallNewOperation implements IOperation {
 
     // add unimplemented methods
     IJavaEnvironment env = getEnvProvider().get(getServerSourceFolder().getJavaProject());
-    List<IMethodSourceBuilder> unimplementedMethods = MethodSourceBuilderFactory.createUnimplementedMethods(lookupSvcImplBuilder.getSuperTypeSignature(), null, env);
+    List<IMethodSourceBuilder> unimplementedMethods = MethodSourceBuilderFactory.createUnimplementedMethods(lookupSvcImplBuilder.getSuperTypeSignature(), null, serverPackage, env);
     for (IMethodSourceBuilder methodSourceBuilder : unimplementedMethods) {
       lookupSvcImplBuilder.addMethod(methodSourceBuilder);
     }
@@ -267,7 +267,7 @@ public class LookupCallNewOperation implements IOperation {
     lcsb.setup();
 
     // add unimplemented methods
-    List<IMethodSourceBuilder> unimplementedMethods = MethodSourceBuilderFactory.createUnimplementedMethods(lcsb.getMainType().getSuperTypeSignature(), null, env);
+    List<IMethodSourceBuilder> unimplementedMethods = MethodSourceBuilderFactory.createUnimplementedMethods(lcsb.getMainType().getSuperTypeSignature(), null, getPackage(), env);
     for (IMethodSourceBuilder methodSourceBuilder : unimplementedMethods) {
       lcsb.getMainType().addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(methodSourceBuilder), methodSourceBuilder);
     }
