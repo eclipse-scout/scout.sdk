@@ -467,7 +467,12 @@ public final class SpiWithJdtUtils {
       return val;
     }
     if (expression instanceof Annotation) {
-      return ((Annotation) expression).getCompilerAnnotation();
+      Annotation annotation = (Annotation) expression;
+      AnnotationBinding compilerAnnotation = annotation.getCompilerAnnotation();
+      if (compilerAnnotation == null) {
+        annotation.resolveType(scopeForTypeLookup.referenceContext.staticInitializerScope);
+      }
+      return annotation.getCompilerAnnotation();
     }
     else if (expression instanceof Reference) {
       FieldBinding fieldBinding = null;
@@ -532,7 +537,7 @@ public final class SpiWithJdtUtils {
           return MetaValueFactory.createFromEnum(f);
         }
       }
-      return MetaValueFactory.createUnknown("ENUM " + fb.declaringClass.debugName() + "#" + name);
+      return MetaValueFactory.createUnknown("ENUM " + fb.declaringClass.debugName() + '#' + name);
     }
     else if (compiledValue instanceof AnnotationBinding) {
       // annotation binding

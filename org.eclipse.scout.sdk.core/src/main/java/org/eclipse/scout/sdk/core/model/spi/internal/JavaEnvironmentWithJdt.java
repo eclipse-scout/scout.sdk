@@ -12,9 +12,11 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +65,7 @@ import org.eclipse.scout.sdk.core.util.SameCompositeObject;
  */
 public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
   private final IFileLocator m_fileLocator;
-  private final Collection<ClasspathEntry> m_classpaths;
+  private final Set<ClasspathEntry> m_classpaths;
   private final AstCompiler m_compiler;
   private final WorkspaceFileSystem m_nameEnv;
   private final Map<Object, JavaElementSpi> m_compilerCache;
@@ -72,13 +74,13 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
 
   private IJavaEnvironment m_api;
 
-  public JavaEnvironmentWithJdt(IFileLocator fileLocator, Collection<ClasspathEntry> classpaths) {
+  public JavaEnvironmentWithJdt(IFileLocator fileLocator, List<ClasspathEntry> classpaths) {
     m_compilerCache = new HashMap<>();
     m_performanceCache = new HashMap<>();
     m_hashSeq = new AtomicInteger();
     m_fileLocator = fileLocator;
-    m_classpaths = classpaths;
-    m_nameEnv = new WorkspaceFileSystem(ClasspathEntry.toClassPaths(classpaths));
+    m_classpaths = new LinkedHashSet<>(classpaths);
+    m_nameEnv = new WorkspaceFileSystem(ClasspathEntry.toClassPaths(m_classpaths));
     m_compiler = new AstCompiler(m_nameEnv);
     m_api = new JavaEnvironmentImplementor(this);
   }
@@ -129,8 +131,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
 
   @Override
   public JavaEnvironmentWithJdt emptyCopy() {
-    Collection<ClasspathSpi> classpath = getClasspath();
-    Collection<ClasspathEntry> newClasspath = new ArrayList<>(classpath.size());
+    List<ClasspathSpi> classpath = getClasspath();
+    List<ClasspathEntry> newClasspath = new ArrayList<>(classpath.size());
     for (ClasspathSpi spi : classpath) {
       Classpath newCpEntry = WorkspaceFileSystem.createClasspath(new File(spi.getPath()), spi.isSource(), spi.getEncoding());
       if (newCpEntry != null) {
@@ -252,8 +254,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
   }
 
   @Override
-  public Collection<ClasspathSpi> getClasspath() {
-    Collection<ClasspathSpi> list = new ArrayList<>(m_classpaths.size());
+  public List<ClasspathSpi> getClasspath() {
+    List<ClasspathSpi> list = new ArrayList<>(m_classpaths.size());
     for (ClasspathEntry cp : m_classpaths) {
       list.add(new ClasspathWithJdt(cp));
     }

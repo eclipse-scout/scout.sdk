@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
 
@@ -40,15 +40,60 @@ public class ClasspathEntry {
     return m_encoding;
   }
 
-  public static Collection<Classpath> toClassPaths(Collection<ClasspathEntry> entries) {
+  public static Set<Classpath> toClassPaths(Set<ClasspathEntry> entries) {
     if (entries == null || entries.isEmpty()) {
-      return Collections.emptyList();
+      return Collections.emptySet();
     }
 
-    Collection<Classpath> result = new ArrayList<>(entries.size());
+    Set<Classpath> result = new LinkedHashSet<>(entries.size());
     for (ClasspathEntry entry : entries) {
       result.add(entry.getClasspath());
     }
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return m_classpath == null ? "null" : m_classpath.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_classpath == null) ? 0 : m_classpath.hashCode());
+    result = prime * result + ((m_encoding == null) ? 0 : m_encoding.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    ClasspathEntry other = (ClasspathEntry) obj;
+    if (m_classpath == null) {
+      if (other.m_classpath != null) {
+        return false;
+      }
+    }
+    else if (!m_classpath.equals(other.m_classpath)) {
+      return false;
+    }
+    if (m_encoding == null) {
+      if (other.m_encoding != null) {
+        return false;
+      }
+    }
+    else if (!m_encoding.equals(other.m_encoding)) {
+      return false;
+    }
+    return true;
   }
 }

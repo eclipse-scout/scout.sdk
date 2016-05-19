@@ -34,25 +34,28 @@ import org.eclipse.scout.sdk.core.util.compat.CompatibilityLayer;
 
 public class WorkspaceFileSystem implements INameEnvironment {
   private static final char SEPARATOR = '/';
-  private Collection<Classpath> m_classpaths;
-  private final Map<String, ICompilationUnit> m_overrideCompilationUnits = new HashMap<>();
-  private final Set<String> m_additionalPackages = new HashSet<>();
+
+  private final Set<Classpath> m_classpaths;
+  private final Map<String, ICompilationUnit> m_overrideCompilationUnits;
+  private final Set<String> m_additionalPackages;
 
   /**
    * @param paths
    * @param overrideCompilationUnits
    *          is a map of "a/b/c/JavaClass.class" to its content
    */
-  public WorkspaceFileSystem(Collection<Classpath> paths) {
+  public WorkspaceFileSystem(Set<Classpath> paths) {
+    m_overrideCompilationUnits = new HashMap<>();
+    m_additionalPackages = new HashSet<>();
+    m_classpaths = paths;
     try {
-      for (Classpath cp : paths) {
+      for (Classpath cp : m_classpaths) {
         cp.initialize();
       }
     }
     catch (IOException e) {
       throw new SdkException(e);
     }
-    m_classpaths = paths;
   }
 
   /**
@@ -106,26 +109,36 @@ public class WorkspaceFileSystem implements INameEnvironment {
 
   @Override
   public boolean isPackage(char[][] compoundName, char[] packageName) {
-    String qualifiedPackageName = new String(CharOperation.concatWith(compoundName, packageName, SEPARATOR));
-    if (m_additionalPackages.contains(qualifiedPackageName)) {
+    String packageFqnSlash = new String(CharOperation.concatWith(compoundName, packageName, SEPARATOR));
+    if (m_additionalPackages.contains(packageFqnSlash)) {
       return true;
     }
 
-    String qp2 = File.separatorChar == SEPARATOR ? qualifiedPackageName : qualifiedPackageName.replace(SEPARATOR, File.separatorChar);
-    if (qualifiedPackageName.equals(qp2)) {
+    if (File.separatorChar == SEPARATOR) {
+      // current platform uses slash: no need to handle different for directories
       for (Classpath cp : m_classpaths) {
-        if (cp.isPackage(qualifiedPackageName)) {
+        if (cp.isPackage(packageFqnSlash)) {
           return true;
         }
       }
     }
     else {
+      String packageFqnPlatform = packageFqnSlash.replace(SEPARATOR, File.separatorChar);
       for (Classpath cp : m_classpaths) {
-        if ((cp instanceof ClasspathJar) ? cp.isPackage(qualifiedPackageName) : cp.isPackage(qp2)) {
+        String pathToUse = null;
+        if (cp instanceof ClasspathJar) {
+          // always use '/' if it is a jar
+          pathToUse = packageFqnSlash;
+        }
+        else {
+          pathToUse = packageFqnPlatform;
+        }
+        if (cp.isPackage(pathToUse)) {
           return true;
         }
       }
     }
+
     return false;
   }
 

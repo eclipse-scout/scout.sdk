@@ -18,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -315,7 +314,7 @@ public class JavaEnvironmentBuilder {
       findSourceAttachments();
     }
 
-    Collection<ClasspathEntry> all = new ArrayList<>(m_srcPaths.size() + m_binPaths.size());
+    List<ClasspathEntry> all = new ArrayList<>(m_srcPaths.size() + m_binPaths.size());
     all.addAll(m_srcPaths.values());
     all.addAll(m_binPaths.values());
     return new JavaEnvironmentWithJdt(createFileLocator(), all).wrap();
