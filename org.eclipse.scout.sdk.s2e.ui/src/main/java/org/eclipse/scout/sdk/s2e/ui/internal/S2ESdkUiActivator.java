@@ -15,9 +15,12 @@ import java.util.logging.Level;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.util.SdkConsole;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -79,6 +82,9 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     }
     getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
 
+    // modify default m2e settings
+    setDefaultMavenSettings();
+
     // start DTO auto-update manager if required
     getPreferenceStore().setDefault(IDerivedResourceManager.PROP_AUTO_UPDATE, true);
     ScoutSdkCore.getDerivedResourceManager().setEnabled(getPreferenceStore().getBoolean(IDerivedResourceManager.PROP_AUTO_UPDATE));
@@ -110,6 +116,28 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
 
   public static S2ESdkUiActivator getDefault() {
     return plugin;
+  }
+
+  private static void setDefaultMavenSettings() {
+    try {
+      M2EUIPluginActivator m2eUiActivator = M2EUIPluginActivator.getDefault();
+      if (m2eUiActivator == null) {
+        return;
+      }
+
+      IPreferenceStore m2eUiPrefs = m2eUiActivator.getPreferenceStore();
+      if (m2eUiPrefs == null) {
+        return;
+      }
+
+      if (m2eUiPrefs.isDefault(MavenPreferenceConstants.P_DOWNLOAD_SOURCES) && !m2eUiPrefs.getBoolean(MavenPreferenceConstants.P_DOWNLOAD_SOURCES)) {
+        m2eUiPrefs.setDefault(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, true);
+        m2eUiPrefs.firePropertyChangeEvent(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, Boolean.FALSE, Boolean.TRUE);
+      }
+    }
+    catch (Exception e) {
+      SdkLog.info("Unable to set default maven options", e);
+    }
   }
 
   @Override
