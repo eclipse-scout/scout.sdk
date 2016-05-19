@@ -41,4 +41,9 @@ public interface IAnnotatableSourceBuilder extends IJavaElementSourceBuilder {
    */
   List<IAnnotationSourceBuilder> getAnnotations();
 
+  /**
+   * Removes all {@link IAnnotationSourceBuilder}s from this source builder.
+   */
+  void removeAllAnnotations();
+
 }

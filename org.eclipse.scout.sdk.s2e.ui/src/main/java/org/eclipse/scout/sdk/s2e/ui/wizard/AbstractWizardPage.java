@@ -232,19 +232,19 @@ public abstract class AbstractWizardPage extends WizardPage {
     return m_propertySupport.setPropertyBool(name, b);
   }
 
-  public void setPropertyDouble(String name, double d) {
-    m_propertySupport.setPropertyDouble(name, d);
+  public boolean setPropertyDouble(String name, double d) {
+    return m_propertySupport.setPropertyDouble(name, d);
   }
 
-  public void setPropertyInt(String name, int i) {
-    m_propertySupport.setPropertyInt(name, i);
+  public boolean setPropertyInt(String name, int i) {
+    return m_propertySupport.setPropertyInt(name, i);
   }
 
-  public void setPropertyLong(String name, long i) {
-    m_propertySupport.setPropertyLong(name, i);
+  public boolean setPropertyLong(String name, long i) {
+    return m_propertySupport.setPropertyLong(name, i);
   }
 
-  public void setPropertyString(String name, String s) {
-    m_propertySupport.setPropertyString(name, s);
+  public boolean setPropertyString(String name, String s) {
+    return m_propertySupport.setPropertyString(name, s);
   }
 }

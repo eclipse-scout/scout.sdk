@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -28,6 +27,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -45,13 +45,13 @@ import org.xml.sax.SAXException;
  */
 public final class ScoutProjectNewHelper {
 
-  public static final String SCOUT_ARCHETYPES_HELLOWORLD_VERSION = "5.2.0-SNAPSHOT";
+  public static final String SCOUT_ARCHETYPES_VERSION = "5.2.0-SNAPSHOT";
   public static final String SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID = "scout-helloworld-app";
   public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"\\/<>=:]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
-  public static final String DEFAULT_JAVA_VERSION = "1.8";
+  public static final String DEFAULT_JAVA_ENV = "1.8";
 
   private ScoutProjectNewHelper() {
   }
@@ -85,13 +85,13 @@ public final class ScoutProjectNewHelper {
       throw new IllegalArgumentException(displayNameMsg);
     }
     if (StringUtils.isEmpty(javaVersion)) {
-      javaVersion = DEFAULT_JAVA_VERSION;
+      javaVersion = DEFAULT_JAVA_ENV;
     }
     if (StringUtils.isBlank(archetypeGroupId) || StringUtils.isBlank(archeTypeArtifactId) || StringUtils.isBlank(archetypeVersion)) {
       // use default
       archetypeGroupId = SCOUT_ARCHETYPES_GROUP_ID;
       archeTypeArtifactId = SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID;
-      archetypeVersion = SCOUT_ARCHETYPES_HELLOWORLD_VERSION;
+      archetypeVersion = SCOUT_ARCHETYPES_VERSION;
     }
 
     String pck = null;
@@ -134,7 +134,7 @@ public final class ScoutProjectNewHelper {
    */
   static void postProcessRootPom(File targetDirectory) throws IOException {
     try {
-      File pom = new File(targetDirectory, "pom.xml");
+      File pom = new File(targetDirectory, IMavenConstants.POM);
       if (!pom.isFile()) {
         return;
       }
@@ -142,7 +142,7 @@ public final class ScoutProjectNewHelper {
       DocumentBuilder docBuilder = CoreUtils.createDocumentBuilder();
       Document doc = docBuilder.parse(pom);
 
-      Element modules = getFirstChildElement(doc.getDocumentElement(), "modules");
+      Element modules = CoreUtils.getFirstChildElement(doc.getDocumentElement(), "modules");
 
       NodeList childNodes = modules.getChildNodes();
       List<Node> nodesToRemove = new ArrayList<>();
@@ -168,20 +168,8 @@ public final class ScoutProjectNewHelper {
   }
 
   static void writeDocument(Document document, Result result) throws TransformerException {
-    Transformer transformer = CoreUtils.createTransformer();
-    transformer.setOutputProperty(OutputKeys.INDENT, "no");
+    Transformer transformer = CoreUtils.createTransformer(false);
     transformer.transform(new DOMSource(document), result);
-  }
-
-  static Element getFirstChildElement(Element parent, String tagName) {
-    NodeList children = parent.getElementsByTagName(tagName);
-    for (int i = 0; i < children.getLength(); ++i) {
-      Node n = children.item(i);
-      if (n.getNodeType() == Node.ELEMENT_NODE) {
-        return ((Element) n);
-      }
-    }
-    return null;
   }
 
   public static String getDisplayNameErrorMEssage(String displayNameCandidate) {

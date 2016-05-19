@@ -302,7 +302,7 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
    *          The suffix to compare against.
    * @return A status that describes the state of the given name
    */
-  protected static IStatus validateJavaName(String name, String suffix) {
+  public static IStatus validateJavaName(String name, String suffix) {
     if (StringUtils.isBlank(name) || name.equals(suffix)) {
       return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "Please specify a class name.");
     }
@@ -342,7 +342,7 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
    * @return the {@link Status#OK_STATUS} if no file exists at the target location with the given name. An error status
    *         otherwise.
    */
-  protected static IStatus validateTypeNotExisting(IPackageFragmentRoot srcFolder, String pck, String typeName) {
+  public static IStatus validateTypeNotExisting(IPackageFragmentRoot srcFolder, String pck, String typeName) {
     if (StringUtils.isBlank(typeName)) {
       return Status.OK_STATUS;
     }
@@ -405,7 +405,7 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
    *          The package name to validate
    * @return An {@link IStatus} describing the given package name.
    */
-  protected static IStatus validatePackageName(String pckName) {
+  public static IStatus validatePackageName(String pckName) {
     if (StringUtils.isBlank(pckName)) {
       return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "The default package is not allowed.");
     }

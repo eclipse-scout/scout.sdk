@@ -152,6 +152,21 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   }
 
   @Override
+  public boolean removeDeclaredStaticImport(String name) {
+    return m_declaredStaticImports.remove(name);
+  }
+
+  @Override
+  public boolean removeDeclaredImport(String name) {
+    return m_declaredImports.remove(name);
+  }
+
+  @Override
+  public void removeAllDeclaredImports() {
+    m_declaredImports.clear();
+  }
+
+  @Override
   public void addDeclaredStaticImport(String name) {
     m_declaredStaticImports.add(name);
   }

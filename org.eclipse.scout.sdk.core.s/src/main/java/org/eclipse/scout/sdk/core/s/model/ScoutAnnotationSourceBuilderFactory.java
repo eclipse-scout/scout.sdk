@@ -62,6 +62,11 @@ public final class ScoutAnnotationSourceBuilderFactory {
     return sourceBuilder;
   }
 
+  public static IAnnotationSourceBuilder createApplicationScoped() {
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.ApplicationScoped);
+    return sourceBuilder;
+  }
+
   public static IAnnotationSourceBuilder createBeanMock() {
     AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.BeanMock);
     return sourceBuilder;

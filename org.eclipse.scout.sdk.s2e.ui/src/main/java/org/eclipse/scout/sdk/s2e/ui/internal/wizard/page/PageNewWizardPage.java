@@ -115,7 +115,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
   }
 
   protected void createPageServcieGroup(Composite p) {
-    Group parent = getFieldToolkit().createGroupBox(p, "PageData & Service Source Folders");
+    Group parent = getFieldToolkit().createGroupBox(p, "PageData and Service Source Folders");
     parent.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     parent.setLayout(new GridLayout(1, true));
 

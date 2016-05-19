@@ -266,7 +266,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
   public static String getLocalizedPropertiesFileName(String prefix, Language language) {
     String fileName = prefix;
     Locale locale = language.getLocale();
-    fileName = fileName + "_" + locale.toString() + ".properties";
+    fileName = fileName + '_' + locale.toString() + ".properties";
     return fileName;
   }
 

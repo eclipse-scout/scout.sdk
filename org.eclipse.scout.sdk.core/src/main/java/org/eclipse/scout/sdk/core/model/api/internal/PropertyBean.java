@@ -33,7 +33,7 @@ public class PropertyBean implements IPropertyBean {
 
   @Override
   public String toString() {
-    return m_declaringType.name() + "#" + m_beanName;
+    return m_declaringType.name() + '#' + m_beanName;
   }
 
   @Override

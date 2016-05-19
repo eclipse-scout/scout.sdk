@@ -72,4 +72,27 @@ public interface ICompilationUnitSourceBuilder extends IJavaElementSourceBuilder
    * @return A {@link List} with all footer {@link ISourceBuilder}s in the order in which they have been added.
    */
   List<ISourceBuilder> getFooters();
+
+  /**
+   * Removes the static import with the given name.
+   *
+   * @param name
+   *          The static import to remove
+   * @return <code>true</code> if a static import with given name has been removed. <code>false</code> otherwise.
+   */
+  boolean removeDeclaredStaticImport(String name);
+
+  /**
+   * Removes the import with the given name.
+   *
+   * @param name
+   *          The import to remove
+   * @return <code>true</code> if an import with given name has been removed. <code>false</code> otherwise.
+   */
+  boolean removeDeclaredImport(String name);
+
+  /**
+   * Removes all imports from this {@link ICompilationUnitSourceBuilder}
+   */
+  void removeAllDeclaredImports();
 }

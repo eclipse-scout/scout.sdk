@@ -126,7 +126,7 @@ public final class CoreScoutTestingUtils {
     if (orderNr != memberOrderNr) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Order annotation not equal: exptected '").append(orderNr).append("'; found on member '");
-        messageBuilder.append(annotatable.elementName()).append("'");
+        messageBuilder.append(annotatable.elementName()).append('\'');
         messageBuilder.append(" is '").append(memberOrderNr).append("'!");
         message = messageBuilder.toString();
       }

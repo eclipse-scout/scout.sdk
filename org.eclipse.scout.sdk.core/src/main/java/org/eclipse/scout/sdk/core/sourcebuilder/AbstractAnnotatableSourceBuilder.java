@@ -105,6 +105,11 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
   }
 
   @Override
+  public void removeAllAnnotations() {
+    m_annotations.clear();
+  }
+
+  @Override
   public List<IAnnotationSourceBuilder> getAnnotations() {
     return Collections.unmodifiableList(m_annotations);
   }

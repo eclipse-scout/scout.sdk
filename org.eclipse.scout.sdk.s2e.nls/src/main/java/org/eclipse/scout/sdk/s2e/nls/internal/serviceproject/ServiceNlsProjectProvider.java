@@ -226,7 +226,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static String getTypeIdentifyer(IType t) {
-    return t.getJavaProject().getProject().getName() + "/" + t.getFullyQualifiedName();
+    return t.getJavaProject().getProject().getName() + '/' + t.getFullyQualifiedName();
   }
 
   @Override

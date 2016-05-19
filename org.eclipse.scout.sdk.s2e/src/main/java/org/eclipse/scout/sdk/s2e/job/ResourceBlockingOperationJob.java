@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.job;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
@@ -29,7 +31,7 @@ import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
  */
 public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
 
-  private final Iterable<? extends IOperation> m_operations;
+  private final Collection<? extends IOperation> m_operations;
 
   public ResourceBlockingOperationJob(IOperation operation) {
     this(operation, (IResource[]) null);
@@ -94,8 +96,12 @@ public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
 
   @Override
   protected final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    final SubMonitor progress = SubMonitor.convert(monitor, getJobName(m_operations), m_operations.size() * 100);
+    if (progress.isCanceled()) {
+      return;
+    }
     for (IOperation op : m_operations) {
-      op.run(monitor, workingCopyManager);
+      op.run(progress.newChild(100), workingCopyManager);
     }
   }
 

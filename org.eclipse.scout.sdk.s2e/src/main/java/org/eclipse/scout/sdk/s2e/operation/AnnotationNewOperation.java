@@ -99,7 +99,7 @@ public class AnnotationNewOperation implements IOperation {
 
   protected ISourceRange getAnnotationReplaceRange(Document sourceDocument, String newLine, String newAnnotationSource) throws JavaModelException, BadLocationException {
     String sn = Signature.getSimpleName(m_sourceBuilder.getName());
-    String fqn = Signature.getQualifier(m_sourceBuilder.getName()) + "." + sn;
+    String fqn = Signature.getQualifier(m_sourceBuilder.getName()) + '.' + sn;
     int newLineLength = newLine.length();
 
     IRegion lineOfMemberName = sourceDocument.getLineInformationOfOffset(m_declaringMember.getNameRange().getOffset());
@@ -128,7 +128,7 @@ public class AnnotationNewOperation implements IOperation {
               result = lineInfo;
             }
 
-            if (lineSource.startsWith("@" + sn) || lineSource.startsWith("@" + fqn)) {
+            if (lineSource.startsWith('@' + sn) || lineSource.startsWith('@' + fqn)) {
               // the annotation that should be created already exists -> replace it
               result = lineInfo;
               isReplaceExisting = true;

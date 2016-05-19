@@ -64,21 +64,32 @@ public class AnnotationSourceBuilder extends AbstractJavaElementSourceBuilder im
     }
 
     source.append("@" + validator.useName(getName()));
-    if (m_values.size() > 0) {
+    int numElements = m_values.size();
+    if (numElements > 0) {
       source.append('(');
-      if (m_values.size() == 1 && m_values.containsKey("value")) {
+      if (numElements == 1 && m_values.containsKey("value")) {
         //single value annotation
         ISourceBuilder v = m_values.values().iterator().next();
         v.createSource(source, lineDelimiter, context, validator);
       }
       else {
+        boolean useMultiLine = numElements > 4;
+        int i = 0;
         for (Map.Entry<String, ISourceBuilder> e : m_values.entrySet()) {
           source.append(e.getKey());
           source.append(" = ");
           e.getValue().createSource(source, lineDelimiter, context, validator);
-          source.append(", ");
+          if (i < numElements - 1) {
+            source.append(',');
+            if (useMultiLine) {
+              source.append(lineDelimiter);
+            }
+            else {
+              source.append(' ');
+            }
+          }
+          i++;
         }
-        source.setLength(source.length() - 2);
       }
       source.append(')');
     }
