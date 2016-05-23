@@ -90,8 +90,8 @@ public class BasicPropertySupport {
     return m_props.containsKey(name);
   }
 
-  public void setPropertyInt(String name, int i) {
-    setProperty(name, Integer.valueOf(i), DEFAULT_INT);
+  public boolean setPropertyInt(String name, int i) {
+    return setProperty(name, Integer.valueOf(i), DEFAULT_INT);
   }
 
   public int getPropertyInt(String name) {
@@ -102,8 +102,8 @@ public class BasicPropertySupport {
     return n.intValue();
   }
 
-  public void setPropertyDouble(String name, double d) {
-    setProperty(name, new Double(d), DEFAULT_DOUBLE);
+  public boolean setPropertyDouble(String name, double d) {
+    return setProperty(name, new Double(d), DEFAULT_DOUBLE);
   }
 
   public double getPropertyDouble(String name) {
@@ -114,8 +114,8 @@ public class BasicPropertySupport {
     return n.doubleValue();
   }
 
-  public void setPropertyLong(String name, long i) {
-    setProperty(name, Long.valueOf(i), DEFAULT_LONG);
+  public boolean setPropertyLong(String name, long i) {
+    return setProperty(name, Long.valueOf(i), DEFAULT_LONG);
   }
 
   public long getPropertyLong(String name) {
@@ -138,12 +138,8 @@ public class BasicPropertySupport {
     return b.booleanValue();
   }
 
-  public void setPropertyString(String name, String s) {
-    setProperty(name, s);
-  }
-
-  public void setPropertyStringAlwaysFire(String name, String s) {
-    setPropertyAlwaysFire(name, s);
+  public boolean setPropertyString(String name, String s) {
+    return setProperty(name, s);
   }
 
   public String getPropertyString(String name) {
@@ -230,7 +226,7 @@ public class BasicPropertySupport {
   }
 
   /**
-   * DESIGN: should remove property if set to null - see hasProperty() as well (tha, 16.2.6)
+   * DESIGN: should remove property if set to null - see hasProperty() as well
    */
   public boolean setProperty(String name, Object newValue, Object defaultOldValueWhenNull) {
     Object oldValue = m_props.get(name);
@@ -245,12 +241,6 @@ public class BasicPropertySupport {
 
     firePropertyChangeImpl(name, oldValue, newValue);
     return true;
-  }
-
-  public void setPropertyAlwaysFire(String name, Object newValue) {
-    Object oldValue = m_props.get(name);
-    m_props.put(name, newValue);
-    firePropertyChangeImpl(name, oldValue, newValue);
   }
 
   /**

@@ -224,7 +224,7 @@ public final class MetaValueFactory {
 
       @Override
       public String toString() {
-        return enumConstant.getDeclaringType().getElementName() + "." + enumConstant.getElementName();
+        return enumConstant.getDeclaringType().getElementName() + '.' + enumConstant.getElementName();
       }
     };
   }

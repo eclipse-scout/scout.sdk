@@ -29,6 +29,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
@@ -129,7 +130,7 @@ public class ScoutProjectNewOperation implements IOperation {
     }
   }
 
-  protected static String getMavenSettings(String in) {
+  public static String getMavenSettings(String in) {
     if (StringUtils.isBlank(in)) {
       return null;
     }
@@ -158,14 +159,13 @@ public class ScoutProjectNewOperation implements IOperation {
 
     Collection<MavenProjectInfo> projects = new ArrayList<>(subFolders.length);
     for (File subFolder : subFolders) {
-      File pom = new File(subFolder, "pom.xml");
+      File pom = new File(subFolder, IMavenConstants.POM);
       if (pom.isFile()) {
         projects.add(new MavenProjectInfo(subFolder.getName(), pom, null, null));
       }
     }
 
-    List<IMavenProjectImportResult> importedProjects = MavenPlugin.getProjectConfigurationManager()
-        .importProjects(projects, new ProjectImportConfiguration(), monitor);
+    List<IMavenProjectImportResult> importedProjects = MavenPlugin.getProjectConfigurationManager().importProjects(projects, new ProjectImportConfiguration(), monitor);
 
     List<IProject> result = new ArrayList<>(importedProjects.size());
     for (IMavenProjectImportResult mavenProject : importedProjects) {

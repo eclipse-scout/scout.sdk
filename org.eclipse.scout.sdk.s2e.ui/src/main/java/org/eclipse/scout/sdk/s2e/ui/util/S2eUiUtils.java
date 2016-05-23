@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.IJavaElement;
@@ -36,7 +37,14 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.ScoutTier;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 /**
  * <h3>{@link S2eUiUtils}</h3>
@@ -121,6 +129,47 @@ public final class S2eUiUtils {
     };
 
     return getPackageOfSelection(selection, elementComparator, ScoutTier.Shared);
+  }
+
+  public static IEditorPart openEditor(IFile f) {
+    return openEditor(f, null);
+  }
+
+  public static IEditorPart openEditor(IFile f, String editorId) {
+    return openEditor(f, null, editorId);
+  }
+
+  public static IEditorPart openEditor(IEditorInput input, String editorId) {
+    return openEditor(null, input, editorId);
+  }
+
+  private static IEditorPart openEditor(IFile f, IEditorInput input, String editorId) {
+    IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+    if (activeWorkbenchWindow == null) {
+      return null;
+    }
+
+    IWorkbenchPage activePage = activeWorkbenchWindow.getActivePage();
+    if (activePage == null) {
+      return null;
+    }
+
+    try {
+      if (input != null) {
+        return IDE.openEditor(activePage, input, editorId, true);
+      }
+
+      if (f != null) {
+        if (editorId != null) {
+          return IDE.openEditor(activePage, f, editorId, true);
+        }
+        return IDE.openEditor(activePage, f, true);
+      }
+    }
+    catch (PartInitException e) {
+      SdkLog.info("Unable to open editor for input '{}'.", f == null ? input : f, e);
+    }
+    return null;
   }
 
   private static PackageContainer getPackageOfSelection(ISelection selection, Comparator<IJavaElement> javaElementComparator, ScoutTier expected) {

@@ -15,6 +15,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -95,25 +96,25 @@ public final class ScoutSdkCore {
     };
   }
 
-  private static Collection<ClasspathEntry> getClasspathEntries(IJavaProject javaProject) {
+  private static List<ClasspathEntry> getClasspathEntries(IJavaProject javaProject) {
     try {
       IPackageFragmentRoot[] allPackageFragmentRoots = javaProject.getAllPackageFragmentRoots();
-      Collection<ClasspathEntry> result = new ArrayList<>(allPackageFragmentRoots.length);
+      List<ClasspathEntry> result = new ArrayList<>(allPackageFragmentRoots.length);
       for (IPackageFragmentRoot cpRoot : allPackageFragmentRoots) {
         String encoding = getEncoding(cpRoot);
         if (cpRoot.getKind() == IPackageFragmentRoot.K_SOURCE) {
           appendPath(result, cpRoot.getResource().getLocation().toFile(), true, encoding);
         }
         else {
+          File cpLocation = cpRoot.getPath().toFile();
           IPath sourceAttachmentPath = cpRoot.getSourceAttachmentPath();
           if (sourceAttachmentPath != null) {
             appendPath(result, sourceAttachmentPath.toFile(), true, encoding);
           }
           else {
-            File cpLocation = cpRoot.getPath().toFile();
             appendPath(result, cpLocation, true, encoding); // add also as source in case the .java files are in the same jar
-            appendPath(result, cpLocation, false, encoding); // and binary
           }
+          appendPath(result, cpLocation, false, encoding); // and binary
         }
       }
       return result;

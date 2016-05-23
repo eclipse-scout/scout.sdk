@@ -91,7 +91,7 @@ public final class ExpressionSourceBuilderFactory {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         //use newlines on multi-dimensional arrays and annotation arrays only
-        char blockSeparator = formatWithNewlines ? '\n' : ' ';
+        String blockSeparator = formatWithNewlines ? lineDelimiter : " ";
         source.append('{');
         source.append(blockSeparator);
         int n = elements.size();

@@ -58,16 +58,18 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
 
   private final IType m_modelType;
   private final IJavaEnvironment m_env;
+  private final String m_targetPackageName;
 
-  public AbstractDtoTypeSourceBuilder(IType modelType, String typeName, IJavaEnvironment env) {
-    this(modelType, typeName, env, true);
+  public AbstractDtoTypeSourceBuilder(IType modelType, String targetPackageName, String typeName, IJavaEnvironment env) {
+    this(modelType, targetPackageName, typeName, env, true);
   }
 
   /**
    * @param elementName
    */
-  public AbstractDtoTypeSourceBuilder(IType modelType, String typeName, IJavaEnvironment env, boolean setup) {
+  public AbstractDtoTypeSourceBuilder(IType modelType, String targetPackageName, String typeName, IJavaEnvironment env, boolean setup) {
     super(typeName);
+    m_targetPackageName = targetPackageName;
     m_modelType = modelType;
     m_env = env;
     if (setup) {
@@ -153,6 +155,10 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
 
   public IType getModelType() {
     return m_modelType;
+  }
+
+  public String getTargetPackage() {
+    return m_targetPackageName;
   }
 
   protected void collectProperties() {

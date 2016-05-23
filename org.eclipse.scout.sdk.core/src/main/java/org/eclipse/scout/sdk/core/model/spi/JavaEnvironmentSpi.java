@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -70,7 +70,7 @@ public interface JavaEnvironmentSpi {
    */
   String getCompileErrors(String fqn);
 
-  Collection<ClasspathSpi> getClasspath();
+  List<ClasspathSpi> getClasspath();
 
   IJavaEnvironment wrap();
 

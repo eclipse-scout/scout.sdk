@@ -294,7 +294,7 @@ public class FormNewOperation implements IOperation {
     if (isCreateFormData()) {
       String formDataSig = Signature.createTypeSignature(getCreatedFormData().getFullyQualifiedName());
       methodBuilder.setReturnTypeSignature(formDataSig);
-      methodBuilder.addParameter(new MethodParameterSourceBuilder("input", formDataSig));
+      methodBuilder.addParameter(new MethodParameterSourceBuilder("formData", formDataSig));
     }
     else {
       methodBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);

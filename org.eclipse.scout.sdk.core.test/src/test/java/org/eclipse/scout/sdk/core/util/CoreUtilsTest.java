@@ -10,13 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.security.GeneralSecurityException;
 import java.util.AbstractList;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
@@ -33,6 +37,10 @@ import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -317,12 +325,56 @@ public class CoreUtilsTest {
   }
 
   @Test
-  public void testCreateDocumentBuilder() throws ParserConfigurationException {
-    Assert.assertNotNull(CoreUtils.createDocumentBuilder());
+  public void testCreateTransformer() throws TransformerConfigurationException {
+    Assert.assertNotNull(CoreUtils.createTransformer(true));
+    Assert.assertNotNull(CoreUtils.createTransformer(false));
   }
 
   @Test
-  public void testCreateTransformer() throws TransformerConfigurationException {
-    Assert.assertNotNull(CoreUtils.createTransformer());
+  public void testEvaluateXPath() throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
+    final String ns = "http://java.sun.com/xml/ns/jaxws";
+    DocumentBuilder b = CoreUtils.createDocumentBuilder();
+    Document prefixExplicit = b
+        .parse(new InputSource(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><p:root xmlns:p=\"" + ns + "\"><p:element>whatever</p:element><p:element>another</p:element></p:root>")));
+    List<Element> result = CoreUtils.evaluateXPath("p:root/p:element", prefixExplicit, "p", ns);
+    Assert.assertEquals(2, result.size());
+
+    Document prefixXmlns = b
+        .parse(new InputSource(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><root xmlns=\"" + ns + "\"><element>whatever</element><element>another</element></root>")));
+    result = CoreUtils.evaluateXPath("p:root/p:element", prefixXmlns, "p", ns);
+    Assert.assertEquals(2, result.size());
+
+    Document prefixDifferent = b
+        .parse(new InputSource(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><a:root xmlns:a=\"" + ns + "\"><a:element>whatever</a:element><a:element>another</a:element></a:root>")));
+    result = CoreUtils.evaluateXPath("p:root/p:element", prefixDifferent, "p", ns);
+    Assert.assertEquals(2, result.size());
+
+    Document noNamespaces = b
+        .parse(new InputSource(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><root> <element>whatever</element> <element>another</element>  <!--comment --></root>")));
+    result = CoreUtils.evaluateXPath("root/element", noNamespaces, null, null);
+    Assert.assertEquals(2, result.size());
+
+    Document notMatching = b
+        .parse(new InputSource(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><root><element>whatever</element><element>another</element></root>")));
+    result = CoreUtils.evaluateXPath("root/elementa", notMatching, null, null);
+    Assert.assertEquals(0, result.size());
+
+    Document multipleNamespaces =
+        b.parse(new InputSource(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><p:root xmlns:bb=\"http://other.name.space/something\" xmlns:p=\"" + ns
+            + "\"><bb:another>content</bb:another><p:element>whatever</p:element><p:element>another</p:element></p:root>")));
+    result = CoreUtils.evaluateXPath("p:root/bb:another", multipleNamespaces, "p", ns);
+    Assert.assertEquals(1, result.size());
+
+    Document emptyDoc = b
+        .parse(new InputSource(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><root></root>")));
+    result = CoreUtils.evaluateXPath("root/element", emptyDoc);
+    Assert.assertEquals(0, result.size());
+
+    result = CoreUtils.evaluateXPath("root/element", null, null, null);
+    Assert.assertEquals(0, result.size());
+
+    result = CoreUtils.evaluateXPath(null, null, null, null);
+    Assert.assertEquals(0, result.size());
   }
+
 }

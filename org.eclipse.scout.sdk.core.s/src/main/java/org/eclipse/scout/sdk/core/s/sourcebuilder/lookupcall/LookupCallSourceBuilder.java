@@ -70,7 +70,7 @@ public class LookupCallSourceBuilder extends AbstractEntitySourceBuilder {
     lookupCallBuilder.addField(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
 
     if (StringUtils.isNotBlank(getLookupServiceIfcSignature())) {
-      IMethodSourceBuilder getConfiguredService = MethodSourceBuilderFactory.createOverride(lookupCallBuilder, getJavaEnvironment(), "getConfiguredService");
+      IMethodSourceBuilder getConfiguredService = MethodSourceBuilderFactory.createOverride(lookupCallBuilder, getPackageName(), getJavaEnvironment(), "getConfiguredService");
       getConfiguredService.setBody(new ISourceBuilder() {
         @Override
         public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {

@@ -18,11 +18,12 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -37,23 +38,33 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.DatatypeConverter;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.text.translate.AggregateTranslator;
 import org.apache.commons.lang3.text.translate.EntityArrays;
 import org.apache.commons.lang3.text.translate.LookupTranslator;
@@ -72,6 +83,9 @@ import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * <h3>{@link CoreUtils}</h3> Holds core utilities.
@@ -120,14 +134,20 @@ public final class CoreUtils {
 
   /**
    * Deletes the given file or folder.<br>
-   * In case the given {@link File} is a folder the contents of the folder are deleted recursively.
+   * In case the given {@link File} is a folder the contents of the folder are deleted recursively.<br>
+   * In case the given {@link File} does not exist this method does nothing.
    *
-   * @param dirToDelete
+   * @param toDelete
    *          The file or folder to delete.
    * @throws IOException
    */
-  public static void deleteFolder(File dirToDelete) throws IOException {
-    Files.walkFileTree(Paths.get(dirToDelete.toURI()), new SimpleFileVisitor<Path>() {
+  public static void deleteFolder(File toDelete) throws IOException {
+    Validate.notNull(toDelete);
+    if (!toDelete.exists()) {
+      return;
+    }
+
+    Files.walkFileTree(toDelete.toPath(), new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         Files.delete(file);
@@ -911,6 +931,7 @@ public final class CoreUtils {
         SdkLog.debug("Feature '{}' is not supported in the current XML parser. Skipping.", feature, e);
       }
     }
+    dbf.setNamespaceAware(true);
     return dbf.newDocumentBuilder();
   }
 
@@ -918,33 +939,228 @@ public final class CoreUtils {
    * Creates a new {@link Transformer}.<br>
    * Use {@link Transformer#transform(javax.xml.transform.Source, javax.xml.transform.Result)} to transform an XML
    * document.
-   * 
+   *
+   * @param format
+   *          <code>true</code> to have the document formatted (indent) during transformation. <code>false</otherwise>.
    * @return The created {@link Transformer}. All external entities are disabled to prevent XXE.
    * @throws TransformerConfigurationException
    *           When it is not possible to create a Transformer instance.
    */
-  public static Transformer createTransformer() throws TransformerConfigurationException {
+  public static Transformer createTransformer(boolean format) throws TransformerConfigurationException {
     TransformerFactory tf = TransformerFactory.newInstance();
-
+    final int indent = 2;
     try {
       tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
     }
     catch (TransformerConfigurationException e) {
       SdkLog.debug("Feature '{}' is not supported in the current TransformerFactory: {}", XMLConstants.FEATURE_SECURE_PROCESSING, tf.getClass().getName(), e);
     }
-    try {
-      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-    }
-    catch (IllegalArgumentException e) {
-      SdkLog.debug("Attribute '{}' is not supported in the current TransformerFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, tf.getClass().getName(), e);
-    }
-    try {
-      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-    }
-    catch (IllegalArgumentException e) {
-      SdkLog.debug("Attribute '{}' is not supported in the current TransformerFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, tf.getClass().getName(), e);
+
+    Map<String, Object> attribs = new HashMap<>(3);
+    attribs.put(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    attribs.put(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    if (format) {
+      attribs.put("indent-number", Integer.valueOf(indent));
     }
 
-    return tf.newTransformer();
+    for (Entry<String, Object> a : attribs.entrySet()) {
+      try {
+        tf.setAttribute(a.getKey(), a.getValue());
+      }
+      catch (IllegalArgumentException e) {
+        SdkLog.debug("Attribute '{}' is not supported in the current TransformerFactory: {}", a.getKey(), tf.getClass().getName(), e);
+      }
+    }
+
+    Transformer transformer = tf.newTransformer();
+
+    Map<String, String> outputProps = new HashMap<>(4);
+    outputProps.put(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
+    outputProps.put(OutputKeys.METHOD, "xml");
+    if (format) {
+      outputProps.put(OutputKeys.INDENT, "yes");
+      outputProps.put("{http://xml.apache.org/xslt}indent-amount", Integer.toString(indent));
+    }
+    else {
+      outputProps.put(OutputKeys.INDENT, "no");
+    }
+
+    for (Entry<String, String> o : outputProps.entrySet()) {
+      try {
+        transformer.setOutputProperty(o.getKey(), o.getValue());
+      }
+      catch (IllegalArgumentException e) {
+        SdkLog.debug("Error applying output property '{}' on transformer of class '{}'.", o.getKey(), transformer.getClass().getName(), e);
+      }
+    }
+    return transformer;
+  }
+
+  /**
+   * Moves the given directory to the given target directory. This means after this method call the source directory
+   * does not exist anymore and the target directory contains a new folder with the name of the source and its content.
+   *
+   * @param sourceDir
+   *          Must be an existing directory.
+   * @param targetDir
+   *          Must be an existing directory.
+   * @throws IOException
+   */
+  public static void moveDirectory(File sourceDir, File targetDir) throws IOException {
+    Validate.notNull(sourceDir);
+    Validate.isTrue(sourceDir.isDirectory());
+    Validate.notNull(targetDir);
+    Validate.isTrue(targetDir.isDirectory());
+
+    final Path sourcePath = sourceDir.toPath();
+    final Path targetPath = new File(targetDir, sourceDir.getName()).toPath();
+
+    Files.createDirectories(targetPath); // ensure target exists
+
+    if (Objects.equals(Files.getFileStore(sourcePath), Files.getFileStore(targetPath))) {
+      Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+    }
+    else {
+      Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
+          Files.delete(file);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+          Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+          Files.delete(dir);
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    }
+  }
+
+  /**
+   * Gets the first child {@link Element} of the given parent {@link Element} having the given local tag name (ignoring
+   * namespaces).
+   *
+   * @param parent
+   *          The parent {@link Element}
+   * @param tagName
+   *          The local tag name (see {@link Node#getLocalName()}
+   * @return The first Element with this tag name or <code>null</code> if no such {@link Element} exists.
+   */
+  public static Element getFirstChildElement(Element parent, String tagName) {
+    NodeList children = parent.getChildNodes();
+    for (int i = 0; i < children.getLength(); ++i) {
+      Node n = children.item(i);
+      String nodeName = n.getLocalName();
+      if (n.getNodeType() == Node.ELEMENT_NODE && Objects.equals(nodeName, tagName)) {
+        return ((Element) n);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Evaluates the given xPath string on the given {@link Document}.
+   * 
+   * @param xPath
+   *          The xPath expression
+   * @param applyToDocument
+   *          The {@link Document} to apply the xPath to.
+   * @return All {@link Element}s that match the given xPath expression.
+   * @throws XPathExpressionException
+   */
+  public static List<Element> evaluateXPath(String xPath, final Document applyToDocument) throws XPathExpressionException {
+    return evaluateXPath(xPath, applyToDocument, null);
+  }
+
+  /**
+   * Evaluates the given xPath string on the given {@link Document}.
+   * 
+   * @param xPath
+   *          The xPath expression
+   * @param applyToDocument
+   *          The {@link Document} to apply the xPath to.
+   * @param prefix
+   *          The single namespace prefix that was used in the given xPath expression
+   * @param namespace
+   *          The namespace the given prefix maps to.
+   * @return All {@link Element}s that match the given xPath expression.
+   * @throws XPathExpressionException
+   */
+  public static List<Element> evaluateXPath(String xPath, final Document applyToDocument, String prefix, String namespace) throws XPathExpressionException {
+    return evaluateXPath(xPath, applyToDocument, Collections.singletonMap(prefix, namespace));
+  }
+
+  /**
+   * Evaluates the given xPath string on the given {@link Document}.
+   *
+   * @param xPath
+   *          The xPath expression
+   * @param applyToDocument
+   *          The {@link Document} to apply the xPath to.
+   * @param usedPprefixToNamespaceMap
+   *          A {@link Map} defining all namespace prefixes used in the given xPath and their corresponding namespace.
+   * @return All {@link Element}s that match the given xPath expression.
+   * @throws XPathExpressionException
+   */
+  public static List<Element> evaluateXPath(String xPath, final Document applyToDocument, final Map<String, String> usedPprefixToNamespaceMap) throws XPathExpressionException {
+    if (applyToDocument == null || StringUtils.isBlank(xPath)) {
+      return Collections.emptyList();
+    }
+
+    XPathFactory xPathfactory = XPathFactory.newInstance();
+    XPath xpath = xPathfactory.newXPath();
+    xpath.setNamespaceContext(new NamespaceContext() {
+      @Override
+      public String getNamespaceURI(String prefix) {
+        if (usedPprefixToNamespaceMap != null) {
+          String ns = usedPprefixToNamespaceMap.get(prefix);
+          if (ns != null) {
+            return ns;
+          }
+        }
+        return applyToDocument.lookupNamespaceURI(prefix);
+      }
+
+      @Override
+      public Iterator<?> getPrefixes(String val) {
+        return Collections.singletonList(getPrefix(val)).iterator();
+      }
+
+      @Override
+      public String getPrefix(String uri) {
+        if (usedPprefixToNamespaceMap != null) {
+          for (Entry<String, String> entry : usedPprefixToNamespaceMap.entrySet()) {
+            if (entry.getValue().equals(uri)) {
+              return entry.getKey();
+            }
+          }
+        }
+        return applyToDocument.lookupPrefix(uri);
+      }
+    });
+
+    XPathExpression expr = xpath.compile(xPath);
+    NodeList result = (NodeList) expr.evaluate(applyToDocument, XPathConstants.NODESET);
+    int size = result.getLength();
+    if (size < 1) {
+      return Collections.emptyList();
+    }
+
+    List<Element> elements = new ArrayList<>(size);
+    for (int i = 0; i < size; i++) {
+      Node n = result.item(i);
+      if (n.getNodeType() == Node.ELEMENT_NODE) {
+        elements.add((Element) n);
+      }
+    }
+    return elements;
   }
 }

@@ -44,8 +44,8 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
   /**
    * @param elementName
    */
-  public AbstractTableBeanSourceBuilder(IType modelType, String typeName, IJavaEnvironment env, boolean setup) {
-    super(modelType, typeName, env, setup);
+  public AbstractTableBeanSourceBuilder(IType modelType, String targetPackageName, String typeName, IJavaEnvironment env, boolean setup) {
+    super(modelType, targetPackageName, typeName, env, setup);
   }
 
   @Override
@@ -69,7 +69,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     // row access methods
     final String tableRowSignature = Signature.createTypeSignature(rowDataName, false);
     // getRows
-    IMethodSourceBuilder getRowsMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "getRows");
+    IMethodSourceBuilder getRowsMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getTargetPackage(), getJavaEnvironment(), "getRows");
     getRowsMethodBuilder.setReturnTypeSignature(Signature.createArraySignature(tableRowSignature, 1));
     getRowsMethodBuilder.setBody(new ISourceBuilder() {
       @Override
@@ -94,7 +94,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
 
     // addRow
     final String addRowMethodName = "addRow";
-    IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), addRowMethodName, new IFilter<IMethod>() {
+    IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getTargetPackage(), getJavaEnvironment(), addRowMethodName, new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod candidate) {
         // choose the narrowed overload from the abstract super class instead of the method defined in the interface
@@ -111,7 +111,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(addRowMethodBuilder), addRowMethodBuilder);
 
     // addRow(int state)
-    final IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), addRowMethodName, new IFilter<IMethod>() {
+    final IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getTargetPackage(), getJavaEnvironment(), addRowMethodName, new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod candidate) {
         return candidate.parameters().list().size() == 1;
@@ -129,7 +129,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(addRowWithStateMethodBuilder), addRowWithStateMethodBuilder);
 
     // rowAt
-    final IMethodSourceBuilder rowAtMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "rowAt");
+    final IMethodSourceBuilder rowAtMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getTargetPackage(), getJavaEnvironment(), "rowAt");
     rowAtMethodBuilder.setReturnTypeSignature(tableRowSignature);
     rowAtMethodBuilder.getParameters().get(0).setElementName("index"); // in case the param name cannot be parsed from the class file
     rowAtMethodBuilder.setBody(new ISourceBuilder() {
@@ -141,7 +141,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(rowAtMethodBuilder), rowAtMethodBuilder);
 
     // createRow
-    IMethodSourceBuilder createRowMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "createRow");
+    IMethodSourceBuilder createRowMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getTargetPackage(), getJavaEnvironment(), "createRow");
     createRowMethodBuilder.setReturnTypeSignature(tableRowSignature);
     if (Flags.isAbstract(table.flags()) || Flags.isAbstract(getModelType().flags())) {
       createRowMethodBuilder.setFlags(createRowMethodBuilder.getFlags() | Flags.AccAbstract);
@@ -157,7 +157,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(createRowMethodBuilder), createRowMethodBuilder);
 
     // getRowType
-    IMethodSourceBuilder getRowTypeMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "getRowType");
+    IMethodSourceBuilder getRowTypeMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getTargetPackage(), getJavaEnvironment(), "getRowType");
     getRowTypeMethodBuilder.setBody(new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
@@ -169,7 +169,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
 
   protected void addAbstractMethodImplementations() {
     // createRow
-    IMethodSourceBuilder createRowSourceBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "createRow");
+    IMethodSourceBuilder createRowSourceBuilder = MethodSourceBuilderFactory.createOverride(this, getTargetPackage(), getJavaEnvironment(), "createRow");
 
     createRowSourceBuilder.setReturnTypeSignature(Signature.createTypeSignature(IScoutRuntimeTypes.AbstractTableRowData));
     createRowSourceBuilder.setBody(new ISourceBuilder() {
@@ -182,7 +182,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     });
     addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(createRowSourceBuilder), createRowSourceBuilder);
 
-    IMethodSourceBuilder getRowTypeSourceBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "getRowType");
+    IMethodSourceBuilder getRowTypeSourceBuilder = MethodSourceBuilderFactory.createOverride(this, getTargetPackage(), getJavaEnvironment(), "getRowType");
     getRowTypeSourceBuilder.setReturnTypeSignature(Signature.createTypeSignature(Class.class.getName() + ISignatureConstants.C_GENERIC_START + "? extends " + IScoutRuntimeTypes.AbstractTableRowData + ISignatureConstants.C_GENERIC_END));
     getRowTypeSourceBuilder.setBody(new ISourceBuilder() {
 

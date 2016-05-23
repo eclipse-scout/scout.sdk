@@ -30,8 +30,8 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
    * @param modelType
    * @param elementName
    */
-  public FormDataTypeSourceBuilder(IType modelType, FormDataAnnotationDescriptor formDataAnnotation, String typeName, IJavaEnvironment env) {
-    super(modelType, typeName, env, false);
+  public FormDataTypeSourceBuilder(IType modelType, FormDataAnnotationDescriptor formDataAnnotation, String targetPackageName, String typeName, IJavaEnvironment env) {
+    super(modelType, targetPackageName, typeName, env, false);
     m_formDataAnnotation = formDataAnnotation;
     setup();
   }

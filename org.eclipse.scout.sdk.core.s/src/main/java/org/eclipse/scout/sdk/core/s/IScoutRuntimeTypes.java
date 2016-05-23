@@ -36,6 +36,7 @@ public interface IScoutRuntimeTypes {
   String ConfigOperation = "org.eclipse.scout.rt.platform.annotations.ConfigOperation";
   String ConfigProperty = "org.eclipse.scout.rt.platform.annotations.ConfigProperty";
   String TunnelToServer = "org.eclipse.scout.rt.shared.TunnelToServer";
+  String ApplicationScoped = "org.eclipse.scout.rt.platform.ApplicationScoped";
   String RunWithSubject = "org.eclipse.scout.rt.testing.platform.runner.RunWithSubject";
   String RunWithClientSession = "org.eclipse.scout.rt.testing.client.runner.RunWithClientSession";
   String RunWithServerSession = "org.eclipse.scout.rt.testing.server.runner.RunWithServerSession";

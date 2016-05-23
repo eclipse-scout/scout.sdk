@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +30,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -80,6 +88,7 @@ import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
@@ -98,6 +107,8 @@ import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.operation.CompilationUnitWriteOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.operation.ResourceWriteOperation;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * <h3>{@link S2eUtils}</h3>
@@ -194,13 +205,23 @@ public final class S2eUtils {
   }
 
   /**
-   * Gets all {@link IType}s of sub classes of the given baseTypeFqn that are on the classpath of the given project and
-   * fulfill the given filter.
+   * @see #findClassesInStrictHierarchy(IJavaProject, IType, IProgressMonitor, IFilter)
+   */
+  public static Set<IType> findClassesInStrictHierarchy(IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor, IFilter<IType> filter) throws CoreException {
+    if (!exists(sourceProject)) {
+      return Collections.emptySet();
+    }
+    return findClassesInStrictHierarchy(sourceProject, sourceProject.findType(baseTypeFqn.replace('$', '.')), monitor, filter);
+  }
+
+  /**
+   * Gets all {@link IType}s on the classpath of the give {@link IJavaProject} that are sub classes of the given
+   * baseType and fulfill the given filter.
    *
    * @param sourceProject
    *          The {@link IJavaProject} defining the classpath.
-   * @param baseTypeFqn
-   *          The fully qualified name of the base class of the hierarchy.
+   * @param baseType
+   *          The base class of the hierarchy.
    * @param monitor
    *          The monitor or <code>null</code>. If the monitor becomes canceled, the search is aborted and an incomplete
    *          result may be returned. The caller of this method is responsible to react on this fact based on the
@@ -211,9 +232,12 @@ public final class S2eUtils {
    *         afterwards.
    * @throws CoreException
    */
-  public static Set<IType> findClassesInStrictHierarchy(final IJavaProject sourceProject, String baseTypeFqn, final IProgressMonitor monitor, final IFilter<IType> filter) throws CoreException {
-    final Set<IType> collector = new TreeSet<>(new ElementNameComparator());
+  public static Set<IType> findClassesInStrictHierarchy(final IJavaProject sourceProject, IType baseType, final IProgressMonitor monitor, final IFilter<IType> filter) throws CoreException {
+    if (!exists(baseType) || !exists(baseType.getParent()) || !exists(sourceProject)) {
+      return Collections.emptySet();
+    }
 
+    final Set<IType> collector = new TreeSet<>(new ElementNameComparator());
     TypeNameMatchRequestor nameMatchRequestor = new TypeNameMatchRequestor() {
       @Override
       public void acceptTypeNameMatch(TypeNameMatch match) {
@@ -225,12 +249,6 @@ public final class S2eUtils {
         }
       }
     };
-
-    IType baseType = sourceProject.findType(baseTypeFqn.replace('$', '.'));
-    if (!exists(baseType) || !exists(baseType.getParent())) {
-      return collector;
-    }
-
     IJavaSearchScope strictHierarchyScope = SearchEngine.createStrictHierarchyScope(sourceProject, baseType, true, false, null);
 
     try {
@@ -1447,6 +1465,73 @@ public final class S2eUtils {
     }
     catch (IOException e) {
       throw new CoreException(new ScoutStatus("Unable to read file '" + file.getFullPath().toOSString() + "'.", e));
+    }
+  }
+
+  /**
+   * Gets the content of the pom.xml file of the given {@link IProject} as {@link Document}.
+   *
+   * @param p
+   *          The {@link IProject} for which the pom should be returned.
+   * @return The {@link Document} holding the pom.xml contents.
+   * @throws CoreException
+   */
+  public static Document getPomDocument(IProject p) throws CoreException {
+    IFile pom = p.getFile(IMavenConstants.POM);
+    return readXmlDocument(pom);
+  }
+
+  /**
+   * Reads the given {@link IFile} into an XML {@link Document}.
+   *
+   * @param file
+   *          The {@link IFile} that should be loaded. Must be an XML file!
+   * @return a {@link Document} holding the contents of the {@link IFile} or <code>null</code> if the given
+   *         {@link IFile} does not exist.
+   * @throws CoreException
+   */
+  public static Document readXmlDocument(IFile file) throws CoreException {
+    if (!file.exists()) {
+      return null;
+    }
+
+    try {
+      DocumentBuilder docBuilder = CoreUtils.createDocumentBuilder();
+      try (InputStream in = file.getContents()) {
+        return docBuilder.parse(in);
+      }
+    }
+    catch (IOException | ParserConfigurationException | CoreException | SAXException e) {
+      throw new CoreException(new ScoutStatus(e));
+    }
+  }
+
+  /**
+   * Writes the given {@link Document} to the given {@link IFile}.
+   *
+   * @param document
+   *          The {@link Document} holding the new content of the given {@link IFile}. Must not be <code>null</code>.
+   * @param file
+   *          The {@link IFile} where the contents should be written to. The file must not exist yet. Must not be
+   *          <code>null</code>.
+   * @param monitor
+   *          The progress monitor
+   * @param workingCopyManager
+   *          The working copy manager
+   * @throws CoreException
+   */
+  public static void writeXmlDocument(Document document, IFile file, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    StringWriter out = new StringWriter();
+    try {
+      Transformer transformer = CoreUtils.createTransformer(true);
+      transformer.transform(new DOMSource(document), new StreamResult(out));
+
+      ResourceWriteOperation writeOp = new ResourceWriteOperation(file, out.toString());
+      writeOp.validate();
+      writeOp.run(monitor, workingCopyManager);
+    }
+    catch (TransformerException e) {
+      throw new CoreException(new ScoutStatus(e));
     }
   }
 }

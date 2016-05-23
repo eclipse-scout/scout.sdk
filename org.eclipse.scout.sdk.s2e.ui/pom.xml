@@ -71,7 +71,8 @@
           <instructions>
             <Bundle-Name>Scout SDK User Interface</Bundle-Name>
             <Import-Package>
-              !javax.*,
+              !javax.swing.*,
+              !javax.xml*,
               !org.eclipse.core.runtime*,
               !org.eclipse.core.resources*,
               !org.eclipse.jdt.core*,

@@ -60,9 +60,11 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
     for (IType t : element.exceptionTypes()) {
       addExceptionSignature(SignatureUtils.getTypeSignature(t));
     }
-    ISourceRange body = element.sourceOfBody();
-    if (body.isAvailable()) {
-      setBody(new RawSourceBuilder(body.toString()));
+    if (!element.declaringType().isInterface() && !Flags.isAbstract(element.flags())) {
+      ISourceRange body = element.sourceOfBody();
+      if (body.isAvailable()) {
+        setBody(new RawSourceBuilder(body.toString()));
+      }
     }
 
     // add interface flag on method if declaring type is an interface
