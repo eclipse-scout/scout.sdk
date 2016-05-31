@@ -107,19 +107,33 @@ public class SimpleNlsProject extends AbstractNlsProject {
       SdkLog.warning("Folder '{}' could not be found in '{}'. Will be ignored.", nlsType.getTranslationsFolderName(), r.getElementName());
     }
     else {
+      String fileNamePrefix = nlsType.getTranslationsPrefix();
       for (Object o : textFolder.getNonJavaResources()) {
         if (o instanceof JarEntryFile) {
           JarEntryFile f = (JarEntryFile) o;
-          try (InputStream is = f.getContents()) {
-            translationFiles.add(new PlatformTranslationFile(is, getLanguage(f.getName())));
-          }
-          catch (Exception e) {
-            SdkLog.error("Could not load NLS files of entry '{}'.", r.getElementName(), e);
+          String fileName = f.getName();
+          if (resourceMatchesPrefix(fileName, fileNamePrefix)) {
+            try (InputStream is = f.getContents()) {
+              translationFiles.add(new PlatformTranslationFile(is, getLanguage(fileName)));
+            }
+            catch (Exception e) {
+              SdkLog.error("Could not load NLS files of entry '{}'.", r.getElementName(), e);
+            }
           }
         }
       }
     }
     return translationFiles;
+  }
+
+  private static boolean resourceMatchesPrefix(String resourceName, String prefix) {
+    if (resourceName == null) {
+      return false;
+    }
+    if (prefix == null) {
+      return false;
+    }
+    return resourceName.matches(prefix + "(_[a-zA-Z]{2}){0,3}" + "\\.properties");
   }
 
   private void createTranslationFile(Language language, IFolder folder, IProgressMonitor monitor) throws CoreException {
@@ -230,7 +244,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
       if (folder.exists()) {
         IResource[] resources = folder.members(IResource.NONE);
         for (IResource resource : resources) {
-          if (resource instanceof IFile && resource.getName().matches(fileNamePrefix + "(_[a-zA-Z]{2}){0,3}" + "\\.properties")) {
+          if (resource instanceof IFile && resourceMatchesPrefix(resource.getName(), fileNamePrefix)) {
             files.add((IFile) resource);
           }
         }
