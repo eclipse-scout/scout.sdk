@@ -302,6 +302,57 @@ public final class SdkLog {
     setLogLevel(getInitialLogLevel());
   }
 
+  /**
+   * Checks if at least the given {@link Level} is enabled. If this method returns <code>true</code> this means that a
+   * message with given {@link Level} would be printed.
+   *
+   * @param level
+   *          The level to check.
+   * @return <code>true</code> if at least the given {@link Level} is currently active.
+   */
+  public static boolean isLevelEnabled(Level level) {
+    if (level == null) {
+      return false;
+    }
+    return getLogLevel().intValue() <= level.intValue();
+  }
+
+  /**
+   * Checks if the Debug level is currently active. See {@link #isLevelEnabled(Level)}.
+   *
+   * @return <code>true</code> if the Debug {@link Level} is currently enabled and would be printed to the log.
+   */
+  public static boolean isDebugEnabled() {
+    return isLevelEnabled(Level.FINE);
+  }
+
+  /**
+   * Checks if the Info level is currently active. See {@link #isLevelEnabled(Level)}.
+   *
+   * @return <code>true</code> if the Info {@link Level} is currently enabled and would be printed to the log.
+   */
+  public static boolean isInfoEnabled() {
+    return isLevelEnabled(Level.INFO);
+  }
+
+  /**
+   * Checks if the Warning level is currently active. See {@link #isLevelEnabled(Level)}.
+   *
+   * @return <code>true</code> if the Warning {@link Level} is currently enabled and would be printed to the log.
+   */
+  public static boolean isWarningEnabled() {
+    return isLevelEnabled(Level.WARNING);
+  }
+
+  /**
+   * Checks if the Error level is currently active. See {@link #isLevelEnabled(Level)}.
+   *
+   * @return <code>true</code> if the Error {@link Level} is currently enabled and would be printed to the log.
+   */
+  public static boolean isErrorEnabled() {
+    return isLevelEnabled(Level.SEVERE);
+  }
+
   static Level parseLevel(String lvl) {
     if (StringUtils.isBlank(lvl)) {
       return DEFAULT_LOG_LEVEL;

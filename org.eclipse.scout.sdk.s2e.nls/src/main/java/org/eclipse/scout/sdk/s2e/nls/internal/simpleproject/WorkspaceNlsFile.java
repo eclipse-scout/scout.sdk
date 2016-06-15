@@ -43,6 +43,10 @@ public class WorkspaceNlsFile extends AbstractNlsFile {
   private class P_NlsFileChangeListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
+      if (event.getBuildKind() != 0) {
+        return; // ignore build events
+      }
+
       try {
         // check if our file is part of the delta
         IResourceDelta delta = event.getDelta();

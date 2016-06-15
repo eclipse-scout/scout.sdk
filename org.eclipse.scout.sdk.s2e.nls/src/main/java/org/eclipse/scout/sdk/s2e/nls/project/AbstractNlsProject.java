@@ -28,7 +28,6 @@ import javax.swing.event.EventListenerList;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.util.OptimisticLock;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -171,9 +170,9 @@ public abstract class AbstractNlsProject implements INlsProject {
   }
 
   @Override
-  public IStatus removeEntries(Collection<INlsEntry> entries, IProgressMonitor m) {
+  public void removeEntries(Collection<INlsEntry> entries, IProgressMonitor m) {
     if (entries == null || entries.isEmpty()) {
-      return Status.OK_STATUS;
+      return;
     }
 
     for (ITranslationResource r : getAllTranslationResources()) {
@@ -186,7 +185,6 @@ public abstract class AbstractNlsProject implements INlsProject {
       r.commitChanges(m);
     }
     refresh();
-    return Status.OK_STATUS;
   }
 
   @Override

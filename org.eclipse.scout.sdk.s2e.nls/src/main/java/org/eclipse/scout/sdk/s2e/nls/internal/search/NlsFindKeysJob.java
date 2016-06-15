@@ -25,22 +25,21 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
+import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 import org.eclipse.search.ui.text.Match;
 
 /**
  * <h4>NlsFindReferencesJob</h4>
  */
-public class NlsFindKeysJob extends Job {
+public class NlsFindKeysJob extends AbstractJob {
 
   private final List<String> m_searchKeys;
   private final Map<String, List<Match>> m_matches;
@@ -67,68 +66,64 @@ public class NlsFindKeysJob extends Job {
   }
 
   @Override
-  public IStatus run(IProgressMonitor monitor) {
-    try {
-      m_matches.clear();
-      IJavaProject[] javaProjects = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
-      monitor.beginTask("Searching for NLS keys", javaProjects.length);
-      for (IJavaProject root : javaProjects) {
-        monitor.setTaskName("Searching in '" + root.getElementName() + "'.");
+  public void execute(IProgressMonitor monitor) throws CoreException {
+    m_matches.clear();
+    IJavaProject[] javaProjects = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
+    monitor.beginTask("Searching for NLS keys", javaProjects.length);
+    for (IJavaProject root : javaProjects) {
+      monitor.setTaskName("Searching in '" + root.getElementName() + "'.");
 
-        IProject p = root.getProject();
-        Path outputLocation = new java.io.File(p.getLocation().toOSString(), root.getOutputLocation().removeFirstSegments(1).toOSString()).toPath();
-        searchInFolder(p.getLocation().toFile().toPath(), p.getDefaultCharset(), outputLocation, monitor);
+      IProject p = root.getProject();
+      Path outputLocation = new java.io.File(p.getLocation().toOSString(), root.getOutputLocation().removeFirstSegments(1).toOSString()).toPath();
+      searchInFolder(p.getLocation().toFile().toPath(), p.getDefaultCharset(), outputLocation, monitor);
 
-        if (monitor.isCanceled()) {
-          return Status.OK_STATUS;
-        }
-        monitor.worked(1);
+      if (monitor.isCanceled()) {
+        return;
       }
+      monitor.worked(1);
     }
-    catch (Exception e) {
-      SdkLog.error("Could not create java projects for nls search.", e);
-    }
-    finally {
-      monitor.done();
-    }
-    return Status.OK_STATUS;
   }
 
-  protected void searchInFolder(Path folder, final String charset, final Path outputFolder, final IProgressMonitor monitor) throws IOException {
-    Files.walkFileTree(folder,
-        new SimpleFileVisitor<Path>() {
-          @Override
-          public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            if (monitor.isCanceled()) {
-              return FileVisitResult.TERMINATE;
-            }
-            if (dir.equals(outputFolder)) {
-              return FileVisitResult.SKIP_SUBTREE;
-            }
-            Path fileName = dir.getFileName();
-            boolean isHiddenDir = fileName != null && fileName.toString().startsWith(".");
-            if (isHiddenDir) {
-              return FileVisitResult.SKIP_SUBTREE;
-            }
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            Path path = file.getFileName();
-            if (path == null) {
+  protected void searchInFolder(Path folder, final String charset, final Path outputFolder, final IProgressMonitor monitor) throws CoreException {
+    try {
+      Files.walkFileTree(folder,
+          new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+              if (monitor.isCanceled()) {
+                return FileVisitResult.TERMINATE;
+              }
+              if (dir.equals(outputFolder)) {
+                return FileVisitResult.SKIP_SUBTREE;
+              }
+              Path fileName = dir.getFileName();
+              boolean isHiddenDir = fileName != null && fileName.toString().startsWith(".");
+              if (isHiddenDir) {
+                return FileVisitResult.SKIP_SUBTREE;
+              }
               return FileVisitResult.CONTINUE;
             }
-            String fileName = path.toString().toLowerCase();
-            if (attrs.isRegularFile() && (fileName.endsWith(SuffixConstants.SUFFIX_STRING_java) || fileName.endsWith(".html"))) {
-              searchInFile(file, charset, monitor);
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+              Path path = file.getFileName();
+              if (path == null) {
+                return FileVisitResult.CONTINUE;
+              }
+              String fileName = path.toString().toLowerCase();
+              if (attrs.isRegularFile() && (fileName.endsWith(SuffixConstants.SUFFIX_STRING_java) || fileName.endsWith(".html"))) {
+                searchInFile(file, charset, monitor);
+              }
+              if (monitor.isCanceled()) {
+                return FileVisitResult.TERMINATE;
+              }
+              return FileVisitResult.CONTINUE;
             }
-            if (monitor.isCanceled()) {
-              return FileVisitResult.TERMINATE;
-            }
-            return FileVisitResult.CONTINUE;
-          }
-        });
+          });
+    }
+    catch (IOException e) {
+      throw new CoreException(new ScoutStatus(e));
+    }
   }
 
   protected void searchInFile(Path file, String charset, IProgressMonitor monitor) throws IOException {

@@ -56,7 +56,7 @@ public class ErrorFormPage extends FormPage {
       msgBuilder.append(m_message).append("\n");
     }
     if (m_throwable != null) {
-      msgBuilder.append(CoreUtils.getStackTrace(m_throwable));
+      msgBuilder.append(CoreUtils.getThrowableAsString(m_throwable));
     }
 
     Text text = toolkit.createText(parent, msgBuilder.toString(), SWT.MULTI);

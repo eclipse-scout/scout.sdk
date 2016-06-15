@@ -150,6 +150,10 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
   private class P_TranslationFileChangedListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
+      if (event.getBuildKind() != 0) {
+        return; // ignore build events
+      }
+
       IResourceDelta delta = event.getDelta();
       try {
         if (delta != null) {

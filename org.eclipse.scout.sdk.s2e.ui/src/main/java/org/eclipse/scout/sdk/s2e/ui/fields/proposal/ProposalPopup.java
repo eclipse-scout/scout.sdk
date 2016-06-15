@@ -17,8 +17,6 @@ import javax.swing.event.EventListenerList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -769,16 +767,16 @@ class ProposalPopup extends Window {
     }
 
     @Override
-    protected IStatus run(final IProgressMonitor monitor) {
+    protected void execute(final IProgressMonitor monitor) {
       final IProposalDescriptionProvider proposalDescriptionProvider = getProposalDescriptionProvider();
       if (proposalDescriptionProvider == null) {
-        return Status.OK_STATUS;
+        return;
       }
       if (monitor.isCanceled()) {
-        return Status.CANCEL_STATUS;
+        return;
       }
       if (m_proposalDescriptionArea.isDisposed()) {
-        return Status.CANCEL_STATUS;
+        return;
       }
 
       final Object contentData = proposalDescriptionProvider.createDescriptionContent(m_proposal, monitor);
@@ -799,8 +797,6 @@ class ProposalPopup extends Window {
           }
         }
       });
-
-      return Status.OK_STATUS;
     }
   }
 
@@ -820,13 +816,12 @@ class ProposalPopup extends Window {
     }
 
     @Override
-    protected IStatus run(final IProgressMonitor monitor) {
+    protected void execute(final IProgressMonitor monitor) {
       m_searchPatternInput.setProposals(loadProposals(m_searchPatternInput.getPattern(), monitor));
       if (monitor.isCanceled()) {
-        return Status.CANCEL_STATUS;
+        return;
       }
       setInputAsync(m_searchPatternInput, monitor);
-      return Status.OK_STATUS;
     }
   }
 

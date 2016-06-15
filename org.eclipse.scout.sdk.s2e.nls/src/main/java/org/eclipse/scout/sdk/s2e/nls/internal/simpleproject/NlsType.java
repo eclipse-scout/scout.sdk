@@ -139,6 +139,10 @@ public class NlsType implements INlsType {
   private class P_NlsResourceChangeListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
+      if (event.getBuildKind() != 0) {
+        return; // ignore build events
+      }
+
       if (!S2eUtils.exists(m_type)) {
         return;
       }

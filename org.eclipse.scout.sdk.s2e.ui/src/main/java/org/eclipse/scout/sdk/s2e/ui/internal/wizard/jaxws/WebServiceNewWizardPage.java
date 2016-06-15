@@ -49,6 +49,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.operation.jaxws.WebServiceNewOperation;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.IProposalListener;
@@ -760,9 +761,9 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
 
       final ResourceTextField currentUrlField = fieldToCheck;
       currentUrlField.setEnabled(false);
-      Job parseRemoteWsdl = new Job("parse WSDL") {
+      Job parseRemoteWsdl = new AbstractJob("parse WSDL") {
         @Override
-        protected IStatus run(IProgressMonitor monitor) {
+        protected void execute(IProgressMonitor monitor) {
           try {
             String msg = validateWsdl(url);
             m_lastParsedWsdlUrl = url;
@@ -786,7 +787,6 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
               });
             }
           }
-          return Status.OK_STATUS;
         }
       };
       parseRemoteWsdl.setSystem(true);

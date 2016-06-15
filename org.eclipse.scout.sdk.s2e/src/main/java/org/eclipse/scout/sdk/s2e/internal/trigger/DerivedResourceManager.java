@@ -29,8 +29,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
@@ -108,9 +106,8 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   public void trigger(final Set<IResource> resources) {
     AbstractJob triggerJob = new AbstractJob("Searching base resources for derived resources update...") {
       @Override
-      protected IStatus run(IProgressMonitor monitor) {
+      protected void execute(IProgressMonitor monitor) {
         triggerSync(resources);
-        return Status.OK_STATUS;
       }
     };
     triggerJob.setPriority(Job.DECORATE);
@@ -289,6 +286,63 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     return false; // we had too many interrupts. we don't want to wait any longer (no endless looping).
   }
 
+  public static boolean isInterestingResourceChangeEvent(IResourceChangeEvent event) {
+    if (event == null) {
+      return false;
+    }
+
+    if (event.getBuildKind() != 0) {
+      return false; // ignore build events
+    }
+
+    Job curJob = Job.getJobManager().currentJob();
+    if (curJob == null) {
+      return false;
+    }
+
+    if (curJob instanceof AbstractJob || curJob instanceof P_RunQueuedTriggerHandlersJob) {
+      // do not automatically update on Scout SDK changes. We expect the SDK to trigger manually where required.
+      return false;
+    }
+
+    if (curJob.belongsTo(ResourcesPlugin.FAMILY_AUTO_BUILD) || curJob.belongsTo(ResourcesPlugin.FAMILY_MANUAL_BUILD)) {
+      // ignore build changes (annotation processing)
+      return false;
+    }
+
+    final String[] excludedJobNamePrefixes = new String[]{"org.eclipse.team.", // excludes svn updates
+        "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
+        "org.eclipse.egit.", // excludes git updates
+        "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
+        "org.eclipse.m2e.", // maven updates
+        "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob", // refresh of external folders after svn update
+        "org.eclipse.core.internal.refresh.RefreshJob", // refresh after git import
+        "org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob", // workspace init job
+        "org.eclipse.wst.jsdt.internal.", // java script tools
+        "org.sonarlint." // sonarlint analyse
+    };
+
+    String jobFqn = curJob.getClass().getName().replace('$', '.');
+    for (String excludedPrefix : excludedJobNamePrefixes) {
+      if (jobFqn.startsWith(excludedPrefix)) {
+        return false;
+      }
+    }
+
+    if ("org.eclipse.core.internal.jobs.ThreadJob".equals(jobFqn)) {
+      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+      for (int i = stackTrace.length - 1; i >= 0; i--) {
+        for (String excludedPrefix : excludedJobNamePrefixes) {
+          if (stackTrace[i].getClassName().startsWith(excludedPrefix)) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
   /**
    * The java change listener that adds the given event to the queue to execute later on
    */
@@ -300,57 +354,9 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       m_eventCollector = eventCollector;
     }
 
-    private static boolean acceptUpdateEvent() {
-      Job curJob = Job.getJobManager().currentJob();
-      if (curJob == null) {
-        return false;
-      }
-
-      if (curJob instanceof AbstractJob || curJob instanceof P_RunQueuedTriggerHandlersJob) {
-        // do not automatically update on Scout SDK changes. We expect the SDK to trigger manually where required.
-        return false;
-      }
-
-      if (curJob.belongsTo(ResourcesPlugin.FAMILY_AUTO_BUILD) || curJob.belongsTo(ResourcesPlugin.FAMILY_MANUAL_BUILD)) {
-        // ignore build changes (annotation processing)
-        return false;
-      }
-
-      final String[] excludedJobNamePrefixes = new String[]{"org.eclipse.team.", // excludes svn updates
-          "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
-          "org.eclipse.egit.", // excludes git updates
-          "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
-          "org.eclipse.m2e.", // maven updates
-          "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob", // refresh of external folders after svn update
-          "org.eclipse.core.internal.refresh.RefreshJob", // refresh after git import
-          "org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob", // workspace init job
-          "org.eclipse.wst.jsdt.internal.ui.InitializeAfterLoadJob.RealJob"
-      };
-
-      String jobFqn = curJob.getClass().getName().replace('$', '.');
-      for (String excludedPrefix : excludedJobNamePrefixes) {
-        if (jobFqn.startsWith(excludedPrefix)) {
-          return false;
-        }
-      }
-
-      if ("org.eclipse.core.internal.jobs.ThreadJob".equals(jobFqn)) {
-        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        for (int i = stackTrace.length - 1; i >= 0; i--) {
-          for (String excludedPrefix : excludedJobNamePrefixes) {
-            if (stackTrace[i].getClassName().startsWith(excludedPrefix)) {
-              return false;
-            }
-          }
-        }
-      }
-
-      return true;
-    }
-
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
-      if (event != null && acceptUpdateEvent() && !addElementToQueueSecure(m_eventCollector, event, event.toString(), 10, TimeUnit.SECONDS)) {
+      if (isInterestingResourceChangeEvent(event) && !addElementToQueueSecure(m_eventCollector, event, event.toString(), 10, TimeUnit.SECONDS)) {
         // element could not be added within the given timeout
         SdkLog.warning("Unable to queue more java element changes. Queue is already full. Skipping event.");
       }
@@ -380,7 +386,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    protected void execute(IProgressMonitor monitor) {
       while (!monitor.isCanceled()) {
         IResourceChangeEvent event = null;
         try {
@@ -390,7 +396,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           // nop
         }
         if (monitor.isCanceled()) {
-          return Status.CANCEL_STATUS;
+          return;
         }
         if (event != null && event.getDelta() != null) {
           // collect all files that have been changed as part of this delta
@@ -398,7 +404,6 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           m_manager.triggerSync(resources);
         }
       }
-      return Status.CANCEL_STATUS;
     }
 
     private static Set<IResource> collectFilesFromDelta(IResourceDelta d) {
@@ -463,38 +468,40 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       return m_isAborted;
     }
 
-    private IStatus doCancel() {
+    private void doCancel() {
       m_queueToConsume.clear();
-      return Status.CANCEL_STATUS;
     }
 
-    private IStatus doAbort() {
+    private void doAbort() {
       m_isAborted = false;
       schedule(); // there may have been more operations added since we were aborted
-      return Status.CANCEL_STATUS;
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    protected void execute(IProgressMonitor monitor) {
       if (monitor.isCanceled()) {
-        return doCancel();
+        doCancel();
+        return;
       }
       if (isAborted()) {
-        return doAbort();
+        doAbort();
+        return;
       }
 
       int numOperations = m_queueToConsume.size();
       if (numOperations < 1) {
-        return Status.OK_STATUS;
+        return;
       }
 
       SubMonitor progress = SubMonitor.convert(monitor, getName(), numOperations);
       for (int i = 1; i <= numOperations; i++) {
         if (progress.isCanceled()) {
-          return doCancel();
+          doCancel();
+          return;
         }
         if (isAborted()) {
-          return doAbort();
+          doAbort();
+          return;
         }
 
         // already remove the operation here. if there is a problem with this operation we don't want to keep trying
@@ -516,7 +523,6 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           SdkLog.error("Error while: {}", handler.getName(), e);
         }
       }
-      return Status.OK_STATUS;
     }
   }
 

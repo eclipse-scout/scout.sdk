@@ -10,8 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.job;
 
+import java.util.logging.Level;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 
 /**
  * Extended job which adds the following features:
@@ -20,6 +28,18 @@ import org.eclipse.core.runtime.jobs.Job;
  * </ul>
  */
 public abstract class AbstractJob extends Job {
+
+  private Exception m_callerTrace;
+
+  public AbstractJob(String name) {
+    super(name);
+  }
+
+  @Override
+  public boolean shouldSchedule() {
+    m_callerTrace = new Exception("Job scheduled by:");
+    return super.shouldSchedule();
+  }
 
   /**
    * Waits until all jobs of the given family are finished. This method will block the calling thread until all such
@@ -43,7 +63,71 @@ public abstract class AbstractJob extends Job {
     while (wasInterrupted);
   }
 
-  public AbstractJob(String name) {
-    super(name);
+  @Override
+  public final IStatus run(IProgressMonitor monitor) {
+    long start = System.currentTimeMillis();
+    try {
+      return runInternal(monitor);
+    }
+    finally {
+      long duration = System.currentTimeMillis() - start;
+      String logMsg = "Job '{}' finished after {}ms.";
+      if (SdkLog.isDebugEnabled()) {
+        // more details on debug level
+        SdkLog.debug(logMsg + " It has been scheduled by:{}", getName(), duration, getCallerStackTrace());
+      }
+      else {
+        SdkLog.debug(logMsg, getName(), duration);
+      }
+    }
   }
+
+  protected String getCallerStackTrace() {
+    int numElementsToRemove = 3;
+    StackTraceElement[] stackTrace = m_callerTrace.getStackTrace();
+    StackTraceElement[] cleaned = new StackTraceElement[stackTrace.length - numElementsToRemove];
+    System.arraycopy(stackTrace, numElementsToRemove, cleaned, 0, cleaned.length);
+
+    StringBuilder callerStack = new StringBuilder();
+    for (StackTraceElement traceElement : cleaned) {
+      callerStack.append("\n\tat ").append(traceElement);
+    }
+    return callerStack.toString();
+  }
+
+  private IStatus runInternal(IProgressMonitor monitor) {
+    Exception exc = null;
+    try {
+      validate();
+      execute(monitor);
+    }
+    catch (Exception e) {
+      exc = e;
+    }
+    finally {
+      monitor.done();
+    }
+
+    // log
+    if (exc != null) {
+      Level lvl = Level.SEVERE;
+      int severity = IStatus.ERROR;
+      String msg = exc.getMessage();
+      if (exc instanceof OperationCanceledException) {
+        lvl = Level.FINE;
+        severity = IStatus.CANCEL;
+      }
+      SdkLog.log(lvl, msg, exc);
+      return new Status(severity, S2ESdkActivator.PLUGIN_ID, msg, exc);
+    }
+    if (monitor.isCanceled()) {
+      return Status.CANCEL_STATUS;
+    }
+    return Status.OK_STATUS;
+  }
+
+  protected void validate() {
+  }
+
+  protected abstract void execute(IProgressMonitor monitor) throws CoreException;
 }

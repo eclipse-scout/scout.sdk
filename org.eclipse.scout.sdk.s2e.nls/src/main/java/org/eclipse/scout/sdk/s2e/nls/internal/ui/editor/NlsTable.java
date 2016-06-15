@@ -12,9 +12,7 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.editor;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.MenuManager;
@@ -23,6 +21,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
@@ -321,11 +320,10 @@ public class NlsTable extends Composite {
     // update translation
     final NlsEntry copy = new NlsEntry(row);
     copy.addTranslation(getLanguageOfTableColumn(column), newText);
-    Job job = new Job("update text") {
+    Job job = new AbstractJob("update text") {
       @Override
-      protected IStatus run(IProgressMonitor monitor) {
+      protected void execute(IProgressMonitor monitor) {
         m_tableModel.getProjects().updateRow(copy, monitor);
-        return Status.OK_STATUS;
       }
     };
     job.setSystem(false);

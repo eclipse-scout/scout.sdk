@@ -66,7 +66,7 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
       else {
         for (Throwable t : exceptions) {
           if (t != null) {
-            String trace = CoreUtils.getStackTrace(t);
+            String trace = CoreUtils.getThrowableAsString(t);
             out.write(trace);
           }
         }

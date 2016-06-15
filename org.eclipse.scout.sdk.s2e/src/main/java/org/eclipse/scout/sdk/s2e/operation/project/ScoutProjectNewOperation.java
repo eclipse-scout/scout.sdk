@@ -18,9 +18,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -30,14 +31,11 @@ import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
-import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.operation.CompilationUnitWriteOperation;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 
 /**
  * <h3>{@link ScoutProjectNewOperation}</h3>
@@ -70,40 +68,52 @@ public class ScoutProjectNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    try {
-      // get archetype settings
-      String groupId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_GROUP_ID);
-      String artifactId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_ARTIFACT_ID);
-      String version = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_VERSION);
-      if (StringUtils.isBlank(groupId) || StringUtils.isBlank(artifactId) || StringUtils.isBlank(version)) {
-        // use default
-        groupId = null;
-        artifactId = null;
-        version = null;
-      }
+    int N = 5;
 
-      // get maven settings from workspace
-      String globalSettings = getMavenSettings(MavenPlugin.getMavenConfiguration().getGlobalSettingsFile());
-      String settings = getMavenSettings(MavenPlugin.getMavenConfiguration().getUserSettingsFile());
+    for (int i = 0; i < N; i++) {
+      long start = System.currentTimeMillis();
+      ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+      System.err.println("------------------------------ clean duration: " + (System.currentTimeMillis() - start));
 
-      if (monitor.isCanceled()) {
-        return;
-      }
-
-      // create project on disk (using archetype)
-      SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 100);
-      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getJavaVersion(), groupId, artifactId, version, globalSettings, settings);
-      progress.worked(5);
-
-      // import into workspace
-      m_createdProjects = importIntoWorkspace(progress.newChild(90));
-
-      // format all compilation units with current workspace settings
-      formatCreatedProjects(progress.newChild(5), workingCopyManager);
+      start = System.currentTimeMillis();
+      ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+      System.err.println("------------------------------ build duration: " + (System.currentTimeMillis() - start));
     }
-    catch (Exception e) {
-      throw new CoreException(new ScoutStatus("Unable to create Scout Project.", e));
-    }
+
+//    try {
+//      // get archetype settings
+//      String groupId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_GROUP_ID);
+//      String artifactId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_ARTIFACT_ID);
+//      String version = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_VERSION);
+//      if (StringUtils.isBlank(groupId) || StringUtils.isBlank(artifactId) || StringUtils.isBlank(version)) {
+//        // use default
+//        groupId = null;
+//        artifactId = null;
+//        version = null;
+//      }
+//
+//      // get maven settings from workspace
+//      String globalSettings = getMavenSettings(MavenPlugin.getMavenConfiguration().getGlobalSettingsFile());
+//      String settings = getMavenSettings(MavenPlugin.getMavenConfiguration().getUserSettingsFile());
+//
+//      if (monitor.isCanceled()) {
+//        return;
+//      }
+//
+//      // create project on disk (using archetype)
+//      SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 100);
+//      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getJavaVersion(), groupId, artifactId, version, globalSettings, settings);
+//      progress.worked(5);
+//
+//      // import into workspace
+//      m_createdProjects = importIntoWorkspace(progress.newChild(90));
+//
+//      // format all compilation units with current workspace settings
+//      formatCreatedProjects(progress.newChild(5), workingCopyManager);
+//    }
+//    catch (Exception e) {
+//      throw new CoreException(new ScoutStatus("Unable to create Scout Project.", e));
+//    }
   }
 
   protected void formatCreatedProjects(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {

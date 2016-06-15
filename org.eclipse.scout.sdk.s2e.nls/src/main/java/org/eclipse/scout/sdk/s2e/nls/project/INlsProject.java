@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.s2e.nls.model.INewLanguageContext;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
@@ -152,7 +151,7 @@ public interface INlsProject {
    */
   INewLanguageContext getTranslationCreationContext();
 
-  IStatus removeEntries(Collection<INlsEntry> entries, IProgressMonitor m);
+  void removeEntries(Collection<INlsEntry> entries, IProgressMonitor m);
 
   /**
    * To find the best matching language supported of the project:

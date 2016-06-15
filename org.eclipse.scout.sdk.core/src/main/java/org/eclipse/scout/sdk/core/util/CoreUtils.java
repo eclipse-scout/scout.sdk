@@ -838,14 +838,13 @@ public final class CoreUtils {
   }
 
   /**
-   * Converts the stack trace of the given {@link Throwable} into a {@link String}. The resulting string includes a
-   * leading new line.
+   * Converts the given {@link Throwable} into a {@link String}. The resulting string includes a leading new line.
    *
    * @param t
-   *          The {@link Throwable} from which the stack trace should be extracted. Must not be <code>null</code>.
-   * @return The {@link String} containing the stack trace.
+   *          The {@link Throwable}. Must not be <code>null</code>.
+   * @return The {@link String} describing the given {@link Throwable}.
    */
-  public static String getStackTrace(Throwable t) {
+  public static String getThrowableAsString(Throwable t) {
     try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
       p.println();
       t.printStackTrace(p);

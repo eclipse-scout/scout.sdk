@@ -11,10 +11,9 @@
 package org.eclipse.scout.sdk.s2e.nls.internal.ui.action;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -61,11 +60,10 @@ public abstract class AbstractWorkspaceAction extends Action {
   }
 
   private void processInternal() {
-    m_job = new Job(getText()) {
+    m_job = new AbstractJob(getText()) {
       @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        execute(monitor);
-        return Status.OK_STATUS;
+      protected void execute(IProgressMonitor monitor) {
+        AbstractWorkspaceAction.this.execute(monitor);
       }
     };
     m_job.setSystem(true);
