@@ -83,7 +83,7 @@ public class LookupCallNewOperation implements IOperation {
   }
 
   protected LookupCallNewOperation(IJavaEnvironmentProvider provider) {
-    m_javaEnvironmentProvider = provider;
+    m_javaEnvironmentProvider = Validate.notNull(provider);
   }
 
   @Override

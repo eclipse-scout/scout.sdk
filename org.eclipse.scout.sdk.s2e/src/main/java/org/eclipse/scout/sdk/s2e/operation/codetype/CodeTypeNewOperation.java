@@ -56,7 +56,7 @@ public class CodeTypeNewOperation implements IOperation {
   }
 
   protected CodeTypeNewOperation(IJavaEnvironmentProvider provider) {
-    m_javaEnvironmentProvider = provider;
+    m_javaEnvironmentProvider = Validate.notNull(provider);
   }
 
   @Override

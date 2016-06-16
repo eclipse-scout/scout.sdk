@@ -844,6 +844,7 @@ public final class CoreUtils {
    *          The {@link Throwable}. Must not be <code>null</code>.
    * @return The {@link String} describing the given {@link Throwable}.
    */
+  @SuppressWarnings({"squid:S1148", "squid:S1166"})
   public static String getThrowableAsString(Throwable t) {
     try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
       p.println();

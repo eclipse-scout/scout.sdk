@@ -72,6 +72,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -493,7 +494,10 @@ public final class S2eUtils {
     try {
       ISourceRange annotSourceRange = annotation.getSourceRange();
       ISourceRange ownerSourceRange = member.getSourceRange();
-      if (annotSourceRange != null && ownerSourceRange != null && annotSourceRange.getOffset() >= 0 && ownerSourceRange.getOffset() >= 0 && ownerSourceRange.getOffset() > annotSourceRange.getOffset()) {
+
+      if (SourceRange.isAvailable(ownerSourceRange)
+          && SourceRange.isAvailable(annotSourceRange)
+          && ownerSourceRange.getOffset() > annotSourceRange.getOffset()) {
         String icuSource = member.getCompilationUnit().getSource();
         if (icuSource != null && icuSource.length() >= ownerSourceRange.getOffset()) {
           String diff = icuSource.substring(annotSourceRange.getOffset(), ownerSourceRange.getOffset());
@@ -639,8 +643,9 @@ public final class S2eUtils {
           case IMemberValuePair.K_SHORT:
             Short shortValue = (Short) p.getValue();
             return BigDecimal.valueOf(shortValue.longValue());
+          default:
+            return null;
         }
-        break;
       }
     }
     return null;
@@ -1016,6 +1021,8 @@ public final class S2eUtils {
             }
           }
           break;
+        default:
+          throw new UnsupportedOperationException("Unknown resource type: " + type);
       }
     }
     if (jset.isEmpty()) {
@@ -1273,7 +1280,9 @@ public final class S2eUtils {
    * @author Matthias Villiger
    * @since 5.2.0
    */
-  public static final class ElementNameComparator implements Comparator<IType> {
+  public static final class ElementNameComparator implements Comparator<IType>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public int compare(IType o1, IType o2) {
       if (o1 == o2) {
@@ -1390,19 +1399,23 @@ public final class S2eUtils {
    * @return The session {@link IType} or <code>null</code> if no session could be found.
    * @throws CoreException
    */
+  @SuppressWarnings("squid:S1067")
   public static IType getSession(IJavaProject project, ScoutTier tier, IProgressMonitor monitor) throws CoreException {
-    IFilter<IType> filter = new IFilter<IType>() {
+    IFilter<IType> filter = new PublicPrimaryTypeFilter() {
       @Override
-      public boolean evaluate(IType element) {
+      public boolean evaluate(IType candidate) {
+        if (!super.evaluate(candidate)) {
+          return false;
+        }
         try {
-          return element.getDeclaringType() == null && !element.isBinary() && !element.isAnonymous() && element.isClass() && Flags.isPublic(element.getFlags());
+          return candidate.isClass();
         }
         catch (JavaModelException e) {
-          SdkLog.warning("Unable to calculate flags of type '{}'. Skipping.", element.getFullyQualifiedName(), e);
-          return false;
+          throw new SdkException("Unable to check for flags in type '" + candidate.getFullyQualifiedName() + "'.", e);
         }
       }
     };
+
     String sessionToFind = null;
     switch (tier) {
       case Server:

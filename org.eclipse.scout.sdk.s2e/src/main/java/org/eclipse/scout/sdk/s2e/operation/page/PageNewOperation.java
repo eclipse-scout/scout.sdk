@@ -84,7 +84,7 @@ public class PageNewOperation implements IOperation {
   }
 
   protected PageNewOperation(IJavaEnvironmentProvider provider) {
-    m_javaEnvironmentProvider = provider;
+    m_javaEnvironmentProvider = Validate.notNull(provider);
   }
 
   @Override

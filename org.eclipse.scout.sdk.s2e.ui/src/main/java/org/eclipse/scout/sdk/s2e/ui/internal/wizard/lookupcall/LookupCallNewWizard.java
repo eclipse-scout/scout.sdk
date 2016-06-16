@@ -40,7 +40,7 @@ import org.eclipse.ui.IWorkbench;
  */
 public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
 
-  public static volatile Class<? extends LookupCallNewWizardPage> pageClass = LookupCallNewWizardPage.class;
+  private static volatile Class<? extends LookupCallNewWizardPage> pageClass = LookupCallNewWizardPage.class;
 
   private LookupCallNewWizardPage m_page1;
   private boolean m_executed = false;
@@ -50,17 +50,14 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
     PackageContainer packageContainer = S2eUiUtils.getSharedPackageOfSelection(selection);
 
     try {
-      m_page1 = pageClass.getConstructor(PackageContainer.class).newInstance(packageContainer);
+      m_page1 = getPage1Class().getConstructor(PackageContainer.class).newInstance(packageContainer);
       addPage(m_page1);
 
       setWindowTitle(m_page1.getTitle());
       setHelpAvailable(true);
       setDefaultPageImageDescriptor(JavaPluginImages.DESC_WIZBAN_NEWCLASS);
     }
-    catch (InvocationTargetException e) {
-      throw new SdkException(e.getCause());
-    }
-    catch (Exception e) {
+    catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
       throw new SdkException(e);
     }
   }
@@ -140,5 +137,13 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
 
   protected void setExecuted(boolean executed) {
     m_executed = executed;
+  }
+
+  public static Class<? extends LookupCallNewWizardPage> getPage1Class() {
+    return pageClass;
+  }
+
+  public static void setPage1Class(Class<? extends LookupCallNewWizardPage> page1Class) {
+    pageClass = page1Class;
   }
 }

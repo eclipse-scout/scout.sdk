@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s;
 /**
  * Classes indices and values used in the scout runtime.
  */
+@SuppressWarnings("squid:S00115")
 public interface IScoutRuntimeTypes {
 
   // type parameter positions

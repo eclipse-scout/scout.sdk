@@ -74,6 +74,9 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
 
   /**
    * @param elementName
+   *          The name of the compilation unit including the filename suffix (.java).
+   * @param packageName
+   *          The package of the compilation unit.
    */
   public CompilationUnitSourceBuilder(String elementName, String packageName) {
     super(elementName);

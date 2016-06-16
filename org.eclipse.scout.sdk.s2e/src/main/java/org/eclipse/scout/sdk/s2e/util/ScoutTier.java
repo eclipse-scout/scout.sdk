@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
  * @author Matthias Villiger
  * @since 5.2.0
  */
+@SuppressWarnings("squid:S00115")
 public enum ScoutTier implements IFilter<IJavaElement> {
 
   /**

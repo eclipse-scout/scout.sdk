@@ -189,15 +189,19 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
   }
 
   protected void handleSuperTypeChanged() {
+    // callback for subclasses invoked when the super type is changed
   }
 
   protected void handleSourceFolderChanged() {
+    // callback for subclasses invoked when the source folder is changed
   }
 
   protected void handleTargetPackageChanged() {
+    // callback for subclasses invoked when the target package is changed
   }
 
   protected void handleIcuNameChanged() {
+    // callback for subclasses invoked when the class name is changed
   }
 
   protected IType calcSuperTypeDefault() {

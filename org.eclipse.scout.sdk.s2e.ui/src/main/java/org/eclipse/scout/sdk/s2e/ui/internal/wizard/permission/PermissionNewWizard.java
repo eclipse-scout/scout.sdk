@@ -36,7 +36,7 @@ import org.eclipse.ui.IWorkbench;
  */
 public class PermissionNewWizard extends AbstractWizard implements INewWizard {
 
-  public static volatile Class<? extends PermissionNewWizardPage> pageClass = PermissionNewWizardPage.class;
+  private static volatile Class<? extends PermissionNewWizardPage> pageClass = PermissionNewWizardPage.class;
 
   private PermissionNewWizardPage m_page1;
   private boolean m_executed = false;
@@ -46,17 +46,14 @@ public class PermissionNewWizard extends AbstractWizard implements INewWizard {
     PackageContainer packageContainer = S2eUiUtils.getSharedPackageOfSelection(selection);
 
     try {
-      m_page1 = pageClass.getConstructor(PackageContainer.class).newInstance(packageContainer);
+      m_page1 = getPage1Class().getConstructor(PackageContainer.class).newInstance(packageContainer);
       addPage(m_page1);
 
       setWindowTitle(m_page1.getTitle());
       setHelpAvailable(true);
       setDefaultPageImageDescriptor(JavaPluginImages.DESC_WIZBAN_NEWCLASS);
     }
-    catch (InvocationTargetException e) {
-      throw new SdkException(e.getCause());
-    }
-    catch (Exception e) {
+    catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
       throw new SdkException(e);
     }
   }
@@ -113,5 +110,13 @@ public class PermissionNewWizard extends AbstractWizard implements INewWizard {
 
   protected void setExecuted(boolean executed) {
     m_executed = executed;
+  }
+
+  public static Class<? extends PermissionNewWizardPage> getPage1Class() {
+    return pageClass;
+  }
+
+  public static void setPage1Class(Class<? extends PermissionNewWizardPage> page1Class) {
+    pageClass = page1Class;
   }
 }

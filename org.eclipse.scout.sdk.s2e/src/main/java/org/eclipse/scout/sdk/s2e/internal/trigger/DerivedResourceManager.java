@@ -254,7 +254,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
    *          >0=we wait for this amount. The meaning of the timeout is defined by the unit parameter which must be
    *          specified in this case.
    * @param unit
-   *          The {@link TimeUnit} that defines the meaning of timeout
+   *          The {@link TimeUnit} that defines the meaning of timeout if > 0.
    * @return true if the element has been added to the queue within the given timeout range. false otherwise.
    */
   private static <T> boolean addElementToQueueSecure(BlockingQueue<T> queue, T element, String name, long timeout, TimeUnit unit) {
@@ -278,7 +278,8 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         }
       }
       catch (InterruptedException e) {
-        interrupted = numInterrupted++ < 10;
+        numInterrupted++;
+        interrupted = numInterrupted < 10;
       }
     }
     while (interrupted);

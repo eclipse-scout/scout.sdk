@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -77,7 +78,7 @@ public class WebServiceUpdateOperation implements IOperation {
     m_entryPointDefinitionUpdates = new LinkedList<>();
     m_webServiceClientUpdates = new LinkedList<>();
     m_webServiceImplUpdates = new LinkedList<>();
-    m_provider = provider;
+    m_provider = Validate.notNull(provider);
   }
 
   @Override
@@ -87,6 +88,7 @@ public class WebServiceUpdateOperation implements IOperation {
 
   @Override
   public void validate() {
+    // no need to validate
   }
 
   @Override

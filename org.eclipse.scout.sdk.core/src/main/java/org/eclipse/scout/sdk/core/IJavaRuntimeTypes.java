@@ -11,8 +11,9 @@
 package org.eclipse.scout.sdk.core;
 
 /**
- *
+ * Holds class names of the JRE.
  */
+@SuppressWarnings("squid:S00115")
 public interface IJavaRuntimeTypes {
 
   // primitive types
