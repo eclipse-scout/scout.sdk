@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
  */
 public abstract class AbstractJob extends Job {
 
-  private Exception m_callerTrace;
+  private StackTraceElement[] m_callerTrace;
 
   public AbstractJob(String name) {
     super(name);
@@ -37,7 +37,7 @@ public abstract class AbstractJob extends Job {
 
   @Override
   public boolean shouldSchedule() {
-    m_callerTrace = new Exception("Job scheduled by:");
+    m_callerTrace = Thread.currentThread().getStackTrace();
     return super.shouldSchedule();
   }
 
@@ -83,10 +83,9 @@ public abstract class AbstractJob extends Job {
   }
 
   protected String getCallerStackTrace() {
-    int numElementsToRemove = 3;
-    StackTraceElement[] stackTrace = m_callerTrace.getStackTrace();
-    StackTraceElement[] cleaned = new StackTraceElement[stackTrace.length - numElementsToRemove];
-    System.arraycopy(stackTrace, numElementsToRemove, cleaned, 0, cleaned.length);
+    int numElementsToRemove = 4;
+    StackTraceElement[] cleaned = new StackTraceElement[m_callerTrace.length - numElementsToRemove];
+    System.arraycopy(m_callerTrace, numElementsToRemove, cleaned, 0, cleaned.length);
 
     StringBuilder callerStack = new StringBuilder();
     for (StackTraceElement traceElement : cleaned) {

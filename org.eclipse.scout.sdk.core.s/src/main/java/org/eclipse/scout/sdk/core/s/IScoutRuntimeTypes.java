@@ -108,6 +108,7 @@ public interface IScoutRuntimeTypes {
   String AbstractTableFieldBeanData = "org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData";
   String AbstractTablePageData = "org.eclipse.scout.rt.shared.data.page.AbstractTablePageData";
   String AbstractTableRowData = "org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData";
+  String AbstractValueFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData";
   String AbstractTree = "org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree";
   String AbstractTreeBox = "org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox";
   String AbstractTreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField";
@@ -210,6 +211,8 @@ public interface IScoutRuntimeTypes {
   String BasicAuthenticationMethod = "org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod";
   String ConfigFileCredentialVerifier = "org.eclipse.scout.rt.server.commons.authentication.ConfigFileCredentialVerifier";
   String NullClazz = "org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz$NullClazz";
+  String BinaryResource = "org.eclipse.scout.rt.platform.resource.BinaryResource";
+  String BooleanUtility = "org.eclipse.scout.rt.platform.util.BooleanUtility";
 
   // Menu Types
   String TableMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TableMenuType";

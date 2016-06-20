@@ -20,6 +20,7 @@ public interface ISdkProperties {
   String SUFFIX_PAGE_WITH_TABLE = "TablePage";
   String SUFFIX_PAGE_WITH_NODES = "NodePage";
   String SUFFIX_DTO = "Data";
+  String SUFFIX_DTO_PROPERTY = "Property";
   String SUFFIX_BUTTON = "Button";
   String SUFFIX_TABLE_COLUMN = "Column";
   String SUFFIX_OUTLINE_PAGE = "Page";
