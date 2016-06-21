@@ -63,15 +63,14 @@
     <sonar.exclusions>**/src/main/fixture/**,**/src/main/client/**,**/src/main/shared/**</sonar.exclusions> <!-- exclude fixtures -->
     <!-- exclude fixtures, archetypes, UI -->
     <sonar.coverage.exclusions>
-      **/src/main/fixture/**,
-      **/src/main/client/**,
-      **/src/main/shared/**,
-      **/scout-jaxws-module/**,
-      **/scout-helloworld-app/**,
-      **/org.eclipse.scout.sdk.s2e.nls/**,
-      **/org.eclipse.scout.sdk.s2e.ui/**,
-      **/org.eclipse.scout.sdk.s2e.doc/**,
-      **/updatesite-maven-plugin/**
+      **/src/main/fixture/**/*,
+      **/src/main/client/**/*,
+      **/src/main/shared/**/*,
+      **/src/main/resources/archetype-resources/**/*,
+      **/src/main/java/org/eclipse/scout/sdk/s2e/nls/**/*,
+      **/src/main/java/org/eclipse/scout/sdk/s2e/ui/**/*,
+      **/src/main/java/org/eclipse/scout/sdk/s2e/doc/**/*,
+      **/org/eclipse/scout/maven/plugins/updatesite/**/*
     </sonar.coverage.exclusions>
 
     <!-- dependencies to Eclipse artifacts deployed by org.eclipse.scout.sdk.core.releng/ -->
