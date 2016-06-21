@@ -130,7 +130,11 @@ public final class JaxWsModuleNewHelper {
       new MavenCliRunner().execute(tempDirectory, args, mavenGlobalSettings, mavenSettings);
 
       // move to final destination
-      File createdProjectDir = tempDirectory.listFiles()[0];
+      File[] listFiles = tempDirectory.listFiles();
+      if (listFiles == null || listFiles.length < 1) {
+        throw new IOException("created project dir not found. Project creation failed.");
+      }
+      File createdProjectDir = listFiles[0];
       createdProjectName = createdProjectDir.getName();
       CoreUtils.moveDirectory(createdProjectDir, targetDirectory);
     }

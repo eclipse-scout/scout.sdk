@@ -102,7 +102,7 @@ public class WebServiceEditor extends FormEditor {
       }
     }
     catch (JavaModelException e) {
-      showError("Unable to check type of project " + getJavaProject().getElementName(), new IllegalArgumentException());
+      showError("Unable to check type of project " + getJavaProject().getElementName(), e);
       return;
     }
 

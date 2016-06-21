@@ -324,7 +324,7 @@ public class WebServiceNewOperation implements IOperation {
       IFile target = wsdlFolder.getFile(relPath);
       try {
         String content = readXmlFromUrl(sourceUri.toURL());
-        ResourceWriteOperation writeWsdl = new ResourceWriteOperation(target, content.toString());
+        ResourceWriteOperation writeWsdl = new ResourceWriteOperation(target, content);
         writeWsdl.validate();
         writeWsdl.run(monitor, workingCopyManager);
       }

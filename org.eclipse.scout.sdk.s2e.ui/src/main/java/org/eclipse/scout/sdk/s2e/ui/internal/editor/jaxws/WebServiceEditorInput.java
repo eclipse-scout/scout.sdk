@@ -35,4 +35,34 @@ public class WebServiceEditorInput extends FileEditorInput {
     m_pageIdToActivate = pageIdToActivate;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_pageIdToActivate == null) ? 0 : m_pageIdToActivate.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    WebServiceEditorInput other = (WebServiceEditorInput) obj;
+    if (m_pageIdToActivate == null) {
+      if (other.m_pageIdToActivate != null) {
+        return false;
+      }
+    }
+    else if (!m_pageIdToActivate.equals(other.m_pageIdToActivate)) {
+      return false;
+    }
+    return true;
+  }
 }
