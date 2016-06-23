@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  * @author Ivan Motsch
  * @since 5.1.0
  */
-public class ResourceWriteOperation implements IOperation {
+public class ResourceWriteOperation implements IFileWriteOperation {
   private final IFile m_file;
   private final String m_content;
 
@@ -59,6 +59,7 @@ public class ResourceWriteOperation implements IOperation {
     return "Write " + m_file.getProjectRelativePath();
   }
 
+  @Override
   public IFile getFile() {
     return m_file;
   }
@@ -124,5 +125,14 @@ public class ResourceWriteOperation implements IOperation {
     if (!dir.exists()) {
       ((IFolder) dir).create(true, false, monitor);
     }
+  }
+
+  @Override
+  public IResource getAffectedResource() {
+    IResource curResource = m_file;
+    while (curResource != null && !curResource.exists()) {
+      curResource = curResource.getParent();
+    }
+    return curResource;
   }
 }

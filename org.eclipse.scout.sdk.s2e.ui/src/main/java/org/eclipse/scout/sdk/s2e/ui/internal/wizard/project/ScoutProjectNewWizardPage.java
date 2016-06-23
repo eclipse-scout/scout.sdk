@@ -11,16 +11,19 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.wizard.project;
 
 import java.io.File;
+import java.net.URL;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
-import org.eclipse.scout.sdk.s2e.ui.fields.file.FileSelectionField;
-import org.eclipse.scout.sdk.s2e.ui.fields.file.IFileSelectionListener;
+import org.eclipse.scout.sdk.s2e.ui.fields.resource.IResourceChangedListener;
+import org.eclipse.scout.sdk.s2e.ui.fields.resource.ResourceTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.StyledTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
@@ -34,8 +37,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -61,7 +62,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   protected StyledTextField m_artifactIdField;
   protected StyledTextField m_displayNameField;
   protected Button m_useWsLoc;
-  protected FileSelectionField m_targetDirectoryField;
+  protected ResourceTextField m_targetDirectoryField;
 
   public ScoutProjectNewWizardPage() {
     super(ScoutProjectNewWizardPage.class.getName());
@@ -72,23 +73,25 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    parent.setLayout(new GridLayout(1, true));
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(parent);
 
-    createProjectNameGroup(parent);
-    createProjectLocationGroup(parent);
+    int labelWidth = 100;
+    createProjectNameGroup(parent, labelWidth);
+    createProjectLocationGroup(parent, labelWidth);
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PROJECT_NEW_WIZARD_PAGE);
   }
 
-  protected void createProjectNameGroup(Composite parent) {
+  protected void createProjectNameGroup(Composite parent, int labelWidth) {
     Group nameGroup = getFieldToolkit().createGroupBox(parent, "Project Name");
-    nameGroup.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    nameGroup.setLayout(new GridLayout(1, true));
 
     // group id
-    m_groupIdField = getFieldToolkit().createStyledTextField(nameGroup, "Group Id");
+    m_groupIdField = getFieldToolkit().createStyledTextField(nameGroup, "Group Id", TextField.TYPE_LABEL, labelWidth);
     m_groupIdField.setText(getGroupId());
-    m_groupIdField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_groupIdField.setSelection(new Point(0, m_groupIdField.getText().length()));
+    m_groupIdField.setFocus();
     m_groupIdField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -101,13 +104,10 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         }
       }
     });
-    m_groupIdField.setSelection(new Point(0, m_groupIdField.getText().length()));
-    m_groupIdField.setFocus();
 
     // artifact id
-    m_artifactIdField = getFieldToolkit().createStyledTextField(nameGroup, "Artifact Id");
+    m_artifactIdField = getFieldToolkit().createStyledTextField(nameGroup, "Artifact Id", TextField.TYPE_LABEL, labelWidth);
     m_artifactIdField.setText(getArtifactId());
-    m_artifactIdField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_artifactIdField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -122,9 +122,8 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     });
 
     // display name
-    m_displayNameField = getFieldToolkit().createStyledTextField(nameGroup, "Display Name");
+    m_displayNameField = getFieldToolkit().createStyledTextField(nameGroup, "Display Name", TextField.TYPE_LABEL, labelWidth);
     m_displayNameField.setText(getDisplayName());
-    m_displayNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_displayNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -132,52 +131,74 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         pingStateChanging();
       }
     });
+
+    // layout
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(nameGroup);
+    GridDataFactory
+        .defaultsFor(nameGroup)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(nameGroup);
+    GridDataFactory
+        .defaultsFor(m_groupIdField)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(m_groupIdField);
+    GridDataFactory
+        .defaultsFor(m_artifactIdField)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(m_artifactIdField);
+    GridDataFactory
+        .defaultsFor(m_displayNameField)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(m_displayNameField);
   }
 
-  protected void createProjectLocationGroup(Composite parent) {
+  protected void createProjectLocationGroup(Composite parent, int labelWidth) {
     Group locationGroup = getFieldToolkit().createGroupBox(parent, "Project Location");
-    GridData locatoinGroupData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    locatoinGroupData.verticalIndent = 10;
-    locationGroup.setLayoutData(locatoinGroupData);
-    locationGroup.setLayout(new GridLayout(1, true));
 
     // location checkbox
     createLocationCheckbox(locationGroup);
 
     // target dir
-    m_targetDirectoryField = new FileSelectionField(locationGroup);
-    m_targetDirectoryField.setLabelText("Target Directory");
+    m_targetDirectoryField = getFieldToolkit().createResourceField(locationGroup, "Target Directory", TextField.TYPE_LABEL, labelWidth);
     m_targetDirectoryField.setFile(getTargetDirectory());
     m_targetDirectoryField.setFolderMode(true);
     m_targetDirectoryField.setEnabled(!m_useWsLoc.getSelection());
-    m_targetDirectoryField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_targetDirectoryField.addFileSelectionListener(new IFileSelectionListener() {
+    m_targetDirectoryField.addResourceChangedListener(new IResourceChangedListener() {
       @Override
-      public void fileSelected(File file) {
-        setTargetDirectoryInternal(file);
+      public void resourceChanged(URL newUrl, File newFile) {
+        setTargetDirectoryInternal(newFile);
         pingStateChanging();
       }
     });
+
+    // layout
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(locationGroup);
+    GridDataFactory
+        .defaultsFor(locationGroup)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .indent(0, 10)
+        .applyTo(locationGroup);
+    GridDataFactory
+        .defaultsFor(m_targetDirectoryField)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(m_targetDirectoryField);
   }
 
   protected Composite createLocationCheckbox(Composite p) {
     Composite parent = new Composite(p, SWT.NONE);
     Label lbl = new Label(parent, SWT.NONE);
 
-    // layout
-    parent.setLayout(new FormLayout());
-    parent.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-
-    FormData labelData = new FormData();
-    labelData.top = new FormAttachment(0, 4);
-    labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(TextField.DEFAULT_LABEL_PERCENTAGE, 0);
-    labelData.bottom = new FormAttachment(100, 0);
-    lbl.setLayoutData(labelData);
-
-    m_useWsLoc = new Button(parent, SWT.CHECK);
-    m_useWsLoc.setText("Use default Workspace location");
-    m_useWsLoc.setSelection(isUseWorkspaceLocation());
+    m_useWsLoc = getFieldToolkit().createCheckBox(parent, "Use default Workspace location", isUseWorkspaceLocation());
     m_useWsLoc.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -187,12 +208,28 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       }
     });
 
+    // layout
+    parent.setLayout(new FormLayout());
+    GridDataFactory
+        .defaultsFor(parent)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(parent);
+
+    FormData labelData = new FormData();
+    labelData.top = new FormAttachment(0, 4);
+    labelData.left = new FormAttachment(0, 0);
+    labelData.right = new FormAttachment(0, 10);
+    labelData.bottom = new FormAttachment(100, 0);
+    lbl.setLayoutData(labelData);
+
     FormData textData = new FormData();
     textData.top = new FormAttachment(0, 0);
     textData.left = new FormAttachment(lbl, 5);
     textData.right = new FormAttachment(100, 0);
     textData.bottom = new FormAttachment(100, 0);
     m_useWsLoc.setLayoutData(textData);
+
     return parent;
   }
 

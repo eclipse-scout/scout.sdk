@@ -33,12 +33,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
@@ -50,9 +48,10 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class ProposalTextField extends TextField {
 
-  public static final int STYLE_DEFAULT = 1 << 0;
-  public static final int STYLE_INITIAL_SHOW_POPUP = 1 << 1;
-  public static final int STYLE_NO_LABEL = 1 << 10;
+  /**
+   * Type constant to show the popup initially without requiring a user interaction.
+   */
+  public static final int TYPE_INITIAL_SHOW_POPUP = 1 << 10;
 
   private Button m_popupButton;
   private ProposalPopup m_popup;
@@ -64,38 +63,59 @@ public class ProposalTextField extends TextField {
   private final EventListenerList m_eventListeners = new EventListenerList();
   private final OptimisticLock m_updateLock = new OptimisticLock();
   private final OptimisticLock m_focusLock = new OptimisticLock();
-  private final int m_style;
 
+  /**
+   * Creates a {@link ProposalTextField} with a label and no image.
+   *
+   * @param parent
+   */
   public ProposalTextField(Composite parent) {
-    this(parent, STYLE_DEFAULT);
+    this(parent, TYPE_LABEL);
   }
 
-  public ProposalTextField(Composite parent, int style) {
-    this(parent, style, DEFAULT_LABEL_PERCENTAGE);
+  /**
+   * @param parent
+   * @param type
+   *          One of {@link #TYPE_INITIAL_SHOW_POPUP}, {@link TextField#TYPE_LABEL}, {@link TextField#TYPE_HYPERLINK},
+   *          {@link TextField#TYPE_IMAGE}
+   */
+  public ProposalTextField(Composite parent, int type) {
+    this(parent, type, DEFAULT_LABEL_WIDTH);
   }
 
-  public ProposalTextField(Composite parent, int style, int labelPercentage) {
-    super(parent, labelPercentage);
-    addDisposeListener(new DisposeListener() {
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        m_popup.dispose();
-      }
-    });
-    m_style = style;
-    init();
+  /**
+   * @param parent
+   * @param type
+   *          One of {@link #TYPE_INITIAL_SHOW_POPUP}, {@link TextField#TYPE_LABEL}, {@link TextField#TYPE_HYPERLINK},
+   *          {@link TextField#TYPE_IMAGE}
+   * @param labelWidth
+   *          The with of the label component. This includes the image if available.
+   */
+  public ProposalTextField(Composite parent, int type, int labelWidth) {
+    super(parent, type, labelWidth);
   }
 
-  public void setInput(Object input) {
+  /**
+   * @param input
+   *          The new input object
+   */
+  protected void setInput(Object input) {
     m_input = input;
     SearchPatternInput searchPatternInput = new SearchPatternInput(input, getText());
     m_popup.setInput(searchPatternInput);
   }
 
-  public Object getInput() {
+  /**
+   * @return The current input object
+   */
+  protected Object getInput() {
     return m_input;
   }
 
+  /**
+   * @param provider
+   *          The content provider of this proposal.
+   */
   public void setContentProvider(IProposalContentProvider provider) {
     if (!Objects.equals(provider, m_popup.getContentProvider())) {
       m_popup.setContentProvider(provider);
@@ -103,19 +123,30 @@ public class ProposalTextField extends TextField {
     }
   }
 
+  /**
+   * @return The content provider of this field
+   */
   public IContentProvider getContentProvider() {
     return m_popup.getContentProvider();
   }
 
+  /**
+   * Sets a new label provider to this field.
+   *
+   * @param labelProvider
+   */
   public void setLabelProvider(IBaseLabelProvider labelProvider) {
     m_popup.setLabelProvider(labelProvider);
   }
 
+  /**
+   * @return The current label provider of this field.
+   */
   public IBaseLabelProvider getLabelProvider() {
     return m_popup.getLabelProvider();
   }
 
-  private void attachProposalListener(StyledText textComponent) {
+  protected void attachProposalListener(StyledText textComponent) {
     if (m_proposalFieldListener == null) {
       m_proposalFieldListener = new P_ProposalFieldListener();
       textComponent.addListener(SWT.KeyDown, m_proposalFieldListener);
@@ -129,23 +160,16 @@ public class ProposalTextField extends TextField {
     }
   }
 
-  private void init() {
-    Label label = getLabelComponent();
-    StyledText text = getTextComponent();
-    FormData labelData = (FormData) label.getLayoutData();
-    FormData textData = (FormData) text.getLayoutData();
-    if ((m_style & STYLE_NO_LABEL) != 0) {
-      label.setVisible(false);
-      labelData.right = new FormAttachment(0, 0);
-      textData.left = new FormAttachment(0, 0);
-    }
-  }
-
   @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
-    Label label = getLabelComponent();
-    StyledText text = getTextComponent();
+    addDisposeListener(new DisposeListener() {
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        m_popup.dispose();
+      }
+    });
+
     m_popupButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_popupButton.setImage(S2ESdkUiActivator.getImage(ISdkIcons.ToolDropdown));
     m_popupButton.addSelectionListener(new SelectionAdapter() {
@@ -168,6 +192,8 @@ public class ProposalTextField extends TextField {
         }
       }
     });
+
+    StyledText text = getTextComponent();
     parent.setTabList(new Control[]{text});
 
     // popup
@@ -177,39 +203,31 @@ public class ProposalTextField extends TextField {
     attachProposalListener(getTextComponent());
 
     // layout
-    parent.setLayout(new FormLayout());
-    FormData labelData = new FormData();
-    labelData.top = new FormAttachment(0, 4);
-    labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(getLabelPercentage(), 0);
-    labelData.bottom = new FormAttachment(100, 0);
-    label.setLayoutData(labelData);
-
-    FormData textData = new FormData();
-    textData.top = new FormAttachment(0, 0);
-    textData.left = new FormAttachment(label, 5);
+    FormData textData = (FormData) text.getLayoutData();
     textData.right = new FormAttachment(m_popupButton, -2);
-    textData.bottom = new FormAttachment(100, 0);
-    text.setLayoutData(textData);
 
     FormData buttonData = new FormData(22, 22);
     buttonData.top = new FormAttachment(0, 0);
     buttonData.right = new FormAttachment(100, 0);
-    buttonData.bottom = new FormAttachment(100, 0);
     m_popupButton.setLayoutData(buttonData);
   }
 
+  /**
+   * Adds a listener which is notified when a new proposal has been selected.
+   *
+   * @param listener
+   */
   public void addProposalListener(IProposalListener listener) {
     m_eventListeners.add(IProposalListener.class, listener);
   }
 
+  /**
+   * Removes a listener
+   *
+   * @param listener
+   */
   public void removeProposalAdapterListener(IProposalListener listener) {
     m_eventListeners.remove(IProposalListener.class, listener);
-  }
-
-  @Override
-  public int getStyle() {
-    return m_style;
   }
 
   protected void notifyAcceptProposal(Object proposal) {
@@ -218,10 +236,27 @@ public class ProposalTextField extends TextField {
     }
   }
 
+  /**
+   * Selects the given proposal even if it is not part of the items provided by the {@link IContentProvider}.
+   *
+   * @param proposal
+   *          The new proposal
+   */
   public void acceptProposal(Object proposal) {
     acceptProposal(proposal, false, true);
   }
 
+  /**
+   * Selects the given proposal.
+   *
+   * @param proposal
+   *          The new proposal
+   * @param onlyAcceptExistingProposals
+   *          If <code>true</code> this field will only accept the proposal if it exists in the list provided by the
+   *          {@link IContentProvider} of this field.
+   * @param closeProposalPopup
+   *          If <code>true</code> closes the popup if it is still open.
+   */
   public synchronized void acceptProposal(Object proposal, boolean onlyAcceptExistingProposals, boolean closeProposalPopup) {
     // update ui
     if (proposal != null) {
@@ -289,10 +324,21 @@ public class ProposalTextField extends TextField {
     acceptProposal(proposal, false, closeProposalPopup);
   }
 
+  /**
+   * Sets a new {@link IProposalDescriptionProvider} used to calculate detail information for a selected proposal. This
+   * information will be displayed in the right half of the popup window. proposal.
+   *
+   * @param proposalDescriptionProvider
+   */
   public void setProposalDescriptionProvider(IProposalDescriptionProvider proposalDescriptionProvider) {
     m_popup.setProposalDescriptionProvider(proposalDescriptionProvider);
   }
 
+  /**
+   * Gets the current IProposalDescriptionProvider if any.
+   *
+   * @return
+   */
   public IProposalDescriptionProvider getProposalDescriptionProvider() {
     return m_popup.getProposalDescriptionProvider();
   }
@@ -389,7 +435,7 @@ public class ProposalTextField extends TextField {
     updateProposals();
   }
 
-  private boolean isProposalFieldFocusOwner() {
+  protected boolean isProposalFieldFocusOwner() {
     if (m_popup != null && m_popup.getShell() != null && !m_popup.getShell().isDisposed()) {
       if (m_popup.isFocusOwner()) {
         return true;
@@ -508,7 +554,7 @@ public class ProposalTextField extends TextField {
           break;
         } // end FocusOut
         case SWT.FocusIn: {
-          if ((m_style & STYLE_INITIAL_SHOW_POPUP) != 0) {
+          if ((getType() & TYPE_INITIAL_SHOW_POPUP) != 0) {
             updateProposals();
           }
           break;

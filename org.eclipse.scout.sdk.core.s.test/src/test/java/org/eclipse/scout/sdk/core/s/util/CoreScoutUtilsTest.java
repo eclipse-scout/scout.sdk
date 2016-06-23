@@ -10,11 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.util;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * <h3>{@link CoreScoutUtilsTest}</h3>
@@ -54,5 +64,48 @@ public class CoreScoutUtilsTest {
     Assert.assertEquals(3, CoreScoutUtils.getOrderValueInBetween(2.6, 3.7), DELTA);
     Assert.assertEquals(187, CoreScoutUtils.getOrderValueInBetween(125, 250), DELTA);
     Assert.assertEquals(2000, CoreScoutUtils.getOrderValueInBetween(1000, 100000), DELTA);
+  }
+
+  @Test
+  public void testGetArtifactIdOfPom() throws SAXException, IOException, ParserConfigurationException {
+    Assert.assertEquals(null, CoreScoutUtils.getArtifactIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>")));
+    Assert.assertEquals(null, CoreScoutUtils.getArtifactIdOfPom(null));
+    Assert.assertEquals("testle", CoreScoutUtils.getArtifactIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><artifactId>testle</artifactId></project>")));
+
+  }
+
+  @Test
+  public void testGetGroupIdOfPom() throws SAXException, IOException, ParserConfigurationException {
+    Assert.assertEquals(null, CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>")));
+    Assert.assertEquals(null, CoreScoutUtils.getGroupIdOfPom(null));
+    Assert.assertEquals("testle", CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><groupId>testle</groupId></project>")));
+    Assert.assertEquals("testle", CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><groupId>whatever</groupId></parent><groupId>testle</groupId></project>")));
+    Assert.assertEquals("testle", CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><groupId>testle</groupId></parent><groupIdA>whatever</groupIdA></project>")));
+    Assert.assertEquals(null, CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><groupIdA>testle</groupIdA></parent><groupIdA>whatever</groupIdA></project>")));
+  }
+
+  @Test
+  public void testGetVersionOfPom() throws SAXException, IOException, ParserConfigurationException {
+    Assert.assertEquals(null, CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>")));
+    Assert.assertEquals(null, CoreScoutUtils.getVersionOfPom(null));
+    Assert.assertEquals("testle", CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><version>testle</version></project>")));
+    Assert.assertEquals("testle", CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><version>whatever</version></parent><version>testle</version></project>")));
+    Assert.assertEquals("testle", CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><version>testle</version></parent><versionA>whatever</versionA></project>")));
+    Assert.assertEquals(null, CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><versionA>testle</versionA></parent><versionA>whatever</versionA></project>")));
+  }
+
+  @Test
+  public void testGetParentArtifactId() throws SAXException, IOException, ParserConfigurationException {
+    Assert.assertEquals(null, CoreScoutUtils.getParentArtifactId(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>")));
+    Assert.assertEquals(null, CoreScoutUtils.getParentArtifactId(null));
+    Assert.assertEquals(null, CoreScoutUtils.getParentArtifactId(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent></parent><version>testle</version></project>")));
+    Assert.assertEquals("testle", CoreScoutUtils.getParentArtifactId(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><artifactId>testle</artifactId></parent></project>")));
+    Assert.assertEquals(null, CoreScoutUtils.getParentArtifactId(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><artifactIdA>testle</artifactIdA></parent><artifactId>testle</artifactId></project>")));
+  }
+
+  protected Document toXmlDocument(String xml) throws SAXException, IOException, ParserConfigurationException {
+    try (Reader r = new StringReader(xml)) {
+      return CoreUtils.createDocumentBuilder().parse(new InputSource(r));
+    }
   }
 }

@@ -10,29 +10,40 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.testing;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.apache.commons.lang3.SystemUtils;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
+import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
+import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.junit.Assert;
 
 /**
  * helpers used for scout core unit tests
  */
 public final class CoreScoutTestingUtils {
 
+  public static final String PROJECT_GROUP_ID = "group";
+  public static final String PROJECT_ARTIFACT_ID = "artifact";
+
   private CoreScoutTestingUtils() {
   }
 
+  /**
+   * @return a new {@link IJavaEnvironment} that contains the src/main/client and src/main/shared folders.
+   */
   public static IJavaEnvironment createClientJavaEnvironment() {
     return new JavaEnvironmentBuilder()
         .withoutScoutSdk()
@@ -42,8 +53,8 @@ public final class CoreScoutTestingUtils {
   }
 
   /**
-   * @return a {@link org.eclipse.scout.sdk.core.model.api.IJavaEnvironment} for org.eclipse.*.shared tests, without the
-   *         org.eclipse.scout.rt.client dependency
+   * @return a {@link IJavaEnvironment} for org.eclipse.*.shared tests, without the org.eclipse.scout.rt.client
+   *         dependency
    */
   public static IJavaEnvironment createSharedJavaEnvironment() {
     return new JavaEnvironmentBuilder()
@@ -53,16 +64,86 @@ public final class CoreScoutTestingUtils {
         .build();
   }
 
+  /**
+   * Create the page data of the given {@link IPage} model class name.
+   *
+   * @param modelFqn
+   *          The fully qualified name of the page model class for which the data should be re-generated
+   * @return The created page data
+   * @throws AssertionError
+   *           if the created page data does not compile within the shared module.
+   */
   public static IType createPageDataAssertNoCompileErrors(String modelFqn) {
     return createPageDataAssertNoCompileErrors(modelFqn, createClientJavaEnvironment(), createSharedJavaEnvironment());
   }
 
+  /**
+   * Create the page data of the given {@link IPage} model class name.
+   *
+   * @param modelFqn
+   *          The fully qualified name of the page model class for which the data should be re-generated
+   * @param clientEnv
+   *          The client {@link IJavaEnvironment} to use.
+   * @param sharedEnv
+   *          The shared {@link IJavaEnvironment} to use.
+   * @return The created page data
+   * @throws AssertionError
+   *           if the created page data does not compile within the shared module.
+   */
   public static IType createPageDataAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
     return createDtoAssertNoCompileErrors(modelFqn, false, clientEnv, sharedEnv);
   }
 
+  /**
+   * Create the row data for the given {@link IExtension} model class name.
+   *
+   * @param modelFqn
+   *          The fully qualified name of the extension class for which the row data should be re-generated.
+   * @return The created row data
+   * @throws AssertionError
+   *           if the created page data does not compile within the shared module.
+   */
   public static IType createRowDataAssertNoCompileErrors(String modelFqn) {
     return createDtoAssertNoCompileErrors(modelFqn, true, createClientJavaEnvironment(), createSharedJavaEnvironment());
+  }
+
+  /**
+   * Creates the form data for the given Scout model class.
+   *
+   * @param modelFqn
+   *          The fully qualified name of the model class for which the form data should be re-generated.
+   * @return The created form data type.
+   * @throws AssertionError
+   *           if the created form data does not compile within the shared module.
+   */
+  public static IType createFormDataAssertNoCompileErrors(String modelFqn) {
+    return createFormDataAssertNoCompileErrors(modelFqn, createClientJavaEnvironment(), createSharedJavaEnvironment());
+  }
+
+  /**
+   * Creates the form data for the given Scout model class.
+   *
+   * @param modelFqn
+   *          The fully qualified name of the model class for which the data should be re-generated
+   * @param clientEnv
+   *          The client {@link IJavaEnvironment} to use.
+   * @param sharedEnv
+   *          The shared {@link IJavaEnvironment} to use.
+   * @return The created form data
+   * @throws AssertionError
+   *           if the created form data does not compile within the shared module.
+   */
+  public static IType createFormDataAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
+    // get model type
+    IType modelType = clientEnv.findType(modelFqn);
+
+    // build source
+    FormDataAnnotationDescriptor formDataAnnotation = DtoUtils.getFormDataAnnotationDescriptor(modelType);
+    ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, formDataAnnotation, sharedEnv);
+    String source = CoreUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
+
+    // ensure it compiles and get model of dto
+    return CoreTestingUtils.assertNoCompileErrors(sharedEnv, cuSrc.getPackageName(), cuSrc.getMainType().getElementName(), source);
   }
 
   private static IType createDtoAssertNoCompileErrors(String modelFqn, boolean rowData, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
@@ -84,63 +165,38 @@ public final class CoreScoutTestingUtils {
     return CoreTestingUtils.assertNoCompileErrors(sharedEnv, cuSrc.getPackageName(), cuSrc.getMainType().getElementName(), source);
   }
 
-  public static IType createFormDataAssertNoCompileErrors(String modelFqn) {
-    return createFormDataAssertNoCompileErrors(modelFqn, createClientJavaEnvironment(), createSharedJavaEnvironment());
-  }
-
-  public static IType createFormDataAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
-    // get model type
-    IType modelType = clientEnv.findType(modelFqn);
-
-    // build source
-    FormDataAnnotationDescriptor formDataAnnotation = DtoUtils.getFormDataAnnotationDescriptor(modelType);
-    ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, formDataAnnotation, sharedEnv);
-    String source = CoreUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
-
-    // ensure it compiles and get model of dto
-    return CoreTestingUtils.assertNoCompileErrors(sharedEnv, cuSrc.getPackageName(), cuSrc.getMainType().getElementName(), source);
-  }
-
   /**
-   * fails if the {@link org.eclipse.scout.sdk.core.model.api.IAnnotatable} does not have an order annotation with the
-   * <code>orderNr</code>.
+   * Creates a new Scout project based on the helloworld archetype using group id {@link #PROJECT_GROUP_ID} and
+   * artifactId {@link #PROJECT_ARTIFACT_ID}.
    *
-   * @param message
-   * @param annotatable
-   * @param orderNr
+   * @return The root directory that contains the created projects.
+   * @throws IOException
    */
-  public static void assertOrderAnnotation(String message, IAnnotatable annotatable, double orderNr) {
-    OrderAnnotation orderAnnotation = annotatable.annotations().withManagedWrapper(OrderAnnotation.class).first();
-    if (orderAnnotation == null) {
-      if (message == null) {
-        StringBuilder messageBuilder = new StringBuilder("No @Order annotation found on member '");
-        messageBuilder.append(annotatable.elementName()).append("'.");
-        messageBuilder.append(" Expected: order value '").append(orderNr).append("'!");
-        message = messageBuilder.toString();
-      }
-      Assert.fail(message);
-      return;
-    }
-
-    double memberOrderNr = orderAnnotation.value();
-    if (orderNr != memberOrderNr) {
-      if (message == null) {
-        StringBuilder messageBuilder = new StringBuilder("Order annotation not equal: exptected '").append(orderNr).append("'; found on member '");
-        messageBuilder.append(annotatable.elementName()).append('\'');
-        messageBuilder.append(" is '").append(memberOrderNr).append("'!");
-        message = messageBuilder.toString();
-      }
-      Assert.fail(message);
-    }
-
-    Assert.assertEquals(message, memberOrderNr, orderNr, 0.00001);
+  public static File createTestProject() throws IOException {
+    File targetDirectory = Files.createTempDirectory(CoreScoutTestingUtils.class.getSimpleName() + "-projectDir").toFile();
+    ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", SystemUtils.JAVA_SPECIFICATION_VERSION);
+    return targetDirectory;
   }
 
   /**
-   * @see org.eclipse.scout.sdk.core.testing.SdkAssert#assertOrderAnnotation(String, IAnnotatable, Double)
+   * Executes a 'mvn clean compile' in the given directory.
+   *
+   * @param pomDir
+   *          The directory in which the maven command should be executed. Must contain a pom.xml file.
+   * @throws IOException
    */
-  public static void assertOrderAnnotation(IAnnotatable annotatable, Double orderNr) {
-    assertOrderAnnotation(null, annotatable, orderNr);
+  public static void runMavenCleanCompile(File pomDir) throws IOException {
+    new MavenCliRunner().execute(pomDir, new String[]{"clean", "compile", "-B", "-X"}, null, null);
   }
 
+  /**
+   * Executes a 'mvn clean test' in the given directory.
+   *
+   * @param pomDir
+   *          The directory in which the maven command should be executed. Must contain a pom.xml file.
+   * @throws IOException
+   */
+  public static void runMavenCleanTest(File pomDir) throws IOException {
+    new MavenCliRunner().execute(pomDir, new String[]{"clean", "test", "-B", "-X", "-Dmaster_test_forkCount=1", "-Dmaster_test_runOrder=filesystem"}, null, null);
+  }
 }

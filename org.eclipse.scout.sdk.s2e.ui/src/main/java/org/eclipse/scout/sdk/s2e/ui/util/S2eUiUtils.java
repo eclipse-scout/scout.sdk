@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.util;
 
+import java.awt.Desktop;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -30,6 +32,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -131,19 +134,62 @@ public final class S2eUiUtils {
     return getPackageOfSelection(selection, elementComparator, ScoutTier.Shared);
   }
 
-  public static IEditorPart openEditor(IFile f) {
-    return openEditor(f, null);
+  /**
+   * Opens the given {@link IJavaElement} in the Java editor. Sets the focus in the editor to the given element.
+   *
+   * @param je
+   *          The element to show.
+   * @return returns the {@link IEditorPart} of the opened editor or <code>null</code> if the element could not be
+   *         opened in the Java editor.
+   */
+  public static IEditorPart openInEditor(IJavaElement je) {
+    try {
+      return JavaUI.openInEditor(je, true, true);
+    }
+    catch (PartInitException | JavaModelException ex) {
+      SdkLog.info("Unable to open java editor for input '{}'.", je.getElementName(), ex);
+    }
+    return null;
   }
 
-  public static IEditorPart openEditor(IFile f, String editorId) {
-    return openEditor(f, null, editorId);
+  /**
+   * Opens the given {@link IFile} in the standard editor associated with this file type.
+   *
+   * @param f
+   *          The file to show in the corresponding standard editor.
+   * @return The opened {@link IEditorPart} or <code>null</code> if the editor could not be opened.
+   */
+  public static IEditorPart openInEditor(IFile f) {
+    return openInEditor(f, null);
   }
 
-  public static IEditorPart openEditor(IEditorInput input, String editorId) {
-    return openEditor(null, input, editorId);
+  /**
+   * Opens the given {@link IFile} in the editor with the given Id.
+   *
+   * @param f
+   *          The file to show in the given editor.
+   * @param editorId
+   *          The id of the editor to use.
+   * @return The opened {@link IEditorPart} or <code>null</code> if the editor could not be opened.
+   */
+  public static IEditorPart openInEditor(IFile f, String editorId) {
+    return openInEditor(f, null, editorId);
   }
 
-  private static IEditorPart openEditor(IFile f, IEditorInput input, String editorId) {
+  /**
+   * Opens the given {@link IEditorInput} in the editor with the given Id
+   *
+   * @param input
+   *          The {@link IEditorInput} to open.
+   * @param editorId
+   *          The id of the editor to open.
+   * @return The opened {@link IEditorPart} or <code>null</code> if the editor could not be opened.
+   */
+  public static IEditorPart openInEditor(IEditorInput input, String editorId) {
+    return openInEditor(null, input, editorId);
+  }
+
+  private static IEditorPart openInEditor(IFile f, IEditorInput input, String editorId) {
     IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
     if (activeWorkbenchWindow == null) {
       return null;
@@ -219,6 +265,10 @@ public final class S2eUiUtils {
   }
 
   private static void fillContainer(List<IJavaElement> candidates, PackageContainer result, Comparator<IJavaElement> javaElementComparator) throws JavaModelException {
+    if (candidates.isEmpty()) {
+      return;
+    }
+
     Collections.sort(candidates, javaElementComparator);
     IJavaElement element = candidates.get(0);
 
@@ -333,5 +383,26 @@ public final class S2eUiUtils {
     }
 
     SdkLog.warning("No test source folder could be found for project '{}'. No {} will be generated.", javaProject.getElementName(), testName);
+  }
+
+  /**
+   * Tries to open the given url in the system default browser.
+   *
+   * @param url
+   *          the url to show
+   */
+  public static void showUrlInBrowser(String url) {
+    try {
+      if (!Desktop.isDesktopSupported()) {
+        return;
+      }
+      Desktop d = Desktop.getDesktop();
+      if (d != null && d.isSupported(Desktop.Action.BROWSE)) {
+        d.browse(URIUtil.fromString(url));
+      }
+    }
+    catch (Exception e) {
+      SdkLog.warning("Could not open default web browser.", e);
+    }
   }
 }

@@ -12,9 +12,6 @@ package org.eclipse.scout.sdk.s2e.job;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 
 /**
  * <h3>{@link RunnableJob}</h3> Eclipse Job to execute a java {@link Runnable}.
@@ -32,17 +29,10 @@ public class RunnableJob extends AbstractJob {
   }
 
   @Override
-  protected IStatus run(IProgressMonitor monitor) {
-    try {
-      if (monitor.isCanceled()) {
-        return Status.CANCEL_STATUS;
-      }
-
-      m_runnable.run();
-      return Status.OK_STATUS;
+  protected void execute(IProgressMonitor monitor) {
+    if (monitor.isCanceled()) {
+      return;
     }
-    catch (Exception e) {
-      return new ScoutStatus("Exception executing runnable '" + m_runnable.getClass().getName() + "'.", e);
-    }
+    m_runnable.run();
   }
 }

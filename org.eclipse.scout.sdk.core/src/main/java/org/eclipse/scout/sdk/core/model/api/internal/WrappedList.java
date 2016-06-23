@@ -41,8 +41,8 @@ public class WrappedList<T> extends AbstractList<T> implements RandomAccess {
         return it.hasNext();
       }
 
-      @SuppressWarnings("unchecked")
       @Override
+      @SuppressWarnings("unchecked")
       public T next() {
         JavaElementSpi s = it.next();
         return s != null ? (T) s.wrap() : null;
@@ -60,11 +60,36 @@ public class WrappedList<T> extends AbstractList<T> implements RandomAccess {
     return m_spiList.size();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public T get(int index) {
     JavaElementSpi s = m_spiList.get(index);
-    return s != null ? (T) s.wrap() : null;
+    if (s == null) {
+      return null;
+    }
+    return (T) s.wrap();
   }
 
+  @Override
+  public int hashCode() {
+    return m_spiList.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (o == m_spiList) {
+      return true;
+    }
+    if (!(o instanceof List)) {
+      return false;
+    }
+    List<?> other = (List<?>) o;
+    if (other.size() != m_spiList.size()) {
+      return false;
+    }
+    return m_spiList.equals(o);
+  }
 }

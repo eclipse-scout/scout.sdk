@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  * @author Ivan Motsch, Matthias Villiger
  * @since 5.1.0
  */
-public class CompilationUnitWriteOperation implements IOperation {
+public class CompilationUnitWriteOperation implements IFileWriteOperation {
   private final IJavaProject m_project;
   private final IPackageFragmentRoot m_root;
   private final String m_packageName;
@@ -85,11 +85,11 @@ public class CompilationUnitWriteOperation implements IOperation {
   @Override
   public String getOperationName() {
     StringBuilder sb = new StringBuilder("write ");
-    sb.append(m_root.getPath().toString()).append('/');
-    if (!m_packageName.isEmpty()) {
-      sb.append(m_packageName.replace('.', '/')).append('/');
+    sb.append(getSourceFolder().getPath().toString()).append('/');
+    if (!getPackageName().isEmpty()) {
+      sb.append(getPackageName().replace('.', '/')).append('/');
     }
-    sb.append(m_fileName);
+    sb.append(getFileName());
     return sb.toString();
   }
 
@@ -102,12 +102,13 @@ public class CompilationUnitWriteOperation implements IOperation {
     // already done in constructor
   }
 
+  @Override
   public IResource getAffectedResource() {
-    IResource result = m_root.getResource();
-    IPackageFragment packageFragment = m_root.getPackageFragment(m_packageName);
+    IResource result = getSourceFolder().getResource();
+    IPackageFragment packageFragment = getSourceFolder().getPackageFragment(getPackageName());
     if (packageFragment.exists()) {
       result = packageFragment.getResource();
-      ICompilationUnit compilationUnit = packageFragment.getCompilationUnit(m_fileName);
+      ICompilationUnit compilationUnit = packageFragment.getCompilationUnit(getFileName());
       if (compilationUnit.exists()) {
         result = compilationUnit.getResource();
       }
@@ -127,21 +128,21 @@ public class CompilationUnitWriteOperation implements IOperation {
     SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 4);
 
     try {
-      String newSource = getSourceFormatted(m_content, m_project, progress.newChild(0), workingCopyManager);
+      String newSource = getSourceFormatted(getContent(), m_project, progress.newChild(0), workingCopyManager);
       if (progress.isCanceled()) {
         return;
       }
       progress.worked(1);
 
-      IPackageFragment pck = m_root.getPackageFragment(m_packageName);
+      IPackageFragment pck = getSourceFolder().getPackageFragment(getPackageName());
       if (!pck.exists()) {
-        pck = m_root.createPackageFragment(m_packageName, true, progress.newChild(0));
+        pck = getSourceFolder().createPackageFragment(getPackageName(), true, progress.newChild(0));
       }
       progress.worked(1);
 
-      m_createdCompilationUnit = pck.getCompilationUnit(m_fileName);
+      m_createdCompilationUnit = pck.getCompilationUnit(getFileName());
       if (!m_createdCompilationUnit.exists()) {
-        m_createdCompilationUnit = pck.createCompilationUnit(m_fileName, newSource, true, progress.newChild(0));
+        m_createdCompilationUnit = pck.createCompilationUnit(getFileName(), newSource, true, progress.newChild(0));
         progress.worked(1);
 
         workingCopyManager.register(m_createdCompilationUnit, progress.newChild(0));
@@ -164,5 +165,33 @@ public class CompilationUnitWriteOperation implements IOperation {
     catch (Exception e) {
       SdkLog.error("Could not {}", getOperationName(), e);
     }
+  }
+
+  public IPackageFragmentRoot getSourceFolder() {
+    return m_root;
+  }
+
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public String getFileName() {
+    return m_fileName;
+  }
+
+  public String getContent() {
+    return m_content;
+  }
+
+  @Override
+  public IFile getFile() {
+    if (!S2eUtils.exists(m_createdCompilationUnit)) {
+      return null;
+    }
+    IResource resource = m_createdCompilationUnit.getResource();
+    if (resource == null || !resource.exists() || resource.getType() != IResource.FILE) {
+      return null;
+    }
+    return (IFile) resource;
   }
 }

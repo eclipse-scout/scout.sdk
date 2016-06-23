@@ -17,6 +17,8 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
@@ -37,8 +39,7 @@ import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
 import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.ScoutTier;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
@@ -75,19 +76,29 @@ public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
 
   protected void createArgumentsGroup(Composite p) {
     Group parent = getFieldToolkit().createGroupBox(p, "Type Arguments");
-    parent.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    parent.setLayout(new GridLayout(1, true));
+    GridDataFactory
+        .defaultsFor(parent)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(parent);
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(parent);
 
     // type arg fields
     for (int i = 0; i < NUM_ARG_FIELDS; i++) {
-      m_typeArgFields[i] = getFieldToolkit().createTypeProposalField(parent, getTypeArgLabel(i), getJavaProject());
-      m_typeArgFields[i].setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+      m_typeArgFields[i] = getFieldToolkit().createTypeProposalField(parent, getTypeArgLabel(i), getJavaProject(), getLabelWidth());
       m_typeArgFields[i].addProposalListener(new IProposalListener() {
         @Override
         public void proposalAccepted(Object proposal) {
           pingStateChanging();
         }
       });
+      GridDataFactory
+          .defaultsFor(m_typeArgFields[i])
+          .align(SWT.FILL, SWT.CENTER)
+          .grab(true, false)
+          .applyTo(m_typeArgFields[i]);
     }
     syncTypeArgFieldsToSuperType();
   }

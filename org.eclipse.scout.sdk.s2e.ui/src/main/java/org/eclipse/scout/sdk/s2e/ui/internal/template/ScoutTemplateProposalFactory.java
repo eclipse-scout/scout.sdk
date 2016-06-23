@@ -110,49 +110,48 @@ public final class ScoutTemplateProposalFactory {
         ISdkProperties.SUFFIX_EXTENSION, ISdkIcons.ExtensionsAdd, 1000, ExtensionProposal.class));
   }
 
-  public static List<ICompletionProposal> createTemplateProposals(IType surroundingType, int offset, String prefix) {
+  public static List<ICompletionProposal> createTemplateProposals(IType declaringType, int offset, String prefix) {
     Set<String> possibleChildrenIfcFqn = new HashSet<>();
-    Set<String> superTypesOfSurroundingType = null;
+    Set<String> superTypesOfDeclaringType = null;
     ISourceRange surroundingTypeNameRange = null;
     try {
-      ITypeHierarchy supertypeHierarchy = surroundingType.newSupertypeHierarchy(null);
+      ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
       IType[] allTypes = supertypeHierarchy.getAllTypes();
-      superTypesOfSurroundingType = new HashSet<>(allTypes.length);
+      superTypesOfDeclaringType = new HashSet<>(allTypes.length);
       for (IType superType : allTypes) {
-        superTypesOfSurroundingType.add(superType.getFullyQualifiedName());
+        superTypesOfDeclaringType.add(superType.getFullyQualifiedName());
       }
-      System.out.println("old: " + superTypesOfSurroundingType.size());
-      surroundingTypeNameRange = surroundingType.getNameRange();
+      surroundingTypeNameRange = declaringType.getNameRange();
     }
     catch (JavaModelException e) {
-      SdkLog.error("Unable to calculate supertype hierarchy for '{}'.", surroundingType.getFullyQualifiedName(), e);
+      SdkLog.error("Unable to calculate supertype hierarchy for '{}'.", declaringType.getFullyQualifiedName(), e);
       return Collections.emptyList();
     }
 
-    if (superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractTabBox)
-        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractTabBoxExtension)) {
+    if (superTypesOfDeclaringType.contains(IScoutRuntimeTypes.AbstractTabBox)
+        || superTypesOfDeclaringType.contains(IScoutRuntimeTypes.AbstractTabBoxExtension)) {
       // special case for tab boxes
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IGroupBox);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IMenu);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IKeyStroke);
     }
-    else if (superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractListBox)
-        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractTreeBox)
-        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractListBoxExtension)
-        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractTreeBoxExtension)) {
+    else if (superTypesOfDeclaringType.contains(IScoutRuntimeTypes.AbstractListBox)
+        || superTypesOfDeclaringType.contains(IScoutRuntimeTypes.AbstractTreeBox)
+        || superTypesOfDeclaringType.contains(IScoutRuntimeTypes.AbstractListBoxExtension)
+        || superTypesOfDeclaringType.contains(IScoutRuntimeTypes.AbstractTreeBoxExtension)) {
       // special case for list boxes & tree boxes
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IMenu);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IKeyStroke);
     }
-    else if (superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractRadioButtonGroup)
-        || superTypesOfSurroundingType.contains(IScoutRuntimeTypes.AbstractRadioButtonGroupExtension)) {
+    else if (superTypesOfDeclaringType.contains(IScoutRuntimeTypes.AbstractRadioButtonGroup)
+        || superTypesOfDeclaringType.contains(IScoutRuntimeTypes.AbstractRadioButtonGroupExtension)) {
       // special case for radio button groups
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IRadioButton);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IMenu);
       possibleChildrenIfcFqn.add(IScoutRuntimeTypes.IKeyStroke);
     }
     else {
-      for (String superType : superTypesOfSurroundingType) {
+      for (String superType : superTypesOfDeclaringType) {
         Set<String> possibleChildren = ScoutModelHierarchy.getPossibleChildren(superType);
         if (!possibleChildren.isEmpty()) {
           possibleChildrenIfcFqn.addAll(possibleChildren);
@@ -163,7 +162,7 @@ public final class ScoutTemplateProposalFactory {
       return Collections.emptyList();
     }
 
-    ICompilationUnit compilationUnit = surroundingType.getCompilationUnit();
+    ICompilationUnit compilationUnit = declaringType.getCompilationUnit();
 
     // start java environment creation
     RunnableFuture<IJavaEnvironmentProvider> javaEnvProviderCreator = new FutureTask<>(new P_JavaEnvironmentInitCallable(compilationUnit, prefix != null, offset));
@@ -174,7 +173,7 @@ public final class ScoutTemplateProposalFactory {
     javaEnvCreatorJob.schedule();
 
     // create proposals
-    IJavaProject javaProject = surroundingType.getJavaProject();
+    IJavaProject javaProject = declaringType.getJavaProject();
     List<ICompletionProposal> result = new ArrayList<>();
     TemplateProposalDescriptor[] templates = null;
     synchronized (ScoutTemplateProposalFactory.TEMPLATES) {

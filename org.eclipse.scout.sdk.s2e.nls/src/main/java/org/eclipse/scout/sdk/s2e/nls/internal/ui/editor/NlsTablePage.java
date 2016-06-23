@@ -20,6 +20,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -47,8 +49,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableItem;
@@ -126,11 +126,21 @@ public class NlsTablePage extends Composite {
     m_table.setInputValidator(new NlsTableInputValidator(m_nlsProjects));
     m_table.setActionHanlder(new P_TableActionHandler());
     m_table.addMenuListener(new P_MenuListener());
+
     // layout
     parent.setLayout(new FillLayout());
-    rootArea.setLayout(new GridLayout(1, true));
-    m_hideInherited.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_table.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(rootArea);
+    GridDataFactory
+        .defaultsFor(m_hideInherited)
+        .align(SWT.FILL, SWT.CENTER)
+        .applyTo(m_hideInherited);
+    GridDataFactory
+        .fillDefaults()
+        .align(SWT.FILL, SWT.FILL)
+        .grab(true, true)
+        .applyTo(m_table);
   }
 
   /**

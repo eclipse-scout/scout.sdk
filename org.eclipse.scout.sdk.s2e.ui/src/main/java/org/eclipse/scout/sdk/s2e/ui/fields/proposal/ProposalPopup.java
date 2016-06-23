@@ -17,9 +17,9 @@ import javax.swing.event.EventListenerList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -66,7 +66,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -219,44 +218,58 @@ class ProposalPopup extends Window {
     m_proposalDescriptionArea.setExpandHorizontal(true);
     m_proposalDescriptionArea.setExpandVertical(true);
 
-    Group group = new Group(proposalArea, SWT.SHADOW_ETCHED_OUT);
-    group.setBackground(group.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-    group.setForeground(group.getDisplay().getSystemColor(SWT.COLOR_BLUE));
-    m_itemCountLabel = new Label(group, SWT.NONE);
+    Composite footer = new Composite(proposalArea, SWT.BORDER);
+    footer.setBackground(footer.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    m_itemCountLabel = new Label(footer, SWT.NONE);
     m_itemCountLabel.setBackground(m_itemCountLabel.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
     // layout
-    GridLayout parentLayout = new GridLayout(1, true);
-    parentLayout.horizontalSpacing = 0;
-    parentLayout.marginHeight = 0;
-    parentLayout.marginWidth = 0;
-    parentLayout.verticalSpacing = 0;
-    parent.setLayout(parentLayout);
-    proposalArea.setLayoutData(new GridData(GridData.FILL_BOTH));
-    GridData proposalDescriptionData = new GridData(GridData.FILL_BOTH);
-    proposalDescriptionData.exclude = true;
-    m_proposalDescriptionArea.setLayoutData(proposalDescriptionData);
+    GridLayoutFactory
+        .swtDefaults()
+        .spacing(0, 0)
+        .margins(0, 0)
+        .applyTo(m_proposalDescriptionArea);
+    GridLayoutFactory
+        .swtDefaults()
+        .equalWidth(true)
+        .spacing(0, 0)
+        .margins(0, 0)
+        .applyTo(parent);
+    GridDataFactory
+        .defaultsFor(proposalArea)
+        .align(SWT.FILL, SWT.FILL)
+        .grab(true, true)
+        .applyTo(proposalArea);
+    GridDataFactory
+        .defaultsFor(m_proposalDescriptionArea)
+        .align(SWT.FILL, SWT.FILL)
+        .grab(true, true)
+        .exclude(true)
+        .applyTo(m_proposalDescriptionArea);
 
     proposalArea.setLayout(new FormLayout());
     FormData data = new FormData();
     data.top = new FormAttachment(0, 0);
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(100, 0);
-    data.bottom = new FormAttachment(group, -2);
+    data.bottom = new FormAttachment(footer, 0);
     table.setLayoutData(data);
 
     data = new FormData();
-    data.left = new FormAttachment(0, 2);
-    data.right = new FormAttachment(100, -2);
-    data.bottom = new FormAttachment(100, -2);
-    group.setLayoutData(data);
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(100, 0);
+    data.bottom = new FormAttachment(100, 0);
+    footer.setLayoutData(data);
 
-    GridLayout gridLayout = new GridLayout(2, false);
-    gridLayout.marginHeight = 0;
-    group.setLayout(gridLayout);
-    GridData gd = new GridData(GridData.BEGINNING | GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    m_itemCountLabel.setLayoutData(gd);
-
+    GridLayoutFactory
+        .swtDefaults()
+        .margins(5, 0)
+        .applyTo(footer);
+    GridDataFactory
+        .defaultsFor(m_itemCountLabel)
+        .align(SWT.FILL, SWT.BEGINNING)
+        .grab(true, true)
+        .applyTo(m_itemCountLabel);
     return parent;
   }
 
@@ -754,16 +767,16 @@ class ProposalPopup extends Window {
     }
 
     @Override
-    protected IStatus run(final IProgressMonitor monitor) {
+    protected void execute(final IProgressMonitor monitor) {
       final IProposalDescriptionProvider proposalDescriptionProvider = getProposalDescriptionProvider();
       if (proposalDescriptionProvider == null) {
-        return Status.OK_STATUS;
+        return;
       }
       if (monitor.isCanceled()) {
-        return Status.CANCEL_STATUS;
+        return;
       }
       if (m_proposalDescriptionArea.isDisposed()) {
-        return Status.CANCEL_STATUS;
+        return;
       }
 
       final Object contentData = proposalDescriptionProvider.createDescriptionContent(m_proposal, monitor);
@@ -784,8 +797,6 @@ class ProposalPopup extends Window {
           }
         }
       });
-
-      return Status.OK_STATUS;
     }
   }
 
@@ -805,13 +816,12 @@ class ProposalPopup extends Window {
     }
 
     @Override
-    protected IStatus run(final IProgressMonitor monitor) {
+    protected void execute(final IProgressMonitor monitor) {
       m_searchPatternInput.setProposals(loadProposals(m_searchPatternInput.getPattern(), monitor));
       if (monitor.isCanceled()) {
-        return Status.CANCEL_STATUS;
+        return;
       }
       setInputAsync(m_searchPatternInput, monitor);
-      return Status.OK_STATUS;
     }
   }
 

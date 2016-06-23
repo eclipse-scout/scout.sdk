@@ -16,7 +16,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,6 +25,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
 import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -175,7 +175,7 @@ public class JavaEnvironmentBuilder {
     catch (Exception e) {
       SdkLog.info("Unable to read running bootstrap classpath. Fallback to minimal bootstrap classpath. Nested exception: ", e);
 
-      String javaHome = System.getProperty("java.home");
+      String javaHome = SystemUtils.JAVA_HOME;
       if (StringUtils.isNotBlank(javaHome)) {
         File javaLocation = new File(javaHome);
         if (javaLocation.isDirectory()) {
@@ -187,9 +187,9 @@ public class JavaEnvironmentBuilder {
   }
 
   protected void collectRunningClassPath() {
-    String javaClassPathRaw = System.getProperty("java.class.path");
+    String javaClassPathRaw = SystemUtils.JAVA_CLASS_PATH;
     if (javaClassPathRaw != null && !javaClassPathRaw.isEmpty()) {
-      String separator = System.getProperty("path.separator");
+      String separator = File.pathSeparator;
       String[] elements = javaClassPathRaw.split(separator);
       for (String cpElement : elements) {
         filterAndAppendBinaryPath(new File(cpElement), true);
@@ -276,7 +276,7 @@ public class JavaEnvironmentBuilder {
       return;
     }
     for (File f : m_findSourceAttachmentFor) {
-      Path path = Paths.get(f.toURI());
+      Path path = f.toPath();
       if (path.endsWith("jre/lib/rt.jar")) {
         filterAndAppendSourcePath(new File(path.getParent().getParent().getParent().toFile(), "src.zip"));
       }

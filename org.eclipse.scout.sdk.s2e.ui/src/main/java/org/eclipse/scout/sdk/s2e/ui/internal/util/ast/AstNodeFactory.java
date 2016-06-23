@@ -93,6 +93,7 @@ public class AstNodeFactory {
   public static final String RADIO_VALUE_GROUP = "RADIO_VALUE";
   public static final String AUTO_CHECK_GROUP = "AUTO_CHECK";
   public static final String MENU_TYPE_GROUP = "MENU_TYPE";
+  public static final String EXTENDS_TYPE_GROUP = "EXTENDS_TYPE_GROUP";
 
   private final AST m_ast;
   private final TypeDeclaration m_declaringType;

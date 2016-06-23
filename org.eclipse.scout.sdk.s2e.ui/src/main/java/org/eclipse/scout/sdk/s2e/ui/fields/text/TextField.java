@@ -10,104 +10,254 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.fields.text;
 
+import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.events.IHyperlinkListener;
+import org.eclipse.ui.forms.widgets.AbstractHyperlink;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 
 /**
- * <h3>TextField</h3>
+ * <h3>TextField with Label and Image support</h3>
  */
 public class TextField extends Composite {
 
-  private StyledTextEx m_text;
-  private Label m_label;
-  private Color m_backupTextBackground;
-  private final int m_labelPercentage;
+  /**
+   * Type constant to have a normal label in front of the text field.
+   */
+  public static final int TYPE_LABEL = 1 << 0;
 
-  public static final int DEFAULT_LABEL_PERCENTAGE = 20;
+  /**
+   * Type constant to have a hyperlink in front of the text field.
+   */
+  public static final int TYPE_HYPERLINK = 1 << 1;
+
+  /**
+   * Type constant to have an image between the label or hyperlink and the text field<br>
+   * Use {@link #setImage(Image)} to apply an image.
+   */
+  public static final int TYPE_IMAGE = 1 << 2;
+
+  /**
+   * The default width of the label
+   */
+  public static final int DEFAULT_LABEL_WIDTH = 150;
+
+  private Control m_label;
+  private Label m_imgLabel;
+  private StyledTextEx m_text;
+  private Color m_backupTextBackground;
+
+  private final int m_labelColumnWidth;
+  private final int m_type;
 
   public TextField(Composite parent) {
-    this(parent, "");
+    this(parent, TYPE_LABEL);
   }
 
-  public TextField(Composite parent, int labelPercentage) {
-    this(parent, "", labelPercentage);
+  /**
+   * @param parent
+   * @param type
+   *          One of {@link #TYPE_LABEL}, {@link #TYPE_HYPERLINK}, {@link #TYPE_IMAGE}.
+   */
+  public TextField(Composite parent, int type) {
+    this(parent, type, DEFAULT_LABEL_WIDTH);
   }
 
-  public TextField(Composite parent, String labelName) {
-    this(parent, labelName, DEFAULT_LABEL_PERCENTAGE);
-  }
-
-  public TextField(Composite parent, String labelName, int labelPercentage) {
+  /**
+   * @param parent
+   * @param type
+   *          One of {@link #TYPE_LABEL}, {@link #TYPE_HYPERLINK}, {@link #TYPE_IMAGE}.
+   * @param labelWidth
+   *          The width in pixels of the label. The image is considered to be part of the label width.
+   */
+  public TextField(Composite parent, int type, int labelWidth) {
     super(parent, SWT.NONE);
-    m_labelPercentage = labelPercentage;
+    m_labelColumnWidth = labelWidth;
+    m_type = type;
     createContent(this);
-    setLabelText(labelName);
   }
 
   protected void createContent(Composite parent) {
-    m_label = new Label(parent, SWT.NONE);
-    m_label.setAlignment(SWT.RIGHT);
+    boolean hasLabel = hasLabel();
+    boolean isHyperLinkLabel = isHyperlinkLabel();
+    boolean hasImage = hasImage();
+
+    // create controls
+    if (isHyperLinkLabel) {
+      Hyperlink hyperlink = new Hyperlink(parent, SWT.NONE);
+      hyperlink.setUnderlined(true);
+
+      Color fg = JFaceColors.getHyperlinkText(parent.getDisplay());
+      if (fg == null) {
+        fg = parent.getDisplay().getSystemColor(SWT.COLOR_LINK_FOREGROUND);
+      }
+      hyperlink.setForeground(fg);
+
+      m_label = hyperlink;
+    }
+    else {
+      m_label = new Label(parent, SWT.NONE);
+    }
+    m_label.setVisible(hasLabel);
+    if (hasImage) {
+      m_imgLabel = new Label(parent, SWT.NONE);
+      m_imgLabel.setImage(getImage());
+    }
     m_text = new StyledTextEx(parent, SWT.BORDER | SWT.SINGLE);
+
+    // calculate offsets
+    int textFieldMarginLeft = 0;
+    int imgOffset = 0;
+    int labelOffset = 0;
+    if (hasLabel) {
+      labelOffset = getLabelWidth();
+    }
+    if (hasImage) {
+      imgOffset = 22;
+    }
+    if (hasLabel || hasImage) {
+      textFieldMarginLeft = 5;
+    }
 
     // layout
     parent.setLayout(new FormLayout());
     FormData labelData = new FormData();
-    labelData.top = new FormAttachment(0, 4);
-    labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(getLabelPercentage(), 0);
-    labelData.bottom = new FormAttachment(100, 0);
+    if (isHyperLinkLabel) {
+      labelData.top = new FormAttachment(0, 3);
+    }
+    else {
+      labelData.top = new FormAttachment(0, 4);
+    }
+    labelData.right = new FormAttachment(m_text, -textFieldMarginLeft - imgOffset);
     m_label.setLayoutData(labelData);
-
     FormData textData = new FormData();
     textData.top = new FormAttachment(0, 0);
-    textData.left = new FormAttachment(m_label, 5);
     textData.right = new FormAttachment(100, 0);
-    textData.bottom = new FormAttachment(100, 0);
+    textData.left = new FormAttachment(0, textFieldMarginLeft + labelOffset + imgOffset);
     m_text.setLayoutData(textData);
+    if (m_imgLabel != null) {
+      FormData imgData = new FormData();
+      imgData.top = new FormAttachment(0, 5);
+      imgData.left = new FormAttachment(0, labelOffset + 6);
+      m_imgLabel.setLayoutData(imgData);
+    }
   }
 
+  protected boolean hasLabel() {
+    return (getType() & TYPE_HYPERLINK) != 0 || (getType() & TYPE_LABEL) != 0;
+  }
+
+  protected boolean hasImage() {
+    return (getType() & TYPE_IMAGE) != 0;
+  }
+
+  protected boolean isHyperlinkLabel() {
+    return (getType() & TYPE_HYPERLINK) != 0;
+  }
+
+  /**
+   * @see Text#addFocusListener(FocusListener)
+   */
   @Override
   public void addFocusListener(FocusListener listener) {
     m_text.addFocusListener(listener);
   }
 
+  /**
+   * @see Text#removeFocusListener(FocusListener)
+   */
   @Override
   public void removeFocusListener(FocusListener listener) {
     m_text.removeFocusListener(listener);
   }
 
+  /**
+   * @see Text#addVerifyListener(VerifyListener)
+   */
   public void addVerifyListener(VerifyListener verifyListener) {
     m_text.addVerifyListener(verifyListener);
   }
 
+  /**
+   * @see Text#removeVerifyListener(VerifyListener)
+   */
   public void removeVerifyListener(VerifyListener verifyListener) {
     m_text.removeVerifyListener(verifyListener);
   }
 
+  /**
+   * @see Text#addModifyListener(ModifyListener)
+   */
   public void addModifyListener(ModifyListener listener) {
     m_text.addModifyListener(listener);
   }
 
+  /**
+   * @see Text#removeModifyListener(ModifyListener)
+   */
   public void removeModifyListener(ModifyListener listener) {
     m_text.removeModifyListener(listener);
   }
 
-  public void setLabelText(String text) {
-    m_label.setText(text);
+  /**
+   * @see AbstractHyperlink#removeHyperlinkListener(IHyperlinkListener)
+   */
+  public void removeHyperlinkListener(IHyperlinkListener listener) {
+    if (!isHyperlinkLabel()) {
+      return;
+    }
+    ((Hyperlink) m_label).removeHyperlinkListener(listener);
   }
 
+  /**
+   * @see AbstractHyperlink#addHyperlinkListener(IHyperlinkListener)
+   */
+  public void addHyperlinkListener(IHyperlinkListener listener) {
+    if (!isHyperlinkLabel()) {
+      return;
+    }
+    ((Hyperlink) m_label).addHyperlinkListener(listener);
+  }
+
+  /**
+   * Sets the text of the label component.
+   *
+   * @param text
+   */
+  public void setLabelText(String text) {
+    if (text == null) {
+      text = "";
+    }
+    if (isHyperlinkLabel()) {
+      ((Hyperlink) m_label).setText(text);
+    }
+    else {
+      ((Label) m_label).setText(text);
+    }
+  }
+
+  /**
+   * @return The text of the label component
+   */
   public String getLabelText() {
-    return m_label.getText();
+    if (isHyperlinkLabel()) {
+      return ((Hyperlink) m_label).getText();
+    }
+    return ((Label) m_label).getText();
   }
 
   @Override
@@ -127,6 +277,12 @@ public class TextField extends Composite {
     m_text.setMenu(menu);
   }
 
+  /**
+   * Sets the text of this text field.
+   *
+   * @param text
+   *          The new text.
+   */
   public void setText(String text) {
     if (text == null) {
       text = "";
@@ -134,61 +290,117 @@ public class TextField extends Composite {
     m_text.setText(text);
   }
 
+  /**
+   * @return The current text of the text component
+   */
   public String getText() {
     return m_text.getText();
   }
 
+  /**
+   * @see Text#setEditable(boolean)
+   */
   public void setEditable(boolean editable) {
     m_text.setEditable(editable);
   }
 
+  /**
+   * @see Text#getEditable()
+   */
   public boolean getEditable() {
     return m_text.getEditable();
   }
 
+  /**
+   * @see Text#getEditable()
+   */
   public boolean isEditable() {
     return m_text.getEditable();
   }
 
+  /**
+   * @see Text#setFocus()
+   */
   @Override
   public boolean setFocus() {
     return m_text.setFocus();
   }
 
+  /**
+   * @return The text component of this field
+   */
   public StyledTextEx getTextComponent() {
     return m_text;
   }
 
-  protected Label getLabelComponent() {
+  /**
+   * @return The label component of this field
+   */
+  public Control getLabelComponent() {
     return m_label;
   }
 
+  /**
+   * @return The image component of this field.
+   */
+  public Label getImageComponent() {
+    return m_imgLabel;
+  }
+
+  /**
+   * @see Text#getSelection()
+   */
   public Point getSelection() {
     return m_text.getSelection();
   }
 
+  /**
+   * @see Text#setSelection(int)
+   */
   public void setSelection(int start) {
     m_text.setSelection(start);
   }
 
+  /**
+   * @see Text#setSelection(Point)
+   */
   public void setSelection(Point point) {
     m_text.setSelection(point);
   }
 
+  /**
+   * @see Text#getEnabled()
+   */
   @Override
   public boolean getEnabled() {
-    if (m_text == null) {
+    if (m_text == null || m_text.isDisposed()) {
       return super.getEnabled();
     }
     return m_text.getEnabled();
   }
 
+  /**
+   * @see Composite#isEnabled()
+   */
+  @Override
+  public boolean isEnabled() {
+    boolean enabled = super.isEnabled();
+    if (m_text == null || m_text.isDisposed()) {
+      return enabled;
+    }
+    return enabled && m_text.getEnabled();
+  }
+
+  /**
+   * @see Text#setEnabled(boolean)
+   */
   @Override
   public void setEnabled(boolean enabled) {
     if (m_backupTextBackground == null) {
       m_backupTextBackground = m_text.getBackground();
     }
     m_text.setEnabled(enabled);
+    m_label.setEnabled(enabled);
     if (enabled) {
       m_text.setBackground(m_backupTextBackground);
     }
@@ -197,8 +409,43 @@ public class TextField extends Composite {
     }
   }
 
-  public int getLabelPercentage() {
-    return m_labelPercentage;
+  /**
+   * @return The width of the text component.
+   */
+  public int getLabelWidth() {
+    return m_labelColumnWidth;
   }
 
+  /**
+   * @return The type of this field.
+   * @see #TYPE_HYPERLINK
+   * @see #TYPE_LABEL
+   * @see #TYPE_IMAGE
+   */
+  public int getType() {
+    return m_type;
+  }
+
+  /**
+   * @return The image of this field. Only valid if this field has been created using {@link #TYPE_IMAGE}
+   */
+  public Image getImage() {
+    if (m_imgLabel == null) {
+      return null;
+    }
+    return m_imgLabel.getImage();
+  }
+
+  /**
+   * Sets the image of this field. Only valid if this field has been created using {@link #TYPE_IMAGE}
+   * 
+   * @param image
+   *          The new image or <code>null</code> if not image should be shown.
+   */
+  public void setImage(Image image) {
+    if (m_imgLabel == null) {
+      return;
+    }
+    m_imgLabel.setImage(image);
+  }
 }

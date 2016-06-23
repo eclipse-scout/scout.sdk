@@ -50,5 +50,15 @@
       <artifactId>org.eclipse.jface.text</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.m2e.core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.debug.core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

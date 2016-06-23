@@ -19,6 +19,8 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model.CountrySmartFieldModel;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model.LanguageSmartFieldModel;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model.TranslationFileNewModel;
@@ -27,8 +29,6 @@ import org.eclipse.scout.sdk.s2e.nls.internal.ui.fields.ISmartFieldListener;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.fields.SmartField;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -127,8 +127,13 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
     attachGridData(m_languageChooser);
 
     // layout
-    rootArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
-    rootArea.setLayout(new GridLayout(1, true));
+    GridDataFactory
+        .defaultsFor(rootArea)
+        .align(SWT.FILL, SWT.FILL)
+        .applyTo(rootArea);
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(rootArea);
     return rootArea;
   }
 
@@ -173,9 +178,10 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
   }
 
   private static void attachGridData(Control c) {
-    GridData d = new GridData();
-    d.grabExcessHorizontalSpace = true;
-    d.horizontalAlignment = SWT.FILL;
-    c.setLayoutData(d);
+    GridDataFactory
+        .defaultsFor(c)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(c);
   }
 }

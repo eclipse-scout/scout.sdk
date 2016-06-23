@@ -42,6 +42,7 @@ public interface ISdkIcons {
   String PermissionAdd = "permission_add.png";
   String RadioButtonAdd = "radiobutton_add.gif";
   String RadioButtonGroupAdd = "radiobuttonGroup_add.gif";
+  String Refresh = "refresh.gif";
   String SequenceBoxAdd = "sequencebox_add.gif";
   String SmartFieldAdd = "smartfield_add.gif";
   String StringFieldAdd = "stringfield_add.gif";
@@ -50,4 +51,8 @@ public interface ISdkIcons {
   String TableFieldAdd = "tablefield_add.gif";
   String TreeFieldAdd = "treefield_add.gif";
   String Separator = "type_separator.gif";
+  String Wsdl = "wsdl.gif";
+  String RebuildWebService = "rebuildws.gif";
+  String WsProviderOverview = "ws_provider_overview.png";
+  String WsConsumerOverview = "ws_consumer_overview.png";
 }

@@ -43,10 +43,13 @@ public class MavenCliRunner {
   }
 
   protected static String[] getMavenArgs(String[] in, String globalSettings, String settings) {
-    List<String> args = new ArrayList<>(in.length + 2);
+    List<String> args = new ArrayList<>(in.length + 3);
     for (String s : in) {
-      args.add(s);
+      if (StringUtils.isNotBlank(s)) {
+        args.add(s);
+      }
     }
+    overwriteIfExisting(args, "-Dmaven.ext.class.path=", "''");
     if (StringUtils.isNotBlank(globalSettings)) {
       overwriteIfExisting(args, "-gs=", globalSettings);
     }

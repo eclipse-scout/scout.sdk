@@ -50,7 +50,7 @@ public class PermissionNewOperation implements IOperation {
   }
 
   protected PermissionNewOperation(IJavaEnvironmentProvider provider) {
-    m_javaEnvironmentProvider = provider;
+    m_javaEnvironmentProvider = Validate.notNull(provider);
   }
 
   @Override

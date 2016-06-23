@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IPropertyBean;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
@@ -168,7 +169,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
       String lowerCaseBeanName = CoreUtils.ensureStartWithLowerCase(beanName);
       final String upperCaseBeanName = CoreUtils.ensureStartWithUpperCase(beanName);
 
-      String propName = upperCaseBeanName + "Property";
+      String propName = upperCaseBeanName + ISdkProperties.SUFFIX_DTO_PROPERTY;
       String resolvedSignature = SignatureUtils.getTypeSignature(desc.type());
       String boxedSignature = SignatureUtils.boxPrimitiveSignature(resolvedSignature);
 

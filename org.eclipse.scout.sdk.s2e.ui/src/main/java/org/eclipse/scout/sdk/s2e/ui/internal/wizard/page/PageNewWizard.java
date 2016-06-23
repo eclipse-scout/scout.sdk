@@ -19,13 +19,10 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.JavaPluginImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.operation.page.PageNewOperation;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
@@ -35,7 +32,6 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PartInitException;
 
 /**
  * <h3>{@link PageNewWizard}</h3>
@@ -45,7 +41,7 @@ import org.eclipse.ui.PartInitException;
  */
 public class PageNewWizard extends AbstractWizard implements INewWizard {
 
-  public static volatile Class<? extends PageNewWizardPage> pageClass = PageNewWizardPage.class;
+  private static volatile Class<? extends PageNewWizardPage> pageClass = PageNewWizardPage.class;
 
   private PageNewWizardPage m_page1;
   private boolean m_executed = false;
@@ -55,17 +51,14 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
     PackageContainer packageContainer = S2eUiUtils.getClientPackageOfSelection(selection);
 
     try {
-      m_page1 = pageClass.getConstructor(PackageContainer.class).newInstance(packageContainer);
+      m_page1 = getPage1Class().getConstructor(PackageContainer.class).newInstance(packageContainer);
       addPage(m_page1);
 
       setWindowTitle(m_page1.getTitle());
       setHelpAvailable(true);
       setDefaultPageImageDescriptor(JavaPluginImages.DESC_WIZBAN_NEWCLASS);
     }
-    catch (InvocationTargetException e) {
-      throw new SdkException(e.getCause());
-    }
-    catch (Exception e) {
+    catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
       throw new SdkException(e);
     }
   }
@@ -126,12 +119,7 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
             if (!S2eUtils.exists(createdPageType)) {
               return;
             }
-            try {
-              JavaUI.openInEditor(createdPageType, true, true);
-            }
-            catch (PartInitException | JavaModelException e) {
-              SdkLog.info("Unable to open type {} in editor.", createdPageType.getFullyQualifiedName(), e);
-            }
+            S2eUiUtils.openInEditor(createdPageType);
           }
         });
       }
@@ -159,5 +147,13 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
 
   protected void setExecuted(boolean executed) {
     m_executed = executed;
+  }
+
+  public static Class<? extends PageNewWizardPage> getPage1Class() {
+    return pageClass;
+  }
+
+  public static void setPage1Class(Class<? extends PageNewWizardPage> page1Class) {
+    pageClass = page1Class;
   }
 }

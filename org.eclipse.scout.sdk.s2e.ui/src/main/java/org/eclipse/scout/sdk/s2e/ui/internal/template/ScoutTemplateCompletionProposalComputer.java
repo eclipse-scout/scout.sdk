@@ -97,6 +97,7 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
 
   @Override
   public void sessionStarted() {
+    // nop
   }
 
   @Override
@@ -111,5 +112,6 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
 
   @Override
   public void sessionEnded() {
+    // nop
   }
 }
