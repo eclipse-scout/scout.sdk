@@ -109,8 +109,8 @@ public final class ScoutProjectNewHelper {
         "-DarchetypeGroupId=" + archetypeGroupId, "-DarchetypeArtifactId=" + archeTypeArtifactId, "-DarchetypeVersion=" + archetypeVersion,
         "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + pck,
         "-DdisplayName=" + displayName, "-DscoutAuthPublicKey=" + authKeysForWar[1], "-DscoutAuthPrivateKey=" + authKeysForWar[0], "-DscoutAuthPublicKeyDev=" + authKeysForDev[1], "-DscoutAuthPrivateKeyDev=" + authKeysForDev[0],
-        "-DjavaVersion=" + javaVersion, "-DuserName=" + CoreUtils.getUsername(),
-        "-Dmaven.ext.class.path=''"};
+        "-DjavaVersion=" + javaVersion, "-DuserName=" + CoreUtils.getUsername()
+    };
 
     // execute archetype generation
     new MavenCliRunner().execute(targetDirectory, args, mavenGlobalSettings, mavenSettings);

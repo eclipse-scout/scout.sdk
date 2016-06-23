@@ -38,16 +38,19 @@ public class CachingJavaEnvironmentProvider implements IJavaEnvironmentProvider 
     return getOrCreateEnv(jdtProject);
   }
 
-  private IJavaEnvironment getOrCreateEnv(IJavaProject jdtProject) {
+  protected IJavaEnvironment getOrCreateEnv(IJavaProject jdtProject) {
     if (jdtProject == null) {
       return null;
     }
     IJavaEnvironment env = m_envs.get(jdtProject);
     if (env == null) {
-      env = ScoutSdkCore.createJavaEnvironment(jdtProject);
+      env = createNew(jdtProject);
       m_envs.put(jdtProject, env);
     }
     return env;
   }
 
+  protected IJavaEnvironment createNew(IJavaProject jdtProject) {
+    return ScoutSdkCore.createJavaEnvironment(jdtProject);
+  }
 }

@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -33,9 +34,9 @@ import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ISelectionStateLabelProvider
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.util.NormalizedPattern;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -106,7 +107,11 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
       return null;
     }
 
-    browser.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
+    GridDataFactory
+        .defaultsFor(browser)
+        .align(SWT.FILL, SWT.FILL)
+        .grab(true, true)
+        .applyTo(browser);
     return browser;
   }
 

@@ -16,6 +16,17 @@
    <extension point="org.eclipse.ui.startup">
       <startup class="org.eclipse.scout.sdk.s2e.ui.internal.util.ScoutSdkStartupExtension"></startup>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.scout.sdk.s2e.ui.internal.editor.jaxws.WebServiceEditor"
+            icon="icons/wsdl.gif"
+            extensions="jaxws"
+            default="true"
+            id="org.eclipse.scout.sdk.s2e.ui.jaxwsEditor"
+            name="Scout Web Service Editor">
+      </editor>
+   </extension>
    <extension point="org.eclipse.ui.preferencePages">
       <page
             class="org.eclipse.scout.sdk.s2e.ui.internal.preference.ScoutSdkPreferencePage"
@@ -141,6 +152,14 @@
             icon="icons/lookupCall_add.png"
             id="org.eclipse.scout.sdk.s2e.ui.newLookupCallWizard"
             name="Scout LookupCall"
+            project="false"/>
+     <wizard
+            category="org.eclipse.scout.sdk.s2e"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.jaxws.WebServiceNewWizard"
+            hasPages="true"
+            icon="icons/wsdl.gif"
+            id="org.eclipse.scout.sdk.s2e.ui.newWebService"
+            name="Scout Web Service"
             project="false"/>
    </extension>
    <extension

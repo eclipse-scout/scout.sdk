@@ -11,8 +11,12 @@
 package org.eclipse.scout.sdk.core.s.util;
 
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * <h3>{@link CoreScoutUtils}</h3>
@@ -22,6 +26,89 @@ import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
  */
 public final class CoreScoutUtils {
   private CoreScoutUtils() {
+  }
+
+  /**
+   * Gets the artifactId of the given pom {@link Document}.
+   *
+   * @param pom
+   *          The pom {@link Document} to search the artifactId for.
+   * @return The artifactId or <code>null</code> if no artifactId exists in the given {@link Document}.
+   */
+  public static String getArtifactIdOfPom(Document pom) {
+    if (pom == null) {
+      return null;
+    }
+    Element artifactIdElement = CoreUtils.getFirstChildElement(pom.getDocumentElement(), IMavenConstants.ARTIFACT_ID);
+    if (artifactIdElement != null) {
+      return artifactIdElement.getTextContent();
+    }
+    return null;
+  }
+
+  /**
+   * Gets the groupId of the given pom {@link Document}.
+   *
+   * @param pom
+   *          The pom {@link Document} to search the groupId for.
+   * @return The groupId or <code>null</code> if no groupId exists in the given {@link Document}.
+   */
+  public static String getGroupIdOfPom(Document pom) {
+    return getInheritedValueOfPom(pom, IMavenConstants.GROUP_ID);
+  }
+
+  /**
+   * Gets the version of the given pom {@link Document}.
+   *
+   * @param pom
+   *          The pom {@link Document} to search the version for.
+   * @return The version or <code>null</code> if no version exists in the given {@link Document}.
+   */
+  public static String getVersionOfPom(Document pom) {
+    return getInheritedValueOfPom(pom, IMavenConstants.VERSION);
+  }
+
+  /**
+   * Gets the artifactId of the parent of the given pom {@link Document}.
+   *
+   * @param pom
+   *          The pom {@link Document} to search the parent artifactId for.
+   * @return The artifactId name or <code>null</code> if it does not exist.
+   */
+  public static String getParentArtifactId(Document pom) {
+    if (pom == null) {
+      return null;
+    }
+    Element parentElement = CoreUtils.getFirstChildElement(pom.getDocumentElement(), IMavenConstants.PARENT);
+    if (parentElement == null) {
+      return null;
+    }
+    Element artifactId = CoreUtils.getFirstChildElement(parentElement, IMavenConstants.ARTIFACT_ID);
+    if (artifactId == null) {
+      return null;
+    }
+    return artifactId.getTextContent();
+  }
+
+  static String getInheritedValueOfPom(Document pom, String tagName) {
+    if (pom == null) {
+      return null;
+    }
+    Element documentElement = pom.getDocumentElement();
+    Element directValueElement = CoreUtils.getFirstChildElement(documentElement, tagName);
+    if (directValueElement != null) {
+      return directValueElement.getTextContent();
+    }
+
+    Element parentElement = CoreUtils.getFirstChildElement(documentElement, IMavenConstants.PARENT);
+    if (parentElement == null) {
+      return null;
+    }
+    directValueElement = CoreUtils.getFirstChildElement(parentElement, tagName);
+    if (directValueElement == null) {
+      return null;
+    }
+    return directValueElement.getTextContent();
   }
 
   /**

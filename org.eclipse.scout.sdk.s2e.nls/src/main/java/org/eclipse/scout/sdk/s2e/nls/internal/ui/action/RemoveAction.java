@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
@@ -42,10 +43,10 @@ public class RemoveAction extends Action {
 
   @Override
   public void run() {
-    Job job = new Job("update translations") {
+    Job job = new AbstractJob("update translations") {
       @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        return m_nlsProject.removeEntries(m_entries, monitor);
+      protected void execute(IProgressMonitor monitor) {
+        m_nlsProject.removeEntries(m_entries, monitor);
       }
     };
     job.setUser(false);

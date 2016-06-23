@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -169,7 +170,12 @@ public final class ScoutSdkCore {
       }
     }
 
-    return System.getProperty("file.encoding", StandardCharsets.UTF_8.name());
+    String systemEncoding = SystemUtils.FILE_ENCODING;
+    if (systemEncoding != null) {
+      return systemEncoding;
+    }
+
+    return StandardCharsets.UTF_8.name();
   }
 
   private static boolean isValidEncoding(String encoding, IPackageFragmentRoot root) {

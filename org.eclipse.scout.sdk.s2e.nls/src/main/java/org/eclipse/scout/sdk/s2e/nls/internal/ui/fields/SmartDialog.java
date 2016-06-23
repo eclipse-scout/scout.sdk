@@ -118,7 +118,7 @@ public class SmartDialog {
       }
     });
 
-    TableColumn col = new TableColumn(m_table, SWT.RIGHT);
+    TableColumn col = new TableColumn(m_table, SWT.TRAIL);
     col.setWidth(100);
     m_viewer = new TableViewer(m_table);
     m_viewer.setLabelProvider(m_smartTableModel);

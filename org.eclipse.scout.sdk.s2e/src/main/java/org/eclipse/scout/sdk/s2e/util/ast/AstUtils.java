@@ -324,10 +324,10 @@ public final class AstUtils {
   }
 
   /**
-   * Method to visit a type hierarchy defined by a given type. The given type itself is not visited.
+   * Method to visit the super type hierarchy of a given type. The given type itself is not visited.
    *
    * @param type
-   *          the type whose hierarchy is to be visited
+   *          the type whose super hierarchy is to be visited
    * @param visitor
    *          the visitor
    * @return <code>true</code> if all types were visited, or <code>false</code> if the visiting got aborted because the

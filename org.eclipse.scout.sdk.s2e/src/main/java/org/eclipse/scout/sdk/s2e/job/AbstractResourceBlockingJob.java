@@ -14,12 +14,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.MultiRule;
-import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 
 /**
@@ -28,8 +24,6 @@ import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
  * @since 5.1.0
  */
 public abstract class AbstractResourceBlockingJob extends AbstractJob {
-
-  private Exception m_callerTrace;
 
   /**
    * Creates a new job blocking on the given resources.
@@ -63,45 +57,19 @@ public abstract class AbstractResourceBlockingJob extends AbstractJob {
   }
 
   @Override
-  public boolean shouldSchedule() {
-    m_callerTrace = new Exception("Job scheduled by:");
-    return super.shouldSchedule();
-  }
-
-  @Override
-  protected final IStatus run(IProgressMonitor monitor) {
-    long start = System.currentTimeMillis();
-    try {
-      return doRun(monitor);
-    }
-    finally {
-      SdkLog.debug("Operation job '{}' took {}ms to execute.", getName(), System.currentTimeMillis() - start);
-    }
-  }
-
-  private IStatus doRun(IProgressMonitor monitor) {
-    IWorkingCopyManager workingCopyManager = ScoutSdkCore.createWorkingCopyManager();
+  protected void execute(IProgressMonitor monitor) throws CoreException {
     boolean save = true;
+    final IWorkingCopyManager workingCopyManager = ScoutSdkCore.createWorkingCopyManager();
     try {
-      validate();
       run(monitor, workingCopyManager);
     }
     catch (Exception e) {
       save = false;
-      if (e.getCause() == e || e.getCause() == null) {
-        e.initCause(m_callerTrace);
-      }
-      SdkLog.error(e.getMessage(), e);
-      return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, e.getMessage(), e);
+      throw e;
     }
     finally {
       workingCopyManager.unregisterAll(monitor, save);
-      monitor.done();
     }
-    return Status.OK_STATUS;
-  }
-
-  protected void validate() {
   }
 
   protected abstract void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException;

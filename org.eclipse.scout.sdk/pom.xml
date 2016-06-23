@@ -35,6 +35,7 @@
   <modules>
     <!-- Must be at first position -->
     <module>../scout-helloworld-app</module>
+    <module>../scout-jaxws-module</module>
 
     <module>../org.eclipse.scout.sdk.core</module>
     <module>../org.eclipse.scout.sdk.core.test</module>
@@ -60,7 +61,17 @@
     <sonar.branch>releases_6.0.x</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
     <sonar.exclusions>**/src/main/fixture/**,**/src/main/client/**,**/src/main/shared/**</sonar.exclusions> <!-- exclude fixtures -->
-    <sonar.coverage.exclusions>**/src/main/fixture/**,**/src/main/client/**,**/src/main/shared/**</sonar.coverage.exclusions> <!-- exclude fixtures -->
+    <!-- exclude fixtures, archetypes, UI -->
+    <sonar.coverage.exclusions>
+      **/src/main/fixture/**/*,
+      **/src/main/client/**/*,
+      **/src/main/shared/**/*,
+      **/src/main/resources/archetype-resources/**/*,
+      **/src/main/java/org/eclipse/scout/sdk/s2e/nls/**/*,
+      **/src/main/java/org/eclipse/scout/sdk/s2e/ui/**/*,
+      **/src/main/java/org/eclipse/scout/sdk/s2e/doc/**/*,
+      **/org/eclipse/scout/maven/plugins/updatesite/**/*
+    </sonar.coverage.exclusions>
 
     <!-- dependencies to Eclipse artifacts deployed by org.eclipse.scout.sdk.core.releng/ -->
     <ecj>4.5</ecj>
@@ -592,6 +603,12 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>3.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>wsdl4j</groupId>
+        <artifactId>wsdl4j</artifactId>
+        <version>1.5.1</version>
       </dependency>
 
       <!-- Test Dependencies -->

@@ -55,6 +55,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
   }
 
   @Override
+  @SuppressWarnings("squid:S1168")
   public IJavaCompletionProposal[] getAssists(final IInvocationContext context, IProblemLocation[] locations) throws CoreException {
     final ClassIdTarget selectedType = getTarget(context.getCoveringNode());
     if (selectedType != null && !S2eUtils.exists(selectedType.m_annotation)) {
@@ -92,7 +93,11 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
   private static ClassIdTarget getTarget(ASTNode selectedNode) {
     if (selectedNode != null && selectedNode.getParent() != null) {
-      if (selectedNode.getNodeType() == ASTNode.SIMPLE_NAME || selectedNode.getNodeType() == ASTNode.QUALIFIED_NAME || selectedNode.getNodeType() == ASTNode.MODIFIER || selectedNode.getNodeType() == ASTNode.TYPE_DECLARATION) {
+      boolean isValidNodeType = selectedNode.getNodeType() == ASTNode.SIMPLE_NAME
+          || selectedNode.getNodeType() == ASTNode.QUALIFIED_NAME
+          || selectedNode.getNodeType() == ASTNode.MODIFIER
+          || selectedNode.getNodeType() == ASTNode.TYPE_DECLARATION;
+      if (isValidNodeType) {
         TypeDeclaration typeDecl = null;
         if (selectedNode.getParent().getNodeType() == ASTNode.TYPE_DECLARATION) {
           typeDecl = (TypeDeclaration) selectedNode.getParent();

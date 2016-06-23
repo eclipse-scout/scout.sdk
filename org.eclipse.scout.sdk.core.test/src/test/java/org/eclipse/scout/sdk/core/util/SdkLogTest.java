@@ -95,14 +95,14 @@ public class SdkLogTest {
         SdkConsole.spi = new SdkConsoleSpi() {
 
           @Override
-          public void println(String s, Throwable... exceptions) {
+          public void println(Level level, String s, Throwable... exceptions) {
             logContent.append(s);
             if (exceptions == null) {
               return;
             }
             for (Throwable t : exceptions) {
               if (t != null) {
-                logContent.append(CoreUtils.getStackTrace(t));
+                logContent.append(CoreUtils.getThrowableAsString(t));
               }
             }
           }
@@ -115,15 +115,17 @@ public class SdkLogTest {
 
         SdkLog.warning("hello");
         Assert.assertEquals("[WARNING]: hello", logContent.toString());
+        Assert.assertTrue(SdkLog.isWarningEnabled());
         SdkConsole.clear();
 
         Exception exception = new Exception();
         SdkLog.warning("hello {} there", "test", exception);
-        Assert.assertEquals("[WARNING]: hello test there" + CoreUtils.getStackTrace(exception), logContent.toString());
+        Assert.assertEquals("[WARNING]: hello test there" + CoreUtils.getThrowableAsString(exception), logContent.toString());
         SdkConsole.clear();
 
         SdkLog.error(exception);
-        Assert.assertEquals("[SEVERE]: " + CoreUtils.getStackTrace(exception), logContent.toString());
+        Assert.assertEquals("[SEVERE]: " + CoreUtils.getThrowableAsString(exception), logContent.toString());
+        Assert.assertTrue(SdkLog.isErrorEnabled());
         SdkConsole.clear();
 
         SdkLog.warning(null, (Object[]) null);
@@ -132,12 +134,15 @@ public class SdkLogTest {
 
         SdkLog.info("hello");
         Assert.assertEquals("", logContent.toString());
+        Assert.assertFalse(SdkLog.isInfoEnabled());
         SdkConsole.clear();
 
         SdkLog.log(Level.OFF, "hello");
         Assert.assertEquals("", logContent.toString());
+        Assert.assertFalse(SdkLog.isDebugEnabled());
         SdkConsole.clear();
 
+        Assert.assertFalse(SdkLog.isLevelEnabled(null));
         SdkLog.log(null, "hello");
         Assert.assertEquals("[WARNING]: hello", logContent.toString());
         SdkConsole.clear();

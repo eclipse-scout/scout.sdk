@@ -25,6 +25,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+/**
+ * <h3>{@link StyledTextField} with optional read-only suffix and prefix.</h3>
+ *
+ * @since 5.2.0
+ */
 public class StyledTextField extends TextField {
 
   private P_SuffixListener m_suffixListener = null;
@@ -33,20 +38,26 @@ public class StyledTextField extends TextField {
   private final OptimisticLock m_revalLock = new OptimisticLock();
 
   /**
+   * Creates a new {@link StyledTextField} with a label and no image.
+   *
    * @param parent
-   * @param style
-   *          of the text field
    */
   public StyledTextField(Composite parent) {
     super(parent);
   }
 
-  public StyledTextField(Composite parent, String labelName) {
-    super(parent, labelName);
+  /**
+   * @see TextField#TextField(Composite, int)
+   */
+  public StyledTextField(Composite parent, int type) {
+    super(parent, type);
   }
 
-  public StyledTextField(Composite parent, String labelName, int labelPercentage) {
-    super(parent, labelName, labelPercentage);
+  /**
+   * @see TextField#TextField(Composite, int, int)
+   */
+  public StyledTextField(Composite parent, int type, int labelWidth) {
+    super(parent, type, labelWidth);
   }
 
   public String getReadOnlySuffix() {

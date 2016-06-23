@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -146,7 +145,7 @@ public class FileUtility {
   }
 
   public static byte[] readFile(File source) throws IOException {
-    return Files.readAllBytes(Paths.get(source.toURI()));
+    return Files.readAllBytes(source.toPath());
   }
 
   public static void writeDOM(Document doc, File file) throws MojoExecutionException {

@@ -21,6 +21,8 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.fields.IInputChangedListener;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.fields.ISmartFieldListener;
@@ -40,8 +42,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -122,8 +122,13 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   protected final Control createDialogArea(final Composite parent) {
     if (m_fixDialogArea == null) {
       m_fixDialogArea = new Composite(parent, SWT.NONE);
-      m_fixDialogArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
-      m_fixDialogArea.setLayout(new GridLayout(1, true));
+      GridLayoutFactory
+          .swtDefaults()
+          .applyTo(m_fixDialogArea);
+      GridDataFactory
+          .defaultsFor(m_fixDialogArea)
+          .align(SWT.FILL, SWT.FILL)
+          .applyTo(m_fixDialogArea);
     }
     final Composite rootArea = new Composite(m_fixDialogArea, SWT.NONE);
     Composite inputComp = new Composite(rootArea, SWT.NONE);
@@ -186,9 +191,12 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
       tabItem.setText(l.getDispalyName());
       tabItem.setControl(control);
 
-      GridData txtGd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-      txtGd.minimumHeight = 80;
-      control.setLayoutData(txtGd);
+      GridDataFactory
+          .defaultsFor(control)
+          .align(SWT.FILL, SWT.FILL)
+          .minSize(0, 80)
+          .applyTo(control);
+
       field.setText(m_nlsEntry.getTranslation(l));
       m_translationFields.put(l, control);
     }
@@ -203,30 +211,44 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     });
 
     // layout
-    rootArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
-    rootArea.setLayout(new GridLayout(1, true));
-
-    GridData plgd = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    plgd.exclude = !isShowProjectList();
-    m_projectProposalField.setLayoutData(plgd);
-
-    GridData data = new GridData(300, SWT.DEFAULT);
-    data.grabExcessHorizontalSpace = true;
-    data.horizontalAlignment = SWT.FILL;
-    inputComp.setLayoutData(data);
-    inputComp.setLayout(new GridLayout(1, true));
-
-    data = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-    m_keyField.setLayoutData(data);
-
-    data = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-    data.widthHint = 600;
-    data.heightHint = 100;
-    translationGroup.setLayoutData(data);
-    translationGroup.setLayout(new GridLayout(1, true));
-
-    data = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-    m_copyKeyToClipboard.setLayoutData(data);
+    GridDataFactory
+        .defaultsFor(rootArea)
+        .align(SWT.FILL, SWT.FILL)
+        .applyTo(rootArea);
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(rootArea);
+    GridDataFactory
+        .defaultsFor(m_projectProposalField)
+        .align(SWT.FILL, SWT.CENTER)
+        .exclude(!isShowProjectList())
+        .applyTo(m_projectProposalField);
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(inputComp);
+    GridDataFactory
+        .defaultsFor(inputComp)
+        .hint(300, SWT.DEFAULT)
+        .grab(true, false)
+        .align(SWT.FILL, SWT.CENTER)
+        .applyTo(inputComp);
+    GridDataFactory
+        .defaultsFor(m_keyField)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(m_keyField);
+    GridDataFactory
+        .defaultsFor(translationGroup)
+        .align(SWT.FILL, SWT.FILL)
+        .hint(600, 100)
+        .applyTo(translationGroup);
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(translationGroup);
+    GridDataFactory
+        .defaultsFor(m_copyKeyToClipboard)
+        .align(SWT.FILL, SWT.CENTER)
+        .applyTo(m_copyKeyToClipboard);
     return m_fixDialogArea;
   }
 

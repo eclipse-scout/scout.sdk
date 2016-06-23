@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s;
 /**
  * Classes indices and values used in the scout runtime.
  */
+@SuppressWarnings("squid:S00115")
 public interface IScoutRuntimeTypes {
 
   // type parameter positions
@@ -40,6 +41,10 @@ public interface IScoutRuntimeTypes {
   String RunWithSubject = "org.eclipse.scout.rt.testing.platform.runner.RunWithSubject";
   String RunWithClientSession = "org.eclipse.scout.rt.testing.client.runner.RunWithClientSession";
   String RunWithServerSession = "org.eclipse.scout.rt.testing.server.runner.RunWithServerSession";
+  String WebServiceEntryPoint = "org.eclipse.scout.rt.server.jaxws.provider.annotation.WebServiceEntryPoint";
+  String Authentication = "org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication";
+  String Handler = "org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler";
+  String Clazz = "org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz";
   String Test = "org.junit.Test";
   String BeanMock = "org.eclipse.scout.rt.testing.platform.mock.BeanMock";
   String RunWith = "org.junit.runner.RunWith";
@@ -95,6 +100,7 @@ public interface IScoutRuntimeTypes {
   String AbstractSequenceBox = "org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox";
   String AbstractSmartField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField";
   String AbstractStringColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn";
+  String AbstractStringConfigProperty = "org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty";
   String AbstractStringField = "org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField";
   String AbstractTabBox = "org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox";
   String AbstractTable = "org.eclipse.scout.rt.client.ui.basic.table.AbstractTable";
@@ -102,11 +108,13 @@ public interface IScoutRuntimeTypes {
   String AbstractTableFieldBeanData = "org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData";
   String AbstractTablePageData = "org.eclipse.scout.rt.shared.data.page.AbstractTablePageData";
   String AbstractTableRowData = "org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData";
+  String AbstractValueFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData";
   String AbstractTree = "org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree";
   String AbstractTreeBox = "org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox";
   String AbstractTreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField";
   String AbstractTreeNode = "org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode";
   String AbstractValueField = "org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField";
+  String AbstractWebServiceClient = "org.eclipse.scout.rt.server.jaxws.consumer.AbstractWebServiceClient";
   String AbstractWizard = "org.eclipse.scout.rt.client.ui.wizard.AbstractWizard";
 
   // interfaces
@@ -195,8 +203,16 @@ public interface IScoutRuntimeTypes {
   String ServerTestRunner = "org.eclipse.scout.rt.testing.server.runner.ServerTestRunner";
   String UiServlet = "org.eclipse.scout.rt.ui.html.UiServlet";
   String TriState = "org.eclipse.scout.rt.platform.util.TriState";
+  String LogHandler = "org.eclipse.scout.rt.server.jaxws.handler.LogHandler";
+  String WsConsumerCorrelationIdHandler = "org.eclipse.scout.rt.server.jaxws.handler.WsConsumerCorrelationIdHandler";
+  String WsProviderCorrelationIdHandler = "org.eclipse.scout.rt.server.jaxws.handler.WsProviderCorrelationIdHandler";
   String Mockito = "org.mockito.Mockito";
   String Matchers = "org.mockito.Matchers";
+  String BasicAuthenticationMethod = "org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod";
+  String ConfigFileCredentialVerifier = "org.eclipse.scout.rt.server.commons.authentication.ConfigFileCredentialVerifier";
+  String NullClazz = "org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz$NullClazz";
+  String BinaryResource = "org.eclipse.scout.rt.platform.resource.BinaryResource";
+  String BooleanUtility = "org.eclipse.scout.rt.platform.util.BooleanUtility";
 
   // Menu Types
   String TableMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TableMenuType";

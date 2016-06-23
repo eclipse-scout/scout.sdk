@@ -12,9 +12,7 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.editor;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.MenuManager;
@@ -23,6 +21,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
@@ -239,7 +238,7 @@ public class NlsTable extends Composite {
       col.dispose();
     }
     // utility columns
-    TableColumn colRefs = new TableColumn(table, SWT.LEFT);
+    TableColumn colRefs = new TableColumn(table, SWT.LEAD);
     colRefs.setResizable(false);
     colRefs.setMoveable(false);
     colRefs.setWidth(45);
@@ -250,7 +249,7 @@ public class NlsTable extends Composite {
     int i = NlsTable.INDEX_COLUMN_KEYS;
     // nls java column
 
-    TableColumn jColumn = new TableColumn(table, SWT.LEFT);
+    TableColumn jColumn = new TableColumn(table, SWT.LEAD);
     jColumn.setText(Language.LANGUAGE_KEY.getDispalyName());
     jColumn.setData(LANGUAGE_COLUMN_ID, Language.LANGUAGE_KEY);
     jColumn.setMoveable(false);
@@ -266,7 +265,7 @@ public class NlsTable extends Composite {
   }
 
   public void createTableColumnInternal(Language language) {
-    TableColumn c = new TableColumn(m_table, SWT.LEFT);
+    TableColumn c = new TableColumn(m_table, SWT.LEAD);
     c.setData(LANGUAGE_COLUMN_ID, language);
     if (!language.isLocal()) {
       c.setToolTipText("this language is only in the parent defined!\nCreate a new language for " + language.getLocale().toString() + " to make it locally available.");
@@ -321,11 +320,10 @@ public class NlsTable extends Composite {
     // update translation
     final NlsEntry copy = new NlsEntry(row);
     copy.addTranslation(getLanguageOfTableColumn(column), newText);
-    Job job = new Job("update text") {
+    Job job = new AbstractJob("update text") {
       @Override
-      protected IStatus run(IProgressMonitor monitor) {
+      protected void execute(IProgressMonitor monitor) {
         m_tableModel.getProjects().updateRow(copy, monitor);
-        return Status.OK_STATUS;
       }
     };
     job.setSystem(false);

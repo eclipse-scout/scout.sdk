@@ -139,7 +139,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
           builder.append(nl);
         }
 
-        S2eUtils.writeResources(Collections.singletonList(new ResourceWriteOperation(m_file, builder.toString())), monitor, true);
+        S2eUtils.writeFiles(Collections.singletonList(new ResourceWriteOperation(m_file, builder.toString())), monitor, true);
       }
       catch (IOException | CoreException e) {
         SdkLog.error("could not refresh file: {}", m_file.getName(), e);
@@ -150,6 +150,10 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
   private class P_TranslationFileChangedListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
+      if (event.getBuildKind() != 0) {
+        return; // ignore build events
+      }
+
       IResourceDelta delta = event.getDelta();
       try {
         if (delta != null) {

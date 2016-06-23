@@ -74,7 +74,7 @@ public class SmartField extends Composite {
       }
     });
 
-    m_label = new Label(parent, SWT.INHERIT_DEFAULT | SWT.RIGHT);
+    m_label = new Label(parent, SWT.INHERIT_DEFAULT | SWT.TRAIL);
     m_text = new Text(parent, SWT.INHERIT_DEFAULT | SWT.BORDER);
     m_text.addFocusListener(new FocusAdapter() {
       @Override

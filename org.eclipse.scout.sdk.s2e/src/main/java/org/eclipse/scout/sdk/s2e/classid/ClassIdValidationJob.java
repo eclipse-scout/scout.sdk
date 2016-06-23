@@ -25,9 +25,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ElementChangedEvent;
@@ -236,20 +234,14 @@ public final class ClassIdValidationJob extends AbstractJob {
   }
 
   @Override
-  protected IStatus run(IProgressMonitor monitor) {
-    try {
-      Map<String, List<IAnnotation>> classIdOccurrences = getClassIdOccurrences(monitor);
-      if (monitor.isCanceled()) {
-        return Status.CANCEL_STATUS;
-      }
+  protected void execute(IProgressMonitor monitor) throws CoreException {
+    Map<String, List<IAnnotation>> classIdOccurrences = getClassIdOccurrences(monitor);
+    if (monitor.isCanceled()) {
+      return;
+    }
 
-      deleteDuplicateMarkers();
-      createDuplicateMarkers(classIdOccurrences);
-      return Status.OK_STATUS;
-    }
-    catch (Exception e) {
-      return new ScoutStatus("Error while updating class id duplicate markers.", e);
-    }
+    deleteDuplicateMarkers();
+    createDuplicateMarkers(classIdOccurrences);
   }
 
   private static final class P_ResourceChangeListener implements IElementChangedListener {
@@ -304,9 +296,9 @@ public final class ClassIdValidationJob extends AbstractJob {
       return;
     }
 
-    Job j = new Job("schedule classid validation") {
+    Job j = new AbstractJob("schedule classid validation") {
       @Override
-      protected IStatus run(IProgressMonitor monitor) {
+      protected void execute(IProgressMonitor monitor) {
         try {
           S2eUtils.waitForJdt();
 
@@ -314,7 +306,7 @@ public final class ClassIdValidationJob extends AbstractJob {
           // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
           Set<IType> classIds = S2eUtils.resolveJdtTypes(IScoutRuntimeTypes.ClassId);
           if (classIds.isEmpty()) {
-            return Status.OK_STATUS;
+            return;
           }
 
           // cancel currently running job. we are starting a new one right afterwards
@@ -331,7 +323,6 @@ public final class ClassIdValidationJob extends AbstractJob {
         catch (Exception e) {
           SdkLog.error("Error while preparing to search for duplicate @ClassIds.", e);
         }
-        return Status.OK_STATUS;
       }
     };
     j.setSystem(true);

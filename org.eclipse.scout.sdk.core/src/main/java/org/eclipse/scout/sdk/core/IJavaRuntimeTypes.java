@@ -11,8 +11,9 @@
 package org.eclipse.scout.sdk.core;
 
 /**
- *
+ * Holds class names of the JRE.
  */
+@SuppressWarnings("squid:S00115")
 public interface IJavaRuntimeTypes {
 
   // primitive types
@@ -66,4 +67,6 @@ public interface IJavaRuntimeTypes {
   String Override = "java.lang.Override";
   String SuppressWarnings = "java.lang.SuppressWarnings";
   String Generated = "javax.annotation.Generated";
+  String WebService = "javax.jws.WebService";
+  String WebServiceClient = "javax.xml.ws.WebServiceClient";
 }

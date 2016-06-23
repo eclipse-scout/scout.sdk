@@ -28,6 +28,8 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
@@ -36,14 +38,15 @@ import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.PackageContentProvider;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.StrictHierarchyTypeContentProvider;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.StyledTextField;
+import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.ScoutTier;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 
 /**
@@ -95,9 +98,14 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    parent.setLayout(new GridLayout(1, true));
-
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(parent);
     createIcuGroup(parent);
+  }
+
+  protected int getLabelWidth() {
+    return 100;
   }
 
   protected void createIcuGroup(Composite p) {
@@ -106,15 +114,12 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
       groupName = "New Class Details";
     }
     m_icuGroupField = getFieldToolkit().createGroupBox(p, groupName);
-    m_icuGroupField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_icuGroupField.setLayout(new GridLayout(1, true));
 
-    int labelColWidthPercent = 20;
+    int labelWidth = getLabelWidth();
     boolean enabled = S2eUtils.exists(getSourceFolder());
 
     // source folder
-    m_sourceFolderField = getFieldToolkit().createSourceFolderTextField(m_icuGroupField, "Source Folder", m_sourceFolderTier, labelColWidthPercent);
-    m_sourceFolderField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_sourceFolderField = getFieldToolkit().createSourceFolderField(m_icuGroupField, "Source Folder", m_sourceFolderTier, labelWidth);
     m_sourceFolderField.acceptProposal(getSourceFolder());
     m_sourceFolderField.addProposalListener(new IProposalListener() {
       @Override
@@ -125,8 +130,7 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
     });
 
     // package
-    m_packageField = getFieldToolkit().createPackageTextField(m_icuGroupField, "Package", getJavaProject(), labelColWidthPercent);
-    m_packageField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_packageField = getFieldToolkit().createPackageField(m_icuGroupField, "Package", getJavaProject(), labelWidth);
     m_packageField.setText(getTargetPackage());
     m_packageField.addModifyListener(new ModifyListener() {
       @Override
@@ -138,8 +142,7 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
     m_packageField.setEnabled(enabled);
 
     // name
-    m_nameField = getFieldToolkit().createStyledTextField(m_icuGroupField, "Name", labelColWidthPercent);
-    m_nameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_nameField = getFieldToolkit().createStyledTextField(m_icuGroupField, "Name", TextField.TYPE_LABEL, labelWidth);
     m_nameField.setText(getIcuName());
     m_nameField.setReadOnlySuffix(getReadOnlySuffix());
     m_nameField.addModifyListener(new ModifyListener() {
@@ -155,8 +158,7 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
     if (S2eUtils.exists(superType)) {
       setSuperTypeInternal(superType);
     }
-    m_superTypeField = getFieldToolkit().createAbstractTypeProposalField(m_icuGroupField, "Super Class", getJavaProject(), getSuperTypeBaseClass());
-    m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_superTypeField = getFieldToolkit().createAbstractTypeProposalField(m_icuGroupField, "Super Class", getJavaProject(), getSuperTypeBaseClass(), labelWidth);
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalListener(new IProposalListener() {
       @Override
@@ -166,18 +168,40 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
       }
     });
     m_superTypeField.setEnabled(enabled);
+
+    // layout
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(m_icuGroupField);
+    applyFieldLayoutData(m_icuGroupField);
+    applyFieldLayoutData(m_sourceFolderField);
+    applyFieldLayoutData(m_packageField);
+    applyFieldLayoutData(m_nameField);
+    applyFieldLayoutData(m_superTypeField);
+  }
+
+  protected void applyFieldLayoutData(Control c) {
+    GridDataFactory
+        .defaultsFor(c)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(c);
   }
 
   protected void handleSuperTypeChanged() {
+    // callback for subclasses invoked when the super type is changed
   }
 
   protected void handleSourceFolderChanged() {
+    // callback for subclasses invoked when the source folder is changed
   }
 
   protected void handleTargetPackageChanged() {
+    // callback for subclasses invoked when the target package is changed
   }
 
   protected void handleIcuNameChanged() {
+    // callback for subclasses invoked when the class name is changed
   }
 
   protected IType calcSuperTypeDefault() {
@@ -290,6 +314,22 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
       return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "Please choose a super class.");
     }
     return Status.OK_STATUS;
+  }
+
+  protected ProposalTextField getSourceFolderField() {
+    return m_sourceFolderField;
+  }
+
+  protected ProposalTextField getPackageField() {
+    return m_packageField;
+  }
+
+  protected StyledTextField getNameField() {
+    return m_nameField;
+  }
+
+  protected ProposalTextField getSuperTypeField() {
+    return m_superTypeField;
   }
 
   /**

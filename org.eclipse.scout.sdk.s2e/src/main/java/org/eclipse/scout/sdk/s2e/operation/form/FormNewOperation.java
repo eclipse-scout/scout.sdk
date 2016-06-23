@@ -97,7 +97,7 @@ public class FormNewOperation implements IOperation {
   }
 
   protected FormNewOperation(IJavaEnvironmentProvider provider) {
-    m_javaEnvironmentProvider = provider;
+    m_javaEnvironmentProvider = Validate.notNull(provider);
   }
 
   @Override

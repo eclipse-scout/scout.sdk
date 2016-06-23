@@ -87,10 +87,8 @@ public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
 
   @Override
   protected void validate() {
-    synchronized (m_operations) {
-      for (IOperation op : m_operations) {
-        op.validate();
-      }
+    for (IOperation op : m_operations) {
+      op.validate();
     }
   }
 
