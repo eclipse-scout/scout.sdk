@@ -209,7 +209,7 @@ public interface IScoutRuntimeTypes {
   String Mockito = "org.mockito.Mockito";
   String Matchers = "org.mockito.Matchers";
   String BasicAuthenticationMethod = "org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod";
-  String ConfigFileCredentialVerifier = "org.eclipse.scout.rt.server.commons.authentication.ConfigFileCredentialVerifier";
+  String ConfigFileCredentialVerifier = "org.eclipse.scout.rt.platform.security.ConfigFileCredentialVerifier";
   String NullClazz = "org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz$NullClazz";
   String BinaryResource = "org.eclipse.scout.rt.platform.resource.BinaryResource";
   String BooleanUtility = "org.eclipse.scout.rt.platform.util.BooleanUtility";
