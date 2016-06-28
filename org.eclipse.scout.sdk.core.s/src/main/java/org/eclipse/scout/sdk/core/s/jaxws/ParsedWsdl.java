@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.wsdl.Binding;
@@ -144,6 +145,25 @@ public class ParsedWsdl {
       return Collections.emptyMap();
     }
     return Collections.unmodifiableMap(map);
+  }
+
+  /**
+   * Gets the port name of the given port type within the given service
+   * 
+   * @param service
+   *          The {@link Service} for which the port name should be returned.
+   * @param portType
+   *          The port type whose port name should be returned.
+   * @return The port name or <code>null</code>.
+   */
+  public String getPortName(Service service, PortType portType) {
+    QName nameToSearch = portType.getQName();
+    for (Entry<String, QName> entry : getPorts(service).entrySet()) {
+      if (entry.getValue().equals(nameToSearch)) {
+        return entry.getKey(); // port name
+      }
+    }
+    return null;
   }
 
   /**

@@ -330,7 +330,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
         return isServerProject(element);
       }
     };
-    m_serverProjectField = getFieldToolkit().createProjectProposalField(projectGroupBox, "Create new Project for", serverProjectsFilter, labelWidth);
+    m_serverProjectField = getFieldToolkit().createProjectProposalField(projectGroupBox, "Add new Project to", serverProjectsFilter, labelWidth);
     m_serverProjectField.acceptProposal(getServerProject());
     m_serverProjectField.addProposalListener(new IProposalListener() {
       @Override
