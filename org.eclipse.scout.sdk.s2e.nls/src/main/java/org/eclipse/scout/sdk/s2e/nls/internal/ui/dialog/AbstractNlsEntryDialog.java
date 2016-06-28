@@ -128,6 +128,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
       GridDataFactory
           .defaultsFor(m_fixDialogArea)
           .align(SWT.FILL, SWT.FILL)
+          .grab(true, true)
           .applyTo(m_fixDialogArea);
     }
     final Composite rootArea = new Composite(m_fixDialogArea, SWT.NONE);
@@ -214,6 +215,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     GridDataFactory
         .defaultsFor(rootArea)
         .align(SWT.FILL, SWT.FILL)
+        .grab(true, true)
         .applyTo(rootArea);
     GridLayoutFactory
         .swtDefaults()
@@ -241,6 +243,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
         .defaultsFor(translationGroup)
         .align(SWT.FILL, SWT.FILL)
         .hint(600, 100)
+        .grab(true, true)
         .applyTo(translationGroup);
     GridLayoutFactory
         .swtDefaults()
