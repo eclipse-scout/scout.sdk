@@ -12,19 +12,24 @@ package org.eclipse.scout.sdk.core.s.testing;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.maven.cli.CLIManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
-import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
@@ -175,6 +180,12 @@ public final class CoreScoutTestingUtils {
   public static File createTestProject() throws IOException {
     File targetDirectory = Files.createTempDirectory(CoreScoutTestingUtils.class.getSimpleName() + "-projectDir").toFile();
     ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", SystemUtils.JAVA_SPECIFICATION_VERSION);
+
+    // create a config.properties in the src/test/resources of the server to use the jax-ws-ri of the JRE instead of metro which is the default.
+    File testConfigProperties = new File(targetDirectory, PROJECT_ARTIFACT_ID + '/' + PROJECT_ARTIFACT_ID + ".server/src/test/resources/config.properties");
+    byte[] configContent = ("jaxws.implementor=" + IScoutRuntimeTypes.JaxWsRISpecifics + "\n").getBytes(StandardCharsets.UTF_8);
+    Files.write(testConfigProperties.toPath(), configContent, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
+
     return targetDirectory;
   }
 
@@ -186,7 +197,12 @@ public final class CoreScoutTestingUtils {
    * @throws IOException
    */
   public static void runMavenCleanCompile(File pomDir) throws IOException {
-    new MavenCliRunner().execute(pomDir, new String[]{"clean", "compile", "-B", "-X"}, null, null);
+    MavenRunner.execute(new MavenBuild()
+        .withWorkingDirectory(pomDir)
+        .withGoal("clean")
+        .withGoal("compile")
+        .withOption(CLIManager.BATCH_MODE)
+        .withOption(CLIManager.DEBUG));
   }
 
   /**
@@ -197,6 +213,13 @@ public final class CoreScoutTestingUtils {
    * @throws IOException
    */
   public static void runMavenCleanTest(File pomDir) throws IOException {
-    new MavenCliRunner().execute(pomDir, new String[]{"clean", "test", "-B", "-X", "-Dmaster_test_forkCount=1", "-Dmaster_test_runOrder=filesystem"}, null, null);
+    MavenRunner.execute(new MavenBuild()
+        .withWorkingDirectory(pomDir)
+        .withGoal("clean")
+        .withGoal("test")
+        .withOption(CLIManager.BATCH_MODE)
+        .withOption(CLIManager.DEBUG)
+        .withProperty("master_test_forkCount", "1")
+        .withProperty("master_test_runOrder", "filesystem"));
   }
 }

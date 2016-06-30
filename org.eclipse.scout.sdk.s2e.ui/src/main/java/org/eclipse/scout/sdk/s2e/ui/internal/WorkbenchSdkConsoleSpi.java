@@ -30,7 +30,7 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 
-public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
+public class WorkbenchSdkConsoleSpi implements SdkConsole.ISdkConsoleSpi {
 
   @Override
   public void clear() {

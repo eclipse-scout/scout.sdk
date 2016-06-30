@@ -213,6 +213,7 @@ public interface IScoutRuntimeTypes {
   String NullClazz = "org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz$NullClazz";
   String BinaryResource = "org.eclipse.scout.rt.platform.resource.BinaryResource";
   String BooleanUtility = "org.eclipse.scout.rt.platform.util.BooleanUtility";
+  String JaxWsRISpecifics = "org.eclipse.scout.rt.server.jaxws.implementor.JaxWsRISpecifics";
 
   // Menu Types
   String TableMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TableMenuType";

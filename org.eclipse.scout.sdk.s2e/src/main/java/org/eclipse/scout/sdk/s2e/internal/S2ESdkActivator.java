@@ -11,8 +11,11 @@
 package org.eclipse.scout.sdk.s2e.internal;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenCliRunner;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.s2e.internal.dto.DtoDerivedResourceHandlerFactory;
 import org.eclipse.scout.sdk.s2e.internal.trigger.DerivedResourceManager;
+import org.eclipse.scout.sdk.s2e.operation.MavenBuildOperation.M2eMavenRunner;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -35,10 +38,14 @@ public class S2ESdkActivator extends Plugin {
     // DTO auto update
     m_derivedResourceManager = new DerivedResourceManager();
     m_derivedResourceManager.addDerivedResourceHandlerFactory(new DtoDerivedResourceHandlerFactory());
+
+    MavenRunner.setMavenRunner(new M2eMavenRunner());
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
+    MavenRunner.setMavenRunner(new MavenCliRunner()); // reset to default
+
     m_derivedResourceManager.dispose();
     m_derivedResourceManager = null;
 

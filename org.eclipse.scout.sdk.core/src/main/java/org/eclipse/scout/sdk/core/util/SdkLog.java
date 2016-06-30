@@ -314,7 +314,19 @@ public final class SdkLog {
     if (level == null) {
       return false;
     }
-    return getLogLevel().intValue() <= level.intValue();
+    return isLevelEnabled(level.intValue());
+  }
+
+  /**
+   * Checks if at least the given level is enabled. If this method returns <code>true</code> this means that a message
+   * with given {@link Level} would be printed.
+   * 
+   * @param level
+   *          The level to check. Must be the {@link Level#intValue()} of one of the constants defined in {@link Level}.
+   * @return <code>true</code> if at least the given {@link Level} is currently active.
+   */
+  public static boolean isLevelEnabled(int level) {
+    return getLogLevel().intValue() <= level;
   }
 
   /**

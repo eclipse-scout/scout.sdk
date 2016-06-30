@@ -71,7 +71,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     }
 
     //attach sdk console to workbench
-    SdkConsole.spi = new WorkbenchSdkConsoleSpi();
+    SdkConsole.setConsoleSpi(new WorkbenchSdkConsoleSpi());
 
     // comment source builder
     CommentSourceBuilderFactory.commentSourceBuilderSpi = new JdtSettingsCommentSourceBuilderDelegate();
@@ -108,6 +108,8 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     }
 
     CommentSourceBuilderFactory.commentSourceBuilderSpi = null;
+
+    SdkConsole.setConsoleSpi(null); // reset to default
 
     plugin = null;
 
