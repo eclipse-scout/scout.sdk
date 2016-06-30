@@ -226,7 +226,9 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
   @Override
   public void setInterfaceSignatures(Collection<String> interfaceSignatures) {
     m_interfaceSignatures.clear();
-    m_interfaceSignatures.addAll(interfaceSignatures);
+    if (interfaceSignatures != null) {
+      m_interfaceSignatures.addAll(interfaceSignatures);
+    }
   }
 
   @Override

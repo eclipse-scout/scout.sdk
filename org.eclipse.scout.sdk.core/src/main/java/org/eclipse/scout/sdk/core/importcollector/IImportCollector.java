@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.core.importcollector;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 
@@ -68,9 +68,10 @@ public interface IImportCollector {
   void reserveElement(SignatureDescriptor cand);
 
   /**
-   * Do not use this method directly, use {@link SignatureUtils#useSignature(String, IImportCollector)} instead
+   * Do not use this method directly, use {@link IImportValidator#useSignature(String)} instead
    *
-   * @return the simple name for this signature and registers the name. Use {@link #checkElement(SignatureDescriptor)}
+   * @return the simple name for this signature and registers the name. Use
+   *         {@link #checkCurrentScope(SignatureDescriptor)} and {@link #checkExistingImports(SignatureDescriptor)}
    *         before calling this method.
    */
   String registerElement(SignatureDescriptor cand);
@@ -112,7 +113,7 @@ public interface IImportCollector {
 
   /**
    * Gets the list of imports to be created (sorted and grouped, including empty lines).
-   * 
+   *
    * @param includeExisting
    *          Specifies if imports that already exist on the underlying {@link ICompilationUnit} should be returned as
    *          well.

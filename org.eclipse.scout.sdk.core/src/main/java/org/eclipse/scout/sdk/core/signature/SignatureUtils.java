@@ -51,10 +51,18 @@ public final class SignatureUtils {
   }
 
   /**
-   * Convenience for: t != null ? {@link IType#signature()} : null
+   * Gets the signature of the given {@link IType}.
+   * 
+   * @param t
+   *          The {@link IType} or <code>null</code>.
+   * @return The signature of the given {@link IType} or <code>null</code> if the given {@link IType} is
+   *         <code>null</code>.
    */
   public static String getTypeSignature(IType t) {
-    return t != null ? t.signature() : null;
+    if (t == null) {
+      return null;
+    }
+    return t.signature();
   }
 
   /**
