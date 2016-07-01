@@ -202,6 +202,8 @@ public class MavenBuildOperation implements IOperation {
     };
 
     launchManager.addLaunchListener(launchListener);
+
+    SdkLog.debug("Executing embedded {}", getBuild().toString());
     launchConfiguration.launch("run", progress.newChild(5), false, true);
   }
 

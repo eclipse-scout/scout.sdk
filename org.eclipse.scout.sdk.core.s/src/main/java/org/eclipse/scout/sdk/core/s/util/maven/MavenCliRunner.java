@@ -49,6 +49,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
   public void execute(MavenBuild build) {
     Validate.notNull(build);
     try (URLClassLoader loader = MavenSandboxClassLoaderFactory.build()) {
+      SdkLog.debug("Executing embedded {}", build.toString());
       execute(Validate.notNull(build.getWorkingDirectory()), build.getOptions(), build.getGoals(), build.getProperties(), loader);
     }
     catch (IOException e) {
@@ -66,8 +67,6 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       Thread.currentThread().setContextClassLoader(loader);
 
       String[] mavenArgs = getMavenArgs(new LinkedHashSet<>(options), goals, new LinkedHashMap<>(props));
-      SdkLog.debug("Executing embedded maven with arguments: {}", new Object[]{mavenArgs});
-
       runMavenInSandbox(mavenArgs, workingDirectory, SdkLog.getLogLevel(), loader);
     }
     finally {

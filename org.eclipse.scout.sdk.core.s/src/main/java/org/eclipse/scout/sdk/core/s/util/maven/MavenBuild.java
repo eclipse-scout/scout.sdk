@@ -72,7 +72,7 @@ public class MavenBuild {
 
   /**
    * Gets if this {@link MavenBuild} has the given option set.
-   * 
+   *
    * @param option
    *          The option to check.
    * @return <code>true</code> if this build contains the given option. <code>false</code> otherwise.
@@ -83,7 +83,7 @@ public class MavenBuild {
 
   /**
    * Gets if this {@link MavenBuild} has the given option set.
-   * 
+   *
    * @param option
    *          The option to check.
    * @return <code>true</code> if this build contains the given option. <code>false</code> otherwise.
@@ -248,6 +248,22 @@ public class MavenBuild {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Maven build in dir '").append(getWorkingDirectory()).append("': ");
+    for (String goal : getGoals()) {
+      builder.append(goal).append(' ');
+    }
+    for (String option : getOptions()) {
+      builder.append('-').append(option).append(' ');
+    }
+    for (String prop : getPropertiesAsList()) {
+      builder.append("-D").append(prop).append(' ');
+    }
+    return builder.toString();
   }
 
   /**
