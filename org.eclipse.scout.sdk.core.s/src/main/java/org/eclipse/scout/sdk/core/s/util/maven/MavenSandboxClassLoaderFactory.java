@@ -15,8 +15,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.CodeSource;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.util.SdkException;
 
@@ -38,7 +38,7 @@ public final class MavenSandboxClassLoaderFactory {
     return URLClassLoader.newInstance(getMavenJarsUrls(), null);
   }
 
-  protected static URL[] getMavenJarsUrls() {
+  static URL[] getMavenJarsUrls() {
     // contains a sample class of all jars required by the maven runtime.
     // the codesource of these classes will be the source of the classpath of the sandbox classloader.
     String[] baseClasses = new String[]{
@@ -92,8 +92,8 @@ public final class MavenSandboxClassLoaderFactory {
    *          The fqn of the classes
    * @return the {@link URL}s of the jars that contain the given class names.
    */
-  protected static URL[] getJarsUrls(String[] baseClasses) {
-    Set<URL> urls = new LinkedHashSet<>(baseClasses.length);
+  static URL[] getJarsUrls(String[] baseClasses) {
+    List<URL> urls = new ArrayList<>(baseClasses.length);
     for (String className : baseClasses) {
       urls.add(getJarContaining(className));
     }
@@ -107,7 +107,7 @@ public final class MavenSandboxClassLoaderFactory {
    *          the fully qualified class name.
    * @return The {@link URL} of the jar that contains the given class.
    */
-  protected static URL getJarContaining(String className) {
+  static URL getJarContaining(String className) {
     try {
       Class<?> clazz = MavenSandboxClassLoaderFactory.class.getClassLoader().loadClass(className);
       URL url = getJarContaining(clazz);
@@ -124,7 +124,7 @@ public final class MavenSandboxClassLoaderFactory {
   /**
    * @return The {@link URL} of the jar or folder that contains the given {@link Class}.
    */
-  protected static URL getJarContaining(Class<?> clazz) {
+  static URL getJarContaining(Class<?> clazz) {
     if (clazz == null) {
       return null;
     }

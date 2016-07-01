@@ -178,6 +178,7 @@ public class MavenBuildOperation implements IOperation {
     final ILaunchListener launchListener = new ILaunchListener() {
       @Override
       public void launchRemoved(ILaunch launch) {
+        // not interesting
       }
 
       @Override
@@ -198,6 +199,7 @@ public class MavenBuildOperation implements IOperation {
 
       @Override
       public void launchAdded(ILaunch launch) {
+        // not interesting
       }
     };
 
