@@ -31,7 +31,6 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
-import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.operation.CompilationUnitWriteOperation;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
@@ -82,17 +81,13 @@ public class ScoutProjectNewOperation implements IOperation {
         version = null;
       }
 
-      // get maven settings from workspace
-      String globalSettings = getMavenSettings(MavenPlugin.getMavenConfiguration().getGlobalSettingsFile());
-      String settings = getMavenSettings(MavenPlugin.getMavenConfiguration().getUserSettingsFile());
-
       if (monitor.isCanceled()) {
         return;
       }
 
       // create project on disk (using archetype)
       SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 100);
-      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getJavaVersion(), groupId, artifactId, version, globalSettings, settings);
+      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getJavaVersion(), groupId, artifactId, version);
       progress.worked(5);
 
       // import into workspace
@@ -128,21 +123,6 @@ public class ScoutProjectNewOperation implements IOperation {
         w.run(monitor, workingCopyManager);
       }
     }
-  }
-
-  public static String getMavenSettings(String in) {
-    if (StringUtils.isBlank(in)) {
-      return null;
-    }
-
-    File p = new File(in);
-    String absolutePath = p.getAbsolutePath();
-    if (!p.isFile()) {
-      SdkLog.warning("Maven settings file '{}' not found. Using empty settings.", absolutePath);
-      return null;
-    }
-
-    return absolutePath;
   }
 
   /**

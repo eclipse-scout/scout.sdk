@@ -29,6 +29,8 @@ import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.typeparameter.ITypeParameterSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.typeparameter.TypeParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
@@ -44,6 +46,8 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
   public static final String EXEC_LOAD_DATA_FILTER_ARG_NAME = "filter";
 
   private boolean m_isPageWithTable;
+  private boolean m_isAbstractPage;
+  private boolean m_createNlsMethod;
   private String m_pageDataSignature;
   private String m_superTypeSignature;
   private String m_pageServiceIfcSignature;
@@ -52,6 +56,7 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
 
   public PageSourceBuilder(String elementName, String packageName, IJavaEnvironment env) {
     super(elementName, packageName, env);
+    m_createNlsMethod = true; // default to true
   }
 
   @Override
@@ -62,6 +67,22 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
     addType(pageBuilder);
 
     pageBuilder.setFlags(Flags.AccPublic);
+    String typeParamName = "T";
+    if (isAbstractPage()) {
+      pageBuilder.setFlags(pageBuilder.getFlags() | Flags.AccAbstract);
+
+      if (isPageWithTable()) {
+        ITypeParameterSourceBuilder tableTypeParamBuilder = new TypeParameterSourceBuilder(typeParamName);
+        String typeParamBoundary = pageBuilder.getFullyQualifiedName()
+            + ISignatureConstants.C_GENERIC_START
+            + typeParamName
+            + ISignatureConstants.C_GENERIC_END
+            + '.'
+            + INNER_TABLE_NAME;
+        tableTypeParamBuilder.addBoundSignature(Signature.createTypeSignature(typeParamBoundary));
+        pageBuilder.addTypeParameter(tableTypeParamBuilder);
+      }
+    }
     String superTypeSignature = getSuperTypeSignature();
     if (isPageWithTable()) {
       ITypeSourceBuilder tableBuilder = createTableBuilder();
@@ -69,7 +90,12 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
 
       StringBuilder superTypeBuilder = new StringBuilder(SignatureUtils.toFullyQualifiedName(getSuperTypeSignature()));
       superTypeBuilder.append(ISignatureConstants.C_GENERIC_START);
-      superTypeBuilder.append(tableBuilder.getFullyQualifiedName());
+      if (isAbstractPage()) {
+        superTypeBuilder.append(typeParamName);
+      }
+      else {
+        superTypeBuilder.append(tableBuilder.getFullyQualifiedName());
+      }
       superTypeBuilder.append(ISignatureConstants.C_GENERIC_END);
       superTypeSignature = Signature.createTypeSignature(superTypeBuilder.toString());
     }
@@ -86,34 +112,38 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
     }
 
     // getConfiguredTitle
-    IMethodSourceBuilder getConfiguredTitle = ScoutMethodSourceBuilderFactory.createNlsMethod("getConfiguredTitle", getEntityName());
-    pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredTitle), getConfiguredTitle);
+    if (isCreateNlsMethod()) {
+      IMethodSourceBuilder getConfiguredTitle = ScoutMethodSourceBuilderFactory.createNlsMethod("getConfiguredTitle", getEntityName());
+      pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredTitle), getConfiguredTitle);
+    }
 
     // execLoadData / execCreateChildPages
-    if (isPageWithTable()) {
-      IMethodSourceBuilder execLoadData = MethodSourceBuilderFactory.createOverride(pageBuilder, getPackageName(), getJavaEnvironment(), "execLoadData");
-      execLoadData.setBody(new ISourceBuilder() {
-        @Override
-        public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-          if (getPageServiceIfcSignature() == null) {
-            source.append(CoreUtils.getCommentBlock("implement data load")).append(lineDelimiter);
-            source.append("// e.g.: importPageData(BEANS.get(IMyService.class).getTableData(").append(EXEC_LOAD_DATA_FILTER_ARG_NAME).append("));");
+    if (!isAbstractPage()) {
+      if (isPageWithTable()) {
+        IMethodSourceBuilder execLoadData = MethodSourceBuilderFactory.createOverride(pageBuilder, getPackageName(), getJavaEnvironment(), "execLoadData");
+        execLoadData.setBody(new ISourceBuilder() {
+          @Override
+          public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+            if (getPageServiceIfcSignature() == null) {
+              source.append(CoreUtils.getCommentBlock("implement data load")).append(lineDelimiter);
+              source.append("// e.g.: importPageData(BEANS.get(IMyService.class).getTableData(").append(EXEC_LOAD_DATA_FILTER_ARG_NAME).append("));");
+            }
+            else {
+              source.append("importPageData(").append(validator.useName(IScoutRuntimeTypes.BEANS)).append(".get(")
+                  .append(validator.useSignature(getPageServiceIfcSignature())).append(SuffixConstants.SUFFIX_class).append(").").append(getDataFetchMethodName()).append('(').append(EXEC_LOAD_DATA_FILTER_ARG_NAME).append("));");
+            }
           }
-          else {
-            source.append("importPageData(").append(validator.useName(IScoutRuntimeTypes.BEANS)).append(".get(")
-                .append(validator.useSignature(getPageServiceIfcSignature())).append(SuffixConstants.SUFFIX_class).append(").").append(getDataFetchMethodName()).append('(').append(EXEC_LOAD_DATA_FILTER_ARG_NAME).append("));");
-          }
-        }
-      });
-      execLoadData.removeAnnotation(IScoutRuntimeTypes.Order);
-      execLoadData.removeAnnotation(IScoutRuntimeTypes.ConfigOperation);
-      pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execLoadData), execLoadData);
-    }
-    else {
-      IMethodSourceBuilder execCreateChildPages = MethodSourceBuilderFactory.createOverride(pageBuilder, getPackageName(), getJavaEnvironment(), "execCreateChildPages");
-      execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.Order);
-      execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.ConfigOperation);
-      pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execCreateChildPages), execCreateChildPages);
+        });
+        execLoadData.removeAnnotation(IScoutRuntimeTypes.Order);
+        execLoadData.removeAnnotation(IScoutRuntimeTypes.ConfigOperation);
+        pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execLoadData), execLoadData);
+      }
+      else {
+        IMethodSourceBuilder execCreateChildPages = MethodSourceBuilderFactory.createOverride(pageBuilder, getPackageName(), getJavaEnvironment(), "execCreateChildPages");
+        execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.Order);
+        execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.ConfigOperation);
+        pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execCreateChildPages), execCreateChildPages);
+      }
     }
   }
 
@@ -170,5 +200,21 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
 
   public void setDataFetchMethodName(String dataFetchMethodName) {
     m_dataFetchMethodName = dataFetchMethodName;
+  }
+
+  public boolean isAbstractPage() {
+    return m_isAbstractPage;
+  }
+
+  public void setAbstractPage(boolean isAbstractPage) {
+    m_isAbstractPage = isAbstractPage;
+  }
+
+  public boolean isCreateNlsMethod() {
+    return m_createNlsMethod;
+  }
+
+  public void setCreateNlsMethod(boolean createNlsMethod) {
+    m_createNlsMethod = createNlsMethod;
   }
 }

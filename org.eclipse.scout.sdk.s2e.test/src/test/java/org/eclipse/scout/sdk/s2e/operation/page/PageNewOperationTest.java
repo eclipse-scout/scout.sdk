@@ -12,8 +12,11 @@ package org.eclipse.scout.sdk.s2e.operation.page;
 
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
+
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
@@ -24,6 +27,7 @@ import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
+import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.testing.SdkPlatformTestRunner;
 import org.eclipse.scout.sdk.s2e.testing.mock.PlatformMock;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -64,55 +68,106 @@ public class PageNewOperationTest {
 
   @Test
   public void testPageWithTableFull() throws CoreException {
-    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, m_testSourceFolder, true);
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, m_testSourceFolder, true, false);
   }
 
   @Test
   public void testPageWithTableNoTest() throws CoreException {
-    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, null, true);
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, null, true, false);
   }
 
   @Test
   public void testPageWithTableNoService() throws CoreException {
-    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, null, null, true);
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, null, null, true, false);
   }
 
   @Test
   public void testPageWithTableNoService2() throws CoreException {
-    testPageCreation(m_dtoSourceFolder, null, m_sharedSourceFolder, null, true);
+    testPageCreation(m_dtoSourceFolder, null, m_sharedSourceFolder, null, true, false);
   }
 
   @Test
   public void testPageWithTableOnly() throws CoreException {
-    testPageCreation(null, null, null, null, true);
+    testPageCreation(null, null, null, null, true, false);
   }
 
   @Test
   public void testPageWithNodesFull() throws CoreException {
-    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, m_testSourceFolder, false);
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, m_testSourceFolder, false, false);
   }
 
   @Test
   public void testPageWithNodesNoTest() throws CoreException {
-    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, null, false);
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, null, false, false);
   }
 
   @Test
   public void testPageWithNodesNoService() throws CoreException {
-    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, null, null, false);
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, null, null, false, false);
   }
 
   @Test
   public void testPageWithNodesNoService2() throws CoreException {
-    testPageCreation(m_dtoSourceFolder, null, m_sharedSourceFolder, null, false);
+    testPageCreation(m_dtoSourceFolder, null, m_sharedSourceFolder, null, false, false);
   }
 
   @Test
   public void testPageWithNodesOnly() throws CoreException {
-    testPageCreation(null, null, null, null, false);
+    testPageCreation(null, null, null, null, false, false);
   }
 
-  protected void testPageCreation(IPackageFragmentRoot dtoSourceFolder, IPackageFragmentRoot serverSourceFolder, IPackageFragmentRoot sharedSourceFolder, IPackageFragmentRoot testSourceFolder, boolean isPageWithTable) throws CoreException {
+  @Test
+  public void testPageWithTableFullWithAbstract() throws CoreException {
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, m_testSourceFolder, true, true);
+  }
+
+  @Test
+  public void testPageWithTableNoTestWithAbstract() throws CoreException {
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, null, true, true);
+  }
+
+  @Test
+  public void testPageWithTableNoServiceWithAbstract() throws CoreException {
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, null, null, true, true);
+  }
+
+  @Test
+  public void testPageWithTableNoService2WithAbstract() throws CoreException {
+    testPageCreation(m_dtoSourceFolder, null, m_sharedSourceFolder, null, true, true);
+  }
+
+  @Test
+  public void testPageWithTableOnlyWithAbstract() throws CoreException {
+    testPageCreation(null, null, null, null, true, true);
+  }
+
+  @Test
+  public void testPageWithNodesFullWithAbstract() throws CoreException {
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, m_testSourceFolder, false, true);
+  }
+
+  @Test
+  public void testPageWithNodesNoTestWithAbstract() throws CoreException {
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, m_sharedSourceFolder, null, false, true);
+  }
+
+  @Test
+  public void testPageWithNodesNoServiceWithAbstract() throws CoreException {
+    testPageCreation(m_dtoSourceFolder, m_serverSourceFolder, null, null, false, true);
+  }
+
+  @Test
+  public void testPageWithNodesNoService2WithAbstract() throws CoreException {
+    testPageCreation(m_dtoSourceFolder, null, m_sharedSourceFolder, null, false, true);
+  }
+
+  @Test
+  public void testPageWithNodesOnlyWithAbstract() throws CoreException {
+    testPageCreation(null, null, null, null, false, true);
+  }
+
+  protected void testPageCreation(IPackageFragmentRoot dtoSourceFolder, IPackageFragmentRoot serverSourceFolder, IPackageFragmentRoot sharedSourceFolder, IPackageFragmentRoot testSourceFolder,
+      boolean isPageWithTable, final boolean isCreateAbstractPage) throws CoreException {
     if (isPageWithTable) {
       // define super class to use
       when(m_superType.getFullyQualifiedName()).thenReturn(IScoutRuntimeTypes.AbstractPageWithTable);
@@ -126,7 +181,15 @@ public class PageNewOperationTest {
       when(m_superType.getFullyQualifiedName()).thenReturn(IScoutRuntimeTypes.AbstractPageWithNodes);
     }
 
-    PageNewOperation pno = new PageNewOperation(m_envProvider);
+    PageNewOperation pno = new PageNewOperation(m_envProvider) {
+      @Override
+      protected void updatePageDatas(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+        if (isCreateAbstractPage) {
+          ScoutSdkCore.getDerivedResourceManager().trigger(Collections.singleton(getCreatedAbstractPage().getResource()));
+        }
+        ScoutSdkCore.getDerivedResourceManager().trigger(Collections.singleton(getCreatedPage().getResource()));
+      }
+    };
     pno.setClientSourceFolder(m_clientSourceFolder);
     pno.setPackage("org.eclipse.scout.sdk.s2e.client.test");
     String suffix = null;
@@ -136,6 +199,7 @@ public class PageNewOperationTest {
     else {
       suffix = ISdkProperties.SUFFIX_PAGE_WITH_NODES;
     }
+    pno.setCreateAbstractPage(isCreateAbstractPage);
     pno.setPageName("My" + suffix);
     pno.setSuperType(m_superType);
     pno.setPageDataSourceFolder(dtoSourceFolder);
@@ -150,9 +214,19 @@ public class PageNewOperationTest {
     IType createdPage = Validate.notNull(pno.getCreatedPage());
     CoreTestingUtils.assertNoCompileErrors(env, createdPage.getFullyQualifiedName(), createdPage.getCompilationUnit().getSource());
 
+    if (isCreateAbstractPage) {
+      IType createdAbstractPage = Validate.notNull(pno.getCreatedAbstractPage());
+      CoreTestingUtils.assertNoCompileErrors(env, createdAbstractPage.getFullyQualifiedName(), createdAbstractPage.getCompilationUnit().getSource());
+    }
+
     if (isPageWithTable && S2eUtils.exists(dtoSourceFolder)) {
       IType createdPageData = Validate.notNull(pno.getCreatedPageData());
       CoreTestingUtils.assertNoCompileErrors(env, createdPageData.getFullyQualifiedName(), createdPageData.getCompilationUnit().getSource());
+
+      if (isCreateAbstractPage) {
+        IType createdAbstractPageData = Validate.notNull(pno.getCreatedAbstractPageData());
+        CoreTestingUtils.assertNoCompileErrors(env, createdAbstractPageData.getFullyQualifiedName(), createdAbstractPageData.getCompilationUnit().getSource());
+      }
 
       if (S2eUtils.exists(serverSourceFolder) && S2eUtils.exists(sharedSourceFolder)) {
         IType createdServiceIfc = pno.getCreatedServiceIfc();

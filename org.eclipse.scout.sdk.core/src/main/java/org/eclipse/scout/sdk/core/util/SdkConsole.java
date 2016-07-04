@@ -25,6 +25,31 @@ import org.apache.commons.lang3.StringUtils;
 public final class SdkConsole {
 
   /**
+   * The currently used sdk console strategy.
+   */
+  private static SdkConsole.ISdkConsoleSpi spi = new P_DefaultConsoleSpi();
+
+  /**
+   * @return the currently used sdk console strategy.
+   */
+  public static synchronized ISdkConsoleSpi getConsoleSpi() {
+    return spi;
+  }
+
+  /**
+   * Sets a new {@link ISdkConsoleSpi}.
+   *
+   * @param newSpi
+   *          The new console strategy. If it is <code>null</code> the default strategy is used.
+   */
+  public static synchronized void setConsoleSpi(ISdkConsoleSpi newSpi) {
+    if (newSpi == null) {
+      newSpi = new P_DefaultConsoleSpi();
+    }
+    spi = newSpi;
+  }
+
+  /**
    * Clears the console contents.
    */
   public static synchronized void clear() {
@@ -49,31 +74,35 @@ public final class SdkConsole {
   }
 
   /**
-   * <h3>{@link SdkConsoleSpi}</h3> Console provider strategy.
+   * <h3>{@link ISdkConsoleSpi}</h3> Console provider strategy.
    *
    * @author Ivan Motsch
    * @since 5.2.0
    */
-  public interface SdkConsoleSpi {
+  public interface ISdkConsoleSpi {
     void clear();
 
     void println(Level level, String s, Throwable... exceptions);
   }
 
-  private static final SdkConsole.SdkConsoleSpi DEFAULT_SPI = new SdkConsole.SdkConsoleSpi() {
+  private static final class P_DefaultConsoleSpi implements ISdkConsoleSpi {
+
+    private static final PrintStream OUT = System.out; // do not inline these constants!
+    private static final PrintStream ERR = System.err;
+
     @Override
     public void clear() {
-      System.out.println(StringUtils.leftPad("", 50, '_'));
+      OUT.println(StringUtils.leftPad("", 50, '_'));
     }
 
     @Override
     public void println(Level level, String s, Throwable... exceptions) {
       PrintStream out = null;
       if (Level.SEVERE.equals(level)) {
-        out = System.err;
+        out = ERR;
       }
       else {
-        out = System.out;
+        out = OUT;
       }
 
       if (s != null) {
@@ -90,11 +119,5 @@ public final class SdkConsole {
         }
       }
     }
-  };
-
-  /**
-   * The currently used sdk console strategy.
-   */
-  public static volatile SdkConsole.SdkConsoleSpi spi = DEFAULT_SPI;
-
+  }
 }

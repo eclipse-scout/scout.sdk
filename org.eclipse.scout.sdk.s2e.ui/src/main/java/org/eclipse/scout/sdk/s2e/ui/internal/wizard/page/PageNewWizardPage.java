@@ -27,6 +27,9 @@ import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.ScoutTier;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
@@ -41,9 +44,12 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
 
   public static final String PROP_SHARED_SOURCE_FOLDER = "sharedSourceFolder";
   public static final String PROP_SERVER_SOURCE_FOLDER = "serverSourceFolder";
+  public static final String PROP_CREATE_ABSTRACT_PAGE = "createAbstractPage";
 
   protected ProposalTextField m_sharedSourceFolder;
   protected ProposalTextField m_serverSourceFolder;
+  private Button m_createAbstractPageButton;
+  private boolean m_isPageWithTable;
 
   public PageNewWizardPage(PackageContainer packageContainer) {
     super(PageNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_PAGE_WITH_TABLE, IScoutRuntimeTypes.IPage, IScoutRuntimeTypes.AbstractPageWithTable, ScoutTier.Client);
@@ -64,8 +70,33 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
     guessSharedFolders();
 
     createPageServcieGroup(parent);
+    createOptionsGroup(parent);
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PAGE_NEW_WIZARD_PAGE);
+  }
+
+  protected void createOptionsGroup(Composite p) {
+    Group optionsGroup = getFieldToolkit().createGroupBox(p, "Options");
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(optionsGroup);
+    GridDataFactory
+        .defaultsFor(optionsGroup)
+        .align(SWT.FILL, SWT.BEGINNING)
+        .applyTo(optionsGroup);
+
+    m_createAbstractPageButton = getFieldToolkit().createCheckBox(optionsGroup, "Create an Abstract Super Page", isCreateAbstractPage());
+    m_createAbstractPageButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setIsCreateAbstractPageInternal(m_createAbstractPageButton.getSelection());
+        pingStateChanging();
+      }
+    });
+    GridDataFactory
+        .defaultsFor(m_createAbstractPageButton)
+        .indent(5, 2)
+        .applyTo(m_createAbstractPageButton);
   }
 
   @Override
@@ -78,19 +109,26 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
   protected void handleSuperTypeChanged() {
     super.handleSuperTypeChanged();
     IType superType = getSuperType();
-    if (S2eUtils.exists(superType)) {
-      try {
-        ITypeHierarchy supertypeHierarchy = superType.newSupertypeHierarchy(null);
-        if (S2eUtils.hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IPageWithTable)) {
-          setReadOnlySuffix(ISdkProperties.SUFFIX_PAGE_WITH_TABLE);
-        }
-        else {
-          setReadOnlySuffix(ISdkProperties.SUFFIX_PAGE_WITH_NODES);
-        }
+    if (!S2eUtils.exists(superType)) {
+      setIsPageWithTable(false);
+      return;
+    }
+
+    try {
+      ITypeHierarchy supertypeHierarchy = superType.newSupertypeHierarchy(null);
+      setIsPageWithTable(S2eUtils.hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IPageWithTable));
+      if (isPageWithTable()) {
+        setReadOnlySuffix(ISdkProperties.SUFFIX_PAGE_WITH_TABLE);
       }
-      catch (JavaModelException e) {
-        SdkLog.warning("Unable to calculate super type hierarchy for type '{}'.", superType.getFullyQualifiedName(), e);
+      else {
+        setReadOnlySuffix(ISdkProperties.SUFFIX_PAGE_WITH_NODES);
       }
+      if (m_serverSourceFolder != null) {
+        m_serverSourceFolder.setEnabled(isPageWithTable());
+      }
+    }
+    catch (JavaModelException e) {
+      SdkLog.warning("Unable to calculate super type hierarchy for type '{}'.", superType.getFullyQualifiedName(), e);
     }
   }
 
@@ -137,6 +175,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
     // server source folder
     m_serverSourceFolder = getFieldToolkit().createSourceFolderField(parent, "Server Source Folder", ScoutTier.Server, getLabelWidth());
     m_serverSourceFolder.acceptProposal(getServerSourceFolder());
+    m_serverSourceFolder.setEnabled(isPageWithTable());
     m_serverSourceFolder.addProposalListener(new IProposalListener() {
       @Override
       public void proposalAccepted(Object proposal) {
@@ -208,5 +247,35 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
 
   protected void setServerSourceFolderInternal(IPackageFragmentRoot serverSourceFolder) {
     setProperty(PROP_SERVER_SOURCE_FOLDER, serverSourceFolder);
+  }
+
+  public boolean isCreateAbstractPage() {
+    Boolean val = getProperty(PROP_CREATE_ABSTRACT_PAGE, Boolean.class);
+    return val != null && val.booleanValue();
+  }
+
+  public void setIsCreateAbstractPage(boolean createAbstractPage) {
+    try {
+      setStateChanging(true);
+      setIsCreateAbstractPageInternal(createAbstractPage);
+      if (isControlCreated() && m_createAbstractPageButton != null) {
+        m_createAbstractPageButton.setSelection(createAbstractPage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setIsCreateAbstractPageInternal(boolean createAbstractPage) {
+    setProperty(PROP_CREATE_ABSTRACT_PAGE, createAbstractPage);
+  }
+
+  protected boolean isPageWithTable() {
+    return m_isPageWithTable;
+  }
+
+  protected void setIsPageWithTable(boolean isPageWithTable) {
+    m_isPageWithTable = isPageWithTable;
   }
 }

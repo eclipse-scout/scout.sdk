@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2e.internal.trigger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -157,7 +157,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       return Collections.emptySet();
     }
 
-    Set<IResource> cleanSet = new HashSet<>(resources.size());
+    Set<IResource> cleanSet = new LinkedHashSet<>(resources.size());
     for (IResource r : resources) {
       if (r != null && r.isAccessible() && !existsParentIn(resources, r)) {
         cleanSet.add(r);
@@ -408,7 +408,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     }
 
     private static Set<IResource> collectFilesFromDelta(IResourceDelta d) {
-      final Set<IResource> scope = new HashSet<>();
+      final Set<IResource> scope = new LinkedHashSet<>();
       try {
         d.accept(new IResourceDeltaVisitor() {
           @Override

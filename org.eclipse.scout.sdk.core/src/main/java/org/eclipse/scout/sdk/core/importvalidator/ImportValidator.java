@@ -10,15 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.importvalidator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 
 /**
  * <h3>{@link ImportValidator}</h3>
@@ -45,7 +47,7 @@ public class ImportValidator implements IImportValidator {
 
   @Override
   public String useType(IType type) {
-    return useSignature(SignatureUtils.getTypeSignature(type));
+    return useSignature(Validate.notNull(type).signature());
   }
 
   @Override
@@ -77,14 +79,37 @@ public class ImportValidator implements IImportValidator {
         sigBuilder.append(Signature.getSignatureSimpleName(signature));
         break;
       case ISignatureConstants.TYPE_VARIABLE_SIGNATURE:
-        sigBuilder.append(SignatureUtils.toFullyQualifiedName(signature));
+        String[] typeParameterBounds = Signature.getTypeParameterBounds(signature);
+        String name = Signature.getTypeVariable(signature);
+        sigBuilder.append(name);
+        if (typeParameterBounds.length > 0) {
+          sigBuilder.append(" extends ");
+          sigBuilder.append(useSignatureInternal(typeParameterBounds[0], false));
+          for (int i = 1; i < typeParameterBounds.length; i++) {
+            sigBuilder.append(" & ").append(useSignatureInternal(typeParameterBounds[i], false));
+          }
+        }
         break;
       default:
-        String[] typeArguments = Signature.getTypeArguments(signature);
-        signature = Signature.getTypeErasure(signature);
+        List<String> segments = getSegments(signature);
+        String signatureToImport = signature;
+        int firstParameterizedSegmentIndex = getFirstSegmentWithTypeArgumentsInQualifier(segments);
+        if (firstParameterizedSegmentIndex >= 0) {
+          StringBuilder segmentsToFirstParameterized = new StringBuilder();
+          for (int i = 0; i <= firstParameterizedSegmentIndex; i++) {
+            if (i != 0) {
+              segmentsToFirstParameterized.append(ISignatureConstants.C_DOT);
+            }
+            segmentsToFirstParameterized.append(segments.get(i));
+          }
+          if (segmentsToFirstParameterized.charAt(segmentsToFirstParameterized.length() - 1) != ISignatureConstants.C_SEMICOLON) {
+            segmentsToFirstParameterized.append(ISignatureConstants.C_SEMICOLON);
+          }
+          signatureToImport = segmentsToFirstParameterized.toString();
+        }
 
         //check and register
-        SignatureDescriptor cand = new SignatureDescriptor(signature);
+        SignatureDescriptor cand = new SignatureDescriptor(Signature.getTypeErasure(signatureToImport));
         IImportCollector collector = getImportCollector();
         String use = collector.checkExistingImports(cand);
         if (use == null) {
@@ -99,8 +124,10 @@ public class ImportValidator implements IImportValidator {
         if (use == null) {
           use = collector.registerElement(cand);
         }
-        sigBuilder.append(use);
 
+        // build reference
+        sigBuilder.append(use);
+        String[] typeArguments = Signature.getTypeArguments(signatureToImport);
         if (typeArguments.length > 0) {
           sigBuilder.append(ISignatureConstants.C_GENERIC_START);
           sigBuilder.append(useSignatureInternal(typeArguments[0], true));
@@ -110,11 +137,64 @@ public class ImportValidator implements IImportValidator {
           }
           sigBuilder.append(ISignatureConstants.C_GENERIC_END);
         }
+
+        // subsequent segments
+        if (firstParameterizedSegmentIndex >= 0) {
+          for (int i = firstParameterizedSegmentIndex + 1; i < segments.size(); i++) {
+            String segmentSig = ISignatureConstants.C_RESOLVED + segments.get(i) + ISignatureConstants.C_SEMICOLON;
+            sigBuilder.append(ISignatureConstants.C_DOT).append(useSignatureInternal(segmentSig, false));
+          }
+        }
         break;
     }
     for (int i = 0; i < arrayCount; i++) {
       sigBuilder.append("[]");
     }
     return sigBuilder.toString();
+  }
+
+  protected static int getFirstSegmentWithTypeArgumentsInQualifier(List<String> segments) {
+    for (int i = 0; i < segments.size(); i++) {
+      if (segments.get(i).indexOf(ISignatureConstants.C_GENERIC_START) >= 0) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  protected static List<String> getSegments(String signature) {
+    List<String> segments = new ArrayList<>();
+    StringBuilder segmentBuilder = new StringBuilder();
+    char[] sig = signature.toCharArray();
+    int argCount = 0;
+    for (int i = 0; i < sig.length; i++) {
+      char curChar = sig[i];
+      switch (curChar) {
+        case ISignatureConstants.C_DOT:
+          boolean insideTypeArg = argCount > 0;
+          if (insideTypeArg) {
+            segmentBuilder.append(curChar);
+          }
+          else {
+            // new segment
+            segments.add(segmentBuilder.toString());
+            segmentBuilder.delete(0, segmentBuilder.length());
+          }
+          break;
+        case ISignatureConstants.C_GENERIC_START:
+          argCount++;
+          segmentBuilder.append(curChar);
+          break;
+        case ISignatureConstants.C_GENERIC_END:
+          argCount--;
+          segmentBuilder.append(curChar);
+          break;
+        default:
+          segmentBuilder.append(curChar);
+          break;
+      }
+    }
+    segments.add(segmentBuilder.toString());
+    return segments;
   }
 }

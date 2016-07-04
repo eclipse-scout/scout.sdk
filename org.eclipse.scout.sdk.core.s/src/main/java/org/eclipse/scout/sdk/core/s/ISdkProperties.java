@@ -44,6 +44,8 @@ public interface ISdkProperties {
   String SUFFIX_WS_ENTRY_POINT = "WebServiceEntryPoint";
   String SUFFIX_WS_ENTRY_POINT_DEFINITION = SUFFIX_WS_ENTRY_POINT + "Definition";
 
+  String PREFIX_ABSTRACT = "Abstract";
+
   String INNER_TABLE_TYPE_NAME = "Table";
   String INNER_TREE_TYPE_NAME = "Tree";
   String INNER_CALENDAR_TYPE_NAME = "Calendar";

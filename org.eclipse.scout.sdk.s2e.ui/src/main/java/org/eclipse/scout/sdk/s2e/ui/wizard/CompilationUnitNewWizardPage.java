@@ -619,7 +619,7 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
 
   public void setReadOnlySuffix(String newSuffix) {
     m_readOnlySuffix = newSuffix;
-    if (isControlCreated()) {
+    if (m_nameField != null) {
       m_nameField.setReadOnlySuffix(newSuffix);
     }
   }

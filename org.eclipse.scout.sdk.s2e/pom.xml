@@ -116,6 +116,8 @@
               !org.eclipse.text*,
               !org.eclipse.m2e.core*,
               !org.apache.maven.*,
+              !org.eclipse.scout.sdk.core.*,
+              !org.slf4j*,
               *
             </Import-Package>
             <Require-Bundle>

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation.page;
 
-import java.util.Collections;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.CoreException;
@@ -27,6 +25,7 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.page.PageSourceBuilder;
 import org.eclipse.scout.sdk.core.s.sourcebuilder.testcase.TestSourceBuilder;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
@@ -41,9 +40,10 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
+import org.eclipse.scout.sdk.s2e.internal.dto.DtoDerivedResourceHandler;
+import org.eclipse.scout.sdk.s2e.operation.CompilationUnitWriteOperation;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.operation.service.ServiceNewOperation;
@@ -69,10 +69,13 @@ public class PageNewOperation implements IOperation {
   private IPackageFragmentRoot m_testSourceFolder;
   private String m_package;
   private IType m_superType;
+  private boolean m_createAbstractPage;
 
   // out
+  private IType m_createdAbstractPage;
   private IType m_createdPage;
   private IType m_createdPageData;
+  private IType m_createdAbstractPageData;
   private IType m_createdServiceIfc;
   private IType m_createdServiceImpl;
   private IType m_createdServiceTest;
@@ -102,34 +105,72 @@ public class PageNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 5);
+    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 10);
 
-    // calc names
     String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getPackage());
-    boolean isPageWithTable = S2eUtils.hierarchyContains(getSuperType().newSupertypeHierarchy(null), IScoutRuntimeTypes.IPageWithTable);
 
+    boolean isPageWithTable = S2eUtils.hierarchyContains(getSuperType().newSupertypeHierarchy(progress.newChild(1)), IScoutRuntimeTypes.IPageWithTable);
     boolean isCreatePageData = isPageWithTable && S2eUtils.exists(getPageDataSourceFolder());
+
     if (isCreatePageData) {
-      setCreatedPageData(createPageData(sharedPackage, progress.newChild(1), workingCopyManager));
+      setCreatedPageData(createPageData(getPageName(), sharedPackage, progress.newChild(1), workingCopyManager));
     }
 
     boolean isCreateService = isCreatePageData && S2eUtils.exists(getSharedSourceFolder()) && S2eUtils.exists(getServerSourceFolder());
     if (isCreateService) {
       createService(sharedPackage, calcServiceBaseName(), progress.newChild(2), workingCopyManager);
     }
-    progress.setWorkRemaining(2);
+    progress.setWorkRemaining(6);
+
+    if (isCreateAbstractPage()) {
+      if (isCreatePageData) {
+        setCreatedAbstractPageData(createPageData(ISdkProperties.PREFIX_ABSTRACT + getPageName(), sharedPackage, progress.newChild(1), workingCopyManager));
+      }
+      setCreatedAbstractPage(createAbstractPage(isPageWithTable, progress.newChild(1), workingCopyManager));
+      setSuperType(getCreatedAbstractPage());
+    }
+    progress.setWorkRemaining(4);
 
     setCreatedPage(createPage(isPageWithTable, progress.newChild(1), workingCopyManager));
 
     if (isCreateService) {
       setCreatedServiceTest(createServiceTest(progress.newChild(1), workingCopyManager));
     }
-    progress.setWorkRemaining(0);
+    progress.setWorkRemaining(2);
 
-    // schedule DTO update because the pageData has been created as empty java file
+    // run DTO update because the pageData has been created as empty java file
     if (isCreatePageData) {
-      ScoutSdkCore.getDerivedResourceManager().trigger(Collections.singleton(getCreatedPage().getResource()));
+      updatePageDatas(progress.newChild(2), workingCopyManager);
     }
+    progress.setWorkRemaining(0);
+  }
+
+  protected void updatePageDatas(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 10);
+
+    IJavaEnvironment clientEnv = getEnvProvider().get(getCreatedPage().getJavaProject());
+    clientEnv.reload();
+
+    if (isCreateAbstractPage()) {
+      CompilationUnitWriteOperation abstractPageDataUpdateOp = DtoDerivedResourceHandler.newDtoOp(getCreatedAbstractPage(), S2eUtils.jdtTypeToScoutType(getCreatedAbstractPage(), clientEnv), getEnvProvider());
+      abstractPageDataUpdateOp.run(progress.newChild(1), workingCopyManager);
+
+      IJavaEnvironment sharedEnv = getEnvProvider().get(getCreatedAbstractPageData().getJavaProject());
+
+      // make the new content of the AbstractPageDat available for the shared env. Because the workingcopy has not yet been written, the file on the disk still contains the old content -> update with new
+      sharedEnv.registerCompilationUnitOverride(getCreatedAbstractPageData().getPackageFragment().getElementName(),
+          getCreatedAbstractPageData().getCompilationUnit().getElementName(),
+          new StringBuilder(abstractPageDataUpdateOp.getContent()));
+      sharedEnv.reload(); // reload the shared env because we just changed the abstractPageData
+    }
+
+    CompilationUnitWriteOperation pageDataUpdateOp = DtoDerivedResourceHandler.newDtoOp(getCreatedPage(), S2eUtils.jdtTypeToScoutType(getCreatedPage(), clientEnv), getEnvProvider());
+    pageDataUpdateOp.run(progress.newChild(1), workingCopyManager);
+  }
+
+  protected IType createAbstractPage(boolean isPageWithTable, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    PageSourceBuilder pageBuilder = createPageBuilder(isPageWithTable, true);
+    return S2eUtils.writeType(getClientSourceFolder(), pageBuilder, pageBuilder.getJavaEnvironment(), monitor, workingCopyManager);
   }
 
   protected String calcServiceMethodName() {
@@ -220,15 +261,25 @@ public class PageNewOperation implements IOperation {
     return new ServiceNewOperation(getEnvProvider());
   }
 
-  protected PageSourceBuilder createPageBuilder(boolean isPageWithTable) {
-    PageSourceBuilder pageBuilder = new PageSourceBuilder(getPageName(), getPackage(), getEnvProvider().get(getClientSourceFolder().getJavaProject()));
+  protected PageSourceBuilder createPageBuilder(boolean isPageWithTable, boolean isAbstractPage) {
+    String name = getPageName();
+    if (isAbstractPage) {
+      name = ISdkProperties.PREFIX_ABSTRACT + name;
+    }
+    PageSourceBuilder pageBuilder = new PageSourceBuilder(name, getPackage(), getEnvProvider().get(getClientSourceFolder().getJavaProject()));
+    pageBuilder.setAbstractPage(isAbstractPage);
+    pageBuilder.setCreateNlsMethod(isCreateAbstractPage() == isAbstractPage);
     if (ClassIdGenerators.isAutomaticallyCreateClassIdAnnotation()) {
       pageBuilder.setClassIdValue(ClassIdGenerators.generateNewId(new ClassIdGenerationContext(getPackage() + '.' + getPageName())));
     }
-    if (S2eUtils.exists(getCreatedPageData())) {
-      pageBuilder.setPageDataSignature(Signature.createTypeSignature(getCreatedPageData().getFullyQualifiedName()));
+    IType dto = getCreatedPageData();
+    if (isAbstractPage) {
+      dto = getCreatedAbstractPageData();
     }
-    if (S2eUtils.exists(getCreatedServiceIfc())) {
+    if (S2eUtils.exists(dto)) {
+      pageBuilder.setPageDataSignature(Signature.createTypeSignature(dto.getFullyQualifiedName()));
+    }
+    if (!isAbstractPage && S2eUtils.exists(getCreatedServiceIfc())) {
       pageBuilder.setPageServiceIfcSignature(Signature.createTypeSignature(getCreatedServiceIfc().getFullyQualifiedName()));
     }
     pageBuilder.setDataFetchMethodName(getDataFetchMethodName());
@@ -239,12 +290,24 @@ public class PageNewOperation implements IOperation {
   }
 
   protected IType createPage(boolean isPageWithTable, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    PageSourceBuilder pageBuilder = createPageBuilder(isPageWithTable);
+    PageSourceBuilder pageBuilder = createPageBuilder(isPageWithTable, false);
+    if (isCreateAbstractPage() && isPageWithTable) {
+      ITypeSourceBuilder mainType = pageBuilder.getMainType();
+
+      ITypeSourceBuilder tableBuilder = mainType.getTypes().get(0);
+      String superTypeFqn = getCreatedAbstractPage().getFullyQualifiedName()
+          + ISignatureConstants.C_GENERIC_START
+          + tableBuilder.getFullyQualifiedName()
+          + ISignatureConstants.C_GENERIC_END
+          + '.'
+          + PageSourceBuilder.INNER_TABLE_NAME;
+      tableBuilder.setSuperTypeSignature(Signature.createTypeSignature(superTypeFqn));
+    }
     return S2eUtils.writeType(getClientSourceFolder(), pageBuilder, pageBuilder.getJavaEnvironment(), monitor, workingCopyManager);
   }
 
-  protected IType createPageData(String sharedPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    String pageDataName = getPageName() + ISdkProperties.SUFFIX_DTO;
+  protected IType createPageData(String pageName, String sharedPackage, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    String pageDataName = pageName + ISdkProperties.SUFFIX_DTO;
 
     ICompilationUnitSourceBuilder pageDataBuilder = new CompilationUnitSourceBuilder(pageDataName + SuffixConstants.SUFFIX_STRING_java, sharedPackage);
     ITypeSourceBuilder formDataTypeBuilder = new TypeSourceBuilder(pageDataName);
@@ -369,5 +432,29 @@ public class PageNewOperation implements IOperation {
 
   protected void setDataFetchMethodName(String dataFetchMethodName) {
     m_dataFetchMethodName = dataFetchMethodName;
+  }
+
+  public boolean isCreateAbstractPage() {
+    return m_createAbstractPage;
+  }
+
+  public void setCreateAbstractPage(boolean createAbstractPage) {
+    m_createAbstractPage = createAbstractPage;
+  }
+
+  public IType getCreatedAbstractPage() {
+    return m_createdAbstractPage;
+  }
+
+  protected void setCreatedAbstractPage(IType createdAbstractPage) {
+    m_createdAbstractPage = createdAbstractPage;
+  }
+
+  public IType getCreatedAbstractPageData() {
+    return m_createdAbstractPageData;
+  }
+
+  protected void setCreatedAbstractPageData(IType createdAbstractPageData) {
+    m_createdAbstractPageData = createdAbstractPageData;
   }
 }

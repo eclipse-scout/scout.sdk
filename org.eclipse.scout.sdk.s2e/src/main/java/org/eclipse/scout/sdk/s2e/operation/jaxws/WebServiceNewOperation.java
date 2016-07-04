@@ -244,7 +244,7 @@ public class WebServiceNewOperation implements IOperation {
         epdsb.setPortTypeFqn(getPackage() + '.' + names.getPortTypeClassName(portTypeName));
         epdsb.setEntryPointPackage(getPackage());
         epdsb.setEntryPointName(names.getEntryPointClassName(portTypeName));
-        epdsb.setPortName(portTypeName);
+        epdsb.setPortName(getParsedWsdl().getPortName(service.getKey(), pt));
         epdsb.setServiceName(names.getWebServiceNameFromWsdl());
         epdsb.setup();
         m_createdEntryPointDefinitions.add(S2eUtils.writeType(S2eUtils.getPrimarySourceFolder(getJaxWsProject()), epdsb, env, monitor, workingCopyManager));

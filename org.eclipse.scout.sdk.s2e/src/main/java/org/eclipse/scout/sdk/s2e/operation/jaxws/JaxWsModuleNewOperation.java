@@ -37,7 +37,6 @@ import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsModuleNewHelper;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
-import org.eclipse.scout.sdk.s2e.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 import org.xml.sax.SAXException;
@@ -74,10 +73,6 @@ public class JaxWsModuleNewOperation implements IOperation {
     SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 100);
 
     try {
-      // get maven settings from workspace
-      String globalSettings = ScoutProjectNewOperation.getMavenSettings(MavenPlugin.getMavenConfiguration().getGlobalSettingsFile());
-      String settings = ScoutProjectNewOperation.getMavenSettings(MavenPlugin.getMavenConfiguration().getUserSettingsFile());
-
       // get pom from target project
       IFile pomFile = getServerModule().getProject().getFile(IMavenConstants.POM);
       if (!pomFile.isAccessible()) {
@@ -89,7 +84,7 @@ public class JaxWsModuleNewOperation implements IOperation {
       progress.worked(5);
 
       // create project on disk (using archetype)
-      File createdProjectDir = JaxWsModuleNewHelper.createModule(pomFile.getLocation().toFile(), getArtifactId(), globalSettings, settings);
+      File createdProjectDir = JaxWsModuleNewHelper.createModule(pomFile.getLocation().toFile(), getArtifactId());
       progress.worked(10);
 
       // import into workspace

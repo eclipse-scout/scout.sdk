@@ -23,10 +23,12 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.maven.cli.CLIManager;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.CoreScoutUtils;
-import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.w3c.dom.Document;
@@ -73,22 +75,24 @@ public final class JaxWsModuleNewHelper {
     return getParentPomOf(projectPomFile, doc);
   }
 
-  public static File createModule(File targetModulePomFile, String artifactId, String mavenGlobalSettings, String mavenSettings) throws IOException {
+  public static File createModule(File targetModulePomFile, String artifactId) throws IOException {
     try {
-      return createModule(targetModulePomFile.getParentFile().getParentFile(), targetModulePomFile, artifactId, mavenGlobalSettings, mavenSettings);
+      return createModuleImpl(targetModulePomFile, artifactId);
     }
     catch (ParserConfigurationException | SAXException e) {
       throw new IOException(e);
     }
   }
 
-  static File createModule(File targetDirectory, File targetModulePomFile, String artifactId, String mavenGlobalSettings, String mavenSettings) throws IOException, ParserConfigurationException, SAXException {
+  static File createModuleImpl(File targetModulePomFile, String artifactId) throws IOException, ParserConfigurationException, SAXException {
     // validate input
-    Validate.notNull(targetDirectory);
     Validate.notNull(targetModulePomFile);
-    Validate.notNull(artifactId);
-    Validate.isTrue(targetDirectory.isDirectory(), "Target directory could not be found.");
     Validate.isTrue(targetModulePomFile.isFile(), "Target module pom file could not be found.");
+    Validate.notNull(artifactId);
+
+    File targetDirectory = targetModulePomFile.getParentFile().getParentFile();
+    Validate.notNull(targetDirectory);
+    Validate.isTrue(targetDirectory.isDirectory(), "Target directory could not be found.");
 
     // read values from target pom
     DocumentBuilder docBuilder = CoreUtils.createDocumentBuilder();
@@ -116,26 +120,48 @@ public final class JaxWsModuleNewHelper {
       displayName = "Server Web Services";
     }
 
-    // generate model using archetype
-    String[] args = new String[]{"archetype:generate", "-B",
-        "-DarchetypeGroupId=org.eclipse.scout.archetypes", "-DarchetypeArtifactId=scout-jaxws-module", "-DarchetypeVersion=" + ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION,
-        "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=" + version, "-Dpackage=''",
-        "-DdisplayName=" + displayName, "-DparentArtifactId=" + parentArtifactId
-    };
-
     File tempDirectory = Files.createTempDirectory("jaxws-module-tmp").toFile();
     String createdProjectName = null;
     try {
-      // execute archetype generation
-      new MavenCliRunner().execute(tempDirectory, args, mavenGlobalSettings, mavenSettings);
+      MavenBuild archetypeBuild = new MavenBuild()
+          .withWorkingDirectory(tempDirectory)
+          .withGoal("archetype:generate")
+          .withOption(CLIManager.BATCH_MODE)
+          .withProperty("archetypeGroupId", "org.eclipse.scout.archetypes")
+          .withProperty("archetypeArtifactId", "scout-jaxws-module")
+          .withProperty("archetypeVersion", ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION)
+          .withProperty("groupId", groupId)
+          .withProperty("artifactId", artifactId)
+          .withProperty("version", version)
+          .withProperty("package", "not.used") // we must specify a package value, but this variable is not used by the archetype
+          .withProperty("displayName", displayName)
+          .withProperty("parentArtifactId", parentArtifactId);
 
-      // move to final destination
+      // execute archetype generation
+      MavenRunner.execute(archetypeBuild);
       File[] listFiles = tempDirectory.listFiles();
       if (listFiles == null || listFiles.length < 1) {
         throw new IOException("created project dir not found. Project creation failed.");
       }
       File createdProjectDir = listFiles[0];
+
+      // delete .gitkeep files
+      String gitkeep1Location = "src/main/resources/WEB-INF/wsdl/.gitkeep";
+      File gitkeep = new File(createdProjectDir, gitkeep1Location);
+      if (!gitkeep.isFile()) {
+        throw new IOException(gitkeep1Location + " file not found.");
+      }
+      Files.delete(gitkeep.toPath());
+      String gitkeep2Location = "src/main/java/.gitkeep";
+      gitkeep = new File(createdProjectDir, gitkeep2Location);
+      if (!gitkeep.isFile()) {
+        throw new IOException(gitkeep2Location + " file not found.");
+      }
+      Files.delete(gitkeep.toPath());
+
       createdProjectName = createdProjectDir.getName();
+
+      // move to final destination
       CoreUtils.moveDirectory(createdProjectDir, targetDirectory);
     }
     finally {

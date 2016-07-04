@@ -156,7 +156,7 @@ public class WebServiceNewOperationTest {
       @Override
       protected IJavaProject createNewJaxWsModule(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
         try {
-          File createdProjectDir = JaxWsModuleNewHelper.createModule(new File(serverModule, IMavenConstants.POM), getArtifactId(), null, null);
+          File createdProjectDir = JaxWsModuleNewHelper.createModule(new File(serverModule, IMavenConstants.POM), getArtifactId());
           return factory.createJavaProject(createdProjectDir);
         }
         catch (IOException e) {
