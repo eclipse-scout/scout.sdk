@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.model.ScoutModelHierarchy;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -111,9 +112,8 @@ public class TemplateProposalDescriptor {
 
     for (String defaultSuperType : m_defaultSuperTypeFqns) {
       String simpleName = Signature.getSimpleName(defaultSuperType);
-      final String abstrPrefix = "Abstract";
-      if (simpleName.startsWith(abstrPrefix)) {
-        simpleName = simpleName.substring(abstrPrefix.length());
+      if (simpleName.startsWith(ISdkProperties.PREFIX_ABSTRACT)) {
+        simpleName = simpleName.substring(ISdkProperties.PREFIX_ABSTRACT.length());
       }
       if (simpleName.toLowerCase().contains(searchString)) {
         return true;

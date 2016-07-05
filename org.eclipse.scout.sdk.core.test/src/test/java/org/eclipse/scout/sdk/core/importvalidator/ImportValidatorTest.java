@@ -10,9 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.importvalidator;
 
+import java.io.Serializable;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.RandomAccess;
 
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
@@ -183,6 +187,84 @@ public class ImportValidatorTest {
 
     Assert.assertEquals(ImportTestClass.Long.class.getSimpleName(), validator.useName(importTest.innerTypes().first().name()));
     Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), validator.useName(org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
+  }
+
+  @Test
+  public void testWildcardSignature() {
+    IImportCollector iv = createImportCollector("a.b.c");
+    IImportValidator validator = new ImportValidator(iv);
+    String ref = validator.useName("? extends java.lang.Long");
+    String ref2 = validator.useName("? extends java.test.Long");
+    String ref3 = validator.useName("?");
+    Assert.assertEquals("? extends Long", ref);
+    Assert.assertEquals("? extends java.test.Long", ref2);
+    Assert.assertEquals("?", ref3);
+  }
+
+  @Test
+  public void testTypeVariableSignature() {
+    IImportCollector iv = createImportCollector("a.b.c");
+    IImportValidator validator = new ImportValidator(iv);
+    String typeParameterSignature1 = Signature.createTypeParameterSignature("TYPE_PARAM_NAME", new String[]{
+        Signature.createTypeSignature(AbstractList.class.getName()),
+        Signature.createTypeSignature(RandomAccess.class.getName()),
+        Signature.createTypeSignature(Serializable.class.getName())});
+    String typeParameterSignature2 = Signature.createTypeParameterSignature("TYPE_PARAM_NAME", new String[]{
+        Signature.createTypeSignature("java.test.RandomAccess")});
+    String typeParameterSignature3 = Signature.createTypeParameterSignature("TYPE_PARAM_NAME", new String[]{});
+    String typeParameterSignature4 = Signature.createTypeParameterSignature("TYPE_PARAM_NAME", new String[]{
+        Signature.createTypeSignature(AbstractList.class.getName()),
+        Signature.createTypeSignature(RandomAccess.class.getName())});
+
+    String ref1 = validator.useSignature(typeParameterSignature1);
+    Assert.assertEquals("TYPE_PARAM_NAME extends AbstractList & RandomAccess & Serializable", ref1);
+    String ref2 = validator.useSignature(typeParameterSignature2);
+    Assert.assertEquals("TYPE_PARAM_NAME extends java.test.RandomAccess", ref2);
+    String ref3 = validator.useSignature(typeParameterSignature3);
+    Assert.assertEquals("TYPE_PARAM_NAME", ref3);
+    String ref4 = validator.useSignature(typeParameterSignature4);
+    Assert.assertEquals("TYPE_PARAM_NAME extends AbstractList & RandomAccess", ref4);
+  }
+
+  @Test
+  public void testWithInnerClassOfPrimaryTypeHavingTypeArgs() {
+    IImportCollector iv = createImportCollector("a.b.c");
+    IImportValidator validator = new ImportValidator(iv);
+    String ref = validator.useName("d.e.f.MyClassOne<java.lang.Long>.InnerClass.SecondInner");
+    Assert.assertEquals("MyClassOne<Long>.InnerClass.SecondInner", ref);
+
+    ref = validator.useName("d.e.f.MyClassTwo<java.lang.Long>.InnerClass<java.lang.Boolean>.SecondInner<java.util.Map<java.lang.Long, java.lang.String>>.ThirdInner");
+    Assert.assertEquals("MyClassTwo<Long>.InnerClass<Boolean>.SecondInner<Map<Long, String>>.ThirdInner", ref);
+
+    ref = validator.useName("d.e.f.TopLevel.MyClassThree<java.lang.Long>.InnerClass<java.lang.Boolean>.SecondInner<java.util.Map<java.lang.Long, java.lang.String>>.ThirdInner");
+    Assert.assertEquals("MyClassThree<Long>.InnerClass<Boolean>.SecondInner<Map<Long, String>>.ThirdInner", ref);
+
+    ref = validator.useName("d.e.f.TopLevelAnother.MyClassThree<java.lang.Long>.InnerClass<org.test.Boolean>.SecondInner<java.util.Map<java.lang.Long[][][], java.lang.String[]>>.ThirdInner");
+    Assert.assertEquals("d.e.f.TopLevelAnother.MyClassThree<Long>.InnerClass<org.test.Boolean>.SecondInner<Map<Long[][][], String[]>>.ThirdInner", ref);
+
+    Collection<String> importsToCreate = iv.getImports();
+    Assert.assertEquals(7, importsToCreate.size());
+    Assert.assertTrue(importsToCreate.contains("d.e.f.MyClassOne"));
+    Assert.assertTrue(importsToCreate.contains("java.lang.Long"));
+    Assert.assertTrue(importsToCreate.contains("d.e.f.MyClassTwo"));
+    Assert.assertTrue(importsToCreate.contains("java.lang.Boolean"));
+    Assert.assertTrue(importsToCreate.contains("java.util.Map"));
+    Assert.assertTrue(importsToCreate.contains("java.lang.String"));
+    Assert.assertTrue(importsToCreate.contains("d.e.f.TopLevel.MyClassThree"));
+    Assert.assertFalse(importsToCreate.contains("d.e.f.TopLevelAnother.MyClassThree")); // d.e.f.TopLevelAnother.MyClassThree is not part of the imports becuase it would be fully qualified!
+    Assert.assertFalse(importsToCreate.contains("org.test.Boolean")); // org.test.Boolean is not part of the list because it would be fully qualified!
+  }
+
+  @Test
+  public void testGetSegments() {
+    String[] origSegments = new String[]{"d", "e", "f", "MyClass<java.lang.Long[]>", "InnerClass<java.lang.Boolean>", "SecondInner<java.util.Map<java.lang.Long, java.lang.String[][][]>[]>", "ThirdInner"};
+    StringBuilder sigBuilder = new StringBuilder();
+    for (String s : origSegments) {
+      sigBuilder.append(s).append('.');
+    }
+    sigBuilder.delete(sigBuilder.length() - 1, sigBuilder.length());
+    List<String> segments = ImportValidator.getSegments(sigBuilder.toString());
+    Assert.assertArrayEquals(origSegments, segments.toArray());
   }
 
   @Test

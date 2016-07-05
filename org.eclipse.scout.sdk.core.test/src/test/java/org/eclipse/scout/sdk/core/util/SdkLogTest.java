@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.util.SdkConsole.SdkConsoleSpi;
+import org.eclipse.scout.sdk.core.util.SdkConsole.ISdkConsoleSpi;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -89,10 +89,10 @@ public class SdkLogTest {
   public void testLog() {
     // lock on console to ensure no other thread writes to the console while we are testing (in case tests are running in parallel)
     synchronized (SdkConsole.class) {
-      SdkConsoleSpi backup = SdkConsole.spi;
+      ISdkConsoleSpi backup = SdkConsole.getConsoleSpi();
       try {
         final StringBuilder logContent = new StringBuilder();
-        SdkConsole.spi = new SdkConsoleSpi() {
+        SdkConsole.setConsoleSpi(new ISdkConsoleSpi() {
 
           @Override
           public void println(Level level, String s, Throwable... exceptions) {
@@ -111,7 +111,7 @@ public class SdkLogTest {
           public void clear() {
             logContent.delete(0, logContent.length());
           }
-        };
+        });
 
         SdkLog.warning("hello");
         Assert.assertEquals("[WARNING]: hello", logContent.toString());
@@ -149,7 +149,7 @@ public class SdkLogTest {
 
       }
       finally {
-        SdkConsole.spi = backup;
+        SdkConsole.setConsoleSpi(backup);
       }
     }
   }

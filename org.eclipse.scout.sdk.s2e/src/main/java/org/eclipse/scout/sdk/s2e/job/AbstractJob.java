@@ -95,10 +95,13 @@ public abstract class AbstractJob extends Job {
   }
 
   private IStatus runInternal(IProgressMonitor monitor) {
-    Exception exc = null;
+    Throwable exc = null;
     try {
       validate();
       execute(monitor);
+    }
+    catch (LinkageError e) {
+      exc = e;
     }
     catch (Exception e) {
       exc = e;

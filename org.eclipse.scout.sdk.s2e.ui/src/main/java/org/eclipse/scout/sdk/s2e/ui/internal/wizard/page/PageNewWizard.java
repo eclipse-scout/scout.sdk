@@ -75,6 +75,7 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
     if (blockingFolders == null) {
       blockingFolders = new HashSet<>(5);
     }
+    op.setCreateAbstractPage(m_page1.isCreateAbstractPage());
     op.setClientSourceFolder(m_page1.getSourceFolder());
     blockingFolders.add(m_page1.getSourceFolder().getResource());
     op.setPackage(m_page1.getTargetPackage());

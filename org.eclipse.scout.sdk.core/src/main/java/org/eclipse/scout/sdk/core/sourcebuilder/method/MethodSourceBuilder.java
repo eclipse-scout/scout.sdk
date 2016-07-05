@@ -218,7 +218,9 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
   @Override
   public void setExceptionSignatures(List<String> exceptionSignatures) {
     m_exceptionSignatures.clear();
-    m_exceptionSignatures.addAll(exceptionSignatures);
+    if (exceptionSignatures != null) {
+      m_exceptionSignatures.addAll(exceptionSignatures);
+    }
   }
 
   @Override

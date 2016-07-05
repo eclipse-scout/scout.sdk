@@ -27,8 +27,10 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.maven.cli.CLIManager;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
-import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.w3c.dom.Document;
@@ -56,22 +58,19 @@ public final class ScoutProjectNewHelper {
   private ScoutProjectNewHelper() {
   }
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName) throws IOException {
-    createProject(targetDirectory, groupId, artifactId, displayName, null);
+  public static void createProject(File workingDir, String groupId, String artifactId, String displayName) throws IOException {
+    createProject(workingDir, groupId, artifactId, displayName, null);
   }
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion) throws IOException {
-    createProject(targetDirectory, groupId, artifactId, displayName, javaVersion, null, null, null);
+  public static void createProject(File workingDir, String groupId, String artifactId, String displayName, String javaVersion) throws IOException {
+    createProject(workingDir, groupId, artifactId, displayName, javaVersion, null, null, null);
   }
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion, String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion) throws IOException {
-    createProject(targetDirectory, groupId, artifactId, displayName, javaVersion, archetypeGroupId, archeTypeArtifactId, archetypeVersion, null, null);
-  }
+  public static void createProject(File workingDir, String groupId, String artifactId, String displayName, String javaVersion,
+      String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion) throws IOException {
 
-  public static void createProject(File targetDirectory, String groupId, String artifactId, String displayName, String javaVersion,
-      String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion, String mavenGlobalSettings, String mavenSettings) throws IOException {
     // validate input
-    Validate.notNull(targetDirectory);
+    Validate.notNull(workingDir);
     String groupIdMsg = getMavenNameErrorMessage(groupId, "groupId");
     if (groupIdMsg != null) {
       throw new IllegalArgumentException(groupIdMsg);
@@ -105,17 +104,29 @@ public final class ScoutProjectNewHelper {
     // create command
     String[] authKeysForWar = generateKeyPair();
     String[] authKeysForDev = generateKeyPair();
-    String[] args = new String[]{"archetype:generate", "-B",
-        "-DarchetypeGroupId=" + archetypeGroupId, "-DarchetypeArtifactId=" + archeTypeArtifactId, "-DarchetypeVersion=" + archetypeVersion,
-        "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + pck,
-        "-DdisplayName=" + displayName, "-DscoutAuthPublicKey=" + authKeysForWar[1], "-DscoutAuthPrivateKey=" + authKeysForWar[0], "-DscoutAuthPublicKeyDev=" + authKeysForDev[1], "-DscoutAuthPrivateKeyDev=" + authKeysForDev[0],
-        "-DjavaVersion=" + javaVersion, "-DuserName=" + CoreUtils.getUsername()
-    };
+    MavenBuild archetypeBuild = new MavenBuild()
+        .withWorkingDirectory(workingDir)
+        .withGoal("archetype:generate")
+        .withOption(CLIManager.BATCH_MODE)
+        .withProperty("archetypeGroupId", archetypeGroupId)
+        .withProperty("archetypeArtifactId", archeTypeArtifactId)
+        .withProperty("archetypeVersion", archetypeVersion)
+        .withProperty("groupId", groupId)
+        .withProperty("artifactId", artifactId)
+        .withProperty("version", "1.0.0-SNAPSHOT")
+        .withProperty("package", pck)
+        .withProperty("displayName", displayName)
+        .withProperty("scoutAuthPublicKey", authKeysForWar[1])
+        .withProperty("scoutAuthPrivateKey", authKeysForWar[0])
+        .withProperty("scoutAuthPublicKeyDev", authKeysForDev[1])
+        .withProperty("scoutAuthPrivateKeyDev", authKeysForDev[0])
+        .withProperty("javaVersion", javaVersion)
+        .withProperty("userName", CoreUtils.getUsername());
 
     // execute archetype generation
-    new MavenCliRunner().execute(targetDirectory, args, mavenGlobalSettings, mavenSettings);
+    MavenRunner.execute(archetypeBuild);
 
-    postProcessRootPom(new File(targetDirectory, artifactId));
+    postProcessRootPom(new File(workingDir, artifactId));
   }
 
   static String[] generateKeyPair() {
