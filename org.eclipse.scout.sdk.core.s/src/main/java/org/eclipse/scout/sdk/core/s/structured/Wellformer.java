@@ -153,7 +153,6 @@ public class Wellformer {
         appendTypes(structureHelper.getElements(IStructuredType.Categories.TYPE_WIZARD_STEP, IType.class), builder, m_recursive);
         appendTypes(structureHelper.getElements(IStructuredType.Categories.TYPE_MENU, IType.class), builder, m_recursive);
         appendTypes(structureHelper.getElements(IStructuredType.Categories.TYPE_VIEW_BUTTON, IType.class), builder, m_recursive);
-        appendTypes(structureHelper.getElements(IStructuredType.Categories.TYPE_TOOL_BUTTON, IType.class), builder, m_recursive);
         appendTypes(structureHelper.getElements(IStructuredType.Categories.TYPE_KEYSTROKE, IType.class), builder, m_recursive);
         appendTypes(structureHelper.getElements(IStructuredType.Categories.TYPE_FORM_HANDLER, IType.class), builder, m_recursive);
         appendTypes(structureHelper.getElements(IStructuredType.Categories.TYPE_UNCATEGORIZED, IType.class), builder, false);

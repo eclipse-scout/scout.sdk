@@ -179,7 +179,6 @@ public interface IScoutRuntimeTypes {
   String ITableControl = "org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl";
   String ITableExtension = "org.eclipse.scout.rt.client.extension.ui.basic.table.ITableExtension";
   String ITableField = "org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField";
-  String IToolButton = "org.eclipse.scout.rt.client.ui.action.tool.IToolButton";
   String ITree = "org.eclipse.scout.rt.client.ui.basic.tree.ITree";
   String ITypeWithClassId = "org.eclipse.scout.rt.platform.classid.ITypeWithClassId";
   String DynamicNls = "org.eclipse.scout.rt.platform.nls.DynamicNls";

@@ -117,9 +117,7 @@ public final class ScoutModelHierarchy {
     addContainerElement(IScoutRuntimeTypes.AbstractFormFieldExtension, IScoutRuntimeTypes.IKeyStroke);
     addContainerElement(IScoutRuntimeTypes.AbstractValueField, IScoutRuntimeTypes.IMenu);
     addContainerElement(IScoutRuntimeTypes.AbstractValueFieldExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractForm, IScoutRuntimeTypes.IToolButton);
     addContainerElement(IScoutRuntimeTypes.AbstractForm, IScoutRuntimeTypes.IFormHandler);
-    addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IToolButton);
     addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IFormHandler);
     addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IFormField);
     addContainerElement(IScoutRuntimeTypes.AbstractWizard, IScoutRuntimeTypes.IWizardStep);
@@ -194,7 +192,6 @@ public final class ScoutModelHierarchy {
     addInterfaceSuperType(IScoutRuntimeTypes.ITableControl, IScoutRuntimeTypes.IAction);
     addInterfaceSuperType(IScoutRuntimeTypes.ITableExtension, IScoutRuntimeTypes.IExtension);
     addInterfaceSuperType(IScoutRuntimeTypes.ITableField, IScoutRuntimeTypes.IFormField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IToolButton, IScoutRuntimeTypes.IMenu);
     addInterfaceSuperType(IScoutRuntimeTypes.ITree, IScoutRuntimeTypes.IContextMenuOwner);
     addInterfaceSuperType(IScoutRuntimeTypes.ITreeField, IScoutRuntimeTypes.IFormField);
     addInterfaceSuperType(IScoutRuntimeTypes.IValueField, IScoutRuntimeTypes.IFormField);

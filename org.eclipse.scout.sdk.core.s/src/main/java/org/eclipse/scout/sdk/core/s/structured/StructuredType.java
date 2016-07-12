@@ -308,11 +308,6 @@ public class StructuredType implements IStructuredType {
           m_visitedCategories.add(Categories.TYPE_VIEW_BUTTON);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
           break;
-        case TYPE_TOOL_BUTTON:
-          visitTypeToolbuttons(unknownTypes);
-          m_visitedCategories.add(Categories.TYPE_TOOL_BUTTON);
-          m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
         case TYPE_KEYSTROKE:
           visitTypeKeystrokes(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_KEYSTROKE);
@@ -668,19 +663,6 @@ public class StructuredType implements IStructuredType {
       }
     }
     m_elements.put(Categories.TYPE_VIEW_BUTTON, new ArrayList<>(types));
-  }
-
-  protected void visitTypeToolbuttons(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    IFilter<IType> filter = Filters.and(CLASS_FILTER, TypeFilters.instanceOf(IScoutRuntimeTypes.IToolButton));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.evaluate(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_TOOL_BUTTON, new ArrayList<>(types));
   }
 
   protected void visitTypeKeystrokes(Iterable<IJavaElement> workingSet) {

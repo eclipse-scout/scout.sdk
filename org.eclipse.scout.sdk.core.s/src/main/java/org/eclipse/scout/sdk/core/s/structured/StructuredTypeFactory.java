@@ -30,7 +30,7 @@ public final class StructuredTypeFactory {
     EnumSet<Categories> enabled = EnumSet.of(Categories.FIELD_LOGGER, Categories.FIELD_STATIC, Categories.FIELD_MEMBER, Categories.FIELD_UNKNOWN, Categories.METHOD_CONSTRUCTOR, Categories.METHOD_CONFIG_PROPERTY,
         Categories.METHOD_CONFIG_EXEC, Categories.METHOD_FORM_DATA_BEAN, Categories.METHOD_OVERRIDDEN, Categories.METHOD_START_HANDLER, Categories.METHOD_INNER_TYPE_GETTER, Categories.METHOD_LOCAL_BEAN, Categories.METHOD_UNCATEGORIZED,
         Categories.TYPE_FORM_FIELD, Categories.TYPE_COLUMN, Categories.TYPE_CODE, Categories.TYPE_FORM, Categories.TYPE_TABLE, Categories.TYPE_TREE, Categories.TYPE_CALENDAR,
-        Categories.TYPE_CALENDAR_ITEM_PROVIDER, Categories.TYPE_WIZARD, Categories.TYPE_WIZARD_STEP, Categories.TYPE_MENU, Categories.TYPE_VIEW_BUTTON, Categories.TYPE_TOOL_BUTTON, Categories.TYPE_KEYSTROKE,
+        Categories.TYPE_CALENDAR_ITEM_PROVIDER, Categories.TYPE_WIZARD, Categories.TYPE_WIZARD_STEP, Categories.TYPE_MENU, Categories.TYPE_VIEW_BUTTON, Categories.TYPE_KEYSTROKE,
         Categories.TYPE_COMPOSER_ATTRIBUTE, Categories.TYPE_COMPOSER_ENTRY, Categories.TYPE_FORM_HANDLER, Categories.TYPE_UNCATEGORIZED);
     return new StructuredType(type, enabled);
   }
@@ -49,7 +49,7 @@ public final class StructuredTypeFactory {
 
   public static IStructuredType createStructuredToolButton(IType type) {
     EnumSet<Categories> enabled = EnumSet.of(Categories.FIELD_STATIC, Categories.FIELD_MEMBER, Categories.FIELD_UNKNOWN, Categories.METHOD_CONSTRUCTOR, Categories.METHOD_CONFIG_PROPERTY, Categories.METHOD_CONFIG_EXEC,
-        Categories.METHOD_OVERRIDDEN, Categories.METHOD_LOCAL_BEAN, Categories.METHOD_UNCATEGORIZED, Categories.TYPE_TOOL_BUTTON, Categories.TYPE_UNCATEGORIZED);
+        Categories.METHOD_OVERRIDDEN, Categories.METHOD_LOCAL_BEAN, Categories.METHOD_UNCATEGORIZED, Categories.TYPE_UNCATEGORIZED);
     return new StructuredType(type, enabled);
   }
 
@@ -79,7 +79,7 @@ public final class StructuredTypeFactory {
 
   public static IStructuredType createStructuredDesktop(IType type) {
     EnumSet<Categories> enabled = EnumSet.of(Categories.FIELD_LOGGER, Categories.FIELD_STATIC, Categories.FIELD_MEMBER, Categories.FIELD_UNKNOWN, Categories.METHOD_CONSTRUCTOR, Categories.METHOD_CONFIG_PROPERTY,
-        Categories.METHOD_CONFIG_EXEC, Categories.METHOD_OVERRIDDEN, Categories.METHOD_LOCAL_BEAN, Categories.METHOD_UNCATEGORIZED, Categories.TYPE_MENU, Categories.TYPE_VIEW_BUTTON, Categories.TYPE_TOOL_BUTTON, Categories.TYPE_KEYSTROKE,
+        Categories.METHOD_CONFIG_EXEC, Categories.METHOD_OVERRIDDEN, Categories.METHOD_LOCAL_BEAN, Categories.METHOD_UNCATEGORIZED, Categories.TYPE_MENU, Categories.TYPE_VIEW_BUTTON, Categories.TYPE_KEYSTROKE,
         Categories.TYPE_UNCATEGORIZED);
     return new StructuredType(type, enabled);
   }
