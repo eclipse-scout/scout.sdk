@@ -50,7 +50,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
  */
 public class WebServiceMessageDialog extends MessageDialogWithToggle {
 
-  public static final String SCOUT_JAX_WS_DOCUMENTATION_URL = "https://eclipsescout.github.io/6.0/latest/book_scout_architecture/scout_architecture/scout_architecture.html#webservices-with-jax-ws";
+  public static final String SCOUT_JAX_WS_DOCUMENTATION_URL = "https://eclipsescout.github.io/6.0/technical-guide.html#webservices-with-jax-ws";
   public static final String HIDE_CONSUMER_MSG = "hideWebServiceConsumerInfoMessage";
   public static final String HIDE_PROVIDER_MSG = "hideWebServiceProviderInfoMessage";
 
