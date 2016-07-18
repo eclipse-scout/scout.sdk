@@ -34,7 +34,16 @@ public class SdkLogTest {
     assertPlaceholders("a testle b", "a {} b", "testle");
     assertPlaceholders("a [] b", "a {} b", new Object[]{new Object[]{}});
     assertPlaceholders("a [1, 2, 3] b", "a {} b", new Object[]{new Object[]{1, 2, 3}});
+    assertPlaceholders("a [1, 2, 3] b", "a {} b", new Object[]{new Integer[]{1, 2, 3}});
     assertPlaceholders("a testle b {} c", "a {} b {} c", "testle");
+    assertPlaceholders("a [true, false, false] b", "a {} b", new Object[]{new boolean[]{true, false, false}});
+    assertPlaceholders("a [40, 41, 2] b", "a {} b", new Object[]{new byte[]{40, 41, 2}});
+    assertPlaceholders("a [a, l, d] b", "a {} b", new Object[]{new char[]{'a', 'l', 'd'}});
+    assertPlaceholders("a [40, 41, 2] b", "a {} b", new Object[]{new short[]{40, 41, 2}});
+    assertPlaceholders("a [40, 41, 2] b", "a {} b", new Object[]{new int[]{40, 41, 2}});
+    assertPlaceholders("a [40, 41, 2000000000000000000] b", "a {} b", new Object[]{new long[]{40L, 41L, 2000000000000000000L}});
+    assertPlaceholders("a [1.1, 1.002, 300.0] b", "a {} b", new Object[]{new float[]{1.1f, 1.002f, 300f}});
+    assertPlaceholders("a [11.3, 12.004, 100.0] b", "a {} b", new Object[]{new double[]{11.3, 12.004, 100}});
 
     Object[] longArgs = new Object[1001];
     for (int i = 0; i < longArgs.length; i++) {
