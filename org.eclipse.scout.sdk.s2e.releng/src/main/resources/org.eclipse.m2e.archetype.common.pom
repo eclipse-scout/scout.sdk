@@ -41,6 +41,4 @@
       <version>${org.eclipse.core.runtime-range}</version>
     </dependency>
   </dependencies>
-
-  <!-- org.eclipse.m2e.maven.runtime;bundle-version="[1.6.0,1.7.0)", -->
 </project>

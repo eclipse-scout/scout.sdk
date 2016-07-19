@@ -130,37 +130,5 @@
       <artifactId>org.eclipse.compare</artifactId>
       <version>${org.eclipse.compare-range}</version>
     </dependency>
-<!-- org.eclipse.debug.ui;bundle-version="[3.10.0,4.0.0)", -->
-<!-- org.eclipse.jdt.launching;bundle-version="[3.2.0,4.0.0)", -->
-<!-- org.eclipse.pde.build;bundle-version="[3.2.0,4.0.0)", -->
-<!-- org.eclipse.team.core;bundle-version="[3.2.0,4.0.0)", -->
-<!-- org.eclipse.ant.launching;bundle-version="[1.0.400,2.0.0)", -->
-<!-- org.eclipse.ant.ui;bundle-version="[3.1.0,4.0.0)", -->
-<!-- org.eclipse.jdt.junit;bundle-version="[3.2.0,4.0.0)", -->
-<!-- org.eclipse.ui.intro;bundle-version="[3.2.0,4.0.0)", -->
-<!-- org.eclipse.ui.cheatsheets;bundle-version="[3.2.0,4.0.0)", -->
-<!-- org.eclipse.update.configurator;bundle-version="[3.1.0,4.0.0)", -->
-<!-- org.eclipse.ui.views.log;bundle-version="[1.0.0,2.0.0)", -->
-<!-- org.eclipse.core.variables;bundle-version="[3.1.0,4.0.0)", -->
-<!-- org.eclipse.ui.navigator.resources;bundle-version="[3.3.100,4.0.0)", -->
-<!-- org.eclipse.equinox.p2.ui;bundle-version="[2.0.0,3.0.0)", -->
-<!-- org.eclipse.equinox.p2.metadata;bundle-version="[2.0.0,3.0.0)", -->
-<!-- org.eclipse.equinox.p2.engine;bundle-version="[2.0.0,3.0.0)", -->
-<!-- org.eclipse.equinox.p2.core;bundle-version="[2.0.0,3.0.0)", -->
-<!-- org.eclipse.equinox.p2.director;bundle-version="[2.1.0,3.0.0)", -->
-<!-- org.eclipse.equinox.p2.artifact.repository;bundle-version="[1.0.100,2.0.0)", -->
-<!-- org.eclipse.equinox.p2.metadata.repository;bundle-version="[1.0.100,2.0.0)", -->
-<!-- org.eclipse.equinox.p2.operations;bundle-version="[2.0.0,3.0.0)", -->
-<!-- org.eclipse.equinox.p2.repository;bundle-version="[2.0.0,3.0.0)", -->
-<!-- org.eclipse.equinox.frameworkadmin;bundle-version="[2.0.0,3.0.0)", -->
-<!-- org.eclipse.equinox.frameworkadmin.equinox;bundle-version="[1.0.100,2.0.0)", -->
-<!-- org.eclipse.pde.launching;bundle-version="[3.6.0,4.0.0)";visibility:=reexport, -->
-<!-- org.eclipse.equinox.simpleconfigurator;bundle-version="[1.0.200,2.0.0)", -->
-<!-- org.eclipse.equinox.p2.repository.tools;bundle-version="[2.0.100,3.0.0)", -->
-<!-- org.eclipse.team.ui;bundle-version="[3.6.100,4.0.0)", -->
-<!-- org.eclipse.help;bundle-version="[3.4.0,4.0.0)", -->
-<!-- org.eclipse.debug.core;bundle-version="[3.10.0,4.0.0)", -->
-<!-- org.eclipse.ui.trace;bundle-version="[1.0.0,2.0.0)", -->
-<!-- org.eclipse.equinox.bidi;bundle-version="[0.0.0,1.0.0)" -->
   </dependencies>
 </project>
