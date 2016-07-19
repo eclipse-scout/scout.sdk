@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -86,14 +87,14 @@ public final class SdkLog {
 
     StringBuilder message = new StringBuilder().append('[').append(level.getName()).append("]: ");
 
-    int argstartIndex = 0;
+    int argStartIndex = 0;
     if (StringUtils.isNotBlank(msg)) {
-      StringBuilder messageBuilder = new StringBuilder(msg);
-      argstartIndex = handlePlaceholders(messageBuilder, args);
+      StringBuilder messageBuilder = new StringBuilder(msg.length() + 50).append(msg);
+      argStartIndex = handlePlaceholders(messageBuilder, args);
       message.append(messageBuilder);
     }
 
-    SdkConsole.println(level, message.toString(), extractThrowables(argstartIndex, args));
+    SdkConsole.println(level, message.toString(), extractThrowables(argStartIndex, args));
   }
 
   static Throwable[] extractThrowables(int startIndex, Object... args) {
@@ -152,31 +153,76 @@ public final class SdkLog {
   }
 
   private static String toString(Object o) {
+    if (o == null || !o.getClass().isArray()) {
+      return safeObjectToString(o);
+    }
+
+    Object[] arr = toObjectArray(o);
+    if (arr.length < 1) {
+      return "[]";
+    }
+
+    int maxSize = 1000;
+    int printSize = Math.min(arr.length, maxSize);
+    StringBuilder b = new StringBuilder();
+    b.append('[');
+    b.append(safeObjectToString(arr[0]));
+    for (int i = 1; i < printSize; i++) {
+      b.append(", ");
+      b.append(safeObjectToString(arr[i]));
+    }
+    if (arr.length > maxSize) {
+      b.append(",...");
+    }
+    b.append(']');
+    return b.toString();
+  }
+
+  private static Object[] toObjectArray(Object arr) {
+    if (arr instanceof Object[]) {
+      return (Object[]) arr;
+    }
+    if (arr instanceof boolean[]) {
+      return ArrayUtils.toObject((boolean[]) arr);
+    }
+    if (arr instanceof byte[]) {
+      return ArrayUtils.toObject((byte[]) arr);
+    }
+    if (arr instanceof char[]) {
+      return ArrayUtils.toObject((char[]) arr);
+    }
+    if (arr instanceof short[]) {
+      return ArrayUtils.toObject((short[]) arr);
+    }
+    if (arr instanceof int[]) {
+      return ArrayUtils.toObject((int[]) arr);
+    }
+    if (arr instanceof long[]) {
+      return ArrayUtils.toObject((long[]) arr);
+    }
+    if (arr instanceof float[]) {
+      return ArrayUtils.toObject((float[]) arr);
+    }
+    if (arr instanceof double[]) {
+      return ArrayUtils.toObject((double[]) arr);
+    }
+
+    throw new IllegalArgumentException();
+  }
+
+  private static String safeObjectToString(Object o) {
     if (o == null) {
       return "null";
     }
-    if (o.getClass().isArray()) {
-      Object[] arr = (Object[]) o;
-      if (arr.length < 1) {
-        return "[]";
-      }
 
-      int maxSize = 1000;
-      int printSize = Math.min(arr.length, maxSize);
-      StringBuilder b = new StringBuilder();
-      b.append('[');
-      b.append(String.valueOf(arr[0]));
-      for (int i = 1; i < printSize; i++) {
-        b.append(", ");
-        b.append(String.valueOf(arr[i]));
-      }
-      if (arr.length > maxSize) {
-        b.append(",...");
-      }
-      b.append(']');
-      return b.toString();
+    try {
+      return o.toString();
     }
-    return o.toString();
+    catch (Throwable t) {
+      System.err.println("Scout SdkLog: Failed toString() invocation on an object of type [" + o.getClass().getName() + "]");
+      t.printStackTrace();
+      return "[FAILED toString()]";
+    }
   }
 
   /**
@@ -320,7 +366,7 @@ public final class SdkLog {
   /**
    * Checks if at least the given level is enabled. If this method returns <code>true</code> this means that a message
    * with given {@link Level} would be printed.
-   * 
+   *
    * @param level
    *          The level to check. Must be the {@link Level#intValue()} of one of the constants defined in {@link Level}.
    * @return <code>true</code> if at least the given {@link Level} is currently active.
