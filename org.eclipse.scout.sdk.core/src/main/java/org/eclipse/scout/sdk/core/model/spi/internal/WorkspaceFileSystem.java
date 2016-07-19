@@ -186,13 +186,19 @@ public class WorkspaceFileSystem implements INameEnvironment {
     }
 
     for (Classpath cp : m_classpaths) {
-      NameEnvironmentAnswer answer;
-      if (cp instanceof ClasspathJar) {
-        answer = cp.findClass(typeName, pckUnix, fileNameUnix, false);
+      NameEnvironmentAnswer answer = null;
+      try {
+        if (cp instanceof ClasspathJar) {
+          answer = cp.findClass(typeName, pckUnix, fileNameUnix, false);
+        }
+        else {
+          answer = cp.findClass(typeName, pckPlatform, fileNamePlatform, false);
+        }
       }
-      else {
-        answer = cp.findClass(typeName, pckPlatform, fileNamePlatform, false);
+      catch (RuntimeException e) {
+        throw new SdkException("Error searching for '" + CharOperation.toString(compoundName) + "' in " + cp, e);
       }
+
       if (answer != null) {
         //prio 1: source type
         if (answer.isSourceType()) {

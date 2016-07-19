@@ -301,7 +301,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       return false;
     }
 
-    if (curJob instanceof AbstractJob || curJob instanceof P_RunQueuedTriggerHandlersJob) {
+    if (curJob instanceof AbstractJob) {
       // do not automatically update on Scout SDK changes. We expect the SDK to trigger manually where required.
       return false;
     }
@@ -317,9 +317,10 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
         "org.eclipse.m2e.", // maven updates
         "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob", // refresh of external folders after svn update
+        "org.eclipse.jdt.internal.debug.ui.JavaDebugOptionsManager.InitJob", // JDT debug
         "org.eclipse.core.internal.refresh.RefreshJob", // refresh after git import
         "org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob", // workspace init job
-        "org.eclipse.wst.jsdt.internal.", // java script tools
+        "org.eclipse.wst.", // web standard tools exclusions
         "org.sonarlint." // sonarlint analyse
     };
 
