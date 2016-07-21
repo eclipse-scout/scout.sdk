@@ -25,10 +25,8 @@ public class NlsTableInputValidator implements IStructuredInputValidator {
 
   @Override
   public IStatus validate(String input, int column) {
-    switch (column) {
-      case NlsTable.INDEX_COLUMN_KEYS: {
-        return m_keyValidator.isValid(input);
-      }
+    if (column == NlsTable.INDEX_COLUMN_KEYS) {
+      return m_keyValidator.isValid(input);
     }
     return Status.OK_STATUS;
   }

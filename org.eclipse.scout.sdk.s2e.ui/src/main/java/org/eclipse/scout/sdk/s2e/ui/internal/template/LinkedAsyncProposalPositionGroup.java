@@ -50,6 +50,7 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
   }
 
   @Override
+  @SuppressWarnings("squid:S1166")
   public Proposal[] getProposals() {
     try {
       return m_future.get(100, TimeUnit.MILLISECONDS);

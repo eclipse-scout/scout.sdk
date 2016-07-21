@@ -53,12 +53,6 @@ public class NlsCore extends AbstractUIPlugin {
   private ColorRegistry m_colorRegistry;
   private INlsWorkspace m_nlsWorkspace;
 
-  /**
-   * The constructor
-   */
-  public NlsCore() {
-  }
-
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);

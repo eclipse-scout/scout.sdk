@@ -46,6 +46,7 @@ public abstract class AbstractJob extends Job {
    * jobs have finished executing. If there are no jobs in the family that are currently waiting, running, or sleeping,
    * this method returns immediately.
    */
+  @SuppressWarnings("squid:S1166")
   public static void waitForJobFamily(final Object family) {
     boolean wasInterrupted = false;
     do {

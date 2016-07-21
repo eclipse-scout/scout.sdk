@@ -88,6 +88,7 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
     }
   }
 
+  @SuppressWarnings("squid:S1067")
   protected boolean acceptType(IType jdtType) throws CoreException {
     //fast check before doing expensive source parsing
     return S2eUtils.exists(jdtType)

@@ -16,6 +16,7 @@ package org.eclipse.scout.sdk.s2e.ui;
  * @author Matthias Villiger
  * @since 5.2.0
  */
+@SuppressWarnings("squid:S00115")
 public interface ISdkIcons {
   String ButtonAdd = "button_add.gif";
   String CodeAdd = "code_add.png";

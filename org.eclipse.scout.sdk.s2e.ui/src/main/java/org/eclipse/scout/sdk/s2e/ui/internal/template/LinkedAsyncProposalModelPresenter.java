@@ -215,10 +215,12 @@ public class LinkedAsyncProposalModelPresenter {
 
     @Override
     public void selected(ITextViewer viewer, boolean smartToggle) {
+      // nop
     }
 
     @Override
     public void unselected(ITextViewer viewer) {
+      // nop
     }
 
     @Override

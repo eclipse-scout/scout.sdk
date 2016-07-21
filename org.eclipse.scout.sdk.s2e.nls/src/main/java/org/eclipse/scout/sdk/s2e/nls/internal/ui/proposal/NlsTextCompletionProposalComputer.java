@@ -26,10 +26,6 @@ public class NlsTextCompletionProposalComputer extends AbstractNlsTextCompletion
 
   private final Image m_image = NlsCore.getImage(INlsIcons.COMMENT);
 
-  public NlsTextCompletionProposalComputer() {
-
-  }
-
   @Override
   protected void collectProposals(List<ICompletionProposal> proposals, INlsProject nlsProject, String prefix, int offset) {
     for (INlsEntry e : nlsProject.getEntries(prefix, false)) {

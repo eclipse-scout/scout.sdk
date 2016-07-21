@@ -105,9 +105,23 @@ public class SignatureDescriptor {
 
   @Override
   public String toString() {
-    return "SignatureDescriptor [" + (m_signature != null ? "m_signature=" + m_signature + ", " : "") + (m_packageName != null ? "m_packageName=" + m_packageName + ", " : "")
-        + (m_simpleName != null ? "m_simpleName=" + m_simpleName + ", " : "") + (m_qualifier != null ? "m_qualifier=" + m_qualifier + ", " : "") + (m_qualifiedName != null ? "m_qualifiedName=" + m_qualifiedName + ", " : "")
-        + "isBaseType()=" + isBaseType() + ", isUnresolved()=" + isUnresolved() + "]";
+    StringBuilder builder = new StringBuilder();
+    builder.append("SignatureDescriptor [");
+    builder.append("signature=").append(m_signature).append(", ");
+    if (m_packageName != null) {
+      builder.append("packageName=").append(m_packageName).append(", ");
+    }
+    if (m_simpleName != null) {
+      builder.append("simpleName=").append(m_simpleName).append(", ");
+    }
+    if (m_qualifier != null) {
+      builder.append("qualifier=").append(m_qualifier).append(", ");
+    }
+    if (m_qualifiedName != null) {
+      builder.append("qualifiedName=").append(m_qualifiedName);
+    }
+    builder.append("]");
+    return builder.toString();
   }
 
   @Override

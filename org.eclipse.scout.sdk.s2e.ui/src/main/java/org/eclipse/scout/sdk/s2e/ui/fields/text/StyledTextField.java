@@ -213,6 +213,7 @@ public class StyledTextField extends TextField {
     }
 
     @Override
+    @SuppressWarnings("squid:SwitchLastCaseIsDefaultCheck")
     public void handleEvent(Event event) {
       try {
         if (m_revalLock.acquire()) {

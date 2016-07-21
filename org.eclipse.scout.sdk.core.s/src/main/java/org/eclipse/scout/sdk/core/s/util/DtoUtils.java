@@ -439,7 +439,8 @@ public final class DtoUtils {
     }
 
     // correction
-    if (isOwner && sdkCommand == SdkCommand.USE && dtoType != null && element instanceof IType && ((IType) element).declaringType() != null) {
+    boolean isMemberType = element instanceof IType && ((IType) element).declaringType() != null;
+    if (isOwner && sdkCommand == SdkCommand.USE && dtoType != null && isMemberType) {
       descriptorToFill.setSuperType(dtoType);
       descriptorToFill.setFormDataType(null);
       descriptorToFill.setSdkCommand(SdkCommand.CREATE);

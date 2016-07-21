@@ -96,6 +96,7 @@ public class NlsEditor extends MultiPageEditorPart {
 
   @Override
   public void doSaveAs() {
+    // it is always automatically saved
   }
 
   @Override
@@ -105,5 +106,6 @@ public class NlsEditor extends MultiPageEditorPart {
 
   @Override
   public void doSave(IProgressMonitor monitor) {
+    // it is always automatically saved
   }
 }

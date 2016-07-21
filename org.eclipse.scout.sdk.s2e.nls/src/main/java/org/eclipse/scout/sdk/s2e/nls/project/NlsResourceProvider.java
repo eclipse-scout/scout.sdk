@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.nls.project;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,7 @@ public class NlsResourceProvider {
   private final Map<Language, ITranslationResource> m_resourceMap = new HashMap<>();
 
   public NlsResourceProvider() {
-    m_languagesOrdered = new ArrayList<>(0);
+    m_languagesOrdered = Collections.emptyList();
   }
 
   public void addResource(ITranslationResource r) {

@@ -14,15 +14,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
-public class ImageRegistry extends org.eclipse.jface.resource.ImageRegistry {
+public class ScoutImageRegistry extends ImageRegistry {
 
   private final Map<ImageDescriptor, Image> m_registry;
   private final Display m_device;
 
-  public ImageRegistry(Display device) {
+  public ScoutImageRegistry(Display device) {
     super(device);
     m_registry = new HashMap<>();
     m_device = device;

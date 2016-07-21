@@ -173,6 +173,7 @@ public class WebServiceEditor extends FormEditor {
     try {
       new ProgressMonitorDialog(shell).run(true, true, new IRunnableWithProgress() {
         @Override
+        @SuppressWarnings("squid:S1141")
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
           try {
             Set<WebServiceFormPageInput> result = findWebServices(monitor);
@@ -390,6 +391,7 @@ public class WebServiceEditor extends FormEditor {
 
   @Override
   public void doSaveAs() {
+    // nop
   }
 
   @Override
@@ -408,6 +410,7 @@ public class WebServiceEditor extends FormEditor {
   /**
    * <h3>{@link P_PreloadedWebServiceData}</h3> Preload the annotated {@link IType}s once for all web services
    */
+  @SuppressWarnings("squid:S2160")
   private static final class P_PreloadedWebServiceData extends WebServiceFormPageInput {
 
     private final Set<IType> m_typesAnnotatedWithWebServiceEntryPoint;

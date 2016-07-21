@@ -70,6 +70,7 @@ public class WellformScoutTypeOperation implements IOperation {
 
   @Override
   public void validate() {
+    // nothing to validate
   }
 
   @Override

@@ -105,6 +105,7 @@ import org.eclipse.jdt.core.dom.WildcardType;
 public class DefaultAstVisitor extends ASTVisitor {
 
   public DefaultAstVisitor() {
+    super();
   }
 
   public DefaultAstVisitor(boolean visitDocTags) {

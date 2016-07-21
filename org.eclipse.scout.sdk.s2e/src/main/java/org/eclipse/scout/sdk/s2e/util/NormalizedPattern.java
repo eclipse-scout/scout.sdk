@@ -93,6 +93,7 @@ public class NormalizedPattern {
    * @return The matching regions of the given text or <code>null</code> if there are no regions. See
    *         {@link SearchPattern#getMatchingRegions(String, String, int)}.
    */
+  @SuppressWarnings("squid:S1168") // as by javadoc
   public int[] getMatchingRegions(String elementText) {
     if (elementText == null) {
       return null;

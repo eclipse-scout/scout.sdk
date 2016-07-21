@@ -57,10 +57,12 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
 
   @Override
   public void dispose() {
+    // nop
   }
 
   @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    // nop
   }
 
   @Override
@@ -196,6 +198,7 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
 
   @Override
   public void addListener(ILabelProviderListener listener) {
+    // nop
   }
 
   @Override
@@ -205,6 +208,7 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
 
   @Override
   public void removeListener(ILabelProviderListener listener) {
+    // nop
   }
 
   public INlsProject getProjects() {

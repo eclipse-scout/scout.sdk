@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
@@ -113,7 +114,7 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
     if (m_exceptions == null) {
       ReferenceBinding[] exceptions = m_binding.thrownExceptions;
       if (exceptions == null || exceptions.length < 1) {
-        m_exceptions = new ArrayList<>(0);
+        m_exceptions = Collections.emptyList();
       }
       else {
         List<TypeSpi> result = new ArrayList<>(exceptions.length);
@@ -142,7 +143,7 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
     if (m_arguments == null) {
       TypeBinding[] arguments = m_binding.parameters;
       if (arguments == null || arguments.length < 1) {
-        m_arguments = new ArrayList<>(0);
+        m_arguments = Collections.emptyList();
       }
       else {
         List<MethodParameterSpi> result = new ArrayList<>(arguments.length);
@@ -162,6 +163,7 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
     return m_arguments;
   }
 
+  @SuppressWarnings("squid:S1168")
   protected static char[] getParamName(MethodBinding b, int paramIndex) {
     if (b.parameterNames.length > paramIndex) {
       return b.parameterNames[paramIndex];
@@ -203,7 +205,7 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
         m_typeParameters = result;
       }
       else {
-        m_typeParameters = new ArrayList<>(0);
+        m_typeParameters = Collections.emptyList();
       }
     }
     return m_typeParameters;

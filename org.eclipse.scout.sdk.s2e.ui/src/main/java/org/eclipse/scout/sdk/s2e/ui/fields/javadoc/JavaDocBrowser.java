@@ -84,6 +84,7 @@ public final class JavaDocBrowser {
 
       @Override
       public void changed(LocationEvent event) {
+        // nop
       }
     });
     browser.setText(javaDocHtml);
@@ -91,6 +92,7 @@ public final class JavaDocBrowser {
     return browser;
   }
 
+  @SuppressWarnings("squid:S1149") // StringBuffer required by API
   static String getJavaDocHtml(IJavaElement element) {
     try {
       String javaDoc = JavadocContentAccess2.getHTMLContent(element, true);
@@ -120,6 +122,7 @@ public final class JavaDocBrowser {
     return null;
   }
 
+  @SuppressWarnings("squid:S1149") // StringBuffer required by API
   static void insertBaseUrl(String javaDoc, IJavaElement element, StringBuffer buffer) {
     try {
       String base = JavadocContentAccess2.extractBaseURL(javaDoc);

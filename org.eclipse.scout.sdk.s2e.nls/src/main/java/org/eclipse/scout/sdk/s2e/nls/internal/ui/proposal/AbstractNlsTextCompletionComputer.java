@@ -46,7 +46,7 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
   @Override
   public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)) {
-      return new ArrayList<>(0);
+      return Collections.emptyList();
     }
     JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
     return computeProposals(javaContext);

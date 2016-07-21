@@ -123,6 +123,7 @@ public final class CoreScoutUtils {
    *          the declaring type.
    * @return the new order value that should be used.
    */
+  @SuppressWarnings("squid:S2583") // second arg is required so that the compiler is happy
   public static double getNewViewOrderValue(IType declaringType, String orderDefinitionType, int pos) {
     IType[] siblings = findSiblings(declaringType, pos, orderDefinitionType);
     Double orderValueBefore = getOrderAnnotationValue(siblings[0]);

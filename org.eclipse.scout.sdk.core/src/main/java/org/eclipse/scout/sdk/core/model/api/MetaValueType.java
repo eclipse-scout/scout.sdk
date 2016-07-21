@@ -16,6 +16,7 @@ package org.eclipse.scout.sdk.core.model.api;
  * @author Matthias Villiger
  * @since 5.1.0
  */
+@SuppressWarnings("squid:S00115")
 public enum MetaValueType {
   /**
    * {@link IMetaValue#getObject()} is a {@link Character}

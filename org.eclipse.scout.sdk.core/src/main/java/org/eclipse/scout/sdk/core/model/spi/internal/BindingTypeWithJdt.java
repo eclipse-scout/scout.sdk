@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -81,7 +82,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
     m_binding = Validate.notNull(binding);
     m_isWildcard = isWildcard;
     m_declaringType = declaringType;
-    m_flags = -1; // mark as uninitialized;
+    m_flags = -1; // mark as not initialized yet
   }
 
   @Override
@@ -188,7 +189,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
       getSourceTypeBinding();
       FieldBinding[] fields = m_binding.fields();
       if (fields == null || fields.length < 1) {
-        m_fields = new ArrayList<>(0);
+        m_fields = Collections.emptyList();
       }
       else {
         //try to sort
@@ -226,7 +227,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
       getSourceTypeBinding();
       MethodBinding[] methods = m_binding.methods();
       if (methods == null || methods.length < 1) {
-        m_methods = new ArrayList<>(0);
+        m_methods = Collections.emptyList();
       }
       else {
         //try to sort
@@ -271,7 +272,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
       getSourceTypeBinding();
       ReferenceBinding[] memberTypes = m_binding.memberTypes();
       if (memberTypes == null || memberTypes.length < 1) {
-        m_memberTypes = new ArrayList<>(0);
+        m_memberTypes = Collections.emptyList();
       }
       else {
         //try to sort
@@ -334,7 +335,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
       getSourceTypeBinding();
       ReferenceBinding[] superInterfaces = m_binding.superInterfaces();
       if (superInterfaces == null || superInterfaces.length < 1) {
-        m_superInterfaces = new ArrayList<>(0);
+        m_superInterfaces = Collections.emptyList();
       }
       else {
         List<TypeSpi> result = new ArrayList<>(superInterfaces.length);
@@ -375,7 +376,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
       }
 
       if (m_typeArguments == null) {
-        m_typeArguments = new ArrayList<>(0);
+        m_typeArguments = Collections.emptyList();
       }
     }
     return m_typeArguments;
@@ -410,7 +411,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
         m_typeParameters = result;
       }
       else {
-        m_typeParameters = new ArrayList<>(0);
+        m_typeParameters = Collections.emptyList();
       }
     }
     return m_typeParameters;

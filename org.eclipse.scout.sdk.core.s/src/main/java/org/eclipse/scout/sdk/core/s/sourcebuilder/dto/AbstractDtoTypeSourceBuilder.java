@@ -133,6 +133,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
       final IType annotationDeclarationType = annotation.type();
       final String elementName = annotationDeclarationType.name();
 
+      @SuppressWarnings("squid:S1067")
       boolean mustCopyAnnotation = !IScoutRuntimeTypes.FormData.equals(elementName)
           && !IScoutRuntimeTypes.Order.equals(elementName)
           && !IScoutRuntimeTypes.PageData.equals(elementName)

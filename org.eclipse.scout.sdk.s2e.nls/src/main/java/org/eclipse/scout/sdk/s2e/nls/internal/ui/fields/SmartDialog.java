@@ -288,6 +288,7 @@ public class SmartDialog {
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      // nop
     }
 
     @Override
@@ -313,16 +314,19 @@ public class SmartDialog {
 
     @Override
     public void addListener(ILabelProviderListener listener) {
+      // nop
     }
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
+      // nop
     }
 
     @Override
     public void dispose() {
+      // nop
     }
-  } // end class P_SmartFieldTableModel
+  }
 
   private final class P_CompareableSmartItem implements Comparable<P_CompareableSmartItem> {
     private final Object m_item;

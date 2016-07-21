@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
  * @author Matthias Villiger
  * @since 5.2.0
  */
+@SuppressWarnings("squid:S00107")
 public class TemplateProposalDescriptor {
 
   private static final Pattern CAMEL_PAT = Pattern.compile("([A-Z]{1})");

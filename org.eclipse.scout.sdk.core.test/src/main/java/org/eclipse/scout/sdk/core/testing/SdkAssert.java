@@ -817,6 +817,7 @@ public class SdkAssert extends Assert {
     return sigBuilder.toString();
   }
 
+  @SuppressWarnings("squid:SwitchLastCaseIsDefaultCheck")
   private static void getResolvedSignature(String unresolvedSignature, IType context, StringBuilder sigBuilder) {
     switch (Signature.getTypeSignatureKind(unresolvedSignature)) {
       case ISignatureConstants.WILDCARD_TYPE_SIGNATURE:

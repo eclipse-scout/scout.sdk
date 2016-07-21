@@ -274,6 +274,7 @@ public abstract class AbstractNlsProject implements INlsProject {
    * The output of this method must fulfill the regex for key-validation defined in
    * org.eclipse.scout.nls.sdk.ui.InputValidator#REGEX_NLS_KEY_NAME
    */
+  @SuppressWarnings("squid:S881")
   protected String generateKey(String baseText, boolean appendFreeNumSuffix) {
     cache();
     if (baseText == null || baseText.length() < 1) {
@@ -730,6 +731,7 @@ public abstract class AbstractNlsProject implements INlsProject {
   /**
    * listens to changes of the parent project
    */
+  @SuppressWarnings("squid:SwitchLastCaseIsDefaultCheck")
   private class P_ParentListener implements INlsProjectListener {
     @Override
     public void notifyProjectChanged(NlsProjectEvent event) {

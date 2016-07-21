@@ -65,6 +65,7 @@ public class MissingClassIdsNewOperation implements IOperation {
 
   @Override
   public void validate() {
+    // no input, no validation
   }
 
   @Override
@@ -120,7 +121,14 @@ public class MissingClassIdsNewOperation implements IOperation {
     int numTypes = 0;
     Map<ICompilationUnit, Set<IType>> typesWithoutClassId = new HashMap<>();
     for (IType t : candidates) {
-      if (S2eUtils.exists(t) && !t.isBinary() && t.isClass() && !t.isAnonymous() && !t.isReadOnly() && !Flags.isAbstract(t.getFlags())) {
+      @SuppressWarnings("squid:S1067")
+      boolean isValidType = S2eUtils.exists(t)
+          && !t.isBinary()
+          && t.isClass()
+          && !t.isAnonymous()
+          && !t.isReadOnly()
+          && !Flags.isAbstract(t.getFlags());
+      if (isValidType) {
         IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
         if (annotation == null) {
           ICompilationUnit icu = t.getCompilationUnit();

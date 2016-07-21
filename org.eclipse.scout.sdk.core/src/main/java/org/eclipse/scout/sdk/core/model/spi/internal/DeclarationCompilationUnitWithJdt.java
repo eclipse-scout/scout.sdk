@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
@@ -167,7 +168,7 @@ public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJd
       TypeDeclaration[] types = m_astNode.types;
 
       if (types == null || types.length < 1) {
-        m_types = new ArrayList<>(0);
+        m_types = Collections.emptyList();
       }
       else {
         List<DeclarationTypeWithJdt> result = new ArrayList<>(types.length);
@@ -185,7 +186,7 @@ public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJd
     if (m_imports == null) {
       ImportReference[] imports = m_astNode.imports;
       if (imports == null || imports.length < 1) {
-        m_imports = new ArrayList<>(0);
+        m_imports = Collections.emptyList();
       }
       else {
         List<DeclarationImportWithJdt> result = new ArrayList<>(imports.length);

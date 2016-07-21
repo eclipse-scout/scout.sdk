@@ -320,6 +320,10 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
         sev = IMessageProvider.INFORMATION;
         break;
       }
+      default: {
+        sev = IMessageProvider.NONE;
+        break;
+      }
     }
 
     setMessage(status.getMessage(), sev);

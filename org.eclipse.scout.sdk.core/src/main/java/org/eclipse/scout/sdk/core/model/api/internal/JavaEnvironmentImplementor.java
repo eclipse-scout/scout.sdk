@@ -41,6 +41,7 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
+  @SuppressWarnings("squid:S1166")
   public IUnresolvedType findUnresolvedType(String fqn) {
     try {
       IType t = findType(fqn);

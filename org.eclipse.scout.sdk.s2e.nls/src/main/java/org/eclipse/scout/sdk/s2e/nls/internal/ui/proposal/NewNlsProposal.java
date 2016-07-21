@@ -118,6 +118,7 @@ public class NewNlsProposal extends AbstractNlsProposal {
   }
 
   @Override
+  @SuppressWarnings("squid:S1168") // as by javadoc
   public char[] getTriggerCharacters() {
     return null;
   }

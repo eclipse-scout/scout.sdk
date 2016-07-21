@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.core.util.SdkException;
  */
 public final class CommentSourceBuilderFactory {
 
-  public static volatile ICommentSourceBuilderSpi commentSourceBuilderSpi;
+  private static volatile ICommentSourceBuilderSpi commentSourceBuilderSpi;
 
   private static final Pattern REGEX_COMMENT_PATTERN1 = Pattern.compile("^s*\\/\\*\\*s*$");
   private static final Pattern REGEX_COMMENT_PATTERN2 = Pattern.compile("^s*\\*\\*\\/s*$");
@@ -44,54 +44,55 @@ public final class CommentSourceBuilderFactory {
   private static final ISourceBuilder EMPTY_COMMENT_SOURCE_BUILDER = new ISourceBuilder() {
     @Override
     public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+      // must be empty
     }
   };
 
   public static ISourceBuilder createDefaultCompilationUnitComment(ICompilationUnitSourceBuilder target) {
-    if (commentSourceBuilderSpi != null) {
-      return commentSourceBuilderSpi.createCompilationUnitComment(target);
+    if (getCommentSourceBuilderSpi() != null) {
+      return getCommentSourceBuilderSpi().createCompilationUnitComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultTypeComment(ITypeSourceBuilder target) {
-    if (commentSourceBuilderSpi != null) {
-      return commentSourceBuilderSpi.createTypeComment(target);
+    if (getCommentSourceBuilderSpi() != null) {
+      return getCommentSourceBuilderSpi().createTypeComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultMethodComment(IMethodSourceBuilder target) {
-    if (commentSourceBuilderSpi != null) {
-      return commentSourceBuilderSpi.createMethodComment(target);
+    if (getCommentSourceBuilderSpi() != null) {
+      return getCommentSourceBuilderSpi().createMethodComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultOverrideMethodComment(IMethodSourceBuilder target, String interfaceFqn) {
-    if (commentSourceBuilderSpi != null) {
-      return commentSourceBuilderSpi.createOverrideMethodComment(target, interfaceFqn);
+    if (getCommentSourceBuilderSpi() != null) {
+      return getCommentSourceBuilderSpi().createOverrideMethodComment(target, interfaceFqn);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultGetterMethodComment(IMethodSourceBuilder target) {
-    if (commentSourceBuilderSpi != null) {
-      return commentSourceBuilderSpi.createGetterMethodComment(target);
+    if (getCommentSourceBuilderSpi() != null) {
+      return getCommentSourceBuilderSpi().createGetterMethodComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultSetterMethodComment(IMethodSourceBuilder target) {
-    if (commentSourceBuilderSpi != null) {
-      return commentSourceBuilderSpi.createSetterMethodComment(target);
+    if (getCommentSourceBuilderSpi() != null) {
+      return getCommentSourceBuilderSpi().createSetterMethodComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultFieldComment(IFieldSourceBuilder target) {
-    if (commentSourceBuilderSpi != null) {
-      return commentSourceBuilderSpi.createFieldComment(target);
+    if (getCommentSourceBuilderSpi() != null) {
+      return getCommentSourceBuilderSpi().createFieldComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
@@ -111,10 +112,7 @@ public final class CommentSourceBuilderFactory {
           commentBuilder.append("/**").append(lineDelimiter);
           String line = inputReader.readLine();
           while (line != null) {
-            if (REGEX_COMMENT_PATTERN1.matcher(line).matches()) {
-              line = inputReader.readLine();
-            }
-            else if (REGEX_COMMENT_PATTERN2.matcher(line).matches()) {
+            if (REGEX_COMMENT_PATTERN1.matcher(line).matches() || REGEX_COMMENT_PATTERN2.matcher(line).matches()) {
               line = inputReader.readLine();
             }
             else {
@@ -137,6 +135,14 @@ public final class CommentSourceBuilderFactory {
         }
       }
     };
+  }
+
+  public static ICommentSourceBuilderSpi getCommentSourceBuilderSpi() {
+    return commentSourceBuilderSpi;
+  }
+
+  public static void setCommentSourceBuilderSpi(ICommentSourceBuilderSpi commentSourceBuilderSpi) {
+    CommentSourceBuilderFactory.commentSourceBuilderSpi = commentSourceBuilderSpi;
   }
 
 }

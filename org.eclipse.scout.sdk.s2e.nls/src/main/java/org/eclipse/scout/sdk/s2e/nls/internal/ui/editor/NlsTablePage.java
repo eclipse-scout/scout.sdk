@@ -162,6 +162,7 @@ public class NlsTablePage extends Composite {
 
     @Override
     public void handleRefreshReferenceCount(final String key) {
+      // nop
     }
   } // end class P_TableActionHandler
 
@@ -181,6 +182,7 @@ public class NlsTablePage extends Composite {
     }
   }
 
+  @SuppressWarnings("squid:SwitchLastCaseIsDefaultCheck")
   private boolean handleProjectChangedEventInternalRec(NlsProjectEvent event) {
     boolean full = false;
     if (event.isMultiEvent()) {

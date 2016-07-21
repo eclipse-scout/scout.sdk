@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
@@ -126,7 +127,7 @@ public class DeclarationMethodWithJdt extends AbstractMemberWithJdt<IMethod> imp
     if (m_arguments == null) {
       Argument[] arguments = m_astNode.arguments;
       if (arguments == null || arguments.length < 1) {
-        m_arguments = new ArrayList<>(0);
+        m_arguments = Collections.emptyList();
       }
       else {
         List<MethodParameterSpi> result = new ArrayList<>(arguments.length);
@@ -166,7 +167,7 @@ public class DeclarationMethodWithJdt extends AbstractMemberWithJdt<IMethod> imp
     if (m_exceptions == null) {
       TypeReference[] exceptions = m_astNode.thrownExceptions;
       if (exceptions == null || exceptions.length < 1) {
-        m_exceptions = new ArrayList<>(0);
+        m_exceptions = Collections.emptyList();
       }
       else {
         List<TypeSpi> result = new ArrayList<>(exceptions.length);
@@ -190,7 +191,7 @@ public class DeclarationMethodWithJdt extends AbstractMemberWithJdt<IMethod> imp
     if (m_typeParameters == null) {
       TypeParameter[] typeParams = m_astNode.typeParameters();
       if (typeParams == null || typeParams.length < 1) {
-        m_typeParameters = new ArrayList<>(0);
+        m_typeParameters = Collections.emptyList();
       }
       else {
         List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);

@@ -57,23 +57,24 @@ public class ImportValidator implements IImportValidator {
 
   @Override
   public String useSignature(String signature) {
-    return useSignatureInternal(signature, false);
+    StringBuilder result = new StringBuilder(128);
+    useSignatureInternal(signature, false, result);
+    return result.toString();
   }
 
-  protected String useSignatureInternal(String signature, boolean isTypeArg) {
-    StringBuilder sigBuilder = new StringBuilder();
+  protected void useSignatureInternal(String signature, boolean isTypeArg, StringBuilder sigBuilder) {
     int arrayCount = 0;
     switch (Signature.getTypeSignatureKind(signature)) {
       case ISignatureConstants.WILDCARD_TYPE_SIGNATURE:
         sigBuilder.append('?');
         if (signature.length() > 1) {
           sigBuilder.append(" extends ");
-          sigBuilder.append(useSignatureInternal(signature.substring(1), false));
+          useSignatureInternal(signature.substring(1), false, sigBuilder);
         }
         break;
       case ISignatureConstants.ARRAY_TYPE_SIGNATURE:
         arrayCount = Signature.getArrayCount(signature);
-        sigBuilder.append(useSignatureInternal(signature.substring(arrayCount), false));
+        useSignatureInternal(signature.substring(arrayCount), false, sigBuilder);
         break;
       case ISignatureConstants.BASE_TYPE_SIGNATURE:
         sigBuilder.append(Signature.getSignatureSimpleName(signature));
@@ -84,9 +85,10 @@ public class ImportValidator implements IImportValidator {
         sigBuilder.append(name);
         if (typeParameterBounds.length > 0) {
           sigBuilder.append(" extends ");
-          sigBuilder.append(useSignatureInternal(typeParameterBounds[0], false));
+          useSignatureInternal(typeParameterBounds[0], false, sigBuilder);
           for (int i = 1; i < typeParameterBounds.length; i++) {
-            sigBuilder.append(" & ").append(useSignatureInternal(typeParameterBounds[i], false));
+            sigBuilder.append(" & ");
+            useSignatureInternal(typeParameterBounds[i], false, sigBuilder);
           }
         }
         break;
@@ -130,10 +132,10 @@ public class ImportValidator implements IImportValidator {
         String[] typeArguments = Signature.getTypeArguments(signatureToImport);
         if (typeArguments.length > 0) {
           sigBuilder.append(ISignatureConstants.C_GENERIC_START);
-          sigBuilder.append(useSignatureInternal(typeArguments[0], true));
+          useSignatureInternal(typeArguments[0], true, sigBuilder);
           for (int i = 1; i < typeArguments.length; i++) {
             sigBuilder.append(", ");
-            sigBuilder.append(useSignatureInternal(typeArguments[i], true));
+            useSignatureInternal(typeArguments[i], true, sigBuilder);
           }
           sigBuilder.append(ISignatureConstants.C_GENERIC_END);
         }
@@ -142,7 +144,8 @@ public class ImportValidator implements IImportValidator {
         if (firstParameterizedSegmentIndex >= 0) {
           for (int i = firstParameterizedSegmentIndex + 1; i < segments.size(); i++) {
             String segmentSig = ISignatureConstants.C_RESOLVED + segments.get(i) + ISignatureConstants.C_SEMICOLON;
-            sigBuilder.append(ISignatureConstants.C_DOT).append(useSignatureInternal(segmentSig, false));
+            sigBuilder.append(ISignatureConstants.C_DOT);
+            useSignatureInternal(segmentSig, false, sigBuilder);
           }
         }
         break;
@@ -150,7 +153,6 @@ public class ImportValidator implements IImportValidator {
     for (int i = 0; i < arrayCount; i++) {
       sigBuilder.append("[]");
     }
-    return sigBuilder.toString();
   }
 
   protected static int getFirstSegmentWithTypeArgumentsInQualifier(List<String> segments) {

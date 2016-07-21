@@ -23,6 +23,7 @@ import org.eclipse.jdt.internal.compiler.lookup.ExtraCompilerModifiers;
  * Specification (except for {@link #AccDeprecated}, {@link #AccAnnotationDefault}, and {@link #AccDefaultMethod}).
  * </p>
  */
+@SuppressWarnings("squid:S00115")
 public final class Flags {
 
   /**
@@ -201,6 +202,7 @@ public final class Flags {
    *          the flags
    * @return <code>true</code> if the element is marked as deprecated
    */
+  @SuppressWarnings("squid:MissingDeprecatedCheck")
   public static boolean isDeprecated(int flags) {
     return (flags & AccDeprecated) != 0;
   }

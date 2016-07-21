@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.lookup.BaseTypeBinding;
@@ -65,7 +65,7 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   public List<AnnotationSpi> getAnnotations() {
     if (m_annotations == null) {
-      m_annotations = new ArrayList<>(0);
+      m_annotations = Collections.emptyList();
     }
     return m_annotations;
   }
@@ -118,7 +118,7 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
     if (m_typeParameters == null) {
-      m_typeParameters = new ArrayList<>(0);
+      m_typeParameters = Collections.emptyList();
     }
     return m_typeParameters;
   }
@@ -146,7 +146,7 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   public List<TypeSpi> getSuperInterfaces() {
     if (m_superInterfaces == null) {
-      m_superInterfaces = new ArrayList<>(0);
+      m_superInterfaces = Collections.emptyList();
     }
     return m_superInterfaces;
   }
@@ -154,7 +154,7 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   public List<TypeSpi> getTypes() {
     if (m_memberTypes == null) {
-      m_memberTypes = new ArrayList<>(0);
+      m_memberTypes = Collections.emptyList();
     }
     return m_memberTypes;
   }
@@ -162,7 +162,7 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   public List<MethodSpi> getMethods() {
     if (m_methods == null) {
-      m_methods = new ArrayList<>(0);
+      m_methods = Collections.emptyList();
     }
     return m_methods;
   }
@@ -170,7 +170,7 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   public List<TypeSpi> getTypeArguments() {
     if (m_typeArguments == null) {
-      m_typeArguments = new ArrayList<>(0);
+      m_typeArguments = Collections.emptyList();
     }
     return m_typeArguments;
   }
@@ -178,7 +178,7 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   public List<FieldSpi> getFields() {
     if (m_fields == null) {
-      m_fields = new ArrayList<>(0);
+      m_fields = Collections.emptyList();
     }
     return m_fields;
   }

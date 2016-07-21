@@ -38,14 +38,17 @@ public class EmptyImportCollector implements IImportCollector {
 
   @Override
   public void addStaticImport(String fqn) {
+    // empty collector must not add anything
   }
 
   @Override
   public void addImport(String fqn) {
+    // empty collector must not add anything
   }
 
   @Override
   public void reserveElement(SignatureDescriptor cand) {
+    // empty collector must not add anything
   }
 
   @Override

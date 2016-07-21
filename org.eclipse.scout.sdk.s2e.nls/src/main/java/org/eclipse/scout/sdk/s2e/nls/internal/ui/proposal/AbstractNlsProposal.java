@@ -175,6 +175,7 @@ public abstract class AbstractNlsProposal implements IJavaCompletionProposal, IC
   }
 
   @Override
+  @SuppressWarnings("squid:S1168") // should return null as by javadoc
   public char[] getTriggerCharacters() {
     return null;
   }

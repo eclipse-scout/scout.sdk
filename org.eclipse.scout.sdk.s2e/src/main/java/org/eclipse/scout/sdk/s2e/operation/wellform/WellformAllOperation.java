@@ -38,9 +38,11 @@ public class WellformAllOperation implements IOperation {
 
   @Override
   public void validate() {
+    // no input: nothing to validate
   }
 
   @Override
+  @SuppressWarnings("squid:S1067")
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     int numTicks = 100;
     int searchStepTicks = 1;

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -138,6 +139,10 @@ public final class SpiWithJdtUtils {
         case IJavaRuntimeTypes._void: {
           return TypeBinding.VOID;
         }
+        default: {
+          // all short class names continue
+          break;
+        }
       }
     }
     char[][] lookupName = CharOperation.splitOn('.', fqn.toCharArray());
@@ -215,6 +220,7 @@ public final class SpiWithJdtUtils {
     return null;
   }
 
+  @SuppressWarnings("squid:AssignmentInSubExpressionCheck")
   static int getTypeFlags(int modifiers, QualifiedAllocationExpression allocation, boolean hasDeprecatedAnnotation) {
     int currentModifiers = modifiers;
     boolean isEnumInit = allocation != null && allocation.enumConstant != null;
@@ -391,7 +397,7 @@ public final class SpiWithJdtUtils {
 
   static List<BindingAnnotationWithJdt> createBindingAnnotations(JavaEnvironmentWithJdt env, AnnotatableSpi owner, AnnotationBinding[] annots) {
     if (annots == null || annots.length < 1) {
-      return new ArrayList<>(0);
+      return Collections.emptyList();
     }
     List<BindingAnnotationWithJdt> result = new ArrayList<>(annots.length);
     for (int i = 0; i < annots.length; i++) {
@@ -402,7 +408,7 @@ public final class SpiWithJdtUtils {
 
   static List<DeclarationAnnotationWithJdt> createDeclarationAnnotations(JavaEnvironmentWithJdt env, AnnotatableSpi owner, Annotation[] annotations) {
     if (annotations == null || annotations.length < 1) {
-      return new ArrayList<>(0);
+      return Collections.emptyList();
     }
     List<DeclarationAnnotationWithJdt> result = new ArrayList<>(annotations.length);
     for (int i = 0; i < annotations.length; i++) {

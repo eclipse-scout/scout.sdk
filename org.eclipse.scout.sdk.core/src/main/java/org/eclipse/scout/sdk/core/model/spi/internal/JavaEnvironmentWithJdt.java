@@ -266,7 +266,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     Object key = VoidTypeWithJdt.class;
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new VoidTypeWithJdt(this));
+      elem = new VoidTypeWithJdt(this);
+      m_compilerCache.put(key, elem);
     }
     return (VoidTypeWithJdt) elem;
   }
@@ -275,7 +276,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     Object key = WildcardOnlyTypeWithJdt.class;
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new WildcardOnlyTypeWithJdt(this));
+      elem = new WildcardOnlyTypeWithJdt(this);
+      m_compilerCache.put(key, elem);
     }
     return (WildcardOnlyTypeWithJdt) elem;
   }
@@ -284,7 +286,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(binding);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingAnnotationWithJdt(this, owner, binding));
+      elem = new BindingAnnotationWithJdt(this, owner, binding);
+      m_compilerCache.put(key, elem);
     }
     return (BindingAnnotationWithJdt) elem;
   }
@@ -293,7 +296,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(owner, bindingPair);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingAnnotationElementWithJdt(this, owner, bindingPair, syntheticDefaultValue));
+      elem = new BindingAnnotationElementWithJdt(this, owner, bindingPair, syntheticDefaultValue);
+      m_compilerCache.put(key, elem);
     }
     return (BindingAnnotationElementWithJdt) elem;
   }
@@ -302,7 +306,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(binding, isWildcard);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingArrayTypeWithJdt(this, binding, isWildcard));
+      elem = new BindingArrayTypeWithJdt(this, binding, isWildcard);
+      m_compilerCache.put(key, elem);
     }
     return (BindingArrayTypeWithJdt) elem;
   }
@@ -311,7 +316,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(binding);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingBaseTypeWithJdt(this, binding));
+      elem = new BindingBaseTypeWithJdt(this, binding);
+      m_compilerCache.put(key, elem);
     }
     return (BindingBaseTypeWithJdt) elem;
   }
@@ -320,7 +326,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(binding);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingFieldWithJdt(this, declaringType, binding));
+      elem = new BindingFieldWithJdt(this, declaringType, binding);
+      m_compilerCache.put(key, elem);
     }
     return (BindingFieldWithJdt) elem;
   }
@@ -329,7 +336,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(binding);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingMethodWithJdt(this, declaringType, binding));
+      elem = new BindingMethodWithJdt(this, declaringType, binding);
+      m_compilerCache.put(key, elem);
     }
     return (BindingMethodWithJdt) elem;
   }
@@ -338,7 +346,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(declaringMethod, binding, name, index);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingMethodParameterWithJdt(this, declaringMethod, binding, name, index));
+      elem = new BindingMethodParameterWithJdt(this, declaringMethod, binding, name, index);
+      m_compilerCache.put(key, elem);
     }
     return (BindingMethodParameterWithJdt) elem;
   }
@@ -347,7 +356,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(binding, isWildcard);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingTypeWithJdt(this, binding, declaringType, isWildcard));
+      elem = new BindingTypeWithJdt(this, binding, declaringType, isWildcard);
+      m_compilerCache.put(key, elem);
     }
     return (BindingTypeWithJdt) elem;
   }
@@ -356,7 +366,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(declaringMember, binding, index);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingTypeParameterWithJdt(this, declaringMember, binding, index));
+      elem = new BindingTypeParameterWithJdt(this, declaringMember, binding, index);
+      m_compilerCache.put(key, elem);
     }
     return (BindingTypeParameterWithJdt) elem;
   }
@@ -365,7 +376,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationAnnotationWithJdt(this, owner, astNode));
+      elem = new DeclarationAnnotationWithJdt(this, owner, astNode);
+      m_compilerCache.put(key, elem);
     }
     return (DeclarationAnnotationWithJdt) elem;
   }
@@ -374,7 +386,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationAnnotationElementWithJdt(this, declaringAnnotation, astNode, syntheticDefaultValue));
+      elem = new DeclarationAnnotationElementWithJdt(this, declaringAnnotation, astNode, syntheticDefaultValue);
+      m_compilerCache.put(key, elem);
     }
     return (DeclarationAnnotationElementWithJdt) elem;
   }
@@ -383,7 +396,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationCompilationUnitWithJdt(this, astNode));
+      elem = new DeclarationCompilationUnitWithJdt(this, astNode);
+      m_compilerCache.put(key, elem);
     }
     return (DeclarationCompilationUnitWithJdt) elem;
   }
@@ -392,7 +406,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationFieldWithJdt(this, declaringType, astNode));
+      elem = new DeclarationFieldWithJdt(this, declaringType, astNode);
+      m_compilerCache.put(key, elem);
     }
     return (DeclarationFieldWithJdt) elem;
   }
@@ -401,7 +416,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationImportWithJdt(this, owner, astNode));
+      elem = new DeclarationImportWithJdt(this, owner, astNode);
+      m_compilerCache.put(key, elem);
     }
     return (DeclarationImportWithJdt) elem;
   }
@@ -410,7 +426,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationMethodWithJdt(this, declaringType, astNode));
+      elem = new DeclarationMethodWithJdt(this, declaringType, astNode);
+      m_compilerCache.put(key, elem);
     }
     return (DeclarationMethodWithJdt) elem;
   }
@@ -419,7 +436,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationMethodParameterWithJdt(this, declaringMethod, astNode, index));
+      elem = new DeclarationMethodParameterWithJdt(this, declaringMethod, astNode, index);
+      m_compilerCache.put(key, elem);
     }
     return (DeclarationMethodParameterWithJdt) elem;
   }
@@ -428,7 +446,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationTypeWithJdt(this, cu, declaringType, astNode));
+      elem = new DeclarationTypeWithJdt(this, cu, declaringType, astNode);
+      m_compilerCache.put(key, elem);
     }
     return (DeclarationTypeWithJdt) elem;
   }
@@ -437,7 +456,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationTypeParameterWithJdt(this, declaringMember, astNode, index));
+      elem = new DeclarationTypeParameterWithJdt(this, declaringMember, astNode, index);
+      m_compilerCache.put(key, elem);
     }
     return (DeclarationTypeParameterWithJdt) elem;
   }
@@ -446,7 +466,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     CompositeObject key = new CompositeObject(PackageWithJdt.class, name);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new PackageWithJdt(this, name));
+      elem = new PackageWithJdt(this, name);
+      m_compilerCache.put(key, elem);
     }
     return (PackageWithJdt) elem;
   }
@@ -459,7 +480,8 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     SameCompositeObject key = new SameCompositeObject(SyntheticCompilationUnitWithJdt.class, mainType);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new SyntheticCompilationUnitWithJdt(this, mainType));
+      elem = new SyntheticCompilationUnitWithJdt(this, mainType);
+      m_compilerCache.put(key, elem);
     }
     return (SyntheticCompilationUnitWithJdt) elem;
   }

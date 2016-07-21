@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -61,7 +62,7 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
     m_cu = Validate.notNull(cu);
     m_declaringType = declaringType;
     m_astNode = Validate.notNull(astNode);
-    m_typeArguments = new ArrayList<>(0); // no arguments for declarations
+    m_typeArguments = Collections.emptyList(); // no arguments for declarations
     m_fqn = calcFullyQualifiedName(astNode);
     m_flags = -1; // mark as uninitialized
   }
@@ -158,7 +159,7 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
     if (m_fields == null) {
       FieldDeclaration[] fields = m_astNode.fields;
       if (fields == null || fields.length < 1) {
-        m_fields = new ArrayList<>(0);
+        m_fields = Collections.emptyList();
       }
       else {
         List<FieldSpi> result = new ArrayList<>(fields.length);
@@ -176,7 +177,7 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
     if (m_methods == null) {
       AbstractMethodDeclaration[] methods = m_astNode.methods;
       if (methods == null || methods.length < 1) {
-        m_methods = new ArrayList<>(0);
+        m_methods = Collections.emptyList();
       }
       else {
         List<MethodSpi> result = new ArrayList<>(methods.length);
@@ -200,7 +201,7 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
     if (m_memberTypes == null) {
       TypeDeclaration[] memberTypes = m_astNode.memberTypes;
       if (memberTypes == null || memberTypes.length < 1) {
-        m_memberTypes = new ArrayList<>(0);
+        m_memberTypes = Collections.emptyList();
       }
       else {
         List<TypeSpi> result = new ArrayList<>(memberTypes.length);
@@ -237,7 +238,7 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
     if (m_superInterfaces == null) {
       TypeReference[] refs = m_astNode.superInterfaces;
       if (refs == null || refs.length < 1) {
-        m_superInterfaces = new ArrayList<>(0);
+        m_superInterfaces = Collections.emptyList();
       }
       else {
         List<TypeSpi> result = new ArrayList<>(refs.length);
@@ -274,7 +275,7 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
     if (m_typeParameters == null) {
       TypeParameter[] typeParams = m_astNode.typeParameters;
       if (typeParams == null || typeParams.length < 1) {
-        m_typeParameters = new ArrayList<>(0);
+        m_typeParameters = Collections.emptyList();
       }
       else {
         List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);

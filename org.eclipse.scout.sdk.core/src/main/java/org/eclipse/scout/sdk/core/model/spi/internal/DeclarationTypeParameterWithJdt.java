@@ -64,16 +64,6 @@ public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<
     return new TypeParameterImplementor(this);
   }
 
-  protected static char[] computeUniqueKey(org.eclipse.jdt.internal.compiler.ast.TypeParameter typeParam) {
-    StringBuffer sig = new StringBuffer();
-    typeParam.printStatement(0, sig);
-
-    int sigLength = sig.length();
-    char[] uniqueKey = new char[sigLength];
-    sig.getChars(0, sigLength, uniqueKey, 0);
-    return uniqueKey;
-  }
-
   public org.eclipse.jdt.internal.compiler.ast.TypeParameter getInternalTypeParameter() {
     return m_astNode;
   }

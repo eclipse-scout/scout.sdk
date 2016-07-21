@@ -97,6 +97,7 @@ public final class SdkLog {
     SdkConsole.println(level, message.toString(), extractThrowables(argStartIndex, args));
   }
 
+  @SuppressWarnings("squid:S1168")
   static Throwable[] extractThrowables(int startIndex, Object... args) {
     if (args == null || args.length <= startIndex) {
       return null;
@@ -145,7 +146,8 @@ public final class SdkLog {
 
     while ((curIndex = messageBuilder.indexOf(ARG_REPLACE_PATTERN, lastPos)) >= 0 && nextIndex < args.length) {
       int endPos = curIndex + ARG_REPLACE_PATTERN.length();
-      messageBuilder.replace(curIndex, endPos, toString(args[nextIndex++]));
+      messageBuilder.replace(curIndex, endPos, toString(args[nextIndex]));
+      nextIndex++;
       lastPos = endPos;
     }
 
@@ -210,6 +212,7 @@ public final class SdkLog {
     throw new IllegalArgumentException();
   }
 
+  @SuppressWarnings({"squid:S1181", "squid:S1166", "squid:S1148"})
   private static String safeObjectToString(Object o) {
     if (o == null) {
       return "null";

@@ -74,7 +74,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     SdkConsole.setConsoleSpi(new WorkbenchSdkConsoleSpi());
 
     // comment source builder
-    CommentSourceBuilderFactory.commentSourceBuilderSpi = new JdtSettingsCommentSourceBuilderDelegate();
+    CommentSourceBuilderFactory.setCommentSourceBuilderSpi(new JdtSettingsCommentSourceBuilderDelegate());
 
     // property change listener (scout preferences)
     if (m_preferencesPropertyListener == null) {
@@ -107,7 +107,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
       m_preferencesPropertyListener = null;
     }
 
-    CommentSourceBuilderFactory.commentSourceBuilderSpi = null;
+    CommentSourceBuilderFactory.setCommentSourceBuilderSpi(null);
 
     SdkConsole.setConsoleSpi(null); // reset to default
 
@@ -143,13 +143,13 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   }
 
   @Override
-  protected ImageRegistry createImageRegistry() {
+  protected ScoutImageRegistry createImageRegistry() {
     // If we are in the UI Thread use that
     if (Display.getCurrent() != null) {
-      return new ImageRegistry(Display.getCurrent());
+      return new ScoutImageRegistry(Display.getCurrent());
     }
     if (PlatformUI.isWorkbenchRunning()) {
-      return new ImageRegistry(PlatformUI.getWorkbench().getDisplay());
+      return new ScoutImageRegistry(PlatformUI.getWorkbench().getDisplay());
     }
     // Invalid thread access if it is not the UI Thread
     // and the workbench is not created.
@@ -157,8 +157,8 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   }
 
   @Override
-  public ImageRegistry getImageRegistry() {
-    return (ImageRegistry) super.getImageRegistry();
+  public ScoutImageRegistry getImageRegistry() {
+    return (ScoutImageRegistry) super.getImageRegistry();
   }
 
   /**

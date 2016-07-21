@@ -66,6 +66,7 @@ public final class ScoutProjectNewHelper {
     createProject(workingDir, groupId, artifactId, displayName, javaVersion, null, null, null);
   }
 
+  @SuppressWarnings("squid:S00107")
   public static void createProject(File workingDir, String groupId, String artifactId, String displayName, String javaVersion,
       String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion) throws IOException {
 
@@ -159,10 +160,8 @@ public final class ScoutProjectNewHelper {
       List<Node> nodesToRemove = new ArrayList<>();
       for (int i = 0; i < childNodes.getLength(); i++) {
         Node n = childNodes.item(i);
-        if (n.getNodeType() == Node.TEXT_NODE) {
-          nodesToRemove.add(n);
-        }
-        else if (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !targetDirectory.getName().equals(n.getTextContent().trim())) {
+        if (n.getNodeType() == Node.TEXT_NODE
+            || (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !targetDirectory.getName().equals(n.getTextContent().trim()))) {
           nodesToRemove.add(n);
         }
       }

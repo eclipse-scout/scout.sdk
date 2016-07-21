@@ -74,7 +74,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
       IPackageFragmentRoot r = (IPackageFragmentRoot) getNlsType().getType().getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
       if (r == null) {
         SdkLog.warning("Could not find text resource for type '{}'.", getNlsType().getType().getFullyQualifiedName());
-        return new ArrayList<>(0);
+        return Collections.emptyList();
       }
       return loadTranslationFilesFromPlatform(getNlsType(), r);
     }

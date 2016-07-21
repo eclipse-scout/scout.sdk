@@ -76,20 +76,17 @@ public class WrappedList<T> extends AbstractList<T> implements RandomAccess {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (o == this) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == m_spiList) {
-      return true;
-    }
-    if (!(o instanceof List)) {
+    if (obj == null) {
       return false;
     }
-    List<?> other = (List<?>) o;
-    if (other.size() != m_spiList.size()) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
-    return m_spiList.equals(o);
+    WrappedList<?> other = (WrappedList<?>) obj;
+    return m_spiList.equals(other.m_spiList);
   }
 }

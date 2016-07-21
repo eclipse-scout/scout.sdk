@@ -134,6 +134,7 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
   private static final class P_EmptyCompilerRequestor implements ICompilerRequestor {
     @Override
     public void acceptResult(CompilationResult result) {
+      // we are not interested in the results
     }
   }
 
@@ -148,14 +149,17 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
 
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
+      // we are not interested
     }
 
     @Override
     public void flush() throws IOException {
+      // we are not interested
     }
 
     @Override
     public void close() throws IOException {
+      // we are not interested
     }
   }
 }

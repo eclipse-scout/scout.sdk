@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.importcollector;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -163,6 +164,7 @@ public class ImportCollector implements IImportCollector {
     return organizeImports(m_staticImports.values(), m_imports.values(), includeExisting);
   }
 
+  @SuppressWarnings("squid:ForLoopCounterChangedCheck")
   protected List<String> organizeImports(Collection<ImportElement> unsortedList1, Collection<ImportElement> unsortedList2, boolean includeExisting) {
     List<ImportElement> workList = new LinkedList<>();
     workList.addAll(unsortedList1);
@@ -262,7 +264,9 @@ public class ImportCollector implements IImportCollector {
   /**
    * Sort in the following order: java, javax, org, other
    */
-  private static final class ImportComparator implements Comparator<ImportElement> {
+  private static final class ImportComparator implements Comparator<ImportElement>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public int compare(ImportElement e1, ImportElement e2) {
       return prefix(e1).compareTo(prefix(e2));

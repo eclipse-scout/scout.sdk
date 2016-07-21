@@ -26,9 +26,6 @@ import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
  */
 public final class NlsWorkspace implements INlsWorkspace {
 
-  public NlsWorkspace() {
-  }
-
   @Override
   public INlsProject getNlsProject(final Object[] args) throws CoreException {
     IExtensionRegistry reg = Platform.getExtensionRegistry();

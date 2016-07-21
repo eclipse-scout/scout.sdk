@@ -275,8 +275,8 @@ public class PlatformMockFactory {
       Method method = getClass().getDeclaredMethod("initMock", type);
       invokeMethod(element, method);
     }
-    catch (NoSuchMethodException | SecurityException e1) {
-      // nop
+    catch (NoSuchMethodException | SecurityException e) {
+      throw new SdkException(e);
     }
   }
 

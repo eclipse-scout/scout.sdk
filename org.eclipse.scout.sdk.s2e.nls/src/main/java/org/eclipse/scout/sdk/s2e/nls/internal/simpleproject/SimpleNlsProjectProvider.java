@@ -29,9 +29,6 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
   private final Map<String, INlsProject> m_projects = new HashMap<>();
   private static final Object LOCK = new Object();
 
-  public SimpleNlsProjectProvider() {
-  }
-
   protected INlsProject getNlsProject(IType type) {
     if (type == null) {
       SdkLog.error("NLS type cannot be null.");

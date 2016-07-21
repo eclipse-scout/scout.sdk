@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.structured;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -106,7 +107,7 @@ public class StructuredType implements IStructuredType {
   public <T extends IJavaElement> List<T> getElements(Categories category, Class<T> clazz) {
     List<? extends IJavaElement> elements = getElementsInternal(category);
     if (elements == null) {
-      return new ArrayList<>(0);
+      return Collections.emptyList();
     }
 
     List<T> result = new ArrayList<>(elements.size());

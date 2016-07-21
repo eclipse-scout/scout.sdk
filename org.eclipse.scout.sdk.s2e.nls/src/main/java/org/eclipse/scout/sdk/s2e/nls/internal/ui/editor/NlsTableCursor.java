@@ -74,6 +74,7 @@ public class NlsTableCursor {
     });
     m_cursor.addKeyListener(new KeyAdapter() {
       @Override
+      @SuppressWarnings("squid:SwitchLastCaseIsDefaultCheck")
       public void keyPressed(KeyEvent e) {
         switch (e.stateMask) {
           case SWT.CONTROL:
@@ -120,9 +121,6 @@ public class NlsTableCursor {
         createEditableText();
       }
     });
-  }
-
-  private void showInheritedWarning() {
   }
 
   /**
@@ -191,7 +189,6 @@ public class NlsTableCursor {
 
   public void createEditableText(String input) {
     if (m_cursor.getRow().getData() instanceof InheritedNlsEntry) {
-      showInheritedWarning();
       return;
     }
     if (m_cursor.getColumn() < NlsTable.AMOUNT_UTILITY_COLS) {
@@ -259,6 +256,7 @@ public class NlsTableCursor {
       }
 
       @Override
+      @SuppressWarnings("squid:SwitchLastCaseIsDefaultCheck")
       public void keyPressed(KeyEvent e) {
         switch (e.keyCode) {
           case SWT.ESC: {

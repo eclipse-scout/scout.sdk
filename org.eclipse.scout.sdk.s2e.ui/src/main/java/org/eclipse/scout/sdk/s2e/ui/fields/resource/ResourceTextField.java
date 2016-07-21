@@ -97,6 +97,7 @@ public class ResourceTextField extends TextField {
   }
 
   @Override
+  @SuppressWarnings("squid:S1166")
   protected void createContent(Composite parent) {
     super.createContent(parent);
 
@@ -146,6 +147,7 @@ public class ResourceTextField extends TextField {
 
       @Override
       public void focusGained(FocusEvent e) {
+        // nop
       }
     });
 
@@ -278,6 +280,7 @@ public class ResourceTextField extends TextField {
     return m_filterExtensions;
   }
 
+  @SuppressWarnings("squid:S1166")
   public File getFile() {
     URL url = getUrl();
     if (url == null) {

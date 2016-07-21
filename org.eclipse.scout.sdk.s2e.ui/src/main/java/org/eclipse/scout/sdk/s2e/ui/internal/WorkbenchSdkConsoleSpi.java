@@ -41,6 +41,7 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.ISdkConsoleSpi {
   }
 
   @Override
+  @SuppressWarnings({"squid:S1166", "squid:S1148"})
   public void println(Level level, String s, Throwable... exceptions) {
     try (IOConsoleOutputStream out = currentConsole(true).newOutputStream()) {
       if (Level.SEVERE.equals(level)) {

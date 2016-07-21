@@ -658,9 +658,12 @@ public class WebServiceFormPage extends FormPage {
       ProposalTextField entryPointPackageField = m_entryPointPackageFields.get(i);
       IType portType = getPortType(entryPointNameField);
       IType entryPointDefinition = getInput().getEntryPointDefinition(portType);
-      if (S2eUtils.exists(entryPointDefinition) && (isPortTypeNameChanged() || isPackageChanged() || isEntryPointNameChanged(entryPointNameField) || isEntryPointPackageChanged(entryPointPackageField))) {
-        EntryPointDefinitionUpdate up = new EntryPointDefinitionUpdate(entryPointDefinition, entryPointPackageField.getText(), entryPointNameField.getText(), getPortTypeNameField(portType).getText(), m_packageField.getText());
-        op.addEntryPointDefinitionUpdate(up);
+      if (S2eUtils.exists(entryPointDefinition)) {
+        boolean isChanged = isPortTypeNameChanged() || isPackageChanged() || isEntryPointNameChanged(entryPointNameField) || isEntryPointPackageChanged(entryPointPackageField);
+        if (isChanged) {
+          EntryPointDefinitionUpdate up = new EntryPointDefinitionUpdate(entryPointDefinition, entryPointPackageField.getText(), entryPointNameField.getText(), getPortTypeNameField(portType).getText(), m_packageField.getText());
+          op.addEntryPointDefinitionUpdate(up);
+        }
       }
     }
   }
@@ -680,6 +683,9 @@ public class WebServiceFormPage extends FormPage {
         break;
       case IStatus.WARNING:
         severity = IMessageProvider.WARNING;
+        break;
+      default:
+        severity = IMessageProvider.NONE;
         break;
     }
     getManagedForm().getForm().setMessage(status.getMessage(), severity);

@@ -231,6 +231,7 @@ public class NlsTable extends Composite {
     m_actionHanlder = handler;
   }
 
+  @SuppressWarnings("squid:S881")
   private void createColumns(Table table) {
     // cleare old columns
     TableColumn[] cols = m_table.getColumns();
@@ -295,10 +296,8 @@ public class NlsTable extends Composite {
     }
     else if (col.equals(m_sortColumn)) {
       int sortDir = SWT.UP;
-      switch (m_table.getSortDirection()) {
-        case SWT.UP:
-          sortDir = SWT.DOWN;
-          break;
+      if (m_table.getSortDirection() == SWT.UP) {
+        sortDir = SWT.DOWN;
       }
       m_table.setSortDirection(sortDir);
     }

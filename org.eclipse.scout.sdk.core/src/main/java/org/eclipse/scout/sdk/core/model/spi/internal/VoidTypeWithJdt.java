@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
@@ -54,7 +54,7 @@ public final class VoidTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<AnnotationSpi> getAnnotations() {
-    return new ArrayList<>(0);
+    return Collections.emptyList();
   }
 
   @Override
@@ -109,7 +109,7 @@ public final class VoidTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    return new ArrayList<>(0);
+    return Collections.emptyList();
   }
 
   @Override
@@ -134,22 +134,22 @@ public final class VoidTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<TypeSpi> getSuperInterfaces() {
-    return new ArrayList<>(0);
+    return Collections.emptyList();
   }
 
   @Override
   public List<TypeSpi> getTypes() {
-    return new ArrayList<>(0);
+    return Collections.emptyList();
   }
 
   @Override
   public List<MethodSpi> getMethods() {
-    return new ArrayList<>(0);
+    return Collections.emptyList();
   }
 
   @Override
   public List<TypeSpi> getTypeArguments() {
-    return new ArrayList<>(0);
+    return Collections.emptyList();
   }
 
   @Override
@@ -159,7 +159,7 @@ public final class VoidTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<FieldSpi> getFields() {
-    return new ArrayList<>(0);
+    return Collections.emptyList();
   }
 
   @Override

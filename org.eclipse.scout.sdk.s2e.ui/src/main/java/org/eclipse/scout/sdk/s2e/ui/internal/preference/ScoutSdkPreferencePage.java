@@ -47,5 +47,6 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
 
   @Override
   public void init(IWorkbench workbench) {
+    // nop
   }
 }
