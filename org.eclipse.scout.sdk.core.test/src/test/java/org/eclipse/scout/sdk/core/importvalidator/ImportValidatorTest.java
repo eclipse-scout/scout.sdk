@@ -44,6 +44,24 @@ import org.junit.Test;
 public class ImportValidatorTest {
 
   @Test
+  public void testImportGrouping() {
+    IImportCollector iv = createImportCollector("com.orig.pck");
+    iv.addImport("org.test.bla.Clazz1");
+    iv.addImport("org.test.bla.Clazz2");
+    iv.addImport("net.application.whatever.Clazz4");
+    iv.addImport("net.application.whatever.Clazz5");
+    iv.addImport("net.application.whatever.Clazz6");
+    iv.addImport("javax.test.Clazz7");
+    iv.addStaticImport("org.test.bla.Clazz1.myMethod");
+
+    List<String> importsToCreate = iv.createImportDeclarations();
+    Assert.assertEquals(Arrays.asList("import static org.test.bla.Clazz1.myMethod;", "",
+        "import javax.test.Clazz7;", "",
+        "import org.test.bla.Clazz1;", "import org.test.bla.Clazz2;", "",
+        "import net.application.whatever.Clazz4;", "import net.application.whatever.Clazz5;", "import net.application.whatever.Clazz6;"), importsToCreate);
+  }
+
+  @Test
   public void testJavaLangPackage() {
     IImportCollector iv = createImportCollector("test");
     IImportValidator validator = new ImportValidator(iv);

@@ -13,14 +13,13 @@ package org.eclipse.scout.sdk.core.importcollector;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
@@ -164,56 +163,39 @@ public class ImportCollector implements IImportCollector {
     return organizeImports(m_staticImports.values(), m_imports.values(), includeExisting);
   }
 
-  @SuppressWarnings("squid:ForLoopCounterChangedCheck")
-  protected List<String> organizeImports(Collection<ImportElement> unsortedList1, Collection<ImportElement> unsortedList2, boolean includeExisting) {
-    List<ImportElement> workList = new LinkedList<>();
-    workList.addAll(unsortedList1);
-    workList.addAll(unsortedList2);
-
-    //filter
-    for (Iterator<ImportElement> it = workList.iterator(); it.hasNext();) {
-      ImportElement e = it.next();
+  protected void addFiltered(Collection<ImportElement> elements, boolean includeExisting, Collection<ImportElement> collector) {
+    for (ImportElement e : elements) {
       if (!includeExisting && e.m_fromExisting) {
-        it.remove();
         continue;
       }
-      if (e.m_static) {
-        //keep
-        continue;
+
+      if (!e.m_static) {
+        if (!e.m_used) {
+          continue;
+        }
+        // don't create imports for java.lang.* classes
+        if ("java.lang".equals(e.m_packageName)) {
+          continue;
+        }
       }
-      if (!e.m_used) {
-        it.remove();
-        continue;
-      }
-      // don't create imports for java.lang.* classes and classes in the same package.
-      if ("java.lang".equals(e.m_packageName)) {
-        it.remove();
-        continue;
-      }
+      collector.add(e);
     }
+  }
 
-    //sort
-    Collections.sort(workList, new ImportComparator());
+  protected List<String> organizeImports(Collection<ImportElement> unsortedList1, Collection<ImportElement> unsortedList2, boolean includeExisting) {
+    Set<ImportElement> workList = new TreeSet<>(new ImportComparator());
+    addFiltered(unsortedList1, includeExisting, workList);
+    addFiltered(unsortedList2, includeExisting, workList);
 
-    //add empty lines for import grouping
-    String curGroup = null;
-    for (int i = 0; i < workList.size(); i++) {
-      ImportElement e = workList.get(i);
-      if (curGroup == null) {
-        curGroup = e.m_group;
-        continue;
-      }
-      if (curGroup.equals(e.m_group)) {
-        continue;
-      }
-      curGroup = e.m_group;
-      workList.add(i, null);
-      i++;
-    }
-
-    List<String> result = new ArrayList<>(workList.size());
+    String lastGroup = null;
+    List<String> result = new ArrayList<>(workList.size() + 7 /* max number of empty group lines */);
     for (ImportElement e : workList) {
-      result.add(e != null ? e.createImportDeclaration() : "");
+      if (lastGroup != null && !lastGroup.equals(e.m_group)) {
+        //add empty lines for import grouping
+        result.add("");
+      }
+      result.add(e.createImportDeclaration());
+      lastGroup = e.m_group;
     }
     return result;
   }
@@ -269,17 +251,15 @@ public class ImportCollector implements IImportCollector {
 
     @Override
     public int compare(ImportElement e1, ImportElement e2) {
-      return prefix(e1).compareTo(prefix(e2));
-    }
-
-    private static String prefix(ImportElement e) {
-      StringBuilder buf = new StringBuilder();
-      buf.append(e.m_group);
-      buf.append('.');
-      buf.append(e.m_packageName);
-      buf.append('.');
-      buf.append(e.m_simpleName);
-      return buf.toString();
+      int result = e1.m_group.compareTo(e2.m_group);
+      if (result != 0) {
+        return result;
+      }
+      result = e1.m_packageName.compareTo(e2.m_packageName);
+      if (result != 0) {
+        return result;
+      }
+      return e1.m_simpleName.compareTo(e2.m_simpleName);
     }
   }
 }
