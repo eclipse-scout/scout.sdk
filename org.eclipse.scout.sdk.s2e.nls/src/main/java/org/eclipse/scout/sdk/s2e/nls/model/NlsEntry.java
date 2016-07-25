@@ -73,7 +73,7 @@ public class NlsEntry implements INlsEntry {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
+
     NlsEntry other = (NlsEntry) obj;
     try {
       m_lock.readLock().lock();

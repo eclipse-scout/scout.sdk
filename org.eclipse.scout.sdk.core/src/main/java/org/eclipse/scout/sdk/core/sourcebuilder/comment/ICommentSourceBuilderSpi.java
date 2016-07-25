@@ -17,8 +17,8 @@ import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 
 /**
- * <h3>{@link ICommentSourceBuilderSpi}</h3> The workspace delegate that creates default comments on types,
- * methods, fields, ...
+ * <h3>{@link ICommentSourceBuilderSpi}</h3> The workspace delegate that creates default comments on types, methods,
+ * fields, ...
  *
  * @author Andreas Hoegger
  * @since 3.10.0 2013-07-12

@@ -18,13 +18,13 @@ import javax.annotation.Generated;
  *
  */
 public @interface AnnotationWithDefaultValues {
-  public int num() default 1;
+  int num() default 1;
 
-  public RoundingMode enumValue() default RoundingMode.HALF_UP;
+  RoundingMode enumValue() default RoundingMode.HALF_UP;
 
-  public String string() default "one";
+  String string() default "one";
 
-  public Class<?> type() default String.class;
+  Class<?> type() default String.class;
 
-  public Generated anno() default @Generated("g") ;
+  Generated anno() default @Generated("g");
 }

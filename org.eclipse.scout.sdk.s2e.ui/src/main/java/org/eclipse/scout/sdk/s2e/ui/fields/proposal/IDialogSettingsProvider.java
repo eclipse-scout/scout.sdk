@@ -15,8 +15,8 @@ import org.eclipse.jface.dialogs.PopupDialog;
 
 /**
  * <h3>{@link IDialogSettingsProvider}</h3> Optional feature interface for dialog settings for
- * {@link IProposalContentProvider}s. If a content provider implements this interface and returns valid dialog
- * settings, the {@link ProposalPopup} remembers its size.
+ * {@link IProposalContentProvider}s. If a content provider implements this interface and returns valid dialog settings,
+ * the {@link ProposalPopup} remembers its size.
  *
  * @author Andreas Hoegger
  * @since 3.8.0 2012-02-22

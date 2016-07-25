@@ -23,8 +23,8 @@ import javax.annotation.Generated;
     strings = {"alpha", ClassWithAnnotationConstants.ALPHA},
     types = {String.class, String.class},
     annos = {
-        @AnnotationWithSingleValues(type = Integer.class, enumValue = RoundingMode.HALF_UP, num = 11, string = "beta", anno = @Generated("g1") ),
-        @AnnotationWithSingleValues(type = Integer.class, enumValue = RoundingMode.HALF_DOWN, num = 12, string = ClassWithAnnotationConstants.BETA, anno = @Generated("g2") ),
+        @AnnotationWithSingleValues(type = Integer.class, enumValue = RoundingMode.HALF_UP, num = 11, string = "beta", anno = @Generated("g1")),
+        @AnnotationWithSingleValues(type = Integer.class, enumValue = RoundingMode.HALF_DOWN, num = 12, string = ClassWithAnnotationConstants.BETA, anno = @Generated("g2")),
     })
 public class ClassWithAnnotationWithArrayValues {
 
@@ -34,8 +34,8 @@ public class ClassWithAnnotationWithArrayValues {
       strings = {"gamma", ClassWithAnnotationConstants.GAMMA},
       types = {Float.class, Float.class},
       annos = {
-          @AnnotationWithSingleValues(type = Double.class, enumValue = RoundingMode.HALF_EVEN, num = 31, string = "delta", anno = @Generated("g3") ),
-          @AnnotationWithSingleValues(type = Double.class, enumValue = RoundingMode.HALF_EVEN, num = 32, string = ClassWithAnnotationConstants.DELTA, anno = @Generated("g4") ),
+          @AnnotationWithSingleValues(type = Double.class, enumValue = RoundingMode.HALF_EVEN, num = 31, string = "delta", anno = @Generated("g3")),
+          @AnnotationWithSingleValues(type = Double.class, enumValue = RoundingMode.HALF_EVEN, num = 32, string = ClassWithAnnotationConstants.DELTA, anno = @Generated("g4")),
       })
   public void run(String a) {
     System.out.println(a);
