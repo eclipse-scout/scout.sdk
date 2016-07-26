@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -65,6 +64,7 @@ public class MissingClassIdsNewOperation implements IOperation {
 
   @Override
   public void validate() {
+    // no input, no validation
   }
 
   @Override
@@ -120,7 +120,11 @@ public class MissingClassIdsNewOperation implements IOperation {
     int numTypes = 0;
     Map<ICompilationUnit, Set<IType>> typesWithoutClassId = new HashMap<>();
     for (IType t : candidates) {
-      if (S2eUtils.exists(t) && !t.isBinary() && t.isClass() && !t.isAnonymous() && !t.isReadOnly() && !Flags.isAbstract(t.getFlags())) {
+      boolean isValidType = S2eUtils.exists(t)
+          && t.isClass()
+          && !t.isBinary()
+          && !t.isAnonymous();
+      if (isValidType) {
         IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
         if (annotation == null) {
           ICompilationUnit icu = t.getCompilationUnit();
