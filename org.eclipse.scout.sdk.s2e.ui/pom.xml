@@ -90,9 +90,9 @@
             <Require-Bundle>
               org.eclipse.scout.sdk.s2e;bundle-version="[6.1,6.2)";visibility:=reexport,
               org.eclipse.scout.sdk.s2e.doc;bundle-version="[6.1,6.2)";visibility:=reexport,
-              org.eclipse.jdt.ui;bundle-version="[3.11,4)";visibility:=reexport,
-              org.eclipse.jdt.launching;bundle-version="[3.8.0,4)";visibility:=reexport,
-              org.eclipse.m2e.core.ui;bundle-version="[1.6.0,2)";visibility:=reexport
+              org.eclipse.jdt.ui;bundle-version="[3.12,4)";visibility:=reexport,
+              org.eclipse.jdt.launching;bundle-version="[3.8.100,4)";visibility:=reexport,
+              org.eclipse.m2e.core.ui;bundle-version="[1.7,2)";visibility:=reexport
             </Require-Bundle>
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator</Bundle-Activator>
           </instructions>

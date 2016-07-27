@@ -387,7 +387,6 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
     return true;
   }
 
-  @SuppressWarnings("unchecked")
   private static String evaluateTemplate(CodeTemplateContext context, Template template) {
     // replace the user name resolver with our own to ensure we can respect the scout specific user names.
     Iterator<TemplateVariableResolver> resolvers = context.getContextType().resolvers();
@@ -460,33 +459,33 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
       if (buf.length() > 0) {
         buf.append(lineDelimiter).append(lineStart);
       }
-      buf.append("@param <").append(typeParameterNames[i]).append('>'); //$NON-NLS-1$
+      buf.append("@param <").append(typeParameterNames[i]).append('>');
     }
     for (int i = 0; i < paramNames.length; i++) {
       if (buf.length() > 0) {
         buf.append(lineDelimiter).append(lineStart);
       }
-      buf.append("@param ").append(paramNames[i]); //$NON-NLS-1$
+      buf.append("@param ").append(paramNames[i]);
     }
-    if (returnType != null && !"void".equals(returnType)) { //$NON-NLS-1$
+    if (returnType != null && !"void".equals(returnType)) {
       if (buf.length() > 0) {
         buf.append(lineDelimiter).append(lineStart);
       }
-      buf.append("@return"); //$NON-NLS-1$
+      buf.append("@return");
     }
     if (exceptionNames != null) {
       for (int i = 0; i < exceptionNames.length; i++) {
         if (buf.length() > 0) {
           buf.append(lineDelimiter).append(lineStart);
         }
-        buf.append("@throws ").append(exceptionNames[i]); //$NON-NLS-1$
+        buf.append("@throws ").append(exceptionNames[i]);
       }
     }
     if (isDeprecated) {
       if (buf.length() > 0) {
         buf.append(lineDelimiter).append(lineStart);
       }
-      buf.append("@deprecated"); //$NON-NLS-1$
+      buf.append("@deprecated");
     }
     if (buf.length() == 0 && isAllCommentWhitespace(lineStart)) {
       int prevLine = textBuffer.getLineOfOffset(offset) - 1;
@@ -494,7 +493,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         IRegion prevRegion = textBuffer.getLineInformation(prevLine);
         int prevLineEnd = prevRegion.getOffset() + prevRegion.getLength();
         // clear full line
-        textBuffer.replace(prevLineEnd, offset + length - prevLineEnd, ""); //$NON-NLS-1$
+        textBuffer.replace(prevLineEnd, offset + length - prevLineEnd, "");
         return;
       }
     }

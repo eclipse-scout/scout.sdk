@@ -41,11 +41,6 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>org.eclipse.mars-dependencies.target</file>
-                  <type>target</type>
-                  <classifier>org.eclipse.mars-dependencies</classifier>
-                </artifact>
-                <artifact>
                   <file>org.eclipse.neon-dependencies.target</file>
                   <type>target</type>
                   <classifier>org.eclipse.neon-dependencies</classifier>

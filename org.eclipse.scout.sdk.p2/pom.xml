@@ -113,7 +113,7 @@
                 <groupId>org.eclipse.scout.sdk</groupId>
                 <artifactId>org.eclipse.scout.sdk-target</artifactId>
                 <version>${project.version}</version>
-                <classifier>org.eclipse.mars-dependencies</classifier>
+                <classifier>org.eclipse.neon-dependencies</classifier>
               </artifact>
             </target>
           </configuration>

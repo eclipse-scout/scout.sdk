@@ -20,17 +20,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.batch.ClasspathJar;
+import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.compat.CompatibilityLayer;
 
 public class WorkspaceFileSystem implements INameEnvironment {
   private static final char SEPARATOR = '/';
@@ -236,11 +235,6 @@ public class WorkspaceFileSystem implements INameEnvironment {
       encoding = StandardCharsets.UTF_8.name();
     }
 
-    return CompatibilityLayer.getFileSystemClasspath(f, source, encoding, new Callable<Map<?, ?>>() {
-      @Override
-      public Map<?, ?> call() throws Exception {
-        return AstCompiler.createDefaultOptions().getMap();
-      }
-    });
+    return FileSystem.getClasspath(f.getAbsolutePath(), encoding, source, null, null, AstCompiler.optsMap);
   }
 }

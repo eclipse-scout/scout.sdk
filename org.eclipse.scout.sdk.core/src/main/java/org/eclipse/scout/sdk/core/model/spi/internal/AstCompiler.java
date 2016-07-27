@@ -33,11 +33,41 @@ import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
  *
  */
 public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
+
+  static final CompilerOptions opts;
+  static final Map<String, String> optsMap;
+  static {
+    opts = new CompilerOptions();
+    opts.produceDebugAttributes = 0;
+    opts.complianceLevel = ClassFileConstants.JDK1_9;
+    opts.originalComplianceLevel = opts.complianceLevel;
+    opts.sourceLevel = opts.complianceLevel;
+    opts.originalSourceLevel = opts.complianceLevel;
+    opts.targetJDK = opts.complianceLevel;
+    opts.verbose = false; // enable for debug info
+    opts.preserveAllLocalVariables = true;
+    opts.parseLiteralExpressionsAsConstants = false;
+    opts.reportUnusedParameterIncludeDocCommentReference = false;
+    opts.reportUnusedDeclaredThrownExceptionExemptExceptionAndThrowable = false;
+    opts.suppressOptionalErrors = true;
+    opts.performMethodsFullRecovery = false;
+    opts.performStatementsRecovery = true;
+    opts.generateClassFiles = false;
+    opts.reportMissingOverrideAnnotationForInterfaceMethodImplementation = false;
+    opts.ignoreSourceFolderWarningOption = true;
+    opts.analyseResourceLeaks = false;
+    opts.ignoreMethodBodies = true;
+    opts.docCommentSupport = true; //we want javadoc start and end positions
+    opts.isAnnotationBasedNullAnalysisEnabled = false; // do not enable (performance and NPE in JDT compiler)
+    opts.storeAnnotations = true; // also parse annotations
+    optsMap = opts.getMap();
+  }
+
   private final Map<CompilationUnitDeclaration, ICompilationUnit> m_sources = new HashMap<>();
 
   @SuppressWarnings("resource")
   public AstCompiler(INameEnvironment nameEnv) {
-    super(nameEnv, DefaultErrorHandlingPolicies.proceedWithAllProblems(), createDefaultOptions(), new P_EmptyCompilerRequestor(), new CollectingProblemFactory(), new P_EmptyPrintWriter(), null /*progress*/);
+    super(nameEnv, DefaultErrorHandlingPolicies.proceedWithAllProblems(), opts, new P_EmptyCompilerRequestor(), new CollectingProblemFactory(), new P_EmptyPrintWriter(), null);
     lookupEnvironment.completeTypeBindings(); // must be called once so that the initial state is ready
   }
 
@@ -67,33 +97,6 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
       return sb.toString();
     }
     return null;
-  }
-
-  static CompilerOptions createDefaultOptions() {
-    CompilerOptions opts = new CompilerOptions();
-    opts.produceDebugAttributes = 0;
-    opts.complianceLevel = ClassFileConstants.JDK1_8;
-    opts.originalComplianceLevel = opts.complianceLevel;
-    opts.sourceLevel = opts.complianceLevel;
-    opts.originalSourceLevel = opts.complianceLevel;
-    opts.targetJDK = opts.complianceLevel;
-    opts.verbose = false; // enable for debug info
-    opts.preserveAllLocalVariables = true;
-    opts.parseLiteralExpressionsAsConstants = false;
-    opts.reportUnusedParameterIncludeDocCommentReference = false;
-    opts.reportUnusedDeclaredThrownExceptionExemptExceptionAndThrowable = false;
-    opts.suppressOptionalErrors = true;
-    opts.performMethodsFullRecovery = false;
-    opts.performStatementsRecovery = true;
-    opts.generateClassFiles = false;
-    opts.reportMissingOverrideAnnotationForInterfaceMethodImplementation = false;
-    opts.ignoreSourceFolderWarningOption = true;
-    opts.analyseResourceLeaks = false;
-    opts.ignoreMethodBodies = true;
-    opts.docCommentSupport = true; //we want javadoc start and end positions
-    opts.isAnnotationBasedNullAnalysisEnabled = false; // do not enable (performance and NPE in JDT compiler)
-    opts.storeAnnotations = true; // also parse annotations
-    return opts;
   }
 
   private static final class CollectingProblemFactory extends DefaultProblemFactory {

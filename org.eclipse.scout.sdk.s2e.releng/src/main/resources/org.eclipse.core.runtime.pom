@@ -60,10 +60,5 @@
       <artifactId>org.eclipse.core.contenttype</artifactId>
       <version>${org.eclipse.core.contenttype-range}</version>
     </dependency>
-    <!-- <dependency> -->
-    <!-- <groupId>org.eclipse.scout.sdk.deps</groupId> -->
-    <!-- <artifactId>org.eclipse.equinox.app</artifactId> -->
-    <!-- <version>1.0.0</version> -->
-    <!-- </dependency> -->
   </dependencies>
 </project>

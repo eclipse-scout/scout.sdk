@@ -1,6 +1,6 @@
 target "Scout SDK Eclipse Neon Dependencies" with source
 
-location eclipse_mars "http://download.eclipse.org/releases/neon/" {
+location eclipse_neon "http://download.eclipse.org/releases/neon/" {
     org.eclipse.platform.feature.group [4.6.0,5.0.0)
     org.eclipse.jdt.feature.group [3.12.0,4.0.0)
     org.eclipse.emf.common.feature.group [2.12.0,3.0.0)
@@ -11,7 +11,7 @@ location eclipse_mars "http://download.eclipse.org/releases/neon/" {
 
     // required for scout.sdk.core
     org.apache.commons.lang3 [3.1.0,4.0.0)
-    javax.wsdl [1.5.1,2.0.0)
+    javax.wsdl [1.6.2,1.7.0)
 
     // required for m2e.core
     org.eclipse.m2e.feature.feature.group [1.7.0,2.0.0)

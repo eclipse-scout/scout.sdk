@@ -59,7 +59,7 @@
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.2.1</version>
+          <version>1.3.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -111,9 +111,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_mars</id>
-              <url>http://download.eclipse.org/releases/mars/</url>
-              <!-- <url>https://scout.bsiag.com/repository/eclipse.releases.mars</url> -->
+              <id>eclipse_neon</id>
+              <url>http://download.eclipse.org/releases/neon/</url>
               <layout>p2</layout>
             </repository>
           </source>
@@ -473,10 +472,10 @@
             </goals>
             <phase>validate</phase>
             <configuration>
-              <url>http://mirror.switch.ch/eclipse/eclipse/downloads/drops4/R-4.5-201506032000/ecj-${ecj}.jar</url>
+              <url>http://mirror.switch.ch/eclipse/eclipse/downloads/drops4/R-4.6-201606061100/ecj-${ecj}.jar</url>
               <outputDirectory>${downloaded}</outputDirectory>
               <outputFileName>ecj_${ecj}.jar</outputFileName>
-              <sha512>fece651e07351cc65655474d03cd141747bf9d49f955c96bf280b51408468a485666faf00df432d5b87c08938cbf243d6a0bf932ee09a80dcdc7bbfe04dc24f9</sha512>
+              <sha512>616866c166ae1fef00cc659799c842621f965e64764e4962c1e14140aded150585f58cc2360d58d3a578a51d259cbe655d3c72a0e543ec43257237153fa25ccb</sha512>
             </configuration>
           </execution>
           <execution>
@@ -486,10 +485,10 @@
             </goals>
             <phase>validate</phase>
             <configuration>
-              <url>http://mirror.switch.ch/eclipse/eclipse/downloads/drops4/R-4.5-201506032000/ecjsrc-${ecj}.jar</url>
+              <url>http://mirror.switch.ch/eclipse/eclipse/downloads/drops4/R-4.6-201606061100/ecjsrc-${ecj}.jar</url>
               <outputDirectory>${downloaded}</outputDirectory>
               <outputFileName>ecj.source_${ecj}.jar</outputFileName>
-              <sha512>1c21248fe2c624ce9314ae8828402ecfc2a157af59e9f4ef517b8bbc12836457adac8939fd7eaabb0112ab3e2d114c2ce545be73f615a8d93ce16e3f6e9b6d01</sha512>
+              <sha512>f07ee9e00633fa15cc7bfdebb2ad07e6226c9df68e4a8b3d756def60c2cc2092faafb40461743c1f0980667e9d071a475245c8cee5c36888b9eaeddd25874aa3</sha512>
             </configuration>
           </execution>
         </executions>

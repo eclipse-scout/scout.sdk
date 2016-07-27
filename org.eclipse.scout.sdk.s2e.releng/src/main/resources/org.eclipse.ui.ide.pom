@@ -55,6 +55,22 @@
       <artifactId>org.eclipse.ui</artifactId>
       <version>${org.eclipse.ui-range}</version>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.core.resources</artifactId>
+      <version>${org.eclipse.core.resources-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.ui.views</artifactId>
+      <version>${org.eclipse.ui.views-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.ui.forms</artifactId>
+      <version>${org.eclipse.ui.forms-range}</version>
+    </dependency>
+
     <!-- org.eclipse.help;bundle-version="[3.2.0,4.0.0)" -->
     <!-- org.eclipse.equinox.p2.engine;bundle-version="[2.0.0,3.0.0)" -->
     <!-- org.eclipse.equinox.p2.metadata;bundle-version="[2.0.0,3.0.0)" -->
