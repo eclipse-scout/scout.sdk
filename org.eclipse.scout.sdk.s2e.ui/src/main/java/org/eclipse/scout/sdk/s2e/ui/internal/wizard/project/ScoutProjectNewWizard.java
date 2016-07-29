@@ -47,7 +47,7 @@ import org.eclipse.ui.IWorkbench;
 public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard {
 
   private static final String EXEC_ENV_PREFIX = "JavaSE-";
-  private static final String MIN_JVM_VERSION = "1.7";
+  private static final String MIN_JVM_VERSION = "1.8";
 
   private ScoutProjectNewWizardPage m_page1;
 
@@ -176,8 +176,8 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
   }
 
   /**
-   * Takes an java execution environment (e.g. "JavaSE-1.8") and parses the version as double (in this example 1.8).<br>
-   * If an invalid value is passed, always 1.7 is returned as minimal version.<br>
+   * Takes an java execution environment (e.g. "JavaSE-1.9") and parses the version as double (in this example 1.9).<br>
+   * If an invalid value is passed, always 1.8 is returned as minimal version.<br>
    * Use {@link #getDefaultJvmExecutionEnvironment()} to get the default execution environment in the current workspace.
    *
    * @param executionEnvId
