@@ -10,11 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.util;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -132,12 +137,16 @@ public final class CoreScoutUtils {
     // calculate next values
     if (orderValueBefore != null && orderValueAfter == null) {
       // insert at last position
-      double v = Math.ceil(orderValueBefore.doubleValue() / ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      double orderValueBeforeAsDouble = orderValueBefore.doubleValue();
+      validateOrderRange(orderValueBeforeAsDouble);
+      double v = Math.ceil(orderValueBeforeAsDouble / ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       return v + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }
     else if (orderValueBefore == null && orderValueAfter != null) {
       // insert at first position
-      double v = Math.floor(orderValueAfter.doubleValue() / ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      double orderValueAfterAsDouble = orderValueAfter.doubleValue();
+      validateOrderRange(orderValueAfterAsDouble);
+      double v = Math.floor(orderValueAfterAsDouble / ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       if (v > ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) {
         return ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       }
@@ -147,11 +156,22 @@ public final class CoreScoutUtils {
       // insert between two types
       double a = orderValueBefore.doubleValue();
       double b = orderValueAfter.doubleValue();
+      validateOrderRange(a);
+      validateOrderRange(b);
       return getOrderValueInBetween(a, b);
     }
 
     // other cases. e.g. first item in a container
     return ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+  }
+
+  private static void validateOrderRange(double order) {
+    if (order > ISdkProperties.DEFAULT_VIEW_ORDER) {
+      NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
+      f.setGroupingUsed(false);
+      String orderAsString = f.format(order);
+      SdkLog.warning("The @Order value {} is very large and therefore may not be precise enough. It is recommended to use a lower value.", orderAsString);
+    }
   }
 
   static Double getOrderAnnotationValue(IType sibling) {
@@ -164,6 +184,10 @@ public final class CoreScoutUtils {
   static IType[] findSiblings(IType declaringType, int pos, String orderDefinitionType) {
     IType prev = null;
     for (IType t : declaringType.innerTypes().withInstanceOf(orderDefinitionType).list()) {
+      if (Flags.isAbstract(t.flags())) {
+        continue; // these are no valid siblings
+      }
+
       if (t.source().start() > pos) {
         return new IType[]{prev, t};
       }

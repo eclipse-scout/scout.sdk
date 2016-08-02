@@ -16,6 +16,7 @@ import java.io.StringReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
@@ -25,6 +26,8 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import formdata.client.ui.forms.FormWithHighOrders;
 
 /**
  * <h3>{@link CoreScoutUtilsTest}</h3>
@@ -38,12 +41,19 @@ public class CoreScoutUtilsTest {
 
   @Test
   public void testNewViewOrderValue() {
-    IType type = CoreScoutTestingUtils.createClientJavaEnvironment().findType("formdata.client.ui.forms.IgnoredFieldsForm$MainBox$AGroupBox");
+    IJavaEnvironment environment = CoreScoutTestingUtils.createClientJavaEnvironment();
+    IType type = environment.findType("formdata.client.ui.forms.IgnoredFieldsForm$MainBox$AGroupBox");
     IType first = type.innerTypes().first();
     IType second = type.innerTypes().list().get(1);
     Assert.assertEquals(-1000.0, CoreScoutUtils.getNewViewOrderValue(type, IScoutRuntimeTypes.IFormField, first.source().start() - 1), DELTA);
     Assert.assertEquals(15.0, CoreScoutUtils.getNewViewOrderValue(type, IScoutRuntimeTypes.IFormField, first.source().end() + 1), DELTA);
     Assert.assertEquals(2000.0, CoreScoutUtils.getNewViewOrderValue(type, IScoutRuntimeTypes.IFormField, second.source().end() + 1), DELTA);
+
+    IType formWithHighOrders = environment.findType(FormWithHighOrders.class.getName());
+    IType mainBox = formWithHighOrders.innerTypes().first();
+    IType aGroupBox = mainBox.innerTypes().first();
+    Assert.assertEquals(99382716061728384d, CoreScoutUtils.getNewViewOrderValue(mainBox, IScoutRuntimeTypes.IFormField, aGroupBox.source().end() + 1), DELTA);
+    Assert.assertEquals(1000, CoreScoutUtils.getNewViewOrderValue(aGroupBox, IScoutRuntimeTypes.IFormField, aGroupBox.source().start() + 1), DELTA);
   }
 
   @Test
