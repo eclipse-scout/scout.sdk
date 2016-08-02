@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.util.ast;
 
+import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -211,15 +213,10 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
         newOrder = CoreScoutUtils.getNewViewOrderValue(getFactory().getJavaEnvironment().findType(declaringTypeFqn), getOrderDefinitionType(), getInsertPosition());
       }
 
-      final String zeroSuffix = ".0";
-      String newOrderStr = Double.toString(newOrder);
-      if (newOrderStr.endsWith(zeroSuffix)) {
-        newOrderStr = newOrderStr.substring(0, newOrderStr.length() - zeroSuffix.length());
-      }
       SingleMemberAnnotation order = ast.newSingleMemberAnnotation();
       String orderRef = getFactory().getImportRewrite().addImport(IScoutRuntimeTypes.Order);
       order.setTypeName(ast.newName(orderRef));
-      NumberLiteral orderValue = ast.newNumberLiteral(newOrderStr);
+      NumberLiteral orderValue = ast.newNumberLiteral(convertOrderToJavaSourceString(newOrder));
       order.setValue(orderValue);
 
       AstUtils.addAnnotationTo(order, m_resultType);
@@ -249,6 +246,23 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
       typeRewrite.insertAfter(m_resultType, previousNode, null);
     }
     return m_return;
+  }
+
+  protected static String convertOrderToJavaSourceString(double order) {
+    NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
+    f.setGroupingUsed(false);
+    String newOrderStr = f.format(order);
+
+    final String zeroSuffix = ".0";
+    if (newOrderStr.endsWith(zeroSuffix)) {
+      newOrderStr = newOrderStr.substring(0, newOrderStr.length() - zeroSuffix.length());
+    }
+
+    if (order > Integer.MAX_VALUE && newOrderStr.indexOf('.') < 0) {
+      // we must specify the double data type because we do not have a decimal separator and we do not fit into an integer literal.
+      newOrderStr += 'd';
+    }
+    return newOrderStr;
   }
 
   private static final class P_EnsureElementInRewriteFilter implements IFilter<ASTNode> {
