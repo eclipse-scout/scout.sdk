@@ -113,8 +113,10 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       Method doMain = mavenCli.getMethod("doMain", new Class[]{String[].class, String.class, PrintStream.class, PrintStream.class});
       Object ret = doMain.invoke(mavenCli.newInstance(), mavenArgs, workingDirectory.getAbsolutePath(), out, err);
 
+      System.out.printf("Output of embedded Maven call:\nMVN-BEGIN\n%s\nMVN-END\n", bOut.toString(charset));
       int result = ((Integer) ret).intValue();
       if (result != 0) {
+        System.out.printf("Error Output of embedded Maven call:\nMVN-BEGIN\n%s\nMVN-END\n", bErr.toString(charset));
         throw new IOException(MAVEN_CALL_FAILED_MSG);
       }
     }
