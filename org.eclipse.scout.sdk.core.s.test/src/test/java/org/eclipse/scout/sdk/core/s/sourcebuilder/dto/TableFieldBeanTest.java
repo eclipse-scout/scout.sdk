@@ -29,7 +29,7 @@ public class TableFieldBeanTest {
   public static final String AbstractAddressTableField = "formdata.client.ui.template.formfield.AbstractAddressTableField";
   public static final String TableFieldBaseForm = "formdata.client.ui.forms.replace.TableFieldBaseForm";
   public static final String TableFieldExForm = "formdata.client.ui.forms.replace.TableFieldExForm";
-
+  public static final String ColumnWithoutTypeForm = "formdata.client.ui.forms.ColumnWithoutTypeForm";
   public static final String BaseWithExtendedTableForm = "formdata.client.ui.forms.BaseWithExtendedTableForm";
   public static final String ChildWithExtendedTableForm = "formdata.client.ui.forms.ChildWithExtendedTableForm";
 
@@ -40,6 +40,12 @@ public class TableFieldBeanTest {
     testTableFieldExFormData();
     testBaseWithExtendedTableFormData();
     testChildWithExtendedTableFormData();
+    testColumnWithoutType();
+  }
+
+  private static void testColumnWithoutType() {
+    IType dto = CoreScoutTestingUtils.createFormDataAssertNoCompileErrors(ColumnWithoutTypeForm);
+    testApiOfColumnWithoutTypeFormData(dto);
   }
 
   private static void testAbstractTableField() {
@@ -932,4 +938,102 @@ public class TableFieldBeanTest {
 
     Assert.assertEquals("inner types count of 'ChildTableRowData'", 0, childTableRowData.innerTypes().list().size());
   }
+
+  /**
+   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   */
+  private static void testApiOfColumnWithoutTypeFormData(IType columnWithoutTypeFormData) {
+    SdkAssert.assertHasFlags(columnWithoutTypeFormData, 1);
+    SdkAssert.assertHasSuperTypeSignature(columnWithoutTypeFormData, "Lorg.eclipse.scout.rt.shared.data.form.AbstractFormData;");
+    Assert.assertEquals("annotation count", 1, columnWithoutTypeFormData.annotations().list().size());
+    SdkAssert.assertAnnotation(columnWithoutTypeFormData, "javax.annotation.Generated");
+
+    // fields of ColumnWithoutTypeFormData
+    Assert.assertEquals("field count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData'", 1, columnWithoutTypeFormData.fields().list().size());
+    IField serialVersionUID = SdkAssert.assertFieldExist(columnWithoutTypeFormData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+    Assert.assertEquals("annotation count", 0, serialVersionUID.annotations().list().size());
+
+    Assert.assertEquals("method count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData'", 1, columnWithoutTypeFormData.methods().list().size());
+    IMethod getMyTable = SdkAssert.assertMethodExist(columnWithoutTypeFormData, "getMyTable", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getMyTable, "Lformdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable;");
+    Assert.assertEquals("annotation count", 0, getMyTable.annotations().list().size());
+
+    Assert.assertEquals("inner types count of 'ColumnWithoutTypeFormData'", 1, columnWithoutTypeFormData.innerTypes().list().size());
+    // type MyTable
+    IType myTable = SdkAssert.assertTypeExists(columnWithoutTypeFormData, "MyTable");
+    SdkAssert.assertHasFlags(myTable, 9);
+    SdkAssert.assertHasSuperTypeSignature(myTable, "Lorg.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;");
+    Assert.assertEquals("annotation count", 0, myTable.annotations().list().size());
+
+    // fields of MyTable
+    Assert.assertEquals("field count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable'", 1, myTable.fields().list().size());
+    IField serialVersionUID1 = SdkAssert.assertFieldExist(myTable, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID1, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID1, "J");
+    Assert.assertEquals("annotation count", 0, serialVersionUID1.annotations().list().size());
+
+    Assert.assertEquals("method count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable'", 7, myTable.methods().list().size());
+    IMethod addRow = SdkAssert.assertMethodExist(myTable, "addRow", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(addRow, "Lformdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData;");
+    Assert.assertEquals("annotation count", 1, addRow.annotations().list().size());
+    SdkAssert.assertAnnotation(addRow, "java.lang.Override");
+    IMethod addRow1 = SdkAssert.assertMethodExist(myTable, "addRow", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(addRow1, "Lformdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData;");
+    Assert.assertEquals("annotation count", 1, addRow1.annotations().list().size());
+    SdkAssert.assertAnnotation(addRow1, "java.lang.Override");
+    IMethod createRow = SdkAssert.assertMethodExist(myTable, "createRow", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(createRow, "Lformdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData;");
+    Assert.assertEquals("annotation count", 1, createRow.annotations().list().size());
+    SdkAssert.assertAnnotation(createRow, "java.lang.Override");
+    IMethod getRowType = SdkAssert.assertMethodExist(myTable, "getRowType", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getRowType, "Ljava.lang.Class<+Lorg.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;>;");
+    Assert.assertEquals("annotation count", 1, getRowType.annotations().list().size());
+    SdkAssert.assertAnnotation(getRowType, "java.lang.Override");
+    IMethod getRows = SdkAssert.assertMethodExist(myTable, "getRows", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getRows, "[Lformdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData;");
+    Assert.assertEquals("annotation count", 1, getRows.annotations().list().size());
+    SdkAssert.assertAnnotation(getRows, "java.lang.Override");
+    IMethod rowAt = SdkAssert.assertMethodExist(myTable, "rowAt", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(rowAt, "Lformdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData;");
+    Assert.assertEquals("annotation count", 1, rowAt.annotations().list().size());
+    SdkAssert.assertAnnotation(rowAt, "java.lang.Override");
+    IMethod setRows = SdkAssert.assertMethodExist(myTable, "setRows", new String[]{"[Lformdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData;"});
+    SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
+    Assert.assertEquals("annotation count", 0, setRows.annotations().list().size());
+
+    Assert.assertEquals("inner types count of 'MyTable'", 1, myTable.innerTypes().list().size());
+    // type MyTableRowData
+    IType myTableRowData = SdkAssert.assertTypeExists(myTable, "MyTableRowData");
+    SdkAssert.assertHasFlags(myTableRowData, 9);
+    SdkAssert.assertHasSuperTypeSignature(myTableRowData, "Lorg.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;");
+    Assert.assertEquals("annotation count", 0, myTableRowData.annotations().list().size());
+
+    // fields of MyTableRowData
+    Assert.assertEquals("field count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData'", 3, myTableRowData.fields().list().size());
+    IField serialVersionUID2 = SdkAssert.assertFieldExist(myTableRowData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID2, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID2, "J");
+    Assert.assertEquals("annotation count", 0, serialVersionUID2.annotations().list().size());
+    IField my = SdkAssert.assertFieldExist(myTableRowData, "my");
+    SdkAssert.assertHasFlags(my, 25);
+    SdkAssert.assertFieldSignature(my, "Ljava.lang.String;");
+    Assert.assertEquals("annotation count", 0, my.annotations().list().size());
+    IField m_my = SdkAssert.assertFieldExist(myTableRowData, "m_my");
+    SdkAssert.assertHasFlags(m_my, 2);
+    SdkAssert.assertFieldSignature(m_my, "Ljava.lang.Object;");
+    Assert.assertEquals("annotation count", 0, m_my.annotations().list().size());
+
+    Assert.assertEquals("method count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData'", 2, myTableRowData.methods().list().size());
+    IMethod getMy = SdkAssert.assertMethodExist(myTableRowData, "getMy", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getMy, "Ljava.lang.Object;");
+    Assert.assertEquals("annotation count", 0, getMy.annotations().list().size());
+    IMethod setMy = SdkAssert.assertMethodExist(myTableRowData, "setMy", new String[]{"Ljava.lang.Object;"});
+    SdkAssert.assertMethodReturnTypeSignature(setMy, "V");
+    Assert.assertEquals("annotation count", 0, setMy.annotations().list().size());
+
+    Assert.assertEquals("inner types count of 'MyTableRowData'", 0, myTableRowData.innerTypes().list().size());
+  }
+
 }

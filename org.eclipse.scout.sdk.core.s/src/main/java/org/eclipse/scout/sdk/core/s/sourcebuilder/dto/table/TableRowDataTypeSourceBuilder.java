@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.ColumnDataAnnotation.SdkColumnCommand;
 import org.eclipse.scout.sdk.core.s.model.ScoutTypeComparators;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
@@ -43,6 +44,7 @@ import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
@@ -121,6 +123,10 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 
       // try to find the column value type with the local hierarchy first.
       String columnValueTypeSignature = DtoUtils.getColumnValueTypeSignature(column);
+      if (columnValueTypeSignature == null) {
+        SdkLog.warning("Column '{}' has no value type.", column.name());
+        columnValueTypeSignature = ISignatureConstants.SIG_JAVA_LANG_OBJECT;
+      }
       memberFieldBuilder.setSignature(columnValueTypeSignature);
       addSortedField(new CompositeObject(SortedMemberKeyFactory.FIELD_MEMBER + 1, i, columnBeanName), memberFieldBuilder);
 
