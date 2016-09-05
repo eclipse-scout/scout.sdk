@@ -518,6 +518,9 @@ public final class CoreUtils {
    */
   public static List<String> getResolvedTypeParamValueSignature(IType focusType, String levelFqn, int typeParamIndex) {
     List<IType> typeParamsValue = getResolvedTypeParamValue(focusType, levelFqn, typeParamIndex);
+    if (typeParamsValue.isEmpty()) {
+      return Collections.emptyList();
+    }
     List<String> result = new ArrayList<>(typeParamsValue.size());
     for (IType t : typeParamsValue) {
       result.add(SignatureUtils.getTypeSignature(t));
@@ -559,7 +562,11 @@ public final class CoreUtils {
     if (levelType == null) {
       return Collections.emptyList();
     }
-    IType item = levelType.typeArguments().get(typeParamIndex);
+    List<IType> typeArguments = levelType.typeArguments();
+    if (typeArguments.size() <= typeParamIndex) {
+      return Collections.emptyList();
+    }
+    IType item = typeArguments.get(typeParamIndex);
     if (!item.isParameterType()) {
       // direct bind
       return Arrays.asList(item);
