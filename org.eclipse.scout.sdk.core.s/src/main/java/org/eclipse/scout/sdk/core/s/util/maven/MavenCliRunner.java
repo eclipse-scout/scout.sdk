@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLClassLoader;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.MavenCli;
@@ -113,15 +115,22 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       Method doMain = mavenCli.getMethod("doMain", new Class[]{String[].class, String.class, PrintStream.class, PrintStream.class});
       Object ret = doMain.invoke(mavenCli.newInstance(), mavenArgs, workingDirectory.getAbsolutePath(), out, err);
 
-      System.out.printf("Output of embedded Maven call:\nMVN-BEGIN\n%s\nMVN-END\n", bOut.toString(charset));
+      logStream(Level.INFO, bOut, charset);
       int result = ((Integer) ret).intValue();
       if (result != 0) {
-        System.out.printf("Error Output of embedded Maven call:\nMVN-BEGIN\n%s\nMVN-END\n", bErr.toString(charset));
+        logStream(Level.SEVERE, bErr, charset);
         throw new IOException(MAVEN_CALL_FAILED_MSG);
       }
     }
     catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
       throw new IOException(e);
+    }
+  }
+
+  protected static void logStream(Level level, ByteArrayOutputStream stream, String charset) throws UnsupportedEncodingException {
+    String outString = stream.toString(charset);
+    if (StringUtils.isNotBlank(outString)) {
+      SdkLog.log(level, "Output of embedded Maven call:\nMVN-BEGIN\n{}\nMVN-END\n", outString);
     }
   }
 }
