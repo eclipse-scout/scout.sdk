@@ -18,10 +18,13 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.util.Filters;
+import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.IProposalListener;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.StrictHierarchyTypeContentProvider;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
 import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -71,6 +74,15 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
 
     createPageServcieGroup(parent);
     createOptionsGroup(parent);
+
+    // remove AbstractPage from the proposal list
+    StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
+    superTypeContentProvider.setTypeProposalFilter(Filters.and(superTypeContentProvider.getTypeProposalFilter(), new IFilter<IType>() {
+      @Override
+      public boolean evaluate(IType element) {
+        return !IScoutRuntimeTypes.AbstractPage.equals(element.getFullyQualifiedName());
+      }
+    }));
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PAGE_NEW_WIZARD_PAGE);
   }

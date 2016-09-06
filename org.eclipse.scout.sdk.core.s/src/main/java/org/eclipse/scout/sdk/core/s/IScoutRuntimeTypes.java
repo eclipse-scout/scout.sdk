@@ -89,6 +89,7 @@ public interface IScoutRuntimeTypes {
   String AbstractLookupService = "org.eclipse.scout.rt.server.services.lookup.AbstractLookupService";
   String AbstractMenu = "org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu";
   String AbstractOkButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton";
+  String AbstractPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage";
   String AbstractPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes";
   String AbstractPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable";
   String AbstractPlanner = "org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner";
