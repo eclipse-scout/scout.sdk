@@ -140,9 +140,12 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
       }
       else {
         IMethodSourceBuilder execCreateChildPages = MethodSourceBuilderFactory.createOverride(pageBuilder, getPackageName(), getJavaEnvironment(), "execCreateChildPages");
-        execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.Order);
-        execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.ConfigOperation);
-        pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execCreateChildPages), execCreateChildPages);
+        if (execCreateChildPages != null) {
+          // execCreateChildPages may not exist if the super type is AbstractPage
+          execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.Order);
+          execCreateChildPages.removeAnnotation(IScoutRuntimeTypes.ConfigOperation);
+          pageBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodExecKey(execCreateChildPages), execCreateChildPages);
+        }
       }
     }
   }
