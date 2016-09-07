@@ -86,53 +86,58 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   @Override
   public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     // add CU scope to import validator chain
-    IImportCollector collector = new CompilationUnitScopedImportCollector(validator.getImportCollector(), getPackageName());
+    IImportCollector origImportCollector = validator.getImportCollector();
+    IImportCollector collector = new CompilationUnitScopedImportCollector(origImportCollector, getPackageName());
     validator.setImportCollector(collector);
+    try {
+      // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
+      consumeAllTypeNamesRec(m_types, collector);
 
-    // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
-    consumeAllTypeNamesRec(m_types, collector);
+      //declared imports
+      for (String s : m_declaredImports) {
+        collector.addImport(s);
+      }
+      for (String s : m_declaredStaticImports) {
+        collector.addStaticImport(s);
+      }
 
-    //declared imports
-    for (String s : m_declaredImports) {
-      collector.addImport(s);
-    }
-    for (String s : m_declaredStaticImports) {
-      collector.addStaticImport(s);
-    }
+      // header
+      StringBuilder headerSourceBuilder = new StringBuilder();
+      super.createSource(headerSourceBuilder, lineDelimiter, context, validator);
 
-    // header
-    StringBuilder headerSourceBuilder = new StringBuilder();
-    super.createSource(headerSourceBuilder, lineDelimiter, context, validator);
+      // package declaration
+      if (!StringUtils.isEmpty(getPackageName())) {
+        headerSourceBuilder.append("package ").append(getPackageName()).append(';').append(lineDelimiter).append(lineDelimiter);
+      }
 
-    // package declaration
-    if (!StringUtils.isEmpty(getPackageName())) {
-      headerSourceBuilder.append("package ").append(getPackageName()).append(';').append(lineDelimiter).append(lineDelimiter);
-    }
+      // type sources
+      StringBuilder typeSourceBuilder = new StringBuilder();
+      for (ITypeSourceBuilder typeBuilder : getTypes()) {
+        if (typeBuilder != null) {
+          typeBuilder.createSource(typeSourceBuilder, lineDelimiter, context, validator);
+        }
+      }
 
-    // type sources
-    StringBuilder typeSourceBuilder = new StringBuilder();
-    for (ITypeSourceBuilder typeBuilder : getTypes()) {
-      if (typeBuilder != null) {
-        typeBuilder.createSource(typeSourceBuilder, lineDelimiter, context, validator);
+      // imports
+      Collection<String> importsToCreate = collector.createImportDeclarations();
+      if (importsToCreate.size() > 0) {
+        for (String imp : importsToCreate) {
+          headerSourceBuilder.append(imp).append(lineDelimiter);
+        }
+        headerSourceBuilder.append(lineDelimiter);
+      }
+
+      source.append(headerSourceBuilder);
+      source.append(typeSourceBuilder);
+      source.append(lineDelimiter);
+
+      // footer
+      for (ISourceBuilder f : m_footerSourceBuilders) {
+        f.createSource(source, lineDelimiter, context, validator);
       }
     }
-
-    // imports
-    Collection<String> importsToCreate = collector.createImportDeclarations();
-    if (importsToCreate.size() > 0) {
-      for (String imp : importsToCreate) {
-        headerSourceBuilder.append(imp).append(lineDelimiter);
-      }
-      headerSourceBuilder.append(lineDelimiter);
-    }
-
-    source.append(headerSourceBuilder);
-    source.append(typeSourceBuilder);
-    source.append(lineDelimiter);
-
-    // footer
-    for (ISourceBuilder f : m_footerSourceBuilders) {
-      f.createSource(source, lineDelimiter, context, validator);
+    finally {
+      validator.setImportCollector(origImportCollector); // reset scope
     }
   }
 

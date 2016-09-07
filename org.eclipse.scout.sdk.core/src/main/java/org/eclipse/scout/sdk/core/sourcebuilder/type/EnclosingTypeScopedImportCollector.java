@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.sourcebuilder.type;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importcollector.WrappedImportCollector;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -62,8 +63,12 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
       m_enclosingQualifiers.add(qname);
       IType t = env.findType(qname);
       if (t != null) {
-        for (IType s : t.superTypes().withSuperTypes(true).list()) {
-          m_enclosingQualifiers.add(s.name());
+        for (IType s : t.superTypes().list()) {
+          String fqnName = s.name();
+          if (IJavaRuntimeTypes.Object.equals(fqnName)) {
+            continue;
+          }
+          m_enclosingQualifiers.add(fqnName);
           for (IType i : s.innerTypes().list()) {
             m_enclosedSimpleNames.add(i.elementName());
           }
