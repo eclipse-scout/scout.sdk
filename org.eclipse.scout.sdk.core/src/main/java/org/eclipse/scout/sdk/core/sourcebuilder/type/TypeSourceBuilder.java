@@ -93,50 +93,56 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
 
   @Override
   public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-    IImportCollector collector = new EnclosingTypeScopedImportCollector(validator.getImportCollector(), this);
+    IImportCollector origImportCollector = validator.getImportCollector();
+    IImportCollector collector = new EnclosingTypeScopedImportCollector(origImportCollector, this);
     validator.setImportCollector(collector);
 
-    super.createSource(source, lineDelimiter, context, validator);
+    try {
+      super.createSource(source, lineDelimiter, context, validator);
 
-    if (Flags.isInterface(getFlags()) && getSuperTypeSignature() != null) {
-      throw new IllegalArgumentException("An interface can not have a superclass.");
-    }
-
-    // type definition
-    source.append(Flags.toString(getFlags())).append(' ');
-    source.append(((getFlags() & Flags.AccInterface) != 0) ? ("interface ") : ("class "));
-    source.append(getElementName());
-
-    // type parameters
-    if (!m_typeParameters.isEmpty()) {
-      source.append(ISignatureConstants.C_GENERIC_START);
-      for (ITypeParameterSourceBuilder p : m_typeParameters) {
-        p.createSource(source, lineDelimiter, context, validator);
-        source.append(", ");
+      if (Flags.isInterface(getFlags()) && getSuperTypeSignature() != null) {
+        throw new IllegalArgumentException("An interface can not have a superclass.");
       }
-      source.setLength(source.length() - 2);
-      source.append(ISignatureConstants.C_GENERIC_END);
-    }
 
-    // super type (extends)
-    if (!StringUtils.isEmpty(getSuperTypeSignature())) {
-      String superTypeRefName = validator.useSignature(getSuperTypeSignature());
-      source.append(" extends ").append(superTypeRefName);
-    }
+      // type definition
+      source.append(Flags.toString(getFlags())).append(' ');
+      source.append(((getFlags() & Flags.AccInterface) != 0) ? ("interface ") : ("class "));
+      source.append(getElementName());
 
-    // interfaces
-    Iterator<String> interfaceSigIterator = getInterfaceSignatures().iterator();
-    if (interfaceSigIterator.hasNext()) {
-      source.append(((getFlags() & Flags.AccInterface) != 0) ? (" extends ") : (" implements "));
-      source.append(validator.useSignature(interfaceSigIterator.next()));
-      while (interfaceSigIterator.hasNext()) {
-        source.append(", ").append(validator.useSignature(interfaceSigIterator.next()));
+      // type parameters
+      if (!m_typeParameters.isEmpty()) {
+        source.append(ISignatureConstants.C_GENERIC_START);
+        for (ITypeParameterSourceBuilder p : m_typeParameters) {
+          p.createSource(source, lineDelimiter, context, validator);
+          source.append(", ");
+        }
+        source.setLength(source.length() - 2);
+        source.append(ISignatureConstants.C_GENERIC_END);
       }
+
+      // super type (extends)
+      if (!StringUtils.isEmpty(getSuperTypeSignature())) {
+        String superTypeRefName = validator.useSignature(getSuperTypeSignature());
+        source.append(" extends ").append(superTypeRefName);
+      }
+
+      // interfaces
+      Iterator<String> interfaceSigIterator = getInterfaceSignatures().iterator();
+      if (interfaceSigIterator.hasNext()) {
+        source.append(((getFlags() & Flags.AccInterface) != 0) ? (" extends ") : (" implements "));
+        source.append(validator.useSignature(interfaceSigIterator.next()));
+        while (interfaceSigIterator.hasNext()) {
+          source.append(", ").append(validator.useSignature(interfaceSigIterator.next()));
+        }
+      }
+      source.append(" {");
+      createTypeContent(source, lineDelimiter, context, validator);
+      source.append(lineDelimiter);
+      source.append('}');
     }
-    source.append(" {");
-    createTypeContent(source, lineDelimiter, context, validator);
-    source.append(lineDelimiter);
-    source.append('}');
+    finally {
+      validator.setImportCollector(origImportCollector); // reset scope
+    }
   }
 
   /**
