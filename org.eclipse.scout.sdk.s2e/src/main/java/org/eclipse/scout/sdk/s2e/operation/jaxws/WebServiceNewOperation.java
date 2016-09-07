@@ -44,6 +44,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
@@ -196,9 +198,37 @@ public class WebServiceNewOperation implements IOperation {
       createProviderServiceImplementations(progress.newChild(4), workingCopyManager);
     }
 
-    if (!isCreateNewModule()) {
+    if (isCreateNewModule()) {
+      setIgnoreOptionalProblems("target/generated-sources/wsimport", progress.newChild(2));
+    }
+    else {
       S2eUtils.mavenUpdate(Collections.singleton(getJaxWsProject().getProject()), false, true, false, false, progress.newChild(2));
     }
+  }
+
+  protected void setIgnoreOptionalProblems(String entryPath, IProgressMonitor monitor) throws JavaModelException {
+    final IJavaProject jaxWsProject = getJaxWsProject();
+    final IClasspathEntry[] rawClasspathEntries = jaxWsProject.getRawClasspath();
+    final List<IClasspathEntry> newEntries = new ArrayList<>(rawClasspathEntries.length);
+    final org.eclipse.core.runtime.Path entryPathToSearch = new org.eclipse.core.runtime.Path('/' + jaxWsProject.getElementName() + '/' + entryPath);
+
+    for (IClasspathEntry entry : rawClasspathEntries) {
+      if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE && entry.getPath().equals(entryPathToSearch)) {
+        IClasspathAttribute[] origAttributes = entry.getExtraAttributes();
+        List<IClasspathAttribute> newAttributes = new ArrayList<>(origAttributes.length + 1);
+        for (IClasspathAttribute attrib : origAttributes) {
+          if (!IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS.equals(attrib.getName())) {
+            newAttributes.add(attrib);
+          }
+        }
+        newAttributes.add(JavaCore.newClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, Boolean.TRUE.toString()));
+        newEntries.add(JavaCore.newSourceEntry(entry.getPath(), entry.getInclusionPatterns(), entry.getExclusionPatterns(), entry.getOutputLocation(), newAttributes.toArray(new IClasspathAttribute[newAttributes.size()])));
+      }
+      else {
+        newEntries.add(entry);
+      }
+    }
+    jaxWsProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), monitor);
   }
 
   protected String getWsdlBaseName() {
