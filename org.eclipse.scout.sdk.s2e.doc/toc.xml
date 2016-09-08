@@ -21,8 +21,8 @@
 		<topic href="html/sdk.html#effects-on-productivity-and-code-quality" label="Effects on Productivity and Code Quality"></topic>
 		<topic href="html/sdk.html#learn-more" label="Learn More"></topic>
 		<topic href="html/sdk_editor_java.html" label="Additions to the Java Editor">
-			<topic href="html/sdk_editor_java.html#create-new-form-fields" label="Create new Form Fields"></topic>
-			<topic href="html/sdk_editor_java.html#create-new-table-columns" label="Create new Table Columns"></topic>
+			<topic href="html/sdk_editor_java.html#sec-sdk_new_form_field" label="Create new Form Fields"></topic>
+			<topic href="html/sdk_editor_java.html#sec-sdk_new_table_column" label="Create new Table Columns"></topic>
 			<topic href="html/sdk_editor_java.html#create-new-codes" label="Create new Codes"></topic>
 			<topic href="html/sdk_editor_java.html#nls-entry-support" label="NLS-Entry support"></topic>
 		</topic>
