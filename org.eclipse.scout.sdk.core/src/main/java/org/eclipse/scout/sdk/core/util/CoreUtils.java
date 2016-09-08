@@ -35,6 +35,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -49,7 +51,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -135,7 +136,9 @@ public final class CoreUtils {
     X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded());
     PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded());
 
-    return new String[]{DatatypeConverter.printBase64Binary(pkcs8EncodedKeySpec.getEncoded()) /*private key*/, DatatypeConverter.printBase64Binary(x509EncodedKeySpec.getEncoded()) /* public key*/};
+    Encoder base64Encoder = Base64.getEncoder();
+
+    return new String[]{base64Encoder.encodeToString(pkcs8EncodedKeySpec.getEncoded()) /*private key*/, base64Encoder.encodeToString(x509EncodedKeySpec.getEncoded()) /* public key*/};
   }
 
   /**
