@@ -94,6 +94,7 @@ public class AstNodeFactory {
   public static final String AUTO_CHECK_GROUP = "AUTO_CHECK";
   public static final String MENU_TYPE_GROUP = "MENU_TYPE";
   public static final String EXTENDS_TYPE_GROUP = "EXTENDS_TYPE_GROUP";
+  public static final String AUTO_FIT_GROUP = "AUTO_FIT";
 
   private final AST m_ast;
   private final TypeDeclaration m_declaringType;
@@ -180,6 +181,15 @@ public class AstNodeFactory {
 
   public AstBigDecimalFieldBuilder newBigDecimalField(String name) {
     return new AstBigDecimalFieldBuilder(this)
+        .withClassId(true)
+        .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
+        .withOrder(true)
+        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withName(name);
+  }
+
+  public AstImageFieldBuilder newImageField(String name) {
+    return new AstImageFieldBuilder(this)
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
@@ -485,8 +495,7 @@ public class AstNodeFactory {
     ILinkedPositionHolder links = getLinkedPositionHolder();
     if (links != null) {
       links.addLinkedPosition(getRewrite().track(literal), true, LABEL_VISIBLE_GROUP);
-      links.addLinkedPositionProposal(LABEL_VISIBLE_GROUP, Boolean.FALSE.toString());
-      links.addLinkedPositionProposal(LABEL_VISIBLE_GROUP, Boolean.TRUE.toString());
+      links.addLinkedPositionProposalsBoolean(LABEL_VISIBLE_GROUP);
     }
 
     return newMethod("getConfiguredLabelVisible")

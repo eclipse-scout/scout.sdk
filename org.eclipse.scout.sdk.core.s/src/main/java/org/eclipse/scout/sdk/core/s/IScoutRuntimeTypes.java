@@ -149,6 +149,7 @@ public interface IScoutRuntimeTypes {
   String IFormHandler = "org.eclipse.scout.rt.client.ui.form.IFormHandler";
   String IGroupBox = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox";
   String IHtmlField = "org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField";
+  String IImageField = "org.eclipse.scout.rt.client.ui.form.fields.imagefield.IImageField";
   String IKeyStroke = "org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke";
   String ILabelField = "org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField";
   String IListBox = "org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox";

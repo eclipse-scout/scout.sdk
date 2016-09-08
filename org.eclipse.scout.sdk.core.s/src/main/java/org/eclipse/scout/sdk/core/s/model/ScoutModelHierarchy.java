@@ -163,6 +163,7 @@ public final class ScoutModelHierarchy {
     addInterfaceSuperType(IScoutRuntimeTypes.IGroupBox, IScoutRuntimeTypes.ICompositeField);
     addInterfaceSuperType(IScoutRuntimeTypes.IGroupBox, IScoutRuntimeTypes.IContextMenuOwner);
     addInterfaceSuperType(IScoutRuntimeTypes.IHtmlField, IScoutRuntimeTypes.IValueField);
+    addInterfaceSuperType(IScoutRuntimeTypes.IImageField, IScoutRuntimeTypes.IFormField);
     addInterfaceSuperType(IScoutRuntimeTypes.IKeyStroke, IScoutRuntimeTypes.IAction);
     addInterfaceSuperType(IScoutRuntimeTypes.ILabelField, IScoutRuntimeTypes.IValueField);
     addInterfaceSuperType(IScoutRuntimeTypes.IListBox, IScoutRuntimeTypes.IValueField);

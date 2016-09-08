@@ -236,6 +236,12 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
     addLinkedPositionProposalProvider(groupId, new P_HierarchyCallable(hierarchyBaseTypeFqn));
   }
 
+  @Override
+  public void addLinkedPositionProposalsBoolean(String groupId) {
+    addLinkedPositionProposal(groupId, Boolean.FALSE.toString());
+    addLinkedPositionProposal(groupId, Boolean.TRUE.toString());
+  }
+
   private void addLinkedPositionProposalProvider(String groupId, Callable<Proposal[]> callable) {
     FutureTask<Proposal[]> future = new FutureTask<>(callable);
     LinkedProposalPositionGroup group = m_linkedProposalModel.getPositionGroup(groupId, false);

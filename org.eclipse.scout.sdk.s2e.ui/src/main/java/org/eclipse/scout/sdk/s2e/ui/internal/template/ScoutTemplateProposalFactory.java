@@ -108,6 +108,8 @@ public final class ScoutTemplateProposalFactory {
         ISdkProperties.SUFFIX_COLUMN, ISdkIcons.ColumnAdd, 1000, ColumnProposal.class));
     TEMPLATES.put(IScoutRuntimeTypes.IExtension, new TemplateProposalDescriptor(IScoutRuntimeTypes.IExtension, IScoutRuntimeTypes.AbstractExtension, "My",
         ISdkProperties.SUFFIX_EXTENSION, ISdkIcons.ExtensionsAdd, 1000, ExtensionProposal.class));
+    TEMPLATES.put(IScoutRuntimeTypes.IImageField, new TemplateProposalDescriptor(IScoutRuntimeTypes.IImageField, IScoutRuntimeTypes.AbstractImageField, "MyImage",
+        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.FormFieldAdd, 1000, ImageFieldProposal.class));
   }
 
   public static List<ICompletionProposal> createTemplateProposals(IType declaringType, int offset, String prefix) {

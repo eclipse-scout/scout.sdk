@@ -43,6 +43,14 @@ public interface ILinkedPositionHolder {
   void addLinkedPositionProposal(String groupId, String proposal);
 
   /**
+   * Adds linked position proposals showing boolean proposals (<code>true</code>, <code>false</code>).
+   * 
+   * @param groupId
+   *          The id of the group that should present the proposal
+   */
+  void addLinkedPositionProposalsBoolean(String groupId);
+
+  /**
    * Adds a linked position proposal to the group with the given id.
    *
    * @param groupId
@@ -54,7 +62,7 @@ public interface ILinkedPositionHolder {
 
   /**
    * Adds a linked position proposal showing all abstract classes below the given hierarchy base class.
-   * 
+   *
    * @param groupId
    *          The id of the group that should present the proposal
    * @param hierarchyBaseTypeFqn
