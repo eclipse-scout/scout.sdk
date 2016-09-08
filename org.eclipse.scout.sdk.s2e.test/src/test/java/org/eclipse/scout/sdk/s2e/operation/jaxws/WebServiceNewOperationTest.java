@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
@@ -162,6 +163,11 @@ public class WebServiceNewOperationTest {
         catch (IOException e) {
           throw new CoreException(new ScoutStatus(e));
         }
+      }
+
+      @Override
+      protected void setIgnoreOptionalProblems(String entryPath, IProgressMonitor monitor) throws JavaModelException {
+        // nop
       }
 
       @Override
