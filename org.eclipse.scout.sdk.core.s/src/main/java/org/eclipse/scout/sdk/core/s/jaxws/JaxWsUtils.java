@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl.WebServiceNames;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -208,9 +209,16 @@ public final class JaxWsUtils implements IMavenConstants {
 
     Map<Path, StringBuilder> result = new HashMap<>(bindingsByFile.size());
     for (Entry<URI, Set<JaxWsBindingMapping>> binding : bindingsByFile.entrySet()) {
-      URI relPath = CoreUtils.relativizeURI(rootWsdlUri, binding.getKey());
+      URI uri = binding.getKey();
+      URI relPath = CoreUtils.relativizeURI(rootWsdlUri, uri);
       StringBuilder jaxwsBindingContent = JaxWsUtils.getJaxwsBindingContent(targetPackage, relPath, binding.getValue(), lineDelimiter);
-      result.put(Paths.get(binding.getKey()), jaxwsBindingContent);
+      Path path = Paths.get(uri);
+      if (path.getNameCount() < 1) {
+        SdkLog.warning("Zero length path found for jax-ws binding content of URI '{}'. Skipping.", uri);
+      }
+      else {
+        result.put(path, jaxwsBindingContent);
+      }
     }
     return result;
   }

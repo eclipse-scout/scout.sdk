@@ -105,7 +105,7 @@ class ProposalPopup extends Window {
 
   private Object m_selectedProposal;
 
-  private volatile SearchPatternInput m_input;
+  private SearchPatternInput m_input;
   private IProposalDescriptionProvider m_proposalDescriptionProvider;
   private IBaseLabelProvider m_labelProvider;
   private P_LazyContentProvider m_contentProvider;
@@ -166,6 +166,7 @@ class ProposalPopup extends Window {
   }
 
   @Override
+  @SuppressWarnings("findbugs:IS2_INCONSISTENT_SYNC")
   protected Control createContents(final Composite parent) {
     Composite proposalArea = new Composite(parent, SWT.INHERIT_FORCE);
     proposalArea.setBackground(proposalArea.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -318,20 +319,8 @@ class ProposalPopup extends Window {
     setInput(new SearchPatternInput(input, pattern));
   }
 
-  public SearchPatternInput getInput() {
+  public synchronized SearchPatternInput getInput() {
     return m_input;
-  }
-
-  protected Object getProposalByText(String text, Collection<Object> proposals) {
-    if (proposals == null || proposals.isEmpty()) {
-      return null;
-    }
-    for (Object o : proposals) {
-      if (text.equals(getText(o))) {
-        return o;
-      }
-    }
-    return null;
   }
 
   public synchronized void setInput(SearchPatternInput input) {
@@ -403,6 +392,18 @@ class ProposalPopup extends Window {
       m_tableViewer.getTable().setRedraw(true);
       m_uiLock.release();
     }
+  }
+
+  protected Object getProposalByText(String text, Collection<Object> proposals) {
+    if (proposals == null || proposals.isEmpty()) {
+      return null;
+    }
+    for (Object o : proposals) {
+      if (text.equals(getText(o))) {
+        return o;
+      }
+    }
+    return null;
   }
 
   public void setContentProvider(IProposalContentProvider contentProvider) {

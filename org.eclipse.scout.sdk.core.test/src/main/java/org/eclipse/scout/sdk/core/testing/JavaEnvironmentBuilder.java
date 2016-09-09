@@ -271,6 +271,7 @@ public class JavaEnvironmentBuilder {
     m_srcPaths.put(key, new ClasspathEntry(cp, StandardCharsets.UTF_8.name()));
   }
 
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected void findSourceAttachments() {
     if (!m_includeSources) {
       return;

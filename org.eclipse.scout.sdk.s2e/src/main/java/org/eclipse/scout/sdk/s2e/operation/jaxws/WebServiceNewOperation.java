@@ -426,7 +426,13 @@ public class WebServiceNewOperation implements IOperation {
         jaxwsBindingXmlFile = wsdlBindingsFolder.getFile(JaxWsUtils.JAXWS_BINDINGS_FILE_NAME);
       }
       else {
-        String partName = binding.getKey().getFileName().toString().toLowerCase();
+        Path pathFileName = binding.getKey().getFileName();
+        if (pathFileName == null) {
+          // should not happen because zero len paths are skipped by JaxWsUtils.getJaxwsBindingContents().
+          throw new IllegalArgumentException("zero length path found.");
+        }
+
+        String partName = pathFileName.toString().toLowerCase();
         if (partName.endsWith(JaxWsUtils.WSDL_FILE_EXTENSION)) {
           partName = partName.substring(0, partName.length() - JaxWsUtils.WSDL_FILE_EXTENSION.length());
         }
