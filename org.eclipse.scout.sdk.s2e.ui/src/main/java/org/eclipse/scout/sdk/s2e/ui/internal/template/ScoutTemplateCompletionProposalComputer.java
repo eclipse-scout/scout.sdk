@@ -16,7 +16,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jdt.core.CompletionContext;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
@@ -52,28 +52,23 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
       }
 
       JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-      CompletionContext coreContext = javaContext.getCoreContext();
-      if (coreContext == null || !coreContext.isExtended() || coreContext.isInJavadoc() || coreContext.isInJavadocText()) {
-        return Collections.emptyList();
-      }
-
       int offset = javaContext.getInvocationOffset();
       if (offset < 0) {
         return Collections.emptyList();
       }
 
-      IJavaElement element = coreContext.getEnclosingElement();
+      ICompilationUnit compilationUnit = javaContext.getCompilationUnit();
+      if (!S2eUtils.exists(compilationUnit)) {
+        return Collections.emptyList();
+      }
+
+      IJavaElement element = compilationUnit.getElementAt(offset);
       if (!S2eUtils.exists(element) || element.getElementType() != IJavaElement.TYPE) {
         return Collections.emptyList();
       }
 
-      IType t = (IType) element;
-      if (t.isBinary()) {
-        return Collections.emptyList();
-      }
-
       // check if we are in the middle of a statement. This may happen e.g. on annotations. The enclosing element is even though the IType holding the annotation
-      Document d = new Document(t.getCompilationUnit().getSource());
+      Document d = new Document(compilationUnit.getSource());
       IRegion lineInformationOfOffset = d.getLineInformationOfOffset(offset);
       String lineSource = d.get(lineInformationOfOffset.getOffset(), lineInformationOfOffset.getLength());
       if (lineSource.indexOf('@') >= 0 || lineSource.indexOf('.') >= 0 || lineSource.indexOf('(') >= 0 || lineSource.indexOf(')') >= 0) {
@@ -86,7 +81,7 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
         prefix = computedPrefix.toString();
       }
 
-      return ScoutTemplateProposalFactory.createTemplateProposals(t, offset, prefix);
+      return ScoutTemplateProposalFactory.createTemplateProposals((IType) element, offset, prefix);
     }
     catch (Exception e) {
       SdkLog.error("Error calculating Scout template proposals.", e);
