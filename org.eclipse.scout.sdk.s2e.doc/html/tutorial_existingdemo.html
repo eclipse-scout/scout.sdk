@@ -251,19 +251,20 @@
        <pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">ContactOutline</span> <span class="directive">extends</span> AbstractOutline {
 
   <span class="annotation">@Override</span>
+  <span class="directive">protected</span> <span class="type">void</span> execCreateChildPages(<span class="predefined-type">List</span>&lt;IPage&lt;?&gt;&gt; pageList) {
+    <span class="comment">// pages to be shown in the navigation area of this outline</span>
+    pageList.add(<span class="keyword">new</span> PersonTablePage()); <i class="conum" data-value="1"></i><b>(1)</b>
+    pageList.add(<span class="keyword">new</span> OrganizationTablePage());
+  }
+
+  <span class="annotation">@Override</span>
   <span class="directive">protected</span> <span class="predefined-type">String</span> getConfiguredTitle() {
     <span class="keyword">return</span> TEXTS.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">Contacts</span><span class="delimiter">&quot;</span></span>);
   }
 
   <span class="annotation">@Override</span>
-  <span class="directive">protected</span> <span class="type">void</span> execCreateChildPages(<span class="predefined-type">List</span>&lt;IPage&lt;?&gt;&gt; pageList) {
-    pageList.add(<span class="keyword">new</span> PersonPage());
-    pageList.add(<span class="keyword">new</span> OrganizationTablePage());
-  }
-
-  <span class="annotation">@Override</span>
   <span class="directive">protected</span> <span class="predefined-type">String</span> getConfiguredIconId() {
-    <span class="keyword">return</span> Icons.Contacts;
+    <span class="keyword">return</span> Icons.Category;
   }
 }</code></pre>
       </div>
