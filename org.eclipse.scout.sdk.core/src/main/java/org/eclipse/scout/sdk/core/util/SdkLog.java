@@ -224,7 +224,7 @@ public final class SdkLog {
     catch (Throwable t) {
       System.err.println("Scout SdkLog: Failed toString() invocation on an object of type [" + o.getClass().getName() + "]");
       t.printStackTrace();
-      return "[FAILED toString()]";
+      return "[FAILED toString() of " + o.getClass() + ']';
     }
   }
 

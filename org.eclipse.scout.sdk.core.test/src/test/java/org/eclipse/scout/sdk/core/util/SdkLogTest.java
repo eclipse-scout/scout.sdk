@@ -95,33 +95,22 @@ public class SdkLogTest {
   }
 
   @Test
-  public void testLog() {
-    // lock on console to ensure no other thread writes to the console while we are testing (in case tests are running in parallel)
-    synchronized (SdkConsole.class) {
-      ISdkConsoleSpi backup = SdkConsole.getConsoleSpi();
-      try {
-        final StringBuilder logContent = new StringBuilder();
-        SdkConsole.setConsoleSpi(new ISdkConsoleSpi() {
+  public void testLogOfObjectWithToStringThrowingException() throws Exception {
+    runWithPrivateLogger(new ILogTestRunner() {
+      @Override
+      public void run(StringBuilder logContent) throws Exception {
+        SdkLog.error("Msg: {}", new ClassWithToStringThrowingNpeFixture());
+        Assert.assertEquals("[SEVERE]: Msg: [FAILED toString() of class " + SdkLogTest.class.getName() + '$' + ClassWithToStringThrowingNpeFixture.class.getSimpleName() + ']', logContent.toString());
+        SdkConsole.clear();
+      }
+    });
+  }
 
-          @Override
-          public void println(Level level, String s, Throwable... exceptions) {
-            logContent.append(s);
-            if (exceptions == null) {
-              return;
-            }
-            for (Throwable t : exceptions) {
-              if (t != null) {
-                logContent.append(CoreUtils.getThrowableAsString(t));
-              }
-            }
-          }
-
-          @Override
-          public void clear() {
-            logContent.delete(0, logContent.length());
-          }
-        });
-
+  @Test
+  public void testLog() throws Exception {
+    runWithPrivateLogger(new ILogTestRunner() {
+      @Override
+      public void run(StringBuilder logContent) {
         SdkLog.warning("hello");
         Assert.assertEquals("[WARNING]: hello", logContent.toString());
         Assert.assertTrue(SdkLog.isWarningEnabled());
@@ -155,6 +144,49 @@ public class SdkLogTest {
         SdkLog.log(null, "hello");
         Assert.assertEquals("[WARNING]: hello", logContent.toString());
         SdkConsole.clear();
+      }
+    });
+  }
+
+  private static final class ClassWithToStringThrowingNpeFixture {
+    @Override
+    public String toString() {
+      throw new NullPointerException("NPE of test " + SdkLogTest.class);
+    }
+  }
+
+  private interface ILogTestRunner {
+    void run(StringBuilder logContent) throws Exception;
+  }
+
+  private static void runWithPrivateLogger(ILogTestRunner runnable) throws Exception {
+    // lock on console to ensure no other thread writes to the console while we are testing (in case tests are running in parallel)
+    synchronized (SdkConsole.class) {
+      ISdkConsoleSpi backup = SdkConsole.getConsoleSpi();
+      try {
+        final StringBuilder logContent = new StringBuilder();
+        SdkConsole.setConsoleSpi(new ISdkConsoleSpi() {
+
+          @Override
+          public void println(Level level, String s, Throwable... exceptions) {
+            logContent.append(s);
+            if (exceptions == null) {
+              return;
+            }
+            for (Throwable t : exceptions) {
+              if (t != null) {
+                logContent.append(CoreUtils.getThrowableAsString(t));
+              }
+            }
+          }
+
+          @Override
+          public void clear() {
+            logContent.delete(0, logContent.length());
+          }
+        });
+
+        runnable.run(logContent);
 
       }
       finally {
