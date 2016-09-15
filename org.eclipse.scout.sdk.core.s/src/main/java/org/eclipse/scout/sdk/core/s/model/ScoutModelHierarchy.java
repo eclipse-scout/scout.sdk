@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
  * @author Matthias Villiger
  * @since 5.2.0
  */
+@SuppressWarnings("squid:UnusedPrivateMethod")
 public final class ScoutModelHierarchy {
 
   private ScoutModelHierarchy() {
