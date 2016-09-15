@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
@@ -63,16 +62,17 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
         return Collections.emptyList();
       }
 
-      IType declaringType = resolveDeclaringType(compilationUnit, offset);
-      if (!S2eUtils.exists(declaringType)) {
-        return Collections.emptyList();
-      }
-
       // check if we are in the middle of a statement. This may happen e.g. on annotations. The enclosing element is even though the IType holding the annotation
       Document d = new Document(compilationUnit.getSource());
       IRegion lineInformationOfOffset = d.getLineInformationOfOffset(offset);
       String lineSource = d.get(lineInformationOfOffset.getOffset(), lineInformationOfOffset.getLength());
       if (lineSource.indexOf('@') >= 0 || lineSource.indexOf('.') >= 0 || lineSource.indexOf('(') >= 0 || lineSource.indexOf(')') >= 0) {
+        return Collections.emptyList();
+      }
+
+      compilationUnit.reconcile(ICompilationUnit.NO_AST, false, false, null, null); // reconcile in case it was a very fast edit and CTRL+space afterwards.
+      IJavaElement element = compilationUnit.getElementAt(offset);
+      if (!S2eUtils.exists(element) || element.getElementType() != IJavaElement.TYPE) {
         return Collections.emptyList();
       }
 
@@ -82,35 +82,13 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
         prefix = computedPrefix.toString();
       }
 
-      return ScoutTemplateProposalFactory.createTemplateProposals(declaringType, offset, prefix);
+      return ScoutTemplateProposalFactory.createTemplateProposals((IType) element, offset, prefix);
     }
     catch (Exception e) {
       SdkLog.error("Error calculating Scout template proposals.", e);
     }
 
     return Collections.emptyList();
-  }
-
-  protected static IType resolveDeclaringType(ICompilationUnit icu, int offset) throws JavaModelException {
-    IJavaElement element = icu.getElementAt(offset);
-    if (isIType(element)) {
-      return (IType) element;
-    }
-
-    // no element found at this position. try to reconcile in case it was a very fast edit and ctrl+space afterwards.
-    icu.reconcile(ICompilationUnit.NO_AST, false, false, null, null);
-    element = icu.getElementAt(offset); // second pass
-    if (isIType(element)) {
-      return (IType) element;
-    }
-    return null;
-  }
-
-  private static boolean isIType(IJavaElement candidate) {
-    if (!S2eUtils.exists(candidate)) {
-      return false;
-    }
-    return candidate.getElementType() == IJavaElement.TYPE;
   }
 
   @Override
