@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IBuffer;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -227,6 +228,7 @@ public class FileSystemMockFactory {
 
   public IPackageFragmentRoot createPackageFragmentRoot(final File location, final IJavaProject owner) {
     final IPackageFragmentRoot p = mock(IPackageFragmentRoot.class);
+    final IClasspathEntry cpEntry = mock(IClasspathEntry.class);
     fillJavaElementMock(p, owner, location);
     try {
       when(p.getKind()).thenReturn(IPackageFragmentRoot.K_SOURCE);
@@ -242,6 +244,17 @@ public class FileSystemMockFactory {
         return createPackageFragment(pckLocation, owner);
       }
     });
+    try {
+      when(p.getRawClasspathEntry()).thenAnswer(new Answer<IClasspathEntry>() {
+        @Override
+        public IClasspathEntry answer(InvocationOnMock invocation) throws Throwable {
+          return cpEntry;
+        }
+      });
+    }
+    catch (JavaModelException e) {
+      throw new SdkException(e);
+    }
     try {
       doAnswer(new Answer<IPackageFragment>() {
         @Override

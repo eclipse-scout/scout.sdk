@@ -48,6 +48,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -58,6 +59,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IClassFile;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModel;
@@ -74,6 +76,7 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
+import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -83,6 +86,7 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
+import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
@@ -1105,39 +1109,73 @@ public final class S2eUtils {
 
     NavigableMap<CompositeObject, IPackageFragmentRoot> prioMap = new TreeMap<>();
     for (IJavaProject project : projects) {
-      if (exists(project)) {
-        for (IPackageFragmentRoot root : project.getPackageFragmentRoots()) {
-          if (monitor != null && monitor.isCanceled()) {
-            return Collections.emptySet();
-          }
-          if (root.getKind() == IPackageFragmentRoot.K_SOURCE && (filter == null || filter.test(root))) {
-            String s = root.getPath().removeFirstSegments(1).toString().toLowerCase();
-            if (root.getResource().isDerived()) {
-              prioMap.put(new CompositeObject(100, project, s), root);
-            }
-            else if ("src/main/java".equals(s)) {
-              prioMap.put(new CompositeObject(1, project, s), root);
-            }
-            else if ("src".equals(s)) {
-              prioMap.put(new CompositeObject(11, project, s), root);
-            }
-            else if (s.startsWith("src/main/")) {
-              prioMap.put(new CompositeObject(12, project, s), root);
-            }
-            else if ("src/test/java".equals(s)) {
-              prioMap.put(new CompositeObject(20, project, s), root);
-            }
-            else if (s.startsWith("src/test/")) {
-              prioMap.put(new CompositeObject(21, project, s), root);
-            }
-            else {
-              prioMap.put(new CompositeObject(30, project, s), root);
-            }
-          }
+      if (!exists(project)) {
+        continue;
+      }
+
+      for (IPackageFragmentRoot root : project.getPackageFragmentRoots()) {
+        if (monitor != null && monitor.isCanceled()) {
+          return Collections.emptySet();
+        }
+        if (!isJavaSourceFolder(root, filter)) {
+          continue;
+        }
+
+        String s = root.getPath().removeFirstSegments(1).toString().toLowerCase();
+        if ("src/main/java".equals(s)) {
+          prioMap.put(new CompositeObject(1, project, s), root);
+        }
+        else if ("src".equals(s)) {
+          prioMap.put(new CompositeObject(11, project, s), root);
+        }
+        else if (s.startsWith("src/main/")) {
+          prioMap.put(new CompositeObject(12, project, s), root);
+        }
+        else if ("src/test/java".equals(s)) {
+          prioMap.put(new CompositeObject(20, project, s), root);
+        }
+        else if (s.startsWith("src/test/")) {
+          prioMap.put(new CompositeObject(21, project, s), root);
+        }
+        else {
+          prioMap.put(new CompositeObject(30, project, s), root);
         }
       }
     }
     return new LinkedHashSet<>(prioMap.values());
+  }
+
+  private static boolean isJavaSourceFolder(IPackageFragmentRoot root, Predicate<IPackageFragmentRoot> filter) throws JavaModelException {
+    if (!exists(root)) {
+      return false;
+    }
+    if (root.getKind() != IPackageFragmentRoot.K_SOURCE || root.isArchive() || root.isExternal()) {
+      return false;
+    }
+    if (filter != null && !filter.test(root)) {
+      return false;
+    }
+    IResource resource = root.getResource();
+    if (resource == null || !resource.exists() || resource.isDerived()) {
+      return false;
+    }
+
+    IClasspathEntry rawClasspathEntry = root.getRawClasspathEntry();
+    if (rawClasspathEntry == null) {
+      return false;
+    }
+    IPath[] exclusionPatterns = rawClasspathEntry.getExclusionPatterns();
+    if (exclusionPatterns != null && exclusionPatterns.length > 0) {
+      char[] javaSample = ("Whatever" + SuffixConstants.SUFFIX_STRING_java).toCharArray();
+      for (IPath excludedPath : exclusionPatterns) {
+        char[] pattern = excludedPath.toString().toCharArray();
+        boolean javaFilesExcluded = CharOperation.pathMatch(pattern, javaSample, true, '/');
+        if (javaFilesExcluded) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   /**
@@ -1341,9 +1379,6 @@ public final class S2eUtils {
     Predicate<IPackageFragmentRoot> filter = new Predicate<IPackageFragmentRoot>() {
       @Override
       public boolean test(IPackageFragmentRoot element) {
-        if (!exists(element)) {
-          return false;
-        }
         String s = element.getPath().removeFirstSegments(1).toString().toLowerCase();
         return s.contains("test");
       }

@@ -53,14 +53,50 @@ public enum ScoutTier implements Predicate<IJavaElement> {
    */
   HtmlUi;
 
+  /**
+   * Tests if the tier of this instance is included in the tier of the given {@link IJavaElement}.
+   *
+   * @return <code>true</code> if the tier of the given {@link IJavaElement} includes all elements of this tier.
+   *         <code>false</code> otherwise or if the given {@link IJavaElement} does not belong to a Scout tier.
+   * @see #isIncludedIn(ScoutTier)
+   */
   @Override
   public boolean test(IJavaElement element) {
-    if (!S2eUtils.exists(element)) {
+    return this.isIncludedIn(valueOfInternal(element));
+  }
+
+  /**
+   * Tests if the tier of this instance is included in the given tier.<br>
+   * <br>
+   * <b>Examples:</b><br>
+   * <code>ScoutTier.Shared.isIncludedIn(ScoutTier.Client) == true</code><br>
+   * <code>ScoutTier.Client.isIncludedIn(ScoutTier.HtmlUi) == true</code><br>
+   * <code>ScoutTier.Server.isIncludedIn(ScoutTier.Server) == true</code><br>
+   * <code>ScoutTier.Server.isIncludedIn(ScoutTier.Shared) == false</code><br>
+   * <code>ScoutTier.HtmlUi.isIncludedIn(ScoutTier.Client) == false</code><br>
+   * <code>ScoutTier.Shared.isIncludedIn(null) == false</code>
+   *
+   * @param tierOfOtherElement
+   *          The other tier to test against or <code>null</code>.
+   * @return <code>true</code> if the given tier includes all elements of this tier. <code>false</code> otherwise or if
+   *         the given tier is <code>null</code>.
+   */
+  public boolean isIncludedIn(ScoutTier tierOfOtherElement) {
+    if (tierOfOtherElement == null) {
       return false;
     }
+    if (Shared.equals(this)) {
+      return true; // shared is always available if the other is not null
+    }
+    if (Client.equals(this)) {
+      return Client.equals(tierOfOtherElement) || HtmlUi.equals(tierOfOtherElement);
+    }
+    return equals(tierOfOtherElement);
+  }
 
+  private static ScoutTier valueOfInternal(IJavaElement element) {
     try {
-      return equals(valueOf(element));
+      return valueOf(element);
     }
     catch (JavaModelException e) {
       throw new SdkException(e);
@@ -81,6 +117,9 @@ public enum ScoutTier implements Predicate<IJavaElement> {
       return null;
     }
     IJavaProject javaProject = element.getJavaProject();
+    if (!S2eUtils.exists(javaProject)) {
+      return null;
+    }
 
     boolean uiAvailable = S2eUtils.exists(javaProject.findType(IScoutRuntimeTypes.UiServlet));
     if (uiAvailable) {
