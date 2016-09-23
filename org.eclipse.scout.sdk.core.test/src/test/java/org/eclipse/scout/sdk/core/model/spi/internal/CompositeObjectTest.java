@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.core.util;
+package org.eclipse.scout.sdk.core.model.spi.internal;
 
+import org.eclipse.scout.sdk.core.model.spi.internal.SameCompositeObject;
+import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.junit.Assert;
 import org.junit.Test;
 

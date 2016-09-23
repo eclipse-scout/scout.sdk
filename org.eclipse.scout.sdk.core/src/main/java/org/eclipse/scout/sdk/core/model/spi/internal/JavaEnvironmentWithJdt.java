@@ -55,7 +55,6 @@ import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.model.spi.internal.SpiWithJdtUtils.TypeDescriptor;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
-import org.eclipse.scout.sdk.core.util.SameCompositeObject;
 
 /**
  * <h3>{@link JavaEnvironmentWithJdt}</h3>

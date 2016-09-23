@@ -87,7 +87,6 @@ import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.util.SameCompositeObject;
 
 /**
  *

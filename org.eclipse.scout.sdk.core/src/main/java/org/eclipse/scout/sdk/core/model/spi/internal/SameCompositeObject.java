@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.core.util;
+package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,7 +19,7 @@ import java.util.Collection;
  *
  * @since 5.1.0
  */
-public class SameCompositeObject {
+class SameCompositeObject {
 
   private final Object[] m_value;
   private final int m_hash;
