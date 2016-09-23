@@ -33,10 +33,12 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
+import org.eclipse.scout.sdk.s2e.trigger.DefaultResourceChangeEventFilter;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandlerFactory;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
@@ -58,6 +60,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   private final List<IDerivedResourceHandlerFactory> m_updateHandlerFactories;
 
   private IResourceChangeListener m_resourceChangeListener;
+  private IFilter<IResourceChangeEvent> m_resourceChangeEventFilter;
 
   // queue that buffers all java change events that need processing
   private final BlockingQueue<IResourceChangeEvent> m_javaChangeEventsToCheck;
@@ -72,6 +75,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   public DerivedResourceManager() {
     m_enabled = false;
     m_updateHandlerFactories = new ArrayList<>();
+    m_resourceChangeEventFilter = new DefaultResourceChangeEventFilter();
 
     m_javaChangeEventsToCheck = new ArrayBlockingQueue<>(5000, true);
     m_triggerHandlers = new ArrayBlockingQueue<>(2000, true);
@@ -112,6 +116,16 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     };
     triggerJob.setPriority(Job.DECORATE);
     triggerJob.schedule();
+  }
+
+  @Override
+  public IFilter<IResourceChangeEvent> getResourceChangeEventFilter() {
+    return m_resourceChangeEventFilter;
+  }
+
+  @Override
+  public void setResourceChangeEventFilter(IFilter<IResourceChangeEvent> resourceChangeEventFilter) {
+    m_resourceChangeEventFilter = resourceChangeEventFilter;
   }
 
   protected void triggerSync(Set<IResource> resources) {
@@ -287,73 +301,20 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     return false; // we had too many interrupts. we don't want to wait any longer (no endless looping).
   }
 
-  public static boolean isInterestingResourceChangeEvent(IResourceChangeEvent event) {
-    if (event == null) {
-      return false;
-    }
-
-    if (event.getBuildKind() != 0) {
-      return false; // ignore build events
-    }
-
-    Job curJob = Job.getJobManager().currentJob();
-    if (curJob == null) {
-      return false;
-    }
-
-    if (curJob instanceof AbstractJob) {
-      // do not automatically update on Scout SDK changes. We expect the SDK to trigger manually where required.
-      return false;
-    }
-
-    if (curJob.belongsTo(ResourcesPlugin.FAMILY_AUTO_BUILD) || curJob.belongsTo(ResourcesPlugin.FAMILY_MANUAL_BUILD)) {
-      // ignore build changes (annotation processing)
-      return false;
-    }
-
-    final String[] excludedJobNamePrefixes = new String[]{"org.eclipse.team.", // excludes svn updates
-        "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
-        "org.eclipse.egit.", // excludes git updates
-        "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
-        "org.eclipse.m2e.", // maven updates
-        "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob", // refresh of external folders after svn update
-        "org.eclipse.jdt.internal.debug.ui.JavaDebugOptionsManager.InitJob", // JDT debug
-        "org.eclipse.core.internal.refresh.RefreshJob", // refresh after git import
-        "org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob", // workspace init job
-        "org.eclipse.wst.", // web standard tools exclusions
-        "org.sonarlint." // sonarlint analyse
-    };
-
-    String jobFqn = curJob.getClass().getName().replace('$', '.');
-    for (String excludedPrefix : excludedJobNamePrefixes) {
-      if (jobFqn.startsWith(excludedPrefix)) {
-        return false;
-      }
-    }
-
-    if ("org.eclipse.core.internal.jobs.ThreadJob".equals(jobFqn)) {
-      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-      for (int i = stackTrace.length - 1; i >= 0; i--) {
-        for (String excludedPrefix : excludedJobNamePrefixes) {
-          if (stackTrace[i].getClassName().startsWith(excludedPrefix)) {
-            return false;
-          }
-        }
-      }
-    }
-
-    return true;
-  }
-
   /**
    * The java change listener that adds the given event to the queue to execute later on
    */
-  private static final class P_ResourceChangeListener implements IResourceChangeListener {
+  private final class P_ResourceChangeListener implements IResourceChangeListener {
 
     private final BlockingQueue<IResourceChangeEvent> m_eventCollector;
 
     private P_ResourceChangeListener(BlockingQueue<IResourceChangeEvent> eventCollector) {
       m_eventCollector = eventCollector;
+    }
+
+    private boolean isInterestingResourceChangeEvent(IResourceChangeEvent event) {
+      IFilter<IResourceChangeEvent> filter = getResourceChangeEventFilter();
+      return filter == null || filter.evaluate(event);
     }
 
     @Override
