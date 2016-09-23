@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.sourcebuilder.dto;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +46,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link AbstractDtoTypeSourceBuilder}</h3>
@@ -237,9 +237,9 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
     return m_env;
   }
 
-  protected static final IFilter<IPropertyBean> DTO_PROPERTY_FILTER = new IFilter<IPropertyBean>() {
+  protected static final Predicate<IPropertyBean> DTO_PROPERTY_FILTER = new Predicate<IPropertyBean>() {
     @Override
-    public boolean evaluate(IPropertyBean property) {
+    public boolean test(IPropertyBean property) {
       // read and write method must exist
       boolean readAndWriteMethodsExist = property.readMethod() != null && property.writeMethod() != null;
       if (!readAndWriteMethodsExist) {

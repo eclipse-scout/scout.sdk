@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.core.dom.AST;
@@ -31,7 +32,6 @@ import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.util.CoreScoutUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
@@ -265,7 +265,7 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
     return newOrderStr;
   }
 
-  private static final class P_EnsureElementInRewriteFilter implements IFilter<ASTNode> {
+  private static final class P_EnsureElementInRewriteFilter implements Predicate<ASTNode> {
     private final Set<Object> m_elements;
 
     private P_EnsureElementInRewriteFilter(ListRewrite declaringTypeRewrite) {
@@ -277,7 +277,7 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
     }
 
     @Override
-    public boolean evaluate(ASTNode element) {
+    public boolean test(ASTNode element) {
       return m_elements.contains(element);
     }
   }

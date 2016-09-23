@@ -12,12 +12,12 @@ package org.eclipse.scout.sdk.core.model.sugar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link SuperMethodQuery}</h3> Super method query that by default returns all {@link IMethod}s of all super
@@ -32,7 +32,7 @@ public class SuperMethodQuery {
   private boolean m_includeSelf = true;
   private boolean m_includeSuperClasses = true;
   private boolean m_includeSuperInterfaces = true;
-  private IFilter<IMethod> m_filter;
+  private Predicate<IMethod> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
   public SuperMethodQuery(IMethod method) {
@@ -94,13 +94,13 @@ public class SuperMethodQuery {
   }
 
   /**
-   * Limit the {@link IMethod}s to the ones that accept the given {@link IFilter}.
+   * Limit the {@link IMethod}s to the ones that accept the given {@link Predicate}.
    *
    * @param filter
    *          The filter. Default none.
    * @return this
    */
-  public SuperMethodQuery withFilter(IFilter<IMethod> filter) {
+  public SuperMethodQuery withFilter(Predicate<IMethod> filter) {
     m_filter = filter;
     return this;
   }
@@ -124,7 +124,7 @@ public class SuperMethodQuery {
     if (!m_methodId.equals(SignatureUtils.createMethodIdentifier(m))) {
       return false;
     }
-    if (m_filter != null && !m_filter.evaluate(m)) {
+    if (m_filter != null && !m_filter.test(m)) {
       return false;
     }
     return true;

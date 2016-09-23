@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -590,17 +591,17 @@ public final class CoreUtils {
   }
 
   /**
-   * Searches the first direct inner {@link IType} matching the given {@link IFilter} checking the entire super
+   * Searches the first direct inner {@link IType} matching the given {@link Predicate} checking the entire super
    * hierarchy of the given {@link IType}. Only direct member {@link IType}s of the given type and its super classes are
    * searched (no recursive inner types).
    *
    * @param declaringType
    *          The {@link IType} to start searching
    * @param filter
-   *          The {@link IFilter} to select the member {@link IType}.
-   * @return The first member {@link IType} on which {@link IFilter#evaluate(Object)} returns true
+   *          The {@link Predicate} to select the member {@link IType}.
+   * @return The first member {@link IType} on which {@link Predicate#test(Object)} returns true
    */
-  public static IType findInnerTypeInSuperHierarchy(IType declaringType, IFilter<IType> filter) {
+  public static IType findInnerTypeInSuperHierarchy(IType declaringType, Predicate<IType> filter) {
     if (declaringType == null) {
       return null;
     }
@@ -630,13 +631,13 @@ public final class CoreUtils {
    * @param type
    *          the type within properties are searched
    * @param propertyFilter
-   *          optional property bean {@link IFilter} used to filter the result
+   *          optional property bean {@link Predicate} used to filter the result
    * @param comparator
    *          optional property bean {@link Comparator} used to sort the result
    * @return Returns a {@link Set} of property bean descriptions.
    * @see <a href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">JavaBeans Spec</a>
    */
-  public static List<IPropertyBean> getPropertyBeans(IType type, IFilter<IPropertyBean> propertyFilter, Comparator<IPropertyBean> comparator) {
+  public static List<IPropertyBean> getPropertyBeans(IType type, Predicate<IPropertyBean> propertyFilter, Comparator<IPropertyBean> comparator) {
     List<IMethod> methods = type.methods().withFlags(Flags.AccPublic).withName(BEAN_METHOD_NAME).list();
     Map<String, PropertyBean> beans = new HashMap<>(methods.size());
     for (IMethod m : methods) {
@@ -690,7 +691,7 @@ public final class CoreUtils {
     }
     else {
       for (PropertyBean bean : beans.values()) {
-        if (propertyFilter.evaluate(bean)) {
+        if (propertyFilter.test(bean)) {
           l.add(bean);
         }
       }

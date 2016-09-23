@@ -12,12 +12,11 @@ package org.eclipse.scout.sdk.core.model.sugar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
-import org.eclipse.scout.sdk.core.util.Filters;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
@@ -32,7 +31,7 @@ public class TypeQuery {
   private String m_name;
   private String m_simpleName;
   private String m_instanceOfFqn;
-  private IFilter<IType> m_filter;
+  private Predicate<IType> m_filter;
   private int m_flags = -1;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
@@ -104,15 +103,14 @@ public class TypeQuery {
   }
 
   /**
-   * Limit the {@link IType}s to the ones that accept the given {@link IFilter}.
+   * Limit the {@link IType}s to the ones that accept the given {@link Predicate}.
    *
    * @param filter
    *          The filter. Default none.
    * @return this
    * @see TypeFilters
-   * @see Filters
    */
-  public TypeQuery withFilter(IFilter<IType> filter) {
+  public TypeQuery withFilter(Predicate<IType> filter) {
     m_filter = filter;
     return this;
   }
@@ -139,7 +137,7 @@ public class TypeQuery {
     if (m_flags >= 0 && (t.flags() & m_flags) != m_flags) {
       return false;
     }
-    if (m_filter != null && !m_filter.evaluate(t)) {
+    if (m_filter != null && !m_filter.test(t)) {
       return false;
     }
     if (m_instanceOfFqn != null && !t.isInstanceOf(m_instanceOfFqn)) {

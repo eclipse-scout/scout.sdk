@@ -12,11 +12,11 @@ package org.eclipse.scout.sdk.core.model.sugar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
-import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link MethodParameterQuery}</h3> Method parameter query that by default returns all parameters of a method.
@@ -28,7 +28,7 @@ public class MethodParameterQuery {
   private final MethodSpi m_method;
   private String m_name;
   private String m_dataTypeFqn;
-  private IFilter<IMethodParameter> m_filter;
+  private Predicate<IMethodParameter> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
   public MethodParameterQuery(MethodSpi method) {
@@ -60,13 +60,13 @@ public class MethodParameterQuery {
   }
 
   /**
-   * Limit the {@link IMethodParameter}s to the ones that accept the given {@link IFilter}.
+   * Limit the {@link IMethodParameter}s to the ones that accept the given {@link Predicate}.
    *
    * @param filter
    *          The filter. Default none.
    * @return this
    */
-  public MethodParameterQuery withFilter(IFilter<IMethodParameter> filter) {
+  public MethodParameterQuery withFilter(Predicate<IMethodParameter> filter) {
     m_filter = filter;
     return this;
   }
@@ -87,7 +87,7 @@ public class MethodParameterQuery {
     if (m_name != null && !m_name.equals(p.elementName())) {
       return false;
     }
-    if (m_filter != null && !m_filter.evaluate(p)) {
+    if (m_filter != null && !m_filter.test(p)) {
       return false;
     }
     if (m_dataTypeFqn != null && !m_dataTypeFqn.equals(p.dataType().name())) {

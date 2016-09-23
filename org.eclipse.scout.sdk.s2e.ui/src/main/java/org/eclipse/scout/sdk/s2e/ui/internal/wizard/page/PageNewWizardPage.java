@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.wizard.page;
 
+import java.util.function.Predicate;
+
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -18,8 +20,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
-import org.eclipse.scout.sdk.core.util.Filters;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.IProposalListener;
@@ -77,9 +77,9 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
 
     // remove AbstractPage from the proposal list
     StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
-    superTypeContentProvider.setTypeProposalFilter(Filters.and(superTypeContentProvider.getTypeProposalFilter(), new IFilter<IType>() {
+    superTypeContentProvider.setTypeProposalFilter(superTypeContentProvider.getTypeProposalFilter().and(new Predicate<IType>() {
       @Override
-      public boolean evaluate(IType element) {
+      public boolean test(IType element) {
         return !IScoutRuntimeTypes.AbstractPage.equals(element.getFullyQualifiedName());
       }
     }));

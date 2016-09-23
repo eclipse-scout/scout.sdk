@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.util;
 
+import java.util.function.Predicate;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jdt.core.IJavaElement;
@@ -19,7 +21,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 
@@ -30,7 +31,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
  * @since 5.2.0
  */
 @SuppressWarnings("squid:S00115")
-public enum ScoutTier implements IFilter<IJavaElement> {
+public enum ScoutTier implements Predicate<IJavaElement> {
 
   /**
    * Scout Client Tier
@@ -53,7 +54,7 @@ public enum ScoutTier implements IFilter<IJavaElement> {
   HtmlUi;
 
   @Override
-  public boolean evaluate(IJavaElement element) {
+  public boolean test(IJavaElement element) {
     if (!S2eUtils.exists(element)) {
       return false;
     }

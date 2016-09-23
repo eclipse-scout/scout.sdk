@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,7 +24,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -36,14 +36,14 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  */
 public class SourceFolderContentProvider extends AbstractContentProviderAdapter {
 
-  private final IFilter<IJavaElement> m_projectFilter;
-  private final IFilter<IPackageFragmentRoot> m_sourceFolderFilter;
+  private final Predicate<IJavaElement> m_projectFilter;
+  private final Predicate<IPackageFragmentRoot> m_sourceFolderFilter;
 
-  public SourceFolderContentProvider(IFilter<IJavaElement> projectFilter) {
+  public SourceFolderContentProvider(Predicate<IJavaElement> projectFilter) {
     m_projectFilter = projectFilter;
-    m_sourceFolderFilter = new IFilter<IPackageFragmentRoot>() {
+    m_sourceFolderFilter = new Predicate<IPackageFragmentRoot>() {
       @Override
-      public boolean evaluate(IPackageFragmentRoot element) {
+      public boolean test(IPackageFragmentRoot element) {
         String srcFolderName = element.getPath().removeFirstSegments(1).toString().toLowerCase();
         return ISdkProperties.GENERATED_SOURCE_FOLDER_NAME.equals(srcFolderName)
             || !srcFolderName.contains("generated");
@@ -61,7 +61,7 @@ public class SourceFolderContentProvider extends AbstractContentProviderAdapter 
           return Collections.emptyList();
         }
 
-        if (m_projectFilter == null || m_projectFilter.evaluate(jp)) {
+        if (m_projectFilter == null || m_projectFilter.test(jp)) {
           relevantProjects.add(jp);
         }
       }

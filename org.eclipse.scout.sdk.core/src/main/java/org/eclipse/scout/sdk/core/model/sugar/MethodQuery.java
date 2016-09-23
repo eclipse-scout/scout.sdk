@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.model.sugar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -20,8 +21,6 @@ import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.util.Filters;
-import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link MethodQuery}</h3> Method query that by default returns all {@link IMethod}s in an {@link IType}.
@@ -38,7 +37,7 @@ public class MethodQuery {
   private String m_methodId;
   private int m_flags = -1;
   private Pattern m_methodNamePattern;
-  private IFilter<IMethod> m_filter;
+  private Predicate<IMethod> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
   public MethodQuery(IType type) {
@@ -124,7 +123,7 @@ public class MethodQuery {
 
   /**
    * Limit the {@link IMethod}s to the given method identifier.
-   * 
+   *
    * @param id
    *          The id of the {@link IMethod}. Use {@link SignatureUtils#createMethodIdentifier(IMethod)} to create a
    *          method identifier.
@@ -150,14 +149,13 @@ public class MethodQuery {
   }
 
   /**
-   * Limit the {@link IMethod}s to the ones that accept the given {@link IFilter}.
+   * Limit the {@link IMethod}s to the ones that accept the given {@link Predicate}.
    *
    * @param filter
    *          The filter. Default none.
    * @return this
-   * @see Filters
    */
-  public MethodQuery withFilter(IFilter<IMethod> filter) {
+  public MethodQuery withFilter(Predicate<IMethod> filter) {
     m_filter = filter;
     return this;
   }
@@ -181,7 +179,7 @@ public class MethodQuery {
     if (m_methodId != null && !m_methodId.equals(SignatureUtils.createMethodIdentifier(f))) {
       return false;
     }
-    if (m_filter != null && !m_filter.evaluate(f)) {
+    if (m_filter != null && !m_filter.test(f)) {
       return false;
     }
     if (m_flags >= 0 && (f.flags() & m_flags) != m_flags) {

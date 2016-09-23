@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import javax.xml.xpath.XPathExpressionException;
 
@@ -46,7 +47,6 @@ import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.CoreScoutUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
@@ -324,9 +324,9 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     });
 
     // existing server project to add the web service dependency
-    IFilter<IJavaProject> serverProjectsFilter = new IFilter<IJavaProject>() {
+    Predicate<IJavaProject> serverProjectsFilter = new Predicate<IJavaProject>() {
       @Override
-      public boolean evaluate(IJavaProject element) {
+      public boolean test(IJavaProject element) {
         return isServerProject(element);
       }
     };
@@ -381,9 +381,9 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     });
 
     // existing jaxws project
-    IFilter<IJavaProject> jaxwsProjectsFilter = new IFilter<IJavaProject>() {
+    Predicate<IJavaProject> jaxwsProjectsFilter = new Predicate<IJavaProject>() {
       @Override
-      public boolean evaluate(IJavaProject element) {
+      public boolean test(IJavaProject element) {
         return isJaxWsProject(element);
       }
     };

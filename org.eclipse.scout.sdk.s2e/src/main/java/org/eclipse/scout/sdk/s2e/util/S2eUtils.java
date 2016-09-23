@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -96,7 +97,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -206,9 +206,9 @@ public final class S2eUtils {
   }
 
   /**
-   * @see #findClassesInStrictHierarchy(IJavaProject, IType, IProgressMonitor, IFilter)
+   * @see #findClassesInStrictHierarchy(IJavaProject, IType, IProgressMonitor, Predicate)
    */
-  public static Set<IType> findClassesInStrictHierarchy(IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor, IFilter<IType> filter) throws CoreException {
+  public static Set<IType> findClassesInStrictHierarchy(IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor, Predicate<IType> filter) throws CoreException {
     if (!exists(sourceProject)) {
       return Collections.emptySet();
     }
@@ -234,7 +234,7 @@ public final class S2eUtils {
    *         afterwards.
    * @throws CoreException
    */
-  public static Set<IType> findClassesInStrictHierarchy(final IJavaProject sourceProject, IType baseType, final IProgressMonitor monitor, final IFilter<IType> filter) throws CoreException {
+  public static Set<IType> findClassesInStrictHierarchy(final IJavaProject sourceProject, IType baseType, final IProgressMonitor monitor, final Predicate<IType> filter) throws CoreException {
     if (!exists(baseType) || !exists(baseType.getParent()) || !exists(sourceProject)) {
       return Collections.emptySet();
     }
@@ -246,7 +246,7 @@ public final class S2eUtils {
         if (monitor != null && monitor.isCanceled()) {
           throw new OperationCanceledException("strict hierarchy search canceled by monitor.");
         }
-        if (filter == null || filter.evaluate(match.getType())) {
+        if (filter == null || filter.test(match.getType())) {
           collector.add(match.getType());
         }
       }
@@ -264,19 +264,19 @@ public final class S2eUtils {
   }
 
   /**
-   * Gets the first {@link IMethod} for which the given {@link IFilter} evaluates to <code>true</code>.<br>
+   * Gets the first {@link IMethod} for which the given {@link Predicate} evaluates to <code>true</code>.<br>
    * <b>Note:</b> Inner Types are not searched.
    *
    * @param type
    *          The {@link IType} in which the {@link IMethod} should be searched.
    * @param filter
-   *          The {@link IFilter}.
+   *          The {@link Predicate}.
    * @return The first {@link IMethod} found in the given type or <code>null</code> if it could not be found.
    * @throws JavaModelException
    */
-  public static IMethod getFirstMethod(IType type, IFilter<IMethod> filter) throws JavaModelException {
+  public static IMethod getFirstMethod(IType type, Predicate<IMethod> filter) throws JavaModelException {
     for (IMethod method : type.getMethods()) {
-      if (filter == null || filter.evaluate(method)) {
+      if (filter == null || filter.test(method)) {
         return method;
       }
     }
@@ -1084,21 +1084,21 @@ public final class S2eUtils {
   }
 
   /**
-   * Gets all source folders of the given {@link IJavaProject}s that fulfill the given {@link IFilter}.
+   * Gets all source folders of the given {@link IJavaProject}s that fulfill the given {@link Predicate}.
    *
    * @param projects
    *          The {@link IJavaProject}s in which the source folders should be searched.
    * @param filter
-   *          The {@link IFilter} the {@link IPackageFragmentRoot} candidates must fulfill.
+   *          The {@link Predicate} the {@link IPackageFragmentRoot} candidates must fulfill.
    * @param monitor
    *          The {@link IProgressMonitor} to use. The search aborts if the given {@link IProgressMonitor} is canceled.
    *          In this case an empty {@link Set} is returned.
    * @return A {@link Set} with all source folders ({@link IPackageFragmentRoot}s of kind
    *         {@link IPackageFragmentRoot#K_SOURCE}) of the given {@link IJavaProject}s that accept the given
-   *         {@link IFilter} ordered by relevance and project.
+   *         {@link Predicate} ordered by relevance and project.
    * @throws JavaModelException
    */
-  public static Set<IPackageFragmentRoot> getSourceFolders(Collection<IJavaProject> projects, IFilter<IPackageFragmentRoot> filter, IProgressMonitor monitor) throws JavaModelException {
+  public static Set<IPackageFragmentRoot> getSourceFolders(Collection<IJavaProject> projects, Predicate<IPackageFragmentRoot> filter, IProgressMonitor monitor) throws JavaModelException {
     if (projects == null || projects.isEmpty()) {
       return Collections.emptySet();
     }
@@ -1110,7 +1110,7 @@ public final class S2eUtils {
           if (monitor != null && monitor.isCanceled()) {
             return Collections.emptySet();
           }
-          if (root.getKind() == IPackageFragmentRoot.K_SOURCE && (filter == null || filter.evaluate(root))) {
+          if (root.getKind() == IPackageFragmentRoot.K_SOURCE && (filter == null || filter.test(root))) {
             String s = root.getPath().removeFirstSegments(1).toString().toLowerCase();
             if (root.getResource().isDerived()) {
               prioMap.put(new CompositeObject(100, project, s), root);
@@ -1227,15 +1227,12 @@ public final class S2eUtils {
   }
 
   /**
-   * {@link IFilter} that only accepts public primary {@link IType}. Furthermore enum types and deprecated types are
+   * {@link Predicate} that only accepts public primary {@link IType}. Furthermore enum types and deprecated types are
    * excluded.
-   *
-   * @author Matthias Villiger
-   * @since 5.2.0
    */
-  public static class PublicPrimaryTypeFilter implements IFilter<IType> {
+  public static class PublicPrimaryTypeFilter implements Predicate<IType> {
     @Override
-    public boolean evaluate(IType candidate) {
+    public boolean test(IType candidate) {
       try {
         if (candidate.isMember() || candidate.isAnonymous() || candidate.isEnum() || candidate.isLocal()) {
           return false;
@@ -1250,16 +1247,13 @@ public final class S2eUtils {
   }
 
   /**
-   * {@link IFilter} that only accepts public abstract primary types that are no enums, not deprecated and no
+   * {@link Predicate} that only accepts public abstract primary types that are no enums, not deprecated and no
    * interfaces.
-   *
-   * @author Matthias Villiger
-   * @since 5.2.0
    */
   public static class PublicAbstractPrimaryTypeFilter extends PublicPrimaryTypeFilter {
     @Override
-    public boolean evaluate(IType candidate) {
-      boolean accept = super.evaluate(candidate);
+    public boolean test(IType candidate) {
+      boolean accept = super.test(candidate);
       if (!accept) {
         return false;
       }
@@ -1344,9 +1338,9 @@ public final class S2eUtils {
     }
 
     // search for a source folder in same project
-    IFilter<IPackageFragmentRoot> filter = new IFilter<IPackageFragmentRoot>() {
+    Predicate<IPackageFragmentRoot> filter = new Predicate<IPackageFragmentRoot>() {
       @Override
-      public boolean evaluate(IPackageFragmentRoot element) {
+      public boolean test(IPackageFragmentRoot element) {
         if (!exists(element)) {
           return false;
         }
@@ -1401,10 +1395,10 @@ public final class S2eUtils {
    */
   @SuppressWarnings("squid:S1067")
   public static IType getSession(IJavaProject project, ScoutTier tier, IProgressMonitor monitor) throws CoreException {
-    IFilter<IType> filter = new PublicPrimaryTypeFilter() {
+    Predicate<IType> filter = new PublicPrimaryTypeFilter() {
       @Override
-      public boolean evaluate(IType candidate) {
-        if (!super.evaluate(candidate)) {
+      public boolean test(IType candidate) {
+        if (!super.test(candidate)) {
           return false;
         }
         try {

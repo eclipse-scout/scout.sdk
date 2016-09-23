@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.fields;
 
+import java.util.function.Predicate;
+
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.JavaProjectContentProvider;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.PackageContentProvider;
@@ -132,11 +133,11 @@ public class FieldToolkit {
     return createProjectProposalField(parent, label, null);
   }
 
-  public ProposalTextField createProjectProposalField(Composite parent, String label, IFilter<IJavaProject> filter) {
+  public ProposalTextField createProjectProposalField(Composite parent, String label, Predicate<IJavaProject> filter) {
     return createProjectProposalField(parent, label, filter, TextField.DEFAULT_LABEL_WIDTH);
   }
 
-  public ProposalTextField createProjectProposalField(Composite parent, String label, IFilter<IJavaProject> filter, int labelWidth) {
+  public ProposalTextField createProjectProposalField(Composite parent, String label, Predicate<IJavaProject> filter, int labelWidth) {
     ProposalTextField proposalField = createProposalField(parent, label, TextField.TYPE_LABEL, labelWidth);
     JavaProjectContentProvider provider = new JavaProjectContentProvider();
     provider.setFilter(filter);

@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -33,7 +34,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.SimpleNlsProject;
@@ -94,10 +94,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     };
 
     final Set<TextProviderServiceDeclaration> result = new TreeSet<>(comparator);
-    IFilter<IType> filter = new PublicPrimaryTypeFilter() {
+    Predicate<IType> filter = new PublicPrimaryTypeFilter() {
       @Override
-      public boolean evaluate(IType candidate) {
-        boolean accept = super.evaluate(candidate);
+      public boolean test(IType candidate) {
+        boolean accept = super.test(candidate);
         if (!accept) {
           return false;
         }

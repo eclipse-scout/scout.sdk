@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
@@ -37,8 +38,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.MethodParameterS
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.Filters;
-import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link MethodSourceBuilderFactory}</h3>
@@ -118,14 +117,14 @@ public final class MethodSourceBuilderFactory {
     }
 
     Map<String, IMethod> abstractMethodIds = new HashMap<>();
-    IFilter<IMethod> abstractMethodFilter = new IFilter<IMethod>() {
+    Predicate<IMethod> abstractMethodFilter = new Predicate<IMethod>() {
       @Override
-      public boolean evaluate(IMethod element) {
+      public boolean test(IMethod element) {
         int flags = element.flags();
         return Flags.isAbstract(flags) || Flags.isInterface(flags) || Flags.isInterface(element.declaringType().flags());
       }
     };
-    IFilter<IMethod> notAbstractMethodFilter = Filters.not(abstractMethodFilter);
+    Predicate<IMethod> notAbstractMethodFilter = abstractMethodFilter.negate();
 
     // collect all abstract and interface method IDs
     List<IMethod> abstractMethods = type.methods().withSuperTypes(true).withFilter(abstractMethodFilter).list();
@@ -144,7 +143,7 @@ public final class MethodSourceBuilderFactory {
     return new ArrayList<>(abstractMethodIds.values());
   }
 
-  private static IMethod getMethodToOverride(ITypeSourceBuilder typeSourceBuilder, String targetPackage, IJavaEnvironment lookupContext, IFilter<IMethod> methodFilter) {
+  private static IMethod getMethodToOverride(ITypeSourceBuilder typeSourceBuilder, String targetPackage, IJavaEnvironment lookupContext, Predicate<IMethod> methodFilter) {
     IType tmpType = createTmpType(typeSourceBuilder.getSuperTypeSignature(), typeSourceBuilder.getInterfaceSignatures(), targetPackage, lookupContext);
     if (tmpType == null) {
       return null;
@@ -156,11 +155,11 @@ public final class MethodSourceBuilderFactory {
     return createOverride(typeSourceBuilder, targetPackage, lookupContext, methodName, null);
   }
 
-  public static IMethodSourceBuilder createOverride(ITypeSourceBuilder typeSourceBuilder, String targetPackage, IJavaEnvironment lookupContext, final String methodName, IFilter<IMethod> methodFilter) {
-    IFilter<IMethod> filter = null;
-    IFilter<IMethod> nameFilter = new IFilter<IMethod>() {
+  public static IMethodSourceBuilder createOverride(ITypeSourceBuilder typeSourceBuilder, String targetPackage, IJavaEnvironment lookupContext, final String methodName, Predicate<IMethod> methodFilter) {
+    Predicate<IMethod> filter = null;
+    Predicate<IMethod> nameFilter = new Predicate<IMethod>() {
       @Override
-      public boolean evaluate(IMethod element) {
+      public boolean test(IMethod element) {
         return element.elementName().equals(methodName);
       }
     };
@@ -169,7 +168,7 @@ public final class MethodSourceBuilderFactory {
       filter = nameFilter;
     }
     else {
-      filter = Filters.and(nameFilter, methodFilter);
+      filter = nameFilter.and(methodFilter);
     }
 
     IMethod methodToOverride = getMethodToOverride(typeSourceBuilder, targetPackage, lookupContext, filter);

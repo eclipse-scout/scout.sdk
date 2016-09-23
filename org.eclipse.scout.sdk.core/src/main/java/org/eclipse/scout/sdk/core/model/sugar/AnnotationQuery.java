@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.sugar;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IField;
@@ -24,7 +25,6 @@ import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link AnnotationQuery}</h3> Annotation query that by default returns all annotations directly defined on the
@@ -42,7 +42,7 @@ public class AnnotationQuery<T> {
   private boolean m_includeSuperInterfaces = false;
   private String m_name;
   private Class<AbstractManagedAnnotation> m_managedWrapperType;
-  private IFilter<IAnnotation> m_filter;
+  private Predicate<IAnnotation> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
   public AnnotationQuery(IType containerType, AnnotatableSpi owner) {
@@ -121,13 +121,13 @@ public class AnnotationQuery<T> {
   }
 
   /**
-   * Limit the annotations to the ones that accept the given {@link IFilter}.
+   * Limit the annotations to the ones that accept the given {@link Predicate}.
    *
    * @param filter
    *          The filter. Default none.
    * @return this
    */
-  public AnnotationQuery<T> withFilter(IFilter<IAnnotation> filter) {
+  public AnnotationQuery<T> withFilter(Predicate<IAnnotation> filter) {
     m_filter = filter;
     return this;
   }
@@ -151,7 +151,7 @@ public class AnnotationQuery<T> {
     if (m_managedWrapperType != null && !AbstractManagedAnnotation.typeName(m_managedWrapperType).equals(a.name())) {
       return false;
     }
-    if (m_filter != null && !m_filter.evaluate(a)) {
+    if (m_filter != null && !m_filter.test(a)) {
       return false;
     }
     return true;
@@ -177,9 +177,9 @@ public class AnnotationQuery<T> {
         }
         else if (m_owner instanceof MethodSpi) {
           // find method with same signature
-          IMethod m = type.methods().withFilter(new IFilter<IMethod>() {
+          IMethod m = type.methods().withFilter(new Predicate<IMethod>() {
             @Override
-            public boolean evaluate(IMethod element) {
+            public boolean test(IMethod element) {
               return m_methodId.equals(SignatureUtils.createMethodIdentifier(element));
             }
           }).first();

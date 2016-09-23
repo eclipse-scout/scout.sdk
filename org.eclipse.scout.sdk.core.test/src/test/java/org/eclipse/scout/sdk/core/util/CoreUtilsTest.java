@@ -25,6 +25,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -213,9 +214,9 @@ public class CoreUtilsTest {
 
   @Test
   public void testFindInnerTypeInSuperHierarchy() {
-    IType innerTypeInSuperClass = CoreUtils.findInnerTypeInSuperHierarchy(CoreTestingUtils.getChildClassType(), new IFilter<IType>() {
+    IType innerTypeInSuperClass = CoreUtils.findInnerTypeInSuperHierarchy(CoreTestingUtils.getChildClassType(), new Predicate<IType>() {
       @Override
-      public boolean evaluate(IType element) {
+      public boolean test(IType element) {
         return "InnerClass2".equals(element.elementName());
       }
     });
@@ -473,9 +474,9 @@ public class CoreUtilsTest {
     Assert.assertNotNull(trueProp.readMethod());
     Assert.assertNotNull(trueProp.writeMethod());
 
-    List<IPropertyBean> propertyBeans2 = CoreUtils.getPropertyBeans(propTestClass, new IFilter<IPropertyBean>() {
+    List<IPropertyBean> propertyBeans2 = CoreUtils.getPropertyBeans(propTestClass, new Predicate<IPropertyBean>() {
       @Override
-      public boolean evaluate(IPropertyBean element) {
+      public boolean test(IPropertyBean element) {
         return Character.isLowerCase(element.type().elementName().charAt(0));
       }
     }, null);

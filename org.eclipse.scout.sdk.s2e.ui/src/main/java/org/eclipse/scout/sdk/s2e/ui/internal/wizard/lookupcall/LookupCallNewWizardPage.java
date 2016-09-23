@@ -88,14 +88,14 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
     StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
     superTypeContentProvider.setTypeProposalFilter(new PublicAbstractPrimaryTypeFilter() {
       @Override
-      public boolean evaluate(IType candidate) {
+      public boolean test(IType candidate) {
         if (!S2eUtils.exists(candidate)) {
           return false;
         }
         if (IScoutRuntimeTypes.LookupCall.equals(candidate.getFullyQualifiedName())) {
           return true;
         }
-        return super.evaluate(candidate);
+        return super.test(candidate);
       }
     });
 

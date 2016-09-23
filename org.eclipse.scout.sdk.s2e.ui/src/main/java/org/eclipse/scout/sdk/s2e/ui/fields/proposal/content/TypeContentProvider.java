@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
@@ -36,7 +37,6 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.NormalizedPattern;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -128,7 +128,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
       return;
     }
 
-    IFilter<IType> filter = getTypeProposalFilter();
+    Predicate<IType> filter = getTypeProposalFilter();
     for (String fqn : m_mostlyUsedTypes) {
       if (monitor.isCanceled()) {
         return;
@@ -137,7 +137,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
       if (matchRegions != null) {
         try {
           IType type = javaProject.findType(fqn);
-          if ((filter == null || filter.evaluate(type)) && !addProposalCandidate(type, candidates)) {
+          if ((filter == null || filter.test(type)) && !addProposalCandidate(type, candidates)) {
             return;
           }
         }
@@ -204,7 +204,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
 
     private final IProgressMonitor m_monitor;
     private final Set<IType> m_collector;
-    private final IFilter<IType> m_typeProposalFilter;
+    private final Predicate<IType> m_typeProposalFilter;
 
     private P_SearchRequestor(Set<IType> collector, IProgressMonitor monitor) {
       m_collector = collector;
@@ -226,7 +226,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
       if (!S2eUtils.exists(type)) {
         return;
       }
-      if (m_typeProposalFilter != null && !m_typeProposalFilter.evaluate(type)) {
+      if (m_typeProposalFilter != null && !m_typeProposalFilter.test(type)) {
         return;
       }
       if (m_collector.contains(type)) {

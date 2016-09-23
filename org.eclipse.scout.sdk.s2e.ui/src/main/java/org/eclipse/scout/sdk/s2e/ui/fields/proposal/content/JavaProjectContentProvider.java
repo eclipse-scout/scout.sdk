@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -22,7 +23,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  */
 public class JavaProjectContentProvider extends AbstractContentProviderAdapter {
 
-  private IFilter<IJavaProject> m_filter;
+  private Predicate<IJavaProject> m_filter;
 
   @Override
   public String getText(Object element) {
@@ -79,15 +79,15 @@ public class JavaProjectContentProvider extends AbstractContentProviderAdapter {
       return false;
     }
 
-    IFilter<IJavaProject> filter = getFilter();
-    return filter == null || filter.evaluate(jp);
+    Predicate<IJavaProject> filter = getFilter();
+    return filter == null || filter.test(jp);
   }
 
-  public IFilter<IJavaProject> getFilter() {
+  public Predicate<IJavaProject> getFilter() {
     return m_filter;
   }
 
-  public void setFilter(IFilter<IJavaProject> filter) {
+  public void setFilter(Predicate<IJavaProject> filter) {
     m_filter = filter;
   }
 }

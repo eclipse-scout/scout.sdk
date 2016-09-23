@@ -11,12 +11,12 @@
 package org.eclipse.scout.sdk.s2e.trigger;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link IDerivedResourceManager}</h3> Manages the life cycle of any resources that are to be generated based on an
@@ -78,18 +78,18 @@ public interface IDerivedResourceManager {
    * Gets the filter used to decide whether an {@link IResourceChangeEvent} should be processed or not.<br>
    * By default the {@link DefaultResourceChangeEventFilter} is used.
    *
-   * @return The {@link IFilter} deciding whether an {@link IResourceChangeEvent} should be processed by this
+   * @return The {@link Predicate} deciding whether an {@link IResourceChangeEvent} should be processed by this
    *         {@link IDerivedResourceManager}. If <code>null</code> is returned, all events are processed (no filtering).
    */
-  IFilter<IResourceChangeEvent> getResourceChangeEventFilter();
+  Predicate<IResourceChangeEvent> getResourceChangeEventFilter();
 
   /**
    * Sets a new filter to decide whether an {@link IResourceChangeEvent} should be processed by this
    * {@link IDerivedResourceManager}.
    *
    * @param resourceChangeEventFilter
-   *          The new {@link IFilter} or <code>null</code> if no events should be filtered.
+   *          The new {@link Predicate} or <code>null</code> if no events should be filtered.
    */
-  void setResourceChangeEventFilter(IFilter<IResourceChangeEvent> resourceChangeEventFilter);
+  void setResourceChangeEventFilter(Predicate<IResourceChangeEvent> resourceChangeEventFilter);
 
 }

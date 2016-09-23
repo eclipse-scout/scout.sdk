@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -42,7 +43,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.core.util.TypeFilters;
@@ -165,9 +165,9 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 
     // the declaring type holds columns
     Set<IType> allColumnsUpTheHierarchy = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    IFilter<IType> filter = new IFilter<IType>() {
+    Predicate<IType> filter = new Predicate<IType>() {
       @Override
-      public boolean evaluate(IType type) {
+      public boolean test(IType type) {
         SdkColumnCommand cmd = DtoUtils.getSdkColumnCommand(type);
         return cmd == null || cmd.equals(SdkColumnCommand.CREATE);
       }

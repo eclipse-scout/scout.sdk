@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -33,7 +34,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
@@ -60,7 +60,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   private final List<IDerivedResourceHandlerFactory> m_updateHandlerFactories;
 
   private IResourceChangeListener m_resourceChangeListener;
-  private IFilter<IResourceChangeEvent> m_resourceChangeEventFilter;
+  private Predicate<IResourceChangeEvent> m_resourceChangeEventFilter;
 
   // queue that buffers all java change events that need processing
   private final BlockingQueue<IResourceChangeEvent> m_javaChangeEventsToCheck;
@@ -119,12 +119,12 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   }
 
   @Override
-  public IFilter<IResourceChangeEvent> getResourceChangeEventFilter() {
+  public Predicate<IResourceChangeEvent> getResourceChangeEventFilter() {
     return m_resourceChangeEventFilter;
   }
 
   @Override
-  public void setResourceChangeEventFilter(IFilter<IResourceChangeEvent> resourceChangeEventFilter) {
+  public void setResourceChangeEventFilter(Predicate<IResourceChangeEvent> resourceChangeEventFilter) {
     m_resourceChangeEventFilter = resourceChangeEventFilter;
   }
 
@@ -313,8 +313,8 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     }
 
     private boolean isInterestingResourceChangeEvent(IResourceChangeEvent event) {
-      IFilter<IResourceChangeEvent> filter = getResourceChangeEventFilter();
-      return filter == null || filter.evaluate(event);
+      Predicate<IResourceChangeEvent> filter = getResourceChangeEventFilter();
+      return filter == null || filter.test(event);
     }
 
     @Override

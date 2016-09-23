@@ -10,29 +10,31 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
+import java.util.function.Predicate;
+
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
 
 /**
- * Contains {@link IFilter}s for {@link IType}s.
+ * Contains {@link Predicate}s for {@link IType}s.
  */
 public final class TypeFilters {
 
-  private static final IFilter<IType> TOP_LEVEL_FILTER = new IFilter<IType>() {
+  private static final Predicate<IType> TOP_LEVEL_FILTER = new Predicate<IType>() {
     @Override
-    public boolean evaluate(IType type) {
+    public boolean test(IType type) {
       return type != null && type.declaringType() == null;
     }
   };
-  private static final IFilter<IType> NO_GENERIC_FILTER = new IFilter<IType>() {
+  private static final Predicate<IType> NO_GENERIC_FILTER = new Predicate<IType>() {
     @Override
-    public boolean evaluate(IType type) {
+    public boolean test(IType type) {
       return !type.hasTypeParameters();
     }
   };
-  private static final IFilter<IType> NO_SURROUNDING_CONTEXT_TYPE_FILTER = new IFilter<IType>() {
+  private static final Predicate<IType> NO_SURROUNDING_CONTEXT_TYPE_FILTER = new Predicate<IType>() {
     @Override
-    public boolean evaluate(IType type) {
+    public boolean test(IType type) {
       return type != null && !type.isParameterType() && (type.declaringType() == null || Flags.isStatic(type.flags()));
     }
   };
@@ -41,46 +43,46 @@ public final class TypeFilters {
   }
 
   /**
-   * Creates and gets a {@link IFilter} that evaluates to <code>true</code> for all {@link IType}s that are
+   * Creates and gets a {@link Predicate} that evaluates to <code>true</code> for all {@link IType}s that are
    * <code>instanceof</code> the given fully qualified name.
    *
    * @param type
    *          The fully qualified type name the candidates must be <code>instanceof</code>.
-   * @return The created {@link IFilter}
+   * @return The created {@link Predicate}
    */
-  public static IFilter<IType> instanceOf(final String type) {
-    return new IFilter<IType>() {
+  public static Predicate<IType> instanceOf(final String type) {
+    return new Predicate<IType>() {
       @Override
-      public boolean evaluate(IType candidate) {
+      public boolean test(IType candidate) {
         return candidate.isInstanceOf(type);
       }
     };
   }
 
   /**
-   * Gets a {@link IFilter} that only accepts primary types (having {@link IType#declaringType()} == null).
+   * Gets a {@link Predicate} that only accepts primary types (having {@link IType#declaringType()} == null).
    *
-   * @return The primary type {@link IFilter}.
+   * @return The primary type {@link Predicate}.
    */
-  public static IFilter<IType> primaryType() {
+  public static Predicate<IType> primaryType() {
     return TOP_LEVEL_FILTER;
   }
 
   /**
-   * Returns an {@link IFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}. <br>
+   * Returns an {@link Predicate} that accepts all {@link IType}s that have no surrounding context {@link IType}. <br>
    * More formally: Accepts all non-parameter types {@link IType}s that are either static or primary types (= have no
    * declaring type).
    *
-   * @return an {@link IFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}.
+   * @return an {@link Predicate} that accepts all {@link IType}s that have no surrounding context {@link IType}.
    */
-  public static IFilter<IType> noSurroundingContext() {
+  public static Predicate<IType> noSurroundingContext() {
     return NO_SURROUNDING_CONTEXT_TYPE_FILTER;
   }
 
   /**
-   * @return An {@link IFilter} that only accepts {@link IType}s that are not parameterized (have not generics).
+   * @return An {@link Predicate} that only accepts {@link IType}s that are not parameterized (have not generics).
    */
-  public static IFilter<IType> noGenerics() {
+  public static Predicate<IType> noGenerics() {
     return NO_GENERIC_FILTER;
   }
 }

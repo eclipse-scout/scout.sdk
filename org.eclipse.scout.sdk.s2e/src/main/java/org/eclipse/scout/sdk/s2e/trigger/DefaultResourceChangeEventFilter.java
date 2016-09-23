@@ -19,17 +19,16 @@ import java.util.function.Predicate;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 
 /**
  * <h3>{@link DefaultResourceChangeEventFilter}</h3> The default {@link IResourceChangeEvent} filter used by
- * {@link IDerivedResourceManager#setResourceChangeEventFilter(IFilter)}.
+ * {@link IDerivedResourceManager#setResourceChangeEventFilter(Predicate)}.
  *
  * @author Matthias Villiger
  * @since 6.1.0
  */
-public class DefaultResourceChangeEventFilter implements IFilter<IResourceChangeEvent> {
+public class DefaultResourceChangeEventFilter implements Predicate<IResourceChangeEvent> {
 
   public static final String GIT_UPDATES = "org.eclipse.egit.";
   public static final String MAVEN_UPDATES = "org.eclipse.m2e.";
@@ -59,7 +58,7 @@ public class DefaultResourceChangeEventFilter implements IFilter<IResourceChange
   }
 
   @Override
-  public boolean evaluate(IResourceChangeEvent event) {
+  public boolean test(IResourceChangeEvent event) {
     if (event == null) {
       return false;
     }

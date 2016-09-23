@@ -12,12 +12,12 @@ package org.eclipse.scout.sdk.core.model.sugar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
-import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link FieldQuery}</h3> Field query that by default returns all {@link IField}s directly declared on the owner.
@@ -31,7 +31,7 @@ public class FieldQuery {
   private boolean m_includeSuperInterfaces = false;
   private String m_name;
   private int m_flags = -1;
-  private IFilter<IField> m_filter;
+  private Predicate<IField> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
   public FieldQuery(IType type) {
@@ -104,13 +104,13 @@ public class FieldQuery {
   }
 
   /**
-   * Limit the {@link IField}s to the ones that accept the given {@link IFilter}.
+   * Limit the {@link IField}s to the ones that accept the given {@link Predicate}.
    *
    * @param filter
    *          The filter. Default none.
    * @return this
    */
-  public FieldQuery withFilter(IFilter<IField> filter) {
+  public FieldQuery withFilter(Predicate<IField> filter) {
     m_filter = filter;
     return this;
   }
@@ -134,7 +134,7 @@ public class FieldQuery {
     if (m_flags >= 0 && (f.flags() & m_flags) != m_flags) {
       return false;
     }
-    if (m_filter != null && !m_filter.evaluate(f)) {
+    if (m_filter != null && !m_filter.test(f)) {
       return false;
     }
     return true;

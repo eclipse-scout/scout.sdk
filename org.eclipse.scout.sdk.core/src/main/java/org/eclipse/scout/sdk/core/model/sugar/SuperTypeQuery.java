@@ -14,11 +14,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.util.Filters;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
@@ -38,7 +37,7 @@ public class SuperTypeQuery {
   private String m_name;
   private String m_simpleName;
   private int m_flags = -1;
-  private IFilter<IType> m_filter;
+  private Predicate<IType> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
   public SuperTypeQuery(IType type) {
@@ -135,15 +134,14 @@ public class SuperTypeQuery {
   }
 
   /**
-   * Limit the {@link IType}s to the ones that accept the given {@link IFilter}.
+   * Limit the {@link IType}s to the ones that accept the given {@link Predicate}.
    *
    * @param filter
    *          The filter. Default none.
    * @return this
    * @see TypeFilters
-   * @see Filters
    */
-  public SuperTypeQuery withFilter(IFilter<IType> filter) {
+  public SuperTypeQuery withFilter(Predicate<IType> filter) {
     m_filter = filter;
     return this;
   }
@@ -173,7 +171,7 @@ public class SuperTypeQuery {
     if (m_simpleName != null && !m_simpleName.equals(t.elementName())) {
       return false;
     }
-    if (m_filter != null && !m_filter.evaluate(t)) {
+    if (m_filter != null && !m_filter.test(t)) {
       return false;
     }
     return true;

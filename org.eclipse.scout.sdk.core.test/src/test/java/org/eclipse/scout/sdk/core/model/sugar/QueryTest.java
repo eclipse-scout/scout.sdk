@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.model.sugar;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
@@ -30,7 +31,6 @@ import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,9 +45,9 @@ public class QueryTest {
   @Test
   public void testSuperTypeQuery() {
     IType childClass = CoreTestingUtils.getChildClassType();
-    Assert.assertEquals(3, childClass.superTypes().withFilter(new IFilter<IType>() {
+    Assert.assertEquals(3, childClass.superTypes().withFilter(new Predicate<IType>() {
       @Override
-      public boolean evaluate(IType element) {
+      public boolean test(IType element) {
         return !element.isInterface();
       }
     }).list().size());
@@ -68,9 +68,9 @@ public class QueryTest {
     Assert.assertEquals(1, acc.methods().withName("blub").first().superMethods().withMaxResultCount(1).list().size());
     Assert.assertEquals(1, acc.methods().withName("blub").first().superMethods().withSelf(false).list().size());
     Assert.assertEquals(1, acc.methods().withName("blub").first().superMethods().withSuperClasses(false).list().size());
-    Assert.assertEquals(1, acc.methods().withName("blub").first().superMethods().withFilter(new IFilter<IMethod>() {
+    Assert.assertEquals(1, acc.methods().withName("blub").first().superMethods().withFilter(new Predicate<IMethod>() {
       @Override
-      public boolean evaluate(IMethod element) {
+      public boolean test(IMethod element) {
         return AbstractBaseClass.class.getName().equals(element.declaringType().name());
       }
     }).list().size());
@@ -79,9 +79,9 @@ public class QueryTest {
   @Test
   public void testTypeQuery() {
     IType base = CoreTestingUtils.getBaseClassType();
-    Assert.assertEquals(1, base.innerTypes().withFilter(new IFilter<IType>() {
+    Assert.assertEquals(1, base.innerTypes().withFilter(new Predicate<IType>() {
       @Override
-      public boolean evaluate(IType element) {
+      public boolean test(IType element) {
         return "InnerClass2".equals(element.elementName());
       }
     }).list().size());
@@ -102,9 +102,9 @@ public class QueryTest {
     Assert.assertEquals(1, methodWithParams.parameters().withDataType(String.class.getName()).list().size());
     Assert.assertEquals(TestAnnotation.class.getName(), methodWithParams.parameters().withName("firstParam").first().annotations().first().type().name());
     Assert.assertEquals(1, methodWithParams.parameters().withMaxResultCount(1).list().size());
-    Assert.assertEquals(1, methodWithParams.parameters().withFilter(new IFilter<IMethodParameter>() {
+    Assert.assertEquals(1, methodWithParams.parameters().withFilter(new Predicate<IMethodParameter>() {
       @Override
-      public boolean evaluate(IMethodParameter element) {
+      public boolean test(IMethodParameter element) {
         return element.annotations().existsAny();
       }
     }).list().size());
@@ -115,9 +115,9 @@ public class QueryTest {
     IType baseClass = CoreTestingUtils.getBaseClassType();
     IType childClass = CoreTestingUtils.getChildClassType();
 
-    Assert.assertEquals(1, baseClass.fields().withFilter(new IFilter<IField>() {
+    Assert.assertEquals(1, baseClass.fields().withFilter(new Predicate<IField>() {
       @Override
-      public boolean evaluate(IField element) {
+      public boolean test(IField element) {
         return element.dataType().name().equals(IJavaRuntimeTypes.Long);
       }
     }).list().size());
@@ -132,9 +132,9 @@ public class QueryTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertEquals(1, childClassType.methods().withAnnotation(TestAnnotation.class.getName()).list().size());
 
-    List<IMethod> list = childClassType.methods().withFilter(new IFilter<IMethod>() {
+    List<IMethod> list = childClassType.methods().withFilter(new Predicate<IMethod>() {
       @Override
-      public boolean evaluate(IMethod element) {
+      public boolean test(IMethod element) {
         return !element.parameters().existsAny();
       }
     }).list();
@@ -163,18 +163,18 @@ public class QueryTest {
     Assert.assertEquals(2, acc.methods().withName("blub").first().annotations().withSuperTypes(true).withName(MarkerAnnotation.class.getName()).list().size());
     Assert.assertEquals(2, childClass.annotations().withSuperClasses(true).withName(TestAnnotation.class.getName()).list().size());
 
-    Assert.assertEquals(1, wbc.annotations().withFilter(new IFilter<IAnnotation>() {
+    Assert.assertEquals(1, wbc.annotations().withFilter(new Predicate<IAnnotation>() {
       @Override
-      public boolean evaluate(IAnnotation element) {
+      public boolean test(IAnnotation element) {
         return element.element("inner").value() instanceof IArrayMetaValue;
       }
     }).list().size());
     Assert.assertEquals(1, acc.methods().withName("blub").first().annotations().withMaxResultCount(1).list().size());
 
     IMethod methodInChildClass = childClass.methods().withName("methodInChildClass").first();
-    Assert.assertEquals(1, methodInChildClass.annotations().withFilter(new IFilter<IAnnotation>() {
+    Assert.assertEquals(1, methodInChildClass.annotations().withFilter(new Predicate<IAnnotation>() {
       @Override
-      public boolean evaluate(IAnnotation element) {
+      public boolean test(IAnnotation element) {
         return element.elements().size() == 3;
       }
     }).list().size());

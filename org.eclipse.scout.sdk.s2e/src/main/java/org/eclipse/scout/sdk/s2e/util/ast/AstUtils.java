@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
@@ -39,7 +40,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.internal.compiler.lookup.CompilationUnitScope;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
@@ -396,7 +396,7 @@ public final class AstUtils {
    *          The filter that the node must fulfill or <code>null</code> if no additional filter is required.
    * @return The next node after the given pos or <code>null</code> if there is no such node.
    */
-  public static ASTNode getNextNode(ASTNode n, int pos, IFilter<ASTNode> filter) {
+  public static ASTNode getNextNode(ASTNode n, int pos, Predicate<ASTNode> filter) {
     return getSiblingNode(n, pos, filter, false);
   }
 
@@ -411,11 +411,11 @@ public final class AstUtils {
    *          The filter that the node must fulfill or <code>null</code> if no additional filter is required.
    * @return The last node before the given pos or <code>null</code> if there is no such node.
    */
-  public static ASTNode getPreviousNode(ASTNode n, int pos, IFilter<ASTNode> filter) {
+  public static ASTNode getPreviousNode(ASTNode n, int pos, Predicate<ASTNode> filter) {
     return getSiblingNode(n, pos, filter, true);
   }
 
-  private static ASTNode getSiblingNode(ASTNode n, int pos, IFilter<ASTNode> filter, boolean prev) {
+  private static ASTNode getSiblingNode(ASTNode n, int pos, Predicate<ASTNode> filter, boolean prev) {
     Deque<ASTNode> children = getChildren(n);
     Iterator<ASTNode> iterator = null;
     if (prev) {
@@ -429,7 +429,7 @@ public final class AstUtils {
       ASTNode currentNode = iterator.next();
       int endOfCurrentNode = currentNode.getStartPosition() + currentNode.getLength();
       boolean isRangeOk = (prev && endOfCurrentNode < pos) || (!prev && pos < endOfCurrentNode);
-      if (isRangeOk && (filter == null || filter.evaluate(currentNode))) {
+      if (isRangeOk && (filter == null || filter.test(currentNode))) {
         return currentNode;
       }
     }

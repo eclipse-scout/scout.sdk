@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import javax.wsdl.Service;
@@ -55,7 +56,6 @@ import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.operation.jaxws.WebServiceNewOperation;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -190,9 +190,9 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   protected void loadWebServiceClient() throws JavaModelException {
-    IFilter<IType> webServiceClientsFilter = new IFilter<IType>() {
+    Predicate<IType> webServiceClientsFilter = new Predicate<IType>() {
       @Override
-      public boolean evaluate(IType element) {
+      public boolean test(IType element) {
         try {
           ITypeHierarchy superTypeHierarchy = getSuperTypeHierarchy(element);
           return S2eUtils.hierarchyContains(superTypeHierarchy, IScoutRuntimeTypes.AbstractWebServiceClient);
@@ -213,14 +213,14 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
     }
   }
 
-  protected IType getPortTypeChildClass(IType portType, IFilter<IType> filter) throws JavaModelException {
+  protected IType getPortTypeChildClass(IType portType, Predicate<IType> filter) throws JavaModelException {
     if (!S2eUtils.exists(portType)) {
       return null;
     }
 
     IType[] candidates = getTypeHierarchy(portType).getAllSubtypes(portType);
     for (IType t : candidates) {
-      if (filter == null || filter.evaluate(t)) {
+      if (filter == null || filter.test(t)) {
         return t;
       }
     }
@@ -228,9 +228,9 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   protected void loadEntryPoint() throws JavaModelException {
-    IFilter<IType> portTypeFilter = new IFilter<IType>() {
+    Predicate<IType> portTypeFilter = new Predicate<IType>() {
       @Override
-      public boolean evaluate(IType element) {
+      public boolean test(IType element) {
         return S2eUtils.exists(S2eUtils.getAnnotation(element, IJavaRuntimeTypes.WebService));
       }
     };
@@ -386,9 +386,9 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   protected void loadServiceImplementations() throws JavaModelException {
-    IFilter<IType> serviceImplFilter = new IFilter<IType>() {
+    Predicate<IType> serviceImplFilter = new Predicate<IType>() {
       @Override
-      public boolean evaluate(IType element) {
+      public boolean test(IType element) {
         if (S2eUtils.exists(S2eUtils.getAnnotation(element, IJavaRuntimeTypes.WebService))) {
           return false; // exclude entry points
         }

@@ -13,13 +13,13 @@ package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
@@ -33,7 +33,7 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
 
   private String m_baseClassFqn;
   private IJavaProject m_javaProject;
-  private IFilter<IType> m_typeProposalFilter;
+  private Predicate<IType> m_typeProposalFilter;
 
   public StrictHierarchyTypeContentProvider(IJavaProject javaProject, String baseClassFqn) {
     setJavaProject(javaProject);
@@ -97,11 +97,11 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
     clearCache();
   }
 
-  public IFilter<IType> getTypeProposalFilter() {
+  public Predicate<IType> getTypeProposalFilter() {
     return m_typeProposalFilter;
   }
 
-  public void setTypeProposalFilter(IFilter<IType> typeProposalFilter) {
+  public void setTypeProposalFilter(Predicate<IType> typeProposalFilter) {
     if (Objects.equals(typeProposalFilter, getTypeProposalFilter())) {
       return;
     }

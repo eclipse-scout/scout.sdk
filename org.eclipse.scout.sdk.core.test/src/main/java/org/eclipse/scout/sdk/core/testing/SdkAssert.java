@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.testing;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.internal.compiler.ASTVisitor;
@@ -35,7 +36,6 @@ import org.eclipse.scout.sdk.core.model.spi.internal.SpiWithJdtUtils;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.util.IFilter;
 import org.junit.Assert;
 
 /**
@@ -169,9 +169,9 @@ public class SdkAssert extends Assert {
    * @return the method if found
    */
   public static IMethod assertMethodExist(String message, IType type, final String methodName, final String[] parameterSignatures) {
-    IMethod method = type.methods().withFilter(new IFilter<IMethod>() {
+    IMethod method = type.methods().withFilter(new Predicate<IMethod>() {
       @Override
-      public boolean evaluate(IMethod candidate) {
+      public boolean test(IMethod candidate) {
         if (Objects.equals(methodName, candidate.elementName())) {
           List<IMethodParameter> refParameterSignatures = candidate.parameters().list();
           if (parameterSignatures.length == refParameterSignatures.size()) {
