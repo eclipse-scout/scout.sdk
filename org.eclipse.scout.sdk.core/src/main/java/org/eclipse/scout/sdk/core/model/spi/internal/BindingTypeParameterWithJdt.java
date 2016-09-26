@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
@@ -75,36 +76,38 @@ public class BindingTypeParameterWithJdt extends AbstractJavaElementWithJdt<ITyp
   @Override
   @SuppressWarnings("null")
   public List<TypeSpi> getBounds() {
-    if (m_bounds == null) {
-      ReferenceBinding superclass = m_binding.superclass();
-      ReferenceBinding[] superInterfaces = m_binding.superInterfaces();
-      boolean hasSuperClass = superclass != null && !CharOperation.equals(superclass.compoundName, TypeConstants.JAVA_LANG_OBJECT);
-      boolean hasSuperInterfaces = superInterfaces != null && superInterfaces.length > 0;
-      int size = 0;
-      if (hasSuperClass) {
-        size++;
-      }
-      if (hasSuperInterfaces) {
-        size += superInterfaces.length;
-      }
+    if (m_bounds != null) {
+      return m_bounds;
+    }
 
-      List<TypeSpi> bounds = new ArrayList<>(size);
-      if (hasSuperClass) {
-        TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, superclass);
+    ReferenceBinding superclass = m_binding.superclass();
+    ReferenceBinding[] superInterfaces = m_binding.superInterfaces();
+    boolean hasSuperClass = superclass != null && !CharOperation.equals(superclass.compoundName, TypeConstants.JAVA_LANG_OBJECT);
+    boolean hasSuperInterfaces = superInterfaces != null && superInterfaces.length > 0;
+    int size = 0;
+    if (hasSuperClass) {
+      size++;
+    }
+    if (hasSuperInterfaces) {
+      size += superInterfaces.length;
+    }
+
+    List<TypeSpi> bounds = new ArrayList<>(size);
+    if (hasSuperClass) {
+      TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, superclass);
+      if (t != null) {
+        bounds.add(t);
+      }
+    }
+    if (hasSuperInterfaces) {
+      for (ReferenceBinding b : superInterfaces) {
+        TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, b);
         if (t != null) {
           bounds.add(t);
         }
       }
-      if (hasSuperInterfaces) {
-        for (ReferenceBinding b : superInterfaces) {
-          TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, b);
-          if (t != null) {
-            bounds.add(t);
-          }
-        }
-      }
-      m_bounds = bounds;
     }
+    m_bounds = Collections.unmodifiableList(bounds);
     return m_bounds;
   }
 

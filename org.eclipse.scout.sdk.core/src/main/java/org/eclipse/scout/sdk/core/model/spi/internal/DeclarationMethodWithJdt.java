@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.Annotation;
 import org.eclipse.jdt.internal.compiler.ast.Argument;
 import org.eclipse.jdt.internal.compiler.ast.Javadoc;
 import org.eclipse.jdt.internal.compiler.ast.MethodDeclaration;
@@ -99,10 +98,11 @@ public class DeclarationMethodWithJdt extends AbstractMemberWithJdt<IMethod> imp
 
   @Override
   public List<DeclarationAnnotationWithJdt> getAnnotations() {
-    if (m_annotations == null) {
-      Annotation[] annots = m_astNode.annotations;
-      m_annotations = SpiWithJdtUtils.createDeclarationAnnotations(m_env, this, annots);
+    if (m_annotations != null) {
+      return m_annotations;
     }
+
+    m_annotations = SpiWithJdtUtils.createDeclarationAnnotations(m_env, this, m_astNode.annotations);
     return m_annotations;
   }
 
@@ -188,18 +188,20 @@ public class DeclarationMethodWithJdt extends AbstractMemberWithJdt<IMethod> imp
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    if (m_typeParameters == null) {
-      TypeParameter[] typeParams = m_astNode.typeParameters();
-      if (typeParams == null || typeParams.length < 1) {
-        m_typeParameters = Collections.emptyList();
+    if (m_typeParameters != null) {
+      return m_typeParameters;
+    }
+
+    TypeParameter[] typeParams = m_astNode.typeParameters();
+    if (typeParams == null || typeParams.length < 1) {
+      m_typeParameters = Collections.emptyList();
+    }
+    else {
+      List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
+      for (int i = 0; i < typeParams.length; i++) {
+        result.add(m_env.createDeclarationTypeParameter(this, typeParams[i], i));
       }
-      else {
-        List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
-        for (int i = 0; i < typeParams.length; i++) {
-          result.add(m_env.createDeclarationTypeParameter(this, typeParams[i], i));
-        }
-        m_typeParameters = result;
-      }
+      m_typeParameters = Collections.unmodifiableList(result);
     }
     return m_typeParameters;
   }

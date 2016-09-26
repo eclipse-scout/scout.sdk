@@ -14,7 +14,6 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,11 +96,12 @@ public final class SpiWithJdtUtils {
 
   @SafeVarargs
   static <T> T coalesce(T... values) {
-    if (values != null) {
-      for (T value : values) {
-        if (value != null) {
-          return value;
-        }
+    if (values == null) {
+      return null;
+    }
+    for (T value : values) {
+      if (value != null) {
+        return value;
       }
     }
     return null;
@@ -402,7 +402,7 @@ public final class SpiWithJdtUtils {
     for (int i = 0; i < annots.length; i++) {
       result.add(env.createBindingAnnotation(owner, annots[i]));
     }
-    return result;
+    return Collections.unmodifiableList(result);
   }
 
   static List<DeclarationAnnotationWithJdt> createDeclarationAnnotations(JavaEnvironmentWithJdt env, AnnotatableSpi owner, Annotation[] annotations) {
@@ -413,7 +413,7 @@ public final class SpiWithJdtUtils {
     for (int i = 0; i < annotations.length; i++) {
       result.add(env.createDeclarationAnnotation(owner, annotations[i]));
     }
-    return result;
+    return Collections.unmodifiableList(result);
   }
 
   /**
@@ -661,28 +661,22 @@ public final class SpiWithJdtUtils {
     Map<String, ElementValuePair> defaultValues = (Map<String, ElementValuePair>) cache.get(key);
     if (defaultValues == null) {
       MethodBinding[] valueMethods = annotationType.methods();
-      //sort
-      valueMethods = Arrays.copyOf(valueMethods, valueMethods.length);
-      Arrays.sort(valueMethods, new Comparator<MethodBinding>() {
-        @Override
-        public int compare(MethodBinding m1, MethodBinding m2) {
-          AbstractMethodDeclaration d1 = m1.sourceMethod();
-          AbstractMethodDeclaration d2 = m2.sourceMethod();
-          if (d1 != null && d2 != null) {
-            return Integer.compare(d1.declarationSourceStart, d2.declarationSourceStart);
+      if (valueMethods == null || valueMethods.length < 1) {
+        defaultValues = Collections.emptyMap();
+      }
+      else {
+        valueMethods = Arrays.copyOf(valueMethods, valueMethods.length);
+        Arrays.sort(valueMethods, new SourcePositionComparator());
+        defaultValues = new LinkedHashMap<>(valueMethods.length);
+        for (MethodBinding mb : valueMethods) {
+          String name = new String(mb.selector);
+          Object value = mb.getDefaultValue();
+          if (value != null) {
+            defaultValues.put(name, new ElementValuePair(mb.selector, value, mb));
           }
-          return 0;
-        }
-      });
-      defaultValues = new LinkedHashMap<>(valueMethods.length);
-      for (MethodBinding mb : valueMethods) {
-        String name = new String(mb.selector);
-        Object value = mb.getDefaultValue();
-        if (value != null) {
-          defaultValues.put(name, new ElementValuePair(mb.selector, value, mb));
-        }
-        else {
-          defaultValues.put(name, null);
+          else {
+            defaultValues.put(name, null);
+          }
         }
       }
       cache.put(key, defaultValues);
@@ -697,30 +691,24 @@ public final class SpiWithJdtUtils {
     Map<String, MemberValuePair> defaultValues = (Map<String, MemberValuePair>) cache.get(key);
     if (defaultValues == null) {
       MethodBinding[] valueMethods = ((ReferenceBinding) typeBinding).methods();
-      defaultValues = new LinkedHashMap<>(valueMethods.length);
-      //sort
-      valueMethods = Arrays.copyOf(valueMethods, valueMethods.length);
-      Arrays.sort(valueMethods, new Comparator<MethodBinding>() {
-        @Override
-        public int compare(MethodBinding m1, MethodBinding m2) {
-          AbstractMethodDeclaration d1 = m1.sourceMethod();
-          AbstractMethodDeclaration d2 = m2.sourceMethod();
-          if (d1 != null && d2 != null) {
-            return Integer.compare(d1.declarationSourceStart, d2.declarationSourceStart);
-          }
-          return 0;
-        }
-      });
-      for (MethodBinding mb : valueMethods) {
-        String name = new String(mb.selector);
-        AbstractMethodDeclaration md0 = mb.sourceMethod();
-        if (md0 instanceof AnnotationMethodDeclaration) {
-          AnnotationMethodDeclaration md = (AnnotationMethodDeclaration) md0;
-          if (md.defaultValue != null) {
-            defaultValues.put(name, new MemberValuePair(mb.selector, md.defaultValue.sourceStart, md.defaultValue.sourceEnd, md.defaultValue));
-          }
-          else {
-            defaultValues.put(name, null);
+      if (valueMethods == null || valueMethods.length < 1) {
+        defaultValues = Collections.emptyMap();
+      }
+      else {
+        defaultValues = new LinkedHashMap<>(valueMethods.length);
+        valueMethods = Arrays.copyOf(valueMethods, valueMethods.length);
+        Arrays.sort(valueMethods, new SourcePositionComparator());
+        for (MethodBinding mb : valueMethods) {
+          String name = new String(mb.selector);
+          AbstractMethodDeclaration md0 = mb.sourceMethod();
+          if (md0 instanceof AnnotationMethodDeclaration) {
+            AnnotationMethodDeclaration md = (AnnotationMethodDeclaration) md0;
+            if (md.defaultValue != null) {
+              defaultValues.put(name, new MemberValuePair(mb.selector, md.defaultValue.sourceStart, md.defaultValue.sourceEnd, md.defaultValue));
+            }
+            else {
+              defaultValues.put(name, null);
+            }
           }
         }
       }

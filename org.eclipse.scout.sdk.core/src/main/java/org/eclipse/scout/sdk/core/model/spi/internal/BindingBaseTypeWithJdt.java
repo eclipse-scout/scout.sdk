@@ -33,13 +33,6 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
   private final BaseTypeBinding m_btb;
   private final String m_elementName;
-  private List<AnnotationSpi> m_annotations;
-  private List<TypeParameterSpi> m_typeParameters;
-  private List<TypeSpi> m_superInterfaces;
-  private List<TypeSpi> m_memberTypes;
-  private List<MethodSpi> m_methods;
-  private List<TypeSpi> m_typeArguments;
-  private List<FieldSpi> m_fields;
 
   BindingBaseTypeWithJdt(JavaEnvironmentWithJdt env, BaseTypeBinding binding) {
     super(env);
@@ -64,10 +57,7 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<AnnotationSpi> getAnnotations() {
-    if (m_annotations == null) {
-      m_annotations = Collections.emptyList();
-    }
-    return m_annotations;
+    return Collections.emptyList();
   }
 
   @Override
@@ -117,10 +107,7 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    if (m_typeParameters == null) {
-      m_typeParameters = Collections.emptyList();
-    }
-    return m_typeParameters;
+    return Collections.emptyList();
   }
 
   @Override
@@ -145,42 +132,27 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<TypeSpi> getSuperInterfaces() {
-    if (m_superInterfaces == null) {
-      m_superInterfaces = Collections.emptyList();
-    }
-    return m_superInterfaces;
+    return Collections.emptyList();
   }
 
   @Override
   public List<TypeSpi> getTypes() {
-    if (m_memberTypes == null) {
-      m_memberTypes = Collections.emptyList();
-    }
-    return m_memberTypes;
+    return Collections.emptyList();
   }
 
   @Override
   public List<MethodSpi> getMethods() {
-    if (m_methods == null) {
-      m_methods = Collections.emptyList();
-    }
-    return m_methods;
+    return Collections.emptyList();
   }
 
   @Override
   public List<TypeSpi> getTypeArguments() {
-    if (m_typeArguments == null) {
-      m_typeArguments = Collections.emptyList();
-    }
-    return m_typeArguments;
+    return Collections.emptyList();
   }
 
   @Override
   public List<FieldSpi> getFields() {
-    if (m_fields == null) {
-      m_fields = Collections.emptyList();
-    }
-    return m_fields;
+    return Collections.emptyList();
   }
 
   @Override

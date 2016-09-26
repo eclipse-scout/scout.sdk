@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
@@ -95,9 +96,16 @@ public class BindingMethodParameterWithJdt extends AbstractJavaElementWithJdt<IM
 
   @Override
   public List<BindingAnnotationWithJdt> getAnnotations() {
-    if (m_annotations == null) {
-      AnnotationBinding[][] a = m_declaringMethod.getInternalBinding().getParameterAnnotations();
-      m_annotations = SpiWithJdtUtils.createBindingAnnotations(m_env, this, a != null ? a[m_index] : new AnnotationBinding[0]);
+    if (m_annotations != null) {
+      return m_annotations;
+    }
+
+    AnnotationBinding[][] a = m_declaringMethod.getInternalBinding().getParameterAnnotations();
+    if (a == null || m_index >= a.length) {
+      m_annotations = Collections.emptyList();
+    }
+    else {
+      m_annotations = SpiWithJdtUtils.createBindingAnnotations(m_env, this, a[m_index]);
     }
     return m_annotations;
   }

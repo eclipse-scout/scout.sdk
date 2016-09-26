@@ -13,13 +13,11 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.core.compiler.CharOperation;
-import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.Javadoc;
 import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
@@ -185,123 +183,85 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<FieldSpi> getFields() {
-    if (m_fields == null) {
-      getSourceTypeBinding();
-      FieldBinding[] fields = m_binding.fields();
-      if (fields == null || fields.length < 1) {
-        m_fields = Collections.emptyList();
-      }
-      else {
-        //try to sort
-        fields = Arrays.copyOf(fields, fields.length);
-        Arrays.sort(fields, new Comparator<FieldBinding>() {
-          @Override
-          public int compare(FieldBinding f1, FieldBinding f2) {
-            FieldDeclaration decl1 = SpiWithJdtUtils.coalesce(f1.original(), f1).sourceField();
-            FieldDeclaration decl2 = SpiWithJdtUtils.coalesce(f2.original(), f2).sourceField();
-            if (decl1 != null && decl2 != null) {
-              int pos1 = decl1.declarationSourceStart;
-              int pos2 = decl2.declarationSourceStart;
-              return pos1 < pos2 ? -1 : pos1 > pos2 ? 1 : 0;
-            }
-            return 0;
-          }
-        });
+    if (m_fields != null) {
+      return m_fields;
+    }
 
-        List<FieldSpi> result = new ArrayList<>(fields.length);
-        for (FieldBinding fd : fields) {
-          if (fd.isSynthetic()) {
-            continue;
-          }
-          result.add(m_env.createBindingField(this, fd));
+    getSourceTypeBinding();
+    FieldBinding[] fields = m_binding.fields();
+    if (fields == null || fields.length < 1) {
+      m_fields = Collections.emptyList();
+    }
+    else {
+      fields = Arrays.copyOf(fields, fields.length);
+      Arrays.sort(fields, new SourcePositionComparator());
+      List<FieldSpi> result = new ArrayList<>(fields.length);
+      for (FieldBinding fd : fields) {
+        if (fd.isSynthetic()) {
+          continue;
         }
-        m_fields = result;
+        result.add(m_env.createBindingField(this, fd));
       }
+      m_fields = Collections.unmodifiableList(result);
     }
     return m_fields;
   }
 
   @Override
   public List<MethodSpi> getMethods() {
-    if (m_methods == null) {
-      getSourceTypeBinding();
-      MethodBinding[] methods = m_binding.methods();
-      if (methods == null || methods.length < 1) {
-        m_methods = Collections.emptyList();
-      }
-      else {
-        //try to sort
-        methods = Arrays.copyOf(methods, methods.length);
-        Arrays.sort(methods, new Comparator<MethodBinding>() {
-          @Override
-          public int compare(MethodBinding m1, MethodBinding m2) {
-            AbstractMethodDeclaration decl1 = SpiWithJdtUtils.coalesce(m1.original(), m1).sourceMethod();
-            AbstractMethodDeclaration decl2 = SpiWithJdtUtils.coalesce(m2.original(), m2).sourceMethod();
-            if (decl1 != null && decl2 != null) {
-              int pos1 = decl1.declarationSourceStart;
-              int pos2 = decl2.declarationSourceStart;
-              return pos1 < pos2 ? -1 : pos1 > pos2 ? 1 : 0;
-            }
-            return 0;
-          }
-        });
+    if (m_methods != null) {
+      return m_methods;
+    }
 
-        List<MethodSpi> result = new ArrayList<>(methods.length);
-        for (MethodBinding a : methods) {
-          if ((a.modifiers & ExtraCompilerModifiers.AccIsDefaultConstructor) != 0) {
-            continue;
-          }
-          if (a.isBridge() || a.isSynthetic() || a.isDefaultAbstract()) {
-            continue;
-          }
-          //bug in jdt: default constructors are not reported as 'isSynthetic'
-          if (a.isConstructor() && (a.sourceMethod() != null && a.sourceMethod().bodyStart == 0)) {
-            continue;
-          }
-          result.add(m_env.createBindingMethod(this, a));
+    getSourceTypeBinding();
+    MethodBinding[] methods = m_binding.methods();
+    if (methods == null || methods.length < 1) {
+      m_methods = Collections.emptyList();
+    }
+    else {
+      methods = Arrays.copyOf(methods, methods.length);
+      Arrays.sort(methods, new SourcePositionComparator());
+      List<MethodSpi> result = new ArrayList<>(methods.length);
+      for (MethodBinding a : methods) {
+        if ((a.modifiers & ExtraCompilerModifiers.AccIsDefaultConstructor) != 0) {
+          continue;
         }
-        m_methods = result;
+        if (a.isBridge() || a.isSynthetic() || a.isDefaultAbstract()) {
+          continue;
+        }
+        //bug in jdt: default constructors are not reported as 'isSynthetic'
+        if (a.isConstructor() && (a.sourceMethod() != null && a.sourceMethod().bodyStart == 0)) {
+          continue;
+        }
+        result.add(m_env.createBindingMethod(this, a));
       }
+      m_methods = Collections.unmodifiableList(result);
     }
     return m_methods;
   }
 
   @Override
   public List<TypeSpi> getTypes() {
-    if (m_memberTypes == null) {
-      getSourceTypeBinding();
-      ReferenceBinding[] memberTypes = m_binding.memberTypes();
-      if (memberTypes == null || memberTypes.length < 1) {
-        m_memberTypes = Collections.emptyList();
-      }
-      else {
-        //try to sort
-        memberTypes = Arrays.copyOf(memberTypes, memberTypes.length);
-        Arrays.sort(memberTypes, new Comparator<ReferenceBinding>() {
-          @Override
-          public int compare(ReferenceBinding t1, ReferenceBinding t2) {
-            TypeBinding b1 = SpiWithJdtUtils.coalesce(t1.original(), t1);
-            TypeBinding b2 = SpiWithJdtUtils.coalesce(t2.original(), t2);
-            TypeDeclaration decl1 = (b1 instanceof SourceTypeBinding ? ((SourceTypeBinding) b1).scope.referenceContext : null);
-            TypeDeclaration decl2 = (b2 instanceof SourceTypeBinding ? ((SourceTypeBinding) b2).scope.referenceContext : null);
-            if (decl1 != null && decl2 != null) {
-              int pos1 = decl1.declarationSourceStart;
-              int pos2 = decl2.declarationSourceStart;
-              return pos1 < pos2 ? -1 : pos1 > pos2 ? 1 : 0;
-            }
-            return 0;
-          }
-        });
+    if (m_memberTypes != null) {
+      return m_memberTypes;
+    }
 
-        List<TypeSpi> result = new ArrayList<>(memberTypes.length);
-        for (ReferenceBinding d : memberTypes) {
-          TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, d, this);
-          if (t != null) {
-            result.add(t);
-          }
+    getSourceTypeBinding();
+    ReferenceBinding[] memberTypes = m_binding.memberTypes();
+    if (memberTypes == null || memberTypes.length < 1) {
+      m_memberTypes = Collections.emptyList();
+    }
+    else {
+      memberTypes = Arrays.copyOf(memberTypes, memberTypes.length);
+      Arrays.sort(memberTypes, new SourcePositionComparator());
+      List<TypeSpi> result = new ArrayList<>(memberTypes.length);
+      for (ReferenceBinding d : memberTypes) {
+        TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, d, this);
+        if (t != null) {
+          result.add(t);
         }
-        m_memberTypes = result;
       }
+      m_memberTypes = Collections.unmodifiableList(result);
     }
     return m_memberTypes;
   }
@@ -331,22 +291,24 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<TypeSpi> getSuperInterfaces() {
-    if (m_superInterfaces == null) {
-      getSourceTypeBinding();
-      ReferenceBinding[] superInterfaces = m_binding.superInterfaces();
-      if (superInterfaces == null || superInterfaces.length < 1) {
-        m_superInterfaces = Collections.emptyList();
-      }
-      else {
-        List<TypeSpi> result = new ArrayList<>(superInterfaces.length);
-        for (ReferenceBinding b : superInterfaces) {
-          TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, b);
-          if (t != null) {
-            result.add(t);
-          }
+    if (m_superInterfaces != null) {
+      return m_superInterfaces;
+    }
+
+    getSourceTypeBinding();
+    ReferenceBinding[] superInterfaces = m_binding.superInterfaces();
+    if (superInterfaces == null || superInterfaces.length < 1) {
+      m_superInterfaces = Collections.emptyList();
+    }
+    else {
+      List<TypeSpi> result = new ArrayList<>(superInterfaces.length);
+      for (ReferenceBinding b : superInterfaces) {
+        TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, b);
+        if (t != null) {
+          result.add(t);
         }
-        m_superInterfaces = result;
       }
+      m_superInterfaces = Collections.unmodifiableList(result);
     }
     return m_superInterfaces;
   }
@@ -358,33 +320,38 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<TypeSpi> getTypeArguments() {
-    if (m_typeArguments == null) {
-      getSourceTypeBinding();
-      if (m_binding instanceof ParameterizedTypeBinding) {
-        ParameterizedTypeBinding ptb = (ParameterizedTypeBinding) m_binding;
-        TypeBinding[] arguments = ptb.arguments;
-        if (arguments != null && arguments.length > 0) {
-          List<TypeSpi> result = new ArrayList<>(arguments.length);
-          for (TypeBinding b : arguments) {
-            TypeSpi type = SpiWithJdtUtils.bindingToType(m_env, b);
-            if (type != null) {
-              result.add(type);
-            }
-          }
-          m_typeArguments = result;
-        }
-      }
+    if (m_typeArguments != null) {
+      return m_typeArguments;
+    }
 
-      if (m_typeArguments == null) {
-        m_typeArguments = Collections.emptyList();
+    getSourceTypeBinding();
+    if (m_binding instanceof ParameterizedTypeBinding) {
+      ParameterizedTypeBinding ptb = (ParameterizedTypeBinding) m_binding;
+      TypeBinding[] arguments = ptb.arguments;
+      if (arguments != null && arguments.length > 0) {
+        List<TypeSpi> result = new ArrayList<>(arguments.length);
+        for (TypeBinding b : arguments) {
+          TypeSpi type = SpiWithJdtUtils.bindingToType(m_env, b);
+          if (type != null) {
+            result.add(type);
+          }
+        }
+        m_typeArguments = Collections.unmodifiableList(result);
       }
+    }
+
+    if (m_typeArguments == null) {
+      m_typeArguments = Collections.emptyList();
     }
     return m_typeArguments;
   }
 
   protected TypeVariableBinding[] getTypeVariables() {
     //ask this or the actualType since we do not distinguish between the virtual parameterized type with arguments and the effective parameterized type with parameters
-    ReferenceBinding refType = m_binding.actualType() != null ? m_binding.actualType() : m_binding;
+    ReferenceBinding refType = m_binding;
+    if (m_binding.actualType() != null) {
+      refType = m_binding.actualType();
+    }
     return refType.typeVariables();
   }
 
@@ -397,22 +364,23 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    if (m_typeParameters == null) {
-      getSourceTypeBinding();
-      if (hasTypeParameters()) {
-        TypeVariableBinding[] typeParams = getTypeVariables();
+    if (m_typeParameters != null) {
+      return m_typeParameters;
+    }
 
-        List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
-        int index = 0;
-        for (TypeVariableBinding param : typeParams) {
-          result.add(m_env.createBindingTypeParameter(this, param, index));
-          index++;
-        }
-        m_typeParameters = result;
+    getSourceTypeBinding();
+    TypeVariableBinding[] typeParams = getTypeVariables();
+    if (typeParams != null && typeParams.length > 0) {
+      List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
+      int index = 0;
+      for (TypeVariableBinding param : typeParams) {
+        result.add(m_env.createBindingTypeParameter(this, param, index));
+        index++;
       }
-      else {
-        m_typeParameters = Collections.emptyList();
-      }
+      m_typeParameters = Collections.unmodifiableList(result);
+    }
+    else {
+      m_typeParameters = Collections.emptyList();
     }
     return m_typeParameters;
   }
@@ -433,11 +401,16 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<BindingAnnotationWithJdt> getAnnotations() {
-    if (m_annotations == null) {
-      getSourceTypeBinding();
-      ReferenceBinding refType = m_binding.actualType() != null ? m_binding.actualType() : m_binding;
-      m_annotations = SpiWithJdtUtils.createBindingAnnotations(m_env, this, refType.getAnnotations());
+    if (m_annotations != null) {
+      return m_annotations;
     }
+
+    getSourceTypeBinding();
+    ReferenceBinding refType = m_binding;
+    if (m_binding.actualType() != null) {
+      refType = m_binding.actualType();
+    }
+    m_annotations = SpiWithJdtUtils.createBindingAnnotations(m_env, this, refType.getAnnotations());
     return m_annotations;
   }
 

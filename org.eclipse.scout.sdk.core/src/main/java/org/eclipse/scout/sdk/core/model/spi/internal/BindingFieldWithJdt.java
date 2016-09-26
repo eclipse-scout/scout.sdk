@@ -99,9 +99,10 @@ public class BindingFieldWithJdt extends AbstractMemberWithJdt<IField> implement
 
   @Override
   public List<BindingAnnotationWithJdt> getAnnotations() {
-    if (m_annotations == null) {
-      m_annotations = SpiWithJdtUtils.createBindingAnnotations(m_env, this, m_binding.getAnnotations());
+    if (m_annotations != null) {
+      return m_annotations;
     }
+    m_annotations = SpiWithJdtUtils.createBindingAnnotations(m_env, this, m_binding.getAnnotations());
     return m_annotations;
   }
 

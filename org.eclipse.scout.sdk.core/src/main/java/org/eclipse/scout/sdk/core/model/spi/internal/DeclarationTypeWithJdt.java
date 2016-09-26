@@ -148,68 +148,75 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<DeclarationAnnotationWithJdt> getAnnotations() {
-    if (m_annotations == null) {
-      m_annotations = SpiWithJdtUtils.createDeclarationAnnotations(m_env, this, m_astNode.annotations);
+    if (m_annotations != null) {
+      return m_annotations;
     }
+    m_annotations = SpiWithJdtUtils.createDeclarationAnnotations(m_env, this, m_astNode.annotations);
     return m_annotations;
   }
 
   @Override
   public List<FieldSpi> getFields() {
-    if (m_fields == null) {
-      FieldDeclaration[] fields = m_astNode.fields;
-      if (fields == null || fields.length < 1) {
-        m_fields = Collections.emptyList();
+    if (m_fields != null) {
+      return m_fields;
+    }
+
+    FieldDeclaration[] fields = m_astNode.fields;
+    if (fields == null || fields.length < 1) {
+      m_fields = Collections.emptyList();
+    }
+    else {
+      List<FieldSpi> result = new ArrayList<>(fields.length);
+      for (FieldDeclaration fd : fields) {
+        result.add(m_env.createDeclarationField(this, fd));
       }
-      else {
-        List<FieldSpi> result = new ArrayList<>(fields.length);
-        for (FieldDeclaration fd : fields) {
-          result.add(m_env.createDeclarationField(this, fd));
-        }
-        m_fields = result;
-      }
+      m_fields = Collections.unmodifiableList(result);
     }
     return m_fields;
   }
 
   @Override
   public List<MethodSpi> getMethods() {
-    if (m_methods == null) {
-      AbstractMethodDeclaration[] methods = m_astNode.methods;
-      if (methods == null || methods.length < 1) {
-        m_methods = Collections.emptyList();
-      }
-      else {
-        List<MethodSpi> result = new ArrayList<>(methods.length);
-        for (AbstractMethodDeclaration a : methods) {
-          if (a.bodyStart <= 0) { // skip compiler generated methods
-            continue;
-          }
-          if ("<init>".equals(new String(a.selector))) {
-            continue;
-          }
-          result.add(m_env.createDeclarationMethod(this, a));
+    if (m_methods != null) {
+      return m_methods;
+    }
+
+    AbstractMethodDeclaration[] methods = m_astNode.methods;
+    if (methods == null || methods.length < 1) {
+      m_methods = Collections.emptyList();
+    }
+    else {
+      List<MethodSpi> result = new ArrayList<>(methods.length);
+      for (AbstractMethodDeclaration a : methods) {
+        if (a.bodyStart <= 0) { // skip compiler generated methods
+          continue;
         }
-        m_methods = result;
+        if ("<init>".equals(new String(a.selector))) {
+          continue;
+        }
+        result.add(m_env.createDeclarationMethod(this, a));
       }
+      m_methods = Collections.unmodifiableList(result);
     }
     return m_methods;
   }
 
   @Override
   public List<TypeSpi> getTypes() {
-    if (m_memberTypes == null) {
-      TypeDeclaration[] memberTypes = m_astNode.memberTypes;
-      if (memberTypes == null || memberTypes.length < 1) {
-        m_memberTypes = Collections.emptyList();
+    if (m_memberTypes != null) {
+      return m_memberTypes;
+    }
+
+    TypeDeclaration[] memberTypes = m_astNode.memberTypes;
+    if (memberTypes == null || memberTypes.length < 1) {
+      m_memberTypes = Collections.emptyList();
+    }
+    else {
+      List<TypeSpi> result = new ArrayList<>(memberTypes.length);
+      for (TypeDeclaration d : memberTypes) {
+        result.add(new DeclarationTypeWithJdt(m_env, m_cu, this, d));
       }
-      else {
-        List<TypeSpi> result = new ArrayList<>(memberTypes.length);
-        for (TypeDeclaration d : memberTypes) {
-          result.add(new DeclarationTypeWithJdt(m_env, m_cu, this, d));
-        }
-        m_memberTypes = result;
-      }
+      m_memberTypes = Collections.unmodifiableList(result);
     }
     return m_memberTypes;
   }
@@ -235,24 +242,26 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<TypeSpi> getSuperInterfaces() {
-    if (m_superInterfaces == null) {
-      TypeReference[] refs = m_astNode.superInterfaces;
-      if (refs == null || refs.length < 1) {
-        m_superInterfaces = Collections.emptyList();
-      }
-      else {
-        List<TypeSpi> result = new ArrayList<>(refs.length);
-        for (TypeReference r : refs) {
-          TypeBinding b = r.resolvedType;
-          if (b != null) {
-            TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, b);
-            if (t != null) {
-              result.add(t);
-            }
+    if (m_superInterfaces != null) {
+      return m_superInterfaces;
+    }
+
+    TypeReference[] refs = m_astNode.superInterfaces;
+    if (refs == null || refs.length < 1) {
+      m_superInterfaces = Collections.emptyList();
+    }
+    else {
+      List<TypeSpi> result = new ArrayList<>(refs.length);
+      for (TypeReference r : refs) {
+        TypeBinding b = r.resolvedType;
+        if (b != null) {
+          TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, b);
+          if (t != null) {
+            result.add(t);
           }
         }
-        m_superInterfaces = result;
       }
+      m_superInterfaces = Collections.unmodifiableList(result);
     }
     return m_superInterfaces;
   }
@@ -272,18 +281,20 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    if (m_typeParameters == null) {
-      TypeParameter[] typeParams = m_astNode.typeParameters;
-      if (typeParams == null || typeParams.length < 1) {
-        m_typeParameters = Collections.emptyList();
+    if (m_typeParameters != null) {
+      return m_typeParameters;
+    }
+
+    TypeParameter[] typeParams = m_astNode.typeParameters;
+    if (typeParams == null || typeParams.length < 1) {
+      m_typeParameters = Collections.emptyList();
+    }
+    else {
+      List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
+      for (int i = 0; i < typeParams.length; i++) {
+        result.add(m_env.createDeclarationTypeParameter(this, typeParams[i], i));
       }
-      else {
-        List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
-        for (int i = 0; i < typeParams.length; i++) {
-          result.add(m_env.createDeclarationTypeParameter(this, typeParams[i], i));
-        }
-        m_typeParameters = result;
-      }
+      m_typeParameters = Collections.unmodifiableList(result);
     }
     return m_typeParameters;
   }

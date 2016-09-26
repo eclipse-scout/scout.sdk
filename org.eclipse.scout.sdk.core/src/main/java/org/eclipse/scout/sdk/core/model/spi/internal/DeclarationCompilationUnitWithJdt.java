@@ -164,38 +164,41 @@ public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJd
 
   @Override
   public List<DeclarationTypeWithJdt> getTypes() {
-    if (m_types == null) {
-      TypeDeclaration[] types = m_astNode.types;
+    if (m_types != null) {
+      return m_types;
+    }
 
-      if (types == null || types.length < 1) {
-        m_types = Collections.emptyList();
+    TypeDeclaration[] types = m_astNode.types;
+    if (types == null || types.length < 1) {
+      m_types = Collections.emptyList();
+    }
+    else {
+      List<DeclarationTypeWithJdt> result = new ArrayList<>(types.length);
+      for (TypeDeclaration td : types) {
+        result.add(m_env.createDeclarationType(this, null, td));
       }
-      else {
-        List<DeclarationTypeWithJdt> result = new ArrayList<>(types.length);
-        for (TypeDeclaration td : types) {
-          result.add(m_env.createDeclarationType(this, null, td));
-        }
-        m_types = result;
-      }
+      m_types = Collections.unmodifiableList(result);
     }
     return m_types;
   }
 
   @Override
   public List<DeclarationImportWithJdt> getImports() {
-    if (m_imports == null) {
-      ImportReference[] imports = m_astNode.imports;
-      if (imports == null || imports.length < 1) {
-        m_imports = Collections.emptyList();
+    if (m_imports != null) {
+      return m_imports;
+    }
+
+    ImportReference[] imports = m_astNode.imports;
+    if (imports == null || imports.length < 1) {
+      m_imports = Collections.emptyList();
+    }
+    else {
+      List<DeclarationImportWithJdt> result = new ArrayList<>(imports.length);
+      for (ImportReference imp : imports) {
+        DeclarationImportWithJdt importDeclaration = m_env.createDeclarationImport(this, imp);
+        result.add(importDeclaration);
       }
-      else {
-        List<DeclarationImportWithJdt> result = new ArrayList<>(imports.length);
-        for (ImportReference imp : imports) {
-          DeclarationImportWithJdt importDeclaration = m_env.createDeclarationImport(this, imp);
-          result.add(importDeclaration);
-        }
-        m_imports = result;
-      }
+      m_imports = Collections.unmodifiableList(result);
     }
     return m_imports;
   }

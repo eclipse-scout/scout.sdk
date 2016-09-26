@@ -99,9 +99,10 @@ public class DeclarationMethodParameterWithJdt extends AbstractJavaElementWithJd
 
   @Override
   public List<DeclarationAnnotationWithJdt> getAnnotations() {
-    if (m_annotations == null) {
-      m_annotations = SpiWithJdtUtils.createDeclarationAnnotations(m_env, this, m_astNode.annotations);
+    if (m_annotations != null) {
+      return m_annotations;
     }
+    m_annotations = SpiWithJdtUtils.createDeclarationAnnotations(m_env, this, m_astNode.annotations);
     return m_annotations;
   }
 
@@ -114,5 +115,4 @@ public class DeclarationMethodParameterWithJdt extends AbstractJavaElementWithJd
     }
     return m_source;
   }
-
 }

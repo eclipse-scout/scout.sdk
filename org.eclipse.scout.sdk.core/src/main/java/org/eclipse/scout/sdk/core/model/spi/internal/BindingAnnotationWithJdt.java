@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -68,29 +69,31 @@ public class BindingAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnota
 
   @Override
   public Map<String, AnnotationElementSpi> getValues() {
-    if (m_values == null) {
-      Map<String, ElementValuePair> defaultsMap = SpiWithJdtUtils.getBindingAnnotationSyntheticDefaultValues(m_env, m_binding.getAnnotationType());
-      final Map<String, AnnotationElementSpi> result = new LinkedHashMap<>(defaultsMap.size());
-      //fill keys only in correct sort order
-      for (String name : defaultsMap.keySet()) {
-        result.put(name, null);
-      }
-      //add declared values
-      ElementValuePair[] bindingPairs = m_binding.getElementValuePairs();
-      if (bindingPairs != null && bindingPairs.length > 0) {
-        for (ElementValuePair bindingPair : bindingPairs) {
-          BindingAnnotationElementWithJdt v = m_env.createBindingAnnotationValue(this, bindingPair, false);
-          result.put(v.getElementName(), v);
-        }
-      }
-      //add default values
-      for (Map.Entry<String, ElementValuePair> e : defaultsMap.entrySet()) {
-        if (result.get(e.getKey()) == null && e.getValue() != null) {
-          result.put(e.getKey(), m_env.createBindingAnnotationValue(this, e.getValue(), true));
-        }
-      }
-      m_values = result;
+    if (m_values != null) {
+      return m_values;
     }
+
+    Map<String, ElementValuePair> defaultsMap = SpiWithJdtUtils.getBindingAnnotationSyntheticDefaultValues(m_env, m_binding.getAnnotationType());
+    final Map<String, AnnotationElementSpi> result = new LinkedHashMap<>(defaultsMap.size());
+    //fill keys only in correct sort order
+    for (String name : defaultsMap.keySet()) {
+      result.put(name, null);
+    }
+    //add declared values
+    ElementValuePair[] bindingPairs = m_binding.getElementValuePairs();
+    if (bindingPairs != null && bindingPairs.length > 0) {
+      for (ElementValuePair bindingPair : bindingPairs) {
+        BindingAnnotationElementWithJdt v = m_env.createBindingAnnotationValue(this, bindingPair, false);
+        result.put(v.getElementName(), v);
+      }
+    }
+    //add default values
+    for (Map.Entry<String, ElementValuePair> e : defaultsMap.entrySet()) {
+      if (result.get(e.getKey()) == null && e.getValue() != null) {
+        result.put(e.getKey(), m_env.createBindingAnnotationValue(this, e.getValue(), true));
+      }
+    }
+    m_values = Collections.unmodifiableMap(result);
     return m_values;
   }
 

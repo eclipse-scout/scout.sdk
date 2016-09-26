@@ -81,10 +81,15 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
 
   @Override
   public List<BindingAnnotationWithJdt> getAnnotations() {
-    if (m_annotations == null) {
-      MethodBinding refMethod = m_binding.original() != null ? m_binding.original() : m_binding;
-      m_annotations = SpiWithJdtUtils.createBindingAnnotations(m_env, this, refMethod.getAnnotations());
+    if (m_annotations != null) {
+      return m_annotations;
     }
+
+    MethodBinding refMethod = m_binding;
+    if (m_binding.original() != null) {
+      refMethod = m_binding.original();
+    }
+    m_annotations = SpiWithJdtUtils.createBindingAnnotations(m_env, this, refMethod.getAnnotations());
     return m_annotations;
   }
 
@@ -192,21 +197,22 @@ public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> impleme
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    if (m_typeParameters == null) {
-      if (hasTypeParameters()) {
-        TypeVariableBinding[] typeParams = getTypeVariables();
+    if (m_typeParameters != null) {
+      return m_typeParameters;
+    }
 
-        List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
-        int index = 0;
-        for (TypeVariableBinding param : typeParams) {
-          result.add(m_env.createBindingTypeParameter(this, param, index));
-          index++;
-        }
-        m_typeParameters = result;
+    TypeVariableBinding[] typeParams = getTypeVariables();
+    if (typeParams != null && typeParams.length > 0) {
+      List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
+      int index = 0;
+      for (TypeVariableBinding param : typeParams) {
+        result.add(m_env.createBindingTypeParameter(this, param, index));
+        index++;
       }
-      else {
-        m_typeParameters = Collections.emptyList();
-      }
+      m_typeParameters = Collections.unmodifiableList(result);
+    }
+    else {
+      m_typeParameters = Collections.emptyList();
     }
     return m_typeParameters;
   }
