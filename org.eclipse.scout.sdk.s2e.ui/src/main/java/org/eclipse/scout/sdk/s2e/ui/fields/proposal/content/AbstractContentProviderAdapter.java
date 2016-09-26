@@ -54,10 +54,12 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
 
   private final Map<Object, int[]> m_searchRanges;
   private ILabelProvider m_decoratingWorkbenchLabelProvider;
-  private Collection<? extends Object> m_allProposals; // lazy loaded
+  private volatile Collection<? extends Object> m_allProposals; // lazy loaded
+  private final Object m_proposalsLock; // lock object. Because 'this' is already used by super.clearListeners() called by dispose()
 
   protected AbstractContentProviderAdapter() {
     m_searchRanges = new HashMap<>();
+    m_proposalsLock = new Object();
     m_decoratingWorkbenchLabelProvider = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider();
   }
 
@@ -66,15 +68,20 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
   }
 
   @Override
-  public synchronized void dispose() {
+  public /* do not synchronize */ void dispose() {
     super.dispose();
-    clearCache();
+    m_allProposals = null; /* do not call clearCache() because of locking! */
     m_searchRanges.clear();
-    m_decoratingWorkbenchLabelProvider = null;
+    if (m_decoratingWorkbenchLabelProvider != null) {
+      m_decoratingWorkbenchLabelProvider.dispose();
+      m_decoratingWorkbenchLabelProvider = null;
+    }
   }
 
-  protected synchronized void clearCache() {
-    m_allProposals = null;
+  protected void clearCache() {
+    synchronized (m_proposalsLock) {
+      m_allProposals = null;
+    }
   }
 
   @Override
@@ -124,11 +131,11 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
       }
 
       Collection<? extends Object> proposals = doLoadProposals(monitor);
-      if (proposals.isEmpty()) {
+      if (proposals == null || proposals.isEmpty()) {
         return Collections.emptyList();
       }
 
-      List<Object> result = new ArrayList<>();
+      List<Object> result = new ArrayList<>(proposals.size());
       for (Object o : proposals) {
         if (monitor != null && monitor.isCanceled()) {
           break;
@@ -144,10 +151,6 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
     finally {
       endRecordMatchRegions();
     }
-  }
-
-  protected void addProposal() {
-
   }
 
   @Override
@@ -173,17 +176,27 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
    * @param monitor
    * @return
    */
-  protected synchronized Collection<? extends Object> doLoadProposals(IProgressMonitor monitor) {
-    if (m_allProposals == null) {
+  protected Collection<? extends Object> doLoadProposals(IProgressMonitor monitor) {
+    Collection<? extends Object> loadedProposals = m_allProposals;
+    if (loadedProposals != null) {
+      return loadedProposals;
+    }
+
+    synchronized (m_proposalsLock) {
+      loadedProposals = m_allProposals;
+      if (loadedProposals != null) {
+        return loadedProposals;
+      }
+
       // Do not pass the input monitor to loadProposals() to ensure the load is not cancelled.
       // We want to completely load on the first request and filter only afterwards.
-      Collection<? extends Object> proposalCandidates = loadProposals(new NullProgressMonitor());
-      if (proposalCandidates == null) {
-        proposalCandidates = Collections.emptyList();
+      loadedProposals = loadProposals(new NullProgressMonitor());
+      if (loadedProposals == null) {
+        loadedProposals = Collections.emptyList();
       }
-      m_allProposals = proposalCandidates;
+      m_allProposals = loadedProposals;
+      return loadedProposals;
     }
-    return m_allProposals;
   }
 
   @Override
