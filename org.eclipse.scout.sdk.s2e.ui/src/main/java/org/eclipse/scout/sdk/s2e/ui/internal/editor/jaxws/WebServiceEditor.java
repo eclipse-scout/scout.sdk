@@ -250,6 +250,7 @@ public class WebServiceEditor extends FormEditor {
     }
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   protected Set<WebServiceFormPageInput> findWebServices(IProgressMonitor monitor) throws CoreException {
     final SubMonitor progress = SubMonitor.convert(monitor, "Loading contents", 100);
     if (progress.isCanceled()) {

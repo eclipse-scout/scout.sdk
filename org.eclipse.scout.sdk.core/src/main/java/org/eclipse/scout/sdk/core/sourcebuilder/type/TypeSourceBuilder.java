@@ -92,6 +92,7 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
   }
 
   @Override
+  @SuppressWarnings("pmd:NPathComplexity")
   public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     IImportCollector origImportCollector = validator.getImportCollector();
     IImportCollector collector = new EnclosingTypeScopedImportCollector(origImportCollector, this);

@@ -382,6 +382,7 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
    * @return the {@link Status#OK_STATUS} if no file exists at the target location with the given name. An error status
    *         otherwise.
    */
+  @SuppressWarnings("pmd:NPathComplexity")
   public static IStatus validateTypeNotExisting(IPackageFragmentRoot srcFolder, String pck, String typeName) {
     if (StringUtils.isBlank(typeName)) {
       return Status.OK_STATUS;

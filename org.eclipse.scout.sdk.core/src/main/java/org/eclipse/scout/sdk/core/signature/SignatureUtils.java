@@ -185,6 +185,7 @@ public final class SignatureUtils {
    *          The primitive signature. Must be a valid signature (not <code>null</code>).
    * @return The boxed version of the given primitive signature or the input if it cannot be boxed.
    */
+  @SuppressWarnings("pmd:NPathComplexity")
   public static String boxPrimitiveSignature(String signature) {
     if (Signature.getTypeSignatureKind(signature) != ISignatureConstants.BASE_TYPE_SIGNATURE) {
       return signature;
@@ -224,6 +225,7 @@ public final class SignatureUtils {
    *          The complex input signature. Must be a valid signature (not <code>null</code>).
    * @return The primitive signature if it can be unboxed, the input signature otherwise.
    */
+  @SuppressWarnings("pmd:NPathComplexity")
   public static String unboxToPrimitiveSignature(String signature) {
     if (Signature.getTypeSignatureKind(signature) == ISignatureConstants.BASE_TYPE_SIGNATURE) {
       return signature;

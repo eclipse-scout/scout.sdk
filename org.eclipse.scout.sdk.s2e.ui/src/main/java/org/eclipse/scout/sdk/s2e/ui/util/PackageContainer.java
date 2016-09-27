@@ -61,6 +61,7 @@ public class PackageContainer {
   }
 
   @Override
+  @SuppressWarnings("pmd:NPathComplexity")
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

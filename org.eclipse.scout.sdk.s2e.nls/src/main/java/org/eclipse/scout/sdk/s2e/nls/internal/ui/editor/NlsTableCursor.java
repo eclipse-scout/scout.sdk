@@ -200,6 +200,7 @@ public class NlsTableCursor {
     createEditableTextInternal(input);
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   private void createEditableTextInternal(String defaultText) {
     if (m_editingText != null && !m_editingText.isDisposed()) {
       m_editingText.dispose();

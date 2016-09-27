@@ -421,6 +421,7 @@ public final class SpiWithJdtUtils {
    * transform this {@link Expression} to a compiled binding value of type {@link Constant}, {@link TypeBinding},
    * {@link FieldBinding}, {@link AnnotationBinding}
    */
+  @SuppressWarnings("pmd:NPathComplexity")
   static Object compileExpression(Expression expression, ClassScope scopeForTypeLookup) {
     if (expression == null) {
       return null;

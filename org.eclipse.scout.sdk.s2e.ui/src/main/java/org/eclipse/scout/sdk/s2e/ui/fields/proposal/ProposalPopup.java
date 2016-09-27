@@ -323,6 +323,7 @@ class ProposalPopup extends Window {
     return m_input;
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   public synchronized void setInput(SearchPatternInput input) {
     m_input = input;
     if (getShell() == null || getShell().isDisposed()) {
@@ -473,6 +474,7 @@ class ProposalPopup extends Window {
   }
 
   @Override
+  @SuppressWarnings("pmd:NPathComplexity")
   protected void constrainShellSize() {
     Shell shell = getShell();
     try {

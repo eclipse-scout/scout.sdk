@@ -180,6 +180,7 @@ public final class SdkLog {
     return b.toString();
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   private static Object[] toObjectArray(Object arr) {
     if (arr instanceof Object[]) {
       return (Object[]) arr;

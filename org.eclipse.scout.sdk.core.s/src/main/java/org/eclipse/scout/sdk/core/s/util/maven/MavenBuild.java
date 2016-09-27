@@ -193,6 +193,7 @@ public class MavenBuild {
   }
 
   @Override
+  @SuppressWarnings("pmd:NPathComplexity")
   public int hashCode() {
     final int prime = 31;
     int result = 1;
@@ -204,6 +205,7 @@ public class MavenBuild {
   }
 
   @Override
+  @SuppressWarnings("pmd:NPathComplexity")
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

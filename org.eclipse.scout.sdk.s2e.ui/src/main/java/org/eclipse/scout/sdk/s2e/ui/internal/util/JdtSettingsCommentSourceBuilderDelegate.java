@@ -219,9 +219,11 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
     return createMethodCommentInternal(target, METHOD_TYPE_SETTER);
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   private static ISourceBuilder createMethodCommentInternal(final IMethodSourceBuilder target, final int type) {
     return new ISourceBuilder() {
       @Override
+      @SuppressWarnings("pmd:NPathComplexity")
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap builderCtx, IImportValidator validator) {
         if (!isAutomaticallyAddComments(builderCtx)) {
           return;
@@ -445,7 +447,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
     return null;
   }
 
-  @SuppressWarnings("squid:S00107")
+  @SuppressWarnings({"squid:S00107", "pmd:NPathComplexity"})
   private static void insertTag(IDocument textBuffer, int offset, int length, String[] paramNames, String[] exceptionNames,
       String returnType, String[] typeParameterNames, boolean isDeprecated, String lineDelimiter) throws BadLocationException {
     IRegion region = textBuffer.getLineInformationOfOffset(offset);

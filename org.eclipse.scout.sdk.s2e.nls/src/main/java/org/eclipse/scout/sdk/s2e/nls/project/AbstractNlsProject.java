@@ -274,7 +274,7 @@ public abstract class AbstractNlsProject implements INlsProject {
    * The output of this method must fulfill the regex for key-validation defined in
    * org.eclipse.scout.nls.sdk.ui.InputValidator#REGEX_NLS_KEY_NAME
    */
-  @SuppressWarnings("squid:S881")
+  @SuppressWarnings({"squid:S881", "pmd:NPathComplexity"})
   protected String generateKey(String baseText, boolean appendFreeNumSuffix) {
     cache();
     if (baseText == null || baseText.length() < 1) {

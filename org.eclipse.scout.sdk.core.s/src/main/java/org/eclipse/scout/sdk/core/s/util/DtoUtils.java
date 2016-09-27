@@ -373,6 +373,7 @@ public final class DtoUtils {
     }
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   private static void fillFormDataAnnotation(IAnnotatable element, FormDataAnnotationDescriptor descriptorToFill, boolean isOwner, boolean cumulativeAttributesOnly) {
 
     FormDataAnnotation formDataAnnotation = element.annotations().withManagedWrapper(FormDataAnnotation.class).first();

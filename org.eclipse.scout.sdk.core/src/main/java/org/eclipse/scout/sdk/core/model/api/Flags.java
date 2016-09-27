@@ -479,6 +479,7 @@ public final class Flags {
    *          the flags
    * @return the standard string representation of the given flags
    */
+  @SuppressWarnings("pmd:NPathComplexity")
   public static String toString(int flags) {
     StringBuilder sb = new StringBuilder();
 

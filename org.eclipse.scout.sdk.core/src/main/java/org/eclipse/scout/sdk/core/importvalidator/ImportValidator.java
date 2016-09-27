@@ -95,7 +95,7 @@ public class ImportValidator implements IImportValidator {
       default:
         List<String> segments = getSegments(signature);
         String signatureToImport = signature;
-        int firstParameterizedSegmentIndex = getFirstSegmentWithTypeArgumentsInQualifier(segments);
+        int firstParameterizedSegmentIndex = getIndexOfFirstSegmentWithTypeArguments(segments);
         if (firstParameterizedSegmentIndex >= 0) {
           StringBuilder segmentsToFirstParameterized = new StringBuilder();
           for (int i = 0; i <= firstParameterizedSegmentIndex; i++) {
@@ -110,35 +110,12 @@ public class ImportValidator implements IImportValidator {
           signatureToImport = segmentsToFirstParameterized.toString();
         }
 
-        //check and register
+        // build reference for first segments
         SignatureDescriptor cand = new SignatureDescriptor(Signature.getTypeErasure(signatureToImport));
-        IImportCollector collector = getImportCollector();
-        String use = collector.checkExistingImports(cand);
-        if (use == null) {
-          use = collector.checkCurrentScope(cand);
-          boolean foundInCurrentScope = use != null && use.indexOf(ISignatureConstants.C_DOT) < 0;
-          boolean inSamePackage = Objects.equals(collector.getQualifier(), cand.getQualifier()) || (StringUtils.isBlank(collector.getQualifier()) && StringUtils.isBlank(cand.getQualifier()));
-          if (isTypeArg && foundInCurrentScope && inSamePackage) {
-            // special case for type argument signature which are simple qualified because in same scope
-            collector.registerElement(cand); // ensure it is registered as used so that it appears in the imports for inner types only
-          }
-        }
-        if (use == null) {
-          use = collector.registerElement(cand);
-        }
+        sigBuilder.append(getReferenceFor(cand, isTypeArg));
 
-        // build reference
-        sigBuilder.append(use);
-        String[] typeArguments = Signature.getTypeArguments(signatureToImport);
-        if (typeArguments.length > 0) {
-          sigBuilder.append(ISignatureConstants.C_GENERIC_START);
-          useSignatureInternal(typeArguments[0], true, sigBuilder);
-          for (int i = 1; i < typeArguments.length; i++) {
-            sigBuilder.append(", ");
-            useSignatureInternal(typeArguments[i], true, sigBuilder);
-          }
-          sigBuilder.append(ISignatureConstants.C_GENERIC_END);
-        }
+        // add type args
+        appendTypeArguments(signatureToImport, sigBuilder);
 
         // subsequent segments
         if (firstParameterizedSegmentIndex >= 0) {
@@ -155,7 +132,38 @@ public class ImportValidator implements IImportValidator {
     }
   }
 
-  protected static int getFirstSegmentWithTypeArgumentsInQualifier(List<String> segments) {
+  protected void appendTypeArguments(String signatureToImport, StringBuilder sigBuilder) {
+    String[] typeArguments = Signature.getTypeArguments(signatureToImport);
+    if (typeArguments.length > 0) {
+      sigBuilder.append(ISignatureConstants.C_GENERIC_START);
+      useSignatureInternal(typeArguments[0], true, sigBuilder);
+      for (int i = 1; i < typeArguments.length; i++) {
+        sigBuilder.append(", ");
+        useSignatureInternal(typeArguments[i], true, sigBuilder);
+      }
+      sigBuilder.append(ISignatureConstants.C_GENERIC_END);
+    }
+  }
+
+  protected String getReferenceFor(SignatureDescriptor cand, boolean isTypeArg) {
+    IImportCollector collector = getImportCollector();
+    String use = collector.checkExistingImports(cand);
+    if (use == null) {
+      use = collector.checkCurrentScope(cand);
+      boolean foundInCurrentScope = use != null && use.indexOf(ISignatureConstants.C_DOT) < 0;
+      boolean inSamePackage = Objects.equals(collector.getQualifier(), cand.getQualifier()) || (StringUtils.isBlank(collector.getQualifier()) && StringUtils.isBlank(cand.getQualifier()));
+      if (isTypeArg && foundInCurrentScope && inSamePackage) {
+        // special case for type argument signature which are simple qualified because in same scope
+        collector.registerElement(cand); // ensure it is registered as used so that it appears in the imports for inner types only
+      }
+    }
+    if (use == null) {
+      use = collector.registerElement(cand);
+    }
+    return use;
+  }
+
+  protected static int getIndexOfFirstSegmentWithTypeArguments(List<String> segments) {
     for (int i = 0; i < segments.size(); i++) {
       if (segments.get(i).indexOf(ISignatureConstants.C_GENERIC_START) >= 0) {
         return i;

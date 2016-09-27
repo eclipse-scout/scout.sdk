@@ -237,6 +237,7 @@ public class FormSourceBuilder extends AbstractEntitySourceBuilder {
     }
 
     @Override
+    @SuppressWarnings("pmd:NPathComplexity")
     public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
       final boolean isModify = MODIFY_HANDLER_NAME.equals(getHandlerBuilder().getElementName());
       final boolean isLoad = LOAD_METHOD_NAME.equals(getHandlerMethodBuilder().getElementName());

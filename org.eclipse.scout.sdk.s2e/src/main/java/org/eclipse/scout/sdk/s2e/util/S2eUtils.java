@@ -721,6 +721,7 @@ public final class S2eUtils {
    *         files and reasons why this is not possible. This may be the case if the file is still read-only or because
    *         it changed value in the mean time.
    */
+  @SuppressWarnings("pmd:NPathComplexity")
   public static IStatus makeCommittable(Collection<IResource> resources) {
     if (resources == null || resources.isEmpty()) {
       return Status.OK_STATUS;
@@ -1145,6 +1146,7 @@ public final class S2eUtils {
     return new LinkedHashSet<>(prioMap.values());
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   private static boolean isJavaSourceFolder(IPackageFragmentRoot root, Predicate<IPackageFragmentRoot> filter) throws JavaModelException {
     if (!exists(root)) {
       return false;

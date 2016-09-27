@@ -66,6 +66,7 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
   }
 
   @Override
+  @SuppressWarnings("pmd:NPathComplexity")
   public boolean test(IResourceChangeEvent event) {
     if (event == null) {
       return false;

@@ -172,6 +172,7 @@ public class MethodQuery {
     return this;
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   protected boolean accept(IMethod f) {
     if (m_name != null && !m_name.equals(f.elementName())) {
       return false;

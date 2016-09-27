@@ -164,7 +164,7 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "pmd:NPathComplexity"})
   public INSTANCE insert() {
     AST ast = getFactory().getAst();
     if (getReadOnlySuffix() == null) {

@@ -62,6 +62,7 @@ class ConstantMetaValue extends AbstractValue {
   }
 
   @Override
+  @SuppressWarnings("pmd:NPathComplexity")
   Object getInternalObject(Class<?> expectedType) {
     if (expectedType == Object.class) {
       return getInternalObject();

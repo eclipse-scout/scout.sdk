@@ -491,6 +491,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     setArtifactId(getServerProject().getElementName() + ".jaxws");
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   protected void guessPackage() {
     if (isPackageChanged()) {
       return; // already changed manually. don't update

@@ -40,6 +40,7 @@ import org.osgi.framework.Bundle;
 public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionProposalComputer {
 
   @Override
+  @SuppressWarnings("pmd:NPathComplexity")
   public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)) {
       return Collections.emptyList();

@@ -60,6 +60,7 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
   }
 
   @Override
+  @SuppressWarnings("pmd:NPathComplexity")
   public void setup() {
     setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(this));
 

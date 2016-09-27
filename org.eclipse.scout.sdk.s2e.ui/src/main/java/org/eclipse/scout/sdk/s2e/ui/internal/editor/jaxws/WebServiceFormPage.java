@@ -259,6 +259,7 @@ public class WebServiceFormPage extends FormPage {
     createPackageField(parent, firstPortType, labelColWidth, numPortTypes);
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   protected void createProviderGroup(Composite p, Set<IType> allPortTypes, int labelColWidth) {
     final int numPortTypes = allPortTypes.size();
     IType firstPortType = allPortTypes.iterator().next();
