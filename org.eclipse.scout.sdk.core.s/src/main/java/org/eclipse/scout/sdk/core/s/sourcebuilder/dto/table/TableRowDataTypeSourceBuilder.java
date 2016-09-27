@@ -147,7 +147,6 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
   }
 
   protected static Set<IType> getColumns(IType declaringType, IType rowDataSuperType) {
-
     // the declaring type is a column itself
     if (declaringType.isInstanceOf(IScoutRuntimeTypes.IColumn)) {
       Set<IType> result = new HashSet<>(1);
@@ -163,7 +162,47 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
       }
     }
 
-    // the declaring type holds columns
+    // the declaring type is now the IType holding the columns: collect all columns in the model
+    Set<IType> allColumnsUpTheHierarchy = collectColumnsInSuperHierarchy(declaringType);
+    if (rowDataSuperType == null) {
+      // no need to filter the columns of the super classes
+      return allColumnsUpTheHierarchy;
+    }
+
+    // collect all columns that exist in the row data and all of its super classes
+    Set<String> usedColumnBeanNames = collectBeanNamesInRowDataSuperHierarchy(rowDataSuperType);
+
+    // filter the already existing columns out
+    Iterator<IType> allColumnsIterator = allColumnsUpTheHierarchy.iterator();
+    while (allColumnsIterator.hasNext()) {
+      IType col = allColumnsIterator.next();
+      String beanName = getColumnBeanName(col);
+      if (usedColumnBeanNames.contains(beanName)) {
+        // the current column is already in a row data of our parent -> we don't need it for us: remove
+        allColumnsIterator.remove();
+      }
+    }
+
+    return allColumnsUpTheHierarchy;
+  }
+
+  protected static Set<String> collectBeanNamesInRowDataSuperHierarchy(IType rowDataSuperType) {
+    Set<String> usedColumnBeanNames = new HashSet<>();
+    IType currentRowDataSuperType = rowDataSuperType;
+    while (currentRowDataSuperType != null && !IScoutRuntimeTypes.AbstractTableRowData.equals(currentRowDataSuperType.name())) {
+      List<IField> columnFields = currentRowDataSuperType.fields().withFlags(ROW_DATA_FIELD_FLAGS).list();
+      for (IField column : columnFields) {
+        IMetaValue val = column.constantValue();
+        if (val != null && val.type() == MetaValueType.String) {
+          usedColumnBeanNames.add(val.get(String.class));
+        }
+      }
+      currentRowDataSuperType = currentRowDataSuperType.superClass();
+    }
+    return usedColumnBeanNames;
+  }
+
+  protected static Set<IType> collectColumnsInSuperHierarchy(IType declaringType) {
     Set<IType> allColumnsUpTheHierarchy = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
     Predicate<IType> filter = new Predicate<IType>() {
       @Override
@@ -180,37 +219,6 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
       allColumnsUpTheHierarchy.addAll(columns);
       curTableType = curTableType.superClass();
     }
-
-    if (rowDataSuperType == null) {
-      // no need to filter the columns of the super classes
-      return allColumnsUpTheHierarchy;
-    }
-
-    // collect all columns that exist in the row data and all of its super classes
-    Set<String> usedColumnBeanNames = new HashSet<>();
-    IType currentRowDataSuperType = rowDataSuperType;
-    while (currentRowDataSuperType != null && !IScoutRuntimeTypes.AbstractTableRowData.equals(currentRowDataSuperType.name())) {
-      List<IField> columnFields = currentRowDataSuperType.fields().withFlags(ROW_DATA_FIELD_FLAGS).list();
-      for (IField column : columnFields) {
-        IMetaValue val = column.constantValue();
-        if (val != null && val.type() == MetaValueType.String) {
-          usedColumnBeanNames.add(val.get(String.class));
-        }
-      }
-      currentRowDataSuperType = currentRowDataSuperType.superClass();
-    }
-
-    // filter the already existing columns out
-    Iterator<IType> allColumnsIterator = allColumnsUpTheHierarchy.iterator();
-    while (allColumnsIterator.hasNext()) {
-      IType col = allColumnsIterator.next();
-      String beanName = getColumnBeanName(col);
-      if (usedColumnBeanNames.contains(beanName)) {
-        // the current column is already in a row data of our parent -> we don't need it for us: remove
-        allColumnsIterator.remove();
-      }
-    }
-
     return allColumnsUpTheHierarchy;
   }
 

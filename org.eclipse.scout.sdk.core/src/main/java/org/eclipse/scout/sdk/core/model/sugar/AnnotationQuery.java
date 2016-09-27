@@ -157,6 +157,32 @@ public class AnnotationQuery<T> {
     return true;
   }
 
+  protected AnnotatableSpi findOwner(IType type) {
+    if (m_owner instanceof TypeSpi) {
+      return type.unwrap();
+    }
+    else if (m_owner instanceof MethodSpi) {
+      // find method with same signature
+      IMethod m = type.methods().withFilter(new Predicate<IMethod>() {
+        @Override
+        public boolean test(IMethod element) {
+          return m_methodId.equals(SignatureUtils.createMethodIdentifier(element));
+        }
+      }).first();
+
+      if (m != null) {
+        return m.unwrap();
+      }
+    }
+    else if (m_owner instanceof FieldSpi) {
+      IField f = type.fields().withName(m_owner.getElementName()).first();
+      if (f != null) {
+        return f.unwrap();
+      }
+    }
+    return null;
+  }
+
   /**
    * @param type
    *          is the container type of the optional owner
@@ -172,28 +198,7 @@ public class AnnotationQuery<T> {
     }
     if (!onlyTraverse) {
       if (owner == null) {
-        if (m_owner instanceof TypeSpi) {
-          owner = type.unwrap();
-        }
-        else if (m_owner instanceof MethodSpi) {
-          // find method with same signature
-          IMethod m = type.methods().withFilter(new Predicate<IMethod>() {
-            @Override
-            public boolean test(IMethod element) {
-              return m_methodId.equals(SignatureUtils.createMethodIdentifier(element));
-            }
-          }).first();
-
-          if (m != null) {
-            owner = m.unwrap();
-          }
-        }
-        else if (m_owner instanceof FieldSpi) {
-          IField f = type.fields().withName(m_owner.getElementName()).first();
-          if (f != null) {
-            owner = f.unwrap();
-          }
-        }
+        owner = findOwner(type);
       }
       if (owner != null) {
         for (AnnotationSpi spi : owner.getAnnotations()) {

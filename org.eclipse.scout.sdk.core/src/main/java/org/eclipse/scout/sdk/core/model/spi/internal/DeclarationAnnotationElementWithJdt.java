@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.core.model.api.internal.AnnotationElementImplemento
 import org.eclipse.scout.sdk.core.model.api.internal.SourceRange;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
+import org.eclipse.scout.sdk.core.model.spi.internal.metavalue.MetaValueFactory;
 
 /**
  *

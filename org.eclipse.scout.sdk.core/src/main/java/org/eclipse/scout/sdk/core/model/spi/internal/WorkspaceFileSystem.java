@@ -183,7 +183,10 @@ public class WorkspaceFileSystem implements INameEnvironment {
       pckPlatform = new String(CharOperation.concatWith(packageName, File.separatorChar));
       fileNamePlatform = new String(CharOperation.concat(CharOperation.concatWith(compoundName, File.separatorChar), SuffixConstants.SUFFIX_class));
     }
+    return findTypeInternal(compoundName, typeName, pckUnix, fileNameUnix, pckPlatform, fileNamePlatform);
+  }
 
+  protected NameEnvironmentAnswer findTypeInternal(char[][] compoundName, char[] typeName, String pckUnix, String fileNameUnix, String pckPlatform, String fileNamePlatform) {
     for (Classpath cp : m_classpaths) {
       NameEnvironmentAnswer answer = null;
       try {

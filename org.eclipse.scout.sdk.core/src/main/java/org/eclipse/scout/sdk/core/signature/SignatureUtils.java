@@ -52,7 +52,7 @@ public final class SignatureUtils {
 
   /**
    * Gets the signature of the given {@link IType}.
-   * 
+   *
    * @param t
    *          The {@link IType} or <code>null</code>.
    * @return The signature of the given {@link IType} or <code>null</code> if the given {@link IType} is

@@ -144,21 +144,7 @@ public final class JaxWsModuleNewHelper {
         throw new IOException("created project dir not found. Project creation failed.");
       }
       File createdProjectDir = listFiles[0];
-
-      // delete .gitkeep files
-      String gitkeep1Location = "src/main/resources/WEB-INF/wsdl/.gitkeep";
-      File gitkeep = new File(createdProjectDir, gitkeep1Location);
-      if (!gitkeep.isFile()) {
-        throw new IOException(gitkeep1Location + " file not found.");
-      }
-      Files.delete(gitkeep.toPath());
-      String gitkeep2Location = "src/main/java/.gitkeep";
-      gitkeep = new File(createdProjectDir, gitkeep2Location);
-      if (!gitkeep.isFile()) {
-        throw new IOException(gitkeep2Location + " file not found.");
-      }
-      Files.delete(gitkeep.toPath());
-
+      deleteGitKeepFiles(createdProjectDir);
       createdProjectName = createdProjectDir.getName();
 
       // move to final destination
@@ -172,6 +158,22 @@ public final class JaxWsModuleNewHelper {
     addDependencyToTargetModule(targetModulePomFile, groupId, artifactId);
 
     return new File(targetDirectory, createdProjectName);
+  }
+
+  static void deleteGitKeepFiles(File createdProjectDir) throws IOException {
+    // delete .gitkeep files
+    String gitkeep1Location = "src/main/resources/WEB-INF/wsdl/.gitkeep";
+    File gitkeep = new File(createdProjectDir, gitkeep1Location);
+    if (!gitkeep.isFile()) {
+      throw new IOException(gitkeep1Location + " file not found.");
+    }
+    Files.delete(gitkeep.toPath());
+    String gitkeep2Location = "src/main/java/.gitkeep";
+    gitkeep = new File(createdProjectDir, gitkeep2Location);
+    if (!gitkeep.isFile()) {
+      throw new IOException(gitkeep2Location + " file not found.");
+    }
+    Files.delete(gitkeep.toPath());
   }
 
   static void registerNewModuleInParent(File targetModulePomFile, Document targetModulePom, String groupId, String artifactId, String version, String parentArtifactId) throws IOException {

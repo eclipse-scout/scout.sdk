@@ -18,6 +18,9 @@ package org.eclipse.scout.sdk.core.fixture;
  */
 public class AnnotationQueryTestFixture {
 
+  @AnnotationWithDefaultValues
+  final Object m_obj = new Object();
+
   public static interface ITestIfc {
     @MarkerAnnotation
     void method();
@@ -31,10 +34,12 @@ public class AnnotationQueryTestFixture {
     @Override
     @ValueAnnot
     public void method(String firstParam) {
+      // nop
     }
 
     @Override
     public void method() {
+      // nop
     }
   }
 
@@ -42,6 +47,7 @@ public class AnnotationQueryTestFixture {
     @Override
     @AnnotationWithDefaultValues
     public void method() {
+      // nop
     }
   }
 }

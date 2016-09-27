@@ -87,40 +87,36 @@ public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<
     List<TypeSpi> result = new ArrayList<>(size);
     Scope scope = SpiWithJdtUtils.memberScopeOf(this);
     if (hasType) {
-      if (m_astNode.type.resolvedType == null) {
-        if (scope instanceof ClassScope) {
-          m_astNode.type.resolveType((ClassScope) scope);
-        }
-        else {
-          m_astNode.type.resolveType((BlockScope) scope);
-        }
-      }
-      TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, m_astNode.type.resolvedType);
+      TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, ensureResolvedType(scope, m_astNode.type));
       if (t != null) {
         result.add(t);
       }
     }
     if (hasBounds) {
       for (TypeReference r : m_astNode.bounds) {
-        if (r.resolvedType == null) {
-          if (scope instanceof ClassScope) {
-            r.resolveType((ClassScope) scope);
-          }
-          else {
-            r.resolveType((BlockScope) scope);
-          }
-        }
-        TypeBinding b = r.resolvedType;
-        if (b != null) {
-          TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, b);
-          if (t != null) {
-            result.add(t);
-          }
+        TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, ensureResolvedType(scope, r));
+        if (t != null) {
+          result.add(t);
         }
       }
     }
     m_bounds = Collections.unmodifiableList(result);
     return m_bounds;
+  }
+
+  protected TypeBinding ensureResolvedType(Scope scope, TypeReference r) {
+    TypeBinding resolvedType = r.resolvedType;
+    if (resolvedType != null) {
+      return resolvedType;
+    }
+
+    if (scope instanceof ClassScope) {
+      r.resolveType((ClassScope) scope);
+    }
+    else {
+      r.resolveType((BlockScope) scope);
+    }
+    return r.resolvedType;
   }
 
   @Override

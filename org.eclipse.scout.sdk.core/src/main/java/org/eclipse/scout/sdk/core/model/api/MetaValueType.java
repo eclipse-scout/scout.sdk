@@ -19,55 +19,55 @@ package org.eclipse.scout.sdk.core.model.api;
 @SuppressWarnings("squid:S00115")
 public enum MetaValueType {
   /**
-   * {@link IMetaValue#getObject()} is a {@link Character}
+   * {@link IMetaValue#get(Class)} is a {@link Character}
    */
   Char,
   /**
-   * {@link IMetaValue#getObject()} is a {@link Byte}
+   * {@link IMetaValue#get(Class)} is a {@link Byte}
    */
   Byte,
   /**
-   * {@link IMetaValue#getObject()} is a {@link Integer}
+   * {@link IMetaValue#get(Class)} is a {@link Integer}
    */
   Int,
   /**
-   * {@link IMetaValue#getObject()} is a {@link Short}
+   * {@link IMetaValue#get(Class)} is a {@link Short}
    */
   Short,
   /**
-   * {@link IMetaValue#getObject()} is a {@link Boolean}
+   * {@link IMetaValue#get(Class)} is a {@link Boolean}
    */
   Bool,
   /**
-   * {@link IMetaValue#getObject()} is a {@link Long}
+   * {@link IMetaValue#get(Class)} is a {@link Long}
    */
   Long,
   /**
-   * {@link IMetaValue#getObject()} is a {@link Double}
+   * {@link IMetaValue#get(Class)} is a {@link Double}
    */
   Double,
   /**
-   * {@link IMetaValue#getObject()} is a {@link Float}
+   * {@link IMetaValue#get(Class)} is a {@link Float}
    */
   Float,
   /**
-   * {@link IMetaValue#getObject()} is a {@link Float}
+   * {@link IMetaValue#get(Class)} is a {@link Float}
    */
   String,
   /**
-   * {@link IMetaValue#getObject()} is a {@link IType}
+   * {@link IMetaValue#get(Class)} is a {@link IType}
    */
   Type,
   /**
-   * {@link IMetaValue#getObject()} is a {@link IField}
+   * {@link IMetaValue#get(Class)} is a {@link IField}
    */
   Enum,
   /**
-   * {@link IMetaValue#getObject()} is a {@link IAnnotation}
+   * {@link IMetaValue#get(Class)} is a {@link IAnnotation}
    */
   Annotation,
   /**
-   * {@link IMetaValue#getObject()} is a primitive array int[] or a typed object array such as String[]
+   * {@link IMetaValue#get(Class)} is a primitive array int[] or a typed object array such as String[]
    * <p>
    * The meta value itself is a {@link IArrayMetaValue}
    */

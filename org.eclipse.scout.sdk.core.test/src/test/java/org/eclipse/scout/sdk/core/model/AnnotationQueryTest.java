@@ -44,4 +44,11 @@ public class AnnotationQueryTest {
     Assert.assertNotNull(testChildClass);
     Assert.assertEquals(3, testChildClass.methods().first().annotations().withSuperInterfaces(true).list().size());
   }
+
+  @Test
+  public void testOnField() {
+    IType testChildClass = CoreTestingUtils.createJavaEnvironment().findType(AnnotationQueryTestFixture.class.getName());
+    Assert.assertNotNull(testChildClass);
+    Assert.assertEquals(1, testChildClass.fields().first().annotations().list().size());
+  }
 }

@@ -119,7 +119,6 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
     }
     while (exceptionSigIterator.hasNext()) {
       source.append(", ").append(validator.useSignature(exceptionSigIterator.next()));
-
     }
     if (Flags.isInterface(getFlags()) || Flags.isAbstract(getFlags())) {
       source.append(';');
@@ -136,7 +135,6 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
       }
       source.append('}');
     }
-
   }
 
   @Override

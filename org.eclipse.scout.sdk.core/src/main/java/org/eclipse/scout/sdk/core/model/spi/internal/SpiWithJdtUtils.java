@@ -84,6 +84,7 @@ import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.model.spi.internal.metavalue.MetaValueFactory;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 
@@ -503,8 +504,7 @@ public final class SpiWithJdtUtils {
           return StringConstant.fromValue(str);
         }
       }
-      //bug fix! jdt does not always set the enum flag
-      if (fieldBinding != null /* && (fieldBinding.modifiers & ClassFileConstants.AccEnum) != 0 */) {
+      if (fieldBinding != null) {
         return fieldBinding;
       }
     }
