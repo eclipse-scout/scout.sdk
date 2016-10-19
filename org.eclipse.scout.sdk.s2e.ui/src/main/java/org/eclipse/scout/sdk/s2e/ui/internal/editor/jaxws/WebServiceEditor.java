@@ -32,7 +32,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -95,14 +94,8 @@ public class WebServiceEditor extends FormEditor {
       return;
     }
 
-    try {
-      if (!ScoutTier.Server.equals(ScoutTier.valueOf(getJavaProject()))) {
-        showError("Invalid project type: " + getJavaProject().getElementName() + " is not a server project", new IllegalArgumentException());
-        return;
-      }
-    }
-    catch (JavaModelException e) {
-      showError("Unable to check type of project " + getJavaProject().getElementName(), e);
+    if (!ScoutTier.Server.test(getJavaProject())) {
+      showError("Invalid project type: " + getJavaProject().getElementName() + " is not a server project", new IllegalArgumentException());
       return;
     }
 

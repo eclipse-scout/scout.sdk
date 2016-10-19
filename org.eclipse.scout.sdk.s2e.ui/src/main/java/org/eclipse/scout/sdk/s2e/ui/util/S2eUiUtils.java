@@ -231,7 +231,7 @@ public final class S2eUiUtils {
       for (IResource r : selectedResources) {
         IJavaElement element = JavaCore.create(r);
         if (S2eUtils.exists(element)) {
-          if (expected.equals(ScoutTier.valueOf(element))) {
+          if (expected.test(element)) {
             elements.add(element);
           }
           else {

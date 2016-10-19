@@ -133,7 +133,7 @@ public class LookupCallNewOperation implements IOperation {
     IJavaEnvironment env = getEnvProvider().get(testSourceFolder.getJavaProject());
     ScoutTier targetTier = ScoutTier.valueOf(testSourceFolder);
     String testPackage = ScoutTier.Shared.convert(targetTier, getPackage());
-    boolean isClient = ScoutTier.Client.equals(targetTier);
+    boolean isClient = ScoutTier.Client.isIncludedIn(targetTier);
     String runnerFqn = null;
     if (isClient) {
       runnerFqn = IScoutRuntimeTypes.ClientTestRunner;
