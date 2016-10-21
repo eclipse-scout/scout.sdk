@@ -199,7 +199,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
   }
 
   protected static void addImplementorMsg(StringBuilder builder) {
-    builder.append("\nThen you have to decide which JAX-WS implementor you want to use. It is hardly recommended to use the implementor that is included in your J2EE application server if any. ");
+    builder.append("\nThen you have to decide which JAX-WS implementor you want to use. It is strongly recommended to use the implementor that is included in your J2EE application server if any. ");
     builder.append("As soon as the implementor is known add the 'jaxws.implementor' property to your config.properties files.\n");
     builder.append("If the desired JAX-WS implementor is not included in your application server, you also have to add the necessary dependencies to your pom.xml files to include this implementor in the deployment.");
   }
