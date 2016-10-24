@@ -62,7 +62,7 @@ public final class ScoutTemplateProposalFactory {
     TEMPLATES.put(IScoutRuntimeTypes.IBigDecimalField, new TemplateProposalDescriptor(IScoutRuntimeTypes.IBigDecimalField, IScoutRuntimeTypes.AbstractBigDecimalField, "MyBigDecimal",
         ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.DoubleFieldAdd, relevance, BigDecimalFieldProposal.class, Arrays.asList("numberfield", "doublefield", "floatfield")));
     TEMPLATES.put(IScoutRuntimeTypes.IBooleanField, new TemplateProposalDescriptor(IScoutRuntimeTypes.IBooleanField, IScoutRuntimeTypes.AbstractBooleanField, "MyBoolean",
-        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.FormFieldAdd, relevance, FormFieldProposal.class, Arrays.asList("checkboxfield")));
+        ISdkProperties.SUFFIX_FORM_FIELD, ISdkIcons.FormFieldAdd, relevance, FormFieldProposal.class, Arrays.asList("checkboxfield", "tristatefield")));
     TEMPLATES.put(IScoutRuntimeTypes.IButton, new TemplateProposalDescriptor(IScoutRuntimeTypes.IButton, IScoutRuntimeTypes.AbstractButton, "My",
         ISdkProperties.SUFFIX_BUTTON, ISdkIcons.ButtonAdd, relevance, ButtonProposal.class));
     TEMPLATES.put(IScoutRuntimeTypes.ICalendarField, new TemplateProposalDescriptor(IScoutRuntimeTypes.ICalendarField, IScoutRuntimeTypes.AbstractCalendarField, "MyCalendar",
