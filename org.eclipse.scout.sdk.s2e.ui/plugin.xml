@@ -240,4 +240,14 @@
             class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateMissingClassIdsSelectedHandler">
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePatternMatchListeners">
+      <consolePatternMatchListener
+            class="org.eclipse.scout.sdk.s2e.ui.internal.HttpPatternMatchListener"
+            id="org.eclipse.scout.sdk.s2e.ui.httpConsolePatternMatchListener"
+            qualifier="https?:"
+            regex="https?://[^\s]+">
+         <enablement></enablement>
+      </consolePatternMatchListener>
+   </extension>
 </plugin>
