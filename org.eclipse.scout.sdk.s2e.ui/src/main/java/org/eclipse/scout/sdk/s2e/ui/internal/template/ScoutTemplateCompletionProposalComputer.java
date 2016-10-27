@@ -13,23 +13,20 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
-import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
+import org.eclipse.scout.sdk.s2e.ui.util.ContentAssistContextInfo;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.osgi.framework.Bundle;
 
 /**
  * <h3>{@link ScoutTemplateCompletionProposalComputer}</h3>
@@ -42,26 +39,14 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
   @Override
   @SuppressWarnings("pmd:NPathComplexity")
   public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-    if (!(context instanceof JavaContentAssistInvocationContext)) {
-      return Collections.emptyList();
-    }
-
     try {
-      Bundle bundle = Platform.getBundle(S2ESdkUiActivator.PLUGIN_ID);
-      if (bundle == null || bundle.getState() != Bundle.ACTIVE) {
+      ContentAssistContextInfo info = ContentAssistContextInfo.build(context, S2ESdkUiActivator.PLUGIN_ID, monitor);
+      if (info == null) {
         return Collections.emptyList();
       }
 
-      JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-      int offset = javaContext.getInvocationOffset();
-      if (offset < 0) {
-        return Collections.emptyList();
-      }
-
-      ICompilationUnit compilationUnit = javaContext.getCompilationUnit();
-      if (!S2eUtils.exists(compilationUnit)) {
-        return Collections.emptyList();
-      }
+      ICompilationUnit compilationUnit = info.getCompilationUnit();
+      int offset = info.getOffset();
 
       // check if we are in the middle of a statement. This may happen e.g. on annotations. The enclosing element is even though the IType holding the annotation
       Document d = new Document(compilationUnit.getSource());
@@ -72,24 +57,17 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
       }
 
       compilationUnit.reconcile(ICompilationUnit.NO_AST, false, false, null, null); // reconcile in case it was a very fast edit and CTRL+space afterwards.
-      IJavaElement element = compilationUnit.getElementAt(offset);
+      IJavaElement element = info.computeEnclosingElement();
       if (!S2eUtils.exists(element) || element.getElementType() != IJavaElement.TYPE) {
         return Collections.emptyList();
       }
 
-      String prefix = null;
-      CharSequence computedPrefix = javaContext.computeIdentifierPrefix();
-      if (StringUtils.isNotEmpty(computedPrefix)) {
-        prefix = computedPrefix.toString();
-      }
-
-      return ScoutTemplateProposalFactory.createTemplateProposals((IType) element, offset, prefix);
+      return ScoutTemplateProposalFactory.createTemplateProposals((IType) element, offset, info.getIdentifierPrefix());
     }
     catch (Exception e) {
       SdkLog.error("Error calculating Scout template proposals.", e);
+      return Collections.emptyList();
     }
-
-    return Collections.emptyList();
   }
 
   @Override
