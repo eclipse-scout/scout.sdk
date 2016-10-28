@@ -54,11 +54,11 @@ public class AstTableFieldBuilder extends AstTypeBuilder<AstTableFieldBuilder> {
         .in(get())
         .insert();
 
-    // inner calendar
+    // inner table
     Type tableSuperType = getFactory().newTypeReference(IScoutRuntimeTypes.AbstractTable);
     m_tableDeclaration = getFactory().newType(ISdkProperties.INNER_TABLE_TYPE_NAME)
         .withCalculatedOrder(false)
-        .withClassId(false)
+        .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withNlsMethod(null)
         .withOrder(false)
