@@ -52,6 +52,7 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
   private String m_superTypeSignature;
   private String m_pageServiceIfcSignature;
   private String m_classIdValue;
+  private String m_tableClassIdValue;
   private String m_dataFetchMethodName;
 
   public PageSourceBuilder(String elementName, String packageName, IJavaEnvironment env) {
@@ -154,6 +155,12 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
     ITypeSourceBuilder tableBuilder = new TypeSourceBuilder(INNER_TABLE_NAME);
     tableBuilder.setFlags(Flags.AccPublic);
     tableBuilder.setSuperTypeSignature(Signature.createTypeSignature(IScoutRuntimeTypes.AbstractTable));
+
+    // class id
+    if (StringUtils.isNotBlank(getTableClassIdValue())) {
+      tableBuilder.addAnnotation(ScoutAnnotationSourceBuilderFactory.createClassId(getTableClassIdValue()));
+    }
+
     return tableBuilder;
   }
 
@@ -187,6 +194,14 @@ public class PageSourceBuilder extends AbstractEntitySourceBuilder {
 
   public void setClassIdValue(String classIdValue) {
     m_classIdValue = classIdValue;
+  }
+
+  public String getTableClassIdValue() {
+    return m_tableClassIdValue;
+  }
+
+  public void setTableClassIdValue(String tableClassIdValue) {
+    m_tableClassIdValue = tableClassIdValue;
   }
 
   public String getPageServiceIfcSignature() {

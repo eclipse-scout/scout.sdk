@@ -56,6 +56,7 @@ public class PageSourceBuilderTest {
       // page
       PageSourceBuilder pageBuilder = new PageSourceBuilder("MyPage", "org.eclipse.scout.sdk.core.s.test", clientEnv);
       pageBuilder.setClassIdValue("whatever");
+      pageBuilder.setTableClassIdValue("whatever2");
       pageBuilder.setPageDataSignature(pageDataSignature);
       pageBuilder.setDataFetchMethodName(methodBuilder.getElementName());
       pageBuilder.setPageWithTable(true);
@@ -78,6 +79,7 @@ public class PageSourceBuilderTest {
       // page
       PageSourceBuilder pageBuilder = new PageSourceBuilder("MyPage", "org.eclipse.scout.sdk.core.s.test", clientEnv);
       pageBuilder.setClassIdValue("whatever");
+      pageBuilder.setTableClassIdValue("whatever2");
       pageBuilder.setPageDataSignature(null);
       pageBuilder.setPageWithTable(false);
       pageBuilder.setAbstractPage(i == 1);

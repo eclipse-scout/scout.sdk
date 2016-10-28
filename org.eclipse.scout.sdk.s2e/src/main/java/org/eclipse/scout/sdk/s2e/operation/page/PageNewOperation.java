@@ -270,7 +270,9 @@ public class PageNewOperation implements IOperation {
     pageBuilder.setAbstractPage(isAbstractPage);
     pageBuilder.setCreateNlsMethod(isCreateAbstractPage() == isAbstractPage);
     if (ClassIdGenerators.isAutomaticallyCreateClassIdAnnotation()) {
-      pageBuilder.setClassIdValue(ClassIdGenerators.generateNewId(new ClassIdGenerationContext(getPackage() + '.' + getPageName())));
+      ClassIdGenerationContext context = new ClassIdGenerationContext(getPackage() + '.' + getPageName());
+      pageBuilder.setClassIdValue(ClassIdGenerators.generateNewId(context));
+      pageBuilder.setTableClassIdValue(ClassIdGenerators.generateNewId(context));
     }
     IType dto = getCreatedPageData();
     if (isAbstractPage) {
