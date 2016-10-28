@@ -78,7 +78,12 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
             formDataTypeName = Signature.getSignatureSimpleName(formDataTypeSignature);
           }
 
-          IType superType = TypeUtility.getTypeBySignature(fieldAnnotation.getSuperTypeSignature());
+          String superTypeSignature = fieldAnnotation.getSuperTypeSignature();
+          IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
+          if (!TypeUtility.exists(superType)) {
+            ScoutSdk.logWarning("Could not read DTO super type of field '" + formField.getFullyQualifiedName() + "'. '" + superTypeSignature + "' Could not be found. Field will be skipped.");
+            continue;
+          }
           ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(superType);
           ITypeSourceBuilder fieldSourceBuilder = null;
           if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.AbstractTableFieldData))) {

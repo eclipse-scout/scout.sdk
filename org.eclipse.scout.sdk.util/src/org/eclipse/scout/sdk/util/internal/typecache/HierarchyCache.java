@@ -128,6 +128,9 @@ public final class HierarchyCache implements IHierarchyCache {
 
   @Override
   public ITypeHierarchy getSupertypeHierarchy(IType type) {
+    if (!TypeUtility.exists(type)) {
+      return null;
+    }
     try {
       return new TypeHierarchy(type, type.newSupertypeHierarchy(null));
     }
