@@ -64,38 +64,40 @@ public class ContentAssistContextInfo {
     if (bundle == null || bundle.getState() != Bundle.ACTIVE) {
       return null;
     }
-    if (monitor != null && monitor.isCanceled()) {
-      return null;
-    }
 
     JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
     ICompilationUnit compilationUnit = javaContext.getCompilationUnit();
     if (!S2eUtils.exists(compilationUnit)) {
       return null;
     }
+
     int offset = javaContext.getInvocationOffset();
     if (offset < 0) {
       return null;
     }
+
     if (monitor != null && monitor.isCanceled()) {
       return null;
     }
 
-    String identifierPrefix = null;
-    try {
-      CharSequence prefix = javaContext.computeIdentifierPrefix();
-      if (StringUtils.isNotBlank(prefix)) {
-        identifierPrefix = prefix.toString().trim();
-      }
-    }
-    catch (BadLocationException e) {
-      SdkLog.warning("Unable to compute identifier prefix.", e);
-      return null;
-    }
+    String identifierPrefix = computeIdentifierPrefix(javaContext);
     if (monitor != null && monitor.isCanceled()) {
       return null;
     }
     return new ContentAssistContextInfo(offset, compilationUnit, identifierPrefix);
+  }
+
+  protected static String computeIdentifierPrefix(JavaContentAssistInvocationContext javaContext) {
+    try {
+      CharSequence prefix = javaContext.computeIdentifierPrefix();
+      if (StringUtils.isNotBlank(prefix)) {
+        return prefix.toString().trim();
+      }
+    }
+    catch (BadLocationException e) {
+      SdkLog.warning("Unable to compute identifier prefix.", e);
+    }
+    return null;
   }
 
   /**
