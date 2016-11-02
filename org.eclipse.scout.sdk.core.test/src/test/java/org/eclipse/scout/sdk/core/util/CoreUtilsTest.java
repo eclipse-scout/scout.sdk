@@ -293,7 +293,7 @@ public class CoreUtilsTest {
     Assert.assertEquals("Integer.valueOf(0)", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_JAVA_LANG_INTEGER));
     Assert.assertEquals("Long.valueOf(0L)", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_JAVA_LANG_LONG));
     Assert.assertEquals("Short.valueOf((short)0)", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_JAVA_LANG_SHORT));
-    Assert.assertEquals("\"\"", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_JAVA_LANG_STRING));
+    Assert.assertEquals("null", CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_JAVA_LANG_STRING));
     Assert.assertEquals(null, CoreUtils.getDefaultValueOf(ISignatureConstants.SIG_JAVA_LANG_VOID));
   }
 

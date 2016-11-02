@@ -450,8 +450,6 @@ public final class CoreUtils {
         return "Long.valueOf(0L)";
       case ISignatureConstants.SIG_JAVA_LANG_SHORT:
         return "Short.valueOf((short)0)";
-      case ISignatureConstants.SIG_JAVA_LANG_STRING:
-        return "\"\"";
       case ISignatureConstants.SIG_JAVA_LANG_VOID:
         return null;
       default:
