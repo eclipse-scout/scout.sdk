@@ -44,6 +44,7 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
   public static final String REFRESH_JOB = "org.eclipse.core.internal.refresh.RefreshJob";
   public static final String WORKSPACE_INIT_JOB = "org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob";
   public static final String TEAM_UPDATES = "org.eclipse.team.";
+  public static final String SEARCH = "org.eclipse.search2.";
 
   private boolean m_isIgnoreBuildEvents;
   private boolean m_isIgnoreScoutSdkEvents;
@@ -52,7 +53,7 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
   public DefaultResourceChangeEventFilter() {
     String[] exclusions = new String[]{GIT_UPDATES, MAVEN_UPDATES, SONAR_UPDATE, WEB_TOOLS_UPDATE, DEBUG_EVENT,
         JDT_DEBUG_EVENT, ANNOTATION_PROCESSING_JOB, ANOTATION_PROCESSING_BUILD, EXTERNAL_FOLDER_UPDATE, DEBUG_INIT,
-        REFRESH_JOB, WORKSPACE_INIT_JOB, TEAM_UPDATES};
+        REFRESH_JOB, WORKSPACE_INIT_JOB, TEAM_UPDATES, SEARCH};
     m_excludedJobNamePrefixes = new ArrayList<>(exclusions.length);
     Collections.addAll(m_excludedJobNamePrefixes, exclusions);
 
