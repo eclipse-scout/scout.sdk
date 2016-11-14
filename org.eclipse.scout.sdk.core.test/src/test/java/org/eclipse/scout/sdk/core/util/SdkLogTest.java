@@ -44,13 +44,15 @@ public class SdkLogTest {
     assertPlaceholders("a [40, 41, 2000000000000000000] b", "a {} b", new Object[]{new long[]{40L, 41L, 2000000000000000000L}});
     assertPlaceholders("a [1.1, 1.002, 300.0] b", "a {} b", new Object[]{new float[]{1.1f, 1.002f, 300f}});
     assertPlaceholders("a [11.3, 12.004, 100.0] b", "a {} b", new Object[]{new double[]{11.3, 12.004, 100}});
+    assertPlaceholders("a [[[11, 12]], [[13], [14, 15, 16]]] b", "a {} b", new Object[]{new int[][][]{{{11, 12}}, {{13}, {14, 15, 16}}}});
+    assertPlaceholders("a false b", "a {} b", false);
 
-    Object[] longArgs = new Object[1001];
+    Object[] longArgs = new Object[101];
     for (int i = 0; i < longArgs.length; i++) {
       longArgs[i] = Integer.valueOf(i + 1);
     }
     StringBuilder expected = new StringBuilder("1");
-    for (int i = 2; i <= 1000; i++) {
+    for (int i = 2; i <= 100; i++) {
       expected.append(", ");
       expected.append(Integer.toString(i));
     }
