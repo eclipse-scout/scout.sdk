@@ -52,7 +52,7 @@ public interface ISdkIcons {
   String TreeFieldAdd = "treefield_add.gif";
   String Separator = "type_separator.gif";
   String Wsdl = "wsdl.gif";
-  String RebuildWebService = "rebuildws.gif";
+  String WebServiceAdd = "webservice_add.gif";
   String WsProviderOverview = "ws_provider_overview.png";
   String WsConsumerOverview = "ws_consumer_overview.png";
 }

@@ -157,7 +157,7 @@
             category="org.eclipse.scout.sdk.s2e"
             class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.jaxws.WebServiceNewWizard"
             hasPages="true"
-            icon="icons/wsdl.gif"
+            icon="icons/webservice_add.gif"
             id="org.eclipse.scout.sdk.s2e.ui.newWebService"
             name="Scout Web Service"
             project="false"/>

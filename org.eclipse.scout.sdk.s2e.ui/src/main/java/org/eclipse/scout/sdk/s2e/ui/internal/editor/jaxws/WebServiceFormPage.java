@@ -804,7 +804,7 @@ public class WebServiceFormPage extends FormPage {
       }
     };
     rebuildAction.setToolTipText("Rebuild all artifacts of this project");
-    rebuildAction.setImageDescriptor(S2ESdkUiActivator.getImageDescriptor(ISdkIcons.RebuildWebService));
+    rebuildAction.setImageDescriptor(S2ESdkUiActivator.getImageDescriptor(ISdkIcons.Wsdl));
     manager.add(rebuildAction);
 
     // add new web service action
@@ -815,7 +815,7 @@ public class WebServiceFormPage extends FormPage {
       }
     };
     addServiceAction.setToolTipText("Create new Web Service");
-    addServiceAction.setImageDescriptor(S2ESdkUiActivator.getImageDescriptor(ISdkIcons.Wsdl));
+    addServiceAction.setImageDescriptor(S2ESdkUiActivator.getImageDescriptor(ISdkIcons.WebServiceAdd));
     manager.add(addServiceAction);
 
     // refresh editor action
