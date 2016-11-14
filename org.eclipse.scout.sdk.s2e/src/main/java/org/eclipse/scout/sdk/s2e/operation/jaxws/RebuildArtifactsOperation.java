@@ -69,10 +69,16 @@ public class RebuildArtifactsOperation implements IOperation {
 
     // schedule maven build 'clean compile'
     progress.worked(44);
-    MavenRunner.execute(new MavenBuild()
-        .withGoal("clean")
-        .withGoal("compile")
-        .withWorkingDirectory(project.getLocation().toFile()));
+
+    try {
+      MavenRunner.execute(new MavenBuild()
+          .withGoal("clean")
+          .withGoal("process-resources")
+          .withWorkingDirectory(project.getLocation().toFile()));
+    }
+    catch (Exception e) {
+      SdkLog.error("Unable to rebuild artifacts. See maven console for details.", e);
+    }
     progress.worked(48);
 
     // refresh the project to 'see' the new artifacts

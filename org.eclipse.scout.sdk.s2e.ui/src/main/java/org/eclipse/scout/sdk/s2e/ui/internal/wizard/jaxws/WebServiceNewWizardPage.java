@@ -488,7 +488,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     if (!S2eUtils.exists(getServerProject())) {
       return;
     }
-    setArtifactId(getServerProject().getElementName() + ".jaxws");
+    setArtifactId(getServerProject().getElementName() + ".ws");
   }
 
   @SuppressWarnings("pmd:NPathComplexity")
