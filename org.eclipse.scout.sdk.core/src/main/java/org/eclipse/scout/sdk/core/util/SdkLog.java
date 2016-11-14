@@ -164,14 +164,14 @@ public final class SdkLog {
       return "[]";
     }
 
-    int maxSize = 1000;
+    int maxSize = 100;
     int printSize = Math.min(arr.length, maxSize);
     StringBuilder b = new StringBuilder();
     b.append('[');
-    b.append(safeObjectToString(arr[0]));
+    b.append(toString(arr[0]));
     for (int i = 1; i < printSize; i++) {
       b.append(", ");
-      b.append(safeObjectToString(arr[i]));
+      b.append(toString(arr[i]));
     }
     if (arr.length > maxSize) {
       b.append(",...");
