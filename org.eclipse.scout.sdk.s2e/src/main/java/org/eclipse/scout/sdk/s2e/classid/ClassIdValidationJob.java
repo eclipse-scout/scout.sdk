@@ -264,7 +264,7 @@ public final class ClassIdValidationJob extends AbstractJob {
       if (element.getElementType() == IJavaElement.ANNOTATION) {
         IAnnotation annotation = (IAnnotation) element;
         if (S2eUtils.exists(annotation) && annotation.getElementName().endsWith(Signature.getSimpleName(IScoutRuntimeTypes.ClassId))) {
-          executeAsync(1000);
+          executeAsync(4000);
         }
         return true; // finished processing
       }
