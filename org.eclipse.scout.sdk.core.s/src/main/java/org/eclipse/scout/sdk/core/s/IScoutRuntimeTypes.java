@@ -215,6 +215,7 @@ public interface IScoutRuntimeTypes {
   String BinaryResource = "org.eclipse.scout.rt.platform.resource.BinaryResource";
   String BooleanUtility = "org.eclipse.scout.rt.platform.util.BooleanUtility";
   String JaxWsRISpecifics = "org.eclipse.scout.rt.server.jaxws.implementor.JaxWsRISpecifics";
+  String OfficialVersion = "org.eclipse.scout.rt.shared.OfficialVersion";
 
   // Menu Types
   String TableMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TableMenuType";
