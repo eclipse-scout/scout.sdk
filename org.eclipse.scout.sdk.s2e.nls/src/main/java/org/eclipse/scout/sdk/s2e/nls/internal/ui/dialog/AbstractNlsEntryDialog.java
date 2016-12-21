@@ -140,7 +140,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     }
     m_projectProposalField = new SmartField(inputComp, SWT.NONE, 10);
     m_projectProposalField.setLabel("Create in");
-    m_projectProposalField.setSmartFieldModel(new P_ProjectSmartfieldModel());
+    m_projectProposalField.setSmartFieldModel(model);
     m_projectProposalField.setValue(getNlsProject());
     m_projectProposalField.addSmartFieldListener(new ISmartFieldListener() {
       @Override

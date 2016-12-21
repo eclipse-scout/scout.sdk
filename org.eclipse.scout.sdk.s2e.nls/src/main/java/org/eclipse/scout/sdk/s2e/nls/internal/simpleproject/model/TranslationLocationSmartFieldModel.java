@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFolder;
@@ -32,14 +32,9 @@ public class TranslationLocationSmartFieldModel implements ISmartFieldModel {
   public TranslationLocationSmartFieldModel(IProject project, IPath path) {
     m_project = project;
     m_path = path;
-
-    m_folders = new LinkedList<>();
-    List<IFolder> folds = new LinkedList<>();
+    m_folders = new ArrayList<>();
     try {
-      folds.addAll(SimpleNlsProject.getFoldersOfProject(m_project, m_path));
-      for (IFolder folder : folds) {
-        m_folders.add(folder);
-      }
+      m_folders.addAll(SimpleNlsProject.getFoldersOfProject(m_project, m_path));
     }
     catch (CoreException e) {
       SdkLog.warning(e);

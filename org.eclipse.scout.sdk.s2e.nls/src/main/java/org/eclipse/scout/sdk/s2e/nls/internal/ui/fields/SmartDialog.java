@@ -10,14 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.ui.fields;
 
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -63,8 +58,6 @@ public class SmartDialog {
   private final P_SmartFieldTableModel m_smartTableModel;
   private final List<ISmartDialogListener> m_smartDialogListeners;
   private final Shell m_parentShell;
-
-  private static final Collator COLLATOR = Collator.getInstance(Locale.getDefault());
 
   public SmartDialog(Shell parentShell) {
     m_defaultSize = new Point(200, 250);
@@ -256,7 +249,7 @@ public class SmartDialog {
   }
 
   protected void handleItemSelection(Object item) {
-    notifyItemSelection(((P_CompareableSmartItem) item).getItem());
+    notifyItemSelection(item);
   }
 
   public boolean isVisible() {
@@ -272,13 +265,10 @@ public class SmartDialog {
   }
 
   private final class P_SmartFieldTableModel implements IStructuredContentProvider, ITableLabelProvider {
-    private final Set<P_CompareableSmartItem> m_items = new TreeSet<>();
+    private List<Object> m_items;
 
     public void setItems(List<Object> items) {
-      m_items.clear();
-      for (Object object : items) {
-        m_items.add(new P_CompareableSmartItem(object));
-      }
+      m_items = items;
     }
 
     @Override
@@ -294,7 +284,7 @@ public class SmartDialog {
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
-        return m_smartModel.getImage(((P_CompareableSmartItem) element).getItem());
+        return m_smartModel.getImage(element);
       }
       return null;
     }
@@ -302,7 +292,7 @@ public class SmartDialog {
     @Override
     public String getColumnText(Object element, int columnIndex) {
       if (columnIndex == 0) {
-        return m_smartModel.getText(((P_CompareableSmartItem) element).getItem());
+        return m_smartModel.getText(element);
       }
       return "";
     }
@@ -324,39 +314,7 @@ public class SmartDialog {
 
     @Override
     public void dispose() {
-      // nop
-    }
-  }
-
-  private final class P_CompareableSmartItem implements Comparable<P_CompareableSmartItem> {
-    private final Object m_item;
-
-    private P_CompareableSmartItem(Object item) {
-      m_item = item;
-    }
-
-    @Override
-    public int hashCode() {
-      return m_smartModel.getText(m_item).hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (!(obj instanceof P_CompareableSmartItem)) {
-        return false;
-      }
-      String me = m_smartModel.getText(m_item);
-      String other = m_smartModel.getText(((P_CompareableSmartItem) obj).getItem());
-      return Objects.equals(me, other);
-    }
-
-    @Override
-    public int compareTo(P_CompareableSmartItem o) {
-      return COLLATOR.compare(m_smartModel.getText(m_item), m_smartModel.getText(o.getItem()));
-    }
-
-    public Object getItem() {
-      return m_item;
+      m_items = null;
     }
   }
 }

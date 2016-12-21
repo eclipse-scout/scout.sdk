@@ -11,9 +11,10 @@
 package org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
@@ -40,13 +41,13 @@ public class CountrySmartFieldModel implements ISmartFieldModel {
 
   @Override
   public List<Object> getProposals(String pattern) {
-    List<Object> props = new LinkedList<>();
+    Map<String, Object> props = new TreeMap<>();
     for (Locale l : m_locales) {
       if (l.getDisplayCountry().toLowerCase().startsWith(pattern.toLowerCase())) {
-        props.add(l);
+        props.put(getText(l), l);
       }
     }
-    return props;
+    return new ArrayList<>(props.values());
   }
 
   @Override
@@ -54,7 +55,15 @@ public class CountrySmartFieldModel implements ISmartFieldModel {
     if (item == null) {
       return "";
     }
-    Locale l = (Locale) item;
-    return l.getDisplayCountry() + " (" + l.getCountry() + ")";
+    Locale loc = (Locale) item;
+    String dc = loc.getDisplayCountry();
+    String c = loc.getCountry();
+
+    StringBuilder b = new StringBuilder(dc.length() + c.length() + 3);
+    b.append(dc);
+    b.append(" (");
+    b.append(c);
+    b.append(')');
+    return b.toString();
   }
 }
