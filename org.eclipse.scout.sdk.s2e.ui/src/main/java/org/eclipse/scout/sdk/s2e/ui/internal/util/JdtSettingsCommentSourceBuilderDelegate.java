@@ -63,6 +63,7 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  * @author Andreas Hoegger
  * @since 3.10.0 2013-07-12
  */
+@SuppressWarnings("pmd:NPathComplexity")
 public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBuilderSpi {
   private static final String[] EMPTY = new String[0];
   private static final String UNDEFINED_VAR_VALUE = "undefined";
@@ -226,11 +227,9 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
     return createMethodCommentInternal(target, METHOD_TYPE_SETTER);
   }
 
-  @SuppressWarnings("pmd:NPathComplexity")
   private static ISourceBuilder createMethodCommentInternal(final IMethodSourceBuilder target, final int type) {
     return new ISourceBuilder() {
       @Override
-      @SuppressWarnings("pmd:NPathComplexity")
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap builderCtx, IImportValidator validator) {
         if (!isAutomaticallyAddComments(builderCtx)) {
           return;
