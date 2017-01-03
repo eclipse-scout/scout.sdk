@@ -55,6 +55,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
  * <h3>{@link JavaElementCommentBuilderService}</h3>
@@ -92,7 +93,9 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
           }
           context.setVariable(CodeTemplateContextType.PACKAGENAME, packageName);
 
-          context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+          if (S2eUtils.exists(ownerProject)) {
+            context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+          }
           context.setVariable(CodeTemplateContextType.TYPENAME, JavaCore.removeJavaLikeExtension(target.getElementName()));
           String comment = evaluateTemplate(context, template);
           if (comment != null) {
@@ -119,7 +122,9 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
         context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
         context.setVariable(CodeTemplateContextType.PACKAGENAME, Signature.getQualifier(target.getFullyQualifiedName()));
-        context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+        if (S2eUtils.exists(ownerProject)) {
+          context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+        }
         context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, Signature.getQualifier(target.getElementName()));
         context.setVariable(CodeTemplateContextType.TYPENAME, Signature.getSimpleName(target.getElementName()));
 
@@ -178,7 +183,9 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         if (template != null) {
           CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
           context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
-          context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+          if (S2eUtils.exists(ownerProject)) {
+            context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+          }
           context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
           context.setVariable(CodeTemplateContextType.ENCLOSING_METHOD, target.getElementName());
           context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, UNDEFINED_VAR_VALUE);
@@ -275,7 +282,9 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         if (matcher.find()) {
           getterSetterName = matcher.group(2);
         }
-        context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+        if (S2eUtils.exists(ownerProject)) {
+          context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+        }
         context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
         context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
         context.setVariable(CodeTemplateContextType.ENCLOSING_METHOD, target.getElementName());
@@ -357,7 +366,9 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
           CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
           context.setVariable(CodeTemplateContextType.FIELD_TYPE, Signature.getSignatureSimpleName(target.getSignature()));
           context.setVariable(CodeTemplateContextType.FIELD, target.getElementName());
-          context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+          if (S2eUtils.exists(ownerProject)) {
+            context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+          }
           context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
           context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
           String comment = evaluateTemplate(context, template);
@@ -423,9 +434,10 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
   }
 
   private static Template getCodeTemplate(String id, IJavaProject project) {
-    if (project == null) {
+    if (!S2eUtils.exists(project)) {
       return JavaPlugin.getDefault().getCodeTemplateStore().findTemplateById(id);
     }
+
     ProjectTemplateStore projectStore = new ProjectTemplateStore(project.getProject());
     try {
       projectStore.load();

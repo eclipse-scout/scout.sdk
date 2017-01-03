@@ -88,24 +88,9 @@ import org.eclipse.scout.sdk.core.model.spi.internal.metavalue.MetaValueFactory;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 
-/**
- *
- */
 public final class SpiWithJdtUtils {
-  private SpiWithJdtUtils() {
-  }
 
-  @SafeVarargs
-  static <T> T coalesce(T... values) {
-    if (values == null) {
-      return null;
-    }
-    for (T value : values) {
-      if (value != null) {
-        return value;
-      }
-    }
-    return null;
+  private SpiWithJdtUtils() {
   }
 
   static TypeBinding findTypeBinding(String fqn, AstCompiler compiler) {
@@ -190,10 +175,6 @@ public final class SpiWithJdtUtils {
   }
 
   static TypeSpi bindingToType(JavaEnvironmentWithJdt env, TypeBinding b, BindingTypeWithJdt declaringType, boolean isWildCard) {
-    if (b == null) {
-      return null;
-    }
-
     if (b instanceof VoidTypeBinding) {
       return env.createVoidType();
     }
@@ -217,7 +198,10 @@ public final class SpiWithJdtUtils {
       return env.createBindingArrayType((ArrayBinding) b, isWildCard);
     }
 
-    return null;
+    if (b == null) {
+      throw new IllegalArgumentException("TypeBinding cannot be null");
+    }
+    throw new IllegalStateException("Unsupported binding type: " + b.getClass().getName());
   }
 
   @SuppressWarnings("squid:AssignmentInSubExpressionCheck")
@@ -333,33 +317,40 @@ public final class SpiWithJdtUtils {
     return null;
   }
 
+  static <T> T nvl(T a, T b) {
+    if (a == null) {
+      return b;
+    }
+    return a;
+  }
+
   static Annotation findAnnotationDeclaration(BindingAnnotationWithJdt a) {
     Annotation[] declaredAnnotations = null;
     AnnotatableSpi owner = a.getOwner();
     if (owner instanceof BindingTypeWithJdt) {
       ReferenceBinding b = ((BindingTypeWithJdt) owner).getInternalBinding();
-      b = coalesce(b.actualType(), b);
+      b = nvl(b.actualType(), b);
       if (b instanceof SourceTypeBinding) {
         declaredAnnotations = ((SourceTypeBinding) b).scope.referenceContext.annotations;
       }
     }
     else if (owner instanceof BindingMethodWithJdt) {
       MethodBinding b = ((BindingMethodWithJdt) owner).getInternalBinding();
-      b = coalesce(b.original(), b);
+      b = nvl(b.original(), b);
       if (b.sourceMethod() != null) {
         declaredAnnotations = b.sourceMethod().annotations;
       }
     }
     else if (owner instanceof BindingFieldWithJdt) {
       FieldBinding b = ((BindingFieldWithJdt) owner).getInternalBinding();
-      b = coalesce(b.original(), b);
+      b = nvl(b.original(), b);
       if (b.sourceField() != null) {
         declaredAnnotations = b.sourceField().annotations;
       }
     }
     else if (owner instanceof BindingTypeParameterWithJdt) {
       TypeVariableBinding b = ((BindingTypeParameterWithJdt) owner).getInternalBinding();
-      b = (TypeVariableBinding) coalesce(b.original(), b);
+      b = (TypeVariableBinding) nvl(b.original(), b);
       if (b.declaringElement instanceof SourceTypeBinding) {
         declaredAnnotations = ((SourceTypeBinding) b.declaringElement).scope.referenceContext.annotations;
       }

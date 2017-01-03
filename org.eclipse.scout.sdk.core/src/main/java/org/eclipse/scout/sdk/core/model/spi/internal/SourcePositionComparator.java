@@ -57,7 +57,7 @@ class SourcePositionComparator implements Comparator<Object>, Serializable {
   }
 
   protected int getSourcePosition(ReferenceBinding rb) {
-    TypeBinding tb = SpiWithJdtUtils.coalesce(rb.original(), rb);
+    TypeBinding tb = SpiWithJdtUtils.nvl(rb.original(), rb);
     if (tb == null) {
       return UNKNOWN_SOURCE_POS;
     }
@@ -74,7 +74,7 @@ class SourcePositionComparator implements Comparator<Object>, Serializable {
   }
 
   protected int getSourcePosition(MethodBinding mb) {
-    MethodBinding methodBinding = SpiWithJdtUtils.coalesce(mb.original(), mb);
+    MethodBinding methodBinding = SpiWithJdtUtils.nvl(mb.original(), mb);
     if (methodBinding == null) {
       return UNKNOWN_SOURCE_POS;
     }
@@ -87,7 +87,7 @@ class SourcePositionComparator implements Comparator<Object>, Serializable {
   }
 
   protected int getSourcePosition(FieldBinding fb) {
-    FieldBinding fieldBinding = SpiWithJdtUtils.coalesce(fb.original(), fb);
+    FieldBinding fieldBinding = SpiWithJdtUtils.nvl(fb.original(), fb);
     if (fieldBinding == null) {
       return UNKNOWN_SOURCE_POS;
     }

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.editor.jaxws;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -334,7 +335,7 @@ public class WebServiceEditor extends FormEditor {
     runOperations(updateOps);
   }
 
-  protected void runOperations(Iterable<? extends IOperation> ops) {
+  protected void runOperations(Collection<? extends IOperation> ops) {
     final List<WebServiceFormPage> allPages = getAllPages();
     setEnabled(allPages, false);
     final String idToActivate = getActivePageInstance().getId();

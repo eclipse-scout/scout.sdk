@@ -257,9 +257,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
       List<TypeSpi> result = new ArrayList<>(memberTypes.length);
       for (ReferenceBinding d : memberTypes) {
         TypeSpi t = SpiWithJdtUtils.bindingToType(m_env, d, this);
-        if (t != null) {
-          result.add(t);
-        }
+        result.add(t);
       }
       m_memberTypes = Collections.unmodifiableList(result);
     }

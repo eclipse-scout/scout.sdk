@@ -1356,7 +1356,7 @@ public final class S2eUtils {
 
     // search for a test project
     String[] testProjectSuffixes = new String[]{".test", ".tests", ".testing"};
-    IJavaModel javaModel = orig.getJavaModel();
+    IJavaModel javaModel = orig.getJavaModel(); // NOSONAR
     for (String suffix : testProjectSuffixes) {
       IJavaProject testProject = javaModel.getJavaProject(orig.getElementName() + suffix);
       sourceFolder = getTestSourceFolderInProject(testProject, fqnOfRequiredType);

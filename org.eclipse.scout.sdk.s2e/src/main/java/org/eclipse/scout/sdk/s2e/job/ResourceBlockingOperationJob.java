@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IResource;
@@ -31,7 +30,7 @@ import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
  */
 public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
 
-  private final Collection<? extends IOperation> m_operations;
+  private final Collection<IOperation> m_operations;
 
   public ResourceBlockingOperationJob(IOperation operation) {
     this(operation, (IResource[]) null);
@@ -41,48 +40,57 @@ public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
     this(Collections.singletonList(operation), resources);
   }
 
-  public ResourceBlockingOperationJob(Iterable<? extends IOperation> operations) {
+  public ResourceBlockingOperationJob(Collection<? extends IOperation> operations) {
     this(operations, (IResource[]) null);
   }
 
-  public ResourceBlockingOperationJob(Iterable<? extends IOperation> operations, IResource... resources) {
+  public ResourceBlockingOperationJob(Collection<? extends IOperation> operations, IResource... resources) {
     super(getJobName(operations), resources);
 
-    List<IOperation> ops = new ArrayList<>();
-    if (operations != null) {
-      Iterator<? extends IOperation> it = operations.iterator();
-      while (it.hasNext()) {
-        IOperation op = it.next();
+    if (operations == null) {
+      m_operations = Collections.emptyList();
+    }
+    else {
+      m_operations = new ArrayList<>(operations.size());
+      for (IOperation op : operations) {
         if (op != null) {
-          ops.add(op);
+          m_operations.add(op);
         }
       }
     }
-    m_operations = new ArrayList<>(ops);
   }
 
-  private static String getJobName(Iterable<? extends IOperation> operations) {
-    if (operations == null) {
+  private static String getJobName(Collection<? extends IOperation> operations) {
+    if (operations == null || operations.isEmpty()) {
       return "";
     }
 
     StringBuilder nameBuilder = new StringBuilder();
-    for (IOperation op : operations) {
-      if (op == null) {
-        continue;
-      }
+    Iterator<? extends IOperation> iterator = operations.iterator();
 
-      String itOpName = op.getOperationName();
-      if (StringUtils.isBlank(itOpName)) {
-        SdkLog.warning("operation '{}' does not have a name.", op.getClass().getName());
-        itOpName = "Missing operation name.";
-      }
-      if (nameBuilder.length() > 0) {
+    IOperation op = iterator.next();
+    boolean mustAppendDelimiter = append(op, nameBuilder);
+    while (iterator.hasNext()) {
+      if (mustAppendDelimiter) {
         nameBuilder.append(", ");
       }
-      nameBuilder.append(itOpName);
+      mustAppendDelimiter = append(op, nameBuilder);
     }
     return nameBuilder.toString();
+  }
+
+  private static boolean append(IOperation opToAppend, StringBuilder nameBuilder) {
+    if (opToAppend == null) {
+      return false;
+    }
+
+    String itOpName = opToAppend.getOperationName();
+    if (StringUtils.isBlank(itOpName)) {
+      SdkLog.warning("operation '{}' does not have a name.", opToAppend.getClass().getName());
+      itOpName = "Missing operation name.";
+    }
+    nameBuilder.append(itOpName);
+    return true;
   }
 
   @Override
@@ -94,7 +102,7 @@ public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
 
   @Override
   protected final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    final SubMonitor progress = SubMonitor.convert(monitor, getJobName(m_operations), m_operations.size() * 100);
+    final SubMonitor progress = SubMonitor.convert(monitor, getName(), m_operations.size() * 100);
     if (progress.isCanceled()) {
       return;
     }
@@ -102,5 +110,4 @@ public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
       op.run(progress.newChild(100), workingCopyManager);
     }
   }
-
 }

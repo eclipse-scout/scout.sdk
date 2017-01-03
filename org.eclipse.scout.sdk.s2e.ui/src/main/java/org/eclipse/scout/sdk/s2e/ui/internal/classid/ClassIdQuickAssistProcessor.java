@@ -60,9 +60,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     final ClassIdTarget selectedType = getTarget(context.getCoveringNode());
     if (selectedType != null && !S2eUtils.exists(selectedType.m_annotation)) {
       CompilationUnitRewrite rewrite = createRewrite(selectedType.m_type, selectedType.m_td);
-      if (rewrite != null) {
-        return new IJavaCompletionProposal[]{new ClassIdAddProposal(rewrite)};
-      }
+      return new IJavaCompletionProposal[]{new ClassIdAddProposal(rewrite)};
     }
     return null;
   }

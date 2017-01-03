@@ -144,7 +144,7 @@ import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
  *
  * @noinstantiate This class is not intended to be instantiated by clients.
  */
-@SuppressWarnings({"squid:SwitchLastCaseIsDefaultCheck", "squid:S1166", "squid:AssignmentInSubExpressionCheck", "squid:S881", "squid:S1141", "squid:S1871", "pmd:NPathComplexity"})
+@SuppressWarnings({"squid:SwitchLastCaseIsDefaultCheck", "squid:S1166", "squid:AssignmentInSubExpressionCheck", "squid:S881", "squid:S1141", "squid:S1871", "pmd:NPathComplexity", "squid:S128"})
 public final class Signature implements ISignatureConstants {
 
   public static final char C_COMMA = ',';

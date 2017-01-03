@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.wizard.page;
 
-import java.util.function.Predicate;
-
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -72,17 +70,12 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
 
     guessSharedFolders();
 
-    createPageServcieGroup(parent);
+    createPageServiceGroup(parent);
     createOptionsGroup(parent);
 
     // remove AbstractPage from the proposal list
     StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
-    superTypeContentProvider.setTypeProposalFilter(superTypeContentProvider.getTypeProposalFilter().and(new Predicate<IType>() {
-      @Override
-      public boolean test(IType element) {
-        return !IScoutRuntimeTypes.AbstractPage.equals(element.getFullyQualifiedName());
-      }
-    }));
+    superTypeContentProvider.setTypeProposalFilter(superTypeContentProvider.getTypeProposalFilter().and(element -> !IScoutRuntimeTypes.AbstractPage.equals(element.getFullyQualifiedName())));
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PAGE_NEW_WIZARD_PAGE);
   }
@@ -135,13 +128,26 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
       else {
         setReadOnlySuffix(ISdkProperties.SUFFIX_PAGE_WITH_NODES);
       }
-      if (m_serverSourceFolder != null) {
-        m_serverSourceFolder.setEnabled(isPageWithTable());
-      }
+      setViewSharedSourceFolder();
+      setViewServerSourceFolder();
     }
     catch (JavaModelException e) {
       SdkLog.warning("Unable to calculate super type hierarchy for type '{}'.", superType.getFullyQualifiedName(), e);
     }
+  }
+
+  protected void setViewServerSourceFolder() {
+    if (m_serverSourceFolder == null) {
+      return;
+    }
+    m_serverSourceFolder.setEnabled(isPageWithTable());
+  }
+
+  protected void setViewSharedSourceFolder() {
+    if (m_sharedSourceFolder == null) {
+      return;
+    }
+    m_sharedSourceFolder.setEnabled(isPageWithTable());
   }
 
   protected void guessSharedFolders() {
@@ -170,7 +176,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
     return 120;
   }
 
-  protected void createPageServcieGroup(Composite p) {
+  protected void createPageServiceGroup(Composite p) {
     Group parent = getFieldToolkit().createGroupBox(p, "PageData and Service Source Folders");
 
     // shared source folder
@@ -183,6 +189,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
         pingStateChanging();
       }
     });
+    setViewSharedSourceFolder();
 
     // server source folder
     m_serverSourceFolder = getFieldToolkit().createSourceFolderField(parent, "Server Source Folder", ScoutTier.Server, getLabelWidth());
@@ -195,6 +202,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
         pingStateChanging();
       }
     });
+    setViewServerSourceFolder();
 
     // layout
     GridLayoutFactory

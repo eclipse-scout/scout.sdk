@@ -155,10 +155,6 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static SimpleNlsProject getServiceNlsProject(IType serviceType) {
-    if (serviceType == null) {
-      SdkLog.error("nls service type cannot be null.");
-      return null;
-    }
     if (!S2eUtils.exists(serviceType)) {
       SdkLog.error("nls service type '{}' does not exist.", serviceType.getFullyQualifiedName());
       return null;
