@@ -71,6 +71,7 @@ public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
     IOperation op = iterator.next();
     boolean mustAppendDelimiter = append(op, nameBuilder);
     while (iterator.hasNext()) {
+      op = iterator.next();
       if (mustAppendDelimiter) {
         nameBuilder.append(", ");
       }
