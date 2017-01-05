@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IResource;
@@ -30,14 +31,14 @@ import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
  */
 public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
 
-  private final Collection<IOperation> m_operations;
+  private final Collection<? extends IOperation> m_operations;
 
   public ResourceBlockingOperationJob(IOperation operation) {
     this(operation, (IResource[]) null);
   }
 
   public ResourceBlockingOperationJob(IOperation operation, IResource... resources) {
-    this(Collections.singletonList(operation), resources);
+    this(operation == null ? Collections.emptyList() : Collections.singletonList(operation), resources);
   }
 
   public ResourceBlockingOperationJob(Collection<? extends IOperation> operations) {
@@ -45,53 +46,53 @@ public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
   }
 
   public ResourceBlockingOperationJob(Collection<? extends IOperation> operations, IResource... resources) {
-    super(getJobName(operations), resources);
-
-    if (operations == null) {
-      m_operations = Collections.emptyList();
-    }
-    else {
-      m_operations = new ArrayList<>(operations.size());
-      for (IOperation op : operations) {
-        if (op != null) {
-          m_operations.add(op);
-        }
-      }
-    }
+    this(cleanList(operations), resources);
   }
 
-  private static String getJobName(Collection<? extends IOperation> operations) {
-    if (operations == null || operations.isEmpty()) {
+  protected ResourceBlockingOperationJob(List<? extends IOperation> cleanOperations, IResource[] resources) {
+    super(getJobName(cleanOperations), resources);
+    m_operations = cleanOperations;
+  }
+
+  protected static <T> List<T> cleanList(Collection<T> c) {
+    if (c == null || c.isEmpty()) {
+      return Collections.emptyList();
+    }
+    List<T> result = new ArrayList<>(c.size());
+    for (T element : c) {
+      if (element != null) {
+        result.add(element);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @param operations
+   *          May not contain {@code null} entries and may not be {@code null}.
+   * @return The name for this job based on the given operations
+   */
+  protected static String getJobName(Collection<? extends IOperation> operations) {
+    if (operations.isEmpty()) {
       return "";
     }
-
     StringBuilder nameBuilder = new StringBuilder();
     Iterator<? extends IOperation> iterator = operations.iterator();
-
-    IOperation op = iterator.next();
-    boolean mustAppendDelimiter = append(op, nameBuilder);
+    appendName(iterator.next(), nameBuilder);
     while (iterator.hasNext()) {
-      op = iterator.next();
-      if (mustAppendDelimiter) {
-        nameBuilder.append(", ");
-      }
-      mustAppendDelimiter = append(op, nameBuilder);
+      nameBuilder.append(", ");
+      appendName(iterator.next(), nameBuilder);
     }
     return nameBuilder.toString();
   }
 
-  private static boolean append(IOperation opToAppend, StringBuilder nameBuilder) {
-    if (opToAppend == null) {
-      return false;
-    }
-
-    String itOpName = opToAppend.getOperationName();
+  protected static void appendName(IOperation op, StringBuilder nameBuilder) {
+    String itOpName = op.getOperationName();
     if (StringUtils.isBlank(itOpName)) {
-      SdkLog.warning("operation '{}' does not have a name.", opToAppend.getClass().getName());
+      SdkLog.warning("operation '{}' does not have a name.", op.getClass().getName());
       itOpName = "Missing operation name.";
     }
     nameBuilder.append(itOpName);
-    return true;
   }
 
   @Override
