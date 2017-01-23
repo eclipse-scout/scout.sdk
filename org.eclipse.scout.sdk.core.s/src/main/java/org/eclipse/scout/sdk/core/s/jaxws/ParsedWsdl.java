@@ -34,6 +34,7 @@ import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.ElementExtensible;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
@@ -208,8 +209,7 @@ public class ParsedWsdl {
     for (Service service : m_services.keySet()) {
       Map<String, Port> ports = service.getPorts();
       for (Port port : ports.values()) {
-        List<ExtensibilityElement> elements = port.getExtensibilityElements();
-        for (ExtensibilityElement element : elements) {
+        for (ExtensibilityElement element : extensibilityElementsOf(port)) {
           if (element instanceof SOAPAddress) {
             Binding binding = port.getBinding();
             if (isBindingSupported(binding)) {
@@ -305,16 +305,15 @@ public class ParsedWsdl {
     }
 
     for (BindingOperation op : ops) {
-      List<ExtensibilityElement> opElements = op.getExtensibilityElements();
-      List<ExtensibilityElement> outputElements = op.getBindingOutput().getExtensibilityElements();
-      List<ExtensibilityElement> inputElements = op.getBindingInput().getExtensibilityElements();
+      List<ExtensibilityElement> opElements = extensibilityElementsOf(op);
+      List<ExtensibilityElement> outputElements = extensibilityElementsOf(op.getBindingOutput());
+      List<ExtensibilityElement> inputElements = extensibilityElementsOf(op.getBindingInput());
 
-      List<ExtensibilityElement> elements = new ArrayList<>(opElements.size() + outputElements.size() + inputElements.size());
-      elements.addAll(opElements);
-      elements.addAll(outputElements);
-      elements.addAll(inputElements);
-
-      for (ExtensibilityElement element : elements) {
+      List<ExtensibilityElement> all = new ArrayList<>(opElements.size() + outputElements.size() + inputElements.size());
+      all.addAll(opElements);
+      all.addAll(outputElements);
+      all.addAll(inputElements);
+      for (ExtensibilityElement element : all) {
         // encoded is not supported in JAX WS 2.0
         if (element instanceof SOAPBody && "encoded".equalsIgnoreCase(((SOAPBody) element).getUse())) {
           return false;
@@ -322,6 +321,14 @@ public class ParsedWsdl {
       }
     }
     return true;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected static List<ExtensibilityElement> extensibilityElementsOf(ElementExtensible e) {
+    if (e == null) {
+      return Collections.emptyList();
+    }
+    return e.getExtensibilityElements();
   }
 
   @SuppressWarnings("unchecked")
@@ -358,8 +365,7 @@ public class ParsedWsdl {
       return;
     }
 
-    List<ExtensibilityElement> elements = types.getExtensibilityElements();
-    for (ExtensibilityElement e : elements) {
+    for (ExtensibilityElement e : extensibilityElementsOf(types)) {
       if (e instanceof Schema) {
         parseSchemasRec((Schema) e, rootDefUri, relPath, collector);
       }
