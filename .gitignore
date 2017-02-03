@@ -22,4 +22,8 @@ target/
 /.settings
 /.project
 
+# IDEA #
+*.iml
+/.idea
+
 org.eclipse.scout.sdk.s2e*/META-INF/MANIFEST.MF

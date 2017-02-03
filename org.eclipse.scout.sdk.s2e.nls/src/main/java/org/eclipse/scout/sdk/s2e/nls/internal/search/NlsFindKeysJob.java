@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -45,24 +46,28 @@ public class NlsFindKeysJob extends AbstractJob {
   private final Map<String, List<Match>> m_matches;
 
   public NlsFindKeysJob(String nlsKey, String jobTitle) {
-    super(jobTitle);
-    m_searchKeys = new ArrayList<>(1);
-    m_searchKeys.add("\"" + nlsKey + "\"");
-    m_matches = new HashMap<>(m_searchKeys.size());
+    this(Collections.singletonList(nlsKey), jobTitle);
   }
 
-  /**
-   * @param name
-   */
   public NlsFindKeysJob(INlsProject project, String jobTitle) {
+    this(getLocalKeys(project), jobTitle);
+  }
+
+  protected NlsFindKeysJob(List<String> searchKeys, String jobTitle) {
     super(jobTitle);
-    m_searchKeys = new ArrayList<>();
-    for (INlsEntry e : project.getAllEntries()) {
-      if (e.getType() == INlsEntry.TYPE_LOCAL) {
-        m_searchKeys.add("\"" + e.getKey() + "\"");
-      }
+    m_searchKeys = new ArrayList<>(searchKeys.size() * 2);
+    for (String key : searchKeys) {
+      m_searchKeys.add("\"" + key + "\"");
+      m_searchKeys.add('\'' + key + '\''); // e.g. for search in .js files
     }
-    m_matches = new HashMap<>(m_searchKeys.size());
+    m_matches = new HashMap<>();
+  }
+
+  protected static List<String> getLocalKeys(INlsProject project) {
+    return project.getAllEntries().stream()
+        .filter(entry -> entry.getType() == INlsEntry.TYPE_LOCAL)
+        .map(INlsEntry::getKey)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -106,12 +111,7 @@ public class NlsFindKeysJob extends AbstractJob {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-              Path path = file.getFileName();
-              if (path == null) {
-                return FileVisitResult.CONTINUE;
-              }
-              String fileName = path.toString().toLowerCase();
-              if (attrs.isRegularFile() && (fileName.endsWith(SuffixConstants.SUFFIX_STRING_java) || fileName.endsWith(".html"))) {
+              if (isInterestingFile(file, attrs)) {
                 searchInFile(file, charset, monitor);
               }
               if (monitor.isCanceled()) {
@@ -126,8 +126,25 @@ public class NlsFindKeysJob extends AbstractJob {
     }
   }
 
+  protected boolean isInterestingFile(Path file, BasicFileAttributes attrs) {
+    if (!attrs.isRegularFile()) {
+      return false;
+    }
+    Path path = file.getFileName();
+    if (path == null) {
+      return false;
+    }
+    String fileName = path.toString().toLowerCase();
+    String[] interestingFileExtensions = {SuffixConstants.SUFFIX_STRING_java, ".js", ".html", ".less", ".json", ".xml", ".sql", ".css", ".svg", ".txt", ".jsp"};
+    for (String extension : interestingFileExtensions) {
+      if (fileName.endsWith(extension)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   protected void searchInFile(Path file, String charset, IProgressMonitor monitor) throws IOException {
-    String content = new String(Files.readAllBytes(file), charset);
     IFile[] workspaceFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toUri());
     if (workspaceFiles.length < 1) {
       return;
@@ -137,6 +154,7 @@ public class NlsFindKeysJob extends AbstractJob {
       return;
     }
 
+    String content = new String(Files.readAllBytes(file), charset);
     for (String search : m_searchKeys) {
       int pos = 0;
       int index = -1;
@@ -146,7 +164,7 @@ public class NlsFindKeysJob extends AbstractJob {
         }
 
         Match match = new Match(workspaceFile, index, search.length());
-        String key = search.substring(1, search.length() - 1); // remove starting and ending double quotes
+        String key = search.substring(1, search.length() - 1); // remove starting and ending quotes
         acceptNlsKeyMatch(key, match);
         pos = index + search.length();
       }
@@ -154,12 +172,9 @@ public class NlsFindKeysJob extends AbstractJob {
   }
 
   protected void acceptNlsKeyMatch(String nlsKey, Match match) {
-    List<Match> list = m_matches.get(nlsKey);
-    if (list == null) {
-      list = new ArrayList<>();
-      m_matches.put(nlsKey, list);
-    }
-    list.add(match);
+    m_matches
+        .computeIfAbsent(nlsKey, key -> new ArrayList<>())
+        .add(match);
   }
 
   public List<Match> getMatches(String nlsKey) {

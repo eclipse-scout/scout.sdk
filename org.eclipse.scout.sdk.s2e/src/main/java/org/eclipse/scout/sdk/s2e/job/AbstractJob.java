@@ -85,6 +85,11 @@ public abstract class AbstractJob extends Job {
 
   protected String getCallerStackTrace() {
     int numElementsToRemove = 4;
+    if (m_callerTrace == null || m_callerTrace.length <= numElementsToRemove) {
+      // can happen if run() is called directly without scheduling over job manager.
+      m_callerTrace = Thread.currentThread().getStackTrace();
+      numElementsToRemove = 3;
+    }
     StackTraceElement[] cleaned = new StackTraceElement[m_callerTrace.length - numElementsToRemove];
     System.arraycopy(m_callerTrace, numElementsToRemove, cleaned, 0, cleaned.length);
 
