@@ -69,7 +69,7 @@
         Name
        </dt> 
        <dd> 
-        <p>The name of the page class. According to Scout conventions the class name ends with the suffix <code>Page</code>.</p> 
+        <p>The name of the page class. According to Scout conventions the class name ends with the suffix <code>TablePage</code> (for subclasses of <code>AbstractPageWithTable</code>) or <code>NodePage</code> (for <code>AbstractPageWithNodes</code>).</p> 
        </dd> 
        <dt class="hdlist1">
         Super Class
@@ -102,14 +102,14 @@
        <li> <p>In Maven module <strong>helloworld.client</strong></p> 
         <div class="ulist"> 
          <ul> 
-          <li> <p>The <code>MyPage</code> page class in folder <code>src/main/java</code> and package <code>org.eclipse.scout.apps.helloworld.client.helloworld</code></p> </li> 
+          <li> <p>The <code>MyTablePage</code> page class in folder <code>src/main/java</code> and package <code>org.eclipse.scout.apps.helloworld.client.helloworld</code></p> </li> 
          </ul> 
         </div> </li> 
        <li> <p>In Maven module <strong>helloworld.shared</strong></p> 
         <div class="ulist"> 
          <ul> 
           <li> <p>The <code>IMyService</code> service interface in folder <code>src/main/java</code> and package <code>org.eclipse.scout.apps.helloworld.shared.helloworld</code></p> </li> 
-          <li> <p><code>MyPageData</code> page data class in folder <code>src/generated/java</code> and package <code>org.eclipse.scout.apps.helloworld.shared.helloworld</code></p> </li> 
+          <li> <p><code>MyTablePageData</code> page data class in folder <code>src/generated/java</code> and package <code>org.eclipse.scout.apps.helloworld.shared.helloworld</code></p> </li> 
          </ul> 
         </div> </li> 
        <li> <p>In Maven module <strong>helloworld.server</strong></p> 
@@ -145,7 +145,7 @@
   <div id="footer"> 
    <div id="footer-text">
      Version 6.0
-    <br /> Last updated 2016-07-13 02:33:13 CEST 
+    <br /> Last updated 2017-01-23 11:56:29 CET 
    </div> 
   </div>  
  </body>
