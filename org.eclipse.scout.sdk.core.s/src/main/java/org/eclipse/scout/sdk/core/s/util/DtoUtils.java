@@ -128,8 +128,8 @@ public final class DtoUtils {
       return null;
     }
 
-    if (modelType.isInstanceOf(IScoutRuntimeTypes.IForm)) {
-      // model type is a form and we have a corresponding DTO type (a form data).
+    if (modelType.declaringType() == null) {
+      // model type is a primary type (form, template) and we have a corresponding DTO type.
       return primaryType;
     }
 
@@ -140,12 +140,7 @@ public final class DtoUtils {
     }
 
     // search field data within form data
-    IType fieldData = primaryType.innerTypes().withRecursiveInnerTypes(true).withSimpleName(formDataName).first();
-    if (fieldData != null) {
-      return fieldData;
-    }
-
-    return primaryType; // if it is a template the primary type itself is the FormData type.
+    return primaryType.innerTypes().withRecursiveInnerTypes(true).withSimpleName(formDataName).first();
   }
 
   /**
