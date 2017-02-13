@@ -30,7 +30,7 @@
 			<topic href="html/sdk_editor_nls.html#accessing-the-nls-editor" label="Accessing the NLS Editor"></topic>
 			<topic href="html/sdk_editor_nls.html#the-nls-editor" label="The NLS Editor"></topic>
 			<topic href="html/sdk_editor_nls.html#action-buttons" label="Action Buttons"></topic>
-			<topic href="html/sdk_editor_nls.html#default-mapping-to-property-files" label="Default Mapping to Property Files"></topic>
+			<topic href="html/sdk_editor_nls.html#default-mapping-to-properties-files" label="Default Mapping to Properties Files"></topic>
 		</topic>
 		<topic href="html/sdk_wizard.html" label="Scout Wizards">
 			<topic href="html/sdk_wizard.html#new-project-wizard" label="New Project Wizard"></topic>
