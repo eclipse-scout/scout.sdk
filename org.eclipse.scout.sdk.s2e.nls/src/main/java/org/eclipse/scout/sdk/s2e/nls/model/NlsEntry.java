@@ -126,6 +126,17 @@ public class NlsEntry implements INlsEntry {
   }
 
   @Override
+  public void resetAllToDefaultTranslation() {
+    String defaultText = m_translations.get(Language.LANGUAGE_DEFAULT);
+    if (defaultText == null) {
+      return;
+    }
+    for (Entry<Language, String> e : m_translations.entrySet()) {
+      e.setValue(defaultText);
+    }
+  }
+
+  @Override
   public Map<Language, String> getAllTranslations() {
     try {
       m_lock.readLock().lock();

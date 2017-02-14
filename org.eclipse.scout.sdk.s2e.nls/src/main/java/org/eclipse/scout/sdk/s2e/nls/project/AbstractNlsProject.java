@@ -141,6 +141,7 @@ public abstract class AbstractNlsProject implements INlsProject {
                 // the key exists in a parent project and here -> change the type from inherited to local
                 entries.remove(key);
                 nlsEntry = new NlsEntry(nlsEntry);
+                nlsEntry.resetAllToDefaultTranslation();
                 entries.put(key, nlsEntry);
               }
 

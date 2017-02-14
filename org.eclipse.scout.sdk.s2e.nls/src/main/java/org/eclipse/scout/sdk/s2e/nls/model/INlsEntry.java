@@ -76,4 +76,13 @@ public interface INlsEntry {
    */
   Map<Language, String> getAllTranslations();
 
+  /**
+   * Resets all translations of this entry to the text of the default language.
+   * <p>
+   * This may be useful on overwritten entries (inherited but also present in current {@link INlsProject}) because in
+   * the Scout RT the default text is used if a text provider service provides a default language but no specific one
+   * even though a child text service would have one.
+   */
+  void resetAllToDefaultTranslation();
+
 }
