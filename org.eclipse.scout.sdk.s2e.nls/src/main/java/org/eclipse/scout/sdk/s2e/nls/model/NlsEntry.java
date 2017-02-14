@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -39,14 +40,14 @@ public class NlsEntry implements INlsEntry {
   }
 
   public NlsEntry(INlsEntry row, INlsProject project) {
-    m_lock = new ReentrantReadWriteLock(true);
+    m_lock = new ReentrantReadWriteLock();
     m_project = project;
     m_translations = new HashMap<>();
     update(row);
   }
 
   public NlsEntry(String key, INlsProject project) {
-    m_lock = new ReentrantReadWriteLock(true);
+    m_lock = new ReentrantReadWriteLock();
     m_translations = new HashMap<>();
     m_project = project;
     m_key = key;
@@ -126,21 +127,10 @@ public class NlsEntry implements INlsEntry {
   }
 
   @Override
-  public void resetAllToDefaultTranslation() {
-    String defaultText = m_translations.get(Language.LANGUAGE_DEFAULT);
-    if (defaultText == null) {
-      return;
-    }
-    for (Entry<Language, String> e : m_translations.entrySet()) {
-      e.setValue(defaultText);
-    }
-  }
-
-  @Override
   public Map<Language, String> getAllTranslations() {
     try {
       m_lock.readLock().lock();
-      return new HashMap<>(m_translations);
+      return Collections.unmodifiableMap(m_translations);
     }
     finally {
       m_lock.readLock().unlock();
