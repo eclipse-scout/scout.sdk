@@ -140,12 +140,7 @@ public final class DtoUtils {
     }
 
     // search field data within form data
-    IType fieldData = primaryType.innerTypes().withRecursiveInnerTypes(true).withSimpleName(formDataName).first();
-    if (fieldData != null) {
-      return fieldData;
-    }
-
-    return primaryType; // if it is a template the primary type itself is the FormData type.
+    return primaryType.innerTypes().withRecursiveInnerTypes(true).withSimpleName(formDataName).first();
   }
 
   /**
