@@ -582,26 +582,8 @@ public final class S2eUtils {
    * @return <code>true</code> if element was found in the classpath of project, <code>false</code> otherwise.
    */
   public static boolean isOnClasspath(IJavaElement element, IJavaProject project) {
-    if (!exists(element)) {
+    if (!exists(element) || !exists(project)) {
       return false;
-    }
-    if (!exists(project)) {
-      return false;
-    }
-
-    if (element instanceof IMember) {
-      IMember member = (IMember) element;
-      if (member.isBinary()) {
-        return project.isOnClasspath(member);
-      }
-    }
-
-    IJavaProject elemenProject = element.getJavaProject();
-    if (elemenProject != null) {
-      if (project.equals(elemenProject)) {
-        return true;
-      }
-      return project.isOnClasspath(elemenProject);
     }
     return project.isOnClasspath(element);
   }
