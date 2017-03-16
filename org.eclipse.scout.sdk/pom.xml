@@ -94,13 +94,13 @@
     <org.eclipse.equinox.common-maven>${org.eclipse.equinox.common}</org.eclipse.equinox.common-maven>
     <org.eclipse.equinox.common-range>[3.8.0,3.8.1)</org.eclipse.equinox.common-range>
 
-    <org.eclipse.equinox.registry>3.7.000.v20160223-2218</org.eclipse.equinox.registry>
+    <org.eclipse.equinox.registry>3.6.100.v20160223-2218</org.eclipse.equinox.registry>
     <org.eclipse.equinox.registry-maven>${org.eclipse.equinox.registry}</org.eclipse.equinox.registry-maven>
-    <org.eclipse.equinox.registry-range>[3.7.000,3.7.001)</org.eclipse.equinox.registry-range>
+    <org.eclipse.equinox.registry-range>[3.6.100,3.6.101)</org.eclipse.equinox.registry-range>
 
     <org.eclipse.equinox.preferences>3.6.0.v20160120-1756</org.eclipse.equinox.preferences>
     <org.eclipse.equinox.preferences-maven>${org.eclipse.equinox.preferences}</org.eclipse.equinox.preferences-maven>
-    <org.eclipse.equinox.preferences-range>[3.6.0,3.7.0)</org.eclipse.equinox.preferences-range>
+    <org.eclipse.equinox.preferences-range>[3.6.0,3.6.1)</org.eclipse.equinox.preferences-range>
 
     <org.eclipse.equinox.security>1.2.200.v20150715-1528</org.eclipse.equinox.security>
     <org.eclipse.equinox.security-maven>${org.eclipse.equinox.security}</org.eclipse.equinox.security-maven>
@@ -108,7 +108,7 @@
 
     <org.eclipse.compare>3.6.0.v20160418-1534</org.eclipse.compare>
     <org.eclipse.compare-maven>${org.eclipse.compare}</org.eclipse.compare-maven>
-    <org.eclipse.compare-range>[3.6.0,3.7.0)</org.eclipse.compare-range>
+    <org.eclipse.compare-range>[3.6.0,3.6.1)</org.eclipse.compare-range>
 
     <org.eclipse.core.resources>3.11.0.v20160503-1608</org.eclipse.core.resources>
     <org.eclipse.core.resources-maven>${org.eclipse.core.resources}</org.eclipse.core.resources-maven>
@@ -128,7 +128,7 @@
 
     <org.eclipse.core.filesystem>1.6.0.v20160503-1608</org.eclipse.core.filesystem>
     <org.eclipse.core.filesystem-maven>${org.eclipse.core.filesystem}</org.eclipse.core.filesystem-maven>
-    <org.eclipse.core.filesystem-range>[1.6.0,1.7.0)</org.eclipse.core.filesystem-range>
+    <org.eclipse.core.filesystem-range>[1.6.0,1.6.1)</org.eclipse.core.filesystem-range>
 
     <org.eclipse.core.variables>3.3.0.v20160419-1720</org.eclipse.core.variables>
     <org.eclipse.core.variables-maven>${org.eclipse.core.variables}</org.eclipse.core.variables-maven>
@@ -152,7 +152,7 @@
 
     <org.eclipse.text>3.6.0.v20160503-1849</org.eclipse.text>
     <org.eclipse.text-maven>${org.eclipse.text}</org.eclipse.text-maven>
-    <org.eclipse.text-range>[3.6.0,3.7.0)</org.eclipse.text-range>
+    <org.eclipse.text-range>[3.6.0,3.6.1)</org.eclipse.text-range>
 
     <org.eclipse.search>3.11.0.v20160519-1501</org.eclipse.search>
     <org.eclipse.search-maven>${org.eclipse.search}</org.eclipse.search-maven>
