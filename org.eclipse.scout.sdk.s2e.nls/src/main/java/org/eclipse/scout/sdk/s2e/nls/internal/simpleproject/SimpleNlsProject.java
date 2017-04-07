@@ -56,8 +56,8 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.swt.widgets.Shell;
 
 public class SimpleNlsProject extends AbstractNlsProject {
-  private NlsType m_nlsClass;
-  private PropertyChangeListener m_nlsClassPropertyListener;
+  private final NlsType m_nlsClass;
+  private final PropertyChangeListener m_nlsClassPropertyListener;
 
   public SimpleNlsProject(NlsType type) {
     super(type.getType());
@@ -297,4 +297,9 @@ public class SimpleNlsProject extends AbstractNlsProject {
       }
     }
   } // end class P_NlsClassPropertyChangeListener
+
+  @Override
+  public String toString() {
+    return "TextProviderService '" + m_nlsClass.getType().getFullyQualifiedName() + "'";
+  }
 }

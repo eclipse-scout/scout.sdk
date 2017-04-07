@@ -54,13 +54,15 @@ public class NlsEntryNewDialog extends AbstractNlsEntryDialog {
     getKeyField().addValidationListener(m_validationListener);
 
     TextField<String> defaultField = getDefaultTranslationField();
-    defaultField.setInputValidator(InputValidator.getDefaultTranslationValidator());
-    defaultField.addValidationListener(new IValidationListener() {
-      @Override
-      public void validationChanged(IStatus valid) {
-        revalidate();
-      }
-    });
+    if (defaultField != null) {
+      defaultField.setInputValidator(InputValidator.getDefaultTranslationValidator());
+      defaultField.addValidationListener(new IValidationListener() {
+        @Override
+        public void validationChanged(IStatus valid) {
+          revalidate();
+        }
+      });
+    }
 
     revalidate();
   }
@@ -69,7 +71,10 @@ public class NlsEntryNewDialog extends AbstractNlsEntryDialog {
   protected void revalidate() {
     MultiStatus status = new MultiStatus(NlsCore.PLUGIN_ID, -1, "multi status", null);
     status.add(getKeyField().getStatus());
-    status.add(getDefaultTranslationField().getStatus());
+    TextField<String> defaultTranslationField = getDefaultTranslationField();
+    if (defaultTranslationField != null) {
+      status.add(defaultTranslationField.getStatus());
+    }
     IStatus highestSeverity = NlsCore.getHighestSeverityStatus(status);
     if (highestSeverity.isOK()) {
       setMessage("Create a new Translation entry.");

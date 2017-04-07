@@ -96,7 +96,7 @@ public abstract class AbstractNlsProject implements INlsProject {
   }
 
   /**
-   * Provides all languages supported by this project and all its ancestors.
+   * Provides all languages supported by this project.
    *
    * @return a sorted list of all supported languages
    */
@@ -540,9 +540,17 @@ public abstract class AbstractNlsProject implements INlsProject {
           addTranslationResource(r);
         }
       }
+
+      // validate configuration
+      if (m_resourceProvider.getAllLanguages().isEmpty()) {
+        SdkLog.warning("NLS Project [{}] contains no translation resources! Check configuration.", this);
+      }
+      else if (!m_resourceProvider.containsResource(Language.LANGUAGE_DEFAULT)) {
+        SdkLog.warning("NLS Project [{}] does not contain a default language translation!", this);
+      }
     }
     catch (CoreException e) {
-      SdkLog.error("could not load translation property resources.", e);
+      SdkLog.error("could not load translation resources.", e);
     }
   }
 

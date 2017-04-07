@@ -111,7 +111,11 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     postCreate();
 
     getButton(IDialogConstants.OK_ID).setText("&Ok");
-    getDefaultTranslationField().setFocus();
+    TextField<String> defaultTranslationField = getDefaultTranslationField();
+    if (defaultTranslationField != null) {
+      defaultTranslationField.setFocus();
+    }
+    contents.setEnabled(!getNlsProject().getAllLanguages().isEmpty());
 
     // as defined in IScoutHelpContextIds.SCOUT_ENTRY_WIZARD_PAGE
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, "org.eclipse.scout.sdk.s2e.ui.scout_wizard_nls-entry_page_context");
