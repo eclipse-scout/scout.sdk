@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.testing.mock;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -49,7 +48,7 @@ import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -87,7 +86,7 @@ public class PlatformMockFactory {
   protected void initMock(final IType element) {
     ITypeHierarchy hierarchy = createMock(ITypeHierarchy.class);
     try {
-      when(element.newSupertypeHierarchy(any(IProgressMonitor.class))).thenReturn(hierarchy);
+      when(element.newSupertypeHierarchy(ArgumentMatchers.any())).thenReturn(hierarchy);
     }
     catch (JavaModelException e) {
       throw new SdkException(e);
@@ -124,11 +123,11 @@ public class PlatformMockFactory {
           if (compilationUnit == null) {
             return null;
           }
-          InputStream inputStream = invocation.getArgumentAt(0, InputStream.class);
+          InputStream inputStream = invocation.getArgument(0);
           compilationUnit.getBuffer().setContents(CoreUtils.inputStreamToString(inputStream, r.getCharset()).toString());
           return null;
         }
-      }).when(r).setContents(any(InputStream.class), Matchers.anyInt(), any(IProgressMonitor.class));
+      }).when(r).setContents(ArgumentMatchers.<InputStream> any(), ArgumentMatchers.anyInt(), ArgumentMatchers.<IProgressMonitor> any());
     }
     catch (CoreException e) {
       throw new SdkException(e);
@@ -157,14 +156,14 @@ public class PlatformMockFactory {
   }
 
   protected void initMock(IJavaEnvironmentProvider element) {
-    Mockito.when(element.get(any(IJavaProject.class))).thenReturn(getJavaEnvironment());
+    Mockito.when(element.get(ArgumentMatchers.any())).thenReturn(getJavaEnvironment());
   }
 
   protected void initMock(IPackageFragmentRoot element) {
     IPath sourceFolderPath = createMock(IPath.class);
     IPackageFragment pck = createMock(IPackageFragment.class);
     when(element.getPath()).thenReturn(sourceFolderPath);
-    when(element.getPackageFragment(Matchers.anyString())).thenReturn(pck);
+    when(element.getPackageFragment(ArgumentMatchers.any())).thenReturn(pck);
     initJavaElementMock(element);
   }
 
@@ -173,11 +172,11 @@ public class PlatformMockFactory {
   }
 
   protected void initMock(IPackageFragment element) {
-    when(element.getCompilationUnit(Matchers.anyString())).then(new Answer<ICompilationUnit>() {
+    when(element.getCompilationUnit(ArgumentMatchers.any())).then(new Answer<ICompilationUnit>() {
       @Override
       public ICompilationUnit answer(InvocationOnMock invocation) throws Throwable {
         ICompilationUnit icu = createMock(ICompilationUnit.class);
-        when(icu.getElementName()).thenReturn(invocation.getArgumentAt(0, String.class));
+        when(icu.getElementName()).thenReturn(invocation.getArgument(0));
         return icu;
       }
     });
@@ -218,7 +217,7 @@ public class PlatformMockFactory {
       }
     });
     when(primaryType.getCompilationUnit()).thenReturn(element);
-    when(element.getType(Matchers.anyString())).thenReturn(primaryType);
+    when(element.getType(ArgumentMatchers.any())).thenReturn(primaryType);
     initJavaElementMock(element);
   }
 
@@ -227,7 +226,7 @@ public class PlatformMockFactory {
     doAnswer(new Answer<Void>() {
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
-        String content = invocation.getArgumentAt(0, String.class);
+        String content = invocation.getArgument(0);
         builder.delete(0, builder.length());
         builder.append(content);
 
@@ -240,14 +239,14 @@ public class PlatformMockFactory {
         }
         return null;
       }
-    }).when(element).setContents(Matchers.anyString());
+    }).when(element).setContents(ArgumentMatchers.<String> any());
     doAnswer(new Answer<Character>() {
       @Override
       public Character answer(InvocationOnMock invocation) throws Throwable {
-        int index = invocation.getArgumentAt(0, int.class);
+        int index = invocation.getArgument(0);
         return builder.charAt(index);
       }
-    }).when(element).getChar(Matchers.anyInt());
+    }).when(element).getChar(ArgumentMatchers.anyInt());
     doAnswer(new Answer<char[]>() {
       @Override
       public char[] answer(InvocationOnMock invocation) throws Throwable {

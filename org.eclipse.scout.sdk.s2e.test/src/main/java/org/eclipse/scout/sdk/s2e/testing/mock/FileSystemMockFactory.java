@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.testing.mock;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,7 +53,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -98,7 +98,7 @@ public class FileSystemMockFactory {
     when(type.getAncestor(anyInt())).then(new Answer<IJavaElement>() {
       @Override
       public IJavaElement answer(InvocationOnMock invocation) throws Throwable {
-        int kind = invocation.getArgumentAt(0, Integer.class).intValue();
+        int kind = invocation.getArgument(0);
         switch (kind) {
           case IJavaElement.PACKAGE_FRAGMENT_ROOT:
             int numPackageNames = StringUtils.countMatches(type.getFullyQualifiedName(), ".") + 1;
@@ -183,7 +183,7 @@ public class FileSystemMockFactory {
     doAnswer(new Answer<Void>() {
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
-        String newContent = invocation.getArgumentAt(0, String.class);
+        String newContent = invocation.getArgument(0);
         Files.write(location.toPath(), newContent.getBytes(StandardCharsets.UTF_8));
         return null;
       }
@@ -197,7 +197,7 @@ public class FileSystemMockFactory {
     when(p.getCompilationUnit(anyString())).thenAnswer(new Answer<ICompilationUnit>() {
       @Override
       public ICompilationUnit answer(InvocationOnMock invocation) throws Throwable {
-        String fileName = invocation.getArgumentAt(0, String.class);
+        String fileName = invocation.getArgument(0);
         return createCompilationUnit(new File(location, fileName), owner);
       }
     });
@@ -211,9 +211,9 @@ public class FileSystemMockFactory {
       when(p.createCompilationUnit(anyString(), anyString(), anyBoolean(), any(IProgressMonitor.class))).thenAnswer(new Answer<ICompilationUnit>() {
         @Override
         public ICompilationUnit answer(InvocationOnMock invocation) throws Throwable {
-          String fileName = invocation.getArgumentAt(0, String.class);
+          String fileName = invocation.getArgument(0);
           ICompilationUnit result = p.getCompilationUnit(fileName);
-          String content = invocation.getArgumentAt(1, String.class);
+          String content = invocation.getArgument(1);
           Files.write(result.getResource().getLocation().toFile().toPath(), content.getBytes(StandardCharsets.UTF_8));
           return result;
         }
@@ -239,7 +239,7 @@ public class FileSystemMockFactory {
     when(p.getPackageFragment(anyString())).thenAnswer(new Answer<IPackageFragment>() {
       @Override
       public IPackageFragment answer(InvocationOnMock invocation) throws Throwable {
-        String pck = invocation.getArgumentAt(0, String.class).replace('.', File.separatorChar);
+        String pck = invocation.<String> getArgument(0).replace('.', File.separatorChar);
         File pckLocation = new File(location, pck);
         return createPackageFragment(pckLocation, owner);
       }
@@ -259,7 +259,7 @@ public class FileSystemMockFactory {
       doAnswer(new Answer<IPackageFragment>() {
         @Override
         public IPackageFragment answer(InvocationOnMock invocation) throws Throwable {
-          IPackageFragment fragment = p.getPackageFragment(invocation.getArgumentAt(0, String.class));
+          IPackageFragment fragment = p.getPackageFragment(invocation.getArgument(0));
           Files.createDirectories(fragment.getResource().getLocation().toFile().toPath());
           return fragment;
         }
@@ -283,13 +283,13 @@ public class FileSystemMockFactory {
     when(p.getFolder(anyString())).thenAnswer(new Answer<IFolder>() {
       @Override
       public IFolder answer(InvocationOnMock invocation) throws Throwable {
-        return createFolder(new File(location, invocation.getArgumentAt(0, String.class)), p);
+        return createFolder(new File(location, invocation.getArgument(0)), p);
       }
     });
     when(p.getFile(anyString())).then(new Answer<IFile>() {
       @Override
       public IFile answer(InvocationOnMock invocation) throws Throwable {
-        return createFile(new File(location, invocation.getArgumentAt(0, String.class)), p);
+        return createFile(new File(location, invocation.getArgument(0)), p);
       }
     });
     return p;
@@ -300,14 +300,14 @@ public class FileSystemMockFactory {
     when(f.getFile(anyString())).then(new Answer<IFile>() {
       @Override
       public IFile answer(InvocationOnMock invocation) throws Throwable {
-        return createFile(new File(location, invocation.getArgumentAt(0, String.class)), p);
+        return createFile(new File(location, invocation.getArgument(0)), p);
       }
     });
     fillIResourceMock(f, p, location, IResource.FOLDER);
     when(f.getFolder(anyString())).then(new Answer<IFolder>() {
       @Override
       public IFolder answer(InvocationOnMock invocation) throws Throwable {
-        return createFolder(new File(location, invocation.getArgumentAt(0, String.class)), p);
+        return createFolder(new File(location, invocation.getArgument(0)), p);
       }
     });
 
@@ -356,7 +356,7 @@ public class FileSystemMockFactory {
         @Override
         @SuppressWarnings("resource")
         public Void answer(InvocationOnMock invocation) throws Throwable {
-          InputStream in = invocation.getArgumentAt(0, InputStream.class);
+          InputStream in = invocation.getArgument(0);
           StringBuilder content = CoreUtils.inputStreamToString(in, StandardCharsets.UTF_8);
           Files.write(location.toPath(), content.toString().getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
           return null;
@@ -371,8 +371,8 @@ public class FileSystemMockFactory {
         @Override
         @SuppressWarnings("resource")
         public Void answer(InvocationOnMock invocation) throws Throwable {
-          InputStream in = invocation.getArgumentAt(0, InputStream.class);
-          f.create(in, invocation.getArgumentAt(1, Boolean.class).booleanValue(), invocation.getArgumentAt(3, IProgressMonitor.class));
+          InputStream in = invocation.getArgument(0);
+          f.create(in, invocation.<Boolean> getArgument(1), invocation.getArgument(3));
           return null;
         }
       }).when(f).setContents(any(InputStream.class), anyBoolean(), anyBoolean(), any(IProgressMonitor.class));
@@ -392,10 +392,10 @@ public class FileSystemMockFactory {
         return location;
       }
     });
-    when(p.removeFirstSegments(Matchers.anyInt())).then(new Answer<IPath>() {
+    when(p.removeFirstSegments(ArgumentMatchers.anyInt())).then(new Answer<IPath>() {
       @Override
       public IPath answer(InvocationOnMock invocation) throws Throwable {
-        int num = invocation.getArgumentAt(0, Integer.class).intValue();
+        int num = invocation.getArgument(0);
         Path path = location.toPath();
         return createPath(path.subpath(num, path.getNameCount()).toFile());
       }
@@ -413,7 +413,7 @@ public class FileSystemMockFactory {
     doAnswer(new Answer<IPath>() {
       @Override
       public IPath answer(InvocationOnMock invocation) throws Throwable {
-        File base = invocation.getArgumentAt(0, IPath.class).toFile();
+        File base = invocation.<IPath> getArgument(0).toFile();
         File relPath = base.toPath().relativize(location.toPath()).toFile();
         return createPath(relPath);
       }

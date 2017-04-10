@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 /**
@@ -31,8 +31,8 @@ public class ResourceBlockingOperationJobTest {
   public void testGetJobName() {
     String MISSING_OP_NAME = "Missing operation name.";
     IResource resource = Mockito.mock(IResource.class);
-    Mockito.when(resource.contains(Matchers.same(resource))).thenReturn(Boolean.TRUE);
-    Mockito.when(resource.isConflicting(Matchers.same(resource))).thenReturn(Boolean.TRUE);
+    Mockito.when(resource.contains(ArgumentMatchers.same(resource))).thenReturn(Boolean.TRUE);
+    Mockito.when(resource.isConflicting(ArgumentMatchers.same(resource))).thenReturn(Boolean.TRUE);
 
     Assert.assertEquals(MISSING_OP_NAME, new ResourceBlockingOperationJob(getOperations(""), resource).getName());
     Assert.assertEquals("", new ResourceBlockingOperationJob(getOperations(), resource).getName());

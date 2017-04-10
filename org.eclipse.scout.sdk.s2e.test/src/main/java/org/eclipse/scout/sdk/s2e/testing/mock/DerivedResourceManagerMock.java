@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.testing.mock;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
@@ -50,7 +50,7 @@ public class DerivedResourceManagerMock {
     doAnswer(new Answer<Void>() {
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
-        Set<IResource> resources = invocation.getArgumentAt(0, Set.class);
+        Set<IResource> resources = invocation.getArgument(0);
         trigger(resources);
         return null;
       }
