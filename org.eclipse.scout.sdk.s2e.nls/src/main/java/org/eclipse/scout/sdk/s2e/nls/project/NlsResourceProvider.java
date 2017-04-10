@@ -116,6 +116,6 @@ public class NlsResourceProvider {
    * @return
    */
   public List<Language> getAllLanguages() {
-    return new ArrayList<>(m_languagesOrdered);
+    return Collections.unmodifiableList(m_languagesOrdered);
   }
 }
