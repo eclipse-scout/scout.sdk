@@ -1421,7 +1421,7 @@ public final class S2eUtils {
           return false;
         }
         try {
-          return candidate.isClass();
+          return candidate.isClass() && !Flags.isAbstract(candidate.getFlags());
         }
         catch (JavaModelException e) {
           throw new SdkException("Unable to check for flags in type '" + candidate.getFullyQualifiedName() + "'.", e);
@@ -1446,7 +1446,25 @@ public final class S2eUtils {
     if (sessions.isEmpty()) {
       return null;
     }
-    return sessions.iterator().next();
+    else if (sessions.size() == 1) {
+      return sessions.iterator().next();
+    }
+    else {
+      return findMostSpecific(sessions);
+    }
+  }
+
+  private static IType findMostSpecific(Collection<IType> candidates) throws JavaModelException {
+    ITypeHierarchy superHierarchy = null;
+    for (IType t : candidates) {
+      if (superHierarchy == null || !superHierarchy.contains(t)) {
+        superHierarchy = t.newSupertypeHierarchy(null);
+      }
+    }
+    if (superHierarchy == null) {
+      return null;
+    }
+    return superHierarchy.getType();
   }
 
   /**
