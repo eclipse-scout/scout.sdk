@@ -219,8 +219,7 @@ public class FormNewOperation implements IOperation {
 
       protected void appendMockSource(String varName, String methodToMock, StringBuilder source, IImportValidator validator) {
         source.append(validator.useName(IScoutRuntimeTypes.Mockito)).append(".when(").append(mockVarName).append('.').append(methodToMock).append('(')
-            .append(validator.useName(IScoutRuntimeTypes.Matchers)).append(".any(")
-            .append(validator.useName(getCreatedFormData().getFullyQualifiedName())).append(SuffixConstants.SUFFIX_class).append("))).thenReturn(").append(varName).append(");");
+            .append(validator.useName(IScoutRuntimeTypes.ArgumentMatchers)).append(".any())).thenReturn(").append(varName).append(");");
       }
     });
 

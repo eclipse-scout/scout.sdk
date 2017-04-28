@@ -208,7 +208,7 @@ public interface IScoutRuntimeTypes {
   String WsConsumerCorrelationIdHandler = "org.eclipse.scout.rt.server.jaxws.handler.WsConsumerCorrelationIdHandler";
   String WsProviderCorrelationIdHandler = "org.eclipse.scout.rt.server.jaxws.handler.WsProviderCorrelationIdHandler";
   String Mockito = "org.mockito.Mockito";
-  String Matchers = "org.mockito.Matchers";
+  String ArgumentMatchers = "org.mockito.ArgumentMatchers";
   String BasicAuthenticationMethod = "org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod";
   String ConfigFileCredentialVerifier = "org.eclipse.scout.rt.platform.security.ConfigFileCredentialVerifier";
   String NullClazz = "org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz$NullClazz";
