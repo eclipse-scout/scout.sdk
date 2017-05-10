@@ -33,6 +33,14 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- because a newer version is included in scout.rt.server.jaxws (javax.annotation:javax.annotation-api:1.2) -->
+          <!-- otherwise there are duplicate classes on the classpath -->
+          <groupId>javax.annotation</groupId>
+          <artifactId>jsr250-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
