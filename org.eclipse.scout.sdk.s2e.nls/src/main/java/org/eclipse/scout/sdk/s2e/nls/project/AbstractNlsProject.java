@@ -394,6 +394,7 @@ public abstract class AbstractNlsProject implements INlsProject {
         m_entries.put(newEntry.getKey(), newEntry);
         multiEvent.addChildEvent(new NlsProjectEvent(this, newEntry, NlsProjectEvent.TYPE_ENTRY_ADDED));
       }
+      fireNlsProjectEvent(multiEvent);
     }
     finally {
       m_lock.writeLock().unlock();
