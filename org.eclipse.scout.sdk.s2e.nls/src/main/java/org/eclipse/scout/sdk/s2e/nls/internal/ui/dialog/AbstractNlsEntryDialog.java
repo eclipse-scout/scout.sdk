@@ -199,6 +199,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
       GridDataFactory
           .defaultsFor(control)
           .align(SWT.FILL, SWT.FILL)
+          .grab(true, true)
           .minSize(0, 80)
           .applyTo(control);
 
