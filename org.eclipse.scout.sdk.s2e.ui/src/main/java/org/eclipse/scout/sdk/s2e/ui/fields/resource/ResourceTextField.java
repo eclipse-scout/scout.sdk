@@ -15,6 +15,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,7 +100,6 @@ public class ResourceTextField extends TextField {
   }
 
   @Override
-  @SuppressWarnings("squid:S1166")
   protected void createContent(Composite parent) {
     super.createContent(parent);
 
@@ -116,28 +118,7 @@ public class ResourceTextField extends TextField {
       public void focusLost(FocusEvent e) {
         try {
           if (m_inputLock.acquire()) {
-            String input = getText();
-            if (StringUtils.isBlank(input)) {
-              setUrl(null);
-            }
-            else {
-              // validate path
-              try {
-                File newFile = new File(input);
-                newFile.getCanonicalPath(); // fails on invalid path
-                setUrl(newFile.toURI().toURL());
-              }
-              catch (Exception ex) {
-                // the supplied string is no valid path for this OS. Try as URL
-                try {
-                  URL url = new URL(input);
-                  setUrl(url);
-                }
-                catch (MalformedURLException e1) {
-                  setUrl(null);
-                }
-              }
-            }
+            setUrl(toUrl(getText()));
           }
         }
         finally {
@@ -161,6 +142,27 @@ public class ResourceTextField extends TextField {
     buttonData.right = new FormAttachment(100, 0);
     buttonData.bottom = new FormAttachment(100, 0);
     m_popupButton.setLayoutData(buttonData);
+  }
+
+  @SuppressWarnings("squid:S1166")
+  private static URL toUrl(String path) {
+    if (StringUtils.isBlank(path)) {
+      return null;
+    }
+
+    try {
+      Path newFile = Paths.get(path).toRealPath(LinkOption.NOFOLLOW_LINKS); // fails on invalid path
+      return newFile.toUri().toURL();
+    }
+    catch (Exception ex) {
+      // the supplied string is no valid path for this OS. Try as URL
+      try {
+        return new URL(path);
+      }
+      catch (MalformedURLException e1) {
+        return null;
+      }
+    }
   }
 
   private void showFileChooserDialog() {
@@ -291,8 +293,7 @@ public class ResourceTextField extends TextField {
       if (!"file".equalsIgnoreCase(uri.getScheme())) {
         return null;
       }
-      File f = new File(uri);
-      return f;
+      return new File(uri);
     }
     catch (URISyntaxException e) {
       return null;
