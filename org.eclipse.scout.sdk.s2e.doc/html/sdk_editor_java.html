@@ -1,22 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
  <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="generator" content="Asciidoctor 1.5.4" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="Asciidoctor 1.5.5">
   <title>Additions to the Java Editor</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700" />
-  <link rel="stylesheet" href="css/eclipse.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" />
-  <link rel="stylesheet" href="css/coderay-eclipse.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+  <link rel="stylesheet" href="css/eclipse.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/coderay-eclipse.css">
  </head>
  <body class="article">
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Previous" border="0" src="images/prev.gif"></a></td>
     <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk_editor_nls.html" shape="rect" title="NLS Editor"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk_editor_nls.html" shape="rect" title="NLS Editor"><img alt="Next" border="0" src="images/next.gif"></a></td>
    </tr>
    <tr>
     <td align="left" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
@@ -33,22 +33,22 @@
      <p>Scout uses the standard Java Editor of the Eclipse IDE. To ease the development, the Scout SDK provides additional features for the Java Editor.</p>
     </div>
     <div class="paragraph">
-     <p>To create new Scout components that are represented by inner classes in the Scout framework, the Scout tooling extends the Java content assist of the Eclipse Java editor. The offered proposals are context specific. Depending on the current cursor position in the Java editor, possible Scout components are added to the proposal list.</p> 
-    </div> 
-    <div class="paragraph"> 
-     <p>In a class representing a group box in a form, the Scout content assist adds proposals for various form fields are shown and in a table class the content assist adds proposals to add table columns or context menus. Those proposals trigger the creation of inner classes for form fields, table columns or codes. The Eclipse content assist can be started by typing <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Space</kbd></span>.</p> 
+     <p>To create new Scout components that are represented by inner classes in the Scout framework, the Scout tooling extends the Java content assist of the Eclipse Java editor. The offered proposals are context specific. Depending on the current cursor position in the Java editor, possible Scout components are added to the proposal list.</p>
+    </div>
+    <div class="paragraph">
+     <p>In a class representing a group box in a form, the Scout content assist adds proposals for various form fields are shown and in a table class the content assist adds proposals to add table columns or context menus. Those proposals trigger the creation of inner classes for form fields, table columns or codes. The Eclipse content assist can be started by typing <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Space</kbd></span>.</p>
     </div>
     <div class="sect3">
-     <h4 id="sec-sdk_new_form_field"><a class="anchor" href="#sec-sdk_new_form_field"></a>Create new Form Fields</h4> 
-     <div class="paragraph"> 
-      <p></p> 
-     </div> 
+     <h4 id="sec-sdk_new_form_field"><a class="anchor" href="#sec-sdk_new_form_field"></a>Create new Form Fields</h4>
+     <div class="paragraph">
+      <p></p>
+     </div>
      <div class="paragraph">
       <p>To add additional form fields to a form the current edit position needs to be inside of a Scout group box. Typing <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Space</kbd></span> then provides access to the most frequently used Scout widgets as shown in <a href="#img-java_proposals_groupbox">Figure 1</a>.</p>
      </div>
      <div id="img-java_proposals_groupbox" class="imageblock">
       <div class="content">
-       <img src="images/java_proposals_groupbox2.png" alt="java proposals groupbox2" />
+       <img src="images/java_proposals_groupbox2.png" alt="java proposals groupbox2">
       </div>
       <div class="title">
        Figure 1. Proposals to create new form fields in a GroupBox
@@ -59,16 +59,16 @@
      </div>
     </div>
     <div class="sect3">
-     <h4 id="sec-sdk_new_table_column"><a class="anchor" href="#sec-sdk_new_table_column"></a>Create new Table Columns</h4> 
-     <div class="paragraph"> 
-      <p></p> 
-     </div> 
+     <h4 id="sec-sdk_new_table_column"><a class="anchor" href="#sec-sdk_new_table_column"></a>Create new Table Columns</h4>
+     <div class="paragraph">
+      <p></p>
+     </div>
      <div class="paragraph">
       <p>For adding new columns in a table the set the current edit position inside a Scout table. The Scout table itself may be located inside of a TableField as shown in <a href="#img-java_proposals_table">Figure 2</a> or can also be located inside of a Scout TablePage.</p>
      </div>
      <div id="img-java_proposals_table" class="imageblock">
       <div class="content">
-       <img src="images/java_proposals_table2.png" alt="java proposals table2" />
+       <img src="images/java_proposals_table2.png" alt="java proposals table2">
       </div>
       <div class="title">
        Figure 2. Proposals to create new columns in a Table
@@ -85,7 +85,7 @@
      </div>
      <div id="img-java_proposals_code" class="imageblock">
       <div class="content">
-       <img src="images/java_proposals_code.png" alt="java proposals code" />
+       <img src="images/java_proposals_code.png" alt="java proposals code">
       </div>
       <div class="title">
        Figure 3. Proposals to create new codes in a CodeType
@@ -95,37 +95,37 @@
     <div class="sect3">
      <h4 id="nls-entry-support"><a class="anchor" href="#nls-entry-support"></a>NLS-Entry support</h4>
      <div class="paragraph">
-      <p>When the the current edit position is inside the String parameter of the <code>TEXTS.get()</code> code, the content assist (opened with <kbd>Ctrl</kbd> + <kbd>Space</kbd>) provides support for the NLS entries as shown in <a href="#img-java_proposals_texts">Figure 4</a>.</p> 
+      <p>When the the current edit position is inside the String parameter of the <code>TEXTS.get()</code> code, the content assist (opened with <kbd>Ctrl</kbd> + <kbd>Space</kbd>) provides support for the NLS entries as shown in <a href="#img-java_proposals_texts">Figure 4</a>.</p>
      </div>
      <div id="img-java_proposals_texts" class="imageblock">
       <div class="content">
-       <img src="images/java_proposals_texts.png" alt="java proposals texts" />
+       <img src="images/java_proposals_texts.png" alt="java proposals texts">
       </div>
       <div class="title">
        Figure 4. Proposals corresponding to NLS Support.
       </div>
      </div>
      <div class="paragraph">
-      <p>Selecting one of proposal entries (like &quot;DateOfBirth&quot; in the example) shows the available translations on the right hand side. To select a specific proposal entry you may double click on the entry or hit the <kbd>Enter</kbd> key. To create a new text entry select <strong>New text&#x2026;&#x200b;</strong> at the end of the proposal list.</p> 
+      <p>Selecting one of proposal entries (like "DateOfBirth" in the example) shows the available translations on the right hand side. To select a specific proposal entry you may double click on the entry or hit the <kbd>Enter</kbd> key. To create a new text entry select <strong>New text&#x2026;&#x200b;</strong> at the end of the proposal list.</p>
      </div>
      <div class="paragraph">
-      <p>Selecting &quot;New text&#x2026;&#x200b;&quot; then opens the <a href="sdk_wizard_nls-entry.html">NLS Entry Wizard</a>.</p> 
+      <p>Selecting "New text&#x2026;&#x200b;" then opens the <a href="sdk_wizard_nls-entry.html">NLS Entry Wizard</a>.</p>
      </div>
-     <hr />
+     <hr>
      <div class="paragraph">
       <p>Go back to the <a href="sdk.html">Scout Tooling</a>.</p>
      </div>
      <div class="paragraph">
-      <p>Do you want to improve this document? Please <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/edit/releases/7.0.x/docs/build/eclipse_help/src/docs/sdk_editor_java.adoc" target="_blank">edit this page</a> on GitHub.</p>
+      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/blob/releases/7.0.x/docs/build/eclipse_help/src/docs/sdk_editor_java.adoc" target="_blank">sources</a> on GitHub.</p>
      </div>
     </div>
    </div>
   </div>
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
    <tr>
-    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
-    <td align="center" colspan="1" rowspan="1" style="width: 40%"><a href="scout_user_guide.html" shape="rect" title="Eclipse Scout User Guide"><img alt="Eclipse Scout User Guide" border="0" src="images/home.gif" /></a></td>
-    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk_editor_nls.html" shape="rect" title="NLS Editor"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Previous" border="0" src="images/prev.gif"></a></td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"><a href="scout_user_guide.html" shape="rect" title="Eclipse Scout User Guide"><img alt="Eclipse Scout User Guide" border="0" src="images/home.gif"></a></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk_editor_nls.html" shape="rect" title="NLS Editor"><img alt="Next" border="0" src="images/next.gif"></a></td>
    </tr>
    <tr>
     <td align="left" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
@@ -135,8 +135,8 @@
   </table>
   <div id="footer">
    <div id="footer-text">
-     Version 7.0.0-SNAPSHOT
-    <br /> Last updated 2017-01-23 11:56:29 CET 
+     Version 7.0
+    <br> Last updated 2017-05-26 14:49:24 CEST
    </div>
   </div>
  </body>
