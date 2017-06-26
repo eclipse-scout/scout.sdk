@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 import formdata.shared.services.process.AbstractCompanyTableFieldData;
@@ -41,7 +40,7 @@ public abstract class AbstractCompanyTableField extends AbstractTableField<Abstr
 
       @Override
       protected String getConfiguredHeaderText() {
-        return ScoutTexts.get("Name");
+        return TEXTS.get("Name");
       }
     }
   }
