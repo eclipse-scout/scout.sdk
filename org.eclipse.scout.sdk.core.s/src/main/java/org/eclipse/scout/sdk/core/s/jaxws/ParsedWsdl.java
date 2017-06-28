@@ -198,8 +198,8 @@ public class ParsedWsdl {
     m_services.put(service, source);
   }
 
-  protected void putReferencedResource(URI absolutePath, URI pathFromWsdlRoot) throws UnsupportedEncodingException {
-    m_referencedResourceUris.put(absolutePath.normalize(), URLDecoder.decode(pathFromWsdlRoot.toString(), StandardCharsets.UTF_8.name()));
+  protected String putReferencedResource(URI absolutePath, URI pathFromWsdlRoot) throws UnsupportedEncodingException {
+    return m_referencedResourceUris.put(absolutePath.normalize(), URLDecoder.decode(pathFromWsdlRoot.toString(), StandardCharsets.UTF_8.name()));
   }
 
   @SuppressWarnings("unchecked")
@@ -256,13 +256,16 @@ public class ParsedWsdl {
    *          and is required to locate relative referenced resources in the given WSDL content.
    * @param wsdlContent
    *          The content of the WSDL file.
+   * @param loadSchemas
+   *          If {@code true} the XSD schemas are parsed recursively. If {@code false} no schemas are parsed. These will
+   *          then be missing in {@link #getReferencedResources()}.
    * @return The created {@link ParsedWsdl} instance
    * @throws WSDLException
    * @throws UnsupportedEncodingException
    */
-  public static ParsedWsdl create(URI documentBase, String wsdlContent) throws WSDLException, UnsupportedEncodingException {
+  public static ParsedWsdl create(URI documentBase, String wsdlContent, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
     Definition wsdl = parseWsdl(documentBase, new InputSource(new StringReader(wsdlContent)));
-    return create(wsdl);
+    return create(wsdl, loadSchemas);
   }
 
   /**
@@ -273,23 +276,26 @@ public class ParsedWsdl {
    *          and is required to locate relative referenced resources in the given WSDL content.
    * @param is
    *          The {@link InputStream} that delivers the WSDL content.
+   * @param loadSchemas
+   *          If {@code true} the XSD schemas are parsed recursively. If {@code false} no schemas are parsed. These will
+   *          then be missing in {@link #getReferencedResources()}.
    * @return The created {@link ParsedWsdl} instance
    * @throws WSDLException
    * @throws UnsupportedEncodingException
    */
-  public static ParsedWsdl create(URI documentBase, InputStream is) throws WSDLException, UnsupportedEncodingException {
+  public static ParsedWsdl create(URI documentBase, InputStream is, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
     Definition wsdl = parseWsdl(documentBase, new InputSource(Validate.notNull(is)));
-    return create(wsdl);
+    return create(wsdl, loadSchemas);
   }
 
-  protected static ParsedWsdl create(Definition wsdl) throws UnsupportedEncodingException {
+  protected static ParsedWsdl create(Definition wsdl, boolean loadSchemas) throws UnsupportedEncodingException {
     if (wsdl == null) {
       return null;
     }
 
     ParsedWsdl result = new ParsedWsdl();
     URI rootDirUri = CoreUtils.getParentURI(URI.create(wsdl.getDocumentBaseURI()));
-    parseWsdlRec(wsdl, rootDirUri, URI.create(""), result);
+    parseWsdlRec(wsdl, rootDirUri, URI.create(""), result, loadSchemas);
     result.completeMapping();
     return result;
   }
@@ -334,7 +340,7 @@ public class ParsedWsdl {
   }
 
   @SuppressWarnings("unchecked")
-  protected static void parseWsdlRec(Definition def, URI rootDefUri, URI relPath, ParsedWsdl collector) throws UnsupportedEncodingException {
+  protected static void parseWsdlRec(Definition def, URI rootDefUri, URI relPath, ParsedWsdl collector, boolean loadSchemas) throws UnsupportedEncodingException {
     Map<String, List<Import>> imports = def.getImports();
     for (List<Import> iv : imports.values()) {
       for (Import i : iv) {
@@ -343,7 +349,7 @@ public class ParsedWsdl {
           URI pathRelativeToRoot = relPath.resolve(i.getLocationURI());
           URI pathAbsolute = URI.create(innerDef.getDocumentBaseURI());
           collector.putReferencedResource(pathAbsolute, pathRelativeToRoot);
-          parseWsdlRec(innerDef, rootDefUri, CoreUtils.getParentURI(pathRelativeToRoot), collector);
+          parseWsdlRec(innerDef, rootDefUri, CoreUtils.getParentURI(pathRelativeToRoot), collector, loadSchemas);
         }
       }
     }
@@ -367,9 +373,11 @@ public class ParsedWsdl {
       return;
     }
 
-    for (ExtensibilityElement e : extensibilityElementsOf(types)) {
-      if (e instanceof Schema) {
-        parseSchemasRec((Schema) e, rootDefUri, relPath, collector);
+    if (loadSchemas) {
+      for (ExtensibilityElement e : extensibilityElementsOf(types)) {
+        if (e instanceof Schema) {
+          parseSchemasRec((Schema) e, rootDefUri, relPath, collector);
+        }
       }
     }
   }
@@ -398,6 +406,7 @@ public class ParsedWsdl {
     for (SchemaReference ref : references) {
       String schemaLocationURI = ref.getSchemaLocationURI();
       URI pathRelativeToRoot = null;
+      boolean exists = false;
       if (StringUtils.isBlank(schemaLocationURI)) {
         pathRelativeToRoot = relPath;
       }
@@ -418,10 +427,12 @@ public class ParsedWsdl {
           pathRelativeToRoot = CoreUtils.relativizeURI(rootUri, pathAbsolute);
         }
 
-        collector.putReferencedResource(pathAbsolute, pathRelativeToRoot);
+        exists = collector.putReferencedResource(pathAbsolute, pathRelativeToRoot) != null;
       }
 
-      parseSchemasRec(ref.getReferencedSchema(), rootUri, CoreUtils.getParentURI(pathRelativeToRoot), collector);
+      if (!exists) {
+        parseSchemasRec(ref.getReferencedSchema(), rootUri, CoreUtils.getParentURI(pathRelativeToRoot), collector);
+      }
     }
   }
 

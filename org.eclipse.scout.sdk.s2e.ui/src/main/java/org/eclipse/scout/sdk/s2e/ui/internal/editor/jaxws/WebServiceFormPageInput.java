@@ -182,7 +182,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
 
   protected void loadWsdlServices() throws CoreException {
     try (InputStream in = getWsdl().getContents()) {
-      setServicesFromWsdl(ParsedWsdl.create(getWsdl().getLocation().toFile().toURI(), in));
+      setServicesFromWsdl(ParsedWsdl.create(getWsdl().getLocation().toFile().toURI(), in, false));
     }
     catch (IOException | WSDLException e) {
       throw new CoreException(new ScoutStatus(e));

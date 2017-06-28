@@ -366,7 +366,7 @@ public class WebServiceNewOperation implements IOperation {
 
   protected ParsedWsdl parseWsdl(URI documentBase) throws CoreException {
     try {
-      return ParsedWsdl.create(documentBase, getWsdlContent());
+      return ParsedWsdl.create(documentBase, getWsdlContent(), true);
     }
     catch (WSDLException | UnsupportedEncodingException e) {
       throw new CoreException(new ScoutStatus("Unable to parse WSDL.", e));
