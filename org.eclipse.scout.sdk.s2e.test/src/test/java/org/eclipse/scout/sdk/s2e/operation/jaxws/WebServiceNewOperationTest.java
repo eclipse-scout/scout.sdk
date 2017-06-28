@@ -61,7 +61,7 @@ public class WebServiceNewOperationTest {
   @Test
   public void testUnsupportedService() throws IOException, WSDLException, URISyntaxException {
     try (InputStream in = RPC_ENCODED_WSDL.openStream()) {
-      ParsedWsdl info = ParsedWsdl.create(RPC_ENCODED_WSDL.toURI(), in);
+      ParsedWsdl info = ParsedWsdl.create(RPC_ENCODED_WSDL.toURI(), in, true);
       Assert.assertTrue(info.isEmpty());
     }
   }

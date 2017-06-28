@@ -803,7 +803,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
 
   protected String validateWsdl(URL url) {
     try (InputStream in = url.openStream()) {
-      ParsedWsdl info = ParsedWsdl.create(url.toURI(), in);
+      ParsedWsdl info = ParsedWsdl.create(url.toURI(), in, false);
       if (info.isEmpty()) {
         return "Either this Web Service uses SOAP encoding (use=encoded) or contains no operations. Ensure the Web Service uses literal encoding.";
       }
