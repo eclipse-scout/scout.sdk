@@ -36,7 +36,7 @@
 
       <properties>
         <buildType>N</buildType>
-        <stageTargetDir>nightly/7.0</stageTargetDir>
+        <stageTargetDir>nightly/7.1</stageTargetDir>
         <buildId>${buildType}${master_build_timestamp}</buildId>
         <buildsToKeep>3</buildsToKeep>
       </properties>
