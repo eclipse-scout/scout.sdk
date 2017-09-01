@@ -43,18 +43,9 @@ public final class CoreTestingUtils {
    *         {@link IFileLocator} with the test module itself as root
    */
   public static IJavaEnvironment createJavaEnvironment() {
-    return createJavaEnvironment(null);
-  }
-
-  /**
-   * @return a {@link IJavaEnvironment} containing the source folder <code>src/main/fixture</code> and the specified
-   *         fileLocator
-   */
-  public static IJavaEnvironment createJavaEnvironment(IFileLocator fileLocator) {
     return new JavaEnvironmentBuilder()
         .withoutScoutSdk()
         .withSourceFolder("src/main/fixture")
-        .withFileLocator(fileLocator)
         .build();
   }
 
@@ -169,7 +160,7 @@ public final class CoreTestingUtils {
 
   /**
    * normalizes all white space characters to one space. This removes any tabs, new-lines, etc.
-   * 
+   *
    * @param s
    *          The input {@link String} for witch the white spaces should be normalized.
    * @return The input {@link String} with the white spaces normalized.
@@ -184,7 +175,7 @@ public final class CoreTestingUtils {
   /**
    * Imports an {@link IJavaEnvironment} that has been previously exported using
    * {@link #exportJavaEnvironment(IJavaEnvironment, Writer)}.
-   * 
+   *
    * @param r
    *          The source to import
    * @return The imported {@link IJavaEnvironment}.
@@ -199,7 +190,7 @@ public final class CoreTestingUtils {
   /**
    * Exports the given {@link IJavaEnvironment} into the given {@link Writer}. It can be imported again using
    * {@link #importJavaEnvironment(Reader)}.
-   * 
+   *
    * @param env
    *          The {@link IJavaEnvironment} to export.
    * @param w
@@ -210,7 +201,7 @@ public final class CoreTestingUtils {
     StringBuilder src = new StringBuilder();
     StringBuilder bin = new StringBuilder();
     for (ClasspathSpi cp : env.unwrap().getClasspath()) {
-      (cp.isSource() ? src : bin).append("\n    " + cp.getPath() + ",");
+      (cp.getMode() == ClasspathSpi.MODE_SOURCE ? src : bin).append("\n    " + cp.getPath() + ",");
     }
     Properties p = new Properties();
     p.setProperty("src", src.toString());

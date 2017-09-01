@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
-import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 
 /**
  * <h3>{@link ClasspathEntry}</h3>
@@ -23,77 +24,72 @@ import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
  * @since 5.2.0
  */
 public class ClasspathEntry {
-  private final Classpath m_classpath;
+
+  private final Path m_classpath;
+  private final int m_mode;
   private final String m_encoding;
 
-  public ClasspathEntry(Classpath classpath, String encoding) {
-    super();
-    m_classpath = classpath;
-    m_encoding = encoding;
+  public ClasspathEntry(final Path classpath, final int mode) {
+    this(classpath, mode, null);
   }
 
-  public Classpath getClasspath() {
+  public ClasspathEntry(final Path classpath, final int mode, final String encoding) {
+    m_classpath = Validate.notNull(classpath);
+    m_mode = mode;
+    m_encoding = StringUtils.isBlank(encoding) ? StandardCharsets.UTF_8.name() : encoding;
+  }
+
+  public Path path() {
     return m_classpath;
   }
 
-  public String getEncoding() {
+  public String encoding() {
     return m_encoding;
   }
 
-  public static Set<Classpath> toClassPaths(Set<ClasspathEntry> entries) {
-    if (entries == null || entries.isEmpty()) {
-      return Collections.emptySet();
-    }
-
-    Set<Classpath> result = new LinkedHashSet<>(entries.size());
-    for (ClasspathEntry entry : entries) {
-      result.add(entry.getClasspath());
-    }
-    return result;
+  public int mode() {
+    return m_mode;
   }
 
   @Override
   public String toString() {
-    return m_classpath == null ? "null" : m_classpath.toString();
+    final StringBuilder builder = new StringBuilder();
+    builder.append("ClasspathEntry [");
+    builder.append("path=").append(m_classpath).append(", ");
+    builder.append("mode=");
+    boolean sourceAttached = false;
+    if ((m_mode & ClasspathSpi.MODE_SOURCE) != 0) {
+      builder.append("source");
+      sourceAttached = true;
+    }
+    if ((m_mode & ClasspathSpi.MODE_BINARY) != 0) {
+      if (sourceAttached) {
+        builder.append('&');
+      }
+      builder.append("binary");
+    }
+    builder.append(", ");
+    builder.append("encoding=").append(m_encoding);
+    builder.append(']');
+    return builder.toString();
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
-    int result = 1;
-    result = prime * result + ((m_classpath == null) ? 0 : m_classpath.hashCode());
-    result = prime * result + ((m_encoding == null) ? 0 : m_encoding.hashCode());
-    return result;
+    final int result = prime + m_classpath.hashCode();
+    return prime * result + m_mode;
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    ClasspathEntry other = (ClasspathEntry) obj;
-    if (m_classpath == null) {
-      if (other.m_classpath != null) {
-        return false;
-      }
-    }
-    else if (!m_classpath.equals(other.m_classpath)) {
-      return false;
-    }
-    if (m_encoding == null) {
-      if (other.m_encoding != null) {
-        return false;
-      }
-    }
-    else if (!m_encoding.equals(other.m_encoding)) {
-      return false;
-    }
-    return true;
+    final ClasspathEntry other = (ClasspathEntry) obj;
+    return m_mode == other.m_mode && m_classpath.equals(other.m_classpath);
   }
 }

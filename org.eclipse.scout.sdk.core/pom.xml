@@ -35,6 +35,18 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-    <!-- Build Dependencies (Provided) -->
   </dependencies>
+  
+  <!-- skip check because of api incompatibility with future ECJ. remove as soon as the Java9 capable ECJ is used in the maven dependencies -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

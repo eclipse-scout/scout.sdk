@@ -77,7 +77,8 @@
               org.eclipse.scout.sdk.s2e;bundle-version="[7.0,7.1)";visibility:=reexport,
               org.eclipse.jdt.ui;bundle-version="[3.12,4)";visibility:=reexport,
               org.eclipse.ui.editors;bundle-version="[3.10,4)";visibility:=reexport,
-              org.eclipse.jface;bundle-version="[3.12,4)";visibility:=reexport
+              org.eclipse.jface;bundle-version="[3.12,4)";visibility:=reexport,
+              org.eclipse.jface.text;bundle-version="[3.11,4)";visibility:=reexport
             </Require-Bundle>
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.nls.NlsCore</Bundle-Activator>
           </instructions>
