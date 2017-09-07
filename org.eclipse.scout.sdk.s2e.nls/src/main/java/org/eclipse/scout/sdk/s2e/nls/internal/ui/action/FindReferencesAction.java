@@ -14,7 +14,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
-import org.eclipse.scout.sdk.s2e.nls.internal.search.NlsKeySearchQuery;
+import org.eclipse.scout.sdk.s2e.nls.internal.search.NlsFindKeyQuery;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.search.ui.NewSearchUI;
 
@@ -34,7 +34,7 @@ public class FindReferencesAction extends Action {
 
   @Override
   public void run() {
-    NewSearchUI.runQueryInBackground(new NlsKeySearchQuery(getProject(), getKey()));
+    NewSearchUI.runQueryInBackground(new NlsFindKeyQuery(getProject(), getKey()));
   }
 
   @Override

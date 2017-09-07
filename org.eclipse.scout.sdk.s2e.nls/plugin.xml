@@ -52,4 +52,30 @@
          </partition>
       </javaCompletionProposalComputer>
    </extension>
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="menu:org.eclipse.scout.sdk.s2e.ui.menu?after=org.eclipse.scout.sdk.s2e.ui.menu.missingClassIdSelected">
+         <separator
+               name="org.eclipse.scout.sdk.s2e.nls.menu.separator01"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.scout.sdk.s2e.nls.commands.searchMissingTextKeys"
+               id="org.eclipse.scout.sdk.s2e.nls.menu.searchMissingTextKeys"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension point="org.eclipse.ui.commands">
+      <command
+            name="Search missing text keys..."
+            id="org.eclipse.scout.sdk.s2e.nls.commands.searchMissingTextKeys"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </command>
+   </extension>
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.eclipse.scout.sdk.s2e.nls.commands.searchMissingTextKeys"
+            class="org.eclipse.scout.sdk.s2e.nls.internal.ui.handler.NlsFindMissingKeysHandler">
+      </handler>
+    </extension>
 </plugin>

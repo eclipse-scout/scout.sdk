@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsProjectProvider;
@@ -84,7 +84,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
               }
             }
           }
-          catch (CoreException e) {
+          catch (JavaModelException e) {
             SdkLog.warning("Could not load NlsFile: {}", f.getFullPath().toString(), e);
           }
         }
