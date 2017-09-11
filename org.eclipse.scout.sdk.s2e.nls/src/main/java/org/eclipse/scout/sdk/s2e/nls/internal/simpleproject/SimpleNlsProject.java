@@ -176,12 +176,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
   private void setSuperType(IType superType) {
     // find parent
     if (superType != null) {
-      try {
-        setParent(NlsCore.getNlsWorkspace().getNlsProject(new Object[]{superType}));
-      }
-      catch (CoreException e) {
-        SdkLog.error("parent of NLS project could not be found. Looked for type '{}'.", superType.getFullyQualifiedName(), e);
-      }
+      setParent(NlsCore.getNlsWorkspace().getNlsProject(superType));
     }
   }
 

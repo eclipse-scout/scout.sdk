@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.swt.SWT;
 
 public final class InputValidator {
-  private static final Pattern REGEX_NLS_KEY_NAME = Pattern.compile("\\b[A-Za-z0-9][a-zA-Z0-9_.\\-]{0,200}\\b");
+  public static final Pattern REGEX_NLS_KEY_NAME = Pattern.compile("[A-Za-z][a-zA-Z0-9_.\\-]{0,200}");
 
   private InputValidator() {
   }

@@ -71,27 +71,22 @@ public class NlsEditor extends MultiPageEditorPart {
   private void createTablePage() {
     INlsProject nlsProjects = null;
     IEditorInput input = getEditorInput();
-    try {
-      if (input instanceof FileEditorInput) {
-        nlsProjects = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{((FileEditorInput) input).getFile()});
-      }
-      else if (input instanceof NlsTypeEditorInput) {
-        nlsProjects = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{((NlsTypeEditorInput) input).getType()});
-      }
+    if (input instanceof FileEditorInput) {
+      nlsProjects = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{((FileEditorInput) input).getFile()});
+    }
+    else if (input instanceof NlsTypeEditorInput) {
+      nlsProjects = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{((NlsTypeEditorInput) input).getType()});
+    }
 
-      if (nlsProjects != null) {
-        setPartName(nlsProjects.getName());
-      }
-      else {
-        setPartName("Translations");
-      }
-      NlsTablePage page = new NlsTablePage(getContainer(), nlsProjects);
-      m_tablePageIndex = addPage(page);
-      setPageText(m_tablePageIndex, "Translations");
+    if (nlsProjects != null) {
+      setPartName(nlsProjects.getName());
     }
-    catch (CoreException e) {
-      SdkLog.error("could not load file: {}", input.getName(), e);
+    else {
+      setPartName("Translations");
     }
+    NlsTablePage page = new NlsTablePage(getContainer(), nlsProjects);
+    m_tablePageIndex = addPage(page);
+    setPageText(m_tablePageIndex, "Translations");
   }
 
   @Override

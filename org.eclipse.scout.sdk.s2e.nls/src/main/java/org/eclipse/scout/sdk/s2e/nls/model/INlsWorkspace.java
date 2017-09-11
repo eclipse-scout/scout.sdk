@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.model;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 
 /**
@@ -25,7 +24,6 @@ public interface INlsWorkspace {
    * @param args
    *          The arguments to be used when trying to find a INlsProject.
    * @return the NlsProject hierarchy for the given parameters or null.
-   * @throws CoreException
    */
-  INlsProject getNlsProject(Object[] args) throws CoreException;
+  INlsProject getNlsProject(Object... args);
 }

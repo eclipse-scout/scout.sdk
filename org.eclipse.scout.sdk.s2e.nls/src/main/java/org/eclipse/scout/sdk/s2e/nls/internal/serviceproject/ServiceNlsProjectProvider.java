@@ -237,6 +237,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
           // text service file
           return getProjectByTextServiceFile((IFile) args[0]);
         }
+        else if (args[0] instanceof IJavaProject) {
+          // java project
+          return getProjectByJavaProject((IJavaProject) args[0]);
+        }
       }
       else if (args.length == 2 && args[0] instanceof IType) {
         if (args[1] instanceof IJavaProject || args[1] == null) {
@@ -263,14 +267,28 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
   }
 
+  private static INlsProject getProjectByJavaProject(final IJavaProject jp) {
+    if (!S2eUtils.exists(jp)) {
+      return null;
+    }
+    try {
+      final Set<IType> txtProviderServices = getRegisteredTextProviderTypes(jp);
+      return textProviderTypesToNlsProject(txtProviderServices);
+    }
+    catch (final CoreException e) {
+      SdkLog.warning("Could not load text provider services for java project: {}", jp.getElementName(), e);
+    }
+    return null;
+  }
+
   private static INlsProject getProjectByTextServiceFile(IFile f) {
     try {
       IType type = getITypeForFile(f);
       if (type != null) {
-        return NlsCore.getNlsWorkspace().getNlsProject(new Object[]{type});
+        return NlsCore.getNlsWorkspace().getNlsProject(type);
       }
     }
-    catch (CoreException e) {
+    catch (JavaModelException e) {
       SdkLog.warning("Could not load text provider services for file: {}", f.getFullPath().toString(), e);
     }
     return null;
