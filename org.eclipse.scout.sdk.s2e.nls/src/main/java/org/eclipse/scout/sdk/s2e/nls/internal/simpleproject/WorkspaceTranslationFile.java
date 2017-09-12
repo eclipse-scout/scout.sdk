@@ -87,9 +87,14 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
   }
 
   @Override
-  public IStatus remove(String key, IProgressMonitor monitor) {
-    super.setTranslation(key, null, false, monitor);
+  public IStatus remove(String key, boolean fireEvent, IProgressMonitor monitor) {
+    super.setTranslation(key, null, fireEvent, monitor);
     return Status.OK_STATUS;
+  }
+
+  @Override
+  public IStatus remove(String key, IProgressMonitor monitor) {
+    return remove(key, false, monitor);
   }
 
   @Override
