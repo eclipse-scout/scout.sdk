@@ -65,7 +65,6 @@ public interface IScoutRuntimeTypes {
   String AbstractColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn";
   String AbstractComposerField = "org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField";
   String AbstractCompositeField = "org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField";
-  String AbstractContentAssistField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractContentAssistField";
   String AbstractDataModel = "org.eclipse.scout.rt.shared.data.model.AbstractDataModel";
   String AbstractDataModelEntity = "org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity";
   String AbstractDateField = "org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField";
@@ -133,7 +132,6 @@ public interface IScoutRuntimeTypes {
   String IColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn";
   String ICompositeField = "org.eclipse.scout.rt.client.ui.form.fields.ICompositeField";
   String ICompositeFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.ICompositeFieldExtension";
-  String IContentAssistFieldTable = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldTable";
   String IContextMenuOwner = "org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner";
   String IDataModelAttribute = "org.eclipse.scout.rt.shared.data.model.IDataModelAttribute";
   String IDataModelEntity = "org.eclipse.scout.rt.shared.data.model.IDataModelEntity";
@@ -255,7 +253,6 @@ public interface IScoutRuntimeTypes {
   String AbstractListBoxExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.AbstractListBoxExtension";
   String AbstractPlannerFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.AbstractPlannerFieldExtension";
   String AbstractRadioButtonGroupExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroupExtension";
-  String AbstractContentAssistFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.AbstractContentAssistFieldExtension";
   String AbstractTabBoxExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.AbstractTabBoxExtension";
   String AbstractTableFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.AbstractTableFieldExtension";
   String AbstractTreeBoxExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.AbstractTreeBoxExtension";

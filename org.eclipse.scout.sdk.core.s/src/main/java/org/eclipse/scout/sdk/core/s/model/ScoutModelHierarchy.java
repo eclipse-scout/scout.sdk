@@ -100,8 +100,6 @@ public final class ScoutModelHierarchy {
     addContainerElement(IScoutRuntimeTypes.AbstractPlannerFieldExtension, IScoutRuntimeTypes.IPlanner);
     addContainerElement(IScoutRuntimeTypes.AbstractRadioButtonGroup, IScoutRuntimeTypes.IFormField);
     addContainerElement(IScoutRuntimeTypes.AbstractRadioButtonGroupExtension, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractContentAssistField, IScoutRuntimeTypes.IContentAssistFieldTable);
-    addContainerElement(IScoutRuntimeTypes.AbstractContentAssistFieldExtension, IScoutRuntimeTypes.IContentAssistFieldTable);
     addContainerElement(IScoutRuntimeTypes.AbstractTabBox, IScoutRuntimeTypes.IMenu);
     addContainerElement(IScoutRuntimeTypes.AbstractTabBoxExtension, IScoutRuntimeTypes.IMenu);
     addContainerElement(IScoutRuntimeTypes.AbstractTableField, IScoutRuntimeTypes.ITable);
@@ -151,7 +149,6 @@ public final class ScoutModelHierarchy {
     addInterfaceSuperType(IScoutRuntimeTypes.IColumn, IScoutRuntimeTypes.ITypeWithClassId);
     addInterfaceSuperType(IScoutRuntimeTypes.ICompositeField, IScoutRuntimeTypes.IFormField);
     addInterfaceSuperType(IScoutRuntimeTypes.ICompositeFieldExtension, IScoutRuntimeTypes.IExtension);
-    addInterfaceSuperType(IScoutRuntimeTypes.IContentAssistFieldTable, IScoutRuntimeTypes.ITable);
     addInterfaceSuperType(IScoutRuntimeTypes.IDataModelAttribute, IScoutRuntimeTypes.IOrdered);
     addInterfaceSuperType(IScoutRuntimeTypes.IDataModelEntity, IScoutRuntimeTypes.IOrdered);
     addInterfaceSuperType(IScoutRuntimeTypes.IDateField, IScoutRuntimeTypes.IValueField);
@@ -180,7 +177,7 @@ public final class ScoutModelHierarchy {
     addInterfaceSuperType(IScoutRuntimeTypes.IPageWithTableExtension, IScoutRuntimeTypes.IExtension);
     addInterfaceSuperType(IScoutRuntimeTypes.IPlanner, IScoutRuntimeTypes.IContextMenuOwner);
     addInterfaceSuperType(IScoutRuntimeTypes.IPlannerField, IScoutRuntimeTypes.IFormField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IProposalField, IScoutRuntimeTypes.IValueField);
+    addInterfaceSuperType(IScoutRuntimeTypes.IProposalField, IScoutRuntimeTypes.ISmartField);
     addInterfaceSuperType(IScoutRuntimeTypes.IRadioButton, IScoutRuntimeTypes.IButton);
     addInterfaceSuperType(IScoutRuntimeTypes.IRadioButtonGroup, IScoutRuntimeTypes.IValueField);
     addInterfaceSuperType(IScoutRuntimeTypes.IRadioButtonGroup, IScoutRuntimeTypes.ICompositeField);
