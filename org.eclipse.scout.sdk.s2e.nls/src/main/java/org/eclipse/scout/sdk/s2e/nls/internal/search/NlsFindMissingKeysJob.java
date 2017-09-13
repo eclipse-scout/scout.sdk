@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -61,6 +62,7 @@ public class NlsFindMissingKeysJob extends AbstractJob {
   private final List<Match> m_matches;
   private final List<Match> m_errorMatches;
   private final String m_textClassName;
+  private final char[] m_ignorePattern;
 
   public NlsFindMissingKeysJob() {
     super("Search for text keys that are used but do not exist.");
@@ -77,6 +79,7 @@ public class NlsFindMissingKeysJob extends AbstractJob {
     m_patternsByFileType.put("js", Arrays.asList(jsTextKeyPat, jsonTextKeyPat));
     m_patternsByFileType.put("html", Arrays.asList(Pattern.compile("\\<scout:message key=\"(" + nlsKeyPattern + ")\"\\s*/?\\>"), jsTextKeyPat, jsonTextKeyPat));
 
+    m_ignorePattern = "NO-NLS-CHECK".toCharArray();
     m_textClassName = Signature.getSimpleName(IScoutRuntimeTypes.TEXTS) + SuffixConstants.SUFFIX_STRING_java;
   }
 
@@ -116,7 +119,12 @@ public class NlsFindMissingKeysJob extends AbstractJob {
       return;
     }
 
-    final String fileName = file.path().getFileName().toString().toLowerCase();
+    final Path lastSegment = file.path().getFileName();
+    if (lastSegment == null) {
+      return;
+    }
+
+    final String fileName = lastSegment.toString().toLowerCase();
     final int lastDotPos = fileName.lastIndexOf('.');
     final String extension = fileName.substring(lastDotPos + 1);
     final Collection<Pattern> patterns = m_patternsByFileType.get(extension);
@@ -124,8 +132,9 @@ public class NlsFindMissingKeysJob extends AbstractJob {
       throw new SdkException("Unexpected: no pattern for file: " + file.path());
     }
 
+    final CharBuffer fileContent = CharBuffer.wrap(file.content());
     for (final Pattern p : patterns) {
-      final Matcher matcher = p.matcher(CharBuffer.wrap(file.content()));
+      final Matcher matcher = p.matcher(fileContent);
       while (matcher.find()) {
         final int keyGroup;
         if (matcher.groupCount() > 1) {
@@ -157,11 +166,24 @@ public class NlsFindMissingKeysJob extends AbstractJob {
         .contains(key);
   }
 
-  protected static Match registerMatch(final WorkspaceFile file, final MatchResult matcher, final Collection<Match> targetList, final int keyGroup) {
+  protected boolean isIgnored(final char[] content, final int offset) {
+    int nlPos = CharOperation.indexOf('\n', content, offset);
+    if (nlPos < m_ignorePattern.length) {
+      return false;
+    }
+    if (content[nlPos - 1] == '\r') {
+      nlPos--;
+    }
+    return CharOperation.fragmentEquals(m_ignorePattern, content, nlPos - m_ignorePattern.length, false);
+  }
+
+  protected void registerMatch(final WorkspaceFile file, final MatchResult matcher, final Collection<Match> targetList, final int keyGroup) {
     final int index = matcher.start(keyGroup);
+    if (isIgnored(file.content(), index)) {
+      return;
+    }
     final Match match = new Match(file.inWorkspace().get(), index, matcher.end(keyGroup) - index);
     targetList.add(match);
-    return match;
   }
 
   public List<Match> matches() {
