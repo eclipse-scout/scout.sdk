@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipError;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.batch.ClasspathJar;
@@ -47,13 +48,13 @@ public class WorkspaceFileSystem implements INameEnvironment {
     m_overrideCompilationUnits = new HashMap<>();
     m_additionalPackages = new HashSet<>();
     m_classpaths = paths;
-    try {
-      for (Classpath cp : m_classpaths) {
+    for (Classpath cp : m_classpaths) {
+      try {
         cp.initialize();
       }
-    }
-    catch (IOException e) {
-      throw new SdkException(e);
+      catch (IOException | ZipError e) {
+        throw new SdkException("Unable to initialize classpath " + cp.getPath(), e);
+      }
     }
   }
 
