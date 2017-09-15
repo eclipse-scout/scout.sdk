@@ -62,6 +62,8 @@ public interface ITranslationResource {
    */
   IStatus remove(String key, IProgressMonitor monitor);
 
+  IStatus remove(String key, boolean fireEvent, IProgressMonitor monitor);
+
   /**
    * @param oldKey
    * @param newKey

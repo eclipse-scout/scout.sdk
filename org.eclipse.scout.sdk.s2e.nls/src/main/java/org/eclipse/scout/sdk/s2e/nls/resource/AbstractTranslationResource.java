@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.s2e.nls.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -138,7 +138,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
 
   @Override
   public Set<String> getAllKeys() {
-    return new HashSet<>(m_entries.keySet());
+    return Collections.unmodifiableSet(m_entries.keySet());
   }
 
   protected void setTranslation(String key, String translation, IProgressMonitor monitor) {
@@ -200,6 +200,11 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
 
   @Override
   public IStatus remove(String key, IProgressMonitor monitor) {
+    throw new UnsupportedOperationException("this method is not supported on : " + this.getClass().getSimpleName() + " readOnly=" + isReadOnly());
+  }
+
+  @Override
+  public IStatus remove(String key, boolean fireEvent, IProgressMonitor monitor) {
     throw new UnsupportedOperationException("this method is not supported on : " + this.getClass().getSimpleName() + " readOnly=" + isReadOnly());
   }
 }

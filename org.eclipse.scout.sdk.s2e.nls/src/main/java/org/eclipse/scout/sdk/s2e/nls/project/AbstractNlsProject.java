@@ -460,14 +460,23 @@ public abstract class AbstractNlsProject implements INlsProject {
 
   private void updateExistingRowInternal(NlsEntry existingRow, INlsEntry row, boolean flush, IProgressMonitor monitor) {
     boolean updated = false;
-    for (Entry<Language, String> entry : row.getAllTranslations().entrySet()) {
-      String existingTranslation = existingRow.getTranslation(entry.getKey());
-      if (!Objects.equals(existingTranslation, entry.getValue())) {
-        ITranslationResource r = getTranslationResource(entry.getKey());
-        if (r != null) {
+    for (final ITranslationResource res : getAllTranslationResources()) {
+      final Language lang = res.getLanguage();
+      if (row.getAllTranslations().containsKey(lang)) {
+        // update
+        final String newText = row.getTranslation(lang);
+        if (!Objects.equals(existingRow.getTranslation(lang), newText)) {
           updated = true;
-          r.updateText(row.getKey(), entry.getValue(), flush, monitor);
-          existingRow.addTranslation(entry.getKey(), entry.getValue());
+          res.updateText(row.getKey(), newText, flush, monitor);
+          existingRow.addTranslation(lang, newText);
+        }
+      }
+      else {
+        // remove
+        if (res.getAllKeys().contains(row.getKey())) {
+          res.remove(row.getKey(), flush, monitor);
+          existingRow.removeTranslation(lang);
+          updated = true;
         }
       }
     }
