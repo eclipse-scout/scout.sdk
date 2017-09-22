@@ -25,9 +25,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
-import org.eclipse.scout.sdk.s2e.nls.internal.search.JavaProjectsWalker.WorkspaceFile;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
+import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker;
+import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker.WorkspaceFile;
 import org.eclipse.search.ui.text.Match;
 
 /**
@@ -66,7 +67,7 @@ public class NlsFindKeysJob extends AbstractJob {
   @Override
   public void execute(final IProgressMonitor monitor) throws CoreException {
     m_matches.clear();
-    new JavaProjectsWalker(getName())
+    new EclipseWorkspaceWalker(getName())
         .withExtensionsAccepted(SuffixConstants.EXTENSION_java, "js", "html", "less", "json", "xml", "sql", "css", "svg", "txt", "jsp")
         .walk(this::searchInFile, monitor);
   }

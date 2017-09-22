@@ -57,7 +57,7 @@
     <!-- Build Dependencies (Provided) -->
     <dependency>
       <groupId>org.eclipse.scout.sdk.deps</groupId>
-      <artifactId>org.eclipse.jdt.core</artifactId>
+      <artifactId>org.eclipse.jdt.launching</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -111,7 +111,9 @@
               !org.eclipse.core.resources*,
               !org.eclipse.jdt.core*,
               !org.eclipse.jdt.internal*,
+              !org.eclipse.jdt.launching*,
               !org.eclipse.jface.text*,
+              !javax.annotation.*,
               !org.codehaus.plexus*,
               !org.eclipse.text*,
               !org.eclipse.m2e.core*,
@@ -124,7 +126,8 @@
               org.eclipse.core.runtime;bundle-version="[3.12,4)";visibility:=reexport,
               org.eclipse.core.resources;bundle-version="[3.11,4)";visibility:=reexport,
               org.eclipse.jdt.core;bundle-version="[3.12,4)";visibility:=reexport,
-              org.eclipse.jface.text;bundle-version="[3.11.0,4)";visibility:=reexport,
+              org.eclipse.jdt.launching;bundle-version="[3.8.100,4)";visibility:=reexport,
+              org.eclipse.text;bundle-version="[3.6.0,4)";visibility:=reexport,
               org.eclipse.m2e.maven.runtime;bundle-version="[1.7,2)";visibility:=reexport,
               org.eclipse.m2e.archetype.common;bundle-version="[1.7,2)";visibility:=reexport,
               org.eclipse.m2e.core;bundle-version="[1.7,2)";visibility:=reexport

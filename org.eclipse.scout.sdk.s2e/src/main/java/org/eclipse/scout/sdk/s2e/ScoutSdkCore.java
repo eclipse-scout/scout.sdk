@@ -13,8 +13,9 @@ package org.eclipse.scout.sdk.s2e;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,14 +33,17 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.scout.sdk.core.model.api.IFileLocator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.model.spi.internal.ClasspathEntry;
 import org.eclipse.scout.sdk.core.model.spi.internal.JavaEnvironmentWithJdt;
-import org.eclipse.scout.sdk.core.model.spi.internal.WorkspaceFileSystem;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
@@ -84,7 +88,29 @@ public final class ScoutSdkCore {
    */
   public static IJavaEnvironment createJavaEnvironment(IJavaProject javaProject) {
     Validate.notNull(javaProject);
-    return new JavaEnvironmentWithJdt(createFileLocator(javaProject), getClasspathEntries(javaProject)).wrap();
+    return new JavaEnvironmentWithJdt(createFileLocator(javaProject), javaHomeOf(javaProject), getClasspathEntries(javaProject)).wrap();
+  }
+
+  private static Path javaHomeOf(final IJavaProject javaProject) {
+    try {
+      final IVMInstall vmInstall = JavaRuntime.getVMInstall(javaProject);
+      if (vmInstall != null) {
+        final File javaInstallLocation = vmInstall.getInstallLocation();
+        if (javaInstallLocation != null) {
+          final Path javaInstallPath = javaInstallLocation.toPath();
+          if (Files.isDirectory(javaInstallPath.resolve("jre/lib"))) {
+            // the install location points to a JDK that contains a JRE! Use the JRE as Java home
+            return javaInstallPath.resolve("jre");
+          }
+          return javaInstallPath;
+        }
+      }
+      SdkLog.info("Unable to find Java home location for project '{}'. Using running Java home as fallback.", javaProject.getElementName());
+      return null; // use the running JRE as fallback
+    }
+    catch (final CoreException e) {
+      throw new SdkException(e);
+    }
   }
 
   private static IFileLocator createFileLocator(IJavaProject javaProject) {
@@ -104,18 +130,18 @@ public final class ScoutSdkCore {
       for (IPackageFragmentRoot cpRoot : allPackageFragmentRoots) {
         String encoding = getEncoding(cpRoot);
         if (cpRoot.getKind() == IPackageFragmentRoot.K_SOURCE) {
-          appendPath(result, cpRoot.getResource().getLocation().toFile(), true, encoding);
+          result.add(new ClasspathEntry(cpRoot.getResource().getLocation().toFile().toPath(), ClasspathSpi.MODE_SOURCE, encoding));
         }
-        else {
-          File cpLocation = cpRoot.getPath().toFile();
-          IPath sourceAttachmentPath = cpRoot.getSourceAttachmentPath();
-          if (sourceAttachmentPath != null) {
-            appendPath(result, sourceAttachmentPath.toFile(), true, encoding);
+        else if (!isJreContainerElement(cpRoot)) {
+          final Path cpLocation = cpRoot.getPath().toFile().toPath();
+          final IPath cpSourceLocation = cpRoot.getSourceAttachmentPath();
+          if (cpSourceLocation != null) {
+            result.add(new ClasspathEntry(cpSourceLocation.toFile().toPath(), ClasspathSpi.MODE_SOURCE, encoding));
+            result.add(new ClasspathEntry(cpLocation, ClasspathSpi.MODE_BINARY, null));
           }
           else {
-            appendPath(result, cpLocation, true, encoding); // add also as source in case the .java files are in the same jar
+            result.add(new ClasspathEntry(cpLocation, ClasspathSpi.MODE_SOURCE | ClasspathSpi.MODE_BINARY, encoding));
           }
-          appendPath(result, cpLocation, false, encoding); // and binary
         }
       }
       return result;
@@ -125,11 +151,13 @@ public final class ScoutSdkCore {
     }
   }
 
-  private static void appendPath(Collection<ClasspathEntry> paths, File f, boolean source, String encoding) {
-    Classpath classpath = WorkspaceFileSystem.createClasspath(f, source, encoding);
-    if (classpath != null) {
-      paths.add(new ClasspathEntry(classpath, encoding));
+  private static boolean isJreContainerElement(final IPackageFragmentRoot root) throws JavaModelException {
+    final IClasspathEntry entry = root.getRawClasspathEntry();
+    if (entry.getEntryKind() != IClasspathEntry.CPE_CONTAINER) {
+      return false;
     }
+    final String type = entry.getPath().segment(0);
+    return JavaRuntime.JRE_CONTAINER.equals(type);
   }
 
   private static String getEncoding(IPackageFragmentRoot root) throws CoreException {

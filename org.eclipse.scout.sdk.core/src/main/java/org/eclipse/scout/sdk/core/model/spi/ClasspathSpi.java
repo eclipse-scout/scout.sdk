@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi;
 
+import java.nio.file.Path;
+
 /**
  * <h3>{@link ClasspathSpi}</h3>
  *
@@ -18,9 +20,23 @@ package org.eclipse.scout.sdk.core.model.spi;
  */
 public interface ClasspathSpi {
 
-  boolean isSource();
+  /**
+   * Describes a {@link ClasspathSpi} containing *.java source files (can be a directory or an archive).
+   */
+  int MODE_SOURCE = 1;
 
-  String getPath();
+  /**
+   * Describes a {@link ClasspathSpi} containing *.class files (can be a directory or an archive).
+   */
+  int MODE_BINARY = 2;
+
+  /**
+   * @return The content mode of this {@link ClasspathSpi}. A bit mask consisting of {@link #MODE_SOURCE} and/or
+   *         {@link #MODE_BINARY}.
+   */
+  int getMode();
+
+  Path getPath();
 
   String getEncoding();
 }

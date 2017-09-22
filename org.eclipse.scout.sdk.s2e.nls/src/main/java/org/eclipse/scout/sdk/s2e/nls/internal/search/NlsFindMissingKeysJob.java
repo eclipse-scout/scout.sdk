@@ -42,10 +42,11 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
-import org.eclipse.scout.sdk.s2e.nls.internal.search.JavaProjectsWalker.WorkspaceFile;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.formatter.InputValidator;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
+import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker.WorkspaceFile;
 import org.eclipse.search.ui.text.Match;
 
 /**
@@ -99,7 +100,7 @@ public class NlsFindMissingKeysJob extends AbstractJob {
   protected void execute(final IProgressMonitor monitor) throws CoreException {
     m_matches.clear();
     m_errorMatches.clear();
-    new JavaProjectsWalker(getName())
+    new EclipseWorkspaceWalker(getName())
         .withExtensionsAccepted(m_patternsByFileType.keySet())
         .withFilter(this::isInterestingPath)
         .walk(this::searchInFile, monitor);

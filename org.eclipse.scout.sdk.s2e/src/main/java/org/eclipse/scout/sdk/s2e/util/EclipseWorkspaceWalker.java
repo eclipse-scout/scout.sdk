@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.s2e.nls.internal.search;
+package org.eclipse.scout.sdk.s2e.util;
 
 import static java.util.Collections.unmodifiableCollection;
 
@@ -40,11 +40,11 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
- * <h3>{@link JavaProjectsWalker}</h3>
+ * <h3>{@link EclipseWorkspaceWalker}</h3>
  *
  * @since 7.0.100
  */
-public class JavaProjectsWalker {
+public class EclipseWorkspaceWalker {
 
   private final String m_taskName;
   private final Collection<String> m_fileExtensions;
@@ -53,7 +53,7 @@ public class JavaProjectsWalker {
   private boolean m_skipHiddenPaths;
   private BiPredicate<Path, BasicFileAttributes> m_fileFilter;
 
-  public JavaProjectsWalker(final String taskName) {
+  public EclipseWorkspaceWalker(final String taskName) {
     m_taskName = Validate.notNull(taskName);
     m_fileExtensions = new ArrayList<>();
     m_skipOutputLocation = true;
@@ -61,19 +61,24 @@ public class JavaProjectsWalker {
   }
 
   public void walk(final Consumer<WorkspaceFile> visitor, final IProgressMonitor monitor) throws CoreException {
-    final IJavaProject[] javaProjects = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
-    monitor.beginTask(taskName(), javaProjects.length);
-    for (final IJavaProject root : javaProjects) {
-      final IProject p = root.getProject();
+    final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+    monitor.beginTask(taskName(), projects.length);
+    for (final IProject root : projects) {
       final Path outputLocation;
       if (isSkipOutputLocation()) {
-        outputLocation = new File(p.getLocation().toOSString(), root.getOutputLocation().removeFirstSegments(1).toOSString()).toPath();
+        final IJavaProject jp = JavaCore.create(root);
+        if (S2eUtils.exists(jp)) {
+          outputLocation = new File(root.getLocation().toOSString(), jp.getOutputLocation().removeFirstSegments(1).toOSString()).toPath();
+        }
+        else {
+          outputLocation = null;
+        }
       }
       else {
         outputLocation = null;
       }
 
-      searchInFolder(visitor, p.getLocation().toFile().toPath(), Charset.forName(p.getDefaultCharset()), outputLocation, monitor);
+      searchInFolder(visitor, root.getLocation().toFile().toPath(), Charset.forName(root.getDefaultCharset()), outputLocation, monitor);
 
       if (monitor.isCanceled()) {
         return;
@@ -136,6 +141,9 @@ public class JavaProjectsWalker {
   }
 
   protected boolean acceptFileExtension(final Path file) {
+    if (extensionsAccepted().isEmpty()) {
+      return true; // no filter
+    }
     final Path path = file.getFileName();
     if (path == null) {
       return false;
@@ -162,7 +170,7 @@ public class JavaProjectsWalker {
     return m_skipOutputLocation;
   }
 
-  public JavaProjectsWalker withSkipOutputLocation(final boolean skipOutputLocation) {
+  public EclipseWorkspaceWalker withSkipOutputLocation(final boolean skipOutputLocation) {
     m_skipOutputLocation = skipOutputLocation;
     return this;
   }
@@ -171,7 +179,7 @@ public class JavaProjectsWalker {
     return m_skipHiddenPaths;
   }
 
-  public JavaProjectsWalker withSkipHiddenPaths(final boolean skipHiddenPaths) {
+  public EclipseWorkspaceWalker withSkipHiddenPaths(final boolean skipHiddenPaths) {
     m_skipHiddenPaths = skipHiddenPaths;
     return this;
   }
@@ -180,7 +188,7 @@ public class JavaProjectsWalker {
     return Optional.ofNullable(m_fileFilter);
   }
 
-  public JavaProjectsWalker withFilter(final BiPredicate<Path, BasicFileAttributes> fileFilter) {
+  public EclipseWorkspaceWalker withFilter(final BiPredicate<Path, BasicFileAttributes> fileFilter) {
     m_fileFilter = fileFilter;
     return this;
   }
@@ -189,12 +197,12 @@ public class JavaProjectsWalker {
     return unmodifiableCollection(m_fileExtensions);
   }
 
-  public JavaProjectsWalker withExtensionsAccepted(final String... extensions) {
+  public EclipseWorkspaceWalker withExtensionsAccepted(final String... extensions) {
     final Collection<String> l = extensions == null ? null : Arrays.asList(extensions);
     return withExtensionsAccepted(l);
   }
 
-  public JavaProjectsWalker withExtensionsAccepted(final Collection<String> extensions) {
+  public EclipseWorkspaceWalker withExtensionsAccepted(final Collection<String> extensions) {
     m_fileExtensions.clear();
     if (extensions != null && !extensions.isEmpty()) {
       for (final String e : extensions) {

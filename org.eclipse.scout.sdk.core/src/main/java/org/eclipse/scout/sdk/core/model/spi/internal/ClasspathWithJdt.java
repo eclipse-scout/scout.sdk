@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import org.eclipse.jdt.internal.compiler.batch.ClasspathLocation;
+import java.nio.file.Path;
+
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 
 public class ClasspathWithJdt implements ClasspathSpi {
@@ -21,21 +22,18 @@ public class ClasspathWithJdt implements ClasspathSpi {
   }
 
   @Override
-  public boolean isSource() {
-    //1=source
-    //2=binary
-    //3=mixed or unknown (target/classes = 2 or 3)
-    return (m_cp.getClasspath() instanceof ClasspathLocation) ? ((ClasspathLocation) m_cp.getClasspath()).getMode() == 1 : false;
+  public int getMode() {
+    return m_cp.mode();
   }
 
   @Override
-  public String getPath() {
-    return m_cp.getClasspath().getPath();
+  public Path getPath() {
+    return m_cp.path();
   }
 
   @Override
   public String getEncoding() {
-    return m_cp.getEncoding();
+    return m_cp.encoding();
   }
 
   @Override
@@ -49,6 +47,6 @@ public class ClasspathWithJdt implements ClasspathSpi {
       return false;
     }
     ClasspathWithJdt other = (ClasspathWithJdt) obj;
-    return this.isSource() == other.isSource() && this.getPath().equals(other.getPath());
+    return this.m_cp.equals(other.m_cp);
   }
 }
