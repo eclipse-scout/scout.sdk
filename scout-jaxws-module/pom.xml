@@ -23,7 +23,7 @@
 
   <groupId>org.eclipse.scout.archetypes</groupId>
   <artifactId>scout-jaxws-module</artifactId>
-  <version>7.0.150-SNAPSHOT</version>
+  <version>7.0.150.001_Oxygen_1a_RC1</version>
   <packaging>maven-archetype</packaging>
 
   <name>Scout JaxWs Module</name>
@@ -108,7 +108,7 @@
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
     <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.sdk</developerConnection>
-    <tag>releases/7.0.x</tag>
+    <tag>7.0.150.001_Oxygen_1a_RC1</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
   </scm>
 
