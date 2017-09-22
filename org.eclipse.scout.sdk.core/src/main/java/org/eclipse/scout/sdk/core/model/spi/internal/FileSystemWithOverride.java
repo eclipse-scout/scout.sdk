@@ -85,7 +85,7 @@ public class FileSystemWithOverride extends FileSystem {
   }
 
   // @Override // override of the Java9 version
-  public NameEnvironmentAnswer findType(char[][] compoundName, char[] moduleName) {
+  public NameEnvironmentAnswer findType(final char[][] compoundName, final char[] moduleName) {
     final NameEnvironmentAnswer answer = searchInOverrideSupport(compoundName);
     if (answer != null) {
       return answer;
@@ -93,7 +93,7 @@ public class FileSystemWithOverride extends FileSystem {
     return superFindType(compoundName, moduleName); // super call using reflection for backwards compatibility
   }
 
-  private NameEnvironmentAnswer superFindType(char[][] compoundName, char[] moduleName) {
+  private NameEnvironmentAnswer superFindType(final char[][] compoundName, final char[] moduleName) {
     try {
       final MethodHandle superFindType = MethodHandles.lookup()
           .findSpecial(FileSystem.class,
@@ -102,13 +102,13 @@ public class FileSystemWithOverride extends FileSystem {
               FileSystemWithOverride.class);
       return (NameEnvironmentAnswer) superFindType.invoke(this, compoundName, moduleName);
     }
-    catch (Throwable e) {
+    catch (final Throwable e) {
       throw new SdkException(e);
     }
   }
 
   //@Override // override of the Java9 version
-  public NameEnvironmentAnswer findType(char[] typeName, char[][] packageName, char[] moduleName) {
+  public NameEnvironmentAnswer findType(final char[] typeName, final char[][] packageName, final char[] moduleName) {
     final NameEnvironmentAnswer answer = searchInOverrideSupport(typeName, packageName);
     if (answer != null) {
       return answer;
@@ -116,7 +116,7 @@ public class FileSystemWithOverride extends FileSystem {
     return superFindType(typeName, packageName, moduleName);
   }
 
-  private NameEnvironmentAnswer superFindType(char[] typeName, char[][] packageName, char[] moduleName) {
+  private NameEnvironmentAnswer superFindType(final char[] typeName, final char[][] packageName, final char[] moduleName) {
     try {
       final MethodHandle superFindType = MethodHandles.lookup()
           .findSpecial(FileSystem.class,
@@ -125,31 +125,31 @@ public class FileSystemWithOverride extends FileSystem {
               FileSystemWithOverride.class);
       return (NameEnvironmentAnswer) superFindType.invoke(this, typeName, packageName, moduleName);
     }
-    catch (Throwable e) {
+    catch (final Throwable e) {
       throw new SdkException(e);
     }
   }
 
   // @Override // override of the Java9 version
-  public boolean hasCompilationUnit(char[][] qualifiedPackageName, char[] moduleName) {
-    for (ICompilationUnit icu : overrideSupport().getCompilationUnits()) {
+  public boolean hasCompilationUnit(final char[][] qualifiedPackageName, final char[] moduleName, final boolean checkCUs) {
+    for (final ICompilationUnit icu : overrideSupport().getCompilationUnits()) {
       if (CharOperation.equals(icu.getPackageName(), qualifiedPackageName)) {
         return true;
       }
     }
-    return superHasCompilationUnit(qualifiedPackageName, moduleName);
+    return superHasCompilationUnit(qualifiedPackageName, moduleName, checkCUs);
   }
 
-  private boolean superHasCompilationUnit(final char[][] qualifiedPackageName, char[] moduleName) {
+  private boolean superHasCompilationUnit(final char[][] qualifiedPackageName, final char[] moduleName, final boolean checkCUs) {
     try {
       final MethodHandle superHasCompilationUnit = MethodHandles.lookup()
           .findSpecial(FileSystem.class,
               "hasCompilationUnit",
-              MethodType.methodType(boolean.class, char[][].class, char[].class),
+              MethodType.methodType(boolean.class, char[][].class, char[].class, boolean.class),
               FileSystemWithOverride.class);
-      return (Boolean) superHasCompilationUnit.invoke(this, qualifiedPackageName, moduleName);
+      return (Boolean) superHasCompilationUnit.invoke(this, qualifiedPackageName, moduleName, checkCUs);
     }
-    catch (Throwable e) {
+    catch (final Throwable e) {
       throw new SdkException(e);
     }
   }
