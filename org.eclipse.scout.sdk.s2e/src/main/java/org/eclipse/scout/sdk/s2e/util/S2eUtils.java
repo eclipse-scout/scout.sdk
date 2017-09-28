@@ -585,6 +585,12 @@ public final class S2eUtils {
     if (!exists(element) || !exists(project)) {
       return false;
     }
+    final boolean isInWorkspace = element.getResource() != null;
+    if (isInWorkspace) {
+      // if the element is in the workspace (not binary in a library): check on the project level. Otherwise the results of IJavaProject#isOnClasspath() may be wrong!
+      // do not calculate the classpath visibility based on the project for binary types because their project may be any project having this dependency which may be wrong.
+      return project.isOnClasspath(element.getJavaProject());
+    }
     return project.isOnClasspath(element);
   }
 
