@@ -61,6 +61,7 @@
          <command
                commandId="org.eclipse.scout.sdk.s2e.nls.commands.searchMissingTextKeys"
                id="org.eclipse.scout.sdk.s2e.nls.menu.searchMissingTextKeys"
+               tooltip="Searches text keys that are used in the code but do not exist in a visible Scout Text Provider Service."
                style="push">
          </command>
       </menuContribution>
