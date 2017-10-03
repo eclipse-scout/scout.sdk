@@ -30,6 +30,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryP
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
 import org.eclipse.m2e.core.ui.internal.wizards.MappingDiscoveryJob;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
@@ -37,6 +38,7 @@ import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.osgi.framework.Version;
 
 /**
  * <h3>{@link ScoutProjectNewWizard}</h3> Wizard that creates a new Scout project
@@ -72,7 +74,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
     op.setDisplayName(m_page1.getDisplayName());
     op.setGroupId(m_page1.getGroupId());
     op.setArtifactId(m_page1.getArtifactId());
-    op.setJavaVersion(Double.toString(getExecEnvVersion(getDefaultJvmExecutionEnvironment())));
+    op.setJavaVersion(getDefaultWorkspaceJavaVersion());
     if (m_page1.isUseWorkspaceLocation()) {
       op.setTargetDirectory(ScoutProjectNewWizardPage.getWorkspaceLocation());
     }
@@ -143,60 +145,70 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
     }
   }
 
-  /**
-   * Gets the default execution environment (e.g. "JavaSE-1.8") supported in the current default JVMs and the given
-   * target platform.<br>
-   * Use {@link #getExecEnvVersion(String)} to parse the execution environment to a double.
-   *
-   * @param targetPlatformVersion
-   *          The target platform to which the execution environment must be compatible or <code>null</code> if no
-   *          compatibility should be ensured.
-   * @return A string like "JavaSE-1.8" with the latest version supported in the current default JVMs and the given
-   *         target platform.
-   * @see #getExecEnvVersion(String)
-   */
-  protected static String getDefaultJvmExecutionEnvironment() {
-    // defaults
-    String execEnv = EXEC_ENV_PREFIX + MIN_JVM_VERSION;
-    double execEnvVersion = getExecEnvVersion(execEnv);
-
-    IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
-    if (defaultVm != null) {
-      for (IExecutionEnvironment env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
-        String executionEnvId = env.getId();
-        if (env.isStrictlyCompatible(defaultVm)) {
-          double envVersion = getExecEnvVersion(executionEnvId);
-          if (envVersion > execEnvVersion) {
-            execEnv = executionEnvId; // take the newest
-          }
-        }
-      }
-    }
-    return execEnv;
+  protected static String getDefaultWorkspaceJavaVersion() {
+    return versionToString(computeDefaultWorkspaceJavaVersion());
   }
 
   /**
-   * Takes an java execution environment (e.g. "JavaSE-1.9") and parses the version as double (in this example 1.9).<br>
+   * Converts the specified {@link Version} to a {@link String}. Only the major and minor parts are used. Trailing
+   * zeroes are omitted.<br>
+   *
+   * @param version
+   *          The {@link Version} to convert.
+   * @return E.g. "1.8" or "9".
+   */
+  protected static String versionToString(final Version version) {
+    final StringBuilder b = new StringBuilder(4);
+    b.append(version.getMajor());
+    if (version.getMinor() != 0) {
+      b.append('.').append(version.getMinor());
+    }
+    return b.toString();
+  }
+
+  /**
+   * Gets the default Java version supported by the current default JVM of the workspace.
+   *
+   * @return A {@link Version} like "1.8.0" or "9.0.0" with the latest version supported in the current default JVM.
+   */
+  protected static Version computeDefaultWorkspaceJavaVersion() {
+    Version result = Version.parseVersion(MIN_JVM_VERSION);
+    final IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
+    if (defaultVm == null) {
+      return result;
+    }
+
+    for (final IExecutionEnvironment env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
+      if (env.isStrictlyCompatible(defaultVm)) {
+        final Version cur = execEnvironmentToVersion(env.getId());
+        if (cur.compareTo(result) > 0) {
+          result = cur; // take the newest
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Takes a Java execution environment (e.g. "JavaSE-1.8" or "JavaSE-9") and converts it to a {@link Version}.<br>
    * If an invalid value is passed, always 1.8 is returned as minimal version.<br>
-   * Use {@link #getDefaultJvmExecutionEnvironment()} to get the default execution environment in the current workspace.
    *
    * @param executionEnvId
-   *          The execution environment to parse.
-   * @return The version as double.
+   *          The execution environment of the form "JavaSE-1.8" or "JavaSE-9 to parse.
+   * @return The {@link Version} holding the decimal equivalent value. E.g. {@code 1.8.0} or {@code 9.0.0}.
    */
-  protected static double getExecEnvVersion(String executionEnvId) {
+  protected static Version execEnvironmentToVersion(final String executionEnvId) {
     if (executionEnvId != null && executionEnvId.startsWith(EXEC_ENV_PREFIX)) {
       String numPart = executionEnvId.substring(EXEC_ENV_PREFIX.length());
       if (StringUtils.isNotBlank(numPart)) {
         try {
-          double ret = Double.parseDouble(numPart);
-          return ret;
+          return Version.parseVersion(numPart);
         }
-        catch (NumberFormatException e) {
-          //nop
+        catch (final IllegalArgumentException e) {
+          SdkLog.warning("Invalid number part ({}) in execution environment {}.", numPart, executionEnvId, e);
         }
       }
     }
-    return Double.parseDouble(MIN_JVM_VERSION);
+    return Version.parseVersion(MIN_JVM_VERSION);
   }
 }
