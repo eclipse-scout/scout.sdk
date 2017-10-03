@@ -62,11 +62,13 @@
             <command
                commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerAllTypeChangedHandlers"
                id="org.eclipse.scout.sdk.s2e.ui.menu.triggerAllTypeChangedHandlers"
+               tooltip="Updates all derived resources in the Workspace."
                style="push">
             </command>
             <command
                commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
                id="org.eclipse.scout.sdk.s2e.ui.menu.triggerSelectedTypeChangedHandlers"
+               tooltip="Updates the resources that are derived from a file in the selected scope."
                style="push">
             </command>
             <separator
@@ -76,11 +78,13 @@
             <command
                commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
                id="org.eclipse.scout.sdk.s2e.ui.menu.wellform"
+               tooltip="Wellforms all Scout classes in the Workspace to conform to the default structure."
                style="push">
             </command>
             <command
                commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
                id="org.eclipse.scout.sdk.s2e.ui.menu.wellformSelected"
+               tooltip="Wellforms the Scout classes in the selected scope to conform to the default structure."
                style="push">
             </command>
             <separator
@@ -90,11 +94,13 @@
             <command
                commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
                id="org.eclipse.scout.sdk.s2e.ui.menu.missingClassId"
+               tooltip="Creates all @ClassId Annotations on classes in the Workspace that support the annotation but currently don't have one."
                style="push">
             </command>
             <command
                commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
                id="org.eclipse.scout.sdk.s2e.ui.menu.missingClassIdSelected"
+               tooltip="Creates all @ClassId Annotations on classes in the selected scope that support the annotation but currently don't have one."
                style="push">
             </command>
          </menu>
@@ -237,7 +243,7 @@
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateMissingClassIdsSelectedHandler">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateSelectedMissingClassIdsHandler">
       </handler>
    </extension>
    <extension

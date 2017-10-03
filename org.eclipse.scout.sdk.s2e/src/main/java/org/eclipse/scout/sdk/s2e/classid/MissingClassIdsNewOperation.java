@@ -16,8 +16,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -56,6 +59,8 @@ import org.eclipse.text.edits.TextEdit;
  * @since 3.10.0 2014-01-05
  */
 public class MissingClassIdsNewOperation implements IOperation {
+
+  private Predicate<IResource> m_filter;
 
   @Override
   public String getOperationName() {
@@ -112,6 +117,17 @@ public class MissingClassIdsNewOperation implements IOperation {
     return result;
   }
 
+  protected boolean acceptFilter(IType candidate) {
+    final IResource resource = candidate.getResource();
+    if (resource == null || !resource.isAccessible()) {
+      return false; // exclude binary types
+    }
+    return filter()
+        .map(f -> f.test(resource))
+        .orElse(Boolean.TRUE)
+        .booleanValue();
+  }
+
   protected void processCandidates(Collection<IType> candidates, SubMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     SubMonitor subMonitor = monitor.newChild(2);
     subMonitor.setWorkRemaining(candidates.size());
@@ -124,7 +140,7 @@ public class MissingClassIdsNewOperation implements IOperation {
           && t.isClass()
           && !t.isBinary()
           && !t.isAnonymous();
-      if (isValidType) {
+      if (isValidType && acceptFilter(t)) {
         IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
         if (annotation == null) {
           ICompilationUnit icu = t.getCompilationUnit();
@@ -189,5 +205,14 @@ public class MissingClassIdsNewOperation implements IOperation {
     catch (BadLocationException e) {
       SdkLog.warning("Could not update @ClassId annotations for compilation unit '{}'.", icu.getElementName(), e);
     }
+  }
+
+  public Optional<Predicate<IResource>> filter() {
+    return Optional.ofNullable(m_filter);
+  }
+
+  public MissingClassIdsNewOperation withFilter(final Predicate<IResource> filter) {
+    m_filter = filter;
+    return this;
   }
 }

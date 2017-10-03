@@ -33,10 +33,12 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IElementChangedListener;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -47,12 +49,13 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeReferenceMatch;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 
 /**
  * <h3>{@link ClassIdValidationJob}</h3>
@@ -185,36 +188,41 @@ public final class ClassIdValidationJob extends AbstractJob {
     return ids;
   }
 
-  private static boolean hasVisibleClassIds(IAnnotation current, List<IAnnotation> matchesById) {
-    for (IAnnotation m : matchesById) {
-      if (m != current && S2eUtils.isOnClasspath(m, current.getJavaProject())) {
-        return true;
+  private static IAnnotation getVisibleDuplicate(final IJavaElement current, final Iterable<IAnnotation> matchesById) {
+    final IJavaProject jp = current.getJavaProject();
+    for (final IAnnotation m : matchesById) {
+      if (m != current && S2eUtils.isOnClasspath(m, jp)) {
+        return m;
       }
     }
-    return false;
+    return null;
   }
 
   private static void createDuplicateMarkers(Map<String, List<IAnnotation>> annotations) throws CoreException {
     for (Entry<String, List<IAnnotation>> matches : annotations.entrySet()) {
       List<IAnnotation> matchesById = matches.getValue();
       if (matchesById.size() > 1) {
-        for (IAnnotation duplicate : matchesById) {
-          IType parent = (IType) duplicate.getAncestor(IJavaElement.TYPE);
-          if (S2eUtils.exists(parent) && hasVisibleClassIds(duplicate, matchesById)) {
-            ISourceRange sourceRange = duplicate.getSourceRange();
-            if (sourceRange != null && sourceRange.getOffset() >= 0) {
-              IMarker marker = duplicate.getResource().createMarker(CLASS_ID_DUPLICATE_MARKER_ID);
-              marker.setAttribute(IMarker.MESSAGE, "Duplicate @ClassId value '" + matches.getKey() + "' in type '" + parent.getFullyQualifiedName() + "'.");
+        for (final IAnnotation duplicate : matchesById) {
+          final IAnnotation other = getVisibleDuplicate(duplicate, matchesById);
+          final IType parent = (IType) duplicate.getAncestor(IJavaElement.TYPE);
+          if (S2eUtils.exists(parent) && S2eUtils.exists(other)) {
+            @SuppressWarnings("squid:S2259")
+            final IType otherParent = (IType) other.getAncestor(IJavaElement.TYPE);
+            final ISourceRange sourceRange = duplicate.getSourceRange();
+            if (S2eUtils.exists(otherParent) && SourceRange.isAvailable(sourceRange)) {
+              final IMarker marker = duplicate.getResource().createMarker(CLASS_ID_DUPLICATE_MARKER_ID);
+              marker.setAttribute(IMarker.MESSAGE, "Duplicate @ClassId. Value '" + matches.getKey() + "' of type '" + parent.getFullyQualifiedName()
+                  + "' is the same as of type '" + otherParent.getFullyQualifiedName() + "'.");
               marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
               marker.setAttribute(IMarker.CHAR_START, sourceRange.getOffset());
               marker.setAttribute(IMarker.CHAR_END, sourceRange.getOffset() + sourceRange.getLength());
               marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
               try {
-                Document doc = new Document(parent.getCompilationUnit().getSource());
+                final IDocument doc = new Document(parent.getCompilationUnit().getSource());
                 marker.setAttribute(IMarker.LINE_NUMBER, doc.getLineOfOffset(sourceRange.getOffset()) + 1);
               }
-              catch (BadLocationException e) {
-                throw new CoreException(new ScoutStatus(e));
+              catch (final BadLocationException e) {
+                throw new SdkException(e);
               }
               marker.setAttribute(CLASS_ID_ATTR_ANNOTATION, duplicate);
             }
