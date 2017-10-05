@@ -98,7 +98,7 @@ public class SdkLogTest {
 
   @Test
   public void testLogOfObjectWithToStringThrowingException() throws Exception {
-    runWithPrivateLogger(new ILogTestRunner() {
+    runWithPrivateLogger(Level.WARNING, new ILogTestRunner() {
       @Override
       public void run(StringBuilder logContent) throws Exception {
         SdkLog.error("Msg: {}", new ClassWithToStringThrowingNpeFixture());
@@ -110,7 +110,7 @@ public class SdkLogTest {
 
   @Test
   public void testLog() throws Exception {
-    runWithPrivateLogger(new ILogTestRunner() {
+    runWithPrivateLogger(Level.WARNING, new ILogTestRunner() {
       @Override
       public void run(StringBuilder logContent) {
         SdkLog.warning("hello");
@@ -161,12 +161,14 @@ public class SdkLogTest {
     void run(StringBuilder logContent) throws Exception;
   }
 
-  private static void runWithPrivateLogger(ILogTestRunner runnable) throws Exception {
+  private static void runWithPrivateLogger(Level initialLevel, ILogTestRunner runnable) throws Exception {
     // lock on console to ensure no other thread writes to the console while we are testing (in case tests are running in parallel)
     synchronized (SdkConsole.class) {
       ISdkConsoleSpi backup = SdkConsole.getConsoleSpi();
+      Level levelBackup = SdkLog.getLogLevel();
       try {
         final StringBuilder logContent = new StringBuilder();
+        SdkLog.setLogLevel(initialLevel);
         SdkConsole.setConsoleSpi(new ISdkConsoleSpi() {
 
           @Override
@@ -192,6 +194,7 @@ public class SdkLogTest {
 
       }
       finally {
+        SdkLog.setLogLevel(levelBackup);
         SdkConsole.setConsoleSpi(backup);
       }
     }
