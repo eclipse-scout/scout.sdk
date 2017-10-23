@@ -17,9 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.util.SdkException;
 
@@ -87,31 +87,27 @@ public class JreInfo {
   }
 
   private List<Path> resolvePlatformLibrariesLegacy() {
+    // fall back to try to retrieve them out of the lib directory
     final Path jreHome = jreHome();
-    final Stream<Path> libDirs;
-    final String osName = System.getProperty("os.name");
-    if (StringUtils.isNotEmpty(osName) && osName.toLowerCase().startsWith("mac")) {
-      libDirs = Stream.of(jreHome.resolve("../Classes").normalize());
-    }
-    else {
-      // fall back to try to retrieve them out of the lib directory
-      libDirs = Stream.of(jreHome.resolve("lib"), jreHome.resolve("lib/ext"));
-    }
+    final Stream<Path> libDirs = Stream.of(jreHome.resolve("lib"), jreHome.resolve("lib/ext"));
 
     final List<Path> result = libDirs
         .flatMap(JreInfo::listFiles)
         .filter(JreInfo::isArchive)
         .collect(toList());
 
-    final Path classesDir = jreHome.resolve("classes");
-    if (Files.isReadable(classesDir) && Files.isDirectory(classesDir)) {
-      result.add(classesDir);
-    }
+    Optional.of(jreHome.resolve("classes"))
+        .filter(Files::isReadable)
+        .filter(Files::isDirectory)
+        .ifPresent(result::add);
 
     return result;
   }
 
   private static Stream<Path> listFiles(final Path directory) {
+    if (!Files.isReadable(directory) || !Files.isDirectory(directory)) {
+      return Stream.empty();
+    }
     try {
       return Files.list(directory);
     }
