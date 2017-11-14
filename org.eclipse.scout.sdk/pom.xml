@@ -65,9 +65,9 @@
 
      <!-- exclude fixtures -->
     <sonar.exclusions>
-      **/src/main/fixture/**,
-      **/src/main/client/**,
-      **/src/main/shared/**
+      **/src/main/fixture/**/*,
+      **/src/main/client/**/*,
+      **/src/main/shared/**/*
     </sonar.exclusions>
 
     <!-- exclude fixtures, archetypes, UI -->
