@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFact
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.AbstractEntitySourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.IMethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
@@ -121,7 +122,6 @@ public class WebServiceClientSourceBuilder extends AbstractEntitySourceBuilder {
   }
 
   protected ITypeSourceBuilder createUrlPropertyType() {
-
     ITypeSourceBuilder urlProperty = new TypeSourceBuilder(getBaseName() + ISdkProperties.SUFFIX_WS_URL_PROPERTY);
     urlProperty.setFlags(Flags.AccPublic | Flags.AccStatic);
     urlProperty.setSuperTypeSignature(Signature.createTypeSignature(IScoutRuntimeTypes.AbstractStringConfigProperty));
@@ -129,6 +129,12 @@ public class WebServiceClientSourceBuilder extends AbstractEntitySourceBuilder {
     IMethodSourceBuilder getKey = MethodSourceBuilderFactory.createOverride(urlProperty, getPackageName(), getJavaEnvironment(), "getKey");
     getKey.setBody(new RawSourceBuilder("return " + CoreUtils.toStringLiteral(getUrlPropertyName()) + ';'));
     urlProperty.addMethod(getKey);
+
+    IMethodSourceBuilder description = new MethodSourceBuilder("description");
+    description.setFlags(Flags.AccPublic);
+    description.setReturnTypeSignature(Signature.createTypeSignature(String.class.getName()));
+    description.setBody(new RawSourceBuilder("return null; " + CoreUtils.getCommentBlock("documentation")));
+    urlProperty.addMethod(description);
 
     return urlProperty;
   }

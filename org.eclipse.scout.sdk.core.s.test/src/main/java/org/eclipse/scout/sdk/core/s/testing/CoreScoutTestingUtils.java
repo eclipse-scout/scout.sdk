@@ -58,8 +58,7 @@ public final class CoreScoutTestingUtils {
   }
 
   /**
-   * @return a {@link IJavaEnvironment} for org.eclipse.*.shared tests, without the org.eclipse.scout.rt.client
-   *         dependency
+   * @return a {@link IJavaEnvironment} for org.eclipse.*.shared tests, without the org.eclipse.scout.rt.client dependency
    */
   public static IJavaEnvironment createSharedJavaEnvironment() {
     return new JavaEnvironmentBuilder()
@@ -171,8 +170,8 @@ public final class CoreScoutTestingUtils {
   }
 
   /**
-   * Creates a new Scout project based on the helloworld archetype using group id {@link #PROJECT_GROUP_ID} and
-   * artifactId {@link #PROJECT_ARTIFACT_ID}.
+   * Creates a new Scout project based on the helloworld archetype using group id {@link #PROJECT_GROUP_ID} and artifactId
+   * {@link #PROJECT_ARTIFACT_ID}.
    *
    * @return The root directory that contains the created projects.
    * @throws IOException
@@ -183,7 +182,7 @@ public final class CoreScoutTestingUtils {
 
     // create a config.properties in the src/test/resources of the server to use the jax-ws-ri of the JRE instead of metro which is the default.
     File testConfigProperties = new File(targetDirectory, PROJECT_ARTIFACT_ID + '/' + PROJECT_ARTIFACT_ID + ".server/src/test/resources/config.properties");
-    byte[] configContent = ("jaxws.implementor=" + IScoutRuntimeTypes.JaxWsRISpecifics + "\n").getBytes(StandardCharsets.UTF_8);
+    byte[] configContent = ("scout.jaxws.implementor=" + IScoutRuntimeTypes.JaxWsRISpecifics + "\n").getBytes(StandardCharsets.UTF_8);
     Files.write(testConfigProperties.toPath(), configContent, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
 
     return targetDirectory;
