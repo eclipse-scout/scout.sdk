@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
-import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.operation.AnnotationNewOperation;
 import org.eclipse.scout.sdk.s2e.operation.IOperation;
@@ -79,7 +78,6 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
                 SdkLog.debug("Unable to delete marker on '{}'.", resource.getFullPath().toOSString(), e);
               }
             }
-            ClassIdValidationJob.executeAsync(0); // the modification of the annotation does not cause an annotation modify event to be triggered
           }
         });
         j.schedule();
