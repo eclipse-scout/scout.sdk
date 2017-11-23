@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipError;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,16 +29,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.IAnnotation;
-import org.eclipse.jdt.core.IElementChangedListener;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
@@ -69,7 +65,6 @@ public final class ClassIdValidationJob extends AbstractJob {
   public static final String CLASS_ID_DUPLICATE_MARKER_ID = "org.eclipse.scout.sdk.classid.duplicate";
   public static final String CLASS_ID_ATTR_ANNOTATION = "SCOUT_CLASS_ID_ATTR_ANNOTATION";
 
-  private static IElementChangedListener listener;
   private final Set<IType> m_classIdTypes;
 
   private ClassIdValidationJob(Set<IType> classIdTypes) {
@@ -144,21 +139,6 @@ public final class ClassIdValidationJob extends AbstractJob {
   @Override
   public boolean belongsTo(Object family) {
     return CLASS_ID_VALIDATION_JOB_FAMILY.equals(family);
-  }
-
-  public static synchronized void install() {
-    if (listener == null) {
-      listener = new P_ResourceChangeListener();
-      JavaCore.addElementChangedListener(listener);
-    }
-  }
-
-  public static synchronized void uninstall() {
-    if (listener != null) {
-      JavaCore.removeElementChangedListener(listener);
-      listener = null;
-    }
-    Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
   }
 
   private Map<String /*classid*/, List<IAnnotation>> getClassIdOccurrences(IProgressMonitor monitor) throws CoreException {
@@ -252,51 +232,6 @@ public final class ClassIdValidationJob extends AbstractJob {
     createDuplicateMarkers(classIdOccurrences);
   }
 
-  private static final class P_ResourceChangeListener implements IElementChangedListener {
-    @Override
-    public void elementChanged(ElementChangedEvent event) {
-      IJavaElementDelta delta = event.getDelta();
-      visitDeltas(delta);
-    }
-
-    private boolean visitDeltas(IJavaElementDelta delta) {
-      if (delta == null) {
-        return false;
-      }
-
-      IJavaElement element = delta.getElement();
-      if (element == null) {
-        return false;
-      }
-
-      if (element.getElementType() == IJavaElement.ANNOTATION) {
-        IAnnotation annotation = (IAnnotation) element;
-        if (S2eUtils.exists(annotation) && annotation.getElementName().endsWith(Signature.getSimpleName(IScoutRuntimeTypes.ClassId))) {
-          executeAsync(4000);
-        }
-        return true; // finished processing
-      }
-
-      // step into children
-      for (IJavaElementDelta d : delta.getAffectedChildren()) {
-        boolean processed = visitDeltas(d);
-        if (processed) {
-          return true;
-        }
-      }
-
-      // step into annotations
-      for (IJavaElementDelta d : delta.getAnnotationDeltas()) {
-        boolean processed = visitDeltas(d);
-        if (processed) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-  }
-
   public static synchronized void executeAsync(final long startDelay) {
     Job currentJob = Job.getJobManager().currentJob();
     if (currentJob instanceof ResourceBlockingOperationJob) {
@@ -321,7 +256,7 @@ public final class ClassIdValidationJob extends AbstractJob {
           Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
 
           // start the new validation
-          new ClassIdValidationJob(classIds).schedule(startDelay);
+          new ClassIdValidationJob(classIds).schedule(TimeUnit.SECONDS.toMillis(1));
         }
         catch (IllegalStateException e) {
           // can happen e.g. when the preference nodes are changed: "java.lang.IllegalStateException: Preference node "org.eclipse.jdt.core" has been removed."
@@ -333,9 +268,10 @@ public final class ClassIdValidationJob extends AbstractJob {
         }
       }
     };
+    j.setPriority(Job.DECORATE);
     j.setSystem(true);
     j.setUser(false);
-    j.schedule();
+    j.schedule(startDelay);
   }
 
   private static final class P_SchedulingRule implements ISchedulingRule {
