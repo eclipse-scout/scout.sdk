@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
@@ -94,14 +95,11 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(getPreferenceStore().getBoolean(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION));
 
     // start class id validation
-    ClassIdValidationJob.install();
-    ClassIdValidationJob.executeAsync(15000);
+    ClassIdValidationJob.executeAsync(TimeUnit.MINUTES.toMillis(5));
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    ClassIdValidationJob.uninstall();
-
     if (m_preferencesPropertyListener != null) {
       getPreferenceStore().removePropertyChangeListener(m_preferencesPropertyListener);
       m_preferencesPropertyListener = null;

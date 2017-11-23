@@ -593,7 +593,8 @@ public final class S2eUtils {
     if (isInWorkspace) {
       // if the element is in the workspace (not binary in a library): check on the project level. Otherwise the results of IJavaProject#isOnClasspath() may be wrong!
       // do not calculate the classpath visibility based on the project for binary types because their project may be any project having this dependency which may be wrong.
-      return project.isOnClasspath(element.getJavaProject());
+      IJavaProject javaProjectOfElement = element.getJavaProject();
+      return project.equals(javaProjectOfElement) || project.isOnClasspath(javaProjectOfElement);
     }
     return project.isOnClasspath(element);
   }
