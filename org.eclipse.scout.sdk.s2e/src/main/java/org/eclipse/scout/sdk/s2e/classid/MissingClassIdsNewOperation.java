@@ -16,12 +16,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -29,8 +28,12 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
@@ -60,7 +63,7 @@ import org.eclipse.text.edits.TextEdit;
  */
 public class MissingClassIdsNewOperation implements IOperation {
 
-  private Predicate<IResource> m_filter;
+  private Set<IResource> m_selection;
 
   @Override
   public String getOperationName() {
@@ -76,11 +79,11 @@ public class MissingClassIdsNewOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     SubMonitor progress = SubMonitor.convert(monitor, 10);
     try {
-      Collection<IType> candidates = findCandidates(progress.newChild(2));
+      Collection<IType> candidates = findCandidates(progress.newChild(8));
       if (candidates.isEmpty()) {
         return;
       }
-      processCandidates(candidates, progress.newChild(8), workingCopyManager);
+      processCandidates(candidates, progress.newChild(2), workingCopyManager);
     }
     catch (OperationCanceledException e) {
       SdkLog.debug("Creation of missing @ClassId annotations has been cancelled.", e);
@@ -88,7 +91,39 @@ public class MissingClassIdsNewOperation implements IOperation {
   }
 
   protected ITypeHierarchy createHierarchy(IType iTypeWithClassId, SubMonitor monitor) throws CoreException {
+    if (useRegion()) {
+      return createRegionHierarchy(monitor);
+    }
     return iTypeWithClassId.newTypeHierarchy(monitor);
+  }
+
+  /**
+   * Decides whether to use a resource based type hierarchy or if the full classid hierarchy should be calculated.
+   */
+  protected boolean useRegion() {
+    Set<IResource> selection = selection();
+    if (selection.isEmpty() || selection.size() > 100) {
+      return false;
+    }
+    for (IResource r : selection) {
+      if (r.getType() != IResource.FILE) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  protected ITypeHierarchy createRegionHierarchy(SubMonitor monitor) throws JavaModelException {
+    IRegion region = JavaCore.newRegion();
+    for (IResource r : selection()) {
+      if (r != null && r.isAccessible()) {
+        IJavaElement element = JavaCore.create(r);
+        if (S2eUtils.exists(element)) {
+          region.add(element);
+        }
+      }
+    }
+    return JavaCore.newTypeHierarchy(region, null, monitor);
   }
 
   protected Collection<IType> findCandidates(SubMonitor monitor) throws CoreException {
@@ -117,15 +152,26 @@ public class MissingClassIdsNewOperation implements IOperation {
     return result;
   }
 
-  protected boolean acceptFilter(IType candidate) {
+  protected boolean acceptType(IType candidate) {
     final IResource resource = candidate.getResource();
     if (resource == null || !resource.isAccessible()) {
       return false; // exclude binary types
     }
-    return filter()
-        .map(f -> f.test(resource))
-        .orElse(Boolean.TRUE)
-        .booleanValue();
+
+    if (selection().isEmpty()) {
+      return true; // not limited to resources: accept all
+    }
+    return isInResources(resource);
+  }
+
+  protected boolean isInResources(final IResource candidate) {
+    final IPath location = candidate.getLocation();
+    for (IResource r : selection()) {
+      if (r.getLocation().isPrefixOf(location)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   protected void processCandidates(Collection<IType> candidates, SubMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
@@ -140,7 +186,7 @@ public class MissingClassIdsNewOperation implements IOperation {
           && t.isClass()
           && !t.isBinary()
           && !t.isAnonymous();
-      if (isValidType && acceptFilter(t)) {
+      if (isValidType && acceptType(t)) {
         IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
         if (annotation == null) {
           ICompilationUnit icu = t.getCompilationUnit();
@@ -207,12 +253,15 @@ public class MissingClassIdsNewOperation implements IOperation {
     }
   }
 
-  public Optional<Predicate<IResource>> filter() {
-    return Optional.ofNullable(m_filter);
+  public Set<IResource> selection() {
+    if (m_selection == null) {
+      return Collections.emptySet();
+    }
+    return m_selection;
   }
 
-  public MissingClassIdsNewOperation withFilter(final Predicate<IResource> filter) {
-    m_filter = filter;
+  public MissingClassIdsNewOperation withSelection(Set<IResource> selection) {
+    m_selection = selection;
     return this;
   }
 }

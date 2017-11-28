@@ -16,7 +16,6 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.classid.MissingClassIdsNewOperation;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
@@ -40,23 +39,9 @@ public class CreateSelectedMissingClassIdsHandler extends AbstractHandler {
     }
 
     final IOperation operation = new MissingClassIdsNewOperation()
-        .withFilter(res -> isInResources(resourcesFromSelection, res));
+        .withSelection(resourcesFromSelection);
 
-    new ResourceBlockingOperationJob(operation, resourcesFromSelection.toArray(new IResource[resourcesFromSelection.size()]))
-        .schedule();
+    new ResourceBlockingOperationJob(operation, resourcesFromSelection.toArray(new IResource[resourcesFromSelection.size()])).schedule();
     return null;
-  }
-
-  protected static boolean isInResources(final Set<IResource> resourcesFromSelection, final IResource candidate) {
-    if (resourcesFromSelection == null) {
-      return true;
-    }
-    final IPath location = candidate.getLocation();
-    for (IResource r : resourcesFromSelection) {
-      if (r.getLocation().isPrefixOf(location)) {
-        return true;
-      }
-    }
-    return false;
   }
 }
