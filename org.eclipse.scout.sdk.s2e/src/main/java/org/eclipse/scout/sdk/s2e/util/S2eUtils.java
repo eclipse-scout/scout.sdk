@@ -137,7 +137,7 @@ public final class S2eUtils {
    * @return The resulting {@link org.eclipse.scout.sdk.core.model.api.IType}
    * @throws CoreException
    */
-  public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType) throws CoreException {
+  public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType) {
     return jdtTypeToScoutType(jdtType, ScoutSdkCore.createJavaEnvironment(jdtType.getJavaProject()));
   }
 
