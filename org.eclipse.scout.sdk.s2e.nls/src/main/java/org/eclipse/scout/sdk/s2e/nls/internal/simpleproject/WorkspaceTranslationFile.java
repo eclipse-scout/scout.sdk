@@ -146,7 +146,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
 
         S2eUtils.writeFiles(Collections.singletonList(new ResourceWriteOperation(m_file, builder.toString())), monitor, true);
       }
-      catch (IOException | CoreException e) {
+      catch (IOException e) {
         SdkLog.error("could not refresh file: {}", m_file.getName(), e);
       }
     }

@@ -136,7 +136,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
     return resourceName.matches(prefix + "(_[a-zA-Z]{2}){0,3}" + "\\.properties");
   }
 
-  private void createTranslationFile(Language language, IFolder folder, IProgressMonitor monitor) throws CoreException {
+  private void createTranslationFile(Language language, IFolder folder, IProgressMonitor monitor) {
     String fileName = getLocalizedPropertiesFileName(getNlsType().getTranslationsPrefix(), language);
     IFile file = folder.getFile(new Path(fileName));
     if (!file.exists()) {
@@ -158,12 +158,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
 
       @Override
       public void execute(IProgressMonitor monitor) {
-        try {
-          createTranslationFile(m_model.getLanguage(), m_model.getFolder(), new NullProgressMonitor());
-        }
-        catch (CoreException e) {
-          SdkLog.error("Unable to create new language.", e);
-        }
+        createTranslationFile(m_model.getLanguage(), m_model.getFolder(), new NullProgressMonitor());
       }
 
       @Override

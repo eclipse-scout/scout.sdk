@@ -135,7 +135,6 @@ public final class S2eUtils {
    * @param jdtType
    *          The input jdt {@link IType}
    * @return The resulting {@link org.eclipse.scout.sdk.core.model.api.IType}
-   * @throws CoreException
    */
   public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType) {
     return jdtTypeToScoutType(jdtType, ScoutSdkCore.createJavaEnvironment(jdtType.getJavaProject()));
@@ -182,8 +181,7 @@ public final class S2eUtils {
    * @param jdtType
    *          The jdt {@link IType} to convert.
    * @param env
-   *          The {@link IJavaEnvironment} to use to find the matching
-   *          {@link org.eclipse.scout.sdk.core.model.api.IType}.
+   *          The {@link IJavaEnvironment} to use to find the matching {@link org.eclipse.scout.sdk.core.model.api.IType}.
    * @return The {@link org.eclipse.scout.sdk.core.model.api.IType} matching the given JDT {@link IType}.
    */
   public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType, IJavaEnvironment env) {
@@ -200,8 +198,8 @@ public final class S2eUtils {
    *          The fully qualified name of the base class. The sub classes of this class are searched.
    * @param monitor
    *          The monitor or <code>null</code>. If the monitor becomes canceled, the search is aborted and an incomplete
-   *          result may be returned. The caller of this method is responsible to react on this fact based on the
-   *          monitor state ({@link IProgressMonitor#isCanceled()}).
+   *          result may be returned. The caller of this method is responsible to react on this fact based on the monitor
+   *          state ({@link IProgressMonitor#isCanceled()}).
    * @return A {@link Set} containing all {@link IType}s sorted ascending by fully qualified name.
    * @throws CoreException
    */
@@ -220,9 +218,8 @@ public final class S2eUtils {
   }
 
   /**
-   * Gets all {@link IType}s on the classpath of the give {@link IJavaProject} that are sub classes of the given
-   * baseType and fulfill the given filter. If the base type itself fulfills the given filter, it is included in the
-   * result.
+   * Gets all {@link IType}s on the classpath of the give {@link IJavaProject} that are sub classes of the given baseType
+   * and fulfill the given filter. If the base type itself fulfills the given filter, it is included in the result.
    *
    * @param sourceProject
    *          The {@link IJavaProject} defining the classpath.
@@ -230,8 +227,8 @@ public final class S2eUtils {
    *          The base class of the hierarchy.
    * @param monitor
    *          The monitor or <code>null</code>. If the monitor becomes canceled, the search is aborted and an incomplete
-   *          result may be returned. The caller of this method is responsible to react on this fact based on the
-   *          monitor state ({@link IProgressMonitor#isCanceled()}).
+   *          result may be returned. The caller of this method is responsible to react on this fact based on the monitor
+   *          state ({@link IProgressMonitor#isCanceled()}).
    * @param filter
    *          A filter to decide which matches are accepted or <code>null</code> if all matches should be accepted.
    * @return A {@link Set} containing the {@link IType}s sorted ascending by simple name and fully qualified name
@@ -291,8 +288,8 @@ public final class S2eUtils {
    * Gets all {@link IType}s that are accessible in the current workspace having the given fully qualified name.
    *
    * @param fqn
-   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator
-   *          (e.g. <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
+   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator (e.g.
+   *          <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
    * @return
    * @throws CoreException
    */
@@ -304,8 +301,8 @@ public final class S2eUtils {
    * Gets all {@link IType}s that are accessible in the given scope having the given fully qualified name.
    *
    * @param fqn
-   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator
-   *          (e.g. <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
+   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator (e.g.
+   *          <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
    * @param scope
    *          The {@link IJavaSearchScope} that defines where to search.
    * @return A {@link Set} with all {@link IType}s
@@ -393,8 +390,8 @@ public final class S2eUtils {
    *          The {@link IType} where to start the search.
    * @param fullyQualifiedAnnotations
    *          The fully qualified names of the annotations to search.
-   * @return The first of the annotations found in the super hierarchy of the given {@link IType} or <code>null</code>
-   *         if it could not be found.
+   * @return The first of the annotations found in the super hierarchy of the given {@link IType} or <code>null</code> if
+   *         it could not be found.
    * @throws CoreException
    */
   public static IAnnotation getFirstAnnotationInSupertypeHierarchy(IType type, String... fullyQualifiedAnnotations) throws CoreException {
@@ -532,8 +529,8 @@ public final class S2eUtils {
    *          {@link SearchEngine#createJavaSearchScope(IJavaElement[])}.
    * @param monitor
    *          The monitor or <code>null</code>. If the monitor becomes canceled, the search is aborted and an incomplete
-   *          result may be returned. The caller of this method is responsible to react on this fact based on the
-   *          monitor state ({@link IProgressMonitor#isCanceled()}).
+   *          result may be returned. The caller of this method is responsible to react on this fact based on the monitor
+   *          state ({@link IProgressMonitor#isCanceled()}).
    * @throws CoreException
    */
   public static Set<IType> findAllTypesAnnotatedWith(String annotationName, IJavaSearchScope scope, final IProgressMonitor monitor) throws CoreException {
@@ -651,8 +648,8 @@ public final class S2eUtils {
    *          The {@link IAnnotation} for which the attribute should be converted.
    * @param name
    *          The name of attribute.
-   * @return A {@link String} with the value of the given attribute or <code>null</code> if the value is
-   *         <code>null</code> or could not be found.
+   * @return A {@link String} with the value of the given attribute or <code>null</code> if the value is <code>null</code>
+   *         or could not be found.
    * @throws JavaModelException
    */
   public static String getAnnotationValueString(IAnnotation annotation, String name) throws JavaModelException {
@@ -707,8 +704,8 @@ public final class S2eUtils {
    *          The resources that should be written
    * @return An {@link IStatus} describing if the given resources can be written now. If {@link IStatus#isOK()} returns
    *         <code>true</code>, it is safe to continue the write operation. Otherwise the {@link IStatus} contains the
-   *         files and reasons why this is not possible. This may be the case if the file is still read-only or because
-   *         it changed value in the mean time.
+   *         files and reasons why this is not possible. This may be the case if the file is still read-only or because it
+   *         changed value in the mean time.
    */
   @SuppressWarnings("pmd:NPathComplexity")
   public static IStatus makeCommittable(Collection<IResource> resources) {
@@ -797,14 +794,14 @@ public final class S2eUtils {
   }
 
   /**
-   * Executes the given {@link CompilationUnitWriteOperation}s in a new {@link ResourceBlockingOperationJob}, waits
-   * until all have finished and returns the resulting first {@link IType}s of each created or updated
+   * Executes the given {@link CompilationUnitWriteOperation}s in a new {@link ResourceBlockingOperationJob}, waits until
+   * all have finished and returns the resulting first {@link IType}s of each created or updated
    * {@link ICompilationUnit}.<br>
    * If you don't need the created or updated {@link IType}s it is faster to call
    * {@link #writeFiles(Collection, IProgressMonitor, boolean)}.<br>
    * <br>
-   * <b>Important:</b> If the {@link Job} invoking this method uses an {@link ISchedulingRule} that conflicts with one
-   * of the {@link IFile}s to be written, this will result in a deadlock! In that case use
+   * <b>Important:</b> If the {@link Job} invoking this method uses an {@link ISchedulingRule} that conflicts with one of
+   * the {@link IFile}s to be written, this will result in a deadlock! In that case use
    * {@link #writeType(IPackageFragmentRoot, ICompilationUnitSourceBuilder, IJavaEnvironment, IProgressMonitor, IWorkingCopyManager)}
    * instead or write the types sync using
    * {@link CompilationUnitWriteOperation#run(IProgressMonitor, IWorkingCopyManager)}.
@@ -861,11 +858,11 @@ public final class S2eUtils {
    * If you don't need the created or updated {@link IFile}s it is faster to call
    * {@link #writeFiles(Collection, IProgressMonitor, boolean)}.<br>
    * <br>
-   * <b>Important:</b> If the {@link Job} invoking this method uses an {@link ISchedulingRule} that conflicts with one
-   * of the {@link IFile}s to be written, this will result in a deadlock! In that case use
+   * <b>Important:</b> If the {@link Job} invoking this method uses an {@link ISchedulingRule} that conflicts with one of
+   * the {@link IFile}s to be written, this will result in a deadlock! In that case use
    * {@link #writeFiles(Collection, IProgressMonitor, boolean)} without waiting instead or write the files sync using
-   * {@link IFileWriteOperation#run(IProgressMonitor, IWorkingCopyManager)} if you need the resulting {@link IFile}
-   * after the invocation of this method.
+   * {@link IFileWriteOperation#run(IProgressMonitor, IWorkingCopyManager)} if you need the resulting {@link IFile} after
+   * the invocation of this method.
    *
    * @param ops
    *          The {@link IFileWriteOperation}s to execute
@@ -874,9 +871,8 @@ public final class S2eUtils {
    * @return A {@link List} containing all created or updated {@link IFile}s in the same order as the given
    *         {@link Collection} returns {@link IFileWriteOperation}s. Therefore the first {@link IFile} in the resulting
    *         {@link List} belongs to the first {@link IFileWriteOperation} in ops.
-   * @throws CoreException
    */
-  public static List<IFile> writeFiles(Collection<? extends IFileWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+  public static List<IFile> writeFiles(Collection<? extends IFileWriteOperation> ops, IProgressMonitor monitor) {
     if (ops == null || ops.isEmpty()) {
       return Collections.emptyList();
     }
@@ -903,16 +899,15 @@ public final class S2eUtils {
    * @param monitor
    *          The {@link IProgressMonitor}
    * @param waitUntilWritten
-   *          <code>true</code> if this method should block until all operations have been executed. <code>false</code>
-   *          if this method should directly return after the {@link ResourceWriteOperation}s have been scheduled.<br>
+   *          <code>true</code> if this method should block until all operations have been executed. <code>false</code> if
+   *          this method should directly return after the {@link ResourceWriteOperation}s have been scheduled.<br>
    *          Important: If this parameter is <code>true</code> and the {@link Job} invoking this method uses an
    *          {@link ISchedulingRule} that conflicts with one of the {@link IFile}s to be written, this will result in a
    *          deadlock! In that case consider writing the files sync using
    *          {@link IFileWriteOperation#run(IProgressMonitor, IWorkingCopyManager)} if you need the resulting
    *          {@link IFile} after the invocation of this method.
-   * @throws CoreException
    */
-  public static void writeFiles(Collection<? extends IFileWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) throws CoreException {
+  public static void writeFiles(Collection<? extends IFileWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) {
     if (ops == null || ops.isEmpty()) {
       return;
     }
@@ -956,13 +951,13 @@ public final class S2eUtils {
    * Creates a {@link IJavaSearchScope} based on the given {@link IResource}s.<br>
    * The search scope contains the following items depending on the resource type:
    * <ul>
-   * <li>{@link IResource#PROJECT}: If the project has the java nature ({@link JavaCore#NATURE_ID}) and is open all
-   * source folders of the project are added (no libraries or dependent projects).</li>
+   * <li>{@link IResource#PROJECT}: If the project has the java nature ({@link JavaCore#NATURE_ID}) and is open all source
+   * folders of the project are added (no libraries or dependent projects).</li>
    * <li>{@link IResource#FOLDER}: The {@link IPackageFragment} or {@link IPackageFragmentRoot} is added if the folder
    * belongs to one. All sub-packages are included as well!</li>
    * <li>{@link IResource#FILE}: If the file is a java file, the corresponding {@link ICompilationUnit} is added. If the
-   * resource is a class file, the corresponding {@link IClassFile} is added. If the file is a jar file, the
-   * corresponding {@link IPackageFragmentRoot} is added.</li>
+   * resource is a class file, the corresponding {@link IClassFile} is added. If the file is a jar file, the corresponding
+   * {@link IPackageFragmentRoot} is added.</li>
    * <li>{@link IResource#ROOT}: All source folders of all {@link IJavaProject}s in the workspace are added.</li>
    * <ul>
    *
@@ -1067,8 +1062,8 @@ public final class S2eUtils {
    * @param projects
    *          The {@link IJavaProject}s in which the source folders should be searched.
    * @param monitor
-   *          The {@link IProgressMonitor} to use. The search aborts if the given {@link IProgressMonitor} is canceled.
-   *          In this case an empty {@link Set} is returned.
+   *          The {@link IProgressMonitor} to use. The search aborts if the given {@link IProgressMonitor} is canceled. In
+   *          this case an empty {@link Set} is returned.
    * @return A {@link Set} with all source folders ({@link IPackageFragmentRoot}s of kind
    *         {@link IPackageFragmentRoot#K_SOURCE}) of the given {@link IJavaProject}s ordered by relevance and project.
    * @throws JavaModelException
@@ -1085,8 +1080,8 @@ public final class S2eUtils {
    * @param filter
    *          The {@link Predicate} the {@link IPackageFragmentRoot} candidates must fulfill.
    * @param monitor
-   *          The {@link IProgressMonitor} to use. The search aborts if the given {@link IProgressMonitor} is canceled.
-   *          In this case an empty {@link Set} is returned.
+   *          The {@link IProgressMonitor} to use. The search aborts if the given {@link IProgressMonitor} is canceled. In
+   *          this case an empty {@link Set} is returned.
    * @return A {@link Set} with all source folders ({@link IPackageFragmentRoot}s of kind
    *         {@link IPackageFragmentRoot#K_SOURCE}) of the given {@link IJavaProject}s that accept the given
    *         {@link Predicate} ordered by relevance and project.
@@ -1214,8 +1209,8 @@ public final class S2eUtils {
    * @param h
    *          The hierarchy to search in.
    * @param fqn
-   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator
-   *          (e.g. <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
+   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator (e.g.
+   *          <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
    * @return <code>true</code> if it is part of the given {@link ITypeHierarchy}, <code>false</code> otherwise.
    */
   public static boolean hierarchyContains(ITypeHierarchy h, String fqn) {
@@ -1521,8 +1516,8 @@ public final class S2eUtils {
    *
    * @param file
    *          The {@link IFile} that should be loaded. Must be an XML file!
-   * @return a {@link Document} holding the contents of the {@link IFile} or <code>null</code> if the given
-   *         {@link IFile} does not exist.
+   * @return a {@link Document} holding the contents of the {@link IFile} or <code>null</code> if the given {@link IFile}
+   *         does not exist.
    * @throws CoreException
    */
   public static Document readXmlDocument(IFile file) throws CoreException {
@@ -1581,8 +1576,8 @@ public final class S2eUtils {
    *          Specifies if the project should be refreshed from disk.
    * @param monitor
    *          The {@link IProgressMonitor} for the update operation.
-   * @return A {@link Map} containing the project name as key and an {@link IStatus} describing the update result for
-   *         the corresponding project.
+   * @return A {@link Map} containing the project name as key and an {@link IStatus} describing the update result for the
+   *         corresponding project.
    */
   public static Map<String, IStatus> mavenUpdate(Set<IProject> projects, boolean updateSnapshots, boolean updateConfig, boolean cleanProject, boolean refreshFromDisk, IProgressMonitor monitor) {
     if (projects == null || projects.isEmpty()) {
