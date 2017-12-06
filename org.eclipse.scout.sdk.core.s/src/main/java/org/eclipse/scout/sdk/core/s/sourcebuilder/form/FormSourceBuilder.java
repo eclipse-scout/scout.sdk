@@ -194,7 +194,7 @@ public class FormSourceBuilder extends AbstractEntitySourceBuilder {
 
   protected HandlerMethodBodySourceBuilder createExecLoadStoreBody(IMethodSourceBuilder methodBuilder, ITypeSourceBuilder handlerBuilder) {
     HandlerMethodBodySourceBuilder handlerMehodBodySourceBuilder = new HandlerMethodBodySourceBuilder(methodBuilder, handlerBuilder);
-    handlerMehodBodySourceBuilder.setFormDataStaticSignature(getFormDataSignature());
+    handlerMehodBodySourceBuilder.setFormDataSignature(getFormDataSignature());
     handlerMehodBodySourceBuilder.setServiceIfcSignature(getServiceIfcSignature());
     if (MODIFY_HANDLER_NAME.equals(handlerBuilder.getElementName())) {
       handlerMehodBodySourceBuilder.setPermissionSignature(getUpdatePermissionSignature());
@@ -220,8 +220,7 @@ public class FormSourceBuilder extends AbstractEntitySourceBuilder {
     public static final String FORM_DATA_VAR_NAME = "formData";
 
     private String m_serviceIfcSignature;
-    private String m_formDataStaticSignature;
-    private String m_formDataDynamicSignature;
+    private String m_formDataSignature;
     private String m_permissionSignature;
     private ISourceBuilder m_methodArgSourceBuilder;
     private ISourceBuilder m_permissionArgSourceBuilder;
@@ -243,25 +242,19 @@ public class FormSourceBuilder extends AbstractEntitySourceBuilder {
       final boolean isLoad = LOAD_METHOD_NAME.equals(getHandlerMethodBuilder().getElementName());
 
       if (getServiceIfcSignature() != null) {
-        final boolean isDtoAvailable = getFormDataStaticSignature() != null;
         final String serviceInterfaceName = validator.useSignature(getServiceIfcSignature());
-
-        String formDataStaticTypeName = null;
-        String formDataDynamicTypeName = null;
-        if (isDtoAvailable) {
-          formDataStaticTypeName = validator.useSignature(getFormDataStaticSignature());
-          formDataDynamicTypeName = validator.useSignature(getFormDataDynamicSignature());
-        }
         source.append(serviceInterfaceName).append(' ').append(SERVICE_VAR_NAME).append(" = ");
         source.append(validator.useSignature(Signature.createTypeSignature(IScoutRuntimeTypes.BEANS))).append(".get(");
         source.append(serviceInterfaceName).append(SuffixConstants.SUFFIX_class).append(");").append(lineDelimiter);
 
+        final boolean isDtoAvailable = getFormDataSignature() != null;
         if (isDtoAvailable) {
-          source.append(formDataStaticTypeName).append(' ').append(FORM_DATA_VAR_NAME).append(" = ");
+          String formDataTypeName = validator.useSignature(getFormDataSignature());
+          source.append(formDataTypeName).append(' ').append(FORM_DATA_VAR_NAME).append(" = ");
           if (!isLoad || isCreateFormDataInLoad()) {
             ISourceBuilder formDataInstanceCreationBuilder = getFormDataInstanceCreationBuilder();
             if (formDataInstanceCreationBuilder == null) {
-              source.append("new ").append(formDataDynamicTypeName).append("();").append(lineDelimiter);
+              source.append("new ").append(formDataTypeName).append("();").append(lineDelimiter);
             }
             else {
               formDataInstanceCreationBuilder.createSource(source, lineDelimiter, context, validator);
@@ -318,23 +311,12 @@ public class FormSourceBuilder extends AbstractEntitySourceBuilder {
       m_serviceIfcSignature = serviceIfcSignature;
     }
 
-    public String getFormDataStaticSignature() {
-      return m_formDataStaticSignature;
+    public String getFormDataSignature() {
+      return m_formDataSignature;
     }
 
-    public void setFormDataStaticSignature(String formDataStaticSignature) {
-      m_formDataStaticSignature = formDataStaticSignature;
-    }
-
-    public String getFormDataDynamicSignature() {
-      if (m_formDataDynamicSignature == null) {
-        return m_formDataStaticSignature;
-      }
-      return m_formDataDynamicSignature;
-    }
-
-    public void setFormDataDynamicSignature(String formDataDynamicSignature) {
-      m_formDataDynamicSignature = formDataDynamicSignature;
+    public void setFormDataSignature(String formDataSignature) {
+      m_formDataSignature = formDataSignature;
     }
 
     public String getPermissionSignature() {
