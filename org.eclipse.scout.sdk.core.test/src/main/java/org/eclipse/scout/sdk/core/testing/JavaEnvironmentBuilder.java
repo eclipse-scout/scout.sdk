@@ -297,6 +297,6 @@ public class JavaEnvironmentBuilder {
       appendSourceAttachments(sourceAttachmentFor, allEntries); // find source attachments for the running classpath entries
     }
 
-    return new JavaEnvironmentWithJdt(null, javaHome(), sort(allEntries)).wrap();
+    return new JavaEnvironmentWithJdt(path -> m_curDir.resolve(path).toFile(), javaHome(), sort(allEntries)).wrap();
   }
 }

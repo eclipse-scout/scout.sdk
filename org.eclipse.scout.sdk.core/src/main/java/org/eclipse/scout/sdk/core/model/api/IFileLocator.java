@@ -20,6 +20,7 @@ import java.io.File;
  * @author Ivan Motsch
  * @since 5.2.0
  */
+@FunctionalInterface
 public interface IFileLocator {
   /**
    * @param path
