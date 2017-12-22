@@ -39,7 +39,6 @@ public class JaxWsUtilsTest {
   public void testJaxWsBindingMapping() {
     JaxWsBindingMapping m = new JaxWsBindingMapping(true, "wsdlName", "className");
     Assert.assertFalse(m.equals(null));
-    Assert.assertFalse(m.equals(""));
     Assert.assertFalse(m.equals(new JaxWsBindingMapping(true, "wsdlName", "className2")));
     Assert.assertFalse(m.equals(new JaxWsBindingMapping(true, "wsdlName2", "className")));
     Assert.assertFalse(m.equals(new JaxWsBindingMapping(false, "wsdlName", "className")));
