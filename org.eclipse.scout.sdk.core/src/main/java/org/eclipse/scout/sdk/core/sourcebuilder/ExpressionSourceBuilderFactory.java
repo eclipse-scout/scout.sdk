@@ -87,29 +87,7 @@ public final class ExpressionSourceBuilderFactory {
    * @return an array builder that creates a { ... } expression that can be used for annotation values of type array
    */
   public static ISourceBuilder createArray(final Collection<? extends ISourceBuilder> elements, final boolean formatWithNewlines) {
-    return new ISourceBuilder() {
-      @Override
-      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        //use newlines on multi-dimensional arrays and annotation arrays only
-        String blockSeparator = formatWithNewlines ? lineDelimiter : " ";
-        source.append('{');
-        source.append(blockSeparator);
-        int n = elements.size();
-        if (n > 0) {
-          int i = 0;
-          for (ISourceBuilder element : elements) {
-            if (i > 0) {
-              source.append(',');
-              source.append(blockSeparator);
-            }
-            element.createSource(source, lineDelimiter, context, validator);
-            i++;
-          }
-          source.append(blockSeparator);
-        }
-        source.append('}');
-      }
-    };
+    return new ArrayExpressionSourceBuilder(elements, formatWithNewlines);
   }
 
   public static ISourceBuilder createFromMetaValue(final IMetaValue metaValue) {
@@ -159,6 +137,42 @@ public final class ExpressionSourceBuilderFactory {
         return createArray(sourceBuilderList, useNewlines);
       default:
         return new RawSourceBuilder("UNKNOWN(" + metaValue.type() + ", " + metaValue + ")");
+    }
+  }
+
+  public static class ArrayExpressionSourceBuilder implements ISourceBuilder {
+    private final boolean m_formatWithNewlines;
+    private final Collection<? extends ISourceBuilder> m_elements;
+
+    public ArrayExpressionSourceBuilder(Collection<? extends ISourceBuilder> elements, boolean formatWithNewlines) {
+      m_formatWithNewlines = formatWithNewlines;
+      m_elements = elements;
+    }
+
+    public Collection<? extends ISourceBuilder> getElements() {
+      return m_elements;
+    }
+
+    @Override
+    public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+      //use newlines on multi-dimensional arrays and annotation arrays only
+      String blockSeparator = m_formatWithNewlines ? lineDelimiter : " ";
+      source.append('{');
+      source.append(blockSeparator);
+      int n = m_elements.size();
+      if (n > 0) {
+        int i = 0;
+        for (ISourceBuilder element : m_elements) {
+          if (i > 0) {
+            source.append(',');
+            source.append(blockSeparator);
+          }
+          element.createSource(source, lineDelimiter, context, validator);
+          i++;
+        }
+        source.append(blockSeparator);
+      }
+      source.append('}');
     }
   }
 }
