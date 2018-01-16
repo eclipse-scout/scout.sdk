@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.Job;
@@ -37,7 +36,6 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
   public static final String WEB_TOOLS_UPDATE = "org.eclipse.wst.";
   public static final String DEBUG_EVENT = "org.eclipse.debug.";
   public static final String JDT_DEBUG_EVENT = "org.eclipse.jdt.internal.debug.";
-  public static final String ANNOTATION_PROCESSING_JOB = "org.eclipse.core.internal.events.NotificationManager.NotifyJob";
   public static final String ANOTATION_PROCESSING_BUILD = "org.eclipse.core.internal.events.AutoBuildJob";
   public static final String EXTERNAL_FOLDER_UPDATE = "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob";
   public static final String DEBUG_INIT = "org.eclipse.jdt.internal.debug.ui.JavaDebugOptionsManager.InitJob";
@@ -45,26 +43,26 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
   public static final String WORKSPACE_INIT_JOB = "org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob";
   public static final String TEAM_UPDATES = "org.eclipse.team.";
   public static final String SEARCH = "org.eclipse.search2.";
+  public static final String MARKER_UPDATE = "org.eclipse.ui.internal.views.markers.";
+  public static final String JAVA_INDEX_UPDATE_JOB_NAME = "Updating Java index";
 
+  private final Collection<String> m_excludedJobClassNamePrefixes;
+  private final Collection<String> m_excludedJobNames;
   private boolean m_isIgnoreBuildEvents;
   private boolean m_isIgnoreScoutSdkEvents;
-  private Collection<String> m_excludedJobNamePrefixes;
 
   public DefaultResourceChangeEventFilter() {
-    String[] exclusions = new String[]{GIT_UPDATES, MAVEN_UPDATES, SONAR_UPDATE, WEB_TOOLS_UPDATE, DEBUG_EVENT,
-        JDT_DEBUG_EVENT, ANNOTATION_PROCESSING_JOB, ANOTATION_PROCESSING_BUILD, EXTERNAL_FOLDER_UPDATE, DEBUG_INIT,
-        REFRESH_JOB, WORKSPACE_INIT_JOB, TEAM_UPDATES, SEARCH};
-    m_excludedJobNamePrefixes = new ArrayList<>(exclusions.length);
-    Collections.addAll(m_excludedJobNamePrefixes, exclusions);
+    String[] defaultJobExclusionsFqn = new String[]{GIT_UPDATES, MAVEN_UPDATES, SONAR_UPDATE, WEB_TOOLS_UPDATE, DEBUG_EVENT,
+        JDT_DEBUG_EVENT, ANOTATION_PROCESSING_BUILD, EXTERNAL_FOLDER_UPDATE, DEBUG_INIT,
+        REFRESH_JOB, WORKSPACE_INIT_JOB, TEAM_UPDATES, SEARCH, MARKER_UPDATE};
+    m_excludedJobClassNamePrefixes = new ArrayList<>(defaultJobExclusionsFqn.length);
+    Collections.addAll(m_excludedJobClassNamePrefixes, defaultJobExclusionsFqn);
+
+    m_excludedJobNames = new ArrayList<>(1);
+    m_excludedJobNames.add(JAVA_INDEX_UPDATE_JOB_NAME);
 
     m_isIgnoreBuildEvents = true;
     m_isIgnoreScoutSdkEvents = true;
-  }
-
-  public DefaultResourceChangeEventFilter(Collection<String> excludedJobNamePrefixes, boolean ignoreBuildEvents, boolean ignoreScoutSdkEvents) {
-    m_excludedJobNamePrefixes = new ArrayList<>(Validate.notNull(excludedJobNamePrefixes));
-    m_isIgnoreBuildEvents = ignoreBuildEvents;
-    m_isIgnoreScoutSdkEvents = ignoreScoutSdkEvents;
   }
 
   @Override
@@ -95,20 +93,23 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
     }
 
     String jobFqn = curJob.getClass().getName().replace('$', '.');
-    Predicate<String> excludedByNamePrefix = className -> getExcludedJobNamePrefixes().stream().anyMatch(prefix -> className.startsWith(prefix));
-    if (excludedByNamePrefix.test(jobFqn)) {
-      return false;
-    }
+    String jobName = curJob.getName();
 
-    if (!"org.eclipse.core.internal.jobs.ThreadJob".equals(jobFqn)) {
-      return true;
-    }
+    Predicate<String> excludedClassNamePrefixes = className -> getExcludedJobClassNamePrefixes().stream().anyMatch(prefix -> className.startsWith(prefix));
+    Predicate<String> excludedJobNames = name -> getExcludedJobNames().stream().anyMatch(n -> name.equals(n));
 
-    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-    boolean isStackTraceElementExcluded = Arrays.stream(stackTrace)
-        .map(element -> element.getClassName())
-        .anyMatch(excludedByNamePrefix);
-    return !isStackTraceElementExcluded;
+    if ("org.eclipse.core.internal.jobs.ThreadJob".equals(jobFqn)) {
+      // for thread jobs: check current stack trace
+      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+      return !Arrays.stream(stackTrace)
+          .map(element -> element.getClassName())
+          .anyMatch(excludedClassNamePrefixes);
+    }
+    if (jobFqn.startsWith("org.eclipse.core.runtime.jobs.Job.")) {
+      // for Job factory methods: check job name
+      return !excludedJobNames.test(jobName);
+    }
+    return !excludedClassNamePrefixes.test(jobFqn) && !excludedJobNames.test(jobName);
   }
 
   /**
@@ -143,23 +144,41 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
   }
 
   /**
-   * @return A live list of fully qualified class name prefixes of jobs that should be excluded. The returned list may
-   *         be modified directly.
+   * @return A live list of fully qualified job class name prefixes that should be excluded. The returned list may be
+   *         modified directly.
    */
-  public Collection<String> getExcludedJobNamePrefixes() {
-    return m_excludedJobNamePrefixes;
+  public Collection<String> getExcludedJobClassNamePrefixes() {
+    return m_excludedJobClassNamePrefixes;
   }
 
   /**
-   * @param excludedJobNamePrefixes
-   *          The new excluded job fully qualified class names. May be <code>null</code>.
+   * @param excludedJobClassNamePrefixes
+   *          The new list of fully qualified class names of jobs to be excluded. Inner types are separated using '.'. May
+   *          be {@code null}.
    */
-  public void setExcludedJobNamePrefixes(Collection<String> excludedJobNamePrefixes) {
-    if (excludedJobNamePrefixes == null || excludedJobNamePrefixes.isEmpty()) {
-      m_excludedJobNamePrefixes = Collections.emptyList();
+  public void setExcludedJobClassNamePrefixes(final Collection<String> excludedJobClassNamePrefixes) {
+    m_excludedJobClassNamePrefixes.clear();
+    if (excludedJobClassNamePrefixes != null) {
+      m_excludedJobClassNamePrefixes.addAll(excludedJobClassNamePrefixes);
     }
-    else {
-      m_excludedJobNamePrefixes = new ArrayList<>(excludedJobNamePrefixes);
+  }
+
+  /**
+   * @return A live list of job names ({@link Job#getName()}) that should be excluded. Please note: Job names may be
+   *         language dependent! The returned list may be modified directly.
+   */
+  public Collection<String> getExcludedJobNames() {
+    return m_excludedJobNames;
+  }
+
+  /**
+   * @param excludedJobNames
+   *          The new list of job names ({@link Job#getName()}) that should be excluded. May be {@code null}.
+   */
+  public void setExcludedJobNames(final Collection<String> excludedJobNames) {
+    m_excludedJobNames.clear();
+    if (excludedJobNames != null) {
+      m_excludedJobNames.addAll(excludedJobNames);
     }
   }
 }
