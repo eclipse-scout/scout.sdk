@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>7.0.200-SNAPSHOT</version>
+    <version>7.0.300-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.sdk/pom.xml</relativePath>
   </parent>
 
@@ -29,7 +29,7 @@
   <properties>
     <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
     <bundle.namespace>${project.artifactId}</bundle.namespace>
-    <bundle.version>7.0.200</bundle.version>
+    <bundle.version>7.0.300</bundle.version>
   </properties>
 
   <dependencies>
