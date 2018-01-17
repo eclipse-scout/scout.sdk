@@ -144,6 +144,7 @@ public interface IScoutRuntimeTypes {
   String IFormExtension = "org.eclipse.scout.rt.client.extension.ui.form.IFormExtension";
   String IFormField = "org.eclipse.scout.rt.client.ui.form.fields.IFormField";
   String IFormFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension";
+  String IFormFieldMenu = "org.eclipse.scout.rt.client.ui.action.menu.form.fields.IFormFieldMenu";
   String IFormHandler = "org.eclipse.scout.rt.client.ui.form.IFormHandler";
   String IGroupBox = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox";
   String IHtmlField = "org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField";

@@ -416,12 +416,10 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     /**
      * An abort stops the current or next run of this job.<br>
      * <br>
-     * An abort differs to a cancel() in that way, that a cancel (can only be performed by the user) discards all
-     * operations that are not yet executed while an abort keeps them and will continue to work on them in the next
-     * schedule().<br>
+     * An abort differs to a cancel() in that way, that a cancel (can only be performed by the user) discards all operations
+     * that are not yet executed while an abort keeps them and will continue to work on them in the next schedule().<br>
      * <br>
-     * An abort will automatically re-schedule this job (if this is no already done) to ensure that no work remains
-     * undone.
+     * An abort will automatically re-schedule this job (if this is no already done) to ensure that no work remains undone.
      */
     private void abort() {
       m_isAborted = true;
@@ -471,7 +469,6 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         IDerivedResourceHandler handler = m_queueToConsume.poll();
         try {
           progress.setTaskName(handler.getName() + " [" + i + " of " + numOperations + "]");
-          progress.subTask("");
           handler.validate();
 
           long start = System.currentTimeMillis();
