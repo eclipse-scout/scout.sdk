@@ -23,7 +23,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk</artifactId>
-  <version>7.0.300-SNAPSHOT</version>
+  <version>7.0.300.001</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK</name>
   <description>Eclipse Scout SDK</description>
@@ -54,7 +54,7 @@
   <properties>
     <scout.base.version>7.0.300</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <org.eclipse.scout.rt_version>7.0.300-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>7.0.300.001</org.eclipse.scout.rt_version>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
 
@@ -262,78 +262,78 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.test</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.test</artifactId>
-        <version>7.0.300-SNAPSHOT</version>
+        <version>7.0.300.001</version>
       </dependency>
 
       <!-- Build Dependencies -->
@@ -726,7 +726,7 @@
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
     <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.sdk</developerConnection>
-    <tag>releases/7.0.x</tag>
+    <tag>7.0.300.001</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
   </scm>
 
