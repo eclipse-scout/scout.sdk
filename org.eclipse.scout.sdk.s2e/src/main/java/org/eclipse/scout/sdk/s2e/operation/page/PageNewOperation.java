@@ -153,19 +153,23 @@ public class PageNewOperation implements IOperation {
 
     if (isCreateAbstractPage()) {
       CompilationUnitWriteOperation abstractPageDataUpdateOp = DtoDerivedResourceHandler.newDtoOp(getCreatedAbstractPage(), S2eUtils.jdtTypeToScoutType(getCreatedAbstractPage(), clientEnv), getEnvProvider());
-      abstractPageDataUpdateOp.run(progress.newChild(1), workingCopyManager);
+      if (abstractPageDataUpdateOp != null) {
+        abstractPageDataUpdateOp.run(progress.newChild(1), workingCopyManager);
 
-      IJavaEnvironment sharedEnv = getEnvProvider().get(getCreatedAbstractPageData().getJavaProject());
+        IJavaEnvironment sharedEnv = getEnvProvider().get(getCreatedAbstractPageData().getJavaProject());
 
-      // make the new content of the AbstractPageDat available for the shared env. Because the workingcopy has not yet been written, the file on the disk still contains the old content -> update with new
-      sharedEnv.registerCompilationUnitOverride(getCreatedAbstractPageData().getPackageFragment().getElementName(),
-          getCreatedAbstractPageData().getCompilationUnit().getElementName(),
-          new StringBuilder(abstractPageDataUpdateOp.getContent()));
-      sharedEnv.reload(); // reload the shared env because we just changed the abstractPageData
+        // make the new content of the AbstractPageDat available for the shared env. Because the workingcopy has not yet been written, the file on the disk still contains the old content -> update with new
+        sharedEnv.registerCompilationUnitOverride(getCreatedAbstractPageData().getPackageFragment().getElementName(),
+            getCreatedAbstractPageData().getCompilationUnit().getElementName(),
+            new StringBuilder(abstractPageDataUpdateOp.getContent()));
+        sharedEnv.reload(); // reload the shared env because we just changed the abstractPageData
+      }
     }
 
     CompilationUnitWriteOperation pageDataUpdateOp = DtoDerivedResourceHandler.newDtoOp(getCreatedPage(), S2eUtils.jdtTypeToScoutType(getCreatedPage(), clientEnv), getEnvProvider());
-    pageDataUpdateOp.run(progress.newChild(1), workingCopyManager);
+    if (pageDataUpdateOp != null) {
+      pageDataUpdateOp.run(progress.newChild(1), workingCopyManager);
+    }
   }
 
   protected IType createAbstractPage(boolean isPageWithTable, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
