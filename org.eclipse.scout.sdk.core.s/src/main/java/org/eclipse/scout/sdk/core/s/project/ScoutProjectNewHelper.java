@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
  */
 public final class ScoutProjectNewHelper {
 
-  public static final String SCOUT_ARCHETYPES_VERSION = "7.1.0-SNAPSHOT";
+  public static final String SCOUT_ARCHETYPES_VERSION = "7.1.0.005_Photon_M5";
   public static final String SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID = "scout-helloworld-app";
   public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
 
