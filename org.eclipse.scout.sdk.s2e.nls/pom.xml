@@ -71,7 +71,7 @@
               !org.eclipse.scout.sdk.s2e*,
               !org.eclipse.jface*,
               !org.eclipse.text*,
-              *
+              *;ui.workbench=!
             </Import-Package>
             <Require-Bundle>
               org.eclipse.scout.sdk.s2e;bundle-version="[7.0,7.1)";visibility:=reexport,
