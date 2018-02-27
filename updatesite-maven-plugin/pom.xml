@@ -23,7 +23,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>updatesite-maven-plugin</artifactId>
-  <version>7.0.300-SNAPSHOT</version>
+  <version>7.0.300.004_Oxygen_3_RC3</version>
   <packaging>maven-plugin</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
