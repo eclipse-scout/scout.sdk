@@ -1,5 +1,3 @@
-autoEnabled=true
+autoEnabled=false
 eclipse.preferences.version=1
 extraProperties=
-moduleKey=org.eclipse.scout.sdk\:org.eclipse.scout.sdk\:releases_6.1.x
-serverId=Scout
