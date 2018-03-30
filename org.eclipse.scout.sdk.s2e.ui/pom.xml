@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>8.0.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.sdk/pom.xml</relativePath>
   </parent>
 
@@ -29,7 +29,7 @@
   <properties>
     <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
     <bundle.namespace>${project.artifactId}</bundle.namespace>
-    <bundle.version>7.1.0</bundle.version>
+    <bundle.version>8.0.0</bundle.version>
   </properties>
 
   <dependencies>
@@ -89,8 +89,8 @@
               *
             </Import-Package>
             <Require-Bundle>
-              org.eclipse.scout.sdk.s2e;bundle-version="[7.1,7.2)";visibility:=reexport,
-              org.eclipse.scout.sdk.s2e.doc;bundle-version="[7.1,7.2)";visibility:=reexport,
+              org.eclipse.scout.sdk.s2e;bundle-version="[8.0,8.1)";visibility:=reexport,
+              org.eclipse.scout.sdk.s2e.doc;bundle-version="[8.0,8.1)";visibility:=reexport,
               org.eclipse.jdt.ui;bundle-version="[3.12,4)";visibility:=reexport,
               org.eclipse.ui.ide;bundle-version="[3.12,4)";visibility:=reexport,
               org.eclipse.ui.workbench;bundle-version="[3.108,4)";visibility:=reexport,
