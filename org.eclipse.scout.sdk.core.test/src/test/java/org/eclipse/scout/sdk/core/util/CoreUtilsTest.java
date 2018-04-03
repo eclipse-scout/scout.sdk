@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -602,5 +605,42 @@ public class CoreUtilsTest {
       CoreUtils.deleteDirectory(folderToMove.toFile());
       CoreUtils.deleteDirectory(targetDirectory.toFile());
     }
+  }
+
+  @Test
+  public void testIsDoubleDifferent() {
+    assertTrue(CoreUtils.isDoubleDifferent(1.1113d, 1.1115d, 0.0001d));
+    assertTrue(CoreUtils.isDoubleDifferent(1.0d, 2.0d, 0.9d));
+    assertFalse(CoreUtils.isDoubleDifferent(1.111d, 1.112d, 0.01d));
+    assertFalse(CoreUtils.isDoubleDifferent(-0.0d, 0.0d, 0.000000001d));
+    assertFalse(CoreUtils.isDoubleDifferent(-0.0d, 0.0d, 1.0d));
+    assertFalse(CoreUtils.isDoubleDifferent(-0.0d, 0.0d, 0.0d));
+
+    // min/max values
+    assertTrue(CoreUtils.isDoubleDifferent(-Double.MAX_VALUE, Double.MAX_VALUE, 10000.0d));
+    assertTrue(CoreUtils.isDoubleDifferent(Double.MAX_VALUE, Double.MIN_VALUE, 10000.0d));
+    assertTrue(CoreUtils.isDoubleDifferent(Double.MIN_VALUE, Double.MAX_VALUE, 10000.0d));
+    assertTrue(CoreUtils.isDoubleDifferent(Double.MAX_VALUE, -Double.MAX_VALUE, 10000.0d));
+    assertTrue(CoreUtils.isDoubleDifferent(Double.MIN_VALUE, -Double.MIN_VALUE, 0.0d));
+    assertFalse(CoreUtils.isDoubleDifferent(Double.MAX_VALUE, Double.MAX_VALUE, 10000.0d));
+    assertFalse(CoreUtils.isDoubleDifferent(Double.MIN_VALUE, Double.MIN_VALUE, 10000.0d));
+    assertFalse(CoreUtils.isDoubleDifferent(-Double.MAX_VALUE, -Double.MAX_VALUE, 10000.0d));
+    assertFalse(CoreUtils.isDoubleDifferent(-Double.MIN_VALUE, -Double.MIN_VALUE, 10000.0d));
+
+    // infinity comparisons
+    assertFalse(CoreUtils.isDoubleDifferent(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 10000.0d));
+    assertFalse(CoreUtils.isDoubleDifferent(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, 10000.0d));
+    assertTrue(CoreUtils.isDoubleDifferent(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, 10000.0d));
+    assertTrue(CoreUtils.isDoubleDifferent(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 10000.0d));
+    assertTrue(CoreUtils.isDoubleDifferent(Double.NEGATIVE_INFINITY, 100.0d, 10000.0d));
+    assertTrue(CoreUtils.isDoubleDifferent(Double.POSITIVE_INFINITY, 100.0d, 10000.0d));
+
+    // NaN comparisons
+    assertTrue(CoreUtils.isDoubleDifferent(1.0d, Double.NaN, 1.0d));
+    assertTrue(CoreUtils.isDoubleDifferent(Double.NaN, 1.0d, 1.0d));
+    assertFalse(CoreUtils.isDoubleDifferent(Double.NaN, Double.NaN, 1.0d));
+    assertFalse(CoreUtils.isDoubleDifferent(Float.NaN, Float.NaN, Float.POSITIVE_INFINITY));
+    assertFalse(CoreUtils.isDoubleDifferent(Double.NaN, Double.NaN, Double.POSITIVE_INFINITY));
+    assertFalse(CoreUtils.isDoubleDifferent(Double.NaN, Double.NaN, Double.NEGATIVE_INFINITY));
   }
 }

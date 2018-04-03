@@ -128,7 +128,7 @@ public final class CoreScoutUtils {
    *          the declaring type.
    * @return the new order value that should be used.
    */
-  @SuppressWarnings("squid:S2583") // second arg is required so that the compiler is happy
+  @SuppressWarnings("squid:S2589") // second arg is required so that the compiler is happy
   public static double getNewViewOrderValue(IType declaringType, String orderDefinitionType, int pos) {
     IType[] siblings = findSiblings(declaringType, pos, orderDefinitionType);
     Double orderValueBefore = getOrderAnnotationValue(siblings[0]);
@@ -219,18 +219,22 @@ public final class CoreScoutUtils {
     double prevIntHigh = Math.max(lowCeil, highFloor);
 
     // special case for stepwise increase
-    if (low % ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP == 0 && low + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP < high) {
+    if ((int) low % ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP == 0 && low + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP < high) {
       return low + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }
 
-    if (lowFloor != highFloor && ((lowFloor != low && highFloor != high) || dif > 1.0)) {
+    if (isDoubleDifferent(lowFloor, highFloor) && ((isDoubleDifferent(lowFloor, low) && isDoubleDifferent(highFloor, high)) || dif > 1.0)) {
       // integer value possible
-      double intDif = prevIntHigh - nextIntLow;
-      if (intDif == 1.0) {
+      final double intDif = prevIntHigh - nextIntLow;
+      if (!isDoubleDifferent(intDif, 1.0)) {
         return prevIntHigh;
       }
       return nextIntLow + Math.floor(intDif / 2.0);
     }
     return low + (dif / 2);
+  }
+
+  static boolean isDoubleDifferent(final double d1, final double d2) {
+    return CoreUtils.isDoubleDifferent(d1, d2, 0.0000000001);
   }
 }

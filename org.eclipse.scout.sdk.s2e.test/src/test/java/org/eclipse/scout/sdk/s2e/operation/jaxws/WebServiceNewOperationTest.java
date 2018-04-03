@@ -181,13 +181,8 @@ public class WebServiceNewOperationTest {
       }
 
       @Override
-      protected void createDerivedResources(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-        try {
-          CoreScoutTestingUtils.runMavenCleanCompile(getJaxWsProject().getProject().getLocation().toFile());
-        }
-        catch (IOException e) {
-          throw new CoreException(new ScoutStatus(e));
-        }
+      protected void createDerivedResources(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+        CoreScoutTestingUtils.runMavenCleanCompile(getJaxWsProject().getProject().getLocation().toFile());
       }
     };
     op.setCreateConsumer(isConsumer);

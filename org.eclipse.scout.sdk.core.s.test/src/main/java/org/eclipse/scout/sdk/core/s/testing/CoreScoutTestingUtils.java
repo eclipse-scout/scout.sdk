@@ -195,7 +195,7 @@ public final class CoreScoutTestingUtils {
    *          The directory in which the maven command should be executed. Must contain a pom.xml file.
    * @throws IOException
    */
-  public static void runMavenCleanCompile(File pomDir) throws IOException {
+  public static void runMavenCleanCompile(File pomDir) {
     MavenRunner.execute(new MavenBuild()
         .withWorkingDirectory(pomDir)
         .withGoal("clean")
@@ -211,7 +211,7 @@ public final class CoreScoutTestingUtils {
    *          The directory in which the maven command should be executed. Must contain a pom.xml file.
    * @throws IOException
    */
-  public static void runMavenCleanTest(File pomDir) throws IOException {
+  public static void runMavenCleanTest(File pomDir) {
     MavenRunner.execute(new MavenBuild()
         .withWorkingDirectory(pomDir)
         .withGoal("clean")
