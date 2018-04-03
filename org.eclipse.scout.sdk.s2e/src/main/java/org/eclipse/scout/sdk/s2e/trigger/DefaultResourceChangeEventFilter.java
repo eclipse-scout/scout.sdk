@@ -36,6 +36,7 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
   public static final String WEB_TOOLS_UPDATE = "org.eclipse.wst.";
   public static final String DEBUG_EVENT = "org.eclipse.debug.";
   public static final String JDT_DEBUG_EVENT = "org.eclipse.jdt.internal.debug.";
+  public static final String ANNOTATION_PROCESSING_JOB = "org.eclipse.core.internal.events.NotificationManager.NotifyJob";
   public static final String ANOTATION_PROCESSING_BUILD = "org.eclipse.core.internal.events.AutoBuildJob";
   public static final String EXTERNAL_FOLDER_UPDATE = "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob";
   public static final String DEBUG_INIT = "org.eclipse.jdt.internal.debug.ui.JavaDebugOptionsManager.InitJob";
@@ -53,7 +54,7 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
 
   public DefaultResourceChangeEventFilter() {
     String[] defaultJobExclusionsFqn = new String[]{GIT_UPDATES, MAVEN_UPDATES, SONAR_UPDATE, WEB_TOOLS_UPDATE, DEBUG_EVENT,
-        JDT_DEBUG_EVENT, ANOTATION_PROCESSING_BUILD, EXTERNAL_FOLDER_UPDATE, DEBUG_INIT,
+        JDT_DEBUG_EVENT, ANNOTATION_PROCESSING_JOB, ANOTATION_PROCESSING_BUILD, EXTERNAL_FOLDER_UPDATE, DEBUG_INIT,
         REFRESH_JOB, WORKSPACE_INIT_JOB, TEAM_UPDATES, SEARCH, MARKER_UPDATE};
     m_excludedJobClassNamePrefixes = new ArrayList<>(defaultJobExclusionsFqn.length);
     Collections.addAll(m_excludedJobClassNamePrefixes, defaultJobExclusionsFqn);
