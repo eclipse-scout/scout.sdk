@@ -151,7 +151,7 @@ public class ManagedAnnotationTest {
     IJavaEnvironment env = CoreTestingUtils.createJavaEnvironment();
     IType t = env.findType(ClassWithAnnotationWithShortValueForIntField.class.getName());
     org_eclipse_scout_sdk_core_fixture_AnnotationWithDefaultValues a = t.annotations().withManagedWrapper(org_eclipse_scout_sdk_core_fixture_AnnotationWithDefaultValues.class).first();
-    Assert.assertEquals(new Integer(4), a.unwrap().element("num").value().get(int.class));
+    Assert.assertEquals(Integer.valueOf(4), a.unwrap().element("num").value().get(int.class));
     Assert.assertTrue(4 == a.num());
 //    Assert.assertEquals(new String[]{"g"}, );
   }

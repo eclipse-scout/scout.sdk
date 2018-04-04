@@ -1182,7 +1182,7 @@ public final class CoreUtils {
       }
 
       @Override
-      public Iterator<?> getPrefixes(String val) {
+      public Iterator<String> getPrefixes(String val) {
         return Collections.singletonList(getPrefix(val)).iterator();
       }
 

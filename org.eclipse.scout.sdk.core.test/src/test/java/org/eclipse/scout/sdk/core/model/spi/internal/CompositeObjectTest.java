@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import org.eclipse.scout.sdk.core.model.spi.internal.SameCompositeObject;
+import java.math.BigDecimal;
+
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,8 +25,8 @@ import org.junit.Test;
 public class CompositeObjectTest {
   @Test
   public void testSameness() {
-    Long a = new Long(1);
-    Long b = new Long(1);
+    BigDecimal a = new BigDecimal(1);
+    BigDecimal b = new BigDecimal(1);
     Assert.assertNotSame(a, b);
     Assert.assertEquals(a, b);
 
@@ -39,8 +40,8 @@ public class CompositeObjectTest {
 
   @Test
   public void testEquality() {
-    Long a = new Long(1);
-    Long b = new Long(1);
+    BigDecimal a = new BigDecimal(1);
+    BigDecimal b = new BigDecimal(1);
     Assert.assertNotSame(a, b);
     Assert.assertEquals(a, b);
 
