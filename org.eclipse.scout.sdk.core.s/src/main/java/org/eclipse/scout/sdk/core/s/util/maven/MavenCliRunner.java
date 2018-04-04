@@ -113,7 +113,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       // start maven call
       Class<?> mavenCli = loader.loadClass(MavenCli.class.getName());
       Method doMain = mavenCli.getMethod("doMain", new Class[]{String[].class, String.class, PrintStream.class, PrintStream.class});
-      Object ret = doMain.invoke(mavenCli.newInstance(), mavenArgs, workingDirectory.getAbsolutePath(), out, err);
+      Object ret = doMain.invoke(mavenCli.getConstructor().newInstance(), mavenArgs, workingDirectory.getAbsolutePath(), out, err);
 
       logStream(Level.INFO, bOut, charset);
       int result = ((Integer) ret).intValue();

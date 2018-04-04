@@ -103,7 +103,7 @@ public class BasicPropertySupport {
   }
 
   public boolean setPropertyDouble(String name, double d) {
-    return setProperty(name, new Double(d), DEFAULT_DOUBLE);
+    return setProperty(name, Double.valueOf(d), DEFAULT_DOUBLE);
   }
 
   public double getPropertyDouble(String name) {

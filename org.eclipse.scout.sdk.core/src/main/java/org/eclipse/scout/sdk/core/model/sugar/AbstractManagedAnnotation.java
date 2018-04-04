@@ -122,7 +122,7 @@ public abstract class AbstractManagedAnnotation {
         throw new IllegalArgumentException("Managed annotation '" + managedAnnotationType.getName() + "' supports '" + typeName + "' but annotation '" + a.type().name() + "' was passed.");
       }
 
-      A annotation = managedAnnotationType.newInstance();
+      A annotation = managedAnnotationType.getConstructor().newInstance();
       annotation.postConstruct(a);
       return annotation;
     }

@@ -35,7 +35,7 @@ public class WizardExtension {
 
   public AbstractImportExportWizard createWizard() {
     try {
-      return m_wizard.newInstance();
+      return m_wizard.getConstructor().newInstance();
     }
     catch (Exception e) {
       SdkLog.error("could not create a new instance of wizard '{}'.", getName(), e);
