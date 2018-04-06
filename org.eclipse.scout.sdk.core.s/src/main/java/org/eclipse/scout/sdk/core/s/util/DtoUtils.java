@@ -64,8 +64,8 @@ public final class DtoUtils {
   }
 
   /**
-   * Parses the possible available {@link IScoutRuntimeTypes#ColumnData} annotation on the given type. If the type is
-   * not annotated, <code>null</code> is returned.
+   * Parses the possible available {@link IScoutRuntimeTypes#ColumnData} annotation on the given type. If the type is not
+   * annotated, <code>null</code> is returned.
    *
    * @since 3.10.0-M5
    */
@@ -89,6 +89,12 @@ public final class DtoUtils {
     return sdkColumnCommand;
   }
 
+  /**
+   * Gets the data type signature of the specified column type.
+   * 
+   * @param columnContainer
+   * @return
+   */
   public static String getColumnValueTypeSignature(IType columnContainer) {
     List<String> resolvedTypeParamValues = CoreUtils.getResolvedTypeParamValueSignature(columnContainer, IScoutRuntimeTypes.IColumn, IScoutRuntimeTypes.TYPE_PARAM_COLUMN__VALUE_TYPE);
     if (resolvedTypeParamValues.isEmpty()) {
@@ -118,8 +124,8 @@ public final class DtoUtils {
   }
 
   /**
-   * @return Returns the form field data/form data for the given form field/form or <code>null</code> if it does not
-   *         have one.
+   * @return Returns the form field data/form data for the given form field/form or <code>null</code> if it does not have
+   *         one.
    * @since 3.8.2
    */
   private static IType getFormDataType(IType modelType) {
@@ -144,9 +150,8 @@ public final class DtoUtils {
   }
 
   /**
-   * @return Returns the form field data/form data for the given form field/form or <code>null</code> if it does not
-   *         have one. The method walks recursively through the list of declaring classes until it has reached a primary
-   *         type.
+   * @return Returns the form field data/form data for the given form field/form or <code>null</code> if it does not have
+   *         one. The method walks recursively through the list of declaring classes until it has reached a primary type.
    * @since 3.8.2
    */
   private static IType getFormFieldDataPrimaryTypeRec(IType recursiveDeclaringType) {
