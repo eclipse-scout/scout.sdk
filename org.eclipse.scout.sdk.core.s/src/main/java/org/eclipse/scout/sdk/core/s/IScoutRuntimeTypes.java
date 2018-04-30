@@ -70,7 +70,7 @@ public interface IScoutRuntimeTypes {
   String AbstractDateField = "org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField";
   String AbstractDesktop = "org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop";
   String AbstractDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension";
-  String AbstractDynamicNlsTextProviderService = "org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService";
+  String AbstractDynamicNlsTextProviderService = "org.eclipse.scout.rt.platform.text.AbstractDynamicNlsTextProviderService";
   String AbstractExtension = "org.eclipse.scout.rt.shared.extension.AbstractExtension";
   String AbstractFileChooserField = "org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileChooserField";
   String AbstractForm = "org.eclipse.scout.rt.client.ui.form.AbstractForm";
@@ -192,7 +192,7 @@ public interface IScoutRuntimeTypes {
   // other runtime classes
   String ACCESS = "org.eclipse.scout.rt.shared.services.common.security.ACCESS";
   String BEANS = "org.eclipse.scout.rt.platform.BEANS";
-  String TEXTS = "org.eclipse.scout.rt.shared.TEXTS";
+  String TEXTS = "org.eclipse.scout.rt.platform.text.TEXTS";
   String Logger = "org.slf4j.Logger";
   String CollectionUtility = "org.eclipse.scout.rt.platform.util.CollectionUtility";
   String VetoException = "org.eclipse.scout.rt.platform.exception.VetoException";
