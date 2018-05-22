@@ -23,6 +23,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl.WebServiceNames;
+import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.s2e.operation.jaxws.WebServiceNewOperation;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
@@ -50,7 +51,6 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
  */
 public class WebServiceMessageDialog extends MessageDialogWithToggle {
 
-  public static final String SCOUT_JAX_WS_DOCUMENTATION_URL = "https://eclipsescout.github.io/7.1/technical-guide.html#webservices-with-jax-ws";
   public static final String HIDE_CONSUMER_MSG = "hideWebServiceConsumerInfoMessage";
   public static final String HIDE_PROVIDER_MSG = "hideWebServiceProviderInfoMessage";
 
@@ -58,6 +58,15 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
 
   protected WebServiceMessageDialog(Shell parentShell, String dialogTitle, Image image, String message, int dialogImageType, String[] dialogButtonLabels, int defaultIndex, String toggleMessage, boolean toggleState) {
     super(parentShell, dialogTitle, image, message, dialogImageType, dialogButtonLabels, defaultIndex, toggleMessage, toggleState);
+  }
+
+  protected static String getScoutJaxWsDocumentationUrl() {
+    String version = ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION;
+    int secondDotPos = version.indexOf('.', 2);
+    if (secondDotPos > 0) {
+      version = version.substring(0, secondDotPos);
+    }
+    return "http://eclipsescout.github.io/" + version + "/technical-guide.html#webservices-with-jax-ws";
   }
 
   public static WebServiceMessageDialog open(Shell shell, WebServiceNewOperation op) {
@@ -90,7 +99,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
     dialog.open();
     if (dialog.isCopyToClipboard()) {
       Clipboard clipboard = new Clipboard(shell.getDisplay());
-      clipboard.setContents(new Object[]{message + "\n\nJAX-WS Documentation: " + SCOUT_JAX_WS_DOCUMENTATION_URL}, new Transfer[]{TextTransfer.getInstance()});
+      clipboard.setContents(new Object[]{message + "\n\nJAX-WS Documentation: " + getScoutJaxWsDocumentationUrl()}, new Transfer[]{TextTransfer.getInstance()});
       clipboard.dispose();
     }
     return dialog;
@@ -132,7 +141,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
     h.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {
-        S2eUiUtils.showUrlInBrowser(SCOUT_JAX_WS_DOCUMENTATION_URL);
+        S2eUiUtils.showUrlInBrowser(getScoutJaxWsDocumentationUrl());
       }
     });
     GridDataFactory
