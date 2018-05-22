@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -177,6 +178,32 @@ public class ClasspathBuilder {
     if (f == null || !Files.isReadable(f)) {
       return null;
     }
-    return FileSystem.getClasspath(f.toString(), encoding, isSourceOnly, null, null, null);
+
+    try {
+      // try ECJ 3.14 version first
+      // this version includes an additional parameter 'release'.
+      final Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class, String.class);
+      return (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null, null);
+    }
+    catch (final NoSuchMethodException nsme) {
+      SdkLog.debug("Fallback to legacy ECJ", nsme);
+      return toClasspathLegacy(f, isSourceOnly, encoding);
+    }
+    catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new SdkException(e);
+    }
+  }
+
+  /**
+   *
+   */
+  private static Classpath toClasspathLegacy(final Path f, final boolean isSourceOnly, final String encoding) {
+    try {
+      final Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class);
+      return (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null);
+    }
+    catch (final ReflectiveOperationException e) {
+      throw new SdkException(e);
+    }
   }
 }
