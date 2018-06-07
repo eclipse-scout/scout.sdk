@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +43,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class FileUtility {
+public final class FileUtility {
+
+  private FileUtility() {
+  }
 
   public static void copy(File inputFile, File outputFile) throws IOException {
     if (inputFile.isDirectory()) {
@@ -148,6 +152,7 @@ public class FileUtility {
     return Files.readAllBytes(source.toPath());
   }
 
+  @SuppressWarnings({"squid:S1166", "squid:S1141"})
   public static void writeDOM(Document doc, File file) throws MojoExecutionException {
     try {
       TransformerFactory tf = TransformerFactory.newInstance();
@@ -155,16 +160,19 @@ public class FileUtility {
         tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
       }
       catch (TransformerConfigurationException e) {
+        // nop
       }
       try {
         tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
       }
       catch (IllegalArgumentException e) {
+        // nop
       }
       try {
         tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
       }
       catch (IllegalArgumentException e) {
+        // nop
       }
       Transformer transformer = tf.newTransformer();
 
@@ -190,7 +198,9 @@ public class FileUtility {
     }
   }
 
-  public static void extractArchive(File archiveFile, File destinationDir) throws IOException {
+  public static void extractArchive(File archiveFile, File targetDir) throws IOException {
+    File destinationDir = targetDir.getCanonicalFile();
+    Path destinationPath = destinationDir.toPath();
     destinationDir.mkdirs();
     destinationDir.setLastModified(archiveFile.lastModified());
     String localFile = destinationDir.getName();
@@ -205,8 +215,12 @@ public class FileUtility {
         while (name.startsWith("/") || name.startsWith("\\")) {
           name = name.substring(1);
         }
+        File f = new File(destinationDir, name).getCanonicalFile();
+        if (!f.toPath().startsWith(destinationPath)) {
+          // security check (see https://github.com/snyk/zip-slip-vulnerability)
+          throw new IllegalArgumentException("Entry is outside of the target dir: " + name);
+        }
 
-        File f = new File(destinationDir, name);
         if (file.isDirectory()) { // if its a directory, create it
           ensureDirExists(f);
         }
@@ -237,6 +251,7 @@ public class FileUtility {
    * @throws ParserConfigurationException
    *           if a {@link DocumentBuilder} cannot be created which satisfies the configuration requested.
    */
+  @SuppressWarnings("squid:S1166")
   public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     Map<String, Boolean> features = new HashMap<>(5);
