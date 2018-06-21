@@ -44,6 +44,8 @@ public class ClasspathBuilder {
 
   private static final Map<Path, JreInfo> JRE_INFOS = new ConcurrentHashMap<>();
 
+  private static final ClasspathAccessor CLASSPATH_ACCESSOR;
+
   private final Classpath[] m_full;
   private final List<Classpath> m_bootClasspath;
   private final Collection<Classpath> m_classpath;
@@ -180,30 +182,39 @@ public class ClasspathBuilder {
     }
 
     try {
-      // try ECJ 3.14 version first
-      // this version includes an additional parameter 'release'.
-      final Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class, String.class);
-      return (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null, null);
+      return CLASSPATH_ACCESSOR.toClasspath(f, isSourceOnly, encoding);
     }
-    catch (final NoSuchMethodException nsme) {
-      SdkLog.debug("Fallback to legacy ECJ", nsme);
-      return toClasspathLegacy(f, isSourceOnly, encoding);
-    }
-    catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+    catch (final IllegalArgumentException | ReflectiveOperationException e) {
       throw new SdkException(e);
     }
   }
 
-  /**
-   *
-   */
-  private static Classpath toClasspathLegacy(final Path f, final boolean isSourceOnly, final String encoding) {
+  private interface ClasspathAccessor {
+
+    Classpath toClasspath(final Path f, final boolean isSourceOnly, final String encoding) throws IllegalAccessException, InvocationTargetException;
+  }
+
+  static {
+    ClasspathAccessor accessor = (f, isSourceOnly, encoding) -> {
+      throw new SdkException("getClasspath method on FileSystem.class could not be found");
+    };
     try {
-      final Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class);
-      return (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null);
+      // try ECJ 3.14 version first
+      // this version includes an additional parameter 'release'.
+      Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class, String.class);
+
+      accessor = (f, isSourceOnly, encoding) -> (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null, null);
     }
-    catch (final ReflectiveOperationException e) {
-      throw new SdkException(e);
+    catch (NoSuchMethodException nsme) {
+      SdkLog.debug("Fallback to legacy ECJ", nsme);
+      try {
+        Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class);
+        accessor = (f, isSourceOnly, encoding) -> (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null);
+      }
+      catch (NoSuchMethodException e) {
+        throw new SdkException(e);
+      }
     }
+    CLASSPATH_ACCESSOR = accessor;
   }
 }
