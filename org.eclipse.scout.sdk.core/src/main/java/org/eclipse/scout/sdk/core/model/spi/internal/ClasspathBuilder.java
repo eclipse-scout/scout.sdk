@@ -190,29 +190,27 @@ public class ClasspathBuilder {
   }
 
   private interface ClasspathAccessor {
-
     Classpath toClasspath(final Path f, final boolean isSourceOnly, final String encoding) throws IllegalAccessException, InvocationTargetException;
   }
 
   static {
     ClasspathAccessor accessor = (f, isSourceOnly, encoding) -> {
-      throw new SdkException("getClasspath method on FileSystem.class could not be found");
+      throw new SdkException("getClasspath method on FileSystem.class could not be found.");
     };
     try {
       // try ECJ 3.14 version first
       // this version includes an additional parameter 'release'.
-      Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class, String.class);
-
+      final Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class, String.class);
       accessor = (f, isSourceOnly, encoding) -> (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null, null);
     }
-    catch (NoSuchMethodException nsme) {
-      SdkLog.debug("Fallback to legacy ECJ", nsme);
+    catch (final NoSuchMethodException nsme) {
+      SdkLog.debug("Fallback to legacy ECJ.", nsme);
       try {
-        Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class);
+        final Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class);
         accessor = (f, isSourceOnly, encoding) -> (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null);
       }
-      catch (NoSuchMethodException e) {
-        throw new SdkException(e);
+      catch (final NoSuchMethodException e) {
+        SdkLog.error("No supported ECJ found.", e);
       }
     }
     CLASSPATH_ACCESSOR = accessor;
