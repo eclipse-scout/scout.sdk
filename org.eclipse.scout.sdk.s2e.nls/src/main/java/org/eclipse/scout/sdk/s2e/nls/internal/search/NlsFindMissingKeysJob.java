@@ -45,8 +45,8 @@ import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.formatter.InputValidator;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker.WorkspaceFile;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.search.ui.text.Match;
 
 /**
@@ -75,7 +75,7 @@ public class NlsFindMissingKeysJob extends AbstractJob {
     final String nlsKeyPattern = InputValidator.REGEX_NLS_KEY_NAME.pattern();
     final Pattern jsonTextKeyPat = Pattern.compile("\\$\\{textKey:(" + nlsKeyPattern + ')');
     final Pattern jsTextKeyPat = Pattern.compile("session\\.text\\(('?)(" + nlsKeyPattern + ")('?)");
-    m_patternsByFileType.put(SuffixConstants.EXTENSION_java, Collections.singletonList(Pattern.compile("TEXTS\\.get\\((\"?)(" + nlsKeyPattern + ")(\"?)")));
+    m_patternsByFileType.put(SuffixConstants.EXTENSION_java, Collections.singletonList(Pattern.compile("TEXTS\\.get\\((?:[a-zA-Z0-9_]+,\\s*)?(\"?)(" + nlsKeyPattern + ")(\"?)")));
     m_patternsByFileType.put("json", Collections.singletonList(jsonTextKeyPat));
     m_patternsByFileType.put("js", Arrays.asList(jsTextKeyPat, jsonTextKeyPat));
     m_patternsByFileType.put("html", Arrays.asList(Pattern.compile("\\<scout:message key=\"(" + nlsKeyPattern + ")\"\\s*/?\\>"), jsTextKeyPat, jsonTextKeyPat));
