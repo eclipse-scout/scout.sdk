@@ -46,14 +46,13 @@ import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
  */
 public class ScoutProjectNewOperation implements IOperation {
 
-  public static final String TEMPLATE_GROUP_ID = "org.eclipse.scout.archetype.groupId";
-  public static final String TEMPLATE_ARTIFACT_ID = "org.eclipse.scout.archetype.artifactId";
   public static final String TEMPLATE_VERSION = "org.eclipse.scout.archetype.version";
 
   private String m_groupId;
   private String m_artifactId;
   private String m_displayName;
   private String m_javaVersion;
+  private boolean m_useJsClient = true;
   private File m_targetDirectory;
   private List<IProject> m_createdProjects;
 
@@ -70,15 +69,17 @@ public class ScoutProjectNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
-      // get archetype settings
-      String groupId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_GROUP_ID);
-      String artifactId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_ARTIFACT_ID);
       String version = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_VERSION);
-      if (StringUtils.isBlank(groupId) || StringUtils.isBlank(artifactId) || StringUtils.isBlank(version)) {
-        // use default
-        groupId = null;
-        artifactId = null;
-        version = null;
+      if (StringUtils.isBlank(version)) {
+        version = ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION;
+      }
+
+      final String artifactId;
+      if (isUseJsClient()) {
+        artifactId = ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
+      }
+      else {
+        artifactId = ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID;
       }
 
       if (monitor.isCanceled()) {
@@ -87,7 +88,8 @@ public class ScoutProjectNewOperation implements IOperation {
 
       // create project on disk (using archetype)
       SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 100);
-      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getJavaVersion(), groupId, artifactId, version);
+      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getJavaVersion(),
+          ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, artifactId, version);
       progress.worked(5);
 
       // import into workspace
@@ -198,5 +200,13 @@ public class ScoutProjectNewOperation implements IOperation {
 
   public void setArtifactId(String artifactId) {
     m_artifactId = artifactId;
+  }
+
+  public boolean isUseJsClient() {
+    return m_useJsClient;
+  }
+
+  public void setUseJsClient(boolean useJsClient) {
+    m_useJsClient = useJsClient;
   }
 }

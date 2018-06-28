@@ -178,7 +178,8 @@ public final class CoreScoutTestingUtils {
    */
   public static File createTestProject() throws IOException {
     File targetDirectory = Files.createTempDirectory(CoreScoutTestingUtils.class.getSimpleName() + "-projectDir").toFile();
-    ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", SystemUtils.JAVA_SPECIFICATION_VERSION);
+    ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", SystemUtils.JAVA_SPECIFICATION_VERSION,
+        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID, ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION);
 
     // create a config.properties in the src/test/resources of the server to use the jax-ws-ri of the JRE instead of metro which is the default.
     File testConfigProperties = new File(targetDirectory, PROJECT_ARTIFACT_ID + '/' + PROJECT_ARTIFACT_ID + ".server/src/test/resources/config.properties");

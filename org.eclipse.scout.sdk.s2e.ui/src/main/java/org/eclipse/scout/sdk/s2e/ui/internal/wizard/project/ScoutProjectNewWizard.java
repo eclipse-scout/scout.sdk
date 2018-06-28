@@ -75,6 +75,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
     op.setGroupId(m_page1.getGroupId());
     op.setArtifactId(m_page1.getArtifactId());
     op.setJavaVersion(getDefaultWorkspaceJavaVersion());
+    op.setUseJsClient(m_page1.isUseJsClient());
     if (m_page1.isUseWorkspaceLocation()) {
       op.setTargetDirectory(ScoutProjectNewWizardPage.getWorkspaceLocation());
     }
@@ -150,8 +151,8 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
   }
 
   /**
-   * Converts the specified {@link Version} to a {@link String}. Only the major and minor parts are used. Trailing
-   * zeroes are omitted.<br>
+   * Converts the specified {@link Version} to a {@link String}. Only the major and minor parts are used. Trailing zeroes
+   * are omitted.<br>
    *
    * @param version
    *          The {@link Version} to convert.

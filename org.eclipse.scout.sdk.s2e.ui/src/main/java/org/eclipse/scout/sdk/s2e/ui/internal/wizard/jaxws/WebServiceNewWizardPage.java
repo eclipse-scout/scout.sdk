@@ -706,7 +706,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     }
 
     // check name pattern
-    String msg = ScoutProjectNewHelper.getMavenNameErrorMessage(getArtifactId(), "Artifact Id");
+    String msg = ScoutProjectNewHelper.getMavenArtifactIdErrorMessage(getArtifactId());
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }

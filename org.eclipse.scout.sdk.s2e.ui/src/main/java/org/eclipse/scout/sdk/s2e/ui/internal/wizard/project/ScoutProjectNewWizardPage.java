@@ -56,11 +56,16 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   public static final String PROP_DISPLAY_NAME = "dispName";
   public static final String PROP_DIR = "dir";
   public static final String PROP_USE_WORKSPACE_LOC = "useWorkspaceLoc";
+  public static final String PROP_USE_JS_CLIENT = "useJsClient";
   public static final String SETTINGS_TARGET_DIR = "targetDirSetting";
 
   protected StyledTextField m_groupIdField;
   protected StyledTextField m_artifactIdField;
   protected StyledTextField m_displayNameField;
+
+  protected Button m_javaScriptButton;
+  protected Button m_javaButton;
+
   protected Button m_useWsLoc;
   protected ResourceTextField m_targetDirectoryField;
 
@@ -79,6 +84,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
     int labelWidth = 100;
     createProjectNameGroup(parent, labelWidth);
+    createClientLanguageGroup(parent);
     createProjectLocationGroup(parent, labelWidth);
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PROJECT_NEW_WIZARD_PAGE);
@@ -156,6 +162,52 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         .align(SWT.FILL, SWT.CENTER)
         .grab(true, false)
         .applyTo(m_displayNameField);
+  }
+
+  protected void createClientLanguageGroup(Composite parent) {
+
+    Group uiLangBox = getFieldToolkit().createGroupBox(parent, "Programming language of the user interface");
+
+    m_javaScriptButton = new Button(uiLangBox, SWT.RADIO);
+    m_javaScriptButton.setText("JavaScript && JSON");
+    m_javaScriptButton.setSelection(isUseJsClient());
+    m_javaScriptButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setUseJsClientInternal(m_javaScriptButton.getSelection());
+        pingStateChanging();
+      }
+    });
+
+    m_javaButton = new Button(uiLangBox, SWT.RADIO);
+    m_javaButton.setText("Java");
+    m_javaButton.setSelection(!isUseJsClient());
+    m_javaButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setUseJsClientInternal(!m_javaButton.getSelection());
+        pingStateChanging();
+      }
+    });
+
+    // layout
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(uiLangBox);
+    GridDataFactory
+        .defaultsFor(uiLangBox)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .indent(0, 10)
+        .applyTo(uiLangBox);
+    GridDataFactory
+        .defaultsFor(m_javaScriptButton)
+        .indent(13, 5)
+        .applyTo(m_javaScriptButton);
+    GridDataFactory
+        .defaultsFor(m_javaButton)
+        .indent(13, 2)
+        .applyTo(m_javaButton);
   }
 
   protected void createProjectLocationGroup(Composite parent, int labelWidth) {
@@ -243,6 +295,9 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     // display name
     setDisplayNameInternal("My Application");
 
+    // ui language
+    setUseJsClientInternal(true);
+
     // use workspace loc
     setUseWorkspaceLocationInternal(true);
 
@@ -291,7 +346,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected IStatus getStatusGroupId() {
     // check name pattern
-    String msg = ScoutProjectNewHelper.getMavenNameErrorMessage(getGroupId(), "Group Id");
+    String msg = ScoutProjectNewHelper.getMavenGroupIdErrorMessage(getGroupId());
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }
@@ -300,7 +355,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected IStatus getStatusArtifactId() {
     // check name pattern
-    String msg = ScoutProjectNewHelper.getMavenNameErrorMessage(getArtifactId(), "Artifact Id");
+    String msg = ScoutProjectNewHelper.getMavenArtifactIdErrorMessage(getArtifactId());
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }
@@ -327,7 +382,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   }
 
   protected IStatus getStatusDisplayName() {
-    String msg = ScoutProjectNewHelper.getDisplayNameErrorMEssage(getDisplayName());
+    String msg = ScoutProjectNewHelper.getDisplayNameErrorMessage(getDisplayName());
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }
@@ -447,5 +502,27 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected void setTargetDirectoryInternal(File f) {
     setProperty(PROP_DIR, f);
+  }
+
+  public boolean isUseJsClient() {
+    return getPropertyBool(PROP_USE_JS_CLIENT);
+  }
+
+  public void setUseJsClient(boolean isUseJsClient) {
+    try {
+      setStateChanging(true);
+      setUseJsClientInternal(isUseJsClient);
+      if (isControlCreated()) {
+        m_javaButton.setSelection(!isUseJsClient);
+        m_javaScriptButton.setSelection(isUseJsClient);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setUseJsClientInternal(boolean isUseJsClient) {
+    setPropertyBool(PROP_USE_JS_CLIENT, isUseJsClient);
   }
 }

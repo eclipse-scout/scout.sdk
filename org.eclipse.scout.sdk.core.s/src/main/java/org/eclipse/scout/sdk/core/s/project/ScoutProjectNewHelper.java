@@ -49,10 +49,12 @@ public final class ScoutProjectNewHelper {
 
   public static final String SCOUT_ARCHETYPES_VERSION = "8.0.0-SNAPSHOT";
   public static final String SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID = "scout-helloworld-app";
+  public static final String SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID = "scout-hellojs-app";
   public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"\\/<>=:]+");
-  public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
+  public static final Pattern GROUP_ID_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
+  public static final Pattern ARTIFACT_ID_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,64}$");
   public static final String DEFAULT_JAVA_ENV = "1.8";
 
   private ScoutProjectNewHelper() {
@@ -72,15 +74,15 @@ public final class ScoutProjectNewHelper {
 
     // validate input
     Validate.notNull(workingDir);
-    String groupIdMsg = getMavenNameErrorMessage(groupId, "groupId");
+    String groupIdMsg = getMavenGroupIdErrorMessage(groupId);
     if (groupIdMsg != null) {
       throw new IllegalArgumentException(groupIdMsg);
     }
-    String artifactIdMsg = getMavenNameErrorMessage(artifactId, "artifactId");
+    String artifactIdMsg = getMavenArtifactIdErrorMessage(artifactId);
     if (artifactIdMsg != null) {
       throw new IllegalArgumentException(artifactIdMsg);
     }
-    String displayNameMsg = getDisplayNameErrorMEssage(displayName);
+    String displayNameMsg = getDisplayNameErrorMessage(displayName);
     if (displayNameMsg != null) {
       throw new IllegalArgumentException(displayNameMsg);
     }
@@ -90,7 +92,7 @@ public final class ScoutProjectNewHelper {
     if (StringUtils.isBlank(archetypeGroupId) || StringUtils.isBlank(archeTypeArtifactId) || StringUtils.isBlank(archetypeVersion)) {
       // use default
       archetypeGroupId = SCOUT_ARCHETYPES_GROUP_ID;
-      archeTypeArtifactId = SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID;
+      archeTypeArtifactId = SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
       archetypeVersion = SCOUT_ARCHETYPES_VERSION;
     }
 
@@ -182,7 +184,7 @@ public final class ScoutProjectNewHelper {
     transformer.transform(new DOMSource(document), result);
   }
 
-  public static String getDisplayNameErrorMEssage(String displayNameCandidate) {
+  public static String getDisplayNameErrorMessage(String displayNameCandidate) {
     if (StringUtils.isEmpty(displayNameCandidate)) {
       return "Display Name is not set.";
     }
@@ -192,17 +194,25 @@ public final class ScoutProjectNewHelper {
     return null;
   }
 
-  public static String getMavenNameErrorMessage(String symbolicNameCandidate, String attribName) {
-    if (StringUtils.isEmpty(symbolicNameCandidate)) {
-      return attribName + " is not set.";
+  public static String getMavenArtifactIdErrorMessage(String artifactIdCandidate) {
+    return getMavenNameErrorMessage(artifactIdCandidate, ARTIFACT_ID_PATTERN, "Artifact Id");
+  }
+
+  public static String getMavenGroupIdErrorMessage(String groupIdCandidate) {
+    return getMavenNameErrorMessage(groupIdCandidate, GROUP_ID_PATTERN, "Group Id");
+  }
+
+  private static String getMavenNameErrorMessage(String nameCandidate, Pattern pattern, String attributeName) {
+    if (StringUtils.isEmpty(nameCandidate)) {
+      return attributeName + " is not set.";
     }
-    if (!SYMBOLIC_NAME_PATTERN.matcher(symbolicNameCandidate).matches()) {
-      return "The " + attribName + " value is not valid.";
+    if (!pattern.matcher(nameCandidate).matches()) {
+      return "The " + attributeName + " value is not valid.";
     }
     // reserved java keywords
-    String jkw = getContainingJavaKeyWord(symbolicNameCandidate);
+    String jkw = getContainingJavaKeyWord(nameCandidate);
     if (jkw != null) {
-      return "The " + attribName + " must not contain the Java keyword '" + jkw + "'.";
+      return "The " + attributeName + " must not contain the Java keyword '" + jkw + "'.";
     }
     return null;
   }

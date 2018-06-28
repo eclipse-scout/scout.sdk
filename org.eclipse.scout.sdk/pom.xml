@@ -36,6 +36,7 @@
     <!-- Must be at first position -->
     <module>../scout-helloworld-app</module>
     <module>../scout-jaxws-module</module>
+    <module>../scout-hellojs-app</module>
 
     <module>../org.eclipse.scout.sdk.core</module>
     <module>../org.eclipse.scout.sdk.core.test</module>
