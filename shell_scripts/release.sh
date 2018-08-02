@@ -68,6 +68,8 @@ mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclips
 processError
 mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f scout-jaxws-module -N $_MAVEN_OPTS
 processError
+mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f scout-hellojs-app -N $_MAVEN_OPTS
+processError
 mvn clean install -U -f org.eclipse.scout.sdk -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
 
