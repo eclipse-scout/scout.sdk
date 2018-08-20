@@ -34,7 +34,6 @@ import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.internal.corext.codemanipulation.StubUtility;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalModel;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
-import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.PositionInformation;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.Proposal;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.JavaUIStatus;
@@ -218,10 +217,10 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
         new LinkedAsyncProposalModelPresenter().enterLinkedMode(viewer, part, didOpenEditor(), m_linkedProposalModel);
       }
       else if (part instanceof ITextEditor) {
-        LinkedProposalPositionGroup.PositionInformation endPosition = m_linkedProposalModel.getEndPosition();
+        Object endPosition = PositionInformationBridge.getEndPosition(m_linkedProposalModel);
         if (endPosition != null) {
           // select a result
-          int pos = endPosition.getOffset() + endPosition.getLength();
+          int pos = PositionInformationBridge.getOffset(endPosition) + PositionInformationBridge.getLength(endPosition);
           ((ITextEditor) part).selectAndReveal(pos, 0);
         }
       }
@@ -250,12 +249,12 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
       m_asyncProposalProviders.add(newGroup);
       if (group != null) {
         // already added positions. copy over
-        for (PositionInformation info : group.getPositions()) {
-          newGroup.addPosition(info);
+        for (Object info : PositionInformationBridge.getPositions(group)) {
+          PositionInformationBridge.addPosition(newGroup, info);
         }
       }
       group = newGroup;
-      m_linkedProposalModel.addPositionGroup(group);
+      PositionInformationBridge.addPositionGroup(m_linkedProposalModel, group);
     }
   }
 

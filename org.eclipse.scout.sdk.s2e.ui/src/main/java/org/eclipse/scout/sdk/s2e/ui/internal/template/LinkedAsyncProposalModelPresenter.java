@@ -15,7 +15,6 @@ import java.util.Iterator;
 
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalModel;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
-import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.PositionInformation;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorHighlightingSynchronizer;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
@@ -82,27 +81,28 @@ public class LinkedAsyncProposalModelPresenter {
       LinkedProposalPositionGroup curr = iterator.next();
 
       LinkedPositionGroup group = new LinkedPositionGroup();
-      LinkedProposalPositionGroup.PositionInformation[] positions = curr.getPositions();
+
+      Object[] positions = PositionInformationBridge.getPositions(curr);
       if (positions.length > 0) {
         if (curr instanceof ICompletionProposalProvider) {
           // lazy provider
           for (int i = 0; i < positions.length; i++) {
-            LinkedProposalPositionGroup.PositionInformation pos = positions[i];
-            if (pos.getOffset() != -1) {
+            Object pos = positions[i];
+            if (PositionInformationBridge.getOffset(pos) != -1) {
               ICompletionProposalProvider proposalProvider = (ICompletionProposalProvider) curr;
               if (display != null) {
                 proposalProvider.addListener(listener);
               }
-              group.addPosition(new AsyncProposalPosition(document, pos.getOffset(), pos.getLength(), pos.getSequenceRank(), proposalProvider, model));
+              group.addPosition(new AsyncProposalPosition(document, PositionInformationBridge.getOffset(pos), PositionInformationBridge.getLength(pos), PositionInformationBridge.getSequenceRank(pos), proposalProvider, model));
             }
           }
         }
         else {
           LinkedProposalPositionGroup.Proposal[] linkedModeProposals = curr.getProposals();
           if (linkedModeProposals.length <= 1) {
-            for (PositionInformation pos : positions) {
-              if (pos.getOffset() != -1) {
-                group.addPosition(new LinkedPosition(document, pos.getOffset(), pos.getLength(), pos.getSequenceRank()));
+            for (Object pos : positions) {
+              if (PositionInformationBridge.getOffset(pos) != -1) {
+                group.addPosition(new LinkedPosition(document, PositionInformationBridge.getOffset(pos), PositionInformationBridge.getLength(pos), PositionInformationBridge.getSequenceRank(pos)));
               }
             }
           }
@@ -112,9 +112,9 @@ public class LinkedAsyncProposalModelPresenter {
               proposalImpls[i] = new LinkedPositionProposalImpl(linkedModeProposals[i], model);
             }
 
-            for (PositionInformation pos : positions) {
-              if (pos.getOffset() != -1) {
-                group.addPosition(new ProposalPosition(document, pos.getOffset(), pos.getLength(), pos.getSequenceRank(), proposalImpls));
+            for (Object pos : positions) {
+              if (PositionInformationBridge.getOffset(pos) != -1) {
+                group.addPosition(new ProposalPosition(document, PositionInformationBridge.getOffset(pos), PositionInformationBridge.getLength(pos), PositionInformationBridge.getSequenceRank(pos), proposalImpls));
               }
             }
           }
