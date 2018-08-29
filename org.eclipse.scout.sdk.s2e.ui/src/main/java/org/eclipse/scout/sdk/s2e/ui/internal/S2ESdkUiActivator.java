@@ -15,6 +15,8 @@ import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.internal.debug.ui.DetailFormatter;
+import org.eclipse.jdt.internal.debug.ui.JavaDetailFormattersManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -22,6 +24,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.util.SdkConsole;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -49,6 +52,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   private static S2ESdkUiActivator plugin;
 
   private IPropertyChangeListener m_preferencesPropertyListener;
+  private DetailFormatter m_iDataObjectDetailFormatter;
 
   @Override
   public void start(BundleContext context) throws Exception {
@@ -86,6 +90,9 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     // modify default m2e settings
     setDefaultMavenSettings();
 
+    // register detail formatters
+    registerDetailFormatters();
+
     // start DTO auto-update manager if required
     getPreferenceStore().setDefault(IDerivedResourceManager.PROP_AUTO_UPDATE, true);
     ScoutSdkCore.getDerivedResourceManager().setEnabled(getPreferenceStore().getBoolean(IDerivedResourceManager.PROP_AUTO_UPDATE));
@@ -98,6 +105,16 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     ClassIdValidationJob.executeAsync(TimeUnit.MINUTES.toMillis(5));
   }
 
+  private void registerDetailFormatters() {
+    String src = "return " + IScoutRuntimeTypes.BEANS + ".get(org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper.class).writeValue(this);";
+    m_iDataObjectDetailFormatter = new DetailFormatter(IScoutRuntimeTypes.IDataObject, src, true);
+    JavaDetailFormattersManager.getDefault().setAssociatedDetailFormatter(m_iDataObjectDetailFormatter);
+  }
+
+  private void deregisterDetailFormatters() {
+    m_iDataObjectDetailFormatter = null;
+  }
+
   @Override
   public void stop(BundleContext context) throws Exception {
     if (m_preferencesPropertyListener != null) {
@@ -108,6 +125,8 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     CommentSourceBuilderFactory.setCommentSourceBuilderSpi(null);
 
     SdkConsole.setConsoleSpi(null); // reset to default
+
+    deregisterDetailFormatters();
 
     plugin = null;
 
