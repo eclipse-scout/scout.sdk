@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
  *
  * The API of JDT did change with release Photon SR1 M2. Once Photon is not supported anymore this class can be removed.
  */
+@SuppressWarnings("squid:S1166")
 public final class PositionInformationBridge {
 
   private static final String POSITION_INFORMATION_FQN = "org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroupCore$PositionInformation";
@@ -40,8 +41,12 @@ public final class PositionInformationBridge {
   private static final String LINKED_POSITION_GROUP_CORE_FQN = "org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroupCore";
   private static final String LINKED_POSITION_GROUP_FQN = "org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup";
 
-  private static String[] FQN_ORDER = {POSITION_INFORMATION_FQN_OLD, POSITION_INFORMATION_FQN};
+  private static String[] fqnOrder = {POSITION_INFORMATION_FQN_OLD, POSITION_INFORMATION_FQN};
 
+  private PositionInformationBridge() {
+  }
+
+  @SuppressWarnings("squid:S1168")
   public static Object[] getPositions(LinkedProposalPositionGroup group) {
     // call with reflection
     try {
@@ -69,16 +74,16 @@ public final class PositionInformationBridge {
   private static Class<?> findPostionInformationClass() throws ClassNotFoundException {
     Class<?> positionInformationClazz = null;
     try {
-      positionInformationClazz = Class.forName(FQN_ORDER[0]);
+      positionInformationClazz = Class.forName(fqnOrder[0]);
       return positionInformationClazz;
     }
     catch (ClassNotFoundException e) {
       // try second
     }
-    positionInformationClazz = Class.forName(FQN_ORDER[1]);
+    positionInformationClazz = Class.forName(fqnOrder[1]);
     // switch
-    String[] newOrder = {FQN_ORDER[1], FQN_ORDER[0]};
-    FQN_ORDER = newOrder;
+    String[] newOrder = {fqnOrder[1], fqnOrder[0]};
+    fqnOrder = newOrder;
     return positionInformationClazz;
   }
 
@@ -138,6 +143,7 @@ public final class PositionInformationBridge {
 
   }
 
+  @SuppressWarnings("squid:S1141")
   public static void addPositionGroup(LinkedProposalModel linkedProposalModel, LinkedProposalPositionGroup group) {
     Method method = null;
     try {
