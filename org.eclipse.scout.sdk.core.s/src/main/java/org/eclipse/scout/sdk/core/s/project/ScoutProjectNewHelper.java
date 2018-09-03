@@ -53,8 +53,7 @@ public final class ScoutProjectNewHelper {
   public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"\\/<>=:]+");
-  public static final Pattern GROUP_ID_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
-  public static final Pattern ARTIFACT_ID_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,64}$");
+  public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
   public static final String DEFAULT_JAVA_ENV = "1.8";
 
   private ScoutProjectNewHelper() {
@@ -195,18 +194,18 @@ public final class ScoutProjectNewHelper {
   }
 
   public static String getMavenArtifactIdErrorMessage(String artifactIdCandidate) {
-    return getMavenNameErrorMessage(artifactIdCandidate, ARTIFACT_ID_PATTERN, "Artifact Id");
+    return getMavenNameErrorMessage(artifactIdCandidate, "Artifact Id");
   }
 
   public static String getMavenGroupIdErrorMessage(String groupIdCandidate) {
-    return getMavenNameErrorMessage(groupIdCandidate, GROUP_ID_PATTERN, "Group Id");
+    return getMavenNameErrorMessage(groupIdCandidate, "Group Id");
   }
 
-  private static String getMavenNameErrorMessage(String nameCandidate, Pattern pattern, String attributeName) {
+  private static String getMavenNameErrorMessage(String nameCandidate, String attributeName) {
     if (StringUtils.isEmpty(nameCandidate)) {
       return attributeName + " is not set.";
     }
-    if (!pattern.matcher(nameCandidate).matches()) {
+    if (!SYMBOLIC_NAME_PATTERN.matcher(nameCandidate).matches()) {
       return "The " + attributeName + " value is not valid.";
     }
     // reserved java keywords

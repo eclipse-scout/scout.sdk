@@ -355,9 +355,15 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected IStatus getStatusArtifactId() {
     // check name pattern
-    String msg = ScoutProjectNewHelper.getMavenArtifactIdErrorMessage(getArtifactId());
+    String artifactId = getArtifactId();
+    String msg = ScoutProjectNewHelper.getMavenArtifactIdErrorMessage(artifactId);
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
+    }
+
+    // do not allow a dot in the artifact name (required for ScoutJS archetype)
+    if (artifactId.indexOf('.') >= 0) {
+      return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "The ArtifactId may not contain a dot.");
     }
 
     // check folder existence on file system
@@ -368,13 +374,13 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     else {
       folder = getTargetDirectory();
     }
-    if (folder != null && new File(folder, getArtifactId()).exists()) {
+    if (folder != null && new File(folder, artifactId).exists()) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Artifact Id already exists in this target directory.");
     }
 
     // check project existence in workspace
     for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-      if (p.getName().startsWith(getArtifactId() + '.')) {
+      if (p.getName().startsWith(artifactId + '.')) {
         return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Artifact Id already exists in the workspace.");
       }
     }
