@@ -131,7 +131,7 @@ public class LinkedAsyncProposalModelPresenter {
 
     final LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
     holder[0] = ui;
-    Object endPosition = linkedProposalModel.getEndPosition();
+    Object endPosition = PositionInformationBridge.getEndPosition(linkedProposalModel);
     int offset = -1;
     if (endPosition != null) {
       offset = PositionInformationBridge.getOffset(endPosition);
