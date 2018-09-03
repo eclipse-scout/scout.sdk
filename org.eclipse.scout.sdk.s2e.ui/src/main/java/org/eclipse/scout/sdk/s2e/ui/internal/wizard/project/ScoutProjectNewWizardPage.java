@@ -296,7 +296,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     setDisplayNameInternal("My Application");
 
     // ui language
-    setUseJsClientInternal(true);
+    setUseJsClientInternal(false);
 
     // use workspace loc
     setUseWorkspaceLocationInternal(true);
