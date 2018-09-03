@@ -131,9 +131,13 @@ public class LinkedAsyncProposalModelPresenter {
 
     final LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
     holder[0] = ui;
-    LinkedProposalPositionGroup.PositionInformation endPosition = linkedProposalModel.getEndPosition();
-    if (endPosition != null && endPosition.getOffset() != -1) {
-      ui.setExitPosition(viewer, endPosition.getOffset() + endPosition.getLength(), 0, Integer.MAX_VALUE);
+    Object endPosition = linkedProposalModel.getEndPosition();
+    int offset = -1;
+    if (endPosition != null) {
+      offset = PositionInformationBridge.getOffset(endPosition);
+    }
+    if (offset != -1) {
+      ui.setExitPosition(viewer, offset + PositionInformationBridge.getLength(endPosition), 0, Integer.MAX_VALUE);
     }
     else if (!switchedEditor) {
       int cursorPosition = viewer.getSelectedRange().x;
