@@ -23,14 +23,10 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk.p2</artifactId>
-  <version>8.0.0-SNAPSHOT</version>
+  <version>9.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK P2</name>
   <description>Eclipse Scout SDK - Eclipse Features/Repository</description>
-
-  <prerequisites>
-    <maven>3.2.2</maven>
-  </prerequisites>
 
   <modules>
     <module>../org.eclipse.scout.sdk-target</module>
@@ -39,9 +35,9 @@
   </modules>
 
   <properties>
-    <scout.base.version>8.0.0</scout.base.version>
+    <scout.base.version>9.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <org.eclipse.scout.rt_version>8.0.0-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>${scout.base.version}-SNAPSHOT</org.eclipse.scout.rt_version>
   </properties>
 
   <dependencyManagement>
@@ -62,7 +58,7 @@
       <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.eclipse.scout.sdk.deps</groupId>
+          <groupId>org.eclipse.jdt</groupId>
           <artifactId>org.eclipse.jdt.core</artifactId>
         </exclusion>
       </exclusions>
@@ -113,7 +109,7 @@
                 <groupId>org.eclipse.scout.sdk</groupId>
                 <artifactId>org.eclipse.scout.sdk-target</artifactId>
                 <version>${project.version}</version>
-                <classifier>org.eclipse.neon-dependencies</classifier>
+                <classifier>org.eclipse.2018-09-dependencies</classifier>
               </artifact>
             </target>
           </configuration>
@@ -186,7 +182,7 @@
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
     <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.sdk</developerConnection>
-    <tag>releases/8.0.x</tag>
+    <tag>releases/9.0.x</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
   </scm>
 

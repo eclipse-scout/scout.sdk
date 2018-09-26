@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -23,13 +21,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
-import org.eclipse.jdt.internal.compiler.env.AccessRuleSet;
-import org.eclipse.jdt.internal.compiler.util.Util;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
-import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
@@ -43,8 +37,6 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
 public class ClasspathBuilder {
 
   private static final Map<Path, JreInfo> JRE_INFOS = new ConcurrentHashMap<>();
-
-  private static final ClasspathAccessor CLASSPATH_ACCESSOR;
 
   private final Classpath[] m_full;
   private final List<Classpath> m_bootClasspath;
@@ -60,7 +52,7 @@ public class ClasspathBuilder {
    *          The runtime classpath entries.
    */
   protected ClasspathBuilder(final Path jreHome, final Collection<? extends ClasspathEntry> paths) {
-    final Path javaHome = Optional.ofNullable(jreHome).orElseGet(() -> Validate.notNull(Util.getJavaHome(), "Cannot calculate the running Java home. Please specify a JRE home explicitly.").toPath());
+    final Path javaHome = Optional.ofNullable(jreHome).orElseGet(JreInfo::getRunningJavaHome);
     m_jreInfo = JRE_INFOS.computeIfAbsent(javaHome, JreInfo::new);
 
     final Map<ClasspathEntry, Classpath> classpath = toClasspath(paths);
@@ -72,7 +64,7 @@ public class ClasspathBuilder {
     final List<Classpath> fullCp = new ArrayList<>(classpath.size() + m_bootClasspath.size());
     fullCp.addAll(classpath.values());
     fullCp.addAll(m_bootClasspath);
-    m_full = fullCp.toArray(new Classpath[fullCp.size()]);
+    m_full = fullCp.toArray(new Classpath[0]);
   }
 
   /**
@@ -119,7 +111,7 @@ public class ClasspathBuilder {
     final Path jreHome = jre.jreHome();
     if (jre.supportsJrtModules()) {
       SdkLog.debug("Boot Classpath uses JRT modules of Java home: {}.", jreHome);
-      bootClasspath.add(resolveJrtClasspath(jreHome));
+      bootClasspath.add(FileSystem.getJrtClasspath(jreHome.toString(), null, null, null));
     }
     else {
       SdkLog.debug("Using Boot Classpath based on the jars in the lib folder of Java home: {}.", jreHome);
@@ -129,20 +121,6 @@ public class ClasspathBuilder {
     }
 
     return bootClasspath;
-  }
-
-  private static Classpath resolveJrtClasspath(final Path jreHome) {
-    try {
-      // try JDT with Java9 support
-      final Method getJrtClasspath = FileSystem.class.getDeclaredMethod("getJrtClasspath", String.class, String.class, AccessRuleSet.class, Map.class);
-      return (Classpath) getJrtClasspath.invoke(null, jreHome.toString(), null, null, null);
-    }
-    catch (final NoSuchMethodException nsme) {
-      throw new SdkException("The specified JRE (" + jreHome + ") uses a JRT FileSystem (Java 9 or newer). But the compiler used does not support JRT. Please update to a newer JDT/ECJ compiler.", nsme);
-    }
-    catch (final ReflectiveOperationException e) {
-      throw new SdkException(e);
-    }
   }
 
   private static Map<ClasspathEntry, Classpath> toClasspath(final Collection<? extends ClasspathEntry> paths) {
@@ -181,38 +159,6 @@ public class ClasspathBuilder {
       return null;
     }
 
-    try {
-      return CLASSPATH_ACCESSOR.toClasspath(f, isSourceOnly, encoding);
-    }
-    catch (final IllegalArgumentException | ReflectiveOperationException e) {
-      throw new SdkException(e);
-    }
-  }
-
-  private interface ClasspathAccessor {
-    Classpath toClasspath(final Path f, final boolean isSourceOnly, final String encoding) throws IllegalAccessException, InvocationTargetException;
-  }
-
-  static {
-    ClasspathAccessor accessor = (f, isSourceOnly, encoding) -> {
-      throw new SdkException("getClasspath method on FileSystem.class could not be found.");
-    };
-    try {
-      // try ECJ 3.14 version first
-      // this version includes an additional parameter 'release'.
-      final Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class, String.class);
-      accessor = (f, isSourceOnly, encoding) -> (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null, null);
-    }
-    catch (final NoSuchMethodException nsme) {
-      SdkLog.debug("Fallback to legacy ECJ.", nsme);
-      try {
-        final Method getClasspath = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class);
-        accessor = (f, isSourceOnly, encoding) -> (Classpath) getClasspath.invoke(null, f.toString(), encoding, isSourceOnly, null, null, null);
-      }
-      catch (final NoSuchMethodException e) {
-        SdkLog.error("No supported ECJ found.", e);
-      }
-    }
-    CLASSPATH_ACCESSOR = accessor;
+    return FileSystem.getClasspath(f.toString(), encoding, isSourceOnly, null, null, null, null);
   }
 }

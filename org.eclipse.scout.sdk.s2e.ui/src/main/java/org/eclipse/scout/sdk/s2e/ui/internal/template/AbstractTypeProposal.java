@@ -35,6 +35,7 @@ import org.eclipse.jdt.internal.corext.codemanipulation.StubUtility;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalModel;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.Proposal;
+import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroupCore.PositionInformation;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.JavaUIStatus;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
@@ -74,10 +75,10 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
   /**
    * Workaround to have a complete, valid AST even if there has been a prefix typed by the user. <br>
-   * Detail: If the user writes "abc" on an empty line before an annotation, this annotation is no longer part of the
-   * AST. This is because "abc@annot" is no valid pattern and gets excluded by the parser. As a workaround a semicolon
-   * is added: "abc;@annot". This way the parser recognizes the annotation because the text written by the user looks
-   * like another, wrong statement. The semicolon is removed again if the proposal is applied.
+   * Detail: If the user writes "abc" on an empty line before an annotation, this annotation is no longer part of the AST.
+   * This is because "abc@annot" is no valid pattern and gets excluded by the parser. As a workaround a semicolon is
+   * added: "abc;@annot". This way the parser recognizes the annotation because the text written by the user looks like
+   * another, wrong statement. The semicolon is removed again if the proposal is applied.
    */
   static final char SEARCH_STRING_END_FIX = ';';
 
@@ -217,10 +218,10 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
         new LinkedAsyncProposalModelPresenter().enterLinkedMode(viewer, part, didOpenEditor(), m_linkedProposalModel);
       }
       else if (part instanceof ITextEditor) {
-        Object endPosition = PositionInformationBridge.getEndPosition(m_linkedProposalModel);
+        PositionInformation endPosition = m_linkedProposalModel.getEndPosition();
         if (endPosition != null) {
           // select a result
-          int pos = PositionInformationBridge.getOffset(endPosition) + PositionInformationBridge.getLength(endPosition);
+          int pos = endPosition.getOffset() + endPosition.getLength();
           ((ITextEditor) part).selectAndReveal(pos, 0);
         }
       }
@@ -249,12 +250,12 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
       m_asyncProposalProviders.add(newGroup);
       if (group != null) {
         // already added positions. copy over
-        for (Object info : PositionInformationBridge.getPositions(group)) {
-          PositionInformationBridge.addPosition(newGroup, info);
+        for (PositionInformation info : group.getPositions()) {
+          newGroup.addPosition(info);
         }
       }
       group = newGroup;
-      PositionInformationBridge.addPositionGroup(m_linkedProposalModel, group);
+      m_linkedProposalModel.addPositionGroup(group);
     }
   }
 

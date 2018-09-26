@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk.p2</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>9.0.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.sdk.p2/pom.xml</relativePath>
   </parent>
 
@@ -30,20 +30,32 @@
     <p2repo-zip-path>${project.build.directory}/org.eclipse.scout.sdk-repository-${project.version}.zip</p2repo-zip-path>
   </properties>
 
+  <!-- java api compatibility test not necessary for repository. Why is it executed? -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>eclipse-stage</id>
 
       <properties>
         <buildType>N</buildType>
-        <stageTargetDir>nightly/8.0</stageTargetDir>
+        <stageTargetDir>nightly/9.0</stageTargetDir>
         <buildId>${buildType}${master_build_timestamp}</buildId>
         <buildsToKeep>3</buildsToKeep>
       </properties>
 
       <build>
         <plugins>
-
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-enforcer-plugin</artifactId>

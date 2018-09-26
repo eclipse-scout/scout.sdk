@@ -31,7 +31,7 @@ import org.junit.Test;
 public class ApiTest {
   @Test
   public void testAstUtilsApi() throws NoSuchMethodException, SecurityException {
-    ASTParser parser = ASTParser.newParser(AST.JLS8);
+    ASTParser parser = ASTParser.newParser(AST.JLS10);
     parser.setBindingsRecovery(false);
     parser.setIgnoreMethodBodies(true);
     parser.setKind(ASTParser.K_COMPILATION_UNIT);

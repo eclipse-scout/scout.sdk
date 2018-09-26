@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>9.0.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.sdk/pom.xml</relativePath>
   </parent>
 
@@ -29,7 +29,7 @@
   <properties>
     <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
     <bundle.namespace>${project.artifactId}</bundle.namespace>
-    <bundle.version>8.0.0</bundle.version>
+    <bundle.version>${scout.base.version}</bundle.version>
   </properties>
 
   <dependencies>
@@ -46,13 +46,18 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.jdt</groupId>
       <artifactId>org.eclipse.jdt.launching</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.jdt</groupId>
       <artifactId>org.eclipse.jdt.ui</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>org.eclipse.jdt.debug.ui</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -60,10 +65,23 @@
       <artifactId>org.eclipse.m2e.core.ui</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.swt.${osgi.platform}</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.basepom.maven</groupId>
+        <artifactId>duplicate-finder-maven-plugin</artifactId>
+        <configuration>
+          <!-- not required because it is a bundle: duplicate classes are allowed in OSGi -->
+          <skip>true</skip>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -85,12 +103,13 @@
               !org.eclipse.jface.text*,
               !org.eclipse.text*,
               !org.eclipse.m2e.core.*,
+              !org.osgi.*,
               org.eclipse.ltk.core.refactoring,<!-- indirectly referenced -->
               *
             </Import-Package>
             <Require-Bundle>
-              org.eclipse.scout.sdk.s2e;bundle-version="[8.0,8.1)";visibility:=reexport,
-              org.eclipse.scout.sdk.s2e.doc;bundle-version="[8.0,8.1)";visibility:=reexport,
+              org.eclipse.scout.sdk.s2e;bundle-version="[9.0,9.1)";visibility:=reexport,
+              org.eclipse.scout.sdk.s2e.doc;bundle-version="[9.0,9.1)";visibility:=reexport,
               org.eclipse.jdt.ui;bundle-version="[3.12,4)";visibility:=reexport,
               org.eclipse.jdt.debug.ui;bundle-version="[3.7.200,4)";visibility:=reexport,
               org.eclipse.ui.ide;bundle-version="[3.12,4)";visibility:=reexport,

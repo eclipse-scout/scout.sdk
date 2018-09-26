@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.Validate;
+import org.eclipse.jdt.internal.compiler.util.Util;
 import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
@@ -121,7 +122,18 @@ public class JreInfo {
     return name.endsWith(".jar") || name.endsWith(".zip");
   }
 
-  private static Path resolveRtSourceZip(final Path jreHome) {
+  /**
+   * Tries to find the source ZIP file within the specified JRE.
+   *
+   * @param jreHome
+   *          The JRE home directory (not the JDK!).
+   * @return The {@link Path} pointing to the source zip or {@code null} if it could not be found.
+   */
+  public static Path resolveRtSourceZip(final Path jreHome) {
+    if (jreHome == null) {
+      return null;
+    }
+
     // in Java9 the src.zip is in the lib folder inside java-home.
     final Path innerSrcZip = jreHome.resolve("lib/src.zip");
     if (Files.isReadable(innerSrcZip) && Files.isRegularFile(innerSrcZip)) {
@@ -134,6 +146,10 @@ public class JreInfo {
       return null;
     }
     return parent.resolve("src.zip");
+  }
+
+  public static Path getRunningJavaHome() {
+    return Validate.notNull(Util.getJavaHome(), "Cannot calculate the running Java home. Please specify a JRE home explicitly.").toPath();
   }
 
   @Override

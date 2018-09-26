@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -21,7 +18,6 @@ import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
-import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
  * <h3>{@link FileSystemWithOverride}</h3>
@@ -84,74 +80,32 @@ public class FileSystemWithOverride extends FileSystem {
         || super.isPackage(compoundName, packageName);
   }
 
-  // @Override // override of the Java9 version
+  @Override
   public NameEnvironmentAnswer findType(final char[][] compoundName, final char[] moduleName) {
     final NameEnvironmentAnswer answer = searchInOverrideSupport(compoundName);
     if (answer != null) {
       return answer;
     }
-    return superFindType(compoundName, moduleName); // super call using reflection for backwards compatibility
+    return super.findType(compoundName, moduleName);
   }
 
-  private NameEnvironmentAnswer superFindType(final char[][] compoundName, final char[] moduleName) {
-    try {
-      final MethodHandle superFindType = MethodHandles.lookup()
-          .findSpecial(FileSystem.class,
-              "findType",
-              MethodType.methodType(NameEnvironmentAnswer.class, char[][].class, char[].class),
-              FileSystemWithOverride.class);
-      return (NameEnvironmentAnswer) superFindType.invoke(this, compoundName, moduleName);
-    }
-    catch (final Throwable e) {
-      throw new SdkException(e);
-    }
-  }
-
-  //@Override // override of the Java9 version
+  @Override
   public NameEnvironmentAnswer findType(final char[] typeName, final char[][] packageName, final char[] moduleName) {
     final NameEnvironmentAnswer answer = searchInOverrideSupport(typeName, packageName);
     if (answer != null) {
       return answer;
     }
-    return superFindType(typeName, packageName, moduleName);
+    return super.findType(typeName, packageName, moduleName);
   }
 
-  private NameEnvironmentAnswer superFindType(final char[] typeName, final char[][] packageName, final char[] moduleName) {
-    try {
-      final MethodHandle superFindType = MethodHandles.lookup()
-          .findSpecial(FileSystem.class,
-              "findType",
-              MethodType.methodType(NameEnvironmentAnswer.class, char[].class, char[][].class, char[].class),
-              FileSystemWithOverride.class);
-      return (NameEnvironmentAnswer) superFindType.invoke(this, typeName, packageName, moduleName);
-    }
-    catch (final Throwable e) {
-      throw new SdkException(e);
-    }
-  }
-
-  // @Override // override of the Java9 version
+  @Override
   public boolean hasCompilationUnit(final char[][] qualifiedPackageName, final char[] moduleName, final boolean checkCUs) {
     for (final ICompilationUnit icu : overrideSupport().getCompilationUnits()) {
       if (CharOperation.equals(icu.getPackageName(), qualifiedPackageName)) {
         return true;
       }
     }
-    return superHasCompilationUnit(qualifiedPackageName, moduleName, checkCUs);
-  }
-
-  private boolean superHasCompilationUnit(final char[][] qualifiedPackageName, final char[] moduleName, final boolean checkCUs) {
-    try {
-      final MethodHandle superHasCompilationUnit = MethodHandles.lookup()
-          .findSpecial(FileSystem.class,
-              "hasCompilationUnit",
-              MethodType.methodType(boolean.class, char[][].class, char[].class, boolean.class),
-              FileSystemWithOverride.class);
-      return (Boolean) superHasCompilationUnit.invoke(this, qualifiedPackageName, moduleName, checkCUs);
-    }
-    catch (final Throwable e) {
-      throw new SdkException(e);
-    }
+    return super.hasCompilationUnit(qualifiedPackageName, moduleName, checkCUs);
   }
 
   public CompilationUnitOverrideSupport overrideSupport() {
@@ -168,7 +122,7 @@ public class FileSystemWithOverride extends FileSystem {
 
   @Override
   public void cleanup() {
-    super.cleanup();
     m_overrideSupport.clear();
+    super.cleanup();
   }
 }

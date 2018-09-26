@@ -52,7 +52,7 @@ public class TypeProposalContext {
   public TypeDeclaration getDeclaringType() {
     if (m_declaringType == null) {
       CompilationUnit cu = Validate.notNull(getCompilationUnit(), "No AST found for '%s'.", m_icu.getElementName());
-      m_declaringType = Validate.notNull((TypeDeclaration) ASTNodes.getParent(NodeFinder.perform(cu, getSurroundingTypeNameRange()), TypeDeclaration.class));
+      m_declaringType = Validate.notNull(ASTNodes.getParent(NodeFinder.perform(cu, getSurroundingTypeNameRange()), TypeDeclaration.class));
     }
     return m_declaringType;
   }

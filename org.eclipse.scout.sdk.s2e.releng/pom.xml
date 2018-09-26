@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>9.0.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.sdk/pom.xml</relativePath>
   </parent>
 
@@ -111,8 +111,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_neon</id>
-              <url>http://download.eclipse.org/releases/neon/</url>
+              <id>eclipse_2018_09</id>
+              <url>http://download.eclipse.org/releases/2018-09/</url>
               <layout>p2</layout>
             </repository>
           </source>

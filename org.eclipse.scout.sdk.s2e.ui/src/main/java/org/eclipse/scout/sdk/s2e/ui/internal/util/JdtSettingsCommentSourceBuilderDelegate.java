@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.internal.core.manipulation.util.Strings;
 import org.eclipse.jdt.internal.corext.template.java.CodeTemplateContext;
 import org.eclipse.jdt.internal.corext.template.java.CodeTemplateContextType;
-import org.eclipse.jdt.internal.corext.util.Strings;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.viewsupport.ProjectTemplateStore;
 import org.eclipse.jdt.ui.JavaUI;
@@ -40,6 +40,7 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
+import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
@@ -434,7 +435,9 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
 
   private static Template getCodeTemplate(String id, IJavaProject project) {
     if (!S2eUtils.exists(project)) {
-      return JavaPlugin.getDefault().getCodeTemplateStore().findTemplateById(id);
+      JavaPlugin plugin = JavaPlugin.getDefault();
+      TemplateStore codeTemplateStore = plugin.getCodeTemplateStore();
+      return codeTemplateStore.findTemplateById(id);
     }
 
     ProjectTemplateStore projectStore = new ProjectTemplateStore(project.getProject());

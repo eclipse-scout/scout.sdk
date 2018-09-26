@@ -10,15 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.util.maven;
 
-import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link MavenSandboxClassLoaderFactory}</h3>
@@ -41,9 +45,10 @@ public final class MavenSandboxClassLoaderFactory {
   static URL[] getMavenJarsUrls() {
     // contains a sample class of all jars required by the maven runtime.
     // the codesource of these classes will be the source of the classpath of the sandbox classloader.
-    String[] baseClasses = new String[]{
-        "org.eclipse.scout.sdk.core.s.util.maven.MavenCliRunner",
-        "org.apache.commons.lang3.StringUtils", // apache-commons3 for MavenCliRunner
+    final String[] baseClasses = {
+        MavenCliRunner.class.getName(),
+        "org.apache.commons.lang3.StringUtils", // apache-commons-lang3 for guice
+        "org.apache.commons.io.DirectoryWalker", // commons-io
         "org.eclipse.scout.sdk.core.util.SdkLog", // sdk.core for logging
         "org.apache.maven.cli.MavenCli", // maven-embedder
         "org.apache.maven.settings.Settings", // maven-settings
@@ -62,6 +67,7 @@ public final class MavenSandboxClassLoaderFactory {
         "org.apache.maven.building.ProblemCollector", // maven-builder-support
         "com.google.common.base.Predicate", // guava
         "org.apache.maven.artifact.ArtifactStatus", // maven-compat
+        "org.apache.maven.shared.utils.logging.MessageUtils", // maven-shared-utils
         "org.codehaus.plexus.util.CachedMap", // plexus-utils
         "org.codehaus.plexus.classworlds.ClassWorld", // plexus-classworlds
         "org.codehaus.plexus.ContainerConfiguration", // org.eclipse.sisu.plexus
@@ -71,13 +77,13 @@ public final class MavenSandboxClassLoaderFactory {
         "org.sonatype.plexus.components.sec.dispatcher.SecDispatcher", // plexus-sec-dispatcher
         "org.sonatype.plexus.components.cipher.PlexusCipher", // plexus-cipher
         "org.apache.commons.cli.CommandLineParser", // commons-cli
-        "org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory", // aether-connector-basic
+        "org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory", // maven-resolver-connector-basic
         "org.eclipse.aether.RepositoryCache", // aether-api
         "org.eclipse.aether.spi.connector.RepositoryConnector", // aether-spi
         "org.eclipse.aether.util.ChecksumUtils", // aether-util
-        "org.eclipse.aether.internal.transport.wagon.PlexusWagonConfigurator", // aether-transport-wagon
+        "org.eclipse.aether.transport.wagon.WagonProvider", // maven-resolver-transport-wagon
         "io.takari.aether.client.AetherClient", // aether-connector-okhttp
-        "com.squareup.okhttp.Interceptor", // okhttp
+        "okhttp3.ConnectionPool", // okhttp
         "okio.Okio", // okio
         "org.slf4j.ILoggerFactory", //slf4j-api
         "org.apache.maven.wagon.AbstractWagon", // wagon-provider-api
@@ -92,12 +98,12 @@ public final class MavenSandboxClassLoaderFactory {
    *          The fqn of the classes
    * @return the {@link URL}s of the jars that contain the given class names.
    */
-  static URL[] getJarsUrls(String[] baseClasses) {
-    List<URL> urls = new ArrayList<>(baseClasses.length);
-    for (String className : baseClasses) {
+  static URL[] getJarsUrls(final String[] baseClasses) {
+    final List<URL> urls = new ArrayList<>(baseClasses.length);
+    for (final String className : baseClasses) {
       urls.add(getJarContaining(className));
     }
-    return urls.toArray(new URL[urls.size()]);
+    return urls.toArray(new URL[0]);
   }
 
   /**
@@ -107,16 +113,16 @@ public final class MavenSandboxClassLoaderFactory {
    *          the fully qualified class name.
    * @return The {@link URL} of the jar that contains the given class.
    */
-  static URL getJarContaining(String className) {
+  static URL getJarContaining(final String className) {
     try {
-      Class<?> clazz = MavenSandboxClassLoaderFactory.class.getClassLoader().loadClass(className);
-      URL url = getJarContaining(clazz);
+      final Class<?> clazz = MavenSandboxClassLoaderFactory.class.getClassLoader().loadClass(className);
+      final URL url = getJarContaining(clazz);
       if (url == null) {
         throw new SdkException("Could not find jar of '" + className + "'.");
       }
       return url;
     }
-    catch (ClassNotFoundException e) {
+    catch (final ClassNotFoundException e) {
       throw new SdkException(e);
     }
   }
@@ -124,17 +130,17 @@ public final class MavenSandboxClassLoaderFactory {
   /**
    * @return The {@link URL} of the jar or folder that contains the given {@link Class}.
    */
-  static URL getJarContaining(Class<?> clazz) {
+  static URL getJarContaining(final Class<?> clazz) {
     if (clazz == null) {
       return null;
     }
-    CodeSource codeSource = clazz.getProtectionDomain().getCodeSource();
+    final CodeSource codeSource = clazz.getProtectionDomain().getCodeSource();
     if (codeSource == null) {
       return null;
     }
-    URL url = codeSource.getLocation();
+    final URL url = codeSource.getLocation();
     if (url == null) {
-      return url;
+      return null;
     }
     if (url.getPath().endsWith(".jar")) {
       return url;
@@ -142,18 +148,19 @@ public final class MavenSandboxClassLoaderFactory {
 
     try {
       URL fileUrl = new URL(url, "target/classes/");
-      File f = new File(fileUrl.getPath());
-      if (f.exists()) {
+      Path f = Paths.get(fileUrl.toURI());
+      if (Files.isReadable(f) || Files.isDirectory(f)) {
         return fileUrl;
       }
+
       fileUrl = url;
-      f = new File(fileUrl.getPath());
-      if (f.exists()) {
+      f = Paths.get(fileUrl.toURI());
+      if (Files.isReadable(f) || Files.isDirectory(f)) {
         return fileUrl;
       }
     }
-    catch (MalformedURLException e) {
-      //nop
+    catch (final MalformedURLException | URISyntaxException e) {
+      SdkLog.warning(e);
     }
     return url;
   }

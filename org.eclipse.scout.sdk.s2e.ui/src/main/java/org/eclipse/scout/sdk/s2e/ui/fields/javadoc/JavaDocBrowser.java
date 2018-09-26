@@ -100,7 +100,7 @@ public final class JavaDocBrowser {
         return null;
       }
 
-      StringBuffer buffer = new StringBuffer();
+      StringBuilder buffer = new StringBuilder();
 
       // header
       HTMLPrinter.insertPageProlog(buffer, 0, getCssStyles());
@@ -123,7 +123,7 @@ public final class JavaDocBrowser {
   }
 
   @SuppressWarnings("squid:S1149") // StringBuffer required by API
-  static void insertBaseUrl(String javaDoc, IJavaElement element, StringBuffer buffer) {
+  static void insertBaseUrl(String javaDoc, IJavaElement element, StringBuilder buffer) {
     try {
       String base = JavadocContentAccess2.extractBaseURL(javaDoc);
       if (base == null) {

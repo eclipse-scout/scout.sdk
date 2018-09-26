@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalModel;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
+import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroupCore.PositionInformation;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorHighlightingSynchronizer;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
@@ -82,27 +83,27 @@ public class LinkedAsyncProposalModelPresenter {
 
       LinkedPositionGroup group = new LinkedPositionGroup();
 
-      Object[] positions = PositionInformationBridge.getPositions(curr);
+      PositionInformation[] positions = curr.getPositions();
       if (positions.length > 0) {
         if (curr instanceof ICompletionProposalProvider) {
           // lazy provider
           for (int i = 0; i < positions.length; i++) {
-            Object pos = positions[i];
-            if (PositionInformationBridge.getOffset(pos) != -1) {
+            PositionInformation pos = positions[i];
+            if (pos.getOffset() != -1) {
               ICompletionProposalProvider proposalProvider = (ICompletionProposalProvider) curr;
               if (display != null) {
                 proposalProvider.addListener(listener);
               }
-              group.addPosition(new AsyncProposalPosition(document, PositionInformationBridge.getOffset(pos), PositionInformationBridge.getLength(pos), PositionInformationBridge.getSequenceRank(pos), proposalProvider, model));
+              group.addPosition(new AsyncProposalPosition(document, pos.getOffset(), pos.getLength(), pos.getSequenceRank(), proposalProvider, model));
             }
           }
         }
         else {
           LinkedProposalPositionGroup.Proposal[] linkedModeProposals = curr.getProposals();
           if (linkedModeProposals.length <= 1) {
-            for (Object pos : positions) {
-              if (PositionInformationBridge.getOffset(pos) != -1) {
-                group.addPosition(new LinkedPosition(document, PositionInformationBridge.getOffset(pos), PositionInformationBridge.getLength(pos), PositionInformationBridge.getSequenceRank(pos)));
+            for (PositionInformation pos : positions) {
+              if (pos.getOffset() != -1) {
+                group.addPosition(new LinkedPosition(document, pos.getOffset(), pos.getLength(), pos.getSequenceRank()));
               }
             }
           }
@@ -112,9 +113,9 @@ public class LinkedAsyncProposalModelPresenter {
               proposalImpls[i] = new LinkedPositionProposalImpl(linkedModeProposals[i], model);
             }
 
-            for (Object pos : positions) {
-              if (PositionInformationBridge.getOffset(pos) != -1) {
-                group.addPosition(new ProposalPosition(document, PositionInformationBridge.getOffset(pos), PositionInformationBridge.getLength(pos), PositionInformationBridge.getSequenceRank(pos), proposalImpls));
+            for (PositionInformation pos : positions) {
+              if (pos.getOffset() != -1) {
+                group.addPosition(new ProposalPosition(document, pos.getOffset(), pos.getLength(), pos.getSequenceRank(), proposalImpls));
               }
             }
           }
@@ -131,13 +132,13 @@ public class LinkedAsyncProposalModelPresenter {
 
     final LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
     holder[0] = ui;
-    Object endPosition = PositionInformationBridge.getEndPosition(linkedProposalModel);
+    PositionInformation endPosition = linkedProposalModel.getEndPosition();
     int offset = -1;
     if (endPosition != null) {
-      offset = PositionInformationBridge.getOffset(endPosition);
+      offset = endPosition.getOffset();
     }
-    if (offset != -1) {
-      ui.setExitPosition(viewer, offset + PositionInformationBridge.getLength(endPosition), 0, Integer.MAX_VALUE);
+    if (offset != -1 && endPosition != null) {
+      ui.setExitPosition(viewer, offset + endPosition.getLength(), 0, Integer.MAX_VALUE);
     }
     else if (!switchedEditor) {
       int cursorPosition = viewer.getSelectedRange().x;

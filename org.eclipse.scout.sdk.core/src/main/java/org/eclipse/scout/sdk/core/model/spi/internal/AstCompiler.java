@@ -34,13 +34,12 @@ import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
  */
 public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
 
-  private static final int MAJOR_VERSION_10 = 54;
   static final CompilerOptions opts;
   static final Map<String, String> optsMap;
   static {
     opts = new CompilerOptions();
     opts.produceDebugAttributes = 0;
-    opts.complianceLevel = ((long) MAJOR_VERSION_10 << 16) + ClassFileConstants.MINOR_VERSION_0; /* JDK10. can be removed as soon as ECJ 3.14 is used as compile dependency */
+    opts.complianceLevel = ClassFileConstants.JDK10;
     opts.originalComplianceLevel = opts.complianceLevel;
     opts.sourceLevel = opts.complianceLevel;
     opts.originalSourceLevel = opts.complianceLevel;
