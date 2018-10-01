@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.Proposal;
+import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroupCore.PositionInformation;
 
 /**
  * <h3>{@link ICompletionProposalProvider}</h3>
@@ -21,6 +22,8 @@ import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.Proposal;
 public interface ICompletionProposalProvider {
 
   Proposal[] getProposals();
+
+  PositionInformation[] getPositions();
 
   void load();
 

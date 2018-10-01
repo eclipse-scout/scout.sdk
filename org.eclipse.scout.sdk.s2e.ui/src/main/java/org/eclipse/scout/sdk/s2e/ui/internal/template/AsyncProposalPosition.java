@@ -16,7 +16,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.ProposalPosition;
-import org.eclipse.scout.sdk.s2e.ui.internal.template.LinkedAsyncProposalModelPresenter.LinkedPositionProposalImpl;
 
 /**
  * <h3>{@link AsyncProposalPosition}</h3>
