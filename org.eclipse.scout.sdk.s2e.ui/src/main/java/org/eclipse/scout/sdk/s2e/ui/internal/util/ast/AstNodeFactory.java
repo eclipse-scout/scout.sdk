@@ -49,8 +49,8 @@ import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
-import org.eclipse.jdt.internal.corext.codemanipulation.StubUtility;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
+import org.eclipse.jdt.ui.CodeStyleConfiguration;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
@@ -135,7 +135,12 @@ public class AstNodeFactory {
     m_ast = m_declaringType.getAST();
     m_rewrite = ASTRewrite.create(m_ast);
     m_root = (CompilationUnit) type.getRoot();
-    m_importRewrite = StubUtility.createImportRewrite(m_root, true);
+
+    m_importRewrite = CodeStyleConfiguration.createImportRewrite(m_root, true);
+    if (m_root.getAST().hasResolvedBindings()) {
+      m_importRewrite.setUseContextToFilterImplicitImports(true);
+    }
+
     m_importsRewrite = m_rewrite.getListRewrite(m_root, CompilationUnit.IMPORTS_PROPERTY);
     m_context = new ContextSensitiveImportRewriteContext(m_root, m_importRewrite);
     m_javaProject = m_icu.getJavaProject();

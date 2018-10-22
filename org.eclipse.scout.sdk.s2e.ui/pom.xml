@@ -92,6 +92,7 @@
               org.eclipse.scout.sdk.s2e;bundle-version="[8.0,8.1)";visibility:=reexport,
               org.eclipse.scout.sdk.s2e.doc;bundle-version="[8.0,8.1)";visibility:=reexport,
               org.eclipse.jdt.ui;bundle-version="[3.12,4)";visibility:=reexport,
+              org.eclipse.jdt.core.manipulation;bundle-version="[1.9,2)";visibility:=reexport,
               org.eclipse.jdt.debug.ui;bundle-version="[3.7.200,4)";visibility:=reexport,
               org.eclipse.ui.ide;bundle-version="[3.12,4)";visibility:=reexport,
               org.eclipse.ui.workbench;bundle-version="[3.108,4)";visibility:=reexport,

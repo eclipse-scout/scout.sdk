@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.util;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -22,11 +22,7 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.corext.template.java.CodeTemplateContext;
 import org.eclipse.jdt.internal.corext.template.java.CodeTemplateContextType;
-import org.eclipse.jdt.internal.corext.util.Strings;
-import org.eclipse.jdt.internal.ui.JavaPlugin;
-import org.eclipse.jdt.internal.ui.viewsupport.ProjectTemplateStore;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.text.BadLocationException;
@@ -54,7 +50,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
@@ -85,7 +80,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         IJavaProject ownerProject = builderCtx.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
         Template template = getCodeTemplate(CodeTemplateContextType.FILECOMMENT_ID, ownerProject);
         if (template != null) {
-          CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
+          TemplateContext context = CodeTemplateContextBridge.createCodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
           context.setVariable(CodeTemplateContextType.FILENAME, target.getElementName());
 
           String packageName = target.getPackageName();
@@ -120,7 +115,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         if (template == null) {
           return;
         }
-        CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
+        TemplateContext context = CodeTemplateContextBridge.createCodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
         context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
         context.setVariable(CodeTemplateContextType.PACKAGENAME, Signature.getQualifier(target.getFullyQualifiedName()));
         if (S2eUtils.exists(ownerProject)) {
@@ -129,7 +124,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, Signature.getQualifier(target.getElementName()));
         context.setVariable(CodeTemplateContextType.TYPENAME, Signature.getSimpleName(target.getElementName()));
 
-        TemplateBuffer buffer;
+        final TemplateBuffer buffer;
         try {
           buffer = context.evaluate(template);
         }
@@ -140,15 +135,13 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
           throw new SdkException(e);
         }
         String str = buffer.getString();
-        if (Strings.containsOnlyWhitespaces(str)) {
+        if (StringUtils.isBlank(str)) {
           return;
         }
 
         TemplateVariable position = findVariable(buffer, CodeTemplateContextType.TAGS); // look if Javadoc tags have to be added
         if (position == null) {
-          if (str != null) {
-            source.append(str);
-          }
+          source.append(str);
           return;
         }
 
@@ -182,7 +175,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         IJavaProject ownerProject = builderCtx.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
         Template template = getCodeTemplate(CodeTemplateContextType.OVERRIDECOMMENT_ID, ownerProject);
         if (template != null) {
-          CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
+          TemplateContext context = CodeTemplateContextBridge.createCodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
           context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
           if (S2eUtils.exists(ownerProject)) {
             context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
@@ -275,7 +268,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         if (template == null) {
           return;
         }
-        CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
+        TemplateContext context = CodeTemplateContextBridge.createCodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
         String getterSetterName = UNDEFINED_VAR_VALUE;
         Matcher matcher = CoreUtils.BEAN_METHOD_NAME.matcher(target.getElementName());
         if (matcher.find()) {
@@ -317,7 +310,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         }
 
         String str = buffer.getString();
-        if (Strings.containsOnlyWhitespaces(str)) {
+        if (StringUtils.isBlank(str)) {
           return;
         }
         TemplateVariable position = findVariable(buffer, CodeTemplateContextType.TAGS); // look if Javadoc tags have to be added
@@ -362,7 +355,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
         IJavaProject ownerProject = builderCtx.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
         Template template = getCodeTemplate(CodeTemplateContextType.FIELDCOMMENT_ID, ownerProject);
         if (template != null) {
-          CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
+          TemplateContext context = CodeTemplateContextBridge.createCodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
           context.setVariable(CodeTemplateContextType.FIELD_TYPE, Signature.getSignatureSimpleName(target.getSignature()));
           context.setVariable(CodeTemplateContextType.FIELD, target.getElementName());
           if (S2eUtils.exists(ownerProject)) {
@@ -399,7 +392,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
     return true;
   }
 
-  private static String evaluateTemplate(CodeTemplateContext context, Template template) {
+  private static String evaluateTemplate(TemplateContext context, Template template) {
     // replace the user name resolver with our own to ensure we can respect the scout specific user names.
     Iterator<TemplateVariableResolver> resolvers = context.getContextType().resolvers();
     while (resolvers.hasNext()) {
@@ -425,26 +418,14 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
       return null;
     }
     String str = buffer.getString();
-
-    if (Strings.containsOnlyWhitespaces(str)) {
+    if (StringUtils.isBlank(str)) {
       return null;
     }
     return str;
   }
 
   private static Template getCodeTemplate(String id, IJavaProject project) {
-    if (!S2eUtils.exists(project)) {
-      return JavaPlugin.getDefault().getCodeTemplateStore().findTemplateById(id);
-    }
-
-    ProjectTemplateStore projectStore = new ProjectTemplateStore(project.getProject());
-    try {
-      projectStore.load();
-    }
-    catch (IOException e) {
-      SdkLog.error(e);
-    }
-    return projectStore.findTemplateById(id);
+    return StubUtilityBridge.getCodeTemplate(id, project);
   }
 
   private static TemplateVariable findVariable(TemplateBuffer buffer, String variable) {
