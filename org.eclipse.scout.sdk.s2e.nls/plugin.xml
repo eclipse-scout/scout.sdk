@@ -53,7 +53,7 @@
       </javaCompletionProposalComputer>
    </extension>
    <extension point="org.eclipse.ui.menus">
-      <menuContribution locationURI="menu:org.eclipse.scout.sdk.s2e.ui.menu?after=org.eclipse.scout.sdk.s2e.ui.menu.missingClassIdSelected">
+      <menuContribution locationURI="menu:org.eclipse.scout.sdk.s2e.ui.menu?after=org.eclipse.scout.sdk.s2e.ui.menu.searchForDuplicateClassIdValues">
          <separator
                name="org.eclipse.scout.sdk.s2e.nls.menu.separator01"
                visible="true">

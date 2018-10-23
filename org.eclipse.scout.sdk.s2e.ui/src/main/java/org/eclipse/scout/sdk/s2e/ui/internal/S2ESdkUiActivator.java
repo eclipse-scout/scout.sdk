@@ -102,7 +102,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(getPreferenceStore().getBoolean(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION));
 
     // start class id validation
-    ClassIdValidationJob.executeAsync(TimeUnit.MINUTES.toMillis(5));
+    ClassIdValidationJob.executeAsync(TimeUnit.MINUTES.toMillis(5), false);
   }
 
   private void registerDetailFormatters() {
