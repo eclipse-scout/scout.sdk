@@ -95,13 +95,8 @@ public final class ScoutProjectNewHelper {
       archetypeVersion = SCOUT_ARCHETYPES_VERSION;
     }
 
-    String pck = null;
-    if (groupId.equals(artifactId)) {
-      pck = artifactId;
-    }
-    else {
-      pck = new StringBuilder(groupId).append('.').append(artifactId).toString();
-    }
+    String pck = getPackage(groupId, artifactId);
+    String artifactName = getArtifactName(artifactId);
 
     // create command
     String[] authKeysForWar = generateKeyPair();
@@ -123,12 +118,28 @@ public final class ScoutProjectNewHelper {
         .withProperty("scoutAuthPublicKeyDev", authKeysForDev[1])
         .withProperty("scoutAuthPrivateKeyDev", authKeysForDev[0])
         .withProperty("javaVersion", javaVersion)
+        .withProperty("simpleArtifactName", artifactName)
         .withProperty("userName", CoreUtils.getUsername());
 
     // execute archetype generation
     MavenRunner.execute(archetypeBuild);
 
     postProcessRootPom(new File(workingDir, artifactId));
+  }
+
+  static String getArtifactName(String artifactId) {
+    int pos = artifactId.lastIndexOf('.');
+    if (pos < 0 || pos >= artifactId.length() - 1) {
+      return artifactId;
+    }
+    return artifactId.substring(pos + 1);
+  }
+
+  static String getPackage(String groupId, String artifactId) {
+    if (artifactId.startsWith(groupId)) {
+      return artifactId;
+    }
+    return new StringBuilder(groupId).append('.').append(artifactId).toString();
   }
 
   static String[] generateKeyPair() {

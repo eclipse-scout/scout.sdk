@@ -361,11 +361,6 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }
 
-    // do not allow a dot in the artifact name (required for ScoutJS archetype)
-    if (artifactId.indexOf('.') >= 0) {
-      return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "The ArtifactId may not contain a dot.");
-    }
-
     // check folder existence on file system
     File folder = null;
     if (isUseWorkspaceLocation()) {
