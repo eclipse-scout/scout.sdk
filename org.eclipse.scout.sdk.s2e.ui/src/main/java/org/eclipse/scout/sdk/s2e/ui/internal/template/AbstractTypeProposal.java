@@ -31,7 +31,6 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
-import org.eclipse.jdt.internal.corext.codemanipulation.StubUtility;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalModel;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.Proposal;
@@ -40,6 +39,7 @@ import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.JavaUIStatus;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.internal.ui.viewsupport.BindingLabelProvider;
+import org.eclipse.jdt.ui.CodeStyleConfiguration;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.jdt.ui.text.java.correction.CUCorrectionProposal;
@@ -336,7 +336,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
     @Override
     public TextEdit computeEdits(int offset, LinkedPosition position, char trigger, int stateMask, LinkedModeModel model) throws CoreException {
-      ImportRewrite impRewrite = StubUtility.createImportRewrite(m_compilationUnit, true);
+      ImportRewrite impRewrite = CodeStyleConfiguration.createImportRewrite(m_compilationUnit, true);
       String replaceString = impRewrite.addImport(m_typeProposal);
 
       MultiTextEdit composedEdit = new MultiTextEdit();

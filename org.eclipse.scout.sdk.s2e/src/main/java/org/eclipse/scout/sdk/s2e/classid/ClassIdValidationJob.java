@@ -67,10 +67,10 @@ public final class ClassIdValidationJob extends AbstractJob {
 
   private final Set<IType> m_classIdTypes;
 
-  private ClassIdValidationJob(Set<IType> classIdTypes) {
+  private ClassIdValidationJob(Set<IType> classIdTypes, boolean showToUser) {
     super(ClassIdValidationJob.class.getName());
-    setSystem(true);
-    setUser(false);
+    setSystem(!showToUser);
+    setUser(showToUser);
     setRule(new P_SchedulingRule());
     setPriority(Job.BUILD);
     m_classIdTypes = classIdTypes;
@@ -232,7 +232,7 @@ public final class ClassIdValidationJob extends AbstractJob {
     createDuplicateMarkers(classIdOccurrences);
   }
 
-  public static synchronized void executeAsync(final long startDelay) {
+  public static synchronized void executeAsync(final long startDelay, final boolean showToUser) {
     Job currentJob = Job.getJobManager().currentJob();
     if (currentJob instanceof ResourceBlockingOperationJob) {
       // do not schedule a check run if the event comes from the scout sdk itself. we assume it does a correct job.
@@ -256,7 +256,7 @@ public final class ClassIdValidationJob extends AbstractJob {
           Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
 
           // start the new validation
-          new ClassIdValidationJob(classIds).schedule(TimeUnit.SECONDS.toMillis(1));
+          new ClassIdValidationJob(classIds, showToUser).schedule(TimeUnit.SECONDS.toMillis(1));
         }
         catch (IllegalStateException e) {
           // can happen e.g. when the preference nodes are changed: "java.lang.IllegalStateException: Preference node "org.eclipse.jdt.core" has been removed."

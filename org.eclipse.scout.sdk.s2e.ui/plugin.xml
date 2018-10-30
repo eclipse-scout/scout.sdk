@@ -103,6 +103,12 @@
                tooltip="Creates all @ClassId Annotations on classes in the selected scope that support the annotation but currently don't have one."
                style="push">
             </command>
+            <command
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.searchForDuplicateClassIdValues"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.searchForDuplicateClassIdValues"
+               tooltip="Searches duplicate @ClassId Values in the current Workspace and marks all findings with Error Markers in the Problems View."
+               style="push">
+            </command>
          </menu>
       </menuContribution>
    </extension>
@@ -190,22 +196,22 @@
             id="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </category>
       <command
-            name="Update all derived resources..."
+            name="Update all Derived Resources..."
             id="org.eclipse.scout.sdk.s2e.ui.commands.triggerAllTypeChangedHandlers"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
       <command
-            name="Update derived resources in selected scope..."
+            name="Update Derived Resources in selected Scope..."
             id="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
       <command
-            name="Wellform all Scout classes..."
+            name="Wellform all Scout Classes..."
             id="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
       <command
-            name="Wellform classes in selected scope"
+            name="Wellform Classes in selected Scope"
             id="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
@@ -215,7 +221,12 @@
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
       <command
-            name="Create missing @ClassId Annotations in selected scope"
+            name="Search for duplicate @ClassId Values"
+            id="org.eclipse.scout.sdk.s2e.ui.commands.searchForDuplicateClassIdValues"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </command>
+      <command
+            name="Create missing @ClassId Annotations in selected Scope"
             id="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
@@ -240,6 +251,10 @@
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
             class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateAllMissingClassIdsHandler">
+      </handler>
+      <handler
+            commandId="org.eclipse.scout.sdk.s2e.ui.commands.searchForDuplicateClassIdValues"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.SearchDuplicateClassIdValuesHandler">
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
