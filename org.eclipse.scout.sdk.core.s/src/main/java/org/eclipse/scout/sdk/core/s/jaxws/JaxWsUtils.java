@@ -180,10 +180,10 @@ public final class JaxWsUtils implements IMavenConstants {
    *          The line delimiter to use.
    * @param targetPackage
    *          The target package in which all JaxWs artifacts should be stored.
-   * @return A {@link Map} holding a {@link Path} for each created binding and a {@link StringBuilder} with the
-   *         corresponding content.
+   * @return A {@link Map} holding the binding path filename as {@link String} and the corresponding binding content as
+   *         {@link StringBuilder}.
    */
-  public static Map<Path, StringBuilder> getJaxwsBindingContents(ParsedWsdl parsedWsdl, URI rootWsdlUri, String lineDelimiter, String targetPackage) {
+  public static Map<String, StringBuilder> getJaxwsBindingContents(ParsedWsdl parsedWsdl, URI rootWsdlUri, String lineDelimiter, String targetPackage) {
     Map<URI, Set<JaxWsBindingMapping>> bindingsByFile = new HashMap<>();
     for (Entry<Service, URI> service : parsedWsdl.getWebServices().entrySet()) {
       WebServiceNames names = parsedWsdl.getServiceNames().get(service.getKey());
@@ -207,17 +207,23 @@ public final class JaxWsUtils implements IMavenConstants {
       }
     }
 
-    Map<Path, StringBuilder> result = new HashMap<>(bindingsByFile.size());
+    Map<String, StringBuilder> result = new HashMap<>(bindingsByFile.size());
     for (Entry<URI, Set<JaxWsBindingMapping>> binding : bindingsByFile.entrySet()) {
       URI uri = binding.getKey();
       URI relPath = CoreUtils.relativizeURI(rootWsdlUri, uri);
       StringBuilder jaxwsBindingContent = JaxWsUtils.getJaxwsBindingContent(targetPackage, relPath, binding.getValue(), lineDelimiter);
-      Path path = Paths.get(uri);
+      final Path path;
+      if ("file".equals(uri.getScheme())) {
+        path = Paths.get(uri);
+      }
+      else {
+        path = Paths.get(uri.getPath());
+      }
       if (path.getNameCount() < 1) {
         SdkLog.warning("Zero length path found for jax-ws binding content of URI '{}'. Skipping.", uri);
       }
       else {
-        result.put(path, jaxwsBindingContent);
+        result.put(path.getFileName().toString(), jaxwsBindingContent);
       }
     }
     return result;

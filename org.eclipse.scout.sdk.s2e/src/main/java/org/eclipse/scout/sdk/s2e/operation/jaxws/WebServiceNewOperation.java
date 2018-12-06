@@ -17,7 +17,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -419,20 +418,20 @@ public class WebServiceNewOperation implements IOperation {
 
   protected void createJaxwsBindings(IFolder wsdlBindingsFolder, String lineDelimiter, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     URI parent = wsdlBindingsFolder.getLocation().toFile().toURI();
-    Map<Path, StringBuilder> jaxwsBindingContents = JaxWsUtils.getJaxwsBindingContents(getParsedWsdl(), parent, lineDelimiter, getPackage());
-    for (Entry<Path, StringBuilder> binding : jaxwsBindingContents.entrySet()) {
+    Map<String, StringBuilder> jaxwsBindingContents = JaxWsUtils.getJaxwsBindingContents(getParsedWsdl(), parent, lineDelimiter, getPackage());
+    for (Entry<String, StringBuilder> binding : jaxwsBindingContents.entrySet()) {
       IFile jaxwsBindingXmlFile = null;
       if (jaxwsBindingContents.size() == 1) {
         jaxwsBindingXmlFile = wsdlBindingsFolder.getFile(JaxWsUtils.JAXWS_BINDINGS_FILE_NAME);
       }
       else {
-        Path pathFileName = binding.getKey().getFileName();
+        String pathFileName = binding.getKey();
         if (pathFileName == null) {
           // should not happen because zero len paths are skipped by JaxWsUtils.getJaxwsBindingContents().
           throw new IllegalArgumentException("zero length path found.");
         }
 
-        String partName = pathFileName.toString().toLowerCase();
+        String partName = pathFileName.toLowerCase();
         if (partName.endsWith(JaxWsUtils.WSDL_FILE_EXTENSION)) {
           partName = partName.substring(0, partName.length() - JaxWsUtils.WSDL_FILE_EXTENSION.length());
         }
