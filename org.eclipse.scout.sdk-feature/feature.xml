@@ -14,7 +14,7 @@
 <feature
       id="org.eclipse.scout.sdk-feature"
       label="%featureName"
-      version="8.0.0.qualifier"
+      version="8.0.0.031_Simrel_2018_12"
       provider-name="%providerName"
       plugin="org.eclipse.scout.sdk.s2e"
       license-feature="org.eclipse.license"
