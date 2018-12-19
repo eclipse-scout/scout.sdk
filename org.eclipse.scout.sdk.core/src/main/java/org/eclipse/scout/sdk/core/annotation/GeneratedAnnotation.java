@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.annotation;
 
-import javax.annotation.Generated;
-
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
 
 /**
- * <h3>{@link GeneratedAnnotation}</h3> Managed annotation for {@link Generated}
+ * <h3>{@link GeneratedAnnotation}</h3> Managed annotation for Generated
  *
  * @author Ivan Motsch
  * @since 5.2.0

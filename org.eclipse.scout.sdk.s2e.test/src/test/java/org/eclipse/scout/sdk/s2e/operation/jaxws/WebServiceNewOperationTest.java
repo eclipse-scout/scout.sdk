@@ -31,7 +31,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
-import org.eclipse.scout.sdk.core.s.jaxws.JaxWsModuleNewHelper;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
@@ -157,7 +156,7 @@ public class WebServiceNewOperationTest {
       @Override
       protected IJavaProject createNewJaxWsModule(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
         try {
-          File createdProjectDir = JaxWsModuleNewHelper.createModule(new File(serverModule, IMavenConstants.POM), getArtifactId());
+          File createdProjectDir = CoreScoutTestingUtils.createJaxWsModule(serverModule, getArtifactId());
           return factory.createJavaProject(createdProjectDir);
         }
         catch (IOException e) {

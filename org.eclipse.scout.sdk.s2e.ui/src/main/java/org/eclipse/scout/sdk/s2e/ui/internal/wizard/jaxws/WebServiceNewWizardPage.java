@@ -611,7 +611,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       final String p = prefix + ":";
       StringBuilder bindingFilesXpathBuilder = new StringBuilder();
       bindingFilesXpathBuilder.append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.BUILD).append('/').append(p).append(IMavenConstants.PLUGINS).append('/').append(p).append(IMavenConstants.PLUGIN)
-          .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(JaxWsUtils.CODEHAUS_GROUP_ID).append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='")
+          .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(JaxWsUtils.JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='")
           .append(JaxWsUtils.JAXWS_MAVEN_PLUGIN_ARTIFACT_ID).append("']");
       List<Element> elements = CoreUtils.evaluateXPath(bindingFilesXpathBuilder.toString(), S2eUtils.getPomDocument(project), prefix, IMavenConstants.POM_XML_NAMESPACE);
       if (elements.isEmpty() && containsWsdls(wsdlFolder)) {

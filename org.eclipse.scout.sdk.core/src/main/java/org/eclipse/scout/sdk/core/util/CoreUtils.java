@@ -118,15 +118,15 @@ public final class CoreUtils {
   }
 
   /**
-   * Compares the given double values. Returns {@code true} if the difference between the two double values is bigger than
-   * the given delta.<br>
+   * Compares the given double values. Returns {@code true} if the difference between the two double values is bigger
+   * than the given delta.<br>
    * <br>
    * Special cases:
    * <ul>
    * <li>{@code -0} and {@code +0} are considered to be equal even though
    * {@code Double.valueOf(0d).equals(Double.valueOf(-0d))} returns {@code false}!</li>
-   * <li>{@link Double#NaN} and {@link Double#NaN} are considered to be equal even though {@code Double.NaN == Double.NaN}
-   * returns {@code false}!</li>
+   * <li>{@link Double#NaN} and {@link Double#NaN} are considered to be equal even though
+   * {@code Double.NaN == Double.NaN} returns {@code false}!</li>
    * </ul>
    *
    * @param d1
@@ -308,8 +308,8 @@ public final class CoreUtils {
   }
 
   /**
-   * Converts the given string into a string literal with leading and ending double-quotes including escaping of the given
-   * string.<br>
+   * Converts the given string into a string literal with leading and ending double-quotes including escaping of the
+   * given string.<br>
    * This is the inverse function of {@link #fromStringLiteral(String)}.
    *
    * @param s
@@ -486,8 +486,8 @@ public final class CoreUtils {
   }
 
   /**
-   * If the given name is a reserved java keyword a suffix is added to ensure it is a valid name to use e.g. for variables
-   * or parameters.
+   * If the given name is a reserved java keyword a suffix is added to ensure it is a valid name to use e.g. for
+   * variables or parameters.
    *
    * @param parameterName
    *          The original name.
@@ -735,8 +735,8 @@ public final class CoreUtils {
    * @param env
    *          The context to search in.
    * @param typeToSearchFqn
-   *          The fully qualified name to search. See {@link IJavaEnvironment#existsType(String)} for detailed constraints
-   *          on the name.
+   *          The fully qualified name to search. See {@link IJavaEnvironment#existsType(String)} for detailed
+   *          constraints on the name.
    * @return <code>true</code> if the given type exists, <code>false</code> otherwise.
    */
   public static boolean isOnClasspath(IJavaEnvironment env, String typeToSearchFqn) {
@@ -965,7 +965,7 @@ public final class CoreUtils {
       dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
     }
     catch (IllegalArgumentException e) {
-      SdkLog.debug("Attribute '{}' is not supported in the current DocumentBuilderFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, dbf.getClass().getName(), e);
+      SdkLog.debug("Attribute '{}' is not supported in the current DocumentBuilderFactory: {}", XMLConstants.ACCESS_EXTERNAL_SCHEMA, dbf.getClass().getName(), e);
     }
 
     for (Entry<String, Boolean> a : features.entrySet()) {
@@ -1043,8 +1043,8 @@ public final class CoreUtils {
   }
 
   /**
-   * Moves the given directory to the given target directory. This means after this method call the source directory does
-   * not exist anymore and the target directory contains a new folder with the name of the source and its content.
+   * Moves the given directory to the given target directory. This means after this method call the source directory
+   * does not exist anymore and the target directory contains a new folder with the name of the source and its content.
    *
    * @param sourceDir
    *          Must be an existing directory.
@@ -1226,8 +1226,8 @@ public final class CoreUtils {
    *          The base {@link URI} from which point the relative {@link URI} should be created. Must not be
    *          <code>null</code>.
    * @param child
-   *          The target {@link URI} that should be relatively expressed from the point of the base {@link URI}. Must not
-   *          be <code>null</code>.
+   *          The target {@link URI} that should be relatively expressed from the point of the base {@link URI}. Must
+   *          not be <code>null</code>.
    * @return A new relative {@link URI} to get to the child {@link URI} from the base {@link URI}.
    */
   public static URI relativizeURI(URI base, URI child) {

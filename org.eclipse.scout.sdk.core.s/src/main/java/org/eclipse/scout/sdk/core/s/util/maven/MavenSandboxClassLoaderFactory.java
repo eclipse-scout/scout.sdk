@@ -39,7 +39,20 @@ public final class MavenSandboxClassLoaderFactory {
    * @return a new {@link URLClassLoader} capable to run the {@link MavenCliRunner}.
    */
   public static URLClassLoader build() {
-    return URLClassLoader.newInstance(getMavenJarsUrls(), null);
+    final ClassLoader parent;
+    if ("1.8".equals(System.getProperty("java.specification.version"))) {
+      // can be removed as soon as java 8 is no longer supported
+      parent = null;
+    }
+    else {
+      try {
+        parent = (ClassLoader) ClassLoader.class.getMethod("getPlatformClassLoader").invoke(null);
+      }
+      catch (ReflectiveOperationException e) {
+        throw new SdkException(e);
+      }
+    }
+    return URLClassLoader.newInstance(getMavenJarsUrls(), parent);
   }
 
   static URL[] getMavenJarsUrls() {
@@ -47,6 +60,9 @@ public final class MavenSandboxClassLoaderFactory {
     // the codesource of these classes will be the source of the classpath of the sandbox classloader.
     final String[] baseClasses = {
         MavenCliRunner.class.getName(),
+        "javax.annotation.processing.RoundEnvironment", // javax.annotations.processing (APT)
+        "javax.jws.WebService", // javax.jws-api
+        "javax.annotation.PostConstruct", // javax.annotations-api
         "org.apache.commons.lang3.StringUtils", // apache-commons-lang3 for guice
         "org.apache.commons.io.DirectoryWalker", // commons-io
         "org.eclipse.scout.sdk.core.util.SdkLog", // sdk.core for logging

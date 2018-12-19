@@ -74,7 +74,7 @@ public class JaxWsUtilsTest {
     String correct = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
-        "        <groupId>org.codehaus.mojo</groupId>" +
+        "        <groupId>com.helger.maven</groupId>" +
         "        <artifactId>jaxws-maven-plugin</artifactId>" +
         "        <executions>" +
         "          <execution>" +
@@ -119,7 +119,7 @@ public class JaxWsUtilsTest {
     String correctWithEmptyBinding = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
-        "        <groupId>org.codehaus.mojo</groupId>" +
+        "        <groupId>com.helger.maven</groupId>" +
         "        <artifactId>jaxws-maven-plugin</artifactId>" +
         "        <executions>" +
         "          <execution>" +
@@ -148,7 +148,7 @@ public class JaxWsUtilsTest {
     String correctCaseMismatch = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
-        "        <groupId>org.codehaus.mojo</groupId>" +
+        "        <groupId>com.helger.maven</groupId>" +
         "        <artifactId>jaxws-maven-plugin</artifactId>" +
         "        <executions>" +
         "          <execution>" +
@@ -222,7 +222,7 @@ public class JaxWsUtilsTest {
     String wrongNamespace = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/5.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
-        "        <groupId>org.codehaus.mojo</groupId>" +
+        "        <groupId>com.helger.maven</groupId>" +
         "        <artifactId>jaxws-maven-plugin</artifactId>" +
         "        <executions>" +
         "          <execution>" +

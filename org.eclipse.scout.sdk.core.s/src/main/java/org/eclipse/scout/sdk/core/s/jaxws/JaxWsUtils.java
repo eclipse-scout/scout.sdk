@@ -75,7 +75,7 @@ public final class JaxWsUtils implements IMavenConstants {
   public static final String WSDL_FOLDER_NAME = "wsdl";
   public static final String BINDING_FOLDER_NAME = "binding";
   public static final String WSIMPORT_TOOL_NAME = "wsimport";
-  public static final String CODEHAUS_GROUP_ID = "org.codehaus.mojo";
+  public static final String JAXWS_MAVEN_PLUGIN_GROUP_ID = "com.helger.maven";
   public static final String JAXWS_MAVEN_PLUGIN_ARTIFACT_ID = "jaxws-maven-plugin";
 
   public static final String PACKAGE_XPATH = "wsdl:definitions";
@@ -417,7 +417,7 @@ public final class JaxWsUtils implements IMavenConstants {
     String uc = wsdlFileName.toUpperCase();
     StringBuilder bindingFilesXpathBuilder = new StringBuilder();
     bindingFilesXpathBuilder.append(p).append(PROJECT).append('/').append(p).append(BUILD).append('/').append(p).append(PLUGINS).append('/').append(p).append(PLUGIN)
-        .append("[./").append(p).append(GROUP_ID).append("='").append(CODEHAUS_GROUP_ID).append("' and ./").append(p).append(ARTIFACT_ID).append("='").append(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID).append("']")
+        .append("[./").append(p).append(GROUP_ID).append("='").append(JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(ARTIFACT_ID).append("='").append(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID).append("']")
         .append('/').append(p).append(EXECUTIONS).append('/').append(p).append(EXECUTION).append('/').append(p).append(CONFIGURATION)
         .append("[translate(./").append(p).append(WSDL_FILES_ELEMENT_NAME).append('/').append(p).append(WSDL_FILE_ELEMENT_NAME).append(", '").append(uc).append("', '").append(lc).append("')='").append(lc).append("']/").append(p)
         .append(BINDING_FILES_ELEMENT_NAME).append('/').append(p).append(BINDING_FILE_ELEMENT_NAME);
@@ -475,7 +475,7 @@ public final class JaxWsUtils implements IMavenConstants {
         Element pluginCandidate = (Element) plugin;
         Element group = CoreUtils.getFirstChildElement(pluginCandidate, GROUP_ID);
         Element artifact = CoreUtils.getFirstChildElement(pluginCandidate, ARTIFACT_ID);
-        if (group != null && CODEHAUS_GROUP_ID.equals(group.getTextContent()) && artifact != null && JAXWS_MAVEN_PLUGIN_ARTIFACT_ID.equals(artifact.getTextContent())) {
+        if (group != null && JAXWS_MAVEN_PLUGIN_GROUP_ID.equals(group.getTextContent()) && artifact != null && JAXWS_MAVEN_PLUGIN_ARTIFACT_ID.equals(artifact.getTextContent())) {
           return pluginCandidate;
         }
       }
@@ -484,7 +484,7 @@ public final class JaxWsUtils implements IMavenConstants {
     // plugin does not exist yet: create a new one
     Element plugin = getOrCreateElement(pluginsElement, PLUGIN);
     Element groupId = getOrCreateElement(plugin, GROUP_ID);
-    groupId.setTextContent(CODEHAUS_GROUP_ID);
+    groupId.setTextContent(JAXWS_MAVEN_PLUGIN_GROUP_ID);
     Element artifactId = getOrCreateElement(plugin, ARTIFACT_ID);
     artifactId.setTextContent(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID);
     return plugin;

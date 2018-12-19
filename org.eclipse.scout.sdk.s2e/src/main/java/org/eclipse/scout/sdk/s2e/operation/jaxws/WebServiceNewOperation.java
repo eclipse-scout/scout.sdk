@@ -332,7 +332,10 @@ public class WebServiceNewOperation implements IOperation {
     factoryPathBuilder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/org/eclipse/scout/rt/org.eclipse.scout.rt.server.jaxws/").append(scoutVersion)
         .append("/org.eclipse.scout.rt.server.jaxws-").append(scoutVersion).append(".jar\" enabled=\"true\" runInBatchMode=\"false\"/>").append(lineDelimiter);
     factoryPathBuilder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").append(lineDelimiter);
-    factoryPathBuilder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/org/slf4j/slf4j-api/1.7.12/slf4j-api-1.7.12.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").append(lineDelimiter);
+    factoryPathBuilder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").append(lineDelimiter);
+    factoryPathBuilder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/javax/jws/javax.jws-api/1.1/javax.jws-api-1.1.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").append(lineDelimiter);
+    factoryPathBuilder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/javax/annotation/javax.annotation-api/1.3.2/javax.annotation-api-1.3.2.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").append(lineDelimiter);
+    factoryPathBuilder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/javax/xml/ws/jaxws-api/2.3.1/jaxws-api-2.3.1.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").append(lineDelimiter);
     factoryPathBuilder.append("</factorypath>").append(lineDelimiter);
 
     ResourceWriteOperation writeFactoryPath = new ResourceWriteOperation(factoryPathFile, factoryPathBuilder.toString());

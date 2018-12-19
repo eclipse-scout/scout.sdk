@@ -43,4 +43,5 @@ public interface IMavenConstants {
   String PARENT = "parent";
   String NAME = "name";
   String RELATIVE_PATH = "relativePath";
+  String SCOPE = "scope";
 }
