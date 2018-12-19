@@ -39,7 +39,7 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
   static {
     opts = new CompilerOptions();
     opts.produceDebugAttributes = 0;
-    opts.complianceLevel = ClassFileConstants.JDK10;
+    opts.complianceLevel = ClassFileConstants.JDK11;
     opts.originalComplianceLevel = opts.complianceLevel;
     opts.sourceLevel = opts.complianceLevel;
     opts.originalSourceLevel = opts.complianceLevel;

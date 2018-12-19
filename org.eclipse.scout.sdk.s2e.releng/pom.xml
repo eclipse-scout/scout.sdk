@@ -59,7 +59,7 @@
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.3.0</version>
+          <version>1.4.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -111,8 +111,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_2018_09</id>
-              <url>http://download.eclipse.org/releases/2018-09/</url>
+              <id>eclipse_2018_12</id>
+              <url>http://download.eclipse.org/releases/2018-12/</url>
               <layout>p2</layout>
             </repository>
           </source>

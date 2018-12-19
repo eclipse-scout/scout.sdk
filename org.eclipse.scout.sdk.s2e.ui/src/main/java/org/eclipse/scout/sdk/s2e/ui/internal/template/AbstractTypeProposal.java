@@ -31,6 +31,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
+import org.eclipse.jdt.core.manipulation.SharedASTProviderCore;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalModel;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.Proposal;
@@ -41,7 +42,6 @@ import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.internal.ui.viewsupport.BindingLabelProvider;
 import org.eclipse.jdt.ui.CodeStyleConfiguration;
 import org.eclipse.jdt.ui.JavaElementLabels;
-import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.jdt.ui.text.java.correction.CUCorrectionProposal;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
@@ -75,10 +75,10 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
   /**
    * Workaround to have a complete, valid AST even if there has been a prefix typed by the user. <br>
-   * Detail: If the user writes "abc" on an empty line before an annotation, this annotation is no longer part of the AST.
-   * This is because "abc@annot" is no valid pattern and gets excluded by the parser. As a workaround a semicolon is
-   * added: "abc;@annot". This way the parser recognizes the annotation because the text written by the user looks like
-   * another, wrong statement. The semicolon is removed again if the proposal is applied.
+   * Detail: If the user writes "abc" on an empty line before an annotation, this annotation is no longer part of the
+   * AST. This is because "abc@annot" is no valid pattern and gets excluded by the parser. As a workaround a semicolon
+   * is added: "abc;@annot". This way the parser recognizes the annotation because the text written by the user looks
+   * like another, wrong statement. The semicolon is removed again if the proposal is applied.
    */
   static final char SEARCH_STRING_END_FIX = ';';
 
@@ -294,7 +294,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
     @Override
     public CompilationUnit call() throws Exception {
-      return SharedASTProvider.getAST(m_icu, SharedASTProvider.WAIT_ACTIVE_ONLY, null);
+      return SharedASTProviderCore.getAST(m_icu, SharedASTProviderCore.WAIT_ACTIVE_ONLY, null);
     }
   }
 
