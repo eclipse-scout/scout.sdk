@@ -129,13 +129,20 @@
 
   <repositories>
     <repository>
-      <snapshots></snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
       <id>eclipse.snapshot</id>
       <name>eclipse-snapshot-repo</name>
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
     </repository>
     <repository>
-      <snapshots></snapshots>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
       <id>eclipse.release</id>
       <name>eclipse-release-repo</name>
       <url>https://repo.eclipse.org/content/groups/releases/</url>
@@ -144,13 +151,20 @@
 
   <pluginRepositories>
     <pluginRepository>
-      <snapshots></snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
       <id>eclipse.snapshot</id>
       <name>eclipse-snapshot-repo</name>
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
     </pluginRepository>
     <pluginRepository>
-      <snapshots></snapshots>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
       <id>eclipse.release</id>
       <name>eclipse-release-repo</name>
       <url>https://repo.eclipse.org/content/groups/releases/</url>
