@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -40,7 +42,7 @@ public final class MavenSandboxClassLoaderFactory {
    */
   public static URLClassLoader build() {
     final ClassLoader parent;
-    if ("1.8".equals(System.getProperty("java.specification.version"))) {
+    if (isJava8()) {
       // can be removed as soon as java 8 is no longer supported
       parent = null;
     }
@@ -55,14 +57,17 @@ public final class MavenSandboxClassLoaderFactory {
     return URLClassLoader.newInstance(getMavenJarsUrls(), parent);
   }
 
+  static boolean isJava8() {
+    // can be removed as soon as Java 8 is no longer supported.
+    return "1.8".equals(System.getProperty("java.specification.version"));
+  }
+
   static URL[] getMavenJarsUrls() {
     // contains a sample class of all jars required by the maven runtime.
     // the codesource of these classes will be the source of the classpath of the sandbox classloader.
-    final String[] baseClasses = {
+    final List<String> baseClasses = new ArrayList<>();
+    baseClasses.addAll(Arrays.asList(
         MavenCliRunner.class.getName(),
-        "javax.annotation.processing.RoundEnvironment", // javax.annotations.processing (APT)
-        "javax.jws.WebService", // javax.jws-api
-        "javax.annotation.PostConstruct", // javax.annotations-api
         "org.apache.commons.lang3.StringUtils", // apache-commons-lang3 for guice
         "org.apache.commons.io.DirectoryWalker", // commons-io
         "org.eclipse.scout.sdk.core.util.SdkLog", // sdk.core for logging
@@ -102,8 +107,16 @@ public final class MavenSandboxClassLoaderFactory {
         "okhttp3.ConnectionPool", // okhttp
         "okio.Okio", // okio
         "org.slf4j.ILoggerFactory", //slf4j-api
-        "org.apache.maven.wagon.AbstractWagon", // wagon-provider-api
-    };
+        "org.apache.maven.wagon.AbstractWagon" // wagon-provider-api
+    ));
+    if (!isJava8()) {
+      baseClasses.addAll(Arrays.asList(
+          "javax.annotation.processing.RoundEnvironment", // javax.annotations.processing (APT)
+          "javax.jws.WebService", // javax.jws-api
+          "javax.annotation.PostConstruct" // javax.annotations-api
+      ));
+    }
+
     return getJarsUrls(baseClasses);
   }
 
@@ -114,8 +127,8 @@ public final class MavenSandboxClassLoaderFactory {
    *          The fqn of the classes
    * @return the {@link URL}s of the jars that contain the given class names.
    */
-  static URL[] getJarsUrls(final String[] baseClasses) {
-    final List<URL> urls = new ArrayList<>(baseClasses.length);
+  static URL[] getJarsUrls(final Collection<String> baseClasses) {
+    final List<URL> urls = new ArrayList<>(baseClasses.size());
     for (final String className : baseClasses) {
       urls.add(getJarContaining(className));
     }
