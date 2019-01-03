@@ -31,7 +31,7 @@ public interface IAnnotationSourceBuilder extends IJavaElementSourceBuilder {
 
   /**
    * see {@link ExpressionSourceBuilderFactory}
-   * 
+   *
    * @return this
    */
   IAnnotationSourceBuilder putElement(String name, String value);
@@ -49,6 +49,13 @@ public interface IAnnotationSourceBuilder extends IJavaElementSourceBuilder {
 
   Map<String, ISourceBuilder> getElements();
 
+  /**
+   * Removes the element with the given name.
+   * 
+   * @param name
+   *          The name of the element to remove.
+   * @return {@code true} if an element was removed. {@code false} if the element with given name could not be found.
+   */
   boolean removeElement(String name);
 
 }
