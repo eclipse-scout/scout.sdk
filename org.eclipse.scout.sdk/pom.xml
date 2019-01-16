@@ -51,7 +51,7 @@
   <properties>
     <scout.base.version>9.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <org.eclipse.scout.rt_version>${scout.base.version}-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>9.0.0-SNAPSHOT</org.eclipse.scout.rt_version> <!-- Don't replace version number with scout.base.version: Required by regex replacement -->
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
 
