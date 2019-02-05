@@ -23,7 +23,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk</artifactId>
-  <version>9.0.0-SNAPSHOT</version>
+  <version>9.0.0.003_Simrel_2019_03_M2</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK</name>
   <description>Eclipse Scout SDK</description>
@@ -51,7 +51,7 @@
   <properties>
     <scout.base.version>9.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <org.eclipse.scout.rt_version>9.0.0-SNAPSHOT</org.eclipse.scout.rt_version> <!-- Don't replace version number with scout.base.version: Required by regex replacement -->
+    <org.eclipse.scout.rt_version>9.0.0.003_Simrel_2019_03_M2</org.eclipse.scout.rt_version> <!-- Don't replace version number with scout.base.version: Required by regex replacement -->
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
 
@@ -253,78 +253,78 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.test</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.test</artifactId>
-        <version>9.0.0-SNAPSHOT</version>
+        <version>9.0.0.003_Simrel_2019_03_M2</version>
       </dependency>
 
       <!-- Build Dependencies -->
@@ -795,7 +795,7 @@
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
     <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.sdk</developerConnection>
-    <tag>releases/9.0.x</tag>
+    <tag>9.0.0.003_Simrel_2019_03_M2</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
   </scm>
 
