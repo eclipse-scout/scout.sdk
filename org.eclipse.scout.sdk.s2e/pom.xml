@@ -66,6 +66,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.m2e.core</artifactId>
       <scope>provided</scope>
@@ -113,6 +118,7 @@
               !org.eclipse.jdt.internal*,
               !org.eclipse.jdt.launching*,
               !org.eclipse.jface.text*,
+              !org.eclipse.scout.sdk.s2e.*,
               !javax.annotation.*,
               !org.codehaus.plexus*,
               !org.eclipse.text*,
@@ -128,6 +134,7 @@
               org.eclipse.core.runtime;bundle-version="[3.12,4)";visibility:=reexport,
               org.eclipse.core.resources;bundle-version="[3.11,4)";visibility:=reexport,
               org.eclipse.jdt.core;bundle-version="[3.12,4)";visibility:=reexport,
+              org.eclipse.jdt.core.manipulation;bundle-version="[1.7,2)";visibility:=reexport,
               org.eclipse.jdt.launching;bundle-version="[3.8.100,4)";visibility:=reexport,
               org.eclipse.text;bundle-version="[3.6.0,4)";visibility:=reexport,
               org.eclipse.m2e.maven.runtime;bundle-version="[1.7,2)";visibility:=reexport,

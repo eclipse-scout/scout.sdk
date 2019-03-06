@@ -123,6 +123,12 @@ public class CompilationUnitWriteOperation implements IFileWriteOperation {
     return op.getDocument().get();
   }
 
+  protected void organizeImports(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    OrganizeImportOperation op = new OrganizeImportOperation(m_createdCompilationUnit);
+    op.validate();
+    op.run(monitor, workingCopyManager);
+  }
+
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 4);
@@ -146,6 +152,7 @@ public class CompilationUnitWriteOperation implements IFileWriteOperation {
         progress.worked(1);
 
         workingCopyManager.register(m_createdCompilationUnit, progress.newChild(0));
+        organizeImports(monitor, workingCopyManager);
         progress.worked(1);
       }
       else {
@@ -158,6 +165,7 @@ public class CompilationUnitWriteOperation implements IFileWriteOperation {
 
           IBuffer buffer = m_createdCompilationUnit.getBuffer();
           buffer.setContents(newSource);
+          organizeImports(monitor, workingCopyManager);
         }
         progress.worked(1);
       }
