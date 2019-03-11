@@ -64,6 +64,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.debug.core</artifactId>
       <scope>test</scope>

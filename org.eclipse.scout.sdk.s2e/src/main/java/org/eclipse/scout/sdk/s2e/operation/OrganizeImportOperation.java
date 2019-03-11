@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.operation;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.manipulation.JavaManipulation;
 import org.eclipse.jdt.core.manipulation.OrganizeImportsOperation;
 import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
@@ -48,6 +49,9 @@ public class OrganizeImportOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    if (JavaManipulation.getPreferenceNodeId() == null) {
+      return; // not configured. throws IllegalArgumentException. Do not organize imports
+    }
     ICompilationUnit unit = getCompilationUnit();
     CodeGenerationSettings settings = JavaPreferencesSettings.getCodeGenerationSettings(unit.getJavaProject());
     OrganizeImportsOperation organizeImps = new OrganizeImportsOperation(unit, null, settings.importIgnoreLowercase, !unit.isWorkingCopy(), true, null);
