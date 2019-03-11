@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -23,9 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IJavaProject;
@@ -92,11 +96,11 @@ public class JaxWsModuleNewOperation implements IOperation {
 
       // refresh modified resources
       Set<IProject> modifiedProjects = getModifiedResources(createdProjectDir);
-      modifiedProjects.add(getCreatedProject());
-      modifiedProjects.add(getServerModule().getProject());
+      modifiedProjects.add(getCreatedProject()); // ensure the created project is in the set
+      modifiedProjects.add(getServerModule().getProject()); // ensure the modified server project is in the set
 
       // run 'maven update' on created project because we modified the parent and the dependencies
-      S2eUtils.mavenUpdate(modifiedProjects, false, true, false, true, progress.newChild(15));
+      S2eUtils.mavenUpdate(modifiedProjects, false, true, false, false, progress.newChild(15));
     }
     catch (IOException e) {
       throw new CoreException(new ScoutStatus("Unable to create Jax-Ws Module.", e));
@@ -119,13 +123,32 @@ public class JaxWsModuleNewOperation implements IOperation {
         return Collections.emptySet();
       }
 
+      File parentReference = parentPom.getCanonicalFile();
+      Set<File> modulesWithModifiedParent = new HashSet<>();
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IFile[] resources = root.findFilesForLocationURI(parentPom.toURI());
-      Set<IProject> result = new HashSet<>(resources.length);
-      for (IFile f : resources) {
-        result.add(f.getProject());
+      for (IProject candidate : root.getProjects()) {
+        IFile pom = candidate.getFile(IMavenConstants.POM);
+        if (pom != null && pom.exists()) {
+          IPath location = pom.getLocation();
+          if (location != null) {
+            File moduleLocation = location.toFile();
+            File parent = JaxWsModuleNewHelper.getParentPomOf(moduleLocation);
+            if (parent != null) {
+              File canonicalFile = parent.getCanonicalFile();
+              if (parentReference.equals(canonicalFile)) {
+                modulesWithModifiedParent.add(new File(moduleLocation, IMavenConstants.POM));
+              }
+            }
+          }
+        }
       }
-      return result;
+      modulesWithModifiedParent.add(parentReference);
+
+      return modulesWithModifiedParent.stream()
+          .map(File::toURI)
+          .flatMap(uri -> Stream.of(root.findFilesForLocationURI(uri)))
+          .map(IResource::getProject)
+          .collect(Collectors.toSet());
     }
     catch (IOException | ParserConfigurationException | SAXException e) {
       throw new CoreException(new ScoutStatus(e));
