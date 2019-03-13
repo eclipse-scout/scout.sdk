@@ -19,7 +19,6 @@ import java.util.function.Predicate;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 
 /**
  * <h3>{@link DefaultResourceChangeEventFilter}</h3> The default {@link IResourceChangeEvent} filter used by
@@ -80,11 +79,6 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
 
     Job curJob = Job.getJobManager().currentJob();
     if (curJob == null) {
-      return false;
-    }
-
-    if (isIgnoreScoutSdkEvents() && curJob instanceof AbstractJob) {
-      // do not automatically update on Scout SDK changes. We expect the SDK to trigger manually where required.
       return false;
     }
 
@@ -154,8 +148,8 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
 
   /**
    * @param excludedJobClassNamePrefixes
-   *          The new list of fully qualified class names of jobs to be excluded. Inner types are separated using '.'. May
-   *          be {@code null}.
+   *          The new list of fully qualified class names of jobs to be excluded. Inner types are separated using '.'.
+   *          May be {@code null}.
    */
   public void setExcludedJobClassNamePrefixes(final Collection<String> excludedJobClassNamePrefixes) {
     m_excludedJobClassNamePrefixes.clear();
