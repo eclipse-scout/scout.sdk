@@ -75,7 +75,10 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   public DerivedResourceManager() {
     m_enabled = false;
     m_updateHandlerFactories = new ArrayList<>();
-    m_resourceChangeEventFilter = new DefaultResourceChangeEventFilter();
+
+    DefaultResourceChangeEventFilter filter = new DefaultResourceChangeEventFilter();
+    filter.setIgnoreScoutSdkEvents(false);
+    m_resourceChangeEventFilter = filter;
 
     m_javaChangeEventsToCheck = new ArrayBlockingQueue<>(5000, true);
     m_triggerHandlers = new ArrayBlockingQueue<>(2000, true);
@@ -416,10 +419,12 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     /**
      * An abort stops the current or next run of this job.<br>
      * <br>
-     * An abort differs to a cancel() in that way, that a cancel (can only be performed by the user) discards all operations
-     * that are not yet executed while an abort keeps them and will continue to work on them in the next schedule().<br>
+     * An abort differs to a cancel() in that way, that a cancel (can only be performed by the user) discards all
+     * operations that are not yet executed while an abort keeps them and will continue to work on them in the next
+     * schedule().<br>
      * <br>
-     * An abort will automatically re-schedule this job (if this is no already done) to ensure that no work remains undone.
+     * An abort will automatically re-schedule this job (if this is no already done) to ensure that no work remains
+     * undone.
      */
     private void abort() {
       m_isAborted = true;

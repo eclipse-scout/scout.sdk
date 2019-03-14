@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 
 /**
  * <h3>{@link DefaultResourceChangeEventFilter}</h3> The default {@link IResourceChangeEvent} filter used by
@@ -79,6 +80,11 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
 
     Job curJob = Job.getJobManager().currentJob();
     if (curJob == null) {
+      return false;
+    }
+
+    if (isIgnoreScoutSdkEvents() && curJob instanceof AbstractJob) {
+      // do not automatically update on Scout SDK changes. We expect the SDK to trigger manually where required.
       return false;
     }
 
