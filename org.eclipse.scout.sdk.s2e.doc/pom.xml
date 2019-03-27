@@ -29,7 +29,7 @@
   <properties>
     <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
     <bundle.namespace>${project.artifactId}</bundle.namespace>
-    <bundle.version>9.0.0</bundle.version>
+    <bundle.version>10.0.0</bundle.version>
   </properties>
 
   <dependencies>

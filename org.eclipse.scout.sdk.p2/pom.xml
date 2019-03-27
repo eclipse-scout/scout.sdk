@@ -35,7 +35,7 @@
   </modules>
 
   <properties>
-    <scout.base.version>9.0.0</scout.base.version>
+    <scout.base.version>10.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <!-- Don't replace version number with scout.base.version: Required by regex replacement -->
     <org.eclipse.scout.rt_version>10.0.0-SNAPSHOT</org.eclipse.scout.rt_version>
@@ -183,7 +183,7 @@
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
     <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.sdk</developerConnection>
-    <tag>releases/9.0.x</tag>
+    <tag>releases/10.0</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
   </scm>
 

@@ -49,7 +49,7 @@
 
       <properties>
         <buildType>N</buildType>
-        <stageTargetDir>nightly/9.0</stageTargetDir>
+        <stageTargetDir>nightly/10.0</stageTargetDir>
         <buildId>${buildType}${master_build_timestamp}</buildId>
         <buildsToKeep>3</buildsToKeep>
       </properties>
