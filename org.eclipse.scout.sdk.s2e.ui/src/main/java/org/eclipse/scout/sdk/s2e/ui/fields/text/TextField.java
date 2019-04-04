@@ -38,7 +38,7 @@ public class TextField extends Composite {
   /**
    * Type constant to have a normal label in front of the text field.
    */
-  public static final int TYPE_LABEL = 1 << 0;
+  public static final int TYPE_LABEL = 1;
 
   /**
    * Type constant to have a hyperlink in front of the text field.
@@ -50,6 +50,11 @@ public class TextField extends Composite {
    * Use {@link #setImage(Image)} to apply an image.
    */
   public static final int TYPE_IMAGE = 1 << 2;
+
+  /**
+   * Type constant to have a multi line text field.
+   */
+  public static final int TYPE_MULTI_LINE = 1 << 3;
 
   /**
    * The default width of the label
@@ -70,6 +75,7 @@ public class TextField extends Composite {
 
   /**
    * @param parent
+   *          a widget which will be the parent of the new instance. Must not be {@code null}.
    * @param type
    *          One of {@link #TYPE_LABEL}, {@link #TYPE_HYPERLINK}, {@link #TYPE_IMAGE}.
    */
@@ -79,6 +85,7 @@ public class TextField extends Composite {
 
   /**
    * @param parent
+   *          a widget which will be the parent of the new instance. Must not be {@code null}.
    * @param type
    *          One of {@link #TYPE_LABEL}, {@link #TYPE_HYPERLINK}, {@link #TYPE_IMAGE}.
    * @param labelWidth
@@ -95,6 +102,7 @@ public class TextField extends Composite {
     boolean hasLabel = hasLabel();
     boolean isHyperLinkLabel = isHyperlinkLabel();
     boolean hasImage = hasImage();
+    boolean isMultiLine = isMultiLine();
 
     // create controls
     if (isHyperLinkLabel) {
@@ -117,7 +125,14 @@ public class TextField extends Composite {
       m_imgLabel = new Label(parent, SWT.NONE);
       m_imgLabel.setImage(getImage());
     }
-    m_text = new StyledTextEx(parent, SWT.BORDER | SWT.SINGLE);
+    int textStyle = SWT.BORDER;
+    if (isMultiLine) {
+      textStyle |= SWT.MULTI;
+    }
+    else {
+      textStyle |= SWT.SINGLE;
+    }
+    m_text = new StyledTextEx(parent, textStyle);
 
     // calculate offsets
     int textFieldMarginLeft = 0;
@@ -148,6 +163,9 @@ public class TextField extends Composite {
     textData.top = new FormAttachment(0, 0);
     textData.right = new FormAttachment(100, 0);
     textData.left = new FormAttachment(0, textFieldMarginLeft + labelOffset + imgOffset);
+    if (isMultiLine) {
+      textData.bottom = new FormAttachment(100, 0); // grow vertically as long as there is space in the parent.
+    }
     m_text.setLayoutData(textData);
     if (m_imgLabel != null) {
       FormData imgData = new FormData();
@@ -155,6 +173,10 @@ public class TextField extends Composite {
       imgData.left = new FormAttachment(0, labelOffset + 6);
       m_imgLabel.setLayoutData(imgData);
     }
+  }
+
+  protected boolean isMultiLine() {
+    return (getType() & TYPE_MULTI_LINE) != 0;
   }
 
   protected boolean hasLabel() {
@@ -220,7 +242,7 @@ public class TextField extends Composite {
     if (!isHyperlinkLabel()) {
       return;
     }
-    ((Hyperlink) m_label).removeHyperlinkListener(listener);
+    ((AbstractHyperlink) m_label).removeHyperlinkListener(listener);
   }
 
   /**
@@ -230,13 +252,14 @@ public class TextField extends Composite {
     if (!isHyperlinkLabel()) {
       return;
     }
-    ((Hyperlink) m_label).addHyperlinkListener(listener);
+    ((AbstractHyperlink) m_label).addHyperlinkListener(listener);
   }
 
   /**
    * Sets the text of the label component.
    *
    * @param text
+   *          The new text. May be {@code null}.
    */
   public void setLabelText(String text) {
     if (text == null) {
@@ -255,16 +278,16 @@ public class TextField extends Composite {
    */
   public String getLabelText() {
     if (isHyperlinkLabel()) {
-      return ((Hyperlink) m_label).getText();
+      return ((AbstractHyperlink) m_label).getText();
     }
     return ((Label) m_label).getText();
   }
 
   @Override
-  public void setToolTipText(String string) {
-    m_label.setToolTipText(string);
-    m_text.setToolTipText(string);
-    super.setToolTipText(string);
+  public void setToolTipText(String tooltip) {
+    m_label.setToolTipText(tooltip);
+    m_text.setToolTipText(tooltip);
+    super.setToolTipText(tooltip);
   }
 
   @Override
@@ -438,9 +461,9 @@ public class TextField extends Composite {
 
   /**
    * Sets the image of this field. Only valid if this field has been created using {@link #TYPE_IMAGE}
-   * 
+   *
    * @param image
-   *          The new image or <code>null</code> if not image should be shown.
+   *          The new image or {@code null} if not image should be shown.
    */
   public void setImage(Image image) {
     if (m_imgLabel == null) {

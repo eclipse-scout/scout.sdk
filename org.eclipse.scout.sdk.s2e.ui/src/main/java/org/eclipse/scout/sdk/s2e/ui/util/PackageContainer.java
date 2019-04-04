@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.util;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -18,7 +20,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 /**
  * <h3>{@link PackageContainer}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class PackageContainer {
@@ -52,7 +53,7 @@ public class PackageContainer {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
+    int prime = 31;
     int result = 1;
     result = prime * result + ((m_package == null) ? 0 : m_package.hashCode());
     result = prime * result + ((m_project == null) ? 0 : m_project.hashCode());
@@ -73,31 +74,9 @@ public class PackageContainer {
       return false;
     }
     PackageContainer other = (PackageContainer) obj;
-    if (m_package == null) {
-      if (other.m_package != null) {
-        return false;
-      }
-    }
-    else if (!m_package.equals(other.m_package)) {
-      return false;
-    }
-    if (m_project == null) {
-      if (other.m_project != null) {
-        return false;
-      }
-    }
-    else if (!m_project.equals(other.m_project)) {
-      return false;
-    }
-    if (m_srcFolder == null) {
-      if (other.m_srcFolder != null) {
-        return false;
-      }
-    }
-    else if (!m_srcFolder.equals(other.m_srcFolder)) {
-      return false;
-    }
-    return true;
+    return Objects.equals(m_package, other.m_package)
+        && Objects.equals(m_project, other.m_project)
+        && Objects.equals(m_srcFolder, other.m_srcFolder);
   }
 
   @Override

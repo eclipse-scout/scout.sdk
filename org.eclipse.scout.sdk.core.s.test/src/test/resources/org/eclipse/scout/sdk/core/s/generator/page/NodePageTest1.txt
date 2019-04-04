@@ -1,0 +1,19 @@
+import java.util.List;
+
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.text.TEXTS;
+
+@ClassId("whatever")
+public class MyNodePage0 extends AbstractPageWithNodes {
+@Override
+protected void execCreateChildPages(List<IPage<?>> pageList) {
+super.execCreateChildPages(pageList);
+}
+@Override
+protected String getConfiguredTitle() {
+// TODO [anonymous] verify translation
+return TEXTS.get("MyNodePage0");
+}
+}

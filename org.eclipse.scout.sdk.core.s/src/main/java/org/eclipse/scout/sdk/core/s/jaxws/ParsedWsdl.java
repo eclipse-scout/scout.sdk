@@ -10,20 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.jaxws;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableMap;
+import static org.eclipse.scout.sdk.core.util.Strings.toCharArray;
+
+import java.io.CharArrayReader;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
@@ -45,17 +52,16 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.xml.sax.InputSource;
 
 /**
  * <h3>{@link ParsedWsdl}</h3> Parses the contents of a WSDL file and its referenced WSDLs and Schemas into a single
  * representation holding the most important objects.
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class ParsedWsdl {
@@ -82,7 +88,7 @@ public class ParsedWsdl {
    *         The root WSDL itself is not part of the resulting {@link Map}.
    */
   public Map<URI, String> getReferencedResources() {
-    return Collections.unmodifiableMap(m_referencedResourceUris);
+    return unmodifiableMap(m_referencedResourceUris);
   }
 
   /**
@@ -92,7 +98,7 @@ public class ParsedWsdl {
    *         WSDL. In this case this {@link URI} can also be found in {@link #getReferencedResources()}.
    */
   public Map<Service, URI> getWebServices() {
-    return Collections.unmodifiableMap(m_services);
+    return unmodifiableMap(m_services);
   }
 
   /**
@@ -102,12 +108,11 @@ public class ParsedWsdl {
    *         imported WSDL. In this case this {@link URI} can also be found in {@link #getReferencedResources()}.
    */
   public Map<PortType, URI> getPortTypes() {
-    return Collections.unmodifiableMap(m_portTypes);
+    return unmodifiableMap(m_portTypes);
   }
 
   /**
-   * @return <code>true</code> if this WSDL does not contain any supported services or port types. <code>false</code>
-   *         otherwise.
+   * @return {@code true} if this WSDL does not contain any supported services or port types. {@code false} otherwise.
    */
   public boolean isEmpty() {
     return m_portTypes.isEmpty();
@@ -123,7 +128,7 @@ public class ParsedWsdl {
   public Set<PortType> getPortTypes(Service service) {
     Map<String, QName> portTypesByPort = m_portTypesByService.get(service);
     if (portTypesByPort == null || portTypesByPort.isEmpty()) {
-      return Collections.emptySet();
+      return emptySet();
     }
     Set<PortType> result = new HashSet<>(portTypesByPort.size());
     for (QName portTypeName : portTypesByPort.values()) {
@@ -143,9 +148,9 @@ public class ParsedWsdl {
   public Map<String, QName> getPorts(Service service) {
     Map<String, QName> map = m_portTypesByService.get(service);
     if (map == null) {
-      return Collections.emptyMap();
+      return emptyMap();
     }
-    return Collections.unmodifiableMap(map);
+    return unmodifiableMap(map);
   }
 
   /**
@@ -155,7 +160,7 @@ public class ParsedWsdl {
    *          The {@link Service} for which the port name should be returned.
    * @param portType
    *          The port type whose port name should be returned.
-   * @return The port name or <code>null</code>.
+   * @return The port name or {@code null}.
    */
   public String getPortName(Service service, PortType portType) {
     QName nameToSearch = portType.getQName();
@@ -172,7 +177,7 @@ public class ParsedWsdl {
    *
    * @param name
    *          The qualified name of the {@link PortType} to return.
-   * @return The {@link PortType} with the given name or <code>null</code> if it could not be found.
+   * @return The {@link PortType} with the given name or {@code null} if it could not be found.
    */
   public PortType getPortType(QName name) {
     for (PortType candidate : m_portTypes.keySet()) {
@@ -187,7 +192,7 @@ public class ParsedWsdl {
    * @return Gets a {@link Map} holding all {@link WebServiceNames} for all {@link Service}s of this WSDL.
    */
   public Map<Service, WebServiceNames> getServiceNames() {
-    return Collections.unmodifiableMap(m_namesByService);
+    return unmodifiableMap(m_namesByService);
   }
 
   protected void putPortType(PortType portType, URI source) {
@@ -204,8 +209,8 @@ public class ParsedWsdl {
 
   @SuppressWarnings("unchecked")
   protected void completeMapping() {
-    Set<Service> usedServices = new HashSet<>(m_services.size());
-    Set<PortType> usedPortTypes = new HashSet<>(m_portTypes.size());
+    Collection<Service> usedServices = new HashSet<>(m_services.size());
+    Collection<PortType> usedPortTypes = new HashSet<>(m_portTypes.size());
     for (Service service : m_services.keySet()) {
       Map<String, Port> ports = service.getPorts();
       for (Port port : ports.values()) {
@@ -218,12 +223,7 @@ public class ParsedWsdl {
               if (portType != null) {
                 usedServices.add(service);
                 usedPortTypes.add(portType);
-                Map<String, QName> portTypesByPortName = m_portTypesByService.get(service);
-                if (portTypesByPortName == null) {
-                  portTypesByPortName = new HashMap<>();
-                  m_portTypesByService.put(service, portTypesByPortName);
-                }
-                portTypesByPortName.put(port.getName(), portType.getQName());
+                m_portTypesByService.computeIfAbsent(service, k -> new HashMap<>()).put(port.getName(), portType.getQName());
               }
             }
           }
@@ -261,10 +261,12 @@ public class ParsedWsdl {
    *          then be missing in {@link #getReferencedResources()}.
    * @return The created {@link ParsedWsdl} instance
    * @throws WSDLException
+   *           on an error parsing the WSDL
    * @throws UnsupportedEncodingException
+   *           if the encoding is not supported
    */
-  public static ParsedWsdl create(URI documentBase, String wsdlContent, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
-    Definition wsdl = parseWsdl(documentBase, new InputSource(new StringReader(wsdlContent)));
+  public static ParsedWsdl create(URI documentBase, StringBuilder wsdlContent, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
+    Definition wsdl = parseWsdl(documentBase, new InputSource(new CharArrayReader(toCharArray(wsdlContent))));
     return create(wsdl, loadSchemas);
   }
 
@@ -281,10 +283,12 @@ public class ParsedWsdl {
    *          then be missing in {@link #getReferencedResources()}.
    * @return The created {@link ParsedWsdl} instance
    * @throws WSDLException
+   *           on an error parsing the WSDL
    * @throws UnsupportedEncodingException
+   *           if the encoding is not supported
    */
   public static ParsedWsdl create(URI documentBase, InputStream is, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
-    Definition wsdl = parseWsdl(documentBase, new InputSource(Validate.notNull(is)));
+    Definition wsdl = parseWsdl(documentBase, new InputSource(Ensure.notNull(is)));
     return create(wsdl, loadSchemas);
   }
 
@@ -317,7 +321,7 @@ public class ParsedWsdl {
       List<ExtensibilityElement> outputElements = extensibilityElementsOf(op.getBindingOutput());
       List<ExtensibilityElement> inputElements = extensibilityElementsOf(op.getBindingInput());
 
-      List<ExtensibilityElement> all = new ArrayList<>(opElements.size() + outputElements.size() + inputElements.size());
+      Collection<ExtensibilityElement> all = new ArrayList<>(opElements.size() + outputElements.size() + inputElements.size());
       all.addAll(opElements);
       all.addAll(outputElements);
       all.addAll(inputElements);
@@ -334,7 +338,7 @@ public class ParsedWsdl {
   @SuppressWarnings("unchecked")
   protected static List<ExtensibilityElement> extensibilityElementsOf(ElementExtensible e) {
     if (e == null) {
-      return Collections.emptyList();
+      return emptyList();
     }
     return e.getExtensibilityElements();
   }
@@ -394,7 +398,7 @@ public class ParsedWsdl {
       return;
     }
 
-    List<SchemaReference> references = new ArrayList<>();
+    Collection<SchemaReference> references = new ArrayList<>();
     for (List<SchemaImport> is : imports.values()) {
       references.addAll(is);
     }
@@ -405,14 +409,14 @@ public class ParsedWsdl {
 
     for (SchemaReference ref : references) {
       String schemaLocationURI = ref.getSchemaLocationURI();
-      URI pathRelativeToRoot = null;
+      URI pathRelativeToRoot;
       boolean exists = false;
-      if (StringUtils.isBlank(schemaLocationURI)) {
+      if (Strings.isBlank(schemaLocationURI)) {
         pathRelativeToRoot = relPath;
       }
       else {
         URI pathAbsolute = URI.create(schemaLocationURI);
-        if (StringUtils.isNotBlank(pathAbsolute.getRawFragment())) {
+        if (Strings.hasText(pathAbsolute.getRawFragment())) {
           // the import is a schema-id inside the current document -> no need to import
           // see http://www.w3.org/TR/wsdl20-primer/#schemaIds.wsdl
           continue;
@@ -450,6 +454,64 @@ public class ParsedWsdl {
     }
 
     /**
+     * @param portTypeNameFromWsdl
+     *          The port type name as it appears in the WSDL.
+     * @return The default port type class name for the given portType WSDL name
+     */
+    public static String getPortTypeClassName(String portTypeNameFromWsdl) {
+      return 'I' + getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_PORT_TYPE;
+    }
+
+    /**
+     * @param portTypeNameFromWsdl
+     *          The port type name as it appears in the WSDL.
+     * @return The entry point class name (for providers) for the given port type WSDL name.
+     */
+    public static String getEntryPointClassName(String portTypeNameFromWsdl) {
+      return getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_ENTRY_POINT;
+    }
+
+    /**
+     * @param portTypeNameFromWsdl
+     *          The port type name as it appears in the WSDL.
+     * @return The web service client class name (for consumers) for the given port type WSDL name.
+     */
+    public static String getWebServiceClientClassName(String portTypeNameFromWsdl) {
+      return getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_CLIENT;
+    }
+
+    /**
+     * @param portTypeNameFromWsdl
+     *          The port type name as it appears in the WSDL.
+     * @return The web service provider implementation class name for the given port type WSDL name.
+     */
+    public static String getWebServiceProviderImplClassName(String portTypeNameFromWsdl) {
+      return getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_PROVIDER;
+    }
+
+    /**
+     * @param portTypeNameFromWsdl
+     *          The port type name as it appears in the WSDL.
+     * @return The entry point definition class name (for providers) for the given port type WSDL name.
+     */
+    public static String getEntryPointDefinitionClassName(String portTypeNameFromWsdl) {
+      return 'I' + getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_ENTRY_POINT_DEFINITION;
+    }
+
+    protected static String getBaseName(String wsNameFromWsdl) {
+      return wsdlNameToJavaName(JaxWsUtils.removeCommonSuffixes(wsNameFromWsdl));
+    }
+
+    protected static String wsdlNameToJavaName(CharSequence name) {
+      String[] parts = Pattern.compile("[^a-zA-Z0-9]").split(name);
+      StringBuilder nameBuilder = new StringBuilder(name.length());
+      for (String part : parts) {
+        nameBuilder.append(Strings.ensureStartWithUpperCase(part));
+      }
+      return nameBuilder.toString();
+    }
+
+    /**
      * @return The original web service name as it is stored in the WSDL.
      */
     public String getWebServiceNameFromWsdl() {
@@ -461,64 +523,6 @@ public class ParsedWsdl {
      */
     public String getWebServiceClassName() {
       return m_wsBaseName + ISdkProperties.SUFFIX_WS_SERVICE;
-    }
-
-    /**
-     * @param portTypeNameFromWsdl
-     *          The port type name as it appears in the WSDL.
-     * @return The default port type class name for the given portType WSDL name
-     */
-    public String getPortTypeClassName(String portTypeNameFromWsdl) {
-      return 'I' + getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_PORT_TYPE;
-    }
-
-    /**
-     * @param portTypeNameFromWsdl
-     *          The port type name as it appears in the WSDL.
-     * @return The entry point class name (for providers) for the given port type WSDL name.
-     */
-    public String getEntryPointClassName(String portTypeNameFromWsdl) {
-      return getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_ENTRY_POINT;
-    }
-
-    /**
-     * @param portTypeNameFromWsdl
-     *          The port type name as it appears in the WSDL.
-     * @return The web service client class name (for consumers) for the given port type WSDL name.
-     */
-    public String getWebServiceClientClassName(String portTypeNameFromWsdl) {
-      return getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_CLIENT;
-    }
-
-    /**
-     * @param portTypeNameFromWsdl
-     *          The port type name as it appears in the WSDL.
-     * @return The web service provider implementation class name for the given port type WSDL name.
-     */
-    public String getWebServiceProviderImplClassName(String portTypeNameFromWsdl) {
-      return getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_PROVIDER;
-    }
-
-    /**
-     * @param portTypeNameFromWsdl
-     *          The port type name as it appears in the WSDL.
-     * @return The entry point definition class name (for providers) for the given port type WSDL name.
-     */
-    public String getEntryPointDefinitionClassName(String portTypeNameFromWsdl) {
-      return 'I' + getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_ENTRY_POINT_DEFINITION;
-    }
-
-    protected static String getBaseName(String wsNameFromWsdl) {
-      return wsdlNameToJavaName(JaxWsUtils.removeCommonSuffixes(wsNameFromWsdl));
-    }
-
-    protected static String wsdlNameToJavaName(String name) {
-      String[] parts = name.split("[^a-zA-Z0-9]");
-      StringBuilder nameBuilder = new StringBuilder(name.length());
-      for (String part : parts) {
-        nameBuilder.append(CoreUtils.ensureStartWithUpperCase(part));
-      }
-      return nameBuilder.toString();
     }
   }
 }

@@ -10,16 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -35,18 +37,17 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
-import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
-import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.util.NormalizedPattern;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils.ElementNameComparator;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils.PublicPrimaryTypeFilter;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.ui.util.NormalizedPattern;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils.ElementNameComparator;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicPrimaryTypeFilter;
 
 /**
  * <h3>{@link TypeContentProvider}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
@@ -59,21 +60,20 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
     super(project, null);
     m_maxProposalCount = 100;
     m_mostlyUsedTypes = new ArrayList<>(Arrays.asList(
-        IJavaRuntimeTypes.Boolean,
-        IJavaRuntimeTypes.Byte,
-        IJavaRuntimeTypes.Character,
-        IJavaRuntimeTypes.CharSequence,
-        IJavaRuntimeTypes.Integer,
-        IJavaRuntimeTypes.Long,
-        IJavaRuntimeTypes.Number,
-        IJavaRuntimeTypes.String,
-        IJavaRuntimeTypes.BigDecimal,
-        IJavaRuntimeTypes.BigInteger,
-        IJavaRuntimeTypes.Collection,
-        IJavaRuntimeTypes.UtilDate,
-        IJavaRuntimeTypes.List,
-        IJavaRuntimeTypes.Map,
-        IJavaRuntimeTypes.Set));
+        JavaTypes.Boolean,
+        JavaTypes.Byte,
+        JavaTypes.Character,
+        CharSequence.class.getName(),
+        JavaTypes.Integer,
+        JavaTypes.Long,
+        Number.class.getName(),
+        String.class.getName(),
+        BigDecimal.class.getName(),
+        BigInteger.class.getName(),
+        Collection.class.getName(),
+        List.class.getName(),
+        Map.class.getName(),
+        Set.class.getName()));
     setTypeProposalFilter(new PublicPrimaryTypeFilter());
   }
 
@@ -98,15 +98,15 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
     if (candidates.size() >= getMaxProposalCount()) {
       return false;// no more space
     }
-    if (S2eUtils.exists(candidate)) {
+    if (JdtUtils.exists(candidate)) {
       candidates.add(candidate);
     }
     return candidates.size() < getMaxProposalCount();
   }
 
   @Override
-  protected Collection<? extends Object> loadProposals(IProgressMonitor monitor) {
-    if (StringUtils.isNotBlank(getBaseClassFqn()) && !IJavaRuntimeTypes.Object.equals(getBaseClassFqn())) {
+  protected Collection<?> loadProposals(IProgressMonitor monitor) {
+    if (Strings.hasText(getBaseClassFqn()) && !Object.class.getName().equals(getBaseClassFqn())) {
       // we have a hierarchy base type: use super implementation to calculate all possible children
       return super.loadProposals(monitor);
     }
@@ -122,9 +122,9 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
     return result;
   }
 
-  protected void addMostlyUsedCandidates(Set<IType> candidates, IProgressMonitor monitor) {
+  protected void addMostlyUsedCandidates(Collection<IType> candidates, IProgressMonitor monitor) {
     IJavaProject javaProject = getJavaProject();
-    if (!S2eUtils.exists(javaProject)) {
+    if (!JdtUtils.exists(javaProject)) {
       return;
     }
 
@@ -133,8 +133,8 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
       if (monitor.isCanceled()) {
         return;
       }
-      int[] matchRegions = m_lastPattern.getMatchingRegions(Signature.getSimpleName(fqn));
-      if (matchRegions != null) {
+      boolean matches = m_lastPattern.getMatchingRegions(JavaTypes.simpleName(fqn)) != null;
+      if (matches) {
         try {
           IType type = javaProject.findType(fqn);
           if ((filter == null || filter.test(type)) && !addProposalCandidate(type, candidates)) {
@@ -154,11 +154,11 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
       return;
     }
     IJavaProject javaProject = getJavaProject();
-    if (!S2eUtils.exists(javaProject)) {
+    if (!JdtUtils.exists(javaProject)) {
       return;
     }
 
-    P_SearchRequestor requestor = new P_SearchRequestor(candidates, monitor);
+    SearchRequestor requestor = new P_SearchRequestor(candidates, monitor);
     SearchPattern pat = SearchPattern.createPattern(m_lastPattern.getPattern(), IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, m_lastPattern.getMatchRule());
     IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{javaProject});
     try {
@@ -213,7 +213,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
     }
 
     @Override
-    public void acceptSearchMatch(SearchMatch m) throws CoreException {
+    public void acceptSearchMatch(SearchMatch m) {
       if (m_monitor.isCanceled()) {
         throw new OperationCanceledException("type lookup canceled because monitor has been canceled.");
       }
@@ -223,7 +223,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
 
       TypeDeclarationMatch match = (TypeDeclarationMatch) m;
       IType type = (IType) match.getElement();
-      if (!S2eUtils.exists(type)) {
+      if (!JdtUtils.exists(type)) {
         return;
       }
       if (m_typeProposalFilter != null && !m_typeProposalFilter.test(type)) {

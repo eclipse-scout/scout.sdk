@@ -1,0 +1,24 @@
+package org.eclipse.scout.sdk.core.s.test;
+
+import org.eclipse.scout.rt.client.dto.Data;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.eclipse.scout.sdk.core.s.test.MyTablePage0.Table;
+
+import formdata.shared.services.pages.BaseTablePageData;
+
+@ClassId("whatever")
+@Data(BaseTablePageData.class)
+public class MyTablePage0 extends AbstractPageWithTable<Table> {
+@Override
+protected void execLoadData(SearchFilter filter) {
+importPageData(BEANS.get(IMyPageService0.class).getTestTableData(filter));
+}
+@ClassId("whatever2")
+public class Table extends AbstractTable {
+
+}
+}

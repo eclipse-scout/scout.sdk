@@ -10,17 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
-import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.Proposal;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.ProposalPosition;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
  * <h3>{@link AsyncProposalPosition}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class AsyncProposalPosition extends ProposalPosition {
@@ -28,10 +27,10 @@ public class AsyncProposalPosition extends ProposalPosition {
   private final ICompletionProposalProvider m_provider;
   private final LinkedModeModel m_model;
 
-  public AsyncProposalPosition(IDocument document, int offset, int length, int sequence, ICompletionProposalProvider provider, LinkedModeModel model) {
-    super(document, offset, length, sequence, null);
-    m_provider = Validate.notNull(provider);
-    m_model = Validate.notNull(model);
+  public AsyncProposalPosition(IDocument document, int rangeOffset, int rangeLength, int sequence, ICompletionProposalProvider provider, LinkedModeModel model) {
+    super(document, rangeOffset, rangeLength, sequence, null);
+    m_provider = Ensure.notNull(provider);
+    m_model = Ensure.notNull(model);
   }
 
   @Override
@@ -46,7 +45,7 @@ public class AsyncProposalPosition extends ProposalPosition {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
+    int prime = 31;
     int result = super.hashCode();
     result = prime * result + m_model.hashCode();
     result = prime * result + m_provider.hashCode();

@@ -99,13 +99,12 @@ import org.eclipse.jdt.core.dom.WildcardType;
 /**
  * <h3>{@link DefaultAstVisitor}</h3>
  *
- * @author Andreas Hoegger
  * @since 1.0.8 2011-02-24
  */
 public class DefaultAstVisitor extends ASTVisitor {
 
   public DefaultAstVisitor() {
-    super();
+    this(false);
   }
 
   public DefaultAstVisitor(boolean visitDocTags) {
@@ -113,7 +112,12 @@ public class DefaultAstVisitor extends ASTVisitor {
   }
 
   /**
+   * Callback to visit each node type.
+   * 
    * @param node
+   *          The visited node.
+   * @return {@code true} if the children of this node should be visited, and {@code false} if the children of this node
+   *         should be skipped.
    */
   protected boolean visitNode(ASTNode node) {
     return true;

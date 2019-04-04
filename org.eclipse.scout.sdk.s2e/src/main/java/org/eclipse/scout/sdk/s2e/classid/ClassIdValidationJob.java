@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.classid;
 
+import static org.eclipse.scout.sdk.s2e.util.JdtUtils.isOnClasspath;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,7 +22,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipError;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -37,26 +38,26 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.ReferenceMatch;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
-import org.eclipse.jdt.core.search.TypeReferenceMatch;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.job.AbstractJob;
-import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
  * <h3>{@link ClassIdValidationJob}</h3>
  *
- * @author Matthias Villiger
  * @since 4.0.0 2014-05-20
  */
 public final class ClassIdValidationJob extends AbstractJob {
@@ -76,27 +77,27 @@ public final class ClassIdValidationJob extends AbstractJob {
     m_classIdTypes = classIdTypes;
   }
 
-  private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(final IProgressMonitor monitor) {
-    final Set<IAnnotation> result = new HashSet<>();
+  private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(IProgressMonitor monitor) {
+    Set<IAnnotation> result = new HashSet<>();
     try {
       SearchEngine e = new SearchEngine();
       IJavaSearchScope workspaceScope = SearchEngine.createWorkspaceScope();
       SearchRequestor requestor = new SearchRequestor() {
         @Override
-        public void acceptSearchMatch(SearchMatch match) throws CoreException {
+        public void acceptSearchMatch(SearchMatch match) {
           if (monitor.isCanceled()) {
             throw new OperationCanceledException("ClassId annotation search canceled by monitor.");
           }
           Object owner = match.getElement();
           if (owner instanceof IType) {
             IType ownerType = (IType) owner;
-            if (S2eUtils.exists(ownerType)) {
-              IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
+            if (JdtUtils.exists(ownerType)) {
+              IJavaElement element = ((ReferenceMatch) match).getLocalElement();
               if (element == null) {
                 // e.g. when the annotation is fully qualified. try reading from owner
-                element = S2eUtils.getAnnotation(ownerType, IScoutRuntimeTypes.ClassId);
+                element = JdtUtils.getAnnotation(ownerType, IScoutRuntimeTypes.ClassId);
               }
-              if (element instanceof IAnnotation && S2eUtils.exists(element)) {
+              if (element instanceof IAnnotation && JdtUtils.exists(element)) {
                 result.add((IAnnotation) element);
               }
             }
@@ -108,7 +109,7 @@ public final class ClassIdValidationJob extends AbstractJob {
         if (monitor.isCanceled()) {
           return result;
         }
-        if (S2eUtils.exists(classIdType)) {
+        if (JdtUtils.exists(classIdType)) {
           SearchPattern pattern = SearchPattern.createPattern(classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH);
           e.search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, workspaceScope, requestor, monitor);
         }
@@ -124,14 +125,11 @@ public final class ClassIdValidationJob extends AbstractJob {
       // can happen if the search engine is running and a e.g. maven update changes the underlying runtime zip file
       SdkLog.warning("unable to find @ClassId annotation references in workspace.", ze);
     }
-    catch (CoreException ex) {
-      SdkLog.error("unable to find @ClassId annotation references in workspace.", ex);
-    }
     catch (IllegalArgumentException iae) {
       SdkLog.info("@ClassId validation job canceled.", iae);
     }
-    catch (Exception e) {
-      SdkLog.error("unable to find @ClassId annotation references in workspace.", e);
+    catch (CoreException | RuntimeException ex) {
+      SdkLog.error("unable to find @ClassId annotation references in workspace.", ex);
     }
     return result;
   }
@@ -141,37 +139,32 @@ public final class ClassIdValidationJob extends AbstractJob {
     return CLASS_ID_VALIDATION_JOB_FAMILY.equals(family);
   }
 
-  private Map<String /*classid*/, List<IAnnotation>> getClassIdOccurrences(IProgressMonitor monitor) throws CoreException {
-    Map<String, List<IAnnotation>> ids = new HashMap<>();
+  private Map<String /*classid*/, List<IAnnotation>> getClassIdOccurrences(IProgressMonitor monitor) {
     Set<IAnnotation> allClassIdAnnotationsInWorkspace = getAllClassIdAnnotationsInWorkspace(monitor);
     if (monitor.isCanceled()) {
       return null;
     }
 
+    Map<String, List<IAnnotation>> ids = new HashMap<>();
     for (IAnnotation r : allClassIdAnnotationsInWorkspace) {
       if (monitor.isCanceled()) {
         return null;
       }
 
-      if (S2eUtils.exists(r)) {
-        String id = S2eUtils.getAnnotationValueString(r, "value");
-        if (StringUtils.isNotEmpty(id)) {
-          List<IAnnotation> files = ids.get(id);
-          if (files == null) {
-            files = new LinkedList<>();
-            ids.put(id, files);
-          }
-          files.add(r);
+      if (JdtUtils.exists(r)) {
+        String id = JdtUtils.getAnnotationValueString(r, "value");
+        if (!Strings.isEmpty(id)) {
+          ids.computeIfAbsent(id, k -> new ArrayList<>()).add(r);
         }
       }
     }
     return ids;
   }
 
-  private static IAnnotation getVisibleDuplicate(final IJavaElement current, final Iterable<IAnnotation> matchesById) {
-    final IJavaProject jp = current.getJavaProject();
-    for (final IAnnotation m : matchesById) {
-      if (m != current && S2eUtils.isOnClasspath(m, jp)) {
+  private static IAnnotation getVisibleDuplicate(IJavaElement current, Iterable<IAnnotation> matchesById) {
+    IJavaProject jp = current.getJavaProject();
+    for (IAnnotation m : matchesById) {
+      if (m != current && isOnClasspath(m, jp)) {
         return m;
       }
     }
@@ -179,18 +172,21 @@ public final class ClassIdValidationJob extends AbstractJob {
   }
 
   private static void createDuplicateMarkers(Map<String, List<IAnnotation>> annotations) throws CoreException {
+    if(annotations == null || annotations.isEmpty()) {
+      return;
+    }
     for (Entry<String, List<IAnnotation>> matches : annotations.entrySet()) {
       List<IAnnotation> matchesById = matches.getValue();
       if (matchesById.size() > 1) {
-        for (final IAnnotation duplicate : matchesById) {
-          final IAnnotation other = getVisibleDuplicate(duplicate, matchesById);
-          final IType parent = (IType) duplicate.getAncestor(IJavaElement.TYPE);
-          if (S2eUtils.exists(parent) && S2eUtils.exists(other)) {
+        for (IAnnotation duplicate : matchesById) {
+          IAnnotation other = getVisibleDuplicate(duplicate, matchesById);
+          IType parent = (IType) duplicate.getAncestor(IJavaElement.TYPE);
+          if (JdtUtils.exists(parent) && JdtUtils.exists(other)) {
             @SuppressWarnings("squid:S2259")
-            final IType otherParent = (IType) other.getAncestor(IJavaElement.TYPE);
-            final ISourceRange sourceRange = duplicate.getSourceRange();
-            if (S2eUtils.exists(otherParent) && SourceRange.isAvailable(sourceRange)) {
-              final IMarker marker = duplicate.getResource().createMarker(CLASS_ID_DUPLICATE_MARKER_ID);
+            IType otherParent = (IType) other.getAncestor(IJavaElement.TYPE);
+            ISourceRange sourceRange = duplicate.getSourceRange();
+            if (JdtUtils.exists(otherParent) && SourceRange.isAvailable(sourceRange)) {
+              IMarker marker = duplicate.getResource().createMarker(CLASS_ID_DUPLICATE_MARKER_ID);
               marker.setAttribute(IMarker.MESSAGE, "Duplicate @ClassId. Value '" + matches.getKey() + "' of type '" + parent.getFullyQualifiedName()
                   + "' is the same as of type '" + otherParent.getFullyQualifiedName() + "'.");
               marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
@@ -198,10 +194,10 @@ public final class ClassIdValidationJob extends AbstractJob {
               marker.setAttribute(IMarker.CHAR_END, sourceRange.getOffset() + sourceRange.getLength());
               marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
               try {
-                final IDocument doc = new Document(parent.getCompilationUnit().getSource());
+                IDocument doc = new Document(parent.getCompilationUnit().getSource());
                 marker.setAttribute(IMarker.LINE_NUMBER, doc.getLineOfOffset(sourceRange.getOffset()) + 1);
               }
-              catch (final BadLocationException e) {
+              catch (BadLocationException e) {
                 throw new SdkException(e);
               }
               marker.setAttribute(CLASS_ID_ATTR_ANNOTATION, duplicate);
@@ -232,13 +228,7 @@ public final class ClassIdValidationJob extends AbstractJob {
     createDuplicateMarkers(classIdOccurrences);
   }
 
-  public static synchronized void executeAsync(final long startDelay, final boolean showToUser) {
-    Job currentJob = Job.getJobManager().currentJob();
-    if (currentJob instanceof ResourceBlockingOperationJob) {
-      // do not schedule a check run if the event comes from the scout sdk itself. we assume it does a correct job.
-      return;
-    }
-
+  public static synchronized void executeAsync(long startDelay, boolean showToUser) {
     Job j = new AbstractJob("schedule classid validation") {
       @Override
       protected void execute(IProgressMonitor monitor) {
@@ -247,7 +237,7 @@ public final class ClassIdValidationJob extends AbstractJob {
 
           // get the class id type outside of the validation job
           // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
-          Set<IType> classIds = S2eUtils.resolveJdtTypes(IScoutRuntimeTypes.ClassId);
+          Set<IType> classIds = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ClassId);
           if (classIds.isEmpty()) {
             return;
           }
@@ -263,7 +253,7 @@ public final class ClassIdValidationJob extends AbstractJob {
           // in that case we just ignore the event and check back later.
           SdkLog.info("Could not schedule class id validation.", e);
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
           SdkLog.error("Error while preparing to search for duplicate @ClassIds.", e);
         }
       }

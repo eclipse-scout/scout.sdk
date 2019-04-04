@@ -10,23 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 
+import static java.util.Collections.emptyList;
+
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  * <h3>{@link StrictHierarchyTypeContentProvider}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class StrictHierarchyTypeContentProvider extends AbstractContentProviderAdapter {
@@ -41,24 +41,24 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
   }
 
   @Override
-  protected Collection<? extends Object> loadProposals(IProgressMonitor monitor) {
+  protected Collection<?> loadProposals(IProgressMonitor monitor) {
     IJavaProject javaProject = getJavaProject();
-    if (!S2eUtils.exists(javaProject)) {
-      return Collections.emptyList();
+    if (!JdtUtils.exists(javaProject)) {
+      return emptyList();
     }
 
     try {
-      return S2eUtils.findClassesInStrictHierarchy(javaProject, getBaseClassFqn(), monitor, getTypeProposalFilter());
+      return JdtUtils.findClassesInStrictHierarchy(javaProject, getBaseClassFqn(), monitor, getTypeProposalFilter());
     }
-    catch (CoreException e) {
+    catch (RuntimeException e) {
       SdkLog.error("Error loading super type proposals in project {} for base class {}", javaProject.getElementName(), getBaseClassFqn(), e);
-      return Collections.emptyList();
+      return emptyList();
     }
   }
 
   @Override
   public String getText(Object element) {
-    return ((IType) element).getElementName();
+    return ((IJavaElement) element).getElementName();
   }
 
   @Override
@@ -66,7 +66,7 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
     IType t = (IType) element;
     StringBuilder sb = new StringBuilder(t.getElementName());
     String elementName = t.getPackageFragment().getElementName();
-    if (StringUtils.isNotBlank(elementName)) {
+    if (Strings.hasText(elementName)) {
       sb.append(" - ").append(elementName);
     }
     return sb.toString();

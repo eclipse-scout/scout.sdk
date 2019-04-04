@@ -11,14 +11,12 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 
-import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -49,12 +47,14 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedPosition;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.s2e.job.RunnableJob;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.s2e.environment.RunnableJob;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.ILinkedPositionHolder;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.ILinkedPositionHolder;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MalformedTreeException;
@@ -68,7 +68,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 /**
  * <h3>{@link AbstractTypeProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public abstract class AbstractTypeProposal extends CUCorrectionProposal implements ILinkedPositionHolder {
@@ -89,31 +88,27 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   private ASTRewrite m_rewrite; // to prevent duplicate calculations
   private AstNodeFactory m_nodeFactory;
 
+  @FunctionalInterface
   public interface IAstNodeFactoryProvider {
     AstNodeFactory createFactoryFor(AbstractTypeProposal proposal);
   }
 
-  private static volatile IAstNodeFactoryProvider astNodeFactoryProvider = new IAstNodeFactoryProvider() {
-    @Override
-    public AstNodeFactory createFactoryFor(AbstractTypeProposal proposal) {
-      return new AstNodeFactory(proposal.getProposalContext().getDeclaringType(), proposal.getProposalContext().getIcu(), proposal.getProposalContext().getProvider(),
-          proposal.getProposalContext().getDeclaringTypeBinding(), proposal);
-    }
-  };
+  private static volatile IAstNodeFactoryProvider astNodeFactoryProvider = proposal -> new AstNodeFactory(proposal.getProposalContext().getDeclaringType(), proposal.getProposalContext().getIcu(), proposal.getProposalContext().getProvider(),
+      proposal.getProposalContext().getDeclaringTypeBinding(), proposal);
 
   public static IAstNodeFactoryProvider getAstNodeFactoryProvider() {
     return astNodeFactoryProvider;
   }
 
   public static void setAstNodeFactoryProvider(IAstNodeFactoryProvider provider) {
-    astNodeFactoryProvider = Validate.notNull(provider);
+    astNodeFactoryProvider = Ensure.notNull(provider);
   }
 
-  public AbstractTypeProposal(String displayName, int relevance, String imageId, ICompilationUnit cu, TypeProposalContext context) {
+  protected AbstractTypeProposal(String displayName, int relevance, String imageId, ICompilationUnit cu, TypeProposalContext context) {
     super(displayName, cu, null, relevance, S2ESdkUiActivator.getImage(imageId));
     m_context = context;
     m_linkedProposalModel = new LinkedProposalModel();
-    m_asyncProposalProviders = new LinkedList<>();
+    m_asyncProposalProviders = new ArrayList<>();
   }
 
   protected abstract void fillRewrite(AstNodeFactory factory, Type superType) throws CoreException;
@@ -140,9 +135,9 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   }
 
   protected Type getBestMatchingSuperType(Iterable<String> candidates) {
-    IJavaEnvironment env = getFactory().getJavaEnvironment();
+    IJavaEnvironment env = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
     for (String superTypeCandidate : candidates) {
-      if (env.findType(superTypeCandidate) != null) {
+      if (env.exists(superTypeCandidate)) {
         // found! return as best candidate
         return getFactory().newTypeReference(superTypeCandidate);
       }
@@ -165,7 +160,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   protected void addEdits(IDocument document, TextEdit editRoot) throws CoreException {
     try {
       ASTRewrite rewrite = getRewrite();
-      MultiTextEdit edit = (MultiTextEdit) rewrite.rewriteAST();
+      TextEdit edit = rewrite.rewriteAST();
       String searchString = m_context.getSearchString();
       if (searchString != null) {
         // remove the search prefix
@@ -181,53 +176,66 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   }
 
   @Override
-  protected void performChange(IEditorPart part, IDocument document) throws CoreException {
-    if (m_context.getSearchString() != null) {
-      try {
-        InsertEdit insertFixEdit = new InsertEdit(m_context.getInsertPosition(), String.valueOf(SEARCH_STRING_END_FIX));
-        TextEditProcessor proc = new TextEditProcessor(document, insertFixEdit, TextEdit.UPDATE_REGIONS);
-        proc.performEdits();
+  protected void performChange(IEditorPart part, IDocument document) {
+    try {
+      applySearchStringFix(document);
+
+      scheduleAstRetrieval();
+
+      getRewrite(); // trigger rewrite creation
+
+      // start proposal calculation
+      for (ICompletionProposalProvider a : m_asyncProposalProviders) {
+        a.load();
       }
-      catch (MalformedTreeException | BadLocationException e) {
-        throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
-      }
+
+      super.performChange(part, document);
+
+      tryEnterLinkedMode(part);
+    }
+    catch (CoreException | BadLocationException e) {
+      SdkLog.error("Unable to insert new element.", e);
+    }
+  }
+
+  private void applySearchStringFix(IDocument document) throws CoreException {
+    if (m_context.getSearchString() == null) {
+      return; // not necessary
     }
 
-    // start AST retrieval
+    try {
+      InsertEdit insertFixEdit = new InsertEdit(m_context.getInsertPosition(), String.valueOf(SEARCH_STRING_END_FIX));
+      TextEditProcessor proc = new TextEditProcessor(document, insertFixEdit, TextEdit.UPDATE_REGIONS);
+      proc.performEdits();
+    }
+    catch (MalformedTreeException | BadLocationException e) {
+      throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
+    }
+  }
+
+  private void scheduleAstRetrieval() {
     RunnableFuture<CompilationUnit> astInitializer = new FutureTask<>(new P_AstInitCallable(m_context.getIcu()));
-    RunnableJob astInitializerJob = new RunnableJob("Get AST", astInitializer);
+    Job astInitializerJob = new RunnableJob("Get AST", astInitializer);
     astInitializerJob.setUser(false);
     astInitializerJob.setSystem(true);
     astInitializerJob.setPriority(Job.INTERACTIVE);
     astInitializerJob.schedule();
     m_context.setCompilationUnit(astInitializer);
+  }
 
-    getRewrite(); // trigger rewrite creation
-
-    // start proposal calculation
-    for (ICompletionProposalProvider a : m_asyncProposalProviders) {
-      a.load();
+  private void tryEnterLinkedMode(IEditorPart part) throws BadLocationException {
+    if (m_linkedProposalModel.hasLinkedPositions() && part instanceof JavaEditor) {
+      // enter linked mode
+      ITextViewer viewer = ((JavaEditor) part).getViewer();
+      LinkedAsyncProposalModelPresenter.enterLinkedMode(viewer, part, didOpenEditor(), m_linkedProposalModel);
     }
-
-    try {
-      super.performChange(part, document);
-
-      if (m_linkedProposalModel.hasLinkedPositions() && part instanceof JavaEditor) {
-        // enter linked mode
-        ITextViewer viewer = ((JavaEditor) part).getViewer();
-        new LinkedAsyncProposalModelPresenter().enterLinkedMode(viewer, part, didOpenEditor(), m_linkedProposalModel);
+    else if (part instanceof ITextEditor) {
+      PositionInformation endPosition = m_linkedProposalModel.getEndPosition();
+      if (endPosition != null) {
+        // select a result
+        int pos = endPosition.getOffset() + endPosition.getLength();
+        ((ITextEditor) part).selectAndReveal(pos, 0);
       }
-      else if (part instanceof ITextEditor) {
-        PositionInformation endPosition = m_linkedProposalModel.getEndPosition();
-        if (endPosition != null) {
-          // select a result
-          int pos = endPosition.getOffset() + endPosition.getLength();
-          ((ITextEditor) part).selectAndReveal(pos, 0);
-        }
-      }
-    }
-    catch (BadLocationException e) {
-      throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
     }
   }
 
@@ -245,7 +253,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   private void addLinkedPositionProposalProvider(String groupId, Callable<Proposal[]> callable) {
     FutureTask<Proposal[]> future = new FutureTask<>(callable);
     LinkedProposalPositionGroup group = m_linkedProposalModel.getPositionGroup(groupId, false);
-    if (group == null || !(group instanceof ICompletionProposalProvider)) {
+    if (!(group instanceof ICompletionProposalProvider)) {
       LinkedAsyncProposalPositionGroup newGroup = new LinkedAsyncProposalPositionGroup(groupId, future);
       m_asyncProposalProviders.add(newGroup);
       if (group != null) {
@@ -293,7 +301,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
     }
 
     @Override
-    public CompilationUnit call() throws Exception {
+    public CompilationUnit call() {
       return SharedASTProviderCore.getAST(m_icu, SharedASTProviderCore.WAIT_ACTIVE_ONLY, null);
     }
   }
@@ -303,12 +311,12 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
     private final String m_hierarchyBaseTypeFqn;
 
     private P_HierarchyCallable(String hierarchyBaseTypeFqn) {
-      m_hierarchyBaseTypeFqn = Validate.notNull(hierarchyBaseTypeFqn);
+      m_hierarchyBaseTypeFqn = Ensure.notNull(hierarchyBaseTypeFqn);
     }
 
     @Override
-    public Proposal[] call() throws Exception {
-      Set<IType> abstractClassesInHierarchy = S2eUtils.findAbstractClassesInHierarchy(getFactory().getJavaProject(), m_hierarchyBaseTypeFqn, null);
+    public Proposal[] call() {
+      Set<IType> abstractClassesInHierarchy = JdtUtils.findAbstractClassesInHierarchy(getFactory().getJavaProject(), m_hierarchyBaseTypeFqn, null);
       List<Proposal> result = new ArrayList<>(abstractClassesInHierarchy.size());
       for (IType type : abstractClassesInHierarchy) {
         ITypeBinding binding = getFactory().resolveTypeBinding(type.getFullyQualifiedName());
@@ -316,7 +324,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
           result.add(new P_JavaLinkedModeProposal(getFactory().getIcu(), binding, 10));
         }
       }
-      return result.toArray(new Proposal[result.size()]);
+      return result.toArray(new Proposal[0]);
     }
   }
 
@@ -339,7 +347,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
       ImportRewrite impRewrite = CodeStyleConfiguration.createImportRewrite(m_compilationUnit, true);
       String replaceString = impRewrite.addImport(m_typeProposal);
 
-      MultiTextEdit composedEdit = new MultiTextEdit();
+      TextEdit composedEdit = new MultiTextEdit();
       composedEdit.addChild(new ReplaceEdit(position.getOffset(), position.getLength(), replaceString));
       composedEdit.addChild(impRewrite.rewriteImports(null));
       return composedEdit;

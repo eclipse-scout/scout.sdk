@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.testing;
 
-import java.io.File;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.regex.Pattern;
+import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,25 +24,19 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.lang3.SystemUtils;
-import org.apache.maven.cli.CLIManager;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IMavenConstants;
-import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsModuleNewHelper;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
-import org.eclipse.scout.sdk.core.s.util.DtoUtils;
+import org.eclipse.scout.sdk.core.s.testing.maven.MavenCliRunner;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
-import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -57,43 +53,88 @@ public final class CoreScoutTestingUtils {
   }
 
   /**
-   * @return a new {@link IJavaEnvironment} that contains the src/main/client and src/main/shared folders.
-   */
-  public static IJavaEnvironment createClientJavaEnvironment() {
-    return new JavaEnvironmentBuilder()
-        .withoutScoutSdk()
-        .withSourceFolder("src/main/client")
-        .withSourceFolder("src/main/shared")
-        .build();
-  }
-
-  /**
-   * @return a {@link IJavaEnvironment} for org.eclipse.*.shared tests, without the org.eclipse.scout.rt.client
-   *         dependency
-   */
-  public static IJavaEnvironment createSharedJavaEnvironment() {
-    return new JavaEnvironmentBuilder()
-        .withoutScoutSdk()
-        .without(".*" + Pattern.quote("org.eclipse.scout.rt.client") + ".*")
-        .withSourceFolder("src/main/shared")
-        .build();
-  }
-
-  /**
-   * Create the page data of the given {@link IPage} model class name.
+   * Creates a new Scout project based on the Scout JS archetype using group id {@link #PROJECT_GROUP_ID} and artifactId
+   * {@link #PROJECT_ARTIFACT_ID}.
    *
-   * @param modelFqn
-   *          The fully qualified name of the page model class for which the data should be re-generated
-   * @return The created page data
-   * @throws AssertionError
-   *           if the created page data does not compile within the shared module.
+   * @return The root directory that contains the created projects.
    */
-  public static IType createPageDataAssertNoCompileErrors(String modelFqn) {
-    return createPageDataAssertNoCompileErrors(modelFqn, createClientJavaEnvironment(), createSharedJavaEnvironment());
+  public static Path createJsTestProject() throws IOException {
+    return createTestProject(ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID);
   }
 
   /**
-   * Create the page data of the given {@link IPage} model class name.
+   * Creates a new Scout project based on the Scout classic helloworld archetype using group id
+   * {@link #PROJECT_GROUP_ID} and artifactId {@link #PROJECT_ARTIFACT_ID}.
+   *
+   * @return The root directory that contains the created projects.
+   */
+  public static Path createClassicTestProject() throws IOException {
+    return createTestProject(ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID);
+  }
+
+  private static Path createTestProject(String archetypeArtifactId) throws IOException {
+    ensureMavenRunnerCreated();
+    Path targetDirectory = Files.createTempDirectory(CoreScoutTestingUtils.class.getSimpleName() + "-projectDir");
+    ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", System.getProperty("java.specification.version"),
+        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION);
+    return targetDirectory;
+  }
+
+  /**
+   * Creates a new JAX WS module into the specified Scout project using the jax-ws-module archetype.
+   *
+   * @param serverModuleDir
+   *          The absolute {@link Path} that points to the scout-server Maven module that should refer the new jax-ws
+   *          module.
+   * @param artifactId
+   *          The jax-ws-module artifact id.
+   * @return The created module root {@link Path}.
+   * @throws IOException
+   *           if there is an error creating the new module.
+   */
+  public static Path createJaxWsModule(Path serverModuleDir, String artifactId) throws IOException {
+    ensureMavenRunnerCreated();
+    addMetroDependency(serverModuleDir.resolve(IMavenConstants.POM));
+    return JaxWsModuleNewHelper.createModule(serverModuleDir.resolve(IMavenConstants.POM), artifactId);
+  }
+
+  static void addMetroDependency(Path pomFile) throws IOException {
+    try {
+      DocumentBuilder createDocumentBuilder = Xml.createDocumentBuilder();
+      Document pom = createDocumentBuilder.parse(pomFile.toFile());
+      Element dependenciesElement = Xml.firstChildElement(pom.getDocumentElement(), IMavenConstants.DEPENDENCIES)
+          .orElseThrow(() -> Ensure.newFail("Pom '{}' does not contain a '{}' element.", pomFile, IMavenConstants.DEPENDENCIES));
+
+      // add jaxws Metro as test-dependency because the default implementor specific is Metro and it must be present so that the test platform can be started
+      Element metroDependencyElement = pom.createElement(IMavenConstants.DEPENDENCY);
+      Element metroGroupIdElement = pom.createElement(IMavenConstants.GROUP_ID);
+      metroGroupIdElement.setTextContent("com.sun.xml.ws");
+      Element metroArtifactIdElement = pom.createElement(IMavenConstants.ARTIFACT_ID);
+      metroArtifactIdElement.setTextContent("jaxws-rt");
+      Element metroScopeElement = pom.createElement(IMavenConstants.SCOPE);
+      metroScopeElement.setTextContent("test");
+      metroDependencyElement.appendChild(metroGroupIdElement);
+      metroDependencyElement.appendChild(metroArtifactIdElement);
+      metroDependencyElement.appendChild(metroScopeElement);
+      dependenciesElement.appendChild(metroDependencyElement);
+
+      // write
+      Transformer transformer = Xml.createTransformer(true);
+      transformer.transform(new DOMSource(pom), new StreamResult(pomFile.toFile()));
+    }
+    catch (ParserConfigurationException | SAXException | TransformerException e) {
+      throw new SdkException("Unable to register Metro test dependency in '{}'.", pomFile, e);
+    }
+  }
+
+  private enum DtoType {
+    FORM_DATA,
+    PAGE_DATA,
+    ROW_DATA
+  }
+
+  /**
+   * Create the page data of the given IPage model class name.
    *
    * @param modelFqn
    *          The fully qualified name of the page model class for which the data should be re-generated
@@ -106,33 +147,24 @@ public final class CoreScoutTestingUtils {
    *           if the created page data does not compile within the shared module.
    */
   public static IType createPageDataAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
-    return createDtoAssertNoCompileErrors(modelFqn, false, clientEnv, sharedEnv);
+    return createDtoAssertNoCompileErrors(modelFqn, clientEnv, sharedEnv, DtoType.PAGE_DATA);
   }
 
   /**
-   * Create the row data for the given {@link IExtension} model class name.
+   * Create the row data for the given IExtension model class name.
    *
    * @param modelFqn
    *          The fully qualified name of the extension class for which the row data should be re-generated.
+   * @param clientEnv
+   *          The client {@link IJavaEnvironment} to use.
+   * @param sharedEnv
+   *          The shared {@link IJavaEnvironment} to use.
    * @return The created row data
    * @throws AssertionError
-   *           if the created page data does not compile within the shared module.
+   *           if the created row data does not compile within the shared module.
    */
-  public static IType createRowDataAssertNoCompileErrors(String modelFqn) {
-    return createDtoAssertNoCompileErrors(modelFqn, true, createClientJavaEnvironment(), createSharedJavaEnvironment());
-  }
-
-  /**
-   * Creates the form data for the given Scout model class.
-   *
-   * @param modelFqn
-   *          The fully qualified name of the model class for which the form data should be re-generated.
-   * @return The created form data type.
-   * @throws AssertionError
-   *           if the created form data does not compile within the shared module.
-   */
-  public static IType createFormDataAssertNoCompileErrors(String modelFqn) {
-    return createFormDataAssertNoCompileErrors(modelFqn, createClientJavaEnvironment(), createSharedJavaEnvironment());
+  public static IType createRowDataAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
+    return createDtoAssertNoCompileErrors(modelFqn, clientEnv, sharedEnv, DtoType.ROW_DATA);
   }
 
   /**
@@ -149,110 +181,38 @@ public final class CoreScoutTestingUtils {
    *           if the created form data does not compile within the shared module.
    */
   public static IType createFormDataAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
+    return createDtoAssertNoCompileErrors(modelFqn, clientEnv, sharedEnv, DtoType.FORM_DATA);
+  }
+
+  private static IType createDtoAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv, DtoType dtoType) {
     // get model type
-    IType modelType = clientEnv.findType(modelFqn);
+    IType modelType = clientEnv.requireType(modelFqn);
 
     // build source
-    FormDataAnnotationDescriptor formDataAnnotation = DtoUtils.getFormDataAnnotationDescriptor(modelType);
-    ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, formDataAnnotation, sharedEnv);
-    String source = CoreUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
+    Optional<ICompilationUnitGenerator<?>> cuSrc;
+    switch (dtoType) {
+      case ROW_DATA:
+        cuSrc = DtoGeneratorFactory.createTableRowDataGenerator(modelType, sharedEnv);
+        break;
+      case PAGE_DATA:
+        cuSrc = DtoGeneratorFactory.createPageDataGenerator(modelType, sharedEnv);
+        break;
+      default:
+        cuSrc = DtoGeneratorFactory.createFormDataGenerator(modelType, sharedEnv);
+    }
 
     // ensure it compiles and get model of dto
-    return CoreTestingUtils.assertNoCompileErrors(sharedEnv, cuSrc.getPackageName(), cuSrc.getMainType().getElementName(), source);
-  }
-
-  private static IType createDtoAssertNoCompileErrors(String modelFqn, boolean rowData, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv) {
-    // get model type
-    IType modelType = clientEnv.findType(modelFqn);
-    DataAnnotationDescriptor dataAnnotation = DtoUtils.getDataAnnotationDescriptor(modelType);
-
-    // build source
-    ICompilationUnitSourceBuilder cuSrc;
-    if (rowData) {
-      cuSrc = DtoUtils.createTableRowDataBuilder(modelType, dataAnnotation, sharedEnv);
-    }
-    else {
-      cuSrc = DtoUtils.createPageDataBuilder(modelType, dataAnnotation, sharedEnv);
-    }
-    String source = CoreUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
-
-    // ensure it compiles and get model of dto
-    return CoreTestingUtils.assertNoCompileErrors(sharedEnv, cuSrc.getPackageName(), cuSrc.getMainType().getElementName(), source);
+    return assertNoCompileErrors(sharedEnv, cuSrc.orElseThrow(() -> new IllegalArgumentException("cannot create DTO for model Type " + modelFqn)));
   }
 
   /**
-   * Creates a new Scout project based on the helloworld archetype using group id {@link #PROJECT_GROUP_ID} and
-   * artifactId {@link #PROJECT_ARTIFACT_ID}.
-   *
-   * @return The root directory that contains the created projects.
-   * @throws IOException
-   */
-  public static File createTestProject() throws IOException {
-    File targetDirectory = Files.createTempDirectory(CoreScoutTestingUtils.class.getSimpleName() + "-projectDir").toFile();
-    ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", SystemUtils.JAVA_SPECIFICATION_VERSION,
-        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID, ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION);
-    return targetDirectory;
-  }
-
-  /**
-   * Creates a new JAX WS module into the specified Scout project using the jax-ws-module archetype.
-   *
-   * @param serverModuleDir
-   *          The absolute {@link File} that points to the scout-server Maven module that should refer the new jax-ws
-   *          module.
-   * @param artifactId
-   *          The jax-ws-module artifact id.
-   * @return The created module root {@link File}.
-   * @throws IOException
-   *           if there is an error creating the new module.
-   */
-  public static File createJaxWsModule(final File serverModuleDir, final String artifactId) throws IOException {
-    addMetroDependency(new File(serverModuleDir, IMavenConstants.POM));
-    return JaxWsModuleNewHelper.createModule(new File(serverModuleDir, IMavenConstants.POM), artifactId);
-  }
-
-  static void addMetroDependency(final File pomFile) throws IOException {
-    try {
-      DocumentBuilder createDocumentBuilder = CoreUtils.createDocumentBuilder();
-      Document pom = createDocumentBuilder.parse(pomFile);
-      Element dependenciesElement = CoreUtils.getFirstChildElement(pom.getDocumentElement(), IMavenConstants.DEPENDENCIES);
-
-      // add jaxws Metro as test-dependency because the default implementor specific is Metro and it must be present so that the test platform can be started
-      Element metroDependencyElement = pom.createElement(IMavenConstants.DEPENDENCY);
-      Element metroGroupIdElement = pom.createElement(IMavenConstants.GROUP_ID);
-      metroGroupIdElement.setTextContent("com.sun.xml.ws");
-      Element metroArtifactIdElement = pom.createElement(IMavenConstants.ARTIFACT_ID);
-      metroArtifactIdElement.setTextContent("jaxws-rt");
-      Element metroScopeElement = pom.createElement(IMavenConstants.SCOPE);
-      metroScopeElement.setTextContent("test");
-      metroDependencyElement.appendChild(metroGroupIdElement);
-      metroDependencyElement.appendChild(metroArtifactIdElement);
-      metroDependencyElement.appendChild(metroScopeElement);
-      dependenciesElement.appendChild(metroDependencyElement);
-
-      // write
-      Transformer transformer = CoreUtils.createTransformer(true);
-      transformer.transform(new DOMSource(pom), new StreamResult(pomFile));
-    }
-    catch (ParserConfigurationException | SAXException | TransformerException e) {
-      throw new SdkException("Unable to register Metro test dependency in " + pomFile, e);
-    }
-  }
-
-  /**
-   * Executes a 'mvn clean compile' in the given directory.
+   * Executes a 'mvn clean verify' in the given directory.
    *
    * @param pomDir
    *          The directory in which the maven command should be executed. Must contain a pom.xml file.
-   * @throws IOException
    */
-  public static void runMavenCleanCompile(File pomDir) {
-    MavenRunner.execute(new MavenBuild()
-        .withWorkingDirectory(pomDir)
-        .withGoal("clean")
-        .withGoal("compile")
-        .withOption(CLIManager.BATCH_MODE)
-        .withOption(CLIManager.DEBUG));
+  public static void runMavenCleanVerify(Path pomDir) {
+    runMavenCommand(pomDir, "clean", "verify");
   }
 
   /**
@@ -260,14 +220,34 @@ public final class CoreScoutTestingUtils {
    *
    * @param pomDir
    *          The directory in which the maven command should be executed. Must contain a pom.xml file.
-   * @throws IOException
    */
-  public static void runMavenCleanTest(File pomDir) {
-    MavenRunner.execute(new MavenBuild()
+  public static void runMavenCleanTest(Path pomDir) {
+    runMavenCommand(pomDir, "clean", "test");
+  }
+
+  /**
+   * Executes a maven command with the given goals in the given directory.
+   *
+   * @param pomDir
+   *          The directory in which the maven command should be executed. Must contain a pom.xml file.
+   * @param goals
+   *          The goals to execute. E.g.: {@code ["clean", "compile"]}.
+   */
+  public static void runMavenCommand(Path pomDir, String... goals) {
+    ensureMavenRunnerCreated();
+    MavenBuild build = new MavenBuild()
         .withWorkingDirectory(pomDir)
-        .withGoal("clean")
-        .withGoal("test")
-        .withOption(CLIManager.BATCH_MODE)
-        .withOption(CLIManager.DEBUG));
+        .withOption(MavenBuild.OPTION_BATCH_MODE)
+        .withOption(MavenBuild.OPTION_DEBUG);
+    if (goals != null && goals.length > 0) {
+      for (String goal : goals) {
+        build.withGoal(goal);
+      }
+    }
+    MavenRunner.execute(build);
+  }
+
+  private static void ensureMavenRunnerCreated() {
+    MavenRunner.setIfAbsent(MavenCliRunner::new);
   }
 }

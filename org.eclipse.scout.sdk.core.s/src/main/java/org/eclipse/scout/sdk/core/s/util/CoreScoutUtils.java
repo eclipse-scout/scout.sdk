@@ -10,110 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.util;
 
+import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * <h3>{@link CoreScoutUtils}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public final class CoreScoutUtils {
   private CoreScoutUtils() {
-  }
-
-  /**
-   * Gets the artifactId of the given pom {@link Document}.
-   *
-   * @param pom
-   *          The pom {@link Document} to search the artifactId for.
-   * @return The artifactId or <code>null</code> if no artifactId exists in the given {@link Document}.
-   */
-  public static String getArtifactIdOfPom(Document pom) {
-    if (pom == null) {
-      return null;
-    }
-    Element artifactIdElement = CoreUtils.getFirstChildElement(pom.getDocumentElement(), IMavenConstants.ARTIFACT_ID);
-    if (artifactIdElement != null) {
-      return artifactIdElement.getTextContent();
-    }
-    return null;
-  }
-
-  /**
-   * Gets the groupId of the given pom {@link Document}.
-   *
-   * @param pom
-   *          The pom {@link Document} to search the groupId for.
-   * @return The groupId or <code>null</code> if no groupId exists in the given {@link Document}.
-   */
-  public static String getGroupIdOfPom(Document pom) {
-    return getInheritedValueOfPom(pom, IMavenConstants.GROUP_ID);
-  }
-
-  /**
-   * Gets the version of the given pom {@link Document}.
-   *
-   * @param pom
-   *          The pom {@link Document} to search the version for.
-   * @return The version or <code>null</code> if no version exists in the given {@link Document}.
-   */
-  public static String getVersionOfPom(Document pom) {
-    return getInheritedValueOfPom(pom, IMavenConstants.VERSION);
-  }
-
-  /**
-   * Gets the artifactId of the parent of the given pom {@link Document}.
-   *
-   * @param pom
-   *          The pom {@link Document} to search the parent artifactId for.
-   * @return The artifactId name or <code>null</code> if it does not exist.
-   */
-  public static String getParentArtifactId(Document pom) {
-    if (pom == null) {
-      return null;
-    }
-    Element parentElement = CoreUtils.getFirstChildElement(pom.getDocumentElement(), IMavenConstants.PARENT);
-    if (parentElement == null) {
-      return null;
-    }
-    Element artifactId = CoreUtils.getFirstChildElement(parentElement, IMavenConstants.ARTIFACT_ID);
-    if (artifactId == null) {
-      return null;
-    }
-    return artifactId.getTextContent();
-  }
-
-  static String getInheritedValueOfPom(Document pom, String tagName) {
-    if (pom == null) {
-      return null;
-    }
-    Element documentElement = pom.getDocumentElement();
-    Element directValueElement = CoreUtils.getFirstChildElement(documentElement, tagName);
-    if (directValueElement != null) {
-      return directValueElement.getTextContent();
-    }
-
-    Element parentElement = CoreUtils.getFirstChildElement(documentElement, IMavenConstants.PARENT);
-    if (parentElement == null) {
-      return null;
-    }
-    directValueElement = CoreUtils.getFirstChildElement(parentElement, tagName);
-    if (directValueElement == null) {
-      return null;
-    }
-    return directValueElement.getTextContent();
   }
 
   /**
@@ -137,14 +52,14 @@ public final class CoreScoutUtils {
     // calculate next values
     if (orderValueBefore != null && orderValueAfter == null) {
       // insert at last position
-      double orderValueBeforeAsDouble = orderValueBefore.doubleValue();
+      double orderValueBeforeAsDouble = orderValueBefore;
       validateOrderRange(orderValueBeforeAsDouble);
       double v = Math.ceil(orderValueBeforeAsDouble / ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       return v + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }
-    else if (orderValueBefore == null && orderValueAfter != null) {
+    if (orderValueBefore == null && orderValueAfter != null) {
       // insert at first position
-      double orderValueAfterAsDouble = orderValueAfter.doubleValue();
+      double orderValueAfterAsDouble = orderValueAfter;
       validateOrderRange(orderValueAfterAsDouble);
       double v = Math.floor(orderValueAfterAsDouble / ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       if (v > ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) {
@@ -152,10 +67,10 @@ public final class CoreScoutUtils {
       }
       return v - ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }
-    else if (orderValueBefore != null && orderValueAfter != null) {
+    if (orderValueBefore != null && orderValueAfter != null) {
       // insert between two types
-      double a = orderValueBefore.doubleValue();
-      double b = orderValueAfter.doubleValue();
+      double a = orderValueBefore;
+      double b = orderValueAfter;
       validateOrderRange(a);
       validateOrderRange(b);
       return getOrderValueInBetween(a, b);
@@ -174,21 +89,21 @@ public final class CoreScoutUtils {
     }
   }
 
-  static Double getOrderAnnotationValue(IType sibling) {
+  static Double getOrderAnnotationValue(IAnnotatable sibling) {
     if (sibling == null) {
       return null;
     }
-    return Double.valueOf(OrderAnnotation.valueOf(sibling, false));
+    return OrderAnnotation.valueOf(sibling, false);
   }
 
   static IType[] findSiblings(IType declaringType, int pos, String orderDefinitionType) {
-    IType prev = null;
-    for (IType t : declaringType.innerTypes().withInstanceOf(orderDefinitionType).list()) {
-      if (Flags.isAbstract(t.flags())) {
-        continue; // these are no valid siblings
-      }
+    Iterable<IType> i = declaringType.innerTypes()
+        .withInstanceOf(orderDefinitionType).stream()
+        .filter(candidate -> !isAbstract(candidate.flags()))::iterator;
 
-      if (t.source().start() > pos) {
+    IType prev = null;
+    for (IType t : i) {
+      if (t.source().get().start() > pos) {
         return new IType[]{prev, t};
       }
       prev = t;
@@ -225,7 +140,7 @@ public final class CoreScoutUtils {
 
     if (isDoubleDifferent(lowFloor, highFloor) && ((isDoubleDifferent(lowFloor, low) && isDoubleDifferent(highFloor, high)) || dif > 1.0)) {
       // integer value possible
-      final double intDif = prevIntHigh - nextIntLow;
+      double intDif = prevIntHigh - nextIntLow;
       if (!isDoubleDifferent(intDif, 1.0)) {
         return prevIntHigh;
       }
@@ -234,7 +149,7 @@ public final class CoreScoutUtils {
     return low + (dif / 2);
   }
 
-  static boolean isDoubleDifferent(final double d1, final double d2) {
+  static boolean isDoubleDifferent(double d1, double d2) {
     return CoreUtils.isDoubleDifferent(d1, d2, 0.0000000001);
   }
 }

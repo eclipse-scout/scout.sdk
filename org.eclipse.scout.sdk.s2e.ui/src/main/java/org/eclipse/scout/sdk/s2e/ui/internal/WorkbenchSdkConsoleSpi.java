@@ -16,9 +16,9 @@ import java.util.logging.Level;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.SdkConsole;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.log.ISdkConsoleSpi;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -30,7 +30,7 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 
-public class WorkbenchSdkConsoleSpi implements SdkConsole.ISdkConsoleSpi {
+public class WorkbenchSdkConsoleSpi implements ISdkConsoleSpi {
 
   @Override
   public void clear() {
@@ -49,25 +49,20 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.ISdkConsoleSpi {
         if (PlatformUI.isWorkbenchRunning()) {
           IWorkbench workbench = PlatformUI.getWorkbench();
           if (workbench != null) {
-            final Display display = workbench.getDisplay();
-            display.syncExec(new Runnable() {
-              @Override
-              public void run() {
-                out.setColor(display.getSystemColor(SWT.COLOR_RED));
-              }
-            });
+            Display display = workbench.getDisplay();
+            display.syncExec(() -> out.setColor(display.getSystemColor(SWT.COLOR_RED)));
           }
         }
       }
 
       out.write(s);
-      if (exceptions == null) {
+      if (exceptions == null || exceptions.length < 1) {
         out.write('\n');
       }
       else {
         for (Throwable t : exceptions) {
           if (t != null) {
-            String trace = CoreUtils.getThrowableAsString(t);
+            String trace = Strings.fromThrowable(t);
             out.write(trace);
           }
         }

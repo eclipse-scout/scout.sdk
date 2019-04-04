@@ -1,0 +1,23 @@
+package org.eclipse.scout.sdk.core.s.test;
+
+import org.eclipse.scout.rt.client.dto.Data;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.text.TEXTS;
+
+import formdata.shared.services.pages.BaseTablePageData;
+
+@ClassId("whatever")
+@Data(BaseTablePageData.class)
+public abstract class MyTablePage1<T extends MyTablePage1<T>.Table> extends AbstractPageWithTable<T> {
+@Override
+protected String getConfiguredTitle() {
+// TODO [anonymous] verify translation
+return TEXTS.get("MyTablePage1");
+}
+@ClassId("whatever2")
+public class Table extends AbstractTable {
+
+}
+}

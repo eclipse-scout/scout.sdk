@@ -10,35 +10,39 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.jaxws;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.maven.cli.CLIManager;
-import org.eclipse.scout.sdk.core.s.IMavenConstants;
+import org.eclipse.scout.sdk.core.ISourceFolders;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
-import org.eclipse.scout.sdk.core.s.util.CoreScoutUtils;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
+import org.eclipse.scout.sdk.core.s.util.maven.Pom;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 /**
  * <h3>{@link JaxWsModuleNewHelper}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public final class JaxWsModuleNewHelper {
@@ -46,13 +50,13 @@ public final class JaxWsModuleNewHelper {
   private JaxWsModuleNewHelper() {
   }
 
-  public static File getParentPomOf(File modulePomFile, Document modulePomDocument) {
-    Element parent = CoreUtils.getFirstChildElement(modulePomDocument.getDocumentElement(), IMavenConstants.PARENT);
-    if (parent != null) {
-      Element relPat = CoreUtils.getFirstChildElement(parent, IMavenConstants.RELATIVE_PATH);
-      if (relPat != null) {
-        String path = relPat.getTextContent();
-        if (StringUtils.isBlank(path)) {
+  public static Path getParentPomOf(Path modulePomFile, Document modulePomDocument) {
+    Optional<Element> parent = Xml.firstChildElement(modulePomDocument.getDocumentElement(), IMavenConstants.PARENT);
+    if (parent.isPresent()) {
+      Optional<Element> relPat = Xml.firstChildElement(parent.get(), IMavenConstants.RELATIVE_PATH);
+      if (relPat.isPresent()) {
+        String path = relPat.get().getTextContent();
+        if (Strings.isBlank(path)) {
           // parent is resolved from the repository. see http://maven.apache.org/ref/3.0.3/maven-model/maven.html#class_parent
           return null;
         }
@@ -63,70 +67,46 @@ public final class JaxWsModuleNewHelper {
           }
           path += IMavenConstants.POM;
         }
-        return modulePomFile.getParentFile().toPath().resolve(path).normalize().toFile();
+        return modulePomFile.getParent().resolve(path).normalize();
       }
     }
-    return new File(modulePomFile.getParentFile().getParentFile(), IMavenConstants.POM);
+    return modulePomFile.getParent().getParent().resolve(IMavenConstants.POM);
   }
 
-  public static File getParentPomOf(File projectPomFile) throws ParserConfigurationException, SAXException, IOException {
-    DocumentBuilder docBuilder = CoreUtils.createDocumentBuilder();
-    Document doc = docBuilder.parse(projectPomFile);
-    return getParentPomOf(projectPomFile, doc);
+  public static Path getParentPomOf(Path projectPomFile) throws IOException {
+    return getParentPomOf(projectPomFile, Xml.get(projectPomFile));
   }
 
-  public static File createModule(File targetModulePomFile, String artifactId) throws IOException {
-    try {
-      return createModuleImpl(targetModulePomFile, artifactId);
-    }
-    catch (ParserConfigurationException | SAXException e) {
-      throw new IOException(e);
-    }
+  public static Path createModule(Path targetModulePomFile, String artifactId) throws IOException {
+    return createModuleImpl(targetModulePomFile, artifactId);
   }
 
-  static File createModuleImpl(File targetModulePomFile, String artifactId) throws IOException, ParserConfigurationException, SAXException {
+  static Path createModuleImpl(Path targetModulePomFile, String artifactId) throws IOException {
     // validate input
-    Validate.notNull(targetModulePomFile);
-    Validate.isTrue(targetModulePomFile.isFile(), "Target module pom file could not be found.");
-    Validate.notNull(artifactId);
-
-    File targetDirectory = targetModulePomFile.getParentFile().getParentFile();
-    Validate.notNull(targetDirectory);
-    Validate.isTrue(targetDirectory.isDirectory(), "Target directory could not be found.");
+    Ensure.isFile(targetModulePomFile, "Target module pom file '{}' could not be found.", targetModulePomFile);
+    Ensure.notBlank(artifactId);
+    Path targetDirectory = targetModulePomFile.getParent().getParent();
+    Ensure.isDirectory(targetDirectory, "Target directory '{}' could not be found.", targetDirectory);
 
     // read values from target pom
-    DocumentBuilder docBuilder = CoreUtils.createDocumentBuilder();
-    Document targetModulePomDocument = docBuilder.parse(targetModulePomFile);
-    String groupId = CoreScoutUtils.getGroupIdOfPom(targetModulePomDocument);
-    if (StringUtils.isBlank(groupId)) {
-      throw new IOException("Unable to calculate " + IMavenConstants.GROUP_ID + " for new module.");
-    }
-    String version = CoreScoutUtils.getVersionOfPom(targetModulePomDocument);
-    if (StringUtils.isBlank(version)) {
-      throw new IOException("Unable to calculate " + IMavenConstants.VERSION + " for new module.");
-    }
+    Document targetModulePomDocument = Xml.get(targetModulePomFile);
+    String groupId = Pom.groupId(targetModulePomDocument)
+        .orElseThrow(() -> newFail("Unable to calculate {} for new module.", IMavenConstants.GROUP_ID));
+    String version = Pom.version(targetModulePomDocument)
+        .orElseThrow(() -> newFail("Unable to calculate {} for new module.", IMavenConstants.VERSION));
+    String parentArtifactId = Pom.parentArtifactId(targetModulePomDocument)
+        .orElseThrow(() -> newFail("Unable to calculate parent for new module."));
+    String displayName = Xml.firstChildElement(targetModulePomDocument.getDocumentElement(), IMavenConstants.NAME)
+        .map(Element::getTextContent)
+        .orElse("Server Web Services");
 
-    String parentArtifactId = CoreScoutUtils.getParentArtifactId(targetModulePomDocument);
-    if (StringUtils.isBlank(version)) {
-      throw new IOException("Unable to calculate parent for new module.");
-    }
-
-    String displayName = null;
-    Element nameElement = CoreUtils.getFirstChildElement(targetModulePomDocument.getDocumentElement(), IMavenConstants.NAME);
-    if (nameElement != null) {
-      displayName = nameElement.getTextContent();
-    }
-    else {
-      displayName = "Server Web Services";
-    }
-
-    File tempDirectory = Files.createTempDirectory("jaxws-module-tmp").toFile();
-    String createdProjectName = null;
+    Path tempDirectory = Files.createTempDirectory("jaxws-module-tmp");
+    String createdProjectName;
     try {
       MavenBuild archetypeBuild = new MavenBuild()
           .withWorkingDirectory(tempDirectory)
           .withGoal("archetype:generate")
-          .withOption(CLIManager.BATCH_MODE)
+          .withOption(MavenBuild.OPTION_BATCH_MODE)
           .withProperty("archetypeGroupId", "org.eclipse.scout.archetypes")
           .withProperty("archetypeArtifactId", "scout-jaxws-module")
           .withProperty("archetypeVersion", ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION)
@@ -139,16 +119,16 @@ public final class JaxWsModuleNewHelper {
 
       // execute archetype generation
       MavenRunner.execute(archetypeBuild);
-      File[] listFiles = tempDirectory.listFiles();
-      if (listFiles == null || listFiles.length < 1) {
-        throw new IOException("created project dir not found. Project creation failed.");
-      }
-      File createdProjectDir = listFiles[0];
-      deleteGitKeepFiles(createdProjectDir);
-      createdProjectName = createdProjectDir.getName();
+      try (Stream<Path> files = Files.list(tempDirectory)) {
+        Path createdProjectDir = files.findAny().orElseThrow(() -> new IOException("Created project dir not found. Project creation failed."));
+        deleteGitKeepFiles(createdProjectDir);
+        Files.createDirectories(createdProjectDir.resolve(ISourceFolders.GENERATED_WSIMPORT_SOURCE_FOLDER));
+        Files.createDirectories(createdProjectDir.resolve(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER));
+        createdProjectName = createdProjectDir.getFileName().toString();
 
-      // move to final destination
-      CoreUtils.moveDirectory(createdProjectDir, targetDirectory);
+        // move to final destination
+        CoreUtils.moveDirectory(createdProjectDir, targetDirectory);
+      }
     }
     finally {
       CoreUtils.deleteDirectory(tempDirectory);
@@ -157,35 +137,24 @@ public final class JaxWsModuleNewHelper {
     registerNewModuleInParent(targetModulePomFile, targetModulePomDocument, groupId, artifactId, version, parentArtifactId);
     addDependencyToTargetModule(targetModulePomFile, groupId, artifactId);
 
-    return new File(targetDirectory, createdProjectName);
+    return targetDirectory.resolve(createdProjectName);
   }
 
-  static void deleteGitKeepFiles(File createdProjectDir) throws IOException {
+  static void deleteGitKeepFiles(Path createdProjectDir) throws IOException {
     // delete .gitkeep files
-    String gitkeep1Location = "src/main/resources/WEB-INF/wsdl/.gitkeep";
-    File gitkeep = new File(createdProjectDir, gitkeep1Location);
-    if (!gitkeep.isFile()) {
-      throw new IOException(gitkeep1Location + " file not found.");
-    }
-    Files.delete(gitkeep.toPath());
-    String gitkeep2Location = "src/main/java/.gitkeep";
-    gitkeep = new File(createdProjectDir, gitkeep2Location);
-    if (!gitkeep.isFile()) {
-      throw new IOException(gitkeep2Location + " file not found.");
-    }
-    Files.delete(gitkeep.toPath());
+    Files.delete(Ensure.isFile(createdProjectDir.resolve(JaxWsUtils.MODULE_REL_WEBINF_FOLDER_PATH + "/wsdl/.gitkeep")));
+    Files.delete(Ensure.isFile(createdProjectDir.resolve(ISourceFolders.MAIN_JAVA_SOURCE_FOLDER + "/.gitkeep")));
   }
 
-  static void registerNewModuleInParent(File targetModulePomFile, Document targetModulePom, String groupId, String artifactId, String version, String parentArtifactId) throws IOException {
-    File parentPomFile = getParentPomOf(targetModulePomFile, targetModulePom);
-    if (parentPomFile == null || !parentPomFile.isFile()) {
+  static void registerNewModuleInParent(Path targetModulePomFile, Document targetModulePom, String groupId, String artifactId, String version, String parentArtifactId) throws IOException {
+    Path parentPomFile = getParentPomOf(targetModulePomFile, targetModulePom);
+    if (parentPomFile == null || !Files.isReadable(parentPomFile) || !Files.isRegularFile(parentPomFile)) {
       SdkLog.warning("Parent pom for new JAX-WS module could not be found. New module will not be registered.");
       return;
     }
 
     try {
-      DocumentBuilder createDocumentBuilder = CoreUtils.createDocumentBuilder();
-      Document parentPom = createDocumentBuilder.parse(parentPomFile);
+      Document parentPom = Xml.get(parentPomFile);
 
       // add module
       Element modulesElement = JaxWsUtils.getOrCreateElement(parentPom.getDocumentElement(), IMavenConstants.MODULES);
@@ -205,37 +174,38 @@ public final class JaxWsModuleNewHelper {
       newArtifactIdElement.setTextContent(artifactId);
       Element newVersionElement = JaxWsUtils.getOrCreateElement(newDependencyElement, IMavenConstants.VERSION);
 
-      Element properties = CoreUtils.getFirstChildElement(parentPom.getDocumentElement(), IMavenConstants.PROPERTIES);
-      if (properties != null) {
-        String[] suffixes = new String[]{".version", "_version"};
+      Optional<Element> properties = Xml.firstChildElement(parentPom.getDocumentElement(), IMavenConstants.PROPERTIES);
+      if (properties.isPresent()) {
+        String[] suffixes = {".version", "_version"};
         for (String suffix : suffixes) {
-          String versionPropertyName = groupId + '.' + parentArtifactId + suffix;
-          if (CoreUtils.getFirstChildElement(properties, versionPropertyName) != null) {
+          String versionPropertyName = groupId + JavaTypes.C_DOT + parentArtifactId + suffix;
+          if (Xml.firstChildElement(properties.get(), versionPropertyName).isPresent()) {
             newVersionElement.setTextContent("${" + versionPropertyName + '}');
             break;
           }
         }
       }
-      if (StringUtils.isEmpty(newVersionElement.getTextContent())) {
+      if (Strings.isEmpty(newVersionElement.getTextContent())) {
         newVersionElement.setTextContent(version);
       }
 
       writeDocument(parentPom, parentPomFile);
     }
-    catch (TransformerException | ParserConfigurationException | SAXException e) {
+    catch (TransformerException e) {
       throw new IOException(e);
     }
   }
 
-  static void writeDocument(Document document, File file) throws TransformerException {
-    Transformer transformer = CoreUtils.createTransformer(true);
-    transformer.transform(new DOMSource(document), new StreamResult(file));
+  static void writeDocument(Document document, Path file) throws TransformerException, IOException {
+    Transformer transformer = Xml.createTransformer(true);
+    try (OutputStream out = Files.newOutputStream(file, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
+      transformer.transform(new DOMSource(document), new StreamResult(out));
+    }
   }
 
-  static void addDependencyToTargetModule(File targetModulePomFile, String groupId, String artifactId) throws IOException {
+  static void addDependencyToTargetModule(Path targetModulePomFile, String groupId, String artifactId) throws IOException {
     try {
-      DocumentBuilder createDocumentBuilder = CoreUtils.createDocumentBuilder();
-      Document pom = createDocumentBuilder.parse(targetModulePomFile);
+      Document pom = Xml.get(targetModulePomFile);
       Element dependenciesElement = JaxWsUtils.getOrCreateElement(pom.getDocumentElement(), IMavenConstants.DEPENDENCIES);
       Element newDependencyElement = pom.createElement(IMavenConstants.DEPENDENCY);
       dependenciesElement.appendChild(newDependencyElement);
@@ -245,7 +215,7 @@ public final class JaxWsModuleNewHelper {
       newArtifactIdElement.setTextContent(artifactId);
       writeDocument(pom, targetModulePomFile);
     }
-    catch (TransformerException | ParserConfigurationException | SAXException e) {
+    catch (TransformerException e) {
       throw new IOException(e);
     }
   }

@@ -10,12 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.structured;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isDeprecated;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isEnum;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +32,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
@@ -35,12 +41,9 @@ import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
-import org.eclipse.scout.sdk.core.s.model.ScoutTypeComparators;
-import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
+import org.eclipse.scout.sdk.core.s.util.ScoutTypeComparators;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.core.util.TypeFilters;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public class StructuredType implements IStructuredType {
 
@@ -48,15 +51,12 @@ public class StructuredType implements IStructuredType {
   private static final Pattern START_HANDLER_REGEX = Pattern.compile("^start(.*)$");
   private static final Pattern METHOD_INNER_TYPE_GETTER_REGEX = Pattern.compile("^get(.*)$");
 
-  private static final Predicate<IType> CLASS_FILTER = new Predicate<IType>() {
-    @Override
-    public boolean test(IType type) {
-      if (StringUtils.isBlank(type.elementName())) {
-        return false; // anonymous type
-      }
-      int flags = type.flags();
-      return !Flags.isAbstract(flags) && !Flags.isInterface(flags) && !Flags.isDeprecated(flags);
+  private static final Predicate<IType> CLASS_FILTER = type -> {
+    if (Strings.isBlank(type.elementName())) {
+      return false; // anonymous type
     }
+    int flags = type.flags();
+    return !isAbstract(flags) && !isInterface(flags) && !isDeprecated(flags);
   };
 
   private final IType m_type;
@@ -64,27 +64,97 @@ public class StructuredType implements IStructuredType {
   private final EnumSet<Categories> m_visitedCategories;
   private final Map<Categories, List<? extends IJavaElement>> m_elements;
 
-  public StructuredType(IType type, EnumSet<Categories> enabledCategories) {
+  protected StructuredType(IType type, EnumSet<Categories> enabledCategories) {
     m_type = type;
-    m_enabledCategories = enabledCategories;
+    m_enabledCategories = EnumSet.copyOf(enabledCategories);
     m_visitedCategories = EnumSet.noneOf(Categories.class);
-    m_elements = new HashMap<>();
+    m_elements = new EnumMap<>(Categories.class);
 
     // initially put all into unknown categories
-    List<IField> fields = type.fields().list();
-    List<IType> enums = type.innerTypes().withFlags(Flags.AccEnum).list();
-    List<IMethod> methods = type.methods().list();
-    List<IType> types = type.innerTypes().withFilter(new Predicate<IType>() {
-      @Override
-      public boolean test(IType element) {
-        return !Flags.isEnum(element.flags());
-      }
-    }).list();
+    List<IField> fields = type.fields().stream().collect(toList());
+    List<IType> enums = type.innerTypes().withFlags(Flags.AccEnum).stream().collect(toList());
+    List<IMethod> methods = type.methods().stream().collect(toList());
+    List<IType> types = type.innerTypes().stream().filter(element -> !isEnum(element.flags())).collect(toList());
 
     m_elements.put(Categories.FIELD_UNKNOWN, fields);
     m_elements.put(Categories.ENUM, enums);
     m_elements.put(Categories.METHOD_UNCATEGORIZED, methods);
     m_elements.put(Categories.TYPE_UNCATEGORIZED, types);
+  }
+
+  public static IStructuredType of(IType type) {
+    EnumSet<Categories> enabled = EnumSet.of(Categories.FIELD_LOGGER, Categories.FIELD_STATIC, Categories.FIELD_MEMBER, Categories.FIELD_UNKNOWN, Categories.METHOD_CONSTRUCTOR, Categories.METHOD_CONFIG_PROPERTY,
+        Categories.METHOD_CONFIG_EXEC, Categories.METHOD_FORM_DATA_BEAN, Categories.METHOD_OVERRIDDEN, Categories.METHOD_START_HANDLER, Categories.METHOD_INNER_TYPE_GETTER, Categories.METHOD_LOCAL_BEAN, Categories.METHOD_UNCATEGORIZED,
+        Categories.TYPE_FORM_FIELD, Categories.TYPE_COLUMN, Categories.TYPE_CODE, Categories.TYPE_FORM, Categories.TYPE_TABLE, Categories.TYPE_TREE, Categories.TYPE_CALENDAR,
+        Categories.TYPE_CALENDAR_ITEM_PROVIDER, Categories.TYPE_WIZARD, Categories.TYPE_WIZARD_STEP, Categories.TYPE_MENU, Categories.TYPE_VIEW_BUTTON, Categories.TYPE_KEYSTROKE,
+        Categories.TYPE_COMPOSER_ATTRIBUTE, Categories.TYPE_COMPOSER_ENTRY, Categories.TYPE_FORM_HANDLER, Categories.TYPE_UNCATEGORIZED);
+    return new StructuredType(type, enabled);
+  }
+
+  private static CompositeObject createPropertyMethodKey(IMethod method) {
+    if (method != null) {
+      Matcher matcher = PROPERTY_BEAN_REGEX.matcher(method.elementName());
+      if (matcher.find()) {
+        int getSetOrder = 20;
+        if ("get".equalsIgnoreCase(matcher.group(1))) {
+          getSetOrder = 1;
+        }
+        else if ("is".equalsIgnoreCase(matcher.group(1))) {
+          getSetOrder = 2;
+        }
+        else if ("set".equalsIgnoreCase(matcher.group(1))) {
+          getSetOrder = 3;
+        }
+        else if ("add".equalsIgnoreCase(matcher.group(1))) {
+          getSetOrder = 4;
+        }
+        else if ("remove".equalsIgnoreCase(matcher.group(1))) {
+          getSetOrder = 5;
+        }
+        else if ("clear".equalsIgnoreCase(matcher.group(1))) {
+          getSetOrder = 6;
+        }
+        else if ("delete".equalsIgnoreCase(matcher.group(1))) {
+          getSetOrder = 7;
+        }
+        String propName = matcher.group(2);
+        return new CompositeObject(propName, getSetOrder, method.elementName(), method.parameters().stream().count(), method);
+      }
+    }
+    return null;
+  }
+
+  private static IMethod getOverwrittenMethod(IMethod method) {
+    String refSig = method.identifier();
+    return method.declaringType().methods()
+        .withSuperClasses(true).stream()
+        .filter(element -> !method.equals(element) && refSig.equals(element.identifier()))
+        .findAny()
+        .orElse(null);
+  }
+
+  protected static CompositeObject createConstructorKey(Collection<IMethodParameter> list) {
+    if (list == null) {
+      return new CompositeObject(0, "");
+    }
+
+    StringBuilder b = new StringBuilder();
+    for (IMethodParameter p : list) {
+      b.append(p.dataType().name());
+    }
+    return new CompositeObject(list.size(), b.toString());
+  }
+
+  /**
+   * Creates and gets a {@link Predicate} that evaluates to {@code true} for all {@link IType}s that are
+   * {@code instanceof} the given fully qualified name.
+   *
+   * @param type
+   *          The fully qualified type name the candidates must be {@code instanceof}.
+   * @return The created {@link Predicate}
+   */
+  public static Predicate<IType> instanceOf(String type) {
+    return candidate -> candidate.isInstanceOf(type);
   }
 
   public IType getType() {
@@ -101,12 +171,12 @@ public class StructuredType implements IStructuredType {
     return new ArrayList<>(getElementsInternal(category));
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public <T extends IJavaElement> List<T> getElements(Categories category, Class<T> clazz) {
     List<? extends IJavaElement> elements = getElementsInternal(category);
     if (elements == null) {
-      return Collections.emptyList();
+      return emptyList();
     }
 
     List<T> result = new ArrayList<>(elements.size());
@@ -117,43 +187,8 @@ public class StructuredType implements IStructuredType {
   }
 
   @Override
-  public IJavaElement getSiblingMethodConfigGetConfigured(String methodName) {
-    return getSibling(methodName, Categories.METHOD_CONFIG_PROPERTY);
-  }
-
-  @Override
-  public IJavaElement getSiblingMethodConfigExec(String methodName) {
-    return getSibling(methodName, Categories.METHOD_CONFIG_EXEC);
-  }
-
-  @Override
   public IJavaElement getSiblingMethodFieldGetter(String methodName) {
     return getSibling(methodName, Categories.METHOD_INNER_TYPE_GETTER);
-  }
-
-  @Override
-  public IJavaElement getSiblingMethodStartHandler(String methodName) {
-    return getSibling(methodName, Categories.METHOD_START_HANDLER);
-  }
-
-  @Override
-  public IJavaElement getSiblingTypeKeyStroke(String keyStrokeName) {
-    return getSibling(keyStrokeName, Categories.TYPE_KEYSTROKE);
-  }
-
-  @Override
-  public IJavaElement getSiblingComposerAttribute(String attributeName) {
-    return getSibling(attributeName, Categories.TYPE_COMPOSER_ATTRIBUTE);
-  }
-
-  @Override
-  public IJavaElement getSiblingComposerEntity(String entityName) {
-    return getSibling(entityName, Categories.TYPE_COMPOSER_ENTRY);
-  }
-
-  @Override
-  public IJavaElement getSiblingTypeFormHandler(String formHandlerName) {
-    return getSibling(formHandlerName, Categories.TYPE_FORM_HANDLER, Categories.TYPE_UNCATEGORIZED);
   }
 
   protected IJavaElement getSibling(String siblingName, Categories... categories) {
@@ -180,15 +215,15 @@ public class StructuredType implements IStructuredType {
   public IJavaElement getSibling(Categories category) {
     boolean search = false;
     Categories[] methodCategories = Categories.values();
-    for (int i = 0; i < methodCategories.length; i++) {
-      cache(methodCategories[i]);
+    for (Categories methodCategory : methodCategories) {
+      cache(methodCategory);
       if (search) {
-        List<? extends IJavaElement> elements = getElementsInternal(methodCategories[i]);
+        List<? extends IJavaElement> elements = getElementsInternal(methodCategory);
         if (elements != null && !elements.isEmpty()) {
           return elements.get(0);
         }
       }
-      else if (methodCategories[i].equals(category)) {
+      else if (methodCategory == category) {
         search = true;
       }
     }
@@ -336,8 +371,6 @@ public class StructuredType implements IStructuredType {
 
   /**
    * can be overwritten. Overwrites must ensure to super call after processing the working set.
-   *
-   * @param workingSet
    */
   protected void visitFields(List<IJavaElement> workingSet) {
     List<IJavaElement> loggers = new ArrayList<>(2);
@@ -348,8 +381,8 @@ public class StructuredType implements IStructuredType {
       IField f = (IField) it.next();
       // static
       if ((f.flags() & Flags.AccStatic) != 0) {
-        String fieldDataType = Signature.toString(f.dataType().signature());
-        if (Signature.getSimpleName(IScoutRuntimeTypes.Logger).equals(fieldDataType) || IScoutRuntimeTypes.Logger.equals(fieldDataType)) {
+        String fieldDataType = f.dataType().reference();
+        if (IScoutRuntimeTypes.Logger.equals(fieldDataType)) {
           loggers.add(f);
           it.remove();
         }
@@ -374,7 +407,7 @@ public class StructuredType implements IStructuredType {
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
       if (method.isConstructor()) {
-        CompositeObject key = createConstructorKey(method.parameters().list());
+        CompositeObject key = createConstructorKey(method.parameters().stream().collect(toList()));
         constructors.put(key, method);
         it.remove();
       }
@@ -389,7 +422,7 @@ public class StructuredType implements IStructuredType {
       IMethod visitedMethod = method;
       while (visitedMethod != null) {
         if (visitedMethod.annotations().withName(IScoutRuntimeTypes.ConfigOperation).existsAny()) {
-          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().list().size(), method);
+          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
           execMethods.put(key, method);
           it.remove();
           break;
@@ -407,7 +440,7 @@ public class StructuredType implements IStructuredType {
       IMethod visitedMethod = method;
       while (visitedMethod != null) {
         if (visitedMethod.annotations().withName(IScoutRuntimeTypes.ConfigProperty).existsAny()) {
-          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().list().size(), method);
+          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
           methods.put(key, method);
           it.remove();
           break;
@@ -441,7 +474,7 @@ public class StructuredType implements IStructuredType {
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
       if (getOverwrittenMethod(method) != null) {
-        CompositeObject key = new CompositeObject(method.elementName(), method.parameters().list().size(), method);
+        CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
         overriddenMethods.put(key, method);
         it.remove();
       }
@@ -457,7 +490,7 @@ public class StructuredType implements IStructuredType {
       if (matcher.find()) {
         String fieldName = matcher.group(1);
         if (getType().innerTypes().withRecursiveInnerTypes(true).withSimpleName(fieldName + ISdkProperties.SUFFIX_FORM_HANDLER).existsAny()) {
-          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().list().size(), method);
+          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
           startHandlerMethods.put(key, method);
           it.remove();
         }
@@ -474,7 +507,7 @@ public class StructuredType implements IStructuredType {
       if (matcher.find()) {
         String fieldName = matcher.group(1);
         if (getType().innerTypes().withRecursiveInnerTypes(true).withSimpleName(fieldName).existsAny()) {
-          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().list().size(), method);
+          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
           fieldGetterMethods.put(key, method);
           it.remove();
         }
@@ -501,7 +534,7 @@ public class StructuredType implements IStructuredType {
     Map<CompositeObject, IJavaElement> methods = new TreeMap<>();
     for (Iterator<IMethod> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = it.next();
-      CompositeObject key = new CompositeObject(method.elementName(), method.parameters().list().size(), method);
+      CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
       methods.put(key, method);
       it.remove();
     }
@@ -510,8 +543,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeFormFields(Iterable<IJavaElement> workingSet) {
-    Set<IType> formFields = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IFormField));
+    Set<IType> formFields = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IFormField));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -523,8 +556,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeColumns(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IColumn));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IColumn));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -536,8 +569,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeCodes(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.ICode));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ICode));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -549,8 +582,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeForms(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IForm));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IForm));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -562,8 +595,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeTables(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.ITable));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ITable));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -575,8 +608,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeTrees(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.ITree));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ITree));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -588,8 +621,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeCalendar(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.ICalendar));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ICalendar));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -601,8 +634,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeCalendarItemProvider(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.ICalendarItemProvider));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ICalendarItemProvider));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -614,8 +647,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeWizards(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IWizard));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IWizard));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -627,8 +660,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeWizardSteps(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IWizardStep));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IWizardStep));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -640,8 +673,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeMenus(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IMenu));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IMenu));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -653,8 +686,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeViewbuttons(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IViewButton));
+    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IViewButton));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -666,8 +699,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeKeystrokes(Iterable<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getTypeNameComparator());
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IKeyStroke));
+    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.BY_NAME);
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IKeyStroke));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -679,8 +712,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeComposerAttribute(Iterable<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getTypeNameComparator());
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IDataModelAttribute));
+    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.BY_NAME);
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IDataModelAttribute));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -692,8 +725,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeDataModelEntry(Iterable<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getTypeNameComparator());
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IDataModelEntity));
+    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.BY_NAME);
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IDataModelEntity));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -705,8 +738,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeFormHandlers(Iterable<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getTypeNameComparator());
-    Predicate<IType> filter = CLASS_FILTER.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IFormHandler));
+    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.BY_NAME);
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IFormHandler));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
@@ -715,65 +748,6 @@ public class StructuredType implements IStructuredType {
       }
     }
     m_elements.put(Categories.TYPE_FORM_HANDLER, new ArrayList<>(types));
-  }
-
-  private static CompositeObject createPropertyMethodKey(IMethod method) {
-    if (method != null) {
-      Matcher matcher = PROPERTY_BEAN_REGEX.matcher(method.elementName());
-      if (matcher.find()) {
-        int getSetOrder = 20;
-        if ("get".equalsIgnoreCase(matcher.group(1))) {
-          getSetOrder = 1;
-        }
-        else if ("is".equalsIgnoreCase(matcher.group(1))) {
-          getSetOrder = 2;
-        }
-        else if ("set".equalsIgnoreCase(matcher.group(1))) {
-          getSetOrder = 3;
-        }
-        else if ("add".equalsIgnoreCase(matcher.group(1))) {
-          getSetOrder = 4;
-        }
-        else if ("remove".equalsIgnoreCase(matcher.group(1))) {
-          getSetOrder = 5;
-        }
-        else if ("clear".equalsIgnoreCase(matcher.group(1))) {
-          getSetOrder = 6;
-        }
-        else if ("delete".equalsIgnoreCase(matcher.group(1))) {
-          getSetOrder = 7;
-        }
-        String propName = matcher.group(2);
-        CompositeObject key = new CompositeObject(propName, getSetOrder, method.elementName(), method.parameters().list().size(), method);
-        return key;
-      }
-    }
-    return null;
-  }
-
-  private static IMethod getOverwrittenMethod(final IMethod method) {
-    final String refSig = SignatureUtils.createMethodIdentifier(method);
-    return method.declaringType().methods().withSuperClasses(true).withFilter(new Predicate<IMethod>() {
-      @Override
-      public boolean test(IMethod element) {
-        if (method.equals(element)) {
-          return false;
-        }
-        return refSig.equals(SignatureUtils.createMethodIdentifier(element));
-      }
-    }).first();
-  }
-
-  protected CompositeObject createConstructorKey(Collection<IMethodParameter> list) {
-    if (list == null) {
-      return new CompositeObject(0, "");
-    }
-
-    StringBuilder b = new StringBuilder();
-    for (IMethodParameter p : list) {
-      b.append(p.dataType().name());
-    }
-    return new CompositeObject(list.size(), b.toString());
   }
 
   public void print(PrintStream printer) {
@@ -785,7 +759,7 @@ public class StructuredType implements IStructuredType {
   }
 
   private void printCategory(PrintStream printer, Categories category) {
-    printer.println("category '" + category.name() + "'");
+    printer.println("category '" + category.name() + '\'');
     for (IJavaElement e : getElements(category)) {
       printer.println("  - " + e.elementName());
     }

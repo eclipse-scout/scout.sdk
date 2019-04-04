@@ -28,8 +28,6 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -37,7 +35,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link EclipseWorkspaceWalker}</h3>
@@ -53,21 +54,21 @@ public class EclipseWorkspaceWalker {
   private boolean m_skipHiddenPaths;
   private BiPredicate<Path, BasicFileAttributes> m_fileFilter;
 
-  public EclipseWorkspaceWalker(final String taskName) {
-    m_taskName = Validate.notNull(taskName);
+  public EclipseWorkspaceWalker(String taskName) {
+    m_taskName = Ensure.notNull(taskName);
     m_fileExtensions = new ArrayList<>();
     m_skipOutputLocation = true;
     m_skipHiddenPaths = true;
   }
 
-  public void walk(final Consumer<WorkspaceFile> visitor, final IProgressMonitor monitor) throws CoreException {
-    final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+  public void walk(Consumer<WorkspaceFile> visitor, IProgressMonitor monitor) throws CoreException {
+    IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
     monitor.beginTask(taskName(), projects.length);
-    for (final IProject root : projects) {
-      final Path outputLocation;
+    for (IProject root : projects) {
+      Path outputLocation;
       if (isSkipOutputLocation()) {
-        final IJavaProject jp = JavaCore.create(root);
-        if (S2eUtils.exists(jp)) {
+        IJavaProject jp = JavaCore.create(root);
+        if (JdtUtils.exists(jp)) {
           outputLocation = new File(root.getLocation().toOSString(), jp.getOutputLocation().removeFirstSegments(1).toOSString()).toPath();
         }
         else {
@@ -87,12 +88,12 @@ public class EclipseWorkspaceWalker {
     }
   }
 
-  protected void searchInFolder(final Consumer<WorkspaceFile> visitor, final Path folder, final Charset charset, final Path outputFolder, final IProgressMonitor monitor) {
+  protected void searchInFolder(Consumer<WorkspaceFile> visitor, Path folder, Charset charset, Path outputFolder, IProgressMonitor monitor) {
     try {
       Files.walkFileTree(folder,
           new SimpleFileVisitor<Path>() {
             @Override
-            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
               if (monitor.isCanceled()) {
                 return FileVisitResult.TERMINATE;
               }
@@ -106,7 +107,7 @@ public class EclipseWorkspaceWalker {
             }
 
             @Override
-            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
               if (monitor.isCanceled()) {
                 return FileVisitResult.TERMINATE;
               }
@@ -117,39 +118,38 @@ public class EclipseWorkspaceWalker {
             }
           });
     }
-    catch (final IOException e) {
+    catch (IOException e) {
       throw new SdkException(e);
     }
   }
 
-  protected boolean hiddenFilterAndCustomFilterAccepted(final Path file, final BasicFileAttributes attrs) {
+  protected boolean hiddenFilterAndCustomFilterAccepted(Path file, BasicFileAttributes attrs) {
     if (isSkipHiddenPaths() && isHidden(file)) {
       return false;
     }
 
     return fileFilter()
         .map(filter -> filter.test(file, attrs))
-        .orElse(Boolean.TRUE)
-        .booleanValue();
+        .orElse(Boolean.TRUE);
   }
 
-  protected boolean allFiltersAccepted(final Path file, final BasicFileAttributes attrs) {
+  protected boolean allFiltersAccepted(Path file, BasicFileAttributes attrs) {
     if (!acceptFileExtension(file)) {
       return false;
     }
     return hiddenFilterAndCustomFilterAccepted(file, attrs);
   }
 
-  protected boolean acceptFileExtension(final Path file) {
+  protected boolean acceptFileExtension(Path file) {
     if (extensionsAccepted().isEmpty()) {
       return true; // no filter
     }
-    final Path path = file.getFileName();
+    Path path = file.getFileName();
     if (path == null) {
       return false;
     }
-    final String fileName = path.toString().toLowerCase();
-    for (final String extension : extensionsAccepted()) {
+    String fileName = path.toString().toLowerCase();
+    for (String extension : extensionsAccepted()) {
       if (fileName.endsWith(extension)) {
         return true;
       }
@@ -157,8 +157,8 @@ public class EclipseWorkspaceWalker {
     return false;
   }
 
-  protected static boolean isHidden(final Path path) {
-    final Path fileName = path.getFileName();
+  protected static boolean isHidden(Path path) {
+    Path fileName = path.getFileName();
     return fileName != null && fileName.toString().startsWith(".");
   }
 
@@ -170,7 +170,7 @@ public class EclipseWorkspaceWalker {
     return m_skipOutputLocation;
   }
 
-  public EclipseWorkspaceWalker withSkipOutputLocation(final boolean skipOutputLocation) {
+  public EclipseWorkspaceWalker withSkipOutputLocation(boolean skipOutputLocation) {
     m_skipOutputLocation = skipOutputLocation;
     return this;
   }
@@ -179,7 +179,7 @@ public class EclipseWorkspaceWalker {
     return m_skipHiddenPaths;
   }
 
-  public EclipseWorkspaceWalker withSkipHiddenPaths(final boolean skipHiddenPaths) {
+  public EclipseWorkspaceWalker withSkipHiddenPaths(boolean skipHiddenPaths) {
     m_skipHiddenPaths = skipHiddenPaths;
     return this;
   }
@@ -188,7 +188,7 @@ public class EclipseWorkspaceWalker {
     return Optional.ofNullable(m_fileFilter);
   }
 
-  public EclipseWorkspaceWalker withFilter(final BiPredicate<Path, BasicFileAttributes> fileFilter) {
+  public EclipseWorkspaceWalker withFilter(BiPredicate<Path, BasicFileAttributes> fileFilter) {
     m_fileFilter = fileFilter;
     return this;
   }
@@ -197,16 +197,16 @@ public class EclipseWorkspaceWalker {
     return unmodifiableCollection(m_fileExtensions);
   }
 
-  public EclipseWorkspaceWalker withExtensionsAccepted(final String... extensions) {
-    final Collection<String> l = extensions == null ? null : Arrays.asList(extensions);
+  public EclipseWorkspaceWalker withExtensionsAccepted(String... extensions) {
+    Collection<String> l = extensions == null ? null : Arrays.asList(extensions);
     return withExtensionsAccepted(l);
   }
 
-  public EclipseWorkspaceWalker withExtensionsAccepted(final Collection<String> extensions) {
+  public EclipseWorkspaceWalker withExtensionsAccepted(Collection<String> extensions) {
     m_fileExtensions.clear();
     if (extensions != null && !extensions.isEmpty()) {
-      for (final String e : extensions) {
-        if (StringUtils.isNotBlank(e)) {
+      for (String e : extensions) {
+        if (Strings.hasText(e)) {
           m_fileExtensions.add(e);
         }
       }
@@ -217,12 +217,13 @@ public class EclipseWorkspaceWalker {
   public static class WorkspaceFile {
     private final Path m_file;
     private final Charset m_charset;
+    private final FinalValue<IFile> m_workspaceFile; // loaded on request
     private char[] m_content; // loaded on request
-    private Optional<IFile> m_workspaceFile; // loaded on request
 
-    protected WorkspaceFile(final Path file, final Charset charset) {
-      m_file = Validate.notNull(file);
-      m_charset = Validate.notNull(charset);
+    protected WorkspaceFile(Path file, Charset charset) {
+      m_file = Ensure.notNull(file);
+      m_charset = Ensure.notNull(charset);
+      m_workspaceFile = new FinalValue<>();
     }
 
     public Charset charset() {
@@ -234,18 +235,15 @@ public class EclipseWorkspaceWalker {
     }
 
     public Optional<IFile> inWorkspace() {
-      if (m_workspaceFile == null) {
-        m_workspaceFile = Optional.ofNullable(resolveInWorkspace(path()));
-      }
-      return m_workspaceFile;
+      return Optional.ofNullable(m_workspaceFile.computeIfAbsentAndGet(() -> resolveInWorkspace(path())));
     }
 
-    protected static IFile resolveInWorkspace(final Path file) {
-      final IFile[] workspaceFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toUri());
+    protected static IFile resolveInWorkspace(Path file) {
+      IFile[] workspaceFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toUri());
       if (workspaceFiles.length < 1) {
         return null;
       }
-      final IFile workspaceFile = workspaceFiles[0];
+      IFile workspaceFile = workspaceFiles[0];
       if (!workspaceFile.exists()) {
         return null;
       }
@@ -257,7 +255,7 @@ public class EclipseWorkspaceWalker {
         try {
           m_content = charset().decode(ByteBuffer.wrap(Files.readAllBytes(path()))).array();
         }
-        catch (final IOException e) {
+        catch (IOException e) {
           throw new SdkException("Unable to read content of file '" + path() + "'.", e);
         }
       }
@@ -275,7 +273,7 @@ public class EclipseWorkspaceWalker {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
       if (this == obj) {
         return true;
       }
@@ -283,7 +281,7 @@ public class EclipseWorkspaceWalker {
         return false;
       }
 
-      final WorkspaceFile other = (WorkspaceFile) obj;
+      WorkspaceFile other = (WorkspaceFile) obj;
       return m_file.equals(other.m_file);
     }
   }

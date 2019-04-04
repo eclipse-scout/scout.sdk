@@ -1,0 +1,12 @@
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.text.TEXTS;
+
+@ClassId("whatever")
+public abstract class MyNodePage1 extends AbstractPageWithNodes {
+@Override
+protected String getConfiguredTitle() {
+// TODO [anonymous] verify translation
+return TEXTS.get("MyNodePage1");
+}
+}

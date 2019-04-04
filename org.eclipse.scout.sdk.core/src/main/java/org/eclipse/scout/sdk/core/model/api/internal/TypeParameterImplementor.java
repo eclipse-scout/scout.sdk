@@ -10,24 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import java.util.List;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformTypeParameter;
 
+import java.util.stream.Stream;
+
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
+import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
-import org.eclipse.scout.sdk.core.signature.Signature;
 
 /**
  * <h3>{@link TypeParameterImplementor}</h3>
  *
- * @author Ivan Motsch
  * @since 4.1.0 2014-11-09
  */
 public class TypeParameterImplementor extends AbstractJavaElementImplementor<TypeParameterSpi> implements ITypeParameter {
-
-  private String m_signature;
 
   public TypeParameterImplementor(TypeParameterSpi spi) {
     super(spi);
@@ -39,35 +40,22 @@ public class TypeParameterImplementor extends AbstractJavaElementImplementor<Typ
   }
 
   @Override
-  public List<IType> bounds() {
-    return new WrappedList<>(m_spi.getBounds());
+  public Stream<IType> bounds() {
+    return WrappingSpliterator.stream(m_spi.getBounds());
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    JavaModelPrinter.print(this, sb);
-    return sb.toString();
+  public Stream<? extends IJavaElement> children() {
+    return Stream.empty();
   }
 
   @Override
-  public void internalSetSpi(JavaElementSpi spi) {
-    super.internalSetSpi(spi);
-    m_signature = null;
+  public ITypeParameterGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
+    return transformTypeParameter(this, transformer);
   }
 
-  //additional convenience methods
-
   @Override
-  public String signature() {
-    if (m_signature == null) {
-      List<IType> bounds = bounds();
-      String[] boundSignatures = new String[bounds.size()];
-      for (int i = 0; i < boundSignatures.length; i++) {
-        boundSignatures[i] = bounds.get(i).signature();
-      }
-      m_signature = Signature.createTypeParameterSignature(elementName(), boundSignatures);
-    }
-    return m_signature;
+  public ITypeParameterGenerator<?> toWorkingCopy() {
+    return toWorkingCopy(null);
   }
 }

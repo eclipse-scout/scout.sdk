@@ -10,37 +10,58 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import java.util.List;
-import java.util.regex.Pattern;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
+import org.eclipse.scout.sdk.core.model.api.query.AnnotationQuery;
+import org.eclipse.scout.sdk.core.model.api.query.FieldQuery;
+import org.eclipse.scout.sdk.core.model.api.query.HierarchyInnerTypeQuery;
+import org.eclipse.scout.sdk.core.model.api.query.MethodQuery;
+import org.eclipse.scout.sdk.core.model.api.query.SuperTypeQuery;
+import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
+import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
-import org.eclipse.scout.sdk.core.model.sugar.AnnotationQuery;
-import org.eclipse.scout.sdk.core.model.sugar.FieldQuery;
-import org.eclipse.scout.sdk.core.model.sugar.MethodQuery;
-import org.eclipse.scout.sdk.core.model.sugar.SuperTypeQuery;
-import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
-import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
-import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implements IType {
-  private String m_signature;
+  private static final Pattern PRIMITIVE_TYPE_ASSIGNABLE_PAT =
+      Pattern.compile("(?:"
+          + "char=(?:char|Character)|byte=(?:byte|Byte)|short=(?:short|Short)|int=(?:int|Integer)|long=(?:long|Long)"
+          + "|float=(?:float|Float)|double=(?:double|Double)|Character=(?:char|Character)|Byte=(?:byte|Byte)"
+          + "|Short=(?:short|Short)|Integer=(?:int|Integer)|Long=(?:long|Long)|Float=(?:float|Float)|Double=(?:double|Double)"
+          + ')');
+  private String m_reference;
+  private String m_referenceErasureOnly;
 
   public TypeImplementor(TypeSpi spi) {
     super(spi);
   }
 
   @Override
+  public Optional<IType> declaringType() {
+    return Optional.ofNullable(m_spi.getDeclaringType())
+        .map(TypeSpi::wrap);
+  }
+
+  @Override
   public boolean isArray() {
-    return m_spi.isArray();
+    return m_spi.getArrayDimension() > 0;
   }
 
   @Override
@@ -49,8 +70,18 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   @Override
-  public IType leafComponentType() {
-    return JavaEnvironmentImplementor.wrapType(m_spi.getLeafComponentType());
+  public Optional<IType> leafComponentType() {
+    return Optional.ofNullable(m_spi.getLeafComponentType())
+        .map(TypeSpi::wrap);
+  }
+
+  @Override
+  public Stream<? extends IJavaElement> children() {
+    Comparator<IJavaElement> c = Comparator.comparing(e -> e.source().map(ISourceRange::start).orElse(0));
+    Stream<? extends IJavaElement> fieldsAndMethos = Stream.concat(fields().stream(), methods().stream());
+    Stream<? extends IJavaElement> innerTypesAndTypeParams = Stream.concat(innerTypes().stream(), typeParameters());
+    return Stream.concat(Stream.concat(innerTypesAndTypeParams, fieldsAndMethos), annotations().stream())
+        .sorted(c);
   }
 
   @Override
@@ -74,28 +105,37 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   @Override
-  public IType superClass() {
-    return JavaEnvironmentImplementor.wrapType(m_spi.getSuperClass());
+  public Optional<IType> superClass() {
+    return Optional.ofNullable(m_spi.getSuperClass())
+        .map(TypeSpi::wrap);
   }
 
   @Override
-  public List<IType> superInterfaces() {
-    return new WrappedList<>(m_spi.getSuperInterfaces());
+  public IType requireSuperClass() {
+    return superClass()
+        .orElseThrow(() -> newFail("Type '{}' has no super class.", name()));
   }
 
   @Override
-  public List<IType> typeArguments() {
-    return new WrappedList<>(m_spi.getTypeArguments());
+  public Stream<IType> superInterfaces() {
+    return WrappingSpliterator.stream(m_spi.getSuperInterfaces());
   }
 
   @Override
-  public IType originalType() {
-    return m_spi.getOriginalType().wrap();
+  public Stream<IType> typeArguments() {
+    return WrappingSpliterator.stream(m_spi.getTypeArguments());
   }
 
   @Override
-  public ICompilationUnit compilationUnit() {
-    return m_spi.getCompilationUnit().wrap();
+  public Optional<ICompilationUnit> compilationUnit() {
+    return Optional.ofNullable(m_spi.getCompilationUnit())
+        .map(CompilationUnitSpi::wrap);
+  }
+
+  @Override
+  public ICompilationUnit requireCompilationUnit() {
+    return compilationUnit()
+        .orElseThrow(() -> newFail("Type '{}' does not have a compilation unit.", name()));
   }
 
   @Override
@@ -104,28 +144,30 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   @Override
-  public ISourceRange sourceOfStaticInitializer() {
-    return m_spi.getSourceOfStaticInitializer();
+  public Optional<ISourceRange> sourceOfStaticInitializer() {
+    return Optional.ofNullable(m_spi.getSourceOfStaticInitializer());
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    JavaModelPrinter.print(this, sb);
-    return sb.toString();
+  public String qualifier() {
+    return declaringType()
+        .map(IType::name)
+        .orElseGet(() -> compilationUnit()
+            .map(ICompilationUnit::containingPackage)
+            .map(IPackage::elementName)
+            .orElse(""));
   }
 
   @Override
-  public void internalSetSpi(JavaElementSpi spi) {
+  public void internalSetSpi(TypeSpi spi) {
     super.internalSetSpi(spi);
-    m_signature = null;
+    m_reference = null;
+    m_referenceErasureOnly = null;
   }
-
-  //additional convenience methods
 
   @Override
   public boolean isVoid() {
-    return name().equals(IJavaRuntimeTypes._void);
+    return JavaTypes._void.equals(name());
   }
 
   @Override
@@ -134,31 +176,48 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   @Override
-  public String signature() {
-    if (m_signature == null) {
-      StringBuilder builder = new StringBuilder();
-      buildSignatureRec(this, builder);
-      int len = builder.length();
-      char[] expr = new char[len];
-      builder.getChars(0, len, expr, 0);
-      m_signature = Signature.createTypeSignature(expr, true);
-    }
-    return m_signature;
+  public String reference() {
+    return reference(false);
   }
 
-  protected static void buildSignatureRec(IType type, StringBuilder builder) {
+  @Override
+  public String reference(boolean erasureOnly) {
+    return erasureOnly ? referenceErasureOnly() : referenceWithTypeArgs();
+  }
+
+  protected String referenceWithTypeArgs() {
+    if (m_reference == null) {
+      m_reference = buildReference(this, false);
+    }
+    return m_reference;
+  }
+
+  protected String referenceErasureOnly() {
+    if (m_referenceErasureOnly == null) {
+      m_referenceErasureOnly = buildReference(this, true);
+    }
+    return m_referenceErasureOnly;
+  }
+
+  protected static String buildReference(IType type, boolean erasureOnly) {
+    StringBuilder builder = new StringBuilder(128);
+    buildReferenceRec(type, erasureOnly, builder);
+    return builder.toString();
+  }
+
+  protected static void buildReferenceRec(IType type, boolean erasureOnly, StringBuilder builder) {
     if (type.isArray()) {
-      buildSignatureRec(type.leafComponentType(), builder);
+      buildReferenceRec(type.leafComponentType().get(), erasureOnly, builder);
       for (int i = 0; i < type.arrayDimension(); i++) {
-        builder.append(ISignatureConstants.C_ARRAY);
-        builder.append(Signature.C_ARRAY_END);
+        builder.append("[]");
       }
       return;
     }
+
     String name = type.name();
     boolean isWildCardOnly = name == null; // name may be null for wildcard only types (<?>)
     if (type.isWildcardType()) {
-      builder.append('?');
+      builder.append(JavaTypes.C_QUESTION_MARK);
       if (isWildCardOnly) {
         return; // no further processing needed.
       }
@@ -168,16 +227,20 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
       builder.append(name);
     }
 
-    // generics
-    List<IType> typeArgs = type.typeArguments();
-    if (typeArgs.size() > 0) {
-      builder.append(ISignatureConstants.C_GENERIC_START);
-      buildSignatureRec(typeArgs.get(0), builder);
+    if (erasureOnly) {
+      return;
+    }
+
+    // type arguments
+    List<IType> typeArgs = type.typeArguments().collect(toList());
+    if (!typeArgs.isEmpty()) {
+      builder.append(JavaTypes.C_GENERIC_START);
+      buildReferenceRec(typeArgs.get(0), false, builder);
       for (int i = 1; i < typeArgs.size(); i++) {
-        builder.append(Signature.C_COMMA);
-        buildSignatureRec(typeArgs.get(i), builder);
+        builder.append(JavaTypes.C_COMMA);
+        buildReferenceRec(typeArgs.get(i), false, builder);
       }
-      builder.append(ISignatureConstants.C_GENERIC_END);
+      builder.append(JavaTypes.C_GENERIC_END);
     }
   }
 
@@ -192,8 +255,8 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   @Override
-  public TypeQuery innerTypes() {
-    return new TypeQuery(new WrappedList<IType>(m_spi.getTypes()));
+  public HierarchyInnerTypeQuery innerTypes() {
+    return new HierarchyInnerTypeQuery(this);
   }
 
   @Override
@@ -207,26 +270,36 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   @Override
+  public Optional<Stream<IType>> resolveTypeParamValue(int typeParamIndex, String levelFqn) {
+    return superTypes()
+        .withName(levelFqn)
+        .first()
+        .flatMap(levelType -> levelType.resolveTypeParamValue(typeParamIndex));
+  }
+
+  @Override
+  public Optional<Stream<IType>> resolveTypeParamValue(int typeParamIndex) {
+    return typeArguments().skip(typeParamIndex).findAny()
+        .map(t -> t.isParameterType() ? Stream.concat(
+            t.superClass().map(Stream::of).orElseGet(Stream::empty),
+            t.superInterfaces())
+            : Stream.of(t));
+  }
+
+  @Override
   public boolean isInstanceOf(String queryType) {
     return superTypes().withName(queryType).existsAny();
   }
 
-  private static final Pattern PRIMITIVE_TYPE_ASSIGNABLE_PAT =
-      Pattern.compile("("
-          + "char=(char|Character)|byte=(byte|Byte)|short=(short|Short)|int=(int|Integer)|long=(long|Long)"
-          + "|float=(float|Float)|double=(double|Double)|Character=(char|Character)|Byte=(byte|Byte)"
-          + "|Short=(short|Short)|Integer=(int|Integer)|Long=(long|Long)|Float=(float|Float)|Double=(double|Double)"
-          + ")");
-
   @Override
   public boolean isAssignableFrom(IType specificClass) {
-    if ((this.isPrimitive() || specificClass.isPrimitive())) {
-      return PRIMITIVE_TYPE_ASSIGNABLE_PAT.matcher(this.elementName() + '=' + specificClass.elementName()).matches();
+    if (isPrimitive() || specificClass.isPrimitive()) {
+      return PRIMITIVE_TYPE_ASSIGNABLE_PAT.matcher(elementName() + '=' + specificClass.elementName()).matches();
     }
-    if ((this.isArray() || specificClass.isArray())) {
-      return this.name().equals(specificClass.name());
+    if (isArray() || specificClass.isArray()) {
+      return name().equals(specificClass.name());
     }
-    return specificClass.superTypes().withName(this.name()).existsAny();
+    return specificClass.superTypes().withName(name()).existsAny();
   }
 
   @Override
@@ -234,24 +307,44 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     if (!isPrimitive()) {
       return this;
     }
-    String boxedFqn = CoreUtils.boxPrimitive(name());
+    String boxedFqn = JavaTypes.boxPrimitive(name());
     if (boxedFqn == null) {
       return this;
     }
-    return javaEnvironment().findType(boxedFqn);
+    return javaEnvironment().requireType(boxedFqn);
   }
 
   @Override
-  public IType unboxPrimitiveType() {
-    String s = name();
-    if (s.length() > 19) {
-      return null;
+  public IType unboxToPrimitive() {
+    if (isPrimitive()) {
+      return this;
     }
-    String unboxed = CoreUtils.unboxToPrimitive(s);
-    if (unboxed == null) {
-      return null;
+    String myName = name();
+    String unboxed = JavaTypes.unboxToPrimitive(myName);
+    if (unboxed == myName) {
+      return this; // there is no primitive type for this type
     }
-    return javaEnvironment().findType(unboxed);
+    return javaEnvironment().requireType(unboxed);
   }
 
+  @Override
+  public IType primary() {
+    IType result = null;
+    Optional<IType> tmp = Optional.of(this);
+    while (tmp.isPresent()) {
+      result = tmp.get();
+      tmp = result.declaringType();
+    }
+    return result;
+  }
+
+  @Override
+  public ITypeGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
+    return transformType(this, transformer);
+  }
+
+  @Override
+  public ITypeGenerator<?> toWorkingCopy() {
+    return toWorkingCopy(null);
+  }
 }

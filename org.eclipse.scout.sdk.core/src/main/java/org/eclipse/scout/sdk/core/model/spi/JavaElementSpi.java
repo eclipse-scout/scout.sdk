@@ -10,13 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi;
 
+import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
+import org.eclipse.scout.sdk.core.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
  * <h3>{@link JavaElementSpi}</h3>Represents a Java element.
  *
- * @author Ivan Motsch
  * @since 5.1.0
  */
 public interface JavaElementSpi {
@@ -34,4 +36,18 @@ public interface JavaElementSpi {
 
   IJavaElement wrap();
 
+  /**
+   * Pre-order visitor call. Must not delegate to any children.
+   */
+  TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index);
+
+  /**
+   * Post-order visitor call. Must not delegate to any children.
+   */
+  boolean acceptPostOrder(IDepthFirstJavaElementVisitor visitor, int level, int index);
+
+  /**
+   * Level-order visitor call. Must not delegate to any children.
+   */
+  TreeVisitResult acceptLevelOrder(IBreadthFirstJavaElementVisitor visitor, int level, int index);
 }

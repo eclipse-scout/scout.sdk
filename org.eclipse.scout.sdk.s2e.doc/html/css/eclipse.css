@@ -8,9 +8,9 @@ div#footer-text {
 pre.highlight{
   background:#EEE;
   padding-top: 1em;
-  padding-right: 0px;
+  padding-right: 0;
   padding-bottom: 1em;
-  padding-left: 0px;
+  padding-left: 0;
 }
 .conum[data-value] {
   background-color:rgba(0,0,0,.8);
@@ -19,7 +19,7 @@ pre.highlight{
   display:inline-block;
   font-size:.75em;
   font-style:normal;
-  font-weight:bold
+  font-weight:bold;
   height:1.67em;
   line-height:1.67em;
   text-align:center;

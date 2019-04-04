@@ -10,15 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
-import java.util.List;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.model.api.query.InnerTypeQuery;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
-import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
 
 /**
  * <h3>{@link ICompilationUnit}</h3> Represents a compilation unit usually defined by a .java file.
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface ICompilationUnit extends IJavaElement {
@@ -27,7 +30,7 @@ public interface ICompilationUnit extends IJavaElement {
    * Synthetic {@link ICompilationUnit}s are based on binary {@link IType}s. Such {@link ICompilationUnit}s have a
    * singleton type list, no imports and no source attached.
    *
-   * @return <code>true</code> if this {@link ICompilationUnit} is synthetic based on a binary type.
+   * @return {@code true} if this {@link ICompilationUnit} is synthetic based on a binary type.
    */
   boolean isSynthetic();
 
@@ -41,46 +44,81 @@ public interface ICompilationUnit extends IJavaElement {
   /**
    * Gets all import declarations in this {@link ICompilationUnit}.
    *
-   * @return A {@link List} containing all imports in the order as they appear in the source. Never returns
-   *         <code>null</code>.
+   * @return A {@link Stream} containing all imports in the order as they appear in the source.
    */
-  List<IImport> imports();
+  Stream<IImport> imports();
 
   /**
-   * Gets a {@link TypeQuery} to retrieve all {@link IType}s in this {@link ICompilationUnit}.
+   * Gets a {@link InnerTypeQuery} which by default returns all direct {@link IType}s in this {@link ICompilationUnit}.
    *
-   * @return A new {@link TypeQuery} for the nested {@link IType}s of this {@link ICompilationUnit}.
+   * @return A new {@link InnerTypeQuery} for the nested {@link IType}s of this {@link ICompilationUnit}.
    */
-  TypeQuery types();
+  InnerTypeQuery types();
 
   /**
    * Gets the main {@link IType} of this {@link ICompilationUnit}. This is the {@link IType} whose name matches the name
    * of the java file.
    *
-   * @return The main {@link IType} or <code>null</code> if no main type is defined in this {@link ICompilationUnit}.
+   * @return The main {@link IType} or an empty {@link Optional} if no main type is defined in this
+   *         {@link ICompilationUnit}.
+   * @see #requireMainType()
    */
-  IType mainType();
+  Optional<IType> mainType();
+
+  /**
+   * Same as {@link #mainType()} but throws an {@link IllegalArgumentException} if this {@link ICompilationUnit} has no
+   * main {@link IType}.
+   *
+   * @return The main {@link IType} of this {@link ICompilationUnit}. This is the type that matches the compilation unit
+   *         name.
+   * @throws IllegalArgumentException
+   *           if this {@link ICompilationUnit} has no main type.
+   * @see #mainType()
+   */
+  IType requireMainType();
 
   /**
    * Resolves the given simple type name in the context of this {@link ICompilationUnit} to an {@link IType}.
    *
    * @param simpleName
    *          The simple class name to search in the context of this {@link ICompilationUnit}.
-   * @return The {@link IType} with given simpleName as it is referenced by this {@link ICompilationUnit} or
-   *         <code>null</code> if no such simpleName is referenced by this {@link ICompilationUnit}.
+   * @return The {@link IType} with given simpleName as it is referenced by this {@link ICompilationUnit} or an empty
+   *         {@link Optional} if no such simpleName is referenced by this {@link ICompilationUnit}.
    */
-  IType resolveTypeBySimpleName(String simpleName);
+  Optional<IType> resolveTypeBySimpleName(String simpleName);
 
   /**
    * Gets the java doc source of this {@link ICompilationUnit}. This is the java doc added on top of the java file
    * (before the imports).
    *
-   * @return The {@link ISourceRange} for the java doc of this {@link ICompilationUnit}. Never returns <code>null</code>
-   *         . Use {@link ISourceRange#isAvailable()} to check if source is actually available for this element.
+   * @return The {@link ISourceRange} for the java doc of this {@link ICompilationUnit}.
    */
-  ISourceRange javaDoc();
+  Optional<ISourceRange> javaDoc();
+
+  /**
+   * Gets the classpath relative path of this {@link ICompilationUnit}.
+   * <p>
+   * <b>Note</b>: {@link Path#toString()} uses platform dependent name separators! This may be wrong if the compilation
+   * unit is inside an archive.
+   *
+   * @return The {@link Path} of this {@link ICompilationUnit} relative to the classpath root.<br>
+   *         E.g. "org/eclipse/scout/myapp/MyClass.java"
+   */
+  Path path();
+
+  /**
+   * @return The name of this {@link ICompilationUnit}. This is the name of the java file.<br>
+   *         E.g. "MyClass.java"
+   */
+  @Override
+  String elementName();
 
   @Override
   CompilationUnitSpi unwrap();
 
+  @Override
+  ICompilationUnitGenerator<?> toWorkingCopy();
+
+  @Override
+  ICompilationUnitGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer);
 }

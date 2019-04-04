@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.fields.resource;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -24,10 +22,10 @@ import java.util.regex.Pattern;
 
 import javax.swing.event.EventListenerList;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.util.OptimisticLock;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
+import org.eclipse.scout.sdk.s2e.util.OptimisticLock;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusEvent;
@@ -44,7 +42,6 @@ import org.eclipse.swt.widgets.FileDialog;
 /**
  * <h3>ResourceTextField</h3> For selecting folders and files on the local file system or URLs in general.
  *
- * @author Andreas Hoegger
  * @since 5.1.0
  * @see IResourceChangedListener
  */
@@ -130,6 +127,28 @@ public class ResourceTextField extends TextField {
       public void focusGained(FocusEvent e) {
         // nop
       }
+
+      @SuppressWarnings("squid:S1166")
+      private URL toUrl(String path) {
+        if (Strings.isBlank(path)) {
+          return null;
+        }
+
+        try {
+          Path newFile = Paths.get(path).toRealPath(); // fails on invalid path
+          return newFile.toUri().toURL();
+        }
+        catch (Exception ex) {
+          // the supplied string is no valid path for this OS. Try as URL
+          try {
+            return new URL(path);
+          }
+          catch (MalformedURLException e1) {
+            SdkLog.debug(e1);
+            return null;
+          }
+        }
+      }
     });
 
     // layout
@@ -144,34 +163,13 @@ public class ResourceTextField extends TextField {
     m_popupButton.setLayoutData(buttonData);
   }
 
-  @SuppressWarnings("squid:S1166")
-  private static URL toUrl(String path) {
-    if (StringUtils.isBlank(path)) {
-      return null;
-    }
-
-    try {
-      Path newFile = Paths.get(path).toRealPath(LinkOption.NOFOLLOW_LINKS); // fails on invalid path
-      return newFile.toUri().toURL();
-    }
-    catch (Exception ex) {
-      // the supplied string is no valid path for this OS. Try as URL
-      try {
-        return new URL(path);
-      }
-      catch (MalformedURLException e1) {
-        return null;
-      }
-    }
-  }
-
   private void showFileChooserDialog() {
-    String fileName = null;
+    String fileName;
     if (isFolderMode()) {
       DirectoryDialog dialog = new DirectoryDialog(getShell());
-      File urlAsFile = getFile();
-      if (urlAsFile != null) {
-        dialog.setFilterPath(urlAsFile.getAbsolutePath());
+      Path urlAsPath = getFile();
+      if (urlAsPath != null) {
+        dialog.setFilterPath(urlAsPath.toString());
       }
       fileName = dialog.open();
     }
@@ -185,14 +183,14 @@ public class ResourceTextField extends TextField {
         dialog.setFilterExtensions(getFilterExtensions());
       }
       fileName = dialog.open();
-      if (StringUtils.isNotEmpty(fileName) && getFilterExtensions() != null && getFilterExtensions().length > 0) {
 
-        Matcher m = Pattern.compile("\\.([^\\.]*)$").matcher(fileName);
+      if (!Strings.isEmpty(fileName) && getFilterExtensions() != null && getFilterExtensions().length > 0) {
+        Matcher m = Pattern.compile("\\.([^.]*)$").matcher(fileName);
         String extension = null;
         if (m.find()) {
           String fileNameExt = m.group(1);
           for (String fExt : getFilterExtensions()) {
-            if (StringUtils.equalsIgnoreCase(fExt, "*." + fileNameExt)) {
+            if (("*." + fileNameExt).equalsIgnoreCase(fExt)) {
               extension = fileNameExt;
               break;
             }
@@ -202,18 +200,18 @@ public class ResourceTextField extends TextField {
         int extIndex = dialog.getFilterIndex();
         if (extension == null && extIndex > -1 && extIndex < getFilterExtensions().length) {
           extension = getFilterExtensions()[extIndex];
-          extension = extension.replaceFirst("\\**", "");
-          fileName = fileName + extension;
+          extension = Pattern.compile("\\**").matcher(extension).replaceFirst("");
+          fileName += extension;
         }
       }
     }
 
-    File newFile = null;
-    if (StringUtils.isNotBlank(fileName)) {
-      newFile = new File(fileName);
+    Path newFile = null;
+    if (Strings.hasText(fileName)) {
+      newFile = Paths.get(fileName);
       try {
         if (m_inputLock.acquire()) {
-          getTextComponent().setText(newFile.getAbsolutePath());
+          getTextComponent().setText(newFile.toString());
         }
       }
       finally {
@@ -232,15 +230,10 @@ public class ResourceTextField extends TextField {
   }
 
   private void fireValueChanged() {
-    File newFile = getFile();
+    Path newFile = getFile();
     URL newUrl = getUrl();
     for (IResourceChangedListener l : m_eventListeners.getListeners(IResourceChangedListener.class)) {
-      try {
-        l.resourceChanged(newUrl, newFile);
-      }
-      catch (Exception t) {
-        SdkLog.error("error during listener notification.", t);
-      }
+      l.resourceChanged(newUrl, newFile);
     }
   }
 
@@ -282,20 +275,21 @@ public class ResourceTextField extends TextField {
     return m_filterExtensions;
   }
 
-  @SuppressWarnings("squid:S1166")
-  public File getFile() {
+  public Path getFile() {
     URL url = getUrl();
     if (url == null) {
       return null;
     }
+
     try {
       URI uri = url.toURI();
       if (!"file".equalsIgnoreCase(uri.getScheme())) {
         return null;
       }
-      return new File(uri);
+      return Paths.get(uri);
     }
     catch (URISyntaxException e) {
+      SdkLog.debug("Ignoring invalid file URI.", e);
       return null;
     }
   }
@@ -317,16 +311,16 @@ public class ResourceTextField extends TextField {
    * @param file
    *          the file to set
    */
-  public void setFile(File file) {
-    String text = null;
+  public void setFile(Path file) {
+    String text;
     if (file == null) {
       text = "";
       setUrl(null);
     }
     else {
-      text = file.getAbsolutePath();
+      text = file.toAbsolutePath().toString();
       try {
-        setUrl(file.toURI().toURL());
+        setUrl(file.toUri().toURL());
       }
       catch (MalformedURLException e) {
         SdkLog.warning("Unable convert File to URL", e);

@@ -28,6 +28,10 @@
   <name>Eclipse Scout SDK</name>
   <description>Eclipse Scout SDK</description>
 
+  <prerequisites>
+    <maven>3.5.3</maven>
+  </prerequisites>
+
   <modules>
     <!-- Must be at first position -->
     <module>../scout-helloworld-app</module>
@@ -35,6 +39,7 @@
     <module>../scout-hellojs-app</module>
 
     <module>../org.eclipse.scout.sdk.core</module>
+    <module>../org.eclipse.scout.sdk.core.ecj</module>
     <module>../org.eclipse.scout.sdk.core.test</module>
     <module>../org.eclipse.scout.sdk.core.s</module>
     <module>../org.eclipse.scout.sdk.core.s.test</module>
@@ -42,8 +47,9 @@
     <module>../org.eclipse.scout.sdk.s2e</module>
     <module>../org.eclipse.scout.sdk.s2e.test</module>
     <module>../org.eclipse.scout.sdk.s2e.doc</module>
-    <module>../org.eclipse.scout.sdk.s2e.nls</module>
     <module>../org.eclipse.scout.sdk.s2e.ui</module>
+
+    <module>../org.eclipse.scout.sdk.s2i</module>
 
     <module>../org.eclipse.scout.sdk-settings</module>
   </modules>
@@ -63,189 +69,63 @@
 
      <!-- exclude fixtures -->
     <sonar.exclusions>
-      **/src/main/fixture/**/*,
-      **/src/main/client/**/*,
-      **/src/main/shared/**/*
+      **/src/test/fixture/**/*,
+      **/src/test/client/**/*,
+      **/src/test/shared/**/*
     </sonar.exclusions>
 
     <!-- exclude fixtures, archetypes, UI -->
     <sonar.coverage.exclusions>
-      **/src/main/fixture/**/*,
-      **/src/main/client/**/*,
-      **/src/main/shared/**/*,
+      **/src/test/fixture/**/*,
+      **/src/test/client/**/*,
+      **/src/test/shared/**/*,
       **/src/main/resources/archetype-resources/**/*,
-      **/src/main/java/org/eclipse/scout/sdk/s2e/nls/**/*,
       **/src/main/java/org/eclipse/scout/sdk/s2e/ui/**/*,
       **/src/main/java/org/eclipse/scout/sdk/s2e/doc/**/*,
-      **/org/eclipse/scout/maven/plugins/updatesite/**/*
+      **/org/eclipse/scout/maven/plugins/updatesite/**/*,
+      **/Ensure*
     </sonar.coverage.exclusions>
 
-    <!-- dependencies to Eclipse artifacts deployed by org.eclipse.scout.sdk.core.releng/ -->
-    <ecj>3.16.0</ecj>
-    <ecj-maven>${ecj}</ecj-maven>
+    <!-- dependencies to Eclipse artifacts -->
+    <org.eclipse.equinox.common>3.10.300</org.eclipse.equinox.common>
+    <org.eclipse.equinox.registry>3.8.300</org.eclipse.equinox.registry>
+    <org.eclipse.equinox.preferences>3.7.300</org.eclipse.equinox.preferences>
+    <org.eclipse.equinox.security>1.3.100</org.eclipse.equinox.security>
+    <org.eclipse.compare>3.7.500</org.eclipse.compare>
+    <org.eclipse.core.resources>3.13.300</org.eclipse.core.resources>
+    <org.eclipse.core.commands>3.9.300</org.eclipse.core.commands>
+    <org.eclipse.core.expressions>3.6.300</org.eclipse.core.expressions>
+    <org.eclipse.core.filesystem>1.7.300</org.eclipse.core.filesystem>
+    <org.eclipse.core.variables>3.4.400</org.eclipse.core.variables>
+    <org.eclipse.core.runtime>3.15.200</org.eclipse.core.runtime>
+    <org.eclipse.debug.core>3.13.200</org.eclipse.debug.core>
+    <org.eclipse.debug.ui>3.14.0</org.eclipse.debug.ui>
+    <org.eclipse.search>3.11.500</org.eclipse.search>
+    <org.eclipse.ltk.core.refactoring>3.10.0</org.eclipse.ltk.core.refactoring>
+    <org.eclipse.swt>3.110.0</org.eclipse.swt>
+    <org.eclipse.ltk.ui.refactoring>3.9.300</org.eclipse.ltk.ui.refactoring>
+    <org.eclipse.ui.workbench>3.113.0</org.eclipse.ui.workbench>
+    <org.eclipse.jface.text>3.15.100</org.eclipse.jface.text>
+    <org.eclipse.ui.ide>3.15.0</org.eclipse.ui.ide>
+    <org.eclipse.ui.editors>3.11.400</org.eclipse.ui.editors>
+    <org.eclipse.ui>3.112.0</org.eclipse.ui>
+    <org.eclipse.ui.console>3.8.400</org.eclipse.ui.console>
+    <org.eclipse.ui.forms>3.7.500</org.eclipse.ui.forms>
+    <org.eclipse.osgi>3.13.300</org.eclipse.osgi>
 
-    <org.eclipse.osgi>3.13.100</org.eclipse.osgi>
-    <org.eclipse.osgi-maven>${org.eclipse.osgi}</org.eclipse.osgi-maven>
-    <org.eclipse.osgi-range>[3.13.0,3.14.0)</org.eclipse.osgi-range>
+    <org.eclipse.jdt.core>3.17.0</org.eclipse.jdt.core>
+    <org.eclipse.jdt.core.manipulation>1.11.100</org.eclipse.jdt.core.manipulation>
+    <org.eclipse.jdt.ui>3.17.0</org.eclipse.jdt.ui>
+    <org.eclipse.jdt.debug.ui>3.10.200</org.eclipse.jdt.debug.ui>
+    <org.eclipse.jdt.junit>3.11.300</org.eclipse.jdt.junit>
+    <org.eclipse.jdt.launching>3.13.0</org.eclipse.jdt.launching>
+    <ecj>3.17.0</ecj>
+    <junit.version>5.4.1</junit.version>
 
-    <org.eclipse.equinox.common>3.10.200</org.eclipse.equinox.common>
-    <org.eclipse.equinox.common-maven>${org.eclipse.equinox.common}</org.eclipse.equinox.common-maven>
-    <org.eclipse.equinox.common-range>[3.10.0,3.11.0)</org.eclipse.equinox.common-range>
-
-    <org.eclipse.equinox.registry>3.8.200</org.eclipse.equinox.registry>
-    <org.eclipse.equinox.registry-maven>${org.eclipse.equinox.registry}</org.eclipse.equinox.registry-maven>
-    <org.eclipse.equinox.registry-range>[3.8.0,3.9.0)</org.eclipse.equinox.registry-range>
-
-    <org.eclipse.equinox.preferences>3.7.200</org.eclipse.equinox.preferences>
-    <org.eclipse.equinox.preferences-maven>${org.eclipse.equinox.preferences}</org.eclipse.equinox.preferences-maven>
-    <org.eclipse.equinox.preferences-range>[3.7.0,3.8.0)</org.eclipse.equinox.preferences-range>
-
-    <org.eclipse.equinox.security>1.3.0</org.eclipse.equinox.security>
-    <org.eclipse.equinox.security-maven>${org.eclipse.equinox.security}</org.eclipse.equinox.security-maven>
-    <org.eclipse.equinox.security-range>[1.3.0,1.4.0)</org.eclipse.equinox.security-range>
-
-    <org.eclipse.compare>3.7.400</org.eclipse.compare>
-    <org.eclipse.compare-maven>${org.eclipse.compare}</org.eclipse.compare-maven>
-    <org.eclipse.compare-range>[3.7.0,3.8.0)</org.eclipse.compare-range>
-
-    <org.eclipse.core.resources>3.13.200</org.eclipse.core.resources>
-    <org.eclipse.core.resources-maven>${org.eclipse.core.resources}</org.eclipse.core.resources-maven>
-    <org.eclipse.core.resources-range>[3.13.0,3.14.0)</org.eclipse.core.resources-range>
-
-    <org.eclipse.core.commands>3.9.200</org.eclipse.core.commands>
-    <org.eclipse.core.commands-maven>${org.eclipse.core.commands}</org.eclipse.core.commands-maven>
-    <org.eclipse.core.commands-range>[3.9.0,3.10.0)</org.eclipse.core.commands-range>
-
-    <org.eclipse.core.contenttype>3.7.100</org.eclipse.core.contenttype>
-    <org.eclipse.core.contenttype-maven>${org.eclipse.core.contenttype}</org.eclipse.core.contenttype-maven>
-    <org.eclipse.core.contenttype-range>[3.7.0,3.8.0)</org.eclipse.core.contenttype-range>
-
-    <org.eclipse.core.expressions>3.6.200</org.eclipse.core.expressions>
-    <org.eclipse.core.expressions-maven>${org.eclipse.core.expressions}</org.eclipse.core.expressions-maven>
-    <org.eclipse.core.expressions-range>[3.6.0,3.7.0)</org.eclipse.core.expressions-range>
-
-    <org.eclipse.core.filesystem>1.7.200</org.eclipse.core.filesystem>
-    <org.eclipse.core.filesystem-maven>${org.eclipse.core.filesystem}</org.eclipse.core.filesystem-maven>
-    <org.eclipse.core.filesystem-range>[1.7.0,1.8.0)</org.eclipse.core.filesystem-range>
-
-    <org.eclipse.core.variables>3.4.300</org.eclipse.core.variables>
-    <org.eclipse.core.variables-maven>${org.eclipse.core.variables}</org.eclipse.core.variables-maven>
-    <org.eclipse.core.variables-range>[3.4.0,3.5.0)</org.eclipse.core.variables-range>
-
-    <org.eclipse.core.runtime>3.15.100</org.eclipse.core.runtime>
-    <org.eclipse.core.runtime-maven>${org.eclipse.core.runtime}</org.eclipse.core.runtime-maven>
-    <org.eclipse.core.runtime-range>[3.15.0,3.16.0)</org.eclipse.core.runtime-range>
-
-    <org.eclipse.core.jobs>3.10.100</org.eclipse.core.jobs>
-    <org.eclipse.core.jobs-maven>${org.eclipse.core.jobs}</org.eclipse.core.jobs-maven>
-    <org.eclipse.core.jobs-range>[3.10.0,3.11.0)</org.eclipse.core.jobs-range>
-
-    <org.eclipse.debug.core>3.13.100</org.eclipse.debug.core>
-    <org.eclipse.debug.core-maven>${org.eclipse.debug.core}</org.eclipse.debug.core-maven>
-    <org.eclipse.debug.core-range>[3.13.0,3.14.0)</org.eclipse.debug.core-range>
-
-    <org.eclipse.debug.ui>3.13.200</org.eclipse.debug.ui>
-    <org.eclipse.debug.ui-maven>${org.eclipse.debug.ui}</org.eclipse.debug.ui-maven>
-    <org.eclipse.debug.ui-range>[3.13.0,3.14.0)</org.eclipse.debug.ui-range>
-
-    <org.eclipse.text>3.8.0</org.eclipse.text>
-    <org.eclipse.text-maven>${org.eclipse.text}</org.eclipse.text-maven>
-    <org.eclipse.text-range>[3.8.0,3.9.0)</org.eclipse.text-range>
-
-    <org.eclipse.search>3.11.400</org.eclipse.search>
-    <org.eclipse.search-maven>${org.eclipse.search}</org.eclipse.search-maven>
-    <org.eclipse.search-range>[3.11.0,3.12.0)</org.eclipse.search-range>
-
-    <org.eclipse.ltk.core.refactoring>3.9.200</org.eclipse.ltk.core.refactoring>
-    <org.eclipse.ltk.core.refactoring-maven>${org.eclipse.ltk.core.refactoring}</org.eclipse.ltk.core.refactoring-maven>
-    <org.eclipse.ltk.core.refactoring-range>[3.9.0,3.10.0)</org.eclipse.ltk.core.refactoring-range>
-
-    <org.eclipse.ltk.ui.refactoring>3.9.200</org.eclipse.ltk.ui.refactoring>
-    <org.eclipse.ltk.ui.refactoring-maven>${org.eclipse.ltk.ui.refactoring}</org.eclipse.ltk.ui.refactoring-maven>
-    <org.eclipse.ltk.ui.refactoring-range>[3.9.0,3.10.0)</org.eclipse.ltk.ui.refactoring-range>
-
-    <org.eclipse.jdt.core>3.16.0</org.eclipse.jdt.core>
-    <org.eclipse.jdt.core-maven>${org.eclipse.jdt.core}</org.eclipse.jdt.core-maven>
-    <org.eclipse.jdt.core-range>[3.16.0,3.17.0)</org.eclipse.jdt.core-range>
-
-    <org.eclipse.jdt.core.manipulation>1.11.0</org.eclipse.jdt.core.manipulation>
-    <org.eclipse.jdt.core.manipulation-maven>${org.eclipse.jdt.core.manipulation}</org.eclipse.jdt.core.manipulation-maven>
-    <org.eclipse.jdt.core.manipulation-range>[1.11.0,1.12.0)</org.eclipse.jdt.core.manipulation-range>
-
-    <org.eclipse.jdt.ui>3.16.0</org.eclipse.jdt.ui>
-    <org.eclipse.jdt.ui-maven>${org.eclipse.jdt.ui}</org.eclipse.jdt.ui-maven>
-    <org.eclipse.jdt.ui-range>[3.16.0,3.17.0)</org.eclipse.jdt.ui-range>
-
-    <org.eclipse.jdt.debug.ui>3.10.100</org.eclipse.jdt.debug.ui>
-    <org.eclipse.jdt.debug.ui-maven>${org.eclipse.jdt.debug.ui}</org.eclipse.jdt.debug.ui-maven>
-    <org.eclipse.jdt.debug.ui-range>[3.10.0,3.11.0)</org.eclipse.jdt.debug.ui-range>
-
-    <org.eclipse.jdt.junit>3.11.200</org.eclipse.jdt.junit>
-    <org.eclipse.jdt.junit-maven>${org.eclipse.jdt.junit}</org.eclipse.jdt.junit-maven>
-    <org.eclipse.jdt.junit-range>[3.11.0,3.12.0)</org.eclipse.jdt.junit-range>
-
-    <org.eclipse.ui.workbench>3.112.100</org.eclipse.ui.workbench>
-    <org.eclipse.ui.workbench-maven>${org.eclipse.ui.workbench}</org.eclipse.ui.workbench-maven>
-    <org.eclipse.ui.workbench-range>[3.112.0,3.113.0)</org.eclipse.ui.workbench-range>
-
-    <org.eclipse.ui.workbench.texteditor>3.11.100</org.eclipse.ui.workbench.texteditor>
-    <org.eclipse.ui.workbench.texteditor-maven>${org.eclipse.ui.workbench.texteditor}</org.eclipse.ui.workbench.texteditor-maven>
-    <org.eclipse.ui.workbench.texteditor-range>[3.11.0,3.12.0)</org.eclipse.ui.workbench.texteditor-range>
-
-    <org.eclipse.jface>3.14.100</org.eclipse.jface>
-    <org.eclipse.jface-maven>${org.eclipse.jface}</org.eclipse.jface-maven>
-    <org.eclipse.jface-range>[3.14.0,3.15.0)</org.eclipse.jface-range>
-
-    <org.eclipse.jface.text>3.15.0</org.eclipse.jface.text>
-    <org.eclipse.jface.text-maven>${org.eclipse.jface.text}</org.eclipse.jface.text-maven>
-    <org.eclipse.jface.text-range>[3.15.0,3.16.0)</org.eclipse.jface.text-range>
-
-    <org.eclipse.swt.win32.win32.x86>3.108.0</org.eclipse.swt.win32.win32.x86>
-    <org.eclipse.swt.win32.win32.x86-maven>${org.eclipse.swt.win32.win32.x86}</org.eclipse.swt.win32.win32.x86-maven>
-    <org.eclipse.swt.win32.win32.x86-range>[3.108.0,3.109.0)</org.eclipse.swt.win32.win32.x86-range>
-
-    <org.eclipse.ui.ide>3.14.200</org.eclipse.ui.ide>
-    <org.eclipse.ui.ide-maven>${org.eclipse.ui.ide}</org.eclipse.ui.ide-maven>
-    <org.eclipse.ui.ide-range>[3.14.0,3.15.0)</org.eclipse.ui.ide-range>
-
-    <org.eclipse.ui.editors>3.11.300</org.eclipse.ui.editors>
-    <org.eclipse.ui.editors-maven>${org.eclipse.ui.editors}</org.eclipse.ui.editors-maven>
-    <org.eclipse.ui.editors-range>[3.11.0,3.12.0)</org.eclipse.ui.editors-range>
-
-    <org.eclipse.ui>3.111.0</org.eclipse.ui>
-    <org.eclipse.ui-maven>${org.eclipse.ui}</org.eclipse.ui-maven>
-    <org.eclipse.ui-range>[3.111.0,3.112.0)</org.eclipse.ui-range>
-
-    <org.eclipse.ui.console>3.8.300</org.eclipse.ui.console>
-    <org.eclipse.ui.console-maven>${org.eclipse.ui.console}</org.eclipse.ui.console-maven>
-    <org.eclipse.ui.console-range>[3.8.0,3.9.0)</org.eclipse.ui.console-range>
-
-    <org.eclipse.ui.views>3.9.200</org.eclipse.ui.views>
-    <org.eclipse.ui.views-maven>${org.eclipse.ui.views}</org.eclipse.ui.views-maven>
-    <org.eclipse.ui.views-range>[3.9.0,3.10.0)</org.eclipse.ui.views-range>
-
-    <org.eclipse.swt>3.109.0</org.eclipse.swt>
-
-    <org.eclipse.ui.forms>3.7.300</org.eclipse.ui.forms>
-    <org.eclipse.ui.forms-maven>${org.eclipse.ui.forms}</org.eclipse.ui.forms-maven>
-    <org.eclipse.ui.forms-range>[3.7.0,3.8.0)</org.eclipse.ui.forms-range>
-
-    <org.eclipse.jdt.launching>3.12.0</org.eclipse.jdt.launching>
-    <org.eclipse.jdt.launching-maven>${org.eclipse.jdt.launching}</org.eclipse.jdt.launching-maven>
-    <org.eclipse.jdt.launching-range>[3.12.0,3.13.0)</org.eclipse.jdt.launching-range>
-
+    <!-- versions to dependencies uploaded by scout -->
     <org.eclipse.m2e.core>1.10.0.20181127-2120</org.eclipse.m2e.core>
-    <org.eclipse.m2e.core-maven>${org.eclipse.m2e.core}</org.eclipse.m2e.core-maven>
-    <org.eclipse.m2e.core-range>[1.10.0,1.11.0)</org.eclipse.m2e.core-range>
-
     <org.eclipse.m2e.core.ui>1.10.0.20181127-2120</org.eclipse.m2e.core.ui>
-    <org.eclipse.m2e.core.ui-maven>${org.eclipse.m2e.core.ui}</org.eclipse.m2e.core.ui-maven>
-    <org.eclipse.m2e.core.ui-range>[1.10.0,1.11.0)</org.eclipse.m2e.core.ui-range>
-
     <org.eclipse.m2e.archetype.common>1.10.0.20181127-2120</org.eclipse.m2e.archetype.common>
-    <org.eclipse.m2e.archetype.common-maven>${org.eclipse.m2e.archetype.common}</org.eclipse.m2e.archetype.common-maven>
-    <org.eclipse.m2e.archetype.common-range>[1.10.0,1.11.0)</org.eclipse.m2e.archetype.common-range>
-
     <maven.model.dependency.version>3.5.3</maven.model.dependency.version>
   </properties>
 
@@ -264,6 +144,12 @@
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
+        <artifactId>org.eclipse.scout.sdk.core.ecj</artifactId>
+        <version>10.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
         <version>10.0.0-SNAPSHOT</version>
       </dependency>
@@ -275,6 +161,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.scout.sdk.s2i</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2i</artifactId>
+        <version>10.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
         <version>10.0.0-SNAPSHOT</version>
@@ -294,18 +186,6 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>10.0.0-SNAPSHOT</version>
-        <classifier>sources</classifier>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-        <version>10.0.0-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
         <version>10.0.0-SNAPSHOT</version>
         <classifier>sources</classifier>
       </dependency>
@@ -338,85 +218,144 @@
       <dependency>
         <groupId>org.eclipse.jdt</groupId>
         <artifactId>ecj</artifactId>
-        <version>${ecj-maven}</version>
+        <version>${ecj}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.commands</artifactId>
-        <version>${org.eclipse.core.commands-maven}</version>
+        <version>${org.eclipse.core.commands}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.common</artifactId>
-        <version>${org.eclipse.equinox.common-maven}</version>
+        <version>${org.eclipse.equinox.common}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.preferences</artifactId>
-        <version>${org.eclipse.equinox.preferences-maven}</version>
+        <version>${org.eclipse.equinox.preferences}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.registry</artifactId>
-        <version>${org.eclipse.equinox.registry-maven}</version>
+        <version>${org.eclipse.equinox.registry}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.security</artifactId>
-        <version>${org.eclipse.equinox.security-maven}</version>
+        <version>${org.eclipse.equinox.security}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.compare</artifactId>
-        <version>${org.eclipse.compare-maven}</version>
+        <version>${org.eclipse.compare}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.expressions</artifactId>
-        <version>${org.eclipse.core.expressions-maven}</version>
+        <version>${org.eclipse.core.expressions}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.filesystem</artifactId>
-        <version>${org.eclipse.core.filesystem-maven}</version>
+        <version>${org.eclipse.core.filesystem}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.variables</artifactId>
-        <version>${org.eclipse.core.variables-maven}</version>
+        <version>${org.eclipse.core.variables}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.resources</artifactId>
-        <version>${org.eclipse.core.resources-maven}</version>
+        <version>${org.eclipse.core.resources}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.runtime</artifactId>
-        <version>${org.eclipse.core.runtime-maven}</version>
+        <version>${org.eclipse.core.runtime}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.jdt</groupId>
         <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
-        <version>${org.eclipse.jdt.core.manipulation-maven}</version>
+        <version>${org.eclipse.jdt.core.manipulation}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.jdt</groupId>
         <artifactId>org.eclipse.jdt.core</artifactId>
-        <version>${org.eclipse.jdt.core-maven}</version>
+        <version>${org.eclipse.jdt.core}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.debug.core</artifactId>
+        <version>${org.eclipse.debug.core}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.debug.ui</artifactId>
+        <version>${org.eclipse.debug.ui}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.junit</artifactId>
+        <version>${org.eclipse.jdt.junit}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.debug.ui</artifactId>
+        <version>${org.eclipse.jdt.debug.ui}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.launching</artifactId>
+        <version>${org.eclipse.jdt.launching}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.ui</artifactId>
+        <version>${org.eclipse.jdt.ui}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.e4.ui.workbench</artifactId>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.jface.text</artifactId>
+        <version>${org.eclipse.jface.text}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
+        <version>${org.eclipse.ltk.core.refactoring}</version>
       </dependency>
 
       <dependency>
@@ -426,105 +365,26 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
+        <artifactId>org.eclipse.swt.${osgi.platform}</artifactId>
         <version>${org.eclipse.swt}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
-        <version>${org.eclipse.swt}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
-        <version>${org.eclipse.swt}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.swt.gtk.linux.x86</artifactId>
-        <version>${org.eclipse.swt}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.swt.gtk.linux.ppc64</artifactId>
-        <version>${org.eclipse.swt}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.swt.cocoa.macosx.x86_64</artifactId>
-        <version>${org.eclipse.swt}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.debug.core</artifactId>
-        <version>${org.eclipse.debug.core-maven}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.debug.ui</artifactId>
-        <version>${org.eclipse.debug.ui-maven}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.junit</artifactId>
-        <version>${org.eclipse.jdt.junit-maven}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.debug.ui</artifactId>
-        <version>${org.eclipse.jdt.debug.ui-maven}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.launching</artifactId>
-        <version>${org.eclipse.jdt.launching-maven}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.ui</artifactId>
-        <version>${org.eclipse.jdt.ui-maven}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.jface.text</artifactId>
-        <version>${org.eclipse.jface.text-maven}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.text</artifactId>
-        <version>${org.eclipse.text}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
-        <version>${org.eclipse.ltk.core.refactoring-maven}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ltk.ui.refactoring</artifactId>
-        <version>${org.eclipse.ltk.ui.refactoring-maven}</version>
+        <version>${org.eclipse.ltk.ui.refactoring}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.m2e.core</artifactId>
-        <version>${org.eclipse.m2e.core-maven}</version>
+        <version>${org.eclipse.m2e.core}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.m2e.core.ui</artifactId>
-        <version>${org.eclipse.m2e.core.ui-maven}</version>
+        <version>${org.eclipse.m2e.core.ui}</version>
       </dependency>
 
       <dependency>
@@ -542,145 +402,43 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.m2e.archetype.common</artifactId>
-        <version>${org.eclipse.m2e.archetype.common-maven}</version>
+        <version>${org.eclipse.m2e.archetype.common}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.search</artifactId>
-        <version>${org.eclipse.search-maven}</version>
+        <version>${org.eclipse.search}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.console</artifactId>
-        <version>${org.eclipse.ui.console-maven}</version>
+        <version>${org.eclipse.ui.console}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.editors</artifactId>
-        <version>${org.eclipse.ui.editors-maven}</version>
+        <version>${org.eclipse.ui.editors}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.ide</artifactId>
-        <version>${org.eclipse.ui.ide-maven}</version>
+        <version>${org.eclipse.ui.ide}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.workbench</artifactId>
-        <version>${org.eclipse.ui.workbench-maven}</version>
+        <version>${org.eclipse.ui.workbench}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui</artifactId>
-        <version>${org.eclipse.ui-maven}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-embedder</artifactId>
-        <version>${maven.model.dependency.version}</version>
-        <exclusions>
-          <exclusion>
-            <!-- these classes are already included in org.eclipse.aether:aether-api -->
-            <groupId>org.apache.maven.resolver</groupId>
-            <artifactId>maven-resolver-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <!-- these classes are already included in org.eclipse.aether:aether-util -->
-            <groupId>org.apache.maven.resolver</groupId>
-            <artifactId>maven-resolver-util</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-connector-basic</artifactId>
-        <version>1.1.1</version>
-        <exclusions>
-          <exclusion>
-            <!-- these classes are already included in org.eclipse.aether:aether-api -->
-            <groupId>org.apache.maven.resolver</groupId>
-            <artifactId>maven-resolver-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <!-- these classes are already included in org.eclipse.aether:aether-util -->
-            <groupId>org.apache.maven.resolver</groupId>
-            <artifactId>maven-resolver-util</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-wagon</artifactId>
-        <version>1.1.1</version>
-        <exclusions>
-          <exclusion>
-            <!-- these classes are already included in org.eclipse.aether:aether-api -->
-            <groupId>org.apache.maven.resolver</groupId>
-            <artifactId>maven-resolver-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <!-- these classes are already included in org.eclipse.aether:aether-util -->
-            <groupId>org.apache.maven.resolver</groupId>
-            <artifactId>maven-resolver-util</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-compat</artifactId>
-        <version>${maven.model.dependency.version}</version>
-        <exclusions>
-          <exclusion>
-            <!-- these classes are already included in org.eclipse.aether:aether-api -->
-            <groupId>org.apache.maven.resolver</groupId>
-            <artifactId>maven-resolver-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <!-- these classes are already included in org.eclipse.aether:aether-util -->
-            <groupId>org.apache.maven.resolver</groupId>
-            <artifactId>maven-resolver-util</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>1.2.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jul-to-slf4j</artifactId>
-        <version>1.7.25</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.takari.aether</groupId>
-        <artifactId>aether-connector-okhttp</artifactId>
-        <version>0.17.4</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-provider-api</artifactId>
-        <version>3.0.0</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.1</version> <!-- use 3.1 even though m2e uses 3.5 because 3.1 is the version on orbit -->
+        <version>${org.eclipse.ui}</version>
       </dependency>
 
       <dependency>
@@ -691,23 +449,70 @@
 
       <!-- Test Dependencies -->
       <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>1.7.26</version>
+      </dependency>
+      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.25</version>
+        <version>1.7.26</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-embedder</artifactId>
+        <version>${maven.model.dependency.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-compat</artifactId>
+        <version>${maven.model.dependency.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-connector-basic</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-wagon</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>io.takari.aether</groupId>
+        <artifactId>aether-connector-okhttp</artifactId>
+        <version>0.17.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-provider-api</artifactId>
+        <version>3.0.0</version>
+      </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
+        <scope>test</scope>
         <version>21.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>2.25.1</version>
       </dependency>
 
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt</artifactId>

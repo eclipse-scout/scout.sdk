@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.s2e.ui.fields.text;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.util.OptimisticLock;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.util.OptimisticLock;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
@@ -32,15 +32,13 @@ import org.eclipse.swt.widgets.Listener;
  */
 public class StyledTextField extends TextField {
 
-  private P_SuffixListener m_suffixListener = null;
+  private P_SuffixListener m_suffixListener;
   private String m_readOnlyPrefix;
   private String m_readOnlySuffix;
   private final OptimisticLock m_revalLock = new OptimisticLock();
 
   /**
    * Creates a new {@link StyledTextField} with a label and no image.
-   *
-   * @param parent
    */
   public StyledTextField(Composite parent) {
     super(parent);
@@ -88,7 +86,7 @@ public class StyledTextField extends TextField {
 
   private synchronized void updateListeners() {
     StyledText textComp = getTextComponent();
-    if (StringUtils.isEmpty(getReadOnlyPrefix()) && StringUtils.isEmpty(getReadOnlySuffix())) {
+    if (Strings.isEmpty(getReadOnlyPrefix()) && Strings.isEmpty(getReadOnlySuffix())) {
       // uninstall
       if (m_suffixListener != null) {
         textComp.removeListener(SWT.Selection, m_suffixListener);
@@ -116,27 +114,6 @@ public class StyledTextField extends TextField {
     }
   }
 
-  /**
-   * A regex may contain several placeholders marked as #0# ... #xx#. This method is used to replace the placeholders.
-   *
-   * @param regex
-   *          the regex containing the exactly same amount of placeholders as the replacements conatins items.
-   * @param replacements
-   *          the array of replacements
-   * @return replaced regex expression.
-   */
-  private static String replace(String regex, String... replacements) {
-    StringBuilder sb = new StringBuilder(regex);
-    for (int i = 0; i < replacements.length; i++) {
-      int index = 0;
-      String placeholder = "#" + i + "#";
-      while ((index = sb.indexOf(placeholder, index)) >= 0) {
-        sb.replace(index, index + placeholder.length(), replacements[i]);
-      }
-    }
-    return sb.toString();
-  }
-
   @Override
   public synchronized void setText(String text) {
     if (text == null) {
@@ -159,16 +136,16 @@ public class StyledTextField extends TextField {
     int start = 0;
     int end = text.length();
     String lowerText = text.toLowerCase();
-    if (StringUtils.isNotBlank(prefix) && lowerText.startsWith(prefix.toLowerCase())) {
+    if (Strings.hasText(prefix) && lowerText.startsWith(prefix.toLowerCase())) {
       start = prefix.length();
     }
-    if (StringUtils.isNotBlank(suffix) && lowerText.endsWith(suffix.toLowerCase())) {
+    if (Strings.hasText(suffix) && lowerText.endsWith(suffix.toLowerCase())) {
       end = text.length() - suffix.length();
     }
 
     StringBuilder sb = new StringBuilder(end - start + prefix.length() + suffix.length());
     sb.append(prefix);
-    sb.append(text.substring(start, end));
+    sb.append(text, start, end);
     sb.append(suffix);
     super.setText(sb.toString());
   }
@@ -200,6 +177,27 @@ public class StyledTextField extends TextField {
       setSuffix(postfix);
     }
 
+    /**
+     * A regex may contain several placeholders marked as #0# ... #xx#. This method is used to replace the placeholders.
+     *
+     * @param regex
+     *          the regex containing the exactly same amount of placeholders as the replacements conatins items.
+     * @param replacements
+     *          the array of replacements
+     * @return replaced regex expression.
+     */
+    private String replace(String regex, String... replacements) {
+      StringBuilder sb = new StringBuilder(regex);
+      for (int i = 0; i < replacements.length; i++) {
+        int index = 0;
+        String placeholder = "#" + i + '#';
+        while ((index = sb.indexOf(placeholder, index)) >= 0) {
+          sb.replace(index, index + placeholder.length(), replacements[i]);
+        }
+      }
+      return sb.toString();
+    }
+
     @Override
     public void verifyKey(VerifyEvent event) {
       Event e = new Event();
@@ -221,7 +219,7 @@ public class StyledTextField extends TextField {
           Matcher suffixMatcher = m_preSuffixPattern.matcher(getTextComponent().getText());
           if (suffixMatcher.find()) {
             switch (event.type) {
-              case SWT.Verify: {
+              case SWT.Verify:
                 if (event.character == SWT.BS) {
                   event.doit = !(textSelection.x - 1 < suffixMatcher.end(1) && textSelection.x == textSelection.y);
                 }
@@ -229,11 +227,9 @@ public class StyledTextField extends TextField {
                   event.doit = !(textSelection.x + 1 > suffixMatcher.start(2) && textSelection.x == textSelection.y);
                 }
                 break;
-              }
-              case SWT.Modify: {
+              case SWT.Modify:
                 updateStyleRanges();
                 break;
-              }
               case SWT.KeyDown:
               case SWT.MouseDown:
               case SWT.Selection:

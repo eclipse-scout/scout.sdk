@@ -1,0 +1,5 @@
+@Override
+protected int methodWithOverload(int a, String b) throws RuntimeException {
+// TODO [anonymous] Auto-generated method stub.
+return 0;
+}

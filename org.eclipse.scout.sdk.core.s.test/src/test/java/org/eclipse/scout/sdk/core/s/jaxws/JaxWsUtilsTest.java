@@ -10,20 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.jaxws;
 
+import static java.util.Collections.emptyList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils.JaxWsBindingMapping;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.eclipse.scout.sdk.core.util.Xml;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -31,45 +36,47 @@ import org.xml.sax.SAXException;
 /**
  * <h3>{@link JaxWsUtilsTest}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class JaxWsUtilsTest {
+
   @Test
+  @SuppressWarnings("unlikely-arg-type")
   public void testJaxWsBindingMapping() {
     JaxWsBindingMapping m = new JaxWsBindingMapping(true, "wsdlName", "className");
-    Assert.assertFalse(m.equals(null));
-    Assert.assertFalse(m.equals(new JaxWsBindingMapping(true, "wsdlName", "className2")));
-    Assert.assertFalse(m.equals(new JaxWsBindingMapping(true, "wsdlName2", "className")));
-    Assert.assertFalse(m.equals(new JaxWsBindingMapping(false, "wsdlName", "className")));
-    Assert.assertFalse(m.equals(new JaxWsBindingMapping(true, null, "className")));
-    Assert.assertFalse(m.equals(new JaxWsBindingMapping(true, "wsdlName", null)));
-    Assert.assertTrue(m.equals(new JaxWsBindingMapping(true, "wsdlName", "className")));
-    Assert.assertTrue(m.equals(m));
+    assertFalse(m.equals(null));
+    assertFalse(m.equals(""));
+    assertFalse(m.equals(new JaxWsBindingMapping(true, "wsdlName", "className2")));
+    assertFalse(m.equals(new JaxWsBindingMapping(true, "wsdlName2", "className")));
+    assertFalse(m.equals(new JaxWsBindingMapping(false, "wsdlName", "className")));
+    assertFalse(m.equals(new JaxWsBindingMapping(true, null, "className")));
+    assertFalse(m.equals(new JaxWsBindingMapping(true, "wsdlName", null)));
+    assertTrue(m.equals(new JaxWsBindingMapping(true, "wsdlName", "className")));
+    assertTrue(m.equals(m));
 
     JaxWsBindingMapping m2 = new JaxWsBindingMapping(true, null, null);
-    Assert.assertFalse(m2.equals(new JaxWsBindingMapping(true, null, "className")));
-    Assert.assertFalse(m2.equals(new JaxWsBindingMapping(true, "wsdlName", null)));
-    Assert.assertTrue(m2.equals(new JaxWsBindingMapping(true, null, null)));
+    assertFalse(m2.equals(new JaxWsBindingMapping(true, null, "className")));
+    assertFalse(m2.equals(new JaxWsBindingMapping(true, "wsdlName", null)));
+    assertTrue(m2.equals(new JaxWsBindingMapping(true, null, null)));
   }
 
   @Test
   public void testRemoveCommonSuffixes() {
-    Assert.assertEquals("My", JaxWsUtils.removeCommonSuffixes("MyWebService"));
-    Assert.assertEquals("My", JaxWsUtils.removeCommonSuffixes("Mywebservice"));
-    Assert.assertEquals("Service", JaxWsUtils.removeCommonSuffixes("Service"));
-    Assert.assertEquals("", JaxWsUtils.removeCommonSuffixes(""));
-    Assert.assertEquals(null, JaxWsUtils.removeCommonSuffixes(null));
+    assertEquals("My", JaxWsUtils.removeCommonSuffixes("MyWebService"));
+    assertEquals("My", JaxWsUtils.removeCommonSuffixes("Mywebservice"));
+    assertEquals("Service", JaxWsUtils.removeCommonSuffixes("Service"));
+    assertEquals("", JaxWsUtils.removeCommonSuffixes(""));
+    assertNull(JaxWsUtils.removeCommonSuffixes(null));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetBindingPathsFromPomInvalidInput() throws XPathExpressionException {
-    JaxWsUtils.getBindingPathsFromPom(null, "my'test.wsdl");
+  @Test
+  public void testGetBindingPathsFromPomInvalidInput() {
+    assertThrows(IllegalArgumentException.class, () -> JaxWsUtils.getBindingPathsFromPom(null, "my'test.wsdl"));
   }
 
   @Test
   public void testGetBindingPathsFromPom() throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
-    assertBindingPathsIn("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>", "myTest/myTest.wsdl", Collections.<String> emptyList());
+    assertBindingPathsIn("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>", "myTest/myTest.wsdl", emptyList());
 
     String correct = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
@@ -114,7 +121,7 @@ public class JaxWsUtilsTest {
         "      </plugin>" +
         "    </plugins>" +
         "  </build></project>";
-    assertBindingPathsIn(correct, "myTest/myTest.wsdl", Arrays.<String> asList("global-binding.xml", "myTest/jaxws-binding-a.xml", "myTest/jaxws-binding-b.xml", "myTest/jaxb-binding.xml"));
+    assertBindingPathsIn(correct, "myTest/myTest.wsdl", Arrays.asList("global-binding.xml", "myTest/jaxws-binding-a.xml", "myTest/jaxws-binding-b.xml", "myTest/jaxb-binding.xml"));
 
     String correctWithEmptyBinding = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
@@ -143,7 +150,7 @@ public class JaxWsUtilsTest {
         "      </plugin>" +
         "    </plugins>" +
         "  </build></project>";
-    assertBindingPathsIn(correctWithEmptyBinding, "myTest/myTest.wsdl", Arrays.<String> asList("global-binding.xml", "myTest/jaxws-binding.xml", "myTest/jaxb-binding.xml"));
+    assertBindingPathsIn(correctWithEmptyBinding, "myTest/myTest.wsdl", Arrays.asList("global-binding.xml", "myTest/jaxws-binding.xml", "myTest/jaxb-binding.xml"));
 
     String correctCaseMismatch = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
@@ -188,7 +195,7 @@ public class JaxWsUtilsTest {
         "      </plugin>" +
         "    </plugins>" +
         "  </build></project>";
-    assertBindingPathsIn(correctCaseMismatch, "myTest/myTest.wsdl", Arrays.<String> asList("global-binding.xml", "myTest/jaxws-binding-A.xml", "myTest/jaxws-binding-B.xml", "myTest/jaxb-binding.xml"));
+    assertBindingPathsIn(correctCaseMismatch, "myTest/myTest.wsdl", Arrays.asList("global-binding.xml", "myTest/jaxws-binding-A.xml", "myTest/jaxws-binding-B.xml", "myTest/jaxb-binding.xml"));
 
     String wrong = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
@@ -217,7 +224,7 @@ public class JaxWsUtilsTest {
         "      </plugin>" +
         "    </plugins>" +
         "  </build></project>";
-    assertBindingPathsIn(wrong, "myTest/myTest.wsdl", Collections.<String> emptyList());
+    assertBindingPathsIn(wrong, "myTest/myTest.wsdl", emptyList());
 
     String wrongNamespace = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/5.0.0\"><build>" +
         "    <plugins>" +
@@ -246,15 +253,15 @@ public class JaxWsUtilsTest {
         "      </plugin>" +
         "    </plugins>" +
         "  </build></project>";
-    assertBindingPathsIn(wrongNamespace, "myTest/myTest.wsdl", Collections.<String> emptyList());
+    assertBindingPathsIn(wrongNamespace, "myTest/myTest.wsdl", emptyList());
   }
 
-  protected void assertBindingPathsIn(String xml, String wsdlName, List<String> expectedPaths) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
-    Document d = null;
+  protected static void assertBindingPathsIn(String xml, String wsdlName, List<String> expectedPaths) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
+    Document d;
     try (Reader r = new StringReader(xml)) {
-      d = CoreUtils.createDocumentBuilder().parse(new InputSource(r));
+      d = Xml.createDocumentBuilder().parse(new InputSource(r));
     }
     List<String> bindingPathsFromPom = JaxWsUtils.getBindingPathsFromPom(d, wsdlName);
-    Assert.assertEquals(expectedPaths, bindingPathsFromPom);
+    assertEquals(expectedPaths, bindingPathsFromPom);
   }
 }

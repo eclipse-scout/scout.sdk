@@ -10,27 +10,34 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
+import static java.util.Collections.unmodifiableMap;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotation;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 
-/**
- *
- */
 public class AnnotationImplementor extends AbstractJavaElementImplementor<AnnotationSpi> implements IAnnotation {
-  private Map<String, IAnnotationElement> m_values;
+  private FinalValue<Map<String, IAnnotationElement>> m_values;
 
   public AnnotationImplementor(AnnotationSpi spi) {
     super(spi);
+    m_values = new FinalValue<>();
   }
 
   @Override
@@ -44,22 +51,25 @@ public class AnnotationImplementor extends AbstractJavaElementImplementor<Annota
   }
 
   @Override
-  public IAnnotationElement element(String name) {
-    return elements().get(name);
+  public Optional<IAnnotationElement> element(String name) {
+    return Optional.ofNullable(elements().get(name));
   }
 
   @Override
   public Map<String, IAnnotationElement> elements() {
-    if (m_values == null) {
+    return m_values.computeIfAbsentAndGet(() -> {
       Set<Entry<String, AnnotationElementSpi>> entrySet = m_spi.getValues().entrySet();
       Map<String, IAnnotationElement> values = new LinkedHashMap<>(entrySet.size());
-      for (Map.Entry<String, AnnotationElementSpi> e : entrySet) {
-        AnnotationElementSpi spiValue = e.getValue();
-        values.put(e.getKey(), spiValue != null ? spiValue.wrap() : null);
+      for (Entry<String, AnnotationElementSpi> e : entrySet) {
+        values.put(e.getKey(), e.getValue().wrap());
       }
-      m_values = values;
-    }
-    return m_values;
+      return unmodifiableMap(values);
+    });
+  }
+
+  @Override
+  public Stream<? extends IJavaElement> children() {
+    return elements().values().stream();
   }
 
   @Override
@@ -73,10 +83,18 @@ public class AnnotationImplementor extends AbstractJavaElementImplementor<Annota
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    JavaModelPrinter.print(this, sb);
-    return sb.toString();
+  public void internalSetSpi(AnnotationSpi spi) {
+    super.internalSetSpi(spi);
+    m_values = new FinalValue<>();
   }
 
+  @Override
+  public IAnnotationGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
+    return transformAnnotation(this, transformer);
+  }
+
+  @Override
+  public IAnnotationGenerator<?> toWorkingCopy() {
+    return toWorkingCopy(null);
+  }
 }

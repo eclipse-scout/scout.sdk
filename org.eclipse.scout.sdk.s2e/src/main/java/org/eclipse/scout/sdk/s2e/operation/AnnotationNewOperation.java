@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation;
 
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
+
+import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IBuffer;
@@ -22,23 +25,29 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
-import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
+import org.eclipse.scout.sdk.core.builder.BuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
+import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
+import org.eclipse.scout.sdk.core.imports.CompilationUnitScopedImportCollector;
+import org.eclipse.scout.sdk.core.imports.IImportCollector;
+import org.eclipse.scout.sdk.core.imports.IImportValidator;
+import org.eclipse.scout.sdk.core.imports.ImportCollector;
+import org.eclipse.scout.sdk.core.imports.ImportValidator;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitScopedImportCollector;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.PropertyMap;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.PropertySupport;
+import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
+import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
+import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -46,60 +55,48 @@ import org.eclipse.text.edits.TextEdit;
 /**
  * <h3>{@link AnnotationNewOperation}</h3>
  *
- * @author Andreas Hoegger
  * @since 3.10.0 2012-12-06
  */
-public class AnnotationNewOperation implements IOperation {
+public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, EclipseProgress> {
 
   private static final Pattern REGEX_WHITE_SPACE_START = Pattern.compile("^(\\s+).*");
 
-  private IAnnotationSourceBuilder m_sourceBuilder;
+  private final IAnnotationGenerator<?> m_sourceBuilder;
   private final IMember m_declaringMember;
 
-  public AnnotationNewOperation(IAnnotationSourceBuilder sourceBuilder, IMember declaringType) {
+  public AnnotationNewOperation(IAnnotationGenerator<?> sourceBuilder, IMember declaringType) {
     m_sourceBuilder = sourceBuilder;
     m_declaringMember = declaringType;
   }
 
   @Override
-  public String getOperationName() {
-    return "create annotation " + Signature.getSimpleName(m_sourceBuilder.getName()) + "...";
-  }
+  public void accept(EclipseEnvironment env, EclipseProgress progress) {
+    Ensure.isTrue(JdtUtils.exists(m_declaringMember));
 
-  @Override
-  public void validate() {
-    if (!S2eUtils.exists(m_declaringMember)) {
-      throw new IllegalArgumentException("Declaring member does not exist!");
-    }
-  }
-
-  @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ICompilationUnit icu = m_declaringMember.getCompilationUnit();
-
-    workingCopyManager.register(icu, monitor);
-
-    IJavaEnvironment env = ScoutSdkCore.createJavaEnvironment(m_declaringMember.getJavaProject());
-    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(env), S2eUtils.getPackage(icu));
-    Document doc = new Document(icu.getSource());
-
-    TextEdit edit = createEdit(new ImportValidator(collector), doc, icu.findRecommendedLineSeparator());
     try {
+      ICompilationUnit icu = m_declaringMember.getCompilationUnit();
+      currentWorkingCopyManager().register(icu, progress.monitor());
+
+      IJavaEnvironment javaEnv = env.toScoutJavaEnvironment(m_declaringMember.getJavaProject());
+      IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(javaEnv), JdtUtils.getPackage(icu));
+      IDocument doc = new Document(icu.getSource());
+
+      TextEdit edit = createEdit(new ImportValidator(collector), doc, icu.findRecommendedLineSeparator());
       edit.apply(doc);
       IBuffer buffer = icu.getBuffer();
       buffer.setContents(doc.get());
 
       // create imports
-      new ImportsCreateOperation(icu, collector).run(monitor, workingCopyManager);
+      new ImportsCreateOperation(icu, collector).accept(env, progress);
     }
-    catch (Exception e) {
-      SdkLog.warning("could not add annotation to '{}'.", m_declaringMember.getElementName(), e);
+    catch (CoreException | BadLocationException ex) {
+      SdkLog.warning("could not add annotation to '{}'.", m_declaringMember.getElementName(), ex);
     }
   }
 
-  protected ISourceRange getAnnotationReplaceRange(Document sourceDocument, String newLine, String newAnnotationSource) throws JavaModelException, BadLocationException {
-    String sn = Signature.getSimpleName(m_sourceBuilder.getName());
-    String fqn = Signature.getQualifier(m_sourceBuilder.getName()) + '.' + sn;
+  protected ISourceRange getAnnotationReplaceRange(IDocument sourceDocument, CharSequence newLine, CharSequence newAnnotationSource) throws JavaModelException, BadLocationException {
+    String sn = JavaTypes.simpleName(m_sourceBuilder.elementName().orElseThrow(() -> newFail("Annotation generator is missing the name.")));
+    String fqn = JavaTypes.qualifier(m_sourceBuilder.elementName().get()) + JavaTypes.C_DOT + sn;
     int newLineLength = newLine.length();
 
     IRegion lineOfMemberName = sourceDocument.getLineInformationOfOffset(m_declaringMember.getNameRange().getOffset());
@@ -113,8 +110,8 @@ public class AnnotationNewOperation implements IOperation {
     while (lineInfo.getOffset() >= lastLineStart) {
       String lineSource = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
       if (lineSource != null) {
-        lineSource = CoreUtils.removeComments(lineSource.trim());
-        if (lineSource.length() > 0) {
+        lineSource = CoreUtils.removeComments(lineSource);
+        if (!lineSource.isEmpty()) {
           if (!isInBlockComment && lineSource.endsWith("*/")) {
             isInBlockComment = true;
           }
@@ -143,7 +140,7 @@ public class AnnotationNewOperation implements IOperation {
     return new SourceRange(result.getOffset(), isReplaceExisting ? result.getLength() : 0);
   }
 
-  protected String getIndent(Document sourceDocument, ISourceRange replaceRange) throws BadLocationException {
+  protected static String getIndent(IDocument sourceDocument, ISourceRange replaceRange) throws BadLocationException {
     IRegion line = sourceDocument.getLineInformationOfOffset(replaceRange.getOffset());
     Matcher matcher = REGEX_WHITE_SPACE_START.matcher(sourceDocument.get(line.getOffset(), line.getLength()));
     if (matcher.find()) {
@@ -152,33 +149,36 @@ public class AnnotationNewOperation implements IOperation {
     return "";
   }
 
-  public TextEdit createEdit(IImportValidator validator, Document sourceDocument, String nl) throws CoreException {
+  public TextEdit createEdit(IImportValidator validator, IDocument sourceDocument, String nl) throws CoreException {
     try {
       // create new source
-      StringBuilder builder = new StringBuilder();
-
-      PropertyMap context = S2eUtils.propertyMap(m_declaringMember.getJavaProject());
-      getSourceBuilder().createSource(builder, nl, context, validator);
+      PropertySupport properties = S2eUtils.propertyMap(m_declaringMember.getJavaProject());
+      StringBuilder src = getSourceBuilder().toJavaSource(new JavaBuilderContext(new BuilderContext(nl, properties), validator));
 
       // find insert/replace range
-      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, nl, builder.toString());
+      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, nl, src);
 
       // insert indentation at the beginning
-      builder.insert(0, getIndent(sourceDocument, replaceRange));
+      src.insert(0, getIndent(sourceDocument, replaceRange));
 
       // insert newline at the end if required
       if (replaceRange.getLength() == 0) {
-        builder.append(nl);
+        src.append(nl);
       }
 
-      return new ReplaceEdit(replaceRange.getOffset(), replaceRange.getLength(), builder.toString());
+      return new ReplaceEdit(replaceRange.getOffset(), replaceRange.getLength(), src.toString());
     }
     catch (BadLocationException e) {
       throw new CoreException(new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "could not find insert location for annotation.", e));
     }
   }
 
-  public IAnnotationSourceBuilder getSourceBuilder() {
+  public IAnnotationGenerator<?> getSourceBuilder() {
     return m_sourceBuilder;
+  }
+
+  @Override
+  public String toString() {
+    return "Create new Annotation";
   }
 }

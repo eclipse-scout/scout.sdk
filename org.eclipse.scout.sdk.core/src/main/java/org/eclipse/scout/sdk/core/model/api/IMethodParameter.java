@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
+import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 
 /**
  * <h3>{@link IMethodParameter}</h3> Represents a parameter of an {@link IMethod}.
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface IMethodParameter extends IAnnotatable {
@@ -39,12 +40,23 @@ public interface IMethodParameter extends IAnnotatable {
   int flags();
 
   /**
+   * @return The position of this {@link IMethodParameter} in the parameter list of the declaring {@link IMethod}.
+   */
+  int index();
+
+  /**
    * Gets the {@link IMethod} this parameter belongs to
    *
-   * @return The {@link IMethod} this parameter belongs to. Never returns <code>null</code>.
+   * @return The {@link IMethod} this parameter belongs to.
    */
   IMethod declaringMethod();
 
   @Override
   MethodParameterSpi unwrap();
+
+  @Override
+  IMethodParameterGenerator<?> toWorkingCopy();
+
+  @Override
+  IMethodParameterGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer);
 }

@@ -10,26 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 
+import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparing;
+
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  * <h3>{@link PackageContentProvider}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class PackageContentProvider extends AbstractContentProviderAdapter {
@@ -42,22 +42,17 @@ public class PackageContentProvider extends AbstractContentProviderAdapter {
 
   @Override
   public String getText(Object element) {
-    return ((IPackageFragment) element).getElementName();
+    return ((IJavaElement) element).getElementName();
   }
 
   @Override
   protected Collection<Object> loadProposals(IProgressMonitor monitor) {
     IJavaProject javaProject = getJavaProject();
-    if (!S2eUtils.exists(javaProject)) {
-      return Collections.emptyList();
+    if (!JdtUtils.exists(javaProject)) {
+      return emptyList();
     }
 
-    Set<Object> ret = new TreeSet<>(new Comparator<Object>() {
-      @Override
-      public int compare(Object o1, Object o2) {
-        return getText(o1).compareTo(getText(o2));
-      }
-    });
+    Collection<Object> ret = new TreeSet<>(comparing(this::getText));
     try {
       IPackageFragment[] packageFragments = javaProject.getPackageFragments();
       for (IPackageFragment pck : packageFragments) {
@@ -67,7 +62,7 @@ public class PackageContentProvider extends AbstractContentProviderAdapter {
 
         if (pck.getKind() == IPackageFragmentRoot.K_SOURCE) {
           String packageName = pck.getElementName();
-          if (StringUtils.isNotBlank(packageName)) {
+          if (Strings.hasText(packageName)) {
             ret.add(pck);
           }
         }

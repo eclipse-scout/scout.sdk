@@ -10,98 +10,93 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation.jaxws;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
+import java.util.function.BiConsumer;
 
-import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.operation.IOperation;
-import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
+import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  * <h3>{@link RebuildArtifactsOperation}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
-public class RebuildArtifactsOperation implements IOperation {
+public class RebuildArtifactsOperation implements BiConsumer<IEnvironment, IProgress> {
 
-  private IJavaProject m_javaProject;
+  private final IJavaProject m_javaProject;
 
-  @Override
-  public String getOperationName() {
-    return "Rebuild all Web Service Artifacts of Project " + getJavaProject().getElementName();
+  public RebuildArtifactsOperation(IJavaProject javaProject) {
+    m_javaProject = Ensure.notNull(javaProject);
   }
 
   @Override
-  public void validate() {
-    Validate.isTrue(S2eUtils.exists(getJavaProject()), "Java Project must exist.");
-  }
-
-  @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 100);
-    IProject project = getJavaProject().getProject();
-
-    // refresh project
-    project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(2));
-    if (progress.isCanceled()) {
-      return;
-    }
-
-    // delete /target folder contents
-    deleteOutputFolderContents(project, progress.newChild(4));
-    if (progress.isCanceled()) {
-      return;
-    }
-
-    // schedule maven build 'clean compile'
-    progress.worked(44);
+  public void accept(IEnvironment env, IProgress p) {
+    Ensure.isTrue(JdtUtils.exists(getJavaProject()), "Java Project must exist.");
+    EclipseProgress progress = EclipseEnvironment.toScoutProgress(p);
+    progress.init(toString(), 100);
 
     try {
+      // refresh project
+      IProject project = getJavaProject().getProject();
+      project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(2).monitor());
+
+      // delete /target folder contents
+      deleteOutputFolderContents(project, progress.newChild(44).monitor());
+
+      rebuildArtifacts(project);
+      progress.worked(52);
+
+      // refresh the project to 'see' the new artifacts
+      progress.monitor().setTaskName("Refresh project");
+      project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(2).monitor());
+    }
+    catch (CoreException e) {
+      throw new SdkException(e);
+    }
+  }
+
+  protected static void rebuildArtifacts(IProject project) {
+    try {
+      // schedule maven build 'clean process-resources'
       MavenRunner.execute(new MavenBuild()
           .withGoal("clean")
           .withGoal("process-resources")
-          .withWorkingDirectory(project.getLocation().toFile()));
+          .withWorkingDirectory(project.getLocation().toFile().toPath()));
     }
-    catch (Exception e) {
+    catch (RuntimeException e) {
       SdkLog.error("Unable to rebuild artifacts. See maven console for details.", e);
     }
-    progress.worked(48);
-
-    // refresh the project to 'see' the new artifacts
-    progress.setTaskName("Refresh project");
-    project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(2));
   }
 
-  protected void deleteOutputFolderContents(IProject project, SubMonitor progress) throws CoreException {
-    final Set<IResource> resourcesToDelete = new HashSet<>();
-    final IFolder outFolder = project.getFolder("target");
+  protected static void deleteOutputFolderContents(IProject project, SubMonitor progress) throws CoreException {
+    IFolder outFolder = project.getFolder("target");
     if (!outFolder.exists()) {
       return;
     }
 
-    outFolder.accept(new IResourceVisitor() {
-      @Override
-      public boolean visit(IResource resource) throws CoreException {
-        boolean isOutFolder = Objects.equals(outFolder, resource);
-        if (!isOutFolder) {
-          resourcesToDelete.add(resource);
-        }
-        return isOutFolder;
+    Collection<IResource> resourcesToDelete = new HashSet<>();
+    outFolder.accept(resource -> {
+      boolean isOutFolder = Objects.equals(outFolder, resource);
+      if (!isOutFolder) {
+        resourcesToDelete.add(resource);
       }
+      return isOutFolder;
     });
     progress.beginTask("Delete existing Artifacts", resourcesToDelete.size());
     for (IResource r : resourcesToDelete) {
@@ -118,7 +113,8 @@ public class RebuildArtifactsOperation implements IOperation {
     return m_javaProject;
   }
 
-  public void setJavaProject(IJavaProject javaProject) {
-    m_javaProject = javaProject;
+  @Override
+  public String toString() {
+    return "Rebuild Web Service Artifacts";
   }
 }

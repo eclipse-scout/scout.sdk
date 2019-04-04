@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 
 /**
  * <h3>{@link IAnnotationElement}</h3>
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface IAnnotationElement extends IJavaElement {
@@ -23,8 +24,8 @@ public interface IAnnotationElement extends IJavaElement {
   /**
    * Gets the value of this annotation element.
    *
-   * @return The {@link IMetaValue} of this element. Never returns <code>null</code>. Returns a value of
-   *         {@link MetaValueType#Unknown} if the value cannot be computed.
+   * @return The {@link IMetaValue} of this element. Returns a value of {@link MetaValueType#Unknown} if the value
+   *         cannot be computed.
    */
   IMetaValue value();
 
@@ -39,8 +40,8 @@ public interface IAnnotationElement extends IJavaElement {
    * Gets if this {@link IAnnotationElement} has been explicitly specified on the {@link IAnnotation} source code or if
    * it is the default inherited from the annotation declaration.
    *
-   * @return <code>true</code> if this {@link IAnnotationElement} was not declared in source code but is the default of
-   *         the annotation. <code>false</code> otherwise.
+   * @return {@code true} if this {@link IAnnotationElement} was not declared in source code but is the default of the
+   *         annotation. {@code false} otherwise.
    */
   boolean isDefault();
 
@@ -54,11 +55,9 @@ public interface IAnnotationElement extends IJavaElement {
    * <li>@Annotation(anno = @Generated("g3")) -> sourceOfExpression() = "@Generated("g1")"</li>
    * </ul>
    *
-   * @return The {@link ISourceRange} of the value expression of this {@link IAnnotationElement}. Never returns
-   *         <code>null</code>. Use {@link ISourceRange#isAvailable()} to check if source is actually available for this
-   *         element.
+   * @return The {@link ISourceRange} of the value expression of this {@link IAnnotationElement}.
    */
-  ISourceRange sourceOfExpression();
+  Optional<ISourceRange> sourceOfExpression();
 
   @Override
   AnnotationElementSpi unwrap();

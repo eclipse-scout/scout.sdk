@@ -12,24 +12,26 @@ package org.eclipse.scout.sdk.core.model.spi;
 
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
+import org.eclipse.scout.sdk.core.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
  * <h3>{@link TypeSpi}</h3> Represents a java data type. This includes classes, interfaces, enums, primitives, the
  * void-type & the wildcard-type ("?").
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface TypeSpi extends MemberSpi {
 
   /**
    * Gets the {@link PackageSpi} of this {@link TypeSpi}.<br>
-   * For primitives, the void-type and the wildcard-type this method returns the {@link PackageSpi#DEFAULT_PACKAGE}.
+   * For primitives, the void-type and the wildcard-type this method returns the default package
+   * ({@link PackageSpi#getElementName()} is {@code null}).
    *
-   * @return The {@link PackageSpi} of this {@link TypeSpi} or {@link PackageSpi#DEFAULT_PACKAGE} for the default
-   *         package. Never returns <code>null</code>.
+   * @return The {@link PackageSpi} of this {@link TypeSpi}.
    */
   PackageSpi getPackage();
 
@@ -37,7 +39,7 @@ public interface TypeSpi extends MemberSpi {
    * Gets the fully qualified name of this {@link TypeSpi}.<br>
    * Inner types are separated by '$'.<br>
    * <br>
-   * <b>Example: </b><code>org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass</code>.<br>
+   * <b>Example: </b>{@code org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass}.<br>
    *
    * @return The fully qualified name of this {@link TypeSpi}.
    */
@@ -53,26 +55,17 @@ public interface TypeSpi extends MemberSpi {
   List<TypeSpi> getTypeArguments();
 
   /**
-   * If this {@link TypeSpi} is a synthetic parameterized type (for example the super class of a parameterized type with
-   * applied type arguments) then this method returns the original type without the type arguments applied.
-   * <p>
-   * Otherwise this is returned
-   */
-  TypeSpi getOriginalType();
-
-  /**
-   * Specifies if this is an anonymous class. If <code>true</code> the {@link #simpleName()} will return an empty
+   * Specifies if this is an anonymous class. If {@code true} the {@link #getElementName()} will return an empty
    * {@link String} and {@link #getName()} will have no last segment.
    *
-   * @return <code>true</code> if it is an anonymous class, <code>false</code> otherwise.
+   * @return {@code true} if it is an anonymous class, {@code false} otherwise.
    */
   boolean isAnonymous();
 
   /**
-   * Gets the super {@link TypeSpi} of this {@link TypeSpi} or <code>null</code> if this {@link TypeSpi} is
-   * {@link Object}.
+   * Gets the super {@link TypeSpi} of this {@link TypeSpi} or {@code null} if this {@link TypeSpi} is {@link Object}.
    *
-   * @return The super {@link TypeSpi} or <code>null</code>.
+   * @return The super {@link TypeSpi} or {@code null}.
    */
   TypeSpi getSuperClass();
 
@@ -84,7 +77,7 @@ public interface TypeSpi extends MemberSpi {
   List<TypeSpi> getSuperInterfaces();
 
   /**
-   * @return the source of the static initializer without the { and } brackets
+   * @return the source of the static initializer.
    */
   ISourceRange getSourceOfStaticInitializer();
 
@@ -114,31 +107,23 @@ public interface TypeSpi extends MemberSpi {
   /**
    * Gets if this {@link TypeSpi} represents a primitive type.
    *
-   * @return <code>true</code> if this {@link TypeSpi} represents a primitive type, <code>false</code> otherwise.
+   * @return {@code true} if this {@link TypeSpi} represents a primitive type, {@code false} otherwise.
    */
   boolean isPrimitive();
-
-  /**
-   * Gets if this {@link TypeSpi} represents an array type.<br>
-   * If the result is <code>true</code> this means the array dimension is &gt; 0 (see {@link #getArrayDimension()}).
-   *
-   * @return <code>true</code> if this {@link TypeSpi} represents an array type, <code>false</code> otherwise.
-   */
-  boolean isArray();
 
   /**
    * Gets the number of array dimensions this {@link TypeSpi} represents.<br>
    * An array dimension of zero means no array.<br>
    * <br>
    * <b>Example: </b><br>
-   * <code>Object[][]: getArrayDimension() = 2</code>
+   * {@code Object[][]: getArrayDimension() = 2}
    *
    * @return The array dimension of this {@link TypeSpi}.
    */
   int getArrayDimension();
 
   /**
-   * Only valid on arrays {@link #isArray()}
+   * Only valid on arrays ({@link #getArrayDimension()} &gt; 0).
    *
    * @return the leaf component type of the array that is the type without []
    */
@@ -147,20 +132,35 @@ public interface TypeSpi extends MemberSpi {
   /**
    * Gets if this {@link TypeSpi} represents a wildcard type ("?").
    *
-   * @return <code>true</code> if this {@link TypeSpi} represents a wildcard type, <code>false</code> otherwise.
+   * @return {@code true} if this {@link TypeSpi} represents a wildcard type, {@code false} otherwise.
    */
   boolean isWildcardType();
 
   /**
    * Gets the {@link CompilationUnitSpi} of this {@link TypeSpi}.
    * <p>
-   * For primitives, the void-type and wildcard-types this method returns <code>null</code>.
+   * For primitives, the void-type and wildcard-types this method returns {@code null}.
    * <p>
    * Binary types return a compilation unit with {@link CompilationUnitSpi#isSynthetic()} = true
    *
-   * @return The {@link CompilationUnitSpi} that belongs to this {@link TypeSpi} <code>null</code>.
+   * @return The {@link CompilationUnitSpi} that belongs to this {@link TypeSpi} or {@code null}.
    */
   CompilationUnitSpi getCompilationUnit();
+
+  @Override
+  default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.preVisit(wrap(), level, index);
+  }
+
+  @Override
+  default boolean acceptPostOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.postVisit(wrap(), level, index);
+  }
+
+  @Override
+  default TreeVisitResult acceptLevelOrder(IBreadthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.visit(wrap(), level, index);
+  }
 
   @Override
   IType wrap();

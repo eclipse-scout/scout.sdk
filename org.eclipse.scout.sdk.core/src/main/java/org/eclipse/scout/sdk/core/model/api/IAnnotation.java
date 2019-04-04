@@ -11,15 +11,16 @@
 package org.eclipse.scout.sdk.core.model.api;
 
 import java.util.Map;
+import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
 
 /**
  * <h3>{@link IAnnotation}</h3><br>
  * Represents an annotation declaration.
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface IAnnotation extends IJavaElement {
@@ -30,11 +31,13 @@ public interface IAnnotation extends IJavaElement {
   String name();
 
   /**
-   * Gets all attributes of this {@link IAnnotation}.<br>
-   * The {@link Map} iterates over the attributes in the order as they appear in the source or class file.
+   * Gets all elements of this {@link IAnnotation}. This includes the elements that are not explicitly specified in the
+   * source file.<br>
+   * The {@link Map} iterates over the elements in the order as they appear in the annotation type declaration source or
+   * class file. The order of the specific annotation occurrence has no influence.
    *
-   * @return A {@link Map} containing the attribute name ({@link IAnnotationElement#name()}) as key and the
-   *         {@link IAnnotationElement} as value. Never returns <code>null</code>.
+   * @return An unmodifiable {@link Map} containing the element name ({@link IAnnotationElement#elementName()}) as key
+   *         and the {@link IAnnotationElement} as value.
    */
   Map<String, IAnnotationElement> elements();
 
@@ -43,15 +46,15 @@ public interface IAnnotation extends IJavaElement {
    *
    * @param name
    *          The name of the {@link IAnnotationElement} to return.
-   * @return The {@link IAnnotationElement} with the given name or <code>null</code> if no attribute with given name
-   *         exists.
+   * @return The {@link IAnnotationElement} with the given name or an empty {@link Optional} if no element with given
+   *         name exists.
    */
-  IAnnotationElement element(String name);
+  Optional<IAnnotationElement> element(String name);
 
   /**
    * Gets the object on which this {@link IAnnotation} is defined.
    *
-   * @return The owner {@link IAnnotatable} of this {@link IAnnotation}. Never returns <code>null</code>.
+   * @return The owner {@link IAnnotatable} of this {@link IAnnotation}.
    */
   IAnnotatable owner();
 
@@ -59,13 +62,13 @@ public interface IAnnotation extends IJavaElement {
    * Gets the annotation definition {@link IType}.<br>
    * Returns e.g. the type {@link Override}.
    *
-   * @return The annotation definition type. Never returns <code>null</code>.
+   * @return The annotation definition type.
    */
   IType type();
 
   /**
    * Wraps this {@link IAnnotation} into the given {@link AbstractManagedAnnotation} class.
-   * 
+   *
    * @param managedAnnotationType
    *          The managed annotation class. The class must match this {@link IAnnotation} type.
    * @return The newly created managed annotation.
@@ -74,4 +77,10 @@ public interface IAnnotation extends IJavaElement {
 
   @Override
   AnnotationSpi unwrap();
+
+  @Override
+  IAnnotationGenerator<?> toWorkingCopy();
+
+  @Override
+  IAnnotationGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer);
 }

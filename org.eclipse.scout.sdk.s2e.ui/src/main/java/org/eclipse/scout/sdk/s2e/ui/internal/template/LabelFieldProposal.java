@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 /**
  * <h3>{@link LabelFieldProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class LabelFieldProposal extends FormFieldProposal {

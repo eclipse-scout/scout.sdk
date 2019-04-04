@@ -22,7 +22,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedPosition;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.text.edits.MalformedTreeException;

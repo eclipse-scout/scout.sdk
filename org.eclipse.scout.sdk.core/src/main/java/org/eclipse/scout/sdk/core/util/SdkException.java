@@ -10,25 +10,45 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
+import org.eclipse.scout.sdk.core.log.FormattingTuple;
+import org.eclipse.scout.sdk.core.log.MessageFormatter;
+
 /**
  * <h3>{@link SdkException}</h3>
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public class SdkException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public SdkException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public SdkException(String message) {
-    super(message);
+  /**
+   * Creates a {@link SdkException} from the given message.
+   * <p>
+   * Formatting anchors in the form of {@link MessageFormatter#ARG_REPLACE_PATTERN} can be used in the message, which
+   * will be replaced by the respective argument.
+   * <p>
+   * If there are more arguments of the type {@link Throwable} and not referenced as formatting anchor in the message,
+   * that {@link Throwable} is used as the exception's cause.
+   * <p>
+   * Internally, {@link MessageFormatter} is used to provide substitution functionality.
+   *
+   * @param message
+   *          the message with support for formatting anchors in the form of
+   *          {@link MessageFormatter#ARG_REPLACE_PATTERN} pairs.
+   * @param args
+   *          optional arguments to substitute formatting anchors in the message, with the last argument used as the
+   *          exception's cause if of type {@link Throwable} and not referenced in the message.
+   */
+  public SdkException(String message, Object... args) {
+    this(MessageFormatter.arrayFormat(message, args));
   }
 
   public SdkException(Throwable cause) {
-    super(cause);
+    this("", cause);
+  }
+
+  protected SdkException(FormattingTuple format) {
+    super(format.message(), format.firstThrowable().orElse(null));
   }
 }

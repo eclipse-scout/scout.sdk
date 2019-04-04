@@ -31,33 +31,6 @@
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.scout.sdk.core</artifactId>
     </dependency>
-
-    <!-- For embedded Maven execution -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-embedder</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.takari.aether</groupId>
-      <artifactId>aether-connector-okhttp</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-provider-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-compat</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-connector-basic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-wagon</artifactId>
-    </dependency>
-
     <!-- for WSDL parsing (JAX-WS) -->
     <dependency>
       <groupId>wsdl4j</groupId>

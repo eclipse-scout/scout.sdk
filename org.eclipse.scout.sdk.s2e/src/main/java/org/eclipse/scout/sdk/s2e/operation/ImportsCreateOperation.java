@@ -13,20 +13,23 @@ package org.eclipse.scout.sdk.s2e.operation;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.core.imports.IImportCollector;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
+import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  * <h3>{@link ImportsCreateOperation}</h3>
  *
- * @author Matthias Villiger
  * @since 4.0.0 2014-03-27
  */
-public class ImportsCreateOperation implements IOperation {
+public class ImportsCreateOperation implements BiConsumer<EclipseEnvironment, EclipseProgress> {
 
   private final Set<String> m_importsToCreate;
   private final ICompilationUnit m_icu;
@@ -36,42 +39,25 @@ public class ImportsCreateOperation implements IOperation {
     m_icu = icu;
   }
 
-  /**
-   * @param icu
-   *          The owner {@link ICompilationUnit}.
-   * @param importsToCreate
-   *          Fully qualified imports without any key words like <code>import</code>.
-   */
-  public ImportsCreateOperation(ICompilationUnit icu, Set<String> importsToCreate) {
-    this(icu);
-    if (importsToCreate != null) {
-      setImportsToCreate(importsToCreate);
-    }
-  }
-
   public ImportsCreateOperation(ICompilationUnit icu, IImportCollector validator) {
     this(icu);
     if (validator != null) {
-      setImportsToCreate(validator.getImports() /* static imports not yet supported */);
+      validator.getImports()
+          .map(StringBuilder::toString)
+          .forEach(this::addImportToCreate);
     }
   }
 
   @Override
-  public String getOperationName() {
-    return "Create imports";
-  }
-
-  @Override
-  public void validate() {
-    if (!S2eUtils.exists(getCompilationUnit())) {
-      throw new IllegalArgumentException("Compilation unit must exist to create imports!");
+  public void accept(EclipseEnvironment env, EclipseProgress progress) {
+    Ensure.isTrue(JdtUtils.exists(getCompilationUnit()));
+    try {
+      for (String s : m_importsToCreate) {
+        getCompilationUnit().createImport(s, null, progress.monitor());
+      }
     }
-  }
-
-  @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    for (String s : m_importsToCreate) {
-      getCompilationUnit().createImport(s, null, monitor);
+    catch (JavaModelException e) {
+      throw new SdkException(e);
     }
   }
 
@@ -90,5 +76,10 @@ public class ImportsCreateOperation implements IOperation {
   public void setImportsToCreate(Collection<String> imports) {
     m_importsToCreate.clear();
     m_importsToCreate.addAll(imports);
+  }
+
+  @Override
+  public String toString() {
+    return "Create imports";
   }
 }

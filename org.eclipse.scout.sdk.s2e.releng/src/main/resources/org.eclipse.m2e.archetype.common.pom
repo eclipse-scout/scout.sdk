@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk.deps</groupId>
   <artifactId>org.eclipse.m2e.archetype.common</artifactId>
-  <version>${org.eclipse.m2e.archetype.common-maven}</version>
+  <version>${org.eclipse.m2e.archetype.common}</version>
 
   <name>Scout SDK org.eclipse.m2e.archetype.common dependency (Incubation)</name>
   <description>This is org.eclipse.m2e.archetype.common jar used by Scout SDK</description>
@@ -31,14 +31,14 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.osgi</artifactId>
-      <version>${org.eclipse.osgi-range}</version>
+      <version>${org.eclipse.osgi}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>${org.eclipse.core.runtime-range}</version>
+      <version>${org.eclipse.core.runtime}</version>
     </dependency>
   </dependencies>
 </project>

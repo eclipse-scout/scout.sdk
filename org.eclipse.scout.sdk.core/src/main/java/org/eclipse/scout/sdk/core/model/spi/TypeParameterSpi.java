@@ -12,12 +12,14 @@ package org.eclipse.scout.sdk.core.model.spi;
 
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
+import org.eclipse.scout.sdk.core.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
  * <h3>{@link TypeParameterSpi}</h3> Represents a type parameter.
  *
- * @author Ivan Motsch
  * @since 4.1.0 2014-11-09
  */
 public interface TypeParameterSpi extends JavaElementSpi {
@@ -26,8 +28,8 @@ public interface TypeParameterSpi extends JavaElementSpi {
    * Gets all bounds of this {@link TypeParameterSpi}. The first bound will be the class parameter (if existing)
    * followed by all interface bounds in the order as it is defined in the source or class file.<br>
    * <br>
-   * <b>Example: </b>
-   * <code>ChildClass&lt;X extends AbstractList&lt;String&gt; & Runnable & Serializable&gt;: .getBounds() = {AbstractList&lt;String&gt;, Runnable, Serializable}</code>
+   * <b>Example: </b> {@code ChildClass<X extends AbstractList<String> & Runnable & Serializable>: .getBounds() =
+   * {AbstractList<String>, Runnable, Serializable}}
    *
    * @return A {@link List} containing all bounds of this {@link TypeParameterSpi}.
    */
@@ -39,6 +41,21 @@ public interface TypeParameterSpi extends JavaElementSpi {
    * @return The {@link MemberSpi} this {@link TypeParameterSpi} belongs to.
    */
   MemberSpi getDeclaringMember();
+
+  @Override
+  default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.preVisit(wrap(), level, index);
+  }
+
+  @Override
+  default boolean acceptPostOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.postVisit(wrap(), level, index);
+  }
+
+  @Override
+  default TreeVisitResult acceptLevelOrder(IBreadthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.visit(wrap(), level, index);
+  }
 
   @Override
   ITypeParameter wrap();

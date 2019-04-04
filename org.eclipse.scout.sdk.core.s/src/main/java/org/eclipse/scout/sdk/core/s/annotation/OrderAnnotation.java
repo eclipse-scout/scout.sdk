@@ -10,33 +10,39 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.annotation;
 
+import java.util.Optional;
+
+import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 
 /**
  * <h3>{@link OrderAnnotation}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class OrderAnnotation extends AbstractManagedAnnotation {
 
   public static final String TYPE_NAME = IScoutRuntimeTypes.Order;
 
-  public double value() {
-    return getValue("value", double.class, null);
+  public static double valueOf(IAnnotatable owner, boolean isBean) {
+    Optional<OrderAnnotation> first = owner.annotations()
+        .withManagedWrapper(OrderAnnotation.class)
+        .first();
+
+    //don't evaluate as stream to prevent auto boxing
+    if (first.isPresent()) {
+      return first.get().value();
+    }
+
+    if (isBean) {
+      return ISdkProperties.DEFAULT_BEAN_ORDER;
+    }
+    return ISdkProperties.DEFAULT_VIEW_ORDER;
   }
 
-  public static double valueOf(IAnnotatable owner, boolean isBean) {
-    OrderAnnotation orderAnnotation = owner.annotations().withManagedWrapper(OrderAnnotation.class).first();
-    if (orderAnnotation == null) {
-      if (isBean) {
-        return ISdkProperties.DEFAULT_BEAN_ORDER; // default order of the scout runtime for beans
-      }
-      return ISdkProperties.DEFAULT_VIEW_ORDER; // default order of the scout runtime for views
-    }
-    return orderAnnotation.value();
+  public double value() {
+    return getValue("value", double.class, null);
   }
 }

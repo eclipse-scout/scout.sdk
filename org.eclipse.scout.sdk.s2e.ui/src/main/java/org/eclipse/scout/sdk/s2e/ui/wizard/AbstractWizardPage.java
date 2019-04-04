@@ -10,44 +10,38 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.wizard;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.scout.sdk.core.util.BasicPropertySupport;
-import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
+import org.eclipse.scout.sdk.core.util.PropertySupport;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>AbstractScoutWizardPage</h3>
  *
- * @author Andreas Hoegger
  * @since 1.0.0 2008-01-11
  */
 public abstract class AbstractWizardPage extends WizardPage {
 
   private IStatus m_status = Status.OK_STATUS;
   private Composite m_content;
-  private int m_stateChangingCounter = 0;
+  private int m_stateChangingCounter;
   private boolean m_excludePage;
 
-  private final FieldToolkit m_fieldToolkit;
-  private final BasicPropertySupport m_propertySupport;
+  private final PropertySupport m_propertySupport;
 
-  public AbstractWizardPage(String pageName) {
-    super(pageName, null, (ImageDescriptor) null);
-
-    m_fieldToolkit = new FieldToolkit();
-    m_propertySupport = new BasicPropertySupport(this);
-  }
-
-  public FieldToolkit getFieldToolkit() {
-    return m_fieldToolkit;
+  protected AbstractWizardPage(String pageName) {
+    super(pageName, null, null);
+    m_propertySupport = new PropertySupport(this);
   }
 
   @Override
@@ -66,8 +60,6 @@ public abstract class AbstractWizardPage extends WizardPage {
 
   /**
    * Overwrite this method to add your controls to the wizard page.
-   *
-   * @param parent
    */
   protected abstract void createContent(Composite parent);
 
@@ -89,7 +81,7 @@ public abstract class AbstractWizardPage extends WizardPage {
       setMessage(getDescription(), IStatus.OK);
     }
     else {
-      IStatus highestSeverityStatus = getHighestSeverityStatus(status, Status.OK_STATUS);
+      IStatus highestSeverityStatus = getHighestSeverityStatus(status);
       int messagetype;
       switch (highestSeverityStatus.getSeverity()) {
         case IStatus.INFO:
@@ -112,7 +104,11 @@ public abstract class AbstractWizardPage extends WizardPage {
     m_status = status;
   }
 
-  private IStatus getHighestSeverityStatus(IStatus status, IStatus highestSeverity) {
+  public static IStatus getHighestSeverityStatus(IStatus status) {
+    return getHighestSeverityStatus(status, Status.OK_STATUS);
+  }
+
+  private static IStatus getHighestSeverityStatus(IStatus status, IStatus highestSeverity) {
     if (status.isMultiStatus()) {
       for (IStatus child : status.getChildren()) {
         highestSeverity = getHighestSeverityStatus(child, highestSeverity);
@@ -138,8 +134,6 @@ public abstract class AbstractWizardPage extends WizardPage {
 
   /**
    * NOTE: always call this method in a try finally block.
-   *
-   * @param changing
    */
   protected void setStateChanging(boolean changing) {
     if (changing) {
@@ -159,7 +153,7 @@ public abstract class AbstractWizardPage extends WizardPage {
    * call to revalidate the wizard page. this method calls the overwritable method
    * {@link AbstractWizardPage#validatePage(MultiStatus)}.
    *
-   * @see {@link AbstractWizardPage#validatePage(MultiStatus)}
+   * @see AbstractWizardPage#validatePage(MultiStatus)
    */
   protected final void revalidate() {
     setStatus(computePageStatus());
@@ -172,12 +166,14 @@ public abstract class AbstractWizardPage extends WizardPage {
   }
 
   /**
-   * Classes extending BCWizardPage can overwrite this method to do some page validation and add additional status to
-   * the given multi status.
+   * Classes extending {@link AbstractWizardPage} can overwrite this method to do some page validation and add
+   * additional status to the given {@link MultiStatus}.
    *
    * @param multiStatus
+   *          The {@link MultiStatus} to modify.
    */
   protected void validatePage(MultiStatus multiStatus) {
+    // may be implemented by subclasses
   }
 
   public boolean performFinish() {
@@ -200,25 +196,28 @@ public abstract class AbstractWizardPage extends WizardPage {
    * @param type
    *          defines the data type returned
    */
-  @SuppressWarnings("unchecked")
-  public <T extends Object> T getProperty(String key, Class<T> type) {
-    return (T) m_propertySupport.getProperty(key);
+  public <T> T getProperty(String key, Class<T> type) {
+    return m_propertySupport.getProperty(key, type);
   }
 
   public boolean getPropertyBool(String name) {
-    return m_propertySupport.getPropertyBool(name);
+    return getPropertyBool(name, false);
+  }
+
+  public boolean getPropertyBool(String name, boolean defaultValue) {
+    return m_propertySupport.getPropertyBool(name, defaultValue);
   }
 
   public double getPropertyDouble(String name) {
-    return m_propertySupport.getPropertyDouble(name);
+    return m_propertySupport.getPropertyDouble(name, 0.0);
   }
 
   public int getPropertyInt(String name) {
-    return m_propertySupport.getPropertyInt(name);
+    return m_propertySupport.getPropertyInt(name, 0);
   }
 
   public long getPropertyLong(String name) {
-    return m_propertySupport.getPropertyLong(name);
+    return m_propertySupport.getPropertyLong(name, 0L);
   }
 
   public String getPropertyString(String name) {
@@ -227,6 +226,33 @@ public abstract class AbstractWizardPage extends WizardPage {
 
   public boolean setProperty(String name, Object newValue) {
     return m_propertySupport.setProperty(name, newValue);
+  }
+
+  /**
+   * Executes the specified property changer. If the result is {@code true} (meaning 'changed') and the specified
+   * control is not {@code null}, the specified control consumer is executed to update the control if necessary.
+   *
+   * @param controlToChange
+   *          The {@link Control} that should be updated in case the property changed.
+   * @param propertyChanger
+   *          The {@link BooleanSupplier} that updates the property. The return value indicates if the property has
+   *          actually been changed.
+   * @param controlChanger
+   *          A {@link Consumer} that updates the specified {@link Control} if the property has changed.
+   * @return {@code true} if the property changed, {@code false} otherwise.
+   */
+  protected <T extends Control> boolean setPropertyWithChangingControl(T controlToChange, BooleanSupplier propertyChanger, Consumer<T> controlChanger) {
+    try {
+      setStateChanging(true);
+      boolean changed = propertyChanger.getAsBoolean();
+      if (changed && controlToChange != null && isControlCreated()) {
+        controlChanger.accept(controlToChange);
+      }
+      return changed;
+    }
+    finally {
+      setStateChanging(false);
+    }
   }
 
   public boolean setPropertyBool(String name, boolean b) {

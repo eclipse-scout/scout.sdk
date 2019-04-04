@@ -10,15 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import java.util.List;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IImport;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.query.InnerTypeQuery;
+import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
-import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
+import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 
 /**
  *
@@ -40,34 +49,56 @@ public class CompilationUnitImplementor extends AbstractJavaElementImplementor<C
   }
 
   @Override
-  public IType resolveTypeBySimpleName(String simpleName) {
-    return JavaEnvironmentImplementor.wrapType(m_spi.findTypeBySimpleName(simpleName));
+  public Optional<IType> resolveTypeBySimpleName(String simpleName) {
+    return Optional.ofNullable(m_spi.findTypeBySimpleName(simpleName))
+        .map(TypeSpi::wrap);
   }
 
   @Override
-  public IType mainType() {
-    return JavaEnvironmentImplementor.wrapType(m_spi.getMainType());
+  public Stream<? extends IJavaElement> children() {
+    Stream<? extends IJavaElement> packageAndImports = Stream.concat(Stream.of(containingPackage()), imports());
+    return Stream.concat(packageAndImports, types().stream());
   }
 
   @Override
-  public List<IImport> imports() {
-    return new WrappedList<>(m_spi.getImports());
+  public Optional<IType> mainType() {
+    return Optional.ofNullable(m_spi.getMainType())
+        .map(TypeSpi::wrap);
   }
 
   @Override
-  public ISourceRange javaDoc() {
-    return m_spi.getJavaDoc();
+  public IType requireMainType() {
+    return mainType()
+        .orElseThrow(() -> newFail("Compilation Unit '{}' has no main type.", path()));
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    JavaModelPrinter.print(this, sb);
-    return sb.toString();
+  public Path path() {
+    return containingPackage().asPath().resolve(elementName());
   }
 
   @Override
-  public TypeQuery types() {
-    return new TypeQuery(new WrappedList<IType>(m_spi.getTypes()));
+  public Stream<IImport> imports() {
+    return WrappingSpliterator.stream(m_spi.getImports());
+  }
+
+  @Override
+  public Optional<ISourceRange> javaDoc() {
+    return Optional.ofNullable(m_spi.getJavaDoc());
+  }
+
+  @Override
+  public InnerTypeQuery types() {
+    return new InnerTypeQuery(new WrappingSpliterator<>(m_spi.getTypes()));
+  }
+
+  @Override
+  public ICompilationUnitGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
+    return IWorkingCopyTransformer.transformCompilationUnit(this, transformer);
+  }
+
+  @Override
+  public ICompilationUnitGenerator<?> toWorkingCopy() {
+    return toWorkingCopy(null);
   }
 }

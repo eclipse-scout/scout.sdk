@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.core.s.util.maven;
 /**
  * <h3>{@link IMavenRunnerSpi}</h3> Represents a class that is capable to execute {@link MavenBuild}s.
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
+@FunctionalInterface
 public interface IMavenRunnerSpi {
   /**
    * Executes the given {@link MavenBuild}.

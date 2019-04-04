@@ -13,14 +13,13 @@ package org.eclipse.scout.sdk.core.model.api;
 /**
  * <h3>{@link IArrayMetaValue}</h3> Describes an array value.
  *
- * @author Ivan Motsch
  * @since 5.1.0
  */
 public interface IArrayMetaValue extends IMetaValue {
   /**
    * Gets the array values of a {@link IMetaValue} of type {@link MetaValueType#Array}.
    *
-   * @return The segments of the array value. Never returns <code>null</code>.
+   * @return The segments of the array value.
    */
   IMetaValue[] metaValueArray();
 }

@@ -13,18 +13,31 @@
 -->
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="nlsImporter" name="Translation Importer" schema="schema/nlsImporter.exsd"/>
+   <extension-point id="nlsExporter" name="Translation Exporter" schema="schema/nlsExporter.exsd"/>
    <extension point="org.eclipse.ui.startup">
-      <startup class="org.eclipse.scout.sdk.s2e.ui.internal.util.ScoutSdkStartupExtension"></startup>
+      <startup class="org.eclipse.scout.sdk.s2e.ui.internal.ScoutSdkStartupExtension"></startup>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.eclipse.scout.sdk.s2e.ui.internal.editor.jaxws.WebServiceEditor"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.jaxws.editor.WebServiceEditor"
             icon="icons/wsdl.gif"
             extensions="jaxws"
             default="true"
             id="org.eclipse.scout.sdk.s2e.ui.jaxwsEditor"
             name="Scout Web Service Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.scout.sdk.s2e.ui.internal.nls.editor.NlsEditor"
+            icon="icons/nls.gif"
+            extensions="nls"
+            default="false"
+            id="org.eclipse.scout.sdk.s2e.ui.nlsEditor"
+            name="Scout NLS Editor">
       </editor>
    </extension>
    <extension point="org.eclipse.ui.preferencePages">
@@ -52,6 +65,27 @@
             class="org.eclipse.scout.sdk.s2e.ui.internal.template.ScoutTemplateCompletionProposalComputer">
          <partition
                type="__dftl_partition_content_type">
+         </partition>
+      </javaCompletionProposalComputer>
+   </extension>
+   <extension
+         id="org.eclipse.scout.sdk.s2e.ui.nls"
+         name="Eclipse Scout NLS Text Proposals"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <proposalCategory
+            icon="icons/comment.png">
+      </proposalCategory>
+   </extension>
+   <extension
+         id="org.eclipse.scout.sdk.s2e.ui.nlsComputer"
+         name="Eclipse Scout NLS Text Proposals"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.nls"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.nls.proposal.TranslationProposalComputer">
+         <partition
+               type="__java_string">
          </partition>
       </javaCompletionProposalComputer>
    </extension>
@@ -109,6 +143,16 @@
                tooltip="Searches duplicate @ClassId Values in the current Workspace and marks all findings with Error Markers in the Problems View."
                style="push">
             </command>
+            <separator
+               name="org.eclipse.scout.sdk.s2e.ui.menu.separator03"
+               visible="true">
+            </separator>
+            <command
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.searchMissingTextKeys"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.searchMissingTextKeys"
+               tooltip="Searches text keys that are used in the code but do not exist in a visible Scout Text Provider Service."
+               style="push">
+            </command>
          </menu>
       </menuContribution>
    </extension>
@@ -119,7 +163,7 @@
             name="Scout"/>
       <wizard
             category="org.eclipse.scout.sdk.s2e"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.project.ScoutProjectNewWizard"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.project.ScoutProjectNewWizard"
             hasPages="true"
             icon="icons/eclipse_scout.gif"
             id="org.eclipse.scout.sdk.s2e.ui.newScoutProjectWizard"
@@ -127,7 +171,7 @@
             project="true"/>
      <wizard
             category="org.eclipse.scout.sdk.s2e"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.code.CodeTypeNewWizard"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.code.CodeTypeNewWizard"
             hasPages="true"
             icon="icons/codeType_add.png"
             id="org.eclipse.scout.sdk.s2e.ui.newCodeTypeWizard"
@@ -135,7 +179,7 @@
             project="false"/>
      <wizard
             category="org.eclipse.scout.sdk.s2e"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.form.FormNewWizard"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.form.FormNewWizard"
             hasPages="true"
             icon="icons/form_add.png"
             id="org.eclipse.scout.sdk.s2e.ui.newFormWizard"
@@ -143,7 +187,7 @@
             project="false"/>
      <wizard
             category="org.eclipse.scout.sdk.s2e"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.page.PageNewWizard"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.page.PageNewWizard"
             hasPages="true"
             icon="icons/page_add.png"
             id="org.eclipse.scout.sdk.s2e.ui.newPageWizard"
@@ -151,7 +195,7 @@
             project="false"/>
      <wizard
             category="org.eclipse.scout.sdk.s2e"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.permission.PermissionNewWizard"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.permission.PermissionNewWizard"
             hasPages="true"
             icon="icons/permission_add.png"
             id="org.eclipse.scout.sdk.s2e.ui.newPermissionWizard"
@@ -159,7 +203,7 @@
             project="false"/>
      <wizard
             category="org.eclipse.scout.sdk.s2e"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.lookupcall.LookupCallNewWizard"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.lookupcall.LookupCallNewWizard"
             hasPages="true"
             icon="icons/lookupCall_add.png"
             id="org.eclipse.scout.sdk.s2e.ui.newLookupCallWizard"
@@ -167,7 +211,7 @@
             project="false"/>
      <wizard
             category="org.eclipse.scout.sdk.s2e"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.jaxws.WebServiceNewWizard"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.jaxws.WebServiceNewWizard"
             hasPages="true"
             icon="icons/webservice_add.gif"
             id="org.eclipse.scout.sdk.s2e.ui.newWebService"
@@ -230,27 +274,32 @@
             id="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
+      <command
+            name="Search missing text keys"
+            id="org.eclipse.scout.sdk.s2e.ui.commands.searchMissingTextKeys"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </command>
    </extension>
    <extension point="org.eclipse.ui.handlers">
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerAllTypeChangedHandlers"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerAllDerivedResourceHandlers">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.derived.TriggerAllDerivedResourceHandlers">
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerSelectedDerivedResourceHandler">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.derived.TriggerSelectedDerivedResourceHandler">
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.WellformAllHandler">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.wellform.WellformAllHandler">
       </handler>
       <handler
           commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
-          class="org.eclipse.scout.sdk.s2e.ui.internal.handler.WellformSelectedHandler">
+          class="org.eclipse.scout.sdk.s2e.ui.internal.wellform.WellformSelectedHandler">
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateAllMissingClassIdsHandler">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.classid.CreateAllMissingClassIdsHandler">
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.searchForDuplicateClassIdValues"
@@ -258,7 +307,11 @@
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateSelectedMissingClassIdsHandler">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.classid.CreateSelectedMissingClassIdsHandler">
+      </handler>
+      <handler
+            commandId="org.eclipse.scout.sdk.s2e.ui.commands.searchMissingTextKeys"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.nls.search.NlsFindMissingKeysHandler">
       </handler>
    </extension>
    <extension

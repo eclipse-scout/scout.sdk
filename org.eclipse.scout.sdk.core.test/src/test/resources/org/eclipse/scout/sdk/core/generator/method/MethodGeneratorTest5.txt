@@ -1,0 +1,5 @@
+@Override
+protected int methodWithArgs(int a, String b, Set<String> c) throws RuntimeException {
+// TODO [anonymous] Auto-generated method stub.
+return 0;
+}

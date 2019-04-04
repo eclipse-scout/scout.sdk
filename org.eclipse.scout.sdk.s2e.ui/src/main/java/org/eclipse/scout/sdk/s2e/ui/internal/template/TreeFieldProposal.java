@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 /**
  * <h3>{@link TreeFieldProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class TreeFieldProposal extends FormFieldProposal {

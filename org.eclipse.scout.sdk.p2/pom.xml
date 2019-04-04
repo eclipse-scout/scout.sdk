@@ -80,15 +80,6 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
       <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
     </dependency>
     <dependency>

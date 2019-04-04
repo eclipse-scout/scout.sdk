@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.doc;
 /**
  * <h3>{@link IContextsScoutXmlIds}</h3> Ids defined in the "contexts_scout.xml" file.
  *
- * @author Jeremie Bresson
  * @since 5.2.0
  */
 public interface IContextsScoutXmlIds {

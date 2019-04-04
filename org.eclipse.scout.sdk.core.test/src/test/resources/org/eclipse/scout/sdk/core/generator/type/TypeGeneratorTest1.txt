@@ -1,0 +1,19 @@
+/**
+* Default Testing Comment for
+* Type TestClass
+*/
+@Generated(value = "GeneratorType", comments = "Comments")
+public final class TestClass<T extends Comparable> extends AbstractMap implements CharSequence, Comparable {
+private final class FirstInnerType {
+
+}
+public void testMethod() {
+}
+private static final long serialVersionUID = 1L;
+private float m_simpleMember;
+public TestClass() {
+}
+public class InnerType {
+
+}
+}

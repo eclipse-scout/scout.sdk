@@ -14,14 +14,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstCalendarFieldBuilder;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.WrappedTrackedNodePosition;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstCalendarFieldBuilder;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.WrappedTrackedNodePosition;
 
 /**
  * <h3>{@link CalendarFieldProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class CalendarFieldProposal extends FormFieldProposal {

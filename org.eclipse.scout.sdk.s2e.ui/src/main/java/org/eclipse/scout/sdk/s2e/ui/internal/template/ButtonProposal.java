@@ -15,14 +15,13 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstButtonBuilder;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.ZeroLenWrappedTrackedNodePosition;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstButtonBuilder;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.ZeroLenWrappedTrackedNodePosition;
 
 /**
  * <h3>{@link ButtonProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class ButtonProposal extends FormFieldProposal {

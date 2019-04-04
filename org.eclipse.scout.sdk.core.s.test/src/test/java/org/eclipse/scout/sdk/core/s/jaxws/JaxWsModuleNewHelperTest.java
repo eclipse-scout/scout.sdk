@@ -10,26 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.jaxws;
 
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.eclipse.scout.sdk.core.s.IMavenConstants;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.junit.Assert;
-import org.junit.Test;
-import org.xml.sax.SAXException;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.junit.jupiter.api.Test;
 
 /**
  * <h3>{@link JaxWsModuleNewHelperTest}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class JaxWsModuleNewHelperTest {
@@ -37,7 +34,7 @@ public class JaxWsModuleNewHelperTest {
   private static final String MODULE_FOLDER = "module";
 
   @Test
-  public void testGetParentPomOf() throws IOException, ParserConfigurationException, SAXException {
+  public void testGetParentPomOf() throws IOException {
     assertParentPomPath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>", IMavenConstants.POM);
     assertParentPomPath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent></parent></project>", IMavenConstants.POM);
     assertParentPomPath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><relativePath></relativePath></parent></project>", null);
@@ -46,25 +43,25 @@ public class JaxWsModuleNewHelperTest {
     assertParentPomPath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><relativePath>../myParentModule/pom.xml</relativePath></parent></project>", "myParentModule/pom.xml");
   }
 
-  protected void assertParentPomPath(String xml, String expectedPath) throws IOException, ParserConfigurationException, SAXException {
+  protected static void assertParentPomPath(String xml, String expectedPath) throws IOException {
     Path dir = Files.createTempDirectory("parentPomTest");
     try {
       Path pom = dir.resolve(MODULE_FOLDER + '/' + IMavenConstants.POM);
       Files.createDirectories(pom.getParent());
       Files.write(pom, xml.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-      File result = JaxWsModuleNewHelper.getParentPomOf(pom.toFile());
+      Path result = JaxWsModuleNewHelper.getParentPomOf(pom);
       if (result == null) {
         if (expectedPath == null) {
           return; // ok
         }
-        throw new SdkException("Parent Pom is null but expected '" + expectedPath + "'.");
+        throw new SdkException("Parent Pom is null but expected '{}'.", expectedPath);
       }
 
-      Assert.assertEquals(expectedPath, dir.relativize(result.toPath()).toString().replace(File.separatorChar, '/'));
+      Path relPath = dir.relativize(result);
+      assertEquals(expectedPath, Strings.replace(relPath.toString(), relPath.getFileSystem().getSeparator(), "/"));
     }
     finally {
-      CoreUtils.deleteDirectory(dir.toFile());
+      CoreUtils.deleteDirectory(dir);
     }
   }
-
 }

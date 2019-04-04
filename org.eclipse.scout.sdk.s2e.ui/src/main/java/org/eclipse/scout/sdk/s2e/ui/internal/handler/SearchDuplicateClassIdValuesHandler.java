@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.ui.internal.handler;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
 
 /**
@@ -23,8 +22,8 @@ import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
 public class SearchDuplicateClassIdValuesHandler extends AbstractHandler {
 
   @Override
-  public Object execute(ExecutionEvent event) throws ExecutionException {
-    ClassIdValidationJob.executeAsync(0, true);
+  public Object execute(ExecutionEvent event) {
+    ClassIdValidationJob.executeAsync(0L, true);
     return null;
   }
 }

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
+import java.util.function.Consumer;
+
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
@@ -19,19 +19,22 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.ToolFactory;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
+import org.eclipse.jdt.internal.core.util.Util;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
 /**
  * <h3>SourceFormatOperation</h3> equivalent to CTRL-SHIFT-F in Eclipse
  */
-public class SourceFormatOperation implements IOperation {
+public class SourceFormatOperation implements Consumer<EclipseProgress> {
   private final IJavaProject m_project;
-  private Document m_document;
-  private ISourceRange m_range;
-  private int m_indent;
+  private final Document m_document;
+  private final ISourceRange m_range;
 
   public SourceFormatOperation(ICompilationUnit icu) throws JavaModelException {
     this(icu.getJavaProject(), new Document(icu.getSource()), icu.getSourceRange());
@@ -42,32 +45,16 @@ public class SourceFormatOperation implements IOperation {
   }
 
   public SourceFormatOperation(IJavaProject project, Document document, ISourceRange range) {
-    m_indent = 0;
     m_project = project;
     m_document = document;
     m_range = range;
   }
 
   @Override
-  public String getOperationName() {
-    return "Format source";
-  }
+  public void accept(EclipseProgress progress) {
+    Ensure.notNull(getProject());
+    Ensure.notNull(getDocument());
 
-  @Override
-  public void validate() {
-    if (getProject() == null) {
-      throw new IllegalArgumentException("java project can not be null.");
-    }
-    if (getDocument() == null) {
-      throw new IllegalArgumentException("document can not be null.");
-    }
-  }
-
-  @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    if (monitor != null && monitor.isCanceled()) {
-      return;
-    }
     try {
       Document document = getDocument();
       ISourceRange range = getRange();
@@ -76,18 +63,17 @@ public class SourceFormatOperation implements IOperation {
         range = new SourceRange(0, document.getLength());
       }
       CodeFormatter formatter = ToolFactory.createCodeFormatter(getProject().getOptions(true));
-      int kind = CodeFormatter.F_INCLUDE_COMMENTS | CodeFormatter.K_UNKNOWN;
       String defaultLineDelimiter = document.getDefaultLineDelimiter();
       if (defaultLineDelimiter == null) {
-        defaultLineDelimiter = S2eUtils.lineSeparator(getProject());
+        defaultLineDelimiter = Util.getLineSeparator(null, getProject());
       }
-      TextEdit te = formatter.format(kind, document.get(), range.getOffset(), range.getLength(), m_indent, defaultLineDelimiter);
+      TextEdit te = formatter.format(CodeFormatter.F_INCLUDE_COMMENTS, document.get(), range.getOffset(), range.getLength(), 0, defaultLineDelimiter);
       if (te != null) {
         te.apply(document);
       }
     }
-    catch (Exception e) {
-      SdkLog.error("Unable to format source.", e);
+    catch (MalformedTreeException | BadLocationException e) {
+      throw new SdkException(e);
     }
   }
 
@@ -95,27 +81,16 @@ public class SourceFormatOperation implements IOperation {
     return m_range;
   }
 
-  public void setRange(ISourceRange range) {
-    m_range = range;
-  }
-
   public Document getDocument() {
     return m_document;
   }
 
-  public void setDocument(Document document) {
-    m_document = document;
-  }
-
-  public int getIndent() {
-    return m_indent;
-  }
-
-  public void setIndent(int indent) {
-    m_indent = indent;
-  }
-
   public IJavaProject getProject() {
     return m_project;
+  }
+
+  @Override
+  public String toString() {
+    return "Format source";
   }
 }

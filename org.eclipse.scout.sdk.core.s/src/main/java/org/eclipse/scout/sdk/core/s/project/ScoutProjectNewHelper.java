@@ -10,39 +10,52 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.project;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.EncodedKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Base64;
+import java.util.Base64.Encoder;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.maven.cli.CLIManager;
-import org.eclipse.scout.sdk.core.s.IMavenConstants;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * <h3>{@link ScoutProjectNewHelper}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public final class ScoutProjectNewHelper {
@@ -52,27 +65,27 @@ public final class ScoutProjectNewHelper {
   public static final String SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID = "scout-hellojs-app";
   public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
 
-  public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"\\/<>=:]+");
-  public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
+  public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"/<>=:]+");
+  public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z][a-z0-9_]{0,32}(?:\\.[a-z][a-z0-9_]{0,32}){0,16}$");
   public static final String DEFAULT_JAVA_ENV = "1.8";
 
   private ScoutProjectNewHelper() {
   }
 
-  public static void createProject(File workingDir, String groupId, String artifactId, String displayName) throws IOException {
+  public static void createProject(Path workingDir, String groupId, String artifactId, String displayName) throws IOException {
     createProject(workingDir, groupId, artifactId, displayName, null);
   }
 
-  public static void createProject(File workingDir, String groupId, String artifactId, String displayName, String javaVersion) throws IOException {
+  public static void createProject(Path workingDir, String groupId, String artifactId, String displayName, String javaVersion) throws IOException {
     createProject(workingDir, groupId, artifactId, displayName, javaVersion, null, null, null);
   }
 
   @SuppressWarnings("squid:S00107")
-  public static void createProject(File workingDir, String groupId, String artifactId, String displayName, String javaVersion,
+  public static void createProject(Path workingDir, String groupId, String artifactId, String displayName, String javaVersion,
       String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion) throws IOException {
 
     // validate input
-    Validate.notNull(workingDir);
+    Ensure.notNull(workingDir);
     String groupIdMsg = getMavenGroupIdErrorMessage(groupId);
     if (groupIdMsg != null) {
       throw new IllegalArgumentException(groupIdMsg);
@@ -85,10 +98,10 @@ public final class ScoutProjectNewHelper {
     if (displayNameMsg != null) {
       throw new IllegalArgumentException(displayNameMsg);
     }
-    if (StringUtils.isEmpty(javaVersion)) {
+    if (Strings.isEmpty(javaVersion)) {
       javaVersion = DEFAULT_JAVA_ENV;
     }
-    if (StringUtils.isBlank(archetypeGroupId) || StringUtils.isBlank(archeTypeArtifactId) || StringUtils.isBlank(archetypeVersion)) {
+    if (Strings.isBlank(archetypeGroupId) || Strings.isBlank(archeTypeArtifactId) || Strings.isBlank(archetypeVersion)) {
       // use default
       archetypeGroupId = SCOUT_ARCHETYPES_GROUP_ID;
       archeTypeArtifactId = SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
@@ -99,12 +112,12 @@ public final class ScoutProjectNewHelper {
     String artifactName = getArtifactName(artifactId);
 
     // create command
-    String[] authKeysForWar = generateKeyPair();
-    String[] authKeysForDev = generateKeyPair();
+    String[] authKeysForWar = generateKeyPairSafe();
+    String[] authKeysForDev = generateKeyPairSafe();
     MavenBuild archetypeBuild = new MavenBuild()
         .withWorkingDirectory(workingDir)
         .withGoal("archetype:generate")
-        .withOption(CLIManager.BATCH_MODE)
+        .withOption(MavenBuild.OPTION_BATCH_MODE)
         .withProperty("archetypeGroupId", archetypeGroupId)
         .withProperty("archetypeArtifactId", archeTypeArtifactId)
         .withProperty("archetypeVersion", archetypeVersion)
@@ -124,7 +137,7 @@ public final class ScoutProjectNewHelper {
     // execute archetype generation
     MavenRunner.execute(archetypeBuild);
 
-    postProcessRootPom(new File(workingDir, artifactId));
+    postProcessRootPom(workingDir.resolve(artifactId));
   }
 
   static String getArtifactName(String artifactId) {
@@ -139,12 +152,12 @@ public final class ScoutProjectNewHelper {
     if (artifactId.startsWith(groupId)) {
       return artifactId;
     }
-    return new StringBuilder(groupId).append('.').append(artifactId).toString();
+    return new StringBuilder(groupId).append(JavaTypes.C_DOT).append(artifactId).toString();
   }
 
-  static String[] generateKeyPair() {
+  static String[] generateKeyPairSafe() {
     try {
-      return CoreUtils.generateKeyPair();
+      return generateKeyPair();
     }
     catch (GeneralSecurityException e) {
       SdkLog.warning("Could not generate a new key pair.", e);
@@ -154,26 +167,46 @@ public final class ScoutProjectNewHelper {
   }
 
   /**
+   * Creates a new key pair (private and public key) compatible with the Scout Runtime.<br>
+   * <b>This method must behave exactly like the one implemented in
+   * org.eclipse.scout.rt.platform.security.SecurityUtility.generateKeyPair().</b>
+   *
+   * @return A {@link String} array of length=2 containing the base64 encoded private key at index zero and the base64
+   *         encoded public key at index 1.
+   */
+  static String[] generateKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+    KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC", "SunEC");
+    AlgorithmParameterSpec spec = new ECGenParameterSpec("secp256k1");
+    keyGen.initialize(spec, SecureRandom.getInstanceStrong());
+    KeyPair keyPair = keyGen.generateKeyPair();
+
+    EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded());
+    EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded());
+
+    Encoder base64Encoder = Base64.getEncoder();
+
+    return new String[]{base64Encoder.encodeToString(pkcs8EncodedKeySpec.getEncoded()) /*private key*/, base64Encoder.encodeToString(x509EncodedKeySpec.getEncoded()) /* public key*/};
+  }
+
+  /**
    * Workaround so that only the parent module is referenced in the root (remove non-parent modules)
    */
-  static void postProcessRootPom(File targetDirectory) throws IOException {
+  static void postProcessRootPom(Path targetDirectory) throws IOException {
     try {
-      File pom = new File(targetDirectory, IMavenConstants.POM);
-      if (!pom.isFile()) {
+      Path pom = targetDirectory.resolve(IMavenConstants.POM);
+      if (!Files.isReadable(pom) || !Files.isRegularFile(pom)) {
         return;
       }
 
-      DocumentBuilder docBuilder = CoreUtils.createDocumentBuilder();
-      Document doc = docBuilder.parse(pom);
-
-      Element modules = CoreUtils.getFirstChildElement(doc.getDocumentElement(), "modules");
-
+      Document doc = Xml.get(pom);
+      Element modules = Xml.firstChildElement(doc.getDocumentElement(), "modules").get();
       NodeList childNodes = modules.getChildNodes();
-      List<Node> nodesToRemove = new ArrayList<>();
+      Collection<Node> nodesToRemove = new ArrayList<>();
+      String targetDirectoryName = targetDirectory.getFileName().toString();
       for (int i = 0; i < childNodes.getLength(); i++) {
         Node n = childNodes.item(i);
         if (n.getNodeType() == Node.TEXT_NODE
-            || (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !targetDirectory.getName().equals(n.getTextContent().trim()))) {
+            || (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !targetDirectoryName.equals(n.getTextContent().trim()))) {
           nodesToRemove.add(n);
         }
       }
@@ -181,21 +214,23 @@ public final class ScoutProjectNewHelper {
         modules.removeChild(n);
       }
 
-      Validate.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");
-      writeDocument(doc, new StreamResult(pom));
+      Ensure.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");
+      try (OutputStream out = Files.newOutputStream(pom, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
+        writeDocument(doc, new StreamResult(out));
+      }
     }
-    catch (ParserConfigurationException | SAXException | TransformerException e) {
+    catch (TransformerException e) {
       throw new IOException(e);
     }
   }
 
   static void writeDocument(Document document, Result result) throws TransformerException {
-    Transformer transformer = CoreUtils.createTransformer(false);
+    Transformer transformer = Xml.createTransformer(false);
     transformer.transform(new DOMSource(document), result);
   }
 
-  public static String getDisplayNameErrorMessage(String displayNameCandidate) {
-    if (StringUtils.isEmpty(displayNameCandidate)) {
+  public static String getDisplayNameErrorMessage(CharSequence displayNameCandidate) {
+    if (Strings.isEmpty(displayNameCandidate)) {
       return "Display Name is not set.";
     }
     if (!DISPLAY_NAME_PATTERN.matcher(displayNameCandidate).matches()) {
@@ -213,7 +248,7 @@ public final class ScoutProjectNewHelper {
   }
 
   private static String getMavenNameErrorMessage(String nameCandidate, String attributeName) {
-    if (StringUtils.isEmpty(nameCandidate)) {
+    if (Strings.isEmpty(nameCandidate)) {
       return attributeName + " is not set.";
     }
     if (!SYMBOLIC_NAME_PATTERN.matcher(nameCandidate).matches()) {
@@ -228,8 +263,8 @@ public final class ScoutProjectNewHelper {
   }
 
   private static String getContainingJavaKeyWord(String s) {
-    for (String keyWord : CoreUtils.getJavaKeyWords()) {
-      if (s.startsWith(keyWord + ".") || s.endsWith("." + keyWord) || s.contains("." + keyWord + ".")) {
+    for (String keyWord : JavaTypes.getJavaKeyWords()) {
+      if (s.startsWith(keyWord + JavaTypes.C_DOT) || s.endsWith(JavaTypes.C_DOT + keyWord) || s.contains(JavaTypes.C_DOT + keyWord + JavaTypes.C_DOT)) {
         return keyWord;
       }
     }

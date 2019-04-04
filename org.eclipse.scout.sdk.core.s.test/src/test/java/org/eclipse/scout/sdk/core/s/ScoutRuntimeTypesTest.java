@@ -12,35 +12,36 @@ package org.eclipse.scout.sdk.core.s;
 
 import java.lang.reflect.Field;
 
-import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * <h3>{@link ScoutRuntimeTypesTest}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
+@ExtendWith(JavaEnvironmentExtension.class)
+@ExtendWithJavaEnvironmentFactory(ScoutFullJavaEnvironmentFactory.class)
 public class ScoutRuntimeTypesTest {
+
   @Test
-  public void testApi() throws IllegalArgumentException, IllegalAccessException {
-    IJavaEnvironment env = CoreScoutTestingUtils.createClientJavaEnvironment();
+  public void testApi(IJavaEnvironment env) throws IllegalAccessException {
     testFields(IScoutRuntimeTypes.class.getFields(), env);
-    testFields(IJavaRuntimeTypes.class.getFields(), env);
+    testFields(JavaTypes.class.getFields(), env);
   }
 
-  private static void testFields(Field[] fields, IJavaEnvironment env) throws IllegalArgumentException, IllegalAccessException {
+  private static void testFields(Field[] fields, IJavaEnvironment env) throws IllegalAccessException {
     for (Field f : fields) {
       Object val = f.get(null);
       if (val instanceof String) {
         String fqn = (String) val;
-        if (fqn.indexOf('.') > 0) {
-          IType type = env.findType(fqn);
-          Assert.assertNotNull("type '" + fqn + "' not found.", type);
+        if (fqn.indexOf(JavaTypes.C_DOT) > 0 && !fqn.endsWith(JavaTypes.JAVA_FILE_SUFFIX)) {
+          env.requireType(fqn);
         }
       }
     }

@@ -15,7 +15,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 /**
  * <h3>{@link TabBoxProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class TabBoxProposal extends FormFieldProposal {

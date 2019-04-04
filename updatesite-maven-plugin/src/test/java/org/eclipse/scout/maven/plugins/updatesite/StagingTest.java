@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.maven.plugins.updatesite;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URL;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class StagingTest {
 
@@ -28,7 +28,7 @@ public class StagingTest {
 
   private File targetDirectory;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     URL testRepo = getClass().getResource("/repository");
     sourceDirectory = new File(testRepo.getFile());
@@ -40,7 +40,7 @@ public class StagingTest {
     tempDir.mkdirs();
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     FileUtility.deleteFile(tempDir);
   }

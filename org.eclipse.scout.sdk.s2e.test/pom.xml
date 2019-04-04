@@ -31,18 +31,6 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk.s2e</groupId>
       <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-      <exclusions>
-        <exclusion>
-          <!-- because a newer version is included in scout.rt.server.jaxws (javax.annotation:javax.annotation-api:1.2) -->
-          <!-- otherwise there are duplicate classes on the classpath -->
-          <groupId>javax.annotation</groupId>
-          <artifactId>jsr250-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
@@ -52,15 +40,11 @@
       <groupId>org.eclipse.jdt</groupId>
       <artifactId>org.eclipse.jdt.core</artifactId>
     </dependency>
+
     <!-- Test dependency -->
     <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.jface.text</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
-      <artifactId>org.eclipse.m2e.core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -70,13 +54,8 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.debug.core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.swt.${osgi.platform}</artifactId>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

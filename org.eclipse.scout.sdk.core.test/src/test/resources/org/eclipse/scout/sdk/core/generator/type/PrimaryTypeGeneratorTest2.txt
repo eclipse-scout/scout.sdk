@@ -1,0 +1,19 @@
+/**
+* Default Testing Comment for
+* CompilationUnit TestingPrimaryType.java
+*/
+package a.b.c;
+
+
+/**
+* Default Testing Comment for
+* Type TestingPrimaryType
+*/
+public class TestingPrimaryType {
+private static final long serialVersionUID = 1L;
+private boolean m_member;
+@Deprecated
+public void testMethod() {
+// TODO [anonymous] Auto-generated method stub.
+}
+}

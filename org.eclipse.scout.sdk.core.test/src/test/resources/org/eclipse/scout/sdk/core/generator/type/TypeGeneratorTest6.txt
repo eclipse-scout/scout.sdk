@@ -1,0 +1,8 @@
+public class TestConsumer implements InterfaceWithTypeParam<String> {
+static transient volatile double VALUE = 44.3;
+@Override
+public String get(String t) {
+// TODO [anonymous] Auto-generated method stub.
+return null;
+}
+}

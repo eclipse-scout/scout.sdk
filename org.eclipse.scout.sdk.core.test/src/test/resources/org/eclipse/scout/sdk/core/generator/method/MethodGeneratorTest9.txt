@@ -1,0 +1,5 @@
+@Override
+public BigDecimal get(int index) {
+// TODO [anonymous] Auto-generated method stub.
+return null;
+}

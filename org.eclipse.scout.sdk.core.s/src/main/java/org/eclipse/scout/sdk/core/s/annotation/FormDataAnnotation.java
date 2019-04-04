@@ -10,16 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.annotation;
 
-import org.apache.commons.lang3.StringUtils;
+import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link FormDataAnnotation}</h3> Represents one single @FormData annotation occurrence
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class FormDataAnnotation extends AbstractManagedAnnotation {
@@ -32,36 +31,22 @@ public class FormDataAnnotation extends AbstractManagedAnnotation {
 
   public static final String TYPE_NAME = IScoutRuntimeTypes.FormData;
 
-  public enum SdkCommand {
-    CREATE, USE, IGNORE, DEFAULT
-  }
-
-  public enum DefaultSubtypeSdkCommand {
-    CREATE, IGNORE, DEFAULT
-  }
-
   public IType value() {
     return getValue(VALUE_ELEMENT_NAME, IType.class, null);
   }
 
   public SdkCommand sdkCommand() {
     IField enumValueField = getValue(SDK_COMMAND_ELEMENT_NAME, IField.class, null);
-    if (enumValueField != null && StringUtils.isNotBlank(enumValueField.elementName())) {
-      SdkCommand cmd = SdkCommand.valueOf(enumValueField.elementName());
-      if (cmd != null) {
-        return cmd;
-      }
+    if (enumValueField != null && Strings.hasText(enumValueField.elementName())) {
+      return SdkCommand.valueOf(enumValueField.elementName());
     }
     return SdkCommand.DEFAULT;
   }
 
   public DefaultSubtypeSdkCommand defaultSubtypeSdkCommand() {
     IField enumValueField = getValue(DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME, IField.class, null);
-    if (enumValueField != null && StringUtils.isNotBlank(enumValueField.elementName())) {
-      DefaultSubtypeSdkCommand cmd = DefaultSubtypeSdkCommand.valueOf(enumValueField.elementName());
-      if (cmd != null) {
-        return cmd;
-      }
+    if (enumValueField != null && Strings.hasText(enumValueField.elementName())) {
+      return DefaultSubtypeSdkCommand.valueOf(enumValueField.elementName());
     }
     return DefaultSubtypeSdkCommand.DEFAULT;
   }
@@ -92,5 +77,13 @@ public class FormDataAnnotation extends AbstractManagedAnnotation {
 
   public boolean isInterfacesDefault() {
     return isDefault(INTERFACES_ELEMENT_NAME);
+  }
+
+  public enum SdkCommand {
+    CREATE, USE, IGNORE, DEFAULT
+  }
+
+  public enum DefaultSubtypeSdkCommand {
+    CREATE, IGNORE, DEFAULT
   }
 }

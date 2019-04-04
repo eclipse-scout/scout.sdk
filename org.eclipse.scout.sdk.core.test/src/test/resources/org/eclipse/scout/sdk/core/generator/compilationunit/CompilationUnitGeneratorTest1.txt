@@ -1,0 +1,20 @@
+/**
+* Default Testing Comment for
+* CompilationUnit TestClass.java
+*/
+package pck.test;
+
+import static java.util.Arrays.asList;
+
+import java.io.Serializable;
+import java.util.stream.StreamSupport;
+
+public class TestClass {
+
+}
+
+class ThirdClassInFile implements Serializable {
+
+}
+
+// whatever

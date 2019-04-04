@@ -174,7 +174,7 @@ public class StagingMojo extends AbstractStagingMojo {
       FileUtility.extractArchive(content, outputDir);
     }
     catch (IOException e) {
-      throw new MojoExecutionException("Could not extract archive");
+      throw new MojoExecutionException("Could not extract archive", e);
     }
     String xmlName = content.getName().replace(".jar", ".xml");
     File xmlFile = new File(content.getParent(), xmlName);

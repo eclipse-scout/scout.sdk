@@ -1,0 +1,7 @@
+/**
+* Default Testing Comment for
+* Setter setTestField
+*/
+public synchronized void setTestField(int testField) {
+m_testField = testField;
+}

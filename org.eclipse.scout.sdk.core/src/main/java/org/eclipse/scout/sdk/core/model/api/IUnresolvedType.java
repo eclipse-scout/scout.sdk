@@ -10,13 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
-import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import java.util.Optional;
+
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.model.api.internal.UnresolvedTypeImplementor.UnresolvedTypeSpi;
 
 /**
  * <h3>{@link IUnresolvedType}</h3> Represents a java data type which may not yet exist on the classpath.<br>
  * Use {@link IJavaEnvironment#findUnresolvedType(String)} to retrieve {@link IUnresolvedType}s.
  *
- * @author Ivan Motsch
  * @since 5.2.0
  */
 public interface IUnresolvedType extends IJavaElement {
@@ -24,7 +27,7 @@ public interface IUnresolvedType extends IJavaElement {
   /**
    * Gets the {@link IPackage} of this {@link IUnresolvedType}.
    *
-   * @return The {@link IPackage} of this {@link IUnresolvedType}. Never returns <code>null</code>.
+   * @return The {@link IPackage} of this {@link IUnresolvedType}.
    */
   IPackage containingPackage();
 
@@ -40,41 +43,45 @@ public interface IUnresolvedType extends IJavaElement {
    * Gets the fully qualified name of this {@link IUnresolvedType}.<br>
    * Inner types are separated by '$'.<br>
    * <br>
-   * <b>Example: </b><code>org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass</code>.<br>
+   * <b>Example: </b>{@code org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass}.<br>
    *
    * @return The fully qualified name of this {@link IUnresolvedType}.
    */
   String name();
 
   /**
-   * @return The type signature of this {@link IUnresolvedType}.
+   * @return The type reference of this {@link IUnresolvedType}.
    */
-  String signature();
+  String reference();
 
   /**
-   * @return <code>true</code> if this {@link IUnresolvedType} actually exists. <code>false</code> otherwise.
+   * @return {@code true} if this {@link IUnresolvedType} actually exists. {@code false} otherwise.
    */
   boolean exists();
 
   /**
-   * @return the existing type or <code>null</code> if it not {@link #exists()}.
+   * @return the existing type or an empty {@link Optional} if it not {@link #exists()}.
    */
-  IType type();
+  Optional<IType> type();
 
   /**
-   * Unwraps this {@link IUnresolvedType} into its underlying {@link TypeSpi}.
+   * Unwraps this {@link IUnresolvedType} into its underlying {@link UnresolvedTypeSpi}.
    *
-   * @return The service provider interface for this {@link IUnresolvedType} if it {@link #exists()}. <code>null</code>
-   *         otherwise.
+   * @return The service provider interface for this {@link IUnresolvedType}.
    */
   @Override
-  TypeSpi unwrap();
+  UnresolvedTypeSpi unwrap();
 
   /**
    * @return The {@link ISourceRange} of this {@link IUnresolvedType} if it {@link #exists()} and the underlying
-   *         {@link #type()} has source attached. Never returns <code>null</code>. Use
-   *         {@link ISourceRange#isAvailable()} to check if source is actually available for this element.
+   *         {@link #type()} has source attached.
    */
   @Override
-  ISourceRange source();
+  Optional<ISourceRange> source();
+
+  @Override
+  ITypeGenerator<?> toWorkingCopy();
+
+  @Override
+  ITypeGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer);
 }

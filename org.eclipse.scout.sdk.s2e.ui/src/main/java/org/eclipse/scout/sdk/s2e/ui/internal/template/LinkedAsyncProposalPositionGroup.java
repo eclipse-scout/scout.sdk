@@ -17,20 +17,19 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.job.RunnableJob;
+import org.eclipse.scout.sdk.s2e.environment.RunnableJob;
 
 /**
  * <h3>{@link LinkedAsyncProposalPositionGroup}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGroup implements ICompletionProposalProvider {
@@ -40,7 +39,7 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
 
   public LinkedAsyncProposalPositionGroup(String groupId, RunnableFuture<Proposal[]> future) {
     super(groupId);
-    m_future = Validate.notNull(future);
+    m_future = Ensure.notNull(future);
     m_listeners = new ArrayList<>();
   }
 
@@ -53,9 +52,10 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
   @SuppressWarnings("squid:S1166")
   public Proposal[] getProposals() {
     try {
-      return m_future.get(100, TimeUnit.MILLISECONDS);
+      return m_future.get(100L, TimeUnit.MILLISECONDS);
     }
     catch (InterruptedException | TimeoutException e) {
+      SdkLog.debug(e);
       return new Proposal[]{new Proposal("Loading...", null, 10)};
     }
     catch (ExecutionException e) {
@@ -63,19 +63,9 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
     }
   }
 
-  private void fireLoaded() {
-    ILinkedAsyncProposalListener[] listeners = null;
-    synchronized (this) {
-      listeners = m_listeners.toArray(new ILinkedAsyncProposalListener[m_listeners.size()]);
-    }
-    for (ILinkedAsyncProposalListener listener : listeners) {
-      listener.loaded();
-    }
-  }
-
   @Override
   public void load() {
-    final RunnableJob job = new RunnableJob("Load template proposals", m_future);
+    Job job = new RunnableJob("Load template proposals", m_future);
     job.setUser(false);
     job.setSystem(true);
     job.setPriority(Job.INTERACTIVE);
@@ -89,6 +79,16 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
         }
         else if (result.getSeverity() != IStatus.CANCEL) {
           SdkLog.error(result.getMessage(), result.getException());
+        }
+      }
+
+      private void fireLoaded() {
+        ILinkedAsyncProposalListener[] listeners;
+        synchronized (this) {
+          listeners = m_listeners.toArray(new ILinkedAsyncProposalListener[0]);
+        }
+        for (ILinkedAsyncProposalListener listener : listeners) {
+          listener.loaded();
         }
       }
     });

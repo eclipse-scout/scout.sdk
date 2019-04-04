@@ -10,46 +10,63 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.util.maven;
 
-import org.apache.commons.lang3.Validate;
+import java.util.function.Supplier;
 
 /**
  * <h3>{@link MavenRunner}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public final class MavenRunner {
 
-  private static IMavenRunnerSpi mavenRunner = new MavenCliRunner();
+  private static IMavenRunnerSpi mavenRunner;
+
+  private MavenRunner() {
+    // no instances
+  }
 
   /**
    * Sets a new {@link IMavenRunnerSpi} strategy.
-   * 
+   *
    * @param newRunner
-   *          The new strategy. Cannot be <code>null</code>.
+   *          The new strategy or {@code null}.
    */
-  public static synchronized void setMavenRunner(IMavenRunnerSpi newRunner) {
-    mavenRunner = Validate.notNull(newRunner);
+  public static synchronized void set(IMavenRunnerSpi newRunner) {
+    mavenRunner = newRunner;
   }
 
   /**
    * @return The current {@link IMavenRunnerSpi} strategy.
    */
-  public static synchronized IMavenRunnerSpi getMavenRunner() {
+  public static synchronized IMavenRunnerSpi get() {
     return mavenRunner;
   }
 
   /**
+   * Sets a new {@link IMavenRunnerSpi} using the given {@link Supplier} if there is not yet a runner present.
+   *
+   * @param producer
+   *          The {@link Supplier} to use if there is no runner yet.
+   * @return the produced runner that will be active after this call.
+   */
+  public static synchronized IMavenRunnerSpi setIfAbsent(Supplier<IMavenRunnerSpi> producer) {
+    if (get() == null) {
+      set(producer.get());
+    }
+    return get();
+  }
+
+  /**
    * Executes the given {@link MavenBuild} using the current {@link IMavenRunnerSpi} strategy.
-   * 
+   *
    * @param build
    *          The {@link MavenBuild} to execute.
    */
   public static void execute(MavenBuild build) {
-    getMavenRunner().execute(build);
-  }
-
-  private MavenRunner() {
-    // no instances
+    IMavenRunnerSpi runner = get();
+    if (runner == null) {
+      throw new IllegalStateException("no maven runner set");
+    }
+    runner.execute(build);
   }
 }

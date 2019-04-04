@@ -12,10 +12,11 @@ package org.eclipse.scout.sdk.core.model.spi;
 
 import java.nio.file.Path;
 
+import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
+
 /**
  * <h3>{@link ClasspathSpi}</h3>
  *
- * @author Ivan Motsch
  * @since 5.1.0
  */
 public interface ClasspathSpi {
@@ -24,7 +25,6 @@ public interface ClasspathSpi {
    * Describes a {@link ClasspathSpi} containing *.java source files (can be a directory or an archive).
    */
   int MODE_SOURCE = 1;
-
   /**
    * Describes a {@link ClasspathSpi} containing *.class files (can be a directory or an archive).
    */
@@ -36,7 +36,15 @@ public interface ClasspathSpi {
    */
   int getMode();
 
+  boolean isDirectory();
+
+  boolean isSourceFolder();
+
+  JavaEnvironmentSpi getJavaEnvironment();
+
   Path getPath();
 
   String getEncoding();
+
+  IClasspathEntry wrap();
 }

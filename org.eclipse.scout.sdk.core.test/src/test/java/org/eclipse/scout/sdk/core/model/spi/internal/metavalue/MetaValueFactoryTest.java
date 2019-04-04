@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal.metavalue;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.impl.BooleanConstant;
@@ -21,284 +26,291 @@ import org.eclipse.jdt.internal.compiler.impl.IntConstant;
 import org.eclipse.jdt.internal.compiler.impl.LongConstant;
 import org.eclipse.jdt.internal.compiler.impl.ShortConstant;
 import org.eclipse.jdt.internal.compiler.impl.StringConstant;
+import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.TestAnnotation.TestEnum;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IArrayMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.MetaValueType;
-import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.eclipse.scout.sdk.core.model.ecj.metavalue.MetaValueFactory;
+import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
+import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(JavaEnvironmentExtension.class)
+@ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class MetaValueFactoryTest {
   @Test
   public void testCreateNull() {
     IMetaValue createNull = MetaValueFactory.createNull();
-    Assert.assertNull(createNull.get(Object.class));
-    Assert.assertEquals("null", createNull.toString());
-    Assert.assertEquals(MetaValueType.Null, createNull.type());
-    Assert.assertEquals(MetaValueType.Null, MetaValueFactory.createArray(null).type());
-    Assert.assertEquals(MetaValueType.Null, MetaValueFactory.createFromAnnotation(null).type());
-    Assert.assertEquals(MetaValueType.Null, MetaValueFactory.createFromConstant(null).type());
-    Assert.assertEquals(MetaValueType.Null, MetaValueFactory.createFromEnum(null).type());
-    Assert.assertEquals(MetaValueType.Null, MetaValueFactory.createFromType(null).type());
-    Assert.assertEquals(MetaValueType.Null, MetaValueFactory.createUnknown(null).type());
+    assertNull(createNull.as(Object.class));
+    assertEquals("null", createNull.toString());
+    assertEquals(MetaValueType.Null, createNull.type());
+    assertEquals(MetaValueType.Null, MetaValueFactory.createArray(null).type());
+    assertEquals(MetaValueType.Null, MetaValueFactory.createFromAnnotation(null).type());
+    assertEquals(MetaValueType.Null, MetaValueFactory.createFromConstant(null).type());
+    assertEquals(MetaValueType.Null, MetaValueFactory.createFromEnum(null).type());
+    assertEquals(MetaValueType.Null, MetaValueFactory.createFromType(null).type());
+    assertEquals(MetaValueType.Null, MetaValueFactory.createUnknown(null).type());
   }
 
   @Test
   public void testCreateUnknown() {
     Object val = "test";
     IMetaValue metaValue = MetaValueFactory.createUnknown(val);
-    Assert.assertSame(val, metaValue.get(Object.class));
-    Assert.assertEquals("Unknown(" + val + ")", metaValue.toString());
-    Assert.assertEquals(MetaValueType.Unknown, metaValue.type());
+    assertSame(val, metaValue.as(Object.class));
+    assertEquals("Unknown(" + val + ')', metaValue.toString());
+    assertEquals(MetaValueType.Unknown, metaValue.type());
   }
 
   @Test
-  public void testCreateFromType() {
-    IType childClassType = CoreTestingUtils.getChildClassType();
+  public void testCreateFromType(IJavaEnvironment env) {
+    IType childClassType = env.requireType(ChildClass.class.getName());
     IMetaValue metaValue = MetaValueFactory.createFromType(childClassType.unwrap());
-    Assert.assertSame(childClassType, metaValue.get(Object.class));
-    Assert.assertSame(childClassType, metaValue.get(IType.class));
-    Assert.assertSame(childClassType.unwrap(), metaValue.get(List.class));
-    Assert.assertEquals(childClassType.name(), metaValue.get(String.class));
-    Assert.assertEquals(childClassType.elementName() + ".class", metaValue.toString());
-    Assert.assertEquals(MetaValueType.Type, metaValue.type());
+    assertSame(childClassType, metaValue.as(Object.class));
+    assertSame(childClassType, metaValue.as(IType.class));
+    assertSame(childClassType.unwrap(), metaValue.as(List.class));
+    assertEquals(childClassType.name(), metaValue.as(String.class));
+    assertEquals(childClassType.elementName() + ".class", metaValue.toString());
+    assertEquals(MetaValueType.Type, metaValue.type());
   }
 
   @Test
-  public void testCreateFromEnum() {
-    IType type = CoreTestingUtils.createJavaEnvironment().findType(TestEnum.class.getName());
-    IField field = type.fields().first();
+  public void testCreateFromEnum(IJavaEnvironment env) {
+    IType type = env.requireType(TestEnum.class.getName());
+    IField field = type.fields().first().get();
 
     IMetaValue metaValue = MetaValueFactory.createFromEnum(field.unwrap());
-    Assert.assertSame(field, metaValue.get(Object.class));
-    Assert.assertSame(field, metaValue.get(IField.class));
-    Assert.assertSame(field.unwrap(), metaValue.get(List.class));
-    Assert.assertEquals(field.elementName(), metaValue.get(String.class));
-    Assert.assertEquals(type.elementName() + '.' + field.elementName(), metaValue.toString());
-    Assert.assertEquals(MetaValueType.Enum, metaValue.type());
+    assertSame(field, metaValue.as(Object.class));
+    assertSame(field, metaValue.as(IField.class));
+    assertSame(field.unwrap(), metaValue.as(List.class));
+    assertEquals(field.elementName(), metaValue.as(String.class));
+    assertEquals(type.elementName() + JavaTypes.C_DOT + field.elementName(), metaValue.toString());
+    assertEquals(MetaValueType.Enum, metaValue.type());
   }
 
   @Test
-  public void testCreateFromAnnotation() {
-    IAnnotation annot = CoreTestingUtils.getChildClassType().annotations().first();
-
+  public void testCreateFromAnnotation(IJavaEnvironment env) {
+    IAnnotation annot = env.requireType(ChildClass.class.getName()).annotations().first().get();
     IMetaValue metaValue = MetaValueFactory.createFromAnnotation(annot.unwrap());
-    Assert.assertSame(annot, metaValue.get(Object.class));
-    Assert.assertSame(annot, metaValue.get(IAnnotation.class));
-    Assert.assertEquals(annot.unwrap(), metaValue.get(String.class));
-    Assert.assertEquals(annot.toString(), metaValue.toString());
-    Assert.assertEquals(MetaValueType.Annotation, metaValue.type());
+    assertSame(annot, metaValue.as(Object.class));
+    assertSame(annot, metaValue.as(IAnnotation.class));
+    assertEquals(annot.unwrap(), metaValue.as(String.class));
+    assertEquals(annot.toString(), metaValue.toString());
+    assertEquals(MetaValueType.Annotation, metaValue.type());
   }
 
   @Test
   public void testCreateFromConstantBoolean() {
     boolean val = true;
     IMetaValue metaValue = MetaValueFactory.createFromConstant(BooleanConstant.fromValue(val));
-    Assert.assertEquals(MetaValueType.Bool, metaValue.type());
-    Assert.assertEquals(val, metaValue.get(Object.class));
-    Assert.assertEquals(val, metaValue.get(Boolean.class));
-    Assert.assertEquals(val, metaValue.get(boolean.class));
-    Assert.assertEquals(Boolean.toString(val), metaValue.get(String.class));
-    Assert.assertEquals(Boolean.toString(val), metaValue.toString());
+    assertEquals(MetaValueType.Bool, metaValue.type());
+    assertEquals(val, metaValue.as(Object.class));
+    assertEquals(val, metaValue.as(Boolean.class));
+    assertEquals(val, metaValue.as(boolean.class));
+    assertEquals(Boolean.toString(val), metaValue.as(String.class));
+    assertEquals(Boolean.toString(val), metaValue.toString());
   }
 
   @Test
   public void testCreateFromConstantByte() {
     byte val = 55;
     IMetaValue metaValue = MetaValueFactory.createFromConstant(ByteConstant.fromValue(val));
-    Assert.assertEquals(MetaValueType.Byte, metaValue.type());
-    Assert.assertEquals(Byte.valueOf(val), metaValue.get(Object.class));
-    Assert.assertEquals(Byte.toString(val), metaValue.toString());
-    Assert.assertEquals(Byte.toString(val), metaValue.get(String.class));
+    assertEquals(MetaValueType.Byte, metaValue.type());
+    assertEquals(val, metaValue.as(Object.class));
+    assertEquals(Byte.toString(val), metaValue.toString());
+    assertEquals(Byte.toString(val), metaValue.as(String.class));
 
-    Assert.assertEquals(Byte.valueOf(val), metaValue.get(Byte.class));
-    Assert.assertEquals(Byte.valueOf(val), metaValue.get(byte.class));
-    Assert.assertEquals(Integer.valueOf(val), metaValue.get(int.class));
-    Assert.assertEquals(Integer.valueOf(val), metaValue.get(Integer.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(char.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(Character.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(long.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(Long.class));
-    Assert.assertEquals(Short.valueOf(val), metaValue.get(short.class));
-    Assert.assertEquals(Short.valueOf(val), metaValue.get(Short.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(double.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(Double.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(float.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(Float.class));
+    assertEquals(Byte.valueOf(val), metaValue.as(Byte.class));
+    assertEquals(Byte.valueOf(val), metaValue.as(byte.class));
+    assertEquals(Integer.valueOf(val), metaValue.as(int.class));
+    assertEquals(Integer.valueOf(val), metaValue.as(Integer.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(char.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(Character.class));
+    assertEquals(Long.valueOf(val), metaValue.as(long.class));
+    assertEquals(Long.valueOf(val), metaValue.as(Long.class));
+    assertEquals(Short.valueOf(val), metaValue.as(short.class));
+    assertEquals(Short.valueOf(val), metaValue.as(Short.class));
+    assertEquals(Double.valueOf(val), metaValue.as(double.class));
+    assertEquals(Double.valueOf(val), metaValue.as(Double.class));
+    assertEquals(Float.valueOf(val), metaValue.as(float.class));
+    assertEquals(Float.valueOf(val), metaValue.as(Float.class));
   }
 
   @Test
   public void testCreateFromConstantInt() {
     int val = 55;
     IMetaValue metaValue = MetaValueFactory.createFromConstant(IntConstant.fromValue(val));
-    Assert.assertEquals(MetaValueType.Int, metaValue.type());
-    Assert.assertEquals(Integer.valueOf(val), metaValue.get(Object.class));
-    Assert.assertEquals(Integer.toString(val), metaValue.toString());
-    Assert.assertEquals(Integer.toString(val), metaValue.get(String.class));
+    assertEquals(MetaValueType.Int, metaValue.type());
+    assertEquals(val, metaValue.as(Object.class));
+    assertEquals(Integer.toString(val), metaValue.toString());
+    assertEquals(Integer.toString(val), metaValue.as(String.class));
 
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(Byte.class));
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(byte.class));
-    Assert.assertEquals(Integer.valueOf(val), metaValue.get(int.class));
-    Assert.assertEquals(Integer.valueOf(val), metaValue.get(Integer.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(char.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(Character.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(long.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(Long.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(short.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(Short.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(double.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(Double.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(float.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(Float.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(Byte.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(byte.class));
+    assertEquals(Integer.valueOf(val), metaValue.as(int.class));
+    assertEquals(Integer.valueOf(val), metaValue.as(Integer.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(char.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(Character.class));
+    assertEquals(Long.valueOf(val), metaValue.as(long.class));
+    assertEquals(Long.valueOf(val), metaValue.as(Long.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(short.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(Short.class));
+    assertEquals(Double.valueOf(val), metaValue.as(double.class));
+    assertEquals(Double.valueOf(val), metaValue.as(Double.class));
+    assertEquals(Float.valueOf(val), metaValue.as(float.class));
+    assertEquals(Float.valueOf(val), metaValue.as(Float.class));
   }
 
   @Test
   public void testCreateFromConstantChar() {
     char val = 55;
     IMetaValue metaValue = MetaValueFactory.createFromConstant(CharConstant.fromValue(val));
-    Assert.assertEquals(MetaValueType.Char, metaValue.type());
-    Assert.assertEquals(Character.valueOf(val), metaValue.get(Object.class));
-    Assert.assertEquals(Character.toString(val), metaValue.toString());
-    Assert.assertEquals(Character.toString(val), metaValue.get(String.class));
+    assertEquals(MetaValueType.Char, metaValue.type());
+    assertEquals(val, metaValue.as(Object.class));
+    assertEquals(Character.toString(val), metaValue.toString());
+    assertEquals(Character.toString(val), metaValue.as(String.class));
 
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(Byte.class));
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(byte.class));
-    Assert.assertEquals(Integer.valueOf(val), metaValue.get(int.class));
-    Assert.assertEquals(Integer.valueOf(val), metaValue.get(Integer.class));
-    Assert.assertEquals(Character.valueOf(val), metaValue.get(char.class));
-    Assert.assertEquals(Character.valueOf(val), metaValue.get(Character.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(long.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(Long.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(short.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(Short.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(double.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(Double.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(float.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(Float.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(Byte.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(byte.class));
+    assertEquals(Integer.valueOf(val), metaValue.as(int.class));
+    assertEquals(Integer.valueOf(val), metaValue.as(Integer.class));
+    assertEquals(Character.valueOf(val), metaValue.as(char.class));
+    assertEquals(Character.valueOf(val), metaValue.as(Character.class));
+    assertEquals(Long.valueOf(val), metaValue.as(long.class));
+    assertEquals(Long.valueOf(val), metaValue.as(Long.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(short.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(Short.class));
+    assertEquals(Double.valueOf(val), metaValue.as(double.class));
+    assertEquals(Double.valueOf(val), metaValue.as(Double.class));
+    assertEquals(Float.valueOf(val), metaValue.as(float.class));
+    assertEquals(Float.valueOf(val), metaValue.as(Float.class));
   }
 
   @Test
   public void testCreateFromConstantLong() {
     long val = 55;
     IMetaValue metaValue = MetaValueFactory.createFromConstant(LongConstant.fromValue(val));
-    Assert.assertEquals(MetaValueType.Long, metaValue.type());
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(Object.class));
-    Assert.assertEquals(Long.toString(val), metaValue.toString());
-    Assert.assertEquals(Long.toString(val), metaValue.get(String.class));
+    assertEquals(MetaValueType.Long, metaValue.type());
+    assertEquals(val, metaValue.as(Object.class));
+    assertEquals(Long.toString(val), metaValue.toString());
+    assertEquals(Long.toString(val), metaValue.as(String.class));
 
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(Byte.class));
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(byte.class));
-    Assert.assertEquals(Integer.valueOf((int) val), metaValue.get(int.class));
-    Assert.assertEquals(Integer.valueOf((int) val), metaValue.get(Integer.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(char.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(Character.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(long.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(Long.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(short.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(Short.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(double.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(Double.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(float.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(Float.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(Byte.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(byte.class));
+    assertEquals(Integer.valueOf((int) val), metaValue.as(int.class));
+    assertEquals(Integer.valueOf((int) val), metaValue.as(Integer.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(char.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(Character.class));
+    assertEquals(Long.valueOf(val), metaValue.as(long.class));
+    assertEquals(Long.valueOf(val), metaValue.as(Long.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(short.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(Short.class));
+    assertEquals(Double.valueOf(val), metaValue.as(double.class));
+    assertEquals(Double.valueOf(val), metaValue.as(Double.class));
+    assertEquals(Float.valueOf(val), metaValue.as(float.class));
+    assertEquals(Float.valueOf(val), metaValue.as(Float.class));
   }
 
   @Test
   public void testCreateFromConstantShort() {
     short val = 55;
     IMetaValue metaValue = MetaValueFactory.createFromConstant(ShortConstant.fromValue(val));
-    Assert.assertEquals(MetaValueType.Short, metaValue.type());
-    Assert.assertEquals(Short.valueOf(val), metaValue.get(Object.class));
-    Assert.assertEquals(Short.toString(val), metaValue.toString());
-    Assert.assertEquals(Short.toString(val), metaValue.get(String.class));
+    assertEquals(MetaValueType.Short, metaValue.type());
+    assertEquals(val, metaValue.as(Object.class));
+    assertEquals(Short.toString(val), metaValue.toString());
+    assertEquals(Short.toString(val), metaValue.as(String.class));
 
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(Byte.class));
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(byte.class));
-    Assert.assertEquals(Integer.valueOf(val), metaValue.get(int.class));
-    Assert.assertEquals(Integer.valueOf(val), metaValue.get(Integer.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(char.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(Character.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(long.class));
-    Assert.assertEquals(Long.valueOf(val), metaValue.get(Long.class));
-    Assert.assertEquals(Short.valueOf(val), metaValue.get(short.class));
-    Assert.assertEquals(Short.valueOf(val), metaValue.get(Short.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(double.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(Double.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(float.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(Float.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(Byte.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(byte.class));
+    assertEquals(Integer.valueOf(val), metaValue.as(int.class));
+    assertEquals(Integer.valueOf(val), metaValue.as(Integer.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(char.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(Character.class));
+    assertEquals(Long.valueOf(val), metaValue.as(long.class));
+    assertEquals(Long.valueOf(val), metaValue.as(Long.class));
+    assertEquals(Short.valueOf(val), metaValue.as(short.class));
+    assertEquals(Short.valueOf(val), metaValue.as(Short.class));
+    assertEquals(Double.valueOf(val), metaValue.as(double.class));
+    assertEquals(Double.valueOf(val), metaValue.as(Double.class));
+    assertEquals(Float.valueOf(val), metaValue.as(float.class));
+    assertEquals(Float.valueOf(val), metaValue.as(Float.class));
   }
 
   @Test
   public void testCreateFromConstantDouble() {
     double val = 55.3;
     IMetaValue metaValue = MetaValueFactory.createFromConstant(DoubleConstant.fromValue(val));
-    Assert.assertEquals(MetaValueType.Double, metaValue.type());
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(Object.class));
-    Assert.assertEquals(Double.toString(val), metaValue.toString());
-    Assert.assertEquals(Double.toString(val), metaValue.get(String.class));
+    assertEquals(MetaValueType.Double, metaValue.type());
+    assertEquals(val, metaValue.as(Object.class));
+    assertEquals(Double.toString(val), metaValue.toString());
+    assertEquals(Double.toString(val), metaValue.as(String.class));
 
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(Byte.class));
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(byte.class));
-    Assert.assertEquals(Integer.valueOf((int) val), metaValue.get(int.class));
-    Assert.assertEquals(Integer.valueOf((int) val), metaValue.get(Integer.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(char.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(Character.class));
-    Assert.assertEquals(Long.valueOf((long) val), metaValue.get(long.class));
-    Assert.assertEquals(Long.valueOf((long) val), metaValue.get(Long.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(short.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(Short.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(double.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(Double.class));
-    Assert.assertEquals(Float.valueOf((float) val), metaValue.get(float.class));
-    Assert.assertEquals(Float.valueOf((float) val), metaValue.get(Float.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(Byte.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(byte.class));
+    assertEquals(Integer.valueOf((int) val), metaValue.as(int.class));
+    assertEquals(Integer.valueOf((int) val), metaValue.as(Integer.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(char.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(Character.class));
+    assertEquals(Long.valueOf((long) val), metaValue.as(long.class));
+    assertEquals(Long.valueOf((long) val), metaValue.as(Long.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(short.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(Short.class));
+    assertEquals(Double.valueOf(val), metaValue.as(double.class));
+    assertEquals(Double.valueOf(val), metaValue.as(Double.class));
+    assertEquals(Float.valueOf((float) val), metaValue.as(float.class));
+    assertEquals(Float.valueOf((float) val), metaValue.as(Float.class));
   }
 
   @Test
   public void testCreateFromConstantFloat() {
     float val = 55.3f;
     IMetaValue metaValue = MetaValueFactory.createFromConstant(FloatConstant.fromValue(val));
-    Assert.assertEquals(MetaValueType.Float, metaValue.type());
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(Object.class));
-    Assert.assertEquals(Float.toString(val), metaValue.toString());
-    Assert.assertEquals(Float.toString(val), metaValue.get(String.class));
+    assertEquals(MetaValueType.Float, metaValue.type());
+    assertEquals(val, metaValue.as(Object.class));
+    assertEquals(Float.toString(val), metaValue.toString());
+    assertEquals(Float.toString(val), metaValue.as(String.class));
 
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(Byte.class));
-    Assert.assertEquals(Byte.valueOf((byte) val), metaValue.get(byte.class));
-    Assert.assertEquals(Integer.valueOf((int) val), metaValue.get(int.class));
-    Assert.assertEquals(Integer.valueOf((int) val), metaValue.get(Integer.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(char.class));
-    Assert.assertEquals(Character.valueOf((char) val), metaValue.get(Character.class));
-    Assert.assertEquals(Long.valueOf((long) val), metaValue.get(long.class));
-    Assert.assertEquals(Long.valueOf((long) val), metaValue.get(Long.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(short.class));
-    Assert.assertEquals(Short.valueOf((short) val), metaValue.get(Short.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(double.class));
-    Assert.assertEquals(Double.valueOf(val), metaValue.get(Double.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(float.class));
-    Assert.assertEquals(Float.valueOf(val), metaValue.get(Float.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(Byte.class));
+    assertEquals(Byte.valueOf((byte) val), metaValue.as(byte.class));
+    assertEquals(Integer.valueOf((int) val), metaValue.as(int.class));
+    assertEquals(Integer.valueOf((int) val), metaValue.as(Integer.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(char.class));
+    assertEquals(Character.valueOf((char) val), metaValue.as(Character.class));
+    assertEquals(Long.valueOf((long) val), metaValue.as(long.class));
+    assertEquals(Long.valueOf((long) val), metaValue.as(Long.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(short.class));
+    assertEquals(Short.valueOf((short) val), metaValue.as(Short.class));
+    assertEquals(Double.valueOf(val), metaValue.as(double.class));
+    assertEquals(Double.valueOf(val), metaValue.as(Double.class));
+    assertEquals(Float.valueOf(val), metaValue.as(float.class));
+    assertEquals(Float.valueOf(val), metaValue.as(Float.class));
   }
 
   @Test
   public void testCreateFromConstantString() {
     String val = "teststring";
     IMetaValue metaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(val));
-    Assert.assertEquals(MetaValueType.String, metaValue.type());
-    Assert.assertEquals(val, metaValue.get(Object.class));
-    Assert.assertEquals(val, metaValue.get(String.class));
-    Assert.assertArrayEquals(new String[]{val}, metaValue.get(String[].class));
-    Assert.assertEquals(val, metaValue.toString());
+    assertEquals(MetaValueType.String, metaValue.type());
+    assertEquals(val, metaValue.as(Object.class));
+    assertEquals(val, metaValue.as(String.class));
+    assertArrayEquals(new String[]{val}, metaValue.as(String[].class));
+    assertEquals(val, metaValue.toString());
   }
 
   @Test
   public void testCreateFromConstantNullString() {
     IMetaValue metaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(null));
-    Assert.assertEquals(MetaValueType.String, metaValue.type());
-    Assert.assertNull(metaValue.get(Object.class));
-    Assert.assertNull(metaValue.get(String.class));
-    Assert.assertEquals("null", metaValue.toString());
+    assertEquals(MetaValueType.String, metaValue.type());
+    assertNull(metaValue.as(Object.class));
+    assertNull(metaValue.as(String.class));
+    assertEquals("null", metaValue.toString());
   }
 
   @Test
@@ -307,32 +319,32 @@ public class MetaValueFactoryTest {
     String second = "second";
     IMetaValue firstMetaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(first));
     IMetaValue secondMetaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(second));
-    IMetaValue[] metaArray = new IMetaValue[]{firstMetaValue, secondMetaValue};
+    IMetaValue[] metaArray = {firstMetaValue, secondMetaValue};
     IMetaValue metaValue = MetaValueFactory.createArray(metaArray);
 
-    Assert.assertEquals(MetaValueType.Array, metaValue.type());
-    Assert.assertArrayEquals(new Object[]{first, second}, (Object[]) metaValue.get(Object.class));
-    Assert.assertArrayEquals(new Object[]{first, second}, metaValue.get(Object[].class));
-    Assert.assertArrayEquals(new Object[]{first, second}, metaValue.get(String[].class));
+    assertEquals(MetaValueType.Array, metaValue.type());
+    assertArrayEquals(new Object[]{first, second}, (Object[]) metaValue.as(Object.class));
+    assertArrayEquals(new Object[]{first, second}, metaValue.as(Object[].class));
+    assertArrayEquals(new Object[]{first, second}, metaValue.as(String[].class));
 
     IArrayMetaValue array = (IArrayMetaValue) metaValue;
-    Assert.assertSame(metaArray, array.metaValueArray());
+    assertSame(metaArray, array.metaValueArray());
   }
 
   @Test
   public void testCreateArrayOneElement() {
     String first = "first";
     IMetaValue firstMetaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(first));
-    IMetaValue[] metaArray = new IMetaValue[]{firstMetaValue};
+    IMetaValue[] metaArray = {firstMetaValue};
     IMetaValue metaValue = MetaValueFactory.createArray(metaArray);
 
-    Assert.assertEquals(MetaValueType.Array, metaValue.type());
-    Assert.assertArrayEquals(new Object[]{first}, (Object[]) metaValue.get(Object.class));
-    Assert.assertArrayEquals(new Object[]{first}, metaValue.get(Object[].class));
-    Assert.assertArrayEquals(new Object[]{first}, metaValue.get(String[].class));
-    Assert.assertEquals(first, metaValue.get(String.class));
+    assertEquals(MetaValueType.Array, metaValue.type());
+    assertArrayEquals(new Object[]{first}, (Object[]) metaValue.as(Object.class));
+    assertArrayEquals(new Object[]{first}, metaValue.as(Object[].class));
+    assertArrayEquals(new Object[]{first}, metaValue.as(String[].class));
+    assertEquals(first, metaValue.as(String.class));
 
     IArrayMetaValue array = (IArrayMetaValue) metaValue;
-    Assert.assertSame(metaArray, array.metaValueArray());
+    assertSame(metaArray, array.metaValueArray());
   }
 }

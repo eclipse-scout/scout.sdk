@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
 
 /**
  * <h3>{@link RadioButtonProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class RadioButtonProposal extends FormFieldProposal {
@@ -28,7 +26,7 @@ public class RadioButtonProposal extends FormFieldProposal {
   }
 
   @Override
-  protected void fillRewrite(AstNodeFactory factory, Type superType) throws CoreException {
+  protected void fillRewrite(AstNodeFactory factory, Type superType) {
     factory.newRadioButton(getProposalContext().getDefaultName())
         .withSuperType(superType) // type parameter is calculated and added in the factory
         .withReadOnlyNameSuffix(getProposalContext().getSuffix())

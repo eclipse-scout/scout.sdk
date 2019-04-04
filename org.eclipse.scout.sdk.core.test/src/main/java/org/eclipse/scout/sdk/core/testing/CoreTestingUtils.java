@@ -10,138 +10,72 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.testing;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.Properties;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
-import org.eclipse.scout.sdk.core.fixture.BaseClass;
-import org.eclipse.scout.sdk.core.fixture.ChildClass;
-import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
-import org.eclipse.scout.sdk.core.model.api.IFileLocator;
+import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
-import org.eclipse.scout.sdk.core.signature.Signature;
-import org.junit.Assert;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
- * helpers used for general core unit tests (not specific to scout generated code)
+ * Testing helpers
  */
 public final class CoreTestingUtils {
   private static final Pattern WHITESPACE_PAT = Pattern.compile("\\s+");
-  private static ICompilationUnit baseClassIcu;
-  private static ICompilationUnit childClassIcu;
 
   private CoreTestingUtils() {
   }
 
   /**
-   * @return a {@link IJavaEnvironment} containing the source folder <code>src/main/fixture</code> and using a
-   *         {@link IFileLocator} with the test module itself as root
-   */
-  public static IJavaEnvironment createJavaEnvironment() {
-    return new JavaEnvironmentBuilder()
-        .withoutScoutSdk()
-        .withSourceFolder("src/main/fixture")
-        .build();
-  }
-
-  /**
-   * @return a {@link IJavaEnvironment} containing the binary folder <code>target/classes</code>
-   */
-  public static IJavaEnvironment createJavaEnvironmentWithBinaries() {
-    return new JavaEnvironmentBuilder()
-        .withoutScoutSdk()
-        .withoutAllSources()
-        .withClassesFolder("target/classes")
-        .build();
-  }
-
-  /**
-   * @return the {@link IType} for the {@link BaseClass} fixture.
-   */
-  public static IType getBaseClassType() {
-    ICompilationUnit icu = getChildClassIcu(); // do not get from getBaseClassIcu()
-    return icu.types().first().superClass();
-  }
-
-  /**
-   * @return the {@link IType} for the {@link ChildClass} fixture.
-   */
-  public static IType getChildClassType() {
-    ICompilationUnit icu = getChildClassIcu();
-    return icu.types().first();
-  }
-
-  /**
-   * Asserts that a primary class with given fully qualified name and source compiles within the given
-   * {@link IJavaEnvironment}.
+   * Registers the source of the specified {@link ICompilationUnitGenerator} within the specified
+   * {@link IJavaEnvironment} as override.
    *
    * @param env
-   *          The {@link IJavaEnvironment} to do the compilation.
-   * @param fqn
-   *          The fully qualified name of the primary class (e.g. org.eclipse.scout.sdk.test.MyClass).
-   * @param source
-   *          The source of the whole compilation unit of the given primary class name.
-   * @return The {@link IType} representing the given type and source.
-   * @throws AssertionError
-   *           if the given type has compile errors within the given {@link IJavaEnvironment}.
+   *          The {@link IJavaEnvironment} in which the compilation unit should be registered as override (see
+   *          {@link IJavaEnvironment#registerCompilationUnitOverride(String, String, CharSequence)}.
+   * @param generator
+   *          The {@link ICompilationUnitGenerator} that builds the source.
+   * @return The {@link IType} that corresponds to the main type of the specified {@link ICompilationUnitGenerator}.
    */
-  public static IType assertNoCompileErrors(IJavaEnvironment env, String fqn, String source) {
-    String pck = Signature.getQualifier(fqn);
-    String simpleName = Signature.getSimpleName(fqn);
-    return assertNoCompileErrors(env, pck, simpleName, source);
+  public static IType registerCompilationUnit(IJavaEnvironment env, ICompilationUnitGenerator<?> generator) {
+    StringBuilder src = Ensure.notNull(generator).toJavaSource(Ensure.notNull(env));
+    return registerCompilationUnit(env, generator.packageName().orElse(null), generator.mainType().get().elementName().get(), src);
   }
 
   /**
-   * Asserts that the primary class with given simple name, qualifier and source compiles within the given
-   * {@link IJavaEnvironment}.
+   * Registers a compilation unit override with the specified configuration.
    *
    * @param env
-   *          The {@link IJavaEnvironment} to do the compilation.
+   *          The {@link IJavaEnvironment} in which the override should be registered.
    * @param qualifier
-   *          The qualifier of the class (e.g. org.eclipse.scout.sdk.test)
+   *          The package qualifier of the compilation unit.
    * @param simpleName
-   *          The simple name of the class (e.g. MyClass)
+   *          The simple name of the compilation unit (this is the Java file name without file extension. Corresponds to
+   *          the name of the main type).
    * @param source
-   *          The source of the whole compilation unit of the given primary class.
-   * @return The {@link IType} representing the given type and source.
-   * @throws AssertionError
-   *           if the given type has compile errors within the given {@link IJavaEnvironment}.
+   *          The source of the compilation unit.
+   * @return The {@link IType} that corresponds to the main type of the specified {@link ICompilationUnitGenerator}.
    */
-  public static IType assertNoCompileErrors(IJavaEnvironment env, String qualifier, String simpleName, String source) {
-    boolean reloadRequired = env.registerCompilationUnitOverride(qualifier, simpleName + SuffixConstants.SUFFIX_STRING_java, new StringBuilder(source));
+  public static IType registerCompilationUnit(IJavaEnvironment env, String qualifier, String simpleName, CharSequence source) {
+    boolean reloadRequired = env.registerCompilationUnitOverride(qualifier, simpleName + JavaTypes.JAVA_FILE_SUFFIX, source);
     if (reloadRequired) {
       env.reload();
     }
-    String fqn = qualifier + '.' + simpleName;
-    IType t = env.findType(fqn);
-    Assert.assertNotNull("Generated type '" + fqn + "' could not be found.", t);
-    Assert.assertNull(env.compileErrors(t.name()));
-    return t;
-  }
 
-  /**
-   * @return The {@link ICompilationUnit} of the {@link ChildClass} fixture.
-   */
-  public static synchronized ICompilationUnit getChildClassIcu() {
-    if (childClassIcu == null) {
-      childClassIcu = createJavaEnvironment().findType(ChildClass.class.getName()).compilationUnit();
+    StringBuilder fqn = new StringBuilder();
+    if (Strings.hasText(qualifier)) {
+      fqn.append(qualifier).append(JavaTypes.C_DOT);
     }
-    return childClassIcu;
-  }
+    fqn.append(simpleName);
 
-  /**
-   * @return The {@link ICompilationUnit} of the {@link BaseClass} fixture.
-   */
-  public static synchronized ICompilationUnit getBaseClassIcu() {
-    if (baseClassIcu == null) {
-      baseClassIcu = createJavaEnvironment().findType(BaseClass.class.getName()).compilationUnit();
-    }
-    return baseClassIcu;
+    Optional<IType> t = env.findType(fqn.toString());
+    assertTrue(t.isPresent(), "Generated type '" + fqn + "' could not be found.");
+    return t.get();
   }
 
   /**
@@ -151,11 +85,22 @@ public final class CoreTestingUtils {
    *          The string in which the white spaces should be removed.
    * @return The input {@link String} without any white spaces.
    */
-  public static String removeWhitespace(String s) {
+  public static String removeWhitespace(CharSequence s) {
     if (s == null) {
       return null;
     }
     return WHITESPACE_PAT.matcher(s).replaceAll("");
+  }
+
+  /**
+   * Normalizes all new lines to unix style.
+   *
+   * @param text
+   *          The text in which the new line characters should be normalized.
+   * @return The input text with all {@code \r} removed.
+   */
+  public static String normalizeNewLines(String text) {
+    return Strings.replace(text, Character.toString('\r'), "");
   }
 
   /**
@@ -165,76 +110,10 @@ public final class CoreTestingUtils {
    *          The input {@link String} for witch the white spaces should be normalized.
    * @return The input {@link String} with the white spaces normalized.
    */
-  public static String normalizeWhitespace(String s) {
+  public static String normalizeWhitespace(CharSequence s) {
     if (s == null) {
       return null;
     }
     return WHITESPACE_PAT.matcher(s).replaceAll(" ").trim();
-  }
-
-  /**
-   * Imports an {@link IJavaEnvironment} that has been previously exported using
-   * {@link #exportJavaEnvironment(IJavaEnvironment, Writer)}.
-   *
-   * @param r
-   *          The source to import
-   * @return The imported {@link IJavaEnvironment}.
-   * @throws IOException
-   */
-  public static IJavaEnvironment importJavaEnvironment(Reader r) throws IOException {
-    Properties p = new Properties();
-    p.load(r);
-    return importJavaEnvironment(p);
-  }
-
-  /**
-   * Exports the given {@link IJavaEnvironment} into the given {@link Writer}. It can be imported again using
-   * {@link #importJavaEnvironment(Reader)}.
-   *
-   * @param env
-   *          The {@link IJavaEnvironment} to export.
-   * @param w
-   *          The write to export it to.
-   * @throws IOException
-   */
-  public static void exportJavaEnvironment(IJavaEnvironment env, Writer w) throws IOException {
-    StringBuilder src = new StringBuilder();
-    StringBuilder bin = new StringBuilder();
-    for (ClasspathSpi cp : env.unwrap().getClasspath()) {
-      (cp.getMode() == ClasspathSpi.MODE_SOURCE ? src : bin).append("\n    " + cp.getPath() + ",");
-    }
-    Properties p = new Properties();
-    p.setProperty("src", src.toString());
-    p.setProperty("bin", bin.toString());
-    p.store(w, "");
-  }
-
-  /**
-   * @param p
-   *
-   *          <pre>
-   * allowErrors=true,
-   * src=path1, path2, ...
-   * bin=path1, path2, ...
-   *          </pre>
-   *
-   * @return
-   */
-  public static IJavaEnvironment importJavaEnvironment(Properties p) {
-    JavaEnvironmentBuilder builder = new JavaEnvironmentBuilder()
-        .withRunningClasspath(false);
-    for (String s : p.getProperty("src").split(",")) {
-      s = s.trim();
-      if (!s.isEmpty()) {
-        builder.withAbsoluteSourcePath(s);
-      }
-    }
-    for (String s : p.getProperty("bin").split(",")) {
-      s = s.trim();
-      if (!s.isEmpty()) {
-        builder.withAbsoluteBinaryPath(s);
-      }
-    }
-    return builder.build();
   }
 }

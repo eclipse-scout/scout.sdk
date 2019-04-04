@@ -20,7 +20,6 @@ class ProposalPopupEvent {
   static final int TYPE_POPUP_CLOSED = 1 << 3;
   static final int TYPE_SEARCH_SHORTENED = 1 << 4;
 
-  static final String IDENTIFIER_SELECTION_SEARCH_SHORTENED = "selectionSearchShortened";
   static final String IDENTIFIER_SELECTED_PROPOSAL = "selectedProposal";
   static final String IDENTIFIER_MOVE_FOCUS = "moveFocus";
 
@@ -46,10 +45,10 @@ class ProposalPopupEvent {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
+    int prime = 31;
     int result = 1;
     result = prime * result + m_type;
-    result = prime * result + ((m_values == null) ? 0 : m_values.hashCode());
+    result = prime * result + m_values.hashCode();
     return result;
   }
 
@@ -65,17 +64,6 @@ class ProposalPopupEvent {
       return false;
     }
     ProposalPopupEvent other = (ProposalPopupEvent) obj;
-    if (m_type != other.m_type) {
-      return false;
-    }
-    if (m_values == null) {
-      if (other.m_values != null) {
-        return false;
-      }
-    }
-    else if (!m_values.equals(other.m_values)) {
-      return false;
-    }
-    return true;
+    return m_type == other.m_type && m_values.equals(other.m_values);
   }
 }

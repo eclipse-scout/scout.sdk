@@ -13,15 +13,6 @@
 -->
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="uniqueId" name="Unique ID Provider" schema="schema/uniqueId.exsd"/>
-   <extension-point id="classIdGenerator" name="ClassId Generators" schema="schema/classIdGenerator.exsd"/>
-   <extension
-         point="org.eclipse.scout.sdk.s2e.classIdGenerator">
-      <generator
-            class="org.eclipse.scout.sdk.s2e.classid.DefaultUniversallyUniqueClassIdGenerator"
-            priority="-10000">
-      </generator>
-   </extension>
    <extension
          id="org.eclipse.scout.sdk.classid.duplicate"
          name="ClassId Duplicate"

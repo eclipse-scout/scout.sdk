@@ -16,7 +16,6 @@ import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 /**
  * <h3>{@link IScoutHelpContextIds}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public interface IScoutHelpContextIds {

@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template;
 /**
  * <h3>{@link ILinkedAsyncProposalListener}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
+@FunctionalInterface
 public interface ILinkedAsyncProposalListener {
   void loaded();
 }

@@ -10,112 +10,65 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.util;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-
-import javax.xml.parsers.ParserConfigurationException;
+import static org.eclipse.scout.sdk.core.s.util.CoreScoutUtils.getNewViewOrderValue;
+import static org.eclipse.scout.sdk.core.s.util.CoreScoutUtils.getOrderValueInBetween;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import formdata.client.ui.forms.FormWithHighOrders;
 
 /**
  * <h3>{@link CoreScoutUtilsTest}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
+@ExtendWith(JavaEnvironmentExtension.class)
+@ExtendWithJavaEnvironmentFactory(ScoutClientJavaEnvironmentFactory.class)
 public class CoreScoutUtilsTest {
 
   private static final double DELTA = 0.00000000001;
 
   @Test
-  public void testNewViewOrderValue() {
-    IJavaEnvironment environment = CoreScoutTestingUtils.createClientJavaEnvironment();
-    IType type = environment.findType("formdata.client.ui.forms.IgnoredFieldsForm$MainBox$AGroupBox");
-    IType first = type.innerTypes().first();
-    IType second = type.innerTypes().list().get(1);
-    Assert.assertEquals(-1000.0, CoreScoutUtils.getNewViewOrderValue(type, IScoutRuntimeTypes.IFormField, first.source().start() - 1), DELTA);
-    Assert.assertEquals(15.0, CoreScoutUtils.getNewViewOrderValue(type, IScoutRuntimeTypes.IFormField, first.source().end() + 1), DELTA);
-    Assert.assertEquals(2000.0, CoreScoutUtils.getNewViewOrderValue(type, IScoutRuntimeTypes.IFormField, second.source().end() + 1), DELTA);
+  public void testNewViewOrderValue(IJavaEnvironment env) {
+    IType type = env.requireType("formdata.client.ui.forms.IgnoredFieldsForm$MainBox$AGroupBox");
+    IType first = type.innerTypes().first().get();
+    IType second = type.innerTypes().item(1).get();
+    assertEquals(-1000.0, getNewViewOrderValue(type, IScoutRuntimeTypes.IFormField, first.source().get().start() - 1), DELTA);
+    assertEquals(15.0, getNewViewOrderValue(type, IScoutRuntimeTypes.IFormField, first.source().get().end() + 1), DELTA);
+    assertEquals(2000.0, getNewViewOrderValue(type, IScoutRuntimeTypes.IFormField, second.source().get().end() + 1), DELTA);
 
-    IType formWithHighOrders = environment.findType(FormWithHighOrders.class.getName());
-    IType mainBox = formWithHighOrders.innerTypes().first();
-    IType aGroupBox = mainBox.innerTypes().first();
-    Assert.assertEquals(99382716061728384d, CoreScoutUtils.getNewViewOrderValue(mainBox, IScoutRuntimeTypes.IFormField, aGroupBox.source().end() + 1), DELTA);
-    Assert.assertEquals(1000, CoreScoutUtils.getNewViewOrderValue(aGroupBox, IScoutRuntimeTypes.IFormField, aGroupBox.source().start() + 1), DELTA);
+    IType formWithHighOrders = env.requireType(FormWithHighOrders.class.getName());
+    IType mainBox = formWithHighOrders.innerTypes().first().get();
+    IType aGroupBox = mainBox.innerTypes().first().get();
+    assertEquals(99382716061728384.0d, getNewViewOrderValue(mainBox, IScoutRuntimeTypes.IFormField, aGroupBox.source().get().end() + 1), DELTA);
+    assertEquals(1000, getNewViewOrderValue(aGroupBox, IScoutRuntimeTypes.IFormField, aGroupBox.source().get().start() + 1), DELTA);
   }
 
   @Test
   public void testValueInBetween() {
-    Assert.assertEquals(1500, CoreScoutUtils.getOrderValueInBetween(1000, 2000), DELTA);
-    Assert.assertEquals(1000, CoreScoutUtils.getOrderValueInBetween(0, 2000), DELTA);
-    Assert.assertEquals(50, CoreScoutUtils.getOrderValueInBetween(100, 0), DELTA);
-    Assert.assertEquals(1.5, CoreScoutUtils.getOrderValueInBetween(1, 2), DELTA);
-    Assert.assertEquals(0.5, CoreScoutUtils.getOrderValueInBetween(0, 1), DELTA);
-    Assert.assertEquals(2, CoreScoutUtils.getOrderValueInBetween(1, 3), DELTA);
-    Assert.assertEquals(2.7, CoreScoutUtils.getOrderValueInBetween(2.4, 3), DELTA);
-    Assert.assertEquals(3, CoreScoutUtils.getOrderValueInBetween(2, 3.1), DELTA);
-    Assert.assertEquals(2.05, CoreScoutUtils.getOrderValueInBetween(2, 2.1), DELTA);
-    Assert.assertEquals(2.2, CoreScoutUtils.getOrderValueInBetween(2.1, 2.3), DELTA);
-    Assert.assertEquals(4, CoreScoutUtils.getOrderValueInBetween(2.1, 5.7), DELTA);
-    Assert.assertEquals(4, CoreScoutUtils.getOrderValueInBetween(2.1, 6.7), DELTA);
-    Assert.assertEquals(5, CoreScoutUtils.getOrderValueInBetween(2.1, 7.7), DELTA);
-    Assert.assertEquals(3, CoreScoutUtils.getOrderValueInBetween(2.6, 3.7), DELTA);
-    Assert.assertEquals(187, CoreScoutUtils.getOrderValueInBetween(125, 250), DELTA);
-    Assert.assertEquals(2000, CoreScoutUtils.getOrderValueInBetween(1000, 100000), DELTA);
-  }
-
-  @Test
-  public void testGetArtifactIdOfPom() throws SAXException, IOException, ParserConfigurationException {
-    Assert.assertEquals(null, CoreScoutUtils.getArtifactIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>")));
-    Assert.assertEquals(null, CoreScoutUtils.getArtifactIdOfPom(null));
-    Assert.assertEquals("testle", CoreScoutUtils.getArtifactIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><artifactId>testle</artifactId></project>")));
-
-  }
-
-  @Test
-  public void testGetGroupIdOfPom() throws SAXException, IOException, ParserConfigurationException {
-    Assert.assertEquals(null, CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>")));
-    Assert.assertEquals(null, CoreScoutUtils.getGroupIdOfPom(null));
-    Assert.assertEquals("testle", CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><groupId>testle</groupId></project>")));
-    Assert.assertEquals("testle", CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><groupId>whatever</groupId></parent><groupId>testle</groupId></project>")));
-    Assert.assertEquals("testle", CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><groupId>testle</groupId></parent><groupIdA>whatever</groupIdA></project>")));
-    Assert.assertEquals(null, CoreScoutUtils.getGroupIdOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><groupIdA>testle</groupIdA></parent><groupIdA>whatever</groupIdA></project>")));
-  }
-
-  @Test
-  public void testGetVersionOfPom() throws SAXException, IOException, ParserConfigurationException {
-    Assert.assertEquals(null, CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>")));
-    Assert.assertEquals(null, CoreScoutUtils.getVersionOfPom(null));
-    Assert.assertEquals("testle", CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><version>testle</version></project>")));
-    Assert.assertEquals("testle", CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><version>whatever</version></parent><version>testle</version></project>")));
-    Assert.assertEquals("testle", CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><version>testle</version></parent><versionA>whatever</versionA></project>")));
-    Assert.assertEquals(null, CoreScoutUtils.getVersionOfPom(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><versionA>testle</versionA></parent><versionA>whatever</versionA></project>")));
-  }
-
-  @Test
-  public void testGetParentArtifactId() throws SAXException, IOException, ParserConfigurationException {
-    Assert.assertEquals(null, CoreScoutUtils.getParentArtifactId(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>")));
-    Assert.assertEquals(null, CoreScoutUtils.getParentArtifactId(null));
-    Assert.assertEquals(null, CoreScoutUtils.getParentArtifactId(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent></parent><version>testle</version></project>")));
-    Assert.assertEquals("testle", CoreScoutUtils.getParentArtifactId(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><artifactId>testle</artifactId></parent></project>")));
-    Assert.assertEquals(null, CoreScoutUtils.getParentArtifactId(toXmlDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><artifactIdA>testle</artifactIdA></parent><artifactId>testle</artifactId></project>")));
-  }
-
-  protected Document toXmlDocument(String xml) throws SAXException, IOException, ParserConfigurationException {
-    try (Reader r = new StringReader(xml)) {
-      return CoreUtils.createDocumentBuilder().parse(new InputSource(r));
-    }
+    assertEquals(1500, getOrderValueInBetween(1000, 2000), DELTA);
+    assertEquals(1000, getOrderValueInBetween(0, 2000), DELTA);
+    assertEquals(50, getOrderValueInBetween(100, 0), DELTA);
+    assertEquals(1.5, getOrderValueInBetween(1, 2), DELTA);
+    assertEquals(0.5, getOrderValueInBetween(0, 1), DELTA);
+    assertEquals(2, getOrderValueInBetween(1, 3), DELTA);
+    assertEquals(2.7, getOrderValueInBetween(2.4, 3), DELTA);
+    assertEquals(3, getOrderValueInBetween(2, 3.1), DELTA);
+    assertEquals(2.05, getOrderValueInBetween(2, 2.1), DELTA);
+    assertEquals(2.2, getOrderValueInBetween(2.1, 2.3), DELTA);
+    assertEquals(4, getOrderValueInBetween(2.1, 5.7), DELTA);
+    assertEquals(4, getOrderValueInBetween(2.1, 6.7), DELTA);
+    assertEquals(5, getOrderValueInBetween(2.1, 7.7), DELTA);
+    assertEquals(3, getOrderValueInBetween(2.6, 3.7), DELTA);
+    assertEquals(187, getOrderValueInBetween(125, 250), DELTA);
+    assertEquals(2000, getOrderValueInBetween(1000, 100000), DELTA);
   }
 }

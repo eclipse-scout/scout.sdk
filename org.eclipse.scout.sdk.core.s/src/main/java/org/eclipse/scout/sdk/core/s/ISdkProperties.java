@@ -55,28 +55,19 @@ public interface ISdkProperties {
   /**
    * The default view order.
    * <p>
-   * The value of this constant is "rather large, but not <i>that</i> large". For most projects it is the biggest of all
-   * orders. But it is not as big that precision is lost during calculations due to the IEEE floating point arithmetic.
-   * In particular, subtracting {@link #DEFAULT_ORDER_STEP} from this value must result in a different number (which,
-   * for example, would not be the case for {@link Double#MAX_VALUE}). As a rule of thumb, this number should be smaller
-   * than {@link Long#MAX_VALUE}.<br>
    * Must match the default order number used in the Scout runtime. See
    * org.eclipse.scout.rt.platform.IOrdered.DEFAULT_ORDER
    */
-  double DEFAULT_VIEW_ORDER = 98765432123456789d;
+  double DEFAULT_VIEW_ORDER = 98_765_432_123_456_789.0;
 
   /**
    * The default bean order if no @Order annotation is present (according to the Scout Runtime)
    */
-  double DEFAULT_BEAN_ORDER = 5000d;
+  double DEFAULT_BEAN_ORDER = 5000.0;
 
   /**
    * Value to add to view orders for new elements.
    */
   int VIEW_ORDER_ANNOTATION_VALUE_STEP = 1000;
 
-  /**
-   * Default source folder for generated sources
-   */
-  String GENERATED_SOURCE_FOLDER_NAME = "src/generated/java";
 }

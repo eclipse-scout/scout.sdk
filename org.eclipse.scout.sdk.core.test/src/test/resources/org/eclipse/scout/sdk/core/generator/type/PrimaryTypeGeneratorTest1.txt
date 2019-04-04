@@ -1,0 +1,14 @@
+/**
+* Default Testing Comment for
+* CompilationUnit PrimaryType.java
+*/
+package a.b.c;
+
+
+/**
+* Default Testing Comment for
+* Type PrimaryType
+*/
+public class PrimaryType {
+
+}

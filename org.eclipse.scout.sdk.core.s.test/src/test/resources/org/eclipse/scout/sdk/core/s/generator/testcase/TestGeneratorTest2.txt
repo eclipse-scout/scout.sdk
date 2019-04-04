@@ -1,0 +1,15 @@
+package org.eclipse.scout.sdk.core.s.test;
+
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.runner.RunWith;
+
+@RunWithSubject("myvalue")
+@RunWith(ClientTestRunner.class)
+@RunWithClientSession(IClientSession.class)
+public class MyTest {
+// TODO [anonymous] add test cases
+
+}

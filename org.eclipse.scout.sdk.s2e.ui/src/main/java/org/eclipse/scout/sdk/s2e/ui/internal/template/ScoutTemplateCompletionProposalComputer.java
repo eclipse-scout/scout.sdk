@@ -10,28 +10,32 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
-import java.util.Collections;
+import static java.util.Collections.emptyList;
+
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.util.ContentAssistContextInfo;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  * <h3>{@link ScoutTemplateCompletionProposalComputer}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionProposalComputer {
@@ -42,31 +46,34 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
     try {
       ContentAssistContextInfo info = ContentAssistContextInfo.build(context, S2ESdkUiActivator.PLUGIN_ID, monitor);
       if (info == null) {
-        return Collections.emptyList();
+        return emptyList();
       }
 
       ICompilationUnit compilationUnit = info.getCompilationUnit();
       int offset = info.getOffset();
 
       // check if we are in the middle of a statement. This may happen e.g. on annotations. The enclosing element is even though the IType holding the annotation
-      Document d = new Document(compilationUnit.getSource());
+      IDocument d = new Document(compilationUnit.getSource());
       IRegion lineInformationOfOffset = d.getLineInformationOfOffset(offset);
       String lineSource = d.get(lineInformationOfOffset.getOffset(), lineInformationOfOffset.getLength());
-      if (lineSource.indexOf('@') >= 0 || lineSource.indexOf('.') >= 0 || lineSource.indexOf('(') >= 0 || lineSource.indexOf(')') >= 0) {
-        return Collections.emptyList();
+      if (lineSource.indexOf('@') >= 0 || lineSource.indexOf(JavaTypes.C_DOT) >= 0 || lineSource.indexOf('(') >= 0 || lineSource.indexOf(')') >= 0) {
+        return emptyList();
       }
 
       compilationUnit.reconcile(ICompilationUnit.NO_AST, false, false, null, null); // reconcile in case it was a very fast edit and CTRL+space afterwards.
       IJavaElement element = info.computeEnclosingElement();
-      if (!S2eUtils.exists(element) || element.getElementType() != IJavaElement.TYPE) {
-        return Collections.emptyList();
+      if (!JdtUtils.exists(element) || element.getElementType() != IJavaElement.TYPE) {
+        return emptyList();
+      }
+      if (monitor != null && monitor.isCanceled()) {
+        return emptyList();
       }
 
-      return ScoutTemplateProposalFactory.createTemplateProposals((IType) element, offset, info.getIdentifierPrefix());
+      return ScoutTemplateProposalFactory.createTemplateProposals((IType) element, offset, info.getIdentifierPrefix(), info.getViewer());
     }
-    catch (Exception e) {
+    catch (JavaModelException | BadLocationException e) {
       SdkLog.error("Error calculating Scout template proposals.", e);
-      return Collections.emptyList();
+      return emptyList();
     }
   }
 
@@ -77,7 +84,7 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
 
   @Override
   public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-    return Collections.emptyList();
+    return emptyList();
   }
 
   @Override

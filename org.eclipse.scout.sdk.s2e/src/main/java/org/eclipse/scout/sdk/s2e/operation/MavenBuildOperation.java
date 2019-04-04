@@ -10,18 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation;
 
+import static java.util.Collections.addAll;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.maven.cli.CLIManager;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -30,7 +32,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.DebugEvent;
@@ -51,22 +52,23 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.scout.sdk.core.s.IMavenConstants;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
+import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  * <h3>{@link MavenBuildOperation}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
-public class MavenBuildOperation implements IOperation {
+public class MavenBuildOperation implements BiConsumer<EclipseEnvironment, EclipseProgress> {
 
   /**
    * see org.eclipse.m2e.actions.MavenLaunchConstants in plug-in 'org.eclipse.m2e.launching'.
@@ -93,7 +95,7 @@ public class MavenBuildOperation implements IOperation {
   private static final AtomicLong BUILD_NAME_NUM = new AtomicLong(0L);
 
   private MavenBuild m_build;
-  private CountDownLatch m_artifactGenCompleted;
+  private volatile CountDownLatch m_artifactGenCompleted;
   private boolean m_waitUntilCompleted;
   private final List<Integer> m_mavenReturnCodes;
 
@@ -103,48 +105,44 @@ public class MavenBuildOperation implements IOperation {
   }
 
   @Override
-  public String getOperationName() {
-    return "Maven Build";
-  }
-
-  @Override
-  public void validate() {
-    Validate.notNull(getBuild());
-    Validate.isTrue(!getBuild().getGoals().isEmpty());
-    Validate.notNull(getBuild().getWorkingDirectory());
-  }
-
-  @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 10);
+  public void accept(EclipseEnvironment env, EclipseProgress p) {
+    Ensure.notNull(getBuild());
+    Ensure.isTrue(!getBuild().getGoals().isEmpty());
+    Ensure.notNull(getBuild().getWorkingDirectory());
+    SubMonitor progress = SubMonitor.convert(p.monitor(), toString(), 10);
 
     m_artifactGenCompleted = new CountDownLatch(1);
 
-    scheduleMavenBuild(progress);
-    if (progress.isCanceled()) {
-      return;
-    }
+    try {
+      scheduleMavenBuild(progress);
+      if (progress.isCanceled()) {
+        return;
+      }
 
-    if (isWaitUntilCompleted()) {
-      // wait until the forked java process has ended
-      progress.setTaskName("Wait for Maven build...");
-      waitForArtifactBuildCompleted();
+      if (isWaitUntilCompleted()) {
+        // wait until the forked java process has ended
+        progress.setTaskName("Wait for Maven build...");
+        waitForArtifactBuildCompleted();
 
-      for (Integer mavenReturnCode : m_mavenReturnCodes) {
-        if (mavenReturnCode == null || mavenReturnCode.intValue() != 0) {
-          throw new CoreException(new ScoutStatus("Maven build failed with error code " + mavenReturnCode + ". See Maven Console for details."));
+        for (Integer mavenReturnCode : m_mavenReturnCodes) {
+          if (mavenReturnCode == null || mavenReturnCode != 0) {
+            throw newFail("Maven build failed with error code {}. See Maven Console for details.", mavenReturnCode);
+          }
         }
       }
+      progress.worked(4);
     }
-    progress.worked(4);
+    catch (CoreException e) {
+      throw new SdkException(e);
+    }
   }
 
-  protected void scheduleMavenBuild(final SubMonitor progress) throws CoreException {
-    final DebugPlugin debugPlugin = DebugPlugin.getDefault();
-    final ILaunchManager launchManager = debugPlugin.getLaunchManager();
-    final Set<IProcess> watchedProcesses = new HashSet<>(1);
-    final ILaunchConfiguration launchConfiguration = createLaunchConfiguration(progress.newChild(1));
-    final IDebugEventSetListener eventSetListener = new IDebugEventSetListener() {
+  protected void scheduleMavenBuild(SubMonitor progress) throws CoreException {
+    DebugPlugin debugPlugin = DebugPlugin.getDefault();
+    ILaunchManager launchManager = debugPlugin.getLaunchManager();
+    Collection<IProcess> watchedProcesses = new HashSet<>(1);
+    ILaunchConfiguration launchConfiguration = createLaunchConfiguration(progress.newChild(1));
+    IDebugEventSetListener eventSetListener = new IDebugEventSetListener() {
       @Override
       public void handleDebugEvents(DebugEvent[] events) {
         synchronized (watchedProcesses) {
@@ -160,7 +158,7 @@ public class MavenBuildOperation implements IOperation {
                 catch (DebugException ex) {
                   SdkLog.error("Error reading exit value.", ex);
                 }
-                m_mavenReturnCodes.add(Integer.valueOf(exitValue));
+                m_mavenReturnCodes.add(exitValue);
                 watchedProcesses.remove(changedProcess);
               }
             }
@@ -175,7 +173,7 @@ public class MavenBuildOperation implements IOperation {
       }
     };
 
-    final ILaunchListener launchListener = new ILaunchListener() {
+    ILaunchListener launchListener = new ILaunchListener() {
       @Override
       public void launchRemoved(ILaunch launch) {
         // not interesting
@@ -190,9 +188,7 @@ public class MavenBuildOperation implements IOperation {
 
         synchronized (watchedProcesses) {
           debugPlugin.addDebugEventListener(eventSetListener);
-          for (IProcess p : processes) {
-            watchedProcesses.add(p);
-          }
+          addAll(watchedProcesses, processes);
           launchManager.removeLaunchListener(this);
         }
       }
@@ -211,7 +207,7 @@ public class MavenBuildOperation implements IOperation {
 
   protected void waitForArtifactBuildCompleted() {
     try {
-      m_artifactGenCompleted.await(5, TimeUnit.MINUTES);
+      m_artifactGenCompleted.await(15, TimeUnit.MINUTES);
     }
     catch (InterruptedException e) {
       SdkLog.debug(e);
@@ -219,7 +215,7 @@ public class MavenBuildOperation implements IOperation {
   }
 
   protected IContainer getWorkspaceContainer() {
-    IContainer[] containers = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(getBuild().getWorkingDirectory().toURI());
+    IContainer[] containers = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(getBuild().getWorkingDirectory().toUri());
     if (containers.length < 1) {
       return null;
     }
@@ -231,14 +227,14 @@ public class MavenBuildOperation implements IOperation {
     ILaunchConfigurationType launchConfigurationType = launchManager.getLaunchConfigurationType(LAUNCH_CONFIGURATION_TYPE_ID);
     ILaunchConfigurationWorkingCopy workingCopy = launchConfigurationType.newInstance(null, "-mavenBuild" + BUILD_NAME_NUM.getAndIncrement());
 
-    workingCopy.setAttribute(WORKING_DIRECTORY, getBuild().getWorkingDirectory().getAbsolutePath());
+    workingCopy.setAttribute(WORKING_DIRECTORY, getBuild().getWorkingDirectory().toAbsolutePath().toString());
     workingCopy.setAttribute(ILaunchManager.ATTR_PRIVATE, true);
-    workingCopy.setAttribute(M2_UPDATE_SNAPSHOTS, getBuild().hasOption(CLIManager.UPDATE_SNAPSHOTS));
-    workingCopy.setAttribute(M2_OFFLINE, getBuild().hasOption(CLIManager.OFFLINE));
+    workingCopy.setAttribute(M2_UPDATE_SNAPSHOTS, getBuild().hasOption(MavenBuild.OPTION_UPDATE_SNAPSHOTS));
+    workingCopy.setAttribute(M2_OFFLINE, getBuild().hasOption(MavenBuild.OPTION_OFFLINE));
     workingCopy.setAttribute(M2_SKIP_TESTS, getBuild().getProperties().containsKey(M2_SKIP_TEST));
-    workingCopy.setAttribute(M2_NON_RECURSIVE, getBuild().hasOption(CLIManager.NON_RECURSIVE));
+    workingCopy.setAttribute(M2_NON_RECURSIVE, getBuild().hasOption(MavenBuild.OPTION_NON_RECURSIVE));
     workingCopy.setAttribute(M2_WORKSPACE_RESOLUTION, true);
-    workingCopy.setAttribute(M2_DEBUG_OUTPUT, SdkLog.isDebugEnabled() || getBuild().hasOption(CLIManager.DEBUG));
+    workingCopy.setAttribute(M2_DEBUG_OUTPUT, SdkLog.isDebugEnabled() || getBuild().hasOption(MavenBuild.OPTION_DEBUG));
     workingCopy.setAttribute(M2_THREADS, 1);
     // not supported yet: "M2_PROFILES" and "M2_USER_SETTINGS"
     workingCopy.setAttribute(M2_PROPERTIES, getBuild().getPropertiesAsList());
@@ -252,14 +248,14 @@ public class MavenBuildOperation implements IOperation {
     return workingCopy;
   }
 
-  protected static void setJreContainerPath(ILaunchConfigurationWorkingCopy workingCopy, IContainer container) throws CoreException {
+  protected static void setJreContainerPath(ILaunchConfigurationWorkingCopy workingCopy, IResource container) throws CoreException {
     IPath path = getJreContainerPath(container);
     if (path != null) {
       workingCopy.setAttribute(JRE_CONTAINER, path.toPortableString());
     }
   }
 
-  protected static void setGoals(ILaunchConfigurationWorkingCopy workingCopy, Set<String> goals) {
+  protected static void setGoals(ILaunchConfigurationWorkingCopy workingCopy, Iterable<String> goals) {
     StringBuilder goalBuilder = new StringBuilder();
     Iterator<String> iterator = goals.iterator();
     goalBuilder.append(iterator.next());
@@ -291,12 +287,12 @@ public class MavenBuildOperation implements IOperation {
     }
 
     String selectedProfiles = configuration.getSelectedProfiles();
-    if (StringUtils.isNotBlank(selectedProfiles)) {
+    if (Strings.hasText(selectedProfiles)) {
       workingCopy.setAttribute(M2_PROFILES, selectedProfiles);
     }
   }
 
-  protected static IPath getJreContainerPath(IContainer basedir) throws CoreException {
+  protected static IPath getJreContainerPath(IResource basedir) throws CoreException {
     if (basedir == null || !basedir.exists()) {
       return null;
     }
@@ -307,13 +303,12 @@ public class MavenBuildOperation implements IOperation {
     }
 
     IJavaProject javaProject = JavaCore.create(project);
-    if (!S2eUtils.exists(javaProject)) {
+    if (!JdtUtils.exists(javaProject)) {
       return null;
     }
 
     IClasspathEntry[] entries = javaProject.getRawClasspath();
-    for (int i = 0; i < entries.length; ++i) {
-      IClasspathEntry entry = entries[i];
+    for (IClasspathEntry entry : entries) {
       if (JRE_CONTAINER.equals(entry.getPath().segment(0))) {
         return entry.getPath();
       }
@@ -343,13 +338,12 @@ public class MavenBuildOperation implements IOperation {
     public void execute(MavenBuild build) {
       MavenBuildOperation op = new MavenBuildOperation();
       op.setBuild(build);
-      op.validate();
-      try {
-        op.run(new NullProgressMonitor(), ScoutSdkCore.createWorkingCopyManager());
-      }
-      catch (CoreException e) {
-        throw new SdkException(e);
-      }
+      runInEclipseEnvironment(op).awaitDoneThrowingOnErrorOrCancel();
     }
+  }
+
+  @Override
+  public String toString() {
+    return "Maven Build";
   }
 }

@@ -18,10 +18,10 @@ import org.eclipse.jface.dialogs.PopupDialog;
  * {@link IProposalContentProvider}s. If a content provider implements this interface and returns valid dialog settings,
  * the {@link ProposalPopup} remembers its size.
  *
- * @author Andreas Hoegger
  * @since 3.8.0 2012-02-22
  * @see IProposalContentProvider
  */
+@FunctionalInterface
 public interface IDialogSettingsProvider {
 
   /**

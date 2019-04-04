@@ -11,12 +11,14 @@
 package org.eclipse.scout.sdk.core.model.spi;
 
 import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
+import org.eclipse.scout.sdk.core.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
  * <h3>{@link MethodParameterSpi}</h3> Represents a parameter of an {@link MethodSpi}.
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface MethodParameterSpi extends AnnotatableSpi {
@@ -39,12 +41,29 @@ public interface MethodParameterSpi extends AnnotatableSpi {
    */
   int getFlags();
 
+  int getIndex();
+
   /**
    * Gets the {@link MethodSpi} this parameter belongs to
    *
-   * @return The {@link MethodSpi} this parameter belongs to. Never returns <code>null</code>.
+   * @return The {@link MethodSpi} this parameter belongs to. Never returns {@code null}.
    */
   MethodSpi getDeclaringMethod();
+
+  @Override
+  default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.preVisit(wrap(), level, index);
+  }
+
+  @Override
+  default boolean acceptPostOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.postVisit(wrap(), level, index);
+  }
+
+  @Override
+  default TreeVisitResult acceptLevelOrder(IBreadthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.visit(wrap(), level, index);
+  }
 
   @Override
   IMethodParameter wrap();

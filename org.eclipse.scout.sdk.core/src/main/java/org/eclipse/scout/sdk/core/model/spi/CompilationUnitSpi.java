@@ -13,13 +13,15 @@ package org.eclipse.scout.sdk.core.model.spi;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
  * <h3>{@link CompilationUnitSpi}</h3> Represents a compilation unit usually defined by a .java file.
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface CompilationUnitSpi extends JavaElementSpi {
@@ -34,8 +36,8 @@ public interface CompilationUnitSpi extends JavaElementSpi {
   /**
    * Gets the {@link PackageSpi} of this {@link CompilationUnitSpi}.
    *
-   * @return The {@link PackageSpi} of this {@link CompilationUnitSpi} or {@link PackageSpi#DEFAULT_PACKAGE} for the
-   *         default package.
+   * @return The {@link PackageSpi} of this {@link CompilationUnitSpi} or the default package
+   *         ({@link PackageSpi#getElementName()} is {@code null}).
    */
   PackageSpi getPackage();
 
@@ -59,8 +61,7 @@ public interface CompilationUnitSpi extends JavaElementSpi {
    * Gets the main {@link TypeSpi} of this {@link CompilationUnitSpi}. This is the {@link TypeSpi} whose name matches
    * the name of the java file.
    *
-   * @return The main {@link TypeSpi} or <code>null</code> if no main type is defined in this {@link CompilationUnitSpi}
-   *         .
+   * @return The main {@link TypeSpi} or {@code null} if no main type is defined in this {@link CompilationUnitSpi} .
    */
   TypeSpi getMainType();
 
@@ -70,11 +71,26 @@ public interface CompilationUnitSpi extends JavaElementSpi {
    * @param simpleName
    *          The simple class name to search in the context of this {@link CompilationUnitSpi}.
    * @return The {@link TypeSpi} with given simpleName as it is referenced by this {@link CompilationUnitSpi} or
-   *         <code>null</code> if no such simpleName is referenced by this {@link CompilationUnitSpi}.
+   *         {@code null} if no such simpleName is referenced by this {@link CompilationUnitSpi}.
    */
   TypeSpi findTypeBySimpleName(String simpleName);
 
   ISourceRange getJavaDoc();
+
+  @Override
+  default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.preVisit(wrap());
+  }
+
+  @Override
+  default boolean acceptPostOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.postVisit(wrap());
+  }
+
+  @Override
+  default TreeVisitResult acceptLevelOrder(IBreadthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.visit(wrap());
+  }
 
   @Override
   ICompilationUnit wrap();

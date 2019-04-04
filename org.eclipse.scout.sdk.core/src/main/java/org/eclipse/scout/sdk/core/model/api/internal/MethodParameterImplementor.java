@@ -10,17 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformMethodParameter;
+
+import java.util.stream.Stream;
+
+import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.query.AnnotationQuery;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
-import org.eclipse.scout.sdk.core.model.sugar.AnnotationQuery;
 
 /**
  * <h3>{@link MethodParameterImplementor}</h3>
  *
- * @author Ivan Motsch
  * @since 3.8.0 2012-12-06
  */
 public class MethodParameterImplementor extends AbstractAnnotatableImplementor<MethodParameterSpi> implements IMethodParameter {
@@ -36,7 +42,12 @@ public class MethodParameterImplementor extends AbstractAnnotatableImplementor<M
 
   @Override
   public IType dataType() {
-    return JavaEnvironmentImplementor.wrapType(m_spi.getDataType());
+    return m_spi.getDataType().wrap();
+  }
+
+  @Override
+  public Stream<? extends IJavaElement> children() {
+    return annotations().stream();
   }
 
   @Override
@@ -45,14 +56,22 @@ public class MethodParameterImplementor extends AbstractAnnotatableImplementor<M
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    JavaModelPrinter.print(this, sb);
-    return sb.toString();
+  public int index() {
+    return m_spi.getIndex();
   }
 
   @Override
   public AnnotationQuery<IAnnotation> annotations() {
     return new AnnotationQuery<>(declaringMethod().declaringType(), m_spi);
+  }
+
+  @Override
+  public IMethodParameterGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
+    return transformMethodParameter(this, transformer);
+  }
+
+  @Override
+  public IMethodParameterGenerator<?> toWorkingCopy() {
+    return toWorkingCopy(null);
   }
 }

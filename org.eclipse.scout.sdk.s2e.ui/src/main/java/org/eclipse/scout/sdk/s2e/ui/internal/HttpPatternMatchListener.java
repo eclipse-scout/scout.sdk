@@ -3,7 +3,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
 import org.eclipse.ui.console.IHyperlink;
 import org.eclipse.ui.console.IPatternMatchListenerDelegate;
@@ -42,7 +42,7 @@ public class HttpPatternMatchListener implements IPatternMatchListenerDelegate {
 
     private final TextConsole m_sourceConsole;
 
-    public P_HttpHyperlink(TextConsole console) {
+    private P_HttpHyperlink(TextConsole console) {
       m_sourceConsole = console;
     }
 

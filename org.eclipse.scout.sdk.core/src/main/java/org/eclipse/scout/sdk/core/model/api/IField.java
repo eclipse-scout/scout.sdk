@@ -10,49 +10,54 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
+import java.util.Optional;
+
+import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 
 /**
  * <h3>{@link IField}</h3> Represents a field in a java type.
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface IField extends IMember {
 
   /**
    * Gets the constant value of this {@link IField}.<br>
-   * Please note: The field must be initialized with a constant value so that it can be retrieved using this method.
+   * <br>
+   * <b>Note:</b> The field must be initialized with a constant value so that it can be retrieved using this method.
    *
-   * @return The constant value of this {@link IField} if it can be computed or <code>null</code> if it cannot be
-   *         computed or the field has no constant value.
+   * @return The constant value of this {@link IField} if it can be computed or an empty {@link Optional} if it cannot
+   *         be computed or the field has no constant value assigned.
    */
-  IMetaValue constantValue();
+  Optional<IMetaValue> constantValue();
 
   /**
    * Gets the data type of this {@link IField}.
    *
-   * @return The {@link IType} describing the data type of this {@link IField}. Never returns <code>null</code>.
+   * @return The {@link IType} describing the data type of this {@link IField}.
    */
   IType dataType();
 
   /**
-   * @return If this {@link IField} is a synthetic parameterized Field (for example the super class of a parameterized
-   *         type with applied type arguments) then this method returns the original field without the type arguments
-   *         applied.
-   *         <p>
-   *         Otherwise the receiver is returned.
-   */
-  IField originalField();
-
-  /**
    * Gets the source of this {@link IField} behind the equals character.
    *
-   * @return The initializer source. Never returns <code>null</code>. Use {@link ISourceRange#isAvailable()} to check if
-   *         source is actually available for this element.
+   * @return The initializer source.
    */
-  ISourceRange sourceOfInitializer();
+  Optional<ISourceRange> sourceOfInitializer();
+
+  /**
+   * @return The {@link IType} this {@link IField} is declared in.
+   */
+  IType declaringType();
 
   @Override
   FieldSpi unwrap();
+
+  @Override
+  IFieldGenerator<?> toWorkingCopy();
+
+  @Override
+  IFieldGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer);
 }

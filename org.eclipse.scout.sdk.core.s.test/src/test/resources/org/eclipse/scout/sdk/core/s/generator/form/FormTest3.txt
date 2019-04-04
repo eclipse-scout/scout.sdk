@@ -1,0 +1,12 @@
+package org.eclipse.scout.sdk.core.s.test.shared;
+
+import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.shared.TunnelToServer;
+
+@TunnelToServer
+public interface IMyFormService extends IService {
+MyFormData prepareCreate(MyFormData formData);
+MyFormData create(MyFormData formData);
+MyFormData load(MyFormData formData);
+MyFormData store(MyFormData formData);
+}

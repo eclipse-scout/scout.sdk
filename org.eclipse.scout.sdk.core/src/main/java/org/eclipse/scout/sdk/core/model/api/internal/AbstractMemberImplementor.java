@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
+import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
 
 public abstract class AbstractMemberImplementor<SPI extends MemberSpi> extends AbstractAnnotatableImplementor<SPI> implements IMember {
@@ -25,18 +26,13 @@ public abstract class AbstractMemberImplementor<SPI extends MemberSpi> extends A
   }
 
   @Override
-  public IType declaringType() {
-    return JavaEnvironmentImplementor.wrapType(m_spi.getDeclaringType());
-  }
-
-  @Override
   public int flags() {
     return m_spi.getFlags();
   }
 
   @Override
-  public List<ITypeParameter> typeParameters() {
-    return new WrappedList<>(m_spi.getTypeParameters());
+  public Stream<ITypeParameter> typeParameters() {
+    return WrappingSpliterator.stream(m_spi.getTypeParameters());
   }
 
   @Override
@@ -45,8 +41,7 @@ public abstract class AbstractMemberImplementor<SPI extends MemberSpi> extends A
   }
 
   @Override
-  public ISourceRange javaDoc() {
-    return m_spi.getJavaDoc();
+  public Optional<ISourceRange> javaDoc() {
+    return Optional.ofNullable(m_spi.getJavaDoc());
   }
-
 }

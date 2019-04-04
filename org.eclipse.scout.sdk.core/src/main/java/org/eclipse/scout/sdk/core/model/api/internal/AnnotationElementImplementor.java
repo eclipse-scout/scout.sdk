@@ -10,15 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotationElement;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
+import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
+import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 
-/**
- *
- */
 public class AnnotationElementImplementor extends AbstractJavaElementImplementor<AnnotationElementSpi> implements IAnnotationElement {
 
   public AnnotationElementImplementor(AnnotationElementSpi spi) {
@@ -41,15 +49,27 @@ public class AnnotationElementImplementor extends AbstractJavaElementImplementor
   }
 
   @Override
-  public ISourceRange sourceOfExpression() {
-    return m_spi.getSourceOfExpression();
+  public Optional<ISourceRange> sourceOfExpression() {
+    return Optional.ofNullable(m_spi.getSourceOfExpression());
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    JavaModelPrinter.print(this, sb);
-    return sb.toString();
+  public Stream<IJavaElement> children() {
+    return Stream.empty();
   }
 
+  @Override
+  public ISourceGenerator<ISourceBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer) {
+    if (isDefault()) {
+      return ISourceGenerator.empty();
+    }
+    ISourceGenerator<IExpressionBuilder<?>> g = b -> b.append(elementName()).equalSign().append(transformAnnotationElement(this, transformer)
+        .generalize(ExpressionBuilder::create));
+    return g.generalize(ExpressionBuilder::create);
+  }
+
+  @Override
+  public ISourceGenerator<ISourceBuilder<?>> toWorkingCopy() {
+    return toWorkingCopy(null);
+  }
 }

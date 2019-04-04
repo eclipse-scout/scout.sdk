@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 
+import static java.util.Collections.emptyList;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ISearchRangeConsumer;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ISelectionStateLabelProvider;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
-import org.eclipse.scout.sdk.s2e.util.NormalizedPattern;
+import org.eclipse.scout.sdk.s2e.ui.util.NormalizedPattern;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
@@ -46,7 +46,6 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * {@link ProposalTextField#setContentProvider(IProposalContentProvider)} and
  * {@link ProposalTextField#setLabelProvider(org.eclipse.jface.viewers.IBaseLabelProvider)}.
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
@@ -54,7 +53,7 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
 
   private final Map<Object, int[]> m_searchRanges;
   private ILabelProvider m_decoratingWorkbenchLabelProvider;
-  private volatile Collection<? extends Object> m_allProposals; // lazy loaded
+  private volatile Collection<?> m_allProposals; // lazy loaded
   private final Object m_proposalsLock; // lock object. Because 'this' is already used by super.clearListeners() called by dispose()
 
   protected AbstractContentProviderAdapter() {
@@ -100,11 +99,11 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
   }
 
   @Override
-  public Object createDescriptionContent(Object proposal, IProgressMonitor monitor) {
-    if (!(proposal instanceof IJavaElement)) {
+  public Object createDescriptionContent(Object element, IProgressMonitor monitor) {
+    if (!(element instanceof IJavaElement)) {
       return null;
     }
-    return JavaDocBrowser.getJavaDoc((IJavaElement) proposal);
+    return JavaDocBrowser.getJavaDoc((IJavaElement) element);
   }
 
   @Override
@@ -127,15 +126,15 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
     try {
       startRecordMatchRegions();
       if (monitor != null && monitor.isCanceled()) {
-        return Collections.emptyList();
+        return emptyList();
       }
 
-      Collection<? extends Object> proposals = doLoadProposals(monitor);
+      Collection<?> proposals = doLoadProposals();
       if (proposals == null || proposals.isEmpty()) {
-        return Collections.emptyList();
+        return emptyList();
       }
 
-      List<Object> result = new ArrayList<>(proposals.size());
+      Collection<Object> result = new ArrayList<>(proposals.size());
       for (Object o : proposals) {
         if (monitor != null && monitor.isCanceled()) {
           break;
@@ -172,12 +171,8 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
   public void endRecordMatchRegions() {
   }
 
-  /**
-   * @param monitor
-   * @return
-   */
-  protected Collection<? extends Object> doLoadProposals(IProgressMonitor monitor) {
-    Collection<? extends Object> loadedProposals = m_allProposals;
+  protected Collection<?> doLoadProposals() {
+    Collection<?> loadedProposals = m_allProposals;
     if (loadedProposals != null) {
       return loadedProposals;
     }
@@ -192,7 +187,7 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
       // We want to completely load on the first request and filter only afterwards.
       loadedProposals = loadProposals(new NullProgressMonitor());
       if (loadedProposals == null) {
-        loadedProposals = Collections.emptyList();
+        loadedProposals = emptyList();
       }
       m_allProposals = loadedProposals;
       return loadedProposals;
@@ -204,9 +199,5 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
     return S2ESdkUiActivator.getDefault().getDialogSettingsSection(getClass().getName());
   }
 
-  /**
-   * @param monitor
-   * @return
-   */
-  protected abstract Collection<? extends Object> loadProposals(IProgressMonitor monitor);
+  protected abstract Collection<?> loadProposals(IProgressMonitor monitor);
 }

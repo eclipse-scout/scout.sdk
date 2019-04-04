@@ -1,0 +1,12 @@
+package org.eclipse.scout.sdk.core.s.test;
+
+import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.shared.TunnelToServer;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+
+import formdata.shared.services.pages.BaseTablePageData;
+
+@TunnelToServer
+public interface IMyPageService1 extends IService {
+BaseTablePageData getTestTableData(SearchFilter filter);
+}

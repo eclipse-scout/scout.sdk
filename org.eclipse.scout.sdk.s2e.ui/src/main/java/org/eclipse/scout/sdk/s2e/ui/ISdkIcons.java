@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.ui;
 /**
  * <h3>{@link ISdkIcons}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 @SuppressWarnings("squid:S00115")
@@ -21,6 +20,7 @@ public interface ISdkIcons {
   String ButtonAdd = "button_add.gif";
   String CodeAdd = "code_add.png";
   String CodeTypeAdd = "codeType_add.png";
+  String Comment = "comment.png";
   String ContentAssist = "content_assist_cue.gif";
   String DateFieldAdd = "datefield_add.gif";
   String DoubleFieldAdd = "doublefield_add.gif";
@@ -56,4 +56,10 @@ public interface ISdkIcons {
   String WebServiceAdd = "webservice_add.gif";
   String WsProviderOverview = "ws_provider_overview.png";
   String WsConsumerOverview = "ws_consumer_overview.png";
+  String Nls = "nls.gif";
+  String TextAdd = "text_add.png";
+  String TextRemove = "text_remove.png";
+  String Text = "text.png";
+  String Find = "find_obj.gif";
+  String LanguageAdd = "language_add.gif";
 }

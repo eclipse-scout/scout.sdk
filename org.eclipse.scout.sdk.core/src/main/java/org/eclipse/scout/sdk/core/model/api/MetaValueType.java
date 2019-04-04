@@ -13,68 +13,69 @@ package org.eclipse.scout.sdk.core.model.api;
 /**
  * <h3>{@link MetaValueType}</h3>
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 @SuppressWarnings("squid:S00115")
 public enum MetaValueType {
   /**
-   * {@link IMetaValue#get(Class)} is a {@link Character}
+   * {@link IMetaValue#as(Class)} is a {@link Character}
    */
   Char,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link Byte}
+   * {@link IMetaValue#as(Class)} is a {@link Byte}
    */
   Byte,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link Integer}
+   * {@link IMetaValue#as(Class)} is a {@link Integer}
    */
   Int,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link Short}
+   * {@link IMetaValue#as(Class)} is a {@link Short}
    */
   Short,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link Boolean}
+   * {@link IMetaValue#as(Class)} is a {@link Boolean}
    */
   Bool,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link Long}
+   * {@link IMetaValue#as(Class)} is a {@link Long}
    */
   Long,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link Double}
+   * {@link IMetaValue#as(Class)} is a {@link Double}
    */
   Double,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link Float}
+   * {@link IMetaValue#as(Class)} is a {@link Float}
    */
   Float,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link Float}
+   * {@link IMetaValue#as(Class)} is a {@link Float}
    */
   String,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link IType}
+   * {@link IMetaValue#as(Class)} is a {@link IType}
    */
   Type,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link IField}
+   * {@link IMetaValue#as(Class)} is a {@link IField}
    */
   Enum,
   /**
-   * {@link IMetaValue#get(Class)} is a {@link IAnnotation}
+   * {@link IMetaValue#as(Class)} is a {@link IAnnotation}
    */
   Annotation,
   /**
-   * {@link IMetaValue#get(Class)} is a primitive array int[] or a typed object array such as String[]
+   * {@link IMetaValue#as(Class)} is a primitive array int[] or a typed object array such as String[]
    * <p>
    * The meta value itself is a {@link IArrayMetaValue}
    */
   Array,
   /**
-   * note that annotation values are never null, field initializers may be null
+   * Represents a {@code null} value. Note that annotation values are never {@code null}, field initializers may be
+   * {@code null}.
    */
   Null,
-  Unknown;
+
+  Unknown
 }

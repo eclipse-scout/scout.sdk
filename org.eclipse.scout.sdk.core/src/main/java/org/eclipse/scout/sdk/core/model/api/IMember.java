@@ -10,14 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.generator.member.IMemberGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
 
 /**
  * <h3>{@link IMember}</h3> Represents Java elements that are members.
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface IMember extends IAnnotatable {
@@ -31,48 +33,46 @@ public interface IMember extends IAnnotatable {
   int flags();
 
   /**
-   * Gets the {@link IType} this {@link IMember} is defined in.
-   *
-   * @return The declaring {@link IType}. Never returns <code>null</code> for {@link IMethod} and {@link IField}. For
-   *         {@link IType} this is the enclosing type that may be null for primary types.
-   */
-  IType declaringType();
-
-  /**
-   * Gets all {@link ITypeParameter}s defined by this {@link IType} in the order as they appear in the source or class
+   * Gets all {@link ITypeParameter}s defined by this {@link IMember} in the order as they appear in the source or class
    * file.<br>
    * <br>
-   * Type parameters are declarations as defined by the hosting {@link IType}. They may have minimal bounds defined.<br>
-   * The difference to {@link #typeArguments()} is that {@link #typeParameters()} returns the parameter as they are
-   * declared by the class file while {@link #typeArguments()} holds the currently bound real {@link IType}s.<br>
+   * Type parameters are declarations as defined by the hosting {@link IMember}. They may have minimal bounds
+   * defined.<br>
+   * The difference to {@link IType#typeArguments()} is that {@link #typeParameters()} returns the parameter as they are
+   * declared by the class file while {@link IType#typeArguments()} holds the currently bound real {@link IType}s.<br>
    * <br>
    * <b>Example: </b><br>
-   * <code>public class NumberList&lt;T extends java.lang.Number&gt; {}</code><br>
-   * <code>public static NumberList&lt;java.lang.Double&gt; getDoubleValues() {}</code><br>
+   * {@code public class NumberList<T extends java.lang.Number>}<br>
+   * {@code public static NumberList<java.lang.Double> getDoubleValues()}<br>
    * <br>
    * The return {@link IType} of the {@link IMethod} "getDoubleValues" would return the following values:<br>
-   * <code>getDoubleValues.getReturnType().getTypeParameters().getBounds() = java.lang.Number</code><br>
-   * <code>getDoubleValues.getReturnType().getTypeArguments() = java.lang.Double</code>
+   * {@code getDoubleValues.requireReturnType().typeParameters().bounds() = java.lang.Number}<br>
+   * {@code getDoubleValues.requireReturnType().typeArguments() = java.lang.Double}
    *
-   * @return
+   * @return A {@link Stream} holding the type parameters of this {@link IType}.
    */
-  List<ITypeParameter> typeParameters();
+  Stream<ITypeParameter> typeParameters();
 
   /**
    * Specifies if this {@link IType} has {@link ITypeParameter}s.
    *
-   * @return <code>true</code> if this is a parameterized {@link IType} (using generics), <code>false</code> otherwise.
+   * @return {@code true} if this is a parameterized {@link IType} (using generics), {@code false} otherwise.
    */
   boolean hasTypeParameters();
 
   /**
    * Gets the java doc source for this {@link IMember}.
    *
-   * @return The {@link ISourceRange} for the java doc of this {@link IMember}. Never returns <code>null</code>. Use
-   *         {@link ISourceRange#isAvailable()} to check if source is actually available for this element.
+   * @return The {@link ISourceRange} for the java doc of this {@link IMember}.
    */
-  ISourceRange javaDoc();
+  Optional<ISourceRange> javaDoc();
 
   @Override
   MemberSpi unwrap();
+
+  @Override
+  IMemberGenerator<?> toWorkingCopy();
+
+  @Override
+  IMemberGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer);
 }

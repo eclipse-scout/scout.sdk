@@ -1,0 +1,5 @@
+@Override
+public int defMethod() {
+// TODO [anonymous] Auto-generated method stub.
+return 0;
+}

@@ -33,6 +33,16 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.scout.sdk.core.test</artifactId>
+    </dependency>
+
+    <!-- For embedded Maven execution -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-embedder</artifactId>
       <exclusions>
         <exclusion>
           <!-- because a newer version is included in scout.rt.server.jaxws (javax.annotation:javax.annotation-api:1.2) -->
@@ -43,20 +53,41 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core.test</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-connector-basic</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-transport-wagon</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.takari.aether</groupId>
+      <artifactId>aether-connector-okhttp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-provider-api</artifactId>
+    </dependency>
+
+    <!-- Scout RT Dependencies to test against -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.ui.html.test</artifactId>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.server.test</artifactId>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
@@ -71,15 +102,15 @@
         <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>add-source</id>
+            <id>add-test-source</id>
             <goals>
-              <goal>add-source</goal>
+              <goal>add-test-source</goal>
             </goals>
             <phase>generate-sources</phase>
             <configuration>
               <sources>
-                <source>src/main/client</source>
-                <source>src/main/shared</source>
+                <source>src/test/client</source>
+                <source>src/test/shared</source>
               </sources>
             </configuration>
           </execution>

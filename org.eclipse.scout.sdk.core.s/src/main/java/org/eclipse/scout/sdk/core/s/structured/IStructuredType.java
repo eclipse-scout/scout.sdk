@@ -17,10 +17,17 @@ import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 /**
  * <h3>{@link IStructuredType}</h3>
  *
- * @author Andreas Hoegger
  * @since 3.0.0
  */
 public interface IStructuredType {
+
+  IJavaElement getSiblingMethodFieldGetter(String methodName);
+
+  IJavaElement getSibling(Categories category);
+
+  List<IJavaElement> getElements(Categories category);
+
+  <T extends IJavaElement> List<T> getElements(Categories category, Class<T> clazz);
 
   enum Categories {
     FIELD_LOGGER,
@@ -55,62 +62,4 @@ public interface IStructuredType {
     TYPE_FORM_HANDLER,
     TYPE_UNCATEGORIZED
   }
-
-  /**
-   * @param methodName
-   * @return
-   */
-  IJavaElement getSiblingMethodFieldGetter(String methodName);
-
-  /**
-   * @param methodName
-   * @return
-   */
-  IJavaElement getSiblingMethodConfigExec(String methodName);
-
-  /**
-   * @param category
-   * @return
-   */
-  IJavaElement getSibling(Categories category);
-
-  List<IJavaElement> getElements(Categories category);
-
-  <T extends IJavaElement> List<T> getElements(Categories category, Class<T> clazz);
-
-  /**
-   * @param methodName
-   * @return
-   */
-  IJavaElement getSiblingMethodConfigGetConfigured(String methodName);
-
-  /**
-   * @param methodName
-   * @return
-   */
-  IJavaElement getSiblingMethodStartHandler(String methodName);
-
-  /**
-   * @param keyStrokeName
-   * @return
-   */
-  IJavaElement getSiblingTypeKeyStroke(String keyStrokeName);
-
-  /**
-   * @param attributeName
-   * @return
-   */
-  IJavaElement getSiblingComposerAttribute(String attributeName);
-
-  /**
-   * @param entityName
-   * @return
-   */
-  IJavaElement getSiblingComposerEntity(String entityName);
-
-  /**
-   * @param formHandlerName
-   * @return
-   */
-  IJavaElement getSiblingTypeFormHandler(String formHandlerName);
 }

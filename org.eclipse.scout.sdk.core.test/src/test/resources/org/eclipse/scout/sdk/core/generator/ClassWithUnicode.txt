@@ -1,0 +1,14 @@
+/**
+ * <h3>{@link ClassWithUnicode}</h3>
+ *
+ * @since 9.0.0
+ */
+public class ClassWithUnicode {
+public static final String UNICODE = "☂✌☀❀☺☺☺☺☺☺";
+/**
+   * ઓઓઊઊઊઊ
+   */
+public static String getValue() {
+    return UNICODE;
+  }
+}

@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.classid;
 
+import static java.util.Collections.addAll;
+import static java.util.Collections.emptyList;
+import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,12 +21,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IAnnotation;
@@ -36,65 +40,60 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
-import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.scout.sdk.core.imports.CompilationUnitScopedImportCollector;
+import org.eclipse.scout.sdk.core.imports.IImportCollector;
+import org.eclipse.scout.sdk.core.imports.IImportValidator;
+import org.eclipse.scout.sdk.core.imports.ImportCollector;
+import org.eclipse.scout.sdk.core.imports.ImportValidator;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitScopedImportCollector;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.core.s.classid.ClassIds;
+import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
+import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.operation.AnnotationNewOperation;
-import org.eclipse.scout.sdk.s2e.operation.IOperation;
-import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.operation.ImportsCreateOperation;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
 
 /**
  * <h3>{@link MissingClassIdsNewOperation}</h3>
  *
- * @author Matthias Villiger
  * @since 3.10.0 2014-01-05
  */
-public class MissingClassIdsNewOperation implements IOperation {
+public class MissingClassIdsNewOperation implements BiConsumer<EclipseEnvironment, EclipseProgress> {
 
   private Set<IResource> m_selection;
 
   @Override
-  public String getOperationName() {
-    return "Create missing @ClassId annotations";
-  }
-
-  @Override
-  public void validate() {
-    // no input, no validation
-  }
-
-  @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    SubMonitor progress = SubMonitor.convert(monitor, 10);
+  public void accept(EclipseEnvironment env, EclipseProgress p) {
+    SubMonitor progress = SubMonitor.convert(p.monitor(), 10);
     try {
       Collection<IType> candidates = findCandidates(progress.newChild(8));
       if (candidates.isEmpty()) {
         return;
       }
-      processCandidates(candidates, progress.newChild(2), workingCopyManager);
+      processCandidates(candidates, env, progress.newChild(2));
     }
     catch (OperationCanceledException e) {
       SdkLog.debug("Creation of missing @ClassId annotations has been cancelled.", e);
     }
   }
 
-  protected ITypeHierarchy createHierarchy(IType iTypeWithClassId, SubMonitor monitor) throws CoreException {
+  protected ITypeHierarchy createHierarchy(IType iTypeWithClassId, IProgressMonitor monitor) {
     if (useRegion()) {
       return createRegionHierarchy(monitor);
     }
-    return iTypeWithClassId.newTypeHierarchy(monitor);
+    try {
+      return iTypeWithClassId.newTypeHierarchy(monitor);
+    }
+    catch (JavaModelException e) {
+      throw new SdkException(e);
+    }
   }
 
   /**
@@ -113,49 +112,62 @@ public class MissingClassIdsNewOperation implements IOperation {
     return true;
   }
 
-  protected ITypeHierarchy createRegionHierarchy(SubMonitor monitor) throws JavaModelException {
+  protected ITypeHierarchy createRegionHierarchy(IProgressMonitor monitor) {
     IRegion region = JavaCore.newRegion();
     for (IResource r : selection()) {
       if (r != null && r.isAccessible()) {
         IJavaElement element = JavaCore.create(r);
-        if (S2eUtils.exists(element)) {
+        if (JdtUtils.exists(element)) {
           region.add(element);
         }
       }
     }
-    return JavaCore.newTypeHierarchy(region, null, monitor);
+    try {
+      return JavaCore.newTypeHierarchy(region, null, monitor);
+    }
+    catch (JavaModelException e) {
+      throw new SdkException(e);
+    }
   }
 
-  protected Collection<IType> findCandidates(SubMonitor monitor) throws CoreException {
-    Set<IType> result = new HashSet<>();
-    Set<IType> startTypes = S2eUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
+  protected Collection<IType> findCandidates(SubMonitor monitor) {
+    Collection<IType> result = new HashSet<>();
+    Set<IType> startTypes = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
     monitor.setWorkRemaining(startTypes.size());
     monitor.setTaskName("Search for classes...");
     if (startTypes.isEmpty()) {
-      return Collections.emptyList();
+      return emptyList();
     }
 
     for (IType startType : startTypes) {
       ITypeHierarchy hierarchy = createHierarchy(startType, monitor.newChild(1));
       if (hierarchy == null || monitor.isCanceled()) {
-        return Collections.emptyList();
+        return emptyList();
       }
 
-      for (IType t : hierarchy.getAllSubtypes(startType)) {
-        result.add(t);
-      }
+      addAll(result, hierarchy.getAllSubtypes(startType));
 
       if (monitor.isCanceled()) {
-        return Collections.emptyList();
+        return emptyList();
       }
     }
     return result;
   }
 
   protected boolean acceptType(IType candidate) {
-    final IResource resource = candidate.getResource();
+    try {
+      if (!JdtUtils.exists(candidate) || !candidate.isClass() || candidate.isBinary() || candidate.isAnonymous()) {
+        return false;
+      }
+    }
+    catch (JavaModelException e) {
+      SdkLog.warning("Unable to check flags of type '{}'. Skipping.", candidate.getFullyQualifiedName(), e);
+      return false;
+    }
+
+    IResource resource = candidate.getResource();
     if (resource == null || !resource.isAccessible()) {
-      return false; // exclude binary types
+      return false;
     }
 
     if (selection().isEmpty()) {
@@ -164,8 +176,8 @@ public class MissingClassIdsNewOperation implements IOperation {
     return isInResources(resource);
   }
 
-  protected boolean isInResources(final IResource candidate) {
-    final IPath location = candidate.getLocation();
+  protected boolean isInResources(IResource candidate) {
+    IPath location = candidate.getLocation();
     for (IResource r : selection()) {
       if (r.getLocation().isPrefixOf(location)) {
         return true;
@@ -174,7 +186,7 @@ public class MissingClassIdsNewOperation implements IOperation {
     return false;
   }
 
-  protected void processCandidates(Collection<IType> candidates, SubMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  protected void processCandidates(Collection<IType> candidates, EclipseEnvironment env, SubMonitor monitor) {
     SubMonitor subMonitor = monitor.newChild(2);
     subMonitor.setWorkRemaining(candidates.size());
     subMonitor.setTaskName("Search for missing annotations...");
@@ -182,20 +194,11 @@ public class MissingClassIdsNewOperation implements IOperation {
     int numTypes = 0;
     Map<ICompilationUnit, Set<IType>> typesWithoutClassId = new HashMap<>();
     for (IType t : candidates) {
-      boolean isValidType = S2eUtils.exists(t)
-          && t.isClass()
-          && !t.isBinary()
-          && !t.isAnonymous();
-      if (isValidType && acceptType(t)) {
-        IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
+      if (acceptType(t)) {
+        IAnnotation annotation = JdtUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
         if (annotation == null) {
           ICompilationUnit icu = t.getCompilationUnit();
-          Set<IType> listByIcu = typesWithoutClassId.get(icu);
-          if (listByIcu == null) {
-            listByIcu = new HashSet<>();
-            typesWithoutClassId.put(icu, listByIcu);
-          }
-          if (listByIcu.add(t)) {
+          if (typesWithoutClassId.computeIfAbsent(icu, k -> new HashSet<>()).add(t)) {
             numTypes++;
           }
         }
@@ -209,29 +212,33 @@ public class MissingClassIdsNewOperation implements IOperation {
     subMonitor = monitor.newChild(6);
     subMonitor.setWorkRemaining(numTypes);
     subMonitor.setTaskName("Create new annotations...");
-    CachingJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
     for (Entry<ICompilationUnit, Set<IType>> e : typesWithoutClassId.entrySet()) {
-      createClassIdsForIcu(e.getKey(), e.getValue(), subMonitor, workingCopyManager, envProvider);
+      try {
+        createClassIdsForIcu(e.getKey(), e.getValue(), env, subMonitor);
+      }
+      catch (CoreException e1) {
+        SdkLog.warning("Unable to write compilation unit '{}'.", e.getKey().getPath(), e1);
+      }
       if (monitor.isCanceled()) {
         return;
       }
     }
   }
 
-  public static void createClassIdsForIcu(ICompilationUnit icu, Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, IJavaEnvironmentProvider envProvider) throws CoreException {
-    workingCopyManager.register(icu, null);
+  public static void createClassIdsForIcu(ICompilationUnit icu, Iterable<IType> types, EclipseEnvironment env, IProgressMonitor monitor) throws CoreException {
+    currentWorkingCopyManager().register(icu, null);
 
-    IJavaEnvironment environment = envProvider.get(icu.getJavaProject());
-    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(environment), S2eUtils.getPackage(icu));
+    IJavaEnvironment environment = env.toScoutJavaEnvironment(icu.getJavaProject());
+    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(environment), JdtUtils.getPackage(icu));
 
     IBuffer buffer = icu.getBuffer();
-    Document sourceDoc = new Document(buffer.getContents());
-    MultiTextEdit multiEdit = new MultiTextEdit();
+    IDocument sourceDoc = new Document(buffer.getContents());
+    TextEdit multiEdit = new MultiTextEdit();
     IImportValidator validator = new ImportValidator(collector);
     String nl = icu.findRecommendedLineSeparator();
     for (IType t : types) {
-      String newClassId = ClassIdGenerators.generateNewId(new ClassIdGenerationContext(t));
-      AnnotationNewOperation op = new AnnotationNewOperation(ScoutAnnotationSourceBuilderFactory.createClassId(newClassId), t);
+      String newClassId = ClassIds.next(t.getFullyQualifiedName());
+      AnnotationNewOperation op = new AnnotationNewOperation(ScoutAnnotationGenerator.createClassId(newClassId), t);
       TextEdit edit = op.createEdit(validator, sourceDoc, nl);
       multiEdit.addChild(edit);
 
@@ -246,11 +253,16 @@ public class MissingClassIdsNewOperation implements IOperation {
       buffer.setContents(sourceDoc.get());
 
       // create imports
-      new ImportsCreateOperation(icu, collector).run(new NullProgressMonitor(), workingCopyManager);
+      new ImportsCreateOperation(icu, collector).accept(env, EclipseEnvironment.toScoutProgress(monitor));
     }
     catch (BadLocationException e) {
       SdkLog.warning("Could not update @ClassId annotations for compilation unit '{}'.", icu.getElementName(), e);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "Create missing @ClassId annotations";
   }
 
   public Set<IResource> selection() {

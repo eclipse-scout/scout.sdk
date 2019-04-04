@@ -14,15 +14,15 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.scout.sdk.s2e.util.NormalizedPattern;
+import org.eclipse.scout.sdk.s2e.ui.util.NormalizedPattern;
 
 /**
  * <h3>{@link IProposalContentProvider}</h3> Content provider interface for {@link ProposalTextField}s.
  *
- * @author Matthias Villiger
  * @since 5.2.0
  * @see ProposalTextField#setContentProvider(IProposalContentProvider)
  */
+@FunctionalInterface
 public interface IProposalContentProvider extends IContentProvider {
   /**
    * Gets the proposals optionally filtered using the given {@link NormalizedPattern}.
@@ -31,7 +31,7 @@ public interface IProposalContentProvider extends IContentProvider {
    *          The {@link NormalizedPattern} to filter the proposals based on the user input search string.
    * @param monitor
    *          The {@link IProgressMonitor} of the background proposal computation job.
-   * @return A {@link Collection} or <code>null</code> with all proposals that should be shown to the user.
+   * @return A {@link Collection} or {@code null} with all proposals that should be shown to the user.
    */
   Collection<Object> getProposals(NormalizedPattern searchPattern, IProgressMonitor monitor);
 }

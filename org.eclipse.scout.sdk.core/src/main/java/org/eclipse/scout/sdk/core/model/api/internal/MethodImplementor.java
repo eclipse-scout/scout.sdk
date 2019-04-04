@@ -10,16 +10,30 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import java.util.List;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformMethod;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.query.AnnotationQuery;
+import org.eclipse.scout.sdk.core.model.api.query.MethodParameterQuery;
+import org.eclipse.scout.sdk.core.model.api.query.SuperMethodQuery;
+import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
-import org.eclipse.scout.sdk.core.model.sugar.AnnotationQuery;
-import org.eclipse.scout.sdk.core.model.sugar.MethodParameterQuery;
-import org.eclipse.scout.sdk.core.model.sugar.SuperMethodQuery;
+import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  *
@@ -31,38 +45,42 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
   }
 
   @Override
+  public IType declaringType() {
+    return m_spi.getDeclaringType().wrap();
+  }
+
+  @Override
   public boolean isConstructor() {
     return m_spi.isConstructor();
   }
 
   @Override
-  public IType returnType() {
-    return JavaEnvironmentImplementor.wrapType(m_spi.getReturnType());
+  public Optional<IType> returnType() {
+    return Optional
+        .ofNullable(m_spi.getReturnType())
+        .map(TypeSpi::wrap);
   }
 
   @Override
-  public List<IType> exceptionTypes() {
-    return new WrappedList<>(m_spi.getExceptionTypes());
+  public Stream<? extends IJavaElement> children() {
+    return Stream.concat(Stream.concat(annotations().stream(), typeParameters()), parameters().stream());
   }
 
   @Override
-  public IMethod originalMethod() {
-    return m_spi.getOriginalMethod().wrap();
+  public IType requireReturnType() {
+    return returnType()
+        .orElseThrow(() -> newFail("Method {} in type {} is a constructor and therefore has no return type.", identifier(true), declaringType().name()));
   }
 
   @Override
-  public ISourceRange sourceOfBody() {
-    return m_spi.getSourceOfBody();
+  public Stream<IType> exceptionTypes() {
+    return WrappingSpliterator.stream(m_spi.getExceptionTypes());
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    JavaModelPrinter.print(this, sb);
-    return sb.toString();
+  public Optional<ISourceRange> sourceOfBody() {
+    return Optional.ofNullable(m_spi.getSourceOfBody());
   }
-
-  //additional convenience methods
 
   @Override
   public SuperMethodQuery superMethods() {
@@ -79,4 +97,27 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
     return new MethodParameterQuery(m_spi);
   }
 
+  @Override
+  public String identifier(boolean useErasureOnly) {
+    List<String> parameterTypes = parameters().stream()
+        .map(IMethodParameter::dataType)
+        .map(p -> p.reference(useErasureOnly))
+        .collect(toList());
+    return JavaTypes.createMethodIdentifier(elementName(), parameterTypes);
+  }
+
+  @Override
+  public String identifier() {
+    return identifier(false);
+  }
+
+  @Override
+  public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer) {
+    return transformMethod(this, transformer);
+  }
+
+  @Override
+  public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toWorkingCopy() {
+    return toWorkingCopy(null);
+  }
 }

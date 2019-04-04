@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Control;
  * {@link ProposalTextField#setProposalDescriptionProvider(IProposalDescriptionProvider)} to display user defined
  * descriptions for a selected proposal.
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public interface IProposalDescriptionProvider {
@@ -32,7 +31,7 @@ public interface IProposalDescriptionProvider {
    * @param monitor
    *          The {@link IProgressMonitor} of the worker thread.
    * @return The description content object that will be passed to {@link #createDescriptionControl(Composite, Object)}
-   *         (only if not <code>null</code>).
+   *         (only if not {@code null}).
    */
   Object createDescriptionContent(Object proposal, IProgressMonitor monitor);
 
@@ -44,8 +43,8 @@ public interface IProposalDescriptionProvider {
    *          The parent {@link Composite}.
    * @param content
    *          The content data as calculated by {@link #createDescriptionContent(Object, IProgressMonitor)} before.
-   *          Never is <code>null</code>.
-   * @return The created control to display in the description area or <code>null</code> if nothing should be displayed.
+   *          Never is {@code null}.
+   * @return The created control to display in the description area or {@code null} if nothing should be displayed.
    */
   Control createDescriptionControl(Composite parent, Object content);
 

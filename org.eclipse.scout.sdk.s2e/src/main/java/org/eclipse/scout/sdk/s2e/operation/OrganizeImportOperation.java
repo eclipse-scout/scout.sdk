@@ -10,59 +10,58 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation;
 
+import java.util.function.Consumer;
+
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.manipulation.JavaManipulation;
 import org.eclipse.jdt.core.manipulation.OrganizeImportsOperation;
 import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 
 /**
  * <h3>{@link OrganizeImportOperation}</h3>
  *
  * @since 9.0.0
  */
-public class OrganizeImportOperation implements IOperation {
+public class OrganizeImportOperation implements Consumer<EclipseProgress> {
 
-  private ICompilationUnit m_icu;
+  private final ICompilationUnit m_icu;
 
-  public OrganizeImportOperation() {
-    this(null);
-  }
-
+  /**
+   * @param icu
+   *          The {@link ICompilationUnit} for which the imports should be organized. Must not be {@code null}.
+   */
   public OrganizeImportOperation(ICompilationUnit icu) {
-    m_icu = icu;
+    m_icu = Ensure.notNull(icu);
   }
 
   @Override
-  public String getOperationName() {
-    return "Organize imports of compilation unit";
-  }
-
-  @Override
-  public void validate() {
-    if (getCompilationUnit() == null) {
-      throw new IllegalArgumentException("compilation unit is null");
-    }
-  }
-
-  @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void accept(EclipseProgress t) {
     if (JavaManipulation.getPreferenceNodeId() == null) {
       return; // not configured. throws IllegalArgumentException. Do not organize imports
     }
+
     ICompilationUnit unit = getCompilationUnit();
-    CodeGenerationSettings settings = JavaPreferencesSettings.getCodeGenerationSettings(unit.getJavaProject());
-    OrganizeImportsOperation organizeImps = new OrganizeImportsOperation(unit, null, settings.importIgnoreLowercase, !unit.isWorkingCopy(), true, null);
-    organizeImps.run(monitor);
+    try {
+      CodeGenerationSettings settings = JavaPreferencesSettings.getCodeGenerationSettings(unit.getJavaProject());
+      OrganizeImportsOperation organizeImps = new OrganizeImportsOperation(unit, null, settings.importIgnoreLowercase, !unit.isWorkingCopy(), true, null);
+      organizeImps.run(t.monitor());
+    }
+    catch (CoreException e) {
+      throw new SdkException(e);
+    }
   }
 
   public ICompilationUnit getCompilationUnit() {
     return m_icu;
   }
 
-  public void setCompilationUnit(ICompilationUnit icu) {
-    m_icu = icu;
+  @Override
+  public String toString() {
+    return "Organize imports of compilation unit '" + getCompilationUnit().getElementName() + "'.";
   }
 }

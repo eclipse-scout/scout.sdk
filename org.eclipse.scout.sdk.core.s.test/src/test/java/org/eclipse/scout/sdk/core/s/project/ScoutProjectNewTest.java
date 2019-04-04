@@ -10,32 +10,55 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.project;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <h3>{@link ScoutProjectNewTest}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class ScoutProjectNewTest {
 
   @Test
-  public void testProjectCreation() throws IOException {
-    File targetDirectory = null;
+  public void testHelloWorldArchetype() throws IOException {
+    Path targetDirectory = null;
     try {
-      targetDirectory = CoreScoutTestingUtils.createTestProject();
-      CoreScoutTestingUtils.runMavenCleanTest(new File(targetDirectory, CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
+      targetDirectory = CoreScoutTestingUtils.createClassicTestProject();
+      CoreScoutTestingUtils.runMavenCleanVerify(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
     }
     finally {
-      if (targetDirectory != null) {
-        CoreUtils.deleteDirectory(targetDirectory);
-      }
+      deleteDir(targetDirectory);
+    }
+  }
+
+  @Test
+  public void testHelloJsArchetype() throws IOException {
+    Path targetDirectory = null;
+    try {
+      targetDirectory = CoreScoutTestingUtils.createJsTestProject();
+      CoreScoutTestingUtils.runMavenCleanVerify(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
+    }
+    finally {
+      deleteDir(targetDirectory);
+    }
+  }
+
+  private static void deleteDir(Path p) {
+    if (p == null) {
+      return;
+    }
+
+    try {
+      CoreUtils.deleteDirectory(p);
+    }
+    catch (IOException e) {
+      SdkLog.error("Unable to delete directory '{}'.", p, e);
     }
   }
 }

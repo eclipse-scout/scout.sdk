@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.util;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.Objects;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -20,8 +21,10 @@ import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.osgi.framework.Bundle;
 
 /**
@@ -29,18 +32,19 @@ import org.osgi.framework.Bundle;
  * {@link IJavaCompletionProposalComputer}.<br>
  * Use {@link #build(ContentAssistInvocationContext, String, IProgressMonitor)} to create instances.
  *
- * @author Matthias Villiger
  * @since 6.0.200
  */
 public class ContentAssistContextInfo {
   private final int m_offset;
   private final ICompilationUnit m_compilationUnit;
   private final String m_identifierPrefix;
+  private final SourceViewer m_viewer;
 
-  protected ContentAssistContextInfo(int offset, ICompilationUnit compilationUnit, String identifierPrefix) {
+  protected ContentAssistContextInfo(int offset, ICompilationUnit compilationUnit, String identifierPrefix, SourceViewer sourceViewer) {
     m_offset = offset;
     m_compilationUnit = compilationUnit;
     m_identifierPrefix = identifierPrefix;
+    m_viewer = sourceViewer;
   }
 
   /**
@@ -51,9 +55,9 @@ public class ContentAssistContextInfo {
    * @param callingPluginId
    *          The plug-in symbolic name of the plug-in containing the proposal computer.
    * @param monitor
-   *          The {@link IProgressMonitor} to use or <code>null</code> if no monitoring is used.
-   * @return An {@link ContentAssistContextInfo} instance or <code>null</code> if it could not be build based on the
-   *         given input.
+   *          The {@link IProgressMonitor} to use or {@code null} if no monitoring is used.
+   * @return An {@link ContentAssistContextInfo} instance or {@code null} if it could not be build based on the given
+   *         input.
    */
   public static ContentAssistContextInfo build(ContentAssistInvocationContext context, String callingPluginId, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)) {
@@ -67,12 +71,16 @@ public class ContentAssistContextInfo {
 
     JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
     ICompilationUnit compilationUnit = javaContext.getCompilationUnit();
-    if (!S2eUtils.exists(compilationUnit)) {
+    if (!JdtUtils.exists(compilationUnit) || !JdtUtils.exists(compilationUnit.getJavaProject())) {
       return null;
     }
 
     int offset = javaContext.getInvocationOffset();
     if (offset < 0) {
+      return null;
+    }
+
+    if (!(context.getViewer() instanceof SourceViewer)) {
       return null;
     }
 
@@ -84,13 +92,13 @@ public class ContentAssistContextInfo {
     if (monitor != null && monitor.isCanceled()) {
       return null;
     }
-    return new ContentAssistContextInfo(offset, compilationUnit, identifierPrefix);
+    return new ContentAssistContextInfo(offset, compilationUnit, identifierPrefix, (SourceViewer) context.getViewer());
   }
 
-  protected static String computeIdentifierPrefix(JavaContentAssistInvocationContext javaContext) {
+  protected static String computeIdentifierPrefix(ContentAssistInvocationContext javaContext) {
     try {
       CharSequence prefix = javaContext.computeIdentifierPrefix();
-      if (StringUtils.isNotBlank(prefix)) {
+      if (Strings.hasText(prefix)) {
         return prefix.toString().trim();
       }
     }
@@ -108,27 +116,34 @@ public class ContentAssistContextInfo {
   }
 
   /**
-   * @return The {@link ICompilationUnit} in which the content assist was invoked. Is never <code>null</code>.
+   * @return The {@link ICompilationUnit} in which the content assist was invoked. Is never {@code null}.
    */
   public ICompilationUnit getCompilationUnit() {
     return m_compilationUnit;
   }
 
   /**
-   * @return A {@link String} with the identifier prefix or <code>null</code> if there was no prefix.
+   * @return A {@link String} with the identifier prefix or {@code null} if there was no prefix.
    */
   public String getIdentifierPrefix() {
     return m_identifierPrefix;
   }
 
   /**
+   * @return The {@link SourceViewer} in which the content assist is performed. Never returns {@code null}.
+   */
+  public SourceViewer getViewer() {
+    return m_viewer;
+  }
+
+  /**
    * @return computes the innermost {@link IJavaElement} that surrounds the offset of the invocation (see
-   *         {@link #getOffset()}. May return <code>null</code> in case no element could be computed.
+   *         {@link #getOffset()}. May return {@code null} in case no element could be computed.
    */
   public IJavaElement computeEnclosingElement() {
     try {
       IJavaElement element = m_compilationUnit.getElementAt(m_offset);
-      if (S2eUtils.exists(element)) {
+      if (JdtUtils.exists(element) && JdtUtils.exists(element.getJavaProject())) {
         return element;
       }
     }
@@ -140,7 +155,7 @@ public class ContentAssistContextInfo {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
+    int prime = 31;
     int result = 1;
     result = prime * result + ((m_compilationUnit == null) ? 0 : m_compilationUnit.hashCode());
     result = prime * result + ((m_identifierPrefix == null) ? 0 : m_identifierPrefix.hashCode());
@@ -160,25 +175,8 @@ public class ContentAssistContextInfo {
       return false;
     }
     ContentAssistContextInfo other = (ContentAssistContextInfo) obj;
-    if (m_compilationUnit == null) {
-      if (other.m_compilationUnit != null) {
-        return false;
-      }
-    }
-    else if (!m_compilationUnit.equals(other.m_compilationUnit)) {
-      return false;
-    }
-    if (m_identifierPrefix == null) {
-      if (other.m_identifierPrefix != null) {
-        return false;
-      }
-    }
-    else if (!m_identifierPrefix.equals(other.m_identifierPrefix)) {
-      return false;
-    }
-    if (m_offset != other.m_offset) {
-      return false;
-    }
-    return true;
+    return m_offset == other.m_offset
+        && Objects.equals(m_identifierPrefix, other.m_identifierPrefix)
+        && Objects.equals(m_compilationUnit, other.m_compilationUnit);
   }
 }

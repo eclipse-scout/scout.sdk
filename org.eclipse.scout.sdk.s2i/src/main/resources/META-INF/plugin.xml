@@ -1,0 +1,53 @@
+<idea-plugin>
+  <id>org.eclipse.scout.sdk.s2i</id>
+  <name>Eclipse Scout</name>
+  <version>0.0.1</version>
+
+  <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
+
+  <description><![CDATA[
+      Eclipse Scout integration for IntelliJ IDEA
+    ]]></description>
+
+  <change-notes><![CDATA[
+      Initial version
+      blablablablablablablablablablablablablablablablablablablablablabla
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="191.0"/>
+
+  <application-components>
+    <component>
+      <interface-class>org.eclipse.scout.sdk.core.log.ISdkConsoleSpi</interface-class>
+      <implementation-class>org.eclipse.scout.sdk.s2i.IdeaLogger</implementation-class>
+    </component>
+  </application-components>
+
+
+  <project-components>
+    <component>
+      <interface-class>org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager</interface-class>
+      <implementation-class>org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor</implementation-class>
+    </component>
+  </project-components>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+  <extensions defaultExtensionNs="com.intellij">
+    <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings" instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings" />
+  </extensions>
+
+  <actions>
+    <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" text="Scout">
+      <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"  />
+      <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu" class="org.eclipse.scout.sdk.s2i.derived.impl.UpdateAllDerivedResourcesMenu" text="Update all derived resources..." description="Updates all derived resources in the Project." />
+    </group>
+  </actions>
+
+
+</idea-plugin>

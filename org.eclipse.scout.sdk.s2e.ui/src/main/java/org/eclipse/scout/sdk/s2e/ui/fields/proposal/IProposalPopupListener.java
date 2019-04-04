@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.fields.proposal;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 interface IProposalPopupListener extends EventListener {
   void popupChanged(ProposalPopupEvent event);
 }

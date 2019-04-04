@@ -14,8 +14,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -29,14 +29,13 @@ import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.internal.text.html.HTMLPrinter;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
-import org.eclipse.swt.browser.OpenWindowListener;
-import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.Bundle;
@@ -44,7 +43,6 @@ import org.osgi.framework.Bundle;
 /**
  * <h3>{@link JavaDocBrowser}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public final class JavaDocBrowser {
@@ -53,7 +51,7 @@ public final class JavaDocBrowser {
   }
 
   public static String getJavaDoc(IJavaElement element) {
-    if (!S2eUtils.exists(element)) {
+    if (!JdtUtils.exists(element)) {
       return null;
     }
 
@@ -70,11 +68,8 @@ public final class JavaDocBrowser {
     browser.setJavascriptEnabled(false);
     browser.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
     browser.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-    browser.addOpenWindowListener(new OpenWindowListener() {
-      @Override
-      public void open(WindowEvent event) {
-        event.required = true; // Cancel opening of new windows
-      }
+    browser.addOpenWindowListener(event -> {
+      event.required = true; // Cancel opening of new windows
     });
     browser.addLocationListener(new LocationListener() {
       @Override
@@ -92,11 +87,10 @@ public final class JavaDocBrowser {
     return browser;
   }
 
-  @SuppressWarnings("squid:S1149") // StringBuffer required by API
   static String getJavaDocHtml(IJavaElement element) {
     try {
       String javaDoc = JavadocContentAccess2.getHTMLContent(element, true);
-      if (StringUtils.isBlank(javaDoc)) {
+      if (Strings.isBlank(javaDoc)) {
         return null;
       }
 
@@ -122,7 +116,6 @@ public final class JavaDocBrowser {
     return null;
   }
 
-  @SuppressWarnings("squid:S1149") // StringBuffer required by API
   static void insertBaseUrl(String javaDoc, IJavaElement element, StringBuilder buffer) {
     try {
       String base = JavadocContentAccess2.extractBaseURL(javaDoc);
@@ -151,18 +144,15 @@ public final class JavaDocBrowser {
     }
 
     String style = null;
-    try {
-      url = FileLocator.toFileURL(url);
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
-        StringBuilder builder = new StringBuilder(256);
-        String line = reader.readLine();
-        while (line != null) {
-          builder.append(line);
-          builder.append('\n');
-          line = reader.readLine();
-        }
-        style = builder.toString();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(FileLocator.toFileURL(url).openStream(), StandardCharsets.UTF_8))) {
+      StringBuilder builder = new StringBuilder(256);
+      String line = reader.readLine();
+      while (line != null) {
+        builder.append(line);
+        builder.append('\n');
+        line = reader.readLine();
       }
+      style = builder.toString();
     }
     catch (IOException ex) {
       SdkLog.info("Unable to read CSS Style for JavaDoc", ex);

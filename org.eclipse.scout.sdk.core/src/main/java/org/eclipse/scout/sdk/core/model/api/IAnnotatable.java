@@ -10,21 +10,31 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
+import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.model.api.query.AnnotationQuery;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
-import org.eclipse.scout.sdk.core.model.sugar.AnnotationQuery;
 
 /**
  * <h3>{@link IAnnotatable}</h3>Represents a Java element that can be annotated.
  *
- * @author Matthias Villiger
- * @since 5.1.0
  * @see IAnnotation
+ * @since 5.1.0
  */
 public interface IAnnotatable extends IJavaElement {
 
   @Override
   AnnotatableSpi unwrap();
 
+  /**
+   * @return A new {@link AnnotationQuery} that by default returns all {@link IAnnotation}s of the receiver
+   *         {@link IAnnotatable}.
+   */
   AnnotationQuery<IAnnotation> annotations();
 
+  @Override
+  IAnnotatableGenerator<?> toWorkingCopy();
+
+  @Override
+  IAnnotatableGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer);
 }

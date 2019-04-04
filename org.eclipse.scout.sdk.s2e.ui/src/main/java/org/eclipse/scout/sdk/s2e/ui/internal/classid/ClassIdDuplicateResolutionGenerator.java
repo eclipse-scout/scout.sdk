@@ -11,8 +11,9 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.classid;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotation;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator;
@@ -20,10 +21,11 @@ import org.eclipse.ui.IMarkerResolutionGenerator;
 /**
  * <h3>{@link ClassIdDuplicateResolutionGenerator}</h3>
  *
- * @author Matthias Villiger
  * @since 4.0.0 2014-05-21
  */
 public class ClassIdDuplicateResolutionGenerator implements IMarkerResolutionGenerator {
+
+  private static final IMarkerResolution[] NO_RESOLUTION = new IMarkerResolution[0];
 
   @Override
   public IMarkerResolution[] getResolutions(IMarker marker) {
@@ -38,9 +40,9 @@ public class ClassIdDuplicateResolutionGenerator implements IMarkerResolutionGen
         }
       }
     }
-    catch (Exception e) {
+    catch (CoreException e) {
       SdkLog.error("Unable to calculate possible marker resolutions.", e);
     }
-    return new IMarkerResolution[]{};
+    return NO_RESOLUTION;
   }
 }

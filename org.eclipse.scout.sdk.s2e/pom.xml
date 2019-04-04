@@ -36,17 +36,11 @@
     <!-- Build Dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.jdt</groupId>
-          <artifactId>ecj</artifactId>
-        </exclusion>
-      </exclusions>
+      <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
+      <artifactId>org.eclipse.scout.sdk.core.ecj</artifactId>
       <exclusions>
         <exclusion>
           <groupId>org.eclipse.jdt</groupId>
@@ -54,6 +48,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <!-- Build Dependencies (Provided) -->
     <dependency>
       <groupId>org.eclipse.jdt</groupId>
@@ -121,8 +116,10 @@
               !org.eclipse.scout.sdk.s2e.*,
               !javax.annotation.*,
               !org.codehaus.plexus*,
+              !org.eclipse.scout.sdk.s2e.*,
               !org.eclipse.text*,
               !org.eclipse.m2e.core*,
+              !org.osgi.framework.*,
               !org.apache.maven.*,
               !org.eclipse.scout.sdk.core.*,
               !org.slf4j*,
@@ -131,25 +128,24 @@
               *
             </Import-Package>
             <Require-Bundle>
-              org.eclipse.core.runtime;bundle-version="[3.12,4)";visibility:=reexport,
-              org.eclipse.core.resources;bundle-version="[3.11,4)";visibility:=reexport,
-              org.eclipse.jdt.core;bundle-version="[3.12,4)";visibility:=reexport,
-              org.eclipse.jdt.core.manipulation;bundle-version="[1.7,2)";visibility:=reexport,
+              org.eclipse.core.runtime;bundle-version="[3.15,4)";visibility:=reexport,
+              org.eclipse.core.resources;bundle-version="[3.13,4)";visibility:=reexport,
+              org.eclipse.jdt.core;bundle-version="[3.15,4)";visibility:=reexport,
+              org.eclipse.jdt.core.manipulation;bundle-version="[1.11,2)";visibility:=reexport,
               org.eclipse.jdt.launching;bundle-version="[3.8.100,4)";visibility:=reexport,
-              org.eclipse.text;bundle-version="[3.6.0,4)";visibility:=reexport,
-              org.eclipse.m2e.maven.runtime;bundle-version="[1.7,2)";visibility:=reexport,
-              org.eclipse.m2e.archetype.common;bundle-version="[1.7,2)";visibility:=reexport,
-              org.eclipse.m2e.core;bundle-version="[1.7,2)";visibility:=reexport
+              org.eclipse.text;bundle-version="[3.8.0,4)";visibility:=reexport,
+              org.eclipse.m2e.maven.runtime;bundle-version="[1.9,2)";visibility:=reexport,
+              org.eclipse.m2e.archetype.common;bundle-version="[1.9,2)";visibility:=reexport,
+              org.eclipse.m2e.core;bundle-version="[1.9,2)";visibility:=reexport
             </Require-Bundle>
 
-            <Bundle-Activator>org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator</Bundle-Activator>
+            <Bundle-Activator>org.eclipse.scout.sdk.s2e.S2ESdkActivator</Bundle-Activator>
 
             <!-- embed compile/runtime dependencies using path that matches the copied dependency folder -->
-            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-            <Embed-Transitive>false</Embed-Transitive>
+            <Embed-Dependency>*org.eclipse.scout.sdk.core*;scope=compile|runtime</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
             <_exportcontents>
-              !org.apache.commons.*,
-              org.eclipse.scout.sdk.core.*;version="${bundle.version}",
+              org.eclipse.scout.sdk.core.*;version="${bundle.version}"
             </_exportcontents>
 
             <Embed-StripVersion>false</Embed-StripVersion>

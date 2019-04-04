@@ -12,20 +12,23 @@ package org.eclipse.scout.sdk.core.model.spi;
 
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
+import org.eclipse.scout.sdk.core.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
  * <h3>{@link MethodSpi}</h3> Represents a method declaration.
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface MethodSpi extends MemberSpi {
 
   /**
-   * @return Gets return data {@link TypeSpi} of this {@link MethodSpi} or {@link TypeSpi#VOID}.
-   * @see TypeSpi#VOID
+   * @return Gets return data {@link TypeSpi} of this {@link MethodSpi}. This can be the void type.<br>
+   *         For constructors {@code null} is returned.
+   * @see #isConstructor()
    */
   TypeSpi getReturnType();
 
@@ -46,19 +49,26 @@ public interface MethodSpi extends MemberSpi {
   /**
    * Gets if this method is a constructor.
    *
-   * @return <code>true</code> if this method is a constructor, <code>false</code> otherwise.
+   * @return {@code true} if this method is a constructor, {@code false} otherwise.
    */
   boolean isConstructor();
 
-  /**
-   * If this {@link MethodSpi} is a synthetic parameterized method (for example the super class of a parameterized type
-   * with applied type arguments) then this method returns the original method without the type arguments applied.
-   * <p>
-   * Otherwise this is returned
-   */
-  MethodSpi getOriginalMethod();
-
   ISourceRange getSourceOfBody();
+
+  @Override
+  default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.preVisit(wrap(), level, index);
+  }
+
+  @Override
+  default boolean acceptPostOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.postVisit(wrap(), level, index);
+  }
+
+  @Override
+  default TreeVisitResult acceptLevelOrder(IBreadthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.visit(wrap(), level, index);
+  }
 
   @Override
   IMethod wrap();

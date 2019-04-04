@@ -10,12 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.structured;
 
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
-import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import formdata.client.ui.desktop.outline.pages.ExtendedTablePage;
 import formdata.client.ui.forms.AnnotationCopyTestForm;
@@ -28,30 +33,29 @@ import formdata.client.ui.forms.TableFieldForm;
 /**
  * <h3>{@link WellformTest}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
+@ExtendWith(JavaEnvironmentExtension.class)
+@ExtendWithJavaEnvironmentFactory(ScoutClientJavaEnvironmentFactory.class)
 public class WellformTest {
 
   @Test
   public void testEmptyCommentRegex() {
-    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   *\n   */").matches());
-    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n\t*\n\t*/").matches());
+    assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   *\n   */").matches());
+    assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n\t*\n\t*/").matches());
 
-    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   * \n   */").matches());
-    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n\t* \n\t*/").matches());
+    assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   * \n   */").matches());
+    assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n\t* \n\t*/").matches());
 
-    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   *\n   *\n   *\n   */").matches());
-    Assert.assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n\t*\n\t*\n\t*/").matches());
+    assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   *\n   *\n   *\n   */").matches());
+    assertTrue(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n\t*\n\t*\n\t*/").matches());
 
-    Assert.assertFalse(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   * whatever \n   */").matches());
+    assertFalse(Wellformer.EMPTY_COMMENT_REGEX.matcher("/**\n   * whatever \n   */").matches());
   }
 
   @Test
-  public void testWellform() {
+  public void testWellform(IJavaEnvironment env) {
     Wellformer wf = new Wellformer("\n", true);
-
-    IJavaEnvironment clientJavaEnvironment = CoreScoutTestingUtils.createClientJavaEnvironment();
 
     Class<?>[] testingClasses = new Class[]{
         AnnotationCopyTestForm.class,
@@ -66,13 +70,13 @@ public class WellformTest {
     for (Class<?> c : testingClasses) {
       StringBuilder out = new StringBuilder();
       String name = c.getName();
-      IType type = clientJavaEnvironment.findType(name);
+      IType type = env.requireType(name);
 
-      String cuSource = type.compilationUnit().source().toString();
+      CharSequence cuSource = type.requireCompilationUnit().source().get().asCharSequence();
 
       wf.buildSource(type, out);
-      String newCuSource = cuSource.substring(0, type.source().start()) + out.toString();
-      CoreTestingUtils.assertNoCompileErrors(clientJavaEnvironment, name, newCuSource);
+      String newCuSource = cuSource.toString().substring(0, type.source().get().start()) + out;
+      assertNoCompileErrors(env, type.qualifier(), type.elementName(), newCuSource);
     }
   }
 }

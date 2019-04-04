@@ -30,7 +30,7 @@ import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags;
 import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.eclipse.jface.text.link.ProposalPosition;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
@@ -39,11 +39,14 @@ import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 /**
  * Does the setup of the linked mode from a {@link LinkedProposalModel}
  */
-public class LinkedAsyncProposalModelPresenter {
+public final class LinkedAsyncProposalModelPresenter {
 
-  public void enterLinkedMode(ITextViewer viewer, IEditorPart editor, boolean switchedEditor, LinkedProposalModel linkedProposalModel) throws BadLocationException {
-    final IDocument document = viewer.getDocument();
-    final AtomicReference<LinkedModeUI> linkedModeUiRef = new AtomicReference<>();
+  private LinkedAsyncProposalModelPresenter() {
+  }
+
+  public static void enterLinkedMode(ITextViewer viewer, IEditorPart editor, boolean switchedEditor, LinkedProposalModel linkedProposalModel) throws BadLocationException {
+    IDocument document = viewer.getDocument();
+    AtomicReference<LinkedModeUI> linkedModeUiRef = new AtomicReference<>();
 
     // setup linked-mode model
     LinkedModeModel model = createLinkedModeModel(linkedProposalModel, document, linkedModeUiRef);
@@ -62,8 +65,8 @@ public class LinkedAsyncProposalModelPresenter {
     viewer.revealRange(region.getOffset(), region.getLength());
   }
 
-  protected LinkedModeUI createLinkedModeUi(ITextViewer viewer, boolean switchedEditor, LinkedModeModel model, LinkedProposalModel linkedProposalModel) throws BadLocationException {
-    final LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
+  static LinkedModeUI createLinkedModeUi(ITextViewer viewer, boolean switchedEditor, LinkedModeModel model, LinkedProposalModel linkedProposalModel) throws BadLocationException {
+    LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
     PositionInformation endPosition = linkedProposalModel.getEndPosition();
     int offset = -1;
     if (endPosition != null) {
@@ -82,9 +85,9 @@ public class LinkedAsyncProposalModelPresenter {
     return ui;
   }
 
-  protected LinkedModeModel createLinkedModeModel(LinkedProposalModel linkedProposalModel, final IDocument document, AtomicReference<LinkedModeUI> linkedModeUiRef) throws BadLocationException {
-    final Iterator<LinkedProposalPositionGroup> iterator = linkedProposalModel.getPositionGroupIterator();
-    final LinkedModeModel model = new LinkedModeModel();
+  static LinkedModeModel createLinkedModeModel(LinkedProposalModel linkedProposalModel, IDocument document, AtomicReference<LinkedModeUI> linkedModeUiRef) throws BadLocationException {
+    Iterator<LinkedProposalPositionGroup> iterator = linkedProposalModel.getPositionGroupIterator();
+    LinkedModeModel model = new LinkedModeModel();
     while (iterator.hasNext()) {
       LinkedProposalPositionGroup curr = iterator.next();
       PositionInformation[] positions = curr.getPositions();
@@ -96,15 +99,15 @@ public class LinkedAsyncProposalModelPresenter {
     return model;
   }
 
-  protected LinkedPositionGroup createGroup(final IDocument document, final LinkedModeModel model, LinkedProposalPositionGroup propPositionGroup, AtomicReference<LinkedModeUI> linkedModeUiRef) throws BadLocationException {
+  static LinkedPositionGroup createGroup(IDocument document, LinkedModeModel model, LinkedProposalPositionGroup propPositionGroup, AtomicReference<LinkedModeUI> linkedModeUiRef) throws BadLocationException {
 
     if (propPositionGroup instanceof ICompletionProposalProvider) {
       return createAsyncGroup(document, model, (ICompletionProposalProvider) propPositionGroup, linkedModeUiRef);
     }
 
-    final LinkedPositionGroup group = new LinkedPositionGroup();
-    final PositionInformation[] positions = propPositionGroup.getPositions();
-    final LinkedProposalPositionGroup.Proposal[] linkedModeProposals = propPositionGroup.getProposals();
+    LinkedPositionGroup group = new LinkedPositionGroup();
+    PositionInformation[] positions = propPositionGroup.getPositions();
+    LinkedProposalPositionGroup.Proposal[] linkedModeProposals = propPositionGroup.getProposals();
     if (linkedModeProposals.length <= 1) {
       for (PositionInformation pos : positions) {
         if (pos.getOffset() != -1) {
@@ -127,15 +130,14 @@ public class LinkedAsyncProposalModelPresenter {
     return group;
   }
 
-  protected LinkedPositionGroup createAsyncGroup(final IDocument document, final LinkedModeModel model, ICompletionProposalProvider proposalProvider, AtomicReference<LinkedModeUI> linkedModeUiRef) throws BadLocationException {
+  static LinkedPositionGroup createAsyncGroup(IDocument document, LinkedModeModel model, ICompletionProposalProvider proposalProvider, AtomicReference<LinkedModeUI> linkedModeUiRef) throws BadLocationException {
     // lazy (async) provider
-    final PositionInformation[] positions = proposalProvider.getPositions();
-    final LinkedPositionGroup group = new LinkedPositionGroup();
-    final Display display = Display.getCurrent();
-    final ILinkedAsyncProposalListener listener = new P_ProposalListener(display, linkedModeUiRef);
+    PositionInformation[] positions = proposalProvider.getPositions();
+    LinkedPositionGroup group = new LinkedPositionGroup();
+    Display display = Display.getCurrent();
+    ILinkedAsyncProposalListener listener = new P_ProposalListener(display, linkedModeUiRef);
 
-    for (int i = 0; i < positions.length; i++) {
-      PositionInformation pos = positions[i];
+    for (PositionInformation pos : positions) {
       if (pos.getOffset() != -1) {
         if (display != null) {
           proposalProvider.addListener(listener);
@@ -158,7 +160,7 @@ public class LinkedAsyncProposalModelPresenter {
 
     @Override
     public void loaded() {
-      m_display.asyncExec(() -> triggerContentAssist());
+      m_display.asyncExec(this::triggerContentAssist);
     }
 
     private void triggerContentAssist() {
@@ -168,7 +170,7 @@ public class LinkedAsyncProposalModelPresenter {
       }
 
       try {
-        final Method m = LinkedModeUI.class.getDeclaredMethod("triggerContentAssist");
+        Method m = LinkedModeUI.class.getDeclaredMethod("triggerContentAssist");
         m.setAccessible(true);
         m.invoke(linkedModeUi);
       }

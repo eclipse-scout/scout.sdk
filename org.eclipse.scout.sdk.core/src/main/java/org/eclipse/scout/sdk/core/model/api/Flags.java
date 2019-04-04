@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
-import org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
-import org.eclipse.jdt.internal.compiler.lookup.ExtraCompilerModifiers;
-
 /**
  * Utility class for decoding modifier flags in Java elements.
  * <p>
@@ -28,153 +25,130 @@ public final class Flags {
 
   /**
    * Constant representing the absence of any flag.
-   *
-   * @since 3.0
    */
-  public static final int AccDefault = ClassFileConstants.AccDefault;
+  public static final int AccDefault = 0;
+
   /**
    * Public access flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccPublic = ClassFileConstants.AccPublic;
+  public static final int AccPublic = 0x0001;
+
   /**
    * Private access flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccPrivate = ClassFileConstants.AccPrivate;
+  public static final int AccPrivate = 0x0002;
+
   /**
    * Protected access flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccProtected = ClassFileConstants.AccProtected;
+  public static final int AccProtected = 0x0004;
+
   /**
    * Static access flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccStatic = ClassFileConstants.AccStatic;
+  public static final int AccStatic = 0x0008;
+
   /**
    * Final access flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccFinal = ClassFileConstants.AccFinal;
+  public static final int AccFinal = 0x0010;
+
   /**
    * Synchronized access flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccSynchronized = ClassFileConstants.AccSynchronized;
+  public static final int AccSynchronized = 0x0020;
+
   /**
    * Volatile property flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccVolatile = ClassFileConstants.AccVolatile;
+  public static final int AccVolatile = 0x0040;
+
   /**
    * Transient property flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccTransient = ClassFileConstants.AccTransient;
+  public static final int AccTransient = 0x0080;
+
   /**
    * Native property flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccNative = ClassFileConstants.AccNative;
+  public static final int AccNative = 0x0100;
+
   /**
    * Interface property flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccInterface = ClassFileConstants.AccInterface;
+  public static final int AccInterface = 0x0200;
+
   /**
    * Abstract property flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccAbstract = ClassFileConstants.AccAbstract;
+  public static final int AccAbstract = 0x0400;
+
   /**
    * Strictfp property flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccStrictfp = ClassFileConstants.AccStrictfp;
+  public static final int AccStrictfp = 0x0800;
+
   /**
    * Super property flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccSuper = ClassFileConstants.AccSuper;
+  public static final int AccSuper = 0x0020;
+
   /**
    * Synthetic property flag. See The Java Virtual Machine Specification for more details.
-   *
-   * @since 2.0
    */
-  public static final int AccSynthetic = ClassFileConstants.AccSynthetic;
+  public static final int AccSynthetic = 0x1000;
+
   /**
    * Deprecated property flag.
    * <p>
    * Note that this flag's value is internal and is not defined in the Virtual Machine specification.
    * </p>
-   *
-   * @since 2.0
    */
-  public static final int AccDeprecated = ClassFileConstants.AccDeprecated;
+  public static final int AccDeprecated = 0x100000;
 
   /**
    * Bridge method property flag (added in J2SE 1.5). Used to flag a compiler-generated bridge methods. See The Java
    * Virtual Machine Specification for more details.
-   *
-   * @since 3.0
    */
-  public static final int AccBridge = ClassFileConstants.AccBridge;
+  public static final int AccBridge = 0x0040;
 
   /**
    * Varargs method property flag (added in J2SE 1.5). Used to flag variable arity method declarations. See The Java
    * Virtual Machine Specification for more details.
-   *
-   * @since 3.0
    */
-  public static final int AccVarargs = ClassFileConstants.AccVarargs;
+  public static final int AccVarargs = 0x0080;
 
   /**
    * Enum property flag (added in J2SE 1.5). See The Java Virtual Machine Specification for more details.
-   *
-   * @since 3.0
    */
-  public static final int AccEnum = ClassFileConstants.AccEnum;
+  public static final int AccEnum = 0x4000;
 
   /**
    * Annotation property flag (added in J2SE 1.5). See The Java Virtual Machine Specification for more details.
-   *
-   * @since 3.0
    */
-  public static final int AccAnnotation = ClassFileConstants.AccAnnotation;
+  public static final int AccAnnotation = 0x2000;
 
   /**
    * Default method property flag.
    * <p>
    * Note that this flag's value is internal and is not defined in the Virtual Machine specification.
    * </p>
-   *
-   * @since 3.10
    */
-  public static final int AccDefaultMethod = ExtraCompilerModifiers.AccDefaultMethod;
+  public static final int AccDefaultMethod = 0x10000;
 
   /**
    * Annotation method default property flag. Used to flag annotation type methods that declare a default value.
    * <p>
    * Note that this flag's value is internal and is not defined in the Virtual Machine specification.
    * </p>
-   *
-   * @since 3.10
    */
-  public static final int AccAnnotationDefault = ClassFileConstants.AccAnnotationDefault;
+  public static final int AccAnnotationDefault = 0x20000;
+
+  /**
+   * From classfile version 52 (compliance 1.8 up), meaning that a formal parameter is mandated by a language
+   * specification, so all compilers for the language must emit it.
+   */
+  public static final int AccMandated = 0x8000;
 
   /**
    * Not instantiable.
@@ -184,46 +158,45 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer includes the <code>abstract</code> modifier.
+   * Returns whether the given integer includes the {@code abstract} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>abstract</code> modifier is included
+   * @return {@code true} if the {@code abstract} modifier is included
    */
   public static boolean isAbstract(int flags) {
     return (flags & AccAbstract) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the indication that the element is deprecated (<code>@deprecated</code>
-   * tag in Javadoc comment).
+   * Returns whether the given integer includes the indication that the element is deprecated ({@code @deprecated} tag
+   * in Javadoc comment).
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the element is marked as deprecated
+   * @return {@code true} if the element is marked as deprecated
    */
-  @SuppressWarnings("squid:MissingDeprecatedCheck")
-  public static boolean isDeprecated(int flags) {
+  public static boolean isDeprecated(int flags) { //NOSONAR
     return (flags & AccDeprecated) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the <code>final</code> modifier.
+   * Returns whether the given integer includes the {@code final} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>final</code> modifier is included
+   * @return {@code true} if the {@code final} modifier is included
    */
   public static boolean isFinal(int flags) {
     return (flags & AccFinal) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the <code>interface</code> modifier.
+   * Returns whether the given integer includes the {@code interface} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>interface</code> modifier is included
+   * @return {@code true} if the {@code interface} modifier is included
    * @since 2.0
    */
   public static boolean isInterface(int flags) {
@@ -231,23 +204,23 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer includes the <code>native</code> modifier.
+   * Returns whether the given integer includes the {@code native} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>native</code> modifier is included
+   * @return {@code true} if the {@code native} modifier is included
    */
   public static boolean isNative(int flags) {
     return (flags & AccNative) != 0;
   }
 
   /**
-   * Returns whether the given integer does not include one of the <code>public</code>, <code>private</code>, or
-   * <code>protected</code> flags.
+   * Returns whether the given integer does not include one of the {@code public}, {@code private}, or {@code protected}
+   * flags.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if no visibility flag is set
+   * @return {@code true} if no visibility flag is set
    * @since 3.2
    */
   public static boolean isPackageDefault(int flags) {
@@ -255,55 +228,55 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer includes the <code>private</code> modifier.
+   * Returns whether the given integer includes the {@code private} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>private</code> modifier is included
+   * @return {@code true} if the {@code private} modifier is included
    */
   public static boolean isPrivate(int flags) {
     return (flags & AccPrivate) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the <code>protected</code> modifier.
+   * Returns whether the given integer includes the {@code protected} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>protected</code> modifier is included
+   * @return {@code true} if the {@code protected} modifier is included
    */
   public static boolean isProtected(int flags) {
     return (flags & AccProtected) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the <code>public</code> modifier.
+   * Returns whether the given integer includes the {@code public} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>public</code> modifier is included
+   * @return {@code true} if the {@code public} modifier is included
    */
   public static boolean isPublic(int flags) {
     return (flags & AccPublic) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the <code>static</code> modifier.
+   * Returns whether the given integer includes the {@code static} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>static</code> modifier is included
+   * @return {@code true} if the {@code static} modifier is included
    */
   public static boolean isStatic(int flags) {
     return (flags & AccStatic) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the <code>super</code> modifier.
+   * Returns whether the given integer includes the {@code super} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>super</code> modifier is included
+   * @return {@code true} if the {@code super} modifier is included
    * @since 3.2
    */
   public static boolean isSuper(int flags) {
@@ -311,22 +284,22 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer includes the <code>strictfp</code> modifier.
+   * Returns whether the given integer includes the {@code strictfp} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>strictfp</code> modifier is included
+   * @return {@code true} if the {@code strictfp} modifier is included
    */
   public static boolean isStrictfp(int flags) {
     return (flags & AccStrictfp) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the <code>synchronized</code> modifier.
+   * Returns whether the given integer includes the {@code synchronized} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>synchronized</code> modifier is included
+   * @return {@code true} if the {@code synchronized} modifier is included
    */
   public static boolean isSynchronized(int flags) {
     return (flags & AccSynchronized) != 0;
@@ -337,40 +310,40 @@ public final class Flags {
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the element is marked synthetic
+   * @return {@code true} if the element is marked synthetic
    */
   public static boolean isSynthetic(int flags) {
     return (flags & AccSynthetic) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the <code>transient</code> modifier.
+   * Returns whether the given integer includes the {@code transient} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>transient</code> modifier is included
+   * @return {@code true} if the {@code transient} modifier is included
    */
   public static boolean isTransient(int flags) {
     return (flags & AccTransient) != 0;
   }
 
   /**
-   * Returns whether the given integer includes the <code>volatile</code> modifier.
+   * Returns whether the given integer includes the {@code volatile} modifier.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>volatile</code> modifier is included
+   * @return {@code true} if the {@code volatile} modifier is included
    */
   public static boolean isVolatile(int flags) {
     return (flags & AccVolatile) != 0;
   }
 
   /**
-   * Returns whether the given integer has the <code>AccBridge</code> bit set.
+   * Returns whether the given integer has the {@code AccBridge} bit set.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>AccBridge</code> flag is included
+   * @return {@code true} if the {@code AccBridge} flag is included
    * @see #AccBridge
    * @since 3.0
    */
@@ -379,11 +352,11 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer has the <code>AccVarargs</code> bit set.
+   * Returns whether the given integer has the {@code AccVarargs} bit set.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>AccVarargs</code> flag is included
+   * @return {@code true} if the {@code AccVarargs} flag is included
    * @see #AccVarargs
    * @since 3.0
    */
@@ -392,11 +365,11 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer has the <code>AccEnum</code> bit set.
+   * Returns whether the given integer has the {@code AccEnum} bit set.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>AccEnum</code> flag is included
+   * @return {@code true} if the {@code AccEnum} flag is included
    * @see #AccEnum
    * @since 3.0
    */
@@ -405,11 +378,11 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer has the <code>AccAnnotation</code> bit set.
+   * Returns whether the given integer has the {@code AccAnnotation} bit set.
    *
    * @param flags
    *          the flags
-   * @return <code>true</code> if the <code>AccAnnotation</code> flag is included
+   * @return {@code true} if the {@code AccAnnotation} flag is included
    * @see #AccAnnotation
    * @since 3.0
    */
@@ -418,11 +391,11 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer has the <code>AccDefaultMethod</code> bit set. Note that this flag represents the
+   * Returns whether the given integer has the {@code AccDefaultMethod} bit set. Note that this flag represents the
    * usage of the 'default' keyword on a method and should not be confused with the 'package' access visibility (which
    * used to be called 'default access').
    *
-   * @return <code>true</code> if the <code>AccDefaultMethod</code> flag is included
+   * @return {@code true} if the {@code AccDefaultMethod} flag is included
    * @see #AccDefaultMethod
    * @since 3.10
    */
@@ -431,14 +404,21 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer has the <code>AccAnnnotationDefault</code> bit set.
+   * Returns whether the given integer has the {@code AccAnnnotationDefault} bit set.
    *
-   * @return <code>true</code> if the <code>AccAnnotationDefault</code> flag is included
+   * @return {@code true} if the {@code AccAnnotationDefault} flag is included
    * @see #AccAnnotationDefault
    * @since 3.10
    */
-  public static boolean isAnnnotationDefault(int flags) {
+  public static boolean isAnnotationDefault(int flags) {
     return (flags & AccAnnotationDefault) != 0;
+  }
+
+  /**
+   * @see #toString(int, boolean)
+   */
+  public static String toString(int flags) {
+    return toString(flags, false);
   }
 
   /**
@@ -451,9 +431,8 @@ public final class Flags {
    * public protected private
    * abstract default static final synchronized native strictfp transient volatile
    * </pre>
-   * <p>
+   *
    * This order is consistent with the recommendations in JLS8 ("*Modifier:" rules in chapters 8 and 9).
-   * </p>
    * <p>
    * Note that the flags of a method can include the AccVarargs flag that has no standard description. Since the
    * AccVarargs flag has the same value as the AccTransient flag (valid for fields only), attempting to get the
@@ -465,23 +444,21 @@ public final class Flags {
    * int flags = method.getFlags() & ~Flags.AccVarargs;
    * return Flags.toString(flags);
    * </pre>
-   * </p>
-   * <p>
+   *
    * Examples results:
    *
    * <pre>
-   *    <code>"public static final"</code>
-   *    <code>"private native"</code>
+   *    {@code "public static final"}
+   *    {@code "private native"}
    * </pre>
-   * </p>
    *
    * @param flags
    *          the flags
    * @return the standard string representation of the given flags
    */
   @SuppressWarnings("pmd:NPathComplexity")
-  public static String toString(int flags) {
-    StringBuilder sb = new StringBuilder();
+  public static String toString(int flags, boolean includeTrailingSpace) {
+    StringBuilder sb = new StringBuilder(32);
 
     if (isPublic(flags)) {
       sb.append("public ");
@@ -523,7 +500,9 @@ public final class Flags {
     if (len == 0) {
       return "";
     }
-    sb.setLength(len - 1);
+    if (!includeTrailingSpace) {
+      sb.setLength(len - 1);
+    }
     return sb.toString();
   }
 }

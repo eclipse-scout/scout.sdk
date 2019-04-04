@@ -10,28 +10,33 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.model.api.query.FieldQuery;
+import org.eclipse.scout.sdk.core.model.api.query.HierarchyInnerTypeQuery;
+import org.eclipse.scout.sdk.core.model.api.query.MethodQuery;
+import org.eclipse.scout.sdk.core.model.api.query.SuperTypeQuery;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
-import org.eclipse.scout.sdk.core.model.sugar.FieldQuery;
-import org.eclipse.scout.sdk.core.model.sugar.MethodQuery;
-import org.eclipse.scout.sdk.core.model.sugar.SuperTypeQuery;
-import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
 
 /**
- * <h3>{@link IType}</h3> Represents a java data type. This includes classes, interfaces, enums, primitives, the
- * void-type & the wildcard-type ("?").
+ * <h3>{@link IType}</h3>
+ * <p>
+ * Represents a java data type. This includes classes, interfaces, enums, primitives, array types, the void-type & the
+ * wildcard-type ("?").
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface IType extends IMember {
 
   /**
    * Gets the {@link IPackage} of this {@link IType}.<br>
-   * For primitives, the void-type and the wildcard-type this method returns the default package.
+   * For primitives, the void-type and the wildcard-type this method returns the default package
+   * ({@link IPackage#elementName()} is {@code null}).
    *
-   * @return The {@link IPackage} of this {@link IType}. Never returns <code>null</code>.
+   * @return The {@link IPackage} of this {@link IType}.
    */
   IPackage containingPackage();
 
@@ -39,7 +44,7 @@ public interface IType extends IMember {
    * Gets the fully qualified name of this {@link IType}.<br>
    * Inner types are separated by '$'.<br>
    * <br>
-   * <b>Example: </b><code>org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass</code>.<br>
+   * <b>Example: </b>{@code org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass}.<br>
    *
    * @return The fully qualified name of this {@link IType}.
    */
@@ -57,59 +62,63 @@ public interface IType extends IMember {
    * Gets all arguments passed to the type parameters of this {@link IType}.<br>
    * See {@link #typeParameters()} for more details.
    *
-   * @return A {@link List} holding all {@link IType}s arguments.
+   * @return A {@link Stream} holding all {@link IType}s arguments.
    * @see #typeParameters()
    */
-  List<IType> typeArguments();
-
-  /**
-   * If this {@link IType} is a synthetic parameterized type (for example the super class of a parameterized type with
-   * applied type arguments) then this method returns the original type without the type arguments applied.
-   * <p>
-   * Otherwise the receiver is returned.
-   */
-  IType originalType();
+  Stream<IType> typeArguments();
 
   /**
    * Specifies if this is a parameter type.<br>
    * A parameter type is an {@link IType} that represents a type parameter placeholder (e.g. "T").
    *
-   * @return <code>true</code> if it is a parameter type, <code>false</code> otherwise.
+   * @return {@code true} if it is a parameter type, {@code false} otherwise.
    */
   boolean isParameterType();
 
   /**
-   * Gets the super {@link IType} of this {@link IType} or <code>null</code> if this {@link IType} is {@link Object}.
+   * Gets the super {@link IType} of this {@link IType} or an empty {@link Optional} if this {@link IType} is
+   * {@link Object}.<br>
+   * The super class of an interface is {@link Object}.
    *
-   * @return The super {@link IType} or <code>null</code>.
+   * @return The super {@link IType}.
+   * @see #requireSuperClass()
    */
-  IType superClass();
+  Optional<IType> superClass();
 
   /**
-   * Gets all direct super interfaces of this {@link IType} in the order as they appear in the source or class file.
+   * Same as {@link #superClass()} but throws an {@link IllegalArgumentException} if this type is {@link Object}.
    *
-   * @return A {@link List} containing all direct super interfaces of this {@link IType}.
+   * @return The super class of this type.
+   * @throws IllegalArgumentException
+   *           if this type is {@link Object}.
+   * @see #superClass()
    */
-  List<IType> superInterfaces();
+  IType requireSuperClass();
 
   /**
-   * @return the source of the static initializer without the { and } brackets. Never returns <code>null</code>. Use
-   *         {@link ISourceRange#isAvailable()} to check if source is actually available for this element.
+   * Gets the direct super interfaces of this {@link IType} in the order as they appear in the source or class file.
+   *
+   * @return A {@link Stream} containing the direct super interfaces of this {@link IType}.
    */
-  ISourceRange sourceOfStaticInitializer();
+  Stream<IType> superInterfaces();
 
   /**
-   * Gets if this {@link IType} represents a primitive type. See also {@link #primitiveType()}
+   * @return the source of the static initializer with the {@code static} keyword and the leading and trailing brackets.
+   */
+  Optional<ISourceRange> sourceOfStaticInitializer();
+
+  /**
+   * Gets if this {@link IType} represents a primitive type.
    *
-   * @return <code>true</code> if this {@link IType} represents a primitive type, <code>false</code> otherwise.
+   * @return {@code true} if this {@link IType} represents a primitive type, {@code false} otherwise.
    */
   boolean isPrimitive();
 
   /**
    * Gets if this {@link IType} represents an array type.<br>
-   * If the result is <code>true</code> this means the array dimension is &gt; 0 (see {@link #arrayDimension()}).
+   * If the result is {@code true} this means the array dimension is &gt; 0 (see {@link #arrayDimension()}).
    *
-   * @return <code>true</code> if this {@link IType} represents an array type, <code>false</code> otherwise.
+   * @return {@code true} if this {@link IType} represents an array type, {@code false} otherwise.
    */
   boolean isArray();
 
@@ -118,78 +127,105 @@ public interface IType extends IMember {
    * An array dimension of zero means no array.<br>
    * <br>
    * <b>Example: </b><br>
-   * <code>Object[][]: getArrayDimension() = 2</code>
+   * {@code Object[][]: getArrayDimension() = 2}
    *
    * @return The array dimension of this {@link IType}.
    */
   int arrayDimension();
 
   /**
-   * Only valid on arrays (see {@link #isArray()}).
+   * Gets the base {@link IType} of an array type. Only valid on arrays (see {@link #isArray()}).
+   * <p>
+   * The leaf component {@link IType} is the type of a single element in the array. This means e.g. the leaf component
+   * type of {@code Long[][]} is {@code Long}.
    *
-   * @return the leaf component {@link IType} of the array that is the type without [].
+   * @return the leaf component {@link IType} of this array type. If this {@link IType} is no array type, this method
+   *         returns an empty {@link Optional}.
+   * @see #isArray()
    */
-  IType leafComponentType();
+  Optional<IType> leafComponentType();
 
   /**
    * Gets if this {@link IType} represents a wildcard type ("?").
    *
-   * @return <code>true</code> if this {@link IType} represents a wildcard type, <code>false</code> otherwise.
+   * @return {@code true} if this {@link IType} represents a wildcard type, {@code false} otherwise.
    */
   boolean isWildcardType();
 
   /**
    * Gets the {@link ICompilationUnit} of this {@link IType}.
    * <p>
-   * For primitives, the void-type and wildcard-types this method returns <code>null</code>.
+   * For primitive-types, array-types, wildcard-types and the void-type this method returns an empty {@link Optional}.
    * <p>
-   * Binary types return a compilation unit with {@link ICompilationUnit#isSynthetic()} = <code>true</code>
+   * Binary types return a compilation unit with {@link ICompilationUnit#isSynthetic()} = {@code true}
    *
-   * @return The {@link ICompilationUnit} that belongs to this {@link IType} <code>null</code>.
+   * @return The {@link ICompilationUnit} that belongs to this {@link IType}.
+   * @see #requireCompilationUnit()
    */
-  ICompilationUnit compilationUnit();
-
-  @Override
-  TypeSpi unwrap();
+  Optional<ICompilationUnit> compilationUnit();
 
   /**
-   * @return <code>true</code> if this type is the void type, <code>false</code> otherwise.
+   * Same as {@link #compilationUnit()} but throws an {@link IllegalArgumentException} if this {@link IType} is a
+   * primitive-, array- or wildcard type as these types do not have a compilation unit.
+   *
+   * @return The {@link ICompilationUnit} of this {@link IType} (may be a synthetic compilation unit for binary types).
+   * @throws IllegalArgumentException
+   *           if this type is a primitive-, array- or wildcard-type.
+   * @see #compilationUnit()
+   */
+  ICompilationUnit requireCompilationUnit();
+
+  /**
+   * @return {@code true} if this type is the void type, {@code false} otherwise.
    */
   boolean isVoid();
 
   /**
-   * @return <code>true</code> if this {@link IType} is an interface, <code>false</code> otherwise.
+   * @return {@code true} if this {@link IType} is an interface, {@code false} otherwise.
    */
   boolean isInterface();
 
   /**
-   * @return The full signature of this {@link IType} including all type arguments.
+   * @return The full reference of this {@link IType} including all type arguments.
    */
-  String signature();
+  String reference();
 
   /**
-   * Gets a {@link SuperTypeQuery} to retrieve super {@link IType}s of this {@link IType}.
+   * @param erasureOnly
+   *          If {@code true}, no type arguments are included. If {@code false}, all type arguments are part of the
+   *          reference.
+   * @return The reference of this {@link IType}. Optionally including all type arguments.
+   */
+  String reference(boolean erasureOnly);
+
+  /**
+   * Gets a {@link SuperTypeQuery} to retrieve super {@link IType}s of this {@link IType}.<br>
+   * By default this query returns all super {@link IType}s of this {@link IType} including this start {@link IType}
+   * itself. If the super hierarchy contains interfaces multiple times, every interface is only returned once.
    *
    * @return A new {@link SuperTypeQuery} for this {@link IType}.
    */
   SuperTypeQuery superTypes();
 
   /**
-   * Gets a {@link TypeQuery} to retrieve inner types of this {@link IType}.
+   * Gets a {@link HierarchyInnerTypeQuery} to retrieve inner types of this {@link IType}.<br>
+   * By default this query returns all direct inner {@link IType}s of this {@link IType}.
    *
-   * @return A new {@link TypeQuery} for inner {@link IType}s of this {@link IType}.
+   * @return A new {@link HierarchyInnerTypeQuery} for inner {@link IType}s of this {@link IType}.
    */
-  TypeQuery innerTypes();
+  HierarchyInnerTypeQuery innerTypes();
 
   /**
-   * Gets a {@link MethodQuery} to retrieve {@link IMethod}s of this {@link IType}.
+   * Gets a {@link MethodQuery} to retrieve {@link IMethod}s of this {@link IType}.<br>
+   * By default this query returns all {@link IMethod}s directly declared in this {@link IType}.
    *
    * @return A new {@link MethodQuery} for {@link IMethod}s in this {@link IType}.
    */
   MethodQuery methods();
 
   /**
-   * Gets a {@link FieldQuery} to retrieve {@link IField}s of this {@link IType}.
+   * Gets a {@link FieldQuery} to retrieve {@link IField}s of this {@link IType}.<br>
+   * By default this query returns all fields directly declared in this {@link IType}.
    *
    * @return A new {@link FieldQuery} for {@link IField}s of this {@link IType}.
    */
@@ -200,8 +236,8 @@ public interface IType extends IMember {
    *
    * @param queryType
    *          The fully qualified name of the super type to check.
-   * @return <code>true</code> if the given fully qualified name exists in the super hierarchy of this {@link IType}.
-   *         <code>false</code> otherwise.
+   * @return {@code true} if the given fully qualified name exists in the super hierarchy of this {@link IType}.
+   *         {@code false} otherwise.
    */
   boolean isInstanceOf(String queryType);
 
@@ -209,19 +245,76 @@ public interface IType extends IMember {
    * Checks if the given {@link IType} has the receiver (this) in its super hierarchy. see
    * {@link Class#isAssignableFrom(Class)}
    *
-   * @return <code>true</code> if the declaration <code>BaseClass a = (SpecificClass)s;</code> is valid, where this is
-   *         the base class
+   * @return {@code true} if the declaration {@code BaseClass a = (SpecificClass)s;} is valid, where this is the base
+   *         class
    */
   boolean isAssignableFrom(IType specificClass);
 
   /**
-   * @return If this is a primitive type then its boxed type is returned. Otherwise type itself is returned.
+   * @return If this is a primitive type then its boxed type is returned. Otherwise {@code this} type itself is
+   *         returned.
    */
   IType boxPrimitiveType();
 
   /**
    * @return If this is a boxed type then its primitive type is returned. Otherwise the type itself is returned.
    */
-  IType unboxPrimitiveType();
+  IType unboxToPrimitive();
 
+  /**
+   * Gets the primary {@link IType} of this given {@link IType}. If the receiver is already the primary type,
+   * {@code this} is returned.
+   *
+   * @return The primary {@link IType}.
+   */
+  IType primary();
+
+  /**
+   * Gets the bounds (according to the receiver context {@link IType}) of the type argument with the given index.<br>
+   * If there is no type argument with given index (e.g. because it was not specified), an empty {@link Optional} is
+   * returned.
+   *
+   * @param typeParamIndex
+   *          The index of the type argument.
+   * @return A {@link Stream} with all bounds of the type argument at the given index.
+   */
+  Optional<Stream<IType>> resolveTypeParamValue(int typeParamIndex);
+
+  /**
+   * Gets the bounds of the type argument of the given super type name at the given index in the context of this
+   * {@link IType}.<br>
+   * If there is no type argument with given index (e.g. because it was not specified), an empty {@link Optional} is
+   * returned.
+   *
+   * @param typeParamIndex
+   *          The index of the type argument as defined on the level of the given super type name.
+   * @param levelFqn
+   *          The fully qualified name of the super type that defines the type argument with the given index.
+   * @return A {@link Stream} with all bounds of the type argument at the given index.
+   */
+  Optional<Stream<IType>> resolveTypeParamValue(int typeParamIndex, String levelFqn);
+
+  /**
+   * @return An {@link Optional} with the declaring {@link IType} of this type. The resulting {@link Optional} is empty
+   *         if this {@link IType} is the primary type already.
+   */
+  Optional<IType> declaringType();
+
+  /**
+   * @return The qualifier of this {@link IType}.<br>
+   *         If this is a nested type, the fully qualified name of the declaring {@link IType} is returned. In this case
+   *         inner classes are separated by {@code $}.<br>
+   *         If this is a primary type the containing package or an empty {@link String} for the default package is
+   *         returned.
+   */
+  String qualifier();
+
+  @Override
+  TypeSpi unwrap();
+
+  @Override
+  ITypeGenerator<?> toWorkingCopy();
+
+  @Override
+  ITypeGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer);
 }

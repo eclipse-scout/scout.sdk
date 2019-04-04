@@ -10,13 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformImport;
+import static org.eclipse.scout.sdk.core.imports.ImportCollector.createImportDeclaration;
+
+import java.util.stream.Stream;
+
+import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IImport;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.spi.ImportSpi;
 
-/**
- *
- */
 public class ImportImplementor extends AbstractJavaElementImplementor<ImportSpi> implements IImport {
 
   public ImportImplementor(ImportSpi spi) {
@@ -24,8 +30,8 @@ public class ImportImplementor extends AbstractJavaElementImplementor<ImportSpi>
   }
 
   @Override
-  public String simpleName() {
-    return m_spi.getSimpleName();
+  public String name() {
+    return m_spi.getName();
   }
 
   @Override
@@ -39,14 +45,22 @@ public class ImportImplementor extends AbstractJavaElementImplementor<ImportSpi>
   }
 
   @Override
+  public Stream<? extends IJavaElement> children() {
+    return Stream.empty();
+  }
+
+  @Override
   public boolean isStatic() {
     return m_spi.isStatic();
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    JavaModelPrinter.print(this, sb);
-    return sb.toString();
+  public ISourceGenerator<ISourceBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer) {
+    return ISourceGenerator.raw(createImportDeclaration(isStatic(), transformImport(this, transformer)));
+  }
+
+  @Override
+  public ISourceGenerator<ISourceBuilder<?>> toWorkingCopy() {
+    return toWorkingCopy(null);
   }
 }

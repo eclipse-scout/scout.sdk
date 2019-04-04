@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 /**
  * <h3>{@link ImageFieldProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 6.1.0
  */
 public class ImageFieldProposal extends FormFieldProposal {

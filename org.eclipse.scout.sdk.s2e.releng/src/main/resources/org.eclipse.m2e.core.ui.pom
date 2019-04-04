@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk.deps</groupId>
   <artifactId>org.eclipse.m2e.core.ui</artifactId>
-  <version>${org.eclipse.m2e.core.ui-maven}</version>
+  <version>${org.eclipse.m2e.core.ui}</version>
 
   <name>Scout SDK org.eclipse.m2e.core.ui dependency (Incubation)</name>
   <description>This is org.eclipse.m2e.core.ui jar used by Scout SDK</description>
@@ -31,64 +31,69 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.osgi</artifactId>
-      <version>${org.eclipse.osgi-range}</version>
+      <version>${org.eclipse.osgi}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>${org.eclipse.core.runtime-range}</version>
+      <version>${org.eclipse.core.runtime}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.resources</artifactId>
-      <version>${org.eclipse.core.resources-range}</version>
+      <version>${org.eclipse.core.resources}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.m2e.core</artifactId>
-      <version>${org.eclipse.m2e.core-range}</version>
+      <version>${org.eclipse.m2e.core}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.m2e.archetype.common</artifactId>
-      <version>${org.eclipse.m2e.archetype.common-range}</version>
+      <version>${org.eclipse.m2e.archetype.common}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.ui.console</artifactId>
-      <version>${org.eclipse.ui.console-range}</version>
+      <version>${org.eclipse.ui.console}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.ui.ide</artifactId>
-      <version>${org.eclipse.ui.ide-range}</version>
+      <version>${org.eclipse.ui.ide}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.filesystem</artifactId>
-      <version>${org.eclipse.core.filesystem-range}</version>
+      <version>${org.eclipse.core.filesystem}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.expressions</artifactId>
-      <version>${org.eclipse.core.expressions-range}</version>
+      <version>${org.eclipse.core.expressions}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.ui.forms</artifactId>
-      <version>${org.eclipse.ui.forms-range}</version>
+      <version>${org.eclipse.ui.forms}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.jface.text</artifactId>
-      <version>${org.eclipse.jface.text-range}</version>
+      <version>${org.eclipse.jface.text}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.ui</artifactId>
-      <version>${org.eclipse.ui-range}</version>
+      <version>${org.eclipse.ui}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
+      <version>${org.eclipse.ltk.core.refactoring}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -1,0 +1,7 @@
+/**
+* Default Testing Comment for
+* Method testMethod
+*/
+@Override
+@SuppressWarnings("checked")
+public abstract </** type param */T extends Iterable & Serializable> byte testMethod(/** do not use anymore */@Deprecated final Integer firstParameter, T generic, int... _static) throws IOException, SecurityException;

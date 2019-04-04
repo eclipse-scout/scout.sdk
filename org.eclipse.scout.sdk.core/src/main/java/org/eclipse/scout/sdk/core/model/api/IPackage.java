@@ -10,27 +10,39 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
+import java.nio.file.Path;
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 
 /**
  * <h3>{@link IPackage}</h3> Represents a package declaration in an {@link ICompilationUnit}.
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface IPackage extends IJavaElement {
 
   /**
-   * @return The name of the package or <code>null</code> if it is the default package.
+   * @return The full name of the package or {@code null} if it is the default package.
    */
   @Override
   String elementName();
 
   /**
-   * @return Always returns {@link ISourceRange#NO_SOURCE}
+   * Gets the name of this {@link IPackage} as {@link Path}.
+   * <p>
+   * <b>Example:</b><br>
+   * {@code org.eclipse.scout.sdk} -> {@code org/eclipse/scout/sdk}
+   *
+   * @return The {@link IPackage} as {@link Path}.
+   */
+  Path asPath();
+
+  /**
+   * @return Always returns an empty {@link Optional}.
    */
   @Override
-  ISourceRange source();
+  Optional<ISourceRange> source();
 
   @Override
   PackageSpi unwrap();

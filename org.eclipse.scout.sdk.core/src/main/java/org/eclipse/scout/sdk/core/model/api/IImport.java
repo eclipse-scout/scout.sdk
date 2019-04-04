@@ -15,7 +15,6 @@ import org.eclipse.scout.sdk.core.model.spi.ImportSpi;
 /**
  * <h3>{@link IImport}</h3> Represents an import declaration in an {@link ICompilationUnit}
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface IImport extends IJavaElement {
@@ -28,6 +27,16 @@ public interface IImport extends IJavaElement {
   ICompilationUnit compilationUnit();
 
   /**
+   * Gets the last segment of the import (without wildcards).<br>
+   * If the import is a type or method import, the simple type name or method name is returned.<br>
+   * If the import is a wildcard package import (e.g. java.util.*), the last package segment is returned.
+   *
+   * @return The last non-wildcard segment of the import.
+   */
+  @Override
+  String elementName();
+
+  /**
    * Gets the full import name.<br>
    * If the import is a type or method import, the fully qualified name of the type or method is returned.<br>
    * If the import contains a wildcard (e.g. java.util.*), the wildcard will be part of the full import name which then
@@ -35,17 +44,7 @@ public interface IImport extends IJavaElement {
    *
    * @return The full import name.
    */
-  @Override
-  String elementName();
-
-  /**
-   * Gets the last segment of the import (without wildcards).<br>
-   * If the import is a type or method import, the simple type name or method name is returned.<br>
-   * If the import is a wildcard package import (e.g. java.util.*), the last package segment is returned.
-   *
-   * @return The last non-wildcard segment of the import.
-   */
-  String simpleName();
+  String name();
 
   /**
    * Gets all but the last segments of the import (without wildcards).<br>
@@ -60,7 +59,7 @@ public interface IImport extends IJavaElement {
   /**
    * Specifies if it is a static method import.
    *
-   * @return <code>true</code> if it is a static method import, <code>false</code> otherwise.
+   * @return {@code true} if it is a static method import, {@code false} otherwise.
    */
   boolean isStatic();
 

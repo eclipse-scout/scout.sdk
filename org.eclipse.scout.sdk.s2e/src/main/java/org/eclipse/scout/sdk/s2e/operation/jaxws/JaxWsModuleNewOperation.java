@@ -10,19 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation.jaxws;
 
-import java.io.File;
+import static java.util.Collections.singleton;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -30,28 +30,26 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsModuleNewHelper;
-import org.eclipse.scout.sdk.s2e.operation.IOperation;
-import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
+import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
-import org.xml.sax.SAXException;
 
 /**
  * <h3>{@link JaxWsModuleNewOperation}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
-public class JaxWsModuleNewOperation implements IOperation {
+public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, EclipseProgress> {
 
   // in
   private IJavaProject m_serverModule;
@@ -61,98 +59,80 @@ public class JaxWsModuleNewOperation implements IOperation {
   private IProject m_createdProject;
 
   @Override
-  public String getOperationName() {
-    return "Create new Jax-Ws Module";
-  }
-
-  @Override
-  public void validate() {
-    Validate.notNull(getServerModule(), "Target module pom file must be specified.");
-    Validate.isTrue(getServerModule().exists(), "Target module pom file could not be found.");
-    Validate.isTrue(StringUtils.isNotBlank(getArtifactId()));
-  }
-
-  @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    SubMonitor progress = SubMonitor.convert(monitor, getOperationName(), 100);
+  public void accept(EclipseEnvironment env, EclipseProgress progress) {
+    Ensure.isTrue(JdtUtils.exists(getServerModule()), "Target module pom file could not be found.");
+    Ensure.notBlank(getArtifactId());
+    progress.init(toString(), 100);
 
     try {
       // get pom from target project
       IFile pomFile = getServerModule().getProject().getFile(IMavenConstants.POM);
       if (!pomFile.isAccessible()) {
-        throw new CoreException(new ScoutStatus(IMavenConstants.POM + " could not be found in module '" + getServerModule().getElementName() + "'."));
-      }
-      if (progress.isCanceled()) {
-        return;
+        throw new SdkException("{} could not be found in module '{}'.", IMavenConstants.POM, getServerModule().getElementName());
       }
       progress.worked(5);
 
       // create project on disk (using archetype)
-      File createdProjectDir = JaxWsModuleNewHelper.createModule(pomFile.getLocation().toFile(), getArtifactId());
+      Path createdProjectDir = JaxWsModuleNewHelper.createModule(pomFile.getLocation().toFile().toPath(), getArtifactId());
       progress.worked(10);
 
       // import into workspace
       setCreatedProject(importIntoWorkspace(createdProjectDir, progress.newChild(70)));
 
       // refresh modified resources
-      Set<IProject> modifiedProjects = getModifiedResources(createdProjectDir);
+      Set<IProject> modifiedProjects = getAffectedProjects(createdProjectDir);
       modifiedProjects.add(getCreatedProject()); // ensure the created project is in the set
       modifiedProjects.add(getServerModule().getProject()); // ensure the modified server project is in the set
 
-      // run 'maven update' on created project because we modified the parent and the dependencies
-      S2eUtils.mavenUpdate(modifiedProjects, false, true, false, false, progress.newChild(15));
+      // run 'maven update' on created project because the parent and the dependencies have been modified
+      S2eUtils.mavenUpdate(modifiedProjects, false, true, false, false, progress.newChild(15).monitor());
     }
-    catch (IOException e) {
-      throw new CoreException(new ScoutStatus("Unable to create Jax-Ws Module.", e));
+    catch (IOException | CoreException e) {
+      throw new SdkException("Unable to create Jax-Ws Module.", e);
     }
   }
 
-  protected IProject importIntoWorkspace(File createdProjectDir, IProgressMonitor monitor) throws CoreException {
-    Set<MavenProjectInfo> projects = Collections.singleton(new MavenProjectInfo(createdProjectDir.getName(), new File(createdProjectDir, IMavenConstants.POM), null, null));
-    List<IMavenProjectImportResult> importedProjects = MavenPlugin.getProjectConfigurationManager().importProjects(projects, new ProjectImportConfiguration(), monitor);
-    if (importedProjects == null || importedProjects.isEmpty()) {
-      throw new CoreException(new ScoutStatus("Unable to import newly created project into workspace."));
+  protected Set<IProject> getAffectedProjects(Path createdProjectDir) throws IOException {
+    Path parentPom = JaxWsModuleNewHelper.getParentPomOf(createdProjectDir.resolve(IMavenConstants.POM));
+    if (parentPom == null) {
+      return Collections.emptySet();
     }
-    return importedProjects.iterator().next().getProject();
-  }
 
-  protected Set<IProject> getModifiedResources(File createdProjectDir) throws CoreException {
-    try {
-      File parentPom = JaxWsModuleNewHelper.getParentPomOf(new File(createdProjectDir, IMavenConstants.POM));
-      if (parentPom == null) {
-        return Collections.emptySet();
-      }
-
-      File parentReference = parentPom.getCanonicalFile();
-      Set<File> modulesWithModifiedParent = new HashSet<>();
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      for (IProject candidate : root.getProjects()) {
-        IFile pom = candidate.getFile(IMavenConstants.POM);
-        if (pom != null && pom.exists()) {
-          IPath location = pom.getLocation();
-          if (location != null) {
-            File moduleLocation = location.toFile();
-            File parent = JaxWsModuleNewHelper.getParentPomOf(moduleLocation);
-            if (parent != null) {
-              File canonicalFile = parent.getCanonicalFile();
-              if (parentReference.equals(canonicalFile)) {
-                modulesWithModifiedParent.add(new File(moduleLocation, IMavenConstants.POM));
-              }
+    Path parentReference = parentPom.normalize();
+    Set<Path> modulesWithModifiedParent = new HashSet<>();
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    for (IProject candidate : root.getProjects()) {
+      IFile pom = candidate.getFile(IMavenConstants.POM);
+      if (pom != null && pom.exists()) {
+        IPath location = pom.getLocation();
+        if (location != null) {
+          Path moduleLocation = location.toFile().toPath();
+          Path parent = JaxWsModuleNewHelper.getParentPomOf(moduleLocation);
+          if (parent != null) {
+            Path canonicalFile = parent.normalize();
+            if (parentReference.equals(canonicalFile)) {
+              modulesWithModifiedParent.add(moduleLocation.resolve(IMavenConstants.POM));
             }
           }
         }
       }
-      modulesWithModifiedParent.add(parentReference);
+    }
+    modulesWithModifiedParent.add(parentReference);
 
-      return modulesWithModifiedParent.stream()
-          .map(File::toURI)
-          .flatMap(uri -> Stream.of(root.findFilesForLocationURI(uri)))
-          .map(IResource::getProject)
-          .collect(Collectors.toSet());
+    return modulesWithModifiedParent.stream()
+        .map(Path::toUri)
+        .flatMap(uri -> Stream.of(root.findFilesForLocationURI(uri)))
+        .map(IResource::getProject)
+        .collect(Collectors.toSet());
+  }
+
+  protected static IProject importIntoWorkspace(Path createdProjectDir, EclipseProgress progress) throws CoreException {
+    Set<MavenProjectInfo> projects = singleton(new MavenProjectInfo(createdProjectDir.getFileName().toString(), createdProjectDir.resolve(IMavenConstants.POM).toFile(), null, null));
+    List<IMavenProjectImportResult> importedProjects = MavenPlugin.getProjectConfigurationManager().importProjects(projects, new ProjectImportConfiguration(), progress.monitor());
+    if (importedProjects == null || importedProjects.isEmpty()) {
+      throw newFail("Unable to import newly created project into workspace.");
     }
-    catch (IOException | ParserConfigurationException | SAXException e) {
-      throw new CoreException(new ScoutStatus(e));
-    }
+    return importedProjects.iterator().next().getProject();
   }
 
   public IJavaProject getServerModule() {
@@ -177,5 +157,10 @@ public class JaxWsModuleNewOperation implements IOperation {
 
   public void setArtifactId(String artifactId) {
     m_artifactId = artifactId;
+  }
+
+  @Override
+  public String toString() {
+    return "Create new JAX-WS Module";
   }
 }

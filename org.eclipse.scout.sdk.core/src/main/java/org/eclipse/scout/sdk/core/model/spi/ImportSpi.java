@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi;
 
+import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
+import org.eclipse.scout.sdk.core.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.IImport;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
  * <h3>{@link ImportSpi}</h3> Represents an import declaration in an {@link CompilationUnitSpi}
  *
- * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface ImportSpi extends JavaElementSpi {
@@ -35,7 +37,8 @@ public interface ImportSpi extends JavaElementSpi {
   /**
    * @return the simple name of the imported type.
    */
-  String getSimpleName();
+  @Override
+  String getElementName();
 
   /**
    * @return the qualifier of the imported type.
@@ -43,6 +46,21 @@ public interface ImportSpi extends JavaElementSpi {
   String getQualifier();
 
   boolean isStatic();
+
+  @Override
+  default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.preVisit(wrap(), level, index);
+  }
+
+  @Override
+  default boolean acceptPostOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.postVisit(wrap(), level, index);
+  }
+
+  @Override
+  default TreeVisitResult acceptLevelOrder(IBreadthFirstJavaElementVisitor visitor, int level, int index) {
+    return visitor.visit(wrap(), level, index);
+  }
 
   @Override
   IImport wrap();

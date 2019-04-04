@@ -11,21 +11,21 @@
 package org.eclipse.scout.sdk.core.model.api.internal;
 
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
  * <h3>{@link SourceRange}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class SourceRange implements ISourceRange {
 
-  private final String m_src;
+  private final CharSequence m_src;
   private final int m_start;
   private final int m_end;
 
-  public SourceRange(String src, int start, int end) {
-    m_src = src;
+  public SourceRange(CharSequence src, int start, int end) {
+    m_src = Ensure.notNull(src);
     m_start = start;
     m_end = end;
   }
@@ -37,9 +37,6 @@ public class SourceRange implements ISourceRange {
 
   @Override
   public int length() {
-    if (m_src == null) {
-      return -1;
-    }
     return m_src.length();
   }
 
@@ -49,12 +46,12 @@ public class SourceRange implements ISourceRange {
   }
 
   @Override
-  public String toString() {
+  public CharSequence asCharSequence() {
     return m_src;
   }
 
   @Override
-  public boolean isAvailable() {
-    return m_src != null && m_start >= 0 && m_end > m_start;
+  public String toString() {
+    return asCharSequence().toString();
   }
 }

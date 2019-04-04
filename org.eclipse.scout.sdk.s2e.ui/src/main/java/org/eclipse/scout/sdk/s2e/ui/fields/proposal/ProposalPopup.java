@@ -15,21 +15,16 @@ import java.util.Objects;
 
 import javax.swing.event.EventListenerList;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -39,13 +34,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.window.Window;
-import org.eclipse.scout.sdk.core.util.OptimisticLock;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.job.AbstractJob;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.StyledTextEx;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
-import org.eclipse.scout.sdk.s2e.util.NormalizedPattern;
+import org.eclipse.scout.sdk.s2e.ui.util.NormalizedPattern;
+import org.eclipse.scout.sdk.s2e.util.OptimisticLock;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
@@ -65,9 +60,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
@@ -125,12 +118,7 @@ class ProposalPopup extends Window {
     setShellStyle(SWT.RESIZE | SWT.NO_FOCUS | SWT.ON_TOP | SWT.TOOL);
     setBlockOnOpen(false);
     // listeners
-    getOwnerControl().getShell().addListener(SWT.Move, new Listener() {
-      @Override
-      public void handleEvent(Event event) {
-        close();
-      }
-    });
+    getOwnerControl().getShell().addListener(SWT.Move, event -> close());
   }
 
   @Override
@@ -141,17 +129,14 @@ class ProposalPopup extends Window {
     shell.addShellListener(new ShellAdapter() {
       @Override
       public void shellDeactivated(ShellEvent e) {
-        getShell().getDisplay().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            if (getOwnerControl() != null && !getOwnerControl().isDisposed()) {
-              if (!getOwnerControl().isFocusControl()) {
-                close();
-              }
-            }
-            else {
+        getShell().getDisplay().asyncExec(() -> {
+          if (getOwnerControl() != null && !getOwnerControl().isDisposed()) {
+            if (!getOwnerControl().isFocusControl()) {
               close();
             }
+          }
+          else {
+            close();
           }
         });
       }
@@ -161,13 +146,13 @@ class ProposalPopup extends Window {
   protected void fireProposalAccepted(IStructuredSelection selection, boolean moveFocus) {
     ProposalPopupEvent delegateEvent = new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_ACCEPTED);
     delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, selection.getFirstElement());
-    delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_MOVE_FOCUS, Boolean.valueOf(moveFocus));
+    delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_MOVE_FOCUS, moveFocus);
     firePopupEvent(delegateEvent);
   }
 
   @Override
   @SuppressWarnings("findbugs:IS2_INCONSISTENT_SYNC")
-  protected Control createContents(final Composite parent) {
+  protected Control createContents(Composite parent) {
     Composite proposalArea = new Composite(parent, SWT.INHERIT_FORCE);
     proposalArea.setBackground(proposalArea.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     Table table = new Table(proposalArea, SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -175,30 +160,24 @@ class ProposalPopup extends Window {
     m_tableViewer.setContentProvider(m_contentProvider);
     m_tableViewer.setLabelProvider(m_labelProvider);
     m_tableViewer.setInput(getInput());
-    m_tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-      @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-        Object newSelection = null;
-        if (!event.getSelection().isEmpty()) {
-          newSelection = ((IStructuredSelection) event.getSelection()).getFirstElement();
-          if (newSelection instanceof ISeparatorProposal) {
-            return;
-          }
+    m_tableViewer.addSelectionChangedListener(event -> {
+      Object newSelection = null;
+      if (!event.getSelection().isEmpty()) {
+        newSelection = ((IStructuredSelection) event.getSelection()).getFirstElement();
+        if (newSelection instanceof ISeparatorProposal) {
+          return;
         }
-        handleProposalSelection(newSelection);
       }
+      handleProposalSelection(newSelection);
     });
 
-    m_tableViewer.addDoubleClickListener(new IDoubleClickListener() {
-      @Override
-      public void doubleClick(DoubleClickEvent event) {
-        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        if (!selection.isEmpty()) {
-          if (selection.size() == 1 && selection.getFirstElement() instanceof ISeparatorProposal) {
-            return;
-          }
-          fireProposalAccepted(selection, true);
+    m_tableViewer.addDoubleClickListener(event -> {
+      IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+      if (!selection.isEmpty()) {
+        if (selection.size() == 1 && selection.getFirstElement() instanceof ISeparatorProposal) {
+          return;
         }
+        fireProposalAccepted(selection, true);
       }
     });
     table.addKeyListener(new KeyAdapter() {
@@ -356,7 +335,7 @@ class ProposalPopup extends Window {
         // try to scroll to items after the selected one to show the selected in the "middle" of the viewer
         int selectedRowIndex = m_tableViewer.getTable().getSelectionIndex();
         int lastRowIndex = m_tableViewer.getTable().getItemCount() - 1;
-        final int numOffsetRows = 3;
+        int numOffsetRows = 3;
         int revealRowIndex;
         if (selectedRowIndex < lastRowIndex - numOffsetRows) {
           revealRowIndex = selectedRowIndex + numOffsetRows;
@@ -461,7 +440,6 @@ class ProposalPopup extends Window {
   public int open() {
     Shell shell = getShell();
     if (shell == null || shell.isDisposed()) {
-      shell = null;
       // create the window
       create();
       shell = getShell();
@@ -485,18 +463,18 @@ class ProposalPopup extends Window {
 
       if (getDialogSettings() != null) {
         String widthString = getDialogSettings().get(DIALOG_SETTINGS_WIDTH);
-        if (StringUtils.isNotBlank(widthString)) {
+        if (Strings.hasText(widthString)) {
           shellBounds.width = Integer.parseInt(widthString);
         }
         String heightString = getDialogSettings().get(DIALOG_SETTINGS_HEIGHT);
-        if (StringUtils.isNotBlank(heightString)) {
+        if (Strings.hasText(heightString)) {
           shellBounds.height = Integer.parseInt(heightString);
         }
       }
 
       // double width if description area is visible
       if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
-        shellBounds.width = shellBounds.width * 2;
+        shellBounds.width *= 2;
       }
 
       // max screen 50% of screen size
@@ -520,7 +498,7 @@ class ProposalPopup extends Window {
       int xDiff = (displayBounds.x + displayBounds.width) - (shellBounds.x + shellBounds.width);
       if (xDiff < 0) {
         // move left
-        shellBounds.x = shellBounds.x + xDiff;
+        shellBounds.x += xDiff;
       }
 
       // check min sizes
@@ -577,7 +555,7 @@ class ProposalPopup extends Window {
           m_descLoaderJob.cancel();
         }
         m_descLoaderJob = new P_DescriptionLoader(proposal);
-        m_descLoaderJob.schedule(400);
+        m_descLoaderJob.schedule(400L);
       }
     }
   }
@@ -629,7 +607,7 @@ class ProposalPopup extends Window {
       Point size = getShell().getSize();
       // double width if description area is visible
       if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
-        size.x = size.x / 2;
+        size.x /= 2;
       }
       if (m_shellSizeDif != null) {
         size.x += m_shellSizeDif.x;
@@ -672,12 +650,7 @@ class ProposalPopup extends Window {
 
   private void firePopupEvent(ProposalPopupEvent event) {
     for (IProposalPopupListener listener : m_selectionListeners.getListeners(IProposalPopupListener.class)) {
-      try {
-        listener.popupChanged(event);
-      }
-      catch (Exception e) {
-        SdkLog.error("Error in IProposalPopupListener listener notification.", e);
-      }
+      listener.popupChanged(event);
     }
   }
 
@@ -692,28 +665,6 @@ class ProposalPopup extends Window {
 
   protected Control getOwnerControl() {
     return m_proposalField;
-  }
-
-  private Collection<Object> loadProposals(String pattern, IProgressMonitor monitor) {
-    return m_contentProvider.getWrappedProvider().getProposals(NormalizedPattern.build(pattern), monitor);
-  }
-
-  private void setInputAsync(final SearchPatternInput input, final IProgressMonitor monitor) {
-    final Control control = m_tableViewer.getControl();
-    if (!control.isDisposed()) {
-      control.getDisplay().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          if (monitor.isCanceled()) {
-            return;
-          }
-          if (control.isDisposed()) {
-            return;
-          }
-          setInput(input);
-        }
-      });
-    }
   }
 
   private final class P_LazyContentProvider implements IStructuredContentProvider {
@@ -770,8 +721,8 @@ class ProposalPopup extends Window {
     }
 
     @Override
-    protected void execute(final IProgressMonitor monitor) {
-      final IProposalDescriptionProvider proposalDescriptionProvider = getProposalDescriptionProvider();
+    protected void execute(IProgressMonitor monitor) {
+      IProposalDescriptionProvider proposalDescriptionProvider = getProposalDescriptionProvider();
       if (proposalDescriptionProvider == null) {
         return;
       }
@@ -782,22 +733,19 @@ class ProposalPopup extends Window {
         return;
       }
 
-      final Object contentData = proposalDescriptionProvider.createDescriptionContent(m_proposal, monitor);
-      m_proposalDescriptionArea.getDisplay().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          synchronized (m_descLoaderJobLock) {
-            if (m_proposalDescriptionArea.isDisposed()) {
-              return;
-            }
-            if (contentData != null) {
-              Control content = proposalDescriptionProvider.createDescriptionControl(m_proposalDescriptionArea, contentData);
-              if (content != null && !monitor.isCanceled()) {
-                m_proposalDescriptionArea.setContent(content);
-              }
-            }
-            layoutDescriptionArea();
+      Object contentData = proposalDescriptionProvider.createDescriptionContent(m_proposal, monitor);
+      m_proposalDescriptionArea.getDisplay().asyncExec(() -> {
+        synchronized (m_descLoaderJobLock) {
+          if (m_proposalDescriptionArea.isDisposed()) {
+            return;
           }
+          if (contentData != null) {
+            Control content = proposalDescriptionProvider.createDescriptionControl(m_proposalDescriptionArea, contentData);
+            if (content != null && !monitor.isCanceled()) {
+              m_proposalDescriptionArea.setContent(content);
+            }
+          }
+          layoutDescriptionArea();
         }
       });
     }
@@ -818,8 +766,27 @@ class ProposalPopup extends Window {
       schedule();
     }
 
+    private Collection<Object> loadProposals(String pattern, IProgressMonitor monitor) {
+      return m_contentProvider.getWrappedProvider().getProposals(NormalizedPattern.build(pattern), monitor);
+    }
+
+    private void setInputAsync(SearchPatternInput input, IProgressMonitor monitor) {
+      Control control = m_tableViewer.getControl();
+      if (!control.isDisposed()) {
+        control.getDisplay().asyncExec(() -> {
+          if (monitor.isCanceled()) {
+            return;
+          }
+          if (control.isDisposed()) {
+            return;
+          }
+          setInput(input);
+        });
+      }
+    }
+
     @Override
-    protected void execute(final IProgressMonitor monitor) {
+    protected void execute(IProgressMonitor monitor) {
       m_searchPatternInput.setProposals(loadProposals(m_searchPatternInput.getPattern(), monitor));
       if (monitor.isCanceled()) {
         return;
@@ -901,7 +868,7 @@ class ProposalPopup extends Window {
       if (selected && m_wrappedLabelProvider instanceof ISelectionStateLabelProvider) {
         return ((ISelectionStateLabelProvider) m_wrappedLabelProvider).getTextSelected(element);
       }
-      else if (m_wrappedLabelProvider instanceof ILabelProvider) {
+      if (m_wrappedLabelProvider instanceof ILabelProvider) {
         return ((ILabelProvider) m_wrappedLabelProvider).getText(element);
       }
       return null;
@@ -914,22 +881,22 @@ class ProposalPopup extends Window {
       if (selected && m_wrappedLabelProvider instanceof ISelectionStateLabelProvider) {
         return ((ISelectionStateLabelProvider) m_wrappedLabelProvider).getImageSelected(element);
       }
-      else if (m_wrappedLabelProvider instanceof ITableLabelProvider) {
+      if (m_wrappedLabelProvider instanceof ITableLabelProvider) {
         return ((ITableLabelProvider) m_wrappedLabelProvider).getColumnImage(element, columnIndex);
       }
-      else if (m_wrappedLabelProvider instanceof ILabelProvider) {
+      if (m_wrappedLabelProvider instanceof ILabelProvider) {
         return ((ILabelProvider) m_wrappedLabelProvider).getImage(element);
       }
       return null;
     }
   } // end class P_StyledLabelProvider
 
-  protected static final class SearchPatternInput {
+  public static final class SearchPatternInput {
     private final String m_pattern;
     private final Object m_input;
     private Collection<Object> m_proposals;
 
-    protected SearchPatternInput(Object input, String pattern) {
+    SearchPatternInput(Object input, String pattern) {
       m_input = input;
       m_pattern = pattern;
     }
@@ -961,40 +928,37 @@ class ProposalPopup extends Window {
         builder.append("null");
       }
       else {
-        builder.append(proposals.toString());
+        builder.append(proposals);
       }
       builder.append("] ");
       return builder.toString();
     }
 
     @Override
-    public int hashCode() {
-      int hash = 0;
-      if (m_input != null) {
-        hash ^= m_input.hashCode();
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
       }
-      if (m_pattern != null) {
-        hash ^= m_pattern.hashCode();
+      if (o == null || getClass() != o.getClass()) {
+        return false;
       }
-      if (m_proposals != null) {
-        for (Object proposal : m_proposals) {
-          if (proposal != null) {
-            hash ^= proposal.hashCode();
-          }
-        }
+
+      SearchPatternInput other = (SearchPatternInput) o;
+      if (!Objects.equals(m_pattern, other.m_pattern)) {
+        return false;
       }
-      return hash;
+      if (!Objects.equals(m_input, other.m_input)) {
+        return false;
+      }
+      return Objects.equals(m_proposals, other.m_proposals);
     }
 
     @Override
-    public boolean equals(Object obj) {
-      if (!(obj instanceof SearchPatternInput)) {
-        return false;
-      }
-      SearchPatternInput input = (SearchPatternInput) obj;
-      return Objects.equals(input.getInput(), getInput())
-          && Objects.equals(input.getPattern(), getPattern())
-          && Objects.equals(input.getProposals(), getProposals());
+    public int hashCode() {
+      int result = m_pattern != null ? m_pattern.hashCode() : 0;
+      result = 31 * result + (m_input != null ? m_input.hashCode() : 0);
+      result = 31 * result + (m_proposals != null ? m_proposals.hashCode() : 0);
+      return result;
     }
   }
 }

@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.util.ast;
 
+import static java.util.stream.Collectors.toList;
+
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -38,15 +40,13 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.internal.compiler.lookup.CompilationUnitScope;
-import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  * <h3>{@link AstUtils}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public final class AstUtils {
@@ -71,7 +71,7 @@ public final class AstUtils {
    *
    * @param td
    *          The type declaration for which the {@link IType} should be returned.
-   * @return The {@link IType} or <code>null</code> if no {@link IType} could be resolved.
+   * @return The {@link IType} or {@code null} if no {@link IType} could be resolved.
    */
   public static IType getTypeBinding(AbstractTypeDeclaration td) {
     ITypeBinding binding = td.resolveBinding();
@@ -79,7 +79,7 @@ public final class AstUtils {
       return null;
     }
     IJavaElement javaElement = binding.getJavaElement();
-    if (!S2eUtils.exists(javaElement) || javaElement.getElementType() != IJavaElement.TYPE) {
+    if (!JdtUtils.exists(javaElement) || javaElement.getElementType() != IJavaElement.TYPE) {
       return null;
     }
     return (IType) javaElement;
@@ -100,7 +100,7 @@ public final class AstUtils {
    */
   public static Type getInnerTypeReturnType(SimpleName innerTypeSimpleName, TypeDeclaration innerTypeDeclaringType) {
     AST ast = innerTypeSimpleName.getAST();
-    Deque<TypeDeclaration> declaringTypes = AstUtils.getDeclaringTypes(innerTypeDeclaringType);
+    Deque<TypeDeclaration> declaringTypes = getDeclaringTypes(innerTypeDeclaringType);
 
     if (hasTypeParametersInDeclaringTypes(declaringTypes)) {
       // return type with type-parameters in the declaring types
@@ -140,7 +140,7 @@ public final class AstUtils {
     return parameterizedType;
   }
 
-  private static boolean hasTypeParametersInDeclaringTypes(Deque<TypeDeclaration> declaringTypes) {
+  private static boolean hasTypeParametersInDeclaringTypes(Iterable<TypeDeclaration> declaringTypes) {
     for (TypeDeclaration td : declaringTypes) {
       if (!td.typeParameters().isEmpty()) {
         return true;
@@ -164,8 +164,8 @@ public final class AstUtils {
       getBindingResolver.setAccessible(true);
       return getBindingResolver.invoke(ast);
     }
-    catch (Exception t) {
-      throw new SdkException(t);
+    catch (IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+      throw new SdkException(e);
     }
   }
 
@@ -173,21 +173,19 @@ public final class AstUtils {
    * Gets the {@link CompilationUnitScope} of the given {@link AST} using the given binding resolver (see
    * {@link #getBindingResolver(AST)}.
    *
-   * @param ast
-   *          The {@link AST} for which to return the {@link CompilationUnitScope}.
    * @param resolver
    *          The resolver of the {@link AST}
    * @return the {@link CompilationUnitScope}.
    * @throws SdkException
    *           if there was an error accessing the {@link CompilationUnitScope}.
    */
-  public static CompilationUnitScope getCompilationUnitScope(AST ast, Object resolver) {
+  public static CompilationUnitScope getCompilationUnitScope(Object resolver) {
     try {
       Method scope = resolver.getClass().getDeclaredMethod("scope");
       scope.setAccessible(true);
       return (CompilationUnitScope) scope.invoke(resolver);
     }
-    catch (Exception t) {
+    catch (IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException t) {
       throw new SdkException(t);
     }
   }
@@ -222,7 +220,7 @@ public final class AstUtils {
    * @return A {@link Deque} with all declaring types
    */
   public static Deque<TypeDeclaration> getDeclaringTypes(TypeDeclaration start) {
-    Deque<TypeDeclaration> result = new LinkedList<>();
+    Deque<TypeDeclaration> result = new ArrayDeque<>();
     if (start == null) {
       return result;
     }
@@ -242,7 +240,7 @@ public final class AstUtils {
    * @return All {@link Annotation}s on the given owner.
    */
   public static Deque<Annotation> getAnnotations(BodyDeclaration owner) {
-    Deque<Annotation> annotations = new LinkedList<>();
+    Deque<Annotation> annotations = new ArrayDeque<>();
     for (Object o : owner.modifiers()) {
       if (o instanceof Annotation) {
         annotations.add((Annotation) o);
@@ -252,7 +250,7 @@ public final class AstUtils {
   }
 
   /**
-   * Returns a unique identifier of a method. The identifier looks like 'methodname(param1Signature,param2Signature)'.
+   * Returns a unique identifier of a method. The identifier looks like 'methodname(param1DataType,param2DataType)'.
    *
    * @param md
    *          The method for which the identifier should be created
@@ -260,14 +258,11 @@ public final class AstUtils {
    */
   @SuppressWarnings("unchecked")
   public static String createMethodIdentifier(MethodDeclaration md) {
-    List<SingleVariableDeclaration> parameters = md.parameters();
-    List<String> paramSigs = new ArrayList<>(parameters.size());
-    for (SingleVariableDeclaration svd : parameters) {
-      Type type = svd.getType();
-      String sig = Signature.createTypeSignature(type.toString());
-      paramSigs.add(sig);
-    }
-    return SignatureUtils.createMethodIdentifier(md.getName().getIdentifier(), paramSigs);
+    List<String> parameters = ((List<SingleVariableDeclaration>) md.parameters()).stream()
+        .map(SingleVariableDeclaration::getType)
+        .map(ASTNode::toString)
+        .collect(toList());
+    return JavaTypes.createMethodIdentifier(md.getName().getIdentifier(), parameters);
   }
 
   /**
@@ -295,20 +290,20 @@ public final class AstUtils {
     }
     for (Object o : owner.modifiers()) {
       if (o instanceof Modifier) {
-        return (Modifier) o;
+        return (ASTNode) o;
       }
     }
     return null;
   }
 
   /**
-   * Checks if the given {@link ITypeBinding} is <code>instanceof</code> the given fully qualified name.
+   * Checks if the given {@link ITypeBinding} is {@code instanceof} the given fully qualified name.
    *
    * @param hierarchyType
    *          The type to check.
    * @param fqn
    *          The fully qualified name to search in the super hierarchy of the given type.
-   * @return <code>true</code> if the given name is in the super hierarchy of the given type.
+   * @return {@code true} if the given name is in the super hierarchy of the given type.
    */
   public static boolean isInstanceOf(ITypeBinding hierarchyType, String fqn) {
     if (hierarchyType == null) {
@@ -330,8 +325,8 @@ public final class AstUtils {
    *          the type whose super hierarchy is to be visited
    * @param visitor
    *          the visitor
-   * @return <code>true</code> if all types were visited, or <code>false</code> if the visiting got aborted because the
-   *         <code>visit</code> method returned <code>false</code> for a type
+   * @return {@code true} if all types were visited, or {@code false} if the visiting got aborted because the
+   *         {@code visit} method returned {@code false} for a type
    */
   public static boolean visitHierarchy(ITypeBinding type, ITypeBindingVisitor visitor) {
     Set<ITypeBinding> visited = new HashSet<>();
@@ -363,19 +358,18 @@ public final class AstUtils {
   }
 
   /**
-   * Returns the closest ancestor of <code>node</code> whose type is <code>nodeType</code>, or <code>null</code> if
-   * none.
+   * Returns the closest ancestor of {@code node} whose type is {@code nodeType}, or {@code null} if none.
    * <p>
    * <b>Warning:</b> This method does not stop at any boundaries like parentheses, statements, body declarations, etc.
    * The resulting node may be in a totally different scope than the given node. Consider using one of the
-   * {@link ASTResolving}<code>.find(..)</code> methods instead.
+   * {@code org.eclipse.jdt.internal.ui.text.correction.ASTResolving.find(..)} methods instead.
    * </p>
    *
    * @param node
    *          the node
    * @param nodeType
    *          the node type constant from {@link ASTNode}
-   * @return the closest ancestor of <code>node</code> whose type is <code>nodeType</code>, or <code>null</code> if none
+   * @return the closest ancestor of {@code node} whose type is {@code nodeType}, or {@code null} if none
    */
   public static ASTNode getParent(ASTNode node, int nodeType) {
     do {
@@ -393,8 +387,8 @@ public final class AstUtils {
    * @param pos
    *          The position. The next node after this position is returned.
    * @param filter
-   *          The filter that the node must fulfill or <code>null</code> if no additional filter is required.
-   * @return The next node after the given pos or <code>null</code> if there is no such node.
+   *          The filter that the node must fulfill or {@code null} if no additional filter is required.
+   * @return The next node after the given pos or {@code null} if there is no such node.
    */
   public static ASTNode getNextNode(ASTNode n, int pos, Predicate<ASTNode> filter) {
     return getSiblingNode(n, pos, filter, false);
@@ -408,8 +402,8 @@ public final class AstUtils {
    * @param pos
    *          The position. The node before this position is returned.
    * @param filter
-   *          The filter that the node must fulfill or <code>null</code> if no additional filter is required.
-   * @return The last node before the given pos or <code>null</code> if there is no such node.
+   *          The filter that the node must fulfill or {@code null} if no additional filter is required.
+   * @return The last node before the given pos or {@code null} if there is no such node.
    */
   public static ASTNode getPreviousNode(ASTNode n, int pos, Predicate<ASTNode> filter) {
     return getSiblingNode(n, pos, filter, true);
@@ -417,7 +411,7 @@ public final class AstUtils {
 
   private static ASTNode getSiblingNode(ASTNode n, int pos, Predicate<ASTNode> filter, boolean prev) {
     Deque<ASTNode> children = getChildren(n);
-    Iterator<ASTNode> iterator = null;
+    Iterator<ASTNode> iterator;
     if (prev) {
       iterator = children.descendingIterator();
     }
@@ -428,7 +422,7 @@ public final class AstUtils {
     while (iterator.hasNext()) {
       ASTNode currentNode = iterator.next();
       int endOfCurrentNode = currentNode.getStartPosition() + currentNode.getLength();
-      boolean isRangeOk = (prev && endOfCurrentNode < pos) || (!prev && pos < endOfCurrentNode);
+      boolean isRangeOk = prev ? endOfCurrentNode < pos : pos < endOfCurrentNode;
       if (isRangeOk && (filter == null || filter.test(currentNode))) {
         return currentNode;
       }
@@ -457,7 +451,7 @@ public final class AstUtils {
    * @return The fully qualified name of the given type. Inner types are separated using '$'.
    */
   public static String getFullyQualifiedName(TypeDeclaration type, TypeDeclaration declaringType) {
-    return getFullyQualifiedName(type, declaringType, '$');
+    return getFullyQualifiedName(type, declaringType, JavaTypes.C_DOLLAR);
   }
 
   /**
@@ -470,7 +464,7 @@ public final class AstUtils {
    * @return The fully qualified name of the given type.
    */
   public static String getFullyQualifiedName(TypeDeclaration type, char innerTypeSeparator) {
-    return getFullyQualifiedName(type, null, '$');
+    return getFullyQualifiedName(type, null, innerTypeSeparator);
   }
 
   /**
@@ -488,7 +482,7 @@ public final class AstUtils {
     ASTNode root = type.getRoot();
     if (root instanceof CompilationUnit) {
       Deque<TypeDeclaration> parentTypes = getDeclaringTypes(type);
-      return AstUtils.getFullyQualifiedName(parentTypes, (CompilationUnit) root, innerTypeSeparator);
+      return getFullyQualifiedName(parentTypes, (CompilationUnit) root, innerTypeSeparator);
     }
 
     StringBuilder sb = new StringBuilder();
@@ -496,7 +490,7 @@ public final class AstUtils {
       sb.append(getFullyQualifiedName(declaringType, null, innerTypeSeparator));
     }
 
-    Deque<TypeDeclaration> declaringTypes = AstUtils.getDeclaringTypes(type);
+    Deque<TypeDeclaration> declaringTypes = getDeclaringTypes(type);
     for (TypeDeclaration td : declaringTypes) {
       sb.append(innerTypeSeparator).append(td.getName().getIdentifier());
     }
@@ -514,7 +508,7 @@ public final class AstUtils {
    *         separated using '$'.
    */
   public static String getFullyQualifiedName(Deque<TypeDeclaration> parentTypes, CompilationUnit cu) {
-    return getFullyQualifiedName(parentTypes, cu, '$');
+    return getFullyQualifiedName(parentTypes, cu, JavaTypes.C_DOLLAR);
   }
 
   /**
@@ -534,7 +528,7 @@ public final class AstUtils {
     // package
     PackageDeclaration pck = cu.getPackage();
     if (pck != null) {
-      fqnBuilder.append(pck.getName().toString()).append('.');
+      fqnBuilder.append(pck.getName()).append(JavaTypes.C_DOT);
     }
 
     Iterator<TypeDeclaration> descendingIterator = parentTypes.descendingIterator();
@@ -578,7 +572,7 @@ public final class AstUtils {
     @Override
     protected boolean visitNode(ASTNode node) {
       if (m_result == null) { // first visitNode: on the node's parent: do nothing, return true
-        m_result = new LinkedList<>();
+        m_result = new ArrayDeque<>();
         return true;
       }
       m_result.add(node);

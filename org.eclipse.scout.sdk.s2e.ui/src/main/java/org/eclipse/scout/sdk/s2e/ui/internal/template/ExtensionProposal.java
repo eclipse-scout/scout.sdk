@@ -17,12 +17,11 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
 
 /**
  * <h3>{@link ExtensionProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class ExtensionProposal extends AbstractTypeProposal {

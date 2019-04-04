@@ -17,7 +17,6 @@ import org.eclipse.swt.graphics.Image;
  * currently selected. So this interface can be used if the currently selected proposal should look different than in
  * unselected state.
  *
- * @author Andreas Hoegger
  * @since 3.8.0 2012-02-07
  */
 public interface ISelectionStateLabelProvider {

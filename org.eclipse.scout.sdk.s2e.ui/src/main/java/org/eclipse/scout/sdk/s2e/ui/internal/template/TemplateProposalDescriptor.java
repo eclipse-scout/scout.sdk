@@ -11,35 +11,34 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
-import org.eclipse.scout.sdk.core.s.model.ScoutModelHierarchy;
-import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.s.ScoutModelHierarchy;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 
 /**
  * <h3>{@link TemplateProposalDescriptor}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 @SuppressWarnings("squid:S00107")
 public class TemplateProposalDescriptor {
 
-  private static final Pattern CAMEL_PAT = Pattern.compile("([A-Z]{1})");
+  private static final Pattern CAMEL_PAT = Pattern.compile("([A-Z])");
 
   private final String m_proposalIfcTypeFqn;
   private final Deque<String> m_defaultSuperTypeFqns;
@@ -65,7 +64,7 @@ public class TemplateProposalDescriptor {
   protected TemplateProposalDescriptor(String proposalIfcTypeFqn, String defaultSuperTypeFqn, String defaultNameOfNewType, String typeSuffix, String imgId,
       int relevance, Class<? extends AbstractTypeProposal> proposal, Collection<String> alias, String displayName) {
     m_proposalIfcTypeFqn = proposalIfcTypeFqn;
-    m_defaultSuperTypeFqns = new LinkedList<>();
+    m_defaultSuperTypeFqns = new ArrayDeque<>();
     m_defaultSuperTypeFqns.add(defaultSuperTypeFqn);
     if (alias == null || alias.isEmpty()) {
       m_aliasNames = new HashSet<>(0);
@@ -81,7 +80,7 @@ public class TemplateProposalDescriptor {
     m_proposalClass = proposal;
   }
 
-  public boolean isActiveFor(Set<String> possibleChildren, IJavaProject context, String searchString) {
+  public boolean isActiveFor(Collection<String> possibleChildren, IJavaProject context, String searchString) {
     if (context == null) {
       return false;
     }
@@ -98,12 +97,12 @@ public class TemplateProposalDescriptor {
   }
 
   protected boolean acceptSearchString(String searchString) {
-    if (StringUtils.isBlank(searchString)) {
+    if (Strings.isBlank(searchString)) {
       return true; // no filter
     }
 
     searchString = searchString.toLowerCase();
-    if (Signature.getSimpleName(m_proposalIfcTypeFqn).toLowerCase().contains(searchString)) {
+    if (JavaTypes.simpleName(m_proposalIfcTypeFqn).toLowerCase().contains(searchString)) {
       return true;
     }
 
@@ -112,7 +111,7 @@ public class TemplateProposalDescriptor {
     }
 
     for (String defaultSuperType : m_defaultSuperTypeFqns) {
-      String simpleName = Signature.getSimpleName(defaultSuperType);
+      String simpleName = JavaTypes.simpleName(defaultSuperType);
       if (simpleName.startsWith(ISdkProperties.PREFIX_ABSTRACT)) {
         simpleName = simpleName.substring(ISdkProperties.PREFIX_ABSTRACT.length());
       }
@@ -129,7 +128,7 @@ public class TemplateProposalDescriptor {
     return false;
   }
 
-  public ICompletionProposal createProposal(ICompilationUnit icu, int pos, ISourceRange surroundingTypeNameRange, Future<IJavaEnvironmentProvider> provider, String searchString) {
+  public ICompletionProposal createProposal(ICompilationUnit icu, int pos, ISourceRange surroundingTypeNameRange, Future<EclipseEnvironment> provider, String searchString) {
     try {
       TypeProposalContext context = new TypeProposalContext();
       context.setProvider(provider);
@@ -149,8 +148,8 @@ public class TemplateProposalDescriptor {
     }
   }
 
-  protected static String createDisplayNameFromIfc(String ifcFqn) {
-    String simpleName = Signature.getSimpleName(ifcFqn);
+  protected static String createDisplayNameFromIfc(CharSequence ifcFqn) {
+    String simpleName = JavaTypes.simpleName(ifcFqn);
     if (!simpleName.isEmpty() && simpleName.charAt(0) == 'I') {
       simpleName = simpleName.substring(1);
     }

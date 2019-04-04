@@ -10,28 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
-import org.eclipse.scout.sdk.core.model.api.internal.SourceRange;
-
 /**
  * <h3>{@link ISourceRange}</h3>
  *
- * @author Ivan Motsch
  * @since 5.1.0
  */
 public interface ISourceRange {
 
   /**
-   * Constant describing that no source is available for an element.
-   */
-  ISourceRange NO_SOURCE = new SourceRange(null, -1, -1);
-
-  /**
    * Gets the source of the element this {@link ISourceRange} belongs to.
    *
-   * @return the source as {@link String}.
+   * @return the source as {@link CharSequence}.
    */
-  @Override
-  String toString();
+  CharSequence asCharSequence();
 
   /**
    * Gets the zero based index of the first character of this element relative to the source of the entire compilation
@@ -41,14 +32,6 @@ public interface ISourceRange {
    *         available.
    */
   int start();
-
-  /**
-   * Returns the number of characters of the source code for this element, relative to the source buffer in which this
-   * element is contained.
-   *
-   * @return the number of characters of the source code for this element, relative to the source buffer in which this
-   *         element is contained
-   */
 
   /**
    * Gets the number of characters of the source code for this element
@@ -65,9 +48,4 @@ public interface ISourceRange {
    *         available.
    */
   int end();
-
-  /**
-   * @return <code>true</code> if source is available, <code>false</code> otherwise.
-   */
-  boolean isAvailable();
 }

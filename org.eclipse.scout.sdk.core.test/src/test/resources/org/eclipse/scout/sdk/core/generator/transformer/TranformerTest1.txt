@@ -1,0 +1,19 @@
+/**
+* Default Testing Comment for
+* CompilationUnit SampleCloseable.java
+*/
+
+/**
+* Default Testing Comment for
+* Type SampleCloseable
+*/
+public class SampleCloseable implements AutoCloseable {
+@Override
+public String toString() {
+return "SampleCloseable class";
+}
+@Override
+public void close() {
+// TODO [anonymous] Auto-generated method stub.
+}
+}

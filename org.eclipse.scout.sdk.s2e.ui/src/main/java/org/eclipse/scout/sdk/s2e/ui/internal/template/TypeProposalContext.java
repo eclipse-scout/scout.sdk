@@ -16,45 +16,51 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
+import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 
 /**
  * <h3>{@link TypeProposalContext}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class TypeProposalContext {
 
+  private final FinalValue<TypeDeclaration> m_declaringType;
+  private final FinalValue<ITypeBinding> m_declaringTypeBinding;
   private String m_proposalIfcTypeFqn;
-  private TypeDeclaration m_declaringType;
   private int m_pos;
   private List<String> m_defaultSuperClasses;
   private String m_defaultName;
   private String m_suffix;
   private String m_searchString;
-  private ITypeBinding m_declaringTypeBinding;
-  private Future<IJavaEnvironmentProvider> m_provider;
+  private Future<EclipseEnvironment> m_provider;
   private Future<CompilationUnit> m_compilationUnit;
   private ICompilationUnit m_icu;
   private ISourceRange m_surroundingTypeNameRange;
 
+  public TypeProposalContext() {
+    m_declaringType = new FinalValue<>();
+    m_declaringTypeBinding = new FinalValue<>();
+  }
+
   public TypeDeclaration getDeclaringType() {
-    if (m_declaringType == null) {
-      CompilationUnit cu = Validate.notNull(getCompilationUnit(), "No AST found for '%s'.", m_icu.getElementName());
-      m_declaringType = Validate.notNull(ASTNodes.getParent(NodeFinder.perform(cu, getSurroundingTypeNameRange()), TypeDeclaration.class));
-    }
-    return m_declaringType;
+    return m_declaringType.computeIfAbsentAndGet(() -> {
+      CompilationUnit cu = Ensure.notNull(getCompilationUnit(), "No AST found for '{}'.", m_icu.getElementName());
+      ASTNode surroundingTypeName = NodeFinder.perform(cu, getSurroundingTypeNameRange());
+      return Ensure.notNull(ASTNodes.getParent(surroundingTypeName, TypeDeclaration.class));
+    });
   }
 
   public int getInsertPosition() {
@@ -74,7 +80,7 @@ public class TypeProposalContext {
   }
 
   public IJavaEnvironment getJavaEnvironment() {
-    return getProvider().get(m_icu.getJavaProject());
+    return getProvider().toScoutJavaEnvironment(m_icu.getJavaProject());
   }
 
   public String getDefaultName() {
@@ -94,14 +100,10 @@ public class TypeProposalContext {
   }
 
   public ITypeBinding getDeclaringTypeBinding() {
-    if (m_declaringTypeBinding == null) {
-      TypeDeclaration declaringType = getDeclaringType();
-      m_declaringTypeBinding = Validate.notNull(declaringType.resolveBinding(), "No type binding available for '%s'.", declaringType.getName().getFullyQualifiedName());
-    }
-    return m_declaringTypeBinding;
+    return m_declaringTypeBinding.computeIfAbsentAndGet(() -> Ensure.notNull(getDeclaringType().resolveBinding(), "No type binding available for '{}'.", getDeclaringType()));
   }
 
-  public IJavaEnvironmentProvider getProvider() {
+  public EclipseEnvironment getProvider() {
     try {
       return m_provider.get();
     }
@@ -110,7 +112,7 @@ public class TypeProposalContext {
     }
   }
 
-  void setProvider(Future<IJavaEnvironmentProvider> provider) {
+  void setProvider(Future<EclipseEnvironment> provider) {
     m_provider = provider;
   }
 
@@ -140,7 +142,7 @@ public class TypeProposalContext {
 
   public CompilationUnit getCompilationUnit() {
     try {
-      return Validate.notNull(m_compilationUnit).get();
+      return Ensure.notNull(m_compilationUnit).get();
     }
     catch (InterruptedException | ExecutionException e) {
       throw new SdkException(e);

@@ -16,7 +16,6 @@ import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroupCore.Posit
 /**
  * <h3>{@link ICompletionProposalProvider}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public interface ICompletionProposalProvider {
@@ -27,8 +26,5 @@ public interface ICompletionProposalProvider {
 
   void load();
 
-  /**
-   * @param listener
-   */
   void addListener(ILinkedAsyncProposalListener listener);
 }

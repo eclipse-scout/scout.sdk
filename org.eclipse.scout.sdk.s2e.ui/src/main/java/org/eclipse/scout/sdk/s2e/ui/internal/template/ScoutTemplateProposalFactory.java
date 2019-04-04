@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractBigDecimalField;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractBooleanField;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractButton;
@@ -102,7 +104,7 @@ import static org.eclipse.scout.sdk.s2e.ui.ISdkIcons.TableFieldAdd;
 import static org.eclipse.scout.sdk.s2e.ui.ISdkIcons.TreeFieldAdd;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +114,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 
-import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -120,19 +122,24 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.text.contentassist.ContentAssistEvent;
+import org.eclipse.jface.text.contentassist.ICompletionListener;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.source.ContentAssistantFacade;
+import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.model.ScoutModelHierarchy;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.CachingJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.job.RunnableJob;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.core.s.ScoutModelHierarchy;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
+import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
+import org.eclipse.scout.sdk.s2e.environment.RunnableJob;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * <h3>{@link ScoutTemplateProposalFactory}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public final class ScoutTemplateProposalFactory {
@@ -145,7 +152,7 @@ public final class ScoutTemplateProposalFactory {
   static {
     int relevance = 10000;
     TEMPLATES.put(IStringField,
-        new TemplateProposalDescriptor(IStringField, AbstractStringField, "MyString", SUFFIX_FORM_FIELD, StringFieldAdd, relevance, StringFieldProposal.class, asList("textfield")));
+        new TemplateProposalDescriptor(IStringField, AbstractStringField, "MyString", SUFFIX_FORM_FIELD, StringFieldAdd, relevance, StringFieldProposal.class, singletonList("textfield")));
     TEMPLATES.put(IBigDecimalField,
         new TemplateProposalDescriptor(IBigDecimalField, AbstractBigDecimalField, "MyBigDecimal", SUFFIX_FORM_FIELD, DoubleFieldAdd, relevance, BigDecimalFieldProposal.class, asList("numberfield", "doublefield", "floatfield")));
     TEMPLATES.put(IBooleanField,
@@ -155,7 +162,7 @@ public final class ScoutTemplateProposalFactory {
     TEMPLATES.put(ICalendarField,
         new TemplateProposalDescriptor(ICalendarField, AbstractCalendarField, "MyCalendar", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, CalendarFieldProposal.class));
     TEMPLATES.put(IDateField,
-        new TemplateProposalDescriptor(IDateField, AbstractDateField, "MyDate", SUFFIX_FORM_FIELD, DateFieldAdd, relevance, DateFieldProposal.class, asList("datetimefield")));
+        new TemplateProposalDescriptor(IDateField, AbstractDateField, "MyDate", SUFFIX_FORM_FIELD, DateFieldAdd, relevance, DateFieldProposal.class, singletonList("datetimefield")));
     TEMPLATES.put(IFileChooserField,
         new TemplateProposalDescriptor(IFileChooserField, AbstractFileChooserField, "MyFileChooser", SUFFIX_FORM_FIELD, FileChooserFieldAdd, relevance, FormFieldProposal.class));
     TEMPLATES.put(IGroupBox,
@@ -200,24 +207,56 @@ public final class ScoutTemplateProposalFactory {
         new TemplateProposalDescriptor(IImageField, AbstractImageField, "MyImage", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, ImageFieldProposal.class));
   }
 
-  public static List<ICompletionProposal> createTemplateProposals(IType declaringType, int offset, String prefix) {
-    Set<String> possibleChildrenIfcFqn = new HashSet<>();
-    Set<String> superTypesOfDeclaringType = null;
-    ISourceRange surroundingTypeNameRange = null;
+  public static List<ICompletionProposal> createTemplateProposals(IType declaringType, int offset, String prefix, SourceViewer viewer) {
+    Set<String> superTypesOfDeclaringType;
+    ISourceRange surroundingTypeNameRange;
     try {
-      ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
-      IType[] allTypes = supertypeHierarchy.getAllTypes();
-      superTypesOfDeclaringType = new HashSet<>(allTypes.length);
-      for (IType superType : allTypes) {
-        superTypesOfDeclaringType.add(superType.getFullyQualifiedName());
-      }
+      superTypesOfDeclaringType = getAllSuperTypesOf(declaringType);
       surroundingTypeNameRange = declaringType.getNameRange();
     }
     catch (JavaModelException e) {
       SdkLog.error("Unable to calculate supertype hierarchy for '{}'.", declaringType.getFullyQualifiedName(), e);
-      return Collections.emptyList();
+      return emptyList();
     }
 
+    Collection<String> possibleChildrenIfcFqn = getPossibleChildInterfaceNames(superTypesOfDeclaringType);
+    if (possibleChildrenIfcFqn.isEmpty()) {
+      return emptyList();
+    }
+
+    ICompilationUnit compilationUnit = declaringType.getCompilationUnit();
+
+    // start java environment creation
+    RunnableFuture<EclipseEnvironment> javaEnvProviderCreator = new FutureTask<>(new P_JavaEnvironmentPreloader(compilationUnit, prefix != null, offset, viewer));
+    Job javaEnvCreatorJob = new RunnableJob("Init Java Environment", javaEnvProviderCreator);
+    javaEnvCreatorJob.setUser(false);
+    javaEnvCreatorJob.setSystem(true);
+    javaEnvCreatorJob.setPriority(Job.SHORT);
+    javaEnvCreatorJob.schedule();
+
+    // create proposals
+    IJavaProject javaProject = declaringType.getJavaProject();
+    List<ICompletionProposal> result = new ArrayList<>();
+    for (TemplateProposalDescriptor candidate : TEMPLATES.values()) {
+      if (candidate.isActiveFor(possibleChildrenIfcFqn, javaProject, prefix)) {
+        result.add(candidate.createProposal(compilationUnit, offset, surroundingTypeNameRange, javaEnvProviderCreator, prefix));
+      }
+    }
+    return result;
+  }
+
+  private static Set<String> getAllSuperTypesOf(IType declaringType) throws JavaModelException {
+    ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
+    IType[] allTypes = supertypeHierarchy.getAllTypes();
+    Set<String> superTypesOfDeclaringType = new HashSet<>(allTypes.length);
+    for (IType superType : allTypes) {
+      superTypesOfDeclaringType.add(superType.getFullyQualifiedName());
+    }
+    return superTypesOfDeclaringType;
+  }
+
+  private static Collection<String> getPossibleChildInterfaceNames(Collection<String> superTypesOfDeclaringType) {
+    Collection<String> possibleChildrenIfcFqn = new HashSet<>();
     if (superTypesOfDeclaringType.contains(AbstractTabBox)
         || superTypesOfDeclaringType.contains(AbstractTabBoxExtension)) {
       // special case for tab boxes
@@ -248,55 +287,34 @@ public final class ScoutTemplateProposalFactory {
         }
       }
     }
-    if (possibleChildrenIfcFqn.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    ICompilationUnit compilationUnit = declaringType.getCompilationUnit();
-
-    // start java environment creation
-    RunnableFuture<IJavaEnvironmentProvider> javaEnvProviderCreator = new FutureTask<>(new P_JavaEnvironmentInitCallable(compilationUnit, prefix != null, offset));
-    RunnableJob javaEnvCreatorJob = new RunnableJob("Init Java Environment", javaEnvProviderCreator);
-    javaEnvCreatorJob.setUser(false);
-    javaEnvCreatorJob.setSystem(true);
-    javaEnvCreatorJob.setPriority(Job.SHORT);
-    javaEnvCreatorJob.schedule();
-
-    // create proposals
-    IJavaProject javaProject = declaringType.getJavaProject();
-    List<ICompletionProposal> result = new ArrayList<>();
-    TemplateProposalDescriptor[] templates = null;
-    synchronized (ScoutTemplateProposalFactory.TEMPLATES) {
-      templates = TEMPLATES.values().toArray(new TemplateProposalDescriptor[TEMPLATES.size()]);
-    }
-    for (TemplateProposalDescriptor candidate : templates) {
-      if (candidate.isActiveFor(possibleChildrenIfcFqn, javaProject, prefix)) {
-        result.add(candidate.createProposal(compilationUnit, offset, surroundingTypeNameRange, javaEnvProviderCreator, prefix));
-      }
-    }
-    return result;
+    return possibleChildrenIfcFqn;
   }
 
-  private static final class P_JavaEnvironmentInitCallable implements Callable<IJavaEnvironmentProvider> {
+  private static final class P_JavaEnvironmentPreloader implements Callable<EclipseEnvironment>, ICompletionListener {
 
     private final ICompilationUnit m_icu;
     private final boolean m_hasSearchString;
     private final int m_pos;
+    private final ContentAssistantFacade m_contentAssistFacade;
+    private final EclipseEnvironment m_provider;
+    private final Display m_display;
 
-    private P_JavaEnvironmentInitCallable(ICompilationUnit icu, boolean hasSearchString, int pos) {
+    private P_JavaEnvironmentPreloader(ICompilationUnit icu, boolean hasSearchString, int pos, SourceViewer viewer) {
       m_icu = icu;
       m_hasSearchString = hasSearchString;
       m_pos = pos;
+      m_contentAssistFacade = viewer.getContentAssistantFacade();
+      m_display = viewer.getControl().getDisplay();
+      m_provider = EclipseEnvironment.createUnsafe(env -> m_contentAssistFacade.addCompletionListener(this));
     }
 
     @Override
-    public IJavaEnvironmentProvider call() throws Exception {
-      IJavaEnvironmentProvider provider = new CachingJavaEnvironmentProvider();
-      String pck = S2eUtils.getPackage(m_icu);
-      if (StringUtils.isBlank(pck)) {
+    public EclipseEnvironment call() throws JavaModelException {
+      String pck = JdtUtils.getPackage(m_icu);
+      if (Strings.isBlank(pck)) {
         pck = null;
       }
-      IJavaEnvironment env = provider.get(m_icu.getJavaProject());
+      IJavaEnvironment env = m_provider.toScoutJavaEnvironment(m_icu.getJavaProject());
 
       StringBuilder buf = new StringBuilder(m_icu.getSource());
       if (m_hasSearchString) {
@@ -304,8 +322,41 @@ public final class ScoutTemplateProposalFactory {
       }
       env.registerCompilationUnitOverride(pck, m_icu.getElementName(), buf);
 
-      env.findType(m_icu.findPrimaryType().getFullyQualifiedName());
-      return provider;
+      env.findType(m_icu.findPrimaryType().getFullyQualifiedName()); // pre-load
+      return m_provider;
+    }
+
+    @Override
+    public void assistSessionStarted(ContentAssistEvent event) {
+      // nop
+    }
+
+    @Override
+    public void assistSessionEnded(ContentAssistEvent event) {
+      m_contentAssistFacade.removeCompletionListener(this);
+
+      // the session end event is executed in the SWT thread. but the end event is fired before the content assist changes are applied.
+      // therefore it is not possible to close the environment already. instead schedule another SWT task which will be executed afterwards.
+      m_display.asyncExec(this::scheduleEnvironmentClose);
+    }
+
+    private void scheduleEnvironmentClose() {
+      // close the environment async. Because if currently a type lookup is going on (in the environment), the close operation is blocked until it is finished.
+      // this method is invoked in the SWT thread. To not freeze the UI close the environment in a worker thread which will finish as soon as the type lookup completes.
+      AbstractJob closeJob = new AbstractJob("close content assist environment") {
+        @Override
+        protected void execute(IProgressMonitor monitor) {
+          m_provider.close();
+        }
+      };
+      closeJob.setSystem(true);
+      closeJob.setUser(false);
+      closeJob.schedule();
+    }
+
+    @Override
+    public void selectionChanged(ICompletionProposal proposal, boolean smartToggle) {
+      // nop
     }
   }
 }

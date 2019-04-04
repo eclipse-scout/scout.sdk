@@ -29,72 +29,18 @@
   <properties>
     <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
     <bundle.namespace>${project.artifactId}</bundle.namespace>
-    <bundle.version>${scout.base.version}</bundle.version>
+    <bundle.version>10.0.0</bundle.version>
   </properties>
-
-  <dependencies>
-    <!-- Build Dependencies -->
-    <!-- Build Dependencies (Provided) -->
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jdt</groupId>
-      <artifactId>org.eclipse.jdt.ui</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.ui.workbench</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.swt.${osgi.platform}</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.basepom.maven</groupId>
-        <artifactId>duplicate-finder-maven-plugin</artifactId>
-        <configuration>
-          <!-- not required because it is a bundle: duplicate classes are allowed in OSGi -->
-          <skip>true</skip>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
             <Bundle-Name>Scout SDK National Language Support</Bundle-Name>
-            <Import-Package>
-              !javax.*,
-              !org.eclipse.core.runtime*,
-              !org.eclipse.core.resources*,
-              !org.eclipse.jdt.core*,
-              !org.eclipse.jdt.internal*,
-              !org.eclipse.jdt.ui*,
-              !org.eclipse.scout.sdk.core*,
-              !org.eclipse.scout.sdk.s2e*,
-              !org.eclipse.jface*,
-              !org.eclipse.text*,
-              !org.osgi.*,
-              *;ui.workbench=!
-            </Import-Package>
-            <Require-Bundle>
-              org.eclipse.scout.sdk.s2e;bundle-version="[10.0,10.1)";visibility:=reexport,
-              org.eclipse.jdt.ui;bundle-version="[3.12,4)";visibility:=reexport,
-              org.eclipse.ui.editors;bundle-version="[3.10,4)";visibility:=reexport,
-              org.eclipse.jface;bundle-version="[3.12,4)";visibility:=reexport,
-              org.eclipse.jface.text;bundle-version="[3.11,4)";visibility:=reexport
-            </Require-Bundle>
-            <Bundle-Activator>org.eclipse.scout.sdk.s2e.nls.NlsCore</Bundle-Activator>
+            <Import-Package>!*</Import-Package>
           </instructions>
         </configuration>
       </plugin>

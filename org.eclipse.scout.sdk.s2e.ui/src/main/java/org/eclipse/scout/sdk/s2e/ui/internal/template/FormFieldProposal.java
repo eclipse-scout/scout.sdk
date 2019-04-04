@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -33,16 +32,15 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jdt.internal.corext.dom.Bindings;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstInnerTypeGetterBuilder;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.ast.WrappedTrackedNodePosition;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstInnerTypeGetterBuilder;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
+import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.WrappedTrackedNodePosition;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
-import org.eclipse.scout.sdk.s2e.util.ast.ITypeBindingVisitor;
 
 /**
  * <h3>{@link FormFieldProposal}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class FormFieldProposal extends AbstractTypeProposal {
@@ -83,7 +81,7 @@ public class FormFieldProposal extends AbstractTypeProposal {
         ITypeBinding[] typeArguments = iExtensionSuperType.getTypeArguments();
         if (typeArguments.length > 0) {
           ITypeBinding extendedForm = typeArguments[0];
-          Set<ITypeBinding> composites = new LinkedHashSet<>();
+          Collection<ITypeBinding> composites = new LinkedHashSet<>();
           collectCompositeTypes(extendedForm, composites);
           if (!composites.isEmpty()) {
             // add @Extends to FormFields in FormExtensions
@@ -119,7 +117,7 @@ public class FormFieldProposal extends AbstractTypeProposal {
     }
   }
 
-  protected void collectCompositeTypes(ITypeBinding owner, Collection<ITypeBinding> collector) {
+  protected static void collectCompositeTypes(ITypeBinding owner, Collection<ITypeBinding> collector) {
     if (owner == null) {
       return;
     }
@@ -132,15 +130,12 @@ public class FormFieldProposal extends AbstractTypeProposal {
   }
 
   protected ITypeBinding getIExtensionSuperType() {
-    final ITypeBinding[] result = new ITypeBinding[1];
-    AstUtils.visitHierarchy(getFactory().getDeclaringTypeBinding(), new ITypeBindingVisitor() {
-      @Override
-      public boolean visit(ITypeBinding type) {
-        if (IScoutRuntimeTypes.IExtension.equals(type.getErasure().getQualifiedName())) {
-          result[0] = type;
-        }
-        return result[0] == null;
+    ITypeBinding[] result = new ITypeBinding[1];
+    AstUtils.visitHierarchy(getFactory().getDeclaringTypeBinding(), type -> {
+      if (IScoutRuntimeTypes.IExtension.equals(type.getErasure().getQualifiedName())) {
+        result[0] = type;
       }
+      return result[0] == null;
     });
     return result[0];
   }
@@ -167,7 +162,7 @@ public class FormFieldProposal extends AbstractTypeProposal {
 
   private void addFormFieldImport(Deque<TypeDeclaration> parentTypes) throws CoreException {
     AstNodeFactory factory = getFactory();
-    String fullyQualifiedName = AstUtils.getFullyQualifiedName(parentTypes, factory.getRoot(), '.');
+    String fullyQualifiedName = AstUtils.getFullyQualifiedName(parentTypes, factory.getRoot(), JavaTypes.C_DOT);
     ImportDeclaration formFieldTypeImport = factory.getAst().newImportDeclaration();
     formFieldTypeImport.setStatic(false);
     formFieldTypeImport.setOnDemand(false);

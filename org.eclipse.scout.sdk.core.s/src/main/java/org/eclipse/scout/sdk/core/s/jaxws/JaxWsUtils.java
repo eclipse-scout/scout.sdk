@@ -10,31 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.jaxws;
 
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import static java.util.Collections.emptyList;
 
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.s.IMavenConstants;
-import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl.WebServiceNames;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.core.ISourceFolders;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -43,14 +31,15 @@ import org.w3c.dom.NodeList;
 /**
  * <h3>{@link JaxWsUtils}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
-public final class JaxWsUtils implements IMavenConstants {
+public final class JaxWsUtils {
 
   public static final String WSDL_FILE_EXTENSION = ".wsdl";
   public static final String ENTRY_POINT_DEFINITION_ENDPOINTINTERFACE_ATTRIBUTE = "endpointInterface";
   public static final String ENTRY_POINT_DEFINITION_NAME_ATTRIBUTE = "entryPointName";
+  public static final String ENTRY_POINT_DEFINITION_SERVICE_NAME_ATTRIBUTE = "serviceName";
+  public static final String ENTRY_POINT_DEFINITION_PORT_NAME_ATTRIBUTE = "portName";
   public static final String ENTRY_POINT_DEFINITION_PACKAGE_ATTRIBUTE = "entryPointPackage";
   public static final String ENTRY_POINT_DEFINITION_AUTH_ATTRIBUTE = "authentication";
   public static final String ENTRY_POINT_DEFINITION_HANDLER_CHAIN_ATTRIBUTE = "handlerChain";
@@ -63,7 +52,7 @@ public final class JaxWsUtils implements IMavenConstants {
   public static final String BINDINGS_ELEMENT_NAME = "bindings";
   public static final String GENERATE_ELEMENT_ATTRIBUTE_NAME = "generateElementProperty";
   public static final String GLOBAL_BINDINGS_ELEMENT_NAME = "globalBindings";
-  public static final String MODULE_REL_WEBINF_FOLDER_PATH = "src/main/resources/WEB-INF";
+  public static final String MODULE_REL_WEBINF_FOLDER_PATH = ISourceFolders.MAIN_RESOURCE_FOLDER + "/WEB-INF";
   public static final String BINDING_FILE_ELEMENT_NAME = "bindingFile";
   public static final String BINDING_FILES_ELEMENT_NAME = "bindingFiles";
   public static final String WSDL_FILE_ELEMENT_NAME = "wsdlFile";
@@ -84,251 +73,6 @@ public final class JaxWsUtils implements IMavenConstants {
   private static final String XPATH_END = "']";
 
   private JaxWsUtils() {
-  }
-
-  /**
-   * Creates the content of a new and empty JaxB binding.
-   *
-   * @param lineDelimiter
-   *          The line delimiter to use.
-   * @return A {@link StringBuilder} holding the content.
-   */
-  public static StringBuilder getJaxbBindingContent(String lineDelimiter) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").append(lineDelimiter);
-    sb.append("<!-- binding to customize xsd schema artifacts (jaxb-namespace: http://java.sun.com/xml/ns/jaxb) -->").append(lineDelimiter);
-    sb.append("<bindings xmlns=\"http://java.sun.com/xml/ns/jaxb\" version=\"2.1\">").append(lineDelimiter);
-    sb.append("</bindings>").append(lineDelimiter);
-    return sb;
-  }
-
-  /**
-   * Gets an empty wsdl with one sample operation (using document/literal)
-   *
-   * @param name
-   *          The name of the wsdl
-   * @param packageName
-   *          The package name of the wsdl (reverse of the namespace).
-   * @param lineDelimiter
-   *          The line delimiter to use.
-   * @return A {@link StringBuilder} holding the empty wsdl content.
-   */
-  public static StringBuilder getEmptyWsdl(String name, String packageName, String lineDelimiter) {
-    String[] parts = packageName.split("\\.");
-    if (parts.length > 0 && name.equalsIgnoreCase(parts[parts.length - 1])) {
-      parts = Arrays.copyOf(parts, parts.length - 1);
-    }
-    ArrayUtils.reverse(parts);
-    String nameSpace = StringUtils.join(parts, '.');
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").append(lineDelimiter);
-    sb.append("<wsdl:definitions name=\"").append(name).append("\"").append(lineDelimiter);
-    sb.append("  xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\"").append(lineDelimiter);
-    sb.append("  xmlns:tns=\"http://").append(nameSpace).append('/').append(name).append("/\"").append(lineDelimiter);
-    sb.append("  xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\"").append(lineDelimiter);
-    sb.append("  xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"").append(lineDelimiter);
-    sb.append("  targetNamespace=\"http://").append(nameSpace).append('/').append(name).append("/\">").append(lineDelimiter);
-    sb.append("  <wsdl:types>").append(lineDelimiter);
-    sb.append("    <xsd:schema targetNamespace=\"http://").append(nameSpace).append('/').append(name).append("/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">").append(lineDelimiter);
-    sb.append("      <xsd:element name=\"InElement\" type=\"xsd:string\"/>").append(lineDelimiter);
-    sb.append("      <xsd:element name=\"OutElement\" type=\"xsd:string\"/>").append(lineDelimiter);
-    sb.append("    </xsd:schema>").append(lineDelimiter);
-    sb.append("  </wsdl:types>").append(lineDelimiter);
-    sb.append("  <wsdl:message name=\"NewOperationRequest\">").append(lineDelimiter);
-    sb.append("    <wsdl:part element=\"tns:InElement\" name=\"in\"/>").append(lineDelimiter);
-    sb.append("  </wsdl:message>").append(lineDelimiter);
-    sb.append("  <wsdl:message name=\"NewOperationResponse\">").append(lineDelimiter);
-    sb.append("    <wsdl:part element=\"tns:OutElement\" name=\"ret\"/>").append(lineDelimiter);
-    sb.append("  </wsdl:message>").append(lineDelimiter);
-    sb.append("  <wsdl:portType name=\"").append(name).append("PortType\">").append(lineDelimiter);
-    sb.append("    <wsdl:operation name=\"NewOperation\">").append(lineDelimiter);
-    sb.append("      <wsdl:input message=\"tns:NewOperationRequest\"/>").append(lineDelimiter);
-    sb.append("      <wsdl:output message=\"tns:NewOperationResponse\"/>").append(lineDelimiter);
-    sb.append("    </wsdl:operation>").append(lineDelimiter);
-    sb.append("  </wsdl:portType>").append(lineDelimiter);
-    sb.append("  <wsdl:binding name=\"").append(name).append("PortSoapBinding\" type=\"tns:").append(name).append("PortType\">").append(lineDelimiter);
-    sb.append("    <soap:binding style=\"document\" transport=\"http://schemas.xmlsoap.org/soap/http\"/>").append(lineDelimiter);
-    sb.append("    <wsdl:operation name=\"NewOperation\">").append(lineDelimiter);
-    sb.append("      <soap:operation soapAction=\"http://").append(nameSpace).append('/').append(name).append("/NewOperation\"/>").append(lineDelimiter);
-    sb.append("      <wsdl:input>").append(lineDelimiter);
-    sb.append("        <soap:body use=\"literal\"/>").append(lineDelimiter);
-    sb.append("      </wsdl:input>").append(lineDelimiter);
-    sb.append("      <wsdl:output>").append(lineDelimiter);
-    sb.append("        <soap:body use=\"literal\"/>").append(lineDelimiter);
-    sb.append("      </wsdl:output>").append(lineDelimiter);
-    sb.append("    </wsdl:operation>").append(lineDelimiter);
-    sb.append("  </wsdl:binding>").append(lineDelimiter);
-    sb.append("  <wsdl:service name=\"").append(name).append("WebService\">").append(lineDelimiter);
-    sb.append("    <wsdl:port binding=\"tns:").append(name).append("PortSoapBinding\" name=\"").append(name).append("Port\">").append(lineDelimiter);
-    sb.append("      <soap:address location=\"http://").append(nameSpace).append("/\"/>").append(lineDelimiter);
-    sb.append("    </wsdl:port>").append(lineDelimiter);
-    sb.append("  </wsdl:service>").append(lineDelimiter);
-    sb.append("</wsdl:definitions>").append(lineDelimiter);
-
-    return sb;
-  }
-
-  /**
-   * Gets the JaxWs binding contents for the given {@link ParsedWsdl}.
-   *
-   * @param parsedWsdl
-   *          The {@link ParsedWsdl} holding all wsdl artifacts.
-   * @param rootWsdlUri
-   *          The root {@link URI} of the wsdl.
-   * @param lineDelimiter
-   *          The line delimiter to use.
-   * @param targetPackage
-   *          The target package in which all JaxWs artifacts should be stored.
-   * @return A {@link Map} holding the binding path filename as {@link String} and the corresponding binding content as
-   *         {@link StringBuilder}.
-   */
-  public static Map<String, StringBuilder> getJaxwsBindingContents(ParsedWsdl parsedWsdl, URI rootWsdlUri, String lineDelimiter, String targetPackage) {
-    Map<URI, Set<JaxWsBindingMapping>> bindingsByFile = new HashMap<>();
-    for (Entry<Service, URI> service : parsedWsdl.getWebServices().entrySet()) {
-      WebServiceNames names = parsedWsdl.getServiceNames().get(service.getKey());
-      Set<JaxWsBindingMapping> bindings = bindingsByFile.get(service.getValue());
-      if (bindings == null) {
-        bindings = new HashSet<>();
-        bindingsByFile.put(service.getValue(), bindings);
-      }
-      bindings.add(new JaxWsBindingMapping(false, names.getWebServiceNameFromWsdl(), names.getWebServiceClassName()));
-
-      Set<PortType> portTypesByService = parsedWsdl.getPortTypes(service.getKey());
-      for (PortType portType : portTypesByService) {
-        URI uriOfPortType = parsedWsdl.getPortTypes().get(portType);
-        bindings = bindingsByFile.get(uriOfPortType);
-        if (bindings == null) {
-          bindings = new HashSet<>();
-          bindingsByFile.put(uriOfPortType, bindings);
-        }
-        String portTypeName = portType.getQName().getLocalPart();
-        bindings.add(new JaxWsBindingMapping(true, portTypeName, names.getPortTypeClassName(portTypeName)));
-      }
-    }
-
-    Map<String, StringBuilder> result = new HashMap<>(bindingsByFile.size());
-    for (Entry<URI, Set<JaxWsBindingMapping>> binding : bindingsByFile.entrySet()) {
-      URI uri = binding.getKey();
-      URI relPath = CoreUtils.relativizeURI(rootWsdlUri, uri);
-      StringBuilder jaxwsBindingContent = JaxWsUtils.getJaxwsBindingContent(targetPackage, relPath, binding.getValue(), lineDelimiter);
-      final Path path;
-      if ("file".equals(uri.getScheme())) {
-        path = Paths.get(uri);
-      }
-      else {
-        path = Paths.get(uri.getPath());
-      }
-      if (path.getNameCount() < 1) {
-        SdkLog.warning("Zero length path found for jax-ws binding content of URI '{}'. Skipping.", uri);
-      }
-      else {
-        result.put(path.getFileName().toString(), jaxwsBindingContent);
-      }
-    }
-    return result;
-  }
-
-  static StringBuilder getJaxwsBindingContent(String wsPackage, URI wsdlLocation, Collection<JaxWsBindingMapping> names, String lineDelimiter) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").append(lineDelimiter);
-    sb.append("<!-- binding to customize webservice artifacts (jaxws-namespace: http://java.sun.com/xml/ns/jaxws) -->").append(lineDelimiter);
-    sb.append("<jaxws:bindings wsdlLocation=\"").append(wsdlLocation).append("\"").append(lineDelimiter);
-    sb.append("  xmlns:jaxws=\"http://java.sun.com/xml/ns/jaxws\"").append(lineDelimiter);
-    sb.append("  xmlns:jaxb=\"http://java.sun.com/xml/ns/jaxb\"").append(lineDelimiter);
-    sb.append("  xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\"").append(lineDelimiter);
-    sb.append("  xmlns:xjc=\"http://java.sun.com/xml/ns/jaxb/xjc\"").append(lineDelimiter);
-    sb.append("  xmlns:javaee=\"http://java.sun.com/xml/ns/javaee\"").append(lineDelimiter);
-    sb.append("  xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">").append(lineDelimiter);
-    sb.append("  <jaxws:bindings node=\"wsdl:definitions\">").append(lineDelimiter);
-    sb.append("    <jaxws:package name=\"").append(wsPackage).append("\"/>").append(lineDelimiter);
-    sb.append("  </jaxws:bindings>").append(lineDelimiter);
-    for (JaxWsBindingMapping mapping : names) {
-      String nodeAttr = null;
-      if (mapping.isPortType()) {
-        nodeAttr = getPortTypeXPath(mapping.getWsdlName());
-      }
-      else {
-        nodeAttr = getWebServiceXPath(mapping.getWsdlName());
-      }
-      sb.append("  <jaxws:bindings node=\"").append(nodeAttr).append("\">").append(lineDelimiter);
-      sb.append("    <jaxws:class name=\"").append(mapping.getClassName()).append("\" />").append(lineDelimiter);
-      sb.append("  </jaxws:bindings>").append(lineDelimiter);
-    }
-    sb.append("</jaxws:bindings>").append(lineDelimiter);
-    return sb;
-  }
-
-  /**
-   * <h3>{@link JaxWsBindingMapping}</h3> Binding mapping between a name of the WSDL and the corresponding Java class
-   * name.
-   */
-  public static class JaxWsBindingMapping {
-    private final boolean m_isPortType;
-    private final String m_wsdlName;
-    private final String m_className;
-
-    public JaxWsBindingMapping(boolean isPortType, String wsdlName, String className) {
-      m_isPortType = isPortType;
-      m_wsdlName = wsdlName;
-      m_className = className;
-    }
-
-    public boolean isPortType() {
-      return m_isPortType;
-    }
-
-    public String getWsdlName() {
-      return m_wsdlName;
-    }
-
-    public String getClassName() {
-      return m_className;
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((m_className == null) ? 0 : m_className.hashCode());
-      result = prime * result + (m_isPortType ? 1231 : 1237);
-      result = prime * result + ((m_wsdlName == null) ? 0 : m_wsdlName.hashCode());
-      return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (obj == null) {
-        return false;
-      }
-      if (getClass() != obj.getClass()) {
-        return false;
-      }
-      JaxWsBindingMapping other = (JaxWsBindingMapping) obj;
-      if (m_className == null) {
-        if (other.m_className != null) {
-          return false;
-        }
-      }
-      else if (!m_className.equals(other.m_className)) {
-        return false;
-      }
-      if (m_isPortType != other.m_isPortType) {
-        return false;
-      }
-      if (m_wsdlName == null) {
-        if (other.m_wsdlName != null) {
-          return false;
-        }
-      }
-      else if (!m_wsdlName.equals(other.m_wsdlName)) {
-        return false;
-      }
-      return true;
-    }
   }
 
   /**
@@ -370,13 +114,13 @@ public final class JaxWsUtils implements IMavenConstants {
     Element executions = getExecutionsElement(root);
     String nextId = getNextExecutionId(executions);
 
-    Element newExecution = root.getOwnerDocument().createElement(EXECUTION);
-    Element idElement = getOrCreateElement(newExecution, ID);
+    Element newExecution = root.getOwnerDocument().createElement(IMavenConstants.EXECUTION);
+    Element idElement = getOrCreateElement(newExecution, IMavenConstants.ID);
     idElement.setTextContent(nextId);
-    Element goalsElement = getOrCreateElement(newExecution, GOALS);
-    Element goalElement = getOrCreateElement(goalsElement, GOAL);
+    Element goalsElement = getOrCreateElement(newExecution, IMavenConstants.GOALS);
+    Element goalElement = getOrCreateElement(goalsElement, IMavenConstants.GOAL);
     goalElement.setTextContent(WSIMPORT_TOOL_NAME);
-    Element configurationElement = getOrCreateElement(newExecution, CONFIGURATION);
+    Element configurationElement = getOrCreateElement(newExecution, IMavenConstants.CONFIGURATION);
     Element wsdlLocationElement = getOrCreateElement(configurationElement, WSDL_LOCATION);
     wsdlLocationElement.setTextContent("WEB-INF/" + WSDL_FOLDER_NAME + '/' + wsdlFileName);
     Element wsdlFilesElement = getOrCreateElement(configurationElement, WSDL_FILES_ELEMENT_NAME);
@@ -406,40 +150,42 @@ public final class JaxWsUtils implements IMavenConstants {
    *          The WSDL file name as it appears in the &lt;wsdlFile&gt; tag of the pom.
    * @return A {@link List} holding all binding paths that belong to the given WSDL.
    * @throws XPathExpressionException
+   *           if there is an error in the xpath expression
    */
-  public static List<String> getBindingPathsFromPom(Document pom, String wsdlFileName) throws XPathExpressionException {
+  public static List<String> getBindingPathsFromPom(Node pom, String wsdlFileName) throws XPathExpressionException {
     if (wsdlFileName.indexOf('\'') >= 0) {
       throw new IllegalArgumentException("apos character (') is not allowed in a WSDL file name.");
     }
-    final String prefix = "p";
-    final String p = prefix + ":";
+    String prefix = "p";
+    String p = prefix + ':';
     String lc = wsdlFileName.toLowerCase();
     String uc = wsdlFileName.toUpperCase();
     StringBuilder bindingFilesXpathBuilder = new StringBuilder();
-    bindingFilesXpathBuilder.append(p).append(PROJECT).append('/').append(p).append(BUILD).append('/').append(p).append(PLUGINS).append('/').append(p).append(PLUGIN)
-        .append("[./").append(p).append(GROUP_ID).append("='").append(JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(ARTIFACT_ID).append("='").append(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID).append("']")
-        .append('/').append(p).append(EXECUTIONS).append('/').append(p).append(EXECUTION).append('/').append(p).append(CONFIGURATION)
+    bindingFilesXpathBuilder.append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.BUILD).append('/').append(p).append(IMavenConstants.PLUGINS).append('/').append(p).append(IMavenConstants.PLUGIN)
+        .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='").append(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID)
+        .append("']")
+        .append('/').append(p).append(IMavenConstants.EXECUTIONS).append('/').append(p).append(IMavenConstants.EXECUTION).append('/').append(p).append(IMavenConstants.CONFIGURATION)
         .append("[translate(./").append(p).append(WSDL_FILES_ELEMENT_NAME).append('/').append(p).append(WSDL_FILE_ELEMENT_NAME).append(", '").append(uc).append("', '").append(lc).append("')='").append(lc).append("']/").append(p)
         .append(BINDING_FILES_ELEMENT_NAME).append('/').append(p).append(BINDING_FILE_ELEMENT_NAME);
 
-    List<Element> nl = CoreUtils.evaluateXPath(bindingFilesXpathBuilder.toString(), pom, prefix, POM_XML_NAMESPACE);
+    List<Element> nl = Xml.evaluateXPath(bindingFilesXpathBuilder.toString(), pom, prefix, IMavenConstants.POM_XML_NAMESPACE);
     if (nl.isEmpty()) {
-      return Collections.emptyList();
+      return emptyList();
     }
 
     List<String> paths = new ArrayList<>(nl.size());
     for (Element e : nl) {
       String content = e.getTextContent();
-      if (StringUtils.isNotBlank(content)) {
+      if (Strings.hasText(content)) {
         paths.add(content.trim());
       }
     }
     return paths;
   }
 
-  static String getNextExecutionId(Element executions) {
+  static String getNextExecutionId(Node executions) {
     int curNum = 1;
-    final String idPrefix = WSIMPORT_TOOL_NAME + '-';
+    String idPrefix = WSIMPORT_TOOL_NAME + '-';
     NodeList children = executions.getChildNodes();
     while (isExecutionIdUsed(idPrefix + curNum, children)) {
       curNum++;
@@ -451,8 +197,8 @@ public final class JaxWsUtils implements IMavenConstants {
     for (int i = 0; i < executionList.getLength(); i++) {
       Node node = executionList.item(i);
       if (node.getNodeType() == Node.ELEMENT_NODE) {
-        Element idElement = CoreUtils.getFirstChildElement((Element) node, ID);
-        if (idElement != null && id.equals(idElement.getTextContent())) {
+        Optional<Element> idElement = Xml.firstChildElement(node, IMavenConstants.ID);
+        if (idElement.isPresent() && id.equals(idElement.get().getTextContent())) {
           return true;
         }
       }
@@ -460,44 +206,44 @@ public final class JaxWsUtils implements IMavenConstants {
     return false;
   }
 
-  static Element getExecutionsElement(Element root) {
-    Element build = getOrCreateElement(root, BUILD);
-    Element plugins = getOrCreateElement(build, PLUGINS);
+  static Element getExecutionsElement(Node root) {
+    Element build = getOrCreateElement(root, IMavenConstants.BUILD);
+    Element plugins = getOrCreateElement(build, IMavenConstants.PLUGINS);
     Element jaxWsMavenPluginElement = getOrCreateJaxWsMavenPluginElement(plugins);
-    return getOrCreateElement(jaxWsMavenPluginElement, EXECUTIONS);
+    return getOrCreateElement(jaxWsMavenPluginElement, IMavenConstants.EXECUTIONS);
   }
 
-  static Element getOrCreateJaxWsMavenPluginElement(Element pluginsElement) {
+  static Element getOrCreateJaxWsMavenPluginElement(Node pluginsElement) {
     NodeList plugins = pluginsElement.getChildNodes();
     for (int i = 0; i < plugins.getLength(); i++) {
       Node plugin = plugins.item(i);
-      if (plugin.getNodeType() == Node.ELEMENT_NODE && PLUGIN.equals(plugin.getNodeName())) {
+      if (plugin.getNodeType() == Node.ELEMENT_NODE && IMavenConstants.PLUGIN.equals(plugin.getNodeName())) {
         Element pluginCandidate = (Element) plugin;
-        Element group = CoreUtils.getFirstChildElement(pluginCandidate, GROUP_ID);
-        Element artifact = CoreUtils.getFirstChildElement(pluginCandidate, ARTIFACT_ID);
-        if (group != null && JAXWS_MAVEN_PLUGIN_GROUP_ID.equals(group.getTextContent()) && artifact != null && JAXWS_MAVEN_PLUGIN_ARTIFACT_ID.equals(artifact.getTextContent())) {
+        Optional<Element> group = Xml.firstChildElement(pluginCandidate, IMavenConstants.GROUP_ID);
+        Optional<Element> artifact = Xml.firstChildElement(pluginCandidate, IMavenConstants.ARTIFACT_ID);
+        if (group.isPresent() && JAXWS_MAVEN_PLUGIN_GROUP_ID.equals(group.get().getTextContent())
+            && artifact.isPresent() && JAXWS_MAVEN_PLUGIN_ARTIFACT_ID.equals(artifact.get().getTextContent())) {
           return pluginCandidate;
         }
       }
     }
 
     // plugin does not exist yet: create a new one
-    Element plugin = getOrCreateElement(pluginsElement, PLUGIN);
-    Element groupId = getOrCreateElement(plugin, GROUP_ID);
+    Element plugin = getOrCreateElement(pluginsElement, IMavenConstants.PLUGIN);
+    Element groupId = getOrCreateElement(plugin, IMavenConstants.GROUP_ID);
     groupId.setTextContent(JAXWS_MAVEN_PLUGIN_GROUP_ID);
-    Element artifactId = getOrCreateElement(plugin, ARTIFACT_ID);
+    Element artifactId = getOrCreateElement(plugin, IMavenConstants.ARTIFACT_ID);
     artifactId.setTextContent(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID);
     return plugin;
   }
 
-  static Element getOrCreateElement(Element parent, String tagName) {
-    Element element = CoreUtils.getFirstChildElement(parent, tagName);
-    if (element != null) {
-      return element;
-    }
-    element = parent.getOwnerDocument().createElement(tagName);
-    parent.appendChild(element);
-    return element;
+  static Element getOrCreateElement(Node parent, String tagName) {
+    return Xml.firstChildElement(parent, tagName)
+        .orElseGet(() -> {
+          Element element = parent.getOwnerDocument().createElement(tagName);
+          parent.appendChild(element);
+          return element;
+        });
   }
 
   /**
@@ -507,15 +253,16 @@ public final class JaxWsUtils implements IMavenConstants {
    *          The node attribute value to search.
    * @param document
    *          The document to search in.
-   * @return The {@link Element} with the given node attribute value or <code>null</code> if it could not be found.
+   * @return The {@link Element} with the given node attribute value or {@code null} if it could not be found.
    * @throws XPathExpressionException
+   *           if there is an error in the xpath expression
    */
-  public static Element getJaxWsBindingElement(String nodeValue, Document document) throws XPathExpressionException {
+  public static Element getJaxWsBindingElement(String nodeValue, Node document) throws XPathExpressionException {
     StringBuilder xPath = new StringBuilder();
-    final String prefix = "jaxws";
-    final String p = prefix + ':';
+    String prefix = "jaxws";
+    String p = prefix + ':';
     xPath.append(p).append(BINDINGS_ELEMENT_NAME).append('/').append(p).append(BINDINGS_ELEMENT_NAME);
-    List<Element> bindings = CoreUtils.evaluateXPath(xPath.toString(), document, prefix, JAX_WS_NAMESPACE);
+    List<Element> bindings = Xml.evaluateXPath(xPath.toString(), document, prefix, JAX_WS_NAMESPACE);
     for (Element binding : bindings) {
       String nodeAttribValue = binding.getAttribute(BINDINGS_NODE_ATTRIBUTE_NAME);
       if (nodeValue.equals(nodeAttribValue)) {
@@ -534,28 +281,75 @@ public final class JaxWsUtils implements IMavenConstants {
    * @return The input with all common suffixes removed.
    */
   public static String removeCommonSuffixes(String input) {
-    if (StringUtils.isBlank(input)) {
+    if (Strings.isBlank(input)) {
       return input;
     }
 
-    Collection<String> suffixes = new LinkedList<>();
-    suffixes.add("xml");
-    suffixes.add("soap");
-    suffixes.add("porttype");
-    suffixes.add("port");
-    suffixes.add("webservice");
-    suffixes.add("services");
-    suffixes.add("service");
-
+    String[] suffixes = {"xml", "soap", "porttype", "port", "webservice", "services", "service"};
     for (String s : suffixes) {
       if (input.toLowerCase().endsWith(s)) {
         String newInputCandidate = input.substring(0, input.length() - s.length());
-        if (StringUtils.isBlank(newInputCandidate)) {
+        if (Strings.isBlank(newInputCandidate)) {
           return input; // cancel suffix removal if we come to an empty name
         }
         input = newInputCandidate;
       }
     }
     return input;
+  }
+
+  /**
+   * <h3>{@link JaxWsBindingMapping}</h3> Binding mapping between a name of the WSDL and the corresponding Java class
+   * name.
+   */
+  public static class JaxWsBindingMapping {
+    private final boolean m_isPortType;
+    private final String m_wsdlName;
+    private final String m_className;
+
+    public JaxWsBindingMapping(boolean isPortType, String wsdlName, String className) {
+      m_isPortType = isPortType;
+      m_wsdlName = wsdlName;
+      m_className = className;
+    }
+
+    public boolean isPortType() {
+      return m_isPortType;
+    }
+
+    public String getWsdlName() {
+      return m_wsdlName;
+    }
+
+    public String getClassName() {
+      return m_className;
+    }
+
+    @Override
+    public int hashCode() {
+      int prime = 31;
+      int result = 1;
+      result = prime * result + ((m_className == null) ? 0 : m_className.hashCode());
+      result = prime * result + (m_isPortType ? 1231 : 1237);
+      result = prime * result + ((m_wsdlName == null) ? 0 : m_wsdlName.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      JaxWsBindingMapping other = (JaxWsBindingMapping) obj;
+      return m_isPortType == other.m_isPortType
+          && Objects.equals(m_className, other.m_className)
+          && Objects.equals(m_wsdlName, other.m_wsdlName);
+    }
   }
 }

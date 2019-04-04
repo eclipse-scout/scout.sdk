@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 
+import static java.util.Collections.emptyList;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
@@ -20,16 +21,16 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.scout.sdk.core.s.IMavenConstants;
-import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  * <h3>{@link JavaProjectContentProvider}</h3>
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
 public class JavaProjectContentProvider extends AbstractContentProviderAdapter {
@@ -38,18 +39,18 @@ public class JavaProjectContentProvider extends AbstractContentProviderAdapter {
 
   @Override
   public String getText(Object element) {
-    return ((IJavaProject) element).getElementName();
+    return ((IJavaElement) element).getElementName();
   }
 
   @Override
-  protected Collection<? extends Object> loadProposals(IProgressMonitor monitor) {
+  protected Collection<?> loadProposals(IProgressMonitor monitor) {
     try {
       IJavaProject[] allJavaProjectsInWorkspace = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
       Collection<IJavaProject> allMavenJavaProjects = new ArrayList<>(allJavaProjectsInWorkspace.length);
 
       for (IJavaProject candidate : allJavaProjectsInWorkspace) {
         if (monitor.isCanceled()) {
-          return Collections.emptyList();
+          return emptyList();
         }
         if (accepts(candidate)) {
           allMavenJavaProjects.add(candidate);
@@ -60,11 +61,11 @@ public class JavaProjectContentProvider extends AbstractContentProviderAdapter {
     catch (CoreException e) {
       SdkLog.error("Unable to get all java projects in the current workspace.", e);
     }
-    return Collections.emptyList();
+    return emptyList();
   }
 
   protected boolean accepts(IJavaProject jp) throws CoreException {
-    if (!S2eUtils.exists(jp)) {
+    if (!JdtUtils.exists(jp)) {
       return false;
     }
     IProject project = jp.getProject();

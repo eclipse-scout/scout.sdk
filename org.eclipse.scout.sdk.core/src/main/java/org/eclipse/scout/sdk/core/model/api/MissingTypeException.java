@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.model.api;
 /**
  * <h3>{@link MissingTypeException}</h3>
  *
- * @author Ivan Motsch
  * @since 5.1.0
  */
 public class MissingTypeException extends RuntimeException {

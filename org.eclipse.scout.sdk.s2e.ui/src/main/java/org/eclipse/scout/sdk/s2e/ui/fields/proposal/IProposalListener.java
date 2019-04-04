@@ -15,9 +15,9 @@ import java.util.EventListener;
 /**
  * <h3>{@link IProposalListener}</h3> Listener to be notified when a new proposal has been selected by the user.
  *
- * @author Matthias Villiger
  * @since 5.2.0
  */
+@FunctionalInterface
 public interface IProposalListener extends EventListener {
   /**
    * Notification that a proposal was selected by the user.

@@ -1,0 +1,48 @@
+/*******************************************************************************
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor.importexport;
+
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
+import org.eclipse.ui.internal.WorkbenchImages;
+
+/**
+ * <h4>NlsExportAction</h4>
+ *
+ * @since 1.1.0 (12.11.2010)
+ */
+public class TranslationExportAction extends Action {
+
+  private final Shell m_parentShell;
+  private final TranslationStoreStack m_nlsProject;
+
+  public TranslationExportAction(TranslationStoreStack nlsProject, Shell shell) {
+    super("Export Translations...");
+    m_nlsProject = nlsProject;
+    m_parentShell = shell;
+
+    setImageDescriptor(WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_ETOOL_EXPORT_WIZ));
+    setEnabled(!TranslationImportExportExtensionPoint.getExporters().isEmpty());
+  }
+
+  @Override
+  public void run() {
+    TranslationImportExportWizard wizard = new TranslationImportExportWizard("Export Translations", "Please choose an exporter.",
+        m_nlsProject, TranslationImportExportExtensionPoint.getExporters());
+    Window dialog = new WizardDialog(m_parentShell, wizard);
+    dialog.setBlockOnOpen(true);
+    dialog.open();
+  }
+}
