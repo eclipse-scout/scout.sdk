@@ -1,5 +1,6 @@
 package org.eclipse.scout.sdk.s2i.environment
 
+import com.intellij.codeInsight.actions.OptimizeImportsProcessor
 import com.intellij.ide.util.DirectoryUtil
 import com.intellij.openapi.fileTypes.StdFileTypes
 import com.intellij.openapi.project.Project
@@ -10,6 +11,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.util.LocalTimeCounter
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.Future
@@ -46,20 +48,38 @@ open class CompilationUnitWriter(private val project: Project, private val sourc
     }
 
     protected fun doWriteCompilationUnit(progress: IdeaProgress) {
-        progress.init("Write $m_fileName", 10)
+        progress.init("Write $m_fileName", 5)
 
-        // create raw source
-
-        progress.worked(5)
-
-        // format source
+        // create in memory file
         val newJavaPsi = PsiFileFactory.getInstance(project).createFileFromText(m_fileName, StdFileTypes.JAVA, source, LocalTimeCounter.currentTime(), false, false)
-        IdeaEnvironment.computeInReadAction(project) { CodeStyleManager.getInstance(project).reformat(newJavaPsi) }
-        progress.worked(2)
+        progress.worked(1)
 
-        // write content
-        storeCompilationUnitContent(newJavaPsi, progress.newChild(3))
+        formatSource(newJavaPsi)
+        progress.worked(1)
+
+        optimizeImports(newJavaPsi)
+        progress.worked(1)
+
+        storeCompilationUnitContent(newJavaPsi, progress.newChild(2))
         formattedCode = newJavaPsi.text
+    }
+
+    protected fun formatSource(newJavaPsi: PsiFile) {
+        try {
+            IdeaEnvironment.computeInReadAction(project) { CodeStyleManager.getInstance(project).reformat(newJavaPsi) }
+        }
+        catch(e: Exception) {
+            SdkLog.warning("Error formatting Java source of file '{}'.", newJavaPsi.name, e)
+        }
+    }
+
+    protected fun optimizeImports(newJavaPsi: PsiFile) {
+        try {
+            OptimizeImportsProcessor(project, newJavaPsi).run()
+        }
+        catch(e: Exception) {
+            SdkLog.warning("Error optimizing imports in file '{}'.", newJavaPsi.name, e)
+        }
     }
 
     protected fun storeCompilationUnitContent(psi: PsiFile, progress: IdeaProgress) {

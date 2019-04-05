@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 
 fun IType.resolvePsi(): PsiClass? {
     val module = this.javaEnvironment().toIdea().module
-    return IdeaEnvironment.computeInReadAction(module.project) { module.project.findTypesByName(name(), GlobalSearchScope.moduleScope(module)).first() }
+    return IdeaEnvironment.computeInReadAction(module.project) { module.project.findTypesByName(name(), GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, true)).firstOrNull() }
 }
 
 fun ProgressIndicator.toScoutProgress(): IdeaProgress = IdeaProgress(this)
