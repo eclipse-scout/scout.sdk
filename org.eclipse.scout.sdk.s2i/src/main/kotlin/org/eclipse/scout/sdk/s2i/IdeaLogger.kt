@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.MessageType
 import org.eclipse.scout.sdk.core.log.ISdkConsoleSpi
 import org.eclipse.scout.sdk.core.log.SdkConsole
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
 import java.util.logging.Level
@@ -16,9 +17,22 @@ open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
     private val m_balloonLog = NotificationGroup.balloonGroup("Scout SDK")
 
+    companion object {
+        const val LEVEL_ERROR: String = "Error"
+        const val LEVEL_WARNING: String = "Warning"
+        const val LEVEL_INFO: String = "Info"
+        const val LEVEL_DEBUG: String = "Debug"
+    }
+
     override fun initComponent() {
         SdkConsole.setConsoleSpi(this)
         ScoutSettings.addListener(this)
+
+        if(!ScoutSettings.isLogLevelConfigured() && isRunningInSandbox()) {
+            // default log level for dev mode
+            ScoutSettings.logLevel(LEVEL_INFO)
+        }
+
         refreshLogLevel()
     }
 
@@ -33,14 +47,21 @@ open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
         }
     }
 
+    protected fun isRunningInSandbox(): Boolean {
+        val sandbox = "sandbox"
+        return Strings.countMatches(System.getProperty("idea.plugins.path"), sandbox) > 0
+                || Strings.countMatches(System.getProperty("idea.config.path"), sandbox) > 0
+                || Strings.countMatches(System.getProperty("idea.system.path"), sandbox) > 0
+    }
+
     protected fun refreshLogLevel() =
             SdkLog.setLogLevel(ideaToJulLevel(ScoutSettings.logLevel()))
 
     protected fun ideaToJulLevel(ideaLevel: String): Level =
             when (ideaLevel) {
-                "Error" -> Level.SEVERE
-                "Info" -> Level.INFO
-                "Debug" -> Level.FINE
+                LEVEL_ERROR -> Level.SEVERE
+                LEVEL_INFO -> Level.INFO
+                LEVEL_DEBUG -> Level.FINE
                 else -> Level.FINE
             }
 

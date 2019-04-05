@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.util.EventListenerList
+import org.eclipse.scout.sdk.s2i.IdeaLogger
 import java.util.*
 import javax.swing.JComponent
 
@@ -18,8 +19,12 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
         const val logLevelKey = "org.eclipse.scout.sdk.s2i.logLevel"
         private val listeners = EventListenerList()
 
+        fun logLevel(newValue: String) = PropertiesComponent.getInstance().setValue(logLevelKey, newValue)
+
+        fun isLogLevelConfigured() = PropertiesComponent.getInstance().isValueSet(logLevelKey)
+
         fun logLevel(): String {
-            return PropertiesComponent.getInstance().getValue(logLevelKey, "Warning")
+            return PropertiesComponent.getInstance().getValue(logLevelKey, IdeaLogger.LEVEL_WARNING)
         }
 
         fun isAutoUpdateDerivedResources(project: Project): Boolean {
