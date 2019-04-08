@@ -66,7 +66,7 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
     Ensure.notNull(r);
     Ensure.notNull(monitorSupplier);
 
-    IWorkingCopyManager wcm = new WorkingCopyManager();
+    WorkingCopyManager wcm = new WorkingCopyManager();
     boolean save = false;
     try {
       runWithWorkingCopyManager(r, wcm);
@@ -98,7 +98,20 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   @Override
-  public synchronized void unregisterAll(boolean save, IProgressMonitor monitor) {
+  public synchronized boolean checkpoint(IProgressMonitor monitor) {
+    return unregisterAllImpl(true, monitor);
+  }
+
+  synchronized void unregisterAll(boolean save, IProgressMonitor monitor) {
+    try {
+      unregisterAllImpl(save, monitor);
+    }
+    finally {
+      m_open = false; // mark this instance as done. No more reconcile or register or checkpoint is allowed now.
+    }
+  }
+
+  private boolean unregisterAllImpl(boolean save, IProgressMonitor monitor) {
     ensureOpen();
     try {
       boolean tryToSave = save && (monitor == null || !monitor.isCanceled()); // only save if asked for save and not canceled yet.
@@ -113,7 +126,7 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
           IStatus result = S2eUtils.makeCommittable(resourcesToSave);
           if (!result.isOK()) {
             tryToSave = false;
-            SdkLog.warning("Unable to make all resources committable. Save will be skipped.", new CoreException(result));
+            SdkLog.info("Unable to make all resources committable. Save will be skipped.", new CoreException(result));
           }
         }
       }
@@ -121,11 +134,11 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
       for (ICompilationUnit icu : m_workingCopies) {
         releaseCompilationUnit(icu, monitor, tryToSave);
       }
+      return tryToSave;
     }
     finally {
       // remove and mark as closed even there was an error in the unregister
       m_workingCopies.clear();
-      m_open = false; // mark this instance as done. No more reconcile or register is allowed now.
     }
   }
 
@@ -155,6 +168,11 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
       throw newFail("compilation unit {} has not been registered", icu.getElementName());
     }
     icu.reconcile(ICompilationUnit.NO_AST, true, icu.getOwner(), monitor);
+  }
+
+  @Override
+  public int size() {
+    return m_workingCopies.size();
   }
 
   private void ensureOpen() {

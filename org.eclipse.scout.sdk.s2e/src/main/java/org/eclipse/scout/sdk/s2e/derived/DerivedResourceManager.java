@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.derived;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
+import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -491,6 +492,11 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         }
         catch (RuntimeException e) {
           SdkLog.error("Error while: {}", handlerName, e);
+        }
+
+        if (i % 500 == 0) {
+          // flush derived resources to disk in blocks of 500 items. this prevents out-of-memory in large workspaces
+          currentWorkingCopyManager().checkpoint(null);
         }
       }
       Future.awaitAll(executedHandlers); // wait until all write operations are executed. otherwise the java environment might already be closed while writing jobs are using it

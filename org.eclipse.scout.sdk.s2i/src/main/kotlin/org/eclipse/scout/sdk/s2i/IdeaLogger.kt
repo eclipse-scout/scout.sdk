@@ -54,8 +54,10 @@ open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
                 || Strings.countMatches(System.getProperty("idea.system.path"), sandbox) > 0
     }
 
-    protected fun refreshLogLevel() =
-            SdkLog.setLogLevel(ideaToJulLevel(ScoutSettings.logLevel()))
+    protected fun refreshLogLevel() {
+        SdkLog.setLogLevel(ideaToJulLevel(ScoutSettings.logLevel()))
+        m_textLog.setLevel(org.apache.log4j.Level.DEBUG) // so that the level filtering of Scout is active
+    }
 
     protected fun ideaToJulLevel(ideaLevel: String): Level =
             when (ideaLevel) {

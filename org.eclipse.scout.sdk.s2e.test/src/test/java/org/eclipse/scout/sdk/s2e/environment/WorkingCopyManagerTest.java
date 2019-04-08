@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.environment;
 
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,9 +34,13 @@ public class WorkingCopyManagerTest {
       WorkingCopyManager currentWorkingCopyManager = (WorkingCopyManager) currentWorkingCopyManager();
       manager.set(currentWorkingCopyManager);
       assertTrue(currentWorkingCopyManager.isOpen());
+      assertEquals(0, currentWorkingCopyManager.size());
+      assertTrue(currentWorkingCopyManager.checkpoint(null));
+      assertTrue(currentWorkingCopyManager.isOpen());
     }, () -> null);
 
     assertFalse(manager.get().isOpen());
+    assertThrows(IllegalArgumentException.class, () -> manager.get().checkpoint(null));
     assertThrows(IllegalArgumentException.class, () -> manager.get().register(null, null));
     assertThrows(IllegalArgumentException.class, () -> manager.get().reconcile(null, null));
     assertThrows(IllegalArgumentException.class, () -> manager.get().unregisterAll(false, null));

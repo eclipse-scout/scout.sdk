@@ -305,7 +305,7 @@ public class WebServiceEditor extends FormEditor {
         .forEach(op -> op.accept(env, progress));
 
     // explicitly flush all modified java files to disk so that the Maven compiler can see the changes
-    currentWorkingCopyManager().unregisterAll(true, progress.monitor());
+    currentWorkingCopyManager().checkpoint(progress.monitor());
 
     new RebuildArtifactsOperation(getJavaProject()).accept(env, progress);
   }

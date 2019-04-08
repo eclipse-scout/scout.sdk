@@ -160,12 +160,20 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
     String javaFileName = generator.fileName().get();
     CompilationUnitWriteOperation writeIcu = new CompilationUnitWriteOperation(sourceFolder, packageName, javaFileName, code);
     return doRunResourceTask(writeIcu, () -> {
-      // return primary type
       ICompilationUnit compilationUnit = writeIcu.getCreatedCompilationUnit();
+      String formattedSource;
+      try {
+        formattedSource = compilationUnit.getSource();
+      }
+      catch (JavaModelException e) {
+        throw new SdkException(e);
+      }
+
+      // return primary type
       org.eclipse.jdt.core.IType jdtType = compilationUnit.getType(generator.mainType().get().elementName().get());
 
       IJavaEnvironment javaEnvironment = targetFolder.javaEnvironment();
-      boolean reloadRequired = javaEnvironment.registerCompilationUnitOverride(packageName, javaFileName, code);
+      boolean reloadRequired = javaEnvironment.registerCompilationUnitOverride(packageName, javaFileName, formattedSource);
       if (reloadRequired) {
         javaEnvironment.reload();
       }

@@ -1,9 +1,5 @@
 package org.eclipse.scout.sdk.s2i.environment
 
-import com.intellij.application.options.CodeStyle
-import com.intellij.openapi.application.TransactionGuard
-import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
@@ -42,7 +38,7 @@ open class IdeaEnvironment(val project: Project) : IEnvironment, AutoCloseable {
     companion object Factory {
         fun <T> callInIdeaEnvironment(task: (IdeaEnvironment, IdeaProgress) -> T, project: Project, @NotNull title: String): IFuture<T> {
             val result = FinalValue<T>()
-            val name = Strings.notBlank(title).orElseGet { CoreUtils.toStringIfOverwritten(task).orElse("Unnamed") }
+            val name = Strings.notBlank(title).orElseGet { CoreUtils.toStringIfOverwritten(task).orElse("Unnamed Task: $task") }
             val job = OperationTask({ p ->
                 IdeaEnvironment(project).use {
                     result.setIfAbsent(task.invoke(it, p))
@@ -55,25 +51,6 @@ open class IdeaEnvironment(val project: Project) : IEnvironment, AutoCloseable {
                 DumbService.getInstance(project).runReadActionInSmartMode(callable)
 
         fun toIdeaProgress(progress: IProgress?): IdeaProgress = progress?.toIdea() ?: IdeaProgress(null)
-
-        fun <T> computeInWriteAction(project: Project, callable: () -> T): T {
-            val result = FinalValue<T>()
-            TransactionGuard.getInstance().submitTransactionAndWait {
-                // this is executed in the UI thread! keep short to prevent freezes!
-                // write operations are only allowed in the UI thread
-                // see http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html
-                result.computeIfAbsent {
-                    WriteAction.compute<T, RuntimeException> { computeInCommandProcessor(project, callable) }
-                }
-            }
-            return result.get()
-        }
-
-        private fun <T> computeInCommandProcessor(project: Project, callable: () -> T): T {
-            val result = FinalValue<T>()
-            CommandProcessor.getInstance().executeCommand(project, { result.computeIfAbsent(callable) }, null, null)
-            return result.get()
-        }
     }
 
     private val m_envs = HashMap<String, JavaEnvironmentWithIdea>()
@@ -141,7 +118,9 @@ open class IdeaEnvironment(val project: Project) : IEnvironment, AutoCloseable {
             createResource(generator, findJavaEnvironment(filePath).orElseThrow { newFail("Cannot find Java environment for path '{}'.", filePath) })
 
     override fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, context: IJavaEnvironment): StringBuilder {
-        val nl = CodeStyle.getSettings(project).lineSeparator
+        // must be \n! see https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/modifying_psi.html
+        // do not use CodeStyle.getSettings(project).lineSeparator because the CompilationUnitWriter uses createFileFromText
+        val nl = "\n"
         val ctx = BuilderContext(nl, PropertySupport(0))
         val builder = MemorySourceBuilder(JavaBuilderContext(ctx, context))
         generator.generate(builder)
@@ -149,7 +128,7 @@ open class IdeaEnvironment(val project: Project) : IEnvironment, AutoCloseable {
     }
 
     override fun writeResource(content: CharSequence, filePath: Path, progress: IProgress?) {
-        doWriteResource(filePath, content, toIdeaProgress(progress), true).awaitDoneThrowingOnErrorOrCancel()
+        doWriteResource(filePath, content).awaitDoneThrowingOnErrorOrCancel()
         return
     }
 
@@ -160,15 +139,12 @@ open class IdeaEnvironment(val project: Project) : IEnvironment, AutoCloseable {
             writeResourceAsync(createResource(generator, filePath), filePath, progress)
 
     override fun writeResourceAsync(content: CharSequence, filePath: Path, progress: IProgress?): IFuture<Void> =
-            doWriteResource(filePath, content, toIdeaProgress(progress), false)
+            doWriteResource(filePath, content)
 
-    protected fun doWriteResource(filePath: Path, content: CharSequence, progress: IdeaProgress, sync: Boolean): IFuture<Void> {
+    protected fun doWriteResource(filePath: Path, content: CharSequence): IFuture<Void> {
         val writer = FileWriter(filePath, content, project)
-        if (sync) {
-            writer.run(progress)
-            return Future.completed(null)
-        }
-        return writer.schedule()
+        TransactionManager.current().register(writer)
+        return Future.completed(null)
     }
 
     protected fun doWriteCompilationUnit(generator: ICompilationUnitGenerator<*>, targetFolder: IClasspathEntry, progress: IdeaProgress, sync: Boolean): IFuture<IType?> {
@@ -180,9 +156,9 @@ open class IdeaEnvironment(val project: Project) : IEnvironment, AutoCloseable {
 
         val writer = CompilationUnitWriter(project, code, pck, name, targetFolder.path())
         val supplier = lambda@{
-            val formattedCode = writer.formattedCode ?: return@lambda null
+            val createdUnit = writer.createdPsi ?: return@lambda null
 
-            val reloadRequired = javaEnv.registerCompilationUnitOverride(pck, name + JavaTypes.JAVA_FILE_SUFFIX, formattedCode)
+            val reloadRequired = javaEnv.registerCompilationUnitOverride(pck, name + JavaTypes.JAVA_FILE_SUFFIX, createdUnit.text)
             if (reloadRequired) {
                 javaEnv.reload()
             }
