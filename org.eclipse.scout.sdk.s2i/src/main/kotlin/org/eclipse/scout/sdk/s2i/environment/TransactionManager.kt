@@ -92,7 +92,7 @@ class TransactionManager private constructor(val project: Project) {
      * @return true if all [TransactionMember]s have been committed successfully
      */
     @Suppress("unused")
-    fun checkpoint(progress: IdeaProgress) = synchronized(this) { finishTransactionImpl(true, progress) }
+    fun checkpoint(progress: IdeaProgress?) = synchronized(this) { finishTransactionImpl(true, IdeaEnvironment.toIdeaProgress(progress)) }
 
     /**
      * Registers the [TransactionMember] specified. If the running transaction ends the member is asked to commit. If the transaction is not committed

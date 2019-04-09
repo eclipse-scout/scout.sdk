@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.s2i.derived.DerivedResourceHandlerFactory
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -131,6 +132,7 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
         progress.init("Update derived resources", handlers.size)
         val indicator = IdeaEnvironment.toIdeaProgress(progress).indicator
         val fileWrites = ArrayList<IFuture<*>>()
+        val transactionManager = TransactionManager.current()
         for (handler in handlers) {
             indicator.text2 = handler.toString()
             val start = System.currentTimeMillis()
@@ -140,6 +142,12 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
                 SdkLog.error("Error while: {}", indicator.text2, e)
             } finally {
                 SdkLog.info("Derived Resource Handler ($handler) took {}ms to execute.", System.currentTimeMillis() - start)
+            }
+
+            if (transactionManager.size() >= 500) {
+                Future.awaitAll(fileWrites)
+                fileWrites.clear()
+                transactionManager.checkpoint(null)
             }
         }
         Future.awaitAll(fileWrites)

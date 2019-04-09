@@ -495,7 +495,9 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         }
 
         if (i % 500 == 0) {
-          // flush derived resources to disk in blocks of 500 items. this prevents out-of-memory in large workspaces
+          // flush derived resources to disk in blocks of 500 items. this prevents out-of-memory in large workspaces where the transaction could get to big
+          Future.awaitAll(executedHandlers);
+          executedHandlers.clear();
           currentWorkingCopyManager().checkpoint(null);
         }
       }
