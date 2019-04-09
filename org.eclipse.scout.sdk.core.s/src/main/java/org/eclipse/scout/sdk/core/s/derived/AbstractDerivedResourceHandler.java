@@ -10,9 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.derived;
 
+import static java.util.Collections.emptyList;
+
 import java.util.Collection;
 import java.util.function.BiFunction;
 
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.MissingTypeException;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -38,6 +43,11 @@ public abstract class AbstractDerivedResourceHandler implements BiFunction<IEnvi
     try {
       CoreUtils.setUsernameForThread("Scout robot");
       return execute(env, progress);
+    }
+    catch (MissingTypeException mte) {
+      String inputTypeName = getInput().getSourceType(env).map(IType::name).orElse(null);
+      SdkLog.info("Skip type '{}' because it contains compile errors", inputTypeName, mte);
+      return emptyList();
     }
     finally {
       CoreUtils.setUsernameForThread(backup);
