@@ -23,6 +23,9 @@ target/
 /.project
 
 # IntelliJ IDEA #
-/.idea
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
 
 org.eclipse.scout.sdk.s2e*/META-INF/MANIFEST.MF
