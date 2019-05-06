@@ -30,6 +30,10 @@
       <interface-class>org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager</interface-class>
       <implementation-class>org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor</implementation-class>
     </component>
+    <component>
+      <interface-class>org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi</interface-class>
+      <implementation-class>org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator</implementation-class>
+    </component>
   </project-components>
 
   <extensions defaultExtensionNs="com.intellij">

@@ -30,7 +30,6 @@ import java.util.function.BiFunction
 
 open class DerivedResourceManagerImplementor(private val project: Project) : ProjectComponent, DerivedResourceManager, SettingsChangedListener {
 
-
     private val m_updateHandlerFactories = ArrayList<DerivedResourceHandlerFactory>()
     private val m_eventBuffer = ArrayList<GlobalSearchScope>()
     private val m_pendingFutures = ConcurrentLinkedQueue<ScheduledFuture<*>>()
