@@ -99,7 +99,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.ui.navigator.resources:3.6.400" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.ui.views.properties.tabbed:3.8.400" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core.manipulation:1.11.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.ibm.icu:icu4j:64.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.ibm.icu:icu4j:64.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.bidi:1.1.300" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.debug.ui:3.10.200" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.filebuffers:3.6.500" level="project" />

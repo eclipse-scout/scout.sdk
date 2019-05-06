@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>org.eclipse.scout.sdk.s2i</id>
   <name>Eclipse Scout</name>
-  <version>0.0.1</version>
+  <version>10.0.0.201905061015</version>
 
   <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
 
@@ -10,8 +10,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      Initial version
-      blablablablablablablablablablablablablablablablablablablablablabla
+      Initial version providing derived resource update for FormData & PageData
     ]]>
   </change-notes>
 
@@ -33,11 +32,6 @@
     </component>
   </project-components>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
   <extensions defaultExtensionNs="com.intellij">
     <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings" instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings" />
   </extensions>
@@ -48,6 +42,5 @@
       <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu" class="org.eclipse.scout.sdk.s2i.derived.impl.UpdateAllDerivedResourcesMenu" text="Update all derived resources..." description="Updates all derived resources in the Project." />
     </group>
   </actions>
-
 
 </idea-plugin>
