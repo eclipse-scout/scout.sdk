@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -90,7 +91,6 @@ public class MavenBuildOperation implements BiConsumer<EclipseEnvironment, Eclip
   public static final String M2_WORKSPACE_RESOLUTION = "M2_WORKSPACE_RESOLUTION";
   public static final String M2_DEBUG_OUTPUT = "M2_DEBUG_OUTPUT";
   public static final String M2_THREADS = "M2_THREADS";
-  public static final String M2_SKIP_TEST = "maven.test.skip";
 
   private static final AtomicLong BUILD_NAME_NUM = new AtomicLong(0L);
 
@@ -226,20 +226,22 @@ public class MavenBuildOperation implements BiConsumer<EclipseEnvironment, Eclip
     ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
     ILaunchConfigurationType launchConfigurationType = launchManager.getLaunchConfigurationType(LAUNCH_CONFIGURATION_TYPE_ID);
     ILaunchConfigurationWorkingCopy workingCopy = launchConfigurationType.newInstance(null, "-mavenBuild" + BUILD_NAME_NUM.getAndIncrement());
+    MavenBuild build = getBuild();
+    Map<String, String> properties = build.getProperties();
 
-    workingCopy.setAttribute(WORKING_DIRECTORY, getBuild().getWorkingDirectory().toAbsolutePath().toString());
+    workingCopy.setAttribute(WORKING_DIRECTORY, build.getWorkingDirectory().toAbsolutePath().toString());
     workingCopy.setAttribute(ILaunchManager.ATTR_PRIVATE, true);
-    workingCopy.setAttribute(M2_UPDATE_SNAPSHOTS, getBuild().hasOption(MavenBuild.OPTION_UPDATE_SNAPSHOTS));
-    workingCopy.setAttribute(M2_OFFLINE, getBuild().hasOption(MavenBuild.OPTION_OFFLINE));
-    workingCopy.setAttribute(M2_SKIP_TESTS, getBuild().getProperties().containsKey(M2_SKIP_TEST));
-    workingCopy.setAttribute(M2_NON_RECURSIVE, getBuild().hasOption(MavenBuild.OPTION_NON_RECURSIVE));
+    workingCopy.setAttribute(M2_UPDATE_SNAPSHOTS, build.hasOption(MavenBuild.OPTION_UPDATE_SNAPSHOTS));
+    workingCopy.setAttribute(M2_OFFLINE, build.hasOption(MavenBuild.OPTION_OFFLINE));
+    workingCopy.setAttribute(M2_SKIP_TESTS, properties.containsKey(MavenBuild.PROPERTY_SKIP_TESTS) || properties.containsKey(MavenBuild.PROPERTY_SKIP_TEST_CREATION));
+    workingCopy.setAttribute(M2_NON_RECURSIVE, build.hasOption(MavenBuild.OPTION_NON_RECURSIVE));
     workingCopy.setAttribute(M2_WORKSPACE_RESOLUTION, true);
-    workingCopy.setAttribute(M2_DEBUG_OUTPUT, SdkLog.isDebugEnabled() || getBuild().hasOption(MavenBuild.OPTION_DEBUG));
+    workingCopy.setAttribute(M2_DEBUG_OUTPUT, SdkLog.isDebugEnabled() || build.hasOption(MavenBuild.OPTION_DEBUG));
     workingCopy.setAttribute(M2_THREADS, 1);
     // not supported yet: "M2_PROFILES" and "M2_USER_SETTINGS"
-    workingCopy.setAttribute(M2_PROPERTIES, getBuild().getPropertiesAsList());
+    workingCopy.setAttribute(M2_PROPERTIES, build.getPropertiesAsList());
 
-    setGoals(workingCopy, getBuild().getGoals());
+    setGoals(workingCopy, build.getGoals());
 
     IContainer container = getWorkspaceContainer();
     setProjectConfiguration(workingCopy, container, monitor);

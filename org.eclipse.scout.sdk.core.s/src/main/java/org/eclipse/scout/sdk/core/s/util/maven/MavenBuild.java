@@ -37,6 +37,8 @@ public class MavenBuild {
   public static final char OPTION_UPDATE_SNAPSHOTS = 'U';
   public static final char OPTION_OFFLINE = 'o';
   public static final char OPTION_NON_RECURSIVE = 'N';
+  public static final String PROPERTY_SKIP_TESTS = "skipTests";
+  public static final String PROPERTY_SKIP_TEST_CREATION = "maven.test.skip";
   private final Set<String> m_goals;
   private final Map<String, String> m_properties;
   private final Set<String> m_options;

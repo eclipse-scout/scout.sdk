@@ -1,50 +1,60 @@
 <idea-plugin>
-  <id>org.eclipse.scout.sdk.s2i</id>
-  <name>Eclipse Scout</name>
-  <version>10.0.0.201905061015</version>
+    <id>org.eclipse.scout.sdk.s2i</id>
+    <name>Eclipse Scout</name>
+    <version>10.0.0.201905061015</version>
 
-  <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
+    <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
       Eclipse Scout integration for IntelliJ IDEA
     ]]></description>
 
-  <change-notes><![CDATA[
+    <change-notes><![CDATA[
       Initial version providing derived resource update for FormData & PageData
     ]]>
-  </change-notes>
+    </change-notes>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="191.0"/>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="191.0"/>
 
-  <application-components>
-    <component>
-      <interface-class>org.eclipse.scout.sdk.core.log.ISdkConsoleSpi</interface-class>
-      <implementation-class>org.eclipse.scout.sdk.s2i.IdeaLogger</implementation-class>
-    </component>
-  </application-components>
+    <application-components>
+        <component>
+            <interface-class>org.eclipse.scout.sdk.core.log.ISdkConsoleSpi</interface-class>
+            <implementation-class>org.eclipse.scout.sdk.s2i.IdeaLogger</implementation-class>
+        </component>
+    </application-components>
 
+    <depends optional="true">org.jetbrains.idea.maven</depends>
 
-  <project-components>
-    <component>
-      <interface-class>org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager</interface-class>
-      <implementation-class>org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor</implementation-class>
-    </component>
-    <component>
-      <interface-class>org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi</interface-class>
-      <implementation-class>org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator</implementation-class>
-    </component>
-  </project-components>
+    <project-components>
+        <component>
+            <interface-class>org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager</interface-class>
+            <implementation-class>org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor
+            </implementation-class>
+        </component>
+        <component>
+            <interface-class>org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi
+            </interface-class>
+            <implementation-class>org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator</implementation-class>
+        </component>
+        <component>
+            <interface-class>org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi</interface-class>
+            <implementation-class>org.eclipse.scout.sdk.s2i.IdeaMavenRunner</implementation-class>
+        </component>
+    </project-components>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings" instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings" />
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
+                             instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
+    </extensions>
 
-  <actions>
-    <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" text="Scout">
-      <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"  />
-      <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu" class="org.eclipse.scout.sdk.s2i.derived.impl.UpdateAllDerivedResourcesMenu" text="Update all derived resources..." description="Updates all derived resources in the Project." />
-    </group>
-  </actions>
+    <actions>
+        <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" text="Scout">
+            <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"/>
+            <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu"
+                    class="org.eclipse.scout.sdk.s2i.derived.impl.UpdateAllDerivedResourcesMenu"
+                    text="Update all derived resources..." description="Updates all derived resources in the Project."/>
+        </group>
+    </actions>
 
 </idea-plugin>

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.util.maven;
 
+import org.eclipse.scout.sdk.core.util.Ensure;
+
 import java.util.function.Supplier;
 
 /**
@@ -60,13 +62,11 @@ public final class MavenRunner {
    * Executes the given {@link MavenBuild} using the current {@link IMavenRunnerSpi} strategy.
    *
    * @param build
-   *          The {@link MavenBuild} to execute.
+   *          The {@link MavenBuild} to execute. Must not be {@code null}.
+   * @throws IllegalArgumentException
+   *           if the {@link MavenBuild} specified is {@code null} or no {@link IMavenRunnerSpi} has been set.
    */
   public static void execute(MavenBuild build) {
-    IMavenRunnerSpi runner = get();
-    if (runner == null) {
-      throw new IllegalStateException("no maven runner set");
-    }
-    runner.execute(build);
+    Ensure.notNull(get(), "no maven runner set").execute(Ensure.notNull(build));
   }
 }
