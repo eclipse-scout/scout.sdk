@@ -105,7 +105,14 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.filebuffers:3.6.500" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.scout.sdk.deps:org.eclipse.m2e.core.ui:1.10.0.20181127-2120" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.scout.sdk.deps:org.eclipse.m2e.core:1.10.0.20181127-2120" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:guava:21.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:guava:27.1-jre" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:failureaccess:1.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.checkerframework:checker-qual:2.5.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.errorprone:error_prone_annotations:2.2.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.j2objc:j2objc-annotations:1.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.17" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.scout.sdk.deps:org.eclipse.m2e.archetype.common:1.10.0.20181127-2120" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.26" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.110.0" level="project" />
