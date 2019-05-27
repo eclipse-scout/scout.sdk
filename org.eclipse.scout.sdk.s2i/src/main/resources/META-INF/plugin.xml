@@ -15,7 +15,7 @@
     </change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="191.0"/>
+    <idea-version since-build="191.5109.14"/>
 
     <application-components>
         <component>
@@ -24,7 +24,7 @@
         </component>
     </application-components>
 
-    <depends optional="true">org.jetbrains.idea.maven</depends>
+    <depends>org.jetbrains.idea.maven</depends>
 
     <project-components>
         <component>
@@ -33,8 +33,7 @@
             </implementation-class>
         </component>
         <component>
-            <interface-class>org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi
-            </interface-class>
+            <interface-class>org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi</interface-class>
             <implementation-class>org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator</implementation-class>
         </component>
         <component>
@@ -46,6 +45,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                              instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
+        <macro implementation="org.eclipse.scout.sdk.s2i.IdeaHomePathMacro"/>
     </extensions>
 
     <actions>
