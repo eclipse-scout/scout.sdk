@@ -49,8 +49,6 @@
     <module>../org.eclipse.scout.sdk.s2e.doc</module>
     <module>../org.eclipse.scout.sdk.s2e.ui</module>
 
-    <module>../org.eclipse.scout.sdk.s2i</module>
-
     <module>../org.eclipse.scout.sdk-settings</module>
   </modules>
 
