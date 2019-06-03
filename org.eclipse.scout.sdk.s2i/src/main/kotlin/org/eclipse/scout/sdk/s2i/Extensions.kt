@@ -101,7 +101,7 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, in
             .toList()
 }
 
-fun Project.findTypesByName(fqn: String) = findTypesByName(fqn, GlobalSearchScope.projectScope(this))
+fun Project.findTypesByName(fqn: String) = findTypesByName(fqn, GlobalSearchScope.allScope(this))
 
 fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
         IdeaEnvironment.computeInReadAction(this) {

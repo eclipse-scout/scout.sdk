@@ -7,6 +7,7 @@ import org.eclipse.scout.sdk.core.model.ecj.ClasspathEntry
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcj
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi
 import org.eclipse.scout.sdk.core.util.SdkException
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
@@ -18,7 +19,16 @@ open class JavaEnvironmentWithIdea(val module: Module) : JavaEnvironmentWithEcj(
         protected fun javaHomeOf(module: Module): Path {
             val moduleRootManager = ModuleRootManager.getInstance(module)
             val sdkPath = moduleRootManager.sdk?.homePath ?: throw SdkException("Cannot find JRE in module '{}'.", module.name)
-            return Paths.get(sdkPath).resolve("jre")
+            val sdkRoot = Paths.get(sdkPath)
+            val jreSubFolder = sdkRoot.resolve("jre")
+            if(Files.isDirectory(jreSubFolder) && Files.isReadable(jreSubFolder)) {
+                return jreSubFolder
+            }
+            val jre64SubFolder = sdkRoot.resolve("jre64")
+            if(Files.isDirectory(jre64SubFolder) && Files.isReadable(jre64SubFolder)) {
+                return jre64SubFolder
+            }
+            return sdkRoot
         }
 
         protected fun classpathOf(module: Module): Collection<ClasspathEntry> {

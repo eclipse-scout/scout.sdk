@@ -9,6 +9,7 @@ import java.awt.*;
 
 public class ScoutSettingsForm {
   private JCheckBox autoUpdateDerivedResources;
+  private JCheckBox autoCreateClassIdAnnotations;
   private JComboBox cboLogLevel;
   private JLabel lblLogLevel;
   private JPanel rootPanel;
@@ -19,6 +20,10 @@ public class ScoutSettingsForm {
 
   public JComboBox getLogLevel() {
     return cboLogLevel;
+  }
+
+  public JCheckBox getAutoCreateClassIdAnnotations() {
+    return autoCreateClassIdAnnotations;
   }
 
   {
@@ -45,6 +50,11 @@ public class ScoutSettingsForm {
     autoUpdateDerivedResources.setText("Automatically update generated classes");
     autoUpdateDerivedResources.putClientProperty("html.disable", Boolean.TRUE);
     rootPanel.add(autoUpdateDerivedResources, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(264, 24), null, 0, false));
+    autoCreateClassIdAnnotations = new JCheckBox();
+    autoCreateClassIdAnnotations.setSelected(true);
+    autoCreateClassIdAnnotations.setText("Automatically update generated classes");
+    autoCreateClassIdAnnotations.putClientProperty("html.disable", Boolean.TRUE);
+    rootPanel.add(autoCreateClassIdAnnotations, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(264, 24), null, 0, false));
     final Spacer spacer1 = new Spacer();
     rootPanel.add(spacer1, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     lblLogLevel = new JLabel();

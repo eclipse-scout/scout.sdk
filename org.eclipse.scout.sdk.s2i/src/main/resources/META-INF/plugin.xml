@@ -40,12 +40,22 @@
             <interface-class>org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi</interface-class>
             <implementation-class>org.eclipse.scout.sdk.s2i.IdeaMavenRunner</implementation-class>
         </component>
+        <component>
+            <implementation-class>org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdAnnotationComponent</implementation-class>
+        </component>
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                              instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
         <macro implementation="org.eclipse.scout.sdk.s2i.IdeaHomePathMacro"/>
+        <localInspection language="JAVA"
+                         shortName="missingClassIdInspection"
+                         displayName="Missing @ClassId Annotation"
+                         groupName="Scout"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="org.eclipse.scout.sdk.s2i.classid.MissingClassIdInspection"/>
     </extensions>
 
     <actions>
