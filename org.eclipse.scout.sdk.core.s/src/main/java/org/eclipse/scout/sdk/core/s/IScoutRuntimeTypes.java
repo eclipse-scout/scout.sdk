@@ -188,7 +188,8 @@ public interface IScoutRuntimeTypes {
   String IViewButton = "org.eclipse.scout.rt.client.ui.action.view.IViewButton";
   String IWizard = "org.eclipse.scout.rt.client.ui.wizard.IWizard";
   String IWizardStep = "org.eclipse.scout.rt.client.ui.wizard.IWizardStep";
-  String IDataObject = "org.eclipse.scout.rt.platform.dataobject.IDataObject";
+  String IDataObject = "org.eclipse.scout.rt.dataobject.IDataObject";
+  String IPrettyPrintDataObjectMapper = "org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper";
   String IUuId = "org.eclipse.scout.rt.dataobject.id.IUuId";
 
   // other runtime classes

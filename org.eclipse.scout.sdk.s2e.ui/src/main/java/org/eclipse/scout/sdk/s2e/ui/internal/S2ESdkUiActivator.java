@@ -106,7 +106,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   }
 
   private void registerDetailFormatters() {
-    String src = "return " + IScoutRuntimeTypes.BEANS + ".get(org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper.class).writeValue(this);";
+    String src = "return " + IScoutRuntimeTypes.BEANS + ".get(" + IScoutRuntimeTypes.IPrettyPrintDataObjectMapper + ".class).writeValue(this);";
     m_iDataObjectDetailFormatter = new DetailFormatter(IScoutRuntimeTypes.IDataObject, src, true);
     JavaDetailFormattersManager.getDefault().setAssociatedDetailFormatter(m_iDataObjectDetailFormatter);
   }
