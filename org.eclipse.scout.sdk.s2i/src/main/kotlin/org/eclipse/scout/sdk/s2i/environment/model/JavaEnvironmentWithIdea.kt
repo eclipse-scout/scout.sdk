@@ -7,6 +7,7 @@ import org.eclipse.scout.sdk.core.model.ecj.ClasspathEntry
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcj
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi
 import org.eclipse.scout.sdk.core.util.SdkException
+import org.eclipse.scout.sdk.s2i.toNioPath
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -18,14 +19,15 @@ open class JavaEnvironmentWithIdea(val module: Module) : JavaEnvironmentWithEcj(
     companion object Factory {
         protected fun javaHomeOf(module: Module): Path {
             val moduleRootManager = ModuleRootManager.getInstance(module)
-            val sdkPath = moduleRootManager.sdk?.homePath ?: throw SdkException("Cannot find JRE in module '{}'.", module.name)
+            val sdkPath = moduleRootManager.sdk?.homePath
+                    ?: throw SdkException("Cannot find JRE in module '{}'.", module.name)
             val sdkRoot = Paths.get(sdkPath)
             val jreSubFolder = sdkRoot.resolve("jre")
-            if(Files.isDirectory(jreSubFolder) && Files.isReadable(jreSubFolder)) {
+            if (Files.isDirectory(jreSubFolder) && Files.isReadable(jreSubFolder)) {
                 return jreSubFolder
             }
             val jre64SubFolder = sdkRoot.resolve("jre64")
-            if(Files.isDirectory(jre64SubFolder) && Files.isReadable(jre64SubFolder)) {
+            if (Files.isDirectory(jre64SubFolder) && Files.isReadable(jre64SubFolder)) {
                 return jre64SubFolder
             }
             return sdkRoot
@@ -40,7 +42,7 @@ open class JavaEnvironmentWithIdea(val module: Module) : JavaEnvironmentWithEcj(
         }
 
         protected fun toClasspathEntry(entry: VirtualFile, type: Int): ClasspathEntry? {
-            var absolutePath = Paths.get(entry.path)
+            var absolutePath = entry.toNioPath()
             if (absolutePath.nameCount < 1) {
                 return null
             }

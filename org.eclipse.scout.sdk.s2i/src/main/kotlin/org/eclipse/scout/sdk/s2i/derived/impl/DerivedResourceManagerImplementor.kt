@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.GlobalSearchScope.fileScope
+import com.intellij.psi.search.SearchScope
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.messages.MessageBusConnection
 import org.eclipse.scout.sdk.core.log.SdkLog
@@ -31,7 +32,7 @@ import java.util.function.BiFunction
 open class DerivedResourceManagerImplementor(private val project: Project) : ProjectComponent, DerivedResourceManager, SettingsChangedListener {
 
     private val m_updateHandlerFactories = ArrayList<DerivedResourceHandlerFactory>()
-    private val m_eventBuffer = ArrayList<GlobalSearchScope>()
+    private val m_eventBuffer = ArrayList<SearchScope>()
     private val m_pendingFutures = ConcurrentLinkedQueue<ScheduledFuture<*>>()
     private val m_executorService = AppExecutorUtil.getAppScheduledExecutorService()
 
@@ -79,7 +80,7 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
 
     override fun isAutoUpdateDerivedResources(): Boolean = ScoutSettings.isAutoUpdateDerivedResources(project)
 
-    override fun trigger(scope: GlobalSearchScope) {
+    override fun trigger(scope: SearchScope) {
         SdkLog.debug("Derived resource update event for scope $scope")
         cancelPendingFutures() // already scheduled but not started futures are no longer necessary because a new one is scheduled that will handle all scopes in the buffer
         registerEvent(scope)
@@ -94,18 +95,23 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
         }
     }
 
-    private fun registerEvent(scope: GlobalSearchScope) = synchronized(m_eventBuffer) {
+    private fun registerEvent(scope: SearchScope) = synchronized(m_eventBuffer) {
         m_eventBuffer.add(scope)
     }
 
-    private fun consumeAllBufferedEvents(): GlobalSearchScope = synchronized(m_eventBuffer) {
+    private fun consumeAllBufferedEvents(): SearchScope = synchronized(m_eventBuffer) {
         if (m_eventBuffer.isEmpty()) {
             return GlobalSearchScope.EMPTY_SCOPE
         }
-        val unionScope = GlobalSearchScope.union(m_eventBuffer)
+
+        var union = GlobalSearchScope.EMPTY_SCOPE
+        for (scope in m_eventBuffer) {
+            union = union.union(scope)
+        }
+
         m_eventBuffer.clear()
         m_pendingFutures.clear() // there is no more work. also ensures that the current future is removed
-        return unionScope
+        return union
     }
 
     private fun scheduleHandlerCreation() {

@@ -1,10 +1,10 @@
 package org.eclipse.scout.sdk.s2i.derived
 
-import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.SearchScope
 
 interface DerivedResourceManager {
 
-    fun trigger(scope: GlobalSearchScope)
+    fun trigger(scope: SearchScope)
 
     fun addDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory)
 

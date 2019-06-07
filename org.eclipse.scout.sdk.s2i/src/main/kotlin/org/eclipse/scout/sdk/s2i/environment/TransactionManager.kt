@@ -22,11 +22,11 @@ class TransactionManager private constructor(val project: Project) {
          * Executes a task within a [TransactionManager] and commits all members on successful completion of the transaction.
          *
          * Successful completion means the given progress monitor is not cancelled and no exception is thrown from the [runnable].
-         * @param runnable The runnable to execute
          * @param project The [Project] for which the transaction should be started
          * @param progressProvider A provider for a progress indicator to use when committing the transaction. This provider is also used to determine if the task has been cancelled. Only if not cancelled the transaction will be committed.
+         * @param runnable The runnable to execute
          */
-        fun runInTransaction(project: Project, progressProvider: () -> IdeaProgress, runnable: () -> Unit) {
+        fun runInTransaction(project: Project, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, runnable: () -> Unit) {
             var save = false
             val transactionManager = TransactionManager(project)
             try {

@@ -28,7 +28,7 @@ open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
         SdkConsole.setConsoleSpi(this)
         ScoutSettings.addListener(this)
 
-        if(!ScoutSettings.isLogLevelConfigured() && isRunningInSandbox()) {
+        if (!ScoutSettings.isLogLevelConfigured() && isRunningInSandbox()) {
             // default log level for dev mode
             ScoutSettings.logLevel(LEVEL_INFO)
         }

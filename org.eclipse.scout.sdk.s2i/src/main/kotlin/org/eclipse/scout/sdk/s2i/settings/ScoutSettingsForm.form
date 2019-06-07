@@ -9,7 +9,7 @@
     <clientProperties>
       <html.disable class="java.lang.Boolean" value="true"/>
     </clientProperties>
-    <border type="none" title-resource-bundle="translations" title-key="scout.sdk.settings.title"/>
+    <border type="none" title-resource-bundle="messages/EclipseScoutBundle" title-key="scout.sdk.settings.title"/>
     <children>
       <component id="31ecb" class="javax.swing.JCheckBox" binding="autoCreateClassIdAnnotations">
         <constraints>
@@ -18,9 +18,9 @@
           </grid>
         </constraints>
         <properties>
-          <actionCommand resource-bundle="translations" key="automatically.create.classid.annotation"/>
+          <actionCommand resource-bundle="messages/EclipseScoutBundle" key="automatically.create.classid.annotation"/>
           <selected value="true"/>
-          <text resource-bundle="translations" key="automatically.create.classid.annotation"/>
+          <text resource-bundle="messages/EclipseScoutBundle" key="automatically.create.classid.annotation"/>
         </properties>
         <clientProperties>
           <html.disable class="java.lang.Boolean" value="true"/>
@@ -39,7 +39,7 @@
         </constraints>
         <properties>
           <labelFor value="a0876"/>
-          <text resource-bundle="translations" key="log.level"/>
+          <text resource-bundle="messages/EclipseScoutBundle" key="log.level"/>
         </properties>
         <clientProperties>
           <html.disable class="java.lang.Boolean" value="true"/>
@@ -68,9 +68,9 @@
           </grid>
         </constraints>
         <properties>
-          <actionCommand resource-bundle="translations" key="automatically.update.generated.classes"/>
+          <actionCommand resource-bundle="messages/EclipseScoutBundle" key="automatically.update.generated.classes"/>
           <selected value="true"/>
-          <text resource-bundle="translations" key="automatically.update.generated.classes"/>
+          <text resource-bundle="messages/EclipseScoutBundle" key="automatically.update.generated.classes"/>
         </properties>
         <clientProperties>
           <html.disable class="java.lang.Boolean" value="true"/>

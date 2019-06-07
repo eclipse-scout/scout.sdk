@@ -3,39 +3,40 @@ package org.eclipse.scout.sdk.s2i.classid
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.LanguageAnnotationSupport
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
+import com.intellij.psi.*
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.JavaTypes
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
+import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager
+import org.eclipse.scout.sdk.s2i.environment.TransactionMember
+import org.eclipse.scout.sdk.s2i.toNioPath
+import java.nio.file.Path
 
 
 open class AddMissingClassIdQuickFix : LocalQuickFix {
 
-    val quickFixName = "Add missing @ClassId Annotation"
+    val quickFixName = EclipseScoutBundle.message("add.missing.classid.annotation")
 
     override fun getFamilyName(): String = quickFixName
 
-    override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+    override fun applyFix(project: Project, descriptor: ProblemDescriptor) = TransactionManager.runInTransaction(project) {
         val psiClass = PsiTreeUtil.getParentOfType(descriptor.psiElement, PsiClass::class.java)
-                ?: throw Ensure.newFail("No class found to add @ClassId annotation. Element: '{}'.", descriptor.psiElement)
-
+                ?: throw Ensure.newFail("No class found to add @ClassId. Element: '{}'.", descriptor.psiElement)
         val psiElementFactory = JavaPsiFacade.getElementFactory(project)
         val javaAnnotationSupport = LanguageAnnotationSupport.INSTANCE.forLanguage(psiClass.language)
-        val javaCodeStyleManager = JavaCodeStyleManager.getInstance(project)
-
-        val classIdAnnotation = psiElementFactory.createAnnotationFromText("@" + IScoutRuntimeTypes.ClassId, psiClass)
         val classIdValue = ClassIds.next(psiClass.qualifiedName)
-        val value = javaAnnotationSupport.createLiteralValue(classIdValue, psiClass)
-        classIdAnnotation.setDeclaredAttributeValue("value", value)
-        javaCodeStyleManager.shortenClassReferences(classIdAnnotation)
+        val psiLiteral = javaAnnotationSupport.createLiteralValue(classIdValue, psiClass)
+        val anchor = findAnchor(psiClass, classIdValue)
+        val targetFile = psiClass.containingFile.virtualFile.toNioPath()
+        val classIdAnnotation = psiElementFactory.createAnnotationFromText("@" + IScoutRuntimeTypes.ClassId, psiClass)
+        classIdAnnotation.setDeclaredAttributeValue(ClassIdAnnotation.VALUE_ATTRIBUTE_NAME, psiLiteral)
 
-        psiClass.modifierList?.addAfter(classIdAnnotation, findAnchor(psiClass, classIdValue))
+        TransactionManager.current().register(CreateClassIdAnnotation(psiClass, classIdAnnotation, anchor, targetFile))
     }
 
     protected fun findAnchor(psiClass: PsiClass, classIdValue: String): PsiElement? {
@@ -47,5 +48,18 @@ open class AddMissingClassIdQuickFix : LocalQuickFix {
             }
         }
         return null
+    }
+
+    companion object {
+        private class CreateClassIdAnnotation(val targetClass: PsiClass, val annotationToAdd: PsiAnnotation, val anchor: PsiElement?, val targetFile: Path) : TransactionMember {
+
+            override fun file() = targetFile
+
+            override fun commit(progress: IdeaProgress): Boolean {
+                targetClass.modifierList?.addAfter(annotationToAdd, anchor)
+                JavaCodeStyleManager.getInstance(targetClass.project).shortenClassReferences(annotationToAdd)
+                return true
+            }
+        }
     }
 }

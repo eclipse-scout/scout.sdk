@@ -5,19 +5,22 @@ import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiTypeParameter
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.s2i.findTypesByName
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
+import org.eclipse.scout.sdk.s2i.isInstanceOf
 import org.eclipse.scout.sdk.s2i.resolveSourceRoot
 
 
 open class MissingClassIdInspection : AbstractBaseJavaLocalInspectionTool() {
 
     private val m_addMissingClassIdQuickFix = AddMissingClassIdQuickFix()
-    private val m_template = "Missing @ClassId Annotation"
+    private val m_template = EclipseScoutBundle.message("missing.classid.annotation")
 
     override fun checkClass(aClass: PsiClass, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
-        if (aClass.hasAnnotation(IScoutRuntimeTypes.ClassId)) {
+        val hasClassIdValue = ClassIdAnnotation.of(aClass)?.hasValue() ?: false
+        if (hasClassIdValue) {
             return ProblemDescriptor.EMPTY_ARRAY
         }
 
@@ -34,15 +37,13 @@ open class MissingClassIdInspection : AbstractBaseJavaLocalInspectionTool() {
     protected fun isInSourceRoot(aClass: PsiClass): Boolean =
             aClass.resolveSourceRoot() != null
 
-    protected fun supportsClassId(aClass: PsiClass): Boolean {
-        if (!aClass.isValid || Strings.isBlank(aClass.name)) {
+    protected fun supportsClassId(candidate: PsiClass): Boolean {
+        if (!candidate.isValid || !candidate.isPhysical || candidate.isAnnotationType || candidate.isEnum || candidate.isInterface
+                || Strings.isBlank(candidate.name) || candidate is PsiTypeParameter) {
             return false
         }
-
-        val iTypeWithClassId = aClass.project
-                .findTypesByName(IScoutRuntimeTypes.ITypeWithClassId)
-                .firstOrNull()
-                ?: return false
-        return aClass.isInheritor(iTypeWithClassId, true)
+        return candidate.isInstanceOf(IScoutRuntimeTypes.ITypeWithClassId)
     }
+
+    override fun getDisplayName(): String = EclipseScoutBundle.message("missing.classid.annotation")
 }

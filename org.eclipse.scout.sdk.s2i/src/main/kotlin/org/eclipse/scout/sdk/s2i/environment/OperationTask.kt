@@ -4,14 +4,16 @@ import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.EventListenerList
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.runInTransaction
 import org.eclipse.scout.sdk.s2i.toScoutProgress
+import java.util.concurrent.TimeUnit
 
-open class OperationTask(private val task: (IdeaProgress) -> Unit, title: String, project: Project) : Task.Backgroundable(project, title, true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+open class OperationTask(title: String, project: Project, private val task: (IdeaProgress) -> Unit) : Task.Backgroundable(project, title, true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
 
     private val m_progress = FinalValue<ProgressIndicator>()
     private val m_listeners = EventListenerList()
@@ -23,18 +25,24 @@ open class OperationTask(private val task: (IdeaProgress) -> Unit, title: String
         val workForCommit = 10
         val workForTask = 1000
         scoutProgress.init(CoreUtils.toStringIfOverwritten(task).orElse(null), workForTask + workForCommit)
-        runInTransaction(project, { scoutProgress.newChild(workForCommit) }) { task.invoke(scoutProgress.newChild(workForTask)) }
+        runInTransaction(project, { scoutProgress.newChild(workForCommit) }) {
+            task.invoke(scoutProgress.newChild(workForTask))
+        }
     }
 
     fun cancel(): Boolean = m_progress.opt()
             .map { it.cancel(); true; }
             .orElse(false)
 
-    fun schedule(): IFuture<Void> = schedule(null)
-
-    fun <T> schedule(resultSupplier: (() -> T)?): IFuture<T> {
+    fun <T> schedule(resultSupplier: (() -> T)? = null, delay: Long = 0, unit: TimeUnit = TimeUnit.MILLISECONDS): IFuture<T> {
         val result = TaskFuture(this, resultSupplier)
-        queue()
+        if (delay == 0L) {
+            queue()
+        } else {
+            AppExecutorUtil.getAppScheduledExecutorService().schedule({
+                queue()
+            }, delay, unit)
+        }
         return result
     }
 

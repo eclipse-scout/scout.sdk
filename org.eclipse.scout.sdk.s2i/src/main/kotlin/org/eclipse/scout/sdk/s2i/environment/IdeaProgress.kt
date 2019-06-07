@@ -32,6 +32,10 @@ open class IdeaProgress(ind: ProgressIndicator?) : IProgress {
     }
 
     override fun newChild(work: Int): IdeaProgress {
+        // in case there was a child already created before: its tick have already been applied to this parent.
+        // but it is only passed to the underlying indicator on the creation of the next child. it is assumed that the first child has finished
+        indicator.fraction = m_percentDone
+
         val child = IdeaProgress(indicator)
         child.m_percentToConsume = m_step * work
         child.m_percentDone = m_percentDone

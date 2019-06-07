@@ -27,24 +27,24 @@ import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import org.eclipse.scout.sdk.s2i.isJavaModule
 import org.eclipse.scout.sdk.s2i.toIdea
+import org.eclipse.scout.sdk.s2i.toNioPath
 import org.jetbrains.annotations.NotNull
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.*
 
 
-open class IdeaEnvironment(val project: Project) : IEnvironment, AutoCloseable {
+open class IdeaEnvironment private constructor(val project: Project) : IEnvironment, AutoCloseable {
 
     companion object Factory {
         fun <T> callInIdeaEnvironment(task: (IdeaEnvironment, IdeaProgress) -> T, project: Project, @NotNull title: String): IFuture<T> {
             val result = FinalValue<T>()
             val name = Strings.notBlank(title).orElseGet { CoreUtils.toStringIfOverwritten(task).orElse("Unnamed Task: $task") }
-            val job = OperationTask({ p ->
+            val job = OperationTask(name, project) { p ->
                 IdeaEnvironment(project).use {
                     result.setIfAbsent(task.invoke(it, p))
                 }
-            }, name, project)
-            return job.schedule { result.get() }
+            }
+            return job.schedule({ result.get() })
         }
 
         fun <T> computeInReadAction(project: Project, callable: () -> T): T =
@@ -81,13 +81,11 @@ open class IdeaEnvironment(val project: Project) : IEnvironment, AutoCloseable {
                     ?.let { toScoutJavaEnvironment(it) }
                     ?.let { findClasspathEntry(classpathRoot, it) }
 
-    protected fun findClasspathEntry(file: VirtualFile, env: IJavaEnvironment): IClasspathEntry? {
-        val path = Paths.get(file.path)
-        return env.sourceFolders()
-                .filter { it.path().startsWith(path) }
-                .findAny()
-                .orElse(null)
-    }
+    protected fun findClasspathEntry(file: VirtualFile, env: IJavaEnvironment): IClasspathEntry? =
+            env.sourceFolders()
+                    .filter { it.path().startsWith(file.toNioPath()) }
+                    .findAny()
+                    .orElse(null)
 
     protected fun getOrCreateEnv(module: Module): JavaEnvironmentWithIdea = m_envs.computeIfAbsent(module.name) { createNewJavaEnvironmentFor(module) }
 

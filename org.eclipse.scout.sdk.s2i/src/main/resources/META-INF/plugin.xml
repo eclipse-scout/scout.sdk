@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>org.eclipse.scout.sdk.s2i</id>
     <name>Eclipse Scout</name>
-    <version>10.0.0.1905291216</version>
+    <version>10.0.0.1906071435</version>
 
     <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
 
@@ -10,7 +10,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      Initial version providing derived resource update for FormData & PageData
+      Initial version providing:
+        - Derived resource update for FormData & PageData
+        - @ClassId validation Inspections
     ]]>
     </change-notes>
 
@@ -33,7 +35,8 @@
             </implementation-class>
         </component>
         <component>
-            <interface-class>org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi</interface-class>
+            <interface-class>org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi
+            </interface-class>
             <implementation-class>org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator</implementation-class>
         </component>
         <component>
@@ -41,7 +44,11 @@
             <implementation-class>org.eclipse.scout.sdk.s2i.IdeaMavenRunner</implementation-class>
         </component>
         <component>
-            <implementation-class>org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdAnnotationComponent</implementation-class>
+            <implementation-class>org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdAnnotationComponent
+            </implementation-class>
+        </component>
+        <component>
+            <implementation-class>org.eclipse.scout.sdk.s2i.EclipseScoutBundle</implementation-class>
         </component>
     </project-components>
 
@@ -49,21 +56,27 @@
         <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                              instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
         <macro implementation="org.eclipse.scout.sdk.s2i.IdeaHomePathMacro"/>
+        <!--suppress InspectionMappingConsistency -->
         <localInspection language="JAVA"
-                         shortName="missingClassIdInspection"
-                         displayName="Missing @ClassId Annotation"
+                         shortName="MissingClassId"
                          groupName="Scout"
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="org.eclipse.scout.sdk.s2i.classid.MissingClassIdInspection"/>
+        <!--suppress InspectionMappingConsistency -->
+        <globalInspection language="JAVA"
+                          shortName="DuplicateClassId"
+                          groupName="Scout"
+                          enabledByDefault="false"
+                          level="ERROR"
+                          implementationClass="org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection"/>
     </extensions>
 
     <actions>
         <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" text="Scout">
             <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"/>
             <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu"
-                    class="org.eclipse.scout.sdk.s2i.derived.impl.UpdateAllDerivedResourcesMenu"
-                    text="Update all derived resources..." description="Updates all derived resources in the Project."/>
+                    class="org.eclipse.scout.sdk.s2i.derived.impl.UpdateAllDerivedResourcesMenu"/>
         </group>
     </actions>
 

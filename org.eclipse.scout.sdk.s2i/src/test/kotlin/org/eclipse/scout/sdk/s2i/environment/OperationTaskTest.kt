@@ -12,8 +12,8 @@ class OperationTaskTest : LightPlatformCodeInsightFixtureTestCase() {
 
     fun testOperationWithException() {
         val ex = NullPointerException()
-        val t = OperationTask({ throw ex }, "Test with Exception", project)
-        val f = t.schedule()
+        val t = OperationTask("Test with Exception", project) { throw ex }
+        val f = t.schedule<Any>()
 
         assertThrows<NullPointerException>(ex.javaClass) { f.result() }
         assertFalse(f.isCancelled)
@@ -23,8 +23,7 @@ class OperationTaskTest : LightPlatformCodeInsightFixtureTestCase() {
         try {
             f.awaitDoneThrowingOnErrorOrCancel()
             Assert.fail()
-        }
-        catch(e: NullPointerException) {
+        } catch (e: NullPointerException) {
             assertSame(ex, e)
         }
     }
@@ -35,7 +34,7 @@ class OperationTaskTest : LightPlatformCodeInsightFixtureTestCase() {
         val taskStarted = CountDownLatch(1)
         val cancelPerformed = CountDownLatch(1)
 
-        val t = OperationTask({
+        val t = OperationTask("Cancel Test", project) {
             it.init("test", 2)
             first.set(true)
             taskStarted.countDown()
@@ -43,12 +42,12 @@ class OperationTaskTest : LightPlatformCodeInsightFixtureTestCase() {
 
             it.worked(1)
             second.set(true)
-        }, "Cancel Test", project)
+        }
 
         val canceler = CancelThread(taskStarted, cancelPerformed, t)
         canceler.start()
 
-        val f = t.schedule()
+        val f = t.schedule<Any>()
 
         assertTrue(first.get())
         assertFalse(second.isSet)
@@ -58,15 +57,14 @@ class OperationTaskTest : LightPlatformCodeInsightFixtureTestCase() {
         try {
             f.awaitDoneThrowingOnErrorOrCancel()
             Assert.fail()
-        }
-        catch(e: CancellationException) {
+        } catch (e: CancellationException) {
             assertNotNull(e)
         }
     }
 
     fun testOperationCancelledAfterFinish() {
-        val t = OperationTask({}, "Test", project)
-        t.schedule().awaitDoneThrowingOnErrorOrCancel()
+        val t = OperationTask("Test", project) {}
+        t.schedule<Any>().awaitDoneThrowingOnErrorOrCancel()
         val result = t.cancel()
         assertTrue(result)
     }

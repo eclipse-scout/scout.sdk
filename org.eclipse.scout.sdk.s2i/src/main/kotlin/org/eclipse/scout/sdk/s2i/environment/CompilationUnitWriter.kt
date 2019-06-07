@@ -33,7 +33,7 @@ open class CompilationUnitWriter(val project: Project, val source: CharSequence,
     }
 
     fun schedule(resultSupplier: () -> IType?): IFuture<IType?> {
-        val task = OperationTask(this::doWriteCompilationUnit, "Write $fileName", project)
+        val task = OperationTask("Write $fileName", project, this::doWriteCompilationUnit)
         return task.schedule(resultSupplier)
     }
 

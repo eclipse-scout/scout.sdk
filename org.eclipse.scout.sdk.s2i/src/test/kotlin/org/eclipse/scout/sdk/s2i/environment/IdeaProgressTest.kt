@@ -8,14 +8,18 @@ import org.mockito.Mockito
 
 class IdeaProgressTest : TestCase() {
 
-    fun testProgressWithChild() {
-        val delta = 0.0000001
+    private fun runWithIndicatorMock(test: (percent: Ref<Double>, progress: IdeaProgress) -> Unit) {
         val percent = Ref.create<Double>()
         val indicator = Mockito.mock(ProgressIndicator::class.java)
         Mockito.`when`(indicator.setFraction(ArgumentMatchers.anyDouble())).thenAnswer { inv ->
             percent.set(inv.getArgument(0))
         }
         val progress = IdeaProgress(indicator)
+        test.invoke(percent, progress)
+    }
+
+    fun testProgressWithChild() = runWithIndicatorMock { percent, progress ->
+        val delta = 0.0000001
 
         progress.init("MyProgress", 10)
         assertEquals(0.0, percent.get(), delta)
@@ -43,5 +47,16 @@ class IdeaProgressTest : TestCase() {
 
         progress.setWorkRemaining(1)
         assertEquals(0.9, percent.get(), delta)
+    }
+
+    fun testNewChildEnhancesProgress() = runWithIndicatorMock { percent, progress ->
+        val delta = 0.0000001
+        progress.init("test", 10)
+        progress.newChild(2)
+        assertEquals(0.0, percent.get(), delta)
+        progress.newChild(3)
+        assertEquals(0.2, percent.get(), delta)
+        progress.newChild(1)
+        assertEquals(0.5, percent.get(), delta)
     }
 }

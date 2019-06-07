@@ -22,13 +22,20 @@ import com.intellij.structuralsearch.Matcher
 import com.intellij.structuralsearch.plugin.util.CollectingMatchResultSink
 import com.intellij.util.CollectionQuery
 import com.intellij.util.Query
+import com.intellij.util.containers.stream
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
+import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.function.Function
 
 fun IType.resolvePsi(): PsiClass? {
     val module = this.javaEnvironment().toIdea().module
@@ -63,7 +70,7 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope): L
 
 fun PsiClass.newSubTypeHierarchy(scope: SearchScope, checkDeep: Boolean, includeAnonymous: Boolean, includeRoot: Boolean): Query<PsiClass> {
     val children = ClassInheritorsSearch.search(this, scope, checkDeep, true, includeAnonymous)
-    if(!includeRoot) {
+    if (!includeRoot) {
         return children
     }
 
@@ -76,7 +83,7 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, in
     val options = MatchOptions()
     options.fileType = StdFileTypes.JAVA
     options.isCaseSensitiveMatch = true
-    options.isRecursiveSearch = false
+    options.isRecursiveSearch = true
     options.scope = scope
     options.searchPattern = "@$annotation( )\nclass \$Class\$ {}"
 
@@ -108,4 +115,19 @@ fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
             JavaPsiFacade.getInstance(this)
                     .findClasses(fqn, scope)
                     .toSet()
+        }
+
+fun VirtualFile.toNioPath(): Path = Paths.get(path)
+
+fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResult =
+        TreeTraversals.create(visitor, Function { f -> f.supers.stream() }).traverse(this)
+
+fun PsiClass.isInstanceOf(vararg parentFqn: String): Boolean =
+        IdeaEnvironment.computeInReadAction(project) {
+            visitSupers(IBreadthFirstVisitor { element, _, _ ->
+                if (parentFqn.contains(element.qualifiedName))
+                    TreeVisitResult.TERMINATE
+                else
+                    TreeVisitResult.CONTINUE
+            }) == TreeVisitResult.TERMINATE
         }
