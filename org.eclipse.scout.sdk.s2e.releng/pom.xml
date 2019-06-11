@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>9.0.0-SNAPSHOT</version>
+    <version>9.0.0.017_Simrel_2019_06</version>
     <relativePath>../org.eclipse.scout.sdk/pom.xml</relativePath>
   </parent>
 
