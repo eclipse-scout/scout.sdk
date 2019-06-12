@@ -6,6 +6,7 @@ import com.intellij.codeInspection.*
 import com.intellij.codeInspection.actions.RunInspectionIntention
 import com.intellij.codeInspection.ex.GlobalInspectionContextUtil
 import com.intellij.codeInspection.ex.InspectionManagerEx
+import com.intellij.ide.PowerSaveMode
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.profile.codeInspection.InspectionProjectProfileManager
@@ -97,6 +98,10 @@ open class DuplicateClassIdInspection : GlobalInspectionTool() {
 
         fun scheduleIfEnabled(project: Project, delay: Long, unit: TimeUnit): ScheduledFuture<*> = AppExecutorUtil.getAppScheduledExecutorService().schedule({
             try {
+                if (PowerSaveMode.isEnabled()) {
+                    SdkLog.info("Duplicate @ClassId validation skipped because the power save mode is activated.")
+                    return@schedule
+                }
                 if (!isEnabledFor(project)) {
                     SdkLog.info("Duplicate @ClassId validation skipped because the Inspection is disabled for the project.")
                     return@schedule
