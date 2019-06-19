@@ -67,6 +67,12 @@
     <dependency>
       <groupId>io.takari.aether</groupId>
       <artifactId>aether-connector-okhttp</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.aether</groupId>
+          <artifactId>aether-util</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
