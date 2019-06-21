@@ -15,28 +15,37 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
 
     companion object Current {
 
-        const val autoUpdateDerivedResourcesKey = "org.eclipse.scout.sdk.s2i.autoUpdateDerivedResources"
-        const val autoCreateClassIdAnnotationsKey = "org.eclipse.scout.sdk.s2i.autoCreateClassIdAnnotations"
-        const val logLevelKey = "org.eclipse.scout.sdk.s2i.logLevel"
+        const val KEY_AUTO_UPDATE_DERIVED_RESOURCES = "org.eclipse.scout.sdk.s2i.autoUpdateDerivedResources"
+        const val KEY_AUTO_CREATE_CLASS_ID = "org.eclipse.scout.sdk.s2i.autoCreateClassIdAnnotations"
+        const val KEY_LOG_LEVEL = "org.eclipse.scout.sdk.s2i.logLevel"
+
         private val listeners = EventListenerList()
 
-        fun logLevel(newValue: String) = PropertiesComponent.getInstance().setValue(logLevelKey, newValue)
-
-        fun isLogLevelConfigured() = PropertiesComponent.getInstance().isValueSet(logLevelKey)
-
-        fun logLevel(): String {
-            return PropertiesComponent.getInstance().getValue(logLevelKey, IdeaLogger.LEVEL_WARNING)
+        fun getLogLevel(): IdeaLogger.LogLevel {
+            return IdeaLogger.LogLevel.parse(PropertiesComponent.getInstance().getValue(KEY_LOG_LEVEL))
         }
+
+        fun isLogLevelSet() = PropertiesComponent.getInstance().isValueSet(KEY_LOG_LEVEL)
+
+        fun setLogLevel(newValue: IdeaLogger.LogLevel) = changeProperty(PropertiesComponent.getInstance(), KEY_LOG_LEVEL, getLogLevel().toString(), newValue.toString())
 
         fun isAutoUpdateDerivedResources(project: Project): Boolean {
             val store = PropertiesComponent.getInstance(project)
-            return store.getBoolean(autoUpdateDerivedResourcesKey, true)
+            return store.getBoolean(KEY_AUTO_UPDATE_DERIVED_RESOURCES, true)
         }
+
+        @Suppress("unused")
+        fun setAutoUpdateDerivedResources(project: Project, newValue: Boolean) =
+                changeProperty(PropertiesComponent.getInstance(project), KEY_AUTO_UPDATE_DERIVED_RESOURCES, isAutoUpdateDerivedResources(project).toString(), newValue.toString())
 
         fun isAutoCreateClassIdAnnotations(project: Project): Boolean {
             val store = PropertiesComponent.getInstance(project)
-            return store.getBoolean(autoCreateClassIdAnnotationsKey, false)
+            return store.getBoolean(KEY_AUTO_CREATE_CLASS_ID, false)
         }
+
+        fun setAutoCreateClassIdAnnotations(project: Project, newValue: Boolean) =
+                changeProperty(PropertiesComponent.getInstance(project), KEY_AUTO_CREATE_CLASS_ID, isAutoCreateClassIdAnnotations(project).toString(), newValue.toString())
+
 
         fun addListener(listener: SettingsChangedListener) {
             listeners.add(listener)
@@ -45,12 +54,37 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
         fun removeListener(listener: SettingsChangedListener) {
             listeners.remove(listener)
         }
+
+        private fun changeProperty(scope: PropertiesComponent, key: String, oldValue: String?, newValue: String?): Boolean {
+            if (Objects.equals(oldValue, newValue)) {
+                return false
+            }
+            scope.setValue(key, newValue)
+            notifyListeners(key, oldValue, newValue)
+            return true
+        }
+
+        private fun notifyListeners(key: String, oldValue: String?, newValue: String?) {
+            for (listener in listeners.get(SettingsChangedListener::class.java)) {
+                try {
+                    listener.changed(key, oldValue, newValue)
+                } catch (e: RuntimeException) {
+                    SdkLog.warning("Error in settings listener {}", listener::class.java, e)
+                }
+            }
+        }
     }
 
-    private var m_ui: ScoutSettingsForm? = null
+    private var m_form: ScoutSettingsForm? = null
+
+    private fun isAutoUpdateDerivedResourcesInUi() = m_form?.isAutoUpdateDerivedResources ?: false
+
+    private fun isAutoCreateClassIdAnnotationsInUi() = m_form?.isAutoCreateClassId ?: false
+
+    private fun logLevelInUi() = m_form?.logLevel
 
     override fun isModified(): Boolean {
-        return !Objects.equals(logLevelInUi(), logLevel())
+        return !Objects.equals(logLevelInUi(), getLogLevel())
                 || isAutoUpdateDerivedResourcesInUi() != isAutoUpdateDerivedResources(project)
                 || isAutoCreateClassIdAnnotationsInUi() != isAutoCreateClassIdAnnotations(project)
     }
@@ -64,55 +98,34 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
     }
 
     override fun apply() {
-        changeProperty(PropertiesComponent.getInstance(project), autoUpdateDerivedResourcesKey, isAutoUpdateDerivedResources(project).toString(), isAutoUpdateDerivedResourcesInUi().toString())
-        changeProperty(PropertiesComponent.getInstance(project), autoCreateClassIdAnnotationsKey, isAutoCreateClassIdAnnotations(project).toString(), isAutoCreateClassIdAnnotationsInUi().toString())
-        changeProperty(PropertiesComponent.getInstance(), logLevelKey, logLevel(), logLevelInUi())
-    }
-
-    private fun changeProperty(scope: PropertiesComponent, key: String, oldValue: String?, newValue: String?) {
-        if (Objects.equals(oldValue, newValue)) {
-            return
-        }
-        scope.setValue(key, newValue)
-        notifyListeners(key, oldValue, newValue)
-    }
-
-    private fun notifyListeners(key: String, oldValue: String?, newValue: String?) {
-        for (listener in listeners.get(SettingsChangedListener::class.java)) {
-            try {
-                listener.changed(key, oldValue, newValue)
-            } catch (e: RuntimeException) {
-                SdkLog.warning("Error in settings listener {}", listener::class.java, e)
-            }
-        }
+        val projectSettings = PropertiesComponent.getInstance(project)
+        changeProperty(
+                projectSettings, KEY_AUTO_UPDATE_DERIVED_RESOURCES,
+                isAutoUpdateDerivedResources(project).toString(),
+                isAutoUpdateDerivedResourcesInUi().toString()
+        )
+        changeProperty(
+                projectSettings, KEY_AUTO_CREATE_CLASS_ID,
+                isAutoCreateClassIdAnnotations(project).toString(),
+                isAutoCreateClassIdAnnotationsInUi().toString()
+        )
+        changeProperty(
+                PropertiesComponent.getInstance(), KEY_LOG_LEVEL,
+                getLogLevel().toString(),
+                logLevelInUi().toString()
+        )
     }
 
     override fun reset() {
-        val ui = m_ui ?: return
-        ui.autoUpdateDerivedResources.isSelected = isAutoUpdateDerivedResources(project)
-        ui.autoCreateClassIdAnnotations.isSelected = isAutoCreateClassIdAnnotations(project)
-        ui.logLevel.selectedItem = logLevel()
-    }
-
-    fun isAutoUpdateDerivedResourcesInUi(): Boolean {
-        val ui = m_ui ?: return false
-        return ui.autoUpdateDerivedResources.isSelected
-    }
-
-    fun isAutoCreateClassIdAnnotationsInUi(): Boolean {
-        val ui = m_ui ?: return false
-        return ui.autoCreateClassIdAnnotations.isSelected
-    }
-
-    fun logLevelInUi(): String? {
-        val ui = m_ui ?: return null
-        return ui.logLevel.selectedItem.toString()
+        m_form?.isAutoUpdateDerivedResources = isAutoUpdateDerivedResources(project)
+        m_form?.isAutoCreateClassId = isAutoCreateClassIdAnnotations(project)
+        m_form?.logLevel = getLogLevel()
     }
 
     override fun createComponent(): JComponent? {
-        val ui = ScoutSettingsForm()
-        m_ui = ui
-        return ui.`$$$getRootComponent$$$`()
+        m_form = ScoutSettingsForm()
+        reset()
+        return m_form
     }
 
     override fun disposeUIResources() {
@@ -120,6 +133,6 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
     }
 
     override fun dispose() {
-        m_ui = null
+        m_form = null
     }
 }

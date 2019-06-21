@@ -13,7 +13,7 @@ open class AutoCreateClassIdAnnotationComponent(private val project: Project) : 
     }
 
     override fun changed(key: String, oldVal: String?, newVal: String?) {
-        if (ScoutSettings.autoCreateClassIdAnnotationsKey == key) {
+        if (ScoutSettings.KEY_AUTO_CREATE_CLASS_ID == key) {
             updateClassIdAutoGeneration()
         }
     }

@@ -52,7 +52,7 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
     }
 
     override fun changed(key: String, oldVal: String?, newVal: String?) {
-        if (ScoutSettings.autoUpdateDerivedResourcesKey == key) {
+        if (ScoutSettings.KEY_AUTO_UPDATE_DERIVED_RESOURCES == key) {
             updateSubscription()
         }
     }

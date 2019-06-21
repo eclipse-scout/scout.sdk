@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>org.eclipse.scout.sdk.s2i</id>
     <name>Eclipse Scout</name>
-    <version>10.0.0.1906071435</version>
+    <version>10.0.0</version>
 
     <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
 
@@ -26,6 +26,8 @@
         </component>
     </application-components>
 
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
     <depends>org.jetbrains.idea.maven</depends>
 
     <project-components>

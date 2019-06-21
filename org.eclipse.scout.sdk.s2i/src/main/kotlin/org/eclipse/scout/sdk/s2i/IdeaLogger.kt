@@ -10,6 +10,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
+import java.util.*
 import java.util.logging.Level
 
 open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
@@ -17,20 +18,33 @@ open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
     private val m_balloonLog = NotificationGroup.balloonGroup("Scout SDK")
 
-    companion object {
-        const val LEVEL_ERROR: String = "Error"
-        const val LEVEL_WARNING: String = "Warning"
-        const val LEVEL_INFO: String = "Info"
-        const val LEVEL_DEBUG: String = "Debug"
+    enum class LogLevel(private val text: String) {
+        ERROR("Error"),
+        WARNING("Warning"),
+        INFO("Info"),
+        DEBUG("Debug");
+
+        companion object {
+            fun parse(text: String?): LogLevel {
+                if (text == null) {
+                    return WARNING
+                }
+                return valueOf(text.toUpperCase(Locale.US))
+            }
+        }
+
+        override fun toString(): String {
+            return text
+        }
     }
 
     override fun initComponent() {
         SdkConsole.setConsoleSpi(this)
         ScoutSettings.addListener(this)
 
-        if (!ScoutSettings.isLogLevelConfigured() && isRunningInSandbox()) {
+        if (!ScoutSettings.isLogLevelSet() && isRunningInSandbox()) {
             // default log level for dev mode
-            ScoutSettings.logLevel(LEVEL_INFO)
+            ScoutSettings.setLogLevel(LogLevel.INFO)
         }
 
         refreshLogLevel()
@@ -42,7 +56,7 @@ open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
     }
 
     override fun changed(key: String, oldVal: String?, newVal: String?) {
-        if (ScoutSettings.logLevelKey == key) {
+        if (ScoutSettings.KEY_LOG_LEVEL == key) {
             refreshLogLevel()
         }
     }
@@ -55,16 +69,16 @@ open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
     }
 
     protected fun refreshLogLevel() {
-        SdkLog.setLogLevel(ideaToJulLevel(ScoutSettings.logLevel()))
+        SdkLog.setLogLevel(ideaToJulLevel(ScoutSettings.getLogLevel()))
         m_textLog.setLevel(org.apache.log4j.Level.DEBUG) // so that the level filtering of Scout is active
     }
 
-    protected fun ideaToJulLevel(ideaLevel: String): Level =
+    protected fun ideaToJulLevel(ideaLevel: LogLevel): Level =
             when (ideaLevel) {
-                LEVEL_ERROR -> Level.SEVERE
-                LEVEL_INFO -> Level.INFO
-                LEVEL_DEBUG -> Level.FINE
-                else -> Level.FINE
+                LogLevel.ERROR -> Level.SEVERE
+                LogLevel.INFO -> Level.INFO
+                LogLevel.DEBUG -> Level.FINE
+                else -> Level.WARNING
             }
 
     override fun clear() {

@@ -10,7 +10,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import org.eclipse.scout.sdk.s2i.containingModule
 
 open class DataContextHelper(val context: DataContext) {
 
