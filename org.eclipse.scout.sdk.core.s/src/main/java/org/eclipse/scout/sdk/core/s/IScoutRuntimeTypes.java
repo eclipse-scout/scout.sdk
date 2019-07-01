@@ -167,7 +167,7 @@ public interface IScoutRuntimeTypes {
   String IPlanner = "org.eclipse.scout.rt.client.ui.basic.planner.IPlanner";
   String IPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField";
   String IProposalField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField";
-  String IPrettyPrintDataObjectMapper = "org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper";
+  String IPrettyPrintDataObjectMapper = "org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper";
   String IRadioButtonGroup = "org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup";
   String IRadioButton = "org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton";
   String ISequenceBox = "org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox";

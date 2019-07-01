@@ -10,17 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.testing;
 
-import static java.util.stream.Collectors.toList;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -37,6 +26,17 @@ import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.util.CharSequenceInputStream;
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * <h3>{@link MockFactory}</h3>
@@ -92,6 +92,12 @@ public final class MockFactory {
       when(f.getContents()).thenAnswer(invocation -> new CharSequenceInputStream(icus.get(name), StandardCharsets.UTF_8));
     }
     catch (CoreException e) {
+      throw new SdkException(e);
+    }
+    try {
+      when(icu.getSource()).thenAnswer(invocation -> icus.get(name));
+    }
+    catch(JavaModelException e) {
       throw new SdkException(e);
     }
     try {
