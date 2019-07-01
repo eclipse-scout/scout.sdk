@@ -12,6 +12,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import kotlin.system.exitProcess
 
 const val XML_ATTRIBUTE_ID = "id"
 const val XML_ATTRIBUTE_VERSION = "version"
@@ -34,19 +35,20 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         fun main(args: Array<String>) {
             if (args.size != 2 || args[0].isBlank() || args[1].isBlank()) {
                 printUsage()
-                return
+                exitProcess(1)
             }
 
             val pluginToDeploy = Paths.get(args[0])
             if (!Files.isRegularFile(pluginToDeploy) || !Files.isReadable(pluginToDeploy)) {
                 println("Plugin file '$pluginToDeploy' could not be found.")
-                return
+
+                exitProcess(2)
             }
 
             val repoDir = Paths.get(args[1])
             if (!Files.isDirectory(repoDir)) {
                 println("Repository directory '$repoDir' could not be found.")
-                return
+                exitProcess(3)
             }
 
             EnterprisePluginRepoPublisher(pluginToDeploy, repoDir).publish()
@@ -63,7 +65,7 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         val pluginXml = ZipInputStream(FileInputStream(pluginToDeploy.toFile())).use { findPluginXml(it) }
         if (pluginXml == null) {
             println("No plugin could be found in the zip '$pluginToDeploy'.")
-            return
+            exitProcess(4)
         }
 
         val newZip = repoDir.relativize(copyNewPluginToRepo()).joinToString("/")
