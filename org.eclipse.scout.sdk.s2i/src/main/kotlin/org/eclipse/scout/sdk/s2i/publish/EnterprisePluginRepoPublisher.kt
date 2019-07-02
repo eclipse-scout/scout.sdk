@@ -89,7 +89,7 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         val root = Xml.createDocumentBuilder()
                 .parse(updatePluginsXml.toFile())
                 .documentElement
-        root.ownerDocument.normalize()
+
         val id = pluginXml.id
         var oldUrl: String? = null
         val pluginNode = Xml.evaluateXPath("//plugin[@id='$id']", root).firstOrNull()
@@ -101,12 +101,22 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
 
         // add new entry
         root.appendChild(pluginXml.toPluginElement(root.ownerDocument, pluginToDeploy.fileName.toString()))
-        removeTextChildNodes(root)
+        cleanupXmlDocument(root.ownerDocument)
         writeXmlDocument(root.ownerDocument, updatePluginsXml)
+
         return oldUrl
     }
 
-    fun removeTextChildNodes(root: Element) {
+    fun cleanupXmlDocument(document: Document) {
+        document.normalize()
+        val root = document.documentElement
+        removeTextChildNodes(root)
+        for (i in 0 until root.childNodes.length) {
+            removeTextChildNodes(root.childNodes.item(i))
+        }
+    }
+
+    fun removeTextChildNodes(root: Node) {
         val toRemove = ArrayList<Node>()
 
         for (i in 0 until root.childNodes.length) {
