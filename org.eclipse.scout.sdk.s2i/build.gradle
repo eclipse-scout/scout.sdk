@@ -45,11 +45,11 @@ intellij {
     plugins 'maven'
     updateSinceUntilBuild = false
 }
-
+/*
 patchPluginXml {
     version SCOUT_SDK_PLUGIN_VERSION
 }
-
+*/
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
