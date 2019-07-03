@@ -10,7 +10,7 @@ plugins {
 }
 
 def SCOUT_SDK_VERSION = '10.0.0-SNAPSHOT'
-def SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
+def SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace('-SNAPSHOT', '.' + timestamp())
 
 group 'org.eclipse.scout.sdk.s2i'
 version SCOUT_SDK_VERSION
@@ -25,7 +25,7 @@ repositories {
 static def timestamp() {
     LocalDateTime now = LocalDateTime.now(Clock.systemUTC())
     // returned number must be a valid integer (not too big)
-    return now.format(DateTimeFormatter.ofPattern("yyMMddHHmm"))
+    return now.format(DateTimeFormatter.ofPattern('yyMMddHHmm'))
 }
 
 dependencies {
@@ -52,9 +52,9 @@ patchPluginXml {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = '1.8'
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = '1.8'
 }
