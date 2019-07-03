@@ -41,7 +41,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="IntelliJ IDEA IU-191" jdkType="IDEA JDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.s:10.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.ecj:10.0.0-SNAPSHOT" level="project" />
