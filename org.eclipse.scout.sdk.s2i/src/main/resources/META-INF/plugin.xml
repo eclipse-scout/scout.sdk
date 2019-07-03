@@ -28,6 +28,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
 
     <project-components>
