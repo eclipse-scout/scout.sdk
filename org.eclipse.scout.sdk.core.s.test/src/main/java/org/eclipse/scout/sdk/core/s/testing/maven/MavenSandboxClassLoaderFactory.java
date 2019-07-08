@@ -10,7 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.testing.maven;
 
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.SdkException;
+
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -22,9 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.util.SdkException;
+import java.util.zip.ZipFile;
 
 /**
  * <h3>{@link MavenSandboxClassLoaderFactory}</h3>
@@ -86,6 +90,7 @@ public final class MavenSandboxClassLoaderFactory {
         "org.apache.maven.model.building.ModelBuilder", // maven-model-builder
         "org.apache.maven.building.ProblemCollector", // maven-builder-support
         "com.google.common.base.Predicate", // guava
+        "com.google.common.util.concurrent.internal.InternalFutureFailureAccess", // guava failureaccess
         "org.apache.maven.artifact.ArtifactStatus", // maven-compat
         "org.apache.maven.shared.utils.logging.MessageUtils", // maven-shared-utils
         "org.codehaus.plexus.util.CachedMap", // plexus-utils
@@ -143,8 +148,12 @@ public final class MavenSandboxClassLoaderFactory {
    */
   static URL getJarContaining(String className) {
     try {
-      Class<?> clazz = MavenSandboxClassLoaderFactory.class.getClassLoader().loadClass(className);
+      ClassLoader classLoader = MavenSandboxClassLoaderFactory.class.getClassLoader();
+      Class<?> clazz = classLoader.loadClass(className);
       URL url = getJarContaining(clazz);
+      if (url == null && classLoader instanceof URLClassLoader) {
+        url = getJarContaining(className, (URLClassLoader) classLoader);
+      }
       if (url == null) {
         throw new SdkException("Could not find jar of '{}'.", className);
       }
@@ -153,6 +162,48 @@ public final class MavenSandboxClassLoaderFactory {
     catch (ClassNotFoundException e) {
       throw new SdkException(e);
     }
+  }
+
+  static URL getJarContaining(String className, URLClassLoader urlClassLoader) {
+    for (URL url : urlClassLoader.getURLs()) {
+      if (zipContainsEntry(url, className)) {
+        return url;
+      }
+    }
+    return null;
+  }
+
+  static boolean zipContainsEntry(URL zipUrl, String className) {
+    try {
+      URI uri = zipUrl.toURI();
+      if (!"file".equals(uri.getScheme())) {
+        return false;
+      }
+
+      Path file = Paths.get(uri);
+      if (!Files.isRegularFile(file) || !Files.isReadable(file)) {
+        return false;
+      }
+
+      //noinspection NestedTryStatement
+      try (ZipFile zip = new ZipFile(file.toFile())) {
+        if (zipContainsEntry(zip, className)) {
+          return true;
+        }
+      }
+      catch (IOException e) {
+        throw new SdkException(e);
+      }
+    }
+    catch (URISyntaxException use) {
+      throw new SdkException(use);
+    }
+
+    return false;
+  }
+
+  static boolean zipContainsEntry(ZipFile zip, String className) {
+    return zip.getEntry(className.replace('.', '/') + JavaTypes.CLASS_FILE_SUFFIX) != null;
   }
 
   /**

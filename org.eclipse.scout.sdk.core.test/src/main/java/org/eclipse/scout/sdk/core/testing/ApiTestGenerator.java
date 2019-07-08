@@ -10,16 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.testing;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-
-import java.beans.Introspector;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.eclipse.scout.sdk.core.imports.IImportCollector;
 import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.imports.ImportCollector;
@@ -33,7 +23,17 @@ import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Assertions;
+
+import java.beans.Introspector;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.stream.Collectors.*;
 
 /**
  * <h3>{@link ApiTestGenerator}</h3>
@@ -85,11 +85,15 @@ public class ApiTestGenerator {
   }
 
   protected static String getFlagsSource(int flags, String flagsRef) {
-    return Arrays.stream(Flags.class.getDeclaredFields())
+    String flagSrc = Arrays.stream(Flags.class.getDeclaredFields())
         .filter(f -> f.getType() == int.class)
         .filter(f -> (intValueOf(f) & flags) != 0)
         .map(f -> flagsRef + JavaTypes.C_DOT + f.getName())
         .collect(joining(" | "));
+    if (Strings.isBlank(flagSrc)) {
+      return flagsRef + JavaTypes.C_DOT + "AccDefault";
+    }
+    return flagSrc;
   }
 
   protected static int intValueOf(Field f) {

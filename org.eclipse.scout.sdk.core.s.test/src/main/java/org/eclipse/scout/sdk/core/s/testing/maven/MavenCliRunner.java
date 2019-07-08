@@ -10,7 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.testing.maven;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import okhttp3.ConnectionPool;
+import org.apache.maven.cli.CLIManager;
+import org.apache.maven.cli.MavenCli;
+import org.eclipse.scout.sdk.core.log.SdkConsole;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,22 +41,14 @@ import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 
-import org.apache.maven.cli.CLIManager;
-import org.apache.maven.cli.MavenCli;
-import org.eclipse.scout.sdk.core.log.SdkConsole;
-import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi;
-import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
-import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.Strings;
-
-import okhttp3.ConnectionPool;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * <h3>{@link MavenCliRunner}</h3>
  *
  * @since 5.2.0
  */
+@SuppressWarnings({"AccessOfSystemProperties", "CallToNativeMethodWhileLocked"})
 public class MavenCliRunner implements IMavenRunnerSpi {
 
   private static final String OKHTTP_KEEP_ALIVE = "http.keepAlive";
@@ -77,6 +77,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       System.setProperty(OKHTTP_KEEP_ALIVE, Boolean.toString(false)); // disable OkHttp keepAlive
       System.setIn(new ByteArrayInputStream(new byte[]{}));
       Thread.currentThread().setContextClassLoader(loader);
+      //noinspection ResultOfMethodCallIgnored
       SdkConsole.getConsoleSpi(); // enforce init of logging SPI
       String[] mavenArgs = getMavenArgs(new LinkedHashSet<>(options), goals, new LinkedHashMap<>(props));
       runMavenInSandbox(mavenArgs, workingDirectory, SdkLog.getLogLevel(), loader);
@@ -164,6 +165,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
         String threadName = candidate.getName();
         if ("Okio Watchdog".equals(threadName) || "OkHttp ConnectionPool".equals(threadName)) {
           candidate.setUncaughtExceptionHandler((t, e) -> SdkLog.debug("Okio Thread terminated", e));
+          //noinspection CallToThreadStopSuspendOrResumeManager
           candidate.stop();
         }
       }
@@ -176,6 +178,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
   protected static void logStream(Level level, ByteArrayOutputStream stream, String charset) throws UnsupportedEncodingException {
     String outString = stream.toString(charset);
     if (Strings.hasText(outString)) {
+      //noinspection HardcodedLineSeparator
       SdkLog.log(level, "Output of embedded Maven call:\nMVN-BEGIN\n{}\nMVN-END\n", outString);
     }
   }
