@@ -10,18 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws.editor;
 
-import static java.util.Collections.singletonList;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -84,6 +72,18 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import static java.util.Collections.singletonList;
+
 /**
  * <h3>{@link WebServiceFormPage}</h3>
  *
@@ -112,6 +112,7 @@ public class WebServiceFormPage extends FormPage {
   private final List<StyledTextField> m_entryPointNameFields;
   private final List<ProposalTextField> m_entryPointPackageFields;
 
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public WebServiceFormPage(FormEditor editor, WebServiceFormPageInput input) {
     super(Ensure.notNull(editor), Ensure.notNull(input).getWsdl().getFileName().toString(), input.getDisplayName());
     m_input = input;
@@ -479,6 +480,7 @@ public class WebServiceFormPage extends FormPage {
     return m_webServices.get(control);
   }
 
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected void createBindingGroup(Composite p) {
     Composite parent = createSection(getFormToolkit(), p, "Bindings");
     GridLayoutFactory
@@ -795,6 +797,7 @@ public class WebServiceFormPage extends FormPage {
     return isValidPackage(m_entryPointPackageFields);
   }
 
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected void createLabeledHyperlink(Composite p, String labelText, Path file, IType element, int labelWidth, int topOffset) {
     Composite parent = getFormToolkit().createComposite(p);
     GridDataFactory

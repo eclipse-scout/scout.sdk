@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.ecj;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
+import org.eclipse.jdt.internal.compiler.util.JRTUtil;
+import org.eclipse.jdt.internal.compiler.util.Util;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -22,12 +25,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.jdt.internal.compiler.util.JRTUtil;
-import org.eclipse.jdt.internal.compiler.util.Util;
-import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.FinalValue;
-import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.Strings;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 
 /**
  * <h3>{@link JreInfo}</h3> Stores meta information about a Java Runtime Environment on the disk.
@@ -191,7 +191,11 @@ public class JreInfo {
   }
 
   protected static boolean isArchive(Path candidate) {
-    String name = candidate.getFileName().toString().toLowerCase();
+    Path fileName = candidate.getFileName();
+    if (fileName == null) {
+      return false;
+    }
+    String name = fileName.toString().toLowerCase();
     return name.endsWith(".jar") || name.endsWith(".zip");
   }
 

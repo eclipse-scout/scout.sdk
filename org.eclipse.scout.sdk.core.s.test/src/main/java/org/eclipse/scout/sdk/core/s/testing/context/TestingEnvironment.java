@@ -10,21 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.testing.context;
 
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
-import static org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension.createJavaEnvironmentUsingBuilder;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
@@ -52,6 +37,21 @@ import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension.createJavaEnvironmentUsingBuilder;
 
 /**
  * <h3>{@link TestingEnvironment}</h3> {@link IEnvironment} implementation used for testing.
@@ -200,6 +200,7 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
     return Future.completed(null, ex);
   }
 
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected static void writeFile(Path filePath, byte[] content) throws IOException {
     Files.createDirectories(filePath.getParent());
     Files.write(filePath, content);

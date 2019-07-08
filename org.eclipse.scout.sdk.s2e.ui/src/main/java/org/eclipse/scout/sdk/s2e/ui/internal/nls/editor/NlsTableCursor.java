@@ -10,12 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor;
 
-import java.util.EventListener;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ColorRegistry;
@@ -39,6 +33,12 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
+
+import java.util.EventListener;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class NlsTableCursor {
 
@@ -233,6 +233,7 @@ public class NlsTableCursor {
     return inputText;
   }
 
+  @SuppressWarnings("pmd:NPathComplexityContentAssistContextInfo.java")
   private void createEditableTextInternal(String defaultText) {
     if (m_editingText != null && !m_editingText.isDisposed()) {
       m_editingText.dispose();

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.dto;
 
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
-
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
@@ -25,6 +23,8 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
+import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
+
 /**
  * <h3>{@link AbstractTableBeanGenerator}</h3>
  *
@@ -37,6 +37,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
   }
 
   @Override
+  @SuppressWarnings("squid:S2201")
   protected void setupBuilder() {
     super.setupBuilder();
 

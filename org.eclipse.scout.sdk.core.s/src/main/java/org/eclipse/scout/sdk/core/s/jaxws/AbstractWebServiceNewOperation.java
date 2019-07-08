@@ -10,9 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.jaxws;
 
-import static java.util.Collections.unmodifiableList;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils.JaxWsBindingMapping;
+import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl.WebServiceNames;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Xml;
+import org.w3c.dom.Document;
 
+import javax.wsdl.PortType;
+import javax.wsdl.Service;
+import javax.wsdl.WSDLException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -32,27 +50,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
-import javax.wsdl.WSDLException;
-import javax.xml.transform.TransformerException;
-
-import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils.JaxWsBindingMapping;
-import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl.WebServiceNames;
-import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.Xml;
-import org.w3c.dom.Document;
+import static java.util.Collections.unmodifiableList;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 /**
  * <h3>{@link AbstractWebServiceNewOperation}</h3>
@@ -92,6 +91,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   @Override
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public void accept(IEnvironment env, IProgress progress) {
     if (!isCreateNewModule()) {
       Ensure.notNull(getProjectRoot());
@@ -278,6 +278,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     return wsdlFile.toUri();
   }
 
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected void addWsdlToPom(Path wsdlFolderRelativePath, String bindingFolderName, IEnvironment env, IProgress progress) {
     Path pom = getProjectRoot().resolve(IMavenConstants.POM);
     if (!Files.isReadable(pom) || !Files.isRegularFile(pom)) {
@@ -291,6 +292,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
 
     try {
       Document document = Xml.get(pom);
+      //noinspection HardcodedFileSeparator
       JaxWsUtils.addWsdlToPom(document, wsdlFolderRelativePath.toString().replace('\\', '/'), bindingFolderName, bindingFileNames);
       env.writeResource(Xml.documentToString(document, true), pom, progress);
     }
@@ -347,6 +349,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
    * @return A {@link Map} holding a {@link Path} for each created binding and a {@link StringBuilder} with the
    *         corresponding content.
    */
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected Map<String, StringBuilder> getJaxwsBindingContents(ParsedWsdl parsedWsdl, URI rootWsdlUri, String targetPackage, IEnvironment env) {
     Map<URI, Set<JaxWsBindingMapping>> bindingsByFile = new HashMap<>();
     for (Entry<Service, URI> service : parsedWsdl.getWebServices().entrySet()) {
@@ -403,6 +406,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     URL wsdlUrl = getWsdlUrl();
     if (wsdlUrl != null) {
       wsdlFileName = wsdlUrl.getPath();
+      //noinspection HardcodedFileSeparator
       int lastSlashPos = wsdlFileName.lastIndexOf('/');
       int lastDotPos = wsdlFileName.lastIndexOf('.');
       if (lastDotPos < lastSlashPos) {

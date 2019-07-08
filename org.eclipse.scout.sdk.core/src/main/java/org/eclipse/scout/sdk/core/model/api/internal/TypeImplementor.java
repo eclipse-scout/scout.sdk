@@ -10,16 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -39,6 +29,17 @@ import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
+@SuppressWarnings("squid:S2160")
 public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implements IType {
   private static final Pattern PRIMITIVE_TYPE_ASSIGNABLE_PAT =
       Pattern.compile("(?:"

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.util;
 
-import java.util.Objects;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -26,6 +24,8 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.osgi.framework.Bundle;
+
+import java.util.Objects;
 
 /**
  * <h3>{@link ContentAssistContextInfo}</h3> Context info helper to be used in a
@@ -59,6 +59,7 @@ public class ContentAssistContextInfo {
    * @return An {@link ContentAssistContextInfo} instance or {@code null} if it could not be build based on the given
    *         input.
    */
+  @SuppressWarnings("pmd:NPathComplexity")
   public static ContentAssistContextInfo build(ContentAssistInvocationContext context, String callingPluginId, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)) {
       return null;

@@ -21,8 +21,6 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.sound.midi.Sequence;
-
 /**
  * <h3>{@link Strings}</h3><br>
  * Static utility methods to work with {@link String}s.<br>
@@ -421,6 +419,7 @@ public final class Strings {
    * @throws IllegalArgumentException
    *           if the lengths of the arrays are not the same ({@code null} is ok, and/or size 0)
    */
+  @SuppressWarnings("pmd:NPathComplexity")
   public static String replaceEach(String text, String[] searchList, String[] replacementList) {
     if (text == null || text.isEmpty()) {
       return text;
@@ -593,7 +592,7 @@ public final class Strings {
    *
    * @param value
    *          The {@link CharSequence} to wrap
-   * @return If the given {@link Sequence} is neither {@code null} nor of length zero, an {@link Optional} holding the
+   * @return If the given {@link CharSequence} is neither {@code null} nor of length zero, an {@link Optional} holding the
    *         value. Otherwise an empty {@link Optional} is returned.
    * @see #isEmpty(CharSequence)
    */
@@ -609,7 +608,7 @@ public final class Strings {
    *
    * @param value
    *          The {@link CharSequence} to wrap
-   * @return An {@link Optional} holding the value if the given {@link Sequence} contains visible characters. Otherwise
+   * @return An {@link Optional} holding the value if the given {@link CharSequence} contains visible characters. Otherwise
    *         an empty {@link Optional} is returned.
    * @see #isBlank(CharSequence)
    */

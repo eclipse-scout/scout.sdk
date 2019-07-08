@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
+import org.eclipse.scout.sdk.core.log.SdkLog;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileVisitResult;
@@ -23,8 +25,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
-
-import org.eclipse.scout.sdk.core.log.SdkLog;
 
 /**
  * <h3>{@link CoreUtils}</h3> Holds core utilities.
@@ -149,6 +149,7 @@ public final class CoreUtils {
     Ensure.notNull(targetDir);
     Ensure.isDirectory(sourceDir);
     Ensure.isDirectory(targetDir);
+    Ensure.notNull(sourceDir.getFileName());
 
     Path targetPath = targetDir.resolve(sourceDir.getFileName().toString());
     Files.createDirectories(targetPath); // ensure target exists

@@ -98,6 +98,7 @@ public class TextField extends Composite {
     createContent(this);
   }
 
+  @SuppressWarnings("pmd:NPathComplexity")
   protected void createContent(Composite parent) {
     boolean hasLabel = hasLabel();
     boolean isHyperLinkLabel = isHyperlinkLabel();

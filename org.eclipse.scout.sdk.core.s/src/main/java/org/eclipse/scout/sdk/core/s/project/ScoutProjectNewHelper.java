@@ -10,6 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.project;
 
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.Xml;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -32,26 +51,6 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.Collection;
 import java.util.regex.Pattern;
-
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
-import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
-import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.Xml;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * <h3>{@link ScoutProjectNewHelper}</h3>
@@ -191,6 +190,7 @@ public final class ScoutProjectNewHelper {
   /**
    * Workaround so that only the parent module is referenced in the root (remove non-parent modules)
    */
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   static void postProcessRootPom(Path targetDirectory) throws IOException {
     try {
       Path pom = targetDirectory.resolve(IMavenConstants.POM);

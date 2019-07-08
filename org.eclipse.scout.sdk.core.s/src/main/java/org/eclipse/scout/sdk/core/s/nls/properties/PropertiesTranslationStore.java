@@ -10,7 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.environment.NullProgress;
+import org.eclipse.scout.sdk.core.s.nls.IEditableTranslationStore;
+import org.eclipse.scout.sdk.core.s.nls.ITranslation;
+import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
+import org.eclipse.scout.sdk.core.s.nls.Language;
+import org.eclipse.scout.sdk.core.s.nls.TranslationEntry;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -22,16 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.environment.NullProgress;
-import org.eclipse.scout.sdk.core.s.nls.IEditableTranslationStore;
-import org.eclipse.scout.sdk.core.s.nls.ITranslation;
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
-import org.eclipse.scout.sdk.core.s.nls.Language;
-import org.eclipse.scout.sdk.core.s.nls.TranslationEntry;
-import org.eclipse.scout.sdk.core.util.Ensure;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 /**
  * <h3>{@link PropertiesTranslationStore}</h3>
@@ -159,6 +159,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   }
 
   @Override
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public void addNewLanguage(Language language) {
     throwIfReadOnly();
     Ensure.notNull(language);

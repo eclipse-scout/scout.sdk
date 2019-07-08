@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxyVisitor;
@@ -34,6 +31,9 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * <h3>{@link WebServiceNewWizard}</h3>
@@ -117,6 +117,7 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
     if (jaxwsFile == null) {
       return;
     }
+    @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     String wsdlName = operation.getCreatedWsdlFile().getFileName().toString();
     d.asyncExec(() -> openJaxwsEditor(jaxwsFile, wsdlName));
   }

@@ -10,21 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.jaxws;
 
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
@@ -39,6 +24,20 @@ import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 /**
  * <h3>{@link JaxWsModuleNewHelper}</h3>
@@ -67,10 +66,18 @@ public final class JaxWsModuleNewHelper {
           }
           path += IMavenConstants.POM;
         }
-        return modulePomFile.getParent().resolve(path).normalize();
+        Path parentDir = modulePomFile.getParent();
+        if (parentDir != null) {
+          return parentDir.resolve(path).normalize();
+        }
+        return null;
       }
     }
-    return modulePomFile.getParent().getParent().resolve(IMavenConstants.POM);
+    Path parentDir = modulePomFile.getParent();
+    if (parentDir != null && parentDir.getParent() != null) {
+      return parentDir.getParent().resolve(IMavenConstants.POM);
+    }
+    return null;
   }
 
   public static Path getParentPomOf(Path projectPomFile) throws IOException {
@@ -81,12 +88,13 @@ public final class JaxWsModuleNewHelper {
     return createModuleImpl(targetModulePomFile, artifactId);
   }
 
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   static Path createModuleImpl(Path targetModulePomFile, String artifactId) throws IOException {
     // validate input
     Ensure.isFile(targetModulePomFile, "Target module pom file '{}' could not be found.", targetModulePomFile);
+    Path parentDir = Ensure.isDirectory(targetModulePomFile.getParent(), "Unknown module structure. Cannot find parent of pom '{}'.", targetModulePomFile);
+    Path targetDirectory = Ensure.isDirectory(parentDir.getParent(), "Unknown module structure. Cannot find parent of '{}'.", parentDir);
     Ensure.notBlank(artifactId);
-    Path targetDirectory = targetModulePomFile.getParent().getParent();
-    Ensure.isDirectory(targetDirectory, "Target directory '{}' could not be found.", targetDirectory);
 
     // read values from target pom
     Document targetModulePomDocument = Xml.get(targetModulePomFile);
@@ -101,6 +109,7 @@ public final class JaxWsModuleNewHelper {
         .orElse("Server Web Services");
 
     Path tempDirectory = Files.createTempDirectory("jaxws-module-tmp");
+
     String createdProjectName;
     try {
       MavenBuild archetypeBuild = new MavenBuild()
@@ -119,6 +128,7 @@ public final class JaxWsModuleNewHelper {
 
       // execute archetype generation
       MavenRunner.execute(archetypeBuild);
+      //noinspection NestedTryStatement
       try (Stream<Path> files = Files.list(tempDirectory)) {
         Path createdProjectDir = files.findAny().orElseThrow(() -> new IOException("Created project dir not found. Project creation failed."));
         deleteGitKeepFiles(createdProjectDir);

@@ -10,23 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
-import javax.wsdl.WSDLException;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -75,6 +58,22 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.wsdl.WSDLException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * <h3>{@link WebServiceNewWizardPage}</h3>
@@ -458,6 +457,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       return null;
     }
     try {
+      @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
       String file = Paths.get(new URL(url).toURI()).getFileName().toString();
       if (Strings.hasText(file)) {
         file = file.toLowerCase();

@@ -10,11 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal;
 
-import java.util.Collection;
-import java.util.Objects;
-
-import javax.swing.event.EventListenerList;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -39,12 +34,17 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
+import javax.swing.event.EventListenerList;
+import java.util.Collection;
+import java.util.Objects;
+
 /**
  * <h3>ProposalTextField</h3> Use {@link #setContentProvider(IProposalContentProvider)} to define the proposal content
  * <br>
  * Use {@link #setLabelProvider(IBaseLabelProvider)} to define the strategy to map a proposal to a readable text<br>
  * Use {@link IProposalListener} to be notified about an accepted proposal.
  */
+@SuppressWarnings({"findbugs:IS2_INCONSISTENT_SYNC", "FieldAccessedSynchronizedAndUnsynchronized"})
 public class ProposalTextField extends TextField {
 
   /**

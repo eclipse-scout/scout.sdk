@@ -10,6 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
+import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SdkException;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,12 +29,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.SdkException;
-
 /**
  * <h3>{@link EditableTranslationFile}</h3>
  *
@@ -38,6 +38,7 @@ public class EditableTranslationFile extends AbstractTranslationPropertiesFile {
 
   private final Path m_file;
 
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public EditableTranslationFile(Path file) {
     super(parseFromFileNameOrThrow(file.getFileName().toString()), () -> toStream(file));
     m_file = Ensure.notNull(file);
@@ -90,6 +91,7 @@ public class EditableTranslationFile extends AbstractTranslationPropertiesFile {
 
   private static String[] propertiesEncode(Map<String, String> entries) {
     Properties prop = new Properties();
+    //noinspection UseOfPropertiesAsHashtable
     prop.putAll(entries);
 
     try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
