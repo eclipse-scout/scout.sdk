@@ -128,7 +128,7 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
         .collect(Collectors.toSet());
   }
 
-  @SuppressWarnings("indbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected static IProject importIntoWorkspace(Path createdProjectDir, EclipseProgress progress) throws CoreException {
     Set<MavenProjectInfo> projects = singleton(new MavenProjectInfo(createdProjectDir.getFileName().toString(), createdProjectDir.resolve(IMavenConstants.POM).toFile(), null, null));
     List<IMavenProjectImportResult> importedProjects = MavenPlugin.getProjectConfigurationManager().importProjects(projects, new ProjectImportConfiguration(), progress.monitor());

@@ -149,9 +149,9 @@ public final class CoreUtils {
     Ensure.notNull(targetDir);
     Ensure.isDirectory(sourceDir);
     Ensure.isDirectory(targetDir);
-    Ensure.notNull(sourceDir.getFileName());
 
-    Path targetPath = targetDir.resolve(sourceDir.getFileName().toString());
+    Path fileName = Ensure.notNull(sourceDir.getFileName());
+    Path targetPath = targetDir.resolve(fileName.toString());
     Files.createDirectories(targetPath); // ensure target exists
 
     if (Objects.equals(Files.getFileStore(sourceDir), Files.getFileStore(targetPath))) {

@@ -173,6 +173,7 @@ public final class MavenSandboxClassLoaderFactory {
     return null;
   }
 
+  @SuppressWarnings("squid:S1141") // nested try
   static boolean zipContainsEntry(URL zipUrl, String className) {
     try {
       URI uri = zipUrl.toURI();

@@ -233,7 +233,7 @@ public class NlsTableCursor {
     return inputText;
   }
 
-  @SuppressWarnings("pmd:NPathComplexityContentAssistContextInfo.java")
+  @SuppressWarnings("pmd:NPathComplexity")
   private void createEditableTextInternal(String defaultText) {
     if (m_editingText != null && !m_editingText.isDisposed()) {
       m_editingText.dispose();

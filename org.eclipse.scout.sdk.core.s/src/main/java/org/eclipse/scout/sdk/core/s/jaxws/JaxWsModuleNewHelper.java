@@ -74,8 +74,11 @@ public final class JaxWsModuleNewHelper {
       }
     }
     Path parentDir = modulePomFile.getParent();
-    if (parentDir != null && parentDir.getParent() != null) {
-      return parentDir.getParent().resolve(IMavenConstants.POM);
+    if (parentDir != null) {
+      Path grandParentDir = parentDir.getParent();
+      if(grandParentDir != null) {
+        return grandParentDir.resolve(IMavenConstants.POM);
+      }
     }
     return null;
   }
