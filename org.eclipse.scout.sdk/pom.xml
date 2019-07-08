@@ -54,10 +54,10 @@
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <master_test_forkCount>1</master_test_forkCount>
+    <master_test_timeout>1800</master_test_timeout>
 
     <!-- Sonar properties -->
     <sonar.branch>releases_10.0</sonar.branch>
-    <master_test_timeout>1800</master_test_timeout>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
 
      <!-- exclude fixtures -->
