@@ -560,6 +560,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <testFailureIgnore>false</testFailureIgnore>
+            <forkCount>1</forkCount>
           </configuration>
         </plugin>
       </plugins>
