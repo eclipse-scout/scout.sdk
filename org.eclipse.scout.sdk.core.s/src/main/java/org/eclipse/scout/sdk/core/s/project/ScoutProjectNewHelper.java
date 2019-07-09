@@ -176,7 +176,7 @@ public final class ScoutProjectNewHelper {
   static String[] generateKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC", "SunEC");
     AlgorithmParameterSpec spec = new ECGenParameterSpec("secp256k1");
-    keyGen.initialize(spec, SecureRandom.getInstanceStrong());
+    keyGen.initialize(spec, new SecureRandom());
     KeyPair keyPair = keyGen.generateKeyPair();
 
     EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded());
