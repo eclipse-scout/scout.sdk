@@ -55,6 +55,8 @@
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <master_test_forkCount>1</master_test_forkCount>
     <master_test_timeout>18000</master_test_timeout> <!-- 5 hours -->
+    <master_test_forkCount>1</master_test_forkCount>
+    <master_unitTest_failureIgnore>false</master_unitTest_failureIgnore>
 
     <!-- Sonar properties -->
     <sonar.branch>releases_10.0</sonar.branch>
@@ -555,13 +557,6 @@
               <version>${project.version}</version>
             </dependency>
           </dependencies>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <testFailureIgnore>false</testFailureIgnore>
-            <forkCount>1</forkCount>
-          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
