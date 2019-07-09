@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.util.maven;
 
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
-import org.eclipse.scout.sdk.core.util.Ensure;
+import static java.util.Collections.*;
 
 /**
  * <h3>{@link MavenBuild}</h3> Represents a Maven Build with all arguments.
@@ -53,7 +52,9 @@ public class MavenBuild {
     withProperty("master_sanityCheck_skip", "true") // workaround for animal sniffer bug that does not close zip files! See https://github.com/mojohaus/animal-sniffer/pull/52
         .withProperty("master_coverage_skip", "true")
         .withProperty("master_test_forkCount", "1")
-        .withProperty("master_test_runOrder", "filesystem");
+        .withProperty("master_test_runOrder", "filesystem")
+        .withProperty("master_git-id_skip", "true")
+        .withProperty("master_enforcerCheck_skip", "true");
   }
 
   /**
@@ -152,7 +153,7 @@ public class MavenBuild {
 
   /**
    * Removes all options.
-   * 
+   *
    * @return this
    */
   public MavenBuild clearOptions() {
