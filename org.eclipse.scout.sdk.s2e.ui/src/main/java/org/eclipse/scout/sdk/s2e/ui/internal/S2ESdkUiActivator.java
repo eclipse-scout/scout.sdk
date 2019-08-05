@@ -52,7 +52,8 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   private static S2ESdkUiActivator plugin;
 
   private IPropertyChangeListener m_preferencesPropertyListener;
-  private DetailFormatter m_iDataObjectDetailFormatter;
+  private DetailFormatter m_iDataObjectDetailFormatter90;
+  private DetailFormatter m_iDataObjectDetailFormatter100;
 
   @Override
   public void start(BundleContext context) throws Exception {
@@ -106,13 +107,20 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   }
 
   private void registerDetailFormatters() {
-    String src = "return " + IScoutRuntimeTypes.BEANS + ".get(org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper.class).writeValue(this);";
-    m_iDataObjectDetailFormatter = new DetailFormatter(IScoutRuntimeTypes.IDataObject, src, true);
-    JavaDetailFormattersManager.getDefault().setAssociatedDetailFormatter(m_iDataObjectDetailFormatter);
+    // Scout 9.0 version
+    String src90 = "return " + IScoutRuntimeTypes.BEANS + ".get(org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper.class).writeValue(this);";
+    m_iDataObjectDetailFormatter90 = new DetailFormatter(IScoutRuntimeTypes.IDataObject, src90, true);
+    JavaDetailFormattersManager.getDefault().setAssociatedDetailFormatter(m_iDataObjectDetailFormatter90);
+
+    // Scout 10.0 version
+    String src100 = "return " + IScoutRuntimeTypes.BEANS + ".get(org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper.class).writeValue(this);";
+    m_iDataObjectDetailFormatter100 = new DetailFormatter("org.eclipse.scout.rt.dataobject.IDataObject", src100, true);
+    JavaDetailFormattersManager.getDefault().setAssociatedDetailFormatter(m_iDataObjectDetailFormatter100);
   }
 
   private void deregisterDetailFormatters() {
-    m_iDataObjectDetailFormatter = null;
+    m_iDataObjectDetailFormatter90 = null;
+    m_iDataObjectDetailFormatter100 = null;
   }
 
   @Override
