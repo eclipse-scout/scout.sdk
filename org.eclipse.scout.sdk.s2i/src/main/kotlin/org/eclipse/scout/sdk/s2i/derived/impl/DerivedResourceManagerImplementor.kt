@@ -5,6 +5,7 @@ import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
@@ -143,6 +144,8 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
             val start = System.currentTimeMillis()
             try {
                 fileWrites.addAll(handler.apply(env, progress.newChild(1)))
+            } catch (e: ProcessCanceledException) {
+                SdkLog.debug("{} has been cancelled.", indicator.text2, e)
             } catch (e: Exception) {
                 SdkLog.error("Error while: {}", indicator.text2, e)
             } finally {
