@@ -268,8 +268,6 @@ public final class CoreScoutTestingUtils {
         .withGoal("clean")
         .withGoal("test")
         .withOption(CLIManager.BATCH_MODE)
-        .withOption(CLIManager.DEBUG)
-        .withProperty("master_test_forkCount", "1")
-        .withProperty("master_test_runOrder", "filesystem"));
+        .withOption(CLIManager.DEBUG));
   }
 }
