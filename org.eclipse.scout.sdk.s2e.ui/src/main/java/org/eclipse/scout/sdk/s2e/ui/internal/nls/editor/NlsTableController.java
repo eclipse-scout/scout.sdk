@@ -174,7 +174,7 @@ public class NlsTableController extends ViewerComparator {
         .collect(toList()), TranslationTableEntry.class);
 
     TableViewer viewer = m_view.tableViewer();
-    ObservableListContentProvider contentProvider = new ObservableListContentProvider();
+    ObservableListContentProvider<TranslationTableEntry> contentProvider = new ObservableListContentProvider<>();
     viewer.setComparator(this);
     viewer.setLabelProvider(new NlsTableLabelProvider(contentProvider, m_observedColumns));
     viewer.setContentProvider(contentProvider);
@@ -377,8 +377,7 @@ public class NlsTableController extends ViewerComparator {
 
   private final class NlsTableLabelProvider extends ObservableMapLabelProvider implements ITableColorProvider {
 
-    @SuppressWarnings("unchecked")
-    private NlsTableLabelProvider(ObservableListContentProvider contentProvider, ObservedColumn[] observedColumns) {
+    private NlsTableLabelProvider(ObservableListContentProvider<TranslationTableEntry> contentProvider, ObservedColumn... observedColumns) {
       super(Properties.observeEach(contentProvider.getKnownElements(), observedColumns));
     }
 
