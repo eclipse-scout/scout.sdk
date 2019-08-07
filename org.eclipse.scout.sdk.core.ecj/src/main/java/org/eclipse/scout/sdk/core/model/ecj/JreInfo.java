@@ -137,7 +137,7 @@ public class JreInfo {
   protected static String parseVersion(List<String> lines) {
     String prefix = "JAVA_VERSION=";
     for (String line : lines) {
-      if (!Strings.hasText(line)) {
+      if (Strings.isBlank(line)) {
         continue;
       }
 

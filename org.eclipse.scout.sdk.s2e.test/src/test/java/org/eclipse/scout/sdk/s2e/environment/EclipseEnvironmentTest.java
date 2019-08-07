@@ -10,33 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.environment;
 
-import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockingDetails;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -58,6 +31,20 @@ import org.eclipse.scout.sdk.s2e.environment.model.JavaEnvironmentWithJdt;
 import org.eclipse.scout.sdk.s2e.testing.MockFactory;
 import org.eclipse.scout.sdk.s2e.util.CharSequenceInputStream;
 import org.junit.jupiter.api.Test;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * <h3>{@link EclipseEnvironmentTest}</h3>
@@ -102,7 +89,7 @@ public class EclipseEnvironmentTest {
 
       env.createResource(PrimaryTypeGenerator.create()
           .withElementName(className)
-          .withField(FieldGenerator.createSerialVersionUid()), je.primarySourceFolder().get().javaEnvironment());
+          .withField(FieldGenerator.createSerialVersionUid()), je.primarySourceFolder().get());
 
       result = env.writeCompilationUnitAsync(
           PrimaryTypeGenerator.create()

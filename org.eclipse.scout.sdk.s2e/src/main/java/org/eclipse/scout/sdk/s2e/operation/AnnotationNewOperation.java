@@ -10,13 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.operation;
 
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
-
-import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -51,6 +44,14 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
+
+import java.nio.file.Path;
+import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
 
 /**
  * <h3>{@link AnnotationNewOperation}</h3>
@@ -152,7 +153,8 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
   public TextEdit createEdit(IImportValidator validator, IDocument sourceDocument, String nl) throws CoreException {
     try {
       // create new source
-      PropertySupport properties = S2eUtils.propertyMap(m_declaringMember.getJavaProject());
+      Path targetPath = m_declaringMember.getCompilationUnit().getResource().getLocation().toFile().toPath();
+      PropertySupport properties = S2eUtils.propertyMap(m_declaringMember.getJavaProject(), targetPath);
       StringBuilder src = getSourceBuilder().toJavaSource(new JavaBuilderContext(new BuilderContext(nl, properties), validator));
 
       // find insert/replace range

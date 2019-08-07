@@ -122,7 +122,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
       EmptyWsdlGenerator generator = new EmptyWsdlGenerator()
           .withName(wsdlBaseName)
           .withPackage(getPackage());
-      setWsdlContent(env.createResource(generator, getSourceFolder().javaEnvironment()));
+      setWsdlContent(env.createResource(generator, getSourceFolder()));
     }
     else {
       setWsdlContent(readXmlFromUrl(getWsdlUrl()));
@@ -388,7 +388,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
             .withNames(binding.getValue())
             .withWsdlLocation(relPath)
             .withWsPackage(targetPackage);
-        StringBuilder jaxwsBindingContent = env.createResource(generator, getSourceFolder().javaEnvironment());
+        StringBuilder jaxwsBindingContent = env.createResource(generator, getSourceFolder());
         result.put(path.getFileName().toString(), jaxwsBindingContent);
       }
     }

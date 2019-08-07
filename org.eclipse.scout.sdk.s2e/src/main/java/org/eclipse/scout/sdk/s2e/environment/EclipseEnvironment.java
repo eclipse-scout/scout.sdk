@@ -10,23 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.environment;
 
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
-import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.runWithWorkingCopyManager;
-
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -47,6 +30,7 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitPath;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
@@ -66,6 +50,22 @@ import org.eclipse.scout.sdk.s2e.environment.model.ClasspathWithJdt;
 import org.eclipse.scout.sdk.s2e.environment.model.JavaEnvironmentWithJdt;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.*;
 
 /**
  * <h3>{@link EclipseEnvironment}</h3>
@@ -96,19 +96,23 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   }
 
   @Override
-  public StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment context) {
-    IJavaProject javaProject = ((JavaEnvironmentWithJdt) Ensure.notNull(context).unwrap()).javaProject();
-    return doCreateResource(generator, javaProject, context);
+  public StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder) {
+    IJavaEnvironment context = targetFolder.javaEnvironment();
+    return doCreateResource(generator, jdtJavaProjectOf(context), targetFolder.path(), context);
+  }
+
+  protected IJavaProject jdtJavaProjectOf(IJavaEnvironment env) {
+    return ((JavaEnvironmentWithJdt) env.unwrap()).javaProject();
   }
 
   protected StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath) {
     IJavaProject javaProject = findJavaProject(filePath)
         .orElseThrow(() -> newFail("Cannot find a Java project for path '{}'.", filePath));
-    return doCreateResource(generator, javaProject, toScoutJavaEnvironment(javaProject));
+    return doCreateResource(generator, javaProject, filePath, toScoutJavaEnvironment(javaProject));
   }
 
-  protected static StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, IJavaProject javaProject, IJavaEnvironment je) {
-    BuilderContext ctx = createBuilderContextFor(javaProject);
+  protected static StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, IJavaProject javaProject, Path targetPath, IJavaEnvironment je) {
+    BuilderContext ctx = createBuilderContextFor(javaProject, targetPath);
     MemorySourceBuilder builder = new MemorySourceBuilder(new JavaBuilderContext(ctx, je));
     Ensure.notNull(generator).generate(builder);
     return builder.source();
@@ -144,15 +148,17 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
         .orElseThrow(() -> newFail("Could not find of workspace files for URI '{}'.", uri));
   }
 
-  protected static BuilderContext createBuilderContextFor(IJavaProject javaProject) {
-    return new BuilderContext(Util.getLineSeparator(null, javaProject), S2eUtils.propertyMap(javaProject));
+  protected static BuilderContext createBuilderContextFor(IJavaProject javaProject, Path targetPath) {
+    return new BuilderContext(Util.getLineSeparator(null, javaProject), S2eUtils.propertyMap(javaProject, targetPath));
   }
 
   protected IFuture<IType> doWriteCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, EclipseProgress progress, boolean syncRun) {
     Ensure.isTrue(Ensure.notNull(targetFolder).isSourceFolder());
 
     // generate new code
-    StringBuilder code = createResource(generator, targetFolder.javaEnvironment());
+    CompilationUnitPath path = new CompilationUnitPath(generator, targetFolder);
+    IJavaEnvironment env = targetFolder.javaEnvironment();
+    StringBuilder code = doCreateResource(generator, jdtJavaProjectOf(env), path.targetFile(), env);
 
     // write to disk
     IPackageFragmentRoot sourceFolder = ((ClasspathWithJdt) targetFolder.unwrap()).getRoot();

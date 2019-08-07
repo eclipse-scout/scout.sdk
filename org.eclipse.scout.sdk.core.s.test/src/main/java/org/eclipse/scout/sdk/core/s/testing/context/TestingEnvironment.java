@@ -212,8 +212,8 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
   }
 
   @Override
-  public StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment context) {
-    return doCreateResource(generator, context);
+  public StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder) {
+    return doCreateResource(generator, targetFolder.javaEnvironment());
   }
 
   protected StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath) {

@@ -1,6 +1,6 @@
 package org.eclipse.scout.sdk.s2i
 
-import com.intellij.openapi.fileTypes.StdFileTypes
+import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.progress.EmptyProgressIndicator
@@ -81,7 +81,7 @@ fun PsiClass.newSubTypeHierarchy(scope: SearchScope, checkDeep: Boolean, include
 
 fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, indicator: ProgressIndicator?): List<PsiClass> {
     val options = MatchOptions()
-    options.fileType = StdFileTypes.JAVA
+    options.dialect = JavaLanguage.INSTANCE
     options.isCaseSensitiveMatch = true
     options.isRecursiveSearch = true
     options.scope = scope

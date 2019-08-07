@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s;
 
+import org.eclipse.scout.sdk.core.builder.IBuilderContext;
+
 /**
  * Defaults used for scout objects
  */
@@ -50,7 +52,18 @@ public interface ISdkProperties {
   String INNER_TREE_TYPE_NAME = "Tree";
   String INNER_CALENDAR_TYPE_NAME = "Calendar";
 
+  /**
+   * Context property for the java project module that is used to resolve imports and in which the source of the generator will be stored.
+   * @see IBuilderContext#properties()
+   */
   String CONTEXT_PROPERTY_JAVA_PROJECT = "JavaProject";
+
+  /**
+   * Context property for the absolute target {@link java.nio.file.Path} in which the source of the generator will be stored.<br>
+   *   This might be the exact path to the target file or a parent folder of the file (if the exact target file is not yet known).
+   * @see IBuilderContext#properties()
+   */
+  String CONTEXT_PROPERTY_TARGET_PATH = "TargetPath";
 
   /**
    * The default view order.

@@ -13,10 +13,12 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator
+import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitPath
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
+import org.eclipse.scout.sdk.core.s.ISdkProperties
 import org.eclipse.scout.sdk.core.s.environment.Future
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IFuture
@@ -113,13 +115,21 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
             doWriteCompilationUnit(generator, targetFolder, toIdeaProgress(progress), false)
 
     fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, filePath: Path): StringBuilder =
-            createResource(generator, findJavaEnvironment(filePath).orElseThrow { newFail("Cannot find Java environment for path '{}'.", filePath) })
+            createResource(generator, findJavaEnvironment(filePath).orElseThrow { newFail("Cannot find Java environment for path '{}'.", filePath) }, filePath)
 
-    override fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, context: IJavaEnvironment): StringBuilder {
+    override fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, targetFolder: IClasspathEntry): StringBuilder =
+            createResource(generator, targetFolder.javaEnvironment(), targetFolder.path())
+
+    protected fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, context: IJavaEnvironment, filePath: Path): StringBuilder {
+        val env = context.unwrap() as JavaEnvironmentWithIdea
+        val props = PropertySupport(2)
+        props.setProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, env.module)
+        props.setProperty(ISdkProperties.CONTEXT_PROPERTY_TARGET_PATH, filePath)
+
         // must be \n! see https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/modifying_psi.html
         // do not use CodeStyle.getSettings(project).lineSeparator because the CompilationUnitWriter uses createFileFromText
         val nl = "\n"
-        val ctx = BuilderContext(nl, PropertySupport(0))
+        val ctx = BuilderContext(nl, props)
         val builder = MemorySourceBuilder(JavaBuilderContext(ctx, context))
         generator.generate(builder)
         return builder.source()
@@ -149,10 +159,10 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         Ensure.isTrue(targetFolder.isSourceFolder)
         val pck = generator.packageName().orElse("")
         val name = generator.elementName().orElseThrow { newFail("File name missing in generator") }
-        val code = createResource(generator, targetFolder.javaEnvironment())
+        val path = CompilationUnitPath(generator, targetFolder)
+        val code = createResource(generator, targetFolder.javaEnvironment(), path.targetFile())
         val javaEnv = targetFolder.javaEnvironment()
-
-        val writer = CompilationUnitWriter(project, code, pck, name, targetFolder.path())
+        val writer = CompilationUnitWriter(project, code, path)
         val supplier = lambda@{
             val createdUnit = writer.createdPsi ?: return@lambda null
 

@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.environment;
 
-import java.nio.file.Path;
-import java.util.Optional;
-
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
@@ -25,6 +22,9 @@ import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
+
+import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * <h3>{@link IEnvironment}</h3>
@@ -126,9 +126,9 @@ public interface IEnvironment {
    *
    * @param generator
    *          The {@link ISourceGenerator} to execute. Must not be {@code null}.
-   * @param context
-   *          The {@link IJavaEnvironment} to run the specified {@link ISourceGenerator} in. This
-   *          {@link IJavaEnvironment} is used to resolve imports (decide which imports are required). Must not be
+   * @param targetFolder
+   *          The {@link IClasspathEntry} where the specified {@link ISourceGenerator} will be executed. The
+   *          {@link IJavaEnvironment} of the specified {@link IClasspathEntry} is used to resolve imports (decide which imports are required). Must not be
    *          {@code null}.
    * @return A {@link StringBuilder} containing the result of the specified {@link ISourceGenerator}.
    * @see ISourceGenerator#generate(ISourceBuilder)
@@ -136,7 +136,7 @@ public interface IEnvironment {
    * @see IJavaBuilderContext#environment()
    * @see IJavaElementGenerator#toJavaSource(IJavaEnvironment)
    */
-  StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment context);
+  StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder);
 
   /**
    * Writes the specified content to the specified file path.

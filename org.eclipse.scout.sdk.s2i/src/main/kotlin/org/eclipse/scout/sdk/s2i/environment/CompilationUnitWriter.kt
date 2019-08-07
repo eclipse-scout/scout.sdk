@@ -10,20 +10,16 @@ import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.util.LocalTimeCounter
+import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitPath
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.Future
 import org.eclipse.scout.sdk.core.s.environment.IFuture
-import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.core.util.SdkException
 import java.io.File
 import java.nio.file.Path
 
-open class CompilationUnitWriter(val project: Project, val source: CharSequence, packageName: String, classSimpleName: String, sourceFolder: Path) {
-
-    val fileName = classSimpleName + JavaTypes.JAVA_FILE_SUFFIX
-    val targetDirectory: Path = sourceFolder.resolve(packageName.replace(JavaTypes.C_DOT, File.separatorChar))
-    val targetFile: Path = targetDirectory.resolve(fileName)
+open class CompilationUnitWriter(val project: Project, val source: CharSequence, val cuPath: CompilationUnitPath) {
 
     var createdPsi: PsiFile? = null
 
@@ -33,15 +29,15 @@ open class CompilationUnitWriter(val project: Project, val source: CharSequence,
     }
 
     fun schedule(resultSupplier: () -> IType?): IFuture<IType?> {
-        val task = OperationTask("Write $fileName", project, this::doWriteCompilationUnit)
+        val task = OperationTask("Write " + cuPath.fileName(), project, this::doWriteCompilationUnit)
         return task.schedule(resultSupplier)
     }
 
     protected fun doWriteCompilationUnit(progress: IdeaProgress) {
-        progress.init("Write $fileName", 3)
+        progress.init("Write " + cuPath.fileName(), 3)
 
         // create in memory file
-        val newPsi = PsiFileFactory.getInstance(project).createFileFromText(fileName, StdFileTypes.JAVA, source, LocalTimeCounter.currentTime(), false, false)
+        val newPsi = PsiFileFactory.getInstance(project).createFileFromText(cuPath.fileName(), StdFileTypes.JAVA, source, LocalTimeCounter.currentTime(), false, false)
         progress.worked(1)
 
         formatSource(newPsi)
@@ -72,17 +68,17 @@ open class CompilationUnitWriter(val project: Project, val source: CharSequence,
     }
 
     protected fun registerCompilationUnit(psi: PsiFile) {
-        val existingFile = LocalFileSystem.getInstance().findFileByIoFile(targetFile.toFile())
+        val existingFile = LocalFileSystem.getInstance().findFileByIoFile(cuPath.targetFile().toFile())
         if (existingFile?.exists() == true) {
             // update existing file
             TransactionManager
                     .current()
-                    .register(FileWriter(targetFile, psi.text, project, existingFile))
+                    .register(FileWriter(cuPath.targetFile(), psi.text, project, existingFile))
         } else {
             // new file
             TransactionManager
                     .current()
-                    .register(NewCompilationUnitWriter(psi, targetFile))
+                    .register(NewCompilationUnitWriter(psi, cuPath.targetFile()))
         }
     }
 

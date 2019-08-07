@@ -10,26 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.util;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Comparator.comparingInt;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -69,6 +49,26 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicPrimaryTypeFilter;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Comparator.comparingInt;
+
 /**
  * <h3>{@link S2eUtils}</h3>
  * <p>
@@ -95,11 +95,15 @@ public final class S2eUtils {
    *
    * @param p
    *          The {@link IJavaProject} the map should contain or {@code null}.
+   * @param targetPath
+   *          The {@link Path} in which the generators source will be stored (as exact as possible)
+   *          
    * @return The created {@link PropertySupport}. Never returns {@code null}.
    */
-  public static PropertySupport propertyMap(IJavaProject p) {
-    PropertySupport context = new PropertySupport(1);
+  public static PropertySupport propertyMap(IJavaProject p, Path targetPath) {
+    PropertySupport context = new PropertySupport(2);
     context.setProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, p);
+    context.setProperty(ISdkProperties.CONTEXT_PROPERTY_TARGET_PATH, targetPath);
     return context;
   }
 
