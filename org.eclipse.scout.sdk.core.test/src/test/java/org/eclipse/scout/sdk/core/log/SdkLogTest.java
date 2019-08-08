@@ -10,24 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.log;
 
-import static java.time.Instant.ofEpochSecond;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.logging.Level;
 
-import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static java.time.Instant.ofEpochSecond;
+import static java.util.Collections.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * <h3>{@link SdkLogTest}</h3>
@@ -40,7 +36,7 @@ public class SdkLogTest {
 
   @BeforeAll
   public static void setup() {
-    SdkLog.clock = Clock.fixed(ofEpochSecond(3600), ZoneId.systemDefault());
+    SdkLog.clock = Clock.fixed(ofEpochSecond(3600), ZoneId.of("Europe/Berlin"));
   }
 
   @Test
