@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,15 +7,8 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.model.ecj;
-
-import org.eclipse.jdt.internal.compiler.util.JRTUtil;
-import org.eclipse.jdt.internal.compiler.util.Util;
-import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.FinalValue;
-import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -25,8 +18,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
+import org.eclipse.jdt.internal.compiler.util.JRTUtil;
+import org.eclipse.jdt.internal.compiler.util.Util;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
+
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.toList;
 
 /**

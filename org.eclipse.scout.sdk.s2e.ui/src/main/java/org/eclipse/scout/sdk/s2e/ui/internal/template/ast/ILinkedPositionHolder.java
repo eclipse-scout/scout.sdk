@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -43,7 +43,7 @@ public interface ILinkedPositionHolder {
 
   /**
    * Adds linked position proposals showing boolean proposals ({@code true}, {@code false}).
-   * 
+   *
    * @param groupId
    *          The id of the group that should present the proposal
    */

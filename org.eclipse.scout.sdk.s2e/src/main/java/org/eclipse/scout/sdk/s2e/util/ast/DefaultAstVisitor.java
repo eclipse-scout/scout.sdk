@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.s2e.util.ast;
 
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -113,7 +113,7 @@ public class DefaultAstVisitor extends ASTVisitor {
 
   /**
    * Callback to visit each node type.
-   * 
+   *
    * @param node
    *          The visited node.
    * @return {@code true} if the children of this node should be visited, and {@code false} if the children of this node

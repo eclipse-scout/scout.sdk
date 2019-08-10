@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,14 +7,8 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.generator.compilationunit;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformImport;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformPackage;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +41,11 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.*;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
 
 /**
  * <h3>{@link CompilationUnitGenerator}</h3>
@@ -87,7 +86,12 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
     m_footerSourceBuilders = new ArrayList<>();
     cu.javaDoc()
         .map(ISourceRange::asCharSequence)
-        .<ISourceGenerator<IJavaElementCommentBuilder<?>>> map(s -> b -> b.append(s).nl())
+        .<ISourceGenerator<IJavaElementCommentBuilder<?>>> map(s -> b -> {
+          b.append(s);
+          if (!Strings.endsWith(s, b.context().lineDelimiter())) {
+            b.nl();
+          }
+        })
         .ifPresent(this::withComment);
   }
 

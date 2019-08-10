@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.generator.annotation;
 
 import java.util.Map;
@@ -84,7 +84,7 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
 
   /**
    * Removes the element with specified name from this {@link IAnnotationGenerator}.
-   * 
+   *
    * @param name
    *          The name of the element to remove.
    * @return This generator

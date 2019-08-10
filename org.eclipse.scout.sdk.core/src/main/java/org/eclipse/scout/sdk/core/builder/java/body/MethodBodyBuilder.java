@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,10 +7,8 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.builder.java.body;
-
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -26,6 +24,8 @@ import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerato
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 /**
  * <h3>{@link MethodBodyBuilder}</h3>
@@ -131,8 +131,14 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
   }
 
   @Override
-  public TYPE appendBlockCommentLine(CharSequence comment) {
-    m_commentBuilder.appendBlockCommentLine(comment);
+  public TYPE appendJavaDocStart() {
+    m_commentBuilder.appendJavaDocStart();
+    return currentInstance();
+  }
+
+  @Override
+  public TYPE appendJavaDocLine(CharSequence comment) {
+    m_commentBuilder.appendJavaDocLine(comment);
     return currentInstance();
   }
 
@@ -145,6 +151,12 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
   @Override
   public TYPE appendBlockComment(String comment) {
     m_commentBuilder.appendBlockComment(comment);
+    return currentInstance();
+  }
+
+  @Override
+  public TYPE appendJavaDocComment(String comment) {
+    m_commentBuilder.appendJavaDocComment(comment);
     return currentInstance();
   }
 

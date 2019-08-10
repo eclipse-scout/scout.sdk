@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal;
 
 import org.eclipse.jdt.core.search.SearchPattern;
@@ -41,7 +41,7 @@ public interface ISearchRangeConsumer {
 
   /**
    * Adds matching regions for the given proposal element.
-   * 
+   *
    * @param element
    *          the proposal
    * @param matchRegions

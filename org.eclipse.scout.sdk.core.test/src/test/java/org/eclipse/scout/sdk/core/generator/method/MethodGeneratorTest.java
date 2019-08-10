@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.generator.method;
 
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
@@ -85,7 +85,7 @@ public class MethodGeneratorTest {
             MethodParameterGenerator.create()
                 .asFinal()
                 .withElementName("firstParameter")
-                .withComment(b -> b.appendBlockCommentLine("do not use anymore"))
+                .withComment(b -> b.appendJavaDocLine("do not use anymore"))
                 .withAnnotation(AnnotationGenerator.createDeprecated())
                 .withDataType(JavaTypes.Integer))
         .withParameter(
@@ -108,7 +108,7 @@ public class MethodGeneratorTest {
             TypeParameterGenerator.create()
                 .withElementName("T")
                 .withBound(Iterable.class.getName())
-                .withComment(b -> b.appendBlockCommentLine("type param"))
+                .withComment(b -> b.appendJavaDocLine("type param"))
                 .withBound(Serializable.class.getName()));
 
     assertEquals("testMethod(java.lang.Integer,T,int)", generator.identifier());

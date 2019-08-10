@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.util;
 
 import java.beans.Introspector;
@@ -567,6 +567,34 @@ public final class Strings {
   }
 
   /**
+   * Tests if the string specified ends with the specified suffix.
+   *
+   * @param string
+   *          The {@link CharSequence} to test
+   * @param suffix
+   *          The suffix to search
+   * @return {@code true} if the string ends with the specified suffix or the suffix has length 0. If the string or
+   *         suffix are {@code null} or the string does not end with the suffix specified, {@code false} is returned.
+   */
+  public static boolean endsWith(CharSequence string, CharSequence suffix) {
+    if (string == null || suffix == null) {
+      return false;
+    }
+    if (suffix.length() == 0) {
+      return true;
+    }
+    if (string.length() < suffix.length()) {
+      return false;
+    }
+    for (int i = string.length() - 1, j = suffix.length() - 1; j >= 0; i--, j--) {
+      if (string.charAt(i) != suffix.charAt(j)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Checks if a {@link CharSequence} contains visible characters.
    * <p>
    *
@@ -592,8 +620,8 @@ public final class Strings {
    *
    * @param value
    *          The {@link CharSequence} to wrap
-   * @return If the given {@link CharSequence} is neither {@code null} nor of length zero, an {@link Optional} holding the
-   *         value. Otherwise an empty {@link Optional} is returned.
+   * @return If the given {@link CharSequence} is neither {@code null} nor of length zero, an {@link Optional} holding
+   *         the value. Otherwise an empty {@link Optional} is returned.
    * @see #isEmpty(CharSequence)
    */
   public static <T extends CharSequence> Optional<T> notEmpty(T value) {
@@ -608,8 +636,8 @@ public final class Strings {
    *
    * @param value
    *          The {@link CharSequence} to wrap
-   * @return An {@link Optional} holding the value if the given {@link CharSequence} contains visible characters. Otherwise
-   *         an empty {@link Optional} is returned.
+   * @return An {@link Optional} holding the value if the given {@link CharSequence} contains visible characters.
+   *         Otherwise an empty {@link Optional} is returned.
    * @see #isBlank(CharSequence)
    */
   public static <T extends CharSequence> Optional<T> notBlank(T value) {

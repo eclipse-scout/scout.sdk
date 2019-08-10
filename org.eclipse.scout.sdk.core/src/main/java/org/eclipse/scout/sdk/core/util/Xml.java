@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,12 +7,8 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.util;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +54,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import static java.util.Collections.*;
 
 /**
  * <h3>{@link Xml}</h3><br>

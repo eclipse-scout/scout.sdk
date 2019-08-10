@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,10 +7,8 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.model.api.internal;
-
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotationElement;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -26,6 +24,8 @@ import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
+
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotationElement;
 
 public class AnnotationElementImplementor extends AbstractJavaElementImplementor<AnnotationElementSpi> implements IAnnotationElement {
 

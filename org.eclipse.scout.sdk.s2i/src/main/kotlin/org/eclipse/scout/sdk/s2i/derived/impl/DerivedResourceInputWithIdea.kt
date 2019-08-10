@@ -8,6 +8,7 @@ import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.model.api.MissingTypeException
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceInput
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.resolvePsi
 import org.eclipse.scout.sdk.s2i.resolveSourceRoot
 import org.eclipse.scout.sdk.s2i.toIdea
@@ -32,5 +33,7 @@ open class DerivedResourceInputWithIdea(val type: PsiClass) : IDerivedResourceIn
 
     protected fun project(): Project = type.project
 
-    override fun toString(): String = type.nameIdentifier?.text ?: type.toString()
+    override fun toString(): String = IdeaEnvironment.computeInReadAction(project()) {
+        type.nameIdentifier?.text ?: type.toString()
+    }
 }

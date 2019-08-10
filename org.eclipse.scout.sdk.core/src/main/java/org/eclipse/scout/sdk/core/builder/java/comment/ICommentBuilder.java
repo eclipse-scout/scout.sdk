@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.builder.java.comment;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
@@ -22,11 +22,18 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 public interface ICommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends ISourceBuilder<TYPE> {
 
   /**
-   * Appends a block comment start expression. The start expression is {@code /**}
+   * Appends a block comment start expression. The start expression is {@code /*}
    *
    * @return This builder
    */
   TYPE appendBlockCommentStart();
+
+  /**
+   * Appends a JavaDoc block comment start expression. The start expression is {@code /**}
+   *
+   * @return This builder
+   */
+  TYPE appendJavaDocStart();
 
   /**
    * Appends a block comment end expression. The end expression is <code>*&#47;</code>.
@@ -44,6 +51,16 @@ public interface ICommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends ISo
    * @return This builder
    */
   TYPE appendBlockComment(String comment);
+
+  /**
+   * Appends the given comment text as JavaDoc block comment. Line delimiters within the specified text are preserved and
+   * prefixed with a comment star.
+   *
+   * @param comment
+   *          The raw comment text. May contain line delimiters. May not be {@code null}.
+   * @return This builder
+   */
+  TYPE appendJavaDocComment(String comment);
 
   /**
    * Appends a single line to-do comment with the specified text. The to-do expression contains the user name.
@@ -70,7 +87,7 @@ public interface ICommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends ISo
    *          The comment text without any line delimiters. May not be {@code null}.
    * @return This builder
    */
-  TYPE appendBlockCommentLine(CharSequence comment);
+  TYPE appendJavaDocLine(CharSequence comment);
 
   /**
    * Appends a single line comment.<br>

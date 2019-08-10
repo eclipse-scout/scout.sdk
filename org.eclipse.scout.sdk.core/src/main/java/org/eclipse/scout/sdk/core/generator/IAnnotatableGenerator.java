@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.generator;
 
 import java.util.stream.Stream;
@@ -34,7 +34,7 @@ public interface IAnnotatableGenerator<TYPE extends IAnnotatableGenerator<TYPE>>
 
   /**
    * Removes all {@link IAnnotationGenerator}s having the specified name from this generator.
-   * 
+   *
    * @param annotationFqn
    *          The fully qualified name of the {@link IAnnotationGenerator}s to remove.
    * @return This generator

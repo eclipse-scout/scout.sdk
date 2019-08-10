@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,12 +7,8 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.s.dto;
-
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toSet;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 
 import java.beans.Introspector;
 import java.util.Optional;
@@ -46,6 +42,10 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toSet;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 
 /**
  * <h3>{@link AbstractDtoGenerator}</h3>
@@ -455,7 +455,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
         .withMethod(MethodGenerator.create() // legacy getter
             .asPublic()
             .withElementName(PropertyBean.getterPrefixFor(propDataType) + upperCaseBeanName)
-            .withComment(b -> b.appendBlockComment("access method for property " + upperCaseBeanName + JavaTypes.C_DOT))
+            .withComment(b -> b.appendJavaDocComment("access method for property " + upperCaseBeanName + JavaTypes.C_DOT))
             .withReturnType(propDataType)
             .withBody(b -> {
               String suffix = "().getValue()";
@@ -469,7 +469,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
         .withMethod(MethodGenerator.create() // legacy setter
             .asPublic()
             .withElementName(PropertyBean.SETTER_PREFIX + upperCaseBeanName)
-            .withComment(b -> b.appendBlockComment("access method for property " + upperCaseBeanName + JavaTypes.C_DOT))
+            .withComment(b -> b.appendJavaDocComment("access method for property " + upperCaseBeanName + JavaTypes.C_DOT))
             .withReturnType(JavaTypes._void)
             .withParameter(MethodParameterGenerator.create()
                 .withElementName(lowerCaseBeanName)

@@ -3,12 +3,15 @@ package org.eclipse.scout.sdk.s2i
 import com.intellij.copyright.CopyrightManager
 import com.intellij.ide.fileTemplates.FileTemplate
 import com.intellij.ide.fileTemplates.FileTemplateManager
+import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
 import com.maddyhome.idea.copyright.pattern.EntityUtil
 import com.maddyhome.idea.copyright.pattern.VelocityHelper
+import com.maddyhome.idea.copyright.util.FileTypeUtil
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder
 import org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi
@@ -64,7 +67,11 @@ open class IdeaSettingsCommentGenerator(val project: Project) : IDefaultElementC
             }
 
             if (cuComment.isNotBlank()) {
-                it.appendBlockComment(cuComment.toString())
+                val fileType = FileTypeUtil.getInstance().getFileTypeByName(JavaLanguage.INSTANCE.id)
+                val opts = CopyrightManager.getInstance(project).options.getMergedOptions(fileType.name)
+                val cmt = FileTypeUtil.buildComment(fileType, cuComment.toString(), opts)
+                val commentText = StringUtil.convertLineSeparators(cmt)
+                it.append(commentText)
             }
         }
     }

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.testing;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
@@ -28,32 +28,32 @@ public class TestingElementCommentGenerator implements IDefaultElementCommentGen
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createCompilationUnitComment(ICompilationUnitGenerator<?> target) {
-    return b -> b.appendBlockComment("Default Testing Comment for\nCompilationUnit " + target.fileName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nCompilationUnit " + target.fileName().orElse(""));
   }
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createTypeComment(ITypeGenerator<?> target) {
-    return b -> b.appendBlockComment("Default Testing Comment for\nType " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nType " + target.elementName().orElse(""));
   }
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
-    return b -> b.appendBlockComment("Default Testing Comment for\nMethod " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nMethod " + target.elementName().orElse(""));
   }
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createGetterMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
-    return b -> b.appendBlockComment("Default Testing Comment for\nGetter " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nGetter " + target.elementName().orElse(""));
   }
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createSetterMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
-    return b -> b.appendBlockComment("Default Testing Comment for\nSetter " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nSetter " + target.elementName().orElse(""));
   }
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createFieldComment(IFieldGenerator<?> target) {
-    return b -> b.appendBlockComment("Default Testing Comment for\nField " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nField " + target.elementName().orElse(""));
   }
 
 }

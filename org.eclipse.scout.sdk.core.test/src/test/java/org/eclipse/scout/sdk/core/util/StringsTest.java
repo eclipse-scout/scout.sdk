@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,21 +7,16 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.util;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * <h3>{@link StringsTest}</h3>
@@ -52,6 +47,23 @@ public class StringsTest {
     assertEquals("", Strings.repeat("asdf", -1));
     assertEquals("aaa", Strings.repeat("a", 3));
     assertEquals("abab", Strings.repeat("ab", 2));
+  }
+
+  @Test
+  public void testEndsWith() {
+    assertTrue(Strings.endsWith("", ""));
+    assertTrue(Strings.endsWith("abc", ""));
+    assertFalse(Strings.endsWith(null, ""));
+    assertFalse(Strings.endsWith("abc", null));
+    assertFalse(Strings.endsWith("", null));
+    assertFalse(Strings.endsWith(null, null));
+    assertFalse(Strings.endsWith(null, "abc"));
+    assertFalse(Strings.endsWith("abc", "de"));
+    assertFalse(Strings.endsWith("abc", "abcde"));
+    assertTrue(Strings.endsWith("aabc", "bc"));
+    assertTrue(Strings.endsWith("aa  ", " "));
+    assertTrue(Strings.endsWith("", ""));
+    assertTrue(Strings.endsWith("abcd", "abcd"));
   }
 
   @Test

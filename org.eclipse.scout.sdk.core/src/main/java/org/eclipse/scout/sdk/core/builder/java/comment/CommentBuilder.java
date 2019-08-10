@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.builder.java.comment;
 
 import java.io.BufferedReader;
@@ -56,7 +56,12 @@ public class CommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends SourceBu
 
   @Override
   public TYPE appendBlockCommentStart() {
-    return append("/**");
+    return append("/*");
+  }
+
+  @Override
+  public TYPE appendJavaDocStart() {
+    return appendBlockCommentStart().append('*');
   }
 
   @Override
@@ -86,14 +91,28 @@ public class CommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends SourceBu
   }
 
   @Override
-  public TYPE appendBlockCommentLine(CharSequence comment) {
-    return appendBlockCommentStart().space().append(comment).space().appendBlockCommentEnd();
+  public TYPE appendJavaDocLine(CharSequence comment) {
+    return appendJavaDocStart().space().append(comment).space().appendBlockCommentEnd();
+  }
+
+  @Override
+  public TYPE appendJavaDocComment(String comment) {
+    return appendBlockComment(comment, true);
   }
 
   @Override
   public TYPE appendBlockComment(String comment) {
-    appendBlockCommentStart()
-        .nl();
+    return appendBlockComment(comment, false);
+  }
+
+  protected TYPE appendBlockComment(String comment, boolean isJavaDoc) {
+    if (isJavaDoc) {
+      appendJavaDocStart();
+    }
+    else {
+      appendBlockCommentStart();
+    }
+    nl();
 
     try (BufferedReader inputReader = new BufferedReader(new StringReader(comment))) {
       String line = inputReader.readLine();

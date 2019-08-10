@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,10 +7,8 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.sdk.core.s.util;
-
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -21,6 +19,8 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+
+import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 
 /**
  * <h3>{@link CoreScoutUtils}</h3>
