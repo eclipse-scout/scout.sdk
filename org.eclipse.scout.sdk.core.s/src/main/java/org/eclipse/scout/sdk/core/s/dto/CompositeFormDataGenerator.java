@@ -107,13 +107,14 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
       // Scout RT requires the first char to be upper-case for a getter.
       // See org.eclipse.scout.rt.platform.reflect.FastBeanUtility.BEAN_METHOD_PAT.
       String methodName = Strings.ensureStartWithUpperCase(formDataTypeName);
-      withType(dtoGenerator
-          .withElementName(formDataTypeName))
-              .withMethod(ScoutMethodGenerator.create()
-                  .asPublic()
-                  .withElementName(PropertyBean.GETTER_PREFIX + methodName)
-                  .withReturnType(formDataTypeName)
-                  .withBody(b -> b.returnClause().appendGetFieldByClass(formDataTypeName).semicolon()));
+      this
+          .withType(dtoGenerator.withElementName(formDataTypeName), DtoMemberSortObjectFactory.forTypeFormDataFormField(formDataTypeName))
+          .withMethod(ScoutMethodGenerator.create()
+              .asPublic()
+              .withElementName(PropertyBean.GETTER_PREFIX + methodName)
+              .withReturnType(formDataTypeName)
+              .withBody(b -> b.returnClause().appendGetFieldByClass(formDataTypeName).semicolon()),
+              DtoMemberSortObjectFactory.forMethodFormDataFormField(methodName));
     }
 
     if (isCompositeField && !fieldExtendsTemplateField) {

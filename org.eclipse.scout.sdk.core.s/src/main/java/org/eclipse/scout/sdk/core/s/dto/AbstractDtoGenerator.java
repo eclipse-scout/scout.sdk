@@ -446,12 +446,14 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
         .withField(FieldGenerator.createSerialVersionUid());
     copyAnnotations(desc.readMethod().get(), propertyTypeBuilder, targetEnvironment());
 
-    withType(propertyTypeBuilder)
+    this
+        .withType(propertyTypeBuilder, DtoMemberSortObjectFactory.forTypeFormDataProperty(propName))
         .withMethod(ScoutMethodGenerator.create() // getter
             .asPublic()
             .withElementName(PropertyBean.GETTER_PREFIX + propName)
             .withReturnType(propName)
-            .withBody(b -> b.returnClause().appendGetPropertyByClass(propName).semicolon()))
+            .withBody(b -> b.returnClause().appendGetPropertyByClass(propName).semicolon()),
+            DtoMemberSortObjectFactory.forMethodFormDataProperty(upperCaseBeanName))
         .withMethod(MethodGenerator.create() // legacy getter
             .asPublic()
             .withElementName(PropertyBean.getterPrefixFor(propDataType) + upperCaseBeanName)
@@ -465,7 +467,8 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
                     .appendDefaultValueOf(propDataTypeBoxed).append(" : get").append(propName).append(suffix);
               }
               b.semicolon();
-            }))
+            }),
+            DtoMemberSortObjectFactory.forMethodFormDataPropertyLegacy(upperCaseBeanName))
         .withMethod(MethodGenerator.create() // legacy setter
             .asPublic()
             .withElementName(PropertyBean.SETTER_PREFIX + upperCaseBeanName)
@@ -474,7 +477,8 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
             .withParameter(MethodParameterGenerator.create()
                 .withElementName(lowerCaseBeanName)
                 .withDataType(propDataType))
-            .withBody(b -> b.append("get").append(propName).append("().setValue(").append(lowerCaseBeanName).parenthesisClose().semicolon()));
+            .withBody(b -> b.append("get").append(propName).append("().setValue(").append(lowerCaseBeanName).parenthesisClose().semicolon()),
+            DtoMemberSortObjectFactory.forMethodFormDataPropertyLegacy(upperCaseBeanName));
   }
 
   public IJavaEnvironment targetEnvironment() {

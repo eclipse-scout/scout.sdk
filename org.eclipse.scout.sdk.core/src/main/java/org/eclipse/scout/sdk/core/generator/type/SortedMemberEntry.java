@@ -10,12 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.generator.type;
 
-import static org.eclipse.scout.sdk.core.model.api.Flags.isFinal;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isPrivate;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isStatic;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
@@ -31,6 +25,9 @@ import org.eclipse.scout.sdk.core.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+
+import static org.eclipse.scout.sdk.core.model.api.Flags.*;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 /**
  * <h3>{@link SortedMemberEntry}</h3>
@@ -205,15 +202,27 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
     return new CompositeObject(DEFAULT_ORDER, METHOD_ORDER, pos, insertionOrder);
   }
 
-  public static Object[] createDefaultMethodPos(int order) {
-    return new Object[]{DEFAULT_ORDER, METHOD_ORDER, order};
+  public static Object[] createDefaultMethodPos(Object... order) {
+    return combine(METHOD_ORDER, order);
   }
 
-  public static Object[] createDefaultTypePos(int order) {
-    return new Object[]{DEFAULT_ORDER, TYPE_ORDER, order};
+  public static Object[] createDefaultTypePos(Object... order) {
+    return combine(TYPE_ORDER, order);
   }
 
-  public static Object[] createDefaultFieldPos(int order) {
-    return new Object[]{DEFAULT_ORDER, FIELD_ORDER, order};
+  public static Object[] createDefaultFieldPos(Object... order) {
+    return combine(FIELD_ORDER, order);
+  }
+
+  static Object[] combine(int objectOrder, Object... orders) {
+    if (orders == null || orders.length < 1) {
+      return new Object[]{DEFAULT_ORDER, objectOrder};
+    }
+
+    Object[] result = new Object[orders.length + 2];
+    result[0] = DEFAULT_ORDER;
+    result[1] = objectOrder;
+    System.arraycopy(orders, 0, result, 2, orders.length);
+    return result;
   }
 }
