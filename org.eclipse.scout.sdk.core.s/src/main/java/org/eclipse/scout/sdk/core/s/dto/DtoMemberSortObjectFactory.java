@@ -17,6 +17,9 @@ import org.eclipse.scout.sdk.core.generator.type.SortedMemberEntry;
  */
 public final class DtoMemberSortObjectFactory {
 
+  private DtoMemberSortObjectFactory() {
+  }
+
   /**
    * Creates a sort order object array for the FormData Property getter.<br>
    * (e.g. {@code public PersonNrProperty getPersonNrProperty()})
