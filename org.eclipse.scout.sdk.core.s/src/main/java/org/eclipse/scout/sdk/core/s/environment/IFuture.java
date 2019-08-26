@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 /**
  * <h3>{@link IFuture}</h3>
@@ -25,7 +26,7 @@ import java.util.concurrent.Future;
  * @see Future
  * @see CompletionStage
  */
-public interface IFuture<V> extends Future<V>, CompletionStage<V> {
+public interface IFuture<V> extends Future<Supplier<V>>, CompletionStage<Supplier<V>> {
 
   /**
    * Returns the result value when complete, or throws an (unchecked) exception if completed exceptionally. To better
@@ -36,16 +37,17 @@ public interface IFuture<V> extends Future<V>, CompletionStage<V> {
    * If the original (unchecked) exception should be thrown instead of a wrapping {@link CompletionException}, use
    * {@link #result()} instead.
    *
-   * @return the result value
+   * @return A {@link Supplier} that returns the result value
    * @throws CancellationException
    *           if the computation was cancelled. See {@link #cancel(boolean)} for more details.
    * @throws CompletionException
    *           if this future completed exceptionally or a completion computation threw an exception.
    */
-  V join();
+  Supplier<V> join();
 
   /**
-   * Returns the result value (or throws any encountered exception) if completed, else returns the given valueIfAbsent.
+   * Returns the result value (or throws any encountered exception) if completed, else returns the given valueIfAbsent
+   * {@link Supplier}.
    *
    * @param valueIfAbsent
    *          the value to return if not completed
@@ -56,7 +58,7 @@ public interface IFuture<V> extends Future<V>, CompletionStage<V> {
    *           if this future completed exceptionally or a completion computation threw an exception
    * @see #join()
    */
-  V getNow(V valueIfAbsent);
+  Supplier<V> getNow(Supplier<V> valueIfAbsent);
 
   /**
    * Returns {@code true} if this {@link IFuture} completed exceptionally, in any way. Possible causes include
@@ -107,7 +109,7 @@ public interface IFuture<V> extends Future<V>, CompletionStage<V> {
   V result();
 
   /**
-   * Same as {@link #result()} but returns this {@link IFuture} instead of the result value.
+   * Same as {@link #join()} but returns this {@link IFuture} instead of the result value.
    *
    * @return this
    */

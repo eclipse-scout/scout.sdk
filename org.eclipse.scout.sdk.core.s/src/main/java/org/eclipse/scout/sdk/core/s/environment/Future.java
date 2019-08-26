@@ -16,13 +16,14 @@ import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 
 /**
  * <h3>{@link Future}</h3>
  *
  * @since 7.1.0
  */
-public class Future<V> extends CompletableFuture<V> implements IFuture<V> {
+public class Future<V> extends CompletableFuture<Supplier<V>> implements IFuture<V> {
 
   /**
    * Creates a completed {@link IFuture} with the specified result.
@@ -93,10 +94,10 @@ public class Future<V> extends CompletableFuture<V> implements IFuture<V> {
   @Override
   public Future<V> awaitDoneThrowingOnError() {
     try {
-      result();
+      join();
     }
     catch (CancellationException e) {
-      SdkLog.debug("Canellation silently ignored", e);
+      SdkLog.debug("Cancellation silently ignored", e);
     }
     return this;
   }
@@ -108,10 +109,11 @@ public class Future<V> extends CompletableFuture<V> implements IFuture<V> {
     else {
       if (error == null) {
         if (resultExtractor == null) {
-          complete(null);
+          complete(() -> null); // the supplier should never be null. only the result provided by the supplier may be null
         }
         else {
-          complete(resultExtractor.get());
+          FinalValue<V> cachedResult = new FinalValue<>();
+          complete(() -> cachedResult.computeIfAbsentAndGet(resultExtractor));
         }
       }
       else {
@@ -124,7 +126,7 @@ public class Future<V> extends CompletableFuture<V> implements IFuture<V> {
   @Override
   public V result() {
     try {
-      return join();
+      return join().get();
     }
     catch (CompletionException e) {
       SdkLog.debug("Future completed with errors.", e);

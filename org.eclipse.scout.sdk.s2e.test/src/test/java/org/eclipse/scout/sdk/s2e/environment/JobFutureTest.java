@@ -10,14 +10,6 @@
  */
 package org.eclipse.scout.sdk.s2e.environment;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -28,6 +20,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -38,6 +31,8 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * <h3>{@link JobFutureTest}</h3>
@@ -253,6 +248,32 @@ public class JobFutureTest {
     future.awaitDoneThrowingOnErrorOrCancel();
   }
 
+  @Test
+  public void testLazyResult() throws ExecutionException, InterruptedException {
+    AtomicInteger resultSupplierInvokeCounter = new AtomicInteger();
+    String expectedResult = "test result";
+    Supplier<String> resultSupplier = () -> {
+      resultSupplierInvokeCounter.incrementAndGet();
+      return expectedResult;
+    };
+    JobFuture<String> jf = createFixtureJobFuture(resultSupplier);
+    assertEquals(0, resultSupplierInvokeCounter.get());
+    jf.job().schedule();
+
+    jf.get(); // wait until completed
+    assertEquals(0, resultSupplierInvokeCounter.get()); // resultSupplier must not yet been executed because the result has not yet been retrieved (lazy computation)
+
+    assertEquals(expectedResult, jf.result()); // here the resultSupplier is invoked
+    assertEquals(1, resultSupplierInvokeCounter.get());
+
+    String result = jf.get().get();
+    assertEquals(expectedResult, result); // here the resultSupplier is invoked
+    assertSame(result, jf.result());
+
+    // even the result was requested multiple times, it has only been computed once
+    assertEquals(1, resultSupplierInvokeCounter.get());
+  }
+
   private static JobFuture<String> createFixtureJobFuture(String result) {
     return createFixtureJobFuture(result, () -> {
     });
@@ -263,7 +284,17 @@ public class JobFutureTest {
     return createFixtureJobFuture(j);
   }
 
+  private static JobFuture<String> createFixtureJobFuture(Supplier<String> resultSupplier) {
+    AbstractJob j = new RunnableJob("", () -> {
+    });
+    return createFixtureJobFuture(j, resultSupplier);
+  }
+
   private static JobFuture<String> createFixtureJobFuture(AbstractJob j) {
-    return new JobFuture<>(j, () -> j.getResult() == null ? null : j.getName());
+    return createFixtureJobFuture(j, () -> j.getResult() == null ? null : j.getName());
+  }
+
+  private static JobFuture<String> createFixtureJobFuture(AbstractJob j, Supplier<String> resultSupplier) {
+    return new JobFuture<>(j, resultSupplier);
   }
 }

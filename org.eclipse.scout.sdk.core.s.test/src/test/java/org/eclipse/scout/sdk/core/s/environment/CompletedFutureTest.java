@@ -10,19 +10,15 @@
  */
 package org.eclipse.scout.sdk.core.s.environment;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * <h3>{@link CompletedFutureTest}</h3>
@@ -38,11 +34,14 @@ public class CompletedFutureTest {
     assertFalse(f.isCancelled());
     assertFalse(f.isCompletedExceptionally());
     assertTrue(f.isDone());
-    assertEquals(input, f.get());
-    assertEquals(input, f.get(1, TimeUnit.SECONDS));
+    assertEquals(input, f.get().get());
+    assertEquals(input, f.result());
+    assertEquals(input, f.get(1, TimeUnit.SECONDS).get());
 
     StringBuilder done = new StringBuilder();
-    f.thenAccept(done::append);
+    f
+        .thenApply(Supplier::get)
+        .thenAccept(done::append);
     f.awaitDoneThrowingOnErrorOrCancel();
     assertEquals(input, done.toString());
   }
@@ -50,7 +49,8 @@ public class CompletedFutureTest {
   @Test
   public void testNoResult() throws InterruptedException, ExecutionException {
     IFuture<String> f = Future.completed(null);
-    assertNull(f.get());
+    assertNull(f.get().get());
+    assertNull(f.result());
   }
 
   @Test
@@ -74,7 +74,10 @@ public class CompletedFutureTest {
 
     String input = "abc";
     StringBuilder done = new StringBuilder();
-    f.exceptionally(ex -> done.append(input));
+    f.exceptionally(ex -> {
+      done.append(input);
+      return () -> null;
+    });
     assertEquals(input, done.toString());
 
     assertSame(t, assertThrows(RuntimeException.class, f::awaitDoneThrowingOnErrorOrCancel).getCause());

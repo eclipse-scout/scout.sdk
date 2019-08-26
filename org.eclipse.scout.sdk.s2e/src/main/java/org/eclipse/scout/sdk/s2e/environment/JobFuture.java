@@ -100,7 +100,7 @@ public final class JobFuture<V> extends Future<V> {
    * @param monitor
    *          the progress monitor that can be used to cancel the waiting, or {@code null} if cancellation is not
    *          required. No progress is reported on this monitor.
-   * @return the computed result
+   * @return A {@link Supplier} that returns the computed result
    * @throws CancellationException
    *           if the computation was cancelled
    * @throws ExecutionException
@@ -110,7 +110,7 @@ public final class JobFuture<V> extends Future<V> {
    * @throws TimeoutException
    *           if the wait timed out
    */
-  public V get(long timeout, TimeUnit unit, IProgressMonitor monitor) throws InterruptedException, ExecutionException, TimeoutException {
+  public Supplier<V> get(long timeout, TimeUnit unit, IProgressMonitor monitor) throws InterruptedException, ExecutionException, TimeoutException {
     try {
       detectDeadLock();
       boolean completed = m_job.join(unit.toMillis(timeout), monitor);
