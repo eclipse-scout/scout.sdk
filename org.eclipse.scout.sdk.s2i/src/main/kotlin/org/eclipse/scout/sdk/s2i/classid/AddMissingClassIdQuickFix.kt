@@ -57,7 +57,7 @@ open class AddMissingClassIdQuickFix : LocalQuickFix {
 
             override fun commit(progress: IdeaProgress): Boolean {
                 targetClass.modifierList?.addAfter(annotationToAdd, anchor)
-                JavaCodeStyleManager.getInstance(targetClass.project).shortenClassReferences(annotationToAdd)
+                JavaCodeStyleManager.getInstance(targetClass.project).shortenClassReferences(targetClass)
                 return true
             }
         }
