@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.sdk.s2i.derived.impl
 
 import com.intellij.AppTopics
@@ -18,6 +28,7 @@ import org.eclipse.scout.sdk.core.s.environment.Future
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceHandlerFactory
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
@@ -163,7 +174,9 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
 
     protected inner class DocumentSyncListener : FileDocumentManagerListener {
         override fun fileContentReloaded(file: VirtualFile, document: Document) {
-            trigger(fileScope(project, file))
+            if (JavaTypes.JAVA_FILE_EXTENSION == file.extension) {
+                trigger(fileScope(project, file))
+            }
         }
 
         override fun beforeDocumentSaving(document: Document) {
