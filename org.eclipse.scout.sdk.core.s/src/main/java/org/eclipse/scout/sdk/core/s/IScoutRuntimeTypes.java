@@ -193,7 +193,7 @@ public interface IScoutRuntimeTypes {
   String IUuId = "org.eclipse.scout.rt.dataobject.id.IUuId";
 
   // other runtime classes
-  String ACCESS = "org.eclipse.scout.rt.shared.services.common.security.ACCESS";
+  String ACCESS = "org.eclipse.scout.rt.security.ACCESS";
   String BEANS = "org.eclipse.scout.rt.platform.BEANS";
   String TEXTS = "org.eclipse.scout.rt.platform.text.TEXTS";
   String Logger = "org.slf4j.Logger";
