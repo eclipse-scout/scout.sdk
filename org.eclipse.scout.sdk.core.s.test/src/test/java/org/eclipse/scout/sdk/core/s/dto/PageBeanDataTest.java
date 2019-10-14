@@ -397,7 +397,7 @@ public class PageBeanDataTest {
     IField serialVersionUID1 = assertFieldExist(extendedExtendedTablePageWithExtendedTableRowData, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
-    IField boolean_ = assertFieldExist(extendedExtendedTablePageWithExtendedTableRowData, "_boolean");
+    IField boolean_ = assertFieldExist(extendedExtendedTablePageWithExtendedTableRowData, "boolean_");
     assertHasFlags(boolean_, 25);
     assertFieldType(boolean_, String.class.getName());
     IField m_boolean = assertFieldExist(extendedExtendedTablePageWithExtendedTableRowData, "m_boolean");

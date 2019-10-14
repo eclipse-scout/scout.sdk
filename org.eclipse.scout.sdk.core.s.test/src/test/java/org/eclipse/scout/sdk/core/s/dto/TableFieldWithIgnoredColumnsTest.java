@@ -199,7 +199,7 @@ public class TableFieldWithIgnoredColumnsTest {
     IField serialVersionUID2 = assertFieldExist(tableBaseRowData, "serialVersionUID");
     assertHasFlags(serialVersionUID2, 26);
     assertFieldType(serialVersionUID2, "long");
-    IField default_ = assertFieldExist(tableBaseRowData, "_default");
+    IField default_ = assertFieldExist(tableBaseRowData, "default_");
     assertHasFlags(default_, 25);
     assertFieldType(default_, String.class.getName());
     IField create = assertFieldExist(tableBaseRowData, "create");

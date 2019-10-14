@@ -86,7 +86,7 @@ public abstract class AbstractJavaElementGenerator<TYPE extends IJavaElementGene
    */
   public static String ensureValidJavaName(String parameterName) {
     if (JavaTypes.isReservedJavaKeyword(parameterName)) {
-      return '_' + parameterName;
+      return parameterName + '_';
     }
     return parameterName;
   }

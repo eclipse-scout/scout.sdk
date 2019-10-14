@@ -677,7 +677,7 @@ public class TableFieldBeanTest {
     IField serialVersionUID8 = assertFieldExist(noTableExtendedRowData, "serialVersionUID");
     assertHasFlags(serialVersionUID8, 26);
     assertFieldType(serialVersionUID8, "long");
-    IField new_ = assertFieldExist(noTableExtendedRowData, "_new");
+    IField new_ = assertFieldExist(noTableExtendedRowData, "new_");
     assertHasFlags(new_, 25);
     assertFieldType(new_, String.class.getName());
     IField m_new = assertFieldExist(noTableExtendedRowData, "m_new");
@@ -736,7 +736,7 @@ public class TableFieldBeanTest {
     IField serialVersionUID10 = assertFieldExist(tableExtendedRowData, "serialVersionUID");
     assertHasFlags(serialVersionUID10, 26);
     assertFieldType(serialVersionUID10, "long");
-    IField boolean_ = assertFieldExist(tableExtendedRowData, "_boolean");
+    IField boolean_ = assertFieldExist(tableExtendedRowData, "boolean_");
     assertHasFlags(boolean_, 25);
     assertFieldType(boolean_, String.class.getName());
     IField m_boolean = assertFieldExist(tableExtendedRowData, "m_boolean");
