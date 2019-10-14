@@ -12,14 +12,13 @@ package org.eclipse.scout.sdk.core.s.permission;
 
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import java.security.BasicPermission;
-
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 
 /**
  * <h3>{@link PermissionGenerator}</h3>
@@ -32,14 +31,15 @@ public class PermissionGenerator<TYPE extends PermissionGenerator<TYPE>> extends
   protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
     mainType
         .withField(FieldGenerator.createSerialVersionUid())
-        .withSuperClass(BasicPermission.class.getName())
+        .withSuperClass(IScoutRuntimeTypes.AbstractPermission)
         .withMethod(createConstructor(mainType));
   }
 
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createConstructor(ITypeGenerator<? extends ITypeGenerator<?>> constructorOwner) {
+    String permissionName = constructorOwner.elementName().orElseThrow(() -> newFail("Permission name is missing"));
     return MethodGenerator.create()
         .asPublic()
-        .withElementName(constructorOwner.elementName().orElseThrow(() -> newFail("Permission name is missing")))
-        .withBody(b -> b.superClause().parenthesisOpen().classLiteral(constructorOwner.fullyQualifiedName()).append(".getSimpleName()").parenthesisClose().semicolon());
+        .withElementName(permissionName)
+        .withBody(b -> b.superClause().parenthesisOpen().stringLiteral(permissionName).parenthesisClose().semicolon());
   }
 }

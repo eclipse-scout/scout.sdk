@@ -12,8 +12,7 @@ package org.eclipse.scout.sdk.core.s.permission;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.security.BasicPermission;
-
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
@@ -38,7 +37,7 @@ public class PermissionNewOperationTest {
     op.setPackage("org.eclipse.scout.sdk.s2e.shared.test");
     op.setPermissionName("My" + ISdkProperties.SUFFIX_PERMISSION);
     op.setSharedSourceFolder(env.getTestingSourceFolder());
-    op.setSuperType(BasicPermission.class.getName());
+    op.setSuperType(IScoutRuntimeTypes.AbstractPermission);
     env.run(op);
     assertNotNull(op.getCreatedPermission());
   }

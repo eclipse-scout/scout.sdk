@@ -10,9 +10,9 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.permission;
 
-import java.security.BasicPermission;
 import java.security.Permission;
 
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
@@ -29,7 +29,7 @@ import org.eclipse.ui.PlatformUI;
 public class PermissionNewWizardPage extends CompilationUnitNewWizardPage {
   public PermissionNewWizardPage(PackageContainer packageContainer) {
     super(PermissionNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_PERMISSION,
-        Permission.class.getName(), BasicPermission.class.getName(), ScoutTier.Shared);
+        Permission.class.getName(), IScoutRuntimeTypes.AbstractPermission, ScoutTier.Shared);
     setTitle("Create a new Permission");
     setDescription(getTitle());
     setIcuGroupName("New Permission Details");

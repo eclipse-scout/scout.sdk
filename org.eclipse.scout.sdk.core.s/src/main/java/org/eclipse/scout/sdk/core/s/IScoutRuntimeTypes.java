@@ -91,6 +91,7 @@ public interface IScoutRuntimeTypes {
   String AbstractPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage";
   String AbstractPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes";
   String AbstractPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable";
+  String AbstractPermission = "org.eclipse.scout.rt.security.AbstractPermission";
   String AbstractPlanner = "org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner";
   String AbstractPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField";
   String AbstractPropertyData = "org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData";

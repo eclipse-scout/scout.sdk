@@ -1,10 +1,10 @@
 package org.eclipse.scout.sdk.core.s.test.shared;
 
-import java.security.BasicPermission;
+import org.eclipse.scout.rt.security.AbstractPermission;
 
-public class MyPermission extends BasicPermission {
+public class MyPermission extends AbstractPermission {
 private static final long serialVersionUID = 1L;
 public MyPermission() {
-super(MyPermission.class.getSimpleName());
+super("MyPermission");
 }
 }
