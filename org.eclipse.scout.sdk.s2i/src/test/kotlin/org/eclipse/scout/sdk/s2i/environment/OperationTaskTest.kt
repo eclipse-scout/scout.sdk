@@ -1,14 +1,24 @@
+/*
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.sdk.s2i.environment
 
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase.assertThrows
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase.assertThrows
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.junit.Assert
 import java.util.concurrent.CancellationException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-class OperationTaskTest : LightPlatformCodeInsightFixtureTestCase() {
+class OperationTaskTest : BasePlatformTestCase() {
 
     fun testOperationWithException() {
         val ex = NullPointerException()

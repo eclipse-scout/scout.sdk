@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.jdt.internal.debug.ui.JavaDetailFormattersManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
@@ -184,7 +185,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
    * @return The new image descriptor
    */
   public static ImageDescriptor getImageDescriptor(String fileName) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + fileName);
+    return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, fileName).orElse(null);
   }
 
   public IDialogSettings getDialogSettingsSection(String name) {

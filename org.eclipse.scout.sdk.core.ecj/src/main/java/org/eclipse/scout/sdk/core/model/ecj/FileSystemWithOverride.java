@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,14 +56,14 @@ public class FileSystemWithOverride extends FileSystem {
   }
 
   @Override
-  public char[][] getModulesDeclaringPackage(char[][] parentPackageName, char[] packageName, char[] moduleName) {
+  public char[][] getModulesDeclaringPackage(char[][] packageName, char[] moduleName) {
     if (!hasModule(moduleName)) {
-      char[] fqnWithSlash = CharOperation.concatWith(parentPackageName, packageName, '/');
+      char[] fqnWithSlash = CharOperation.concatWith(packageName, '/');
       if (overrideSupport().containsPackage(fqnWithSlash)) {
         return new char[][]{ModuleBinding.UNNAMED};
       }
     }
-    return super.getModulesDeclaringPackage(parentPackageName, packageName, moduleName);
+    return super.getModulesDeclaringPackage(packageName, moduleName);
   }
 
   @Override
