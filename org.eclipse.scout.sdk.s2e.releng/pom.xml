@@ -110,7 +110,7 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_2018_12</id>
+              <id>eclipse_2019_09</id>
               <url>http://download.eclipse.org/releases/2019-09/</url>
               <layout>p2</layout>
             </repository>
