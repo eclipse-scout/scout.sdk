@@ -10,15 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.testing.maven;
 
-import okhttp3.ConnectionPool;
-import org.apache.maven.cli.CLIManager;
-import org.apache.maven.cli.MavenCli;
-import org.eclipse.scout.sdk.core.log.SdkConsole;
-import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi;
-import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
-import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.Strings;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,7 +33,16 @@ import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.apache.maven.cli.CLIManager;
+import org.apache.maven.cli.MavenCli;
+import org.eclipse.scout.sdk.core.log.SdkConsole;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
+
+import okhttp3.internal.connection.RealConnectionPool;
 
 /**
  * <h3>{@link MavenCliRunner}</h3>
@@ -155,11 +156,11 @@ public class MavenCliRunner implements IMavenRunnerSpi {
   @SuppressWarnings({"deprecation", "squid:S1181"}) // Throwable and Error should not be caught
   protected static void stopOkHttp(ClassLoader loader) {
     try {
-      Class<?> poolClass = loader.loadClass(ConnectionPool.class.getName());
+      Class<?> poolClass = loader.loadClass(RealConnectionPool.class.getName());
       Field field = poolClass.getDeclaredField("executor");
       field.setAccessible(true);
-      Object executor = field.get(null);
-      ThreadPoolExecutor.class.getMethod("shutdownNow").invoke(executor);
+      ThreadPoolExecutor executor = (ThreadPoolExecutor) field.get(null);
+      executor.shutdownNow();
 
       for (Thread candidate : Thread.getAllStackTraces().keySet()) {
         String threadName = candidate.getName();
