@@ -206,16 +206,6 @@ public final class CoreScoutTestingUtils {
   }
 
   /**
-   * Executes a 'mvn clean verify' in the given directory.
-   *
-   * @param pomDir
-   *          The directory in which the maven command should be executed. Must contain a pom.xml file.
-   */
-  public static void runMavenCleanVerify(Path pomDir) {
-    runMavenCommand(pomDir, "clean", "verify");
-  }
-
-  /**
    * Executes a 'mvn clean test' in the given directory.
    *
    * @param pomDir
