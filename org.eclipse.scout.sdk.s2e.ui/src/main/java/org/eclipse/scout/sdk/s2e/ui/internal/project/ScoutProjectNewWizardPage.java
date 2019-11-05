@@ -148,7 +148,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     Group uiLangBox = FieldToolkit.createGroupBox(parent, "Programming language of the user interface");
 
     m_javaScriptButton = new Button(uiLangBox, SWT.RADIO);
-    m_javaScriptButton.setText("JavaScript && JSON");
+    m_javaScriptButton.setText("JavaScript");
     m_javaScriptButton.setSelection(isUseJsClient());
     m_javaScriptButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -272,7 +272,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     setDisplayNameInternal("My Application");
 
     // ui language
-    setUseJsClientInternal(false);
+    setUseJsClientInternal(true);
 
     // use workspace loc
     setUseWorkspaceLocationInternal(true);
