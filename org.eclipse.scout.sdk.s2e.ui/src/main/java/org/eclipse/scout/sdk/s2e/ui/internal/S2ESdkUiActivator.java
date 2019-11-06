@@ -185,7 +185,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
    * @return The new image descriptor
    */
   public static ImageDescriptor getImageDescriptor(String fileName) {
-    return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, fileName).orElse(null);
+    return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, IMAGE_PATH + fileName).orElse(null);
   }
 
   public IDialogSettings getDialogSettingsSection(String name) {
