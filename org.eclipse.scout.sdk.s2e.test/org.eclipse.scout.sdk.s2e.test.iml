@@ -111,7 +111,6 @@
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:10.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.jboss:jandex:2.0.5.Final" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
-    <orderEntry type="library" name="Maven: com.zaxxer:HikariCP-java7:2.4.13" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.19.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.13.500" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.16.0" level="project" />
