@@ -10,12 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
-import org.eclipse.scout.sdk.core.log.SdkLog;
-
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
@@ -23,8 +22,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
+
+import org.eclipse.scout.sdk.core.log.SdkLog;
 
 /**
  * <h3>{@link CoreUtils}</h3> Holds core utilities.
@@ -34,7 +34,9 @@ import java.util.regex.Pattern;
 public final class CoreUtils {
 
   private static final Pattern PATH_SEGMENT_SPLIT_PATTERN = Pattern.compile("/");
+  @SuppressWarnings("HardcodedLineSeparator")
   private static final Pattern REGEX_COMMENT_REMOVE_1 = Pattern.compile("//.*?\r\n");
+  @SuppressWarnings("HardcodedLineSeparator")
   private static final Pattern REGEX_COMMENT_REMOVE_2 = Pattern.compile("//.*?\n");
   private static final Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)/\\*.*?\\*/");
   private static final ThreadLocal<String> CURRENT_USER_NAME = ThreadLocal.withInitial(() -> null);
@@ -54,6 +56,7 @@ public final class CoreUtils {
     if (name != null) {
       return name;
     }
+    //noinspection AccessOfSystemProperties
     return System.getProperty("user.name");
   }
 
@@ -102,35 +105,34 @@ public final class CoreUtils {
       return;
     }
 
-    AtomicReference<IOException> ex = new AtomicReference<>(); // remember the first exception but continue to delete as far as possible.
     Files.walkFileTree(toDelete, new SimpleFileVisitor<Path>() {
       @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-        try {
-          Files.delete(file);
-        }
-        catch (IOException e) {
-          ex.compareAndSet(null, e);
-        }
-        return FileVisitResult.CONTINUE;
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        Files.delete(file);
+        return super.visitFile(file, attrs);
       }
 
       @Override
-      public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+      public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
         try {
-          Files.delete(dir);
+          // try to delete the file anyway, even if its attributes could not be read, since delete-only access is theoretically possible
+          Files.delete(file);
         }
-        catch (IOException e) {
-          ex.compareAndSet(null, e);
+        catch(IOException e) {
+          SdkLog.debug("Unable to delete '{}' after failed visit.", file, e);
         }
-        return FileVisitResult.CONTINUE;
+        if(exc instanceof NoSuchFileException) {
+          return FileVisitResult.SKIP_SUBTREE;
+        }
+        throw exc;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        Files.delete(dir);
+        return super.postVisitDirectory(dir, exc);
       }
     });
-
-    IOException ioException = ex.get();
-    if (ioException != null) {
-      throw ioException;
-    }
   }
 
   /**
@@ -209,6 +211,7 @@ public final class CoreUtils {
     String[] cParts = PATH_SEGMENT_SPLIT_PATTERN.split(child.getRawPath());
 
     // Discard trailing segment of base path
+    //noinspection HardcodedFileSeparator
     if (bParts.length > 0 && !base.getPath().endsWith("/")) {
       bParts = Arrays.copyOf(bParts, bParts.length - 1);
     }
@@ -224,10 +227,12 @@ public final class CoreUtils {
     // Construct the relative path
     StringBuilder sb = new StringBuilder();
     for (int j = 0; j < (bParts.length - i); j++) {
+      //noinspection HardcodedFileSeparator
       sb.append("../");
     }
     for (int j = i; j < cParts.length; j++) {
       if (j != i) {
+        //noinspection HardcodedFileSeparator
         sb.append('/');
       }
       sb.append(cParts[j]);
@@ -249,6 +254,7 @@ public final class CoreUtils {
     if (uri == null) {
       return null;
     }
+    //noinspection HardcodedFileSeparator
     if (uri.getPath().endsWith("/")) {
       return uri.resolve("..");
     }
