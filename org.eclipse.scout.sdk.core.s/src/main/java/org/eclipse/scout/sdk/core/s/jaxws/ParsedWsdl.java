@@ -41,6 +41,7 @@ import javax.wsdl.extensions.schema.SchemaImport;
 import javax.wsdl.extensions.schema.SchemaReference;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap.SOAPBody;
+import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
@@ -210,7 +211,7 @@ public class ParsedWsdl {
       Map<String, Port> ports = service.getPorts();
       for (Port port : ports.values()) {
         for (ExtensibilityElement element : extensibilityElementsOf(port)) {
-          if (element instanceof SOAPAddress) {
+          if (element instanceof SOAPAddress || element instanceof SOAP12Address) {
             @SuppressWarnings("squid:S2259")
             Binding binding = port.getBinding();
             if (isBindingSupported(binding)) {
