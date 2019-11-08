@@ -46,7 +46,7 @@ public final class DtoMemberSortObjectFactory {
 
   /**
    * Creates a sort order object array for the FormData FormField getter.<br>
-   * * (e.g. {@code public LastName getLastName()})
+   * (e.g. {@code public LastName getLastName()})
    *
    * @param name
    *          The name of the FormField. E.g. "LastName" without getter or setter prefix and without "Field" Suffix.
@@ -54,6 +54,17 @@ public final class DtoMemberSortObjectFactory {
    */
   public static Object[] forMethodFormDataFormField(String name) {
     return SortedMemberEntry.createDefaultMethodPos(name, 10);
+  }
+
+  /**
+   * Creates a sort order object array for the methods in a AbstractTableFieldBeanData.<br>
+   * (e.g. {@code addRow()} or {@code getRowType()})
+   * 
+   * @param name The name of the method (e.g. "getRowType").
+   * @return The sort order for the TableFieldBeanData method
+   */
+  public static Object[] forMethodTableData(String name) {
+    return forMethodFormDataFormField(name);
   }
 
   /**
@@ -78,5 +89,14 @@ public final class DtoMemberSortObjectFactory {
    */
   public static Object[] forTypeFormDataFormField(String name) {
     return SortedMemberEntry.createDefaultTypePos(name);
+  }
+
+  /**
+   * Creates a sort order object array for the AbstractTableRowData type within a AbstractTableFieldBeanData.
+   * @param name The name of the TableRowData type
+   * @return The sort order for the RowData type.
+   */
+  public static Object[] forTypeTableRowData(String name) {
+    return forTypeFormDataFormField(name);
   }
 }
