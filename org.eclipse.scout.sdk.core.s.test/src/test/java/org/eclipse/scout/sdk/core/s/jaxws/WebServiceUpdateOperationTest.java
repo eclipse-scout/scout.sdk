@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.jaxws;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -43,7 +42,7 @@ public class WebServiceUpdateOperationTest {
   private static final String PORT_TYPE_NAME_IN_WSDL = "scoutQueryInterface2";
   private static final String WEB_SERVICE_NAME_IN_WSDL = "scoutQuery";
   private static final String ORIGINAL_PORT_TYPE_NAME = "IScoutQueryInterface2PortType";
-  private static final String ORIGINA_WEB_SERVICE_NAME = "ScoutQueryService";
+  private static final String ORIGINAL_WEB_SERVICE_NAME = "ScoutQueryService";
   private static final String ORIGINAL_ENTRY_POINT_NAME = "ScoutQueryInterface2WebServiceEntryPoint";
 
   @Test
@@ -100,7 +99,7 @@ public class WebServiceUpdateOperationTest {
 
       // validate change
       assertFalse(javaEnvironment.findType(origPackage + JavaTypes.C_DOT + ORIGINAL_PORT_TYPE_NAME).isPresent());
-      assertFalse(javaEnvironment.findType(origPackage + JavaTypes.C_DOT + ORIGINA_WEB_SERVICE_NAME).isPresent());
+      assertFalse(javaEnvironment.findType(origPackage + JavaTypes.C_DOT + ORIGINAL_WEB_SERVICE_NAME).isPresent());
       assertTrue(javaEnvironment.findType(newPortTypePackage + JavaTypes.C_DOT + newServiceName).isPresent());
       assertTrue(javaEnvironment.findType(newPortTypePackage + JavaTypes.C_DOT + newPortTypeName).isPresent());
     };
@@ -153,7 +152,7 @@ public class WebServiceUpdateOperationTest {
 
       // validate change
       assertFalse(javaEnvironment.findType(origPackage + JavaTypes.C_DOT + ORIGINAL_PORT_TYPE_NAME).isPresent());
-      assertFalse(javaEnvironment.findType(origPackage + JavaTypes.C_DOT + ORIGINA_WEB_SERVICE_NAME).isPresent());
+      assertFalse(javaEnvironment.findType(origPackage + JavaTypes.C_DOT + ORIGINAL_WEB_SERVICE_NAME).isPresent());
       assertFalse(javaEnvironment.findType(origPackage + JavaTypes.C_DOT + ORIGINAL_ENTRY_POINT_NAME).isPresent());
       assertTrue(javaEnvironment.findType(newEntryPointPackage + JavaTypes.C_DOT + newEntryPointName).isPresent());
       assertTrue(javaEnvironment.findType(newPortTypePackage + JavaTypes.C_DOT + newServiceName).isPresent());
