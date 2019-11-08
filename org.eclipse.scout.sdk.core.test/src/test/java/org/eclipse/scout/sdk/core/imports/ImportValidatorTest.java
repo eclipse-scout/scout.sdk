@@ -12,9 +12,7 @@ package org.eclipse.scout.sdk.core.imports;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +26,7 @@ import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilder;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ImportTestClass;
+import org.eclipse.scout.sdk.core.fixture.sub.ImportTestClass2;
 import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
@@ -228,6 +227,17 @@ public class ImportValidatorTest {
 
     assertEquals(ImportTestClass.Long.class.getSimpleName(), validator.useReference(importTest.innerTypes().first().get().name()));
     assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), validator.useReference(org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
+  }
+
+  @Test
+  @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
+  public void testResolveSuperClassInnerNameWhileExistingInOwnClassToo(IJavaEnvironment env) {
+    IType importTest = env.requireType(ImportTestClass2.class.getName());
+    IImportCollector iv = createEnclosingTypeImportCollector(importTest);
+    IImportValidator validator = new ImportValidator(iv);
+
+    // must be qualified because the same name also exists in the sub class itself (and the parent class).
+    assertEquals(ImportTestClass.Long.class.getName().replace('$', '.'), validator.useReference(ImportTestClass.Long.class.getName()));
   }
 
   @Test

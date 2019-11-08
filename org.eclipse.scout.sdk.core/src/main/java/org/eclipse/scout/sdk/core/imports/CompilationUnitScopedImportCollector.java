@@ -70,27 +70,19 @@ public class CompilationUnitScopedImportCollector extends WrappedImportCollector
       return cand.getSimpleName();
     }
 
-    // check if simpleName (with other packageName) exists in same package
     IJavaEnvironment env = getJavaEnvironment();
-    if (env != null) {
-      Boolean existsInSamePackage = m_existsInSamePackageCache.get(cand.getSimpleName());
-      if (existsInSamePackage == null) {
-        // load to cache
-        String name;
-        if (Strings.isEmpty(q)) {
-          name = cand.getSimpleName();
-        }
-        else {
-          name = new StringBuilder(q).append(JavaTypes.C_DOT).append(cand.getSimpleName()).toString();
-        }
-        existsInSamePackage = env.exists(name);
-        m_existsInSamePackageCache.put(cand.getSimpleName(), existsInSamePackage);
-      }
-      if (existsInSamePackage) {
-        //must qualify
-        return cand.getQualifiedName();
-      }
+    if (env == null) {
+      return super.checkCurrentScope(cand);
     }
+
+    // check if simpleName (with other packageName) exists in same package
+    boolean existsInSamePackage = m_existsInSamePackageCache.computeIfAbsent(cand.getSimpleName(),
+        simpleName -> env.exists(Strings.isEmpty(q) ? simpleName : new StringBuilder(q).append(JavaTypes.C_DOT).append(simpleName).toString()));
+    if (existsInSamePackage) {
+      // must qualify
+      return cand.getQualifiedName();
+    }
+
     return super.checkCurrentScope(cand);
   }
 }

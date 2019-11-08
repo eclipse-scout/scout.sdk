@@ -29,10 +29,8 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  */
 public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
   private final String m_qualifier;
-  //as far as these types exist already!
-  private final Set<String> m_enclosingQualifiers;
-  //as far as these types exist already!
-  private final Set<String> m_enclosedSimpleNames;
+  private final Set<String> m_enclosingQualifiers;    // as far as these types exist already!
+  private final Set<String> m_enclosedSimpleNames;    // as far as these types exist already!
 
   public EnclosingTypeScopedImportCollector(IImportCollector inner, ITypeGenerator<?> enclosingTypeGenerator) {
     super(inner);
@@ -83,14 +81,15 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
 
   @Override
   public String checkCurrentScope(TypeReferenceDescriptor cand) {
-    //same qualifier
     if (m_enclosingQualifiers.contains(cand.getQualifier())) {
+      if (m_enclosedSimpleNames.contains(cand.getSimpleName()) && !m_qualifier.equals(cand.getQualifier())) {
+        return cand.getQualifiedName();
+      }
       return cand.getSimpleName();
     }
 
     // check if simpleName (with other qualifier) exists in same enclosing type
     if (m_enclosedSimpleNames.contains(cand.getSimpleName())) {
-      //must qualify
       return cand.getQualifiedName();
     }
 
