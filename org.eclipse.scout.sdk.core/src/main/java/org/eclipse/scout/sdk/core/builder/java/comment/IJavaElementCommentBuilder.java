@@ -15,6 +15,7 @@ import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
+import org.eclipse.scout.sdk.core.model.api.IType;
 
 /**
  * <h3>{@link IJavaElementCommentBuilder}</h3>
@@ -36,4 +37,22 @@ public interface IJavaElementCommentBuilder<TYPE extends IJavaElementCommentBuil
    * @see IDefaultElementCommentGeneratorSpi
    */
   TYPE appendDefaultElementComment();
+
+  /**
+   * Appends a link reference to the {@link CharSequence} specified. No leading or trailing space is appended.
+   *
+   * @param ref
+   *          The reference for which a link should be added.
+   * @return A reference to this object.
+   */
+  TYPE appendLink(CharSequence ref);
+
+  /**
+   * Appends a linkto the {@link IType} specified. No leading or trailing space is appended.
+   *
+   * @param ref
+   *          The {@link IType} to which a JavaDoc link should be added.
+   * @return A reference to this object.
+   */
+  TYPE appendLink(IType ref);
 }

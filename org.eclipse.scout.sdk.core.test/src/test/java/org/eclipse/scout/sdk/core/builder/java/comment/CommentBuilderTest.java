@@ -10,10 +10,22 @@
  */
 package org.eclipse.scout.sdk.core.builder.java.comment;
 
-import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
-import org.junit.jupiter.api.Test;
-
+import static java.util.stream.Collectors.joining;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.function.Consumer;
+
+import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
+import org.eclipse.scout.sdk.core.fixture.BaseClass;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
+import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * <h3>{@link CommentBuilderTest}</h3>
@@ -36,6 +48,37 @@ public class CommentBuilderTest {
     assertCommentEquals("/*\n* a\n* b\n*/\n", "a\n* b");
     assertCommentEquals("/*\n* abc\n*/\n", "/**\nabc\n**/");
     assertCommentEquals("/*\n* abc\n*/\n", "/*\nabc\n*/");
+  }
+
+  @Test
+  @ExtendWith(JavaEnvironmentExtension.class)
+  @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
+  public void testAppendLink(IJavaEnvironment env) {
+    assertJavaElementCommentEquals("{@link}", "", b -> b.appendLink((CharSequence) null), env);
+    assertJavaElementCommentEquals("{@link}", "", b -> b.appendLink((IType) null), env);
+    assertJavaElementCommentEquals("{@link " + BaseClass.class.getSimpleName() + '}', "import " + BaseClass.class.getName() + ';',
+        b -> b.appendLink(env.requireType(BaseClass.class.getName())), env);
+    assertJavaElementCommentEquals("{@link}", "", b -> b.appendLink(""), env);
+    assertJavaElementCommentEquals("{@link " + BaseClass.class.getSimpleName() + '}', "import " + BaseClass.class.getName() + ';',
+        b -> b.appendLink(BaseClass.class.getName()), env);
+    assertJavaElementCommentEquals(JavaTypes._boolean, "", b -> b.appendLink(env.requireType(JavaTypes._boolean)), env);
+    assertJavaElementCommentEquals(JavaTypes._void, "", b -> b.appendLink(env.requireType(JavaTypes._void)), env);
+    assertJavaElementCommentEquals(String.class.getSimpleName() + "[]", "", b -> b.appendLink(env.requireType(String.class.getName() + "[]")), env);
+  }
+
+  protected static void assertJavaElementCommentEquals(String expectedSrc, String expectedImports, Consumer<IJavaElementCommentBuilder<?>> task, IJavaEnvironment env) {
+    JavaBuilderContext context = new JavaBuilderContext(env);
+    MemorySourceBuilder inner = new MemorySourceBuilder(context);
+    IJavaElementCommentBuilder<?> builder = new JavaElementCommentBuilder<>(inner, () -> null);
+
+    task.accept(builder);
+
+    String imports = context.validator()
+        .importCollector()
+        .createImportDeclarations()
+        .collect(joining(", "));
+    assertEquals(expectedSrc, inner.source().toString());
+    assertEquals(expectedImports, imports);
   }
 
   protected static void assertJavaDocEquals(String expected, String input) {

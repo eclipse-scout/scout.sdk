@@ -12,10 +12,7 @@ package org.eclipse.scout.sdk.core.model.api;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -35,9 +32,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
+@SuppressWarnings({"SimplifiableJUnitAssertion", "EqualsWithItself", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "unlikely-arg-type"})
 public class PropertyBeanTest {
   @Test
-  @SuppressWarnings("unlikely-arg-type")
   public void testPropertyBean(IJavaEnvironment env) {
     IType propTestClass = env.requireType(PropertyTestClass.class.getName());
     IType propTestClass2 = env.requireType(PropertyTestClass2.class.getName());
@@ -100,6 +97,20 @@ public class PropertyBeanTest {
         .filter(b -> Character.isLowerCase(b.type().elementName().charAt(0)))
         .count();
     assertEquals(1, num);
+  }
+
+  @Test
+  public void testDataTypeOf(IJavaEnvironment env) {
+    IType t = env.requireType(PropertyTestClass.class.getName());
+    assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("getString").first().get()).get().name());
+    assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("setString").first().get()).get().name());
+
+    assertEquals(JavaTypes._boolean, PropertyBean.dataTypeOf(t.methods().withName("isTrue").first().get()).get().name());
+    assertEquals(JavaTypes._boolean, PropertyBean.dataTypeOf(t.methods().withName("setTrue").first().get()).get().name());
+
+    assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("setAlone").first().get()).get().name());
+    assertFalse(PropertyBean.dataTypeOf(t.methods().withName("doAnything").first().get()).isPresent());
+    assertFalse(PropertyBean.dataTypeOf(null).isPresent());
   }
 
   @Test

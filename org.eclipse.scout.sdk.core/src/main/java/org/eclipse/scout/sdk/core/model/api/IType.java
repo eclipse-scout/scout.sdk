@@ -176,7 +176,7 @@ public interface IType extends IMember {
   ICompilationUnit requireCompilationUnit();
 
   /**
-   * @return {@code true} if this type is the void type, {@code false} otherwise.
+   * @return {@code true} if this type is the (primitive) void type, {@code false} otherwise.
    */
   boolean isVoid();
 

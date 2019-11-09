@@ -22,14 +22,14 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 public interface ICommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends ISourceBuilder<TYPE> {
 
   /**
-   * Appends a block comment start expression. The start expression is {@code /*}
+   * Appends a block comment start expression without any trailing space. The start expression is {@code /*}
    *
    * @return This builder
    */
   TYPE appendBlockCommentStart();
 
   /**
-   * Appends a JavaDoc block comment start expression. The start expression is {@code /**}
+   * Appends a JavaDoc block comment start expression (without trailing space). The start expression is {@code /**}
    *
    * @return This builder
    */

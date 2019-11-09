@@ -40,8 +40,11 @@ public class PropertyBean {
   /**
    * Regular expression matching bean method names (is..., get..., set...)
    */
+  @SuppressWarnings("HardcodedFileSeparator")
   public static final Pattern BEAN_METHOD_NAME = Pattern.compile('(' + GETTER_PREFIX + '|' + SETTER_PREFIX + '|' + GETTER_BOOL_PREFIX + ")([A-Z]\\w*)");
+  @SuppressWarnings("HardcodedFileSeparator")
   public static final Pattern GETTER_METHOD_NAME = Pattern.compile('(' + GETTER_PREFIX + '|' + GETTER_BOOL_PREFIX + ")([A-Z]\\w*)");
+  @SuppressWarnings("HardcodedFileSeparator")
   public static final Pattern SETTER_METHOD_NAME = Pattern.compile('(' + SETTER_PREFIX + ")([A-Z]\\w*)");
 
   private final String m_beanName;
@@ -213,6 +216,7 @@ public class PropertyBean {
       return Optional.empty();
     }
     CharSequence methodName = m.elementName().orElseThrow(() -> newFail("Method name is missing."));
+    //noinspection NumericCastThatLosesPrecision
     int numParams = (int) m.parameters().count();
     if (setter) {
       return setterName(methodName, numParams, m.returnType().get());
@@ -226,12 +230,33 @@ public class PropertyBean {
       return Optional.empty();
     }
 
+    //noinspection NumericCastThatLosesPrecision
     int numParams = (int) m.parameters().stream().count();
     String returnDataType = m.requireReturnType().name();
     if (setter) {
       return setterName(m.elementName(), numParams, returnDataType);
     }
     return getterName(m.elementName(), numParams, returnDataType);
+  }
+
+  /**
+   * Gets the data type of the bean method.
+   *
+   * @param getterOrSetter
+   *          The getter or setter {@link IMethod}.
+   * @return An {@link Optional} holding the bean data type of the method or an empty {@link Optional} if the data type
+   *         could not be determined.
+   */
+  public static Optional<IType> dataTypeOf(IMethod getterOrSetter) {
+    if (getterOrSetter == null) {
+      return Optional.empty();
+    }
+    if (getterOrSetter.parameters().existsAny()) {
+      return getterOrSetter.parameters()
+          .first()
+          .map(IMethodParameter::dataType);
+    }
+    return getterOrSetter.returnType().filter(t -> !t.isVoid());
   }
 
   /**

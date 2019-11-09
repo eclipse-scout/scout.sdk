@@ -14,15 +14,19 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link JavaElementCommentBuilder}</h3>
@@ -35,11 +39,19 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
 
   private final Supplier<ISourceGenerator<ICommentBuilder<?>>> m_defaultCommentGeneratorSupplier;
   private final FinalValue<ISourceGenerator<ICommentBuilder<?>>> m_defaultElementCommentGenerator;
+  private final IJavaBuilderContext m_context;
 
   protected JavaElementCommentBuilder(ISourceBuilder<?> inner, Supplier<ISourceGenerator<ICommentBuilder<?>>> defaultCommentGeneratorSupplier) {
     super(inner);
     m_defaultElementCommentGenerator = new FinalValue<>();
     m_defaultCommentGeneratorSupplier = Ensure.notNull(defaultCommentGeneratorSupplier);
+    IBuilderContext context = inner.context();
+    if (context instanceof IJavaBuilderContext) {
+      m_context = (IJavaBuilderContext) context;
+    }
+    else {
+      m_context = null;
+    }
   }
 
   public static IDefaultElementCommentGeneratorSpi getCommentGeneratorSpi() {
@@ -144,5 +156,39 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
 
   public ISourceGenerator<ICommentBuilder<?>> defaultElementComment() {
     return m_defaultElementCommentGenerator.computeIfAbsentAndGet(m_defaultCommentGeneratorSupplier);
+  }
+
+  @Override
+  public TYPE appendLink(IType ref) {
+    if (ref == null) {
+      return appendLink(null, true);
+    }
+    return appendLink(ref.reference(), !ref.isArray() && !ref.isPrimitive() && !ref.isWildcardType() && !ref.isVoid());
+  }
+
+  @Override
+  public TYPE appendLink(CharSequence ref) {
+    return appendLink(ref, true);
+  }
+
+  protected TYPE appendLink(CharSequence ref, boolean useLink) {
+    if (useLink) {
+      append("{@link");
+    }
+    if (Strings.hasText(ref)) {
+      if (useLink) {
+        append(' ');
+      }
+      if (m_context != null) {
+        append(m_context.validator().useReference(ref));
+      }
+      else {
+        append(ref);
+      }
+    }
+    if (useLink) {
+      append('}');
+    }
+    return currentInstance();
   }
 }

@@ -159,8 +159,6 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
                 SdkLog.debug("{} has been cancelled.", indicator.text2, e)
             } catch (e: Exception) {
                 SdkLog.error("Error while: {}", indicator.text2, e)
-            } catch (e: LinkageError) {
-                SdkLog.error("Error while: {}", indicator.text2, e)
             } finally {
                 SdkLog.info("Derived Resource Handler ($handler) took {}ms to execute.", System.currentTimeMillis() - start)
             }
