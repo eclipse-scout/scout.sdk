@@ -10,10 +10,13 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      Initial version providing:
-        - Derived resource update for FormData & PageData
-        - @ClassId validation Inspections
-    ]]>
+        Adds support for:
+        <br>
+        <ul>
+          <li>Derived resource update for FormData & PageData</li>
+          <li>@ClassId validation inspections</li>
+        </ul>
+      ]]>
     </change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
