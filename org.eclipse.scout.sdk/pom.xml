@@ -476,12 +476,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
-        <version>1.7.28</version>
+        <version>1.7.29</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.28</version>
+        <version>1.7.29</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -517,7 +517,7 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <scope>test</scope>
-        <version>27.1-jre</version>
+        <version>28.1-jre</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
