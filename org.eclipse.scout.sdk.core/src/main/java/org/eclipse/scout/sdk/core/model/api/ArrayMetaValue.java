@@ -86,7 +86,10 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
       throw new IllegalArgumentException("expected type must be an array type: " + expectedType);
     }
     for (int i = 0; i < n; i++) {
-      Array.set(array, i, m_metaArray[i].as(elementType));
+      IMetaValue mv = m_metaArray[i];
+      if (mv != null) {
+        Array.set(array, i, mv.as(elementType));
+      }
     }
     return (T) array;
   }
