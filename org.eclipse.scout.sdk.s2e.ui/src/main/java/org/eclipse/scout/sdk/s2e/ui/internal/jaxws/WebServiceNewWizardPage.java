@@ -10,6 +10,24 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import javax.wsdl.WSDLException;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -58,22 +76,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.wsdl.WSDLException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 /**
  * <h3>{@link WebServiceNewWizardPage}</h3>
@@ -427,7 +429,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     if (WebServiceType.PROVIDER_FROM_EMPTY_WSDL == getWebServiceType()) {
       baseName = getWsdlName();
       if (Strings.hasText(baseName)) {
-        baseName = JaxWsUtils.removeCommonSuffixes(baseName.toLowerCase());
+        baseName = JaxWsUtils.removeCommonSuffixes(baseName.toLowerCase(Locale.ENGLISH));
       }
     }
     else if (WebServiceType.PROVIDER_FROM_EXISTING_WSDL == getWebServiceType()) {
@@ -460,7 +462,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
       String file = Paths.get(new URL(url).toURI()).getFileName().toString();
       if (Strings.hasText(file)) {
-        file = file.toLowerCase();
+        file = file.toLowerCase(Locale.ENGLISH);
 
         int lastDotPos = file.lastIndexOf('.');
         if (lastDotPos > 0) {
@@ -516,7 +518,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       }
 
       IPackageFragmentRoot primarySourceFolder = primarySourceFolderOpt.get();
-      if (!JdtUtils.exists(primarySourceFolder) || !primarySourceFolder.getResource().getProjectRelativePath().toString().toLowerCase().contains("java")) {
+      if (!JdtUtils.exists(primarySourceFolder) || !primarySourceFolder.getResource().getProjectRelativePath().toString().toLowerCase(Locale.ENGLISH).contains("java")) {
         return false;
       }
       if (!JdtUtils.exists(jp.findType(IScoutRuntimeTypes.AbstractWebServiceClient))) {

@@ -10,6 +10,10 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Locale;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxyVisitor;
@@ -31,9 +35,6 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * <h3>{@link WebServiceNewWizard}</h3>
@@ -126,7 +127,7 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
     try {
       IFile[] result = new IFile[1];
       owner.accept((IResourceProxyVisitor) proxy -> {
-        if (result[0] == null && proxy.getType() == IResource.FILE && proxy.getName().toLowerCase().endsWith('.' + WebServiceEditor.WEB_SERVICE_FILE_EXTENSION)) {
+        if (result[0] == null && proxy.getType() == IResource.FILE && proxy.getName().toLowerCase(Locale.ENGLISH).endsWith('.' + WebServiceEditor.WEB_SERVICE_FILE_EXTENSION)) {
           IFile resource = (IFile) proxy.requestResource();
           if (resource.exists()) {
             result[0] = resource;

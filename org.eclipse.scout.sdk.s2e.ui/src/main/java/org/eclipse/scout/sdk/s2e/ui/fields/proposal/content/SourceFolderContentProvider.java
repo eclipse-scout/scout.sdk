@@ -10,11 +10,11 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal.content;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
+import static java.util.Collections.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -56,7 +56,7 @@ public class SourceFolderContentProvider extends AbstractContentProviderAdapter 
           S2eUtils.sourceFoldersOrdered(jp)
               .filter(root -> {
                 // filter generated source folders (except the form-data-generated source folder)
-                String srcFolderName = root.getPath().removeFirstSegments(1).toString().toLowerCase();
+                String srcFolderName = root.getPath().removeFirstSegments(1).toString().toLowerCase(Locale.ENGLISH);
                 return IScoutSourceFolders.GENERATED_SOURCE_FOLDER.equals(srcFolderName)
                     || !srcFolderName.contains("generated");
               })

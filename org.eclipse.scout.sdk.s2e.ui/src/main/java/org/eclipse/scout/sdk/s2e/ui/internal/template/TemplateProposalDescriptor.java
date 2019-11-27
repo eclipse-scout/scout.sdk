@@ -15,6 +15,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
@@ -101,12 +102,12 @@ public class TemplateProposalDescriptor {
       return true; // no filter
     }
 
-    searchString = searchString.toLowerCase();
-    if (JavaTypes.simpleName(m_proposalIfcTypeFqn).toLowerCase().contains(searchString)) {
+    searchString = searchString.toLowerCase(Locale.ENGLISH);
+    if (JavaTypes.simpleName(m_proposalIfcTypeFqn).toLowerCase(Locale.ENGLISH).contains(searchString)) {
       return true;
     }
 
-    if (m_displayName.toLowerCase().contains(searchString)) {
+    if (m_displayName.toLowerCase(Locale.ENGLISH).contains(searchString)) {
       return true;
     }
 
@@ -115,13 +116,13 @@ public class TemplateProposalDescriptor {
       if (simpleName.startsWith(ISdkProperties.PREFIX_ABSTRACT)) {
         simpleName = simpleName.substring(ISdkProperties.PREFIX_ABSTRACT.length());
       }
-      if (simpleName.toLowerCase().contains(searchString)) {
+      if (simpleName.toLowerCase(Locale.ENGLISH).contains(searchString)) {
         return true;
       }
     }
 
     for (String alias : m_aliasNames) {
-      if (alias.toLowerCase().contains(searchString)) {
+      if (alias.toLowerCase(Locale.ENGLISH).contains(searchString)) {
         return true;
       }
     }

@@ -17,6 +17,7 @@ import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutPr
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
@@ -136,7 +137,7 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
     try {
       for (IPackageFragmentRoot root : getJaxWsProject().getPackageFragmentRoots()) {
         String fileName = root.getPath().lastSegment();
-        String fileNameLower = fileName.toLowerCase();
+        String fileNameLower = fileName.toLowerCase(Locale.ENGLISH);
         if (fileNameLower.startsWith(prefix) && fileNameLower.endsWith(suffix)) {
           return fileName.substring(prefix.length(), fileName.length() - suffix.length());
         }

@@ -10,11 +10,15 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static java.util.Collections.*;
+import static java.util.stream.Collectors.toList;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -24,9 +28,6 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
-
-import static java.util.Collections.*;
-import static java.util.stream.Collectors.toList;
 
 /**
  * <h3>{@link JreInfo}</h3> Stores meta information about a Java Runtime Environment on the disk.
@@ -140,7 +141,7 @@ public class JreInfo {
         continue;
       }
 
-      if (line.toUpperCase().startsWith(prefix)) {
+      if (line.toUpperCase(Locale.ENGLISH).startsWith(prefix)) {
         String value = line.substring(prefix.length()).trim();
         if (value.length() > 0) {
           // strip quotes
@@ -194,7 +195,7 @@ public class JreInfo {
     if (fileName == null) {
       return false;
     }
-    String name = fileName.toString().toLowerCase();
+    String name = fileName.toString().toLowerCase(Locale.ENGLISH);
     return name.endsWith(".jar") || name.endsWith(".zip");
   }
 

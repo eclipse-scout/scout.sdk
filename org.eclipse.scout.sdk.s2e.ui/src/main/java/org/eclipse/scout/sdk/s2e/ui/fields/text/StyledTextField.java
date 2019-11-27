@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.fields.text;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -135,11 +136,11 @@ public class StyledTextField extends TextField {
 
     int start = 0;
     int end = text.length();
-    String lowerText = text.toLowerCase();
-    if (Strings.hasText(prefix) && lowerText.startsWith(prefix.toLowerCase())) {
+    String lowerText = text.toLowerCase(Locale.ENGLISH);
+    if (Strings.hasText(prefix) && lowerText.startsWith(prefix.toLowerCase(Locale.ENGLISH))) {
       start = prefix.length();
     }
-    if (Strings.hasText(suffix) && lowerText.endsWith(suffix.toLowerCase())) {
+    if (Strings.hasText(suffix) && lowerText.endsWith(suffix.toLowerCase(Locale.ENGLISH))) {
       end = text.length() - suffix.length();
     }
 

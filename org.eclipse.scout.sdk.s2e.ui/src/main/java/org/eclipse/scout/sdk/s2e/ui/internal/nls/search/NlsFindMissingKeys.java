@@ -10,11 +10,9 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.search;
 
-import static java.util.Collections.emptySet;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.toSet;
-import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
-import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.*;
 
 import java.nio.CharBuffer;
 import java.nio.file.Path;
@@ -25,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.MatchResult;
@@ -136,7 +135,7 @@ public class NlsFindMissingKeys {
       return;
     }
 
-    String fileName = lastSegment.toString().toLowerCase();
+    String fileName = lastSegment.toString().toLowerCase(Locale.ENGLISH);
     int lastDotPos = fileName.lastIndexOf('.');
     String extension = fileName.substring(lastDotPos + 1);
     Collection<Pattern> patterns = m_patternsByFileType.get(extension);

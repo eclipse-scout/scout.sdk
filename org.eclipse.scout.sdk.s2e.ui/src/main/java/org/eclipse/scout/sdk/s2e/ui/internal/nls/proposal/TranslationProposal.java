@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.proposal;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -92,7 +93,7 @@ public class TranslationProposal extends AbstractTranslationProposal {
         }
 
         String prefix = document.get(keyRange.x, offset - keyRange.x);
-        return m_translation.key().toLowerCase().startsWith(prefix.toLowerCase());
+        return m_translation.key().toLowerCase(Locale.ENGLISH).startsWith(prefix.toLowerCase(Locale.ENGLISH));
       }
       catch (BadLocationException e) {
         SdkLog.warning(e);

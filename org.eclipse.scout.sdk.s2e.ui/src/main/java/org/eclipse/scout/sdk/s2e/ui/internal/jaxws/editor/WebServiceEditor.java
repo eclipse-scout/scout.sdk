@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
@@ -247,7 +248,7 @@ public class WebServiceEditor extends FormEditor {
 
     try (Stream<Path> content = Files.walk(wsdlFolder)) {
       Set<WebServiceFormPageInput> services = content
-          .filter(f -> f.getFileName().toString().toLowerCase().endsWith(JaxWsUtils.WSDL_FILE_EXTENSION))
+          .filter(f -> f.getFileName().toString().toLowerCase(Locale.ENGLISH).endsWith(JaxWsUtils.WSDL_FILE_EXTENSION))
           .filter(Files::isReadable)
           .filter(Files::isRegularFile)
           .map(f -> new P_PreloadedWebServiceData(f, getJavaProject(), webServiceEntryPointAnnotatedTypes, webServiceClientAnnotatedTypes, webServiceAnnotatedTypes))

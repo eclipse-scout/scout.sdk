@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -131,7 +132,7 @@ public class NlsFilterComponent extends Composite {
 
     private P_ViewerFilter(Language lang, String pattern) {
       m_lang = lang;
-      m_pattern = (pattern.toLowerCase() + '*').toCharArray();
+      m_pattern = (pattern.toLowerCase(Locale.ENGLISH) + '*').toCharArray();
     }
 
     @Override

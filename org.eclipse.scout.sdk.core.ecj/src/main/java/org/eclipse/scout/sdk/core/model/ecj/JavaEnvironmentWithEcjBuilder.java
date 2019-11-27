@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -128,7 +129,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     if (regex == null) {
       return null;
     }
-    return regex.toLowerCase();
+    return regex.toLowerCase(Locale.ENGLISH);
   }
 
   /**

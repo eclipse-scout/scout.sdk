@@ -10,6 +10,28 @@
  */
 package org.eclipse.scout.sdk.s2e.util;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Comparator.comparingInt;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -48,26 +70,6 @@ import org.eclipse.scout.sdk.s2e.environment.model.ClasspathWithJdt;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicPrimaryTypeFilter;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
-import static java.util.Collections.emptyMap;
-import static java.util.Comparator.comparingInt;
 
 /**
  * <h3>{@link S2eUtils}</h3>
@@ -247,7 +249,7 @@ public final class S2eUtils {
     }
 
     return sourceFoldersOrdered(project)
-        .filter(element -> element.getPath().removeFirstSegments(1).toString().toLowerCase().contains("test"))
+        .filter(element -> element.getPath().removeFirstSegments(1).toString().toLowerCase(Locale.ENGLISH).contains("test"))
         .findAny()
         .orElse(null);
   }

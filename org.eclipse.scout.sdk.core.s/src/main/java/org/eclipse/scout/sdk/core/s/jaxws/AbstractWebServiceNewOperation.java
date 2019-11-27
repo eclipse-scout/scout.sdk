@@ -10,6 +10,34 @@
  */
 package org.eclipse.scout.sdk.core.s.jaxws;
 
+import static java.util.Collections.unmodifiableList;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.BiConsumer;
+
+import javax.wsdl.PortType;
+import javax.wsdl.Service;
+import javax.wsdl.WSDLException;
+import javax.xml.transform.TransformerException;
+
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -26,32 +54,6 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Xml;
 import org.w3c.dom.Document;
-
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
-import javax.wsdl.WSDLException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.function.BiConsumer;
-
-import static java.util.Collections.unmodifiableList;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 /**
  * <h3>{@link AbstractWebServiceNewOperation}</h3>
@@ -268,7 +270,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected Path getWsdlFolder(String wsBaseName) {
-    String wsdlFolderName = wsBaseName.toLowerCase();
+    String wsdlFolderName = wsBaseName.toLowerCase(Locale.ENGLISH);
     return getWsdlRootFolder(getProjectRoot()).resolve(wsdlFolderName);
   }
 
@@ -302,7 +304,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected static Path getBindingFolder(Path jaxWsProject, String wsBaseName) {
-    String bindingFolderName = wsBaseName.toLowerCase();
+    String bindingFolderName = wsBaseName.toLowerCase(Locale.ENGLISH);
     return getBindingRootFolder(jaxWsProject).resolve(bindingFolderName);
   }
 
@@ -321,7 +323,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
           throw new IllegalArgumentException("zero length path found.");
         }
 
-        String partName = pathFileName.toLowerCase();
+        String partName = pathFileName.toLowerCase(Locale.ENGLISH);
         if (partName.endsWith(JaxWsUtils.WSDL_FILE_EXTENSION)) {
           partName = partName.substring(0, partName.length() - JaxWsUtils.WSDL_FILE_EXTENSION.length());
         }

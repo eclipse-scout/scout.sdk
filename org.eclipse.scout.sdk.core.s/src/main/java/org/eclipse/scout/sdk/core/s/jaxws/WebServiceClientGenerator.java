@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.core.s.jaxws;
 
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
+import java.util.Locale;
+
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
@@ -66,7 +68,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
   }
 
   public String urlPropertyName() {
-    return "jaxws." + getBaseName().toLowerCase() + ".url";
+    return "jaxws." + getBaseName().toLowerCase(Locale.ENGLISH) + ".url";
   }
 
   protected String getPropertyClassName() {

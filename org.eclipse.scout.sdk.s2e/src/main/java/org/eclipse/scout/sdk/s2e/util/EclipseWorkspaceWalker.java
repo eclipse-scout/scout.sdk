@@ -24,6 +24,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -148,7 +149,7 @@ public class EclipseWorkspaceWalker {
     if (path == null) {
       return false;
     }
-    String fileName = path.toString().toLowerCase();
+    String fileName = path.toString().toLowerCase(Locale.ENGLISH);
     for (String extension : extensionsAccepted()) {
       if (fileName.endsWith(extension)) {
         return true;

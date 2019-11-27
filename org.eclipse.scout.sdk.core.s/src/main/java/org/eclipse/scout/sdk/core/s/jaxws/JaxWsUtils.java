@@ -14,6 +14,7 @@ import static java.util.Collections.emptyList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -158,8 +159,8 @@ public final class JaxWsUtils {
     }
     String prefix = "p";
     String p = prefix + ':';
-    String lc = wsdlFileName.toLowerCase();
-    String uc = wsdlFileName.toUpperCase();
+    String lc = wsdlFileName.toLowerCase(Locale.ENGLISH);
+    String uc = wsdlFileName.toUpperCase(Locale.ENGLISH);
     StringBuilder bindingFilesXpathBuilder = new StringBuilder();
     bindingFilesXpathBuilder.append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.BUILD).append('/').append(p).append(IMavenConstants.PLUGINS).append('/').append(p).append(IMavenConstants.PLUGIN)
         .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='").append(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID)
@@ -287,7 +288,7 @@ public final class JaxWsUtils {
 
     String[] suffixes = {"xml", "soap", "porttype", "port", "webservice", "services", "service"};
     for (String s : suffixes) {
-      if (input.toLowerCase().endsWith(s)) {
+      if (input.toLowerCase(Locale.ENGLISH).endsWith(s)) {
         String newInputCandidate = input.substring(0, input.length() - s.length());
         if (Strings.isBlank(newInputCandidate)) {
           return input; // cancel suffix removal if we come to an empty name
