@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 5.2.0
  */
+@Tag("IntegrationTest")
 public class WebServiceUpdateOperationTest {
 
   private static final String PORT_TYPE_NAME_IN_WSDL = "scoutQueryInterface2";

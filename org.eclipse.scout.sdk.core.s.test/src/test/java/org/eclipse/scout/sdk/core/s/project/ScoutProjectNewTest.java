@@ -17,6 +17,7 @@ import java.nio.file.Path;
 
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 5.2.0
  */
+@Tag("IntegrationTest")
 public class ScoutProjectNewTest {
 
   @Test

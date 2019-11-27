@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.jaxws;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +39,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Xml;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,6 +64,7 @@ public class WebServiceNewOperationTest {
   }
 
   @Test
+  @Tag("IntegrationTest")
   public void testNewWebServicesConsumerFirst() throws IOException {
     Path root = CoreScoutTestingUtils.createClassicTestProject();
     try {
@@ -93,6 +93,7 @@ public class WebServiceNewOperationTest {
   }
 
   @Test
+  @Tag("IntegrationTest")
   public void testNewWebServicesProviderFirst() throws IOException {
     Path root = CoreScoutTestingUtils.createClassicTestProject();
     try {
