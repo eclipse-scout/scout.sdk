@@ -11,13 +11,7 @@
 package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.function.Predicate.isEqual;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createAddLanguageEvent;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createAddTranslationEvent;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createChangeKeyEvent;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createFlushEvent;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createReloadEvent;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createRemoveTranslationEvent;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createUpdateTranslationEvent;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.*;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.file.Path;
@@ -59,6 +53,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class TranslationStoreStack {
 
+  @SuppressWarnings("PublicStaticCollectionField")
   public static final List<ITranslationStoreSupplier> SUPPLIERS = new CopyOnWriteArrayList<>();
 
   private final Deque<ITranslationStore> m_stores;
@@ -105,11 +100,13 @@ public class TranslationStoreStack {
   }
 
   private static Collection<ITranslationStore> findAllTranslationStores(Path file, IEnvironment env, IProgress progress) {
-    int ticksBySupplier = 1000;
-    progress.init("Search for translation stores for " + Ensure.notNull(file), SUPPLIERS.size() * ticksBySupplier);
-    List<ITranslationStore> unsortedStores = new ArrayList<>();
     Ensure.notNull(env);
     Ensure.notNull(progress);
+
+    int ticksBySupplier = 1000;
+    progress.init("Search for translation stores for " + Ensure.notNull(file), SUPPLIERS.size() * ticksBySupplier);
+
+    List<ITranslationStore> unsortedStores = new ArrayList<>();
     for (ITranslationStoreSupplier supplier : SUPPLIERS) {
       Stream<? extends ITranslationStore> stores = supplier.get(file, env, progress.newChild(ticksBySupplier));
       if (stores != null) {
@@ -553,7 +550,7 @@ public class TranslationStoreStack {
    * @param listener
    *          The listener to add. Must not be {@code null}.
    */
-  public void addListener(ITranslationStoreStackListener listener) {
+  public void addListener(@SuppressWarnings("TypeMayBeWeakened") ITranslationStoreStackListener listener) {
     m_listeners.add(listener);
   }
 
@@ -564,7 +561,7 @@ public class TranslationStoreStack {
    *          The listener to remove.
    * @return {@code true} if the listener was removed. {@code false} if it could not be found.
    */
-  public boolean removeListener(ITranslationStoreStackListener listener) {
+  public boolean removeListener(@SuppressWarnings("TypeMayBeWeakened") ITranslationStoreStackListener listener) {
     return m_listeners.remove(listener);
   }
 
@@ -601,7 +598,7 @@ public class TranslationStoreStack {
     }
   }
 
-  @SuppressWarnings("squid:S2063") // Comparators should be "Serializable". Not necessary here because translation stores are not.
+  @SuppressWarnings({"squid:S2063", "ComparatorNotSerializable"}) // Comparators should be "Serializable". Not necessary here because translation stores are not.
   private static final class P_TranslationStoreComparator implements Comparator<ITranslationStore> {
 
     private final Set<String> m_duplicateOrders;
@@ -645,6 +642,7 @@ public class TranslationStoreStack {
   }
 
   @Override
+  @SuppressWarnings("HardcodedLineSeparator")
   public String toString() {
     StringBuilder builder = new StringBuilder(TranslationStoreStack.class.getSimpleName());
     builder.append(" [\n");

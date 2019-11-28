@@ -3,11 +3,8 @@ package org.eclipse.scout.sdk.s2i.environment
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiClass
 import org.eclipse.scout.sdk.core.builder.BuilderContext
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder
@@ -25,11 +22,8 @@ import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.util.*
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
-import org.eclipse.scout.sdk.s2i.containingModule
+import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
-import org.eclipse.scout.sdk.s2i.isJavaModule
-import org.eclipse.scout.sdk.s2i.toIdea
-import org.eclipse.scout.sdk.s2i.toNioPath
 import org.jetbrains.annotations.NotNull
 import java.nio.file.Path
 import java.util.*
@@ -64,10 +58,8 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
 
     override fun findJavaEnvironment(root: Path?): Optional<IJavaEnvironment> =
             Optional.ofNullable(
-                    root?.toFile()
-                            ?.let { LocalFileSystem.getInstance().findFileByIoFile(it) }
-                            ?.takeIf { it.isValid }
-                            ?.let { ProjectFileIndex.getInstance(project).getModuleForFile(it) }
+                    root?.toVirtualFile()
+                            ?.containingModuleOf(project)
                             ?.let { toScoutJavaEnvironment(it) })
 
 
@@ -92,18 +84,6 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
     protected fun getOrCreateEnv(module: Module): JavaEnvironmentWithIdea = m_envs.computeIfAbsent(module.name) { createNewJavaEnvironmentFor(module) }
 
     protected fun createNewJavaEnvironmentFor(module: Module): JavaEnvironmentWithIdea = JavaEnvironmentWithIdea(module)
-
-    protected fun psiClassToScoutType(type: PsiClass, env: IJavaEnvironment): IType? {
-        val fqn = computeInReadAction(type.project) { type.qualifiedName }
-        return env.findType(fqn).orElse(null)
-    }
-
-    fun psiClassToScoutType(type: PsiClass): IType? {
-        return type
-                .containingModule()
-                ?.let { toScoutJavaEnvironment(it) }
-                ?.let { psiClassToScoutType(type, it) }
-    }
 
     override fun writeCompilationUnit(generator: ICompilationUnitGenerator<*>, targetFolder: IClasspathEntry): IType? =
             writeCompilationUnit(generator, targetFolder, null)

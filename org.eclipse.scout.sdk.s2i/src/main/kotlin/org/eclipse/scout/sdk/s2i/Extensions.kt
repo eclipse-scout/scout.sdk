@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -27,6 +28,7 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult
@@ -50,6 +52,31 @@ fun PsiElement.resolveSourceRoot(): VirtualFile? {
             ?.let { ProjectFileIndex.getInstance(this.project).getSourceRootForFile(it) }
 }
 
+fun PsiClass.toScoutType(env: IJavaEnvironment): IType? {
+    val fqn = IdeaEnvironment.computeInReadAction(this.project) { this.qualifiedName }
+    return env.findType(fqn).orElse(null)
+}
+
+/**
+ * Converts the [PsiClass] to a Scout [IType] if the [PsiClass] is part of the project sources (not within a library for instance)
+ *
+ * If the PsiClass might be part of a binary library, consider using [toScoutType] instead.
+ * @param env The IdeaEnvironment that performs the conversion
+ * @throws java.lang.IllegalArgumentException if this [PsiClass] cannot be found in the modules of this project
+ */
+fun PsiClass.toScoutTypeIfInProject(env: IdeaEnvironment): IType? {
+    val module = this.containingModule() ?: throw Ensure.newFail("The type '{}' is not part of the project sources.", this.name)
+    return env.toScoutJavaEnvironment(module)
+            ?.let { this.toScoutType(it) }
+}
+
+/**
+ * @return The [Module] in which this [PsiElement] exists.
+ *
+ * If this [PsiElement] is not part of the Project (e.g. if it exists in a jar library), this method call returns null.
+ *
+ * In other words: This method only returns the [Module] if this [PsiClass] is part of the project sources
+ */
 fun PsiElement.containingModule(): Module? {
     return IdeaEnvironment.computeInReadAction(this.project) {
         this
@@ -66,8 +93,6 @@ fun IEnvironment.toIdea(): IdeaEnvironment = this as IdeaEnvironment
 
 fun IJavaEnvironment.toIdea(): JavaEnvironmentWithIdea = this.unwrap() as JavaEnvironmentWithIdea
 
-fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope): List<PsiClass> = findAllTypesAnnotatedWith(annotation, scope, null)
-
 fun PsiClass.newSubTypeHierarchy(scope: SearchScope, checkDeep: Boolean, includeAnonymous: Boolean, includeRoot: Boolean): Query<PsiClass> {
     val children = ClassInheritorsSearch.search(this, scope, checkDeep, true, includeAnonymous)
     if (!includeRoot) {
@@ -78,6 +103,12 @@ fun PsiClass.newSubTypeHierarchy(scope: SearchScope, checkDeep: Boolean, include
     resultWithRoot.add(this)
     return CollectionQuery(resultWithRoot)
 }
+
+fun Path.toVirtualFile() = LocalFileSystem.getInstance()
+        .findFileByIoFile(this.toFile())
+        ?.takeIf { it.isValid }
+
+fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope): List<PsiClass> = findAllTypesAnnotatedWith(annotation, scope, null)
 
 fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, indicator: ProgressIndicator?): List<PsiClass> {
     val options = MatchOptions()
@@ -116,8 +147,11 @@ fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
                     .findClasses(fqn, scope)
                     .toSet()
         }
+                .filter { it.isValid }
 
 fun VirtualFile.toNioPath(): Path = Paths.get(path)
+
+fun VirtualFile.containingModuleOf(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
 
 fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResult =
         TreeTraversals.create(visitor, Function { f -> f.supers.stream() }).traverse(this)
@@ -131,3 +165,4 @@ fun PsiClass.isInstanceOf(vararg parentFqn: String): Boolean =
                     TreeVisitResult.CONTINUE
             }) == TreeVisitResult.TERMINATE
         }
+

@@ -27,6 +27,10 @@
             <interface-class>org.eclipse.scout.sdk.core.log.ISdkConsoleSpi</interface-class>
             <implementation-class>org.eclipse.scout.sdk.s2i.IdeaLogger</implementation-class>
         </component>
+        <component>
+            <interface-class>org.eclipse.scout.sdk.core.s.nls.ITranslationStoreSupplier</interface-class>
+            <implementation-class>org.eclipse.scout.sdk.s2i.nls.IdeaTranslationStoreSupplier</implementation-class>
+        </component>
     </application-components>
 
     <depends>com.intellij.modules.platform</depends>

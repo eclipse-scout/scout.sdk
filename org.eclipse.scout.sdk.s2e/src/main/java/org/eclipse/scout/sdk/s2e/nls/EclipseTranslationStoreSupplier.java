@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.nls;
 
 import static java.util.Collections.emptyList;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
+import static org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTextProviderService.resourceMatchesPrefix;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -32,6 +33,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -73,7 +75,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
         .orElseGet(Stream::empty);
   }
 
-  private static Stream<? extends ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, EclipseProgress progress) {
+  private static Stream<? extends ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, @SuppressWarnings("TypeMayBeWeakened") EclipseProgress progress) {
     progress.init("Search properties text provider services.", 20);
 
     Predicate<IType> filter = new PublicPrimaryTypeFilter() {
@@ -146,7 +148,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     }
   }
 
-  private static Collection<ITranslationPropertiesFile> filesFromWorkspace(IType jdtType, PropertiesTranslationStore store) throws CoreException {
+  private static Collection<ITranslationPropertiesFile> filesFromWorkspace(IJavaElement jdtType, @SuppressWarnings("TypeMayBeWeakened") PropertiesTranslationStore store) throws CoreException {
     IPath translationPath = new org.eclipse.core.runtime.Path(store.service().folder());
     List<IFile> propertiesFiles = getAllTranslations(jdtType.getJavaProject(), translationPath, store.service().filePrefix());
 
@@ -203,17 +205,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     return files;
   }
 
-  private static boolean resourceMatchesPrefix(String resourceName, String prefix) {
-    if (resourceName == null) {
-      return false;
-    }
-    if (prefix == null) {
-      return false;
-    }
-    return resourceName.matches(prefix + "(?:_[a-zA-Z]{2}){0,3}" + "\\.properties");
-  }
-
-  private static Collection<ITranslationPropertiesFile> filesFromPlatform(IPackageFragmentRoot r, PropertiesTranslationStore store) throws JavaModelException {
+  private static Collection<ITranslationPropertiesFile> filesFromPlatform(IPackageFragmentRoot r, @SuppressWarnings("TypeMayBeWeakened") PropertiesTranslationStore store) throws JavaModelException {
     char delim = '.';
     String pckg = store.service().folder().replace(PropertiesTextProviderService.FOLDER_SEGMENT_DELIMITER, delim);
     IPackageFragment textFolder = r.getPackageFragment(pckg);
