@@ -19,14 +19,17 @@ open class IdeaMavenRunner(val project: Project) : IMavenRunnerSpi, ProjectCompo
 
     private var m_origRunner: IMavenRunnerSpi? = null
 
+    override fun initComponent() {
+        // Scout requires sources to be present e.g. to parse text services (NLS)
+        MavenProjectsManager.getInstance(project).importingSettings.isDownloadSourcesAutomatically = true
+
+        m_origRunner = MavenRunner.get()
+        MavenRunner.set(this)
+    }
+
     override fun disposeComponent() {
         MavenRunner.set(m_origRunner)
         m_origRunner = null
-    }
-
-    override fun initComponent() {
-        m_origRunner = MavenRunner.get()
-        MavenRunner.set(this)
     }
 
     override fun execute(build: MavenBuild) {
