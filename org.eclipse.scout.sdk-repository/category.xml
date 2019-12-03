@@ -12,10 +12,10 @@
 
 -->
 <site>
-   <feature url="features/org.eclipse.scout.sdk-feature_0.0.0.qualifier.jar" id="org.eclipse.scout.sdk-feature" version="0.0.0">
+   <feature url="features/org.eclipse.scout.sdk-feature_9.0.0.032_Simrel_2019_12_RC1.jar" id="org.eclipse.scout.sdk-feature" version="0.0.0">
       <category name="Eclipse Scout SDK"/>
    </feature>
-   <feature url="features/org.eclipse.scout.sdk-feature.source_0.0.0.qualifier.jar" id="org.eclipse.scout.sdk-feature.source" version="0.0.0">
+   <feature url="features/org.eclipse.scout.sdk-feature.source_9.0.0.032_Simrel_2019_12_RC1.jar" id="org.eclipse.scout.sdk-feature.source" version="0.0.0">
       <category name="Eclipse Scout SDK"/>
    </feature>
    <category-def name="Eclipse Scout SDK" label="Scout Application Development SDK">
