@@ -10,6 +10,13 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static java.util.Collections.emptyList;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ASTVisitor;
 import org.eclipse.jdt.internal.compiler.ast.ASTNode;
@@ -76,13 +83,6 @@ import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.SdkException;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import static java.util.Collections.emptyList;
 
 public final class SpiWithEcjUtils {
 
@@ -379,13 +379,15 @@ public final class SpiWithEcjUtils {
     return v.getResult();
   }
 
-  static List<BindingAnnotationWithEcj> createBindingAnnotations(JavaEnvironmentWithEcj env, AnnotatableSpi owner, AnnotationBinding[] annots) {
-    if (annots == null || annots.length < 1) {
+  static List<BindingAnnotationWithEcj> createBindingAnnotations(JavaEnvironmentWithEcj env, AnnotatableSpi owner, AnnotationBinding[] annotationBindings) {
+    if (annotationBindings == null || annotationBindings.length < 1) {
       return emptyList();
     }
-    List<BindingAnnotationWithEcj> result = new ArrayList<>(annots.length);
-    for (AnnotationBinding annot : annots) {
-      result.add(env.createBindingAnnotation(owner, annot));
+    List<BindingAnnotationWithEcj> result = new ArrayList<>(annotationBindings.length);
+    for (AnnotationBinding annotation : annotationBindings) {
+      if (annotation != null) {
+        result.add(env.createBindingAnnotation(owner, annotation));
+      }
     }
     return result;
   }

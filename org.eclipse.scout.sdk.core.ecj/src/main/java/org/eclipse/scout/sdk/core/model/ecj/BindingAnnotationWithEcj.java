@@ -101,7 +101,15 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
       AnnotationElementSpi declaredElement = resultArr[pos];
       if (declaredElement == null) {
         // add default value
-        result.put(e.getKey(), createAnnotationElementSpi(e.getValue(), true, owner, env));
+        Object defaultValue = e.getValue();
+        String name = e.getKey();
+        if (defaultValue == null) {
+          // the annotation has no default value for this element and the element is not defined. this is a compile error but still might be possible in the source.
+          result.put(name, env.createNullAnnotationValue(owner, name, true));
+        }
+        else {
+          result.put(name, createAnnotationElementSpi(defaultValue, true, owner, env));
+        }
       }
       else {
         result.put(declaredElement.getElementName(), declaredElement);

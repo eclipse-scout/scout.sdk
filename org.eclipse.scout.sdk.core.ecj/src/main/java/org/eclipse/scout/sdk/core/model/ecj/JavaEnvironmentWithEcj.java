@@ -11,10 +11,8 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.util.Ensure.fail;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static java.util.stream.Collectors.*;
+import static org.eclipse.scout.sdk.core.util.Ensure.*;
 
 import java.nio.CharBuffer;
 import java.nio.file.Path;
@@ -409,6 +407,12 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     return (BindingAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new BindingAnnotationElementWithEcj(this, owner, bindingPair, syntheticDefaultValue));
   }
 
+  public synchronized NullAnnotationElementWithEcj createNullAnnotationValue(AnnotationSpi owner, String name, boolean syntheticDefaultValue) {
+    assertInitialized();
+    SameCompositeObject key = new SameCompositeObject(NullAnnotationElementWithEcj.class, owner, name);
+    return (NullAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new NullAnnotationElementWithEcj(this, owner, name, syntheticDefaultValue));
+  }
+
   public synchronized BindingArrayTypeWithEcj createBindingArrayType(ArrayBinding binding, boolean isWildcard) {
     assertInitialized();
     SameCompositeObject key = new SameCompositeObject(binding, isWildcard);
@@ -534,10 +538,10 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
    */
   public synchronized Map<String, ElementValuePair> getBindingAnnotationSyntheticDefaultValues(ReferenceBinding annotationType) {
     assertInitialized();
-    return new LinkedHashMap<>(m_evpCache.computeIfAbsent(annotationType, this::computeBindingAnnotationSyntheticDefaultValues));
+    return new LinkedHashMap<>(m_evpCache.computeIfAbsent(annotationType, JavaEnvironmentWithEcj::computeBindingAnnotationSyntheticDefaultValues));
   }
 
-  protected Map<String, ElementValuePair> computeBindingAnnotationSyntheticDefaultValues(ReferenceBinding annotationType) {
+  protected static Map<String, ElementValuePair> computeBindingAnnotationSyntheticDefaultValues(ReferenceBinding annotationType) {
     MethodBinding[] valueMethods = annotationType.methods();
     if (valueMethods == null || valueMethods.length < 1) {
       return emptyMap();
@@ -562,10 +566,10 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
 
   public synchronized Map<String, MemberValuePair> getDeclarationAnnotationSyntheticDefaultValues(TypeBinding typeBinding) {
     assertInitialized();
-    return new LinkedHashMap<>(m_mvpCache.computeIfAbsent(typeBinding, this::computeDeclarationAnnotationSyntheticDefaultValues));
+    return new LinkedHashMap<>(m_mvpCache.computeIfAbsent(typeBinding, JavaEnvironmentWithEcj::computeDeclarationAnnotationSyntheticDefaultValues));
   }
 
-  protected Map<String, MemberValuePair> computeDeclarationAnnotationSyntheticDefaultValues(TypeBinding typeBinding) {
+  protected static Map<String, MemberValuePair> computeDeclarationAnnotationSyntheticDefaultValues(TypeBinding typeBinding) {
     MethodBinding[] valueMethods = ((ReferenceBinding) typeBinding).methods();
     if (valueMethods == null || valueMethods.length < 1) {
       return emptyMap();

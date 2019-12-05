@@ -11,10 +11,8 @@
 package org.eclipse.scout.sdk.core.model.api;
 
 import static java.util.function.Function.identity;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.registerCompilationUnit;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
+import org.eclipse.scout.sdk.core.fixture.AnnotationWithSingleValues;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -98,6 +97,33 @@ public class AnnotationElementTest {
 
     IAnnotationElement testAnnotValues = env.requireType(ChildClass.class.getName()).requireSuperClass().annotations().first().get().element("values").get();
     assertFalse(Strings.isBlank(testAnnotValues.toString()));
+  }
+
+  /**
+   * Tests that no NPE occurs when an annotation declaration is incomplete. Means: if elements without default value are
+   * missing in the annotation.
+   * 
+   * @param env
+   *          The environment for the test
+   */
+  @Test
+  public void testAnnotationWithCompileError(IJavaEnvironment env) {
+    String annotationName = AnnotationWithSingleValues.class.getName();
+    String elementName = "num";
+
+    IType myClass = registerCompilationUnit(env, "test", "MyClass",
+        "@" + annotationName + "() public class MyClass {}");
+
+    Map<String, IAnnotationElement> elements = myClass.annotations().withName(annotationName).first().get().elements();
+    assertEquals(5, elements.size());
+
+    IAnnotationElement element = elements.get(elementName);
+    assertTrue(element.isDefault());
+    assertNull(element.value().as(Integer.class));
+    assertNotNull(element.declaringAnnotation());
+    assertFalse(element.sourceOfExpression().isPresent());
+    assertFalse(element.source().isPresent());
+    assertEquals(elementName, element.elementName());
   }
 
   @Test
