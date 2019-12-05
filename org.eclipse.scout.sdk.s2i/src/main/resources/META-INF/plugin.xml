@@ -15,6 +15,7 @@
         <ul>
           <li>Derived resource update for FormData & PageData</li>
           <li>@ClassId validation inspections</li>
+          <li>NLS validation inspections</li>
         </ul>
       ]]>
     </change-notes>
@@ -67,20 +68,26 @@
         <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                              instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
         <macro implementation="org.eclipse.scout.sdk.s2i.IdeaHomePathMacro"/>
-        <!--suppress InspectionMappingConsistency -->
         <localInspection language="JAVA"
                          shortName="MissingClassId"
                          groupName="Scout"
                          enabledByDefault="false"
                          level="ERROR"
+                         key="missing.classid.annotation"
                          implementationClass="org.eclipse.scout.sdk.s2i.classid.MissingClassIdInspection"/>
-        <!--suppress InspectionMappingConsistency -->
         <globalInspection language="JAVA"
                           shortName="DuplicateClassId"
                           groupName="Scout"
                           enabledByDefault="false"
                           level="ERROR"
+                          key="duplicate.classid.inspection.displayName"
                           implementationClass="org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection"/>
+      <localInspection shortName="MissingTranslation"
+                       groupName="Scout"
+                       enabledByDefault="true"
+                       level="WARNING"
+                       key="missing.translation.inspection.displayName"
+                       implementationClass="org.eclipse.scout.sdk.s2i.nls.MissingTranslationInspection"/>
     </extensions>
 
     <actions>
@@ -91,4 +98,5 @@
         </group>
     </actions>
 
+  <resource-bundle>messages.EclipseScoutBundle</resource-bundle>
 </idea-plugin>

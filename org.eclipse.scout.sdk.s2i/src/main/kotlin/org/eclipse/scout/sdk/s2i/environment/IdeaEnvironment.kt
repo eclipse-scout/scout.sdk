@@ -21,10 +21,10 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.util.*
+import org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
-import org.jetbrains.annotations.NotNull
 import java.nio.file.Path
 import java.util.*
 
@@ -32,12 +32,24 @@ import java.util.*
 open class IdeaEnvironment private constructor(val project: Project) : IEnvironment, AutoCloseable {
 
     companion object Factory {
-        fun <T> callInIdeaEnvironment(task: (IdeaEnvironment, IdeaProgress) -> T, project: Project, @NotNull title: String): IFuture<T> {
-            val result = FinalValue<T>()
-            val name = Strings.notBlank(title).orElseGet { CoreUtils.toStringIfOverwritten(task).orElse("Unnamed Task: $task") }
-            val job = OperationTask(name, project) { p ->
+
+        fun createUnsafeFor(project: Project, registerCloseCallback: (IdeaEnvironment) -> Unit): IdeaEnvironment {
+            val ideaEnvironment = IdeaEnvironment(project)
+            registerCloseCallback.invoke(ideaEnvironment)
+            return ideaEnvironment
+        }
+
+        fun <T> callInIdeaEnvironmentSync(project: Project, progressIndicator: IdeaProgress, task: (IdeaEnvironment, IdeaProgress) -> T): T =
                 IdeaEnvironment(project).use {
-                    result.setIfAbsent(task.invoke(it, p))
+                    return task.invoke(it, progressIndicator)
+                }
+
+        fun <T> callInIdeaEnvironment(project: Project, title: String, task: (IdeaEnvironment, IdeaProgress) -> T): IFuture<T> {
+            val result = FinalValue<T>()
+            val name = Strings.notBlank(title).orElseGet { toStringIfOverwritten(task).orElse("Unnamed Task: $task") }
+            val job = OperationTask(name, project) { pr ->
+                callInIdeaEnvironmentSync(project, pr) { e, p ->
+                    result.setIfAbsent(task.invoke(e, p))
                 }
             }
             return job.schedule({ result.get() })

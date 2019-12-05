@@ -87,8 +87,6 @@ open class DuplicateClassIdInspection : GlobalInspectionTool() {
 
     override fun isGraphNeeded(): Boolean = false
 
-    override fun getDisplayName(): String = EclipseScoutBundle.message("duplicate.classid.inspection.displayName")
-
     companion object {
 
         private const val SHORT_NAME = "DuplicateClassId"

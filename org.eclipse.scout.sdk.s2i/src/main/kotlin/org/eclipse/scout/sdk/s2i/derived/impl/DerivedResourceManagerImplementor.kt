@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceHandlerFactory
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
@@ -129,12 +130,12 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
     private fun scheduleHandlerCreation() {
         val scope = consumeAllBufferedEvents()
         SdkLog.debug("Check for derived resource updates in scope $scope")
-        IdeaEnvironment.callInIdeaEnvironment({ env, progress ->
+        callInIdeaEnvironment(project, "Update derived resources") { env, progress ->
             val handlers = synchronized(this) {
                 m_updateHandlerFactories.flatMap { it.createHandlersFor(scope, project) }
             }
             executeHandlers(handlers, env, progress)
-        }, project, "Update derived resources")
+        }
     }
 
     override fun addDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory) = synchronized(this) {

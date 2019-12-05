@@ -44,6 +44,4 @@ open class MissingClassIdInspection : AbstractBaseJavaLocalInspectionTool() {
         }
         return candidate.isInstanceOf(IScoutRuntimeTypes.ITypeWithClassId)
     }
-
-    override fun getDisplayName(): String = EclipseScoutBundle.message("missing.classid.annotation")
 }

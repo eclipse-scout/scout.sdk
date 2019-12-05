@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.nls;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * <h3>{@link ITranslation}</h3>
@@ -22,6 +23,11 @@ import java.util.Optional;
  * @since 7.0.0
  */
 public interface ITranslation {
+
+  /**
+   * Regular expression matching translation keys (see {@link #key()}).
+   */
+  Pattern KEY_REGEX = Pattern.compile("[A-Za-z][a-zA-Z0-9_.\\-]{0,200}");
 
   /**
    * @return The key as {@link String}. A key is unique within an {@link ITranslationStore}.

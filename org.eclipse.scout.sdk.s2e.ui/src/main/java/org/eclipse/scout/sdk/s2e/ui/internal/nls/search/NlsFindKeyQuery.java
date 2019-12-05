@@ -10,14 +10,17 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.search;
 
-import java.util.List;
+import static org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils.queryResultToSearchResult;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.query.TranslationKeysQuery;
+import org.eclipse.scout.sdk.core.s.util.search.IFileQueryResult;
+import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker;
 import org.eclipse.search.internal.ui.text.FileSearchQuery;
 import org.eclipse.search.internal.ui.text.FileSearchResult;
-import org.eclipse.search.ui.text.Match;
 
 /**
  * <h4>NlsKeySearchQuery</h4>
@@ -50,15 +53,9 @@ public class NlsFindKeyQuery extends FileSearchQuery {
 
   @Override
   public IStatus run(IProgressMonitor monitor) {
-    NlsFindKeysJob nlsFindReferencesJob = new NlsFindKeysJob(getNlsKey(), getLabel());
-    IStatus result = nlsFindReferencesJob.run(monitor);
-    if (result != null && result.isOK()) {
-      List<Match> matches = nlsFindReferencesJob.getMatches(getNlsKey());
-      FileSearchResult searchResult = getSearchResult();
-      searchResult.removeAll();
-      searchResult.addMatches(matches.toArray(new Match[0]));
-    }
-    return result;
+    IFileQueryResult query = EclipseWorkspaceWalker.executeQuerySync(new TranslationKeysQuery(getNlsKey(), getLabel()), monitor);
+    queryResultToSearchResult(query, getSearchResult());
+    return Status.OK_STATUS;
   }
 
   public String getNlsKey() {

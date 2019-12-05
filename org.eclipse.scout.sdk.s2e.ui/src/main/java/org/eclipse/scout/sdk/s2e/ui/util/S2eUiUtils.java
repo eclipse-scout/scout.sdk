@@ -14,6 +14,7 @@ import static java.util.Collections.emptySet;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,11 +43,16 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
+import org.eclipse.scout.sdk.core.s.util.search.FileRange;
+import org.eclipse.scout.sdk.core.s.util.search.IFileQueryResult;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
+import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker.WorkspaceFile;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
+import org.eclipse.search.internal.ui.text.FileSearchResult;
+import org.eclipse.search.ui.text.Match;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -440,5 +446,28 @@ public final class S2eUiUtils {
     catch (PartInitException | MalformedURLException | URISyntaxException | RuntimeException e) {
       SdkLog.warning("Could not open default web browser.", e);
     }
+  }
+
+  /**
+   * Adds all findings ({@link IFileQueryResult#result()} of the query to {@link FileSearchResult}. The
+   * {@link FileSearchResult} is cleared before.
+   * 
+   * @param from
+   *          The data source
+   * @param to
+   *          The target
+   */
+  public static void queryResultToSearchResult(IFileQueryResult from, FileSearchResult to) {
+    to.removeAll();
+    from.result()
+        .map(S2eUiUtils::toEclipseMatch)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .forEach(to::addMatch);
+  }
+
+  static Optional<Match> toEclipseMatch(FileRange range) {
+    return new WorkspaceFile(range.file(), StandardCharsets.UTF_8).inWorkspace()
+        .map(iFile -> new Match(iFile, range.start(), range.length()));
   }
 }

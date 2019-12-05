@@ -12,10 +12,10 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -27,8 +27,6 @@ import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
  * @since 7.0.0
  */
 public final class TranslationInputValidator {
-
-  public static final Pattern REGEX_NLS_KEY_NAME = Pattern.compile("[A-Za-z][a-zA-Z0-9_.\\-]{0,200}");
 
   private TranslationInputValidator() {
   }
@@ -59,7 +57,7 @@ public final class TranslationInputValidator {
       }
     }
 
-    if (!REGEX_NLS_KEY_NAME.matcher(key).matches()) {
+    if (!ITranslation.KEY_REGEX.matcher(key).matches()) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, -1, "The key name is not valid.", null);
     }
 

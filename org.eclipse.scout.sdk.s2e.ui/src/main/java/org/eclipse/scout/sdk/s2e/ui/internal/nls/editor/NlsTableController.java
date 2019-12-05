@@ -49,7 +49,6 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
-import org.eclipse.search.ui.text.Match;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -247,16 +246,13 @@ public class NlsTableController extends ViewerComparator {
         if (refProvider == null) {
           return "";
         }
-        List<Match> references = refProvider.getReferencesFor(element);
-        if (references == null) {
-          return "0";
-        }
-        return Integer.toString(references.size());
+        return Integer.toString(refProvider.getReferencesFor(element).size());
       case INDEX_COLUMN_KEYS:
         return element.key();
       default:
         Language lang = languageOfColumn(columnIndex);
         String text = element.translation(lang).orElse("");
+        //noinspection HardcodedLineSeparator
         return Strings.replaceEach(text, new String[]{"\n", "\r"}, new String[]{" ", ""});
     }
   }
@@ -414,7 +410,7 @@ public class NlsTableController extends ViewerComparator {
     }
   }
 
-  private final class ObservedColumn extends SimpleValueProperty<TranslationTableEntry, String> {
+  private final class ObservedColumn extends SimpleValueProperty<TranslationTableEntry, CharSequence> {
 
     private NativeListener m_propertyChangeListener;
     private final int m_index;
@@ -435,31 +431,31 @@ public class NlsTableController extends ViewerComparator {
     }
 
     @Override
-    protected String doGetValue(TranslationTableEntry source) {
+    protected CharSequence doGetValue(TranslationTableEntry source) {
       return getColumnText(source.unwrap(), m_index);
     }
 
     @Override
-    protected void doSetValue(TranslationTableEntry source, String value) {
+    protected void doSetValue(TranslationTableEntry source, CharSequence value) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public INativePropertyListener<TranslationTableEntry> adaptListener(ISimplePropertyListener<TranslationTableEntry, ValueDiff<? extends String>> listener) {
+    public INativePropertyListener<TranslationTableEntry> adaptListener(ISimplePropertyListener<TranslationTableEntry, ValueDiff<? extends CharSequence>> listener) {
       m_propertyChangeListener = new NativeListener(this, listener);
+      //noinspection ReturnOfInnerClass
       return m_propertyChangeListener;
     }
   }
 
-  private final class NativeListener extends NativePropertyListener<TranslationTableEntry, ValueDiff<? extends String>> {
+  private final class NativeListener extends NativePropertyListener<TranslationTableEntry, ValueDiff<? extends CharSequence>> {
 
-    private NativeListener(IProperty property, ISimplePropertyListener<TranslationTableEntry, ValueDiff<? extends String>> listener) {
+    private NativeListener(IProperty property, ISimplePropertyListener<TranslationTableEntry, ValueDiff<? extends CharSequence>> listener) {
       super(property, listener);
     }
 
     private void fireChange(ITranslationEntry entry) {
       translationToTableEntry(entry).ifPresent(e -> super.fireChange(e, null));
-
     }
 
     @Override

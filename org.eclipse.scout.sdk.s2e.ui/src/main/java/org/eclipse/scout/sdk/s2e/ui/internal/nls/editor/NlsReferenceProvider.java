@@ -10,31 +10,36 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor;
 
-import java.util.List;
+import static java.util.Collections.emptySet;
+
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
-import org.eclipse.search.ui.text.Match;
+import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 
 /**
  * <h4>NlsReferenceProvider</h4>
  */
 public class NlsReferenceProvider {
-  private final Map<String, List<Match>> m_matches;
+  private final Map<String, ? extends Collection<FileRange>> m_matches;
 
-  public NlsReferenceProvider(Map<String, List<Match>> matches) {
+  public NlsReferenceProvider(Map<String, ? extends Collection<FileRange>> matches) {
     m_matches = matches;
   }
 
-  public List<Match> getReferencesFor(ITranslation entry) {
-    return m_matches.get(entry.key());
+  public Collection<FileRange> getReferencesFor(ITranslation entry) {
+    if (entry == null) {
+      return emptySet();
+    }
+    return getReferencesFor(entry.key());
   }
 
-  public Match[] getReferences(ITranslation entry) {
-    if (m_matches.containsKey(entry.key())) {
-      List<Match> list = m_matches.get(entry.key());
-      return list.toArray(new Match[0]);
+  public Collection<FileRange> getReferencesFor(String key) {
+    Collection<FileRange> references = m_matches.get(key);
+    if (references == null) {
+      return emptySet();
     }
-    return new Match[0];
+    return references;
   }
 }

@@ -10,6 +10,22 @@
  */
 package org.eclipse.scout.sdk.s2e.environment;
 
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.*;
+
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -51,27 +67,12 @@ import org.eclipse.scout.sdk.s2e.environment.model.JavaEnvironmentWithJdt;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.*;
-
 /**
  * <h3>{@link EclipseEnvironment}</h3>
  *
  * @since 7.0.0
  */
+@SuppressWarnings("MethodMayBeStatic")
 public class EclipseEnvironment implements IEnvironment, AutoCloseable {
 
   private final Map<IJavaProject, JavaEnvironmentWithJdt> m_envs;
@@ -478,11 +479,18 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
     return callInEclipseEnvironment(task, null);
   }
 
+  public static <T> T callInEclipseEnvironmentSync(BiFunction<? super EclipseEnvironment, ? super EclipseProgress, T> task, IProgressMonitor monitor) {
+    Ensure.notNull(monitor);
+    try (EclipseEnvironment eclipseEnvironment = new EclipseEnvironment()) {
+      return task.apply(eclipseEnvironment, toScoutProgress(monitor));
+    }
+  }
+
   public static <T> IFuture<T> callInEclipseEnvironment(BiFunction<? super EclipseEnvironment, ? super EclipseProgress, T> task, ISchedulingRule rule) {
     return callInEclipseEnvironment(task, rule, OperationJob.getJobName(task));
   }
 
-  protected static <T> IFuture<T> callInEclipseEnvironment(BiFunction<? super EclipseEnvironment, ? super EclipseProgress, T> task, ISchedulingRule rule, String jobName) {
+  public static <T> IFuture<T> callInEclipseEnvironment(BiFunction<? super EclipseEnvironment, ? super EclipseProgress, T> task, ISchedulingRule rule, String jobName) {
     AtomicReference<T> result = new AtomicReference<>();
     OperationJob job = new OperationJob((env, progress) -> result.set(task.apply(env, progress)), jobName);
     job.setRule(rule);

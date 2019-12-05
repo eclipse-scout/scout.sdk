@@ -10,14 +10,16 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.search;
 
-import java.util.List;
+import static org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils.queryResultToSearchResult;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.sdk.core.s.nls.query.MissingTranslationQuery;
+import org.eclipse.scout.sdk.core.s.util.search.IFileQueryResult;
+import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker;
 import org.eclipse.search.internal.ui.text.FileSearchQuery;
 import org.eclipse.search.internal.ui.text.FileSearchResult;
-import org.eclipse.search.ui.text.Match;
 
 /**
  * <h3>{@link NlsFindMissingKeysQuery}</h3>
@@ -32,12 +34,12 @@ public class NlsFindMissingKeysQuery extends FileSearchQuery {
 
   @Override
   public String getResultLabel(int matches) {
-    return "References to missing text keys (" + matches + ").";
+    return "References to missing translations (" + matches + ").";
   }
 
   @Override
   public String getLabel() {
-    return "Find references to missing text keys...";
+    return "Find references to missing translations...";
   }
 
   @Override
@@ -47,15 +49,8 @@ public class NlsFindMissingKeysQuery extends FileSearchQuery {
 
   @Override
   public IStatus run(IProgressMonitor monitor) {
-    NlsFindMissingKeys nlsFindMissingKeysJob = new NlsFindMissingKeys();
-    nlsFindMissingKeysJob.search();
-    List<Match> missingKeys = nlsFindMissingKeysJob.matches();
-    List<Match> unableToDetect = nlsFindMissingKeysJob.errors();
-    FileSearchResult searchResult = getSearchResult();
-    searchResult.removeAll();
-    searchResult.addMatches(missingKeys.toArray(new Match[0]));
-    searchResult.addMatches(unableToDetect.toArray(new Match[0]));
-
+    IFileQueryResult query = EclipseWorkspaceWalker.executeQuerySync(new MissingTranslationQuery(), monitor);
+    queryResultToSearchResult(query, getSearchResult());
     return Status.OK_STATUS;
   }
 }

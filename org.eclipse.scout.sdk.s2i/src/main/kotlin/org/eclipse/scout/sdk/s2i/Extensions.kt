@@ -10,6 +10,7 @@ import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -36,7 +37,6 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.function.Function
 
 fun IType.resolvePsi(): PsiClass? {
@@ -149,7 +149,7 @@ fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
         }
                 .filter { it.isValid }
 
-fun VirtualFile.toNioPath(): Path = Paths.get(path)
+fun VirtualFile.toNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath()
 
 fun VirtualFile.containingModuleOf(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
 
