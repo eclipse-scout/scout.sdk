@@ -163,7 +163,7 @@ public interface ISourceBuilder<TYPE extends ISourceBuilder<TYPE>> {
    *          {@link Optional} is empty.
    * @return This builder
    */
-  TYPE append(Optional<? extends ISourceGenerator<ISourceBuilder<?>>> opt);
+  TYPE append(@SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<? extends ISourceGenerator<ISourceBuilder<?>>> opt);
 
   /**
    * Appends the specified generators to this {@link ISourceBuilder}.
