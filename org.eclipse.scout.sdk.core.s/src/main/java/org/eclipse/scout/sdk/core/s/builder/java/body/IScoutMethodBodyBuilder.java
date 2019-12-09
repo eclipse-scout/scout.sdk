@@ -19,20 +19,20 @@ import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
  */
 public interface IScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> extends IMethodBodyBuilder<TYPE> {
 
-  TYPE appendBeansGetVariable(String bean, CharSequence varName);
+  TYPE appendBeansGetVariable(CharSequence bean, CharSequence varName);
 
   TYPE appendExportFormData(CharSequence formDataVarName);
 
   TYPE appendImportFormData(CharSequence formDataVarName);
 
-  TYPE appendBeansGet(String bean);
+  TYPE appendBeansGet(CharSequence bean);
 
-  TYPE appendGetFieldByClass(String fieldFqn);
+  TYPE appendGetFieldByClass(CharSequence fieldFqn);
 
-  TYPE appendGetPropertyByClass(String propName);
+  TYPE appendGetPropertyByClass(CharSequence propName);
 
   TYPE appendTextsGet(String textKey);
 
-  TYPE appendPermissionCheck(String permission);
+  TYPE appendPermissionCheck(CharSequence permission);
 
 }

@@ -36,17 +36,17 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
   }
 
   @Override
-  public TYPE appendBeansGetVariable(String bean, CharSequence varName) {
+  public TYPE appendBeansGetVariable(CharSequence bean, CharSequence varName) {
     return ref(bean).space().append(varName).equalSign().appendBeansGet(bean);
   }
 
   @Override
-  public TYPE appendGetFieldByClass(String fieldFqn) {
+  public TYPE appendGetFieldByClass(CharSequence fieldFqn) {
     return append("getFieldByClass").parenthesisOpen().classLiteral(fieldFqn).parenthesisClose();
   }
 
   @Override
-  public TYPE appendGetPropertyByClass(String propName) {
+  public TYPE appendGetPropertyByClass(CharSequence propName) {
     return append("getPropertyByClass").parenthesisOpen().classLiteral(propName).parenthesisClose();
   }
 
@@ -56,7 +56,7 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
   }
 
   @Override
-  public TYPE appendBeansGet(String bean) {
+  public TYPE appendBeansGet(CharSequence bean) {
     return ref(IScoutRuntimeTypes.BEANS).dotSign().append("get").parenthesisOpen()
         .classLiteral(bean).parenthesisClose();
   }
@@ -67,7 +67,7 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
   }
 
   @Override
-  public TYPE appendPermissionCheck(String permission) {
+  public TYPE appendPermissionCheck(CharSequence permission) {
     return appendIf().parenthesisOpen().appendNot().ref(IScoutRuntimeTypes.ACCESS).dotSign().append("check").parenthesisOpen().appendNew().ref(permission)
         .parenthesisOpen().parenthesisClose().parenthesisClose().parenthesisClose().space().blockStart().nl()
         .appendThrow().appendNew().ref(IScoutRuntimeTypes.VetoException).parenthesisOpen().appendTextsGet("AuthorizationFailed").parenthesisClose().semicolon().nl()

@@ -60,7 +60,7 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
       }
     }
 
-  protected void buildBackendCall(IScoutMethodBodyBuilder<?> builder, String serviceInterface, boolean isLoad) {
+  protected void buildBackendCall(IScoutMethodBodyBuilder<?> builder, CharSequence serviceInterface, boolean isLoad) {
     boolean isDtoAvailable = formDataType().isPresent();
 
     builder.appendBeansGetVariable(serviceInterface, SERVICE_VAR_NAME).semicolon().nl();

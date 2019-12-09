@@ -287,7 +287,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     return methodBuilder;
   }
 
-  protected void createPermissionCheckSource(IScoutMethodBodyBuilder<?> b, String permissionFqn) {
+  protected void createPermissionCheckSource(IScoutMethodBodyBuilder<?> b, CharSequence permissionFqn) {
     b.appendPermissionCheck(permissionFqn);
   }
 
