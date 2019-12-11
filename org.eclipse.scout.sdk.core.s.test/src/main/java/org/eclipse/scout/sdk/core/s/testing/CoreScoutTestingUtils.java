@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.testing;
 
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,6 +29,8 @@ import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGene
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsModuleNewHelper;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.testing.maven.MavenCliRunner;
@@ -75,8 +78,11 @@ public final class CoreScoutTestingUtils {
   private static Path createTestProject(String archetypeArtifactId) throws IOException {
     ensureMavenRunnerCreated();
     Path targetDirectory = Files.createTempDirectory(CoreScoutTestingUtils.class.getSimpleName() + "-projectDir");
+
+    // The testing runner does not make use of the environment and the progress: pass empty mocks
+    //noinspection AccessOfSystemProperties
     ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", System.getProperty("java.specification.version"),
-        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION);
+        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION, mock(IEnvironment.class), mock(IProgress.class));
     return targetDirectory;
   }
 
@@ -95,7 +101,9 @@ public final class CoreScoutTestingUtils {
   public static Path createJaxWsModule(Path serverModuleDir, String artifactId) throws IOException {
     ensureMavenRunnerCreated();
     addMetroDependency(serverModuleDir.resolve(IMavenConstants.POM));
-    return JaxWsModuleNewHelper.createModule(serverModuleDir.resolve(IMavenConstants.POM), artifactId);
+
+    // The testing runner does not make use of the environment and the progress: pass empty mocks
+    return JaxWsModuleNewHelper.createModule(serverModuleDir.resolve(IMavenConstants.POM), artifactId, mock(IEnvironment.class), mock(IProgress.class));
   }
 
   static void addMetroDependency(Path pomFile) throws IOException {
@@ -234,7 +242,8 @@ public final class CoreScoutTestingUtils {
         build.withGoal(goal);
       }
     }
-    MavenRunner.execute(build);
+    // The testing runner does not make use of the environment and the progress: pass empty mocks
+    MavenRunner.execute(build, mock(IEnvironment.class), mock(IProgress.class));
   }
 
   private static void ensureMavenRunnerCreated() {

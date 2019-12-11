@@ -10,6 +10,18 @@
  */
 package org.eclipse.scout.sdk.s2e.operation.project;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.stream.Stream;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -38,18 +50,6 @@ import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.stream.Stream;
-
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
 
 /**
  * <h3>{@link ScoutProjectNewOperation}</h3>
@@ -90,8 +90,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
       // create project on disk (using archetype)
       progress.init(toString(), 100);
       ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getDefaultWorkspaceJavaVersion(),
-          ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, artifactId, version);
-      progress.worked(5);
+          ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, artifactId, version, env, progress.newChild(5));
 
       // import into workspace
       m_createdProjects = importIntoWorkspace(progress.newChild(90));
@@ -195,7 +194,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
   /**
    * Imports the extracted projects into the workspace using m2e import
    */
-  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+  @SuppressWarnings({"findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", "TypeMayBeWeakened"})
   protected List<IProject> importIntoWorkspace(EclipseProgress progress) throws CoreException {
     List<Path> subFolders;
     try (Stream<Path> files = Files.list(getTargetDirectory().resolve(getArtifactId()))) {

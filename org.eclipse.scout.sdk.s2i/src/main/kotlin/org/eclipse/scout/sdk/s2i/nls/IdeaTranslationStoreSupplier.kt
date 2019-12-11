@@ -11,10 +11,14 @@
 package org.eclipse.scout.sdk.s2i.nls
 
 import com.intellij.lang.jvm.JvmModifier
-import com.intellij.openapi.components.BaseComponent
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
+import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
@@ -36,7 +40,7 @@ import java.nio.file.Path
 import java.util.function.Supplier
 import java.util.stream.Stream
 
-open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, BaseComponent {
+open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActivity, DumbAware, Disposable {
 
     override fun get(file: Path, env: IEnvironment, progress: IProgress): Stream<out ITranslationStore> =
             file.toVirtualFile()
@@ -44,11 +48,28 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, BaseCompone
                     ?.let { findTranslationStoresVisibleIn(it, env.toIdea(), progress.toIdea()) }
                     ?: Stream.empty()
 
-    override fun initComponent() {
-        TranslationStoreStack.SUPPLIERS.add(IdeaTranslationStoreSupplier())
+    /**
+     * Executed on [Project] open
+     */
+    override fun runActivity(project: Project) {
+        if (alreadyRegistered()) {
+            return
+        }
+
+        Disposer.register(project, this)
+        TranslationStoreStack.SUPPLIERS.add(this)
     }
 
-    override fun disposeComponent() = TranslationStoreStack.SUPPLIERS.clear()
+    /**
+     * Executed on [Project] close
+     */
+    override fun dispose() {
+        TranslationStoreStack.SUPPLIERS.remove(this)
+    }
+
+    protected fun alreadyRegistered() =
+            TranslationStoreStack.SUPPLIERS.stream()
+                    .anyMatch { it is IdeaTranslationStoreSupplier }
 
     protected fun findTranslationStoresVisibleIn(module: Module, env: IdeaEnvironment, progress: IdeaProgress): Stream<out ITranslationStore> {
         progress.init("Search properties text provider services.", 20)

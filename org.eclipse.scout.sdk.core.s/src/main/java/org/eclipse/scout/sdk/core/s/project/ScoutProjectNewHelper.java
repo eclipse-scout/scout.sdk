@@ -10,25 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.s.project;
 
-import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
-import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
-import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.Xml;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -52,6 +33,28 @@ import java.util.Base64.Encoder;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.Xml;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 /**
  * <h3>{@link ScoutProjectNewHelper}</h3>
  *
@@ -71,17 +74,17 @@ public final class ScoutProjectNewHelper {
   private ScoutProjectNewHelper() {
   }
 
-  public static void createProject(Path workingDir, String groupId, String artifactId, String displayName) throws IOException {
-    createProject(workingDir, groupId, artifactId, displayName, null);
+  public static void createProject(Path workingDir, String groupId, String artifactId, String displayName, IEnvironment env, IProgress progress) throws IOException {
+    createProject(workingDir, groupId, artifactId, displayName, null, env, progress);
   }
 
-  public static void createProject(Path workingDir, String groupId, String artifactId, String displayName, String javaVersion) throws IOException {
-    createProject(workingDir, groupId, artifactId, displayName, javaVersion, null, null, null);
+  public static void createProject(Path workingDir, String groupId, String artifactId, String displayName, String javaVersion, IEnvironment env, IProgress progress) throws IOException {
+    createProject(workingDir, groupId, artifactId, displayName, javaVersion, null, null, null, env, progress);
   }
 
   @SuppressWarnings("squid:S00107")
   public static void createProject(Path workingDir, String groupId, String artifactId, String displayName, String javaVersion,
-      String archetypeGroupId, String archeTypeArtifactId, String archetypeVersion) throws IOException {
+      String archetypeGroupId, String archetypeArtifactId, String archetypeVersion, IEnvironment env, IProgress progress) throws IOException {
 
     // validate input
     Ensure.notNull(workingDir);
@@ -100,10 +103,10 @@ public final class ScoutProjectNewHelper {
     if (Strings.isEmpty(javaVersion)) {
       javaVersion = DEFAULT_JAVA_ENV;
     }
-    if (Strings.isBlank(archetypeGroupId) || Strings.isBlank(archeTypeArtifactId) || Strings.isBlank(archetypeVersion)) {
+    if (Strings.isBlank(archetypeGroupId) || Strings.isBlank(archetypeArtifactId) || Strings.isBlank(archetypeVersion)) {
       // use default
       archetypeGroupId = SCOUT_ARCHETYPES_GROUP_ID;
-      archeTypeArtifactId = SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
+      archetypeArtifactId = SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
       archetypeVersion = SCOUT_ARCHETYPES_VERSION;
     }
 
@@ -118,7 +121,7 @@ public final class ScoutProjectNewHelper {
         .withGoal("archetype:generate")
         .withOption(MavenBuild.OPTION_BATCH_MODE)
         .withProperty("archetypeGroupId", archetypeGroupId)
-        .withProperty("archetypeArtifactId", archeTypeArtifactId)
+        .withProperty("archetypeArtifactId", archetypeArtifactId)
         .withProperty("archetypeVersion", archetypeVersion)
         .withProperty("groupId", groupId)
         .withProperty("artifactId", artifactId)
@@ -134,7 +137,7 @@ public final class ScoutProjectNewHelper {
         .withProperty("userName", CoreUtils.getUsername());
 
     // execute archetype generation
-    MavenRunner.execute(archetypeBuild);
+    MavenRunner.execute(archetypeBuild, env, progress);
 
     postProcessRootPom(workingDir.resolve(artifactId));
   }
@@ -215,6 +218,7 @@ public final class ScoutProjectNewHelper {
       }
 
       Ensure.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");
+      //noinspection NestedTryStatement
       try (OutputStream out = Files.newOutputStream(pom, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
         writeDocument(doc, new StreamResult(out));
       }
@@ -234,6 +238,7 @@ public final class ScoutProjectNewHelper {
       return "Display Name is not set.";
     }
     if (!DISPLAY_NAME_PATTERN.matcher(displayNameCandidate).matches()) {
+      //noinspection HardcodedFileSeparator
       return "The Display Name must not contain these characters: \\\"/<>:=";
     }
     return null;

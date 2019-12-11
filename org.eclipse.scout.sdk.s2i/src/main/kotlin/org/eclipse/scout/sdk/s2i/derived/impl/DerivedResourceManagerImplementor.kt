@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2i.derived.impl
 
 import com.intellij.AppTopics
-import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
@@ -42,22 +41,21 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.function.BiFunction
 
-open class DerivedResourceManagerImplementor(private val project: Project) : ProjectComponent, DerivedResourceManager, SettingsChangedListener {
+class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceManager, SettingsChangedListener {
 
     private val m_updateHandlerFactories = ArrayList<DerivedResourceHandlerFactory>()
     private val m_eventBuffer = ArrayList<SearchScope>()
     private val m_pendingFutures = ConcurrentLinkedQueue<ScheduledFuture<*>>()
     private val m_executorService = AppExecutorUtil.getAppScheduledExecutorService()
-
     private var m_busConnection: MessageBusConnection? = null
 
-    override fun initComponent() = synchronized(this) {
+    init {
         addDerivedResourceHandlerFactory(DtoUpdateHandlerFactory())
         ScoutSettings.addListener(this)
         updateSubscription()
     }
 
-    override fun disposeComponent(): Unit = synchronized(this) {
+    override fun dispose() {
         unsubscribe()
         ScoutSettings.removeListener(this)
         m_updateHandlerFactories.clear()
@@ -70,7 +68,7 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
         }
     }
 
-    protected fun subscribe() = synchronized(this) {
+    private fun subscribe() = synchronized(this) {
         if (m_busConnection != null) {
             return@synchronized
         }
@@ -78,12 +76,12 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
         m_busConnection?.subscribe(AppTopics.FILE_DOCUMENT_SYNC, DocumentSyncListener())
     }
 
-    protected fun unsubscribe() = synchronized(this) {
+    private fun unsubscribe() = synchronized(this) {
         m_busConnection?.disconnect()
         m_busConnection = null
     }
 
-    protected fun updateSubscription() {
+    private fun updateSubscription() {
         if (isAutoUpdateDerivedResources()) {
             subscribe()
         } else {
@@ -146,7 +144,7 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
         m_updateHandlerFactories -= factory
     }
 
-    protected fun executeHandlers(handlers: List<BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>>, env: IdeaEnvironment, progress: IdeaProgress) {
+    private fun executeHandlers(handlers: List<BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>>, env: IdeaEnvironment, progress: IdeaProgress) {
         progress.init("Update derived resources", handlers.size)
         val indicator = IdeaEnvironment.toIdeaProgress(progress).indicator
         val fileWrites = ArrayList<IFuture<*>>()
@@ -173,7 +171,7 @@ open class DerivedResourceManagerImplementor(private val project: Project) : Pro
         Future.awaitAll(fileWrites)
     }
 
-    protected inner class DocumentSyncListener : FileDocumentManagerListener {
+    private inner class DocumentSyncListener : FileDocumentManagerListener {
         override fun fileContentReloaded(file: VirtualFile, document: Document) {
             if (JavaTypes.JAVA_FILE_EXTENSION == file.extension) {
                 trigger(fileScope(project, file))

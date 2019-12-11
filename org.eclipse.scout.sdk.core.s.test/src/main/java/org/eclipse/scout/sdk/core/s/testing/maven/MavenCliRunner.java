@@ -37,6 +37,8 @@ import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.MavenCli;
 import org.eclipse.scout.sdk.core.log.SdkConsole;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -56,7 +58,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
   private static final String MAVEN_CALL_FAILED_MSG = "Maven call failed.";
 
   @Override
-  public void execute(MavenBuild build) {
+  public void execute(MavenBuild build, IEnvironment env, IProgress progress) {
     assertNotNull(build);
     try (URLClassLoader loader = MavenSandboxClassLoaderFactory.build()) {
       SdkLog.debug("Executing embedded {}", build.toString());
@@ -159,6 +161,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       Class<?> poolClass = loader.loadClass(RealConnectionPool.class.getName());
       Field field = poolClass.getDeclaredField("executor");
       field.setAccessible(true);
+      //noinspection TypeMayBeWeakened
       ThreadPoolExecutor executor = (ThreadPoolExecutor) field.get(null);
       executor.shutdownNow();
 

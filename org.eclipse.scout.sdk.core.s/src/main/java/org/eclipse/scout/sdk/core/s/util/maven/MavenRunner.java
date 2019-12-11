@@ -10,9 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.s.util.maven;
 
-import org.eclipse.scout.sdk.core.util.Ensure;
-
 import java.util.function.Supplier;
+
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
  * <h3>{@link MavenRunner}</h3>
@@ -63,10 +65,14 @@ public final class MavenRunner {
    *
    * @param build
    *          The {@link MavenBuild} to execute. Must not be {@code null}.
+   * @param env
+   *          The {@link IEnvironment} in which the Maven build should be executed. Must not be {@code null}.
+   * @param progress
+   *          The {@link IProgress} indicator. Must not be {@code null}.
    * @throws IllegalArgumentException
-   *           if the {@link MavenBuild} specified is {@code null} or no {@link IMavenRunnerSpi} has been set.
+   *           if an argument is {@code null} or no {@link IMavenRunnerSpi} has been set.
    */
-  public static void execute(MavenBuild build) {
-    Ensure.notNull(get(), "no maven runner set").execute(Ensure.notNull(build));
+  public static void execute(MavenBuild build, IEnvironment env, IProgress progress) {
+    Ensure.notNull(get(), "no maven runner set").execute(Ensure.notNull(build), Ensure.notNull(env), Ensure.notNull(progress));
   }
 }

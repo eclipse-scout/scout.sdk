@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.operation.jaxws;
 
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -28,7 +30,6 @@ import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
@@ -48,8 +49,7 @@ public class RebuildArtifactsOperation implements BiConsumer<IEnvironment, IProg
   @Override
   public void accept(IEnvironment env, IProgress p) {
     Ensure.isTrue(JdtUtils.exists(getJavaProject()), "Java Project must exist.");
-    EclipseProgress progress = EclipseEnvironment.toScoutProgress(p);
-    progress.init(toString(), 100);
+    EclipseProgress progress = toScoutProgress(p).init(toString(), 100);
 
     try {
       // refresh project
@@ -59,8 +59,7 @@ public class RebuildArtifactsOperation implements BiConsumer<IEnvironment, IProg
       // delete /target folder contents
       deleteOutputFolderContents(project, progress.newChild(44).monitor());
 
-      rebuildArtifacts(project);
-      progress.worked(52);
+      rebuildArtifacts(project, env, progress.newChild(52));
 
       // refresh the project to 'see' the new artifacts
       progress.monitor().setTaskName("Refresh project");
@@ -71,13 +70,13 @@ public class RebuildArtifactsOperation implements BiConsumer<IEnvironment, IProg
     }
   }
 
-  protected static void rebuildArtifacts(IProject project) {
+  protected static void rebuildArtifacts(IResource workingDir, IEnvironment env, IProgress p) {
     try {
       // schedule maven build 'clean process-resources'
       MavenRunner.execute(new MavenBuild()
           .withGoal("clean")
           .withGoal("process-resources")
-          .withWorkingDirectory(project.getLocation().toFile().toPath()));
+          .withWorkingDirectory(workingDir.getLocation().toFile().toPath()), env, p);
     }
     catch (RuntimeException e) {
       SdkLog.error("Unable to rebuild artifacts. See maven console for details.", e);

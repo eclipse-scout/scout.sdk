@@ -1,8 +1,11 @@
 package org.eclipse.scout.sdk.s2i
 
 import com.intellij.CommonBundle
-import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.jetbrains.annotations.PropertyKey
@@ -11,9 +14,14 @@ import java.lang.ref.SoftReference
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class EclipseScoutBundle private constructor(private val project: Project) : ProjectComponent {
+class EclipseScoutBundle : StartupActivity, DumbAware {
 
-    override fun initComponent() = synchronized(this) {
+    /**
+     * Executed on [Project] open
+     */
+    override fun runActivity(project: Project) {
+        val derivedResourceManager = derivedResourceManager(project)
+        Disposer.register(project, derivedResourceManager)
         scheduleDuplicateClassIdInspectionIfEnabled(project, TimeUnit.MINUTES.toMillis(10))
     }
 
@@ -26,7 +34,7 @@ class EclipseScoutBundle private constructor(private val project: Project) : Pro
                 CommonBundle.message(getBundle(), key, *params)
 
         fun derivedResourceManager(project: Project): DerivedResourceManager =
-                project.getComponent(DerivedResourceManager::class.java)
+                ServiceManager.getService(project, DerivedResourceManager::class.java)
 
         fun scheduleDuplicateClassIdInspectionIfEnabled(project: Project, startupDelayMillis: Long) {
             DuplicateClassIdInspection.scheduleIfEnabled(project, startupDelayMillis, TimeUnit.MILLISECONDS)

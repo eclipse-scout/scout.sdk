@@ -1,9 +1,13 @@
 package org.eclipse.scout.sdk.s2i
 
 import com.intellij.notification.NotificationGroup
-import com.intellij.openapi.components.BaseComponent
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.ui.MessageType
+import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.log.ISdkConsoleSpi
 import org.eclipse.scout.sdk.core.log.SdkConsole
 import org.eclipse.scout.sdk.core.log.SdkLog
@@ -13,10 +17,11 @@ import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
 import java.util.*
 import java.util.logging.Level
 
-open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
+open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable, SettingsChangedListener {
 
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
     private val m_balloonLog = NotificationGroup.balloonGroup("Scout SDK")
+    private var m_previousConsoleSpi: ISdkConsoleSpi? = null
 
     enum class LogLevel(private val text: String) {
         ERROR("Error"),
@@ -38,7 +43,18 @@ open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
         }
     }
 
-    override fun initComponent() {
+    /**
+     * Executed on [Project] open
+     */
+    override fun runActivity(project: Project) {
+        val existingConsoleSpi = SdkConsole.getConsoleSpi()
+        if (existingConsoleSpi == this) {
+            // there is already a project open which registered the logger already
+            return
+        }
+
+        Disposer.register(project, this)
+        m_previousConsoleSpi = existingConsoleSpi
         SdkConsole.setConsoleSpi(this)
         ScoutSettings.addListener(this)
 
@@ -50,9 +66,13 @@ open class IdeaLogger : ISdkConsoleSpi, BaseComponent, SettingsChangedListener {
         refreshLogLevel()
     }
 
-    override fun disposeComponent() {
+    /**
+     * Executed on [Project] close
+     */
+    override fun dispose() {
         ScoutSettings.removeListener(this)
-        SdkConsole.setConsoleSpi(null)
+        SdkConsole.setConsoleSpi(m_previousConsoleSpi)
+        m_previousConsoleSpi = null
     }
 
     override fun changed(key: String, oldVal: String?, newVal: String?) {

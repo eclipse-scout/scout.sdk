@@ -4,8 +4,12 @@ import com.intellij.copyright.CopyrightManager
 import com.intellij.ide.fileTemplates.FileTemplate
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.lang.java.JavaLanguage
-import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
@@ -28,36 +32,45 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import java.nio.file.Path
 import java.util.*
 
-open class IdeaSettingsCommentGenerator(val project: Project) : IDefaultElementCommentGeneratorSpi, ProjectComponent {
+open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, StartupActivity, DumbAware, Disposable {
 
-    private var m_fileTemplateManager: FileTemplateManager? = null
-    private var m_origCommentGenerator: IDefaultElementCommentGeneratorSpi? = null
-    private var m_copyrightManager: CopyrightManager? = null
-    private var m_psiManager: PsiManager? = null
+    private var m_previousCommentGenerator: IDefaultElementCommentGeneratorSpi? = null
 
-    override fun disposeComponent() {
-        JavaElementCommentBuilder.setCommentGeneratorSpi(m_origCommentGenerator)
-        m_fileTemplateManager = null
-        m_copyrightManager = null
-        m_origCommentGenerator = null
-        m_psiManager = null
+    /**
+     * Executed on [Project] open
+     */
+    override fun runActivity(project: Project) {
+        val existingCommentGenerator = JavaElementCommentBuilder.getCommentGeneratorSpi()
+        if (existingCommentGenerator == this) {
+            return
+        }
+
+        Disposer.register(project, this)
+        m_previousCommentGenerator = existingCommentGenerator
+        JavaElementCommentBuilder.setCommentGeneratorSpi(this)
     }
 
-    override fun initComponent() {
-        m_origCommentGenerator = JavaElementCommentBuilder.getCommentGeneratorSpi()
-        m_fileTemplateManager = FileTemplateManager.getInstance(project)
-        m_copyrightManager = CopyrightManager.getInstance(project)
-        m_psiManager = PsiManager.getInstance(project)
-        JavaElementCommentBuilder.setCommentGeneratorSpi(this)
+    /**
+     * Executed on [Project] close
+     */
+    override fun dispose() {
+        JavaElementCommentBuilder.setCommentGeneratorSpi(m_previousCommentGenerator)
+        m_previousCommentGenerator = null
     }
 
     override fun createCompilationUnitComment(target: ICompilationUnitGenerator<*>): ISourceGenerator<ICommentBuilder<*>> {
         return ISourceGenerator {
-            val targetPath: Path? = it.context().properties().getProperty(ISdkProperties.CONTEXT_PROPERTY_TARGET_PATH, Path::class.java)
-            val copyrightNotice = computeCopyrightNoticeFor(targetPath)
-            val fileHeader = computeFileHeaderTemplateFor(target)
-            val cuComment = StringBuilder()
+            val module: Module = it.context().properties().getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, Module::class.java) ?: return@ISourceGenerator
+            val project = module.project
+            val fileTemplateManager = FileTemplateManager.getInstance(project)
+            val copyrightManager = CopyrightManager.getInstance(project)
+            val psiManager = PsiManager.getInstance(project)
 
+            val targetPath: Path? = it.context().properties().getProperty(ISdkProperties.CONTEXT_PROPERTY_TARGET_PATH, Path::class.java)
+            val copyrightNotice = computeCopyrightNoticeFor(targetPath, psiManager, module, copyrightManager)
+            val fileHeader = computeFileHeaderTemplateFor(target, fileTemplateManager)
+
+            val cuComment = StringBuilder()
             Strings.notBlank(copyrightNotice).ifPresent { cuComment.append(copyrightNotice) }
             Strings.notBlank(fileHeader).ifPresent {
                 if (cuComment.isNotBlank()) {
@@ -68,7 +81,7 @@ open class IdeaSettingsCommentGenerator(val project: Project) : IDefaultElementC
 
             if (cuComment.isNotBlank()) {
                 val fileType = FileTypeUtil.getInstance().getFileTypeByName(JavaLanguage.INSTANCE.id)
-                val opts = CopyrightManager.getInstance(project).options.getMergedOptions(fileType.name)
+                val opts = copyrightManager.options.getMergedOptions(fileType.name)
                 val cmt = FileTypeUtil.buildComment(fileType, cuComment.toString(), opts)
                 val commentText = StringUtil.convertLineSeparators(cmt)
                 it.append(commentText)
@@ -76,11 +89,10 @@ open class IdeaSettingsCommentGenerator(val project: Project) : IDefaultElementC
         }
     }
 
-    protected fun computeFileHeaderTemplateFor(target: ICompilationUnitGenerator<*>): String? {
-        val pat = m_fileTemplateManager?.getPattern(FileTemplateManager.FILE_HEADER_TEMPLATE_NAME)
-                ?: return null
+    protected fun computeFileHeaderTemplateFor(target: ICompilationUnitGenerator<*>, fileTemplateManager: FileTemplateManager): String? {
+        val pat = fileTemplateManager.getPattern(FileTemplateManager.FILE_HEADER_TEMPLATE_NAME) ?: return null
         val pckName = target.packageName().orElse("")
-        val props = defaultProperties()
+        val props = defaultProperties(fileTemplateManager)
         props[FileTemplate.ATTRIBUTE_DIR_PATH] = pckName.replace('.', '/')
         props[FileTemplate.ATTRIBUTE_PACKAGE_NAME] = pckName
         props[FileTemplate.ATTRIBUTE_FILE_NAME] = target.fileName().orElse("")
@@ -88,16 +100,16 @@ open class IdeaSettingsCommentGenerator(val project: Project) : IDefaultElementC
         return pat.getText(props)
     }
 
-    protected fun computeCopyrightNoticeFor(path: Path?): String? {
+    protected fun computeCopyrightNoticeFor(path: Path?, psiManager: PsiManager, module: Module, copyrightManager: CopyrightManager): String? {
         if (path == null) {
             return null
         }
 
+        val project = module.project
         val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(path.toFile()) ?: return null
-        val psiFile = IdeaEnvironment.computeInReadAction(project) { m_psiManager?.findFile(virtualFile) }
-                ?: return null
-        val module = psiFile.containingModule() ?: return null
-        val raw = m_copyrightManager?.getCopyrightOptions(psiFile)?.notice ?: return null
+        val psiFile = IdeaEnvironment.computeInReadAction(project) { psiManager.findFile(virtualFile) } ?: return null
+
+        val raw = copyrightManager.getCopyrightOptions(psiFile)?.notice ?: return null
         return VelocityHelper.evaluate(psiFile, project, module, EntityUtil.decode(raw))
     }
 
@@ -126,8 +138,8 @@ open class IdeaSettingsCommentGenerator(val project: Project) : IDefaultElementC
         return ISourceGenerator.empty()
     }
 
-    protected fun defaultProperties(): Properties {
-        val props = m_fileTemplateManager?.defaultProperties ?: return Properties()
+    protected fun defaultProperties(fileTemplateManager: FileTemplateManager): Properties {
+        val props = fileTemplateManager.defaultProperties
         props["USER"] = CoreUtils.getUsername()
         return props
     }

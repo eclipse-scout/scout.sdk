@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2e.operation;
 
 import static java.util.Collections.addAll;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -54,14 +53,14 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
-import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
@@ -69,7 +68,7 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils;
  *
  * @since 5.2.0
  */
-public class MavenBuildOperation implements BiConsumer<EclipseEnvironment, EclipseProgress> {
+public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> {
 
   /**
    * see org.eclipse.m2e.actions.MavenLaunchConstants in plug-in 'org.eclipse.m2e.launching'.
@@ -105,23 +104,20 @@ public class MavenBuildOperation implements BiConsumer<EclipseEnvironment, Eclip
   }
 
   @Override
-  public void accept(EclipseEnvironment env, EclipseProgress p) {
+  public void accept(IEnvironment env, IProgress progress) {
     Ensure.notNull(getBuild());
     Ensure.isTrue(!getBuild().getGoals().isEmpty());
     Ensure.notNull(getBuild().getWorkingDirectory());
-    SubMonitor progress = SubMonitor.convert(p.monitor(), toString(), 10);
+
+    progress.init(toString(), 10);
 
     m_artifactGenCompleted = new CountDownLatch(1);
-
     try {
       scheduleMavenBuild(progress);
-      if (progress.isCanceled()) {
-        return;
-      }
+      progress.setWorkRemaining(4);
 
       if (isWaitUntilCompleted()) {
         // wait until the forked java process has ended
-        progress.setTaskName("Wait for Maven build...");
         waitForArtifactBuildCompleted();
 
         for (Integer mavenReturnCode : m_mavenReturnCodes) {
@@ -137,17 +133,18 @@ public class MavenBuildOperation implements BiConsumer<EclipseEnvironment, Eclip
     }
   }
 
-  protected void scheduleMavenBuild(SubMonitor progress) throws CoreException {
+  protected void scheduleMavenBuild(IProgress progress) throws CoreException {
     DebugPlugin debugPlugin = DebugPlugin.getDefault();
     ILaunchManager launchManager = debugPlugin.getLaunchManager();
     Collection<IProcess> watchedProcesses = new HashSet<>(1);
-    ILaunchConfiguration launchConfiguration = createLaunchConfiguration(progress.newChild(1));
+    ILaunchConfiguration launchConfiguration = createLaunchConfiguration(toScoutProgress(progress.newChild(1)).monitor());
     IDebugEventSetListener eventSetListener = new IDebugEventSetListener() {
       @Override
       public void handleDebugEvents(DebugEvent[] events) {
         synchronized (watchedProcesses) {
           for (DebugEvent e : events) {
             Object source = e.getSource();
+            //noinspection SuspiciousMethodCalls
             if (source != null && watchedProcesses.contains(source)) {
               IProcess changedProcess = (IProcess) source;
               if (changedProcess.isTerminated()) {
@@ -202,7 +199,7 @@ public class MavenBuildOperation implements BiConsumer<EclipseEnvironment, Eclip
     launchManager.addLaunchListener(launchListener);
 
     SdkLog.debug("Executing embedded {}", getBuild().toString());
-    launchConfiguration.launch("run", progress.newChild(5), false, true);
+    launchConfiguration.launch("run", toScoutProgress(progress.newChild(5)).monitor(), false, true);
   }
 
   protected void waitForArtifactBuildCompleted() {
@@ -335,12 +332,11 @@ public class MavenBuildOperation implements BiConsumer<EclipseEnvironment, Eclip
   }
 
   public static final class M2eMavenRunner implements IMavenRunnerSpi {
-
     @Override
-    public void execute(MavenBuild build) {
+    public void execute(MavenBuild build, IEnvironment env, IProgress progress) {
       MavenBuildOperation op = new MavenBuildOperation();
       op.setBuild(build);
-      runInEclipseEnvironment(op).awaitDoneThrowingOnErrorOrCancel();
+      op.accept(env, progress);
     }
   }
 

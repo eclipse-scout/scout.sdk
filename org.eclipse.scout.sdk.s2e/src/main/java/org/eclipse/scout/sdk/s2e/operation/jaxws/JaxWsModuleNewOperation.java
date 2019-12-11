@@ -10,6 +10,20 @@
  */
 package org.eclipse.scout.sdk.s2e.operation.jaxws;
 
+import static java.util.Collections.singleton;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -30,20 +44,6 @@ import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Collections.singleton;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 /**
  * <h3>{@link JaxWsModuleNewOperation}</h3>
@@ -74,8 +74,7 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
       progress.worked(5);
 
       // create project on disk (using archetype)
-      Path createdProjectDir = JaxWsModuleNewHelper.createModule(pomFile.getLocation().toFile().toPath(), getArtifactId());
-      progress.worked(10);
+      Path createdProjectDir = JaxWsModuleNewHelper.createModule(pomFile.getLocation().toFile().toPath(), getArtifactId(), env, progress.newChild(10));
 
       // import into workspace
       setCreatedProject(importIntoWorkspace(createdProjectDir, progress.newChild(70)));

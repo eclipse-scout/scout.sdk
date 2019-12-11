@@ -10,8 +10,25 @@
  */
 package org.eclipse.scout.sdk.core.s.jaxws;
 
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
@@ -25,25 +42,12 @@ import org.eclipse.scout.sdk.core.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-
 /**
  * <h3>{@link JaxWsModuleNewHelper}</h3>
  *
  * @since 5.2.0
  */
+@SuppressWarnings("HardcodedFileSeparator")
 public final class JaxWsModuleNewHelper {
 
   private JaxWsModuleNewHelper() {
@@ -76,7 +80,7 @@ public final class JaxWsModuleNewHelper {
     Path parentDir = modulePomFile.getParent();
     if (parentDir != null) {
       Path grandParentDir = parentDir.getParent();
-      if(grandParentDir != null) {
+      if (grandParentDir != null) {
         return grandParentDir.resolve(IMavenConstants.POM);
       }
     }
@@ -87,12 +91,12 @@ public final class JaxWsModuleNewHelper {
     return getParentPomOf(projectPomFile, Xml.get(projectPomFile));
   }
 
-  public static Path createModule(Path targetModulePomFile, String artifactId) throws IOException {
-    return createModuleImpl(targetModulePomFile, artifactId);
+  public static Path createModule(Path targetModulePomFile, String artifactId, IEnvironment env, IProgress progress) throws IOException {
+    return createModuleImpl(targetModulePomFile, artifactId, env, progress);
   }
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  static Path createModuleImpl(Path targetModulePomFile, String artifactId) throws IOException {
+  static Path createModuleImpl(Path targetModulePomFile, String artifactId, IEnvironment env, IProgress progress) throws IOException {
     // validate input
     Ensure.isFile(targetModulePomFile, "Target module pom file '{}' could not be found.", targetModulePomFile);
     Path parentDir = Ensure.isDirectory(targetModulePomFile.getParent(), "Unknown module structure. Cannot find parent of pom '{}'.", targetModulePomFile);
@@ -130,7 +134,7 @@ public final class JaxWsModuleNewHelper {
           .withProperty("parentArtifactId", parentArtifactId);
 
       // execute archetype generation
-      MavenRunner.execute(archetypeBuild);
+      MavenRunner.execute(archetypeBuild, env, progress);
       //noinspection NestedTryStatement
       try (Stream<Path> files = Files.list(tempDirectory)) {
         Path createdProjectDir = files.findAny().orElseThrow(() -> new IOException("Created project dir not found. Project creation failed."));
@@ -179,12 +183,8 @@ public final class JaxWsModuleNewHelper {
       Element dependencyManagementElement = JaxWsUtils.getOrCreateElement(parentPom.getDocumentElement(), IMavenConstants.DEPENDENCY_MANAGEMENT);
       Element dependenciesElement = JaxWsUtils.getOrCreateElement(dependencyManagementElement, IMavenConstants.DEPENDENCIES);
 
-      Element newDependencyElement = parentPom.createElement(IMavenConstants.DEPENDENCY);
+      Element newDependencyElement = createDependencyElement(groupId, artifactId, parentPom);
       dependenciesElement.appendChild(newDependencyElement);
-      Element newGroupIdElement = JaxWsUtils.getOrCreateElement(newDependencyElement, IMavenConstants.GROUP_ID);
-      newGroupIdElement.setTextContent(groupId);
-      Element newArtifactIdElement = JaxWsUtils.getOrCreateElement(newDependencyElement, IMavenConstants.ARTIFACT_ID);
-      newArtifactIdElement.setTextContent(artifactId);
       Element newVersionElement = JaxWsUtils.getOrCreateElement(newDependencyElement, IMavenConstants.VERSION);
 
       Optional<Element> properties = Xml.firstChildElement(parentPom.getDocumentElement(), IMavenConstants.PROPERTIES);
@@ -209,6 +209,17 @@ public final class JaxWsModuleNewHelper {
     }
   }
 
+  private static Element createDependencyElement(String groupId, String artifactId, Document parentPom) {
+    Element newDependencyElement = parentPom.createElement(IMavenConstants.DEPENDENCY);
+
+    Element newGroupIdElement = JaxWsUtils.getOrCreateElement(newDependencyElement, IMavenConstants.GROUP_ID);
+    newGroupIdElement.setTextContent(groupId);
+    Element newArtifactIdElement = JaxWsUtils.getOrCreateElement(newDependencyElement, IMavenConstants.ARTIFACT_ID);
+    newArtifactIdElement.setTextContent(artifactId);
+
+    return newDependencyElement;
+  }
+
   static void writeDocument(Document document, Path file) throws TransformerException, IOException {
     Transformer transformer = Xml.createTransformer(true);
     try (OutputStream out = Files.newOutputStream(file, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
@@ -220,12 +231,8 @@ public final class JaxWsModuleNewHelper {
     try {
       Document pom = Xml.get(targetModulePomFile);
       Element dependenciesElement = JaxWsUtils.getOrCreateElement(pom.getDocumentElement(), IMavenConstants.DEPENDENCIES);
-      Element newDependencyElement = pom.createElement(IMavenConstants.DEPENDENCY);
-      dependenciesElement.appendChild(newDependencyElement);
-      Element newGroupIdElement = JaxWsUtils.getOrCreateElement(newDependencyElement, IMavenConstants.GROUP_ID);
-      newGroupIdElement.setTextContent(groupId);
-      Element newArtifactIdElement = JaxWsUtils.getOrCreateElement(newDependencyElement, IMavenConstants.ARTIFACT_ID);
-      newArtifactIdElement.setTextContent(artifactId);
+      Element dependencyElement = createDependencyElement(groupId, artifactId, pom);
+      dependenciesElement.appendChild(dependencyElement);
       writeDocument(pom, targetModulePomFile);
     }
     catch (TransformerException e) {

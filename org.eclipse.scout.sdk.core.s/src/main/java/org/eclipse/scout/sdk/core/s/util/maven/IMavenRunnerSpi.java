@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.sdk.core.s.util.maven;
 
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
+
 /**
  * <h3>{@link IMavenRunnerSpi}</h3> Represents a class that is capable to execute {@link MavenBuild}s.
  *
@@ -22,8 +25,12 @@ public interface IMavenRunnerSpi {
    *
    * @param build
    *          The {@link MavenBuild} to execute.
+   * @param env
+   *          The {@link IEnvironment} in which the Maven build should be executed. Must not be {@code null}.
+   * @param progress
+   *          The {@link IProgress} indicator. Must not be {@code null}.
    * @throws RuntimeException
    *           if there is an error during the maven build.
    */
-  void execute(MavenBuild build);
+  void execute(MavenBuild build, IEnvironment env, IProgress progress);
 }

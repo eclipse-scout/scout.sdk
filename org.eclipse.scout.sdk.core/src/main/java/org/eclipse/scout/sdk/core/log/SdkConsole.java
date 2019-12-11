@@ -25,7 +25,7 @@ public final class SdkConsole {
   /**
    * The currently used sdk console strategy.
    */
-  private static ISdkConsoleSpi spi = new P_DefaultConsoleSpi();
+  private static volatile ISdkConsoleSpi spi = new P_DefaultConsoleSpi();
 
   private SdkConsole() {
   }
@@ -71,6 +71,7 @@ public final class SdkConsole {
     spi.println(level, msg, exceptions);
   }
 
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
   private static final class P_DefaultConsoleSpi implements ISdkConsoleSpi {
 
     private static final PrintStream OUT = System.out; // do not inline these constants!

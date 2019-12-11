@@ -1,12 +1,18 @@
 package org.eclipse.scout.sdk.s2i
 
-import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment
+import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner
 import org.eclipse.scout.sdk.core.util.Ensure
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.jetbrains.idea.maven.execution.MavenExecutionOptions
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters
@@ -15,26 +21,41 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager
 import org.jetbrains.idea.maven.utils.MavenUtil
 import java.util.*
 
-open class IdeaMavenRunner(val project: Project) : IMavenRunnerSpi, ProjectComponent {
+open class IdeaMavenRunner : IMavenRunnerSpi, StartupActivity, DumbAware, Disposable {
 
-    private var m_origRunner: IMavenRunnerSpi? = null
+    private var m_previousRunner: IMavenRunnerSpi? = null
 
-    override fun initComponent() {
+    /**
+     * Executed on [Project] open
+     */
+    override fun runActivity(project: Project) {
+        val existingRunner = MavenRunner.get()
+        if (existingRunner == this) {
+            return
+        }
+
+        Disposer.register(project, this)
+
         // Scout requires sources to be present e.g. to parse text services (NLS)
         MavenProjectsManager.getInstance(project).importingSettings.isDownloadSourcesAutomatically = true
 
-        m_origRunner = MavenRunner.get()
+        m_previousRunner = existingRunner
         MavenRunner.set(this)
     }
 
-    override fun disposeComponent() {
-        MavenRunner.set(m_origRunner)
-        m_origRunner = null
+    /**
+     * Executed on [Project] close
+     */
+    override fun dispose() {
+        MavenRunner.set(m_previousRunner)
+        m_previousRunner = null
     }
 
-    override fun execute(build: MavenBuild) {
+    override fun execute(build: MavenBuild, env: IEnvironment, progress: IProgress) {
         SdkLog.debug("Executing embedded {}", build.toString())
 
+        val environment = env as IdeaEnvironment
+        val project = environment.project
         val runner = org.jetbrains.idea.maven.execution.MavenRunner.getInstance(project)
         val projectsManager = MavenProjectsManager.getInstance(project)
         val mavenHome = MavenUtil.resolveMavenHomeDirectory(projectsManager.generalSettings.mavenHome)
