@@ -28,6 +28,7 @@
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
     <depends>com.intellij.copyright</depends>
+    <depends>com.intellij.properties</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
