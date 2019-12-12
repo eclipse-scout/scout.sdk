@@ -11,7 +11,13 @@
 package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.function.Predicate.isEqual;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.*;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createAddLanguageEvent;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createAddTranslationEvent;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createChangeKeyEvent;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createFlushEvent;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createReloadEvent;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createRemoveTranslationEvent;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createUpdateTranslationEvent;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.file.Path;
@@ -218,6 +224,9 @@ public class TranslationStoreStack {
   /**
    * Adds the specified {@link ITranslation} to the {@link #primaryEditableStore()}. For more details see
    * {@link #addNewTranslation(ITranslation, ITranslationStore)}
+   * <p>
+   * If the {@link ITranslation} provided contains more {@link Language languages} than the store in which it will be
+   * created, languages will be created as needed.
    *
    * @param newTranslation
    *          The new {@link ITranslation} to add.
@@ -228,6 +237,9 @@ public class TranslationStoreStack {
 
   /**
    * Adds the specified {@link ITranslation} to the specified {@link ITranslationStore}.
+   * <p>
+   * If the {@link ITranslation} provided contains more {@link Language languages} than the store provided, languages
+   * will be created as needed.
    * <p>
    * The following conditions must be fulfilled that the operation can be completed:
    * <ul>
@@ -260,6 +272,38 @@ public class TranslationStoreStack {
 
     // create new text
     runAndFireChanged(() -> createAddTranslationEvent(this, editableStore.addNewTranslation(newTranslation)));
+  }
+
+  /**
+   * Merges the {@link ITranslation} specified into this stack.
+   * <p>
+   * If an entry with the same key as the {@link ITranslation} provided already exists in this stack, this entry is
+   * updated within the same {@link ITranslationStore} as it already exists.
+   * <p>
+   * If no entry with the same key as the {@link ITranslation} provided exists, a new translation is created within the
+   * {@link ITranslationStore} provided.
+   * <p>
+   * If the {@link ITranslation} provided contains more {@link Language languages} than the store in which it will be
+   * created/updated, languages will be created as needed.
+   * 
+   * @param newTranslation
+   *          The new {@link ITranslation} that should be merged into this store. Must not be {@code null}.
+   * @param targetInCaseNew
+   *          The {@link ITranslationStore} in which the entry should be created in case it does not yet exist. May be
+   *          {@code null} which means the primary (first) editable stored available in this stack is used.
+   * @throws IllegalArgumentException
+   *           if the given translation is invalid, the given store does not belong to this stack or is not editable.
+   * @see #addNewTranslation(ITranslation, ITranslationStore)
+   * @see #updateTranslation(ITranslation)
+   */
+  public synchronized void mergeTranslation(ITranslation newTranslation, ITranslationStore targetInCaseNew) {
+    Ensure.notNull(newTranslation, "A translation must be specified.");
+    if (containsKey(newTranslation.key())) {
+      updateTranslation(newTranslation);
+    }
+    else {
+      addNewTranslation(newTranslation, targetInCaseNew);
+    }
   }
 
   /**
@@ -328,6 +372,9 @@ public class TranslationStoreStack {
   /**
    * Replaces the existing {@link ITranslation} (that has the same key as the specified one) with the specified
    * {@link ITranslation}.
+   * <p>
+   * If the {@link ITranslation} provided contains more {@link Language languages} than the store in which it exists,
+   * languages will be created as needed.
    *
    * @param newEntry
    *          The new entry.

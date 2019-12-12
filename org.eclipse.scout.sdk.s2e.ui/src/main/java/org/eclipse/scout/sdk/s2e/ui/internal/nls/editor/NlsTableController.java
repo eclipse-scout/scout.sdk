@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.ValueDiff;
@@ -83,22 +84,19 @@ public class NlsTableController extends ViewerComparator {
   private final ITranslationStoreStackListener m_stackListener;
   private final DisposeListener m_disposeListener;
 
-  private WritableList<TranslationTableEntry> m_translations;
   private ObservedColumn[] m_observedColumns;
   private NlsTable m_view;
   private int m_sortIndex = INDEX_COLUMN_KEYS;
   private boolean m_ascSorting;
   private NlsReferenceProvider m_referenceProvider;
   private List<Language> m_langIndexCache; // performance cache
+  private WritableList<TranslationTableEntry> m_translationList; // observable list wrapping m_translations
+  private List<TranslationTableEntry> m_translations; // original list. is wrapped with m_translationWritableList
 
   protected NlsTableController(TranslationStoreStack stack) {
     m_stack = notNull(stack);
     m_image = S2ESdkUiActivator.getImage(ISdkIcons.Text);
-    m_stackListener = events -> events
-        .map(this::handleTranslationStoreStackEvent)
-        .max(naturalOrder())
-        .filter(Boolean::booleanValue)
-        .ifPresent(b -> preservingSelectionDo(() -> m_view.tableViewer().refresh(false, true)));
+    m_stackListener = events -> m_view.getDisplay().asyncExec(() -> handleTranslationStoreStackEvents(events));
     m_disposeListener = e -> unbind();
 
     ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
@@ -106,6 +104,14 @@ public class NlsTableController extends ViewerComparator {
       colorRegistry.put(COLOR_INACTIVE_FOREGROUND, new RGB(166, 166, 166));
     }
     m_colorDisabledForeground = colorRegistry.get(COLOR_INACTIVE_FOREGROUND);
+  }
+
+  protected void handleTranslationStoreStackEvents(Stream<TranslationStoreStackEvent> events) {
+    events
+        .map(this::handleTranslationStoreStackEvent)
+        .max(naturalOrder())
+        .filter(Boolean::booleanValue)
+        .ifPresent(b -> preservingSelectionDo(() -> m_view.tableViewer().refresh(false, true)));
   }
 
   /**
@@ -120,11 +126,11 @@ public class NlsTableController extends ViewerComparator {
   protected boolean handleTranslationStoreStackEvent(TranslationStoreStackEvent event) {
     switch (event.type()) {
       case TranslationStoreStackEvent.TYPE_NEW_TRANSLATION:
-        m_translations.add(new TranslationTableEntry(event.entry().get()));
+        m_translationList.add(new TranslationTableEntry(event.entry().get()));
         updateReferenceCountInTable();
         return true;
       case TranslationStoreStackEvent.TYPE_REMOVE_TRANSLATION:
-        translationToTableEntry(event.entry().get()).ifPresent(m_translations::remove);
+        translationToTableEntry(event.entry().get()).ifPresent(m_translationList::remove);
         updateReferenceCountInTable();
         return false;
       case TranslationStoreStackEvent.TYPE_NEW_LANGUAGE:
@@ -167,17 +173,18 @@ public class NlsTableController extends ViewerComparator {
       m_observedColumns[i] = new ObservedColumn(i);
     }
 
-    m_translations = new WritableList<>(m_stack
+    m_translations = m_stack
         .allEntries()
         .map(TranslationTableEntry::new)
-        .collect(toList()), TranslationTableEntry.class);
+        .collect(toList());
+    m_translationList = new WritableList<>(m_translations, TranslationTableEntry.class);
 
     TableViewer viewer = m_view.tableViewer();
     ObservableListContentProvider<TranslationTableEntry> contentProvider = new ObservableListContentProvider<>();
     viewer.setComparator(this);
     viewer.setLabelProvider(new NlsTableLabelProvider(contentProvider, m_observedColumns));
     viewer.setContentProvider(contentProvider);
-    viewer.setInput(m_translations);
+    viewer.setInput(m_translationList);
     viewer.getControl().addDisposeListener(m_disposeListener);
     m_stack.addListener(m_stackListener);
   }
@@ -347,6 +354,11 @@ public class NlsTableController extends ViewerComparator {
   }
 
   protected void updateReferenceCountInTable() {
+    NlsReferenceProvider referenceProvider = getReferenceProvider();
+    if (referenceProvider == null) {
+      return; // no need to update ref count as there is no reference provider and therefore no count
+    }
+
     ObservedColumn refCountProperty = m_observedColumns[INDEX_COLUMN_REF_COUNT];
     if (refCountProperty != null) {
       m_stack.allEntries().forEach(refCountProperty::fireChange);

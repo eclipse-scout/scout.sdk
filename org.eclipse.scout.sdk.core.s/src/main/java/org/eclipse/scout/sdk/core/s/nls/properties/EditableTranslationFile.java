@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
-import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.SdkException;
+import static java.util.stream.Collectors.toMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,8 +22,16 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Pattern;
+
+import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link EditableTranslationFile}</h3>
@@ -66,13 +70,30 @@ public class EditableTranslationFile extends AbstractTranslationPropertiesFile {
   protected void writeEntries(Map<String, String> entries, IEnvironment env, IProgress progress) {
     progress.init("Write translation properties file", 100);
 
-    String[] propertiesEncodeLines = propertiesEncode(entries);
+    // remove empty texts
+    Map<String, String> filteredTexts = entries.entrySet().stream()
+        .filter(e -> !Strings.isBlank(e.getValue()))
+        .collect(toMap(Entry::getKey, Entry::getValue));
+
+    if (filteredTexts.isEmpty()) {
+      // this file has no more texts: remove it
+      try {
+        Files.deleteIfExists(file());
+      }
+      catch (IOException e) {
+        throw new SdkException("Unable to remove file '{}'.", file(), e);
+      }
+      progress.worked(100);
+      return;
+    }
+
+    String[] propertiesEncodedLines = propertiesEncode(filteredTexts);
     progress.worked(20);
 
-    Arrays.sort(propertiesEncodeLines);
+    Arrays.sort(propertiesEncodedLines);
     progress.worked(10);
 
-    env.writeResource(b -> appendLines(b, propertiesEncodeLines), file(), progress.newChild(70));
+    env.writeResource(b -> appendLines(b, propertiesEncodedLines), file(), progress.newChild(70));
   }
 
   private static void appendLines(ISourceBuilder<?> builder, String[] linesSorted) {

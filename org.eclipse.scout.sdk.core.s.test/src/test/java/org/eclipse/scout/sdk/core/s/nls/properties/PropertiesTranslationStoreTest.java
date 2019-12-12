@@ -98,13 +98,13 @@ public class PropertiesTranslationStoreTest {
       assertEquals(4, store.entries().count());
       store.removeTranslation("key2"); // remove an existing one
       assertEquals(3, store.entries().count());
-      assertEquals(4, store.languages().count());
+      assertEquals(5, store.languages().count());
 
       store.flush(env, new NullProgress());
 
       store.reload(new NullProgress()); // check if it is written
       assertEquals("new de", store.get("added", de).get());
-      assertEquals(4, store.languages().count());
+      assertEquals(5, store.languages().count());
       assertEquals(3, store.entries().count());
     }
     finally {
@@ -141,7 +141,7 @@ public class PropertiesTranslationStoreTest {
   }
 
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "SimplifiableJUnitAssertion", "EqualsWithItself"})
   @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class), flushToDisk = true)
   public void testStoreEqualsHashCode(TestingEnvironment env) throws IOException {
     Path tmpDir = Files.createTempDirectory("sdkTest");
@@ -192,6 +192,7 @@ public class PropertiesTranslationStoreTest {
         translationFiles.add(TranslationPropertiesFileTest.createTranslationFile(dir.resolve("Prefix_es.properties")));
       }
       if (readOnly) {
+        //noinspection resource
         translationFiles.add(new ReadOnlyTranslationFile(() -> new ByteArrayInputStream(new byte[]{}), Language.parseThrowingOnError("it")));
       }
     }

@@ -10,16 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
-import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.environment.NullProgress;
-import org.eclipse.scout.sdk.core.s.nls.IEditableTranslationStore;
-import org.eclipse.scout.sdk.core.s.nls.ITranslation;
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
-import org.eclipse.scout.sdk.core.s.nls.Language;
-import org.eclipse.scout.sdk.core.s.nls.TranslationEntry;
-import org.eclipse.scout.sdk.core.util.Ensure;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -31,7 +22,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.environment.NullProgress;
+import org.eclipse.scout.sdk.core.s.nls.IEditableTranslationStore;
+import org.eclipse.scout.sdk.core.s.nls.ITranslation;
+import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
+import org.eclipse.scout.sdk.core.s.nls.Language;
+import org.eclipse.scout.sdk.core.s.nls.TranslationEntry;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
  * <h3>{@link PropertiesTranslationStore}</h3>
@@ -113,6 +113,8 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     TranslationEntry entryToModify = (TranslationEntry) get(key).get();
     setDirty(true);
 
+    ensureAllLanguagesExist(newEntry);
+
     // remove translation from all properties files
     for (Language l : entryToModify.translations().keySet()) {
       m_files.get(l).removeTranslation(key);
@@ -120,17 +122,24 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     // update instance
     entryToModify.setTranslations(newEntry.translations());
 
-    // add to new properties fiels
+    // add to new properties files
     for (Entry<Language, String> newTranslations : entryToModify.translations().entrySet()) {
       m_files.get(newTranslations.getKey()).setTranslation(key, newTranslations.getValue());
     }
     return entryToModify;
   }
 
+  protected void ensureAllLanguagesExist(ITranslation translation) {
+    translation.translations().keySet().stream()
+        .filter(lang -> languages().noneMatch(existing -> existing.equals(lang)))
+        .forEach(this::addNewLanguage);
+  }
+
   @Override
   public ITranslationEntry addNewTranslation(ITranslation newTranslation) {
     throwIfReadOnly();
     TranslationEntry newEntry = new TranslationEntry(newTranslation, this);
+    ensureAllLanguagesExist(newEntry);
     setDirty(true);
     addTranslationEntry(newEntry);
     return newEntry;

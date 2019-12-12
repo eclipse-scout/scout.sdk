@@ -108,6 +108,29 @@ public class TranslationStoreStackTest {
   }
 
   @Test
+  public void testMergeTranslation(TestingEnvironment env) {
+    TranslationStoreStack stack = createFixtureStack(env);
+
+    String key = "added";
+    Language engb = Language.parseThrowingOnError("en_GB");
+    String valAfterInsert = "engb1";
+    String valAfterUpdate = "engb2";
+
+    Translation toAdd = new Translation(key);
+    toAdd.putTranslation(Language.LANGUAGE_DEFAULT, "default1");
+    toAdd.putTranslation(engb, valAfterInsert);
+    stack.mergeTranslation(toAdd, null);
+    assertEquals(1, stack.allWithPrefix("add").count());
+    assertEquals(valAfterInsert, stack.translation(key).get().translation(engb).get());
+
+    Translation toModify = new Translation(key);
+    toModify.putTranslation(Language.LANGUAGE_DEFAULT, "default2");
+    toModify.putTranslation(engb, valAfterUpdate);
+    stack.mergeTranslation(toModify, null);
+    assertEquals(valAfterUpdate, stack.translation(key).get().translation(engb).get());
+  }
+
+  @Test
   public void testAddNewLanguage(TestingEnvironment env) {
     TranslationStoreStack stack = createFixtureStack(env);
     Language deCh = Language.parseThrowingOnError("de_CH");
