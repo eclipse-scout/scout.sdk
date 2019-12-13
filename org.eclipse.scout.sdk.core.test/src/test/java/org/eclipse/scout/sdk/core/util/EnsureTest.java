@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
+import static org.eclipse.scout.sdk.core.util.Ensure.failOnDuplicates;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -100,6 +101,6 @@ public class EnsureTest {
 
   @Test
   public void testFailOnDuplicates() {
-    assertThrows(IllegalArgumentException.class, () -> Ensure.failOnDuplicates().apply(null, null));
+    assertThrows(IllegalArgumentException.class, () -> failOnDuplicates().apply(null, null));
   }
 }

@@ -10,18 +10,18 @@
  */
 package org.eclipse.scout.sdk.s2e.operation.jaxws;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -96,7 +96,7 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
   protected Set<IProject> getAffectedProjects(Path createdProjectDir) throws IOException {
     Path parentPom = JaxWsModuleNewHelper.getParentPomOf(createdProjectDir.resolve(IMavenConstants.POM));
     if (parentPom == null) {
-      return Collections.emptySet();
+      return emptySet();
     }
 
     Path parentReference = parentPom.normalize();
@@ -124,7 +124,7 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
         .map(Path::toUri)
         .flatMap(uri -> Stream.of(root.findFilesForLocationURI(uri)))
         .map(IResource::getProject)
-        .collect(Collectors.toSet());
+        .collect(toSet());
   }
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")

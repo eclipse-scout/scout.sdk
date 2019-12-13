@@ -11,7 +11,9 @@
 package org.eclipse.scout.sdk.s2e.util;
 
 import static java.util.Collections.unmodifiableCollection;
-import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.*;
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironment;
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironmentSync;
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
 
 import java.io.File;
 import java.io.IOException;
@@ -215,7 +217,8 @@ public class EclipseWorkspaceWalker {
       return false;
     }
 
-    if (isSkipNodeModules() && "node_modules".equals(file.getFileName().toString())) {
+    Path fileName = file.getFileName();
+    if (isSkipNodeModules() && fileName != null && "node_modules".equals(fileName.toString())) {
       return false;
     }
 

@@ -12,10 +12,10 @@ package org.eclipse.scout.sdk.s2e.classid;
 
 import static java.util.Collections.addAll;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -267,7 +267,7 @@ public class MissingClassIdsNewOperation implements BiConsumer<EclipseEnvironmen
 
   public Set<IResource> selection() {
     if (m_selection == null) {
-      return Collections.emptySet();
+      return emptySet();
     }
     return m_selection;
   }
