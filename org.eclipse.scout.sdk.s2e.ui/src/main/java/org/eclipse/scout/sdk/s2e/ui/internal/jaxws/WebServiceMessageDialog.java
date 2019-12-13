@@ -20,6 +20,7 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl.WebServiceNames;
@@ -62,12 +63,18 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
   }
 
   protected static String getScoutJaxWsDocumentationUrl() {
+    String base = "http://eclipsescout.github.io/";
     String version = ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION;
-    int secondDotPos = version.indexOf('.', 2);
+    int firstDotPos = version.indexOf('.');
+    if (firstDotPos < 0) {
+      SdkLog.warning("Cannot parse current Scout version");
+      return base;
+    }
+    int secondDotPos = version.indexOf('.', firstDotPos + 1);
     if (secondDotPos > 0) {
       version = version.substring(0, secondDotPos);
     }
-    return "http://eclipsescout.github.io/" + version + "/technical-guide.html#webservices-with-jax-ws";
+    return base + version + "/technical-guide.html#webservices-with-jax-ws";
   }
 
   public static void open(AbstractWebServiceNewOperation op, Display d) {
