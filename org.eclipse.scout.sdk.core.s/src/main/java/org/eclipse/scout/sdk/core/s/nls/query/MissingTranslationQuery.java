@@ -11,7 +11,11 @@
 package org.eclipse.scout.sdk.core.s.nls.query;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.*;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toSet;
 
 import java.nio.CharBuffer;
@@ -82,7 +86,10 @@ public class MissingTranslationQuery implements IFileQuery {
 
   protected static boolean acceptCandidate(FileQueryInput candidate) {
     String fullPath = candidate.file().toString().replace('\\', '/');
-    if (fullPath.contains("/src/test/") || fullPath.contains("/archetype-resources/") || fullPath.contains("/generated-resources/")) {
+    if (fullPath.contains("/src/test/")
+        || fullPath.contains("/archetype-resources/")
+        || fullPath.contains("/generated-resources/")
+        || fullPath.contains("/org.eclipse.scout.rt/eclipse-scout-core/")) {
       return false;
     }
     return PATTERNS_BY_FILE_EXTENSION.containsKey(candidate.fileExtension()) && !candidate.file().endsWith(TEXTS_FILE_NAME);

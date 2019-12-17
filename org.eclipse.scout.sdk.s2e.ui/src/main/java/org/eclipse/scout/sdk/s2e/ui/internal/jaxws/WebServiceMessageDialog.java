@@ -50,6 +50,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
  *
  * @since 5.2.0
  */
+@SuppressWarnings({"HardcodedLineSeparator", "HardcodedFileSeparator"})
 public class WebServiceMessageDialog extends MessageDialogWithToggle {
 
   public static final String HIDE_CONSUMER_MSG = "hideWebServiceConsumerInfoMessage";
@@ -62,6 +63,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
     super(parentShell, dialogTitle, image, msg, dialogImageType, dialogButtonLabels, defaultIndex, toggleMessage, toggleState);
   }
 
+  @SuppressWarnings("ConstantConditions")
   protected static String getScoutJaxWsDocumentationUrl() {
     String base = "http://eclipsescout.github.io/";
     String version = ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION;
