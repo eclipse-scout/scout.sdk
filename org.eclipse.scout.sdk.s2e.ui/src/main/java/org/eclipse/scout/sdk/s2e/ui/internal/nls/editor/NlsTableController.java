@@ -110,8 +110,21 @@ public class NlsTableController extends ViewerComparator {
     events
         .map(this::handleTranslationStoreStackEvent)
         .max(naturalOrder())
-        .filter(Boolean::booleanValue)
-        .ifPresent(b -> preservingSelectionDo(() -> m_view.tableViewer().refresh(false, true)));
+        .ifPresent(this::finishTranslationStoreStackEvents);
+  }
+
+  /**
+   * Callback executed after all events have been handled. Here the table may be layouted or refreshed.
+   */
+  protected void finishTranslationStoreStackEvents(boolean requireReSort) {
+    if (requireReSort) {
+      preservingSelectionDo(() -> m_view.tableViewer().refresh(false, true));
+    }
+    else {
+      // no sort of the table required. just layout the table.
+      // this is necessary on some operating system to ensure new texts are visible below the cursor (when editing in Excel style).
+      m_view.tableViewer().getTable().requestLayout();
+    }
   }
 
   /**
