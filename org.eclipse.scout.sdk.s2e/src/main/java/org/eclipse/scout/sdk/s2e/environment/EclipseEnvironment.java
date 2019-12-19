@@ -11,7 +11,8 @@
 package org.eclipse.scout.sdk.s2e.environment;
 
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.*;
+import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
+import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.runWithWorkingCopyManager;
 
 import java.net.URI;
 import java.nio.file.Path;
@@ -154,7 +155,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   }
 
   protected IFuture<IType> doWriteCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, EclipseProgress progress, boolean syncRun) {
-    Ensure.isTrue(Ensure.notNull(targetFolder).isSourceFolder());
+    Ensure.isTrue(Ensure.notNull(targetFolder).isSourceFolder(), "{} is no source folder. It is only allowed to generate new source into source folders.", targetFolder);
 
     // generate new code
     CompilationUnitPath path = new CompilationUnitPath(generator, targetFolder);
