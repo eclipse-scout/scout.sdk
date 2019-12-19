@@ -113,27 +113,27 @@
     <orderEntry type="library" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.19.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.13.500" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.16.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.osgi:3.15.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.osgi:3.15.100" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.common:3.10.500" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.jobs:3.10.500" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.jobs:3.10.600" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.registry:3.8.500" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.preferences:3.7.500" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.contenttype:3.7.400" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.contenttype:3.7.500" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.app:1.4.300" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.filesystem:1.7.500" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.text:3.9.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.text:3.10.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.commands:3.9.500" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface.text:3.15.300" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.swt:3.112.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface:3.17.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface:3.18.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core.manipulation:1.12.100" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.ltk.core.refactoring:3.10.200" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.expressions:3.6.500" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.launching:3.15.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.debug.core:3.14.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.debug:3.13.100" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.debug:3.14.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.core.variables:3.4.600" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.core.filebuffers:3.6.700" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.core.filebuffers:3.6.800" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.112.0" level="project" />
   </component>
 </module>
