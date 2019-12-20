@@ -4,21 +4,20 @@ BASEDIR=$(dirname $0)
 . $BASEDIR/_functions.sh
 
 GIT_USERNAME=
-RELEASE="TEST_RELEASE"
-TAG=
+VERSION=
 
 function usage {
   cat << EOF
 
-	${PRG} [-h] --git_username <EGerritUser> --release <RELEASE> --scoutrt_version <RT_VERSION> --tag <TAG>
+	${PRG} [-h] --git_username <GitUser> --version <VERSION> --scoutrt_version <RT_VERSION> [--tag <TAG>]
 
 	-h                                  - Usage info
-	-u | --git_username <EGerritUser>   - Eclipse Gerrit Username of Commiter, SSH Key is used for authorisation
-	-r | --release <RELEASE>            - <RELEASE> name (Optional / Default: TEST_RELEASE)
+	-u | --git_username <GitUser>       - Eclipse Gerrit Username, SSH Key is used for authorisation
+	-v | --version <VERSION>            - <VERSION> name
 	-s | --scoutrt_version <RT_VERSION> - <RT_VERSION> Release Scout Version
-	-t | --tag <TAG>                    - <TAG> name (Optional / Default: Project Version)
+	-t | --tag <TAG>                    - <TAG> name (Optional / Default: <VERRSION>)
 
-	Example: ${PRG} -u sleicht -r NIGHTLY -s 5.2.0.M3
+	Example: ${PRG} -u sleicht -v 10.0.7-beta.1 -s 10.0.42
 
 EOF
 }
@@ -30,8 +29,8 @@ function get_options {
 			-u | --git_username )		shift
 										GIT_USERNAME=$1
 										;;
-			-r | --release )			shift
-										RELEASE=$1
+			-v | --version )			shift
+										VERSION=$1
 										;;
 			-s | --scoutrt_version )	shift
 										SCOUT_RT=$1
@@ -51,7 +50,12 @@ function get_options {
 get_options $*
 
 if [[ -z  "$GIT_USERNAME" ]]; then
-	echo "[ERROR]:       <EGerritUser> missing"
+	echo "[ERROR]:       <GitUser> missing"
+	usage
+	exit 7
+fi
+if [[ -z "$VERSION" ]]; then
+	echo "[ERROR]:       <VERSION> missing"
 	usage
 	exit 7
 fi
@@ -60,28 +64,29 @@ if [[ "$TAG" ]]; then
 fi
 _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
-mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f updatesite-maven-plugin -N $_MAVEN_OPTS
+mvn -f updatesite-maven-plugin -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
-mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f org.eclipse.scout.sdk -N $_MAVEN_OPTS
+mvn -f scout-helloworld-app -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
-mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f scout-helloworld-app -N $_MAVEN_OPTS
+mvn -f scout-jaxws-module -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
-mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f scout-jaxws-module -N $_MAVEN_OPTS
-processError
-mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f scout-hellojs-app -N $_MAVEN_OPTS
-processError
-mvn clean install -U -f org.eclipse.scout.sdk -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
+mvn -f scout-hellojs-app -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
 
-mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dorg.eclipse.scout.rt_version=$SCOUT_RT -f org.eclipse.scout.sdk.p2 -Dtycho.mode=maven -N $_MAVEN_OPTS
+mvn -f org.eclipse.scout.sdk -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
-mvn clean install -T0.5C -f org.eclipse.scout.sdk.p2 -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
-processError
-
-mvn -Prelease.checkin -Declipse_gerrit_username=$GIT_USERNAME -f org.eclipse.scout.sdk $_MAVEN_OPTS
+mvn -f org.eclipse.scout.sdk clean install -U -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
 
-mvn -Prelease.tag -Declipse_gerrit_username=$GIT_USERNAME -Dmaster_release_pushChanges=true -f org.eclipse.scout.sdk $_MAVEN_OPTS
+mvn -f org.eclipse.scout.sdk.p2 -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT -Dtycho.mode=maven $_MAVEN_OPTS
+processError
+mvn -f org.eclipse.scout.sdk.p2 clean install -T0.5C -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
+processError
+
+mvn -f org.eclipse.scout.sdk -P release.checkin -Declipse_gerrit_username=$GIT_USERNAME $_MAVEN_OPTS
+processError
+
+mvn -f org.eclipse.scout.sdk -P release.tag -Declipse_gerrit_username=$GIT_USERNAME -Dmaster_release_pushChanges=true $_MAVEN_OPTS
 processError
 
 git reset HEAD~1 --hard
