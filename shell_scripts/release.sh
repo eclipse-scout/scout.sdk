@@ -78,7 +78,7 @@ processError
 mvn -f org.eclipse.scout.sdk clean install -U -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
 
-mvn -f org.eclipse.scout.sdk.p2 -P release.setversion -N -Dmaster_release_newVersion=$SCOUT_RT -Dorg.eclipse.scout.rt_version=$SCOUT_RT -Dtycho.mode=maven $_MAVEN_OPTS
+mvn -f org.eclipse.scout.sdk.p2 -P release.setversion -N -Dmaster_release_newVersion=$OSGI_VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT -Dtycho.mode=maven $_MAVEN_OPTS
 processError
 mvn -f org.eclipse.scout.sdk.p2 clean install -T0.5C -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
