@@ -13,7 +13,7 @@ function usage {
 
 	-h                                  - Usage info
 	-u | --git_username <GitUser>       - Eclipse Gerrit Username, SSH Key is used for authorisation
-	-v | --version <VERSION>            - <VERSION> name
+	-v | --version <OSGi VERSION>       - <OSGi VERSION> name
 	-s | --scoutrt_version <RT_VERSION> - <RT_VERSION> Release Scout Version
 	-t | --tag <TAG>                    - <TAG> name (Optional / Default: <VERRSION>)
 
@@ -30,7 +30,7 @@ function get_options {
 										GIT_USERNAME=$1
 										;;
 			-v | --version )			shift
-										VERSION=$1
+										OSGI_VERSION=$1
 										;;
 			-s | --scoutrt_version )	shift
 										SCOUT_RT=$1
@@ -54,8 +54,8 @@ if [[ -z  "$GIT_USERNAME" ]]; then
 	usage
 	exit 7
 fi
-if [[ -z "$VERSION" ]]; then
-	echo "[ERROR]:       <VERSION> missing"
+if [[ -z "$OSGI_VERSION" ]]; then
+	echo "[ERROR]:       <OSGi VERSION> missing"
 	usage
 	exit 7
 fi
@@ -64,21 +64,21 @@ if [[ "$TAG" ]]; then
 fi
 _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
-mvn -f updatesite-maven-plugin -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
+mvn -f updatesite-maven-plugin -P release.setversion -N -Dmaster_release_newVersion=$SCOUT_RT -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
-mvn -f scout-helloworld-app -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
+mvn -f scout-helloworld-app -P release.setversion -N -Dmaster_release_newVersion=$SCOUT_RT -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
-mvn -f scout-jaxws-module -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
+mvn -f scout-jaxws-module -P release.setversion -N -Dmaster_release_newVersion=$SCOUT_RT -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
-mvn -f scout-hellojs-app -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
+mvn -f scout-hellojs-app -P release.setversion -N -Dmaster_release_newVersion=$SCOUT_RT -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
 
-mvn -f org.eclipse.scout.sdk -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
+mvn -f org.eclipse.scout.sdk -P release.setversion -N -Dmaster_release_newVersion=$OSGI_VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
 mvn -f org.eclipse.scout.sdk clean install -U -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
 
-mvn -f org.eclipse.scout.sdk.p2 -P release.setversion -N -Dmaster_release_newVersion=$VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT -Dtycho.mode=maven $_MAVEN_OPTS
+mvn -f org.eclipse.scout.sdk.p2 -P release.setversion -N -Dmaster_release_newVersion=$OSGI_VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT -Dtycho.mode=maven $_MAVEN_OPTS
 processError
 mvn -f org.eclipse.scout.sdk.p2 clean install -T0.5C -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
