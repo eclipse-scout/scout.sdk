@@ -125,6 +125,7 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
   protected void processTableExtension(IType tableExtension) {
     withType(new TableRowDataGenerator<>(tableExtension, tableExtension, targetEnvironment())
         .withElementName(getRowDataName(tableExtension.elementName()))
-        .withExtendsAnnotationIfNecessary(tableExtension));
+        .withExtendsAnnotationIfNecessary(tableExtension),
+        DtoMemberSortObjectFactory.forTypeTableRowData(tableExtension.elementName()));
   }
 }
