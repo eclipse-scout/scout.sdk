@@ -57,7 +57,7 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
   public static final String PROP_KEY_TYPE = "keyType";
   public static final String PROP_SERVER_JAVA_PROJECT = "serverJavaProject";
 
-  private final EclipseEnvironment m_provider;
+  private EclipseEnvironment m_provider;
 
   protected ProposalTextField m_lookupServiceSuperTypeField;
   protected ProposalTextField m_serverSourceFolder;
@@ -69,7 +69,6 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
     setDescription(getTitle());
     setIcuGroupName("New LookupCall Details");
     setServiceImplSuperTypeBaseClassInternal(IScoutRuntimeTypes.ILookupService);
-    m_provider = EclipseEnvironment.createUnsafe(env -> getControl().addDisposeListener(e -> env.close()));
   }
 
   @Override
@@ -80,6 +79,7 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
   @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
+    m_provider = EclipseEnvironment.createUnsafe(env -> getControl().addDisposeListener(e -> env.close()));
 
     // change the filter for the super types to also include the LookupCall class as proposal (which is not abstract and would be excluded otherwise)
     StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();

@@ -49,9 +49,9 @@ import org.eclipse.ui.PlatformUI;
  */
 public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
 
-  private final EclipseEnvironment m_provider;
   private final ProposalTextField[] m_typeArgFields;
   private static final int NUM_ARG_FIELDS = 3;
+  private EclipseEnvironment m_provider;
 
   public CodeTypeNewWizardPage(PackageContainer packageContainer) {
     super(CodeTypeNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_CODE_TYPE, IScoutRuntimeTypes.ICodeType, IScoutRuntimeTypes.AbstractCodeType, ScoutTier.Shared);
@@ -60,13 +60,13 @@ public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
     setIcuGroupName("New CodeType Details");
 
     m_typeArgFields = new ProposalTextField[NUM_ARG_FIELDS];
-    m_provider = EclipseEnvironment.createUnsafe(env -> getControl().addDisposeListener(e -> env.close()));
+
   }
 
   @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
-
+    m_provider = EclipseEnvironment.createUnsafe(env -> getControl().addDisposeListener(e -> env.close()));
     createArgumentsGroup(parent);
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_CODETYPE_NEW_WIZARD_PAGE);
