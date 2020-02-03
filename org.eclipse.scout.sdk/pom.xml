@@ -815,7 +815,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-scm-plugin</artifactId>
             <configuration>
-              <includes>*/pom.xml,**/ScoutProjectNewHelper.java,*/src/main/resources/archetype-resources/*/pom.xml,*/feature.xml,*/category.xml</includes>
+              <includes>*/pom.xml,**/ScoutProjectNewHelper.java,*/src/main/resources/archetype-resources/*/pom.xml,*/src/main/resources/archetype-resources/*/package.json,*/feature.xml,*/category.xml</includes>
             </configuration>
           </plugin>
         </plugins>
