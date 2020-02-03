@@ -147,17 +147,6 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
     Group uiLangBox = FieldToolkit.createGroupBox(parent, "Programming language of the user interface");
 
-    m_javaScriptButton = new Button(uiLangBox, SWT.RADIO);
-    m_javaScriptButton.setText("JavaScript");
-    m_javaScriptButton.setSelection(isUseJsClient());
-    m_javaScriptButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        setUseJsClientInternal(m_javaScriptButton.getSelection());
-        pingStateChanging();
-      }
-    });
-
     m_javaButton = new Button(uiLangBox, SWT.RADIO);
     m_javaButton.setText("Java");
     m_javaButton.setSelection(!isUseJsClient());
@@ -165,6 +154,17 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         setUseJsClientInternal(!m_javaButton.getSelection());
+        pingStateChanging();
+      }
+    });
+
+    m_javaScriptButton = new Button(uiLangBox, SWT.RADIO);
+    m_javaScriptButton.setText("JavaScript");
+    m_javaScriptButton.setSelection(isUseJsClient());
+    m_javaScriptButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setUseJsClientInternal(m_javaScriptButton.getSelection());
         pingStateChanging();
       }
     });
@@ -180,13 +180,13 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         .indent(0, 10)
         .applyTo(uiLangBox);
     GridDataFactory
-        .defaultsFor(m_javaScriptButton)
-        .indent(13, 5)
-        .applyTo(m_javaScriptButton);
-    GridDataFactory
         .defaultsFor(m_javaButton)
         .indent(13, 2)
         .applyTo(m_javaButton);
+    GridDataFactory
+        .defaultsFor(m_javaScriptButton)
+        .indent(13, 5)
+        .applyTo(m_javaScriptButton);
   }
 
   protected void createProjectLocationGroup(Composite parent, int labelWidth) {
@@ -272,7 +272,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     setDisplayNameInternal("My Application");
 
     // ui language
-    setUseJsClientInternal(true);
+    setUseJsClientInternal(false);
 
     // use workspace loc
     setUseWorkspaceLocationInternal(true);
