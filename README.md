@@ -9,9 +9,9 @@ This repository **Eclipse Scout SDK** contains the source of the tooling compone
 Downloads
 ---------
 
-The content of this repository is build on the Eclipse infrastructure and the different versions are available on several [P2 Update Sites] [2].
+The content of this repository is built on the Eclipse infrastructure and the different versions are available on several [P2 Update Sites] [2].
 
-The easiest way to start with Eclipse Scout is to download _Eclipse for Scout Developers Eclipse for Scout Developers_ on the [Eclipse downloads page] [3].
+The easiest way to start with Eclipse Scout is to download _Eclipse for Scout Developers_ on the [Eclipse downloads page] [3].
 
 
 Documentation & Links
