@@ -40,7 +40,7 @@ public class JaxWsModuleNewHelperTest {
     assertParentPomPath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><relativePath></relativePath></parent></project>", null);
     assertParentPomPath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><relativePath>../myParentModule</relativePath></parent></project>", "myParentModule/pom.xml");
     assertParentPomPath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><relativePath>../myParentModule/</relativePath></parent></project>", "myParentModule/pom.xml");
-    assertParentPomPath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><relativePath>../myParentModule/pom.xml</relativePath></parent></project>", "myParentModule/pom.xml");
+    assertParentPomPath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project><parent><relativePath>../myParentModule</relativePath></parent></project>", "myParentModule/pom.xml");
   }
 
   protected static void assertParentPomPath(String xml, String expectedPath) throws IOException {
