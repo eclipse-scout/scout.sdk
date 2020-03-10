@@ -34,12 +34,12 @@
     </div>
     <div class="ulist">
      <ul>
-      <li> <p>Install the Scout Demo application</p> </li>
+      <li> <p>Install the Scout Demo applications</p> </li>
       <li> <p>Run the Scout demo from your IDE</p> </li>
      </ul>
     </div>
     <div class="sect3">
-     <h4 id="install-the-scout-demo-application"><a class="anchor" href="#install-the-scout-demo-application"></a>Install the Scout Demo Application</h4>
+     <h4 id="install-the-scout-demo-applications"><a class="anchor" href="#install-the-scout-demo-application"></a>Install the Scout Demo Applications</h4>
      <div class="paragraph">
       <p>In the first part of the tutorial we import the demo applications using the <a href="https://wiki.eclipse.org/Eclipse_Installer" target="_blank">Oomph Eclipse installer</a> tool.</p>
      </div>
@@ -55,85 +55,53 @@
       </div>
      </div>
      <div class="paragraph">
-      <p>The <em class="wizard">Eclipse Importer</em> contains the folder hierarchy <em class="folder">Eclipse Projects</em>, <em class="folder">Scout</em> and <em class="folder">Scout Demo App</em> as shown in <a href="#img-oomph_exiting_projects1">Figure 2</a>. You can enter "Scout Demo" in the search filter to find the project easily.</p>
+       <p>Now select Scout Demo App, check in the table below that 'Stream' shows the desired Scout version and click <b class="button">Next</b>.</p>
      </div>
-     <div id="img-oomph_exiting_projects1" class="imageblock">
+     <div id="img-oomph_existing_project1" class="imageblock">
       <div class="content">
-       <img src="images/oomph_exiting_projects1.png" alt="oomph exiting projects1">
+       <img src="images/oomph_existing_project1.png" alt="oomph existing projects1">
       </div>
       <div class="title">
-       Figure 2. Top part of the "Projects" Step of the Importer.
+       Figure 2. Select Scout Demo App</div>
       </div>
+	       <div class="paragraph">
+      <p>On the next wizard page, select the <em>Show all variables</em> check box in the bottom left corner.</p>
      </div>
-     <div class="paragraph">
-      <p>Now, add the desired project to the list to import according to the following steps.</p>
-     </div>
-     <div class="ulist">
-      <ul>
-       <li> <p>[1] Select the "Scout Demo App" element.</p> </li>
-       <li> <p>[2] Add it to the list of projects using the <b class="button">"Add Projects"</b> (down arrow) button.</p> </li>
-       <li> <p>[3] Adjust the Stream to the milestone build matching your Eclipse IDE, eg. &#x201c;Neon (M4 release)&#x201d; for January 2016.</p> </li>
-      </ul>
-     </div>
-     <div id="img-oomph_exiting_projects2" class="imageblock">
+     <div id="img-oomph_existing_variables" class="imageblock">
       <div class="content">
-       <img src="images/oomph_exiting_projects2.png" alt="oomph exiting projects2">
+       <img src="images/oomph_existing_variables.png" alt="oomph existing variables">
       </div>
       <div class="title">
-       Figure 3. Bottom part of the "Projects" Step of the Importer.
+       Figure 3. "Variables" Step of the Importer.
       </div>
-     </div>
      <div class="paragraph">
-      <p>Once the project selection in your Eclipse importer looks as shown in <a href="#img-oomph_exiting_projects2">Figure 3</a> Click on the <b class="button">Next</b> button.</p>
-     </div>
-     <div class="paragraph">
-      <p>On the <em class="wizard">Variables</em> dialog of the Eclipse importer a number of Oomph variables have to be specified. In case you have already used Oomph for other purposes, this step might look different or empty (for example when all variables have been set in a previous Oomph session).</p>
-     </div>
-     <div class="paragraph">
-      <p>Make sure to display all variables by activating checkbox <code>Show all Variables</code> in the bottom left corner as shown in <a href="#img-oomph_exiting_variables">Figure 4</a>.</p>
-     </div>
-     <div id="img-oomph_exiting_variables" class="imageblock">
-      <div class="content">
-       <img src="images/oomph_exiting_variables.png" alt="oomph exiting variables">
-      </div>
-      <div class="title">
-       Figure 4. "Variables" Step of the Importer.
-      </div>
-     </div>
-     <div class="admonitionblock warning">
-      <table>
-       <tbody>
-        <tr>
-         <td class="icon"> <i class="fa icon-warning" title="Warning"></i> </td>
-         <td class="content"> The variables in <a href="#img-oomph_exiting_variables">Figure 4</a> may be shown in a different order in your case. </td>
-        </tr>
-       </tbody>
-      </table>
-     </div>
-     <div class="paragraph">
-      <p>Before you proceed make sure that all shown variables are set appropriately for your use case. For the settings proposed below we assume that we only need read access for the git repository hosting the Scout demo application.</p>
+      <p>Before you proceed make sure that all shown variables are set appropriately for your use case.</p>
      </div>
      <div class="ulist">
       <ul>
        <li> <p><code>Git clone location rule</code>: &#x201c;Located in a folder named '.git/&lt;repo&gt;' within the workspace folder&#x201d;</p> </li>
        <li> <p><code>Target Platform</code>: &#x201c;None&#x201d;</p> </li>
-       <li> <p><code>JRE 1.7 Location</code>: Path to your Java 7 JRE</p> </li>
        <li> <p><code>JRE 1.8 Location</code>: Path to your Java 8 JRE</p> </li>
-       <li> <p><code>Scout Demo App Github repository</code>: &#x201c;HTTPS (read-write)&#x201d; if you already have a GitHub account. Otherwise use &#x201c;HTTPS (read-only, anonymous)&#x201d;</p> </li>
+       <li> <p><code>Scout Demo App Github repository</code>: &#8220;HTTPS (read-only, anonymous)&#8221;</p></li>
       </ul>
      </div>
      <div class="paragraph">
-      <p>Once the setting of the variables is completed click <b class="button">Next</b>. This leads to the <em class="wizard">Confirmation</em> dialog. This last step can be completed by clicking on <b class="button">Finish</b>.</p>
-     </div>
+  <p>Once you finished setting the variables click <b class="button">Next</b>.
+This leads to the <em class="wizard">Confirmation</em> dialog.
+This last step can be completed by clicking on <b class="button">Finish</b>.</p>     </div>
      <div class="paragraph">
-      <p>The Oomph installer first makes sure that all necessary Scout components and M2E connectors are available. In case one or more components are missing, Oomph will first download and install them. This triggers a restart request as shown in <a href="#img-oomph_restart">Figure 5</a>.</p>
+<p>The Oomph installer first makes sure that all necessary Scout components and M2E connectors are available.
+In case one or more components are missing, Oomph will first download and install them.
+This triggers a restart request as shown in <a href="#img-oomph_restart">Figure 4</a>.
+If the dialog does not automatically appear, click on the small icon in the status bar on the bottom as shown in <a href="#img-oomph_status">Figure 4</a>.</p>
+
      </div>
      <div id="img-oomph_restart" class="imageblock">
       <div class="content">
        <img src="images/oomph_restart.png" alt="oomph restart">
       </div>
       <div class="title">
-       Figure 5. Restart of the IDE after installation.
+       Figure 4. Restart of the IDE after installation.
       </div>
      </div>
      <div class="paragraph">
@@ -159,7 +127,7 @@
          Demo App: Widgets
         </dt>
         <dd>
-         <p>The projects corresponding to the Scout Demo Application "Widgets".</p>
+         <p>The projects corresponding to the Scout Demo Applications "Widgets" and "JSWidgets".</p>
         </dd>
         <dt class="hdlist1">
          Demo Docs
@@ -198,11 +166,14 @@
      <div class="sect4">
       <h5 id="start-the-application-in-the-ide"><a class="anchor" href="#start-the-application-in-the-ide"></a>Start the application in the IDE</h5>
       <div class="paragraph">
-       <p>In the <em class="wizard">Package Explorer</em> view of the IDE open the Maven module <code>org.eclipse.scout.contacts.all.app.dev</code>. To run the Contacts application use the <em class="menu">Run As</em> context menu on file <code>contacts-all-dev.launch</code> as shown in <a href="#img-oomph_run_contacts_all">Figure 8</a>.</p>
+<p>Open the <em class="menu">Run As</em> menu as shown in <a href="#img-oomph_run_contacts_all">Figure 8</a>.
+There are 3 launch groups available, one for each application.
+Each launch group will start all the necessary builds and servers.
+Now select <em>[contacts] all</em> to run the Contacts application.</p>
       </div>
       <div id="img-oomph_run_contacts_all" class="imageblock">
        <div class="content">
-        <img src="images/run_contracts_all_dev.png" alt="run contracts all dev">
+        <img src="images/run_contacts_all_dev.png" alt="run contacts all dev">
        </div>
        <div class="title">
         Figure 8. Start the Contacts application.
@@ -274,7 +245,7 @@
      </div>
      <hr>
      <div class="paragraph">
-      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/blob/releases/10.0/docs/build/eclipse_help/src/docs/tutorial_existingdemo.adoc" target="_blank">sources</a> on GitHub.</p>
+      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/BSI-Business-Systems-Integration-AG/org.eclipse.scout.docs/blob/releases/10.0.x/docs/build/eclipse_help/src/docs/tutorial_existingdemo.adoc" target="_blank">sources</a> on GitHub.</p>
      </div>
     </div>
    </div>
@@ -294,7 +265,7 @@
   <div id="footer">
    <div id="footer-text">
      Version 10.0
-    <br> Last updated 2018-04-03 14:49:24 CEST
+    <br> Last updated 2020-04-10 14:49:24 CEST
    </div>
   </div>
  </body>
