@@ -17,8 +17,8 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_p2_plugin_config-master</artifactId>
-    <version>3.9.0</version>
-    <relativePath></relativePath>
+    <version>3.11.0</version>
+    <relativePath />
   </parent>
 
   <groupId>org.eclipse.scout.sdk</groupId>
@@ -126,6 +126,7 @@
         <inherited>false</inherited>
         <configuration>
           <flattenMode>bom</flattenMode>
+          <updatePomFile>true</updatePomFile>
         </configuration>
       </plugin>
     </plugins>
