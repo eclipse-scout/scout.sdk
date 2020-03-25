@@ -107,6 +107,7 @@
             <Bundle-Name>Scout SDK</Bundle-Name>
             <Import-Package>
               !javax.xml*,
+              !jakarta.xml*,
               !org.eclipse.core.runtime*,
               !org.eclipse.core.resources*,
               !org.eclipse.jdt.core*,
@@ -115,6 +116,7 @@
               !org.eclipse.jface.text*,
               !org.eclipse.scout.sdk.s2e.*,
               !javax.annotation.*,
+              !jakarta.annotation.*,
               !org.codehaus.plexus*,
               !org.eclipse.scout.sdk.s2e.*,
               !org.eclipse.text*,

@@ -105,6 +105,8 @@
             <Import-Package>
               !javax.swing.*,
               !javax.xml*,
+              !jakarta.swing.*,
+              !jakarta.xml*,
               !org.eclipse.core.runtime*,
               !org.eclipse.core.resources*,
               !org.eclipse.jdt.core*,
