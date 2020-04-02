@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.model.api;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.RoundingMode;
 
@@ -24,6 +23,9 @@ import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithDefaultValues;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithShortValueForIntField;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithSingleValues;
 import org.eclipse.scout.sdk.core.fixture.ClassWithScalarGeneratedAnnotation;
+import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithArrayValues;
+import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithDefaultValues;
+import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithSingleValues;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -35,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 /**
  * Test managed annotation wrapper {@link AbstractManagedAnnotation}
  */
+@SuppressWarnings("HtmlTagCanBeJavadocTag")
 @ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class ManagedAnnotationTest {
@@ -158,6 +161,6 @@ public class ManagedAnnotationTest {
     IType t = env.requireType(ClassWithAnnotationWithShortValueForIntField.class.getName());
     AnnotationWithDefaultValues a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
     assertEquals(Integer.valueOf(4), a.unwrap().element("num").get().value().as(int.class));
-    assertTrue(4 == a.num());
+    assertEquals(4, a.num());
   }
 }
