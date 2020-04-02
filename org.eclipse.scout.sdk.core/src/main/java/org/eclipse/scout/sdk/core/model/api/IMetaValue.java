@@ -29,6 +29,13 @@ public interface IMetaValue {
 
   /**
    * Gets the value converted into the given class.
+   * <p>
+   * If the expected type is an array type, the result will never be {@code null} and the array does not contain any
+   * {@code null} values.<br>
+   * For non-array types the result may be {@code null} only if the compiler was unable to calculate the constant value
+   * (which is not allowed according to the JLS). This might happen if invalid Java files are parsed.
+   * <p>
+   * See <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-9.html#jls-9.7">the JLS</a> for details.
    *
    * @param expectedType
    *          The class it should be converted. Must be compatible with the value returned in {@link #type()}.

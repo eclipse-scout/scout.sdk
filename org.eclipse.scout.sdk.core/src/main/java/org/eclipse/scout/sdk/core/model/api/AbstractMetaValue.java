@@ -76,9 +76,18 @@ public abstract class AbstractMetaValue implements IMetaValue {
   @SuppressWarnings("unchecked")
   public <T> T as(Class<T> expectedType) {
     if (expectedType.isArray()) {
-      // value is scalar, requested is array (for example the Generated annotation)
-      T array = (T) Array.newInstance(expectedType.getComponentType(), 1);
-      Array.set(array, 0, getInternalObject(expectedType.getComponentType()));
+      // value is scalar, requested is array (for example the SuppressWarnings annotation)
+      Class<?> componentType = expectedType.getComponentType();
+      Object val = getInternalObject(componentType);
+      if (val == null) {
+        // null values for annotations are not allowed according to JLS.
+        // it might happen even though if e.g. a Java file contains compile errors.
+        // in that case treat it as if the element is not there at all (it is invalid anyway).
+        return (T) Array.newInstance(componentType, 0);
+      }
+
+      T array = (T) Array.newInstance(componentType, 1);
+      Array.set(array, 0, val);
       return array;
     }
     return (T) getInternalObject(expectedType);

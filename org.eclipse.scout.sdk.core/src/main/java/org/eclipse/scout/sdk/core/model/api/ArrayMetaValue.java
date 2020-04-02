@@ -33,7 +33,7 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
   private final IMetaValue[] m_metaArray;
 
   public ArrayMetaValue(IMetaValue[] metaArray) {
-    m_metaArray = metaArray;
+    m_metaArray = withoutNullElements(metaArray);
   }
 
   @Override
@@ -54,6 +54,42 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
     return b -> b.array(generators.stream(), useNewlines);
   }
 
+  /**
+   * Returns the input array with all null elements removed. Implementation detail: only creates a new array if
+   * required. If the input array contains no null elements the input is returned!
+   *
+   * @param original
+   * @return . Never returns {@code null} or an array with {@code null} elements
+   */
+  protected static IMetaValue[] withoutNullElements(IMetaValue[] original) {
+    if (original == null) {
+      return new IMetaValue[0];
+    }
+
+    int numNotNullElements = numNotNullElements(original);
+    if (numNotNullElements == original.length) {
+      return original;
+    }
+    IMetaValue[] filtered = new IMetaValue[numNotNullElements];
+    int targetPos = 0;
+    for (IMetaValue mv : original) {
+      if (mv != null) {
+        filtered[targetPos++] = mv;
+      }
+    }
+    return filtered;
+  }
+
+  private static int numNotNullElements(IMetaValue[] arr) {
+    int num = 0;
+    for (IMetaValue mv : arr) {
+      if (mv != null) {
+        num++;
+      }
+    }
+    return num;
+  }
+
   @Override
   public IMetaValue[] metaValueArray() {
     return m_metaArray;
@@ -67,31 +103,29 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
   @Override
   @SuppressWarnings("unchecked")
   public <T> T as(Class<T> expectedType) {
-    int n = m_metaArray.length;
-    Object array;
-    Class<?> elementType;
+    int arraySize = m_metaArray.length;
+    Class<?> arrayElementType;
+    Object result;
     if (expectedType == Object.class) {
-      array = new Object[n];
-      elementType = Object.class;
+      arrayElementType = Object.class;
+      result = new Object[arraySize];
     }
     else if (expectedType.isArray()) {
-      elementType = expectedType.getComponentType();
-      array = Array.newInstance(elementType, n);
+      arrayElementType = expectedType.getComponentType();
+      result = Array.newInstance(arrayElementType, arraySize);
     }
-    else if (n == 1) {
-      //value is array with length 1, requested is scalar (for example the Generated annotation)
+    else if (arraySize == 1) {
+      // value is array with length 1, requested is scalar (for example the SuppressWarnings annotation)
       return m_metaArray[0].as(expectedType);
     }
     else {
-      throw new IllegalArgumentException("expected type must be an array type: " + expectedType);
+      throw new IllegalArgumentException("expected type must be an array type but was: " + expectedType);
     }
-    for (int i = 0; i < n; i++) {
-      IMetaValue mv = m_metaArray[i];
-      if (mv != null) {
-        Array.set(array, i, mv.as(elementType));
-      }
+
+    for (int i = 0; i < arraySize; i++) {
+      Array.set(result, i, m_metaArray[i].as(arrayElementType));
     }
-    return (T) array;
+    return (T) result;
   }
 
   @Override
@@ -100,6 +134,7 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
     //use newlines on multi-dimensional arrays and annotation arrays only
     char blockSeparator;
     if (n > 0 && (m_metaArray[0].type() == MetaValueType.Array || m_metaArray[0].type() == MetaValueType.Annotation)) {
+      //noinspection HardcodedLineSeparator
       blockSeparator = '\n';
     }
     else {
