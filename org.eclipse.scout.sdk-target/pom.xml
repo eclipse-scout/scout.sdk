@@ -41,9 +41,9 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>org.eclipse.2019-09-dependencies.target</file>
+                  <file>org.eclipse.2020-03-dependencies.target</file>
                   <type>target</type>
-                  <classifier>org.eclipse.2019-09</classifier>
+                  <classifier>org.eclipse.2020-03</classifier>
                 </artifact>
               </artifacts>
             </configuration>
