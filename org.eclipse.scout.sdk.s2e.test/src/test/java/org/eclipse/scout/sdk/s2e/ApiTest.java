@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.lang.reflect.Method;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -21,8 +23,6 @@ import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 /**
  * <h3>{@link ApiTest}</h3>
  *
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ApiTest {
   @Test
   public void testAstUtilsApi() throws NoSuchMethodException {
-    ASTParser parser = ASTParser.newParser(AST.JLS11);
+    ASTParser parser = ASTParser.newParser(AST.JLS13);
     parser.setBindingsRecovery(false);
     parser.setIgnoreMethodBodies(true);
     parser.setKind(ASTParser.K_COMPILATION_UNIT);

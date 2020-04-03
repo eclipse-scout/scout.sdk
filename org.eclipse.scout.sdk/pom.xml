@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>3.12.0</version>
+    <version>3.12.1</version>
     <relativePath />
   </parent>
 
@@ -80,40 +80,40 @@
     </sonar.coverage.exclusions>
 
     <!-- dependencies to Eclipse artifacts -->
-    <org.eclipse.equinox.common>3.10.500</org.eclipse.equinox.common>
-    <org.eclipse.equinox.registry>3.8.500</org.eclipse.equinox.registry>
-    <org.eclipse.equinox.preferences>3.7.500</org.eclipse.equinox.preferences>
-    <org.eclipse.equinox.security>1.3.300</org.eclipse.equinox.security>
-    <org.eclipse.compare>3.7.700</org.eclipse.compare>
-    <org.eclipse.core.resources>3.13.500</org.eclipse.core.resources>
-    <org.eclipse.core.commands>3.9.500</org.eclipse.core.commands>
-    <org.eclipse.core.expressions>3.6.500</org.eclipse.core.expressions>
-    <org.eclipse.core.filesystem>1.7.500</org.eclipse.core.filesystem>
-    <org.eclipse.core.variables>3.4.600</org.eclipse.core.variables>
-    <org.eclipse.core.runtime>3.16.0</org.eclipse.core.runtime>
-    <org.eclipse.debug.core>3.14.0</org.eclipse.debug.core>
-    <org.eclipse.debug.ui>3.14.200</org.eclipse.debug.ui>
-    <org.eclipse.search>3.11.700</org.eclipse.search>
-    <org.eclipse.ltk.core.refactoring>3.10.200</org.eclipse.ltk.core.refactoring>
-    <org.eclipse.swt>3.112.0</org.eclipse.swt>
-    <org.eclipse.ltk.ui.refactoring>3.10.0</org.eclipse.ltk.ui.refactoring>
-    <org.eclipse.ui.workbench>3.116.0</org.eclipse.ui.workbench>
-    <org.eclipse.jface.text>3.15.300</org.eclipse.jface.text>
-    <org.eclipse.ui.ide>3.16.0</org.eclipse.ui.ide>
-    <org.eclipse.ui.editors>3.12.0</org.eclipse.ui.editors>
-    <org.eclipse.ui>3.114.0</org.eclipse.ui>
-    <org.eclipse.ui.console>3.8.600</org.eclipse.ui.console>
+    <org.eclipse.equinox.common>3.11.0</org.eclipse.equinox.common>
+    <org.eclipse.equinox.registry>3.8.700</org.eclipse.equinox.registry>
+    <org.eclipse.equinox.preferences>3.7.700</org.eclipse.equinox.preferences>
+    <org.eclipse.equinox.security>1.3.500</org.eclipse.equinox.security>
+    <org.eclipse.compare>3.7.900</org.eclipse.compare>
+    <org.eclipse.core.resources>3.13.700</org.eclipse.core.resources>
+    <org.eclipse.core.commands>3.9.700</org.eclipse.core.commands>
+    <org.eclipse.core.expressions>3.6.700</org.eclipse.core.expressions>
+    <org.eclipse.core.filesystem>1.7.700</org.eclipse.core.filesystem>
+    <org.eclipse.core.variables>3.4.800</org.eclipse.core.variables>
+    <org.eclipse.core.runtime>3.17.100</org.eclipse.core.runtime>
+    <org.eclipse.debug.core>3.15.0</org.eclipse.debug.core>
+    <org.eclipse.debug.ui>3.14.400</org.eclipse.debug.ui>
+    <org.eclipse.search>3.11.900</org.eclipse.search>
+    <org.eclipse.ltk.core.refactoring>3.10.400</org.eclipse.ltk.core.refactoring>
+    <org.eclipse.swt>3.114.0</org.eclipse.swt>
+    <org.eclipse.ltk.ui.refactoring>3.10.200</org.eclipse.ltk.ui.refactoring>
+    <org.eclipse.ui.workbench>3.118.0</org.eclipse.ui.workbench>
+    <org.eclipse.jface.text>3.16.200</org.eclipse.jface.text>
+    <org.eclipse.ui.ide>3.17.0</org.eclipse.ui.ide>
+    <org.eclipse.ui.editors>3.13.100</org.eclipse.ui.editors>
+    <org.eclipse.ui>3.116.0</org.eclipse.ui>
+    <org.eclipse.ui.console>3.9.100</org.eclipse.ui.console>
     <org.eclipse.ui.forms>3.8.0</org.eclipse.ui.forms>
     <org.eclipse.osgi>3.14.0</org.eclipse.osgi>
 
-    <org.eclipse.jdt.core>3.19.0</org.eclipse.jdt.core>
-    <org.eclipse.jdt.core.manipulation>1.12.100</org.eclipse.jdt.core.manipulation>
-    <org.eclipse.jdt.ui>3.19.0</org.eclipse.jdt.ui>
-    <org.eclipse.jdt.debug.ui>3.10.400</org.eclipse.jdt.debug.ui>
-    <org.eclipse.jdt.junit>3.11.500</org.eclipse.jdt.junit>
-    <org.eclipse.jdt.launching>3.15.0</org.eclipse.jdt.launching>
-    <ecj>3.19.0</ecj>
-    <junit.version>5.5.2</junit.version>
+    <org.eclipse.jdt.core>3.21.0</org.eclipse.jdt.core>
+    <org.eclipse.jdt.core.manipulation>1.13.100</org.eclipse.jdt.core.manipulation>
+    <org.eclipse.jdt.ui>3.21.0</org.eclipse.jdt.ui>
+    <org.eclipse.jdt.debug.ui>3.10.600</org.eclipse.jdt.debug.ui>
+    <org.eclipse.jdt.junit>3.11.700</org.eclipse.jdt.junit>
+    <org.eclipse.jdt.launching>3.17.0</org.eclipse.jdt.launching>
+    <ecj>3.21.0</ecj>
+    <junit.version>5.6.1</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
     <org.eclipse.m2e.core>1.13.0.20190716-1624</org.eclipse.m2e.core>
@@ -474,12 +474,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
-        <version>1.7.29</version>
+        <version>1.7.30</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.29</version>
+        <version>1.7.30</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -520,7 +520,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.3</version>
       </dependency>
 
       <dependency>
