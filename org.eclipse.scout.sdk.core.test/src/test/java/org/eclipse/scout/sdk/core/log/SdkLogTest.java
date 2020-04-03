@@ -10,20 +10,25 @@
  */
 package org.eclipse.scout.sdk.core.log;
 
-import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static java.lang.System.lineSeparator;
+import static java.time.Instant.ofEpochSecond;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Clock;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.logging.Level;
 
-import static java.time.Instant.ofEpochSecond;
-import static java.util.Collections.*;
-import static org.junit.jupiter.api.Assertions.*;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * <h3>{@link SdkLogTest}</h3>
@@ -145,22 +150,22 @@ public class SdkLogTest {
   public void testLog() {
     runWithPrivateLogger(Level.WARNING, logContent -> {
       SdkLog.warning("hello");
-      assertEqualsWithTime("[WARNING]  hello", logContent.toString());
+      assertEqualsWithTime("[WARNING] hello", logContent.toString());
       assertTrue(SdkLog.isWarningEnabled());
       SdkConsole.clear();
 
       Exception exception = new Exception();
       SdkLog.warning("hello {} there", "test", exception);
-      assertEqualsWithTime("[WARNING]  hello test there" + Strings.fromThrowable(exception), logContent.toString());
+      assertEqualsWithTime("[WARNING] hello test there" + lineSeparator() + Strings.fromThrowable(exception), logContent.toString());
       SdkConsole.clear();
 
       SdkLog.error(exception);
-      assertEqualsWithTime("[SEVERE]  " + Strings.fromThrowable(exception), logContent.toString());
+      assertEqualsWithTime("[SEVERE]  " + lineSeparator() + Strings.fromThrowable(exception), logContent.toString());
       assertTrue(SdkLog.isErrorEnabled());
       SdkConsole.clear();
 
       SdkLog.warning(null, (Object[]) null);
-      assertEqualsWithTime("[WARNING]  ", logContent.toString());
+      assertEqualsWithTime("[WARNING] ", logContent.toString());
       SdkConsole.clear();
 
       SdkLog.info("hello");
@@ -175,7 +180,7 @@ public class SdkLogTest {
 
       assertFalse(SdkLog.isLevelEnabled(null));
       SdkLog.log(null, "hello");
-      assertEqualsWithTime("[WARNING]  hello", logContent.toString());
+      assertEqualsWithTime("[WARNING] hello", logContent.toString());
       SdkConsole.clear();
     });
   }
@@ -198,6 +203,7 @@ public class SdkLogTest {
 
   private static void runWithPrivateLogger(Level initialLevel, ILogTestRunner runnable) {
     // lock on console to ensure no other thread writes to the console while we are testing (in case tests are running in parallel)
+    //noinspection SynchronizeOnThis
     synchronized (SdkConsole.class) {
       ISdkConsoleSpi backup = SdkConsole.getConsoleSpi();
       Level oldLevel = SdkLog.getLogLevel();
@@ -207,16 +213,8 @@ public class SdkLogTest {
         SdkConsole.setConsoleSpi(new ISdkConsoleSpi() {
 
           @Override
-          public void println(Level level, String s, Throwable... exceptions) {
-            logContent.append(s);
-            if (exceptions == null) {
-              return;
-            }
-            for (Throwable t : exceptions) {
-              if (t != null) {
-                logContent.append(Strings.fromThrowable(t));
-              }
-            }
+          public void println(LogMessage msg) {
+            logContent.append(msg.all());
           }
 
           @Override

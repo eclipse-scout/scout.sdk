@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal;
 
+import static java.lang.System.lineSeparator;
+
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -17,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.core.log.ISdkConsoleSpi;
-import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.log.LogMessage;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.swt.SWT;
@@ -41,52 +43,52 @@ public class WorkbenchSdkConsoleSpi implements ISdkConsoleSpi {
   }
 
   @Override
-  @SuppressWarnings({"squid:S1166", "squid:S1148"})
-  public void println(Level level, String s, Throwable... exceptions) {
+  @SuppressWarnings({"squid:S1166", "squid:S1148", "UseOfSystemOutOrSystemErr", "CallToPrintStackTrace"})
+  public void println(LogMessage message) {
     try (IOConsoleOutputStream out = currentConsole(true).newOutputStream()) {
-      if (Level.SEVERE.equals(level)) {
+      if (Level.SEVERE.equals(message.severity())) {
         out.setActivateOnWrite(true);
-        if (PlatformUI.isWorkbenchRunning()) {
-          IWorkbench workbench = PlatformUI.getWorkbench();
-          if (workbench != null) {
-            Display display = workbench.getDisplay();
-            display.syncExec(() -> out.setColor(display.getSystemColor(SWT.COLOR_RED)));
-          }
-        }
+        setConsoleColorRed(out);
       }
 
-      out.write(s);
-      if (exceptions == null || exceptions.length < 1) {
-        out.write('\n');
-      }
-      else {
-        for (Throwable t : exceptions) {
-          if (t != null) {
-            String trace = Strings.fromThrowable(t);
-            out.write(trace);
-          }
-        }
-      }
+      out.write(message.all());
+      out.write(lineSeparator());
       out.flush();
     }
     catch (IOException e) {
       System.err.println("Unable to write to console:");
-      System.err.println(s);
+      System.err.println(message.all());
       e.printStackTrace();
     }
 
     // dev mode: also log to Eclipse log
     if (Platform.isRunning() && (Platform.inDebugMode() || Platform.inDevelopmentMode())) {
-      S2ESdkActivator activator = S2ESdkActivator.getDefault();
-      if (activator == null) {
-        return;
-      }
-      Throwable t = null;
-      if (exceptions != null && exceptions.length > 0) {
-        t = exceptions[0];
-      }
-      activator.getLog().log(new Status(julToEclipseSeverity(level), S2ESdkActivator.PLUGIN_ID, s, t));
+      logToPluginLog(message);
     }
+  }
+
+  protected static void setConsoleColorRed(IOConsoleOutputStream out) {
+    if (!PlatformUI.isWorkbenchRunning()) {
+      return;
+    }
+    IWorkbench workbench = PlatformUI.getWorkbench();
+    if (workbench == null) {
+      return;
+    }
+    Display display = workbench.getDisplay();
+    if (display == null) {
+      return;
+    }
+    display.syncExec(() -> out.setColor(display.getSystemColor(SWT.COLOR_RED)));
+  }
+
+  protected static void logToPluginLog(LogMessage message) {
+    S2ESdkActivator activator = S2ESdkActivator.getDefault();
+    if (activator == null) {
+      return;
+    }
+    IStatus status = new Status(julToEclipseSeverity(message.severity()), S2ESdkActivator.PLUGIN_ID, message.text(), message.firstThrowable().orElse(null));
+    activator.getLog().log(status);
   }
 
   private static int julToEclipseSeverity(Level l) {

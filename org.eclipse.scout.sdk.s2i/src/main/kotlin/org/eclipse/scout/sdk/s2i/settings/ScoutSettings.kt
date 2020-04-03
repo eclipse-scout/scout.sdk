@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.util.EventListenerList
-import org.eclipse.scout.sdk.s2i.IdeaLogger
 import java.util.*
 import javax.swing.JComponent
 
@@ -17,17 +16,8 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
 
         const val KEY_AUTO_UPDATE_DERIVED_RESOURCES = "org.eclipse.scout.sdk.s2i.autoUpdateDerivedResources"
         const val KEY_AUTO_CREATE_CLASS_ID = "org.eclipse.scout.sdk.s2i.autoCreateClassIdAnnotations"
-        const val KEY_LOG_LEVEL = "org.eclipse.scout.sdk.s2i.logLevel"
 
         private val listeners = EventListenerList()
-
-        fun getLogLevel(): IdeaLogger.LogLevel {
-            return IdeaLogger.LogLevel.parse(PropertiesComponent.getInstance().getValue(KEY_LOG_LEVEL))
-        }
-
-        fun isLogLevelSet() = PropertiesComponent.getInstance().isValueSet(KEY_LOG_LEVEL)
-
-        fun setLogLevel(newValue: IdeaLogger.LogLevel) = changeProperty(PropertiesComponent.getInstance(), KEY_LOG_LEVEL, getLogLevel().toString(), newValue.toString())
 
         fun isAutoUpdateDerivedResources(project: Project): Boolean {
             val store = PropertiesComponent.getInstance(project)
@@ -81,11 +71,8 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
 
     private fun isAutoCreateClassIdAnnotationsInUi() = m_form?.isAutoCreateClassId ?: false
 
-    private fun logLevelInUi() = m_form?.logLevel
-
     override fun isModified(): Boolean {
-        return !Objects.equals(logLevelInUi(), getLogLevel())
-                || isAutoUpdateDerivedResourcesInUi() != isAutoUpdateDerivedResources(project)
+        return isAutoUpdateDerivedResourcesInUi() != isAutoUpdateDerivedResources(project)
                 || isAutoCreateClassIdAnnotationsInUi() != isAutoCreateClassIdAnnotations(project)
     }
 
@@ -109,17 +96,11 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
                 isAutoCreateClassIdAnnotations(project).toString(),
                 isAutoCreateClassIdAnnotationsInUi().toString()
         )
-        changeProperty(
-                PropertiesComponent.getInstance(), KEY_LOG_LEVEL,
-                getLogLevel().toString(),
-                logLevelInUi().toString()
-        )
     }
 
     override fun reset() {
         m_form?.isAutoUpdateDerivedResources = isAutoUpdateDerivedResources(project)
         m_form?.isAutoCreateClassId = isAutoCreateClassIdAnnotations(project)
-        m_form?.logLevel = getLogLevel()
     }
 
     override fun createComponent(): JComponent? {

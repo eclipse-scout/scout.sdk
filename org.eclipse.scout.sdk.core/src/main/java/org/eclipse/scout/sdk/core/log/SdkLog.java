@@ -10,10 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.log;
 
+import static java.util.Collections.singletonList;
+
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.logging.Level;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -77,16 +78,22 @@ public final class SdkLog {
       level = DEFAULT_LOG_LEVEL;
     }
 
-    if (level.intValue() < curLevel.intValue() || level.intValue() == Level.OFF.intValue()) {
+    if (!SdkConsole.isRelevant(level)) {
       return;
     }
 
     FormattingTuple tuple = MessageFormatter.arrayFormat(msg, args);
-    StringBuilder message = new StringBuilder().append(logTime()).append(" [").append(level.getName()).append("]  ");
-    message.append(tuple.message());
+    LogMessage message = new LogMessage(level, defaultPrefixFor(level), tuple.message(), tuple.throwables());
+    SdkConsole.println(message);
+  }
 
-    List<Throwable> throwables = tuple.throwables();
-    SdkConsole.println(level, message.toString(), throwables.toArray(new Throwable[0]));
+  static String defaultPrefixFor(Level level) {
+    int levelColWidth = 8;
+    String levelName = level.getName();
+    String spaces = Strings.repeat(" ", levelColWidth - levelName.length());
+    return new StringBuilder().append(logTime())
+        .append(" [").append(levelName).append(']')
+        .append(spaces).toString();
   }
 
   static String logTime() {
@@ -289,12 +296,14 @@ public final class SdkLog {
       }
     }
     catch (Exception e) {
-      SdkConsole.println(Level.SEVERE, "Unable to parse log level '" + lvl + "'. Fallback to default: '" + DEFAULT_LOG_LEVEL.getName() + "'.", e);
+      String msg = "Unable to parse log level '" + lvl + "'. Fallback to default: '" + DEFAULT_LOG_LEVEL.getName() + "'.";
+      SdkConsole.println(new LogMessage(Level.SEVERE, defaultPrefixFor(Level.SEVERE), msg, singletonList(e)));
     }
     return DEFAULT_LOG_LEVEL;
   }
 
   static Level getInitialLogLevel() {
+    //noinspection AccessOfSystemProperties
     String lvl = System.getProperty(LOG_LEVEL_PROPERTY_NAME);
     if (Strings.isBlank(lvl)) {
       return DEFAULT_LOG_LEVEL;

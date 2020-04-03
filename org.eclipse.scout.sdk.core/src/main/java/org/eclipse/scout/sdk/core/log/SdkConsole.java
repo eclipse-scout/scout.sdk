@@ -57,18 +57,12 @@ public final class SdkConsole {
     spi.clear();
   }
 
-  /**
-   * Write the given message with optional {@link Throwable}s to the console.
-   *
-   * @param level
-   *          The severity of the given message
-   * @param msg
-   *          The message to write. May be {@code null}.
-   * @param exceptions
-   *          Optional {@link Throwable}s to write to the console.
-   */
-  static synchronized void println(Level level, String msg, Throwable... exceptions) {
-    spi.println(level, msg, exceptions);
+  static synchronized void println(LogMessage message) {
+    spi.println(message);
+  }
+
+  static synchronized boolean isRelevant(Level level) {
+    return spi.isRelevant(level);
   }
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
@@ -85,28 +79,16 @@ public final class SdkConsole {
     }
 
     @Override
-    public void println(Level level, String s, Throwable... exceptions) {
+    public void println(LogMessage msg) {
       PrintStream out;
-      if (Level.SEVERE.equals(level)) {
+      if (Level.SEVERE.equals(msg.severity())) {
         out = ERR;
       }
       else {
         out = OUT;
       }
 
-      if (s != null) {
-        out.println(s);
-      }
-
-      if (exceptions == null || exceptions.length < 1) {
-        return;
-      }
-
-      for (Throwable t : exceptions) {
-        if (t != null) {
-          t.printStackTrace(out);
-        }
-      }
+      out.println(msg.all());
     }
   }
 }

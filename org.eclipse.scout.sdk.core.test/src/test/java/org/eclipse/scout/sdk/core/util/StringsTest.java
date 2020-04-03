@@ -10,19 +10,26 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
+import static java.lang.System.lineSeparator;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * <h3>{@link StringsTest}</h3>
  *
  * @since 6.1.0
  */
+@SuppressWarnings({"HardcodedFileSeparator", "HardcodedLineSeparator"})
 public class StringsTest {
 
   @Test
@@ -34,9 +41,16 @@ public class StringsTest {
 
   @Test
   public void testToCharArray() {
-    assertArrayEquals("".toCharArray(), Strings.toCharArray(new StringBuilder("")));
+    assertArrayEquals("".toCharArray(), Strings.toCharArray(new StringBuilder()));
     assertArrayEquals("abc".toCharArray(), Strings.toCharArray(new StringBuilder("abc")));
     assertThrows(IllegalArgumentException.class, () -> Strings.toCharArray(null));
+  }
+
+  @Test
+  public void testFromThrowable() {
+    String s = Strings.fromThrowable(new Exception());
+    assertFalse(s.startsWith(lineSeparator()));
+    assertFalse(s.endsWith(lineSeparator()));
   }
 
   @Test

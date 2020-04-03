@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws.editor;
 
+import static java.lang.System.lineSeparator;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -51,7 +53,7 @@ public class ErrorFormPage extends FormPage {
 
     StringBuilder msgBuilder = new StringBuilder();
     if (Strings.hasText(m_message)) {
-      msgBuilder.append(m_message).append('\n');
+      msgBuilder.append(m_message).append(lineSeparator());
     }
     if (m_throwable != null) {
       msgBuilder.append(Strings.fromThrowable(m_throwable));

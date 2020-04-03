@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
+import static java.lang.System.lineSeparator;
+
 import java.beans.Introspector;
 import java.io.IOException;
 import java.io.InputStream;
@@ -273,6 +275,7 @@ public final class Strings {
     char[] buffer = new char[8192];
     StringBuilder out = new StringBuilder(buffer.length);
     int length;
+    //noinspection resource,IOResourceOpenedButNotSafelyClosed
     Reader in = new InputStreamReader(is, charset);
     while ((length = in.read(buffer)) != INDEX_NOT_FOUND) {
       out.append(buffer, 0, length);
@@ -302,7 +305,9 @@ public final class Strings {
   }
 
   /**
-   * Converts the given {@link Throwable} into a {@link String}. The resulting string includes a leading new line.
+   * Converts the stack trace of the given {@link Throwable} into a {@link String}.
+   * <p>
+   * The resulting {@link String} contains no leading or trailing line separators.
    *
    * @param t
    *          The {@link Throwable}. Must not be {@code null}.
@@ -311,8 +316,9 @@ public final class Strings {
   @SuppressWarnings({"squid:S1148", "squid:S1166"})
   public static String fromThrowable(Throwable t) {
     try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
-      p.println();
       t.printStackTrace(p);
+      StringBuffer buffer = w.getBuffer();
+      buffer.delete(buffer.length() - lineSeparator().length(), buffer.length());
       return w.toString();
     }
     catch (IOException e) {
@@ -667,6 +673,7 @@ public final class Strings {
     for (int i = 0; i < limit; i++) {
       char x = a.charAt(i);
       char y = b.charAt(i);
+      //noinspection CharUsedInArithmeticContext
       int diff = x - y;
       if (diff != 0) {
         return diff;

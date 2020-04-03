@@ -36,7 +36,8 @@ public class BuilderContext implements IBuilderContext {
   }
 
   public BuilderContext(String nl, PropertySupport properties) {
-    m_nl = Strings.notEmpty(nl).orElse("\n");
+    //noinspection HardcodedLineSeparator
+    m_nl = Strings.notEmpty(nl).orElse("\n"); // do not use System.lineSeparator() here so that the created source is not platform dependent.
     m_properties = new FinalValue<>();
     Optional.ofNullable(properties).ifPresent(m_properties::set);
   }
