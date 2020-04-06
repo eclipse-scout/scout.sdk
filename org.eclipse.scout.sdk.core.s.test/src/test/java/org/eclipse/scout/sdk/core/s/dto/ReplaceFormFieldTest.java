@@ -16,7 +16,7 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperIntefaceSignatures;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperInterfaces;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
@@ -1261,7 +1261,7 @@ public class ReplaceFormFieldTest {
     IType sdkCommandNoneNoneCreate = assertTypeExists(extendedExtendedFormData, "SdkCommandNoneNoneCreate");
     assertHasFlags(sdkCommandNoneNoneCreate, 9);
     assertHasSuperClass(sdkCommandNoneNoneCreate, "formdata.shared.services.process.replace.ExtendedFormData$SdkCommandNoneNone");
-    assertHasSuperIntefaceSignatures(sdkCommandNoneNoneCreate, new String[]{"formdata.shared.IFormDataInterface03"});
+    assertHasSuperInterfaces(sdkCommandNoneNoneCreate, new String[]{"formdata.shared.IFormDataInterface03"});
     assertAnnotation(sdkCommandNoneNoneCreate, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SdkCommandNoneNoneCreate

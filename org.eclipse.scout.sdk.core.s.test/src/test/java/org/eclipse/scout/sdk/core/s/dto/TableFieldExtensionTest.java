@@ -16,7 +16,7 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperIntefaceSignatures;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperInterfaces;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
@@ -74,7 +74,7 @@ public class TableFieldExtensionTest {
     IType customAbstractAdvisorTableFieldTableExtensionRowData = assertTypeExists(extensionToAbstractTableFieldTemplateData, "CustomAbstractAdvisorTableFieldTableExtensionRowData");
     assertHasFlags(customAbstractAdvisorTableFieldTableExtensionRowData, 9);
     assertHasSuperClass(customAbstractAdvisorTableFieldTableExtensionRowData, "java.lang.Object");
-    assertHasSuperIntefaceSignatures(customAbstractAdvisorTableFieldTableExtensionRowData, new String[]{"java.io.Serializable"});
+    assertHasSuperInterfaces(customAbstractAdvisorTableFieldTableExtensionRowData, new String[]{"java.io.Serializable"});
     assertEquals(1, customAbstractAdvisorTableFieldTableExtensionRowData.annotations().stream().count(), "annotation count");
     IAnnotation rowDataExtendsAnnot = assertAnnotation(customAbstractAdvisorTableFieldTableExtensionRowData, "org.eclipse.scout.rt.platform.extension.Extends");
     assertValueOfRowDataExtendsAnnotation("formdata.shared.services.process.AbstractAddressTableFieldData$AbstractAddressTableRowData", rowDataExtendsAnnot);
@@ -130,7 +130,7 @@ public class TableFieldExtensionTest {
     // type TestTableFieldExtensionRowData
     IType testTableFieldExtensionRowData = assertTypeExists(simpleTableFormExtensionWithTableData, "TestTableFieldExtensionRowData");
     assertHasFlags(testTableFieldExtensionRowData, 9);
-    assertHasSuperIntefaceSignatures(testTableFieldExtensionRowData, new String[]{"java.io.Serializable"});
+    assertHasSuperInterfaces(testTableFieldExtensionRowData, new String[]{"java.io.Serializable"});
     assertEquals(1, testTableFieldExtensionRowData.annotations().stream().count(), "annotation count");
     IAnnotation rowDataExtendsAnnot = assertAnnotation(testTableFieldExtensionRowData, "org.eclipse.scout.rt.platform.extension.Extends");
     assertValueOfRowDataExtendsAnnotation("formdata.shared.services.process.SimpleTableFormData$TestTable$TestTableRowData", rowDataExtendsAnnot);

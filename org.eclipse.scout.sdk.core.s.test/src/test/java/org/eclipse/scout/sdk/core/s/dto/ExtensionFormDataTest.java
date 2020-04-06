@@ -17,7 +17,7 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperIntefaceSignatures;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperInterfaces;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
@@ -81,7 +81,7 @@ public class ExtensionFormDataTest {
    */
   private static void testApiOfSimpleTableFormExtensionData(IType simpleTableFormExtensionData) {
     assertHasFlags(simpleTableFormExtensionData, 1);
-    assertHasSuperIntefaceSignatures(simpleTableFormExtensionData, new String[]{"java.io.Serializable"});
+    assertHasSuperInterfaces(simpleTableFormExtensionData, new String[]{"java.io.Serializable"});
     assertEquals(2, simpleTableFormExtensionData.annotations().stream().count(), "annotation count");
     assertAnnotation(simpleTableFormExtensionData, "org.eclipse.scout.rt.platform.extension.Extends");
     assertAnnotation(simpleTableFormExtensionData, "javax.annotation.Generated");
@@ -115,7 +115,7 @@ public class ExtensionFormDataTest {
   private static void testApiOfMultiColumnExtensionData(IType multiColumnExtensionData) {
     // type MultiColumnExtensionData
     assertHasFlags(multiColumnExtensionData, 1);
-    assertHasSuperIntefaceSignatures(multiColumnExtensionData, new String[]{Serializable.class.getName()});
+    assertHasSuperInterfaces(multiColumnExtensionData, new String[]{Serializable.class.getName()});
     assertAnnotation(multiColumnExtensionData, "org.eclipse.scout.rt.platform.extension.Extends");
     assertAnnotation(multiColumnExtensionData, "javax.annotation.Generated");
 
@@ -191,7 +191,7 @@ public class ExtensionFormDataTest {
   private static void testApiOfThirdIntegerColumnData(IType thirdIntegerColumnData) {
     // type ThirdIntegerColumnData
     assertHasFlags(thirdIntegerColumnData, 1);
-    assertHasSuperIntefaceSignatures(thirdIntegerColumnData, new String[]{Serializable.class.getName()});
+    assertHasSuperInterfaces(thirdIntegerColumnData, new String[]{Serializable.class.getName()});
     assertAnnotation(thirdIntegerColumnData, "org.eclipse.scout.rt.platform.extension.Extends");
     assertAnnotation(thirdIntegerColumnData, "javax.annotation.Generated");
 

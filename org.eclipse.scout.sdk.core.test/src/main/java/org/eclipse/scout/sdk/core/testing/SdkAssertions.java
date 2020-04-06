@@ -96,6 +96,7 @@ public final class SdkAssertions {
    * @throws AssertionError
    *           if there are compilation errors.
    */
+  @SuppressWarnings("HardcodedLineSeparator")
   public static IType assertNoCompileErrors(IType t) {
     List<String> compileErrors = t.javaEnvironment().compileErrors(t);
     if (compileErrors.isEmpty()) {
@@ -170,8 +171,8 @@ public final class SdkAssertions {
     return type.orElse(null);
   }
 
-  public static IMethod assertMethodExist(IType type, String methodName, String[] parameterSignatures) {
-    return assertMethodExist(type, methodName, parameterSignatures, null);
+  public static IMethod assertMethodExist(IType type, String methodName, String[] parameterTypes) {
+    return assertMethodExist(type, methodName, parameterTypes, null);
   }
 
   /**
@@ -179,8 +180,8 @@ public final class SdkAssertions {
    *
    * @return the method if found
    */
-  public static IMethod assertMethodExist(IType type, String methodName, String[] parameterSignatures, String message) {
-    String methodId = JavaTypes.createMethodIdentifier(methodName, Arrays.asList(parameterSignatures));
+  public static IMethod assertMethodExist(IType type, String methodName, String[] parameterTypes, String message) {
+    String methodId = JavaTypes.createMethodIdentifier(methodName, Arrays.asList(parameterTypes));
     return type.methods().stream()
         .filter(method -> method.identifier().equals(methodId))
         .findAny()
@@ -190,9 +191,9 @@ public final class SdkAssertions {
             StringBuilder messageBuilder = new StringBuilder("Method '").append(methodName).append('\'');
             messageBuilder.append(" in type '").append(type.name()).append('\'');
             messageBuilder.append(" does not exist! [parameters: ");
-            for (int i = 0; i < parameterSignatures.length; i++) {
-              messageBuilder.append('\'').append(parameterSignatures[i]).append('\'');
-              if (i < parameterSignatures.length - 1) {
+            for (int i = 0; i < parameterTypes.length; i++) {
+              messageBuilder.append('\'').append(parameterTypes[i]).append('\'');
+              if (i < parameterTypes.length - 1) {
                 messageBuilder.append(", ");
               }
             }
@@ -208,8 +209,8 @@ public final class SdkAssertions {
   }
 
   public static void assertMethodReturnType(IMethod method, String expectedType, String message) {
-    String signature = method.requireReturnType().reference();
-    assertEquals(expectedType, signature, message);
+    String typeRef = method.requireReturnType().reference();
+    assertEquals(expectedType, typeRef, message);
   }
 
   /**
@@ -243,8 +244,8 @@ public final class SdkAssertions {
   }
 
   public static void assertFieldType(IField field, String expectedType, String message) {
-    String resolvedSignature = field.dataType().reference();
-    assertEquals(expectedType, resolvedSignature, message);
+    String typeRef = field.dataType().reference();
+    assertEquals(expectedType, typeRef, message);
   }
 
   public static void assertHasSuperClass(IType type, String expectedSuperClass) {
@@ -256,11 +257,11 @@ public final class SdkAssertions {
     assertEquals(expectedSuperClass, refSuperTypeSig, message);
   }
 
-  public static void assertHasSuperIntefaceSignatures(IType type, String[] interfaceSignatures) {
-    assertHasSuperIntefaceSignatures(type, interfaceSignatures, "Type '" + type.name() + "' does not have the same interfaces!");
+  public static void assertHasSuperInterfaces(IType type, String[] interfaceTypes) {
+    assertHasSuperInterfaces(type, interfaceTypes, "Type '" + type.name() + "' does not have the same interfaces!");
   }
 
-  public static void assertHasSuperIntefaceSignatures(IType type, String[] expectedInterfaces, String message) {
+  public static void assertHasSuperInterfaces(IType type, String[] expectedInterfaces, String message) {
     List<String> interfaces = type.superInterfaces()
         .map(IType::reference)
         .collect(toList());

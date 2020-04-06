@@ -10,6 +10,16 @@
  */
 package org.eclipse.scout.sdk.core.testing;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
+import java.beans.Introspector;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.scout.sdk.core.imports.IImportCollector;
 import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.imports.ImportCollector;
@@ -26,20 +36,12 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Assertions;
 
-import java.beans.Introspector;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static java.util.stream.Collectors.*;
-
 /**
  * <h3>{@link ApiTestGenerator}</h3>
  *
  * @since 3.10.0 2013-08-26
  */
+@SuppressWarnings({"HardcodedLineSeparator", "HardcodedFileSeparator"})
 public class ApiTestGenerator {
   public static final String NL = "\n";
 
@@ -52,11 +54,11 @@ public class ApiTestGenerator {
   }
 
   protected static void buildMethod(IMethod method, String methodVarName, StringBuilder source) {
-    List<IMethodParameter> parameterSignatures = method.parameters().stream().collect(toList());
-    if (!parameterSignatures.isEmpty()) {
-      for (int i = 0; i < parameterSignatures.size(); i++) {
-        source.append('"').append(parameterSignatures.get(i).dataType().reference()).append('"');
-        if (i < parameterSignatures.size() - 1) {
+    List<IMethodParameter> parameterTypes = method.parameters().stream().collect(toList());
+    if (!parameterTypes.isEmpty()) {
+      for (int i = 0; i < parameterTypes.size(); i++) {
+        source.append('"').append(parameterTypes.get(i).dataType().reference()).append('"');
+        if (i < parameterTypes.size() - 1) {
           source.append(", ");
         }
       }
@@ -68,10 +70,10 @@ public class ApiTestGenerator {
 
     method.returnType()
         .map(IType::reference)
-        .ifPresent(sig -> source.append("assertMethodReturnType(")
+        .ifPresent(ref -> source.append("assertMethodReturnType(")
             .append(methodVarName)
             .append(", \"")
-            .append(sig)
+            .append(ref)
             .append("\");")
             .append(NL));
 
@@ -109,8 +111,8 @@ public class ApiTestGenerator {
     List<IAnnotation> annotations = annotatable.annotations().stream().collect(toList());
     source.append("assertEquals(").append(annotations.size()).append(", ").append(annotatableRef).append(".annotations().stream().count(), \"annotation count\");").append(NL);
     for (IAnnotation a : annotations) {
-      String annotationSignature = a.type().reference();
-      source.append("assertAnnotation(").append(annotatableRef).append(", \"").append(annotationSignature).append("\");").append(NL);
+      String annotationRef = a.type().reference();
+      source.append("assertAnnotation(").append(annotatableRef).append(", \"").append(annotationRef).append("\");").append(NL);
     }
   }
 
@@ -134,13 +136,14 @@ public class ApiTestGenerator {
     collector.addStaticImport(SdkAssertions.class.getName() + ".assertFieldType");
     collector.addStaticImport(SdkAssertions.class.getName() + ".assertHasFlags");
     collector.addStaticImport(SdkAssertions.class.getName() + ".assertHasSuperClass");
-    collector.addStaticImport(SdkAssertions.class.getName() + ".assertHasSuperIntefaceSignatures");
+    collector.addStaticImport(SdkAssertions.class.getName() + ".assertHasSuperInterfaces");
     collector.addStaticImport(SdkAssertions.class.getName() + ".assertMethodExist");
     collector.addStaticImport(SdkAssertions.class.getName() + ".assertMethodReturnType");
     collector.addStaticImport(SdkAssertions.class.getName() + ".assertNoCompileErrors");
     collector.addStaticImport(SdkAssertions.class.getName() + ".assertTypeExists");
     collector.addStaticImport(Assertions.class.getName() + ".assertArrayEquals");
     collector.addStaticImport(Assertions.class.getName() + ".assertEquals");
+    collector.addStaticImport(Assertions.class.getName() + ".assertTrue");
 
     StringBuilder result = new StringBuilder();
     collector.createImportDeclarations()
@@ -158,17 +161,17 @@ public class ApiTestGenerator {
     // super type
     type.superClass()
         .map(IType::reference)
-        .ifPresent(sig -> source
+        .ifPresent(ref -> source
             .append("assertHasSuperClass(")
             .append(typeVarName).append(", \"")
-            .append(sig)
+            .append(ref)
             .append("\");")
             .append(NL));
 
     // interfaces
     List<IType> interfaces = type.superInterfaces().collect(toList());
     if (!interfaces.isEmpty()) {
-      source.append("assertHasSuperIntefaceSignatures(").append(typeVarName).append(", new String[]{");
+      source.append("assertHasSuperInterfaces(").append(typeVarName).append(", new String[]{");
       for (int i = 0; i < interfaces.size(); i++) {
         source.append('"').append(interfaces.get(i).reference()).append('"');
         if (i < interfaces.size() - 1) {

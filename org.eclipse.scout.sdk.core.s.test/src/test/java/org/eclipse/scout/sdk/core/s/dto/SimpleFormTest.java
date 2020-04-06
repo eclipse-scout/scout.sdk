@@ -16,7 +16,7 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperIntefaceSignatures;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperInterfaces;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
@@ -45,7 +45,7 @@ public class SimpleFormTest {
   private static void testApiOfSimpleFormData(IType simpleFormData) {
     assertHasFlags(simpleFormData, Flags.AccPublic);
     assertHasSuperClass(simpleFormData, "org.eclipse.scout.rt.shared.data.form.AbstractFormData");
-    assertHasSuperIntefaceSignatures(simpleFormData, new String[]{"formdata.shared.IFormDataInterface02", "formdata.shared.IFormDataInterface03"});
+    assertHasSuperInterfaces(simpleFormData, new String[]{"formdata.shared.IFormDataInterface02", "formdata.shared.IFormDataInterface03"});
     assertEquals(2, simpleFormData.annotations().stream().count(), "annotation count");
     assertValidDtoClassIdValue(assertAnnotation(simpleFormData, "org.eclipse.scout.rt.platform.classid.ClassId"));
     assertAnnotation(simpleFormData, "javax.annotation.Generated");

@@ -17,7 +17,7 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperIntefaceSignatures;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperInterfaces;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
@@ -419,7 +419,7 @@ public class PageBeanDataTest {
   private static void testApiOfPageWithTableExtensionData(IType pageWithTableExtensionData) {
     // type PageWithTableExtensionData
     assertHasFlags(pageWithTableExtensionData, 1);
-    assertHasSuperIntefaceSignatures(pageWithTableExtensionData, new String[]{Serializable.class.getName()});
+    assertHasSuperInterfaces(pageWithTableExtensionData, new String[]{Serializable.class.getName()});
     assertAnnotation(pageWithTableExtensionData, "org.eclipse.scout.rt.platform.extension.Extends");
     assertAnnotation(pageWithTableExtensionData, "javax.annotation.Generated");
 
