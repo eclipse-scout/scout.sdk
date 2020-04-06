@@ -48,7 +48,7 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
     }
 
     try {
-      return JdtUtils.findClassesInStrictHierarchy(javaProject, getBaseClassFqn(), monitor, getTypeProposalFilter());
+      return JdtUtils.findTypesInStrictHierarchy(javaProject, getBaseClassFqn(), monitor, getTypeProposalFilter());
     }
     catch (RuntimeException e) {
       SdkLog.error("Error loading super type proposals in project {} for base class {}", javaProject.getElementName(), getBaseClassFqn(), e);

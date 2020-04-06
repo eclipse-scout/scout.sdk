@@ -357,7 +357,7 @@ public final class S2eUtils {
         sessionToFind = IScoutRuntimeTypes.ISession;
         break;
     }
-    Set<IType> sessions = JdtUtils.findClassesInStrictHierarchy(project, sessionToFind, monitor, filter);
+    Set<IType> sessions = JdtUtils.findTypesInStrictHierarchy(project, sessionToFind, monitor, filter);
 
     if (sessions.isEmpty()) {
       return Optional.empty();
@@ -415,6 +415,7 @@ public final class S2eUtils {
 
     try {
       DocumentBuilder docBuilder = Xml.createDocumentBuilder();
+      //noinspection NestedTryStatement
       try (InputStream in = file.getContents()) {
         return docBuilder.parse(in);
       }

@@ -169,6 +169,10 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
     CompilationUnitWriteOperation writeIcu = new CompilationUnitWriteOperation(sourceFolder, packageName, javaFileName, code);
     return doRunResourceTask(writeIcu, () -> {
       ICompilationUnit compilationUnit = writeIcu.getCreatedCompilationUnit();
+      if (compilationUnit == null) {
+        return null; // may happen if the asynchronous write operation is cancelled
+      }
+
       String formattedSource;
       try {
         formattedSource = compilationUnit.getSource();

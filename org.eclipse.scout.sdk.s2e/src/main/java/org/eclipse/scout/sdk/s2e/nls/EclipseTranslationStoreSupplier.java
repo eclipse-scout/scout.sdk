@@ -93,7 +93,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
       }
     };
 
-    Set<IType> dynamicNlsTextProviderServices = JdtUtils.findClassesInStrictHierarchy(jp, IScoutRuntimeTypes.AbstractDynamicNlsTextProviderService, progress.newChild(10).monitor(), filter);
+    Set<IType> dynamicNlsTextProviderServices = JdtUtils.findTypesInStrictHierarchy(jp, IScoutRuntimeTypes.AbstractDynamicNlsTextProviderService, progress.newChild(10).monitor(), filter);
     EclipseProgress loopProgress = progress
         .newChild(10)
         .setWorkRemaining(dynamicNlsTextProviderServices.size());

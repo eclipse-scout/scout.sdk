@@ -60,8 +60,6 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
-import org.eclipse.jdt.core.search.TypeNameMatch;
-import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -131,19 +129,19 @@ public final class JdtUtils {
    * @return A {@link Set} containing all {@link IType}s sorted ascending by fully qualified name.
    */
   public static Set<IType> findAbstractClassesInHierarchy(IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor) {
-    return findClassesInStrictHierarchy(sourceProject, baseTypeFqn, monitor, new PublicAbstractPrimaryTypeFilter());
+    return findTypesInStrictHierarchy(sourceProject, baseTypeFqn, monitor, new PublicAbstractPrimaryTypeFilter());
   }
 
   /**
-   * @see #findClassesInStrictHierarchy(IJavaProject, IType, IProgressMonitor, Predicate)
+   * @see #findTypesInStrictHierarchy(IJavaProject, IType, IProgressMonitor, Predicate)
    */
-  public static Set<IType> findClassesInStrictHierarchy(IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor, Predicate<IType> filter) {
+  public static Set<IType> findTypesInStrictHierarchy(IJavaProject sourceProject, String baseTypeFqn, IProgressMonitor monitor, Predicate<IType> filter) {
     if (!exists(sourceProject)) {
       return emptySet();
     }
     try {
       IType t = sourceProject.findType(baseTypeFqn.replace(JavaTypes.C_DOLLAR, JavaTypes.C_DOT), monitor);
-      return findClassesInStrictHierarchy(sourceProject, t, monitor, filter);
+      return findTypesInStrictHierarchy(sourceProject, t, monitor, filter);
     }
     catch (JavaModelException e) {
       throw new SdkException(e);
@@ -151,9 +149,8 @@ public final class JdtUtils {
   }
 
   /**
-   * Gets all {@link IType}s on the classpath of the give {@link IJavaProject} that are sub classes of the given
-   * baseType and fulfill the given filter. If the base type itself fulfills the given filter, it is included in the
-   * result.
+   * Gets all {@link IType}s on the classpath of the give {@link IJavaProject} that are sub types of the given baseType
+   * and fulfill the given filter. If the base type itself fulfills the given filter, it is included in the result.
    *
    * @param sourceProject
    *          The {@link IJavaProject} defining the classpath.
@@ -168,36 +165,35 @@ public final class JdtUtils {
    * @return A {@link Set} containing the {@link IType}s sorted ascending by simple name and fully qualified name
    *         afterwards.
    */
-  public static Set<IType> findClassesInStrictHierarchy(IJavaProject sourceProject, IType baseType, IProgressMonitor monitor, Predicate<IType> filter) {
+  public static Set<IType> findTypesInStrictHierarchy(IJavaProject sourceProject, IType baseType, IProgressMonitor monitor, Predicate<IType> filter) {
     if (!exists(baseType) || !exists(baseType.getParent()) || !exists(sourceProject)) {
       return emptySet();
     }
 
-    Set<IType> collector = new TreeSet<>(new ElementNameComparator());
-    TypeNameMatchRequestor nameMatchRequestor = new TypeNameMatchRequestor() {
-      @Override
-      public void acceptTypeNameMatch(TypeNameMatch match) {
-        if (monitor != null && monitor.isCanceled()) {
-          throw new OperationCanceledException("strict hierarchy search canceled by monitor.");
-        }
-        if (filter == null || filter.test(match.getType())) {
-          collector.add(match.getType());
+    // do not use SearchEngine.createStrictHierarchyScope because there is a bug in Eclipse 2019-12:
+    // files open in the Java Editor are not included in the result! Use the type hierarchy instead.
+    try {
+      ITypeHierarchy hierarchy = baseType.newTypeHierarchy(sourceProject, monitor);
+      org.eclipse.jdt.core.IType[] jdtTypes = hierarchy.getAllSubtypes(baseType);
+      if (jdtTypes == null || jdtTypes.length < 1) {
+        return emptySet();
+      }
+
+      Set<IType> collector = new TreeSet<>(new ElementNameComparator());
+      for (org.eclipse.jdt.core.IType candidate : jdtTypes) {
+        if (filter == null || filter.test(candidate)) {
+          collector.add(candidate);
         }
       }
-    };
-
-    try {
-      IJavaSearchScope strictHierarchyScope = SearchEngine.createStrictHierarchyScope(sourceProject, baseType, true, true, null);
-      new SearchEngine().searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, null, SearchPattern.R_EXACT_MATCH, IJavaSearchConstants.CLASS, strictHierarchyScope,
-          nameMatchRequestor, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, monitor);
+      return collector;
     }
     catch (OperationCanceledException oce) {
       SdkLog.debug("Strict hierarchy search has been canceled. An incomplete result will be returned.", oce);
+      return emptySet();
     }
     catch (JavaModelException e) {
       throw new SdkException(e);
     }
-    return collector;
   }
 
   /**
