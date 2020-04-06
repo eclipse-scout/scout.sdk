@@ -17,7 +17,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -82,6 +81,7 @@ import org.w3c.dom.Element;
  *
  * @since 5.2.0
  */
+@SuppressWarnings("HardcodedFileSeparator")
 public class WebServiceNewWizardPage extends AbstractWizardPage {
 
   public static final String PROP_WEB_SERVICE_TYPE = "webServiceType";
@@ -459,19 +459,22 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       return null;
     }
     try {
-      @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-      String file = Paths.get(new URL(url).toURI()).getFileName().toString();
-      if (Strings.hasText(file)) {
-        file = file.toLowerCase(Locale.ENGLISH);
-
-        int lastDotPos = file.lastIndexOf('.');
-        if (lastDotPos > 0) {
-          file = file.substring(0, lastDotPos);
+      String path = new URL(url).getPath();
+      if (Strings.hasText(path)) {
+        int lastSlashPos = path.lastIndexOf('/');
+        if (lastSlashPos >= 0) {
+          path = path.substring(lastSlashPos + 1);
         }
-        return JaxWsUtils.removeCommonSuffixes(file);
+        path = path.toLowerCase(Locale.ENGLISH);
+
+        int lastDotPos = path.lastIndexOf('.');
+        if (lastDotPos > 0) {
+          path = path.substring(0, lastDotPos);
+        }
+        return JaxWsUtils.removeCommonSuffixes(path);
       }
     }
-    catch (MalformedURLException | URISyntaxException e) {
+    catch (Exception e) {
       SdkLog.debug("Invalid URL passed.", e);
     }
     return null;
@@ -532,6 +535,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
           .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(JaxWsUtils.JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='")
           .append(JaxWsUtils.JAXWS_MAVEN_PLUGIN_ARTIFACT_ID).append("']");
       List<Element> elements = Xml.evaluateXPath(bindingFilesXpathBuilder.toString(), S2eUtils.getPomDocument(project), prefix, IMavenConstants.POM_XML_NAMESPACE);
+      //noinspection RedundantIfStatement
       if (elements.isEmpty() && containsWsdls(wsdlFolder)) {
         // these are jaxws project that contain wsdls but they are not listed in the pom (auto discovery).
         // we do not support these because when adding a new wsdl to the pom, the existing ones will be ignored.
