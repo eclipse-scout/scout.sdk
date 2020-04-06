@@ -67,7 +67,7 @@ public class MissingTranslationQuery implements IFileQuery {
     Pattern jsTextKeyPat2 = Pattern.compile("session\\.text\\(('?)(" + nlsKeyPattern + ")('?)");
 
     Map<String, Collection<Pattern>> patternsByFile = new HashMap<>(3);
-    patternsByFile.put(JavaTypes.JAVA_FILE_EXTENSION, singletonList(Pattern.compile("TEXTS\\.get\\((?:[a-zA-Z0-9_]+,\\s*)?(\")(" + nlsKeyPattern + ")(\")")));
+    patternsByFile.put(JavaTypes.JAVA_FILE_EXTENSION, singletonList(Pattern.compile("TEXTS\\.get\\((?:[a-zA-Z0-9_]+,\\s*)?(\")?(" + nlsKeyPattern + ")(\")?")));
     patternsByFile.put("js", unmodifiableList(asList(jsTextKeyPat1, jsTextKeyPat2)));
     patternsByFile.put("html", singletonList(Pattern.compile("<scout:message key=\"(" + nlsKeyPattern + ")\"\\s*/?>")));
 
@@ -120,8 +120,11 @@ public class MissingTranslationQuery implements IFileQuery {
       keyGroup = 2;
       boolean noLiteral = Strings.isEmpty(match.group(1)) || Strings.isEmpty(match.group(3));
       if (noLiteral) {
-        // is no string literal. might be e variable or concatenation. add to findings for manual review.
-        registerMatch(match, fileQueryInput, m_matches, keyGroup);
+        // is no string literal. might be e variable or concatenation.
+        if (!tryToResolveConstant(match.group(keyGroup), fileQueryInput, env, progress)) {
+          // cannot be resolved as constant. register as match for manual review
+          registerMatch(match, fileQueryInput, m_matches, keyGroup);
+        }
         return;
       }
     }
@@ -129,7 +132,22 @@ public class MissingTranslationQuery implements IFileQuery {
       // pattern without literal delimiter
       keyGroup = 1;
     }
+    registerMatchIfNlsKeyIsMissing(match, keyGroup, fileQueryInput, env, progress);
+  }
 
+  protected boolean tryToResolveConstant(String constantName, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
+    Pattern constantPat = Pattern.compile("final\\s+[\\w]+\\s+" + constantName + "\\s*=\\s*\"(" + ITranslation.KEY_REGEX.pattern() + ")\"");
+    CharSequence content = CharBuffer.wrap(fileQueryInput.fileContent());
+    Matcher constantMatcher = constantPat.matcher(content);
+    boolean constantFound = false;
+    while (constantMatcher.find()) {
+      registerMatchIfNlsKeyIsMissing(constantMatcher, 1, fileQueryInput, env, progress);
+      constantFound = true;
+    }
+    return constantFound;
+  }
+
+  protected void registerMatchIfNlsKeyIsMissing(MatchResult match, int keyGroup, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
     String key = match.group(keyGroup);
     if (!keyExists(fileQueryInput.module(), key, env, progress)) {
       registerMatch(match, fileQueryInput, m_matches, keyGroup);

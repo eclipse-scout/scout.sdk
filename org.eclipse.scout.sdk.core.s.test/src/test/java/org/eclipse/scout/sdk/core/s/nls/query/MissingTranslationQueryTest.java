@@ -39,6 +39,8 @@ public class MissingTranslationQueryTest {
   public void test(TestingEnvironment env) {
     String existing = "key";
     String fileHtml = "test.html";
+    String nonExistingConstantJavaTestFile = "test7.java";
+    String unresolvableConstantJavaTestFile = "test8.java";
     MissingTranslationQuery query = createQueryWithKeys(existing);
 
     searchIn(query, "test1.java", "abc TEXTS.get(\"aa\") def", env);
@@ -46,6 +48,9 @@ public class MissingTranslationQueryTest {
     searchIn(query, "test3.java", "abc TEXTS.get(\"cc\", arg1, arg2) def", env);
     searchIn(query, "test4.java", "abc TEXTS.get(locale, \"dd\", arg1, arg2) def", env);
     searchIn(query, "test5.java", "abc TEXTS.get(\"" + existing + "\") def", env);
+    searchIn(query, "test6.java", "public static final String CONSTANT = \"" + existing + "\"; TEXTS.get(CONSTANT) def", env);
+    searchIn(query, nonExistingConstantJavaTestFile, "public static final String CONSTANT = \"non_existing\"; TEXTS.get(CONSTANT) def", env);
+    searchIn(query, unresolvableConstantJavaTestFile, "abc TEXTS.get(flag ? \"first\" : \"second\") def", env);
 
     searchIn(query, "test1.js", "abc '${textKey:ee}' def", env);
     searchIn(query, "test2.js", "abc session.text('ff')} def", env);
@@ -58,15 +63,21 @@ public class MissingTranslationQueryTest {
     searchIn(query, "test.xml", "abc <scout:message key=\"kk\"> def", env);
     searchIn(query, "abc/src/test/java/test.html", "abc <scout:message key=\"ll\"> def", env); // ignore path
 
-    assertEquals(8, query.result().count());
+    assertEquals(10, query.result().count());
     assertEquals(0, query.result(Paths.get("notexisting")).size());
 
-    Set<FileRange> htmlFileResult = query.result(Paths.get(fileHtml));
+    assertFileRange(query, unresolvableConstantJavaTestFile, 14, 18);
+    assertFileRange(query, nonExistingConstantJavaTestFile, 39, 51);
+    assertFileRange(query, fileHtml, 24, 26);
+  }
+
+  protected static void assertFileRange(MissingTranslationQuery query, String fileName, int expectedStart, int expectedEnd) {
+    Set<FileRange> htmlFileResult = query.result(Paths.get(fileName));
     assertEquals(1, htmlFileResult.size());
 
     FileRange finding = htmlFileResult.iterator().next();
-    assertEquals(24, finding.start());
-    assertEquals(26, finding.end());
+    assertEquals(expectedStart, finding.start());
+    assertEquals(expectedEnd, finding.end());
   }
 
   protected static MissingTranslationQuery createQueryWithKeys(String... keys) {
