@@ -153,6 +153,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
             indicator.text2 = handler.toString()
             val start = System.currentTimeMillis()
             try {
+                SdkLog.debug("Executing handler '{}'", handler)
                 fileWrites.addAll(handler.apply(env, progress.newChild(1)))
             } catch (e: ProcessCanceledException) {
                 SdkLog.debug("{} has been cancelled.", indicator.text2, e)

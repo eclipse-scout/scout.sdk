@@ -2,6 +2,7 @@ package org.eclipse.scout.sdk.s2i
 
 import com.intellij.notification.NotificationGroup
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -11,6 +12,7 @@ import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.log.ISdkConsoleSpi
 import org.eclipse.scout.sdk.core.log.LogMessage
 import org.eclipse.scout.sdk.core.log.SdkConsole
+import org.eclipse.scout.sdk.core.util.Strings
 import java.util.logging.Level
 
 open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
@@ -32,6 +34,17 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
         Disposer.register(project, this)
         m_previousConsoleSpi = existingConsoleSpi
         SdkConsole.setConsoleSpi(this)
+
+        if (isRunningInSandbox()) {
+            m_textLog.setLevel(org.apache.log4j.Level.ALL)
+        }
+    }
+
+    protected fun isRunningInSandbox(): Boolean {
+        val sandbox = "sandbox"
+        return Strings.countMatches(PathManager.getPluginsPath(), sandbox) > 0
+                || Strings.countMatches(PathManager.getConfigPath(), sandbox) > 0
+                || Strings.countMatches(PathManager.getSystemPath(), sandbox) > 0
     }
 
     /**
