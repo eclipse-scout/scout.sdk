@@ -27,7 +27,9 @@ import org.eclipse.scout.sdk.core.util.Ensure;
  */
 public final class ScoutFixtureHelper {
 
+  @SuppressWarnings("HardcodedFileSeparator")
   public static final String SHARED_FIXTURE_PATH = "src/test/shared";
+  @SuppressWarnings("HardcodedFileSeparator")
   public static final String CLIENT_FIXTURE_PATH = "src/test/client";
 
   private ScoutFixtureHelper() {
@@ -45,10 +47,7 @@ public final class ScoutFixtureHelper {
    */
   public static void createPageDataAssertNoCompileErrors(String modelFqn, Consumer<IType> withDtoTask) {
     BiFunction<IJavaEnvironment, IJavaEnvironment, IType> createPageData = (shared, client) -> CoreScoutTestingUtils.createPageDataAssertNoCompileErrors(modelFqn, client, shared);
-    runWithSharedAndClientEnv(createPageData.andThen(t -> {
-      Optional.ofNullable(withDtoTask).ifPresent(task -> task.accept(t));
-      return null;
-    }));
+    runWithSharedAndClientEnv(createPageData.andThen(pageData -> runDtoTask(pageData, withDtoTask)));
   }
 
   /**
@@ -63,10 +62,7 @@ public final class ScoutFixtureHelper {
    */
   public static void createRowDataAssertNoCompileErrors(String modelFqn, Consumer<IType> withDtoTask) {
     BiFunction<IJavaEnvironment, IJavaEnvironment, IType> createRowData = (shared, client) -> CoreScoutTestingUtils.createRowDataAssertNoCompileErrors(modelFqn, client, shared);
-    runWithSharedAndClientEnv(createRowData.andThen(t -> {
-      Optional.ofNullable(withDtoTask).ifPresent(task -> task.accept(t));
-      return null;
-    }));
+    runWithSharedAndClientEnv(createRowData.andThen(rowData -> runDtoTask(rowData, withDtoTask)));
   }
 
   /**
@@ -81,10 +77,13 @@ public final class ScoutFixtureHelper {
    */
   public static void createFormDataAssertNoCompileErrors(String modelFqn, Consumer<IType> withDtoTask) {
     BiFunction<IJavaEnvironment, IJavaEnvironment, IType> createFormData = (shared, client) -> CoreScoutTestingUtils.createFormDataAssertNoCompileErrors(modelFqn, client, shared);
-    runWithSharedAndClientEnv(createFormData.andThen(t -> {
-      Optional.ofNullable(withDtoTask).ifPresent(task -> task.accept(t));
-      return null;
-    }));
+    runWithSharedAndClientEnv(createFormData.andThen(formData -> runDtoTask(formData, withDtoTask)));
+  }
+
+  static <T> T runDtoTask(IType dto, Consumer<IType> withDtoTask) {
+    Ensure.notNull(dto); // created dto must not be null
+    Optional.ofNullable(withDtoTask).ifPresent(task -> task.accept(dto));
+    return null;
   }
 
   public static <T> T runWithSharedAndClientEnv(BiFunction<IJavaEnvironment /* shared */, IJavaEnvironment /* client */, T> task) {
