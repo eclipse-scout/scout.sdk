@@ -10,6 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.s.derived;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
@@ -18,10 +22,6 @@ import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 
 /**
  * <h3>{@link DtoUpdateHandler}</h3>
@@ -73,19 +73,17 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
     return Optional.empty();
   }
 
-  protected static Optional<FormDataAnnotationDescriptor> findDataAnnotationForFormData(IType modelType) {
-    FormDataAnnotationDescriptor formDataAnnotation = FormDataAnnotationDescriptor.of(modelType);
-    if (FormDataAnnotationDescriptor.isCreate(formDataAnnotation) && formDataAnnotation.getFormDataType() != null) {
-      return Optional.of(formDataAnnotation);
-    }
-    return Optional.empty();
+  protected static Optional<FormDataAnnotationDescriptor> findDataAnnotationForFormData(IType model) {
+    return Optional.of(model)
+        .map(FormDataAnnotationDescriptor::of)
+        .filter(FormDataAnnotationDescriptor::isCreate)
+        .filter(d -> d.getFormDataType() != null);
   }
 
   protected static Optional<DataAnnotationDescriptor> findDataAnnotationForPageData(IType model) {
-    if (model.isInstanceOf(IScoutRuntimeTypes.IPageWithTable)) {
-      return DataAnnotationDescriptor.of(model);
-    }
-    return Optional.empty();
+    return Optional.of(model)
+        .filter(m -> m.isInstanceOf(IScoutRuntimeTypes.IPageWithTable))
+        .flatMap(DataAnnotationDescriptor::of);
   }
 
   protected static Optional<DataAnnotationDescriptor> findDataAnnotationForRowData(IType model) {
@@ -93,11 +91,18 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
     if (model.isInstanceOf(IScoutRuntimeTypes.IColumn) || model.isInstanceOf(IScoutRuntimeTypes.ITableExtension)) {
       return DataAnnotationDescriptor.of(model);
     }
+
     // check for table extension in IPageWithTableExtension
-    if (model.isInstanceOf(IScoutRuntimeTypes.IPageWithTableExtension)) {
-      return model.innerTypes().withInstanceOf(IScoutRuntimeTypes.ITableExtension).first().flatMap(DataAnnotationDescriptor::of);
-    }
-    return Optional.empty();
+    return Optional.of(model)
+        .filter(m -> m.isInstanceOf(IScoutRuntimeTypes.IPageWithTableExtension))
+        .filter(DtoUpdateHandler::containsTableExtension)
+        .flatMap(DataAnnotationDescriptor::of);
+  }
+
+  protected static boolean containsTableExtension(IType model) {
+    return model.innerTypes()
+        .withInstanceOf(IScoutRuntimeTypes.ITableExtension)
+        .existsAny();
   }
 
   @Override
