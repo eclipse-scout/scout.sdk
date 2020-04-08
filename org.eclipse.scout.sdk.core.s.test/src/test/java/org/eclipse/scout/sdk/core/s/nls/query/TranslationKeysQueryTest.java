@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
@@ -56,7 +57,7 @@ public class TranslationKeysQueryTest {
     assertEquals(keyToFind1.length() + 2/*leading and trailing '"' */, finding.length());
     assertEquals(prefix.length(), finding.start());
     assertEquals(expectedEnd, finding.end());
-    assertEquals("FileRange [file=test.java, start=" + prefix.length() + ", end=" + expectedEnd + "]", finding.toString());
+    assertEquals("FileRange [file=test.java, start=" + prefix.length() + ", end=" + expectedEnd + ", severity=" + Level.OFF.intValue() + "]", finding.toString());
 
     assertEquals(finding, finding);
     assertFalse(finding.equals(null));
