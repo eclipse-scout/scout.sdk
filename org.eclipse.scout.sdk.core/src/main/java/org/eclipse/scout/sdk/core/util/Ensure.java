@@ -63,6 +63,34 @@ public final class Ensure {
   }
 
   /**
+   * Ensures that the given expression is {@code false}. Throws an {@link IllegalArgumentException} otherwise.
+   *
+   * @param expression
+   *          The expression to check.
+   * @throws IllegalArgumentException
+   *           if the given expression is {@code true}.
+   */
+  public static void isFalse(boolean expression) {
+    isFalse(expression, "The validated expression is true");
+  }
+
+  /**
+   * Ensures that the given expression is {@code false}. Throws an {@link IllegalArgumentException} otherwise.
+   *
+   * @param expression
+   *          The expression to check.
+   * @param msg
+   *          The message to show if the assertion fails.
+   * @param msgArgs
+   *          The arguments to be placed into the formatting anchors of the given message. See {@link MessageFormatter}.
+   * @throws IllegalArgumentException
+   *           if the given expression is {@code true}.
+   */
+  public static void isFalse(boolean expression, String msg, Object... msgArgs) {
+    isTrue(!expression, msg, msgArgs);
+  }
+
+  /**
    * Ensures that the given {@link Path} points to an existing file.
    *
    * @param candidate

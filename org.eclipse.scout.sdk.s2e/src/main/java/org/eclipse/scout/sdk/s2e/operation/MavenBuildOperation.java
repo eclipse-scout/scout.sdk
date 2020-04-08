@@ -106,7 +106,7 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
   @Override
   public void accept(IEnvironment env, IProgress progress) {
     Ensure.notNull(getBuild());
-    Ensure.isTrue(!getBuild().getGoals().isEmpty());
+    Ensure.isFalse(getBuild().getGoals().isEmpty());
     Ensure.notNull(getBuild().getWorkingDirectory());
 
     progress.init(toString(), 10);

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.generator.type;
 
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
@@ -52,6 +53,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class TypeGeneratorTest {
 
+  @SuppressWarnings("HardcodedFileSeparator")
   private static final String REF_FILE_FOLDER = "org/eclipse/scout/sdk/core/generator/type/";
   private static final AtomicLong INSERTION_ORDER = new AtomicLong();
 
@@ -156,6 +158,7 @@ public class TypeGeneratorTest {
         .toJavaSource()
         .toString();
 
+    //noinspection HardcodedLineSeparator
     assertEquals("public interface GenericIfc<? extends CharSequence & Iterable & Comparable> {\n\n}", src);
   }
 
@@ -228,6 +231,13 @@ public class TypeGeneratorTest {
     assertFieldOrder(2000, FieldGenerator.create().asStatic().asFinal().withElementName("field01"));
     assertFieldOrder(3000, FieldGenerator.create().asFinal().withElementName("field02"));
     assertFieldOrder(4000, FieldGenerator.create().asPrivate().withElementName("field03"));
+  }
+
+  @Test
+  public void testUnableToAddPrimaryTypeToType() {
+    PrimaryTypeGenerator<?> primary = PrimaryTypeGenerator.create();
+    PrimaryTypeGenerator<?> nested = PrimaryTypeGenerator.create();
+    assertEquals("A PrimaryTypeGenerator cannot be added as nested type. Use a TypeGenerator instead.", assertThrows(IllegalArgumentException.class, () -> primary.withType(nested)).getMessage());
   }
 
   protected static void assertMethodOrder(int expectedOrder, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator) {

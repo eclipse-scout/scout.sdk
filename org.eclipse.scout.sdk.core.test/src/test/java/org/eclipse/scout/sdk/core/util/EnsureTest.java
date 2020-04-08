@@ -40,6 +40,12 @@ public class EnsureTest {
   }
 
   @Test
+  public void testIsFalse() {
+    Ensure.isFalse(false);
+    assertEquals("a22b", assertThrows(IllegalArgumentException.class, () -> Ensure.isFalse(true, "a{}b", 22)).getMessage());
+  }
+
+  @Test
   public void testIsTrue() {
     Ensure.isTrue(true);
     assertEquals("a22b", assertThrows(IllegalArgumentException.class, () -> Ensure.isTrue(false, "a{}b", 22)).getMessage());

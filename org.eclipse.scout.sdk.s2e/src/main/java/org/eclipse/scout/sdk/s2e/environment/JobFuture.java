@@ -129,7 +129,7 @@ public final class JobFuture<V> extends Future<V> {
   }
 
   void detectDeadLock() {
-    Ensure.isTrue(!isCurrentContextConflictingWithJobRule(),
+    Ensure.isFalse(isCurrentContextConflictingWithJobRule(),
         "DEADLOCK detected: Cannot wait for future because the scheduling rule of the calling thread is conflicting with the scheduling rule of the future!");
   }
 

@@ -267,7 +267,7 @@ public class TranslationStoreStack {
 
     // validate input
     validateTranslation(newTranslation);
-    Ensure.isTrue(!editableStore.containsKey(newTranslation.key()), "Key '{}' already exists in store {}", newTranslation.key(), editableStore);
+    Ensure.isFalse(editableStore.containsKey(newTranslation.key()), "Key '{}' already exists in store {}", newTranslation.key(), editableStore);
     Ensure.isTrue(m_stores.contains(editableStore), "Store of wrong stack.");
 
     // create new text
@@ -319,7 +319,7 @@ public class TranslationStoreStack {
   public synchronized void changeKey(String oldKey, String newKey) {
     Ensure.notBlank(oldKey, "Cannot change a blank key.");
     Ensure.notBlank(newKey, "Cannot update to a blank key.");
-    Ensure.isTrue(!translation(newKey).isPresent(), "Cannot change key '{}' to '{}' because the new key already exists.", oldKey, newKey);
+    Ensure.isFalse(translation(newKey).isPresent(), "Cannot change key '{}' to '{}' because the new key already exists.", oldKey, newKey);
 
     setChanging(true);
     try {
@@ -366,7 +366,7 @@ public class TranslationStoreStack {
   protected static void validateTranslation(ITranslation translation) {
     Ensure.notNull(translation, "A translation must be specified.");
     Ensure.notBlank(translation.key(), "Key must be specified.");
-    Ensure.isTrue(!Strings.isEmpty(translation.translation(Language.LANGUAGE_DEFAULT).orElse(null)), "Default language translation must be specified.");
+    Ensure.isFalse(Strings.isEmpty(translation.translation(Language.LANGUAGE_DEFAULT).orElse(null)), "Default language translation must be specified.");
   }
 
   /**

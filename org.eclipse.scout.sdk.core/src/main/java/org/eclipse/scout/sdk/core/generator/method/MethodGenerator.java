@@ -466,14 +466,8 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
   @Override
   public TYPE withoutTypeParameter(String elementName) {
-    Ensure.notBlank(elementName);
-    for (Iterator<ITypeParameterGenerator<?>> it = m_typeParameters.iterator(); it.hasNext();) {
-      ITypeParameterGenerator<?> typeParam = it.next();
-      if (elementName.equals(typeParam.elementName().orElse(null))) {
-        it.remove();
-        return currentInstance();
-      }
-    }
+    Ensure.notNull(elementName);
+    m_typeParameters.removeIf(generator -> elementName.equals(generator.elementName().orElse(null)));
     return currentInstance();
   }
 

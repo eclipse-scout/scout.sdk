@@ -379,7 +379,6 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public Stream<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methods() {
     return m_members.stream()
         .filter(SortedMemberEntry::isMethod)
@@ -450,6 +449,8 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   @Override
   public TYPE withType(ITypeGenerator<?> generator, Object... sortObject) {
+    Ensure.isFalse(generator instanceof ICompilationUnitGenerator<?>,
+        "A {} cannot be added as nested type. Use a {} instead.", PrimaryTypeGenerator.class.getSimpleName(), TypeGenerator.class.getSimpleName());
     m_members.add(new SortedMemberEntry(applyConnection(generator, this), sortObject));
     return currentInstance();
   }
@@ -484,13 +485,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   @Override
   public TYPE withoutTypeParameter(String elementName) {
     Ensure.notNull(elementName);
-    for (Iterator<ITypeParameterGenerator<?>> it = m_typeParameters.iterator(); it.hasNext();) {
-      ITypeParameterGenerator<?> generator = it.next();
-      if (elementName.equals(generator.elementName().orElse(null))) {
-        it.remove();
-        return currentInstance();
-      }
-    }
+    m_typeParameters.removeIf(generator -> elementName.equals(generator.elementName().orElse(null)));
     return currentInstance();
   }
 
