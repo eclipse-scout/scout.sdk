@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.toIdeaProgr
 import org.eclipse.scout.sdk.s2i.toNioPath
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
+import java.util.logging.Level
 
 open class MissingTranslationInspection : LocalInspectionTool() {
 
@@ -66,8 +67,19 @@ open class MissingTranslationInspection : LocalInspectionTool() {
     protected fun toProblemDescription(range: FileRange, file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
         return IdeaEnvironment.computeInReadAction(file.project) {
             val element = file.findElementAt(range.start()) ?: return@computeInReadAction null
-            return@computeInReadAction manager.createProblemDescriptor(element, "Translation key not found", isOnTheFly, LocalQuickFix.EMPTY_ARRAY, ProblemHighlightType.WARNING)
+            val type = julLevelToProblemHighlightType(range.severity())
+            val msg = when (range.severity()) {
+                Level.INFO.intValue() -> "Possibly missing translation key. Check manually and suppress if valid."
+                else -> "Missing translation key"
+            }
+            return@computeInReadAction manager.createProblemDescriptor(element, msg, isOnTheFly, LocalQuickFix.EMPTY_ARRAY, type)
         }
+    }
+
+    protected fun julLevelToProblemHighlightType(severity: Int): ProblemHighlightType = when (severity) {
+        Level.INFO.intValue() -> ProblemHighlightType.WEAK_WARNING
+        Level.SEVERE.intValue() -> ProblemHighlightType.ERROR
+        else -> ProblemHighlightType.WARNING
     }
 
     override fun cleanup(project: Project) {

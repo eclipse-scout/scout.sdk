@@ -11,7 +11,9 @@
 package org.eclipse.scout.sdk.core.s.nls.query;
 
 import static java.util.stream.Collectors.toSet;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -99,6 +101,10 @@ public class TranslationKeysQueryTest {
   }
 
   public static void searchIn(IFileQuery query, String fileName, String fileContent, IEnvironment env) {
-    query.searchIn(new FileQueryInput(Paths.get(fileName), Paths.get("whatever") /*not used*/, fileContent::toCharArray), env, new NullProgress());
+    searchIn(query, fileName, fileContent, "whatever", env);
+  }
+
+  public static void searchIn(IFileQuery query, String fileName, String fileContent, String moduleName, IEnvironment env) {
+    query.searchIn(new FileQueryInput(Paths.get(fileName), Paths.get(moduleName), fileContent::toCharArray), env, new NullProgress());
   }
 }
