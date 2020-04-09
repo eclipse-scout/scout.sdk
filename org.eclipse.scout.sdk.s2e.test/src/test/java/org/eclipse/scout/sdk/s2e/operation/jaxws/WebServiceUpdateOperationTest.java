@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
+import org.eclipse.scout.sdk.core.s.testing.IntegrationTest;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.operation.IWorkingCopyManager;
@@ -33,6 +34,7 @@ import org.eclipse.scout.sdk.s2e.operation.jaxws.WebServiceUpdateOperation.WebSe
 import org.eclipse.scout.sdk.s2e.testing.mock.FileSystemMockFactory;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.xml.sax.SAXException;
 
@@ -42,6 +44,7 @@ import org.xml.sax.SAXException;
  * @author Matthias Villiger
  * @since 5.2.0
  */
+@Category(IntegrationTest.class)
 public class WebServiceUpdateOperationTest {
 
   private static final String PORT_TYPE_NAME_IN_WSDL = "scoutQueryInterface2";
