@@ -537,6 +537,14 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <!-- MissingTranslationQueryTest needs sources of org.eclipse.scout.rt.ui.html.UiTextContributor -->
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.ui.html.test</artifactId>
+        <version>${org.eclipse.scout.rt_version}</version>
+        <scope>compile</scope>
+        <classifier>sources</classifier>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
