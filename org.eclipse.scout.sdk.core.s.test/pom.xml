@@ -130,6 +130,48 @@
   </dependencies>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <!-- Required because the artifact 'org.eclipse.scout.rt.ui.html' exists twice on the classpath (binary jar & source jar) -->
+          <!-- This artifact contains json files in the binary and the source jar which is a resource duplicate. Can be ignored because the json file is not used by the test -->
+          <groupId>org.basepom.maven</groupId>
+          <artifactId>duplicate-finder-maven-plugin</artifactId>
+          <configuration>
+            <skip>${master_sanityCheck_skip}</skip>
+            <printEqualFiles>false</printEqualFiles>
+            <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
+            <failBuildInCaseOfDifferentContentConflict>true</failBuildInCaseOfDifferentContentConflict>
+            <failBuildInCaseOfEqualContentConflict>true</failBuildInCaseOfEqualContentConflict>
+            <checkCompileClasspath>true</checkCompileClasspath>
+            <checkRuntimeClasspath>true</checkRuntimeClasspath>
+            <checkTestClasspath>true</checkTestClasspath>
+            <quiet>false</quiet>
+            <preferLocal>true</preferLocal>
+            <useResultFile>false</useResultFile>
+            <includePomProjects>true</includePomProjects>
+            <ignoredResourcePatterns>
+              <ignoredResourcePattern>.*json$</ignoredResourcePattern> <!-- Added because of 'org.eclipse.scout.rt.ui.html' -->
+              <ignoredResourcePattern>.*ico$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*jpg$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*png$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*gif$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*html$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*xml$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*txt$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*.api_description$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*options$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*properties$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*gitkeep$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*sql$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*xjb$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*exsd$</ignoredResourcePattern>
+              <ignoredResourcePattern>.*about.ini$</ignoredResourcePattern>
+            </ignoredResourcePatterns>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
