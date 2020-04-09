@@ -27,6 +27,7 @@ public class FactoryPathGenerator implements ISourceGenerator<ISourceBuilder<?>>
   private String m_rtVersion;
 
   @Override
+  @SuppressWarnings("HardcodedFileSeparator")
   public void generate(ISourceBuilder<?> builder) {
     String scoutVersion = rtVersion().orElse(ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION);
     builder.append("<factorypath>").nl();
@@ -37,11 +38,11 @@ public class FactoryPathGenerator implements ISourceGenerator<ISourceBuilder<?>>
         .append("/org.eclipse.scout.rt.platform-").append(scoutVersion).append(".jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
     builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/org/eclipse/scout/rt/org.eclipse.scout.rt.server.jaxws/").append(scoutVersion)
         .append("/org.eclipse.scout.rt.server.jaxws-").append(scoutVersion).append(".jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
-    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
+    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/jakarta/servlet/jakarta.servlet-api/4.0.3/jakarta.servlet-api-4.0.3.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
     builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
-    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/javax/jws/javax.jws-api/1.1/javax.jws-api-1.1.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
-    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/javax/annotation/javax.annotation-api/1.3.2/javax.annotation-api-1.3.2.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
-    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/javax/xml/ws/jaxws-api/2.3.1/jaxws-api-2.3.1.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
+    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/jakarta/jws/jakarta.jws-api/1.1.1/jakarta.jws-api-1.1.1.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
+    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
+    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/jakarta/xml/ws/jakarta.xml.ws-api/2.3.3/jakarta.xml.ws-api-2.3.3.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
     builder.append("</factorypath>").nl();
   }
 
