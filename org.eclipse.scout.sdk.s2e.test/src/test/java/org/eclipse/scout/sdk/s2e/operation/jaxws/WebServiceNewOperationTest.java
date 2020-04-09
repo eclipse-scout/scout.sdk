@@ -33,6 +33,7 @@ import org.eclipse.scout.sdk.core.s.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
+import org.eclipse.scout.sdk.core.s.testing.IntegrationTest;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.s2e.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
@@ -41,6 +42,7 @@ import org.eclipse.scout.sdk.s2e.testing.mock.FileSystemMockFactory;
 import org.eclipse.scout.sdk.s2e.util.ScoutStatus;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -66,6 +68,7 @@ public class WebServiceNewOperationTest {
   }
 
   @Test
+  @Category(IntegrationTest.class)
   public void testNewWebServicesConsumerFirst() throws CoreException, IOException, ParserConfigurationException, SAXException, XPathExpressionException {
     File root = CoreScoutTestingUtils.createTestProject();
     try {
@@ -87,6 +90,7 @@ public class WebServiceNewOperationTest {
   }
 
   @Test
+  @Category(IntegrationTest.class)
   public void testNewWebServicesProviderFirst() throws XPathExpressionException, CoreException, ParserConfigurationException, SAXException, IOException {
     File root = CoreScoutTestingUtils.createTestProject();
     try {

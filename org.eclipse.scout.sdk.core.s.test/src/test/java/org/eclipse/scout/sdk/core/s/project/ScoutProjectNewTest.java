@@ -14,8 +14,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
+import org.eclipse.scout.sdk.core.s.testing.IntegrationTest;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * <h3>{@link ScoutProjectNewTest}</h3>
@@ -23,6 +25,7 @@ import org.junit.Test;
  * @author Matthias Villiger
  * @since 5.2.0
  */
+@Category(IntegrationTest.class)
 public class ScoutProjectNewTest {
 
   @Test
