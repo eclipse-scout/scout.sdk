@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.generator.type;
 
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,9 +30,12 @@ import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
+import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -238,6 +242,36 @@ public class TypeGeneratorTest {
     PrimaryTypeGenerator<?> primary = PrimaryTypeGenerator.create();
     PrimaryTypeGenerator<?> nested = PrimaryTypeGenerator.create();
     assertEquals("A PrimaryTypeGenerator cannot be added as nested type. Use a TypeGenerator instead.", assertThrows(IllegalArgumentException.class, () -> primary.withType(nested)).getMessage());
+  }
+
+  @Test
+  public void testAnnotationReferringNestedType(IJavaEnvironment env) {
+    String idFieldName = "ID";
+    PrimaryTypeGenerator<?> primary = PrimaryTypeGenerator.create()
+        .withElementName("Outer")
+        .withPackageName("a.b.c");
+    ITypeGenerator<?> inner = TypeGenerator.create()
+        .withElementName("Inner")
+        .withField(FieldGenerator.create()
+            .asPublic()
+            .asStatic()
+            .asFinal()
+            .withDataType(String.class.getName())
+            .withElementName(idFieldName)
+            .withValue(b -> b.stringLiteral("value")));
+    primary.withType(inner)
+        .withAnnotation(AnnotationGenerator.createGenerated("whatever")
+            .withElement(GeneratedAnnotation.VALUE_ELEMENT_NAME, b -> b.ref(inner.fullyQualifiedName()).dotSign().append(idFieldName)))
+        .withMethod(MethodGenerator.create()
+            .withElementName("setter")
+            .withReturnType(JavaTypes._void)
+            .withParameter(MethodParameterGenerator.create()
+                .withDataType(inner.fullyQualifiedName())
+                .withElementName("param")));
+    IType result = assertNoCompileErrors(env, primary);
+
+    // import to the nested type must be present for the annotation
+    assertEquals(2, result.requireCompilationUnit().imports().count());
   }
 
   protected static void assertMethodOrder(int expectedOrder, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator) {

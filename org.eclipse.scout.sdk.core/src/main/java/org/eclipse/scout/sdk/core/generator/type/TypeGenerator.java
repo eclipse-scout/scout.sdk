@@ -162,12 +162,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
+    super.build(builder);
     IImportValidator currentValidator = builder.context().validator();
     currentValidator.runWithImportCollector(() -> buildType(builder), inner -> new EnclosingTypeScopedImportCollector(inner, this));
   }
 
   protected void buildType(IJavaSourceBuilder<?> builder) {
-    super.build(builder);
     buildTypeDeclaration(MemberBuilder.create(builder));
     builder
         .space()
@@ -320,7 +320,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     }
 
     String declaringFqn = getDeclaringFullyQualifiedName()
-        .orElseThrow(() -> newFail("Cannot calculate the fully qualified name if no parent context is available."));
+        .orElseThrow(() -> newFail("Cannot calculate the fully qualified name of generator '{}' if no parent context is available.", elementName().orElse(null)));
     return new String[]{declaringFqn, null};
   }
 
