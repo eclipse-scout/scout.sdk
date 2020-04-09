@@ -110,7 +110,7 @@
       <!-- MissingTranslationQueryTest needs sources of org.eclipse.scout.rt.ui.html.UiTextContributor -->
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-      <scope>compile</scope>
+      <scope>test</scope>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
