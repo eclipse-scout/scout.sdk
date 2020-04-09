@@ -1,6 +1,6 @@
 package org.eclipse.scout.sdk.s2i.environment
 
-import com.intellij.openapi.application.TransactionGuard
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.project.Project
@@ -54,7 +54,7 @@ class TransactionManager private constructor(val project: Project) {
          */
         fun <T> computeInWriteAction(project: Project, callable: () -> T): T {
             val result = FinalValue<T>()
-            TransactionGuard.getInstance().submitTransactionAndWait {
+            ApplicationManager.getApplication().invokeAndWait {
                 // this is executed in the UI thread! keep short to prevent freezes!
                 // write operations are only allowed in the UI thread
                 // see http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html
@@ -73,6 +73,7 @@ class TransactionManager private constructor(val project: Project) {
     }
 
     private val m_members = HashMap<Path, TransactionMember>()
+
     @Volatile
     private var m_open = true
 

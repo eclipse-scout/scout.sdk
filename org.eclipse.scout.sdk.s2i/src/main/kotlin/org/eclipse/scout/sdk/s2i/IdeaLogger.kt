@@ -1,5 +1,6 @@
 package org.eclipse.scout.sdk.s2i
 
+import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.PathManager
@@ -18,7 +19,7 @@ import java.util.logging.Level
 open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
 
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
-    private val m_balloonLog = NotificationGroup.balloonGroup("Scout SDK")
+    private val m_balloonLog = NotificationGroup("Scout", NotificationDisplayType.BALLOON, true)
     private var m_previousConsoleSpi: ISdkConsoleSpi? = null
 
     /**

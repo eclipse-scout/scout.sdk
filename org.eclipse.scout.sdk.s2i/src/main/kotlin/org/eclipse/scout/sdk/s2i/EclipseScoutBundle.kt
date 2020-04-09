@@ -1,6 +1,6 @@
 package org.eclipse.scout.sdk.s2i
 
-import com.intellij.CommonBundle
+import com.intellij.BundleBase
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -31,7 +31,7 @@ class EclipseScoutBundle : StartupActivity, DumbAware {
         private var ourBundle: Reference<ResourceBundle>? = null
 
         fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String =
-                CommonBundle.message(getBundle(), key, *params)
+                BundleBase.message(getBundle(), key, *params)
 
         fun derivedResourceManager(project: Project): DerivedResourceManager =
                 ServiceManager.getService(project, DerivedResourceManager::class.java)

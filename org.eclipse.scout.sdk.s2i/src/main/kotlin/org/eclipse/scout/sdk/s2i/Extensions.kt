@@ -19,12 +19,14 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.ClassInheritorsSearch
 import com.intellij.structuralsearch.MatchOptions
+import com.intellij.structuralsearch.MatchResultSink
 import com.intellij.structuralsearch.MatchVariableConstraint
 import com.intellij.structuralsearch.Matcher
 import com.intellij.structuralsearch.plugin.util.CollectingMatchResultSink
 import com.intellij.util.CollectionQuery
 import com.intellij.util.Query
 import com.intellij.util.containers.stream
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
@@ -38,6 +40,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import java.nio.file.Path
 import java.util.function.Function
+import java.util.stream.Stream
 
 fun IType.resolvePsi(): PsiClass? {
     val module = this.javaEnvironment().toIdea().module
@@ -127,7 +130,8 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, in
             return indicator ?: EmptyProgressIndicator()
         }
     }
-    Matcher(this).findMatches(result, options)
+
+    findMatches(Matcher(this, options), result, options)
 
     return result.matches
             .asSequence()
@@ -137,6 +141,19 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, in
             .filter { it is PsiClass }
             .map { it as PsiClass }
             .toList()
+}
+
+private fun findMatches(matcher: Matcher, result: MatchResultSink, options: MatchOptions) {
+    // sample taken from com.intellij.structuralsearch.plugin.ui.SearchCommand
+    // the API is different in IntelliJ 19x than in 20x
+    try {
+        val method = Matcher::class.java.getMethod("findMatches", MatchResultSink::class.java)
+        method.invoke(matcher, result)
+    } catch (e: NoSuchMethodException) {
+        SdkLog.debug("Using legacy structural search API")
+        val method = Matcher::class.java.getMethod("findMatches", MatchResultSink::class.java, MatchOptions::class.java)
+        method.invoke(matcher, result, options)
+    }
 }
 
 fun Project.findTypesByName(fqn: String) = findTypesByName(fqn, GlobalSearchScope.allScope(this))
@@ -153,8 +170,10 @@ fun VirtualFile.toNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath()
 
 fun VirtualFile.containingModuleOf(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
 
-fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResult =
-        TreeTraversals.create(visitor, Function { f -> f.supers.stream() }).traverse(this)
+fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResult {
+    val supplier: Function<PsiClass, Stream<out PsiClass>> = Function { a -> a.supers.stream() }
+    return TreeTraversals.create(visitor, supplier).traverse(this)
+}
 
 fun PsiClass.isInstanceOf(vararg parentFqn: String): Boolean =
         IdeaEnvironment.computeInReadAction(project) {
@@ -165,4 +184,3 @@ fun PsiClass.isInstanceOf(vararg parentFqn: String): Boolean =
                     TreeVisitResult.CONTINUE
             }) == TreeVisitResult.TERMINATE
         }
-

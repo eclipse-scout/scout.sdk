@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.s2i.nls
 
-import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbAware
@@ -22,6 +21,7 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
+import com.intellij.psi.PsiModifier
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
@@ -81,10 +81,10 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
                 .asSequence()
                 .filter { IdeaEnvironment.computeInReadAction(module.project) { !it.isDeprecated } }
                 .filter { !it.isEnum }
-                .filter { it.hasModifier(JvmModifier.PUBLIC) }
-                .filter { !it.hasModifier(JvmModifier.ABSTRACT) }
+                .filter { it.hasModifierProperty(PsiModifier.PUBLIC) }
+                .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
                 .filter { it.scope is PsiJavaFile }
-                .filter { it.sourceElement != null }
+                .filter { it.canNavigateToSource() }
                 .map { TypeMapping(it.toScoutType(javaEnv), it) }
                 .filter { it.scoutType != null }
                 .toList()

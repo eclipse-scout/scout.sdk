@@ -10,5 +10,5 @@ open class IdeaHomePathMacro : Macro() {
 
     override fun getDescription(): String = "Installation Path of the running IntelliJ IDEA instance."
 
-    override fun expand(dataContext: DataContext?): String? = PathManager.getHomePath()
+    override fun expand(dataContext: DataContext): String? = PathManager.getHomePath()
 }

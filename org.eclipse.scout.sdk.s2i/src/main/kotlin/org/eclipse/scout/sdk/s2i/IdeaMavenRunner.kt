@@ -72,7 +72,7 @@ open class IdeaMavenRunner : IMavenRunnerSpi, StartupActivity, DumbAware, Dispos
         generalSettings.isPrintErrorStackTraces = debug
 
         val settings: MavenRunnerSettings = runner.settings.clone()
-        settings.mavenProperties = LinkedHashMap<String, String>(build.properties)
+        settings.mavenProperties = LinkedHashMap(build.properties)
         settings.isSkipTests = build.properties.containsKey(MavenBuild.PROPERTY_SKIP_TESTS) || build.properties.containsKey(MavenBuild.PROPERTY_SKIP_TEST_CREATION)
 
         val parameters = MavenRunnerParameters(true, build.workingDirectory.toString(), null,

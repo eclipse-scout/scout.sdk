@@ -1,10 +1,9 @@
 package org.eclipse.scout.sdk.s2i.derived.impl
 
-import com.intellij.lang.jvm.JvmClassKind
-import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
+import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.SearchScope
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler
@@ -36,8 +35,10 @@ open class DtoUpdateHandlerFactory : AbstractDerivedResourceHandlerFactory() {
     protected fun acceptClass(type: PsiClass): Boolean = type.isValid
             && type.isPhysical
             && type.isWritable
-            && type.classKind == JvmClassKind.CLASS
-            && type.hasModifier(JvmModifier.PUBLIC)
-            && type.sourceElement != null
-            && type.scope is PsiJavaFile
+            && !type.isInterface
+            && !type.isAnnotationType
+            && !type.isEnum
+            && type.hasModifierProperty(PsiModifier.PUBLIC)
+            && type.canNavigateToSource()
+            && type.scope is PsiJavaFile // primary type
 }
