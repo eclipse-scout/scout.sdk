@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,6 +47,7 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
     IMethod declaringMethod = parameter.declaringMethod();
     if (Flags.isVarargs(declaringMethod.flags()) && parameter.index() == declaringMethod.parameters().stream().count() - 1) {
       asVarargs(true);
+      //noinspection InstanceVariableUsedBeforeInitialized
       m_dataType = m_dataType.substring(0, m_dataType.length() - 2); // remove one array dimension because it is printed as varargs
     }
   }

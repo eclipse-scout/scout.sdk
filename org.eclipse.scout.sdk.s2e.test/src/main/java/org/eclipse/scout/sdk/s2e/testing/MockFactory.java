@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.s2e.testing;
+
+import static java.util.stream.Collectors.toList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -30,10 +37,6 @@ import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.util.CharSequenceInputStream;
-
-import static java.util.stream.Collectors.toList;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 /**
  * <h3>{@link MockFactory}</h3>
@@ -86,6 +89,7 @@ public final class MockFactory {
     IFile f = mock(IFile.class);
     when(f.exists()).thenAnswer(invocation -> icus.containsKey(name));
     try {
+      //noinspection resource,IOResourceOpenedButNotSafelyClosed
       when(f.getContents()).thenAnswer(invocation -> new CharSequenceInputStream(icus.get(name), StandardCharsets.UTF_8));
     }
     catch (CoreException e) {
@@ -94,7 +98,7 @@ public final class MockFactory {
     try {
       when(icu.getSource()).thenAnswer(invocation -> icus.get(name));
     }
-    catch(JavaModelException e) {
+    catch (JavaModelException e) {
       throw new SdkException(e);
     }
     try {

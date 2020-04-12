@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ public class PropertySupportTest {
   private static final String PROP_NAME = "prop";
 
   @Test
+  @SuppressWarnings({"CallToSystemGC", "UnusedAssignment"})
   public void testEventListenerAllProperties() {
     PropertySupport ps = new PropertySupport(this);
     P_Listener l = new P_Listener();
@@ -57,6 +58,7 @@ public class PropertySupportTest {
   }
 
   @Test
+  @SuppressWarnings({"CallToSystemGC", "UnusedAssignment"})
   public void testNoFireWeakListenerAfterReclaim() {
     PropertySupport ps = new PropertySupport(this);
     PropertyChangeListener wl = new P_WeakListener();
@@ -163,7 +165,7 @@ public class PropertySupportTest {
   }
 
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testEqualsAndHashCode() {
     PropertySupport a = new PropertySupport();
     PropertySupport b = new PropertySupport("source");

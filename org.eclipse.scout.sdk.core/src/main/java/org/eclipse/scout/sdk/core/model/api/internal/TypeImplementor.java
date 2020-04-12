@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,16 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.model.api.internal;
+
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
@@ -28,16 +38,6 @@ import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 @SuppressWarnings("squid:S2160")
 public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implements IType {
@@ -322,6 +322,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     }
     String myName = name();
     String unboxed = JavaTypes.unboxToPrimitive(myName);
+    //noinspection StringEquality
     if (unboxed == myName) {
       return this; // there is no primitive type for this type
     }

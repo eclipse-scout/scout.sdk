@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -135,6 +135,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   }
 
   protected Type getBestMatchingSuperType(Iterable<String> candidates) {
+    //noinspection resource
     IJavaEnvironment env = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
     for (String superTypeCandidate : candidates) {
       if (env.exists(superTypeCandidate)) {
@@ -147,6 +148,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
   protected synchronized AstNodeFactory getFactory() {
     if (m_nodeFactory == null) {
+      //noinspection AccessToStaticFieldLockedOnInstance
       m_nodeFactory = astNodeFactoryProvider.createFactoryFor(this);
     }
     return m_nodeFactory;
@@ -244,6 +246,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
     addLinkedPositionProposalProvider(groupId, new P_HierarchyCallable(hierarchyBaseTypeFqn));
   }
 
+  @SuppressWarnings("CallToNumericToString")
   @Override
   public void addLinkedPositionProposalsBoolean(String groupId) {
     addLinkedPositionProposal(groupId, Boolean.FALSE.toString());

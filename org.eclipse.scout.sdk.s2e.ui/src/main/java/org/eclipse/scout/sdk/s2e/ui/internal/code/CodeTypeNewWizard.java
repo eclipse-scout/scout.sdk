@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,6 +41,7 @@ public class CodeTypeNewWizard extends AbstractWizard implements INewWizard {
         .withUiAction((op, d) -> d.asyncExec(() -> S2eUiUtils.openInEditor(op.getCreatedCodeType(), false)));
   }
 
+  @SuppressWarnings("resource")
   protected void mapPageToOperation(PageToOperationMappingInput input, CodeTypeNewOperation op) {
     op.setCodeTypeName(m_page1.getIcuName());
     op.setPackage(m_page1.getTargetPackage());

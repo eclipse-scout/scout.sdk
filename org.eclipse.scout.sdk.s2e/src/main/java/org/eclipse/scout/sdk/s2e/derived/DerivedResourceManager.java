@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -85,6 +85,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     m_triggerHandlers = new ArrayBlockingQueue<>(200, true);
 
     m_runQueuedTriggerHandlersJob = new P_RunQueuedTriggerHandlersJob(m_triggerHandlers);
+    //noinspection ThisEscapedInObjectConstruction
     m_javaDeltaCheckJob = new P_ResourceChangeEventCheckJob(this, m_javaChangeEventsToCheck);
   }
 
@@ -283,6 +284,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     int numInterrupted = 0;
     do {
       try {
+        //noinspection UnusedAssignment
         interrupted = false;
         if (timeout == 0) {
           // immediate insert try (no waiting)

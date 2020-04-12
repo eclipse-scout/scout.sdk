@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -363,10 +362,7 @@ public final class S2eUiUtils {
 
     IStructuredSelection structSel = (IStructuredSelection) selection;
     Set<IResource> resourceSet = new LinkedHashSet<>(structSel.size());
-
-    Iterator<?> iterator = structSel.iterator();
-    while (iterator.hasNext()) {
-      Object selElem = iterator.next();
+    for (Object selElem : structSel) {
       if (selElem instanceof IWorkingSet) {
         IWorkingSet workingSet = (IWorkingSet) selElem;
         if (workingSet.isEmpty() && workingSet.isAggregateWorkingSet()) {

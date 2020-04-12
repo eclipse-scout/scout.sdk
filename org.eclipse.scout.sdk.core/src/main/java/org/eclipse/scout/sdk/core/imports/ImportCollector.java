@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -260,7 +260,8 @@ public class ImportCollector implements IImportCollector {
       return e1.m_simpleName.compareTo(e2.m_simpleName);
     }
 
-    private static int compareStrings(String a, String b) {
+    private static int compareStrings(@SuppressWarnings("TypeMayBeWeakened") String a, String b) {
+      //noinspection StringEquality
       if (a == b) {
         return 0;
       }

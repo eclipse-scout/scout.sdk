@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s.util;
 
+import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -19,8 +21,6 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 
 /**
  * <h3>{@link CoreScoutUtils}</h3>
@@ -67,6 +67,7 @@ public final class CoreScoutUtils {
       }
       return v - ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }
+    //noinspection ConstantConditions
     if (orderValueBefore != null && orderValueAfter != null) {
       // insert between two types
       double a = orderValueBefore;
@@ -134,6 +135,7 @@ public final class CoreScoutUtils {
     double prevIntHigh = Math.max(lowCeil, highFloor);
 
     // special case for stepwise increase
+    //noinspection NumericCastThatLosesPrecision
     if ((int) low % ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP == 0 && low + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP < high) {
       return low + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
@@ -105,6 +106,7 @@ public class JreInfo {
   protected List<Path> resolvePlatformLibrariesLegacy() {
     // fall back to try to retrieve them out of the lib directory
     Path jreHome = jreHome();
+    //noinspection HardcodedFileSeparator
     Stream<Path> libDirs = Stream.of(jreHome.resolve("lib"), jreHome.resolve("lib/ext"));
 
     List<Path> result = libDirs
@@ -134,7 +136,7 @@ public class JreInfo {
     }
   }
 
-  protected static String parseVersion(List<String> lines) {
+  protected static String parseVersion(Iterable<String> lines) {
     String prefix = "JAVA_VERSION=";
     for (String line : lines) {
       if (Strings.isBlank(line)) {
@@ -212,6 +214,7 @@ public class JreInfo {
     }
 
     // in Java9 the src.zip is in the lib folder inside java-home.
+    //noinspection HardcodedFileSeparator
     Path innerSrcZip = jreHome.resolve("lib/src.zip");
     if (Files.isReadable(innerSrcZip) && Files.isRegularFile(innerSrcZip)) {
       return innerSrcZip;

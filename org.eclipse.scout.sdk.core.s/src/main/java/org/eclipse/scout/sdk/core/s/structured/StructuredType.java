@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,10 +16,11 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isDeprecated;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isEnum;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
+import static org.eclipse.scout.sdk.core.s.util.ScoutTypeComparators.orderAnnotationComparator;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -339,7 +340,7 @@ public class StructuredType implements IStructuredType {
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
           break;
         case TYPE_VIEW_BUTTON:
-          visitTypeViewbuttons(unknownTypes);
+          visitTypeViewButtons(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_VIEW_BUTTON);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
           break;
@@ -522,7 +523,6 @@ public class StructuredType implements IStructuredType {
       IMethod method = (IMethod) it.next();
       CompositeObject key = createPropertyMethodKey(method);
       if (key != null) {
-
         localPropertyMethods.put(key, method);
         it.remove();
       }
@@ -539,229 +539,83 @@ public class StructuredType implements IStructuredType {
       it.remove();
     }
     m_elements.put(Categories.METHOD_UNCATEGORIZED, new ArrayList<>(methods.values()));
-
   }
 
   protected void visitTypeFormFields(Iterable<IJavaElement> workingSet) {
-    Set<IType> formFields = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IFormField));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        formFields.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_FORM_FIELD, new ArrayList<>(formFields));
+    consumeType(workingSet, IScoutRuntimeTypes.IFormField, Categories.TYPE_COLUMN, orderAnnotationComparator(false));
   }
 
   protected void visitTypeColumns(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IColumn));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_COLUMN, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.IColumn, Categories.TYPE_FORM_FIELD, orderAnnotationComparator(false));
   }
 
   protected void visitTypeCodes(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ICode));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_CODE, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.ICode, Categories.TYPE_CODE, orderAnnotationComparator(false));
   }
 
   protected void visitTypeForms(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IForm));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_FORM, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.IForm, Categories.TYPE_FORM, orderAnnotationComparator(false));
   }
 
   protected void visitTypeTables(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ITable));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_TABLE, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.ITable, Categories.TYPE_TABLE, orderAnnotationComparator(false));
   }
 
   protected void visitTypeTrees(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ITree));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_TREE, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.ITree, Categories.TYPE_TREE, orderAnnotationComparator(false));
   }
 
   protected void visitTypeCalendar(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ICalendar));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_CALENDAR, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.ICalendar, Categories.TYPE_CALENDAR, orderAnnotationComparator(false));
   }
 
   protected void visitTypeCalendarItemProvider(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.ICalendarItemProvider));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_CALENDAR_ITEM_PROVIDER, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.ICalendarItemProvider, Categories.TYPE_CALENDAR_ITEM_PROVIDER, orderAnnotationComparator(false));
   }
 
   protected void visitTypeWizards(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IWizard));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_WIZARD, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.IWizard, Categories.TYPE_WIZARD, orderAnnotationComparator(false));
   }
 
   protected void visitTypeWizardSteps(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IWizardStep));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_WIZARD_STEP, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.IWizardStep, Categories.TYPE_WIZARD_STEP, orderAnnotationComparator(false));
   }
 
   protected void visitTypeMenus(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IMenu));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_MENU, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.IMenu, Categories.TYPE_MENU, orderAnnotationComparator(false));
   }
 
-  protected void visitTypeViewbuttons(Iterable<IJavaElement> workingSet) {
-    Set<IType> types = new TreeSet<>(ScoutTypeComparators.orderAnnotationComparator(false));
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IViewButton));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_VIEW_BUTTON, new ArrayList<>(types));
+  protected void visitTypeViewButtons(Iterable<IJavaElement> workingSet) {
+    consumeType(workingSet, IScoutRuntimeTypes.IViewButton, Categories.TYPE_VIEW_BUTTON, orderAnnotationComparator(false));
   }
 
   protected void visitTypeKeystrokes(Iterable<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.BY_NAME);
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IKeyStroke));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_KEYSTROKE, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.IKeyStroke, Categories.TYPE_KEYSTROKE, ScoutTypeComparators.BY_NAME);
   }
 
   protected void visitTypeComposerAttribute(Iterable<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.BY_NAME);
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IDataModelAttribute));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_COMPOSER_ATTRIBUTE, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.IDataModelAttribute, Categories.TYPE_COMPOSER_ATTRIBUTE, ScoutTypeComparators.BY_NAME);
   }
 
   protected void visitTypeDataModelEntry(Iterable<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.BY_NAME);
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IDataModelEntity));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
-      }
-    }
-    m_elements.put(Categories.TYPE_COMPOSER_ENTRY, new ArrayList<>(types));
+    consumeType(workingSet, IScoutRuntimeTypes.IDataModelEntity, Categories.TYPE_COMPOSER_ENTRY, ScoutTypeComparators.BY_NAME);
   }
 
   protected void visitTypeFormHandlers(Iterable<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.BY_NAME);
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(IScoutRuntimeTypes.IFormHandler));
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
+    consumeType(workingSet, IScoutRuntimeTypes.IFormHandler, Categories.TYPE_FORM_HANDLER, ScoutTypeComparators.BY_NAME);
+  }
+
+  protected void consumeType(Iterable<IJavaElement> workingSet, String typeInterface, Categories category, Comparator<IType> comparator) {
+    Set<IType> types = new TreeSet<>(comparator);
+    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(typeInterface));
+    Iterator<IJavaElement> it = workingSet.iterator();
+    while (it.hasNext()) {
       IType candidate = (IType) it.next();
       if (filter.test(candidate)) {
         types.add(candidate);
         it.remove();
       }
     }
-    m_elements.put(Categories.TYPE_FORM_HANDLER, new ArrayList<>(types));
-  }
-
-  public void print(PrintStream printer) {
-    printer.println("------ Structured type of '" + getType().name() + "' ------------");
-    for (Categories c : Categories.values()) {
-      printCategory(printer, c);
-    }
-    printer.println("---------------------------------------------------------------------------");
-  }
-
-  private void printCategory(PrintStream printer, Categories category) {
-    printer.println("category '" + category.name() + '\'');
-    for (IJavaElement e : getElements(category)) {
-      printer.println("  - " + e.elementName());
-    }
+    m_elements.put(category, new ArrayList<>(types));
   }
 }

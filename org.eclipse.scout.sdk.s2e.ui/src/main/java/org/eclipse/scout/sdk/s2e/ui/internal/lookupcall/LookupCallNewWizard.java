@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,6 +52,7 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
     return m_finishTask;
   }
 
+  @SuppressWarnings("resource")
   protected void mapPageToOperation(PageToOperationMappingInput input, LookupCallNewOperation op) {
     op.setPackage(m_page1.getTargetPackage());
     op.setLookupCallName(m_page1.getIcuName());

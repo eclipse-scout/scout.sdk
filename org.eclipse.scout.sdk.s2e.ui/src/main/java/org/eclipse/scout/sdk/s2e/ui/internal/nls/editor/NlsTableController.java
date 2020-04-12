@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.notNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -253,8 +252,8 @@ public class NlsTableController extends ViewerComparator {
   public List<ITranslationEntry> getSelectedEntries() {
     IStructuredSelection selection = (IStructuredSelection) m_view.tableViewer().getSelection();
     List<ITranslationEntry> result = new ArrayList<>(selection.size());
-    for (Iterator<?> it = selection.iterator(); it.hasNext();) {
-      result.add(entryOfRow(it.next()));
+    for (Object o : selection) {
+      result.add(entryOfRow(o));
     }
     return result;
   }

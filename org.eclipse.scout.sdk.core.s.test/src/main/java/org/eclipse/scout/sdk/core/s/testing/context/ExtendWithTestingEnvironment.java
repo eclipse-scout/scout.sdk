@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,8 @@ import java.lang.annotation.Target;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -59,7 +61,8 @@ public @interface ExtendWithTestingEnvironment {
 
   /**
    * Specifies if created resources should be written to disk. This can be useful if the resource should be available to
-   * a subsequent Maven call (see {@link MavenRunner#execute(MavenBuild)}). Default is {@code false}.
+   * a subsequent Maven call (see {@link MavenRunner#execute(MavenBuild, IEnvironment, IProgress)}). Default is
+   * {@code false}.
    */
   boolean flushToDisk() default false;
 }

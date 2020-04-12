@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -124,41 +124,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, target.getDeclaringFullyQualifiedName().orElse(null));
       context.setVariable(CodeTemplateContextType.TYPENAME, target.elementName().orElse(null));
 
-      TemplateBuffer buffer;
-      try {
-        buffer = context.evaluate(template);
-      }
-      catch (BadLocationException | TemplateException e) {
-        throw new SdkException(e);
-      }
-      String str = buffer.getString();
-      if (Strings.isBlank(str)) {
-        return;
-      }
-
-      TemplateVariable position = findVariable(buffer, CodeTemplateContextType.TAGS); // look if Javadoc tags have to be added
-      if (position == null) {
-        b.append(str);
-        ensureEndsWithNewline(b, str);
-        return;
-      }
-
-      IDocument document = new Document(str);
-      int[] tagOffsets = position.getOffsets();
-      for (int i = tagOffsets.length - 1; i >= 0; i--) { // from last to first
-        try {
-          insertTag(document, tagOffsets[i], position.getLength(), emptyList(), emptyList(), null, emptyList(), false, b.context().lineDelimiter());
-        }
-        catch (BadLocationException e) {
-          throw new SdkException(e);
-        }
-      }
-
-      String comment = document.get();
-      if (comment != null) {
-        b.append(comment);
-        ensureEndsWithNewline(b, comment);
-      }
+      evaluateTemplate(context, template, b, emptyList(), emptyList(), null);
     };
   }
 
@@ -191,16 +157,13 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
         return;
       }
       IJavaProject ownerProject = builderCtx.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
-
       List<String> paramNames = target.parameters()
           .map(IMethodParameterGenerator::elementName)
           .filter(Optional::isPresent)
           .map(Optional::get)
           .collect(toList());
-
       List<String> exceptionNames = target.exceptions()
           .collect(toList());
-
       Optional<String> returnTypeName = target.returnType();
 
       String fieldTypeSimpleName = UNDEFINED_VAR_VALUE;
@@ -247,22 +210,21 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       context.setVariable(CodeTemplateContextType.FIELD, getterSetterName);
       context.setVariable(CodeTemplateContextType.FIELD_TYPE, fieldTypeSimpleName);
       context.setVariable(CodeTemplateContextType.BARE_FIELD_NAME, getterSetterName);
-
       if (!paramNames.isEmpty()) {
         context.setVariable(CodeTemplateContextType.PARAM, paramNames.get(0));
       }
       else {
         context.setVariable(CodeTemplateContextType.PARAM, UNDEFINED_VAR_VALUE);
       }
-
       returnTypeName.ifPresent(s -> context.setVariable(CodeTemplateContextType.RETURN_TYPE, s));
-      TemplateBuffer buffer;
-      try {
-        buffer = context.evaluate(template);
-      }
-      catch (BadLocationException | TemplateException e) {
-        throw new SdkException(e);
-      }
+
+      evaluateTemplate(context, template, b, paramNames, exceptionNames, returnTypeName.orElse(null));
+    };
+  }
+
+  private static void evaluateTemplate(TemplateContext context, Template template, ICommentBuilder<?> b, Iterable<String> paramNames, Iterable<String> exceptionNames, String returnType) {
+    try {
+      TemplateBuffer buffer = context.evaluate(template);
       if (buffer == null) {
         return;
       }
@@ -281,19 +243,17 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       IDocument document = new Document(str);
       int[] tagOffsets = position.getOffsets();
       for (int i = tagOffsets.length - 1; i >= 0; i--) { // from last to first
-        try {
-          insertTag(document, tagOffsets[i], position.getLength(), paramNames, exceptionNames, returnTypeName.orElse(null), emptyList(), false, b.context().lineDelimiter());
-        }
-        catch (BadLocationException e) {
-          throw new SdkException(e);
-        }
+        insertTag(document, tagOffsets[i], position.getLength(), paramNames, exceptionNames, returnType, emptyList(), false, b.context().lineDelimiter());
       }
       String comment = document.get();
       if (comment != null) {
         b.append(comment);
         ensureEndsWithNewline(b, comment);
       }
-    };
+    }
+    catch (BadLocationException | TemplateException e) {
+      throw new SdkException(e);
+    }
   }
 
   @Override

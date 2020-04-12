@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,6 +71,7 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
     IJavaProject jaxWsProject = getJaxWsProject();
     if (JdtUtils.exists(jaxWsProject)) {
       setProjectRoot(jaxWsProject.getProject().getLocation().toFile().toPath());
+      //noinspection resource
       setSourceFolder(EclipseEnvironment.narrow(env)
           .toScoutJavaEnvironment(jaxWsProject)
           .primarySourceFolder()
@@ -155,6 +156,7 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
       IJavaProject jaxWsProject = getJaxWsProject();
       IClasspathEntry[] rawClasspathEntries = jaxWsProject.getRawClasspath();
       List<IClasspathEntry> newEntries = new ArrayList<>(rawClasspathEntries.length);
+      //noinspection HardcodedFileSeparator
       org.eclipse.core.runtime.Path entryPathToSearch = new org.eclipse.core.runtime.Path('/' + jaxWsProject.getElementName() + '/' + entryPath);
       for (IClasspathEntry entry : rawClasspathEntries) {
         if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE && entry.getPath().equals(entryPathToSearch)) {
@@ -165,6 +167,7 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
               newAttributes.add(attrib);
             }
           }
+          //noinspection CallToNumericToString
           newAttributes.add(JavaCore.newClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, Boolean.TRUE.toString()));
           newEntries.add(JavaCore.newSourceEntry(entry.getPath(), entry.getInclusionPatterns(), entry.getExclusionPatterns(), entry.getOutputLocation(), newAttributes.toArray(new IClasspathAttribute[0])));
         }
