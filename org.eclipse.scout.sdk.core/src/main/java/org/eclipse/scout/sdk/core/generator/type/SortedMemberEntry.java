@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.generator.type;
+
+import static org.eclipse.scout.sdk.core.model.api.Flags.isFinal;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isPrivate;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isStatic;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -25,9 +31,6 @@ import org.eclipse.scout.sdk.core.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
-
-import static org.eclipse.scout.sdk.core.model.api.Flags.*;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 /**
  * <h3>{@link SortedMemberEntry}</h3>

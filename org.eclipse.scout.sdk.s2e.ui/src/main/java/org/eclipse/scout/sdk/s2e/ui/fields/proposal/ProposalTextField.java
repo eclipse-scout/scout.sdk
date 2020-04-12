@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal;
+
+import java.util.Collection;
+import java.util.Objects;
+
+import javax.swing.event.EventListenerList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -33,10 +38,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-
-import javax.swing.event.EventListenerList;
-import java.util.Collection;
-import java.util.Objects;
 
 /**
  * <h3>ProposalTextField</h3> Use {@link #setContentProvider(IProposalContentProvider)} to define the proposal content

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.s.dto;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toSet;
+import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 
 import java.beans.Introspector;
 import java.util.Optional;
@@ -42,10 +46,6 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
-
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toSet;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 
 /**
  * <h3>{@link AbstractDtoGenerator}</h3>

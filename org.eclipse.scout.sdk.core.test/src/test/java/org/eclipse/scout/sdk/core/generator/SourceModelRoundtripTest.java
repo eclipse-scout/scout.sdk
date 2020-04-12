@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.generator;
+
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertAnnotation;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldExist;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldType;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodExist;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodReturnType;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.fixture.ClassWithMembers;
 import org.eclipse.scout.sdk.core.fixture.InterfaceWithDefaultMethods;
@@ -24,9 +35,6 @@ import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFacto
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * <h3>{@link SourceModelRoundtripTest}</h3>

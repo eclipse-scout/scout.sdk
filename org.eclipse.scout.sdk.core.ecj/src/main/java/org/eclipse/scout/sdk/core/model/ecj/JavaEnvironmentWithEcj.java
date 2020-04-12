@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,10 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.*;
-import static org.eclipse.scout.sdk.core.util.Ensure.*;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.util.Ensure.fail;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.CharBuffer;
 import java.nio.file.Path;

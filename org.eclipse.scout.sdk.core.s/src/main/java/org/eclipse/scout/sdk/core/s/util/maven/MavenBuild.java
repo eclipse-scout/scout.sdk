@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s.util.maven;
 
-import org.eclipse.scout.sdk.core.util.Ensure;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
-import static java.util.Collections.*;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
  * <h3>{@link MavenBuild}</h3> Represents a Maven Build with all arguments.
