@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,7 +47,7 @@ public final class JobFuture<V> extends Future<V> {
         try {
           AbstractJob j = (AbstractJob) event.getJob();
           j.removeJobChangeListener(this);
-          doCompletion(j.isCancelled(), exception().orElse(null), resultExtractor);
+          doCompletion(j.isCanceled(), exception().orElse(null), resultExtractor);
         }
         catch (Throwable t) {
           completeExceptionally(t); // we must complete here. otherwise the future will never be done (deadlock)
@@ -102,7 +102,7 @@ public final class JobFuture<V> extends Future<V> {
    *          required. No progress is reported on this monitor.
    * @return A {@link Supplier} that returns the computed result
    * @throws CancellationException
-   *           if the computation was cancelled
+   *           if the computation was canceled
    * @throws ExecutionException
    *           if the computation threw an exception
    * @throws InterruptedException

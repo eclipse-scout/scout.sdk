@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.s2e.environment;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -31,8 +39,6 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * <h3>{@link JobFutureTest}</h3>
@@ -198,14 +204,14 @@ public class JobFutureTest {
   @Test
   public void testCancel() throws InterruptedException {
     CountDownLatch futureStarted = new CountDownLatch(1);
-    CountDownLatch futureCancelled = new CountDownLatch(1);
+    CountDownLatch futureCanceled = new CountDownLatch(1);
     AtomicBoolean finished = new AtomicBoolean(false);
     JobFuture<String> future = createFixtureJobFuture(new AbstractJob("") {
       @Override
       protected void execute(IProgressMonitor monitor) {
         futureStarted.countDown();
         try {
-          futureCancelled.await(1, TimeUnit.MINUTES);
+          futureCanceled.await(1, TimeUnit.MINUTES);
         }
         catch (InterruptedException e) {
           throw new SdkException(e);
@@ -220,7 +226,7 @@ public class JobFutureTest {
     futureStarted.await(1, TimeUnit.MINUTES);
     future.cancel(false);
     assertTrue(future.isCancelled());
-    futureCancelled.countDown();
+    futureCanceled.countDown();
     assertThrows(CancellationException.class, future::awaitDoneThrowingOnErrorOrCancel);
     assertFalse(finished.get());
   }

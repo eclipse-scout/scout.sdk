@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,7 @@ public interface IDepthFirstVisitor<T> {
    *          The index of the current element in the list of children of the parent. The root element on which the
    *          visit was started has always the index {@code 0} even if it is not the first in the list of its parent!
    * @return {@code true} if the visit should continue (same as {@link TreeVisitResult#CONTINUE}. {@code false} if the
-   *         visit should be cancelled (same as {@link TreeVisitResult#TERMINATE}.
+   *         visit should be canceled (same as {@link TreeVisitResult#TERMINATE}.
    */
   boolean postVisit(T element, int level, int index);
 }

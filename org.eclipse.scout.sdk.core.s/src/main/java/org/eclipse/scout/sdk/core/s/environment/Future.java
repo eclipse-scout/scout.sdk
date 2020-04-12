@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,7 +66,7 @@ public class Future<V> extends CompletableFuture<Supplier<V>> implements IFuture
 
   /**
    * Waits until all of the futures specified have completed. A future is completed if it ends successfully, threw an
-   * exception or was cancelled.
+   * exception or was canceled.
    *
    * @param futures
    *          The futures to wait for
@@ -102,8 +102,8 @@ public class Future<V> extends CompletableFuture<Supplier<V>> implements IFuture
     return this;
   }
 
-  protected Future<V> doCompletion(boolean isCancelled, Throwable error, Supplier<V> resultExtractor) {
-    if (isCancelled) {
+  protected Future<V> doCompletion(boolean isCanceled, Throwable error, Supplier<V> resultExtractor) {
+    if (isCanceled) {
       completeExceptionally(new CancellationException());
     }
     else {

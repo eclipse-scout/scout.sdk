@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -73,12 +73,11 @@ public abstract class AbstractJob extends Job {
   }
 
   /**
-   * @return {@code true} if this {@link AbstractJob} has been started and was cancelled. This can either be from
-   *         outside (Job{@link #cancel()} or by the internal monitor
-   *         ({@link IProgressMonitor#setCanceled(boolean)}).<br>
-   *         If this {@link AbstractJob} did not start yet or was not cancelled yet, this method returns {@code false}.
+   * @return {@code true} if this {@link AbstractJob} has been started and was canceled. This can either be from outside
+   *         (Job{@link #cancel()} or by the internal monitor ({@link IProgressMonitor#setCanceled(boolean)}).<br>
+   *         If this {@link AbstractJob} did not start yet or was not canceled yet, this method returns {@code false}.
    */
-  public boolean isCancelled() {
+  public boolean isCanceled() {
     return monitor()
         .map(IProgressMonitor::isCanceled)
         .orElse(Boolean.FALSE);
@@ -163,6 +162,7 @@ public abstract class AbstractJob extends Job {
 
     StringBuilder callerStack = new StringBuilder();
     for (StackTraceElement traceElement : cleaned) {
+      //noinspection HardcodedLineSeparator
       callerStack.append("\n\tat ").append(traceElement);
     }
     return callerStack.toString();
@@ -172,17 +172,17 @@ public abstract class AbstractJob extends Job {
     try {
       execute(monitor);
       if (monitor.isCanceled()) {
-        SdkLog.debug("Job '{}' has been cancelled by monitor.", getName());
+        SdkLog.debug("Job '{}' has been canceled by monitor.", getName());
         return Status.CANCEL_STATUS;
       }
       return Status.OK_STATUS;
     }
     catch (CancellationException ce) {
-      SdkLog.debug("Job '{}' has been cancelled.", getName(), ce);
+      SdkLog.debug("Job '{}' has been canceled.", getName(), ce);
       return Status.CANCEL_STATUS;
     }
     catch (OperationCanceledException ce) {
-      SdkLog.debug("Job '{}' has been cancelled.", getName(), ce);
+      SdkLog.debug("Job '{}' has been canceled.", getName(), ce);
       throw ce; // handled by job manager
     }
     catch (LinkageError | CoreException | RuntimeException | ZipError e) {

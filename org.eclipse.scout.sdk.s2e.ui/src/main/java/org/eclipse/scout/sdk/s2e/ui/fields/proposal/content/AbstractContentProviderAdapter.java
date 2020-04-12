@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -183,7 +183,7 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
         return loadedProposals;
       }
 
-      // Do not pass the input monitor to loadProposals() to ensure the load is not cancelled.
+      // Do not pass the input monitor to loadProposals() to ensure the load is not canceled.
       // We want to completely load on the first request and filter only afterwards.
       loadedProposals = loadProposals(new NullProgressMonitor());
       if (loadedProposals == null) {

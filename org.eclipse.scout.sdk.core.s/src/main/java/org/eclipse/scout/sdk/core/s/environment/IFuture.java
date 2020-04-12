@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,7 @@ public interface IFuture<V> extends Future<Supplier<V>>, CompletionStage<Supplie
    *
    * @return A {@link Supplier} that returns the result value
    * @throws CancellationException
-   *           if the computation was cancelled. See {@link #cancel(boolean)} for more details.
+   *           if the computation was canceled. See {@link #cancel(boolean)} for more details.
    * @throws CompletionException
    *           if this future completed exceptionally or a completion computation threw an exception.
    */
@@ -53,7 +53,7 @@ public interface IFuture<V> extends Future<Supplier<V>>, CompletionStage<Supplie
    *          the value to return if not completed
    * @return the result value, if completed, else the given valueIfAbsent
    * @throws CancellationException
-   *           if the computation was cancelled. See {@link #cancel(boolean)} for more details.
+   *           if the computation was canceled. See {@link #cancel(boolean)} for more details.
    * @throws CompletionException
    *           if this future completed exceptionally or a completion computation threw an exception
    * @see #join()
@@ -72,7 +72,7 @@ public interface IFuture<V> extends Future<Supplier<V>>, CompletionStage<Supplie
   /**
    * Waits if necessary for the computation to complete, and then retrieves its result. This method call blocks until
    * the asynchronous task of this {@link IFuture} is completed. A future is completed if it ends successfully, threw an
-   * exception or was cancelled (see {@link #cancel(boolean)} for more details).
+   * exception or was canceled (see {@link #cancel(boolean)} for more details).
    * <p>
    * If completion computations have been registered (e.g. by using {@link #thenRun(Runnable)}), the method call to this
    * {@link #result()} method returns before (!) the completion stage is finished. It returns as soon as the result is
@@ -83,7 +83,7 @@ public interface IFuture<V> extends Future<Supplier<V>>, CompletionStage<Supplie
    * original {@link Exception} was a checked {@link Exception} it is wrapped into a {@link CompletionException}. In
    * that case the original {@link Exception} can be obtained using {@link Exception#getCause()}.
    * <p>
-   * If the future was cancelled, this method throws a {@link CancellationException}.
+   * If the future was canceled, this method throws a {@link CancellationException}.
    * <p>
    * The difference to {@link #get()} is that this method does not make use of checked {@link Exception}s and
    * automatically unwraps unchecked exceptions throwing the original exception if possible.<br>
@@ -99,7 +99,7 @@ public interface IFuture<V> extends Future<Supplier<V>>, CompletionStage<Supplie
    *           if this future completed with a checked exception or a completion computation threw a checked exception.
    *           The original checked exception can be obtained using {@link Exception#getCause()}.
    * @throws CancellationException
-   *           if the future was cancelled.
+   *           if the future was canceled.
    * @see #join()
    * @see #get()
    * @see #cancel(boolean)
@@ -125,7 +125,7 @@ public interface IFuture<V> extends Future<Supplier<V>>, CompletionStage<Supplie
 
   /**
    * Attempts to cancel execution of this task. This attempt will fail if the task has already completed, has already
-   * been cancelled, or could not be cancelled for some other reason.
+   * been canceled, or could not be canceled for some other reason.
    * <p>
    * If successful, and this task has not started when {@code cancel} is called, this task should never run. If the task
    * has already started, then the {@code mayInterruptIfRunning} parameter determines whether the thread executing this
@@ -144,7 +144,7 @@ public interface IFuture<V> extends Future<Supplier<V>>, CompletionStage<Supplie
    * @param mayInterruptIfRunning
    *          {@code true} if the thread executing this task should be interrupted; otherwise, in-progress tasks are
    *          allowed to complete
-   * @return {@code false} if the task could not be cancelled, typically because it has already completed normally;
+   * @return {@code false} if the task could not be canceled, typically because it has already completed normally;
    *         {@code true} otherwise
    */
   @Override

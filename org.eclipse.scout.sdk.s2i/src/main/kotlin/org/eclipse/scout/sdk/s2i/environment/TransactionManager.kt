@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.openapi.application.ApplicationManager
@@ -21,9 +31,9 @@ class TransactionManager private constructor(val project: Project) {
         /**
          * Executes a task within a [TransactionManager] and commits all members on successful completion of the transaction.
          *
-         * Successful completion means the given progress monitor is not cancelled and no exception is thrown from the [runnable].
+         * Successful completion means the given progress monitor is not canceled and no exception is thrown from the [runnable].
          * @param project The [Project] for which the transaction should be started
-         * @param progressProvider A provider for a progress indicator to use when committing the transaction. This provider is also used to determine if the task has been cancelled. Only if not cancelled the transaction will be committed.
+         * @param progressProvider A provider for a progress indicator to use when committing the transaction. This provider is also used to determine if the task has been canceled. Only if not canceled the transaction will be committed.
          * @param runnable The runnable to execute
          */
         fun runInTransaction(project: Project, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, runnable: () -> Unit) {
@@ -97,7 +107,7 @@ class TransactionManager private constructor(val project: Project) {
 
     /**
      * Registers the [TransactionMember] specified. If the running transaction ends the member is asked to commit. If the transaction is not committed
-     * (e.g. because of an error or because the task was cancelled), the member will never be committed. There is no rollback operation.
+     * (e.g. because of an error or because the task was canceled), the member will never be committed. There is no rollback operation.
      * @param member The [TransactionMember] to register.
      */
     fun register(member: TransactionMember) = synchronized(this) {
@@ -120,7 +130,6 @@ class TransactionManager private constructor(val project: Project) {
             if (!save || progress.indicator.isCanceled) {
                 return false
             }
-
             return computeInWriteAction(project) { commitAll(progress) }
         } finally {
             m_members.clear()
