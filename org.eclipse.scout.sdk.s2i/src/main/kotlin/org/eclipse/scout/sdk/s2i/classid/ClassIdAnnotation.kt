@@ -1,6 +1,17 @@
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.sdk.s2i.classid
 
 import com.intellij.psi.*
+import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
@@ -13,6 +24,16 @@ open class ClassIdAnnotation private constructor(val psiClass: PsiClass, val psi
     companion object {
 
         const val VALUE_ATTRIBUTE_NAME = "value"
+
+        fun of(annotation: PsiAnnotation?): ClassIdAnnotation? {
+            if (annotation == null) {
+                return null
+            }
+            val owner = IdeaEnvironment.computeInReadAction(annotation.project) {
+                PsiTreeUtil.getParentOfType(annotation, PsiClass::class.java)
+            } ?: return null
+            return ClassIdAnnotation(owner, annotation)
+        }
 
         fun of(owner: PsiClass?): ClassIdAnnotation? {
             if (owner == null) {
@@ -47,4 +68,22 @@ open class ClassIdAnnotation private constructor(val psiClass: PsiClass, val psi
 
         return if (computedValue is String) computedValue else null
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+        if (javaClass != other?.javaClass) {
+            return false
+        }
+
+        other as ClassIdAnnotation
+        return psiAnnotation == other.psiAnnotation
+    }
+
+    override fun hashCode(): Int {
+        return psiAnnotation.hashCode()
+    }
+
+    override fun toString() = "${ClassIdAnnotation::class.java.simpleName} of ${psiClass.name}"
 }

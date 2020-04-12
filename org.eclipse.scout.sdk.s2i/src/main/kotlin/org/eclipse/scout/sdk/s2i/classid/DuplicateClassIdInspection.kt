@@ -1,126 +1,137 @@
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.sdk.s2i.classid
 
-import com.intellij.analysis.AnalysisScope
-import com.intellij.codeInsight.daemon.HighlightDisplayKey
-import com.intellij.codeInspection.*
-import com.intellij.codeInspection.actions.RunInspectionIntention
-import com.intellij.codeInspection.ex.GlobalInspectionContextUtil
-import com.intellij.codeInspection.ex.InspectionManagerEx
-import com.intellij.ide.PowerSaveMode
-import com.intellij.openapi.project.DumbService
+import com.intellij.codeInspection.InspectionManager
+import com.intellij.codeInspection.LocalInspectionTool
+import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.lang.java.JavaLanguage
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.profile.codeInspection.InspectionProjectProfileManager
-import com.intellij.psi.PsiClass
-import com.intellij.psi.search.SearchScope
-import com.intellij.util.concurrency.AppExecutorUtil
+import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiFile
+import com.intellij.psi.search.GlobalSearchScope.*
+import com.intellij.structuralsearch.MatchOptions
+import com.intellij.util.containers.ContainerUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
-import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
-import org.eclipse.scout.sdk.s2i.isInstanceOf
-import java.awt.FlowLayout
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
-import javax.swing.JCheckBox
-import javax.swing.JComponent
-import javax.swing.JPanel
+import org.eclipse.scout.sdk.s2i.structuralSearch
+import java.util.concurrent.ConcurrentHashMap
 
+open class DuplicateClassIdInspection : LocalInspectionTool() {
 
-open class DuplicateClassIdInspection : GlobalInspectionTool() {
+    private val m_duplicateClassIdsByFile = ConcurrentHashMap<Project, Map<PsiFile, List<ClassIdAnnotation>>>()
+    private val m_duplicateClassIdsByValue = ConcurrentHashMap<Project, Map<String?, List<ClassIdAnnotation>>>()
 
-    var ignoreGenerated = true
-
-    override fun runInspection(scope: AnalysisScope, manager: InspectionManager, globalContext: GlobalInspectionContext, problemDescriptionsProcessor: ProblemDescriptionsProcessor) =
-            runInspection(manager.project, scope.toSearchScope()) { message, duplicate ->
-                val quickFix = ChangeClassIdValueQuickFix(duplicate)
-                val problem = manager.createProblemDescriptor(duplicate.psiAnnotation, message, false, arrayOf(quickFix), ProblemHighlightType.ERROR)
-                problemDescriptionsProcessor.addProblemElement(GlobalInspectionContextUtil.retrieveRefElement(duplicate.psiAnnotation, globalContext), problem)
+    override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
+        try {
+            if (isOnTheFly) {
+                // use optimized implementation for single file
+                return getProblemsForFile(file, manager).toTypedArray()
             }
 
-
-    fun runInspection(project: Project, scope: SearchScope, problemConsumer: (String, ClassIdAnnotation) -> Unit) =
-            project.findAllTypesAnnotatedWith(IScoutRuntimeTypes.ClassId, scope)
-                    .filter { accept(it) }
-                    .mapNotNull { ClassIdAnnotation.of(it) }
-                    .filter { it.hasValue() }
-                    .groupBy { it.value() }
-                    .values
-                    .filter { it.size > 1 }
-                    .forEach { registerProblemFor(it, problemConsumer) }
-
-    protected fun accept(type: PsiClass): Boolean =
-            !ignoreGenerated || !type.isInstanceOf(
-                    IScoutRuntimeTypes.AbstractValueFieldData,
-                    IScoutRuntimeTypes.AbstractFormData,
-                    IScoutRuntimeTypes.AbstractTablePageData,
-                    IScoutRuntimeTypes.AbstractTableFieldBeanData,
-                    IScoutRuntimeTypes.AbstractFormFieldData)
-
-    protected fun registerProblemFor(duplicates: List<ClassIdAnnotation>, problemCollector: (String, ClassIdAnnotation) -> Unit) {
-        for (duplicate in duplicates) {
-            val othersWithSameValue = IdeaEnvironment.computeInReadAction(duplicate.psiClass.project) {
-                duplicates
-                        .filter { d -> d != duplicate }
-                        .map { d -> d.psiClass }
-                        .map { psi -> psi.qualifiedName }
-                        .joinToString(prefix = "[", postfix = "]")
-            }
-            val message = EclipseScoutBundle.message("duplicate.classid.value", othersWithSameValue)
-            problemCollector.invoke(message, duplicate)
+            // use optimized implementation (with caches) for large scopes
+            val duplicates = getDuplicatesByFileCached(file.project)[file] ?: return ProblemDescriptor.EMPTY_ARRAY
+            return duplicates
+                    .mapNotNull { createProblemFor(it, manager, false) }
+                    .toTypedArray()
+        } catch (e: ProcessCanceledException) {
+            SdkLog.debug("Duplicate @ClassId inspection canceled.", e)
+            return ProblemDescriptor.EMPTY_ARRAY
         }
     }
 
-    override fun createOptionsPanel(): JComponent? {
-        val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        val ignoreGeneratedCheckBox = JCheckBox()
-        ignoreGeneratedCheckBox.putClientProperty("html.disable", true)
-        ignoreGeneratedCheckBox.text = EclipseScoutBundle.message("ignore.generated.classes")
-        ignoreGeneratedCheckBox.isSelected = ignoreGenerated
-        ignoreGeneratedCheckBox.addItemListener {
-            ignoreGenerated = ignoreGeneratedCheckBox.isSelected
+    protected fun getProblemsForFile(file: PsiFile, manager: InspectionManager): Set<ProblemDescriptor> {
+        val project = file.project
+        val progress = ProgressManager.getInstance().progressIndicator
+        progress.isIndeterminate = false
+        val classIdAnnotationsInFile = project.findAllTypesAnnotatedWith(IScoutRuntimeTypes.ClassId, fileScope(file), progress)
+                .mapNotNull { ClassIdAnnotation.of(it) }
+                .filter { it.hasValue() }
+                .toList()
+
+        val problems = ContainerUtil.newConcurrentSet<ProblemDescriptor>()
+        classIdAnnotationsInFile.parallelStream().forEach {
+            val findings = searchForAnnotationInProject(it, progress).toList()
+            if (findings.size > 1) {
+                problems.add(createProblemFor(it, manager, true, findings))
+            }
         }
-        panel.add(ignoreGeneratedCheckBox)
-        return panel
+        return problems
     }
 
-    override fun isGraphNeeded(): Boolean = false
+    protected fun searchForAnnotationInProject(classIdAnnotationToFind: ClassIdAnnotation, progress: ProgressIndicator): Sequence<ClassIdAnnotation> {
+        val project = classIdAnnotationToFind.psiClass.project
+        val options = MatchOptions()
+        options.dialect = JavaLanguage.INSTANCE
+        options.isCaseSensitiveMatch = true
+        options.isRecursiveSearch = true
+        options.scope = projectScope(project)
+        options.searchPattern = "@${IScoutRuntimeTypes.ClassId}(\"${classIdAnnotationToFind.value()}\")"
+        return project.structuralSearch(options, progress)
+                .map { it.match }
+                .filter { it.isValid }
+                .filter { it.isPhysical }
+                .filter { it is PsiAnnotation }
+                .map { it as PsiAnnotation }
+                .mapNotNull { ClassIdAnnotation.of(it) }
+                .filter { it.hasValue() }
+    }
 
-    companion object {
+    protected fun getDuplicatesByFileCached(project: Project) = m_duplicateClassIdsByFile.computeIfAbsent(project) { p ->
+        getDuplicatesByValueCached(p)
+                .map { it.value }
+                .flatten()
+                .groupBy { it.psiClass.containingFile }
+    }
 
-        private const val SHORT_NAME = "DuplicateClassId"
+    protected fun getDuplicatesByValueCached(project: Project) = m_duplicateClassIdsByValue.computeIfAbsent(project) { p ->
+        project.findAllTypesAnnotatedWith(IScoutRuntimeTypes.ClassId, allScope(p))
+                .filter { it.isValid }
+                .mapNotNull { ClassIdAnnotation.of(it) }
+                .filter { it.hasValue() }
+                .groupBy { it.value() }
+                .filter { it.value.size > 1 }
+    }
 
-        fun isEnabledFor(project: Project): Boolean = !project.isDisposed
-                && InspectionProjectProfileManager.getInstance(project).currentProfile.isToolEnabled(HighlightDisplayKey.find(SHORT_NAME))
+    protected fun createProblemFor(duplicate: ClassIdAnnotation, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
+        val withSameValue = getDuplicatesByValueCached(duplicate.psiClass.project)[duplicate.value()] ?: return null
+        return createProblemFor(duplicate, manager, isOnTheFly, withSameValue)
+    }
 
-        fun scheduleIfEnabled(project: Project, delay: Long, unit: TimeUnit): ScheduledFuture<*> = AppExecutorUtil.getAppScheduledExecutorService().schedule({
-            try {
-                if (PowerSaveMode.isEnabled()) {
-                    SdkLog.info("Duplicate @ClassId validation skipped because the power save mode is activated.")
-                    return@schedule
-                }
-                if (!isEnabledFor(project)) {
-                    SdkLog.info("Duplicate @ClassId validation skipped because the Inspection is disabled for the project.")
-                    return@schedule
-                }
+    protected fun createProblemFor(duplicate: ClassIdAnnotation, manager: InspectionManager, isOnTheFly: Boolean, withSameValue: List<ClassIdAnnotation>): ProblemDescriptor {
+        val othersWithSameValue = IdeaEnvironment.computeInReadAction(duplicate.psiClass.project) {
+            withSameValue
+                    .filter { d -> d != duplicate }
+                    .map { d -> d.psiClass }
+                    .map { psi -> psi.qualifiedName }
+                    .joinToString()
+        }
+        val message = EclipseScoutBundle.message("duplicate.classid.value", othersWithSameValue)
+        val quickFix = ChangeClassIdValueQuickFix(duplicate)
+        return manager.createProblemDescriptor(duplicate.psiAnnotation, message, isOnTheFly, arrayOf(quickFix), ProblemHighlightType.ERROR)
+    }
 
-                val currentProfile = InspectionProjectProfileManager.getInstance(project).currentProfile
-                val wrapper = currentProfile.getInspectionTool(SHORT_NAME, project)
-                        ?: throw Ensure.newFail("Inspection '{}' could not be found.", SHORT_NAME)
-                val inspectionMgr = InspectionManager.getInstance(project) as InspectionManagerEx
-                val scope = AnalysisScope(project)
-                scope.setSearchInLibraries(false)
-                scope.isIncludeTestSource = true
-
-                DumbService.getInstance(project).smartInvokeLater {
-                    RunInspectionIntention.rerunInspection(wrapper, inspectionMgr, scope, null)
-                }
-                SdkLog.info("Duplicate @ClassId validation scheduled.")
-            } catch (e: Throwable) {
-                SdkLog.error("Error scheduling automatic @ClassId value validation.", e)
-            }
-        }, delay, unit)
+    /**
+     * Executed on not-onTheFly executions of the inspection when the result tab is closed
+     */
+    override fun cleanup(project: Project) {
+        m_duplicateClassIdsByValue.remove(project)
+        m_duplicateClassIdsByFile.remove(project)
+        super.cleanup(project)
     }
 }
-

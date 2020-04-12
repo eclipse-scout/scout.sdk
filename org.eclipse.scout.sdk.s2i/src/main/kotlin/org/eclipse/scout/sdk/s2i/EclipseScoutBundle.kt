@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.sdk.s2i
 
 import com.intellij.BundleBase
@@ -6,13 +16,11 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.util.Disposer
-import org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.jetbrains.annotations.PropertyKey
 import java.lang.ref.Reference
 import java.lang.ref.SoftReference
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class EclipseScoutBundle : StartupActivity, DumbAware {
 
@@ -20,9 +28,7 @@ class EclipseScoutBundle : StartupActivity, DumbAware {
      * Executed on [Project] open
      */
     override fun runActivity(project: Project) {
-        val derivedResourceManager = derivedResourceManager(project)
-        Disposer.register(project, derivedResourceManager)
-        scheduleDuplicateClassIdInspectionIfEnabled(project, TimeUnit.MINUTES.toMillis(10))
+        Disposer.register(project, derivedResourceManager(project))
     }
 
     companion object {
@@ -35,10 +41,6 @@ class EclipseScoutBundle : StartupActivity, DumbAware {
 
         fun derivedResourceManager(project: Project): DerivedResourceManager =
                 ServiceManager.getService(project, DerivedResourceManager::class.java)
-
-        fun scheduleDuplicateClassIdInspectionIfEnabled(project: Project, startupDelayMillis: Long) {
-            DuplicateClassIdInspection.scheduleIfEnabled(project, startupDelayMillis, TimeUnit.MILLISECONDS)
-        }
 
         private fun getBundle(): ResourceBundle {
             val cachedBundle = com.intellij.reference.SoftReference.dereference(ourBundle)

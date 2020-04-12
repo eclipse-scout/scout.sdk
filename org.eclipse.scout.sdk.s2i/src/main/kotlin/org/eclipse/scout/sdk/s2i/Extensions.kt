@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.sdk.s2i
 
 import com.intellij.lang.java.JavaLanguage
@@ -18,10 +28,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.ClassInheritorsSearch
-import com.intellij.structuralsearch.MatchOptions
-import com.intellij.structuralsearch.MatchResultSink
-import com.intellij.structuralsearch.MatchVariableConstraint
-import com.intellij.structuralsearch.Matcher
+import com.intellij.structuralsearch.*
 import com.intellij.structuralsearch.plugin.util.CollectingMatchResultSink
 import com.intellij.util.CollectionQuery
 import com.intellij.util.Query
@@ -32,6 +39,7 @@ import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.util.Ensure
+import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult
@@ -41,6 +49,8 @@ import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import java.nio.file.Path
 import java.util.function.Function
 import java.util.stream.Stream
+
+private val useLegacyMatcher: FinalValue<Boolean> = FinalValue()
 
 fun IType.resolvePsi(): PsiClass? {
     val module = this.javaEnvironment().toIdea().module
@@ -111,9 +121,9 @@ fun Path.toVirtualFile() = LocalFileSystem.getInstance()
         .findFileByIoFile(this.toFile())
         ?.takeIf { it.isValid }
 
-fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope): List<PsiClass> = findAllTypesAnnotatedWith(annotation, scope, null)
+fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope) = findAllTypesAnnotatedWith(annotation, scope, null)
 
-fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, indicator: ProgressIndicator?): List<PsiClass> {
+fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, indicator: ProgressIndicator?): Sequence<PsiClass> {
     val options = MatchOptions()
     options.dialect = JavaLanguage.INSTANCE
     options.isCaseSensitiveMatch = true
@@ -125,36 +135,51 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, in
     constraint.name = "Class"
     options.addVariableConstraint(constraint)
 
-    val result = object : CollectingMatchResultSink() {
-        override fun getProgressIndicator(): ProgressIndicator {
-            return indicator ?: EmptyProgressIndicator()
-        }
-    }
-
-    findMatches(Matcher(this, options), result, options)
-
-    return result.matches
-            .asSequence()
+    return structuralSearch(options, indicator)
             .map { it.match }
             .filter { it.isValid }
             .filter { it.isPhysical }
             .filter { it is PsiClass }
             .map { it as PsiClass }
-            .toList()
+}
+
+fun Project.structuralSearch(query: MatchOptions, indicator: ProgressIndicator?): Sequence<MatchResult> {
+    val progress = indicator ?: EmptyProgressIndicator()
+    val result = object : CollectingMatchResultSink() {
+        override fun getProgressIndicator(): ProgressIndicator {
+            return progress
+        }
+    }
+    findMatches(Matcher(this, query), result, query)
+    return result.matches.asSequence()
 }
 
 private fun findMatches(matcher: Matcher, result: MatchResultSink, options: MatchOptions) {
     // sample taken from com.intellij.structuralsearch.plugin.ui.SearchCommand
     // the API is different in IntelliJ 19x than in 20x
-    try {
-        val method = Matcher::class.java.getMethod("findMatches", MatchResultSink::class.java)
-        method.invoke(matcher, result)
-    } catch (e: NoSuchMethodException) {
-        SdkLog.debug("Using legacy structural search API")
-        val method = Matcher::class.java.getMethod("findMatches", MatchResultSink::class.java, MatchOptions::class.java)
-        method.invoke(matcher, result, options)
+    if (useLegacyMatcher.computeIfAbsentAndGet { isUseLegacyMatcher() }) {
+        findMatchesLegacy(matcher, result, options)
+    } else {
+        findMatchesNew(matcher, result)
     }
 }
+
+private fun isUseLegacyMatcher() =
+        try {
+            findMatchesMethodNew()
+            false
+        } catch (e: NoSuchMethodException) {
+            SdkLog.debug("Using legacy structural search API", e)
+            true
+        }
+
+private fun findMatchesMethodNew() = Matcher::class.java.getMethod("findMatches", MatchResultSink::class.java)
+
+private fun findMatchesMethodLegacy() = Matcher::class.java.getMethod("findMatches", MatchResultSink::class.java, MatchOptions::class.java)
+
+private fun findMatchesNew(matcher: Matcher, result: MatchResultSink) = findMatchesMethodNew().invoke(matcher, result)
+
+private fun findMatchesLegacy(matcher: Matcher, result: MatchResultSink, options: MatchOptions) = findMatchesMethodLegacy().invoke(matcher, result, options)
 
 fun Project.findTypesByName(fqn: String) = findTypesByName(fqn, GlobalSearchScope.allScope(this))
 

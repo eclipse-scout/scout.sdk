@@ -1,15 +1,25 @@
+<!--
+  ~ Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+  ~ All rights reserved. This program and the accompanying materials
+  ~ are made available under the terms of the Eclipse Public License v1.0
+  ~ which accompanies this distribution, and is available at
+  ~ http://www.eclipse.org/legal/epl-v10.html
+  ~
+  ~ Contributors:
+  ~     BSI Business Systems Integration AG - initial API and implementation
+  -->
 <idea-plugin allow-bundled-update="true">
-    <id>org.eclipse.scout.sdk.s2i</id>
-    <name>Eclipse Scout</name>
-    <version>10.0.0.9999999999</version>
+  <id>org.eclipse.scout.sdk.s2i</id>
+  <name>Eclipse Scout</name>
+  <version>10.0.0.9999999999</version>
 
-    <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
+  <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
 
-    <description><![CDATA[
+  <description><![CDATA[
       Eclipse Scout integration for IntelliJ IDEA
     ]]></description>
 
-    <change-notes><![CDATA[
+  <change-notes><![CDATA[
         Adds support for:
         <br>
         <ul>
@@ -18,61 +28,61 @@
           <li>NLS validation inspections</li>
         </ul>
       ]]>
-    </change-notes>
+  </change-notes>
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="192.6817.14"/>
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="192.6817.14"/>
 
-    <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.lang</depends>
-    <depends>com.intellij.modules.java</depends>
-    <depends>org.jetbrains.idea.maven</depends>
-    <depends>com.intellij.copyright</depends>
-    <depends>com.intellij.properties</depends>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.java</depends>
+  <depends>org.jetbrains.idea.maven</depends>
+  <depends>com.intellij.copyright</depends>
+  <depends>com.intellij.properties</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
-        <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.nls.IdeaTranslationStoreSupplier"/>
-        <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator"/>
-        <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaMavenRunner"/>
-        <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdStartup"/>
-        <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.EclipseScoutBundle"/>
+  <extensions defaultExtensionNs="com.intellij">
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.nls.IdeaTranslationStoreSupplier"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaMavenRunner"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdStartup"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.EclipseScoutBundle"/>
 
-        <projectService serviceInterface="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager"
-                        serviceImplementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor"/>
+    <projectService serviceInterface="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager"
+                    serviceImplementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor"/>
 
-        <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
-                             instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
-        <macro implementation="org.eclipse.scout.sdk.s2i.IdeaHomePathMacro"/>
-        <localInspection language="JAVA"
-                         shortName="MissingClassId"
-                         groupName="Scout"
-                         enabledByDefault="false"
-                         level="ERROR"
-                         key="missing.classid.annotation"
-                         implementationClass="org.eclipse.scout.sdk.s2i.classid.MissingClassIdInspection"/>
-        <globalInspection language="JAVA"
-                          shortName="DuplicateClassId"
-                          groupName="Scout"
-                          enabledByDefault="false"
-                          level="ERROR"
-                          key="duplicate.classid.inspection.displayName"
-                          implementationClass="org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection"/>
-      <localInspection shortName="MissingTranslation"
-                       groupName="Scout"
-                       enabledByDefault="true"
-                       level="WARNING"
-                       key="missing.translation.inspection.displayName"
-                       implementationClass="org.eclipse.scout.sdk.s2i.nls.MissingTranslationInspection"/>
-    </extensions>
+    <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
+                         instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
+    <macro implementation="org.eclipse.scout.sdk.s2i.IdeaHomePathMacro"/>
+    <localInspection language="JAVA"
+                     shortName="MissingClassId"
+                     groupName="Scout"
+                     enabledByDefault="false"
+                     level="ERROR"
+                     key="missing.classid.annotation"
+                     implementationClass="org.eclipse.scout.sdk.s2i.classid.MissingClassIdInspection"/>
+    <localInspection language="JAVA"
+                     shortName="DuplicateClassId"
+                     groupName="Scout"
+                     enabledByDefault="false"
+                     level="ERROR"
+                     key="duplicate.classid.inspection.displayName"
+                     implementationClass="org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection"/>
+    <localInspection shortName="MissingTranslation"
+                     groupName="Scout"
+                     enabledByDefault="true"
+                     level="WARNING"
+                     key="missing.translation.inspection.displayName"
+                     implementationClass="org.eclipse.scout.sdk.s2i.nls.MissingTranslationInspection"/>
+  </extensions>
 
-    <actions>
-        <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" text="Scout">
-            <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"/>
-            <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu"
-                    class="org.eclipse.scout.sdk.s2i.derived.impl.UpdateAllDerivedResourcesMenu"/>
-        </group>
-    </actions>
+  <actions>
+    <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" text="Scout">
+      <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"/>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu"
+              class="org.eclipse.scout.sdk.s2i.derived.impl.UpdateAllDerivedResourcesMenu"/>
+    </group>
+  </actions>
 
   <resource-bundle>messages.EclipseScoutBundle</resource-bundle>
 </idea-plugin>

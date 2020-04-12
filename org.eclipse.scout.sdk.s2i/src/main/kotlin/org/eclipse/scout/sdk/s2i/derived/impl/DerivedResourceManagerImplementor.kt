@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,8 +129,11 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         val scope = consumeAllBufferedEvents()
         SdkLog.debug("Check for derived resource updates in scope $scope")
         callInIdeaEnvironment(project, "Update derived resources") { env, progress ->
-            val handlers = synchronized(this) {
-                m_updateHandlerFactories.flatMap { it.createHandlersFor(scope, project) }
+            val factories = synchronized(this) {
+                ArrayList(m_updateHandlerFactories)
+            }
+            val handlers = IdeaEnvironment.computeInReadAction(project) {
+                factories.flatMap { it.createHandlersFor(scope, project).toList() }
             }
             executeHandlers(handlers, env, progress)
         }
@@ -153,14 +156,14 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
             indicator.text2 = handler.toString()
             val start = System.currentTimeMillis()
             try {
-                SdkLog.debug("Executing handler '{}'", handler)
+                SdkLog.debug("Executing derived resource handler: {}", handler)
                 fileWrites.addAll(handler.apply(env, progress.newChild(1)))
             } catch (e: ProcessCanceledException) {
-                SdkLog.debug("{} has been cancelled.", indicator.text2, e)
+                SdkLog.debug("Canceled: {}", indicator.text2, e)
             } catch (e: Exception) {
                 SdkLog.error("Error while: {}", indicator.text2, e)
             } finally {
-                SdkLog.info("Derived Resource Handler ($handler) took {}ms to execute.", System.currentTimeMillis() - start)
+                SdkLog.info("Derived resource handler took {}ms to execute: {}", System.currentTimeMillis() - start, handler)
             }
 
             if (transactionManager.size() >= 500) {
