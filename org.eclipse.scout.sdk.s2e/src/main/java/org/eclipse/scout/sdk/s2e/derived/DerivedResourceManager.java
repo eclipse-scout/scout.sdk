@@ -39,10 +39,10 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.environment.Future;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
 import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
@@ -498,12 +498,12 @@ public class DerivedResourceManager implements IDerivedResourceManager {
 
         if (i % 500 == 0) {
           // flush derived resources to disk in blocks of 500 items. this prevents out-of-memory in large workspaces where the transaction could get to big
-          Future.awaitAll(executedHandlers);
+          SdkFuture.awaitAll(executedHandlers);
           executedHandlers.clear();
           currentWorkingCopyManager().checkpoint(null);
         }
       }
-      Future.awaitAll(executedHandlers); // wait until all write operations are executed. otherwise the java environment might already be closed while writing jobs are using it
+      SdkFuture.awaitAll(executedHandlers); // wait until all write operations are executed. otherwise the java environment might already be closed while writing jobs are using it
     }
 
     private static Collection<? extends IFuture<?>> executeHandler(BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>> handler, IEnvironment env, IProgress progress) {

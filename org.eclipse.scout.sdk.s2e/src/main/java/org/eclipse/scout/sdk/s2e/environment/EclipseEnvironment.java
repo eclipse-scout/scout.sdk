@@ -56,10 +56,10 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
-import org.eclipse.scout.sdk.core.s.environment.Future;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -258,7 +258,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
     catch (RuntimeException e) {
       t = e;
     }
-    return Future.completed(resultExtractor, t);
+    return SdkFuture.completed(resultExtractor, t);
   }
 
   protected <T> IFuture<T> doRunAsync(Consumer<? super EclipseProgress> operation, ISchedulingRule rule, Supplier<T> resultExtractor) {

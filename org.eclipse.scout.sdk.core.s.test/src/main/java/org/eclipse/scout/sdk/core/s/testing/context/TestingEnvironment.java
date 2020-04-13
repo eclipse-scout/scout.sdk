@@ -44,11 +44,11 @@ import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler;
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceInput;
-import org.eclipse.scout.sdk.core.s.environment.Future;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -112,7 +112,7 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
     if (isFlushResourcesToDisk()) {
       err = writeIcuToDisk(targetFolder, result.requireCompilationUnit());
     }
-    return Future.completed(result, err);
+    return SdkFuture.completed(result, err);
   }
 
   protected static Throwable writeIcuToDisk(IClasspathEntry sourceFolder, ICompilationUnit icu) {
@@ -197,7 +197,7 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
         ex = e;
       }
     }
-    return Future.completed(null, ex);
+    return SdkFuture.completed(null, ex);
   }
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")

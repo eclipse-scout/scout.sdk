@@ -23,10 +23,10 @@ import com.intellij.psi.search.SearchScope
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.messages.MessageBusConnection
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.environment.Future
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceHandlerFactory
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
@@ -167,12 +167,12 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
             }
 
             if (transactionManager.size() >= 500) {
-                Future.awaitAll(fileWrites)
+                SdkFuture.awaitAll(fileWrites)
                 fileWrites.clear()
                 transactionManager.checkpoint(null)
             }
         }
-        Future.awaitAll(fileWrites)
+        SdkFuture.awaitAll(fileWrites)
     }
 
     private inner class DocumentSyncListener : FileDocumentManagerListener {

@@ -36,15 +36,24 @@ class TransactionManager private constructor(val project: Project) {
          * @param progressProvider A provider for a progress indicator to use when committing the transaction. This provider is also used to determine if the task has been canceled. Only if not canceled the transaction will be committed.
          * @param runnable The runnable to execute
          */
-        fun runInTransaction(project: Project, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, runnable: () -> Unit) {
+        fun runInNewTransaction(project: Project, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, runnable: () -> Unit) {
             var save = false
             val transactionManager = TransactionManager(project)
             try {
-                runInContext(CURRENT, transactionManager, runnable)
+                runInExistingTransaction(transactionManager, runnable)
                 save = true
             } finally {
                 transactionManager.finishTransaction(save, progressProvider.invoke())
             }
+        }
+
+        /**
+         * Executes the [runnable] specified in the context of the [TransactionManager] specified.
+         * @param transactionManager The [TransactionManager] under which the [runnable] should be executed.
+         * @param runnable The task to execute.
+         */
+        fun runInExistingTransaction(transactionManager: TransactionManager, runnable: () -> Unit) {
+            runInContext(CURRENT, transactionManager, runnable)
         }
 
         /**

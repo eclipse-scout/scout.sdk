@@ -26,10 +26,10 @@ import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.ISdkProperties
-import org.eclipse.scout.sdk.core.s.environment.Future
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.*
 import org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
@@ -152,9 +152,10 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
             doWriteResource(filePath, content)
 
     protected fun doWriteResource(filePath: Path, content: CharSequence): IFuture<Void> {
-        val writer = FileWriter(filePath, content, project)
-        TransactionManager.current().register(writer)
-        return Future.completed(null)
+        // No need for async support here as the FIleWriter is just registered and no actual action is performed yet
+        // The real write is done on transaction commit
+        TransactionManager.current().register(FileWriter(filePath, content, project))
+        return SdkFuture.completed(null)
     }
 
     protected fun doWriteCompilationUnit(generator: ICompilationUnitGenerator<*>, targetFolder: IClasspathEntry, progress: IdeaProgress, sync: Boolean): IFuture<IType?> {

@@ -10,9 +10,9 @@
  */
 package org.eclipse.scout.sdk.s2i.environment
 
-import org.eclipse.scout.sdk.core.s.environment.Future
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 
-class TaskFuture<V>(val task: OperationTask, resultSupplier: (() -> V)?) : Future<V>() {
+class TaskFuture<V>(val task: OperationTask, resultSupplier: (() -> V)?) : SdkFuture<V>() {
 
     init {
         val listener = object : OperationTaskListener {

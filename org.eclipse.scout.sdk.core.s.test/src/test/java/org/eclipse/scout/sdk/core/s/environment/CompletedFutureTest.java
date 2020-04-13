@@ -34,7 +34,7 @@ public class CompletedFutureTest {
   @Test
   public void testResultPresent() throws InterruptedException, ExecutionException, TimeoutException {
     String input = "abc";
-    IFuture<String> f = Future.completed(input);
+    IFuture<String> f = SdkFuture.completed(input);
     assertFalse(f.cancel(true));
     assertFalse(f.isCancelled());
     assertFalse(f.isCompletedExceptionally());
@@ -53,7 +53,7 @@ public class CompletedFutureTest {
 
   @Test
   public void testNoResult() throws InterruptedException, ExecutionException {
-    IFuture<String> f = Future.completed(null);
+    IFuture<String> f = SdkFuture.completed(null);
     assertNull(f.get().get());
     assertNull(f.result());
   }
@@ -61,14 +61,14 @@ public class CompletedFutureTest {
   @Test
   public void testRuntimeException() {
     RuntimeException t = new RuntimeException();
-    IFuture<Object> f = Future.completed(null, t);
+    IFuture<Object> f = SdkFuture.completed(null, t);
     assertSame(t, assertThrows(RuntimeException.class, f::result));
   }
 
   @Test
   public void testException() {
     Exception t = new Exception("msg");
-    IFuture<Object> f = Future.completed(null, t);
+    IFuture<Object> f = SdkFuture.completed(null, t);
     assertFalse(f.cancel(true));
     assertFalse(f.isCancelled());
     assertTrue(f.isCompletedExceptionally());

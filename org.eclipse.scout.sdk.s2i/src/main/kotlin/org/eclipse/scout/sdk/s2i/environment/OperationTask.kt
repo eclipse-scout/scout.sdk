@@ -20,11 +20,13 @@ import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.EventListenerList
 import org.eclipse.scout.sdk.core.util.FinalValue
-import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.runInTransaction
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.runInExistingTransaction
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.runInNewTransaction
 import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.util.concurrent.TimeUnit
 
-open class OperationTask(title: String, project: Project, private val task: (IdeaProgress) -> Unit) : Task.Backgroundable(project, title, true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+open class OperationTask(title: String, project: Project, private val transactionManager: TransactionManager? = null, private val task: (IdeaProgress) -> Unit)
+    : Task.Backgroundable(project, title, true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
 
     private val m_progress = FinalValue<ProgressIndicator>()
     private val m_listeners = EventListenerList()
@@ -37,8 +39,16 @@ open class OperationTask(title: String, project: Project, private val task: (Ide
         val workForCommit = 10
         val workForTask = 1000
         scoutProgress.init(m_name, workForTask + workForCommit)
-        runInTransaction(project, { scoutProgress.newChild(workForCommit) }) {
-            task.invoke(scoutProgress.newChild(workForTask))
+        if (transactionManager == null) {
+            // new independent top level transaction
+            runInNewTransaction(project, { scoutProgress.newChild(workForCommit) }) {
+                task.invoke(scoutProgress.newChild(workForTask))
+            }
+        } else {
+            // new asynchronous task running in existing parent transaction
+            runInExistingTransaction(transactionManager) {
+                task.invoke(scoutProgress.newChild(workForTask))
+            }
         }
     }
 

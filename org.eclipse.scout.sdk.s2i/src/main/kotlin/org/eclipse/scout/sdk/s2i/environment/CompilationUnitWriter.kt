@@ -23,8 +23,8 @@ import com.intellij.util.LocalTimeCounter
 import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitPath
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.s.environment.Future
 import org.eclipse.scout.sdk.core.s.environment.IFuture
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.SdkException
 import java.io.File
 import java.nio.file.Path
@@ -35,11 +35,11 @@ open class CompilationUnitWriter(val project: Project, val source: CharSequence,
 
     fun run(progress: IdeaProgress, resultSupplier: () -> IType?): IFuture<IType?> {
         doWriteCompilationUnit(progress)
-        return Future.completed(resultSupplier, null)
+        return SdkFuture.completed(resultSupplier, null)
     }
 
     fun schedule(resultSupplier: () -> IType?): IFuture<IType?> {
-        val task = OperationTask("Write " + cuPath.fileName(), project, this::doWriteCompilationUnit)
+        val task = OperationTask("Write " + cuPath.fileName(), project, TransactionManager.current(), this::doWriteCompilationUnit)
         return task.schedule(resultSupplier)
     }
 

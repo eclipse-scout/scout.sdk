@@ -311,6 +311,15 @@ public final class CoreUtils {
     }
   }
 
+  private static <T> void setThreadLocal(ThreadLocal<T> tl, T context) {
+    if (context == null) {
+      tl.remove();
+    }
+    else {
+      tl.set(context);
+    }
+  }
+
   /**
    * Gets the value of {@link Object#toString()} of the specified object if the method has been overwritten with a
    * custom implementation.
@@ -346,14 +355,5 @@ public final class CoreUtils {
     }
 
     return Strings.notBlank(val);
-  }
-
-  private static <T> void setThreadLocal(ThreadLocal<T> tl, T context) {
-    if (context == null) {
-      tl.remove();
-    }
-    else {
-      tl.set(context);
-    }
   }
 }

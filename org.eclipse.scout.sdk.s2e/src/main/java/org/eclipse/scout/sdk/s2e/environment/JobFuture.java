@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.environment.Future;
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 
@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.core.util.SdkException;
  *
  * @since 7.0.0
  */
-public final class JobFuture<V> extends Future<V> {
+public final class JobFuture<V> extends SdkFuture<V> {
 
   private final AbstractJob m_job;
 

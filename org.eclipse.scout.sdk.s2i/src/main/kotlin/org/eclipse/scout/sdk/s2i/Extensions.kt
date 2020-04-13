@@ -40,12 +40,14 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
+import java.lang.reflect.InvocationTargetException
 import java.nio.file.Path
 import java.util.function.Function
 import java.util.stream.Stream
@@ -157,11 +159,26 @@ fun Project.structuralSearch(query: MatchOptions, indicator: ProgressIndicator?)
 private fun findMatches(matcher: Matcher, result: MatchResultSink, options: MatchOptions) {
     // sample taken from com.intellij.structuralsearch.plugin.ui.SearchCommand
     // the API is different in IntelliJ 19x than in 20x
-    if (useLegacyMatcher.computeIfAbsentAndGet { isUseLegacyMatcher() }) {
-        findMatchesLegacy(matcher, result, options)
-    } else {
-        findMatchesNew(matcher, result)
+    try {
+        if (useLegacyMatcher.computeIfAbsentAndGet { isUseLegacyMatcher() }) {
+            findMatchesLegacy(matcher, result, options)
+        } else {
+            findMatchesNew(matcher, result)
+        }
+    } catch (e: InvocationTargetException) {
+        throw expandInvocationTargetException(e)
     }
+}
+
+private fun expandInvocationTargetException(e: InvocationTargetException): RuntimeException {
+    var original: Throwable? = e
+    while (original is InvocationTargetException) {
+        original = e.cause
+    }
+    if (original is RuntimeException) {
+        return original
+    }
+    return SdkException(original)
 }
 
 private fun isUseLegacyMatcher() =

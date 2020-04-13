@@ -10,20 +10,27 @@
  */
 package org.eclipse.scout.sdk.core.s.environment;
 
+import static java.util.Collections.emptyList;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
- * <h3>{@link Future}</h3>
+ * <h3>{@link SdkFuture}</h3>
  *
  * @since 7.1.0
  */
-public class Future<V> extends CompletableFuture<Supplier<V>> implements IFuture<V> {
+public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFuture<V> {
 
   /**
    * Creates a completed {@link IFuture} with the specified result.
@@ -61,7 +68,7 @@ public class Future<V> extends CompletableFuture<Supplier<V>> implements IFuture
    *         as computed by the {@link Supplier} specified.
    */
   public static <T> IFuture<T> completed(Supplier<T> resultExtractor, Throwable error) {
-    return new Future<T>().doCompletion(false, error, resultExtractor);
+    return new SdkFuture<T>().doCompletion(false, error, resultExtractor);
   }
 
   /**
@@ -70,29 +77,43 @@ public class Future<V> extends CompletableFuture<Supplier<V>> implements IFuture
    *
    * @param futures
    *          The futures to wait for
-   * @throws RuntimeException
-   *           if there was an exception during the execution of the future.
+   * @return A {@link Collection} holding the {@link Throwable} of the futures that completed exceptionally
    */
-  public static void awaitAll(Iterable<? extends IFuture<?>> futures) {
-    if (futures == null) {
-      return;
+  public static Collection<Throwable> awaitAll(Collection<? extends Future<?>> futures) {
+    if (futures == null || futures.isEmpty()) {
+      return emptyList();
     }
 
-    for (IFuture<?> future : futures) {
-      if (future != null) {
-        future.awaitDoneThrowingOnError();
+    Collection<Throwable> errors = new ArrayList<>(futures.size());
+    for (Future<?> future : futures) {
+      if (future == null) {
+        continue;
+      }
+
+      try {
+        future.get();
+      }
+      catch (ExecutionException e) {
+        errors.add(e.getCause());
+      }
+      catch (InterruptedException e) {
+        throw new SdkException(e);
+      }
+      catch (CancellationException e) {
+        SdkLog.debug("Cancellation silently ignored", e);
       }
     }
+    return errors;
   }
 
   @Override
-  public Future<V> awaitDoneThrowingOnErrorOrCancel() {
+  public SdkFuture<V> awaitDoneThrowingOnErrorOrCancel() {
     result();
     return this;
   }
 
   @Override
-  public Future<V> awaitDoneThrowingOnError() {
+  public SdkFuture<V> awaitDoneThrowingOnError() {
     try {
       join();
     }
@@ -102,7 +123,7 @@ public class Future<V> extends CompletableFuture<Supplier<V>> implements IFuture
     return this;
   }
 
-  protected Future<V> doCompletion(boolean isCanceled, Throwable error, Supplier<V> resultExtractor) {
+  protected SdkFuture<V> doCompletion(boolean isCanceled, Throwable error, Supplier<V> resultExtractor) {
     if (isCanceled) {
       completeExceptionally(new CancellationException());
     }
@@ -129,7 +150,7 @@ public class Future<V> extends CompletableFuture<Supplier<V>> implements IFuture
       return join().get();
     }
     catch (CompletionException e) {
-      SdkLog.debug("Future completed with errors.", e);
+      SdkLog.debug("Future completed exceptionally.", e);
       Throwable cause = e.getCause();
       if (cause instanceof RuntimeException) {
         throw (RuntimeException) cause;

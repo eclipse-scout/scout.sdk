@@ -96,6 +96,9 @@ public interface IEnvironment {
    * <ul>
    * <li>The execution of the {@link ICompilationUnitGenerator} is done in the calling thread and only the write
    * operation is executed asynchronously!</li>
+   * <li>The async write operation runs in the same transaction as the calling thread. Therefore at some point the
+   * calling thread must wait for the async write operation to complete to ensure its result is registered in the
+   * transaction before committing it!</li>
    * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
    * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
    * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
@@ -128,8 +131,8 @@ public interface IEnvironment {
    *          The {@link ISourceGenerator} to execute. Must not be {@code null}.
    * @param targetFolder
    *          The {@link IClasspathEntry} where the specified {@link ISourceGenerator} will be executed. The
-   *          {@link IJavaEnvironment} of the specified {@link IClasspathEntry} is used to resolve imports (decide which imports are required). Must not be
-   *          {@code null}.
+   *          {@link IJavaEnvironment} of the specified {@link IClasspathEntry} is used to resolve imports (decide which
+   *          imports are required). Must not be {@code null}.
    * @return A {@link StringBuilder} containing the result of the specified {@link ISourceGenerator}.
    * @see ISourceGenerator#generate(ISourceBuilder)
    * @see MemorySourceBuilder
@@ -175,9 +178,18 @@ public interface IEnvironment {
    * Executes the specified {@link ISourceGenerator} in the calling thread and asynchronously writes the result to the
    * specified file path.
    * <p>
+   * <b>Notes:</b>
+   * <ul>
+   * <li>The execution of the {@link ISourceGenerator} is done in the calling thread and only the write operation is
+   * executed asynchronously!</li>
+   * <li>The async write operation runs in the same transaction as the calling thread. Therefore at some point the
+   * calling thread must wait for the async write operation to complete to ensure its result is registered in the
+   * transaction before committing it!</li>
+   * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
    * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
    * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
-   * {@link IEnvironment} will be closed.
+   * {@link IEnvironment} will be closed.</li>
+   * </ul>
    *
    * @param generator
    *          The {@link ISourceGenerator} to use to create the content that should be written to the specified file.
@@ -198,9 +210,18 @@ public interface IEnvironment {
   /**
    * Asynchronously writes the specified content to the specified file path.
    * <p>
+   * <b>Notes:</b>
+   * <ul>
+   * <li>The execution of the {@link ISourceGenerator} is done in the calling thread and only the write operation is
+   * executed asynchronously!</li>
+   * <li>The async write operation runs in the same transaction as the calling thread. Therefore at some point the
+   * calling thread must wait for the async write operation to complete to ensure its result is registered in the
+   * transaction before committing it!</li>
+   * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
    * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
    * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
-   * {@link IEnvironment} will be closed.
+   * {@link IEnvironment} will be closed.</li>
+   * </ul>
    *
    * @param content
    *          The new content of the file. Must not be {@code null}.
