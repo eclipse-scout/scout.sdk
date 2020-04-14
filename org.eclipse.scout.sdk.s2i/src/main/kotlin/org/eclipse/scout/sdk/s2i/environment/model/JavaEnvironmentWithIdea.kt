@@ -32,15 +32,10 @@ open class JavaEnvironmentWithIdea(val module: Module) : JavaEnvironmentWithEcj(
             val sdkPath = moduleRootManager.sdk?.homePath
                     ?: throw SdkException("Cannot find JRE in module '{}'.", module.name)
             val sdkRoot = Paths.get(sdkPath)
-            val jreSubFolder = sdkRoot.resolve("jre")
-            if (Files.isDirectory(jreSubFolder) && Files.isReadable(jreSubFolder)) {
-                return jreSubFolder
-            }
-            val jre64SubFolder = sdkRoot.resolve("jre64")
-            if (Files.isDirectory(jre64SubFolder) && Files.isReadable(jre64SubFolder)) {
-                return jre64SubFolder
-            }
-            return sdkRoot
+            return arrayOf("jre", "jre64", "jbr")
+                    .map { sdkRoot.resolve(it) }
+                    .filter { Files.isDirectory(it) }
+                    .firstOrNull { Files.isReadable(it) } ?: sdkRoot
         }
 
         protected fun classpathOf(module: Module): Collection<ClasspathEntry> {
