@@ -11,13 +11,13 @@
 package org.eclipse.scout.sdk.core.log;
 
 import static java.lang.System.lineSeparator;
-import static java.util.Collections.unmodifiableList;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -53,18 +53,18 @@ public class LogMessage {
   }
 
   /**
-   * @return A {@link List} with all {@link Throwable}s of the arguments. Neither the {@link List} nor one of its
+   * @return A {@link Stream} with all {@link Throwable}s of the arguments. Neither the {@link Stream} nor one of its
    *         elements may be {@code null}.
    */
-  public List<Throwable> throwables() {
-    return unmodifiableList(m_throwables);
+  public Stream<Throwable> throwables() {
+    return m_throwables.stream();
   }
 
   /**
    * @return The first {@link Throwable}.
    */
   public Optional<Throwable> firstThrowable() {
-    return throwables().stream().findFirst();
+    return throwables().findFirst();
   }
 
   /**
@@ -86,9 +86,8 @@ public class LogMessage {
    */
   public String all() {
     StringBuilder logContent = new StringBuilder(prefix()).append(text());
-    List<Throwable> throwables = throwables();
-    if (!throwables.isEmpty()) {
-      Iterator<Throwable> iterator = throwables.iterator();
+    if (!m_throwables.isEmpty()) {
+      Iterator<Throwable> iterator = m_throwables.iterator();
       Throwable t = iterator.next();
       logContent.append(lineSeparator()).append(Strings.fromThrowable(t));
       while (iterator.hasNext()) {

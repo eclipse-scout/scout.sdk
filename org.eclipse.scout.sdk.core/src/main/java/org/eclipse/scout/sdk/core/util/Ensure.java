@@ -400,7 +400,7 @@ public final class Ensure {
    */
   public static <T> BinaryOperator<T> failOnDuplicates() {
     return (u, v) -> {
-      throw newFail("Unexpected duplicates found.");
+      throw newFail("Unexpected duplicates found: '{}' and '{}'.", u, v);
     };
   }
 }

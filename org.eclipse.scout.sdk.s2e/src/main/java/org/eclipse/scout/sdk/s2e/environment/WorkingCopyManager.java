@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2e.environment;
 
-import static org.eclipse.scout.sdk.core.util.CoreUtils.runInContext;
+import static org.eclipse.scout.sdk.core.util.CoreUtils.callInContext;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.ArrayList;
@@ -78,7 +78,11 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   static void runWithWorkingCopyManager(Runnable r, IWorkingCopyManager wcm) {
-    runInContext(CURRENT, wcm, r);
+    Supplier<Void> s = () -> {
+      r.run();
+      return null;
+    };
+    callInContext(CURRENT, wcm, s);
   }
 
   private WorkingCopyManager() {
@@ -176,7 +180,8 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   private void ensureOpen() {
-    Ensure.isTrue(isOpen(), "{} has already been commited/rollbacked. No more changes are allowed.", getClass().getName());
+    //noinspection HardcodedFileSeparator
+    Ensure.isTrue(isOpen(), "{} has already been committed/discarded. No more changes are allowed.", getClass().getName());
   }
 
   boolean isOpen() {

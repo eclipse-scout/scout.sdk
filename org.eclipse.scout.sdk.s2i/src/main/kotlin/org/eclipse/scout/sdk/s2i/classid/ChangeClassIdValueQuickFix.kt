@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.runInNewTransaction
 import org.eclipse.scout.sdk.s2i.environment.TransactionMember
 import org.eclipse.scout.sdk.s2i.toNioPath
 import java.nio.file.Path
@@ -29,7 +30,7 @@ open class ChangeClassIdValueQuickFix(val annotation: ClassIdAnnotation) : Local
 
     override fun getFamilyName(): String = quickFixName
 
-    override fun applyFix(project: Project, descriptor: ProblemDescriptor) = TransactionManager.runInNewTransaction(project) {
+    override fun applyFix(project: Project, descriptor: ProblemDescriptor) = runInNewTransaction(project) {
         val newClassIdValue = ClassIds.next(annotation.psiClass.qualifiedName)
         val javaAnnotationSupport = LanguageAnnotationSupport.INSTANCE.forLanguage(annotation.psiClass.language)
         val value = javaAnnotationSupport.createLiteralValue(newClassIdValue, annotation.psiAnnotation)

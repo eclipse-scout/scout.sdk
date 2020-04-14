@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.runInNewTransaction
 import org.eclipse.scout.sdk.s2i.environment.TransactionMember
 import org.eclipse.scout.sdk.s2i.toNioPath
 import java.nio.file.Path
@@ -34,7 +35,7 @@ open class AddMissingClassIdQuickFix : LocalQuickFix {
 
     override fun getFamilyName(): String = quickFixName
 
-    override fun applyFix(project: Project, descriptor: ProblemDescriptor) = TransactionManager.runInNewTransaction(project) {
+    override fun applyFix(project: Project, descriptor: ProblemDescriptor) = runInNewTransaction(project) {
         val psiClass = PsiTreeUtil.getParentOfType(descriptor.psiElement, PsiClass::class.java)
                 ?: throw Ensure.newFail("No class found to add @ClassId. Element: '{}'.", descriptor.psiElement)
         val psiElementFactory = JavaPsiFacade.getElementFactory(project)

@@ -542,11 +542,11 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeFormFields(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IFormField, Categories.TYPE_COLUMN, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutRuntimeTypes.IFormField, Categories.TYPE_FORM_FIELD, orderAnnotationComparator(false));
   }
 
   protected void visitTypeColumns(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IColumn, Categories.TYPE_FORM_FIELD, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutRuntimeTypes.IColumn, Categories.TYPE_COLUMN, orderAnnotationComparator(false));
   }
 
   protected void visitTypeCodes(Iterable<IJavaElement> workingSet) {

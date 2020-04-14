@@ -14,6 +14,7 @@ import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.PathManager
+import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -94,7 +95,10 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
     }
 
     protected fun logToTextFile(msg: LogMessage) {
-        val exception = msg.firstThrowable().orElse(null)
+        val exception = msg.throwables()
+                .filter { it !is ControlFlowException } // ControlFlowExceptions should not be logged. See com.intellij.openapi.diagnostic.Logger.checkException
+                .findFirst()
+                .orElse(null)
         // do not log the prefix here as this information is already logged by the text logger
         when (msg.severity()) {
             Level.SEVERE -> m_textLog.error(msg.text(), exception)

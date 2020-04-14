@@ -22,6 +22,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -290,21 +291,21 @@ public final class CoreUtils {
   }
 
   /**
-   * Executes the specified {@link Runnable} while the specified {@link ThreadLocal} has the specified context value.
+   * Executes the specified {@link Supplier} while the specified {@link ThreadLocal} has the specified context value.
    *
    * @param threadLocal
    *          The {@link ThreadLocal} in which the context should be stored. The initial value of the
    *          {@link ThreadLocal} must be {@code null}!
    * @param context
    *          The context to store. May be {@code null}.
-   * @param runnable
-   *          The runnable to execute. Must not be {@code null}.
+   * @param callable
+   *          The {@link Supplier} to execute. Must not be {@code null}.
    */
-  public static <T> void runInContext(ThreadLocal<T> threadLocal, T context, Runnable runnable) {
+  public static <T, R> R callInContext(ThreadLocal<T> threadLocal, T context, Supplier<R> callable) {
     T orig = threadLocal.get();
     try {
       setThreadLocal(threadLocal, context);
-      runnable.run();
+      return callable.get();
     }
     finally {
       setThreadLocal(threadLocal, orig);

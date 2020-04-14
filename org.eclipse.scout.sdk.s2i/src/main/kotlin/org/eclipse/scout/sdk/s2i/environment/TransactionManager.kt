@@ -17,7 +17,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.ReadonlyStatusHandler
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.util.CoreUtils.runInContext
+import org.eclipse.scout.sdk.core.util.CoreUtils.callInContext
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
 import java.nio.file.Path
@@ -37,24 +37,38 @@ class TransactionManager private constructor(val project: Project) {
          * @param runnable The runnable to execute
          */
         fun runInNewTransaction(project: Project, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, runnable: () -> Unit) {
-            var save = false
-            val transactionManager = TransactionManager(project)
-            try {
-                runInExistingTransaction(transactionManager, runnable)
-                save = true
-            } finally {
-                transactionManager.finishTransaction(save, progressProvider.invoke())
+            callInNewTransaction(project, progressProvider) {
+                runnable.invoke()
             }
         }
 
         /**
-         * Executes the [runnable] specified in the context of the [TransactionManager] specified.
-         * @param transactionManager The [TransactionManager] under which the [runnable] should be executed.
-         * @param runnable The task to execute.
+         * Executes a task within a [TransactionManager] and commits all members on successful completion of the transaction.
+         *
+         * Successful completion means the given progress monitor is not canceled and no exception is thrown from the [callable].
+         * @param project The [Project] for which the transaction should be started
+         * @param progressProvider A provider for a progress indicator to use when committing the transaction. This provider is also used to determine if the task has been canceled. Only if not canceled the transaction will be committed.
+         * @param callable The runnable to execute
          */
-        fun runInExistingTransaction(transactionManager: TransactionManager, runnable: () -> Unit) {
-            runInContext(CURRENT, transactionManager, runnable)
+        fun <R> callInNewTransaction(project: Project, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, callable: () -> R?): R? {
+            var save = false
+            val transactionManager = TransactionManager(project)
+            val result: R?
+            try {
+                result = callInExistingTransaction(transactionManager, callable)
+                save = true
+            } finally {
+                transactionManager.finishTransaction(save, progressProvider.invoke())
+            }
+            return result
         }
+
+        /**
+         * Executes the [callable] specified in the context of the [TransactionManager] specified.
+         * @param transactionManager The [TransactionManager] under which the [callable] should be executed. Must not be null.
+         * @param callable The task to execute. Must not be null.
+         */
+        fun <R> callInExistingTransaction(transactionManager: TransactionManager, callable: () -> R?): R? = callInContext(CURRENT, transactionManager, callable)
 
         /**
          * Retrieves the [TransactionManager] of the current thread.

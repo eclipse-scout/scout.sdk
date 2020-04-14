@@ -20,8 +20,8 @@ import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.EventListenerList
 import org.eclipse.scout.sdk.core.util.FinalValue
-import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.runInExistingTransaction
-import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.runInNewTransaction
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.callInExistingTransaction
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.callInNewTransaction
 import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.util.concurrent.TimeUnit
 
@@ -41,12 +41,12 @@ open class OperationTask(title: String, project: Project, private val transactio
         scoutProgress.init(m_name, workForTask + workForCommit)
         if (transactionManager == null) {
             // new independent top level transaction
-            runInNewTransaction(project, { scoutProgress.newChild(workForCommit) }) {
+            callInNewTransaction(project, { scoutProgress.newChild(workForCommit) }) {
                 task.invoke(scoutProgress.newChild(workForTask))
             }
         } else {
             // new asynchronous task running in existing parent transaction
-            runInExistingTransaction(transactionManager) {
+            callInExistingTransaction(transactionManager) {
                 task.invoke(scoutProgress.newChild(workForTask))
             }
         }
