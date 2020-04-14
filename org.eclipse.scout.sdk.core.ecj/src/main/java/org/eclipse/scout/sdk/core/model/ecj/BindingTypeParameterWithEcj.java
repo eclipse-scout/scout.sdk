@@ -79,8 +79,12 @@ public class BindingTypeParameterWithEcj extends AbstractJavaElementWithEcj<ITyp
   @SuppressWarnings("null")
   public List<TypeSpi> getBounds() {
     return m_bounds.computeIfAbsentAndGet(() -> {
-      ReferenceBinding superclass = m_binding.superclass();
-      ReferenceBinding[] superInterfaces = m_binding.superInterfaces();
+      ReferenceBinding superclass;
+      ReferenceBinding[] superInterfaces;
+      synchronized (javaEnvWithEcj().lock()) {
+        superclass = m_binding.superclass();
+        superInterfaces = m_binding.superInterfaces();
+      }
       boolean hasSuperClass = superclass != null && !CharOperation.equals(superclass.compoundName, TypeConstants.JAVA_LANG_OBJECT);
       boolean hasSuperInterfaces = superInterfaces != null && superInterfaces.length > 0;
       int size = 0;

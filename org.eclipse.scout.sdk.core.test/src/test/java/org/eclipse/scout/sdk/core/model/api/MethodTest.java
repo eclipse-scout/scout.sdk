@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ClassWithConstructors;
 import org.eclipse.scout.sdk.core.fixture.ClassWithDefaultMethods;
 import org.eclipse.scout.sdk.core.fixture.MarkerAnnotation;
+import org.eclipse.scout.sdk.core.model.ecj.DeclarationTypeWithEcj;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentBinaryOnlyFactory;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -138,6 +139,14 @@ public class MethodTest {
   public void testConstructor(IJavaEnvironment env) {
     IMethod secondConstr = env.requireType(ClassWithConstructors.class.getName()).methods().item(1).get();
     assertFalse(secondConstr.returnType().isPresent());
+    assertTrue(secondConstr.isConstructor());
+
+    IType declarationType = env.requireType(ClassWithConstructors.class.getName()).requireCompilationUnit().types().first().get();
+    assertTrue(declarationType.unwrap() instanceof DeclarationTypeWithEcj);
+    assertEquals(2, declarationType.methods().stream().count());
+    IMethod declarationMethod = declarationType.methods().first().get();
+    assertTrue(declarationMethod.isConstructor());
+    assertFalse(declarationMethod.returnType().isPresent());
 
     new CoreJavaEnvironmentBinaryOnlyFactory().accept(binEnv -> {
       binEnv.requireType(ClassWithConstructors.class.getName()).methods().item(1).get();

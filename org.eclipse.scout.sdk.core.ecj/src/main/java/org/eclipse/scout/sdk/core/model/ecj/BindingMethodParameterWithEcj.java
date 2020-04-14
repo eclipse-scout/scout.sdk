@@ -102,13 +102,18 @@ public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IM
 
   @Override
   public List<BindingAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> {
-      AnnotationBinding[][] a = m_declaringMethod.getInternalBinding().getParameterAnnotations();
-      if (a == null || m_index >= a.length) {
-        return emptyList();
-      }
-      return SpiWithEcjUtils.createBindingAnnotations(javaEnvWithEcj(), this, a[m_index]);
-    });
+    return m_annotations.computeIfAbsentAndGet(this::computeAnnotations);
+  }
+
+  private List<BindingAnnotationWithEcj> computeAnnotations() {
+    AnnotationBinding[][] annotations;
+    synchronized (javaEnvWithEcj().lock()) {
+      annotations = m_declaringMethod.getInternalBinding().getParameterAnnotations();
+    }
+    if (annotations == null || m_index >= annotations.length) {
+      return emptyList();
+    }
+    return SpiWithEcjUtils.createBindingAnnotations(this, annotations[m_index]);
   }
 
   @Override

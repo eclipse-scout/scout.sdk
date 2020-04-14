@@ -90,7 +90,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getTypeFlags(m_binding.modifiers, null, SpiWithEcjUtils.hasDeprecatedAnnotation(m_binding.getAnnotations()));
+      m_flags = SpiWithEcjUtils.getTypeFlags(m_binding.modifiers, null, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }
@@ -102,7 +102,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
 
   @Override
   public List<BindingAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createBindingAnnotations(javaEnvWithEcj(), this, m_binding.getAnnotations()));
+    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createBindingAnnotations(this, m_binding));
   }
 
   @Override

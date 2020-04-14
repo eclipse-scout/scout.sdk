@@ -172,7 +172,7 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public List<BindingAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createBindingAnnotations(javaEnvWithEcj(), this, m_binding.getAnnotations()));
+    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createBindingAnnotations(this, m_binding));
   }
 
   @Override

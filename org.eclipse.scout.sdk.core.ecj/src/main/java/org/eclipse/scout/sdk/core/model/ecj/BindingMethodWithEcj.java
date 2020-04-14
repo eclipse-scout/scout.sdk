@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
-import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -82,15 +81,13 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
 
   @Override
   public List<BindingAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils
-        .createBindingAnnotations(javaEnvWithEcj(), this, SpiWithEcjUtils.nvl(m_binding.original(), m_binding)
-            .getAnnotations()));
+    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createBindingAnnotations(this, SpiWithEcjUtils.nvl(m_binding.original(), m_binding)));
   }
 
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getMethodFlags(m_binding.modifiers, false, SpiWithEcjUtils.hasDeprecatedAnnotation(m_binding.getAnnotations()));
+      m_flags = SpiWithEcjUtils.getMethodFlags(m_binding.modifiers, false, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }
@@ -107,21 +104,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
 
   @Override
   public List<TypeSpi> getExceptionTypes() {
-    return m_exceptions.computeIfAbsentAndGet(() -> {
-      ReferenceBinding[] exceptions = m_binding.thrownExceptions;
-      if (exceptions == null || exceptions.length < 1) {
-        return emptyList();
-      }
-
-      List<TypeSpi> result = new ArrayList<>(exceptions.length);
-      for (ReferenceBinding r : exceptions) {
-        TypeSpi t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), r);
-        if (t != null) {
-          result.add(t);
-        }
-      }
-      return result;
-    });
+    return m_exceptions.computeIfAbsentAndGet(() -> SpiWithEcjUtils.bindingsToTypes(javaEnvWithEcj(), m_binding.thrownExceptions));
   }
 
   @Override
@@ -186,8 +169,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
 
   protected TypeVariableBinding[] getTypeVariables() {
     //ask this or the actualType since we do not distinguish between the virtual parameterized type with arguments and the effective parameterized type with parameters
-    MethodBinding refMethod = m_binding.original() != null ? m_binding.original() : m_binding;
-    return refMethod.typeVariables();
+    return SpiWithEcjUtils.nvl(m_binding.original(), m_binding).typeVariables();
   }
 
   @Override
@@ -198,20 +180,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    return m_typeParameters.computeIfAbsentAndGet(() -> {
-      TypeVariableBinding[] typeParams = getTypeVariables();
-      if (typeParams == null || typeParams.length < 1) {
-        return emptyList();
-      }
-
-      List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
-      int index = 0;
-      for (TypeVariableBinding param : typeParams) {
-        result.add(javaEnvWithEcj().createBindingTypeParameter(this, param, index));
-        index++;
-      }
-      return result;
-    });
+    return m_typeParameters.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createTypeParameters(this, getTypeVariables()));
   }
 
   @Override

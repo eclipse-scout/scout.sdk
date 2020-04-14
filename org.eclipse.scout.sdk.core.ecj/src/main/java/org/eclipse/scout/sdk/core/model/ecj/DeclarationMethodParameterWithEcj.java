@@ -98,7 +98,7 @@ public class DeclarationMethodParameterWithEcj extends AbstractJavaElementWithEc
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getMethodFlags(m_astNode.modifiers, false, SpiWithEcjUtils.hasDeprecatedAnnotation(m_astNode.annotations));
+      m_flags = SpiWithEcjUtils.getMethodFlags(m_astNode.modifiers, false, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }

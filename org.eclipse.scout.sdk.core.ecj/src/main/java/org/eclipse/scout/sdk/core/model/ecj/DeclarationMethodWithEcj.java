@@ -108,7 +108,7 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getMethodFlags(m_astNode.modifiers, isVarArgs(), SpiWithEcjUtils.hasDeprecatedAnnotation(m_astNode.annotations));
+      m_flags = SpiWithEcjUtils.getMethodFlags(m_astNode.modifiers, isVarArgs(), SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }

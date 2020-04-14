@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import java.nio.file.Path
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 
 open class IdeaEnvironment private constructor(val project: Project) : IEnvironment, AutoCloseable {
@@ -71,7 +72,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         fun toIdeaProgress(progress: IProgress?): IdeaProgress = progress?.toIdea() ?: IdeaProgress(null)
     }
 
-    private val m_envs = HashMap<String, JavaEnvironmentWithIdea>()
+    private val m_envs = ConcurrentHashMap<String, JavaEnvironmentWithIdea>()
 
     override fun close() {
         m_envs.values.forEach(AutoCloseable::close)

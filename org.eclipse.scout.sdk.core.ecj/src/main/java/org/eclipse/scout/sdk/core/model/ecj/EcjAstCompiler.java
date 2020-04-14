@@ -26,9 +26,15 @@ import org.eclipse.jdt.internal.compiler.CompilationResult;
 import org.eclipse.jdt.internal.compiler.ICompilerRequestor;
 import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
+import org.eclipse.jdt.internal.compiler.env.AccessRestriction;
+import org.eclipse.jdt.internal.compiler.env.IBinaryType;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
+import org.eclipse.jdt.internal.compiler.env.IModule;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
+import org.eclipse.jdt.internal.compiler.env.ISourceType;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
+import org.eclipse.jdt.internal.compiler.lookup.LookupEnvironment;
+import org.eclipse.jdt.internal.compiler.lookup.PackageBinding;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblem;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
@@ -38,17 +44,18 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
 
   private final Map<CompilationUnitDeclaration, ICompilationUnit> m_sources = new HashMap<>();
+  private final Object m_lock;
 
-  @SuppressWarnings("resource")
-  protected EcjAstCompiler(INameEnvironment nameEnv, CompilerOptions opts) {
+  protected EcjAstCompiler(INameEnvironment nameEnv, CompilerOptions opts, Object lock) {
     super(nameEnv, proceedWithAllProblems(), opts, new EmptyCompilerRequestor(), new CollectingProblemFactory(), new PrintWriter(new SdkLogWriter()), null);
+    m_lock = lock;
     lookupEnvironment.completeTypeBindings(); // must be called once so that the initial state is ready
   }
 
   static CompilerOptions createDefaultOptions() {
     CompilerOptions result = new CompilerOptions();
     result.produceDebugAttributes = 0;
-    result.complianceLevel = ClassFileConstants.JDK11;
+    result.complianceLevel = ClassFileConstants.getLatestJDKLevel();
     result.originalComplianceLevel = result.complianceLevel;
     result.sourceLevel = result.complianceLevel;
     result.originalSourceLevel = result.complianceLevel;
@@ -78,15 +85,17 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
     m_sources.put(parsedUnit, sourceUnit);
   }
 
-  public ICompilationUnit getSource(CompilationUnitDeclaration decl) {
+  public synchronized ICompilationUnit getSource(CompilationUnitDeclaration decl) {
     return m_sources.get(decl);
   }
 
   /**
    * @return null when no errors
    */
-  public synchronized List<String> getCompileErrors(CompilationUnitDeclaration unit) {
-    process(unit, 0);
+  public List<String> getCompileErrors(CompilationUnitDeclaration unit) {
+    synchronized (m_lock) {
+      process(unit, 0);
+    }
 
     CategorizedProblem[] errors = unit.compilationResult().getErrors();
     if (errors == null || errors.length < 1) {
@@ -96,6 +105,34 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
     return Arrays.stream(errors)
         .map(CategorizedProblem::getMessage)
         .collect(toList());
+  }
+
+  @Override
+  public void accept(IModule module, LookupEnvironment environment) {
+    synchronized (m_lock) {
+      super.accept(module, environment);
+    }
+  }
+
+  @Override
+  public void accept(IBinaryType binaryType, PackageBinding packageBinding, AccessRestriction accessRestriction) {
+    synchronized (m_lock) {
+      super.accept(binaryType, packageBinding, accessRestriction);
+    }
+  }
+
+  @Override
+  public void accept(ISourceType[] sourceTypes, PackageBinding packageBinding, AccessRestriction accessRestriction) {
+    synchronized (m_lock) {
+      super.accept(sourceTypes, packageBinding, accessRestriction);
+    }
+  }
+
+  @Override
+  public void accept(ICompilationUnit sourceUnit, AccessRestriction accessRestriction) {
+    synchronized (m_lock) {
+      super.accept(sourceUnit, accessRestriction);
+    }
   }
 
   static final class CollectingProblemFactory extends DefaultProblemFactory {
@@ -138,11 +175,11 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
   static final class SdkLogWriter extends Writer {
 
     @Override
-    public void write(char[] cbuf, int off, int len) {
+    public void write(@SuppressWarnings("NullableProblems") char[] buffer, int off, int len) {
       if (!SdkLog.isDebugEnabled()) {
         return;
       }
-      String msg = new String(cbuf, off, len);
+      String msg = new String(buffer, off, len);
       if (Strings.hasText(msg)) {
         SdkLog.debug(msg);
       }

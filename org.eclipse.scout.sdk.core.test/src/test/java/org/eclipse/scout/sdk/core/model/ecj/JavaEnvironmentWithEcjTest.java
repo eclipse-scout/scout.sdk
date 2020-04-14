@@ -42,7 +42,6 @@ public class JavaEnvironmentWithEcjTest {
   public void testRegisterAfterCloseKeepsEnvironmentUntouched() throws ReflectiveOperationException {
     String pck = "xx.yy";
     String className = "Test";
-    @SuppressWarnings("resource")
     JavaEnvironmentWithEcj closedEnv = createClosedJavaEnvironment();
     assertEnvironmentClosed(closedEnv);
     closedEnv.registerCompilationUnitOverride(pck, className + JavaTypes.JAVA_FILE_SUFFIX, ("package " + pck + "; public class " + className + " {}").toCharArray());
@@ -56,13 +55,13 @@ public class JavaEnvironmentWithEcjTest {
     assertTrue(closedEnv.isInitialized());
   }
 
-  private JavaEnvironmentWithEcj createClosedJavaEnvironment() {
+  private static JavaEnvironmentWithEcj createClosedJavaEnvironment() {
     AtomicReference<IJavaEnvironment> holder = new AtomicReference<>();
     new CoreJavaEnvironmentBinaryOnlyFactory().accept(holder::set);
     return (JavaEnvironmentWithEcj) holder.get().unwrap();
   }
 
-  private void assertEnvironmentClosed(JavaEnvironmentWithEcj candidate) throws ReflectiveOperationException {
+  private static void assertEnvironmentClosed(JavaEnvironmentWithEcj candidate) throws ReflectiveOperationException {
     assertNotNull(candidate);
     assertEquals(0, fieldValue(candidate, "m_elements", Map.class).size());
     assertEquals(0, fieldValue(candidate, "m_evpCache", Map.class).size());
@@ -74,7 +73,7 @@ public class JavaEnvironmentWithEcjTest {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> T fieldValue(Object instance, String fieldName, Class<T> type) throws ReflectiveOperationException {
+  private static <T> T fieldValue(Object instance, String fieldName, @SuppressWarnings("unused") Class<T> type) throws ReflectiveOperationException {
     Field field = instance.getClass().getDeclaredField(fieldName);
     field.setAccessible(true);
     return (T) field.get(instance);

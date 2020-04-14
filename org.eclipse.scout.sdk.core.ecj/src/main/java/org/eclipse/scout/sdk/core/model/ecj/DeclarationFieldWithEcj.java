@@ -118,7 +118,7 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getTypeFlags(m_astNode.modifiers, null, SpiWithEcjUtils.hasDeprecatedAnnotation(m_astNode.annotations));
+      m_flags = SpiWithEcjUtils.getTypeFlags(m_astNode.modifiers, null, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }

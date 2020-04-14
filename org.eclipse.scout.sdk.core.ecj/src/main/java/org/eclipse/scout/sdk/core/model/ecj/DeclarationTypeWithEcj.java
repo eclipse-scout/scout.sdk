@@ -26,6 +26,7 @@ import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.TypeParameter;
 import org.eclipse.jdt.internal.compiler.ast.TypeReference;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.TypeConstants;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
@@ -205,12 +206,11 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
       }
 
       List<MethodSpi> result = new ArrayList<>(methods.length);
-      char[] constrName = "<init>".toCharArray();
       for (AbstractMethodDeclaration a : methods) {
         if (a.bodyStart <= 0) { // skip compiler generated methods
           continue;
         }
-        if (Arrays.equals(constrName, a.selector)) {
+        if (Arrays.equals(TypeConstants.INIT, a.selector)) {
           continue;
         }
         result.add(javaEnvWithEcj().createDeclarationMethod(this, a));
@@ -272,7 +272,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getTypeFlags(m_astNode.modifiers, m_astNode.allocation, SpiWithEcjUtils.hasDeprecatedAnnotation(m_astNode.annotations));
+      m_flags = SpiWithEcjUtils.getTypeFlags(m_astNode.modifiers, m_astNode.allocation, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }

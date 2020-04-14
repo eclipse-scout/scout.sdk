@@ -16,10 +16,10 @@ import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.runWithWo
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -79,7 +79,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   private final Map<IJavaProject, JavaEnvironmentWithJdt> m_envs;
 
   protected EclipseEnvironment() {
-    m_envs = new HashMap<>();
+    m_envs = new ConcurrentHashMap<>();
   }
 
   @Override

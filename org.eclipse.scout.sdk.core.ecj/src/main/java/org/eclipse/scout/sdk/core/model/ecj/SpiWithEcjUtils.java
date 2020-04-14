@@ -14,6 +14,7 @@ import static java.util.Collections.emptyList;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -61,7 +62,6 @@ import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.Scope;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
-import org.eclipse.jdt.internal.compiler.lookup.TypeConstants;
 import org.eclipse.jdt.internal.compiler.lookup.TypeIds;
 import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.jdt.internal.compiler.lookup.VoidTypeBinding;
@@ -71,6 +71,7 @@ import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.ecj.metavalue.MetaValueFactory;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
@@ -86,7 +87,24 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 
 public final class SpiWithEcjUtils {
 
+  private static final String DEPRECATED_ANNOTATION_FQN = Deprecated.class.getName();
+
   private SpiWithEcjUtils() {
+  }
+
+  static List<TypeParameterSpi> createTypeParameters(AbstractMemberWithEcj<?> owner, TypeVariableBinding[] typeParams) {
+    if (typeParams == null || typeParams.length < 1) {
+      return emptyList();
+    }
+
+    List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
+    int index = 0;
+    JavaEnvironmentWithEcj env = (JavaEnvironmentWithEcj) owner.getJavaEnvironment();
+    for (TypeVariableBinding param : typeParams) {
+      result.add(env.createBindingTypeParameter(owner, param, index));
+      index++;
+    }
+    return result;
   }
 
   static TypeSpi bindingToInnerType(JavaEnvironmentWithEcj env, TypeBinding primaryTypeBinding, String innerTypes) {
@@ -116,8 +134,23 @@ public final class SpiWithEcjUtils {
     return result;
   }
 
+  static List<TypeSpi> bindingsToTypes(JavaEnvironmentWithEcj env, ReferenceBinding[] exceptions) {
+    if (exceptions == null || exceptions.length < 1) {
+      return emptyList();
+    }
+
+    List<TypeSpi> result = new ArrayList<>(exceptions.length);
+    for (ReferenceBinding r : exceptions) {
+      TypeSpi t = bindingToType(env, r);
+      if (t != null) {
+        result.add(t);
+      }
+    }
+    return result;
+  }
+
   //public only for junit testing purposes
-  public static TypeSpi bindingToType(JavaEnvironmentWithEcj env, TypeBinding b) {
+  static TypeSpi bindingToType(JavaEnvironmentWithEcj env, TypeBinding b) {
     return bindingToType(env, b, null);
   }
 
@@ -379,11 +412,23 @@ public final class SpiWithEcjUtils {
     return v.getResult();
   }
 
-  static List<BindingAnnotationWithEcj> createBindingAnnotations(JavaEnvironmentWithEcj env, AnnotatableSpi owner, AnnotationBinding[] annotationBindings) {
+  static List<BindingAnnotationWithEcj> createBindingAnnotations(AnnotatableSpi owner, Binding binding) {
+    Object lock = ((AbstractJavaEnvironment) owner.getJavaEnvironment()).lock();
+
+    AnnotationBinding[] annotations;
+    //noinspection SynchronizationOnLocalVariableOrMethodParameter
+    synchronized (lock) {
+      annotations = binding.getAnnotations();
+    }
+    return createBindingAnnotations(owner, annotations);
+  }
+
+  static List<BindingAnnotationWithEcj> createBindingAnnotations(AnnotatableSpi owner, AnnotationBinding[] annotationBindings) {
     if (annotationBindings == null || annotationBindings.length < 1) {
       return emptyList();
     }
     List<BindingAnnotationWithEcj> result = new ArrayList<>(annotationBindings.length);
+    JavaEnvironmentWithEcj env = (JavaEnvironmentWithEcj) owner.getJavaEnvironment();
     for (AnnotationBinding annotation : annotationBindings) {
       if (annotation != null) {
         result.add(env.createBindingAnnotation(owner, annotation));
@@ -570,24 +615,13 @@ public final class SpiWithEcjUtils {
     return -1;
   }
 
-  static boolean hasDeprecatedAnnotation(AnnotationBinding[] annotations) {
-    if (annotations == null) {
+  static boolean hasDeprecatedAnnotation(Collection<? extends AnnotationSpi> annotations) {
+    if (annotations == null || annotations.isEmpty()) {
       return false;
     }
-    for (AnnotationBinding annotation : annotations) {
-      if (annotation != null && annotation.getAnnotationType() != null && CharOperation.equals(annotation.getAnnotationType().sourceName, TypeConstants.JAVA_LANG_DEPRECATED[2])) {
-        return true;
-      }
-    }
-    return false;
-  }
 
-  static boolean hasDeprecatedAnnotation(Annotation[] annotations) {
-    if (annotations == null) {
-      return false;
-    }
-    for (Annotation annotation : annotations) {
-      if (CharOperation.equals(annotation.type.getLastToken(), TypeConstants.JAVA_LANG_DEPRECATED[2])) {
+    for (AnnotationSpi annotation : annotations) {
+      if (annotation != null && DEPRECATED_ANNOTATION_FQN.equals(annotation.getType().getName())) {
         return true;
       }
     }
