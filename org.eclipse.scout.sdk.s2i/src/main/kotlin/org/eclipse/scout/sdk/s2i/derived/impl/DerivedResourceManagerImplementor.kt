@@ -32,14 +32,17 @@ import org.eclipse.scout.sdk.s2i.derived.DerivedResourceHandlerFactory
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
+import java.util.Collections.emptyList
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.function.BiFunction
+import kotlin.streams.toList
 
 class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceManager, SettingsChangedListener {
 
@@ -129,14 +132,21 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         val scope = consumeAllBufferedEvents()
         SdkLog.debug("Check for derived resource updates in scope $scope")
         callInIdeaEnvironment(project, "Update derived resources") { env, progress ->
-            val factories = synchronized(this) {
-                ArrayList(m_updateHandlerFactories)
+            val start = System.currentTimeMillis()
+            val factories = synchronized(this) { ArrayList(m_updateHandlerFactories) }
+            val handlers = factories
+                    .parallelStream()
+                    .flatMap { executeDerivedResourceHandlerFactory(it, scope) }
+                    .toList()
+            SdkLog.debug("Derived resource handler creation took {}ms. Number of created handlers: {}", System.currentTimeMillis() - start, handlers.size)
+            if (handlers.isNotEmpty() && !progress.indicator.isCanceled) {
+                executeAllHandlersAndWait(handlers, env, progress)
             }
-            val handlers = IdeaEnvironment.computeInReadAction(project) {
-                factories.flatMap { it.createHandlersFor(scope, project).toList() }
-            }
-            executeHandlers(handlers, env, progress)
         }
+    }
+
+    private fun executeDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory, scope: SearchScope) = computeInReadAction(project) {
+        factory.createHandlersFor(scope, project).toList().stream() // create a list first (terminal operation) so that the factory is executed here!
     }
 
     override fun addDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory) = synchronized(this) {
@@ -147,32 +157,51 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         m_updateHandlerFactories -= factory
     }
 
-    private fun executeHandlers(handlers: List<BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>>, env: IdeaEnvironment, progress: IdeaProgress) {
-        progress.init("Update derived resources", handlers.size)
-        val indicator = IdeaEnvironment.toIdeaProgress(progress).indicator
-        val fileWrites = ArrayList<IFuture<*>>()
-        val transactionManager = TransactionManager.current()
-        for (handler in handlers) {
-            indicator.text2 = handler.toString()
-            val start = System.currentTimeMillis()
-            try {
-                SdkLog.debug("Executing derived resource handler: {}", handler)
-                fileWrites.addAll(handler.apply(env, progress.newChild(1)))
-            } catch (e: ProcessCanceledException) {
-                SdkLog.debug("Canceled: {}", indicator.text2, e)
-            } catch (e: Exception) {
-                SdkLog.error("Error while: {}", indicator.text2, e)
-            } finally {
-                SdkLog.info("Derived resource handler took {}ms to execute: {}", System.currentTimeMillis() - start, handler)
+    private fun executeAllHandlersAndWait(handlers: List<BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>>, env: IdeaEnvironment, progress: IdeaProgress) {
+        val workForHandler = 1000
+        val start = System.currentTimeMillis()
+        val transaction = TransactionManager.current()
+        val runningFileWrites = ArrayList<IFuture<*>>()
+        progress.init("Update derived resources", handlers.size * workForHandler)
+        handlers.parallelStream().forEach {
+            if (progress.indicator.isCanceled) {
+                return@forEach
             }
-
-            if (transactionManager.size() >= 500) {
-                SdkFuture.awaitAll(fileWrites)
-                fileWrites.clear()
-                transactionManager.checkpoint(null)
-            }
+            executeHandler(it, transaction, env)
+            commitTransactionIfNecessary(transaction)
+            progress.worked(workForHandler)
         }
-        SdkFuture.awaitAll(fileWrites)
+        SdkFuture.awaitAll(runningFileWrites) // wait for the remaining file writes to participate in the current transaction
+        if (handlers.size > 1) {
+            SdkLog.debug("All derived resource handlers took {}ms", System.currentTimeMillis() - start)
+        }
+    }
+
+    private fun executeHandler(handler: BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>, transaction: TransactionManager, env: IdeaEnvironment): Collection<IFuture<*>>? {
+        val start = System.currentTimeMillis()
+        try {
+            return TransactionManager.callInExistingTransaction(transaction) {
+                SdkLog.debug("About to execute derived resource handler: {}", handler)
+                return@callInExistingTransaction handler.apply(env, IdeaEnvironment.toIdeaProgress(null))
+            }
+        } catch (e: ProcessCanceledException) {
+            SdkLog.debug("Canceled: {}", handler, e)
+        } catch (e: Exception) {
+            SdkLog.error("Error while: {}", handler, e)
+        } finally {
+            SdkLog.info("Derived resource handler took {}ms to execute: {}", System.currentTimeMillis() - start, handler)
+        }
+        return emptyList()
+    }
+
+    private fun commitTransactionIfNecessary(transaction: TransactionManager) {
+        if (transaction.size() < 1000) {
+            return
+        }
+        // to save memory the running transaction is committed in chunk blocks of 1000 items
+        // bigger chunks are faster (less events in the IDE and less IO) but require more memory to store the transaction members
+        SdkLog.debug("Derived resource update transaction chunk size reached. Performing intermediate commit.")
+        transaction.checkpoint(null)
     }
 
     private inner class DocumentSyncListener : FileDocumentManagerListener {
