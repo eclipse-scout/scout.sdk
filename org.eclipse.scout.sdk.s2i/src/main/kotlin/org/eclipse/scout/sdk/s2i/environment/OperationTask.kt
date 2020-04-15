@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2i.environment
 
+import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -56,16 +57,39 @@ open class OperationTask(title: String, project: Project, private val transactio
             .map { it.cancel(); true; }
             .orElse(false)
 
-    fun <T> schedule(resultSupplier: (() -> T)? = null, delay: Long = 0, unit: TimeUnit = TimeUnit.MILLISECONDS): IFuture<T> {
+    fun <T> schedule(resultSupplier: (() -> T)? = null, delay: Long = 0, unit: TimeUnit = TimeUnit.MILLISECONDS, hidden: Boolean = false): IFuture<T> {
         val result = TaskFuture(this, resultSupplier)
+        if (hidden) {
+            scheduleHidden(delay, unit)
+        } else {
+            scheduleWithUi(delay, unit)
+        }
+        return result
+    }
+
+    protected fun scheduleHidden(delay: Long = 0, unit: TimeUnit = TimeUnit.MILLISECONDS) {
+        val runnable = Runnable {
+            try {
+                val progress = EmptyProgressIndicator()
+                run(progress)
+                if (progress.isCanceled) {
+                    onCancel()
+                } else {
+                    onFinished()
+                }
+            } catch (e: Throwable) {
+                onThrowable(e)
+            }
+        }
+        AppExecutorUtil.getAppScheduledExecutorService().schedule(runnable, delay, unit)
+    }
+
+    protected fun scheduleWithUi(delay: Long = 0, unit: TimeUnit = TimeUnit.MILLISECONDS) {
         if (delay == 0L) {
             queue()
         } else {
-            AppExecutorUtil.getAppScheduledExecutorService().schedule({
-                queue()
-            }, delay, unit)
+            AppExecutorUtil.getAppScheduledExecutorService().schedule({ queue() }, delay, unit)
         }
-        return result
     }
 
     fun addListener(listener: OperationTaskListener) = m_listeners.add(listener)

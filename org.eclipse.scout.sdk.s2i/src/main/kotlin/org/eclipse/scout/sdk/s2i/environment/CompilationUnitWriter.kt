@@ -40,7 +40,7 @@ open class CompilationUnitWriter(val project: Project, val source: CharSequence,
 
     fun schedule(resultSupplier: () -> IType?): IFuture<IType?> {
         val task = OperationTask("Write " + cuPath.fileName(), project, TransactionManager.current(), this::doWriteCompilationUnit)
-        return task.schedule(resultSupplier)
+        return task.schedule(resultSupplier, hidden = true)
     }
 
     protected fun doWriteCompilationUnit(progress: IdeaProgress) {
