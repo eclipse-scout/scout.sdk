@@ -112,7 +112,7 @@ public interface IJavaSourceBuilder<TYPE extends IJavaSourceBuilder<TYPE>> exten
    *
    * @return This builder
    */
-  TYPE atSign();
+  TYPE at();
 
   /**
    * Appends the equal sign (=) including a leading and trailing space.
@@ -126,7 +126,7 @@ public interface IJavaSourceBuilder<TYPE extends IJavaSourceBuilder<TYPE>> exten
    *
    * @return This builder
    */
-  TYPE dotSign();
+  TYPE dot();
 
   /**
    * Appends a semicolon: ;

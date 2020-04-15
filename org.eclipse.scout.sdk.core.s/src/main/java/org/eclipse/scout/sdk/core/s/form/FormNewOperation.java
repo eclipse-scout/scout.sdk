@@ -191,9 +191,9 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected static void appendMockSource(IMethodBodyBuilder<?> builder, String formDataVarName, String mockVarName, String methodToMock) {
-    builder.ref(IScoutRuntimeTypes.Mockito).dotSign().append("when").parenthesisOpen().append(mockVarName).dotSign().append(methodToMock).parenthesisOpen()
-        .ref(IScoutRuntimeTypes.ArgumentMatchers).dotSign().append("any").parenthesisOpen().parenthesisClose().parenthesisClose().parenthesisClose()
-        .dotSign().append("thenReturn").parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon().nl();
+    builder.ref(IScoutRuntimeTypes.Mockito).dot().append("when").parenthesisOpen().append(mockVarName).dot().append(methodToMock).parenthesisOpen()
+        .ref(IScoutRuntimeTypes.ArgumentMatchers).dot().append("any").parenthesisOpen().parenthesisClose().parenthesisClose().parenthesisClose()
+        .dot().append("thenReturn").parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon().nl();
   }
 
   protected IType createFormTest(IEnvironment env, IProgress progress) {

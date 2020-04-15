@@ -80,7 +80,7 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
     }
 
     builder
-        .append(SERVICE_VAR_NAME).dotSign().append(getBackendServiceMethodName(isLoad))
+        .append(SERVICE_VAR_NAME).dot().append(getBackendServiceMethodName(isLoad))
         .parenthesisOpen()
         .append(methodArgGenerator()
             .orElseGet(() -> b -> {

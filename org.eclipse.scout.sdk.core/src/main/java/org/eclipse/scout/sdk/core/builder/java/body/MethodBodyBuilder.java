@@ -95,7 +95,7 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
 
     boolean isConstructor = !surroundingMethod().returnType().isPresent();
     if (!isConstructor) {
-      dotSign()
+      dot()
           .append(surroundingMethod().elementName().orElseThrow(() -> newFail("Cannot create a super call because method has no name.")));
     }
 

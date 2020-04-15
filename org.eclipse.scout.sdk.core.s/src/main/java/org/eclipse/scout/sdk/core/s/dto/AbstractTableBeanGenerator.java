@@ -71,7 +71,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
         .withAnnotation(AnnotationGenerator.createOverride())
         .withElementName(CREATE_ROW_METHOD_NAME)
         .withBody(b -> b.returnClause().parenthesisOpen().ref(rowDataName).parenthesisClose().space()
-            .superClause().dotSign().append(ROW_AT_METHOD_NAME).parenthesisOpen().append(ROW_INDEX_PARAM_NAME).parenthesisClose().semicolon());
+            .superClause().dot().append(ROW_AT_METHOD_NAME).parenthesisOpen().append(ROW_INDEX_PARAM_NAME).parenthesisClose().semicolon());
     if (isAbstract(table.flags()) || isAbstract(modelType().flags())) {
       createRow.asAbstract();
     }
@@ -89,7 +89,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
             .withAnnotation(AnnotationGenerator.createOverride())
             .withElementName(ADD_ROW_METHOD_NAME)
             .withBody(b -> b.returnClause().parenthesisOpen().ref(rowDataName).parenthesisClose().space()
-                .superClause().dotSign().append(ADD_ROW_METHOD_NAME).parenthesisOpen().parenthesisClose().semicolon()),
+                .superClause().dot().append(ADD_ROW_METHOD_NAME).parenthesisOpen().parenthesisClose().semicolon()),
             DtoMemberSortObjectFactory.forMethodTableData(ADD_ROW_METHOD_NAME))
         .withMethod(MethodGenerator.create() // addRow(int state)
             .asPublic()
@@ -100,7 +100,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
                 .withElementName(ROW_STATE_PARAM_NAME)
                 .withDataType(JavaTypes._int))
             .withBody(b -> b.returnClause().parenthesisOpen().ref(rowDataName).parenthesisClose().space()
-                .superClause().dotSign().append(ADD_ROW_METHOD_NAME).parenthesisOpen().append(ROW_STATE_PARAM_NAME).parenthesisClose().semicolon()),
+                .superClause().dot().append(ADD_ROW_METHOD_NAME).parenthesisOpen().append(ROW_STATE_PARAM_NAME).parenthesisClose().semicolon()),
             DtoMemberSortObjectFactory.forMethodTableData(ADD_ROW_METHOD_NAME))
         .withMethod(createRow, DtoMemberSortObjectFactory.forMethodTableData(createRow.elementName().get())) // createRow
         .withMethod(MethodGenerator.create() // getRowType
@@ -116,7 +116,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
             .withElementName(GET_ROWS_METHOD_NAME)
             .withAnnotation(AnnotationGenerator.createOverride())
             .withBody(b -> b.returnClause().parenthesisOpen().ref(tableRowArray).parenthesisClose().space()
-                .superClause().dotSign().append(GET_ROWS_METHOD_NAME).parenthesisOpen().parenthesisClose().semicolon()),
+                .superClause().dot().append(GET_ROWS_METHOD_NAME).parenthesisOpen().parenthesisClose().semicolon()),
             DtoMemberSortObjectFactory.forMethodTableData(GET_ROWS_METHOD_NAME))
         .withMethod(MethodGenerator.create() // rowAt
             .asPublic()
@@ -127,7 +127,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
                 .withElementName(ROW_INDEX_PARAM_NAME)
                 .withDataType(JavaTypes._int))
             .withBody(b -> b.returnClause().parenthesisOpen().ref(rowDataName).parenthesisClose().space()
-                .superClause().dotSign().append(ROW_AT_METHOD_NAME).parenthesisOpen().append(ROW_INDEX_PARAM_NAME).parenthesisClose().semicolon()),
+                .superClause().dot().append(ROW_AT_METHOD_NAME).parenthesisOpen().append(ROW_INDEX_PARAM_NAME).parenthesisClose().semicolon()),
             DtoMemberSortObjectFactory.forMethodTableData(ROW_AT_METHOD_NAME))
         .withMethod(MethodGenerator.create() // setRows
             .asPublic()

@@ -93,9 +93,7 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
 
   @Override
   public TYPE enumValue(String enumType, CharSequence enumField) {
-    return ref(enumType)
-        .dotSign()
-        .append(Ensure.notNull(enumField));
+    return ref(enumType).dot().append(Ensure.notNull(enumField));
   }
 
   @Override

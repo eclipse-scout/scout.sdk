@@ -186,7 +186,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
     // type definition
     if (isAnnotation(flags)) {
-      builder.atSign().append("interface ");
+      builder.at().append("interface ");
     }
     else if (isEnum(flags)) {
       builder.append("enum ");

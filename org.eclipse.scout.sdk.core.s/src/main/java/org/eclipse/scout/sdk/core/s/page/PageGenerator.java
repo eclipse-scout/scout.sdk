@@ -112,7 +112,7 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
         pageServiceInterface()
             .map(execLoadBodyGenerator()
                 .orElseGet(() -> ifc -> b -> b.append("importPageData").parenthesisOpen().appendBeansGet(ifc)
-                    .dotSign().append(dataFetchMethodName()).parenthesisOpen().append(EXEC_LOAD_DATA_FILTER_ARG_NAME).parenthesisClose().parenthesisClose().semicolon()))
+                    .dot().append(dataFetchMethodName()).parenthesisOpen().append(EXEC_LOAD_DATA_FILTER_ARG_NAME).parenthesisClose().parenthesisClose().semicolon()))
             .map(g -> g.generalize(inner -> ScoutMethodBodyBuilder.create(inner, execLoadData)))
             .orElseGet(
                 () -> b -> MethodBodyBuilder.create(b, execLoadData).appendTodo("implement data load")

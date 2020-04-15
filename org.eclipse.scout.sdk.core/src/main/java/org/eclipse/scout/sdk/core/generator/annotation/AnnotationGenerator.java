@@ -175,7 +175,7 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
   protected void build(IJavaSourceBuilder<?> builder) {
     super.build(builder);
 
-    builder.atSign().ref(elementName().orElseThrow(() -> newFail("Annotation name missing for generator {}", this)));
+    builder.at().ref(elementName().orElseThrow(() -> newFail("Annotation name missing for generator {}", this)));
 
     if (m_values.isEmpty()) {
       return;

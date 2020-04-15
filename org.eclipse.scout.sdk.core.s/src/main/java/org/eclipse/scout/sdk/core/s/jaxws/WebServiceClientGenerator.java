@@ -55,6 +55,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
                 .build());
   }
 
+  @SuppressWarnings("MethodMayBeStatic")
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> fillOverriddenMethods(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> unimplemented) {
     return unimplemented.withBody(b -> b.appendCallToSame("newInvocationContext().getPort()"));
   }
@@ -105,8 +106,8 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
     return MethodOverrideGenerator.createOverride()
         .withElementName("execInstallHandlers")
         .withBody(b -> ScoutMethodBodyBuilder.create(b)
-            .appendParameterName(0).dotSign().append("add").parenthesisOpen().appendBeansGet(IScoutRuntimeTypes.LogHandler).parenthesisClose().semicolon().nl()
-            .appendParameterName(0).dotSign().append("add").parenthesisOpen().appendBeansGet(IScoutRuntimeTypes.WsConsumerCorrelationIdHandler).parenthesisClose().semicolon());
+            .appendParameterName(0).dot().append("add").parenthesisOpen().appendBeansGet(IScoutRuntimeTypes.LogHandler).parenthesisClose().semicolon().nl()
+            .appendParameterName(0).dot().append("add").parenthesisOpen().appendBeansGet(IScoutRuntimeTypes.WsConsumerCorrelationIdHandler).parenthesisClose().semicolon());
   }
 
   public String portType() {

@@ -148,7 +148,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
 
           b.ref(getCreatedLookupCall()).space().append(callVarName).equalSign().append(lookupCallCreateMethodName).parenthesisOpen().parenthesisClose().semicolon().nl()
               .appendTodo("fill call")
-              .ref(dataType).space().append("data").equalSign().append(callVarName).dotSign().append("getDataBy").append(suffix).parenthesisOpen().parenthesisClose().semicolon().nl()
+              .ref(dataType).space().append("data").equalSign().append(callVarName).dot().append("getDataBy").append(suffix).parenthesisOpen().parenthesisClose().semicolon().nl()
               .appendTodo("verify data");
         });
   }

@@ -98,7 +98,7 @@ public class JavaSourceBuilder extends SourceBuilderWrapper<JavaSourceBuilder> i
   }
 
   @Override
-  public JavaSourceBuilder atSign() {
+  public JavaSourceBuilder at() {
     return append('@');
   }
 
@@ -133,7 +133,7 @@ public class JavaSourceBuilder extends SourceBuilderWrapper<JavaSourceBuilder> i
   }
 
   @Override
-  public JavaSourceBuilder dotSign() {
+  public JavaSourceBuilder dot() {
     return append(JavaTypes.C_DOT);
   }
 

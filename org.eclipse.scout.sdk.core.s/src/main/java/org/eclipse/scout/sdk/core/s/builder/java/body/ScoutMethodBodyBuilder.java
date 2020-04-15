@@ -52,12 +52,12 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
 
   @Override
   public TYPE appendTextsGet(String textKey) {
-    return ref(IScoutRuntimeTypes.TEXTS).dotSign().append("get").parenthesisOpen().stringLiteral(textKey).parenthesisClose();
+    return ref(IScoutRuntimeTypes.TEXTS).dot().append("get").parenthesisOpen().stringLiteral(textKey).parenthesisClose();
   }
 
   @Override
   public TYPE appendBeansGet(CharSequence bean) {
-    return ref(IScoutRuntimeTypes.BEANS).dotSign().append("get").parenthesisOpen()
+    return ref(IScoutRuntimeTypes.BEANS).dot().append("get").parenthesisOpen()
         .classLiteral(bean).parenthesisClose();
   }
 
@@ -68,7 +68,7 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
 
   @Override
   public TYPE appendPermissionCheck(CharSequence permission) {
-    return appendIf().parenthesisOpen().appendNot().ref(IScoutRuntimeTypes.ACCESS).dotSign().append("check").parenthesisOpen().appendNew().ref(permission)
+    return appendIf().parenthesisOpen().appendNot().ref(IScoutRuntimeTypes.ACCESS).dot().append("check").parenthesisOpen().appendNew().ref(permission)
         .parenthesisOpen().parenthesisClose().parenthesisClose().parenthesisClose().space().blockStart().nl()
         .appendThrow().appendNew().ref(IScoutRuntimeTypes.VetoException).parenthesisOpen().appendTextsGet("AuthorizationFailed").parenthesisClose().semicolon().nl()
         .blockEnd().nl();

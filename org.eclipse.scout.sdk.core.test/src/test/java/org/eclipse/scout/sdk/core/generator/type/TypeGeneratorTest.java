@@ -261,7 +261,7 @@ public class TypeGeneratorTest {
             .withValue(b -> b.stringLiteral("value")));
     primary.withType(inner)
         .withAnnotation(AnnotationGenerator.createGenerated("whatever")
-            .withElement(GeneratedAnnotation.VALUE_ELEMENT_NAME, b -> b.ref(inner.fullyQualifiedName()).dotSign().append(idFieldName)))
+            .withElement(GeneratedAnnotation.VALUE_ELEMENT_NAME, b -> b.ref(inner.fullyQualifiedName()).dot().append(idFieldName)))
         .withMethod(MethodGenerator.create()
             .withElementName("setter")
             .withReturnType(JavaTypes._void)

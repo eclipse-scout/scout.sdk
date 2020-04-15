@@ -63,8 +63,8 @@ public class JavaSourceBuilderWrapper<TYPE extends IJavaSourceBuilder<TYPE>> ext
   }
 
   @Override
-  public TYPE atSign() {
-    inner().atSign();
+  public TYPE at() {
+    inner().at();
     return currentInstance();
   }
 
@@ -99,8 +99,8 @@ public class JavaSourceBuilderWrapper<TYPE extends IJavaSourceBuilder<TYPE>> ext
   }
 
   @Override
-  public TYPE dotSign() {
-    inner().dotSign();
+  public TYPE dot() {
+    inner().dot();
     return currentInstance();
   }
 
