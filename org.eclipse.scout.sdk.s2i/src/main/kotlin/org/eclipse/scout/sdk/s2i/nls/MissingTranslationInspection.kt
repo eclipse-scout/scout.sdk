@@ -60,6 +60,7 @@ open class MissingTranslationInspection : LocalInspectionTool() {
         query.searchIn(queryInput, environment, toIdeaProgress(null))
 
         return query.result(path)
+                .filter { it.severity() >= Level.WARNING.intValue() } // only report important findings
                 .mapNotNull { toProblemDescription(it, file, manager, isOnTheFly) }
                 .toTypedArray()
     }
