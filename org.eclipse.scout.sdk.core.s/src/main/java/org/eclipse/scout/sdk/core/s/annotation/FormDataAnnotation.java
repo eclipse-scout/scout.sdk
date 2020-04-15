@@ -11,10 +11,8 @@
 package org.eclipse.scout.sdk.core.s.annotation;
 
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link FormDataAnnotation}</h3> Represents one single @FormData annotation occurrence
@@ -36,19 +34,11 @@ public class FormDataAnnotation extends AbstractManagedAnnotation {
   }
 
   public SdkCommand sdkCommand() {
-    IField enumValueField = getValue(SDK_COMMAND_ELEMENT_NAME, IField.class, null);
-    if (enumValueField != null && Strings.hasText(enumValueField.elementName())) {
-      return SdkCommand.valueOf(enumValueField.elementName());
-    }
-    return SdkCommand.DEFAULT;
+    return getValueAsEnum(SDK_COMMAND_ELEMENT_NAME, SdkCommand.class);
   }
 
   public DefaultSubtypeSdkCommand defaultSubtypeSdkCommand() {
-    IField enumValueField = getValue(DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME, IField.class, null);
-    if (enumValueField != null && Strings.hasText(enumValueField.elementName())) {
-      return DefaultSubtypeSdkCommand.valueOf(enumValueField.elementName());
-    }
-    return DefaultSubtypeSdkCommand.DEFAULT;
+    return getValueAsEnum(DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME, DefaultSubtypeSdkCommand.class);
   }
 
   public int genericOrdinal() {

@@ -86,12 +86,14 @@ public abstract class AbstractManagedAnnotation {
    *          If this {@link Supplier} is set then it is used in case the actual annotation does not define a
    *          <b>direct</b> value for this attribute.
    * @return The element value.
+   * @throws IllegalArgumentException
+   *           If the element name given does not exist for this annotation
    * @see IAnnotationElement#isDefault()
    */
   @SuppressWarnings("unchecked")
   protected <T> T getValue(String name, Class<T> expectedType, Supplier<T> optionalCustomDefaultValueSupplier) {
-    IAnnotationElement av = m_ann.element(name).orElseThrow(() -> new SdkException("Annotation '{}' has no attribute named '{}'.", m_ann.elementName(), name));
-    if (av.isDefault() && optionalCustomDefaultValueSupplier != null) {
+    IAnnotationElement av = m_ann.element(name).orElseThrow(() -> elementNotExistingException(name));
+    if (optionalCustomDefaultValueSupplier != null && av.isDefault()) {
       return optionalCustomDefaultValueSupplier.get();
     }
 
@@ -116,6 +118,61 @@ public abstract class AbstractManagedAnnotation {
   }
 
   /**
+   * Gets the annotation element with the name given as value of an {@link Enum}.
+   *
+   * @param elementName
+   *          The name of the annotation element. Must exist for that annotation.
+   * @param enumType
+   *          The enum class from which the matching value should be returned. The match is done by name. So the given
+   *          {@link Enum} must contain an element with the same name as in the source. Must not be {@code null}.
+   * @param <T>
+   *          The {@link Enum} type
+   * @return The matching {@link Enum} value. Never returns {@code null}.
+   * @see IAnnotationElement#isDefault()
+   * @throws IllegalArgumentException
+   *           If the element name given does not exist for this annotation or there is no element with the name used in
+   *           the source code on the given {@link Enum}.
+   */
+  protected <T extends Enum<T>> T getValueAsEnum(String elementName, Class<T> enumType) {
+    return getValueAsEnum(elementName, enumType, null);
+  }
+
+  /**
+   * Gets the annotation element with the name given as value of an {@link Enum}.
+   * 
+   * @param elementName
+   *          The name of the annotation element. Must exist for that annotation.
+   * @param enumType
+   *          The enum class from which the matching value should be returned. The match is done by name. So the given
+   *          {@link Enum} must contain an element with the same name as in the source. Must not be {@code null}.
+   * @param optionalCustomDefaultValueSupplier
+   *          An optional {@link Supplier} which will be used to return a custom value in case the annotation element is
+   *          not specified in the source (is the default value from the annotation definition).
+   * @param <T>
+   *          The {@link Enum} type
+   * @return The matching {@link Enum} value. Never returns {@code null}.
+   * @see IAnnotationElement#isDefault()
+   * @throws IllegalArgumentException
+   *           If the element name given does not exist for this annotation or there is no element with the name used in
+   *           the source code on the given {@link Enum}.
+   */
+  protected <T extends Enum<T>> T getValueAsEnum(String elementName, Class<T> enumType, Supplier<T> optionalCustomDefaultValueSupplier) {
+    if (optionalCustomDefaultValueSupplier != null && isDefault(elementName)) {
+      return optionalCustomDefaultValueSupplier.get();
+    }
+
+    IField enumValueField = getValue(elementName, IField.class, null);
+    if (enumValueField == null) {
+      throw elementNotExistingException(elementName);
+    }
+    return Enum.valueOf(enumType, enumValueField.elementName());
+  }
+
+  protected SdkException elementNotExistingException(String name) {
+    return new SdkException("Annotation '{}' has no attribute named '{}'.", m_ann.elementName(), name);
+  }
+
+  /**
    * Gets if the given element name is specified in the annotation or if the default value from the annotation
    * declaration is used.
    *
@@ -123,12 +180,14 @@ public abstract class AbstractManagedAnnotation {
    *          The name of the element.
    * @return {@code true} if the given element does not exist in the annotation, {@code false} if it is explicitly
    *         specified.
+   * @throws IllegalArgumentException
+   *           if the name given does not exist for this annotation
    */
   protected boolean isDefault(String name) {
     return m_ann
         .element(name)
         .map(IAnnotationElement::isDefault)
-        .orElse(Boolean.FALSE);
+        .orElseThrow(() -> elementNotExistingException(name));
   }
 
   /**

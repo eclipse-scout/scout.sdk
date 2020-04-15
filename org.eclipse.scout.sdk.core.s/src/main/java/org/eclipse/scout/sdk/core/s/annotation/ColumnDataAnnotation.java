@@ -14,10 +14,8 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link ColumnDataAnnotation}</h3>
@@ -28,6 +26,7 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
 
   public static final String TYPE_NAME = IScoutRuntimeTypes.ColumnData;
   public static final SdkColumnCommand DEFAULT_VALUE = SdkColumnCommand.CREATE;
+  public static final String VALUE_ELEMENT_NAME = "value";
 
   /**
    * Gets the {@link SdkColumnCommand} value of the given {@link IAnnotatable}.
@@ -57,11 +56,7 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
    *         value is not explicitly given in the annotation the default value {@link #DEFAULT_VALUE} is returned.
    */
   public SdkColumnCommand value() {
-    IField enumValueField = getValue("value", IField.class, null);
-    if (enumValueField != null && Strings.hasText(enumValueField.elementName())) {
-      return SdkColumnCommand.valueOf(enumValueField.elementName());
-    }
-    return DEFAULT_VALUE;
+    return getValueAsEnum(VALUE_ELEMENT_NAME, SdkColumnCommand.class);
   }
 
   public boolean isValueDefault() {

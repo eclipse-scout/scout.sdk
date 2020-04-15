@@ -85,7 +85,6 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   @Override
   public boolean isDefaultValue() {
     return m_syntheticDefaultValue;
-
   }
 
   @Override
