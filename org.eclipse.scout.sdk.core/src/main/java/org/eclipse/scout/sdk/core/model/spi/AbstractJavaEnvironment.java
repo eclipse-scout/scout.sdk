@@ -100,14 +100,6 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
     return m_instanceLock;
   }
 
-  private static JavaElementSpi rootOf(TypeSpi type) {
-    CompilationUnitSpi compilationUnit = type.getCompilationUnit();
-    if (compilationUnit != null) {
-      return compilationUnit;
-    }
-    return type;
-  }
-
   @Override
   @SuppressWarnings("unchecked")
   public void reload() {
