@@ -163,21 +163,26 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         val transaction = TransactionManager.current()
         val runningFileWrites = ArrayList<IFuture<*>>()
         progress.init("Update derived resources", handlers.size * workForHandler)
+
         handlers.parallelStream().forEach {
             if (progress.indicator.isCanceled) {
                 return@forEach
             }
-            executeHandler(it, transaction, env)
+            runningFileWrites.addAll(executeHandler(it, transaction, env))
             commitTransactionIfNecessary(transaction)
             progress.worked(workForHandler)
         }
-        SdkFuture.awaitAll(runningFileWrites) // wait for the remaining file writes to participate in the current transaction
+
+        // wait for the remaining file writes to participate in the current transaction.
+        // The failure of a single file does not fail the whole transaction, therefore only log the failed writes.
+        SdkFuture.awaitAllLoggingOnError(runningFileWrites)
+
         if (handlers.size > 1) {
             SdkLog.debug("All derived resource handlers took {}ms", System.currentTimeMillis() - start)
         }
     }
 
-    private fun executeHandler(handler: BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>, transaction: TransactionManager, env: IdeaEnvironment): Collection<IFuture<*>>? {
+    private fun executeHandler(handler: BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>, transaction: TransactionManager, env: IdeaEnvironment): Collection<IFuture<*>> {
         val start = System.currentTimeMillis()
         try {
             return TransactionManager.callInExistingTransaction(transaction) {
@@ -185,8 +190,9 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
                 return@callInExistingTransaction handler.apply(env, IdeaEnvironment.toIdeaProgress(null))
             }
         } catch (e: ProcessCanceledException) {
-            SdkLog.debug("Canceled: {}", handler, e)
+            throw e // so that it is not logged below and cancels the transaction. In the end its handles by the IntelliJ framework
         } catch (e: Exception) {
+            // log the exception but continue processing. The failure of one handler does not abort the transaction
             SdkLog.error("Error while: {}", handler, e)
         } finally {
             SdkLog.info("Derived resource handler took {}ms to execute: {}", System.currentTimeMillis() - start, handler)

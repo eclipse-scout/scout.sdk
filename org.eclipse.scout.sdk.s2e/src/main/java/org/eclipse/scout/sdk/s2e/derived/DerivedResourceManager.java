@@ -469,7 +469,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     private void execute(IEnvironment env, EclipseProgress progress, int numOperations) {
       int workByHandler = 100;
       progress.init("", numOperations * workByHandler);
-      Collection<IFuture<?>> executedHandlers = new ArrayList<>(numOperations);
+      Collection<IFuture<?>> executedFileWrites = new ArrayList<>(numOperations);
       for (int i = 1; i <= numOperations; i++) {
         if (isAborted()) {
           doAbort();
@@ -486,7 +486,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         progress.monitor().subTask("");
 
         try {
-          executedHandlers.addAll(executeHandler(handler, env, progress.newChild(workByHandler)));
+          executedFileWrites.addAll(executeHandler(handler, env, progress.newChild(workByHandler)));
         }
         catch (OperationCanceledException e) {
           doCancel();
@@ -498,12 +498,12 @@ public class DerivedResourceManager implements IDerivedResourceManager {
 
         if (i % 500 == 0) {
           // flush derived resources to disk in blocks of 500 items. this prevents out-of-memory in large workspaces where the transaction could get to big
-          SdkFuture.awaitAll(executedHandlers);
-          executedHandlers.clear();
+          SdkFuture.awaitAllLoggingOnError(executedFileWrites);
+          executedFileWrites.clear();
           currentWorkingCopyManager().checkpoint(null);
         }
       }
-      SdkFuture.awaitAll(executedHandlers); // wait until all write operations are executed. otherwise the java environment might already be closed while writing jobs are using it
+      SdkFuture.awaitAllLoggingOnError(executedFileWrites); // wait until all write operations are executed. otherwise the java environment might already be closed while writing jobs are using it
     }
 
     private static Collection<? extends IFuture<?>> executeHandler(BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>> handler, IEnvironment env, IProgress progress) {

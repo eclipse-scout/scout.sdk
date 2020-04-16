@@ -166,7 +166,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         val path = CompilationUnitPath(generator, targetFolder)
         val code = createResource(generator, targetFolder.javaEnvironment(), path.targetFile())
         val javaEnv = targetFolder.javaEnvironment()
-        val writer = CompilationUnitWriter(project, code, path)
+        val writer = CompilationUnitWriteOperation(project, code, path)
         val supplier = lambda@{
             val createdUnit = writer.createdPsi ?: return@lambda null
 

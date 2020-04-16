@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.core.util.SdkException
 import java.io.File
 import java.nio.file.Path
 
-open class CompilationUnitWriter(val project: Project, val source: CharSequence, val cuPath: CompilationUnitPath) {
+open class CompilationUnitWriteOperation(val project: Project, val source: CharSequence, val cuPath: CompilationUnitPath) {
 
     var createdPsi: PsiFile? = null
 

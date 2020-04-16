@@ -17,20 +17,22 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture.CompositeException;
 import org.junit.jupiter.api.Test;
 
 /**
- * <h3>{@link CompletedFutureTest}</h3>
+ * <h3>{@link SdkFutureTest}</h3>
  *
  * @since 7.0.0
  */
-public class CompletedFutureTest {
+public class SdkFutureTest {
   @Test
   public void testResultPresent() throws InterruptedException, ExecutionException, TimeoutException {
     String input = "abc";
@@ -86,5 +88,17 @@ public class CompletedFutureTest {
     assertEquals(input, done.toString());
 
     assertSame(t, assertThrows(RuntimeException.class, f::awaitDoneThrowingOnErrorOrCancel).getCause());
+  }
+
+  @Test
+  public void testCompositeException() {
+    RuntimeException a = new RuntimeException("first exception");
+    IllegalStateException nested = new IllegalStateException("nested");
+    IllegalArgumentException b = new IllegalArgumentException("second", nested);
+
+    String exceptionText = new CompositeException(Arrays.asList(a, b)).toString();
+    assertTrue(exceptionText.contains(a.getMessage()));
+    assertTrue(exceptionText.contains(b.getMessage()));
+    assertTrue(exceptionText.contains(nested.getMessage()));
   }
 }

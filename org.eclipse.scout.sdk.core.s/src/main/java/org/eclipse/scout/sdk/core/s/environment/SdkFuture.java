@@ -10,7 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s.environment;
 
-import static java.util.Collections.emptyList;
+import static java.lang.System.lineSeparator;
+import static java.util.Collections.unmodifiableCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import java.util.function.Supplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link SdkFuture}</h3>
@@ -73,18 +75,22 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
 
   /**
    * Waits until all of the futures specified have completed. A future is completed if it ends successfully, threw an
-   * exception or was canceled.
+   * exception or was canceled.<br>
+   * If there is at least one {@link Future} that ended exceptionally, this method throws an exception as well.
    *
    * @param futures
    *          The futures to wait for
-   * @return A {@link Collection} holding the {@link Throwable} of the futures that completed exceptionally
+   * @throws CompositeException
+   *           if at least one future completed exceptionally. This exception holds all {@link Throwable}s of the failed
+   *           {@link Future}s.
    */
-  public static Collection<Throwable> awaitAll(Collection<? extends Future<?>> futures) {
-    if (futures == null || futures.isEmpty()) {
-      return emptyList();
+  @SuppressWarnings("squid:S1166") // "Exception handlers should preserve the original exceptions". this is given as the exceptions are collected and then thrown at once
+  public static void awaitAll(Iterable<? extends Future<?>> futures) {
+    if (futures == null) {
+      return;
     }
 
-    Collection<Throwable> errors = new ArrayList<>(futures.size());
+    Collection<Throwable> errors = new ArrayList<>();
     for (Future<?> future : futures) {
       if (future == null) {
         continue;
@@ -103,7 +109,53 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
         SdkLog.debug("Cancellation silently ignored", e);
       }
     }
-    return errors;
+    if (errors.isEmpty()) {
+      return;
+    }
+    throw new CompositeException(errors);
+  }
+
+  /**
+   * Waits until all of the futures specified have completed. A future is completed if it ends successfully, threw an
+   * exception or was canceled.<br>
+   * Futures that end exceptionally are logged with level error. The log is only written when all the futures have
+   * completed.
+   * 
+   * @param futures
+   *          The futures to wait for
+   */
+  public static void awaitAllLoggingOnError(Iterable<IFuture<?>> futures) {
+    try {
+      awaitAll(futures);
+    }
+    catch (CompositeException e) {
+      e.exceptions().forEach(SdkLog::error);
+    }
+  }
+
+  public static class CompositeException extends RuntimeException {
+
+    private static final long serialVersionUID = -2565677977298841153L;
+    private final Collection<Throwable> m_throwables;
+
+    public CompositeException(Collection<Throwable> throwables) {
+      super("Composite exception was thrown with embedded exceptions (see details before)");
+      m_throwables = new ArrayList<>(throwables);
+    }
+
+    public Collection<Throwable> exceptions() {
+      return unmodifiableCollection(m_throwables);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder builder = new StringBuilder("Nested Exception: [").append(lineSeparator());
+      for (Throwable throwable : m_throwables) {
+        builder.append(throwable.toString()).append(Strings.fromThrowable(throwable)).append(lineSeparator());
+      }
+      builder.append(']').append(lineSeparator()).append(super.toString());
+      return builder.toString();
+    }
   }
 
   @Override
@@ -133,7 +185,7 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
           complete(() -> null); // the supplier should never be null. only the result provided by the supplier may be null
         }
         else {
-          FinalValue<V> cachedResult = new FinalValue<>();
+          FinalValue<V> cachedResult = new FinalValue<>(); // use a final value so that the extractor is only executed once
           complete(() -> cachedResult.computeIfAbsentAndGet(resultExtractor));
         }
       }

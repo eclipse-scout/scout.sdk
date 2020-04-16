@@ -74,7 +74,8 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
     int targetPos = 0;
     for (IMetaValue mv : original) {
       if (mv != null) {
-        filtered[targetPos++] = mv;
+        filtered[targetPos] = mv;
+        targetPos++;
       }
     }
     return filtered;

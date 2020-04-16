@@ -65,10 +65,13 @@ class TransactionManager private constructor(val project: Project) {
 
         /**
          * Executes the [callable] specified in the context of the [TransactionManager] specified.
+         *
+         * If the [callable] throws an exception the transaction is not automatically discarded. It is the responsibility of the caller to decide if the thrown exception is a
+         * reason to abort the transaction by rethrowing it up to the transaction creation or catching the exception and continue the transaction.
          * @param transactionManager The [TransactionManager] under which the [callable] should be executed. Must not be null.
          * @param callable The task to execute. Must not be null.
          */
-        fun <R> callInExistingTransaction(transactionManager: TransactionManager, callable: () -> R?): R? = callInContext(CURRENT, transactionManager, callable)
+        fun <R> callInExistingTransaction(transactionManager: TransactionManager, callable: () -> R): R = callInContext(CURRENT, transactionManager, callable)
 
         /**
          * Retrieves the [TransactionManager] of the current thread.
