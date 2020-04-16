@@ -89,6 +89,9 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
     }
 
     protected fun logToEventLogWindow(msg: LogMessage) {
+        if (!Strings.hasText(msg.text())) {
+            return // no balloon for empty log message
+        }
         val notification = m_balloonLog.createNotification(msg.text(), levelToMessageType(msg.severity()))
         notification.isImportant = msg.severity() == Level.SEVERE
         notification.notify(null)
