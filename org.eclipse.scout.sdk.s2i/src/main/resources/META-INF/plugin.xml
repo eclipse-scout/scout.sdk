@@ -16,19 +16,23 @@
   <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
 
   <description><![CDATA[
+      <p>
       Eclipse Scout integration for IntelliJ IDEA
-    ]]></description>
-
-  <change-notes><![CDATA[
-        Adds support for:
+      </p>
+      <p>
+      Includes support for:
         <br>
         <ul>
           <li>Derived resource update for FormData & PageData</li>
           <li>@ClassId validation inspections</li>
           <li>NLS validation inspections</li>
         </ul>
-      ]]>
-  </change-notes>
+        </p>
+  ]]></description>
+
+  <change-notes><![CDATA[
+        Includes fixes and performance improvements
+  ]]></change-notes>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
   <idea-version since-build="192.6817.14"/>
