@@ -16,7 +16,6 @@ import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTrans
 import static org.eclipse.scout.sdk.core.imports.ImportCollector.createImportDeclaration;
 
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
@@ -89,13 +88,12 @@ public final class SimpleGenerators {
 
   public static ISourceGenerator<IExpressionBuilder<?>> createArrayMetaValueGenerator(IArrayMetaValue mv, IWorkingCopyTransformer transformer) {
     IMetaValue[] metaArray = mv.metaValueArray();
-    Stream<ISourceGenerator<ISourceBuilder<?>>> generators = Arrays.stream(metaArray)
-        .map(m -> createMetaValueGenerator(m, transformer))
-        .map(g -> g.generalize(ExpressionBuilder::create));
 
     // use newlines on multi-dimensional arrays and annotation arrays only
     boolean useNewlines = metaArray.length > 0 && (metaArray[0].type() == MetaValueType.Array || metaArray[0].type() == MetaValueType.Annotation);
-    return b -> b.array(generators, useNewlines);
+    return b -> b.array(Arrays.stream(metaArray)
+        .map(m -> createMetaValueGenerator(m, transformer))
+        .map(g -> g.generalize(ExpressionBuilder::create)), useNewlines);
   }
 
   public static ISourceGenerator<IExpressionBuilder<?>> createAnnotationElementGenerator(IAnnotationElement ae, IWorkingCopyTransformer transformer) {
