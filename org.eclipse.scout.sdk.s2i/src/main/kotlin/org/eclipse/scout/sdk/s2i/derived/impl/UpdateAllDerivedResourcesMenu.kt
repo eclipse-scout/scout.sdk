@@ -14,6 +14,7 @@ import com.intellij.analysis.AnalysisUIOptions
 import com.intellij.analysis.BaseAnalysisActionDialog
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import org.eclipse.scout.sdk.s2i.DataContextHelper
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 
@@ -32,6 +33,7 @@ class UpdateAllDerivedResourcesMenu : AnAction(EclipseScoutBundle.message("updat
         if (dialog.showAndGet()) {
             val scopeToTrigger = dialog.getScope(initialAnalysisScope)
             val manager = EclipseScoutBundle.derivedResourceManager(project)
+            FileDocumentManager.getInstance().saveAllDocuments() // save all documents so that the handlers for sure see the latest changes
             manager.trigger(scopeToTrigger.toSearchScope())
         }
     }
