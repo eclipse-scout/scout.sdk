@@ -385,17 +385,15 @@ public class StructuredType implements IStructuredType {
         String fieldDataType = f.dataType().reference();
         if (IScoutRuntimeTypes.Logger.equals(fieldDataType)) {
           loggers.add(f);
-          it.remove();
         }
         else {
           statics.add(f);
-          it.remove();
         }
       }
       else {
         members.add(f);
-        it.remove();
       }
+      it.remove();
     }
     m_elements.put(Categories.FIELD_LOGGER, loggers);
     m_elements.put(Categories.FIELD_STATIC, statics);
