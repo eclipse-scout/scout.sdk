@@ -181,6 +181,22 @@ public class WorkingCopyTransformerTest {
         "annotationElement: strings",
         "annotationElement: types",
         "annotationElement: annos",
+        "annotation: AnnotationWithSingleValues",
+        "annotationElement: num",
+        "annotationElement: enumValue",
+        "annotationElement: string",
+        "annotationElement: type",
+        "annotationElement: anno",
+        "annotation: Generated",
+        "annotationElement: value",
+        "annotation: AnnotationWithSingleValues",
+        "annotationElement: num",
+        "annotationElement: enumValue",
+        "annotationElement: string",
+        "annotationElement: type",
+        "annotationElement: anno",
+        "annotation: Generated",
+        "annotationElement: value",
         "method: run",
         "annotation: AnnotationWithArrayValues",
         "annotationElement: nums",
@@ -188,7 +204,6 @@ public class WorkingCopyTransformerTest {
         "annotationElement: strings",
         "annotationElement: types",
         "annotationElement: annos",
-        "methodParam: a",
         "annotation: AnnotationWithSingleValues",
         "annotationElement: num",
         "annotationElement: enumValue",
@@ -205,22 +220,7 @@ public class WorkingCopyTransformerTest {
         "annotationElement: anno",
         "annotation: Generated",
         "annotationElement: value",
-        "annotation: AnnotationWithSingleValues",
-        "annotationElement: num",
-        "annotationElement: enumValue",
-        "annotationElement: string",
-        "annotationElement: type",
-        "annotationElement: anno",
-        "annotation: Generated",
-        "annotationElement: value",
-        "annotation: AnnotationWithSingleValues",
-        "annotationElement: num",
-        "annotationElement: enumValue",
-        "annotationElement: string",
-        "annotationElement: type",
-        "annotationElement: anno",
-        "annotation: Generated",
-        "annotationElement: value");
+        "methodParam: a");
   }
 
   @Test
@@ -320,6 +320,21 @@ public class WorkingCopyTransformerTest {
       return input.requestDefaultWorkingCopy().withElement("value", b -> b.stringLiteral("all"));
     }
     return input.requestDefaultWorkingCopy();
+  }
+
+  @Test
+  public void testTransformationIsExecutedBeforeGeneratorExecution(IJavaEnvironment env) {
+    AtomicInteger transformCount = new AtomicInteger();
+    IWorkingCopyTransformer transformer = new SimpleWorkingCopyTransformerBuilder()
+        .withAnnotationElementMapper(input -> {
+          if ("type".equals(input.model().elementName())) {
+            transformCount.incrementAndGet();
+          }
+          return input.requestDefaultWorkingCopy();
+        }).build();
+
+    env.requireType(ClassWithAnnotationWithArrayValues.class.getName()).toWorkingCopy(transformer); // here the generator is not saved and therefore not executed. even though the transformation must have been executed completely!
+    assertEquals(4, transformCount.get());
   }
 
   @Test

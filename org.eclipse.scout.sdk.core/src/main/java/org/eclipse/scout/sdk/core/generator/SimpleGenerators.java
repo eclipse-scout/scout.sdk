@@ -10,12 +10,14 @@
  */
 package org.eclipse.scout.sdk.core.generator;
 
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.empty;
 import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.raw;
 import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotation;
 import static org.eclipse.scout.sdk.core.imports.ImportCollector.createImportDeclaration;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
@@ -78,7 +80,9 @@ public final class SimpleGenerators {
         IField field = mv.as(IField.class);
         return b -> b.enumValue(field.declaringType().name(), field.elementName());
       case Annotation:
-        return b -> transformAnnotation(mv.as(IAnnotation.class), transformer).ifPresent(b::append);
+        return transformAnnotation(mv.as(IAnnotation.class), transformer)
+            .<ISourceGenerator<IExpressionBuilder<?>>> map(g -> b -> b.append(g))
+            .orElseGet(ISourceGenerator::empty);
       case Array:
         return createArrayMetaValueGenerator((IArrayMetaValue) mv, transformer);
       default:
@@ -89,11 +93,15 @@ public final class SimpleGenerators {
   public static ISourceGenerator<IExpressionBuilder<?>> createArrayMetaValueGenerator(IArrayMetaValue mv, IWorkingCopyTransformer transformer) {
     IMetaValue[] metaArray = mv.metaValueArray();
 
+    // do not inline this into the generator! the transformation must be executed before the generator is used!
+    List<ISourceGenerator<ISourceBuilder<?>>> generators = Arrays.stream(metaArray)
+        .map(m -> createMetaValueGenerator(m, transformer))
+        .map(g -> g.generalize(ExpressionBuilder::create))
+        .collect(toList());
+
     // use newlines on multi-dimensional arrays and annotation arrays only
     boolean useNewlines = metaArray.length > 0 && (metaArray[0].type() == MetaValueType.Array || metaArray[0].type() == MetaValueType.Annotation);
-    return b -> b.array(Arrays.stream(metaArray)
-        .map(m -> createMetaValueGenerator(m, transformer))
-        .map(g -> g.generalize(ExpressionBuilder::create)), useNewlines);
+    return b -> b.array(generators.stream(), useNewlines);
   }
 
   public static ISourceGenerator<IExpressionBuilder<?>> createAnnotationElementGenerator(IAnnotationElement ae, IWorkingCopyTransformer transformer) {
