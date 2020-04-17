@@ -10,22 +10,20 @@
  */
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformPackage;
+import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createPackageGenerator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 public class PackageImplementor extends AbstractJavaElementImplementor<PackageSpi> implements IPackage {
 
@@ -35,15 +33,13 @@ public class PackageImplementor extends AbstractJavaElementImplementor<PackageSp
 
   @Override
   public Path asPath() {
+    //noinspection HardcodedFileSeparator
     return Paths.get(elementName().replace(JavaTypes.C_DOT, '/'));
   }
 
   @Override
   public ISourceGenerator<ISourceBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    return Strings.notBlank(transformPackage(this, transformer))
-        .<ISourceGenerator<IJavaSourceBuilder<?>>> map(name -> builder -> builder.append("package ").append(name).semicolon())
-        .map(g -> g.generalize(JavaSourceBuilder::create))
-        .orElseGet(ISourceGenerator::empty);
+    return createPackageGenerator(this).generalize(ExpressionBuilder::create);
   }
 
   @Override

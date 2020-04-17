@@ -10,11 +10,13 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
+import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createMetaValueGenerator;
+
 import java.lang.reflect.Array;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 
 /**
@@ -33,43 +35,12 @@ public abstract class AbstractMetaValue implements IMetaValue {
 
   @Override
   public ISourceGenerator<IExpressionBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    switch (type()) {
-      case Null:
-        return b -> b.append("null");
-      case Int:
-        return b -> b.append(as(Integer.class).intValue());
-      case Byte:
-        return b -> b.append(as(Byte.class).byteValue());
-      case Short:
-        return b -> b.append(as(Short.class).shortValue());
-      case Char:
-        return b -> b.append('\'')
-            .append(as(Character.class))
-            .append('\'');
-      case Float:
-        return b -> b.append(as(Float.class))
-            .append('f');
-      case Double:
-        return b -> b.append(as(Double.class).doubleValue());
-      case Bool:
-        return b -> b.append(as(Boolean.class).booleanValue());
-      case Long:
-        return b -> b.append(as(Long.class))
-            .append('L');
-      case String:
-        return b -> b.stringLiteral(as(String.class));
-      case Type:
-        return b -> b.classLiteral(as(IType.class).reference(true));
-      case Enum:
-        IField field = as(IField.class);
-        return b -> b.enumValue(field.declaringType().name(), field.elementName());
-      case Annotation:
-        IAnnotationGenerator<?> annotationGenerator = as(IAnnotation.class).toWorkingCopy(transformer);
-        return b -> b.append(annotationGenerator);
-      // array case is handled in corresponding subclass
-      default:
-        return b -> b.append("UNKNOWN(").append(type().toString()).append(", ").append(toString()).append(')');
-    }
+    return createMetaValueGenerator(this, transformer);
+  }
+
+  @Override
+  public Stream<IJavaElement> children() {
+    return Stream.empty();
   }
 
   @Override

@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.generator.field;
 
+import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createMetaValueGenerator;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
@@ -52,7 +53,7 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
             .map(ISourceRange::asCharSequence)
             .<ISourceGenerator<IExpressionBuilder<?>>> map(ISourceGenerator::raw)
             .orElseGet(() -> field.constantValue()
-                .map(mv -> mv.toWorkingCopy(transformer))
+                .map(mv -> createMetaValueGenerator(mv, transformer))
                 .orElse(null)));
   }
 

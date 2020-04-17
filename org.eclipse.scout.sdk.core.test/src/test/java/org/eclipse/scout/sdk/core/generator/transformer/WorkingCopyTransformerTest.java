@@ -14,6 +14,8 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFi
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -21,9 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
+import org.eclipse.scout.sdk.core.fixture.AnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -33,9 +38,11 @@ import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
+import org.eclipse.scout.sdk.core.model.api.DefaultDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
@@ -56,6 +63,7 @@ import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtensi
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.UsernameExtension;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -70,6 +78,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class WorkingCopyTransformerTest {
 
+  @SuppressWarnings("HardcodedFileSeparator")
   private static final String REF_FILE_FOLDER = "org/eclipse/scout/sdk/core/generator/transformer/";
 
   @Test
@@ -115,7 +124,6 @@ public class WorkingCopyTransformerTest {
     };
 
     ICompilationUnit transformedUnit = assertTransformedComponents(env, ChildClass.class, transformer,
-        "compilationUnit: ChildClass.java",
         "package: org.eclipse.scout.sdk.core.fixture",
         "import: IOException",
         "import: Serializable",
@@ -163,7 +171,6 @@ public class WorkingCopyTransformerTest {
   @Test
   public void testTransformationOnArrayAnnotationWithoutModifications(IJavaEnvironment env) {
     assertTransformedComponents(env, ClassWithAnnotationWithArrayValues.class,
-        "compilationUnit: ClassWithAnnotationWithArrayValues.java",
         "package: org.eclipse.scout.sdk.core.fixture",
         "import: RoundingMode",
         "import: Generated",
@@ -174,22 +181,6 @@ public class WorkingCopyTransformerTest {
         "annotationElement: strings",
         "annotationElement: types",
         "annotationElement: annos",
-        "annotation: AnnotationWithSingleValues",
-        "annotationElement: num",
-        "annotationElement: enumValue",
-        "annotationElement: string",
-        "annotationElement: type",
-        "annotationElement: anno",
-        "annotation: Generated",
-        "annotationElement: value",
-        "annotation: AnnotationWithSingleValues",
-        "annotationElement: num",
-        "annotationElement: enumValue",
-        "annotationElement: string",
-        "annotationElement: type",
-        "annotationElement: anno",
-        "annotation: Generated",
-        "annotationElement: value",
         "method: run",
         "annotation: AnnotationWithArrayValues",
         "annotationElement: nums",
@@ -197,6 +188,7 @@ public class WorkingCopyTransformerTest {
         "annotationElement: strings",
         "annotationElement: types",
         "annotationElement: annos",
+        "methodParam: a",
         "annotation: AnnotationWithSingleValues",
         "annotationElement: num",
         "annotationElement: enumValue",
@@ -213,7 +205,22 @@ public class WorkingCopyTransformerTest {
         "annotationElement: anno",
         "annotation: Generated",
         "annotationElement: value",
-        "methodParam: a");
+        "annotation: AnnotationWithSingleValues",
+        "annotationElement: num",
+        "annotationElement: enumValue",
+        "annotationElement: string",
+        "annotationElement: type",
+        "annotationElement: anno",
+        "annotation: Generated",
+        "annotationElement: value",
+        "annotation: AnnotationWithSingleValues",
+        "annotationElement: num",
+        "annotationElement: enumValue",
+        "annotationElement: string",
+        "annotationElement: type",
+        "annotationElement: anno",
+        "annotation: Generated",
+        "annotationElement: value");
   }
 
   @Test
@@ -223,10 +230,11 @@ public class WorkingCopyTransformerTest {
 
     P_TestingWorkingCopyTransformer transformer = new P_TestingWorkingCopyTransformer();
     ITypeGenerator<?> generator = notExisting.toWorkingCopy(transformer);
-    assertEquals("classWhatEver{}", generator.toJavaSource(env).toString().replaceAll("\\s", ""));
+    assertEquals("classWhatEver{}", Pattern.compile("\\s").matcher(generator.toJavaSource(env)).replaceAll(""));
 
     transformer = new P_TestingWorkingCopyTransformer();
     generator = existing.toWorkingCopy(transformer);
+    assertNotNull(generator);
     assertTrue(transformer.m_protocol.size() > 10); // Long must be found and therefore has some elements
   }
 
@@ -261,6 +269,164 @@ public class WorkingCopyTransformerTest {
   }
 
   /**
+   * If changes in this method are necessary also update the corresponding example on {@link IWorkingCopyTransformer}
+   * class javadoc.
+   * 
+   * @param env
+   *          The environment passed
+   */
+  @Test
+  public void testTransformerDocumentation(IJavaEnvironment env) {
+    IWorkingCopyTransformer transformer = new DefaultWorkingCopyTransformer() {
+      @Override
+      public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+        IMethod templateMethod = input.model();
+        IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> overrideGenerator = input.requestDefaultWorkingCopy();
+        switch (templateMethod.elementName()) {
+          case "toString":
+            // provide method body for toString method
+            return overrideGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon());
+          case "close":
+            // remove throws declaration for close method
+            return overrideGenerator.withoutException(Exception.class.getName());
+          default:
+            return overrideGenerator;
+        }
+      }
+    };
+
+    //noinspection unused
+    PrimaryTypeGenerator<?> generator = PrimaryTypeGenerator.create()
+        .withElementName("SampleCloseable")
+        .withInterface(AutoCloseable.class.getName()) // defines the methods that can be overridden
+        .withMethod(MethodOverrideGenerator.createOverride(transformer)
+            .withElementName("toString")) // override toString
+        .withAllMethodsImplemented(transformer); // override all methods required by super types.
+
+    ICompilationUnit icu = env.requireType(Long.class.getName()).requireCompilationUnit();
+    //noinspection unused
+    ICompilationUnitGenerator<?> workingCopy = icu.toWorkingCopy(
+        new SimpleWorkingCopyTransformerBuilder()
+            .withAnnotationMapper(this::transformAnnotation) // change SuppressWarnings to 'all'
+            .withMethodParameterMapper(IWorkingCopyTransformer::remove) // remove all parameters from methods
+            .build());
+
+  }
+
+  @SuppressWarnings("MethodMayBeStatic")
+  private IAnnotationGenerator<?> transformAnnotation(ITransformInput<IAnnotation, IAnnotationGenerator<?>> input) {
+    if (SuppressWarnings.class.getName().equals(input.model().type().name())) {
+      // modify all suppress-warning annotations to suppress all warnings
+      return input.requestDefaultWorkingCopy().withElement("value", b -> b.stringLiteral("all"));
+    }
+    return input.requestDefaultWorkingCopy();
+  }
+
+  @Test
+  public void testTransformationOfOverriddenMethodWithRemove(IJavaEnvironment env) {
+    String methodToModify = "methodInChildClass";
+    IWorkingCopyTransformer transformer = new SimpleWorkingCopyTransformerBuilder()
+        .withMethodParameterMapper(IWorkingCopyTransformer::remove) // remove all method parameters
+        .build();
+    PrimaryTypeGenerator<?> generatorWithoutTransformer = PrimaryTypeGenerator.create()
+        .withElementName("TestOnly")
+        .withSuperClass(ChildClass.class.getName())
+        .withMethod(MethodOverrideGenerator.createOverride()
+            .withElementName(methodToModify));
+    PrimaryTypeGenerator<?> generatorWithTransformer = PrimaryTypeGenerator.create()
+        .withElementName("TestOnly")
+        .withSuperClass(ChildClass.class.getName())
+        .withMethod(MethodOverrideGenerator.createOverride(transformer)
+            .withElementName(methodToModify));
+
+    long numParamsWithoutTransformer = CoreTestingUtils.registerCompilationUnit(env, generatorWithoutTransformer)
+        .methods()
+        .withName(methodToModify)
+        .first().get()
+        .parameters().stream()
+        .count();
+    long numParamsWithTransformer = CoreTestingUtils.registerCompilationUnit(env, generatorWithTransformer)
+        .methods()
+        .withName(methodToModify)
+        .first().get()
+        .parameters().stream()
+        .count();
+    assertEquals(2, numParamsWithoutTransformer);
+    assertEquals(0, numParamsWithTransformer);
+  }
+
+  @Test
+  public void testRemovalOfOverriddenMethod(IJavaEnvironment env) {
+    IWorkingCopyTransformer transformer = new SimpleWorkingCopyTransformerBuilder()
+        .withMethodMapper(WorkingCopyTransformerTest::transformMethod)
+        .build();
+    PrimaryTypeGenerator<?> generator = PrimaryTypeGenerator.create()
+        .withElementName("SampleSequence")
+        .withInterface(CharSequence.class.getName());
+
+    long numMethodsWithoutTransformer = CoreTestingUtils.registerCompilationUnit(env, generator.withAllMethodsImplemented()).methods().stream().count();
+    long numMethodsWithTransformer = CoreTestingUtils.registerCompilationUnit(env, generator.withAllMethodsImplemented(transformer)).methods().stream().count();
+    assertEquals(numMethodsWithoutTransformer - 1 /* the method removed by the transformer */, numMethodsWithTransformer);
+  }
+
+  private static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+    if ("charAt".equals(input.model().elementName())) {
+      return null;
+    }
+    return input.requestDefaultWorkingCopy();
+  }
+
+  @Test
+  public void testTransformerRemovingAnnotationElement(IJavaEnvironment env) {
+    String annotationElementNameToRemove = "strings";
+    IType classWithAnnotationArrayValues = env.requireType(ClassWithAnnotationWithArrayValues.class.getName());
+    IAnnotation firstAnnotation = classWithAnnotationArrayValues.annotations().withName(AnnotationWithArrayValues.class.getName()).first().get();
+    assertFalse(firstAnnotation.element(annotationElementNameToRemove).get().isDefault());
+
+    IWorkingCopyTransformer removeElementTransformer = new DefaultWorkingCopyTransformer() {
+      @Override
+      public ISourceGenerator<IExpressionBuilder<?>> transformAnnotationElement(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input) {
+        if (annotationElementNameToRemove.equals(input.model().elementName())) {
+          return null; // remove the "strings" element from all annotations
+        }
+        return super.transformAnnotationElement(input);
+      }
+    };
+
+    assertTrue(classWithAnnotationArrayValues.toWorkingCopy().annotations().findAny().get().element(annotationElementNameToRemove).isPresent()); // is not removed with default transform
+    assertFalse(classWithAnnotationArrayValues.toWorkingCopy(removeElementTransformer).annotations().findAny().get().element(annotationElementNameToRemove).isPresent()); // is removed because of transformer
+  }
+
+  @Test
+  public void testTransformerRemovingAnnotations(IJavaEnvironment env) {
+    ICompilationUnit baseType = env.requireType(ClassWithAnnotationWithArrayValues.class.getName()).requireCompilationUnit();
+    assertEquals(10, numberOfAnnotationsIn(baseType));
+
+    IWorkingCopyTransformer removeAllAnnotationsTransformer = new DefaultWorkingCopyTransformer() {
+      @Override
+      public IAnnotationGenerator<?> transformAnnotation(ITransformInput<IAnnotation, IAnnotationGenerator<?>> input) {
+        return null;
+      }
+    };
+    ICompilationUnitGenerator<?> generator = baseType.toWorkingCopy(removeAllAnnotationsTransformer);
+    generator.mainType().get().withElementName("OtherClass"); // change the name so that the original class is not changed in the IJavaEnvironment. Otherwise it is modified for later tests
+    IType baseTypeWithoutAnnotations = assertNoCompileErrors(env, generator);
+    assertEquals(0, numberOfAnnotationsIn(baseTypeWithoutAnnotations));
+  }
+
+  private static int numberOfAnnotationsIn(IJavaElement element) {
+    AtomicInteger numberOfAnnotations = new AtomicInteger();
+    element.visit(new DefaultDepthFirstJavaElementVisitor() {
+      @Override
+      public TreeVisitResult preVisit(IAnnotation annotation, int level, int index) {
+        numberOfAnnotations.incrementAndGet();
+        return super.preVisit(annotation, level, index);
+      }
+    });
+    return numberOfAnnotations.get();
+  }
+
+  /**
    * Parses the specified fixture class and transforms it into a working copy. A default {@link IWorkingCopyTransformer}
    * is used that does not apply any transformation. It is ensured that the specified components have been called on the
    * transformer. The working copy is then parsed into an {@link ICompilationUnit} again and returned.
@@ -273,7 +439,7 @@ public class WorkingCopyTransformerTest {
    *          The components that must be called on the transformer.
    * @return The transformed {@link ICompilationUnit} of the specified fixture class.
    */
-  private ICompilationUnit assertTransformedComponents(IJavaEnvironment env, Class<?> fixture, String... components) {
+  private static ICompilationUnit assertTransformedComponents(IJavaEnvironment env, Class<?> fixture, String... components) {
     return assertTransformedComponents(env, fixture, null, components);
   }
 
@@ -292,7 +458,7 @@ public class WorkingCopyTransformerTest {
    *          The components that must be called on the transformer.
    * @return The transformed {@link ICompilationUnit} of the specified fixture class.
    */
-  private ICompilationUnit assertTransformedComponents(IJavaEnvironment env, Class<?> fixture, P_TestingWorkingCopyTransformer transformer, String... components) {
+  private static ICompilationUnit assertTransformedComponents(IJavaEnvironment env, Class<?> fixture, P_TestingWorkingCopyTransformer transformer, String... components) {
     P_TestingWorkingCopyTransformer t = Optional.ofNullable(transformer)
         .orElseGet(P_TestingWorkingCopyTransformer::new);
     ICompilationUnitGenerator<?> generator = env.requireType(fixture.getName())

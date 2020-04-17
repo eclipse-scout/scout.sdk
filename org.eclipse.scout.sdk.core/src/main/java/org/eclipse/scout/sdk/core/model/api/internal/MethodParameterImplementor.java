@@ -10,11 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformMethodParameter;
-
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
+import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
@@ -67,7 +66,7 @@ public class MethodParameterImplementor extends AbstractAnnotatableImplementor<M
 
   @Override
   public IMethodParameterGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    return transformMethodParameter(this, transformer);
+    return MethodParameterGenerator.create(this, transformer);
   }
 
   @Override

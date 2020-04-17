@@ -26,8 +26,9 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.ITransformInput;
+import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
@@ -206,17 +207,15 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
       }
 
       ICompilationUnit definition = entryPointDefinition.requireCompilationUnit();
-      ICompilationUnitGenerator<?> builder = definition.toWorkingCopy(new DefaultWorkingCopyTransformer() {
-        @Override
-        public ISourceGenerator<IExpressionBuilder<?>> transformAnnotationElement(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input) {
-          return rewriteEntryPointDefinitionAnnotationElements(input, up);
-        }
-      });
+      IWorkingCopyTransformer transformer = new SimpleWorkingCopyTransformerBuilder()
+          .withAnnotationElementMapper(input -> rewriteEntryPointDefinitionAnnotationElements(input, up))
+          .build();
+      ICompilationUnitGenerator<?> builder = definition.toWorkingCopy(transformer);
       env.writeCompilationUnit(builder, up.getSourceFolder(), progress);
     }
   }
 
-  protected ISourceGenerator<IExpressionBuilder<?>> rewriteEntryPointDefinitionAnnotationElements(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input, EntryPointDefinitionUpdate up) {
+  protected static ISourceGenerator<IExpressionBuilder<?>> rewriteEntryPointDefinitionAnnotationElements(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input, EntryPointDefinitionUpdate up) {
     if (IScoutRuntimeTypes.WebServiceEntryPoint.equals(input.model().declaringAnnotation().name())) {
       if (JaxWsUtils.ENTRY_POINT_DEFINITION_ENDPOINTINTERFACE_ATTRIBUTE.equals(input.model().elementName())) {
         String newPortTypeFqn = up.getPortTypePackage() + JavaTypes.C_DOT + up.getPortTypeName();

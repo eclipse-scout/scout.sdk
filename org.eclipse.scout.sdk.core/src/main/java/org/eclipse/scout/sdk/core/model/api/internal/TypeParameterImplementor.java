@@ -10,12 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformTypeParameter;
-
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
+import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -51,7 +50,7 @@ public class TypeParameterImplementor extends AbstractJavaElementImplementor<Typ
 
   @Override
   public ITypeParameterGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    return transformTypeParameter(this, transformer);
+    return TypeParameterGenerator.create(this);
   }
 
   @Override

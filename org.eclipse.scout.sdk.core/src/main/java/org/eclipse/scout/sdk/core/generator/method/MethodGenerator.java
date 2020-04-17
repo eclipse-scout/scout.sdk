@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.core.generator.method;
 
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformMethodParameter;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformTypeParameter;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isDefaultMethod;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
@@ -81,11 +83,15 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
         .orElse(null);
 
     m_typeParameters = method.typeParameters()
-        .map(p -> p.toWorkingCopy(transformer))
+        .map(p -> transformTypeParameter(p, transformer))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toList());
 
     m_parameters = method.parameters().stream()
-        .map(mp -> mp.toWorkingCopy(transformer))
+        .map(mp -> transformMethodParameter(mp, transformer))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toList());
 
     m_exceptions = method.exceptionTypes()

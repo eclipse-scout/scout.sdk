@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.model.api.internal;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Comparator;
@@ -22,6 +21,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
@@ -342,7 +342,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
 
   @Override
   public ITypeGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    return transformType(this, transformer);
+    return TypeGenerator.create(this, transformer);
   }
 
   @Override

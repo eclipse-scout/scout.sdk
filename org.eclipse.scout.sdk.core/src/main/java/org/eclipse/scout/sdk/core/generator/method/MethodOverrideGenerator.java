@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.generator.method;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transform;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
@@ -139,7 +140,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
     boolean needsImplementation = isFromInterface || isAbstract(template.flags());
 
     IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> innerGenerator =
-        template.toWorkingCopy(null /* do not pass the transformer here. it is called later explicitly as soon as the default setup is done. transformer is 'stronger'.*/)
+        template.toWorkingCopy(m_transformer)
             .clearAnnotations() // clear annotations from method
             .withComment(null)
             .withAnnotation(AnnotationGenerator.createOverride())
@@ -173,9 +174,8 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
     };
   }
 
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createOverrideGenerator(IMethod template) {
-    return IWorkingCopyTransformer.<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> transform(m_transformer, template,
-        () -> createDefaultOverrideGenerator(template), (t, i) -> t.transformMethod(i));
+  protected Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> createOverrideGenerator(IMethod template) {
+    return transform(m_transformer, template, () -> createDefaultOverrideGenerator(template), (t, i) -> t.transformMethod(i));
   }
 
   protected Optional<IMethod> findMethodToOverride(IType container) {
@@ -197,10 +197,8 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     callWithTmpType(declaringTypeGenerator(), builder.context().environment().orElseThrow(() -> newFail("Cannot override a method without java environment.")),
-        tmpType -> createOverrideGenerator(
-            findMethodToOverride(tmpType)
-                .orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName().orElse(null)))))
-                    .generate(builder);
+        tmpType -> createOverrideGenerator(findMethodToOverride(tmpType).orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName().orElse(null)))))
+            .ifPresent(generator -> generator.generate(builder));
   }
 
   /**

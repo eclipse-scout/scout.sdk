@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGene
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -28,6 +29,7 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IImport;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
@@ -45,119 +47,119 @@ import org.eclipse.scout.sdk.core.model.api.IUnresolvedType;
  */
 public class SimpleWorkingCopyTransformerBuilder {
 
-  private Function<IAnnotationGenerator<?>, IAnnotationGenerator<?>> m_annotationMapper = Function.identity();
-  private Function<ICompilationUnitGenerator<?>, ICompilationUnitGenerator<?>> m_compilationUnitMapper = Function.identity();
-  private Function<ITypeParameterGenerator<?>, ITypeParameterGenerator<?>> m_typeParameterMapper = Function.identity();
-  private Function<IMethodParameterGenerator<?>, IMethodParameterGenerator<?>> m_methodParameterMapper = Function.identity();
-  private Function<IFieldGenerator<?>, IFieldGenerator<?>> m_fieldMapper = Function.identity();
-  private Function<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> m_methodMapper = Function.identity();
-  private Function<ITypeGenerator<?>, ITypeGenerator<?>> m_typeMapper = Function.identity();
-  private Function<ITypeGenerator<?>, ITypeGenerator<?>> m_unresolvedTypeMapper = Function.identity();
-  private Function<String, String> m_packageMapper = Function.identity();
-  private Function<ISourceGenerator<IExpressionBuilder<?>>, ISourceGenerator<IExpressionBuilder<?>>> m_annotationElementMapper = Function.identity();
-  private Function<CharSequence, CharSequence> m_importMapper = Function.identity();
+  private Function<ITransformInput<IAnnotation, IAnnotationGenerator<?>>, IAnnotationGenerator<?>> m_annotationMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<ICompilationUnit, ICompilationUnitGenerator<?>>, ICompilationUnitGenerator<?>> m_compilationUnitMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<ITypeParameter, ITypeParameterGenerator<?>>, ITypeParameterGenerator<?>> m_typeParameterMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<IMethodParameter, IMethodParameterGenerator<?>>, IMethodParameterGenerator<?>> m_methodParameterMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<IField, IFieldGenerator<?>>, IFieldGenerator<?>> m_fieldMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>>, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> m_methodMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<IType, ITypeGenerator<?>>, ITypeGenerator<?>> m_typeMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<IUnresolvedType, ITypeGenerator<?>>, ITypeGenerator<?>> m_unresolvedTypeMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<IPackage, String>, String> m_packageMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>>, ISourceGenerator<IExpressionBuilder<?>>> m_annotationElementMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<IImport, CharSequence>, CharSequence> m_importMapper = ITransformInput::requestDefaultWorkingCopy;
 
-  public Function<IAnnotationGenerator<?>, IAnnotationGenerator<?>> annotationMapper() {
+  public Function<ITransformInput<IAnnotation, IAnnotationGenerator<?>>, IAnnotationGenerator<?>> annotationMapper() {
     return m_annotationMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withAnnotationMapper(Function<IAnnotationGenerator<?>, IAnnotationGenerator<?>> annotationFunction) {
-    m_annotationMapper = identityIfNull(annotationFunction);
+  public SimpleWorkingCopyTransformerBuilder withAnnotationMapper(Function<ITransformInput<IAnnotation, IAnnotationGenerator<?>>, IAnnotationGenerator<?>> annotationFunction) {
+    m_annotationMapper = defaultIfNull(annotationFunction);
     return this;
   }
 
-  public Function<ICompilationUnitGenerator<?>, ICompilationUnitGenerator<?>> compilationUnitMapper() {
+  public Function<ITransformInput<ICompilationUnit, ICompilationUnitGenerator<?>>, ICompilationUnitGenerator<?>> compilationUnitMapper() {
     return m_compilationUnitMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withCompilationUnitMapper(Function<ICompilationUnitGenerator<?>, ICompilationUnitGenerator<?>> compilationUnitFunction) {
-    m_compilationUnitMapper = identityIfNull(compilationUnitFunction);
+  public SimpleWorkingCopyTransformerBuilder withCompilationUnitMapper(Function<ITransformInput<ICompilationUnit, ICompilationUnitGenerator<?>>, ICompilationUnitGenerator<?>> compilationUnitFunction) {
+    m_compilationUnitMapper = defaultIfNull(compilationUnitFunction);
     return this;
   }
 
-  public Function<ITypeParameterGenerator<?>, ITypeParameterGenerator<?>> typeParameterMapper() {
+  public Function<ITransformInput<ITypeParameter, ITypeParameterGenerator<?>>, ITypeParameterGenerator<?>> typeParameterMapper() {
     return m_typeParameterMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withTypeParameterMapper(Function<ITypeParameterGenerator<?>, ITypeParameterGenerator<?>> typeParameterFunction) {
-    m_typeParameterMapper = identityIfNull(typeParameterFunction);
+  public SimpleWorkingCopyTransformerBuilder withTypeParameterMapper(Function<ITransformInput<ITypeParameter, ITypeParameterGenerator<?>>, ITypeParameterGenerator<?>> typeParameterFunction) {
+    m_typeParameterMapper = defaultIfNull(typeParameterFunction);
     return this;
   }
 
-  public Function<IMethodParameterGenerator<?>, IMethodParameterGenerator<?>> methodParameterMapper() {
+  public Function<ITransformInput<IMethodParameter, IMethodParameterGenerator<?>>, IMethodParameterGenerator<?>> methodParameterMapper() {
     return m_methodParameterMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withMethodParameterMapper(Function<IMethodParameterGenerator<?>, IMethodParameterGenerator<?>> methodParameterFunction) {
-    m_methodParameterMapper = identityIfNull(methodParameterFunction);
+  public SimpleWorkingCopyTransformerBuilder withMethodParameterMapper(Function<ITransformInput<IMethodParameter, IMethodParameterGenerator<?>>, IMethodParameterGenerator<?>> methodParameterFunction) {
+    m_methodParameterMapper = defaultIfNull(methodParameterFunction);
     return this;
   }
 
-  public Function<IFieldGenerator<?>, IFieldGenerator<?>> fieldMapper() {
+  public Function<ITransformInput<IField, IFieldGenerator<?>>, IFieldGenerator<?>> fieldMapper() {
     return m_fieldMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withFieldMapper(Function<IFieldGenerator<?>, IFieldGenerator<?>> fieldFunction) {
-    m_fieldMapper = identityIfNull(fieldFunction);
+  public SimpleWorkingCopyTransformerBuilder withFieldMapper(Function<ITransformInput<IField, IFieldGenerator<?>>, IFieldGenerator<?>> fieldFunction) {
+    m_fieldMapper = defaultIfNull(fieldFunction);
     return this;
   }
 
-  public Function<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methodMapper() {
+  public Function<ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>>, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methodMapper() {
     return m_methodMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withMethodMapper(Function<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methodFunction) {
-    m_methodMapper = identityIfNull(methodFunction);
+  public SimpleWorkingCopyTransformerBuilder withMethodMapper(Function<ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>>, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methodFunction) {
+    m_methodMapper = defaultIfNull(methodFunction);
     return this;
   }
 
-  public Function<ITypeGenerator<?>, ITypeGenerator<?>> typeMapper() {
+  public Function<ITransformInput<IType, ITypeGenerator<?>>, ITypeGenerator<?>> typeMapper() {
     return m_typeMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withTypeMapper(Function<ITypeGenerator<?>, ITypeGenerator<?>> typeFunction) {
-    m_typeMapper = identityIfNull(typeFunction);
+  public SimpleWorkingCopyTransformerBuilder withTypeMapper(Function<ITransformInput<IType, ITypeGenerator<?>>, ITypeGenerator<?>> typeFunction) {
+    m_typeMapper = defaultIfNull(typeFunction);
     return this;
   }
 
-  public Function<ITypeGenerator<?>, ITypeGenerator<?>> unresolvedTypeMapper() {
+  public Function<ITransformInput<IUnresolvedType, ITypeGenerator<?>>, ITypeGenerator<?>> unresolvedTypeMapper() {
     return m_unresolvedTypeMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withUnresolvedTypeMapper(Function<ITypeGenerator<?>, ITypeGenerator<?>> unresolvedTypeFunction) {
-    m_unresolvedTypeMapper = identityIfNull(unresolvedTypeFunction);
+  public SimpleWorkingCopyTransformerBuilder withUnresolvedTypeMapper(Function<ITransformInput<IUnresolvedType, ITypeGenerator<?>>, ITypeGenerator<?>> unresolvedTypeFunction) {
+    m_unresolvedTypeMapper = defaultIfNull(unresolvedTypeFunction);
     return this;
   }
 
-  public Function<String, String> packageMapper() {
+  public Function<ITransformInput<IPackage, String>, String> packageMapper() {
     return m_packageMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withPackageMapper(Function<String, String> packageFunction) {
-    m_packageMapper = identityIfNull(packageFunction);
+  public SimpleWorkingCopyTransformerBuilder withPackageMapper(Function<ITransformInput<IPackage, String>, String> packageFunction) {
+    m_packageMapper = defaultIfNull(packageFunction);
     return this;
   }
 
-  public Function<ISourceGenerator<IExpressionBuilder<?>>, ISourceGenerator<IExpressionBuilder<?>>> annotationElementMapper() {
+  public Function<ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>>, ISourceGenerator<IExpressionBuilder<?>>> annotationElementMapper() {
     return m_annotationElementMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withAnnotationElementMapper(Function<ISourceGenerator<IExpressionBuilder<?>>, ISourceGenerator<IExpressionBuilder<?>>> annotationElementFunction) {
-    m_annotationElementMapper = identityIfNull(annotationElementFunction);
+  public SimpleWorkingCopyTransformerBuilder withAnnotationElementMapper(Function<ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>>, ISourceGenerator<IExpressionBuilder<?>>> annotationElementFunction) {
+    m_annotationElementMapper = defaultIfNull(annotationElementFunction);
     return this;
   }
 
-  public Function<CharSequence, CharSequence> importMapper() {
+  public Function<ITransformInput<IImport, CharSequence>, CharSequence> importMapper() {
     return m_importMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withImportMapper(Function<CharSequence, CharSequence> importFunction) {
-    m_importMapper = identityIfNull(importFunction);
+  public SimpleWorkingCopyTransformerBuilder withImportMapper(Function<ITransformInput<IImport, CharSequence>, CharSequence> importFunction) {
+    m_importMapper = defaultIfNull(importFunction);
     return this;
   }
 
-  protected static <T> Function<T, T> identityIfNull(Function<T, T> candidate) {
-    return Optional.ofNullable(candidate).orElseGet(Function::identity);
+  protected static <M extends IJavaElement, G> Function<ITransformInput<M, G>, G> defaultIfNull(Function<ITransformInput<M, G>, G> candidate) {
+    return Optional.ofNullable(candidate).orElseGet(() -> ITransformInput::requestDefaultWorkingCopy);
   }
 
   @SuppressWarnings("ReturnOfInnerClass")
@@ -166,57 +168,57 @@ public class SimpleWorkingCopyTransformerBuilder {
 
       @Override
       public IAnnotationGenerator<?> transformAnnotation(ITransformInput<IAnnotation, IAnnotationGenerator<?>> input) {
-        return annotationMapper().apply(input.requestDefaultWorkingCopy());
+        return annotationMapper().apply(input);
       }
 
       @Override
       public ICompilationUnitGenerator<?> transformCompilationUnit(ITransformInput<ICompilationUnit, ICompilationUnitGenerator<?>> input) {
-        return compilationUnitMapper().apply(input.requestDefaultWorkingCopy());
+        return compilationUnitMapper().apply(input);
       }
 
       @Override
       public ITypeParameterGenerator<?> transformTypeParameter(ITransformInput<ITypeParameter, ITypeParameterGenerator<?>> input) {
-        return typeParameterMapper().apply(input.requestDefaultWorkingCopy());
+        return typeParameterMapper().apply(input);
       }
 
       @Override
       public IMethodParameterGenerator<?> transformMethodParameter(ITransformInput<IMethodParameter, IMethodParameterGenerator<?>> input) {
-        return methodParameterMapper().apply(input.requestDefaultWorkingCopy());
+        return methodParameterMapper().apply(input);
       }
 
       @Override
       public IFieldGenerator<?> transformField(ITransformInput<IField, IFieldGenerator<?>> input) {
-        return fieldMapper().apply(input.requestDefaultWorkingCopy());
+        return fieldMapper().apply(input);
       }
 
       @Override
       public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
-        return methodMapper().apply(input.requestDefaultWorkingCopy());
+        return methodMapper().apply(input);
       }
 
       @Override
       public ITypeGenerator<?> transformType(ITransformInput<IType, ITypeGenerator<?>> input) {
-        return typeMapper().apply(input.requestDefaultWorkingCopy());
+        return typeMapper().apply(input);
       }
 
       @Override
       public ITypeGenerator<?> transformUnresolvedType(ITransformInput<IUnresolvedType, ITypeGenerator<?>> input) {
-        return unresolvedTypeMapper().apply(input.requestDefaultWorkingCopy());
+        return unresolvedTypeMapper().apply(input);
       }
 
       @Override
       public String transformPackage(ITransformInput<IPackage, String> input) {
-        return packageMapper().apply(input.requestDefaultWorkingCopy());
+        return packageMapper().apply(input);
       }
 
       @Override
       public ISourceGenerator<IExpressionBuilder<?>> transformAnnotationElement(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input) {
-        return annotationElementMapper().apply(input.requestDefaultWorkingCopy());
+        return annotationElementMapper().apply(input);
       }
 
       @Override
       public CharSequence transformImport(ITransformInput<IImport, CharSequence> input) {
-        return importMapper().apply(input.requestDefaultWorkingCopy());
+        return importMapper().apply(input);
       }
     };
   }

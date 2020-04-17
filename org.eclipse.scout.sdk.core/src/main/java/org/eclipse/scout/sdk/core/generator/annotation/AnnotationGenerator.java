@@ -16,6 +16,7 @@ import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTrans
 import static org.eclipse.scout.sdk.core.util.Ensure.failOnDuplicates;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +33,6 @@ import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -51,10 +51,9 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
     withElementName(annotation.type().name());
     m_values = annotation.elements().values().stream()
         .filter(ae -> !ae.isDefault())
-        .collect(toMap(IJavaElement::elementName,
-            ae -> transformAnnotationElement(ae, transformer),
-            failOnDuplicates(),
-            LinkedHashMap::new));
+        .map(ae -> new SimpleEntry<>(ae.elementName(), transformAnnotationElement(ae, transformer)))
+        .filter(ae -> ae.getValue().isPresent())
+        .collect(toMap(SimpleEntry::getKey, se -> se.getValue().get(), failOnDuplicates(), LinkedHashMap::new));
   }
 
   protected AnnotationGenerator() {

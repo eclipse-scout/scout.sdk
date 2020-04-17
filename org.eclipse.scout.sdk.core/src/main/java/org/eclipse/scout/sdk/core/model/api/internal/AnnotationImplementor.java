@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.model.api.internal;
 
 import static java.util.Collections.unmodifiableMap;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
@@ -91,7 +91,7 @@ public class AnnotationImplementor extends AbstractJavaElementImplementor<Annota
 
   @Override
   public IAnnotationGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    return transformAnnotation(this, transformer);
+    return AnnotationGenerator.create(this, transformer);
   }
 
   @Override

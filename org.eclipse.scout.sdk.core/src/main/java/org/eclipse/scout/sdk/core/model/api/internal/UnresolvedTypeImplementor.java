@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformUnresolvedType;
+import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createUnresolvedTypeGenerator;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -75,7 +75,7 @@ public class UnresolvedTypeImplementor extends AbstractJavaElementImplementor<Un
 
   @Override
   public ITypeGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    return transformUnresolvedType(this, transformer);
+    return createUnresolvedTypeGenerator(this, transformer);
   }
 
   @Override

@@ -10,14 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
-import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createArrayMetaValueGenerator;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
+import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
@@ -43,15 +40,12 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
 
   @Override
   public ISourceGenerator<IExpressionBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    IMetaValue[] metaArray = metaValueArray();
-    List<ISourceGenerator<ISourceBuilder<?>>> generators = Arrays.stream(metaArray)
-        .map(mv -> mv.toWorkingCopy(transformer))
-        .map(g -> g.generalize(ExpressionBuilder::create))
-        .collect(toList());
+    return createArrayMetaValueGenerator(this, transformer);
+  }
 
-    // use newlines on multi-dimensional arrays and annotation arrays only
-    boolean useNewlines = metaArray.length > 0 && (metaArray[0].type() == MetaValueType.Array || metaArray[0].type() == MetaValueType.Annotation);
-    return b -> b.array(generators.stream(), useNewlines);
+  @Override
+  public Stream<IJavaElement> children() {
+    return Stream.of(m_metaArray).flatMap(IMetaValue::children);
   }
 
   /**

@@ -14,6 +14,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformImport;
 import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformPackage;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
 
 import java.util.ArrayList;
@@ -23,8 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.CommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
@@ -32,7 +33,9 @@ import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilde
 import org.eclipse.scout.sdk.core.builder.java.comment.JavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator;
+import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.SimpleGenerators;
 import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
@@ -71,17 +74,24 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   protected CompilationUnitGenerator(ICompilationUnit cu, IWorkingCopyTransformer transformer) {
     super(cu);
 
-    m_packageName = transformPackage(cu.containingPackage(), transformer);
+    m_packageName = transformPackage(cu.containingPackage(), transformer).orElse(null);
     m_declaredImports = cu.imports()
         .filter(i -> !i.isStatic())
         .map(i -> transformImport(i, transformer))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toList());
     m_declaredStaticImports = cu.imports()
         .filter(IImport::isStatic)
         .map(i -> transformImport(i, transformer))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toList());
     m_types = cu.types().stream()
-        .map(t -> new SortedMemberEntry(t, transformer))
+        .map(t -> transformType(t, transformer)
+            .map(g -> new SortedMemberEntry(g, t)))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .peek(entry -> applyConnection((ITypeGenerator<?>) entry.generator(), this))
         .collect(toList());
     m_footerSourceBuilders = new ArrayList<>();
@@ -136,10 +146,13 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
     StringBuilder typeSource = buildTypeSource(builder.context()); // pre build type source so that all imports are defined
     String nl = builder.context().lineDelimiter();
 
+    ISourceGenerator<ISourceBuilder<?>> packageBuilder = packageName()
+        .map(SimpleGenerators::createPackageGenerator)
+        .<ISourceGenerator<ISourceBuilder<?>>> map(g -> b -> b.append(g).nl().nl())
+        .orElseGet(ISourceGenerator::empty);
+
     builder
-        .append(packageName()
-            .<ISourceGenerator<IJavaSourceBuilder<?>>> map(s -> b -> b.append("package ").append(s).semicolon().nl().nl())
-            .map(g -> g.generalize(b -> builder)))
+        .append(packageBuilder)
         .append(builder.context().validator().importCollector().createImportDeclarations()
             .map(ISourceGenerator::raw), null, nl, nl)
         .append(typeSource)
@@ -148,7 +161,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
             .map(b -> b.generalize(CommentBuilder::create)), nl, nl, null);
   }
 
-  protected StringBuilder buildTypeSource(IJavaBuilderContext context) {
+  protected StringBuilder buildTypeSource(IBuilderContext context) {
     ISourceGenerator<ISourceBuilder<?>> typeGenerator =
         builder -> builder.append(
             m_types.stream()
@@ -270,7 +283,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
     return currentInstance();
   }
 
-  protected static ITypeGenerator<?> applyConnection(ITypeGenerator<?> child, ICompilationUnitGenerator<?> parent) {
+  protected static ITypeGenerator<?> applyConnection(ITypeGenerator<?> child, IJavaElementGenerator<?> parent) {
     if (child instanceof TypeGenerator) {
       ((TypeGenerator<?>) child).withDeclaringGenerator(parent);
     }

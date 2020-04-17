@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
@@ -94,7 +95,7 @@ public class CompilationUnitImplementor extends AbstractJavaElementImplementor<C
 
   @Override
   public ICompilationUnitGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.transformCompilationUnit(this, transformer);
+    return CompilationUnitGenerator.create(this, transformer);
   }
 
   @Override

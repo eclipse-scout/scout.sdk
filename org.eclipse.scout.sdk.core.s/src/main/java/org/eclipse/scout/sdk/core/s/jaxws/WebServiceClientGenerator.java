@@ -19,10 +19,12 @@ import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.builder.java.body.ScoutMethodBodyBuilder;
@@ -56,8 +58,8 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
   }
 
   @SuppressWarnings("MethodMayBeStatic")
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> fillOverriddenMethods(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> unimplemented) {
-    return unimplemented.withBody(b -> b.appendCallToSame("newInvocationContext().getPort()"));
+  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> fillOverriddenMethods(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+    return input.requestDefaultWorkingCopy().withBody(b -> b.appendCallToSame("newInvocationContext().getPort()"));
   }
 
   protected String getBaseName() {

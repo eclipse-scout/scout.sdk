@@ -22,11 +22,7 @@ import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.member.IMemberGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -49,18 +45,6 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
   private final IMemberGenerator<?> m_generator;
   private final FinalValue<CompositeObject> m_sortOrder;
   private final long m_index;
-
-  protected SortedMemberEntry(IField origin, IWorkingCopyTransformer transformer) {
-    this(Ensure.notNull(origin).toWorkingCopy(transformer), origin);
-  }
-
-  public SortedMemberEntry(IType origin, IWorkingCopyTransformer transformer) {
-    this(Ensure.notNull(origin).toWorkingCopy(transformer), origin);
-  }
-
-  public SortedMemberEntry(IMethod origin, IWorkingCopyTransformer transformer) {
-    this(Ensure.notNull(origin).toWorkingCopy(transformer), origin);
-  }
 
   public SortedMemberEntry(IMemberGenerator<?> generator, IJavaElement origin) {
     this(generator,
@@ -93,7 +77,6 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
     return m_sortOrder.computeIfAbsentAndGet(this::calculateDefaultOrder);
   }
 
-  @SuppressWarnings("unchecked")
   protected CompositeObject calculateDefaultOrder() {
     IMemberGenerator<?> generator = generator();
     if (isType()) {
@@ -143,7 +126,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
     return sortOrder().equals(other.sortOrder());
   }
 
-  protected static CompositeObject defaultFieldOrder(IFieldGenerator<?> generator, long insertionOrder) {
+  protected static CompositeObject defaultFieldOrder(@SuppressWarnings("TypeMayBeWeakened") IFieldGenerator<?> generator, long insertionOrder) {
     int flags = generator.flags();
     boolean isFinal = isFinal(flags);
     boolean isConstant = isStatic(flags) && isFinal;
@@ -166,7 +149,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
     return new CompositeObject(DEFAULT_ORDER, FIELD_ORDER, pos, insertionOrder);
   }
 
-  protected static CompositeObject defaultTypeOrder(ITypeGenerator<?> generator, long insertionOrder) {
+  protected static CompositeObject defaultTypeOrder(@SuppressWarnings("TypeMayBeWeakened") ITypeGenerator<?> generator, long insertionOrder) {
     int pos;
     int flags = generator.flags();
     if (isPublic(flags)) {

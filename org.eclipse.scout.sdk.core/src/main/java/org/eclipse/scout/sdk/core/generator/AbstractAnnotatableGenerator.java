@@ -12,9 +12,11 @@ package org.eclipse.scout.sdk.core.generator;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
@@ -41,7 +43,9 @@ public abstract class AbstractAnnotatableGenerator<TYPE extends IAnnotatableGene
   protected AbstractAnnotatableGenerator(IAnnotatable element, IWorkingCopyTransformer transformer) {
     super(element);
     m_annotations = element.annotations().stream()
-        .map(a -> a.toWorkingCopy(transformer))
+        .map(a -> transformAnnotation(a, transformer))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toList());
   }
 

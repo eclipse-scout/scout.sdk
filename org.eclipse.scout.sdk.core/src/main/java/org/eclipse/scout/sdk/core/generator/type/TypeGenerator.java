@@ -15,6 +15,10 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformField;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformMethod;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
+import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformTypeParameter;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAnnotation;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isDefaultMethod;
@@ -97,7 +101,9 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     m_fullyQualifiedName = new FinalValue<>();
     m_qualifier = new FinalValue<>();
     m_typeParameters = type.typeParameters()
-        .map(p -> p.toWorkingCopy(transformer))
+        .map(p -> transformTypeParameter(p, transformer))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toList());
 
     m_superType = type.superClass()
@@ -110,13 +116,22 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
     m_members = new ArrayList<>();
     type.fields().stream()
-        .map(f -> new SortedMemberEntry(f, transformer))
+        .map(f -> transformField(f, transformer)
+            .map(g -> new SortedMemberEntry(g, f)))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toCollection(() -> m_members));
     type.methods().stream()
-        .map(m -> new SortedMemberEntry(m, transformer))
+        .map(m -> transformMethod(m, transformer)
+            .map(g -> new SortedMemberEntry(g, m)))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toCollection(() -> m_members));
     type.innerTypes().stream()
-        .map(t -> new SortedMemberEntry(t, transformer))
+        .map(t -> transformType(t, transformer)
+            .map(g -> new SortedMemberEntry(g, t)))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .peek(s -> applyConnection(s.generator(), this))
         .collect(toCollection(() -> m_members));
 
@@ -145,7 +160,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
    * @see SimpleWorkingCopyTransformerBuilder
    */
   public static ITypeGenerator<?> create(IType type, IWorkingCopyTransformer transformer) {
-    return new TypeGenerator<>(type, transformer);
+    return new TypeGenerator<>(type, transformer).setDeclaringFullyQualifiedName(type.qualifier());
   }
 
   /**
@@ -431,9 +446,9 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMehtodsAdded) {
+  public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded) {
     m_addAllNecessaryMehtods = true;
-    m_unimplementedMethodsTransformer = callbackForMehtodsAdded;
+    m_unimplementedMethodsTransformer = callbackForMethodsAdded;
     return currentInstance();
   }
 

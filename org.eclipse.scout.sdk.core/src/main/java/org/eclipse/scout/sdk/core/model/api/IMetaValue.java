@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
+import java.util.stream.Stream;
+
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -42,6 +44,12 @@ public interface IMetaValue {
    * @return the value converted into the given class.
    */
   <T> T as(Class<T> expectedType);
+
+  /**
+   * @return A {@link Stream} of {@link IJavaElement}s that are children of this {@link IMetaValue}. The {@link Stream}
+   *         can only contain {@link IAnnotation}s as all oder values are no {@link IJavaElement}s.
+   */
+  Stream<IJavaElement> children();
 
   /**
    * Converts this {@link IMetaValue} into a {@link ISourceGenerator} that generates source that is structurally equal

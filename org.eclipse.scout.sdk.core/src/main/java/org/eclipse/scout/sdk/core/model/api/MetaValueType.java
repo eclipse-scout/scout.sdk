@@ -50,7 +50,7 @@ public enum MetaValueType {
    */
   Float,
   /**
-   * {@link IMetaValue#as(Class)} is a {@link Float}
+   * {@link IMetaValue#as(Class)} is a {@link String}
    */
   String,
   /**
@@ -66,7 +66,8 @@ public enum MetaValueType {
    */
   Annotation,
   /**
-   * {@link IMetaValue#as(Class)} is a primitive array int[] or a typed object array such as String[]
+   * {@link IMetaValue#as(Class)} is a primitive array int[] or a typed object array such as String[] or an
+   * {@link IAnnotation} array.
    * <p>
    * The meta value itself is a {@link IArrayMetaValue}
    */

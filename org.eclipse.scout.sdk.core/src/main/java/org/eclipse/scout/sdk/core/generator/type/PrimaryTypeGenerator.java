@@ -400,8 +400,8 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   }
 
   @Override
-  public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMehtodsAdded) {
-    primary().withAllMethodsImplemented(callbackForMehtodsAdded);
+  public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded) {
+    primary().withAllMethodsImplemented(callbackForMethodsAdded);
     return currentInstance();
   }
 

@@ -10,11 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformField;
-
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -64,7 +63,7 @@ public class FieldImplementor extends AbstractMemberImplementor<FieldSpi> implem
 
   @Override
   public IFieldGenerator<?> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    return transformField(this, transformer);
+    return FieldGenerator.create(this, transformer);
   }
 
   @Override

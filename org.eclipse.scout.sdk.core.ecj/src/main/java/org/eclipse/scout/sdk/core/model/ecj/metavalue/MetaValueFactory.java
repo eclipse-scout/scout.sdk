@@ -10,12 +10,15 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj.metavalue;
 
+import java.util.stream.Stream;
+
 import org.eclipse.jdt.internal.compiler.impl.Constant;
 import org.eclipse.jdt.internal.compiler.lookup.TypeIds;
 import org.eclipse.scout.sdk.core.model.api.AbstractMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ArrayMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.MetaValueType;
@@ -149,6 +152,11 @@ public final class MetaValueFactory {
       @Override
       public MetaValueType type() {
         return MetaValueType.Annotation;
+      }
+
+      @Override
+      public Stream<IJavaElement> children() {
+        return Stream.of(as(IAnnotation.class));
       }
 
       @Override

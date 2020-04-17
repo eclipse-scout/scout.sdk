@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
+import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.ITransformInput;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -52,11 +54,11 @@ public class SimpleWorkingCopyTransformerBuilderTest {
     env.requireType(ChildClass.class.getName())
         .requireCompilationUnit()
         .toWorkingCopy(transformer);
-    assertEquals(25, m_counter.get());
+    assertEquals(24, m_counter.get());
   }
 
-  private <A> A count(A a) {
+  private <M extends IJavaElement, G> G count(ITransformInput<M, G> input) {
     m_counter.incrementAndGet();
-    return a;
+    return input.requestDefaultWorkingCopy();
   }
 }

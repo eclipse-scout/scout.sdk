@@ -17,20 +17,13 @@ import java.util.function.Supplier;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
@@ -43,7 +36,6 @@ import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.model.api.IUnresolvedType;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link IWorkingCopyTransformer}</h3>
@@ -55,11 +47,11 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  * <b>Override Methods with modifications on the overridden components:</b>
  *
  * <pre>
- * final IWorkingCopyTransformer transformer = new DefaultWorkingCopyTransformer() {
+ * IWorkingCopyTransformer transformer = new DefaultWorkingCopyTransformer() {
  *   &#64;Override
- *   public IMethodGenerator&#60;?, ? extends IMethodBodyBuilder&#60;?&#62;&#62; transformMethod(final ITransformInput&#60;IMethod, IMethodGenerator&#60;?, ? extends IMethodBodyBuilder&#60;?&#62;&#62;&#62; input) {
- *     final IMethod templateMethod = input.model();
- *     final IMethodGenerator&#60;?, ? extends IMethodBodyBuilder&#60;?&#62;&#62; overrideGenerator = input.requestDefaultWorkingCopy();
+ *   public IMethodGenerator&#60;?, ? extends IMethodBodyBuilder&#60;?&#62;&#62; transformMethod(ITransformInput&#60;IMethod, IMethodGenerator&#60;?, ? extends IMethodBodyBuilder&#60;?&#62;&#62;&#62; input) {
+ *     IMethod templateMethod = input.model();
+ *     IMethodGenerator&#60;?, ? extends IMethodBodyBuilder&#60;?&#62;&#62; overrideGenerator = input.requestDefaultWorkingCopy();
  *     switch (templateMethod.elementName()) {
  *       case "toString":
  *         // provide method body for toString method
@@ -73,7 +65,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  *   }
  * };
  *
- * final PrimaryTypeGenerator&#60;?&#62; generator = PrimaryTypeGenerator.create()
+ * PrimaryTypeGenerator&#60;?&#62; generator = PrimaryTypeGenerator.create()
  *     .withElementName("SampleCloseable")
  *     .withInterface(AutoCloseable.class.getName()) // defines the methods that can be overridden
  *     .withMethod(MethodOverrideGenerator.createOverride(transformer)
@@ -84,18 +76,19 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  * <b>Convert to working copy applying modifications:</b>
  *
  * <pre>
- * final ICompilationUnit icu = env.requireType(Long.class.getName()).requireCompilationUnit();
- * final ICompilationUnitGenerator&#60;?&#62; workingCopy = icu.toWorkingCopy(
+ * ICompilationUnit icu = env.requireType(Long.class.getName()).requireCompilationUnit();
+ * ICompilationUnitGenerator&#60;?&#62; workingCopy = icu.toWorkingCopy(
  *     new SimpleWorkingCopyTransformerBuilder()
- *         .withAnnotationMapper(this::transformAnnotation)
+ *         .withAnnotationMapper(this::transformAnnotation) // change SuppressWarnings to 'all'
+ *         .withMethodParameterMapper(IWorkingCopyTransformer::remove) // remove all parameters from methods
  *         .build());
  *
- * private IAnnotationGenerator&#60;?&#62; transformAnnotation(final IAnnotationGenerator&#60;?&#62; gen) {
- *   if (SuppressWarnings.class.getName().equals(gen.elementName().orElse(null))) {
+ * private IAnnotationGenerator&#60;?&#62; transformAnnotation(ITransformInput&#60;IAnnotation, IAnnotationGenerator&#60;?&#62;&#62; input) {
+ *   if (SuppressWarnings.class.getName().equals(input.model().type().name())) {
  *     // modify all suppress-warning annotations to suppress all warnings
- *     gen.withElement("value", b -&#62; b.stringLiteral("all"));
+ *     return input.requestDefaultWorkingCopy().withElement("value", b -&#62; b.stringLiteral("all"));
  *   }
- *   return gen;
+ *   return input.requestDefaultWorkingCopy();
  * }
  * </pre>
  *
@@ -133,11 +126,11 @@ public interface IWorkingCopyTransformer {
    *          The {@link IAnnotation} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link IAnnotationGenerator} to use as working copy for the {@link IAnnotation} specified.
+   * @return The {@link IAnnotationGenerator} to use as working copy for the {@link IAnnotation} specified or an empty
+   *         {@link Optional} if the annotation should be removed.
    */
-  static IAnnotationGenerator<?> transformAnnotation(IAnnotation a, IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.<IAnnotation, IAnnotationGenerator<?>> transform(transformer, a,
-        () -> AnnotationGenerator.create(a, transformer), (t, i) -> t.transformAnnotation(i));
+  static Optional<IAnnotationGenerator<?>> transformAnnotation(IAnnotation a, IWorkingCopyTransformer transformer) {
+    return transform(transformer, a, () -> a.toWorkingCopy(transformer), (t, i) -> t.transformAnnotation(i));
   }
 
   /**
@@ -147,11 +140,11 @@ public interface IWorkingCopyTransformer {
    *          The {@link ICompilationUnit} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link ICompilationUnitGenerator} to use as working copy for the {@link ICompilationUnit} specified.
+   * @return The {@link ICompilationUnitGenerator} to use as working copy for the {@link ICompilationUnit} specified or
+   *         an empty {@link Optional} if the compilation unit should be removed.
    */
-  static ICompilationUnitGenerator<?> transformCompilationUnit(ICompilationUnit icu, IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.<ICompilationUnit, ICompilationUnitGenerator<?>> transform(transformer, icu,
-        () -> CompilationUnitGenerator.create(icu, transformer), (t, i) -> t.transformCompilationUnit(i));
+  static Optional<ICompilationUnitGenerator<?>> transformCompilationUnit(ICompilationUnit icu, IWorkingCopyTransformer transformer) {
+    return transform(transformer, icu, () -> icu.toWorkingCopy(transformer), (t, i) -> t.transformCompilationUnit(i));
   }
 
   /**
@@ -161,11 +154,11 @@ public interface IWorkingCopyTransformer {
    *          The {@link ITypeParameter} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link ITypeParameterGenerator} to use as working copy for the {@link ITypeParameter} specified.
+   * @return The {@link ITypeParameterGenerator} to use as working copy for the {@link ITypeParameter} specified or an
+   *         empty {@link Optional} if the type parameter should be removed.
    */
-  static ITypeParameterGenerator<?> transformTypeParameter(ITypeParameter param, IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.<ITypeParameter, ITypeParameterGenerator<?>> transform(transformer, param,
-        () -> TypeParameterGenerator.create(param), (t, i) -> t.transformTypeParameter(i));
+  static Optional<ITypeParameterGenerator<?>> transformTypeParameter(ITypeParameter param, IWorkingCopyTransformer transformer) {
+    return transform(transformer, param, () -> param.toWorkingCopy(transformer), (t, i) -> t.transformTypeParameter(i));
   }
 
   /**
@@ -175,11 +168,11 @@ public interface IWorkingCopyTransformer {
    *          The {@link IMethodParameter} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link IMethodParameterGenerator} to use as working copy for the {@link IMethodParameter} specified.
+   * @return The {@link IMethodParameterGenerator} to use as working copy for the {@link IMethodParameter} specified or
+   *         an empty {@link Optional} if the parameter should be removed.
    */
-  static IMethodParameterGenerator<?> transformMethodParameter(IMethodParameter mp, IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.<IMethodParameter, IMethodParameterGenerator<?>> transform(transformer, mp,
-        () -> MethodParameterGenerator.create(mp, transformer), (t, i) -> t.transformMethodParameter(i));
+  static Optional<IMethodParameterGenerator<?>> transformMethodParameter(IMethodParameter mp, IWorkingCopyTransformer transformer) {
+    return transform(transformer, mp, () -> mp.toWorkingCopy(transformer), (t, i) -> t.transformMethodParameter(i));
   }
 
   /**
@@ -189,11 +182,11 @@ public interface IWorkingCopyTransformer {
    *          The {@link IField} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link IFieldGenerator} to use as working copy for the {@link IField} specified.
+   * @return The {@link IFieldGenerator} to use as working copy for the {@link IField} specified or an empty
+   *         {@link Optional} if the field should be removed.
    */
-  static IFieldGenerator<?> transformField(IField f, IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.<IField, IFieldGenerator<?>> transform(transformer, f,
-        () -> FieldGenerator.create(f, transformer), (t, i) -> t.transformField(i));
+  static Optional<IFieldGenerator<?>> transformField(IField f, IWorkingCopyTransformer transformer) {
+    return transform(transformer, f, () -> f.toWorkingCopy(transformer), (t, i) -> t.transformField(i));
   }
 
   /**
@@ -203,11 +196,11 @@ public interface IWorkingCopyTransformer {
    *          The {@link IMethod} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link IMethodGenerator} to use as working copy for the {@link IMethod} specified.
+   * @return The {@link IMethodGenerator} to use as working copy for the {@link IMethod} specified or an empty
+   *         {@link Optional} if the method should be removed.
    */
-  static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(IMethod m, IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> transform(transformer, m,
-        () -> MethodGenerator.create(m, transformer), (t, i) -> t.transformMethod(i));
+  static Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> transformMethod(IMethod m, IWorkingCopyTransformer transformer) {
+    return transform(transformer, m, () -> m.toWorkingCopy(transformer), (t, i) -> t.transformMethod(i));
   }
 
   /**
@@ -217,11 +210,11 @@ public interface IWorkingCopyTransformer {
    *          The {@link IType} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link ITypeGenerator} to use as working copy for the {@link IType} specified.
+   * @return The {@link ITypeGenerator} to use as working copy for the {@link IType} specified or an empty
+   *         {@link Optional} if the type should be removed.
    */
-  static ITypeGenerator<?> transformType(IType type, IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.<IType, ITypeGenerator<?>> transform(transformer, type,
-        () -> TypeGenerator.create(type, transformer).setDeclaringFullyQualifiedName(type.qualifier()), (t, i) -> t.transformType(i));
+  static Optional<ITypeGenerator<?>> transformType(IType type, IWorkingCopyTransformer transformer) {
+    return transform(transformer, type, () -> type.toWorkingCopy(transformer), (t, i) -> t.transformType(i));
   }
 
   /**
@@ -231,15 +224,12 @@ public interface IWorkingCopyTransformer {
    *          The {@link IUnresolvedType} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link ITypeGenerator} to use as working copy for the {@link IUnresolvedType} specified.
+   * @return The {@link ITypeGenerator} to use as working copy for the {@link IUnresolvedType} specified or an empty
+   *         {@link Optional} if the type should be removed.
    */
-  static ITypeGenerator<?> transformUnresolvedType(IUnresolvedType ut, IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.<IUnresolvedType, ITypeGenerator<?>> transform(transformer, ut,
-        () -> ut.type()
-            .<ITypeGenerator<?>> map(t -> TypeGenerator.create(t, transformer))
-            .orElseGet(() -> TypeGenerator.create()
-                .setDeclaringFullyQualifiedName(JavaTypes.qualifier(ut.name().replace(JavaTypes.C_DOLLAR, JavaTypes.C_DOT)))
-                .withElementName(ut.elementName())),
+  static Optional<ITypeGenerator<?>> transformUnresolvedType(IUnresolvedType ut, IWorkingCopyTransformer transformer) {
+    return transform(transformer, ut,
+        () -> ut.toWorkingCopy(transformer),
         (t, i) -> t.transformUnresolvedType(i));
   }
 
@@ -250,10 +240,10 @@ public interface IWorkingCopyTransformer {
    *          The {@link IPackage} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link String} to use as package (without package key word and semicolon). May be {@code null} if the
-   *         default package should be used.
+   * @return The {@link String} to use as package (without package key word and semicolon) or an empty {@link Optional}
+   *         if the package should be removed (move to the default package).
    */
-  static String transformPackage(IPackage p, IWorkingCopyTransformer transformer) {
+  static Optional<String> transformPackage(IPackage p, IWorkingCopyTransformer transformer) {
     return transform(transformer, p, p::elementName, (t, i) -> t.transformPackage(i));
   }
 
@@ -264,11 +254,14 @@ public interface IWorkingCopyTransformer {
    *          The {@link IAnnotationElement} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link ISourceGenerator} to use as working copy for the {@link IAnnotationElement} specified.
+   * @return The {@link ISourceGenerator} to use as working copy for the value (without annotation element name and
+   *         equal sign) of the {@link IAnnotationElement} specified or an empty {@link Optional} if the element should
+   *         be removed.
    */
-  static ISourceGenerator<IExpressionBuilder<?>> transformAnnotationElement(IAnnotationElement ae, IWorkingCopyTransformer transformer) {
+  static Optional<ISourceGenerator<IExpressionBuilder<?>>> transformAnnotationElement(IAnnotationElement ae, IWorkingCopyTransformer transformer) {
     return transform(transformer, ae,
-        () -> ae.value().toWorkingCopy(transformer), (t, i) -> t.transformAnnotationElement(i));
+        () -> ae.value().toWorkingCopy(transformer),
+        (t, i) -> t.transformAnnotationElement(i));
   }
 
   /**
@@ -278,11 +271,11 @@ public interface IWorkingCopyTransformer {
    *          The {@link IImport} to transform. Must not be {@code null}.
    * @param transformer
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
-   * @return The {@link CharSequence} to use as import (without import key word and semicolon). Must not be
-   *         {@code null}.
+   * @return The {@link CharSequence} to use as import (without import key word and semicolon) or an empty
+   *         {@link Optional} if the import should be removed.
    */
-  static CharSequence transformImport(IImport imp, IWorkingCopyTransformer transformer) {
-    return IWorkingCopyTransformer.<IImport, CharSequence> transform(transformer, imp, imp::name, (t, i) -> t.transformImport(i));
+  static Optional<CharSequence> transformImport(IImport imp, IWorkingCopyTransformer transformer) {
+    return transform(transformer, imp, imp::name, (t, i) -> t.transformImport(i));
   }
 
   /**
@@ -292,18 +285,50 @@ public interface IWorkingCopyTransformer {
    *          The transformer to use. May be {@code null} if a default transformation should be performed.
    * @param model
    *          The model object to transform. May not be {@code null}.
-   * @param generatorSupplier
+   * @param defaultGeneratorSupplier
    *          {@link Supplier} to create a default transformer.
    * @param transformerCall
    *          The transformation call to execute if a transformer is present. The inputs of the {@link BiFunction} are
    *          never {@code null}.
-   * @return The transformed model.
+   * @return The transformed model or an empty {@link Optional} if the model element should not be generated at all.
    */
-  static <M extends IJavaElement, G> G transform(IWorkingCopyTransformer transformer, M model, Supplier<G> generatorSupplier,
+  static <M extends IJavaElement, G> Optional<G> transform(IWorkingCopyTransformer transformer, M model, Supplier<G> defaultGeneratorSupplier,
       BiFunction<IWorkingCopyTransformer, ITransformInput<M, G>, G> transformerCall) {
-    return Optional.ofNullable(transformer)
-        .map(t -> transformerCall.apply(t, new TransformInput<>(model, generatorSupplier)))
-        .orElseGet(generatorSupplier);
+    if (transformer == null) {
+      return Optional.of(defaultGeneratorSupplier.get()); // default transformers are not allowed to return a null generator
+    }
+    return Optional.ofNullable(transformerCall.apply(transformer, new TransformInput<>(model, defaultGeneratorSupplier)));
+  }
+
+  /**
+   * This function may be used as reference to remove elements during transformation.
+   * <p>
+   * <b>Example:</b>
+   * <p>
+   * 
+   * <pre>
+   * IWorkingCopyTransformer transformer = new SimpleWorkingCopyTransformerBuilder()
+   *     .withMethodParameterMapper(IWorkingCopyTransformer::remove) // remove all method parameters
+   *     .build();
+   * </pre>
+   * 
+   * @param input
+   *          The input element to remove.
+   * @param <G>
+   * @return always {@code null} which removes the element.
+   */
+  static <G> G remove(ITransformInput<?, G> input) {
+    return null; // removes the element
+  }
+
+  /**
+   * This method can be called if an {@link IWorkingCopyTransformer} would like to completely remove an element.
+   * 
+   * @param <G>
+   * @return always {@code null} which removes the element.
+   */
+  default <G> G remove() {
+    return remove(null);
   }
 
   /**
@@ -314,8 +339,8 @@ public interface IWorkingCopyTransformer {
    * @param input
    *          The transformation input providing the source {@link IAnnotation} and a default
    *          {@link IAnnotationGenerator}. Is never {@code null}.
-   * @return The {@link IAnnotationGenerator} to use as working copy for the {@link IAnnotation}. Must not be
-   *         {@code null}.
+   * @return The {@link IAnnotationGenerator} to use as working copy for the {@link IAnnotation}. May be {@code null} if
+   *         the annotation should be removed (use {@link #remove()}).
    */
   IAnnotationGenerator<?> transformAnnotation(ITransformInput<IAnnotation, IAnnotationGenerator<?>> input);
 
@@ -327,8 +352,8 @@ public interface IWorkingCopyTransformer {
    * @param input
    *          The transformation input providing the source {@link ICompilationUnit} and a default
    *          {@link ICompilationUnitGenerator}. Is never {@code null}.
-   * @return The {@link ICompilationUnitGenerator} to use as working copy for the {@link ICompilationUnit}. Must not be
-   *         {@code null}.
+   * @return The {@link ICompilationUnitGenerator} to use as working copy for the {@link ICompilationUnit}. May be
+   *         {@code null} if the compilation unit should be removed (use {@link #remove()}).
    */
   ICompilationUnitGenerator<?> transformCompilationUnit(ITransformInput<ICompilationUnit, ICompilationUnitGenerator<?>> input);
 
@@ -340,8 +365,8 @@ public interface IWorkingCopyTransformer {
    * @param input
    *          The transformation input providing the source {@link ITypeParameter} and a default
    *          {@link ITypeParameterGenerator}. Is never {@code null}.
-   * @return The {@link ITypeParameterGenerator} to use as working copy for the {@link ITypeParameter}. Must not be
-   *         {@code null}.
+   * @return The {@link ITypeParameterGenerator} to use as working copy for the {@link ITypeParameter}. May be
+   *         {@code null} if the type parameter should be removed (use {@link #remove()}).
    */
   ITypeParameterGenerator<?> transformTypeParameter(ITransformInput<ITypeParameter, ITypeParameterGenerator<?>> input);
 
@@ -353,8 +378,8 @@ public interface IWorkingCopyTransformer {
    * @param input
    *          The transformation input providing the source {@link IMethodParameter} and a default
    *          {@link IMethodParameterGenerator}. Is never {@code null}.
-   * @return The {@link IMethodParameterGenerator} to use as working copy for the {@link IMethodParameter}. Must not be
-   *         {@code null}.
+   * @return The {@link IMethodParameterGenerator} to use as working copy for the {@link IMethodParameter}. May be
+   *         {@code null} if the method parameter should be removed (use {@link #remove()}).
    */
   IMethodParameterGenerator<?> transformMethodParameter(ITransformInput<IMethodParameter, IMethodParameterGenerator<?>> input);
 
@@ -366,7 +391,8 @@ public interface IWorkingCopyTransformer {
    * @param input
    *          The transformation input providing the source {@link IField} and a default {@link IFieldGenerator}. Is
    *          never {@code null}.
-   * @return The {@link IFieldGenerator} to use as working copy for the {@link IField}. Must not be {@code null}.
+   * @return The {@link IFieldGenerator} to use as working copy for the {@link IField}. May be {@code null} if the field
+   *         should be removed (use {@link #remove()}).
    */
   IFieldGenerator<?> transformField(ITransformInput<IField, IFieldGenerator<?>> input);
 
@@ -378,7 +404,8 @@ public interface IWorkingCopyTransformer {
    * @param input
    *          The transformation input providing the source {@link IMethod} and a default {@link IMethodGenerator}. Is
    *          never {@code null}.
-   * @return The {@link IMethodGenerator} to use as working copy for the {@link IMethod}. Must not be {@code null}.
+   * @return The {@link IMethodGenerator} to use as working copy for the {@link IMethod}. May be {@code null} if the
+   *         method should be removed (use {@link #remove()}).
    */
   IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input);
 
@@ -390,7 +417,8 @@ public interface IWorkingCopyTransformer {
    * @param input
    *          The transformation input providing the source {@link IType} and a default {@link ITypeGenerator}. Is never
    *          {@code null}.
-   * @return The {@link ITypeGenerator} to use as working copy for the {@link IType}. Must not be {@code null}.
+   * @return The {@link ITypeGenerator} to use as working copy for the {@link IType}. May be {@code null} if the type
+   *         should be removed (use {@link #remove()}).
    */
   ITypeGenerator<?> transformType(ITransformInput<IType, ITypeGenerator<?>> input);
 
@@ -402,8 +430,8 @@ public interface IWorkingCopyTransformer {
    * @param input
    *          The transformation input providing the source {@link IUnresolvedType} and a default
    *          {@link ITypeGenerator}. Is never {@code null}.
-   * @return The {@link ITypeGenerator} to use as working copy for the {@link IUnresolvedType}. Must not be
-   *         {@code null}.
+   * @return The {@link ITypeGenerator} to use as working copy for the {@link IUnresolvedType}. May be {@code null} if
+   *         the annotation should be removed (use {@link #remove()}).
    */
   ITypeGenerator<?> transformUnresolvedType(ITransformInput<IUnresolvedType, ITypeGenerator<?>> input);
 
@@ -426,8 +454,8 @@ public interface IWorkingCopyTransformer {
    * @param input
    *          The transformation input providing the source {@link IAnnotationElement} and a default
    *          {@link ISourceGenerator}. Is never {@code null}.
-   * @return The {@link ISourceGenerator} to use as working copy for the {@link IAnnotationElement}. Must not be
-   *         {@code null}.
+   * @return The {@link ISourceGenerator} to use as working copy for the {@link IAnnotationElement}. May be {@code null}
+   *         if the annotation element should be removed (use {@link #remove()}).
    */
   ISourceGenerator<IExpressionBuilder<?>> transformAnnotationElement(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input);
 

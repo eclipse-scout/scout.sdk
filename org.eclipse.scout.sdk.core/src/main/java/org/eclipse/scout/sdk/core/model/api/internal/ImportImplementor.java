@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformImport;
-import static org.eclipse.scout.sdk.core.imports.ImportCollector.createImportDeclaration;
+import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createImportGenerator;
 
 import java.util.stream.Stream;
 
@@ -56,7 +55,7 @@ public class ImportImplementor extends AbstractJavaElementImplementor<ImportSpi>
 
   @Override
   public ISourceGenerator<ISourceBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    return ISourceGenerator.raw(createImportDeclaration(isStatic(), transformImport(this, transformer)));
+    return createImportGenerator(this);
   }
 
   @Override

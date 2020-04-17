@@ -346,7 +346,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * <p>
    * <b>Example:</b> See {@link IWorkingCopyTransformer}.
    *
-   * @param callbackForMehtodsAdded
+   * @param callbackForMethodsAdded
    *          Optional callback that is invoked for each missing method that is generated. May be {@code null}.<br>
    *          The {@link IWorkingCopyTransformer} is called for each {@link IJavaElement} in every method that is
    *          created. The corresponding {@link ITransformInput}s default working copy (see
@@ -366,7 +366,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @see DefaultWorkingCopyTransformer
    * @see SimpleWorkingCopyTransformerBuilder
    */
-  TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMehtodsAdded);
+  TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded);
 
   /**
    * Instructs this {@link ITypeGenerator} to not automatically add missing methods. This is the default.

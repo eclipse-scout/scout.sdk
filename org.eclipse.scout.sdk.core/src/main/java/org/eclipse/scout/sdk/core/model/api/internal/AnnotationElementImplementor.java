@@ -10,14 +10,13 @@
  */
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotationElement;
+import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createAnnotationElementGenerator;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
-import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -55,17 +54,12 @@ public class AnnotationElementImplementor extends AbstractJavaElementImplementor
 
   @Override
   public Stream<IJavaElement> children() {
-    return Stream.empty();
+    return value().children();
   }
 
   @Override
   public ISourceGenerator<ISourceBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer) {
-    if (isDefault()) {
-      return ISourceGenerator.empty();
-    }
-    ISourceGenerator<IExpressionBuilder<?>> g = b -> b.append(elementName()).equalSign().append(transformAnnotationElement(this, transformer)
-        .generalize(ExpressionBuilder::create));
-    return g.generalize(ExpressionBuilder::create);
+    return createAnnotationElementGenerator(this, transformer).generalize(ExpressionBuilder::create);
   }
 
   @Override
