@@ -16,11 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
+import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -167,6 +169,69 @@ public class JavaElementVisitorTest {
   }
 
   @Test
+  public void testVisitNestedAnnotations(IJavaEnvironment env) {
+    IType type = env.requireType(ClassWithAnnotationWithArrayValues.class.getName());
+    StringJoiner protocol = new StringJoiner(",");
+    Consumer<IJavaElement> visitor = element -> protocol.add(element.elementName());
+    type.visit(visitor);
+    assertEquals("ClassWithAnnotationWithArrayValues," +
+        "AnnotationWithArrayValues," +
+        "nums," +
+        "enumValues," +
+        "strings," +
+        "types," +
+        "annos," +
+        "AnnotationWithSingleValues," +
+        "num," +
+        "enumValue," +
+        "string," +
+        "type," +
+        "anno," +
+        "Generated," +
+        "value," +
+        "date," +
+        "comments," +
+        "AnnotationWithSingleValues," +
+        "num," +
+        "enumValue," +
+        "string," +
+        "type," +
+        "anno," +
+        "Generated," +
+        "value," +
+        "date," +
+        "comments," +
+        "run," +
+        "AnnotationWithArrayValues," +
+        "nums," +
+        "enumValues," +
+        "strings," +
+        "types," +
+        "annos," +
+        "AnnotationWithSingleValues," +
+        "num," +
+        "enumValue," +
+        "string," +
+        "type," +
+        "anno," +
+        "Generated," +
+        "value," +
+        "date," +
+        "comments," +
+        "AnnotationWithSingleValues," +
+        "num," +
+        "enumValue," +
+        "string," +
+        "type," +
+        "anno," +
+        "Generated," +
+        "value," +
+        "date," +
+        "comments," +
+        "a", protocol.toString());
+  }
+
+  @Test
   public void testVisitConsumer(IJavaEnvironment env) {
     ICompilationUnit icu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
     StringBuilder aggregator1 = new StringBuilder();
@@ -215,6 +280,7 @@ public class JavaElementVisitorTest {
     StringBuilder protocol();
 
     default void append(IJavaElement e, int level, int index) {
+      //noinspection HardcodedLineSeparator
       protocol()
           .append(repeat("  ", level))
           .append(e.elementName())
@@ -225,6 +291,7 @@ public class JavaElementVisitorTest {
     }
 
     default void postAppend(int level) {
+      //noinspection HardcodedLineSeparator
       protocol()
           .append(repeat("  ", level))
           .append("}\n");
