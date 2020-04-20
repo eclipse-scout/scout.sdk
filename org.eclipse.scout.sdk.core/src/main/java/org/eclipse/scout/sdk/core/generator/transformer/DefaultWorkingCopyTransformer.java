@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IImport;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
@@ -44,56 +45,73 @@ public class DefaultWorkingCopyTransformer implements IWorkingCopyTransformer {
 
   @Override
   public IAnnotationGenerator<?> transformAnnotation(ITransformInput<IAnnotation, IAnnotationGenerator<?>> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public ICompilationUnitGenerator<?> transformCompilationUnit(ITransformInput<ICompilationUnit, ICompilationUnitGenerator<?>> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public ITypeParameterGenerator<?> transformTypeParameter(ITransformInput<ITypeParameter, ITypeParameterGenerator<?>> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public IMethodParameterGenerator<?> transformMethodParameter(ITransformInput<IMethodParameter, IMethodParameterGenerator<?>> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public IFieldGenerator<?> transformField(ITransformInput<IField, IFieldGenerator<?>> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public ITypeGenerator<?> transformType(ITransformInput<IType, ITypeGenerator<?>> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public ITypeGenerator<?> transformUnresolvedType(ITransformInput<IUnresolvedType, ITypeGenerator<?>> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public String transformPackage(ITransformInput<IPackage, String> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public ISourceGenerator<IExpressionBuilder<?>> transformAnnotationElement(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input) {
-    return input.requestDefaultWorkingCopy();
+    return transformElement(input);
   }
 
   @Override
   public CharSequence transformImport(ITransformInput<IImport, CharSequence> input) {
+    return transformElement(input);
+  }
+
+  /**
+   * Default transformation implementation for all elements.
+   * 
+   * @param input
+   *          The {@link ITransformInput} that holds the input {@link IJavaElement} and access to the original default
+   *          transformation.
+   * @param <M>
+   *          The {@link IJavaElement model} to transform
+   * @param <R>
+   *          The created source generator
+   * @return The created source generator
+   */
+  @SuppressWarnings("MethodMayBeStatic")
+  protected <M extends IJavaElement, R> R transformElement(ITransformInput<M, R> input) {
     return input.requestDefaultWorkingCopy();
   }
 }
