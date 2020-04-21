@@ -40,11 +40,11 @@ public class UniqueIdExtension implements BeforeAllCallback, AfterAllCallback {
 
   @Override
   public void afterAll(ExtensionContext context) {
-    UniqueIds.STORE.remove(0);
+    UniqueIds.removeIdProvider(TESTING_ID_PROVIDER);
   }
 
   @Override
   public void beforeAll(ExtensionContext context) {
-    UniqueIds.STORE.add(0, TESTING_ID_PROVIDER);
+    UniqueIds.registerIdProvider(TESTING_ID_PROVIDER);
   }
 }

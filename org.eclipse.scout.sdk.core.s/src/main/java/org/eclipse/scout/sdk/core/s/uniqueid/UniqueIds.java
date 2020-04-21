@@ -10,11 +10,12 @@
  */
 package org.eclipse.scout.sdk.core.s.uniqueid;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
  * <h3>{@link UniqueIds}</h3>
@@ -23,9 +24,25 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
  */
 public final class UniqueIds {
 
-  public static final List<Function<String, String>> STORE = new CopyOnWriteArrayList<>();
+  private static final List<Function<String, String>> STORE = new ArrayList<>();
 
   private UniqueIds() {
+  }
+
+  public static synchronized boolean registerIdProvider(Function<String, String> provider) {
+    if (STORE.contains(Ensure.notNull(provider))) {
+      return false;
+    }
+    STORE.add(0, provider); // insert at beginning
+    return true;
+  }
+
+  public static synchronized boolean removeIdProvider(Function<String, String> provider) {
+    return STORE.remove(provider);
+  }
+
+  public static synchronized List<Function<String, String>> providers() {
+    return new ArrayList<>(STORE);
   }
 
   /**
@@ -37,7 +54,7 @@ public final class UniqueIds {
    * @return The unique id or {@code null}.
    */
   public static String next(String dataType) {
-    for (Function<String, String> p : STORE) {
+    for (Function<String, String> p : providers()) {
       try {
         String value = p.apply(dataType);
         if (value != null) {
