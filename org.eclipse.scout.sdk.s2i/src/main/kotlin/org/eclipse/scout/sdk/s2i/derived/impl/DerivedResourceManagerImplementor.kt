@@ -46,7 +46,7 @@ import kotlin.streams.toList
 
 class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceManager, SettingsChangedListener {
 
-    private val m_updateHandlerFactories = ArrayList<DerivedResourceHandlerFactory>()
+    private val m_updateHandlerFactories = HashMap<Class<*>, DerivedResourceHandlerFactory>() // use a map so that there is always only one factory of the same type
     private val m_eventBuffer = ArrayList<SearchScope>()
     private val m_pendingFutures = ConcurrentLinkedQueue<ScheduledFuture<*>>()
     private val m_executorService = AppExecutorUtil.getAppScheduledExecutorService()
@@ -133,7 +133,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         SdkLog.debug("Check for derived resource updates in scope $scope")
         callInIdeaEnvironment(project, "Update derived resources") { env, progress ->
             val start = System.currentTimeMillis()
-            val factories = synchronized(this) { ArrayList(m_updateHandlerFactories) }
+            val factories = synchronized(this) { ArrayList(m_updateHandlerFactories.values) }
             val handlers = factories
                     .parallelStream()
                     .flatMap { executeDerivedResourceHandlerFactory(it, scope) }
@@ -150,11 +150,11 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
     }
 
     override fun addDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory) = synchronized(this) {
-        m_updateHandlerFactories += factory
+        m_updateHandlerFactories[factory::class.java] = factory
     }
 
-    override fun removeDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory) = synchronized(this) {
-        m_updateHandlerFactories -= factory
+    override fun removeDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory): Boolean = synchronized(this) {
+        return m_updateHandlerFactories.keys.remove(factory::class.java)
     }
 
     private fun executeAllHandlersAndWait(handlers: List<BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>>, env: IdeaEnvironment, progress: IdeaProgress) {

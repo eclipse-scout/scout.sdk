@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s.testing;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -31,6 +33,8 @@ public final class ScoutFixtureHelper {
   public static final String SHARED_FIXTURE_PATH = "src/test/shared";
   @SuppressWarnings("HardcodedFileSeparator")
   public static final String CLIENT_FIXTURE_PATH = "src/test/client";
+
+  public static final Path NLS_TEST_DIR = Paths.get("").toAbsolutePath().resolve(SHARED_FIXTURE_PATH).resolve("nls");
 
   private ScoutFixtureHelper() {
   }

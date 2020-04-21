@@ -23,6 +23,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStoreStackListener;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
@@ -96,7 +97,7 @@ public class NlsEditor extends EditorPart {
       progress.init("Loading translation editor...", 1000);
 
       try {
-        TranslationStoreStack.create(path, e, progress.newChild(1000))
+        TranslationStores.createFullStack(path, e, progress.newChild(1000))
             .ifPresent(stack -> {
               progress.monitor().setTaskName("Creating table...");
               parent.getDisplay().syncExec(() -> createPageAsync(stack, parent));

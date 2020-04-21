@@ -270,7 +270,7 @@ public class NlsTableController extends ViewerComparator {
         return element.key();
       default:
         Language lang = languageOfColumn(columnIndex);
-        String text = element.translation(lang).orElse("");
+        String text = element.text(lang).orElse("");
         //noinspection HardcodedLineSeparator
         return Strings.replaceEach(text, new String[]{"\n", "\r"}, new String[]{" ", ""});
     }

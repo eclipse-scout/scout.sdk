@@ -17,6 +17,7 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
+import java.nio.CharBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,7 +116,7 @@ public class TranslationKeysQuery implements IFileQuery {
       int pos = 0;
       int index;
       while ((index = fileContent.indexOf(search, pos)) >= 0) {
-        FileRange match = new FileRange(candidate.file(), index, index + search.length());
+        FileRange match = new FileRange(candidate.file(), CharBuffer.wrap(candidate.fileContent(), index, search.length()), index, index + search.length());
         String key = search.substring(1, search.length() - 1); // remove starting and ending quotes
         acceptNlsKeyMatch(key, match);
         pos = index + search.length();

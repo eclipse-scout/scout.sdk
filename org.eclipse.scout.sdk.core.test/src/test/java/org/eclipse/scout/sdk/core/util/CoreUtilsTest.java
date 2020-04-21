@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
+import static org.eclipse.scout.sdk.core.util.CoreUtils.extensionOf;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.getParentURI;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.isDoubleDifferent;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.relativizeURI;
@@ -25,7 +26,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +57,28 @@ public class CoreUtilsTest {
     assertEquals(child2, relativizeURI(URI.create("http://user:pw@host:port/a/b/c/d/"), URI.create(child2)).toString());
     String child3 = "file://user:pw@host:port/a/b/c/d/sub/sub2";
     assertEquals(child3, relativizeURI(URI.create("http://user:pw@host:port/a/b/c/d/"), URI.create(child3)).toString());
+  }
+
+  @SuppressWarnings("HardcodedFileSeparator")
+  @Test
+  public void testExtensionOf() {
+    assertEquals("", extensionOf((String) null));
+    assertEquals("", extensionOf((String) null));
+    assertEquals("", extensionOf(""));
+    assertEquals("gitignore", extensionOf(".gitignore"));
+    assertEquals("txt", extensionOf("test.txt"));
+    assertEquals("js", extensionOf("a/asdf/ddd/test.js"));
+    assertEquals("", extensionOf("test"));
+    assertEquals("jpg", extensionOf("test.JPG"));
+    assertEquals("", extensionOf("endsWithDot."));
+
+    assertEquals("", extensionOf((Path) null));
+    assertEquals("", extensionOf((Path) null));
+    assertEquals("", extensionOf(Paths.get("")));
+    assertEquals("gitignore", extensionOf(Paths.get(".gitignore")));
+    assertEquals("txt", extensionOf(Paths.get("test.txt")));
+    assertEquals("js", extensionOf(Paths.get("a/asdf/ddd/test.js")));
+    assertEquals("", extensionOf(Paths.get("test")));
   }
 
   @Test
@@ -145,11 +170,14 @@ public class CoreUtilsTest {
       CoreUtils.moveDirectory(folderToMove, targetDirectory);
 
       assertFalse(Files.isDirectory(folderToMove));
-      Path[] newContent = Files.list(targetDirectory).toArray(Path[]::new);
-      assertEquals(1, newContent.length);
-      Path movedDir = newContent[0];
-      assertEquals(folderToMove.getFileName().toString(), movedDir.getFileName().toString());
-      assertTrue(Files.isReadable(movedDir.resolve(subDirs + fileName)));
+      //noinspection NestedTryStatement
+      try (Stream<Path> files = Files.list(targetDirectory)) {
+        Path[] newContent = files.toArray(Path[]::new);
+        assertEquals(1, newContent.length);
+        Path movedDir = newContent[0];
+        assertEquals(folderToMove.getFileName().toString(), movedDir.getFileName().toString());
+        assertTrue(Files.isReadable(movedDir.resolve(subDirs + fileName)));
+      }
     }
     finally {
       CoreUtils.deleteDirectory(folderToMove);

@@ -48,6 +48,7 @@ public class NlsTable extends Composite {
 
   private TableColumn m_sortColumn;
 
+  @SuppressWarnings("ThisEscapedInObjectConstruction")
   public NlsTable(Composite parent, NlsTableController controller) {
     super(parent, SWT.NONE);
     setBackground(parent.getBackground());
@@ -116,7 +117,7 @@ public class NlsTable extends Composite {
           // language does not yet exist for that store: create it
           stack.addNewLanguage(language, cell.entry().store());
         }
-        updatedTranslation.putTranslation(language, newText);
+        updatedTranslation.putText(language, newText);
         stack.updateTranslation(updatedTranslation);
       }
       finally {

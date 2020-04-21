@@ -42,10 +42,10 @@ public interface ITranslation {
    *          country and variant of the {@link Language#locale()}). Must not be {@code null}.
    * @return The translation text or an empty {@link Optional}.
    */
-  Optional<String> translation(Language language);
+  Optional<String> text(Language language);
 
   /**
    * @return An unmodifiable view on all language-text mappings of this {@link ITranslation}.
    */
-  Map<Language, String> translations();
+  Map<Language, String> texts();
 }

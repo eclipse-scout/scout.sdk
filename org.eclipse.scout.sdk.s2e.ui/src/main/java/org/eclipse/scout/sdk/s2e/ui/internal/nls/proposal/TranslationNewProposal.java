@@ -71,7 +71,7 @@ public class TranslationNewProposal extends AbstractTranslationProposal {
 
     String key = m_stack.generateNewKey(proposalFieldText);
     Translation entry = new Translation(key);
-    entry.putTranslation(Language.LANGUAGE_DEFAULT, proposalFieldText);
+    entry.putText(Language.LANGUAGE_DEFAULT, proposalFieldText);
 
     TranslationNewAction action = new TranslationNewAction(Display.getDefault().getActiveShell(), m_stack, entry);
     action.run();

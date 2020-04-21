@@ -295,6 +295,30 @@ public interface IType extends IMember {
   Optional<Stream<IType>> resolveTypeParamValue(int typeParamIndex, String levelFqn);
 
   /**
+   * Tries to resolve the simple specified from the view of this {@link IType}.
+   * <p>
+   * The implementation tries to find the given simple name by looking at the following places:
+   * <ol>
+   * <li>The imports (explicit or wildcard) of the {@link ICompilationUnit} of this {@link IType}. Please note that this
+   * only works if imports are available in the {@link ICompilationUnit} which is only the case if it is based on source
+   * code not on a binary class.</li>
+   * <li>The package of this {@link IType}.</li>
+   * <li>The {@code java.lang} package</li>
+   * <li>Resolving the given name directly assuming it is already fully qualified</li>
+   * </ol>
+   * Therefore the resulting {@link Optional} only contains a result if this {@link IType} actually contains a reference
+   * to the simple name or can be found in the places as explained above. An empty {@link Optional} does not necessarily
+   * mean that there is no {@link IType} with that simple name.
+   * 
+   * @param simpleName
+   *          The simple name to resolve. May be {@code null}, empty {@link String}, a simple name or a fully qualified
+   *          name.
+   * @return An {@link Optional} holding the {@link IType} the given simple name points to as seen from this
+   *         {@link IType}.
+   */
+  Optional<IType> resolveSimpleName(String simpleName);
+
+  /**
    * @return An {@link Optional} with the declaring {@link IType} of this type. The resulting {@link Optional} is empty
    *         if this {@link IType} is the primary type already.
    */

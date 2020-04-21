@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
+import static org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTextProviderService.resourceMatchesPrefix;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -45,9 +46,26 @@ public class PropertiesTextProviderServiceTest {
     PropertiesTextProviderService txtSvc = PropertiesTextProviderService.create(txtSvcType).get();
 
     assertEquals("Prefix", txtSvc.filePrefix());
+    //noinspection HardcodedFileSeparator
     assertEquals("formdata/shared/texts", txtSvc.folder());
     assertEquals(11.2, txtSvc.order(), 0.001);
     assertSame(txtSvcType, txtSvc.type());
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testResourceMatchesPrefix() {
+    assertFalse(resourceMatchesPrefix("MyName.properties", "Text"));
+    assertFalse(resourceMatchesPrefix("MyName.properties", null));
+    assertFalse(resourceMatchesPrefix(null, "Text"));
+
+    assertTrue(resourceMatchesPrefix("Text.properties", "Text"));
+    assertTrue(resourceMatchesPrefix("Text_en.properties", "Text"));
+    assertTrue(resourceMatchesPrefix("Text_en_GB.properties", "Text"));
+    assertTrue(resourceMatchesPrefix("Text_en_GB_ll.properties", "Text"));
+    assertFalse(resourceMatchesPrefix("Text_en_GB_ll_dd.properties", "Text"));
+
+    assertFalse(resourceMatchesPrefix("Text_en_GB_ll.js", "Text"));
   }
 
   @Test
@@ -61,7 +79,7 @@ public class PropertiesTextProviderServiceTest {
     ScoutJavaEnvironmentFactory.run(secondSharedEnv -> testFromSegments(env, secondSharedEnv), false, false);
   }
 
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "EqualsWithItself", "ConstantConditions", "EqualsBetweenInconvertibleTypes"})
   private static void testFromSegments(IJavaEnvironment first, IJavaEnvironment second) {
 
     IType txtSvcType = first.requireType(TestTextProviderService.class.getName());

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.environment;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
@@ -48,6 +49,16 @@ public interface IEnvironment {
    *         {@link Optional} if no {@link IJavaEnvironment} exists at this location.
    */
   Optional<IJavaEnvironment> findJavaEnvironment(Path root);
+
+  /**
+   * Tries to find all types with the fully qualified name given. The {@link IEnvironment} tries to find all accessible
+   * matches. This may include matches in {@link IJavaEnvironment}s not yet used.
+   * 
+   * @param fqn
+   *          The fully qualified name to find. Must not be empty.
+   * @return All {@link IType}s found. The different instances may belong to different {@link IJavaEnvironment}s.
+   */
+  Stream<IType> findType(String fqn);
 
   /**
    * Executes the specified {@link ICompilationUnitGenerator} in the {@link IJavaEnvironment} of the specified

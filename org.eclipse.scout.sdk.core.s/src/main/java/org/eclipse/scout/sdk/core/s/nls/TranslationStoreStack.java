@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -52,15 +51,12 @@ import org.eclipse.scout.sdk.core.util.Strings;
  * Represents a stack of {@link ITranslationStore}s as available at runtime. In the Scout runtime such a stack is
  * represented by all {@code org.eclipse.scout.rt.shared.services.common.text.ITextProviderService}s available.
  * <p>
- * Use {@link #create(Path, IEnvironment, IProgress)} to create a {@link TranslationStoreStack} for a specific
- * {@link Path}.
+ * Use {@link TranslationStores#createFullStack(Path, IEnvironment, IProgress)} to create a
+ * {@link TranslationStoreStack} for a specific {@link Path}.
  *
  * @since 7.0.0
  */
 public class TranslationStoreStack {
-
-  @SuppressWarnings("PublicStaticCollectionField")
-  public static final List<ITranslationStoreSupplier> SUPPLIERS = new CopyOnWriteArrayList<>();
 
   private final Deque<ITranslationStore> m_stores;
   private final EventListenerList m_listeners;
@@ -79,21 +75,7 @@ public class TranslationStoreStack {
     m_stores = new ArrayDeque<>(l);
   }
 
-  /**
-   * Calls all {@link ITranslationStoreSupplier}s to provide {@link ITranslationStore}s for the specified path and
-   * collects them in a new {@link TranslationStoreStack}.
-   *
-   * @param file
-   *          The {@link Path} for which all {@link ITranslationStore}s should be collected into a new
-   *          {@link TranslationStoreStack}.
-   * @param env
-   *          The {@link IEnvironment} of the request. Must not be {@code null}.
-   * @param progress
-   *          The {@link IProgress} monitor. Must not be {@code null}.
-   * @return A new {@link TranslationStoreStack} for the specified file {@link Path}.
-   * @see ITranslationStoreSupplier
-   */
-  public static Optional<TranslationStoreStack> create(Path file, IEnvironment env, IProgress progress) {
+  protected static Optional<TranslationStoreStack> create(Path file, IEnvironment env, IProgress progress) {
     Ensure.notNull(file);
     return createStack(findAllTranslationStores(file, env, progress));
   }
@@ -106,15 +88,13 @@ public class TranslationStoreStack {
   }
 
   private static Collection<ITranslationStore> findAllTranslationStores(Path file, IEnvironment env, IProgress progress) {
-    Ensure.notNull(env);
-    Ensure.notNull(progress);
-
     int ticksBySupplier = 1000;
-    progress.init("Search for translation stores for " + Ensure.notNull(file), SUPPLIERS.size() * ticksBySupplier);
+    List<ITranslationStoreSupplier> suppliers = TranslationStores.storeSuppliers();
+    progress.init("Search translation stores for " + Ensure.notNull(file), suppliers.size() * ticksBySupplier);
 
     List<ITranslationStore> unsortedStores = new ArrayList<>();
-    for (ITranslationStoreSupplier supplier : SUPPLIERS) {
-      Stream<? extends ITranslationStore> stores = supplier.get(file, env, progress.newChild(ticksBySupplier));
+    for (ITranslationStoreSupplier supplier : suppliers) {
+      Stream<? extends ITranslationStore> stores = supplier.all(file, env, progress.newChild(ticksBySupplier));
       if (stores != null) {
         stores
             .filter(TranslationStoreStack::isContentAvailable)
@@ -366,7 +346,7 @@ public class TranslationStoreStack {
   protected static void validateTranslation(ITranslation translation) {
     Ensure.notNull(translation, "A translation must be specified.");
     Ensure.notBlank(translation.key(), "Key must be specified.");
-    Ensure.isFalse(Strings.isEmpty(translation.translation(Language.LANGUAGE_DEFAULT).orElse(null)), "Default language translation must be specified.");
+    Ensure.isFalse(Strings.isEmpty(translation.text(Language.LANGUAGE_DEFAULT).orElse(null)), "Default language translation must be specified.");
   }
 
   /**
@@ -394,7 +374,7 @@ public class TranslationStoreStack {
    * @param lang
    *          The language to add. Must not be {@code null}.
    * @param target
-   *          The target store. Must be an editable STORE that does not yet contain the specified {@link Language}.
+   *          The target store. Must be an editable store that does not yet contain the specified {@link Language}.
    * @throws IllegalArgumentException
    *           if one of the conditions is not fulfilled.
    */

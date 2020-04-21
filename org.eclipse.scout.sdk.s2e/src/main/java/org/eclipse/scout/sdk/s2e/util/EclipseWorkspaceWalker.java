@@ -17,7 +17,6 @@ import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutPr
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -423,7 +422,7 @@ public class EclipseWorkspaceWalker {
     public char[] content() {
       if (m_content == null) {
         try {
-          m_content = charset().decode(ByteBuffer.wrap(Files.readAllBytes(path()))).array();
+          m_content = Strings.fromFileAsChars(path(), charset());
         }
         catch (IOException e) {
           throw new SdkException("Unable to read content of file '{}'.", path(), e);

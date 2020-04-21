@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TranslationEntryTest {
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "ConstantConditions", "SimplifiableJUnitAssertion", "EqualsWithItself", "EqualsBetweenInconvertibleTypes"})
   public void testEntry() {
     ITranslationStore store = mock(ITranslationStore.class);
     ITranslationStore store2 = mock(ITranslationStore.class);
@@ -37,18 +37,19 @@ public class TranslationEntryTest {
     Translation template1 = new Translation("otherKey");
     template1.setKey("otherKey2");
     assertEquals("otherKey2", template1.key());
-    template1.putTranslation(Language.LANGUAGE_DEFAULT, "def");
+    template1.putText(Language.LANGUAGE_DEFAULT, "def");
     ITranslation template2 = new Translation(template1);
     Translation template3 = new Translation(template1);
-    template3.putTranslation(Language.LANGUAGE_DEFAULT, null); // removes the entry
+    template3.putText(Language.LANGUAGE_DEFAULT, null); // removes the entry
 
-    assertEquals("def", template2.translation(Language.LANGUAGE_DEFAULT).get());
-    assertFalse(template2.translation(Language.parseThrowingOnError("notexisting")).isPresent());
-    assertFalse(template3.translation(Language.LANGUAGE_DEFAULT).isPresent());
+    assertEquals("def", template2.text(Language.LANGUAGE_DEFAULT).get());
+    assertFalse(template2.text(Language.parseThrowingOnError("notexisting")).isPresent());
+    assertFalse(template3.text(Language.LANGUAGE_DEFAULT).isPresent());
 
     TranslationEntry b = new TranslationEntry(template2, store);
     TranslationEntry c = new TranslationEntry("key", store2);
-    assertThrows(IllegalArgumentException.class, () -> new TranslationEntry("", store).toString());
+    //noinspection ResultOfObjectAllocationIgnored
+    assertThrows(IllegalArgumentException.class, () -> new TranslationEntry("", store));
 
     assertSame(store, a.store());
     assertNotEquals(a.hashCode(), b.hashCode());

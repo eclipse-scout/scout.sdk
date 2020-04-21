@@ -11,6 +11,9 @@
 package org.eclipse.scout.sdk.core.util;
 
 import static java.lang.System.lineSeparator;
+import static org.eclipse.scout.sdk.core.util.Strings.fromFileAsCharSequence;
+import static org.eclipse.scout.sdk.core.util.Strings.fromFileAsChars;
+import static org.eclipse.scout.sdk.core.util.Strings.fromFileAsString;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,6 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import org.junit.jupiter.api.Test;
 
@@ -51,6 +58,33 @@ public class StringsTest {
     String s = Strings.fromThrowable(new Exception());
     assertFalse(s.startsWith(lineSeparator()));
     assertFalse(s.endsWith(lineSeparator()));
+  }
+
+  @Test
+  public void testFromFile() throws IOException {
+    assertThrows(IOException.class, () -> fromFileAsString(Paths.get("not.existing.file"), StandardCharsets.UTF_8));
+    assertThrows(IOException.class, () -> fromFileAsChars(Paths.get("not.existing.file"), StandardCharsets.UTF_8));
+    assertThrows(IOException.class, () -> fromFileAsCharSequence(Paths.get("not.existing.file"), StandardCharsets.UTF_8));
+    assertThrows(IllegalArgumentException.class, () -> fromFileAsString(Paths.get("not.existing.file"), null));
+    assertThrows(IllegalArgumentException.class, () -> fromFileAsChars(Paths.get("not.existing.file"), null));
+    assertThrows(IllegalArgumentException.class, () -> fromFileAsCharSequence(Paths.get("not.existing.file"), null));
+    assertThrows(IllegalArgumentException.class, () -> fromFileAsString(null, StandardCharsets.UTF_8));
+    assertThrows(IllegalArgumentException.class, () -> fromFileAsChars(null, StandardCharsets.UTF_8));
+    assertThrows(IllegalArgumentException.class, () -> fromFileAsCharSequence(null, StandardCharsets.UTF_8));
+
+    String testFileContent = "testcontent\nnewline";
+    Path testFile = Files.createTempFile("scoutSdkTestFile", ".txt");
+    try {
+      // write test content
+      Files.write(testFile, testFileContent.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+
+      assertEquals(testFileContent, fromFileAsCharSequence(testFile, StandardCharsets.UTF_8).toString());
+      assertArrayEquals(testFileContent.toCharArray(), fromFileAsChars(testFile, StandardCharsets.UTF_8));
+      assertEquals(testFileContent, fromFileAsString(testFile, StandardCharsets.UTF_8));
+    }
+    finally {
+      Files.delete(testFile);
+    }
   }
 
   @Test

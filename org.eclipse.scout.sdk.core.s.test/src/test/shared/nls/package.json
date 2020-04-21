@@ -1,0 +1,16 @@
+{
+  "name": "@bsi-sdk/testfixture",
+  "version": "0.0.1",
+  "description": "Fixture",
+  "private": true,
+  "author": "BSI Business Systems Integration AG",
+  "homepage": "https://www.eclipse.org/scout",
+  "repository": {
+    "type": "git",
+    "url": "https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git"
+  },
+  "license": "EPL-1.0",
+  "devDependencies": {
+    "@bsi-sdk/testdependency": "0.0.1"
+  }
+}

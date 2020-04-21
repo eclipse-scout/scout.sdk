@@ -158,11 +158,11 @@ public class NlsTableCursor {
     getCursor().removeKeyListener(listener);
   }
 
-  public void addCursorListener(INlsTableCursorListener listener) {
+  public void addCursorListener(@SuppressWarnings("TypeMayBeWeakened") INlsTableCursorListener listener) {
     m_listeners.add(listener);
   }
 
-  public void removeCursorListener(INlsTableCursorListener listener) {
+  public void removeCursorListener(@SuppressWarnings("TypeMayBeWeakened") INlsTableCursorListener listener) {
     m_listeners.remove(listener);
   }
 
@@ -228,7 +228,7 @@ public class NlsTableCursor {
         return NlsTableController.entryOfRow(getCursor().getRow()).key();
       }
       Language lang = m_controller.languageOfColumn(getCursor().getColumn());
-      return NlsTableController.entryOfRow(getCursor().getRow()).translation(lang).orElse("");
+      return NlsTableController.entryOfRow(getCursor().getRow()).text(lang).orElse("");
     }
     return inputText;
   }
@@ -294,6 +294,7 @@ public class NlsTableCursor {
         if (m_editingText == null || m_editingText.isDisposed()) {
           return;
         }
+        //noinspection HardcodedLineSeparator
         m_editingText.insertText("\n");
       }
     });

@@ -77,7 +77,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
       loadFileContent(f);
 
       // create translation mapping by language
-      m_files.put(f.language(), f);
+      translationFiles().put(f.language(), f);
 
       if (!f.isEditable()) {
         isEditable = false;
@@ -91,7 +91,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     f.allEntries()
         .forEach((key, translation) -> m_translations
             .computeIfAbsent(key, k -> new TranslationEntry(k, this))
-            .putTranslation(f.language(), translation));
+            .putText(f.language(), translation));
   }
 
   @Override
@@ -116,21 +116,21 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     ensureAllLanguagesExist(newEntry);
 
     // remove translation from all properties files
-    for (Language l : entryToModify.translations().keySet()) {
-      m_files.get(l).removeTranslation(key);
+    for (Language l : entryToModify.texts().keySet()) {
+      translationFiles().get(l).removeTranslation(key);
     }
     // update instance
-    entryToModify.setTranslations(newEntry.translations());
+    entryToModify.setTexts(newEntry.texts());
 
     // add to new properties files
-    for (Entry<Language, String> newTranslations : entryToModify.translations().entrySet()) {
-      m_files.get(newTranslations.getKey()).setTranslation(key, newTranslations.getValue());
+    for (Entry<Language, String> newTranslations : entryToModify.texts().entrySet()) {
+      translationFiles().get(newTranslations.getKey()).setTranslation(key, newTranslations.getValue());
     }
     return entryToModify;
   }
 
   protected void ensureAllLanguagesExist(ITranslation translation) {
-    translation.translations().keySet().stream()
+    translation.texts().keySet().stream()
         .filter(lang -> languages().noneMatch(existing -> existing.equals(lang)))
         .forEach(this::addNewLanguage);
   }
@@ -147,19 +147,19 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
 
   protected void addTranslationEntry(TranslationEntry entryToAdd) {
     m_translations.put(entryToAdd.key(), entryToAdd);
-    entryToAdd.translations().forEach((key, value) -> updateTextInFile(key, entryToAdd.key(), value));
+    entryToAdd.texts().forEach((key, value) -> updateTextInFile(key, entryToAdd.key(), value));
   }
 
   @Override
   public ITranslationEntry removeTranslation(String key) {
     throwIfReadOnly();
     setDirty(true);
-    m_files.values().forEach(f -> f.removeTranslation(key));
+    translationFiles().values().forEach(f -> f.removeTranslation(key));
     return m_translations.remove(key);
   }
 
   protected void updateTextInFile(Language l, String key, String text) {
-    ITranslationPropertiesFile file = m_files.get(l);
+    ITranslationPropertiesFile file = translationFiles().get(l);
     if (file == null) {
       SdkLog.warning("Cannot add text '{}' for key '{}' and language '{}' because this language does not exist in store {}.", text, key, l, this);
       return;
@@ -172,7 +172,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   public void addNewLanguage(Language language) {
     throwIfReadOnly();
     Ensure.notNull(language);
-    Path directory = m_files.values().stream()
+    Path directory = translationFiles().values().stream()
         .filter(f -> f instanceof EditableTranslationFile)
         .map(f -> (EditableTranslationFile) f)
         .findAny()
@@ -185,7 +185,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     newFile.load(new NullProgress());
 
     setDirty(true);
-    m_files.put(language, newFile);
+    translationFiles().put(language, newFile);
     m_newFiles.add(newFile);
   }
 
@@ -207,7 +207,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     if (!isDirty()) {
       return;
     }
-    for (ITranslationPropertiesFile f : m_files.values()) {
+    for (ITranslationPropertiesFile f : translationFiles().values()) {
       f.flush(env, progress);
     }
     m_newFiles.clear();
@@ -252,12 +252,12 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   @Override
   public Optional<String> get(String key, Language language) {
     return get(key)
-        .flatMap(t -> t.translation(language));
+        .flatMap(t -> t.text(language));
   }
 
   @Override
   public Optional<Map<String, String>> get(Language language) {
-    return Optional.ofNullable(m_files.get(language))
+    return Optional.ofNullable(translationFiles().get(language))
         .map(ITranslationPropertiesFile::allEntries);
   }
 
@@ -268,7 +268,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
 
   @Override
   public Stream<Language> languages() {
-    return m_files.keySet().stream();
+    return translationFiles().keySet().stream();
   }
 
   @Override
@@ -279,11 +279,15 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   @Override
   public void reload(IProgress progress) {
     // remove created but not yet flushed languages
-    m_files.values().removeAll(m_newFiles);
+    translationFiles().values().removeAll(m_newFiles);
     m_newFiles.clear();
 
     // reload
-    load(m_files.values(), progress);
+    load(translationFiles().values(), progress);
+  }
+
+  protected Map<Language, ITranslationPropertiesFile> translationFiles() {
+    return m_files;
   }
 
   @Override

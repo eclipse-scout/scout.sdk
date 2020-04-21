@@ -71,7 +71,7 @@ open class MissingTranslationInspection : LocalInspectionTool() {
             val type = julLevelToProblemHighlightType(range.severity())
             val msg = when (range.severity()) {
                 Level.INFO.intValue() -> "Possibly missing translation key. Check manually and suppress if valid."
-                else -> "Missing translation key"
+                else -> "Missing translation for key '${range.text()}'"
             }
             return@computeInReadAction manager.createProblemDescriptor(element, msg, isOnTheFly, LocalQuickFix.EMPTY_ARRAY, type)
         }

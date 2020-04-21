@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 public class FileRange {
 
   private final Path m_file;
+  private final CharSequence m_textOfRange;
   private final int m_start;
   private final int m_end;
   private final int m_severity;
@@ -31,18 +32,22 @@ public class FileRange {
   /**
    * @param file
    *          The file {@link Path}
+   * @param textOfRange
+   *          The text in the file at the range specified
    * @param start
    *          The zero based start index.
    * @param end
    *          The zero based end index.
    */
-  public FileRange(Path file, int start, int end) {
-    this(file, start, end, Level.OFF.intValue());
+  public FileRange(Path file, CharSequence textOfRange, int start, int end) {
+    this(file, textOfRange, start, end, Level.OFF.intValue());
   }
 
   /**
    * @param file
    *          The file {@link Path}
+   * @param textOfRange
+   *          The text in the file at the range specified
    * @param start
    *          The zero based start index.
    * @param end
@@ -50,8 +55,9 @@ public class FileRange {
    * @param severity
    *          The severity of the section. One of the {@link Level} constants.
    */
-  public FileRange(Path file, int start, int end, int severity) {
+  public FileRange(Path file, CharSequence textOfRange, int start, int end, int severity) {
     m_file = Ensure.notNull(file);
+    m_textOfRange = Ensure.notNull(textOfRange);
     m_start = start;
     m_end = end;
     m_severity = severity;
@@ -62,6 +68,13 @@ public class FileRange {
    */
   public Path file() {
     return m_file;
+  }
+
+  /**
+   * @return The text stored in the {@link #file()} at this range.
+   */
+  public CharSequence text() {
+    return m_textOfRange;
   }
 
   /**

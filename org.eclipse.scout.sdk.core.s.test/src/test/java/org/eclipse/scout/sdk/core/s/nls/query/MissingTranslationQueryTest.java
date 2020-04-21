@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.eclipse.scout.sdk.core.s.nls.TranslationStoreSupplierExtension;
+import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
@@ -90,12 +92,13 @@ public class MissingTranslationQueryTest {
   }
 
   @Test
+  @ExtendWith(TranslationStoreSupplierExtension.class)
   public void testScoutJsModuleKeys(TestingEnvironment env) {
-    MissingTranslationQuery query = createQueryWithKeys();
-    searchIn(query, "test1.js", "abc; session.text('ui.notExisting.key');", MissingTranslationQuery.SCOUT_RT_JS_MODULE_PATH, env);
-    searchIn(query, "test2.js", "abc; session.text('ui.Copy');", MissingTranslationQuery.SCOUT_RT_JS_MODULE_PATH, env); // exists in the ui contributor
-    searchIn(query, "test3.js", "var test = 'ui.from'; abc; session.text(test);", MissingTranslationQuery.SCOUT_RT_JS_MODULE_PATH, env); // exists in the ui contributor
-    searchIn(query, "test4.js", "var test = 'ui.does.not.exist.key'; abc; session.text(test);", MissingTranslationQuery.SCOUT_RT_JS_MODULE_PATH, env);
+    MissingTranslationQuery query = new MissingTranslationQuery();
+    searchIn(query, "test1.js", "abc; session.text('ui.notExisting.key');", ScoutFixtureHelper.NLS_TEST_DIR, env);
+    searchIn(query, "test2.js", "abc; session.text('" + TranslationStoreSupplierExtension.TRANSLATION_KEY_1 + "');", ScoutFixtureHelper.NLS_TEST_DIR, env); // exists in the ui contributor (referenced text service)
+    searchIn(query, "test3.js", "var test = 'testKey1FromUiContributor'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR, env); // exists in the ui contributor (literal)
+    searchIn(query, "test4.js", "var test = 'ui.does.not.exist.key'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR, env);
     searchIn(query, "test5.js", "session.text('ui.from');", env); // is not in the scout js module
     assertEquals(3, query.result().count());
   }
@@ -113,7 +116,7 @@ public class MissingTranslationQueryTest {
   protected static MissingTranslationQuery createQueryWithKeys(String... keys) {
     MissingTranslationQuery spy = Mockito.spy(MissingTranslationQuery.class);
     Set<String> existingKeys = new HashSet<>(Arrays.asList(keys));
-    doReturn(Optional.of(existingKeys)).when(spy).loadAllKeysForJavaModule(any(), any(), any());
+    doReturn(Optional.of(existingKeys)).when(spy).accessibleKeysForModule(any(), any(), any());
     return spy;
   }
 }

@@ -49,7 +49,7 @@ public class TranslationProposal extends AbstractTranslationProposal {
 
   @Override
   public String getAdditionalProposalInfo() {
-    Map<Language, String> allTranslations = m_translation.translations();
+    Map<Language, String> allTranslations = m_translation.texts();
     if (allTranslations.isEmpty()) {
       return null;
     }
@@ -57,6 +57,7 @@ public class TranslationProposal extends AbstractTranslationProposal {
     StringBuilder b = new StringBuilder();
     for (Entry<Language, String> e : allTranslations.entrySet()) {
       String text = e.getValue();
+      //noinspection HardcodedLineSeparator
       text = Strings.replaceEach(Strings.escapeHtml(text), new String[]{"\n", "\r"}, new String[]{"<br>", ""});
       b.append("<b>").append(text).append("</b> [").append(e.getKey().dispalyName()).append("]<br>");
     }

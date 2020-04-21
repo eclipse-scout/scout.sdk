@@ -15,6 +15,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.search.GlobalSearchScope
 import org.eclipse.scout.sdk.core.builder.BuilderContext
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder
@@ -79,10 +80,14 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         m_envs.clear()
     }
 
+    override fun findType(fqn: String) = project.findTypesByName(Ensure.notBlank(fqn), GlobalSearchScope.allScope(project))
+            .mapNotNull { it.toScoutTypeIfInProject(this) }
+            .stream()
+
     override fun findJavaEnvironment(root: Path?): Optional<IJavaEnvironment> =
             Optional.ofNullable(
                     root?.toVirtualFile()
-                            ?.containingModuleOf(project)
+                            ?.containingModule(project)
                             ?.let { toScoutJavaEnvironment(it) })
 
 

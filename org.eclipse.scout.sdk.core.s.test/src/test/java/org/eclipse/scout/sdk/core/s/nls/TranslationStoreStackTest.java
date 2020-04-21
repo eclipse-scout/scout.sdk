@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
-import static org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStoreTest.createStore;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreSupplierExtension.testingStack;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,10 +21,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,21 +33,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
-import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
-import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentBuilder;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.SdkException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -61,38 +48,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @since 7.0.0
  */
 @ExtendWith(TestingEnvironmentExtension.class)
+@ExtendWith(TranslationStoreSupplierExtension.class)
 @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class))
 public class TranslationStoreStackTest {
 
-  private static Path dir;
-
-  @BeforeAll
-  public static void setup() {
-    TranslationStoreStack.SUPPLIERS.add(new P_TestingSupplier());
-  }
-
-  @AfterAll
-  public static void cleanup() {
-    TranslationStoreStack.SUPPLIERS.clear();
-  }
-
-  @AfterEach
-  public void removeTestDir() throws IOException {
-    if (dir == null) {
-      return;
-    }
-    CoreUtils.deleteDirectory(dir);
-  }
-
   @Test
   public void testStackRead(TestingEnvironment env) {
-    TranslationStoreStack stack = createFixtureStack(env);
+    TranslationStoreStack stack = testingStack(env);
     assertEquals(3, stack.allWithPrefix("k").count());
     assertEquals(1, stack.allWithPrefix("key1").count());
     assertEquals("key10", stack.generateNewKey("key1"));
     assertEquals("somethingNew", stack.generateNewKey("something,New "));
     assertTrue(stack.isEditable());
-    assertEquals("1_en", stack.translation("key1").get().translation(Language.parseThrowingOnError("en_US")).get());
+    assertEquals("1_en", stack.translation("key1").get().text(Language.parseThrowingOnError("en_US")).get());
     assertFalse(stack.translation("dddd").isPresent());
     assertFalse(stack.containsKey("dddd"));
     assertTrue(stack.containsKey("key1"));
@@ -103,13 +71,13 @@ public class TranslationStoreStackTest {
     assertFalse(stack.isDirty());
     assertEquals(2, stack.allStores().count());
     assertEquals(3, stack.allEditableLanguages().count());
-    assertEquals(4, stack.allLanguages().count());
+    assertEquals(3, stack.allLanguages().count());
     assertNotNull(stack.toString());
   }
 
   @Test
   public void testMergeTranslation(TestingEnvironment env) {
-    TranslationStoreStack stack = createFixtureStack(env);
+    TranslationStoreStack stack = testingStack(env);
 
     String key = "added";
     Language engb = Language.parseThrowingOnError("en_GB");
@@ -117,22 +85,23 @@ public class TranslationStoreStackTest {
     String valAfterUpdate = "engb2";
 
     Translation toAdd = new Translation(key);
-    toAdd.putTranslation(Language.LANGUAGE_DEFAULT, "default1");
-    toAdd.putTranslation(engb, valAfterInsert);
+    toAdd.putText(Language.LANGUAGE_DEFAULT, "default1");
+    toAdd.putText(engb, valAfterInsert);
     stack.mergeTranslation(toAdd, null);
     assertEquals(1, stack.allWithPrefix("add").count());
-    assertEquals(valAfterInsert, stack.translation(key).get().translation(engb).get());
+    assertEquals(valAfterInsert, stack.translation(key).get().text(engb).get());
 
     Translation toModify = new Translation(key);
-    toModify.putTranslation(Language.LANGUAGE_DEFAULT, "default2");
-    toModify.putTranslation(engb, valAfterUpdate);
+    toModify.putText(Language.LANGUAGE_DEFAULT, "default2");
+    toModify.putText(engb, valAfterUpdate);
     stack.mergeTranslation(toModify, null);
-    assertEquals(valAfterUpdate, stack.translation(key).get().translation(engb).get());
+    assertEquals(valAfterUpdate, stack.translation(key).get().text(engb).get());
   }
 
   @Test
   public void testAddNewLanguage(TestingEnvironment env) {
-    TranslationStoreStack stack = createFixtureStack(env);
+    TranslationStoreStack stack = testingStack(env);
+    ITranslationStore newStore = createMockStore();
     Language deCh = Language.parseThrowingOnError("de_CH");
     stack.addNewLanguage(deCh, stack.primaryEditableStore().get());
     assertEquals(4, stack.allEditableLanguages().count());
@@ -140,27 +109,25 @@ public class TranslationStoreStackTest {
 
     assertThrows(IllegalArgumentException.class, () -> stack.addNewLanguage(deCh, stack.allStores().filter(s -> !s.isEditable()).findAny().get()));
     assertThrows(IllegalArgumentException.class, () -> stack.addNewLanguage(null, stack.primaryEditableStore().get()));
-    assertThrows(IllegalArgumentException.class, () -> stack.addNewLanguage(null, createStore(env.primaryEnvironment(), dir)));
+    assertThrows(IllegalArgumentException.class, () -> stack.addNewLanguage(deCh, newStore));
   }
 
   @Test
   public void testAddNewTranslation(TestingEnvironment env) {
-    TranslationStoreStack stack = createFixtureStack(env);
+    TranslationStoreStack stack = testingStack(env);
     assertFalse(stack.isDirty());
     Translation t = new Translation("newKey");
-    t.putTranslation(Language.LANGUAGE_DEFAULT, "def");
+    t.putText(Language.LANGUAGE_DEFAULT, "def");
     stack.addNewTranslation(t, null);
     assertTrue(stack.isDirty());
     Translation t2 = new Translation("newKey2");
-    t2.putTranslation(Language.LANGUAGE_DEFAULT, "def2");
+    t2.putText(Language.LANGUAGE_DEFAULT, "def2");
     stack.addNewTranslation(t2);
 
     ITranslation existing = new Translation("key2");
-    t2.putTranslation(Language.LANGUAGE_DEFAULT, "def2");
+    t2.putText(Language.LANGUAGE_DEFAULT, "def2");
 
-    PropertiesTranslationStore newStore = new TestingEnvironmentBuilder()
-        .withPrimaryEnvironment(task -> new ScoutSharedJavaEnvironmentFactory().accept(task))
-        .call(e -> createStore(e.primaryEnvironment(), dir));
+    ITranslationStore newStore = createMockStore();
 
     assertThrows(IllegalArgumentException.class, () -> stack.addNewTranslation(null));
     assertThrows(IllegalArgumentException.class, () -> stack.addNewTranslation(new Translation("key")));
@@ -173,7 +140,7 @@ public class TranslationStoreStackTest {
 
   @Test
   public void testRemoveTranslation(TestingEnvironment env) {
-    TranslationStoreStack stack = createFixtureStack(env);
+    TranslationStoreStack stack = testingStack(env);
     stack.removeTranslations(Stream.of("key1"));
     stack.removeTranslations(Stream.of("key2", "", "key3"));
     assertEquals(0, stack.primaryEditableStore().get().entries().count());
@@ -181,20 +148,20 @@ public class TranslationStoreStackTest {
 
   @Test
   public void testUpdateTranslation(TestingEnvironment env) {
-    TranslationStoreStack stack = createFixtureStack(env);
+    TranslationStoreStack stack = testingStack(env);
     Translation t = new Translation("key1");
-    t.putTranslation(Language.LANGUAGE_DEFAULT, "updated");
-    t.putTranslation(Language.LANGUAGE_DEFAULT, "updated");
+    t.putText(Language.LANGUAGE_DEFAULT, "updated");
+    t.putText(Language.LANGUAGE_DEFAULT, "updated");
 
     stack.updateTranslation(t);
-    assertEquals("updated", stack.translation("key1").get().translation(Language.LANGUAGE_DEFAULT).get());
+    assertEquals("updated", stack.translation("key1").get().text(Language.LANGUAGE_DEFAULT).get());
   }
 
   @Test
   public void testChangeKey(TestingEnvironment env) {
-    TranslationStoreStack stack = createFixtureStack(env);
+    TranslationStoreStack stack = testingStack(env);
     stack.changeKey("key1", "newKey1");
-    assertEquals("1_def", stack.translation("newKey1").get().translation(Language.LANGUAGE_DEFAULT).get());
+    assertEquals("1_def", stack.translation("newKey1").get().text(Language.LANGUAGE_DEFAULT).get());
 
     assertThrows(IllegalArgumentException.class, () -> stack.changeKey(null, "aaa"));
     assertThrows(IllegalArgumentException.class, () -> stack.changeKey("aa", null));
@@ -205,7 +172,7 @@ public class TranslationStoreStackTest {
   @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class), flushToDisk = true)
   public void testBatchChange(TestingEnvironment env) {
     AtomicInteger counter = new AtomicInteger();
-    TranslationStoreStack stack = createFixtureStack(env);
+    TranslationStoreStack stack = testingStack(env);
     ITranslationStoreStackListener l = s -> counter.incrementAndGet();
     stack.addListener(l);
     stack.setChanging(true);
@@ -213,7 +180,7 @@ public class TranslationStoreStackTest {
     try {
       for (int i = 0; i < 10; i++) {
         Translation t = new Translation("newKey" + i);
-        t.putTranslation(Language.LANGUAGE_DEFAULT, textPrefix + i);
+        t.putText(Language.LANGUAGE_DEFAULT, textPrefix + i);
         stack.addNewTranslation(t);
       }
     }
@@ -225,7 +192,7 @@ public class TranslationStoreStackTest {
     stack.flush(env, new NullProgress());
     stack.reload(new NullProgress());
     assertEquals(13, stack.allEntries().count());
-    assertEquals(textPrefix + '2', stack.translation("newKey2").get().translation(Language.LANGUAGE_DEFAULT).get());
+    assertEquals(textPrefix + '2', stack.translation("newKey2").get().text(Language.LANGUAGE_DEFAULT).get());
   }
 
   @Test
@@ -242,15 +209,15 @@ public class TranslationStoreStackTest {
             createStoreMock(100.00d, entries01)));
 
     assertEquals(1, stack.allEntries().count());
-    assertEquals("text01", stack.translation(key).get().translations().get(Language.LANGUAGE_DEFAULT));
+    assertEquals("text01", stack.translation(key).get().texts().get(Language.LANGUAGE_DEFAULT));
 
     List<Integer> eventTypes = new ArrayList<>(); // remember each event type that happens
     stack.addListener(events -> events.forEach(e -> eventTypes.add(e.type())));
     stack.changeKey(key, newKey);
 
     assertEquals(2, stack.allEntries().count());
-    assertEquals("text02", stack.translation(key).get().translations().get(Language.LANGUAGE_DEFAULT));
-    assertEquals("text01", stack.translation(newKey).get().translations().get(Language.LANGUAGE_DEFAULT));
+    assertEquals("text02", stack.translation(key).get().texts().get(Language.LANGUAGE_DEFAULT));
+    assertEquals("text01", stack.translation(newKey).get().texts().get(Language.LANGUAGE_DEFAULT));
     assertEquals(Arrays.asList(TranslationStoreStackEvent.TYPE_KEY_CHANGED, TranslationStoreStackEvent.TYPE_NEW_TRANSLATION), eventTypes);
   }
 
@@ -303,20 +270,20 @@ public class TranslationStoreStackTest {
     ITranslationEntry k02Result = stack.allEntries().filter(e -> key02.equals(e.key())).findAny().get();
     ITranslationEntry k03Result = stack.allEntries().filter(e -> key03.equals(e.key())).findAny().get();
 
-    assertEquals(1, k01Result.translations().size());
-    assertNull(k01Result.translations().get(langDe));
-    assertNull(k01Result.translations().get(langEs));
-    assertEquals("03_k1_en", k01Result.translations().get(Language.LANGUAGE_DEFAULT));
+    assertEquals(1, k01Result.texts().size());
+    assertNull(k01Result.texts().get(langDe));
+    assertNull(k01Result.texts().get(langEs));
+    assertEquals("03_k1_en", k01Result.texts().get(Language.LANGUAGE_DEFAULT));
 
-    assertEquals(3, k02Result.translations().size());
-    assertEquals("01_k2_en", k02Result.translations().get(Language.LANGUAGE_DEFAULT));
-    assertEquals("01_k2_es", k02Result.translations().get(langEs));
-    assertEquals("01_k2_de", k02Result.translations().get(langDe));
+    assertEquals(3, k02Result.texts().size());
+    assertEquals("01_k2_en", k02Result.texts().get(Language.LANGUAGE_DEFAULT));
+    assertEquals("01_k2_es", k02Result.texts().get(langEs));
+    assertEquals("01_k2_de", k02Result.texts().get(langDe));
 
-    assertEquals(2, k03Result.translations().size());
-    assertEquals("02_k3_en", k03Result.translations().get(Language.LANGUAGE_DEFAULT));
-    assertNull(k03Result.translations().get(langEs));
-    assertEquals("02_k3_de", k03Result.translations().get(langDe));
+    assertEquals(2, k03Result.texts().size());
+    assertEquals("02_k3_en", k03Result.texts().get(Language.LANGUAGE_DEFAULT));
+    assertNull(k03Result.texts().get(langEs));
+    assertEquals("02_k3_de", k03Result.texts().get(langDe));
   }
 
   private static ITranslationStore createStoreMock(double order, Map<String, Map<Language, String>> entries) {
@@ -328,7 +295,7 @@ public class TranslationStoreStackTest {
     for (Entry<String, Map<Language, String>> entry : entries.entrySet()) {
       ITranslationEntry entryMock = mock(ITranslationEntry.class);
       when(entryMock.key()).thenReturn(entry.getKey());
-      when(entryMock.translations()).thenReturn(entry.getValue());
+      when(entryMock.texts()).thenReturn(entry.getValue());
       allEntries.add(entryMock);
     }
 
@@ -360,24 +327,16 @@ public class TranslationStoreStackTest {
     return mock;
   }
 
-  private static TranslationStoreStack createFixtureStack(IEnvironment env) {
-    return TranslationStoreStack.create(Paths.get("").toAbsolutePath(), env, new NullProgress()).get();
-  }
+  private static ITranslationStore createMockStore() {
+    IType type = mock(IType.class);
+    when(type.name()).thenReturn("test.type");
 
-  private static final class P_TestingSupplier implements ITranslationStoreSupplier {
-    @Override
-    public Stream<? extends ITranslationStore> get(Path file, IEnvironment env, IProgress progress) {
-      try {
-        TestingEnvironment testingEnv = (TestingEnvironment) env;
-        dir = Files.createTempDirectory("sdkTest");
-        Collection<ITranslationStore> stores = new ArrayList<>(2);
-        stores.add(createStore(testingEnv.primaryEnvironment(), dir));
-        stores.add(createStore(testingEnv.primaryEnvironment(), dir, 2, true));
-        return stores.stream();
-      }
-      catch (IOException e) {
-        throw new SdkException(e);
-      }
-    }
+    TextProviderService svc = mock(TextProviderService.class);
+    when(svc.type()).thenReturn(type);
+
+    IEditableTranslationStore store = mock(IEditableTranslationStore.class);
+    when(store.isDirty()).thenReturn(true);
+    when(store.service()).thenReturn(svc);
+    return store;
   }
 }

@@ -43,6 +43,9 @@ public interface ICompilationUnit extends IJavaElement {
 
   /**
    * Gets all import declarations in this {@link ICompilationUnit}.
+   * <p>
+   * Please note that imports are only available if this {@link ICompilationUnit} is not {@link #isSynthetic()
+   * synthetic}. For synthetic {@link ICompilationUnit} instances this method always returns an empty {@link Stream}.
    *
    * @return A {@link Stream} containing all imports in the order as they appear in the source.
    */

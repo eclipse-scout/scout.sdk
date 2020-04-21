@@ -15,6 +15,7 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -25,7 +26,9 @@ import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IImport;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -38,6 +41,7 @@ import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 @SuppressWarnings("squid:S2160")
 public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implements IType {
@@ -285,6 +289,69 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
             t.superClass().map(Stream::of).orElseGet(Stream::empty),
             t.superInterfaces())
             : Stream.of(t));
+  }
+
+  @Override
+  public Optional<IType> resolveSimpleName(String simpleName) {
+    if (Strings.isBlank(simpleName)) {
+      return Optional.empty();
+    }
+    Optional<ICompilationUnit> optCu = compilationUnit();
+    if (!optCu.isPresent()) {
+      return Optional.empty(); // simple types cannot resolve anything
+    }
+    IJavaEnvironment env = javaEnvironment();
+    ICompilationUnit compilationUnit = optCu.get();
+
+    // 1. step: try to resolve the name using the declared imports
+    Optional<IType> fromImports = resolveNameUsingImports(compilationUnit, simpleName);
+    if (fromImports.isPresent()) {
+      return fromImports;
+    }
+
+    // 2. step: search in own package
+    String pck = Strings.notBlank(compilationUnit.containingPackage().elementName())
+        .map(p -> p + JavaTypes.C_DOT)
+        .orElse("");
+    Optional<IType> fromPackage = env.findType(pck + simpleName);
+    if (fromPackage.isPresent()) {
+      return fromPackage;
+    }
+
+    // 3. step: name is already fully qualified
+    Optional<IType> fromFqn = env.findType(simpleName);
+    if (fromFqn.isPresent()) {
+      return fromFqn;
+    }
+
+    // 4. step: in java.lang package
+    return env.findType("java.lang." + simpleName);
+  }
+
+  protected Optional<IType> resolveNameUsingImports(ICompilationUnit compilationUnit, String simpleName) {
+    IJavaEnvironment env = javaEnvironment();
+    return compilationUnit
+        .imports() // imports are empty on synthetic type. Can only be parsed if source is available
+        .map(imp -> toImportName(imp, simpleName))
+        .filter(Objects::nonNull)
+        .map(env::findType)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findAny();
+  }
+
+  private static String toImportName(IImport imp, String simpleNameToResolve) {
+    String impName = imp.name();
+    if (impName.endsWith(JavaTypes.C_DOT + simpleNameToResolve)) {
+      // explicit import
+      return impName;
+    }
+    String wildcardSuffix = ".*";
+    if (impName.endsWith(wildcardSuffix)) {
+      // wildcard import
+      return impName.substring(0, impName.length() - 1 /* only remove the star, keep the dot */) + simpleNameToResolve;
+    }
+    return null;
   }
 
   @Override

@@ -20,6 +20,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -119,10 +120,10 @@ public final class CoreUtils {
           // try to delete the file anyway, even if its attributes could not be read, since delete-only access is theoretically possible
           Files.delete(file);
         }
-        catch(IOException e) {
+        catch (IOException e) {
           SdkLog.debug("Unable to delete '{}' after failed visit.", file, e);
         }
-        if(exc instanceof NoSuchFileException) {
+        if (exc instanceof NoSuchFileException) {
           return FileVisitResult.SKIP_SUBTREE;
         }
         throw exc;
@@ -319,6 +320,45 @@ public final class CoreUtils {
     else {
       tl.set(context);
     }
+  }
+
+  /**
+   * Gets the file extension of the file path specified. This is the part after the last dot in the path given.
+   *
+   * @param filePath
+   *          The file path for which the extension should be returned.
+   * @return The extension if it exists or an empty {@link String} otherwise (never returns {@code null}). The extension
+   *         is always lowercase and does not contain the dot.
+   */
+  public static String extensionOf(String filePath) {
+    if (Strings.isBlank(filePath)) {
+      return "";
+    }
+    int lastDot = filePath.lastIndexOf('.');
+    if (lastDot < 0) {
+      return "";
+    }
+    return filePath.substring(lastDot + 1).toLowerCase(Locale.ENGLISH);
+  }
+
+  /**
+   * Gets the file extension of the {@link Path} specified. This is the part after the last dot in the last segment of
+   * the given file.
+   * 
+   * @param file
+   *          The file for which the extension should be returned.
+   * @return The extension if it exists or an empty {@link String} otherwise (never returns {@code null}). The extension
+   *         is always lowercase and does not contain the dot.
+   */
+  public static String extensionOf(Path file) {
+    if (file == null) {
+      return "";
+    }
+    Path lastSegment = file.getFileName();
+    if (lastSegment == null) {
+      return "";
+    }
+    return extensionOf(lastSegment.toString());
   }
 
   /**

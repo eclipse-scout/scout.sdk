@@ -19,7 +19,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -256,6 +261,64 @@ public final class Strings {
       throw new IOException("Charset '" + charsetName + "' is not supported.");
     }
     return fromInputStream(is, Charset.forName(charsetName));
+  }
+
+  /**
+   * Creates a {@link String} holding the content of the file specified.
+   * 
+   * @param file
+   *          The file to load. Must not be {@code null}.
+   * @param charset
+   *          The {@link Charset} to use to transform the bytes in the file into characters. Consider using one of the
+   *          {@link StandardCharsets} constants. Must not be {@code null}.
+   * @return A {@link String} holding the content.
+   * @throws IOException
+   *           If {@link Path} does not point to a readable file or there was an error during read.
+   */
+  public static String fromFileAsString(Path file, Charset charset) throws IOException {
+    Ensure.notNull(charset);
+    return new String(fileRawBytes(file), charset);
+  }
+
+  /**
+   * Creates a char array holding the content of the file specified.
+   *
+   * @param file
+   *          The file to load. Must not be {@code null}.
+   * @param charset
+   *          The {@link Charset} to use to transform the bytes in the file into characters. Consider using one of the
+   *          {@link StandardCharsets} constants. Must not be {@code null}.
+   * @return The chars of the file.
+   * @throws IOException
+   *           If {@link Path} does not point to a readable file or there was an error during read.
+   */
+  public static char[] fromFileAsChars(Path file, Charset charset) throws IOException {
+    Ensure.notNull(charset);
+    return charset.decode(ByteBuffer.wrap(fileRawBytes(file))).array();
+  }
+
+  /**
+   * Creates a {@link CharSequence} holding the content of the file specified.
+   *
+   * @param file
+   *          The file to load. Must not be {@code null}.
+   * @param charset
+   *          The {@link Charset} to use to transform the bytes in the file into characters. Consider using one of the
+   *          {@link StandardCharsets} constants. Must not be {@code null}.
+   * @return A {@link CharSequence} holding the content.
+   * @throws IOException
+   *           If {@link Path} does not point to a readable file or there was an error during read.
+   */
+  public static CharSequence fromFileAsCharSequence(Path file, Charset charset) throws IOException {
+    return CharBuffer.wrap(fromFileAsChars(file, charset));
+  }
+
+  private static byte[] fileRawBytes(Path file) throws IOException {
+    Ensure.notNull(file);
+    if (!Files.isRegularFile(file) || !Files.isReadable(file)) {
+      throw new IOException(file + " cannot be read.");
+    }
+    return Files.readAllBytes(file);
   }
 
   /**

@@ -102,10 +102,10 @@ public class TranslationKeysQueryTest {
   }
 
   public static void searchIn(IFileQuery query, String fileName, String fileContent, IEnvironment env) {
-    searchIn(query, fileName, fileContent, "whatever", env);
+    searchIn(query, fileName, fileContent, Paths.get("whatever"), env);
   }
 
-  public static void searchIn(IFileQuery query, String fileName, String fileContent, String moduleName, IEnvironment env) {
-    query.searchIn(new FileQueryInput(Paths.get(fileName), Paths.get(moduleName), fileContent::toCharArray), env, new NullProgress());
+  public static void searchIn(IFileQuery query, String fileName, String fileContent, Path modulePath, IEnvironment env) {
+    query.searchIn(new FileQueryInput(Paths.get(fileName), modulePath, fileContent::toCharArray), env, new NullProgress());
   }
 }

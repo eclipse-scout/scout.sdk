@@ -10,8 +10,9 @@
  */
 package org.eclipse.scout.sdk.core.s.util.search;
 
+import static org.eclipse.scout.sdk.core.util.CoreUtils.extensionOf;
+
 import java.nio.file.Path;
-import java.util.Locale;
 import java.util.function.Supplier;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -33,21 +34,7 @@ public class FileQueryInput {
     m_module = Ensure.notNull(module);
     m_fileContentLoader = Ensure.notNull(fileContentLoader);
     m_fileContent = new FinalValue<>();
-
-    Path lastSegment = file.getFileName();
-    if (lastSegment == null) {
-      m_extension = null;
-    }
-    else {
-      String fileName = lastSegment.toString().toLowerCase(Locale.ENGLISH);
-      int lastDotPos = fileName.lastIndexOf('.');
-      if (lastDotPos >= 0) {
-        m_extension = fileName.substring(lastDotPos + 1);
-      }
-      else {
-        m_extension = null;
-      }
-    }
+    m_extension = extensionOf(file);
   }
 
   /**
@@ -65,7 +52,7 @@ public class FileQueryInput {
   }
 
   /**
-   * @return The file extension of {@link #file()} without leading dot.
+   * @return The file extension of {@link #file()} without leading dot or an empty String if the file has no extension.
    */
   public String fileExtension() {
     return m_extension;

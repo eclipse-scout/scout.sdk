@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.AbstractList;
@@ -29,11 +30,15 @@ import org.eclipse.scout.sdk.core.fixture.AbstractBaseClass;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ClassWithMembers;
+import org.eclipse.scout.sdk.core.fixture.ImportTestClass;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel0;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel1;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel2;
+import org.eclipse.scout.sdk.core.fixture.TestAnnotation;
 import org.eclipse.scout.sdk.core.fixture.TypeWithParameterizedSuperType;
 import org.eclipse.scout.sdk.core.fixture.WildcardChildClass;
+import org.eclipse.scout.sdk.core.fixture.sub.ClassWithWildcardImport;
+import org.eclipse.scout.sdk.core.fixture.sub.ImportTestClass2;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentBinaryOnlyFactory;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
@@ -120,9 +125,13 @@ public class TypeTest {
     assertEquals("classNotExisting{}", CoreTestingUtils.removeWhitespace(notExisting.toWorkingCopy().toJavaSource().toString()));
     assertFalse(notExisting.source().isPresent());
 
+    //noinspection SimplifiableJUnitAssertion,EqualsWithItself
     assertTrue(existing.equals(existing));
+    //noinspection ConstantConditions,SimplifiableJUnitAssertion
     assertFalse(existing.equals(null));
+    //noinspection SimplifiableJUnitAssertion,EqualsBetweenInconvertibleTypes
     assertFalse(existing.equals("other class"));
+    //noinspection SimplifiableJUnitAssertion
     assertFalse(existing.equals(notExisting));
     assertNotEquals(existing.hashCode(), notExisting.hashCode());
   }
@@ -254,6 +263,39 @@ public class TypeTest {
   @Test
   public void testGetFields(IJavaEnvironment env) {
     assertEquals(1, env.requireType(ChildClass.class.getName()).fields().withName("m_test").stream().count());
+  }
+
+  @Test
+  public void testResolveSimpleName(IJavaEnvironment env) {
+    // wildcard package
+    IType type = env.requireType(ClassWithWildcardImport.class.getName());
+    assertEquals(1, type.requireCompilationUnit().imports().filter(imp -> imp.name().endsWith(".*")).count());
+    assertEquals(BaseClass.class.getName(), type.resolveSimpleName(BaseClass.class.getSimpleName()).get().name());
+
+    // explicit package
+    type = env.requireType(ImportTestClass2.class.getName());
+    assertEquals(ImportTestClass.class.getName(), type.resolveSimpleName(ImportTestClass.class.getSimpleName()).get().name());
+
+    // type which is not references
+    assertFalse(type.resolveSimpleName(IOException.class.getSimpleName()).isPresent());
+
+    // in own package
+    type = env.requireType(AbstractBaseClass.class.getName());
+    assertEquals(TestAnnotation.class.getName(), type.resolveSimpleName(TestAnnotation.class.getSimpleName()).get().name());
+
+    // java.lang package
+    type = env.requireType(AbstractBaseClass.class.getName());
+    assertEquals(AutoCloseable.class.getName(), type.resolveSimpleName(AutoCloseable.class.getSimpleName()).get().name());
+
+    // already fully qualified
+    assertEquals(IOException.class.getName(), type.resolveSimpleName(IOException.class.getName()).get().name());
+
+    assertFalse(type.resolveSimpleName(null).isPresent());
+    assertFalse(type.resolveSimpleName("").isPresent());
+    assertFalse(type.resolveSimpleName(" ").isPresent());
+
+    // resolve on a primitive type
+    assertFalse(env.requireType(JavaTypes._int).resolveSimpleName(Long.class.getSimpleName()).isPresent());
   }
 
   @Test

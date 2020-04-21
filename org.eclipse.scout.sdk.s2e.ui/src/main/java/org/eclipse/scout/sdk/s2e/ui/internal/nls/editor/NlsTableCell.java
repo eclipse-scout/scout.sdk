@@ -51,7 +51,7 @@ public class NlsTableCell {
       return entry().key();
     }
     if (m_language != null) {
-      return entry().translation(m_language).orElse(null);
+      return entry().text(m_language).orElse(null);
     }
     return null;
   }

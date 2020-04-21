@@ -210,7 +210,7 @@ fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
 
 fun VirtualFile.toNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath()
 
-fun VirtualFile.containingModuleOf(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
+fun VirtualFile.containingModule(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
 
 fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResult {
     val supplier: Function<PsiClass, Stream<out PsiClass>> = Function { a -> a.supers.stream() }

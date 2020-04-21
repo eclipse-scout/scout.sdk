@@ -53,6 +53,7 @@ public class NlsFilterComponent extends Composite {
     m_tableViewer.getTable().addListener(SWT.Paint, event -> layout());
     m_filterFields = new HashMap<>();
 
+    //noinspection ThisEscapedInObjectConstruction
     m_resetButton = new Button(this, SWT.PUSH | SWT.FLAT);
     m_resetButton.setText("Clear");
     m_resetButton.addSelectionListener(new SelectionAdapter() {
@@ -143,7 +144,7 @@ public class NlsFilterComponent extends Composite {
         text = nlsEntry.key();
       }
       else {
-        text = nlsEntry.translation(m_lang).orElse(null);
+        text = nlsEntry.text(m_lang).orElse(null);
       }
       if (text == null) {
         text = "";

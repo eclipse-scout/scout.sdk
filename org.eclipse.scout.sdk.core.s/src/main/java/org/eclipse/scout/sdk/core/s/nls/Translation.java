@@ -26,37 +26,38 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 public class Translation implements ITranslation {
 
   private String m_key;
-  private final Map<Language, String> m_translations;
+  private final Map<Language, String> m_texts;
 
   public Translation(ITranslation template) {
     m_key = Ensure.notNull(Ensure.notNull(template).key());
-    m_translations = new TreeMap<>(template.translations());
+    m_texts = new TreeMap<>(template.texts());
   }
 
   public Translation(String key) {
     m_key = Ensure.notNull(key);
-    m_translations = new TreeMap<>();
+    m_texts = new TreeMap<>();
   }
 
-  protected Map<Language, String> translationsMap() {
-    return m_translations;
+  protected Map<Language, String> textsMap() {
+    return m_texts;
   }
 
   /**
-   * Adds or removes an entry.
+   * Adds or removes a text entry.
    *
    * @param lang
    *          The {@link Language} that should be modified. Must not be {@code null}.
    * @param text
-   *          If the text is {@code null} the specified language is removed. Otherwise the specified text is stored for
-   *          the specified language. If there was already a text entry for this language it is replaced.
+   *          If the text is {@code null} the specified {@link Language} is removed for this {@link ITranslation}.
+   *          Otherwise the specified text is stored for the given {@link Language}. If there was already a text entry
+   *          for this {@link Language} it is replaced.
    */
-  public void putTranslation(Language lang, String text) {
+  public void putText(Language lang, String text) {
     if (text == null) {
-      translationsMap().remove(Ensure.notNull(lang));
+      textsMap().remove(Ensure.notNull(lang));
     }
     else {
-      translationsMap().put(Ensure.notNull(lang), text);
+      textsMap().put(Ensure.notNull(lang), text);
     }
   }
 
@@ -66,12 +67,12 @@ public class Translation implements ITranslation {
    * @param newTranslations
    *          The new translation entries.
    */
-  public void setTranslations(Map<Language, String> newTranslations) {
-    translationsMap().clear();
+  public void setTexts(Map<Language, String> newTranslations) {
+    textsMap().clear();
     if (newTranslations == null || newTranslations.isEmpty()) {
       return;
     }
-    translationsMap().putAll(newTranslations);
+    textsMap().putAll(newTranslations);
   }
 
   /**
@@ -90,18 +91,18 @@ public class Translation implements ITranslation {
   }
 
   @Override
-  public Optional<String> translation(Language language) {
-    return Optional.ofNullable(translationsMap().get(Ensure.notNull(language)));
+  public Optional<String> text(Language language) {
+    return Optional.ofNullable(textsMap().get(Ensure.notNull(language)));
   }
 
   @Override
-  public Map<Language, String> translations() {
-    return unmodifiableMap(translationsMap());
+  public Map<Language, String> texts() {
+    return unmodifiableMap(textsMap());
   }
 
   @Override
   public int hashCode() {
-    return 31 * key().hashCode() + translationsMap().hashCode();
+    return 31 * key().hashCode() + textsMap().hashCode();
   }
 
   @Override
@@ -115,11 +116,11 @@ public class Translation implements ITranslation {
 
     Translation other = (Translation) obj;
     return key().equals(other.key())
-        && translationsMap().equals(other.translationsMap());
+        && textsMap().equals(other.textsMap());
   }
 
   @Override
   public String toString() {
-    return key() + '=' + translationsMap();
+    return key() + '=' + textsMap();
   }
 }

@@ -67,12 +67,18 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
 
   @Override
   @SuppressWarnings("resource") // false positive
-  public Stream<? extends ITranslationStore> get(Path t, IEnvironment env, IProgress progress) {
+  public Stream<? extends ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress) {
     EclipseEnvironment e = EclipseEnvironment.narrow(env);
     EclipseProgress p = EclipseEnvironment.toScoutProgress(progress);
-    return e.findJavaProject(t)
+    return e.findJavaProject(modulePath)
         .map(jp -> visibleTranslationStores(jp, e, p))
         .orElseGet(Stream::empty);
+  }
+
+  @Override
+  public Optional<? extends ITranslationStore> single(org.eclipse.scout.sdk.core.model.api.IType textService, IProgress progress) {
+    progress.init("Search properties text provider service.", 1);
+    return createTranslationStore(textService, progress);
   }
 
   private static Stream<? extends ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, @SuppressWarnings("TypeMayBeWeakened") EclipseProgress progress) {
@@ -100,11 +106,15 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
 
     return dynamicNlsTextProviderServices.stream()
         .map(env::toScoutType)
-        .map(PropertiesTextProviderService::create)
+        .map(svc -> createTranslationStore(svc, loopProgress))
         .filter(Optional::isPresent)
-        .map(Optional::get)
+        .map(Optional::get);
+  }
+
+  private static Optional<PropertiesTranslationStore> createTranslationStore(org.eclipse.scout.sdk.core.model.api.IType textProviderServiceType, IProgress progress) {
+    return PropertiesTextProviderService.create(textProviderServiceType)
         .map(PropertiesTranslationStore::new)
-        .filter(s -> loadStore(s, loopProgress.newChild(1)));
+        .filter(s -> loadStore(s, progress.newChild(1)));
   }
 
   private static boolean loadStore(PropertiesTranslationStore store, IProgress progress) {

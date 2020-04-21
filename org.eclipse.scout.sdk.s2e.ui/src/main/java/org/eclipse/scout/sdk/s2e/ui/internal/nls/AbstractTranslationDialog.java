@@ -204,7 +204,7 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
 
       // translation text field for a language
       TextField field = createTranslationField(txtFieldContainer, l);
-      field.setText(m_nlsEntry.translation(l).orElse(""));
+      field.setText(m_nlsEntry.text(l).orElse(""));
       field.setSelection(field.getText().length());
       GridDataFactory
           .defaultsFor(field)
@@ -273,10 +273,10 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
     translationField.addModifyListener(event -> {
       String newText = translationField.getText();
       if (Strings.isEmpty(newText)) {
-        m_nlsEntry.putTranslation(l, null);
+        m_nlsEntry.putText(l, null);
       }
       else {
-        m_nlsEntry.putTranslation(l, newText);
+        m_nlsEntry.putText(l, newText);
       }
     });
 

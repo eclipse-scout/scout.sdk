@@ -21,9 +21,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
@@ -40,6 +44,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcj;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
+import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler;
@@ -246,6 +251,23 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
             .withAbsoluteSourcePath(root.resolve(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER).toString())
             .withAbsoluteSourcePath(root.resolve(IScoutSourceFolders.GENERATED_SOURCE_FOLDER).toString()))
                 .map(this::registerJavaEnvironment);
+  }
+
+  @Override
+  public Stream<IType> findType(String fqn) {
+    List<IType> result = new ArrayList<>();
+    if (m_env != null) {
+      m_env.findType(fqn).ifPresent(result::add);
+    }
+    if (m_dtoEnv != null) {
+      m_dtoEnv.findType(fqn).ifPresent(result::add);
+    }
+    m_javaEnvironments.stream()
+        .map(e -> e.findType(fqn))
+        .filter(Objects::nonNull)
+        .map(TypeSpi::wrap)
+        .collect(Collectors.toCollection(() -> result));
+    return result.stream();
   }
 
   protected IJavaEnvironment registerJavaEnvironment(JavaEnvironmentWithEcj env) {

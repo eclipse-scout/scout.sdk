@@ -26,6 +26,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -308,6 +309,13 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
       throw new SdkException(e);
     }
     return Optional.empty();
+  }
+
+  @Override
+  public Stream<IType> findType(String fqn) {
+    Ensure.notBlank(fqn);
+    return JdtUtils.resolveJdtTypes(fqn).stream()
+        .map(this::toScoutType);
   }
 
   protected static boolean hasJavaNature(IProject p) {

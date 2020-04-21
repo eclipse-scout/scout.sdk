@@ -31,6 +31,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
 
 /**
  * <h3>{@link TranslationProposalComputer}</h3>
@@ -75,7 +76,7 @@ public class TranslationProposalComputer implements IJavaCompletionProposalCompu
         Path path = context.getCompilationUnit().getResource().getLocation().toFile().toPath();
 
         return callInEclipseEnvironment(
-            (env, progress) -> TranslationStoreStack.create(path, env, progress)
+            (env, progress) -> TranslationStores.createFullStack(path, env, progress)
                 .map(stack -> collectProposals(stack, prefix, offset))
                 .orElseGet(Collections::emptyList))
                     .result();

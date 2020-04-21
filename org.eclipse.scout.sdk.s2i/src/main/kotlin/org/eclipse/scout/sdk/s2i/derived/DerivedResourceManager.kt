@@ -19,7 +19,7 @@ interface DerivedResourceManager : Disposable {
 
     fun addDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory)
 
-    fun removeDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory)
+    fun removeDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory): Boolean
 
     fun isAutoUpdateDerivedResources(): Boolean
 }

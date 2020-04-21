@@ -125,7 +125,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     return currentInstance();
   }
 
-  protected String toIncludeExcludeKey(String regex) {
+  protected static String toIncludeExcludeKey(String regex) {
     if (regex == null) {
       return null;
     }
@@ -298,6 +298,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   }
 
   protected void collectRunningClassPath(Collection<ClasspathEntry> collector, Collection<Path> sourceAttachmentFor) {
+    //noinspection AccessOfSystemProperties
     String javaClassPathRaw = System.getProperty("java.class.path");
     if (Strings.isBlank(javaClassPathRaw)) {
       return;
@@ -346,6 +347,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
       return false;
     }
 
+    //noinspection resource
     String s = Strings.replace(f.toString(), f.getFileSystem().getSeparator(), "/");
     for (Pattern p : exclusions) {
       if (p.matcher(s).matches()) {
@@ -393,7 +395,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
         filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.TEST_JAVA_SOURCE_FOLDER), collector);
       }
       else {
-        String fileName = path.getFileName().toString();
+        String fileName = path.getFileName().toString().toLowerCase(Locale.ENGLISH);
         if (fileName.endsWith(".zip") || fileName.endsWith(".jar")) {
           fileName = fileName.substring(0, fileName.length() - 4) + "-sources" + fileName.substring(fileName.length() - 4);
           filterAndAppendSourcePath(path.getParent().resolve(fileName), collector);
@@ -447,6 +449,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     return build(javaHome(), sort(allEntries), opts);
   }
 
+  @SuppressWarnings("MethodMayBeStatic")
   protected JavaEnvironmentWithEcj build(Path javaHome, Collection<? extends ClasspathEntry> classpaths, CompilerOptions options) {
     return new JavaEnvironmentWithEcj(javaHome, classpaths, options);
   }

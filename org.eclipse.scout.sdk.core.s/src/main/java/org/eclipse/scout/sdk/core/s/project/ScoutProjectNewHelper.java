@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s.project;
 
+import static org.eclipse.scout.sdk.core.util.CoreUtils.extensionOf;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -111,7 +113,7 @@ public final class ScoutProjectNewHelper {
     }
 
     String pck = getPackage(groupId, artifactId);
-    String artifactName = getArtifactName(artifactId);
+    String artifactName = extensionOf(artifactId);
 
     // create command
     String[] authKeysForWar = generateKeyPairSafe();
@@ -140,14 +142,6 @@ public final class ScoutProjectNewHelper {
     MavenRunner.execute(archetypeBuild, env, progress);
 
     postProcessRootPom(workingDir.resolve(artifactId));
-  }
-
-  static String getArtifactName(String artifactId) {
-    int pos = artifactId.lastIndexOf('.');
-    if (pos < 0 || pos >= artifactId.length() - 1) {
-      return artifactId;
-    }
-    return artifactId.substring(pos + 1);
   }
 
   static String getPackage(String groupId, String artifactId) {
