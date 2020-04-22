@@ -269,6 +269,8 @@ public class TypeTest {
   public void testResolveSimpleName(IJavaEnvironment env) {
     // wildcard package
     IType type = env.requireType(ClassWithWildcardImport.class.getName());
+
+    // if this test fails the IDE might have adapted the import in this file. It must be a wildcard package import!
     assertEquals(1, type.requireCompilationUnit().imports().filter(imp -> imp.name().endsWith(".*")).count());
     assertEquals(BaseClass.class.getName(), type.resolveSimpleName(BaseClass.class.getSimpleName()).get().name());
 

@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.fixture.sub;
 
-import org.eclipse.scout.sdk.core.fixture.BaseClass;
+import org.eclipse.scout.sdk.core.fixture.*;
 
 public class ClassWithWildcardImport extends BaseClass<CharSequence, AutoCloseable> {
 
