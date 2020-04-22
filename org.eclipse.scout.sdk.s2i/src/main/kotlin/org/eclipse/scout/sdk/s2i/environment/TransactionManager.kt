@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
 import java.nio.file.Path
 
-class TransactionManager private constructor(val project: Project) {
+class TransactionManager constructor(val project: Project) {
 
     companion object {
 
@@ -108,8 +108,9 @@ class TransactionManager private constructor(val project: Project) {
         }
     }
 
-    private val m_members = HashMap<Path, TransactionMember>()
-
+    private val m_members = HashMap<Path, MutableList<TransactionMember>>()
+    @Volatile
+    private var m_size = 0
     @Volatile
     private var m_open = true
 
@@ -138,13 +139,15 @@ class TransactionManager private constructor(val project: Project) {
      */
     fun register(member: TransactionMember) = synchronized(this) {
         ensureOpen()
-        m_members[member.file()] = member
+        m_members.computeIfAbsent(member.file()) { ArrayList() }
+                .add(member)
+        m_size++
     }
 
     /**
      * @return The number of [TransactionMember] instances available in this manager
      */
-    fun size(): Int = m_members.size
+    fun size(): Int = m_size // do not use m_members.flatMap().size() here because this would require synchronization. Then the size() method could not longer be called from commitAllAsync -> deadlock!
 
     private fun finishTransactionImpl(save: Boolean, progress: IdeaProgress): Boolean {
         ensureOpen()
@@ -156,13 +159,14 @@ class TransactionManager private constructor(val project: Project) {
             if (!save || progress.indicator.isCanceled) {
                 return false
             }
-            return computeInWriteAction(project) { commitAll(progress) }
+            return computeInWriteAction(project) { commitAllAsync(progress) }
         } finally {
             m_members.clear()
+            m_size = 0
         }
     }
 
-    private fun commitAll(progress: IdeaProgress): Boolean {
+    private fun commitAllAsync(progress: IdeaProgress): Boolean {
         val workForEnsureWritable = 1
         progress.init("Flush file content", size() + workForEnsureWritable)
 
@@ -173,12 +177,13 @@ class TransactionManager private constructor(val project: Project) {
 
         val status = ReadonlyStatusHandler.getInstance(project).ensureFilesWritable(existingFiles)
         if (status.hasReadonlyFiles()) {
-            SdkLog.info("Unable to make all resources writable. Transaction will be rolled back. Message: ${status.readonlyFilesMessage}")
+            SdkLog.info("Unable to make all resources writable. Transaction will be discarded. Message: ${status.readonlyFilesMessage}")
             return false
         }
         progress.worked(workForEnsureWritable)
 
         return m_members.values
+                .flatten()
                 .map { commitMember(it, progress.newChild(1)) }
                 .all { committed -> committed }
     }
