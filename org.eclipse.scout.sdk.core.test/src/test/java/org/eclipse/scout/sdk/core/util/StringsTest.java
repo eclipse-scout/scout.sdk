@@ -36,7 +36,6 @@ import org.junit.jupiter.api.Test;
  *
  * @since 6.1.0
  */
-@SuppressWarnings({"HardcodedFileSeparator", "HardcodedLineSeparator"})
 public class StringsTest {
 
   @Test

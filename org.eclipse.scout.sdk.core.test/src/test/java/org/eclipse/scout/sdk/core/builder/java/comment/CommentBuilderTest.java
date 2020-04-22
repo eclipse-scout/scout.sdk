@@ -32,7 +32,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  *
  * @since 7.0.0
  */
-@SuppressWarnings({"HardcodedFileSeparator", "HardcodedLineSeparator"})
 public class CommentBuilderTest {
   @Test
   public void testJavaDoc() {

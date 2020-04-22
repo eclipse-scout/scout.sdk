@@ -46,7 +46,6 @@ public class PropertiesTextProviderServiceTest {
     PropertiesTextProviderService txtSvc = PropertiesTextProviderService.create(txtSvcType).get();
 
     assertEquals("Prefix", txtSvc.filePrefix());
-    //noinspection HardcodedFileSeparator
     assertEquals("formdata/shared/texts", txtSvc.folder());
     assertEquals(11.2, txtSvc.order(), 0.001);
     assertSame(txtSvcType, txtSvc.type());

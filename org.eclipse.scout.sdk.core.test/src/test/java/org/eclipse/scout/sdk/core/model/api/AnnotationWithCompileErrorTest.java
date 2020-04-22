@@ -34,7 +34,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * Java files under development. During development it may happen that invalid java files are saved. In this case the
  * corresponding annotation elements should just be ignored instead of throwing an exception like NPE.
  */
-@SuppressWarnings("HardcodedLineSeparator")
 @ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class AnnotationWithCompileErrorTest {

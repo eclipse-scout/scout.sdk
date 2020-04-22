@@ -78,7 +78,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class WorkingCopyTransformerTest {
 
-  @SuppressWarnings("HardcodedFileSeparator")
   private static final String REF_FILE_FOLDER = "org/eclipse/scout/sdk/core/generator/transformer/";
 
   @Test

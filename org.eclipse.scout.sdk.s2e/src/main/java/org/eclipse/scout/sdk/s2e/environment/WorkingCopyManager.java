@@ -180,7 +180,6 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   private void ensureOpen() {
-    //noinspection HardcodedFileSeparator
     Ensure.isTrue(isOpen(), "{} has already been committed/discarded. No more changes are allowed.", getClass().getName());
   }
 

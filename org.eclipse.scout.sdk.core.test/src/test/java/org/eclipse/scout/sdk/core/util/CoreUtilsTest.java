@@ -59,7 +59,6 @@ public class CoreUtilsTest {
     assertEquals(child3, relativizeURI(URI.create("http://user:pw@host:port/a/b/c/d/"), URI.create(child3)).toString());
   }
 
-  @SuppressWarnings("HardcodedFileSeparator")
   @Test
   public void testExtensionOf() {
     assertEquals("", extensionOf((String) null));

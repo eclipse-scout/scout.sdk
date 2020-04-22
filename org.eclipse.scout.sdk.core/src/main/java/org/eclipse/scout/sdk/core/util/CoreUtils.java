@@ -213,7 +213,6 @@ public final class CoreUtils {
     String[] cParts = PATH_SEGMENT_SPLIT_PATTERN.split(child.getRawPath());
 
     // Discard trailing segment of base path
-    //noinspection HardcodedFileSeparator
     if (bParts.length > 0 && !base.getPath().endsWith("/")) {
       bParts = Arrays.copyOf(bParts, bParts.length - 1);
     }
@@ -229,12 +228,10 @@ public final class CoreUtils {
     // Construct the relative path
     StringBuilder sb = new StringBuilder();
     for (int j = 0; j < (bParts.length - i); j++) {
-      //noinspection HardcodedFileSeparator
       sb.append("../");
     }
     for (int j = i; j < cParts.length; j++) {
       if (j != i) {
-        //noinspection HardcodedFileSeparator
         sb.append('/');
       }
       sb.append(cParts[j]);
@@ -256,7 +253,6 @@ public final class CoreUtils {
     if (uri == null) {
       return null;
     }
-    //noinspection HardcodedFileSeparator
     if (uri.getPath().endsWith("/")) {
       return uri.resolve("..");
     }

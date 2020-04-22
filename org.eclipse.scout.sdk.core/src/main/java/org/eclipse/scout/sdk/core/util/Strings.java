@@ -390,9 +390,9 @@ public final class Strings {
   }
 
   private static String replaceLiterals(String result, boolean fromLiteral) {
-    //noinspection HardcodedLineSeparator,HardcodedFileSeparator
+    //noinspection HardcodedLineSeparator
     String[] a = {"\b", "\t", "\n", "\f", "\r", "\"", "\\", "\0", "\1", "\2", "\3", "\4", "\5", "\6", "\7"};
-    //noinspection HardcodedFileSeparator,HardcodedLineSeparator
+    //noinspection HardcodedLineSeparator
     String[] b = {"\\b", "\\t", "\\n", "\\f", "\\r", "\\\"", "\\\\", "\\0", "\\1", "\\2", "\\3", "\\4", "\\5", "\\6", "\\7"};
 
     if (fromLiteral) {
@@ -451,7 +451,6 @@ public final class Strings {
    * @return The escaped version.
    */
   public static String escapeHtml(String html) {
-    //noinspection HardcodedFileSeparator
     return replaceEach(html,
         new String[]{"\"", "&", "<", ">", "'", "/"},
         new String[]{"&quot;", "&amp;", "&lt;", "&gt;", "&apos;", "&#47;"});

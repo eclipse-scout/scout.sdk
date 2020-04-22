@@ -52,7 +52,6 @@ import org.eclipse.scout.sdk.core.util.Strings;
  *
  * @since 10.0.0
  */
-@SuppressWarnings("HardcodedFileSeparator")
 public class MissingTranslationQuery implements IFileQuery {
 
   public static final String IGNORE_MARKER = "NO-NLS-CHECK";

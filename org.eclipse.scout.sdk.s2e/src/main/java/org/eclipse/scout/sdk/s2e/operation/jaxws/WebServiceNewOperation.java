@@ -156,7 +156,6 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
       IJavaProject jaxWsProject = getJaxWsProject();
       IClasspathEntry[] rawClasspathEntries = jaxWsProject.getRawClasspath();
       List<IClasspathEntry> newEntries = new ArrayList<>(rawClasspathEntries.length);
-      //noinspection HardcodedFileSeparator
       org.eclipse.core.runtime.Path entryPathToSearch = new org.eclipse.core.runtime.Path('/' + jaxWsProject.getElementName() + '/' + entryPath);
       for (IClasspathEntry entry : rawClasspathEntries) {
         if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE && entry.getPath().equals(entryPathToSearch)) {

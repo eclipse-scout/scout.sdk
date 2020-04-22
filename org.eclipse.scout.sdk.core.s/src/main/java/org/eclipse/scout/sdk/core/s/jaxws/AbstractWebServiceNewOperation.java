@@ -294,7 +294,6 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
 
     try {
       Document document = Xml.get(pom);
-      //noinspection HardcodedFileSeparator
       JaxWsUtils.addWsdlToPom(document, wsdlFolderRelativePath.toString().replace('\\', '/'), bindingFolderName, bindingFileNames);
       env.writeResource(Xml.documentToString(document, true), pom, progress);
     }
@@ -408,7 +407,6 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     URL wsdlUrl = getWsdlUrl();
     if (wsdlUrl != null) {
       wsdlFileName = wsdlUrl.getPath();
-      //noinspection HardcodedFileSeparator
       int lastSlashPos = wsdlFileName.lastIndexOf('/');
       int lastDotPos = wsdlFileName.lastIndexOf('.');
       if (lastDotPos < lastSlashPos) {

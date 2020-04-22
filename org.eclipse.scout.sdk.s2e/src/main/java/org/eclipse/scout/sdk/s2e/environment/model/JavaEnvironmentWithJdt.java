@@ -92,7 +92,6 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
         File javaInstallLocation = vmInstall.getInstallLocation();
         if (javaInstallLocation != null) {
           Path javaInstallPath = javaInstallLocation.toPath();
-          //noinspection HardcodedFileSeparator
           if (Files.isDirectory(javaInstallPath.resolve("jre/lib"))) {
             // the install location points to a JDK that contains a JRE! Use the JRE as Java home
             return javaInstallPath.resolve("jre");

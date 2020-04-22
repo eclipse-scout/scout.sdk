@@ -27,7 +27,6 @@ public class FactoryPathGenerator implements ISourceGenerator<ISourceBuilder<?>>
   private String m_rtVersion;
 
   @Override
-  @SuppressWarnings("HardcodedFileSeparator")
   public void generate(ISourceBuilder<?> builder) {
     String scoutVersion = rtVersion().orElse(ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION);
     builder.append("<factorypath>").nl();

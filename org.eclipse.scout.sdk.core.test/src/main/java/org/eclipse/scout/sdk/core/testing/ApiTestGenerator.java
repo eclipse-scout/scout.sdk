@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Assertions;
  *
  * @since 3.10.0 2013-08-26
  */
-@SuppressWarnings({"HardcodedLineSeparator", "HardcodedFileSeparator"})
+@SuppressWarnings("HardcodedLineSeparator")
 public class ApiTestGenerator {
   public static final String NL = "\n";
 

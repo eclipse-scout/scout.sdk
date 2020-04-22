@@ -232,7 +232,6 @@ public final class ScoutProjectNewHelper {
       return "Display Name is not set.";
     }
     if (!DISPLAY_NAME_PATTERN.matcher(displayNameCandidate).matches()) {
-      //noinspection HardcodedFileSeparator
       return "The Display Name must not contain these characters: \\\"/<>:=";
     }
     return null;

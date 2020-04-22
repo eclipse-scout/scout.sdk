@@ -50,7 +50,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
  *
  * @since 5.2.0
  */
-@SuppressWarnings({"HardcodedLineSeparator", "HardcodedFileSeparator"})
+@SuppressWarnings("HardcodedLineSeparator")
 public class WebServiceMessageDialog extends MessageDialogWithToggle {
 
   public static final String HIDE_CONSUMER_MSG = "hideWebServiceConsumerInfoMessage";

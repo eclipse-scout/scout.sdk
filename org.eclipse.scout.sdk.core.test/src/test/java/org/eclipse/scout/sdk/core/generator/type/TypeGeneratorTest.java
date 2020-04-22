@@ -57,7 +57,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class TypeGeneratorTest {
 
-  @SuppressWarnings("HardcodedFileSeparator")
   private static final String REF_FILE_FOLDER = "org/eclipse/scout/sdk/core/generator/type/";
   private static final AtomicLong INSERTION_ORDER = new AtomicLong();
 
@@ -162,7 +161,6 @@ public class TypeGeneratorTest {
         .toJavaSource()
         .toString();
 
-    //noinspection HardcodedLineSeparator
     assertEquals("public interface GenericIfc<? extends CharSequence & Iterable & Comparable> {\n\n}", src);
   }
 

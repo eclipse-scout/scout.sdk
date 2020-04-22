@@ -106,7 +106,6 @@ public class JreInfo {
   protected List<Path> resolvePlatformLibrariesLegacy() {
     // fall back to try to retrieve them out of the lib directory
     Path jreHome = jreHome();
-    //noinspection HardcodedFileSeparator
     Stream<Path> libDirs = Stream.of(jreHome.resolve("lib"), jreHome.resolve("lib/ext"));
 
     List<Path> result = libDirs
@@ -214,7 +213,6 @@ public class JreInfo {
     }
 
     // in Java9 the src.zip is in the lib folder inside java-home.
-    //noinspection HardcodedFileSeparator
     Path innerSrcZip = jreHome.resolve("lib/src.zip");
     if (Files.isReadable(innerSrcZip) && Files.isRegularFile(innerSrcZip)) {
       return innerSrcZip;

@@ -33,7 +33,6 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
 public class PropertiesTextProviderService extends TextProviderService {
   protected static final Pattern REGEX_RESOURCE_BUNDLE_GETTER = Pattern.compile("return\\s*\"([^\"]*)\"\\s*;", Pattern.DOTALL);
   protected static final Pattern REGEX_DOT = Pattern.compile("\\.");
-  @SuppressWarnings("HardcodedFileSeparator")
   public static final char FOLDER_SEGMENT_DELIMITER = '/';
 
   private final String m_folder;
@@ -91,7 +90,6 @@ public class PropertiesTextProviderService extends TextProviderService {
     if (prefix == null) {
       return false;
     }
-    //noinspection HardcodedFileSeparator
     return resourceName.matches(prefix + "(?:_[a-zA-Z]{2}){0,3}\\.properties");
   }
 

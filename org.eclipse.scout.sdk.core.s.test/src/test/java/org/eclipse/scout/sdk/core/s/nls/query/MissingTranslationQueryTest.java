@@ -34,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
-@SuppressWarnings({"HardcodedFileSeparator", "HardcodedLineSeparator"})
 @ExtendWith(TestingEnvironmentExtension.class)
 @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutFullJavaEnvironmentFactory.class))
 public class MissingTranslationQueryTest {

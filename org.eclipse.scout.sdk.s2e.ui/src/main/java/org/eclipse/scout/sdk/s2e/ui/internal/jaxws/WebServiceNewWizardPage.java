@@ -81,7 +81,6 @@ import org.w3c.dom.Element;
  *
  * @since 5.2.0
  */
-@SuppressWarnings("HardcodedFileSeparator")
 public class WebServiceNewWizardPage extends AbstractWizardPage {
 
   public static final String PROP_WEB_SERVICE_TYPE = "webServiceType";

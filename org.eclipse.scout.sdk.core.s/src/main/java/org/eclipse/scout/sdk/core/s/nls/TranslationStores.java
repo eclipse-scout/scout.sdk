@@ -36,7 +36,6 @@ public final class TranslationStores {
   private static final Set<ITranslationStoreSupplier> SUPPLIERS = new HashSet<>();
   private static final Map<String /*npm dependency name*/, String /* UiTextContributor FQN */> UI_TEXT_CONTRIBUTORS = new HashMap<>();
   static {
-    //noinspection HardcodedFileSeparator
     UI_TEXT_CONTRIBUTORS.put("@eclipse-scout/core", IScoutRuntimeTypes.UiTextContributor);
   }
 

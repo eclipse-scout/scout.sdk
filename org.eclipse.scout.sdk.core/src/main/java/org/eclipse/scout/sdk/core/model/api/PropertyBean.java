@@ -40,11 +40,8 @@ public class PropertyBean {
   /**
    * Regular expression matching bean method names (is..., get..., set...)
    */
-  @SuppressWarnings("HardcodedFileSeparator")
   public static final Pattern BEAN_METHOD_NAME = Pattern.compile('(' + GETTER_PREFIX + '|' + SETTER_PREFIX + '|' + GETTER_BOOL_PREFIX + ")([A-Z]\\w*)");
-  @SuppressWarnings("HardcodedFileSeparator")
   public static final Pattern GETTER_METHOD_NAME = Pattern.compile('(' + GETTER_PREFIX + '|' + GETTER_BOOL_PREFIX + ")([A-Z]\\w*)");
-  @SuppressWarnings("HardcodedFileSeparator")
   public static final Pattern SETTER_METHOD_NAME = Pattern.compile('(' + SETTER_PREFIX + ")([A-Z]\\w*)");
 
   private final String m_beanName;

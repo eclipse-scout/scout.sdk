@@ -33,7 +33,6 @@ public class PackageImplementor extends AbstractJavaElementImplementor<PackageSp
 
   @Override
   public Path asPath() {
-    //noinspection HardcodedFileSeparator
     return Paths.get(elementName().replace(JavaTypes.C_DOT, '/'));
   }
 

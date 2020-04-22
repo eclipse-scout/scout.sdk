@@ -47,7 +47,6 @@ import org.w3c.dom.Element;
  *
  * @since 5.2.0
  */
-@SuppressWarnings("HardcodedFileSeparator")
 public final class JaxWsModuleNewHelper {
 
   private JaxWsModuleNewHelper() {

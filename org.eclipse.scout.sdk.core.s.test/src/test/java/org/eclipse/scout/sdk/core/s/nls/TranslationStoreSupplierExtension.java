@@ -59,7 +59,6 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  */
 public class TranslationStoreSupplierExtension implements BeforeEachCallback, AfterEachCallback {
 
-  @SuppressWarnings("HardcodedFileSeparator")
   public static final String TEST_DEPENDENCY_NAME = "@bsi-sdk/testdependency";
   public static final String TEST_UI_CONTRIBUTOR_FQN = "nls.TestUiTextContributor";
 

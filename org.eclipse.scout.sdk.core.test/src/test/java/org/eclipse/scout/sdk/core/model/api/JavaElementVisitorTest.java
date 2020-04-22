@@ -280,7 +280,6 @@ public class JavaElementVisitorTest {
     StringBuilder protocol();
 
     default void append(IJavaElement e, int level, int index) {
-      //noinspection HardcodedLineSeparator
       protocol()
           .append(repeat("  ", level))
           .append(e.elementName())
@@ -291,7 +290,6 @@ public class JavaElementVisitorTest {
     }
 
     default void postAppend(int level) {
-      //noinspection HardcodedLineSeparator
       protocol()
           .append(repeat("  ", level))
           .append("}\n");

@@ -29,9 +29,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
  */
 public final class ScoutFixtureHelper {
 
-  @SuppressWarnings("HardcodedFileSeparator")
   public static final String SHARED_FIXTURE_PATH = "src/test/shared";
-  @SuppressWarnings("HardcodedFileSeparator")
   public static final String CLIENT_FIXTURE_PATH = "src/test/client";
 
   public static final Path NLS_TEST_DIR = Paths.get("").toAbsolutePath().resolve(SHARED_FIXTURE_PATH).resolve("nls");
