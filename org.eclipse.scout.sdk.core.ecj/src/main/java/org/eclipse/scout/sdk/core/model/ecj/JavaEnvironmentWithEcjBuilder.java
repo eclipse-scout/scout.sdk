@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -34,6 +33,7 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.RunningJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -118,18 +118,10 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    * @return this
    */
   public T exclude(String regex) {
-    String key = toIncludeExcludeKey(regex);
     Pattern pat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-    m_sourceExcludes.put(key, pat);
-    m_binaryExcludes.put(key, pat);
+    m_sourceExcludes.put(regex, pat);
+    m_binaryExcludes.put(regex, pat);
     return currentInstance();
-  }
-
-  protected static String toIncludeExcludeKey(String regex) {
-    if (regex == null) {
-      return null;
-    }
-    return regex.toLowerCase(Locale.ENGLISH);
   }
 
   /**
@@ -143,9 +135,8 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    * @return this
    */
   public T include(String regex) {
-    String key = toIncludeExcludeKey(regex);
-    m_sourceExcludes.remove(key);
-    m_binaryExcludes.remove(key);
+    m_sourceExcludes.remove(regex);
+    m_binaryExcludes.remove(regex);
     return currentInstance();
   }
 
@@ -198,7 +189,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    * @return this
    */
   public T withoutSources(String regex) {
-    m_sourceExcludes.put(toIncludeExcludeKey(regex), Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
+    m_sourceExcludes.put(regex, Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
     return currentInstance();
   }
 
@@ -395,8 +386,9 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
         filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.TEST_JAVA_SOURCE_FOLDER), collector);
       }
       else {
-        String fileName = path.getFileName().toString().toLowerCase(Locale.ENGLISH);
-        if (fileName.endsWith(".zip") || fileName.endsWith(".jar")) {
+        String extension = CoreUtils.extensionOf(path);
+        if ("jar".equals(extension) || "zip".equals(extension)) {
+          String fileName = path.getFileName().toString(); // no lower case here! Otherwise case sensitive filesystem may not find the file anymore!
           fileName = fileName.substring(0, fileName.length() - 4) + "-sources" + fileName.substring(fileName.length() - 4);
           filterAndAppendSourcePath(path.getParent().resolve(fileName), collector);
         }
