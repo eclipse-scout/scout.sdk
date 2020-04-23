@@ -33,7 +33,7 @@ open class MissingTranslationInspection : LocalInspectionTool() {
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
         val module = file.containingModule() ?: return ProblemDescriptor.EMPTY_ARRAY
-        if (!MissingTranslationQuery.PATTERNS_BY_FILE_EXTENSION.containsKey(file.virtualFile.extension)) {
+        if (!MissingTranslationQuery.supportedFileTypes().contains(file.virtualFile.extension)) {
             return ProblemDescriptor.EMPTY_ARRAY
         }
 

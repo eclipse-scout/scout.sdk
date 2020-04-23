@@ -10,18 +10,17 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.query;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.keysAccessibleForModule;
+import static org.eclipse.scout.sdk.core.util.SourceState.isInCode;
+import static org.eclipse.scout.sdk.core.util.SourceState.isInString;
 
 import java.nio.CharBuffer;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -55,8 +54,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class MissingTranslationQuery implements IFileQuery {
 
   public static final String IGNORE_MARKER = "NO-NLS-CHECK";
-  @SuppressWarnings("PublicStaticCollectionField")
-  public static final Map<String, Collection<Pattern>> PATTERNS_BY_FILE_EXTENSION;
+  private static final Map<String, List<AbstractTranslationSearch>> SEARCH_PATTERNS;
   public static final String JAVA_TEXTS_FILE_NAME = JavaTypes.simpleName(IScoutRuntimeTypes.TEXTS) + JavaTypes.JAVA_FILE_SUFFIX;
   public static final String JS_TEXTS_FILE_NAME = "texts.js";
 
@@ -64,16 +62,12 @@ public class MissingTranslationQuery implements IFileQuery {
   private final Map<Path, Set<FileRange>> m_matches;
 
   static {
-    String nlsKeyPattern = ITranslation.KEY_REGEX.pattern();
-    Pattern jsTextKeyPat1 = Pattern.compile("\\$\\{textKey:(" + nlsKeyPattern + ')');
-    Pattern jsTextKeyPat2 = Pattern.compile("session\\.text\\(('?)(" + nlsKeyPattern + ")('?)");
+    SEARCH_PATTERNS = Stream.of(new JavaTextsGetSearch(), new JsSessionTextSearch(), new JsonTextKeySearch(), new HtmlScoutMessageSearch())
+        .collect(groupingBy(AbstractTranslationSearch::fileExtension));
+  }
 
-    Map<String, Collection<Pattern>> patternsByFile = new HashMap<>(3);
-    patternsByFile.put(JavaTypes.JAVA_FILE_EXTENSION, singletonList(Pattern.compile("TEXTS\\.get\\((?:[a-zA-Z0-9_]+,\\s*)?(\")?(" + nlsKeyPattern + ")(\")?")));
-    patternsByFile.put("js", unmodifiableList(asList(jsTextKeyPat1, jsTextKeyPat2)));
-    patternsByFile.put("html", singletonList(Pattern.compile("<scout:message key=\"(" + nlsKeyPattern + ")\"\\s*/?>")));
-
-    PATTERNS_BY_FILE_EXTENSION = unmodifiableMap(patternsByFile);
+  public static Set<String> supportedFileTypes() {
+    return unmodifiableSet(SEARCH_PATTERNS.keySet());
   }
 
   public MissingTranslationQuery() {
@@ -91,7 +85,7 @@ public class MissingTranslationQuery implements IFileQuery {
     if (fullPath.contains("/archetype-resources/") || fullPath.contains("/generated-resources/")) {
       return false;
     }
-    return PATTERNS_BY_FILE_EXTENSION.containsKey(candidate.fileExtension())
+    return SEARCH_PATTERNS.containsKey(candidate.fileExtension())
         && !candidate.file().endsWith(JAVA_TEXTS_FILE_NAME)
         && !candidate.file().endsWith(JS_TEXTS_FILE_NAME);
   }
@@ -102,18 +96,18 @@ public class MissingTranslationQuery implements IFileQuery {
       return;
     }
 
-    Collection<Pattern> patterns = PATTERNS_BY_FILE_EXTENSION.get(candidate.fileExtension());
+    List<AbstractTranslationSearch> patterns = SEARCH_PATTERNS.get(candidate.fileExtension());
     CharSequence content = CharBuffer.wrap(candidate.fileContent());
     progress.init(name(), patterns.size());
-    for (Pattern p : patterns) {
-      Matcher matcher = p.matcher(content);
+    for (AbstractTranslationSearch search : patterns) {
+      Matcher matcher = search.pattern().matcher(content);
       while (matcher.find()) {
-        checkMatch(matcher, candidate, env, progress.newChild(1));
+        checkMatch(matcher, search, candidate, env, progress.newChild(1));
       }
     }
   }
 
-  protected void checkMatch(MatchResult match, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
+  protected void checkMatch(MatchResult match, AbstractTranslationSearch search, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
     int keyGroup;
     if (match.groupCount() > 1) {
       // pattern with optional literal delimiter: '"' for java, ''' for js
@@ -122,9 +116,9 @@ public class MissingTranslationQuery implements IFileQuery {
       boolean noLiteral = Strings.isEmpty(match.group(1)) || Strings.isEmpty(match.group(3));
       if (noLiteral) {
         // is no string literal. might be e variable or concatenation.
-        if (!tryToResolveConstant(match.group(keyGroup), fileQueryInput, env, progress)) {
+        if (!tryToResolveConstant(match.group(keyGroup), search, fileQueryInput, env, progress)) {
           // cannot be resolved as constant. register as match for manual review
-          registerMatchIfNotIgnored(match, keyGroup, Level.INFO.intValue(), fileQueryInput);
+          registerMatchIfNotIgnored(match, keyGroup, Level.INFO.intValue(), search, fileQueryInput);
         }
         return;
       }
@@ -133,40 +127,40 @@ public class MissingTranslationQuery implements IFileQuery {
       // pattern without literal delimiter
       keyGroup = 1;
     }
-    registerMatchIfKeyIsMissing(match, keyGroup, Level.WARNING.intValue(), fileQueryInput, env, progress);
+    registerMatchIfKeyIsMissing(match, keyGroup, Level.WARNING.intValue(), search, fileQueryInput, env, progress);
   }
 
-  protected boolean tryToResolveConstant(String constantName, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
+  protected boolean tryToResolveConstant(String constantName, AbstractTranslationSearch search, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
     Pattern constantPat = Pattern.compile("\\s+" + constantName + "\\s*=\\s*[\"'](" + ITranslation.KEY_REGEX.pattern() + ")[\"'];");
     CharSequence content = CharBuffer.wrap(fileQueryInput.fileContent());
     Matcher constantMatcher = constantPat.matcher(content);
     boolean constantFound = false;
     while (constantMatcher.find()) {
-      registerMatchIfKeyIsMissing(constantMatcher, 1, Level.WARNING.intValue(), fileQueryInput, env, progress);
+      registerMatchIfKeyIsMissing(constantMatcher, 1, Level.WARNING.intValue(), search, fileQueryInput, env, progress);
       constantFound = true;
     }
     return constantFound;
   }
 
-  protected void registerMatchIfKeyIsMissing(MatchResult match, int keyGroup, int severity, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
+  protected void registerMatchIfKeyIsMissing(MatchResult match, int keyGroup, int severity, AbstractTranslationSearch search, FileQueryInput queryInput, IEnvironment env, IProgress progress) {
     String key = match.group(keyGroup);
-    if (isKeyValidForModule(fileQueryInput.module(), key, env, progress)) {
+    if (keyExistsForModule(queryInput.module(), key, env, progress)) {
       return;
     }
-    registerMatchIfNotIgnored(match, keyGroup, severity, fileQueryInput);
+    registerMatchIfNotIgnored(match, keyGroup, severity, search, queryInput);
   }
 
-  protected void registerMatchIfNotIgnored(MatchResult match, int keyGroup, int severity, FileQueryInput fileQueryInput) {
+  protected void registerMatchIfNotIgnored(MatchResult match, int keyGroup, int severity, AbstractTranslationSearch search, FileQueryInput queryInput) {
+    if (!search.acceptMatch(match, keyGroup, queryInput)) {
+      return;
+    }
     int startIndex = match.start(keyGroup);
-    if (isIgnored(fileQueryInput.fileContent(), startIndex)) {
-      return;
-    }
     int endIndex = match.end(keyGroup);
-    m_matches.computeIfAbsent(fileQueryInput.file(), f -> ConcurrentHashMap.newKeySet())
-        .add(new FileRange(fileQueryInput.file(), CharBuffer.wrap(fileQueryInput.fileContent(), startIndex, endIndex - startIndex), startIndex, endIndex, severity));
+    m_matches.computeIfAbsent(queryInput.file(), f -> ConcurrentHashMap.newKeySet())
+        .add(new FileRange(queryInput.file(), CharBuffer.wrap(queryInput.fileContent(), startIndex, endIndex - startIndex), startIndex, endIndex, severity));
   }
 
-  protected boolean isKeyValidForModule(Path modulePath, String key, IEnvironment env, IProgress progress) {
+  protected boolean keyExistsForModule(Path modulePath, String key, IEnvironment env, IProgress progress) {
     return accessibleKeysForModule(modulePath, env, progress)
         .map(keys -> keys.contains(key))
         .orElse(true); // no stack could be created: the module is no scout module (no TextProviderService visible, but at least the Scout service should be available). In that case no markers should be created.
@@ -196,25 +190,149 @@ public class MissingTranslationQuery implements IFileQuery {
     return unmodifiableSet(ranges);
   }
 
-  @SuppressWarnings("HardcodedLineSeparator")
-  protected static boolean isIgnored(char[] content, int offset) {
-    int nlPos = indexOf('\n', content, offset);
-    if (nlPos < IGNORE_MARKER.length()) {
-      nlPos = content.length; // no more newline found: search to the end of the content
+  protected static abstract class AbstractTranslationSearch {
+
+    protected static final String NLS_KEY_PAT = ITranslation.KEY_REGEX.pattern();
+    protected static final String JS_FILE_EXTENSION = "js";
+
+    protected abstract Pattern pattern();
+
+    protected abstract String fileExtension();
+
+    protected abstract boolean acceptMatch(MatchResult match, int keyGroup, FileQueryInput fileQueryInput);
+
+    @SuppressWarnings("HardcodedLineSeparator")
+    protected static int nextLineEnd(char[] content, int offset) {
+      int nlPos = indexOf('\n', content, offset);
+      if (nlPos < 0) {
+        return content.length; // no more newline found: search to the end of the content
+      }
+      if (nlPos > 0 && content[nlPos - 1] == '\r') {
+        nlPos--;
+      }
+      return nlPos;
     }
-    if (content[nlPos - 1] == '\r') {
-      nlPos--;
+
+    protected static int indexOf(char toBeFound, char[] array, int start) {
+      for (int i = start; i < array.length; ++i) {
+        if (toBeFound == array[i]) {
+          return i;
+        }
+      }
+      return -1;
     }
-    String end = new String(content, nlPos - IGNORE_MARKER.length(), IGNORE_MARKER.length());
-    return IGNORE_MARKER.equalsIgnoreCase(end);
+
+    protected static String textToNextNewLine(char[] content, int offset) {
+      int lineEnd = nextLineEnd(content, offset);
+      return new String(content, offset, lineEnd - offset);
+    }
+
+    protected static boolean lineEndsWithIgnoreMarker(char[] content, int offset) {
+      int lineEnd = nextLineEnd(content, offset); // because of the regex patterns the full content cannot be shorter than the ignore marker -> no need to check for the bounds
+      String end = new String(content, lineEnd - IGNORE_MARKER.length(), IGNORE_MARKER.length());
+      return IGNORE_MARKER.equalsIgnoreCase(end);
+    }
+
+    protected static boolean isKeyInCode(char[] content, int offset) {
+      /*the start index itself is inside of the string literal and therefore never in the code. subtract two (one to get to the string delim and one to get to the char before*/
+      int posBeforeKeyMatch = offset - 2;
+      return isInCode(content, posBeforeKeyMatch);
+    }
+
+    protected static boolean isAcceptedCodeMatch(MatchResult match, int keyGroup, char[] content) {
+      int endIndex = match.end(keyGroup);
+      if (lineEndsWithIgnoreMarker(content, endIndex)) {
+        return false;
+      }
+
+      int startIndex = match.start(keyGroup);
+      return isKeyInCode(content, startIndex);
+    }
   }
 
-  protected static int indexOf(char toBeFound, char[] array, int start) {
-    for (int i = start; i < array.length; ++i) {
-      if (toBeFound == array[i]) {
-        return i;
-      }
+  protected static class JsSessionTextSearch extends AbstractTranslationSearch {
+
+    private static final Pattern JS_SESSION_TEXT_PAT = Pattern.compile("session\\.text\\(('?)(" + NLS_KEY_PAT + ")('?)\\s*[,)]");
+
+    @Override
+    protected Pattern pattern() {
+      return JS_SESSION_TEXT_PAT;
     }
-    return -1;
+
+    @Override
+    protected String fileExtension() {
+      return JS_FILE_EXTENSION;
+    }
+
+    @Override
+    protected boolean acceptMatch(MatchResult match, int keyGroup, FileQueryInput fileQueryInput) {
+      return isAcceptedCodeMatch(match, keyGroup, fileQueryInput.fileContent());
+    }
+  }
+
+  protected static class JsonTextKeySearch extends AbstractTranslationSearch {
+
+    private static final Pattern JSON_PAT = Pattern.compile("\\$\\{textKey:(" + NLS_KEY_PAT + ')');
+
+    @Override
+    protected Pattern pattern() {
+      return JSON_PAT;
+    }
+
+    @Override
+    protected String fileExtension() {
+      return JS_FILE_EXTENSION;
+    }
+
+    @Override
+    protected boolean acceptMatch(MatchResult match, int keyGroup, FileQueryInput fileQueryInput) {
+      int endIndex = match.end(keyGroup);
+      if (lineEndsWithIgnoreMarker(fileQueryInput.fileContent(), endIndex)) {
+        return false;
+      }
+
+      int startIndex = match.start(keyGroup);
+      return isInString(fileQueryInput.fileContent(), startIndex);
+    }
+  }
+
+  protected static class JavaTextsGetSearch extends AbstractTranslationSearch {
+
+    private static final Pattern TEXTS_GET_PAT = Pattern.compile("TEXTS\\.get\\((?:[a-zA-Z0-9_]+,\\s*)?(\")?(" + NLS_KEY_PAT + ")(\")?\\s*[,)]");
+
+    @Override
+    protected Pattern pattern() {
+      return TEXTS_GET_PAT;
+    }
+
+    @Override
+    protected String fileExtension() {
+      return JavaTypes.JAVA_FILE_EXTENSION;
+    }
+
+    @Override
+    protected boolean acceptMatch(MatchResult match, int keyGroup, FileQueryInput fileQueryInput) {
+      return isAcceptedCodeMatch(match, keyGroup, fileQueryInput.fileContent());
+    }
+  }
+
+  protected static class HtmlScoutMessageSearch extends AbstractTranslationSearch {
+    private static final Pattern HTML_PAT = Pattern.compile("\\s+key=\"(" + NLS_KEY_PAT + ")\""); // there is no 'key' attribute in html. so no need to check for the scout:message tag
+
+    @Override
+    protected Pattern pattern() {
+      return HTML_PAT;
+    }
+
+    @Override
+    protected String fileExtension() {
+      return "html";
+    }
+
+    @Override
+    protected boolean acceptMatch(MatchResult match, int keyGroup, FileQueryInput fileQueryInput) {
+      int endOfMatch = match.end(keyGroup);
+      return !textToNextNewLine(fileQueryInput.fileContent(), endOfMatch).toUpperCase(Locale.ENGLISH).endsWith(IGNORE_MARKER + " -->");
+    }
   }
 }

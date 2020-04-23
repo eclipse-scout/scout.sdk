@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls.search;
 
 import static org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils.queryResultToSearchResult;
 
+import java.util.logging.Level;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -50,7 +52,9 @@ public class NlsFindMissingKeysQuery extends FileSearchQuery {
   @Override
   public IStatus run(IProgressMonitor monitor) {
     IFileQueryResult query = EclipseWorkspaceWalker.executeQuerySync(new MissingTranslationQuery(), monitor);
-    queryResultToSearchResult(query, getSearchResult());
+    queryResultToSearchResult(query
+        .result()
+        .filter(r -> r.severity() >= Level.WARNING.intValue()), getSearchResult());
     return Status.OK_STATUS;
   }
 }

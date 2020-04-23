@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -46,6 +47,7 @@ import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.s.util.search.IFileQueryResult;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
+import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker;
 import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker.WorkspaceFile;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
@@ -445,17 +447,18 @@ public final class S2eUiUtils {
   }
 
   /**
-   * Adds all findings ({@link IFileQueryResult#result()} of the query to {@link FileSearchResult}. The
-   * {@link FileSearchResult} is cleared before.
+   * Adds all {@link FileRange}s to the {@link FileSearchResult}. The {@link FileSearchResult} is cleared before.
    * 
    * @param from
    *          The data source
    * @param to
    *          The target
+   * @see IFileQueryResult
+   * @see EclipseWorkspaceWalker
    */
-  public static void queryResultToSearchResult(IFileQueryResult from, FileSearchResult to) {
+  public static void queryResultToSearchResult(Stream<FileRange> from, FileSearchResult to) {
     to.removeAll();
-    from.result()
+    from
         .map(S2eUiUtils::toEclipseMatch)
         .filter(Optional::isPresent)
         .map(Optional::get)

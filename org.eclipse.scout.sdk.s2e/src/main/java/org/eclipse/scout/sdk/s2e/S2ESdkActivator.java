@@ -26,7 +26,7 @@ public class S2ESdkActivator extends Plugin {
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.s2e";
 
   private static volatile S2ESdkActivator plugin;
-  private static volatile ITranslationStoreSupplier m_nlsSupplier;
+  private volatile ITranslationStoreSupplier m_nlsSupplier;
   private volatile DerivedResourceManager m_derivedResourceManager;
 
   @Override

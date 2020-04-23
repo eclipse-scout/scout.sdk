@@ -10,26 +10,31 @@
  */
 package org.eclipse.scout.sdk.s2e.util;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableCollection;
+import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironment;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironmentSync;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -37,8 +42,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
@@ -149,24 +156,16 @@ public class EclipseWorkspaceWalker {
     IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
     SubMonitor subMonitor = SubMonitor.convert(monitor, taskName(), projects.length * 2);
     for (IProject root : projects) {
-      Path outputLocation;
+      Set<Path> outputLocations = emptySet();
       subMonitor.subTask(root.getName());
       if (isSkipOutputLocation()) {
         IJavaProject jp = JavaCore.create(root);
-        if (JdtUtils.exists(jp)) {
-          outputLocation = new File(root.getLocation().toOSString(), jp.getOutputLocation().removeFirstSegments(1).toOSString()).toPath();
-        }
-        else {
-          outputLocation = null;
-        }
-      }
-      else {
-        outputLocation = null;
+        outputLocations = getOutputLocations(jp);
       }
 
       Path projectPath = root.getLocation().toFile().toPath();
       if (Files.exists(projectPath)) {
-        searchInFolder(visitor, projectPath, Charset.forName(root.getDefaultCharset()), outputLocation, subMonitor.newChild(1));
+        searchInFolder(visitor, projectPath, Charset.forName(root.getDefaultCharset()), outputLocations, subMonitor.newChild(1));
       }
 
       if (subMonitor.isCanceled()) {
@@ -176,7 +175,21 @@ public class EclipseWorkspaceWalker {
     }
   }
 
-  protected void searchInFolder(BiConsumer<WorkspaceFile, IProgress> visitor, Path folder, Charset charset, Path outputFolder, IProgressMonitor monitor) {
+  protected static Set<Path> getOutputLocations(IJavaProject jp) throws JavaModelException {
+    if (!JdtUtils.exists(jp)) {
+      return emptySet();
+    }
+    String projectDir = jp.getProject().getLocation().toOSString();
+    IClasspathEntry[] rawClasspath = jp.getRawClasspath();
+    return Stream.of(rawClasspath)
+        .map(IClasspathEntry::getOutputLocation)
+        .filter(Objects::nonNull)
+        .map(location -> location.removeFirstSegments(1).toOSString())
+        .map(location -> Paths.get(projectDir, location))
+        .collect(toSet());
+  }
+
+  protected void searchInFolder(BiConsumer<WorkspaceFile, IProgress> visitor, Path folder, Charset charset, Collection<Path> outputFolders, IProgressMonitor monitor) {
     try {
       Files.walkFileTree(folder,
           new SimpleFileVisitor<Path>() {
@@ -185,7 +198,7 @@ public class EclipseWorkspaceWalker {
               if (monitor.isCanceled()) {
                 return FileVisitResult.TERMINATE;
               }
-              if (dir.equals(outputFolder)) {
+              if (outputFolders.contains(dir)) {
                 return FileVisitResult.SKIP_SUBTREE;
               }
               if (!directoryFiltersAccepted(dir, attrs)) {
