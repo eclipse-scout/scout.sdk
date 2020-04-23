@@ -538,9 +538,16 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <!-- MissingTranslationQueryTest needs sources of org.eclipse.scout.rt.ui.html.UiTextContributor -->
+        <!-- NLS tests need sources of org.eclipse.scout.rt.ui.html.UiTextContributor -->
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
+        <version>${org.eclipse.scout.rt_version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+      <dependency>
+        <!-- NLS tests need sources of org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService -->
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.shared</artifactId>
         <version>${org.eclipse.scout.rt_version}</version>
         <classifier>sources</classifier>
       </dependency>
