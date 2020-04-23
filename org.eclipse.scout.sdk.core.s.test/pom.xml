@@ -121,6 +121,13 @@
       <classifier>sources</classifier>
     </dependency>
     <dependency>
+      <!-- NLS tests need sources of org.eclipse.scout.rt.security.ScoutSecurityTextProviderService -->
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.security</artifactId>
+      <scope>test</scope>
+      <classifier>sources</classifier>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.server.test</artifactId>
       <scope>compile</scope>
