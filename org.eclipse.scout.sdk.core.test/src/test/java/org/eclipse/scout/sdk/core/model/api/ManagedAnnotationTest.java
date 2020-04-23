@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithDefaultValues;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithShortValueForIntField;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithSingleValues;
 import org.eclipse.scout.sdk.core.fixture.ClassWithScalarGeneratedAnnotation;
+import org.eclipse.scout.sdk.core.fixture.ValueAnnot;
 import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithDefaultValues;
 import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithSingleValues;
@@ -62,7 +63,7 @@ public class ManagedAnnotationTest {
     assertEquals("alpha", a.string());
     assertEquals(env.requireType(RoundingMode.class.getName()).fields().withName("HALF_UP").first().get(), a.enumValue());
     assertEquals(env.requireType(String.class.getName()), a.type());
-    assertEquals(env.requireType(Generated.class.getName()), a.anno().type());
+    assertEquals(env.requireType(ValueAnnot.class.getName()), a.anno().type());
     assertEquals("g1", a.anno().element("value").get().value().as(String.class));
   }
 
@@ -96,7 +97,7 @@ public class ManagedAnnotationTest {
     assertEquals("alpha", a.string((String) null));
     assertEquals(env.requireType(RoundingMode.class.getName()).fields().withName("HALF_UP").first().get(), a.enumValue((IField) null));
     assertEquals(env.requireType(String.class.getName()), a.type((IType) null));
-    assertEquals(env.requireType(Generated.class.getName()), a.anno((IAnnotation) null).type());
+    assertEquals(env.requireType(ValueAnnot.class.getName()), a.anno((IAnnotation) null).type());
     assertEquals("g1", a.anno((IAnnotation) null).element("value").get().value().as(String.class));
     assertArrayEquals(new String[]{"g1"}, a.generated().value());
   }

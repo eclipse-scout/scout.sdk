@@ -187,20 +187,16 @@ public class JavaElementVisitorTest {
         "string," +
         "type," +
         "anno," +
-        "Generated," +
+        "ValueAnnot," +
         "value," +
-        "date," +
-        "comments," +
         "AnnotationWithSingleValues," +
         "num," +
         "enumValue," +
         "string," +
         "type," +
         "anno," +
-        "Generated," +
+        "ValueAnnot," +
         "value," +
-        "date," +
-        "comments," +
         "run," +
         "AnnotationWithArrayValues," +
         "nums," +
@@ -214,20 +210,16 @@ public class JavaElementVisitorTest {
         "string," +
         "type," +
         "anno," +
-        "Generated," +
+        "ValueAnnot," +
         "value," +
-        "date," +
-        "comments," +
         "AnnotationWithSingleValues," +
         "num," +
         "enumValue," +
         "string," +
         "type," +
         "anno," +
-        "Generated," +
+        "ValueAnnot," +
         "value," +
-        "date," +
-        "comments," +
         "a", protocol.toString());
   }
 

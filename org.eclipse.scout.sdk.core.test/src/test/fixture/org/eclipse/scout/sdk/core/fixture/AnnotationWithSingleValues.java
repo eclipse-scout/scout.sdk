@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.core.fixture;
 
 import java.math.RoundingMode;
 
-import javax.annotation.Generated;
-
 /**
  *
  */
@@ -26,5 +24,5 @@ public @interface AnnotationWithSingleValues {
 
   Class<?> type();
 
-  Generated anno();
+  ValueAnnot anno();
 }

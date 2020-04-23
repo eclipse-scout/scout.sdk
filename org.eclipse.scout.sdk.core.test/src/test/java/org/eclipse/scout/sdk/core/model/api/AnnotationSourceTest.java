@@ -67,7 +67,7 @@ public class AnnotationSourceTest {
     assertAnnotationValue(a, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_UP", "RoundingMode.HALF_UP");
     assertAnnotationValue(a, "string", MetaValueType.String, String.class, "\"alpha\"", "\"alpha\"");
     assertAnnotationValue(a, "type", MetaValueType.Type, TypeImplementor.class, "String.class", "String.class");
-    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g1\")", "@Generated(\"g1\")");
+    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g1\")", "@ValueAnnot(\"g1\")");
 
     IMethod m = t.methods().first().get();//the constructor is a synthetic method
     assertEquals(1, m.annotations().stream().count());
@@ -76,7 +76,7 @@ public class AnnotationSourceTest {
     assertAnnotationValue(a, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_DOWN", "RoundingMode.HALF_DOWN");
     assertAnnotationValue(a, "string", MetaValueType.String, String.class, "\"alpha\"", "ClassWithAnnotationConstants.ALPHA");
     assertAnnotationValue(a, "type", MetaValueType.Type, TypeImplementor.class, "Integer.class", "Integer.class");
-    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g2\")", "@Generated(\"g2\")");
+    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g2\")", "@ValueAnnot(\"g2\")");
   }
 
   @Test
@@ -89,20 +89,20 @@ public class AnnotationSourceTest {
     assertAnnotationArrayValues(a, "strings", MetaValueType.String, String.class, new String[]{"\"alpha\"", "\"alpha\""}, "{\"alpha\", ClassWithAnnotationConstants.ALPHA}");
     assertAnnotationArrayValues(a, "types", MetaValueType.Type, TypeImplementor.class, new String[]{"String.class", "String.class"}, "{String.class, String.class}");
     assertAnnotationArrayValues(a, "annos", MetaValueType.Annotation, AnnotationImplementor.class, new String[]{"*", "*"},
-        "{@AnnotationWithSingleValues(type = Integer.class,enumValue = RoundingMode.HALF_UP,num = 11,string = \"beta\",anno = @Generated(\"g1\")), @AnnotationWithSingleValues(type = Integer.class,enumValue = RoundingMode.HALF_DOWN,num = 12,string = ClassWithAnnotationConstants.BETA,anno = @Generated(\"g2\"))}");
+        "{@AnnotationWithSingleValues(type = Integer.class,enumValue = RoundingMode.HALF_UP,num = 11,string = \"beta\",anno = @ValueAnnot(\"g1\")), @AnnotationWithSingleValues(type = Integer.class,enumValue = RoundingMode.HALF_DOWN,num = 12,string = ClassWithAnnotationConstants.BETA,anno = @ValueAnnot(\"g2\"))}");
     //deep check
     IAnnotation annos0 = a.element("annos").get().value().as(IAnnotation[].class)[0];
     assertAnnotationValue(annos0, "num", MetaValueType.Int, Integer.class, "11", "11");
     assertAnnotationValue(annos0, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_UP", "RoundingMode.HALF_UP");
     assertAnnotationValue(annos0, "string", MetaValueType.String, String.class, "\"beta\"", "\"beta\"");
     assertAnnotationValue(annos0, "type", MetaValueType.Type, TypeImplementor.class, "Integer.class", "Integer.class");
-    assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g1\")", "@Generated(\"g1\")");
+    assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g1\")", "@ValueAnnot(\"g1\")");
     IAnnotation annos1 = a.element("annos").get().value().as(IAnnotation[].class)[1];
     assertAnnotationValue(annos1, "num", MetaValueType.Int, Integer.class, "12", "12");
     assertAnnotationValue(annos1, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_DOWN", "RoundingMode.HALF_DOWN");
     assertAnnotationValue(annos1, "string", MetaValueType.String, String.class, "\"beta\"", "ClassWithAnnotationConstants.BETA");
     assertAnnotationValue(annos1, "type", MetaValueType.Type, TypeImplementor.class, "Integer.class", "Integer.class");
-    assertAnnotationValue(annos1, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g2\")", "@Generated(\"g2\")");
+    assertAnnotationValue(annos1, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g2\")", "@ValueAnnot(\"g2\")");
 
     IMethod m = t.methods().first().get();//the constructor is a synthetic method
     assertEquals(1, m.annotations().stream().count());
@@ -112,20 +112,20 @@ public class AnnotationSourceTest {
     assertAnnotationArrayValues(a, "strings", MetaValueType.String, String.class, new String[]{"\"gamma\"", "\"gamma\""}, "{\"gamma\", ClassWithAnnotationConstants.GAMMA}");
     assertAnnotationArrayValues(a, "types", MetaValueType.Type, TypeImplementor.class, new String[]{"Float.class", "Float.class"}, "{Float.class, Float.class}");
     assertAnnotationArrayValues(a, "annos", MetaValueType.Annotation, AnnotationImplementor.class, new String[]{"*", "*"},
-        "{@AnnotationWithSingleValues(type = Double.class,enumValue = RoundingMode.HALF_EVEN,num = 31,string = \"delta\",anno = @Generated(\"g3\")), @AnnotationWithSingleValues(type = Double.class,enumValue = RoundingMode.HALF_EVEN,num = 32,string = ClassWithAnnotationConstants.DELTA,anno = @Generated(\"g4\"))}");
+        "{@AnnotationWithSingleValues(type = Double.class,enumValue = RoundingMode.HALF_EVEN,num = 31,string = \"delta\",anno = @ValueAnnot(\"g3\")), @AnnotationWithSingleValues(type = Double.class,enumValue = RoundingMode.HALF_EVEN,num = 32,string = ClassWithAnnotationConstants.DELTA,anno = @ValueAnnot(\"g4\"))}");
     //deep check
     annos0 = a.element("annos").get().value().as(IAnnotation[].class)[0];
     assertAnnotationValue(annos0, "num", MetaValueType.Int, Integer.class, "31", "31");
     assertAnnotationValue(annos0, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_EVEN", "RoundingMode.HALF_EVEN");
     assertAnnotationValue(annos0, "string", MetaValueType.String, String.class, "\"delta\"", "\"delta\"");
     assertAnnotationValue(annos0, "type", MetaValueType.Type, TypeImplementor.class, "Double.class", "Double.class");
-    assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g3\")", "@Generated(\"g3\")");
+    assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g3\")", "@ValueAnnot(\"g3\")");
     annos1 = a.element("annos").get().value().as(IAnnotation[].class)[1];
     assertAnnotationValue(annos1, "num", MetaValueType.Int, Integer.class, "32", "32");
     assertAnnotationValue(annos1, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_EVEN", "RoundingMode.HALF_EVEN");
     assertAnnotationValue(annos1, "string", MetaValueType.String, String.class, "\"delta\"", "ClassWithAnnotationConstants.DELTA");
     assertAnnotationValue(annos1, "type", MetaValueType.Type, TypeImplementor.class, "Double.class", "Double.class");
-    assertAnnotationValue(annos1, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g4\")", "@Generated(\"g4\")");
+    assertAnnotationValue(annos1, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g4\")", "@ValueAnnot(\"g4\")");
   }
 
   @Test
@@ -150,7 +150,7 @@ public class AnnotationSourceTest {
     assertAnnotationValue(a, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_UP", null);
     assertAnnotationValue(a, "string", MetaValueType.String, String.class, "\"alpha\"", null);
     assertAnnotationValue(a, "type", MetaValueType.Type, TypeImplementor.class, "String.class", null);
-    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated({\"g1\"})", null);
+    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g1\")", null);
 
     IMethod m = t.methods().withName("run").first().get();
     assertEquals(1, m.annotations().stream().count());
@@ -159,7 +159,7 @@ public class AnnotationSourceTest {
     assertAnnotationValue(a, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_DOWN", null);
     assertAnnotationValue(a, "string", MetaValueType.String, String.class, "\"alpha\"", null);
     assertAnnotationValue(a, "type", MetaValueType.Type, TypeImplementor.class, "Integer.class", null);
-    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated({\"g2\"})", null);
+    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g2\")", null);
   }
 
   @Test
@@ -179,13 +179,13 @@ public class AnnotationSourceTest {
     assertAnnotationValue(annos0, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_UP", null);
     assertAnnotationValue(annos0, "string", MetaValueType.String, String.class, "\"beta\"", null);
     assertAnnotationValue(annos0, "type", MetaValueType.Type, TypeImplementor.class, "Integer.class", null);
-    assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated({\"g1\"})", null);
+    assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g1\")", null);
     IAnnotation annos1 = a.element("annos").get().value().as(IAnnotation[].class)[1];
     assertAnnotationValue(annos1, "num", MetaValueType.Int, Integer.class, "12", null);
     assertAnnotationValue(annos1, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_DOWN", null);
     assertAnnotationValue(annos1, "string", MetaValueType.String, String.class, "\"beta\"", null);
     assertAnnotationValue(annos1, "type", MetaValueType.Type, TypeImplementor.class, "Integer.class", null);
-    assertAnnotationValue(annos1, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated({\"g2\"})", null);
+    assertAnnotationValue(annos1, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g2\")", null);
 
     IMethod m = t.methods().withName("run").first().get();
     assertEquals(1, m.annotations().stream().count());
@@ -201,13 +201,13 @@ public class AnnotationSourceTest {
     assertAnnotationValue(annos0, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_EVEN", null);
     assertAnnotationValue(annos0, "string", MetaValueType.String, String.class, "\"delta\"", null);
     assertAnnotationValue(annos0, "type", MetaValueType.Type, TypeImplementor.class, "Double.class", null);
-    assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated({\"g3\"})", null);
+    assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g3\")", null);
     annos1 = a.element("annos").get().value().as(IAnnotation[].class)[1];
     assertAnnotationValue(annos1, "num", MetaValueType.Int, Integer.class, "32", null);
     assertAnnotationValue(annos1, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_EVEN", null);
     assertAnnotationValue(annos1, "string", MetaValueType.String, String.class, "\"delta\"", null);
     assertAnnotationValue(annos1, "type", MetaValueType.Type, TypeImplementor.class, "Double.class", null);
-    assertAnnotationValue(annos1, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated({\"g4\"})", null);
+    assertAnnotationValue(annos1, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ValueAnnot(\"g4\")", null);
   }
 
   private static void assertAnnotationValue(IAnnotation a, String key, MetaValueType valueType, Class<?> modelType, CharSequence aptSource, CharSequence expressionSource) {
