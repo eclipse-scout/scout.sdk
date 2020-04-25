@@ -36,7 +36,9 @@ import org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
+import org.jetbrains.jps.model.serialization.PathMacroUtil
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -81,7 +83,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
     }
 
     override fun findType(fqn: String) = project.findTypesByName(Ensure.notBlank(fqn), GlobalSearchScope.allScope(project))
-            .mapNotNull { it.toScoutTypeIfInProject(this) }
+            .mapNotNull { it.toScoutType(this) }
             .stream()
 
     override fun findJavaEnvironment(root: Path?): Optional<IJavaEnvironment> =
@@ -89,6 +91,13 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
                     root?.toVirtualFile()
                             ?.containingModule(project)
                             ?.let { toScoutJavaEnvironment(it) })
+
+    override fun rootOfJavaEnvironment(environment: IJavaEnvironment?): Path {
+        val spi = environment?.unwrap() ?: throw newFail("Java environment must not be null")
+        val ideaEnv = spi as JavaEnvironmentWithIdea
+        val moduleDirPath = PathMacroUtil.getModuleDir(ideaEnv.module.moduleFilePath) ?: throw newFail("Java environment '{}' has no root directory.", ideaEnv)
+        return Paths.get(moduleDirPath)
+    }
 
 
     fun toScoutJavaEnvironment(module: Module?): IJavaEnvironment? =

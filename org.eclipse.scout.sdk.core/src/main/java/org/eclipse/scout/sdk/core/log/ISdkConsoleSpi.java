@@ -34,7 +34,7 @@ public interface ISdkConsoleSpi {
    * @return {@code true} if the level is relevant and should be forwarded to {@link #println(LogMessage)}.
    *         {@code false} otherwise.
    */
-  default boolean isRelevant(Level level) {
+  default boolean isEnabled(Level level) {
     return level.intValue() >= SdkLog.getLogLevel().intValue()
         && level.intValue() != Level.OFF.intValue();
   }

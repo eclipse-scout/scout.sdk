@@ -66,7 +66,7 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     Ensure.notNull(getSharedPackage(), "No shared package provided");
     Ensure.notNull(getServiceName(), "No service base name provided");
 
-    progress.init(toString(), 2);
+    progress.init(2, toString());
 
     String serverPackage = ScoutTier.Shared.convert(ScoutTier.Server, getSharedPackage());
     String svcName = getServiceName() + ISdkProperties.SUFFIX_SERVICE;

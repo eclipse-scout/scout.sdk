@@ -49,7 +49,7 @@ public class RebuildArtifactsOperation implements BiConsumer<IEnvironment, IProg
   @Override
   public void accept(IEnvironment env, IProgress p) {
     Ensure.isTrue(JdtUtils.exists(getJavaProject()), "Java Project must exist.");
-    EclipseProgress progress = toScoutProgress(p).init(toString(), 100);
+    EclipseProgress progress = toScoutProgress(p).init(100, toString());
 
     try {
       // refresh project

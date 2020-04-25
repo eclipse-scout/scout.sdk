@@ -76,7 +76,7 @@ public class TranslationProposalComputer implements IJavaCompletionProposalCompu
         Path path = context.getCompilationUnit().getResource().getLocation().toFile().toPath();
 
         return callInEclipseEnvironment(
-            (env, progress) -> TranslationStores.createFullStack(path, env, progress)
+            (env, progress) -> TranslationStores.createStack(path, env, progress)
                 .map(stack -> collectProposals(stack, prefix, offset))
                 .orElseGet(Collections::emptyList))
                     .result();

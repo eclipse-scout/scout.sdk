@@ -67,7 +67,14 @@ public interface IJavaElement {
   ISourceGenerator<ISourceBuilder<?>> toWorkingCopy();
 
   /**
-   * Converts this parsed {@link IJavaElement} into a modifiable working copy.
+   * Converts this {@link IJavaElement} into a modifiable working copy.
+   * <p>
+   * The {@link IWorkingCopyTransformer} acts like a visitor and allows to transform each <u>child</u>
+   * {@link IJavaElement element} into a custom {@link ISourceGenerator}.
+   * <p>
+   * Please note that the given transformer is NOT called for the receiver (the root element the transformation was
+   * started on) but for its children only! To modify the root generator us the resulting {@link ISourceGenerator}
+   * directly.
    * <p>
    * <b>Example:</b> See {@link IWorkingCopyTransformer}.
    *

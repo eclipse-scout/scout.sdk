@@ -38,7 +38,6 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
-import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
@@ -67,36 +66,48 @@ fun PsiElement.resolveSourceRoot(): VirtualFile? {
             ?.let { ProjectFileIndex.getInstance(this.project).getSourceRootForFile(it) }
 }
 
+/**
+ * Converts this [PsiClass] into its corresponding Scout [IType].
+ *
+ *  If the [PsiClass] is within a file in the [Project] (part of the project sources), the classpath of the parent module is used to resolve the Scout [IType].
+ *
+ * If not in the [Project] files and [returnReferencingModuleIfNotInFilesystem] is true, the [PsiClass] will be resolved based on the classpath of a [Module] that contains this [PsiClass]. It is undefined which [Module] exactly that is used.
+ *
+ * If not in the [Project] files and [returnReferencingModuleIfNotInFilesystem] is false, null is returned (no attempt is performed to resolve the [PsiClass]).
+ *
+ * @param returnReferencingModuleIfNotInFilesystem specifies how to handle [PsiClass]es which are not part of the [Project] files (see above). The default is true.
+ *
+ * @return The [IType] corresponding to this [PsiClass].
+ */
+fun PsiClass.toScoutType(env: IdeaEnvironment, returnReferencingModuleIfNotInFilesystem: Boolean = true): IType? =
+        containingModule(returnReferencingModuleIfNotInFilesystem)
+                ?.let { env.toScoutJavaEnvironment(it) }
+                ?.let { toScoutType(it) }
+
 fun PsiClass.toScoutType(env: IJavaEnvironment): IType? {
     val fqn = IdeaEnvironment.computeInReadAction(this.project) { this.qualifiedName }
     return env.findType(fqn).orElse(null)
 }
 
 /**
- * Converts the [PsiClass] to a Scout [IType] if the [PsiClass] is part of the project sources (not within a library for instance)
- *
- * If the PsiClass might be part of a binary library, consider using [toScoutType] instead.
- * @param env The IdeaEnvironment that performs the conversion
- * @throws java.lang.IllegalArgumentException if this [PsiClass] cannot be found in the modules of this project
- */
-fun PsiClass.toScoutTypeIfInProject(env: IdeaEnvironment): IType? {
-    val module = this.containingModule() ?: throw Ensure.newFail("The type '{}' is not part of the project sources.", this.name)
-    return env.toScoutJavaEnvironment(module)
-            ?.let { this.toScoutType(it) }
-}
-
-/**
+ * Gets the [Module] of the receiver.
+ * @param returnReferencingModuleIfNotInFilesystem specifies how to handle [PsiElement]s which are not part of the [Project] files (e.g. exist in a library).
+ * If true, querying the [Module] for such an element will return an instance that includes the [PsiElement] in its classpath.
+ * If false only files in the [Project] will return a [Module].
  * @return The [Module] in which this [PsiElement] exists.
  *
- * If this [PsiElement] is not part of the Project (e.g. if it exists in a jar library), this method call returns null.
- *
- * In other words: This method only returns the [Module] if this [PsiClass] is part of the project sources
  */
-fun PsiElement.containingModule(): Module? {
+fun PsiElement.containingModule(returnReferencingModuleIfNotInFilesystem: Boolean = true): Module? {
+    val isInProject = containingFile.virtualFile.isInLocalFileSystem
+    if (!returnReferencingModuleIfNotInFilesystem && !isInProject) {
+        return null
+    }
+
+    val searchElement = if (isInProject) this else containingFile ?: this
     return IdeaEnvironment.computeInReadAction(this.project) {
         this
                 .takeIf { it.isValid }
-                ?.let { ModuleUtil.findModuleForPsiElement(it) }
+                ?.let { ModuleUtil.findModuleForPsiElement(searchElement) }
     }
 }
 

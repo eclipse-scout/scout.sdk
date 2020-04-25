@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -251,6 +252,11 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
             .withAbsoluteSourcePath(root.resolve(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER).toString())
             .withAbsoluteSourcePath(root.resolve(IScoutSourceFolders.GENERATED_SOURCE_FOLDER).toString()))
                 .map(this::registerJavaEnvironment);
+  }
+
+  @Override
+  public Path rootOfJavaEnvironment(IJavaEnvironment environment) {
+    return Paths.get("").toAbsolutePath();
   }
 
   @Override

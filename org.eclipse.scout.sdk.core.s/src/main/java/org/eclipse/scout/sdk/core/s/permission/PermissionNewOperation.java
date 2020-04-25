@@ -36,7 +36,7 @@ public class PermissionNewOperation implements BiConsumer<IEnvironment, IProgres
 
   @Override
   public void accept(IEnvironment env, IProgress progress) {
-    progress.init(toString(), 1);
+    progress.init(1, toString());
     setCreatedPermission(createPermission(env, progress.newChild(1)));
   }
 

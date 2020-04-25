@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -109,25 +110,23 @@ public class PropertiesTextProviderService extends TextProviderService {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + m_filePrefix.hashCode();
-    result = prime * result + m_folder.hashCode();
-    return result;
+    return Objects.hash(super.hashCode(), m_folder, m_filePrefix);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (!super.equals(obj)) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-
-    PropertiesTextProviderService other = (PropertiesTextProviderService) obj;
-    return m_folder.equals(other.m_folder)
-        && m_filePrefix.equals(other.m_filePrefix);
+    if (!super.equals(o)) {
+      return false;
+    }
+    PropertiesTextProviderService that = (PropertiesTextProviderService) o;
+    return m_folder.equals(that.m_folder) &&
+        m_filePrefix.equals(that.m_filePrefix);
   }
 
   @Override

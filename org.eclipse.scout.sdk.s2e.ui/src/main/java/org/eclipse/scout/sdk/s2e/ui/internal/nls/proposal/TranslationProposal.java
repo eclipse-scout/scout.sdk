@@ -59,7 +59,7 @@ public class TranslationProposal extends AbstractTranslationProposal {
       String text = e.getValue();
       //noinspection HardcodedLineSeparator
       text = Strings.replaceEach(Strings.escapeHtml(text), new String[]{"\n", "\r"}, new String[]{"<br>", ""});
-      b.append("<b>").append(text).append("</b> [").append(e.getKey().dispalyName()).append("]<br>");
+      b.append("<b>").append(text).append("</b> [").append(e.getKey().displayName()).append("]<br>");
     }
     return b.toString();
   }

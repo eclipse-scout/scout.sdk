@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.model.api;
 
 import static java.util.function.Function.identity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Paths;
@@ -25,7 +24,6 @@ import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithS
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -62,6 +60,6 @@ public class CompilationUnitTest {
   @Test
   public void testToString(IJavaEnvironment env) {
     ICompilationUnit baseClassIcu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
-    assertFalse(Strings.isBlank(baseClassIcu.toString()));
+    assertEquals(BaseClass.class.getName() + JavaTypes.JAVA_FILE_SUFFIX, baseClassIcu.toString());
   }
 }

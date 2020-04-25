@@ -45,14 +45,10 @@ public final class SdkLog {
   private SdkLog() {
   }
 
-  public static void log(Level level, Object... args) {
-    log(level, null, args);
-  }
-
   /**
    * Logs the given message with the given log {@link Level} and given arguments to the {@link SdkConsole}.<br>
-   * This method has no effect if the currently active level ({@link #getLogLevel()}) is higher than the given level.
-   * <br>
+   * This method has no effect if the currently active level is higher than the given level
+   * ({@link #isLevelEnabled(Level)}).<br>
    * <br>
    * <b>Examples:</b><br>
    * <ul>
@@ -78,7 +74,7 @@ public final class SdkLog {
       level = DEFAULT_LOG_LEVEL;
     }
 
-    if (!SdkConsole.isRelevant(level)) {
+    if (!SdkConsole.isEnabled(level)) {
       return;
     }
 
@@ -233,19 +229,7 @@ public final class SdkLog {
    * @return {@code true} if at least the given {@link Level} is currently active.
    */
   public static boolean isLevelEnabled(Level level) {
-    return level != null && isLevelEnabled(level.intValue());
-  }
-
-  /**
-   * Checks if at least the given level is enabled. If this method returns {@code true} this means that a message with
-   * given {@link Level} would be printed.
-   *
-   * @param level
-   *          The level to check. Must be the {@link Level#intValue()} of one of the constants defined in {@link Level}.
-   * @return {@code true} if at least the given {@link Level} is currently active.
-   */
-  public static boolean isLevelEnabled(int level) {
-    return getLogLevel().intValue() <= level;
+    return SdkConsole.isEnabled(level);
   }
 
   /**

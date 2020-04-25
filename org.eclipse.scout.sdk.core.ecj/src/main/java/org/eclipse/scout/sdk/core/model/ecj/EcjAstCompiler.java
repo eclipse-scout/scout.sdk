@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
@@ -39,10 +40,10 @@ import org.eclipse.jdt.internal.compiler.problem.DefaultProblem;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
 
+  private static final Level VERBOSE_LOG_LEVEL = Level.FINER;
   private final Map<CompilationUnitDeclaration, ICompilationUnit> m_sources = new HashMap<>();
   private final Object m_lock;
 
@@ -60,7 +61,7 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
     result.sourceLevel = result.complianceLevel;
     result.originalSourceLevel = result.complianceLevel;
     result.targetJDK = result.complianceLevel;
-    result.verbose = SdkLog.isDebugEnabled();
+    result.verbose = SdkLog.isLevelEnabled(VERBOSE_LOG_LEVEL);
     result.preserveAllLocalVariables = true;
     result.parseLiteralExpressionsAsConstants = false;
     result.reportUnusedParameterIncludeDocCommentReference = false;
@@ -175,14 +176,11 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
   static final class SdkLogWriter extends Writer {
 
     @Override
-    public void write(@SuppressWarnings("NullableProblems") char[] buffer, int off, int len) {
-      if (!SdkLog.isDebugEnabled()) {
+    public void write(char[] buffer, int off, int len) {
+      if (!SdkLog.isLevelEnabled(VERBOSE_LOG_LEVEL)) {
         return;
       }
-      String msg = new String(buffer, off, len);
-      if (Strings.hasText(msg)) {
-        SdkLog.debug(msg);
-      }
+      SdkLog.log(VERBOSE_LOG_LEVEL, new String(buffer, off, len));
     }
 
     @Override

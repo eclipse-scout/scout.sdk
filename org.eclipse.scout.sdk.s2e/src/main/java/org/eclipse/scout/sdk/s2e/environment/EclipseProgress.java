@@ -10,8 +10,11 @@
  */
 package org.eclipse.scout.sdk.s2e.environment;
 
+import static org.eclipse.scout.sdk.core.log.MessageFormatter.arrayFormat;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
@@ -41,8 +44,10 @@ public class EclipseProgress implements IProgress {
   }
 
   @Override
-  public EclipseProgress init(String name, int totalWork) {
-    m_monitor.beginTask(name, totalWork);
+  public EclipseProgress init(int totalWork, String name, Object... args) {
+    String message = arrayFormat(name, args).message();
+    SdkLog.debug(message);
+    m_monitor.beginTask(message, totalWork);
     return this;
   }
 

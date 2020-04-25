@@ -45,7 +45,7 @@ class OperationTaskTest : BasePlatformTestCase() {
         val cancelPerformed = CountDownLatch(1)
 
         val t = OperationTask("Cancel Test", project) {
-            it.init("test", 2)
+            it.init(2, "test")
             first.set(true)
             taskStarted.countDown()
             cancelPerformed.await(1, TimeUnit.MINUTES)

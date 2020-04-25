@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.core.model.api.query.InnerTypeQuery;
 import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  *
@@ -101,5 +102,13 @@ public class CompilationUnitImplementor extends AbstractJavaElementImplementor<C
   @Override
   public ICompilationUnitGenerator<?> toWorkingCopy() {
     return toWorkingCopy(null);
+  }
+
+  @Override
+  public String toString() {
+    return mainType()
+        .map(IType::name)
+        .map(fqn -> fqn + JavaTypes.JAVA_FILE_SUFFIX)
+        .orElseGet(this::elementName);
   }
 }

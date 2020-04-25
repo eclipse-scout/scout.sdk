@@ -94,10 +94,10 @@ public class NlsEditor extends EditorPart {
   private void loadAndCreateContentAsync(Composite parent, Path path, IProgressMonitor monitor) {
     runInEclipseEnvironment((e, p /* do not use this monitor in here. instead use the monitor from the ProgressMonitorDialog */) -> {
       EclipseProgress progress = toScoutProgress(monitor);
-      progress.init("Loading translation editor...", 1000);
+      progress.init(1000, "Loading translation editor...");
 
       try {
-        TranslationStores.createFullStack(path, e, progress.newChild(1000))
+        TranslationStores.createStack(path, e, progress.newChild(1000))
             .ifPresent(stack -> {
               progress.monitor().setTaskName("Creating table...");
               parent.getDisplay().syncExec(() -> createPageAsync(stack, parent));

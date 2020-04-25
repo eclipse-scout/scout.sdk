@@ -88,7 +88,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
       }
 
       // create project on disk (using archetype)
-      progress.init(toString(), 100);
+      progress.init(100, toString());
       ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getDefaultWorkspaceJavaVersion(),
           ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, artifactId, version, env, progress.newChild(5));
 
@@ -171,7 +171,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
   }
 
   protected void formatCreatedProjects(EclipseProgress progress) throws CoreException {
-    progress.init("Format created projects", m_createdProjects.size());
+    progress.init(m_createdProjects.size(), "Format created projects");
     for (IProject createdProject : m_createdProjects) {
       if (createdProject.isAccessible() && createdProject.hasNature(JavaCore.NATURE_ID)) {
         IJavaProject jp = JavaCore.create(createdProject);

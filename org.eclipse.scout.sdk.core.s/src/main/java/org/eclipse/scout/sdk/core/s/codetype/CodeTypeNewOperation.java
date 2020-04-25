@@ -42,7 +42,7 @@ public class CodeTypeNewOperation implements BiConsumer<IEnvironment, IProgress>
 
   @Override
   public void accept(IEnvironment env, IProgress progress) {
-    progress.init(toString(), 1);
+    progress.init(1, toString());
     IType createCodeType = createCodeType(env, progress.newChild(1));
     setCreatedCodeType(createCodeType);
   }

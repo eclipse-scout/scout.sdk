@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.nls.query;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.s.nls.query.TranslationKeysQueryTest.searchIn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
@@ -144,6 +145,7 @@ public class MissingTranslationQueryTest {
     MissingTranslationQuery query = new MissingTranslationQuery();
     searchIn(query, "test1.java", "TEXTS.get(\"aa\")", env);
     assertEquals(0, query.result().count());
+    assertTrue(MissingTranslationQuery.supportedFileTypes().size() > 0);
   }
 
   @Test
@@ -152,10 +154,18 @@ public class MissingTranslationQueryTest {
     MissingTranslationQuery query = new MissingTranslationQuery();
     searchIn(query, "test1.js", "abc; session.text('ui.notExisting.key');", ScoutFixtureHelper.NLS_TEST_DIR, env);
     searchIn(query, "test2.js", "abc; session.text('" + TranslationStoreSupplierExtension.TRANSLATION_KEY_1 + "');", ScoutFixtureHelper.NLS_TEST_DIR, env); // exists in the ui contributor (referenced text service)
-    searchIn(query, "test3.js", "var test = 'testKey1FromUiContributor'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR, env); // exists in the ui contributor (literal)
+    searchIn(query, "test3.js", "var test = '" + TranslationStoreSupplierExtension.TRANSLATION_KEY_1 + "'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR, env); // exists in the ui contributor (literal)
     searchIn(query, "test4.js", "var test = 'ui.does.not.exist.key'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR, env);
     searchIn(query, "test5.js", "session.text('ui.from');", env); // is not in the scout js module
-    assertEquals(3, query.result().count());
+
+    assertEquals(Stream.of("test1.js", "test4.js", "test5.js")
+        .sorted()
+        .collect(toList()),
+        query.result()
+            .map(FileRange::file)
+            .map(Path::toString)
+            .sorted()
+            .collect(toList()));
   }
 
   protected static void assertFileRange(MissingTranslationQuery query, String fileName, int expectedStart, int expectedEnd, int expectedSeverity) {

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.nls.properties;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +30,7 @@ import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.nls.IEditableTranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
+import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.TranslationEntry;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -64,11 +66,14 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
    *          The {@link IProgress} monitor.
    */
   public void load(Collection<ITranslationPropertiesFile> translationFiles, IProgress progress) {
-    int ticksByFile = 100;
-    progress.init("Load translation files for service " + service().type().name(), Ensure.notNull(translationFiles).size() * ticksByFile);
+    Ensure.notNull(translationFiles);
 
-    boolean isEditable = !Ensure.notNull(translationFiles).isEmpty();
+    int ticksByFile = 100;
+    progress.init(translationFiles.size() * ticksByFile, "Load translation files for service '{}'.", service().type().name());
+
+    boolean isEditable = !translationFiles.isEmpty();
     m_translations.clear();
+    translationFiles().clear();
     for (ITranslationPropertiesFile f : translationFiles) {
       // load data from file
       f.load(progress.newChild(ticksByFile));
@@ -283,7 +288,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     m_newFiles.clear();
 
     // reload
-    load(translationFiles().values(), progress);
+    load(new ArrayList<>(translationFiles().values()), progress); // create a copy here because the load modifies the translation files. otherwise it modifies its own method argument.
   }
 
   protected Map<Language, ITranslationPropertiesFile> translationFiles() {
@@ -292,7 +297,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
 
   @Override
   public int hashCode() {
-    return m_svc.hashCode();
+    return service().hashCode();
   }
 
   @Override
@@ -304,8 +309,8 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
       return false;
     }
 
-    PropertiesTranslationStore other = (PropertiesTranslationStore) obj;
-    return m_svc.equals(other.m_svc);
+    ITranslationStore other = (ITranslationStore) obj;
+    return service().equals(other.service());
   }
 
   @Override

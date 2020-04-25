@@ -44,7 +44,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
     }
 
     protected fun doWriteCompilationUnit(progress: IdeaProgress) {
-        progress.init("Write " + cuPath.fileName(), 3)
+        progress.init(3, "Write {}", cuPath.fileName())
 
         // create in memory file
         val newPsi = PsiFileFactory.getInstance(project).createFileFromText(cuPath.fileName(), StdFileTypes.JAVA, source, LocalTimeCounter.currentTime(), false, false)
@@ -98,7 +98,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
             override fun file() = targetFile
 
             override fun commit(progress: IdeaProgress): Boolean {
-                progress.init("Write ${psi.name}", 2)
+                progress.init(2, "Write {}", psi.name)
                 val targetDirectory = targetFile.parent
                 val dir = DirectoryUtil.mkdirs(PsiManager.getInstance(psi.project), targetDirectory.toString().replace(File.separatorChar, '/'))
                         ?: throw SdkException("Cannot write '$targetFile' because the directory could not be created.")

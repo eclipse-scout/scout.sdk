@@ -68,7 +68,7 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
 
   @Override
   public void accept(IEnvironment env, IProgress progress) {
-    progress.init(toString(), 40);
+    progress.init(40, toString());
     updateJaxWsBinding(env, progress.newChild(10));
     updateWebServiceImpls(env, progress.newChild(10));
     updateEntryPointDefinitions(env, progress.newChild(10));
@@ -164,7 +164,7 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
       return;
     }
 
-    progress.init("Update Jax-Ws Bindings", jaxwsBindingFiles.size() * 2);
+    progress.init(jaxwsBindingFiles.size() * 2, "Update Jax-Ws Bindings");
     try {
       for (Path jaxwsBindingFile : jaxwsBindingFiles) {
         Document document = Xml.get(jaxwsBindingFile);

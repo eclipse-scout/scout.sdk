@@ -157,7 +157,7 @@ public class NlsTable extends Composite {
 
   private void createColumnForLanguage(Language language) {
     TableColumn c = new TableColumn(m_table, SWT.LEFT);
-    c.setText(language.dispalyName());
+    c.setText(language.displayName());
     c.setMoveable(false);
     c.addSelectionListener(new P_SortSelectionAdapter(m_table.indexOf(c)));
     c.setWidth(200);

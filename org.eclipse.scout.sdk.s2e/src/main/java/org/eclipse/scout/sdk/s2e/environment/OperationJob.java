@@ -42,7 +42,7 @@ public class OperationJob extends AbstractJob {
     int workForOperation = 10000;
     EclipseProgress progress = EclipseEnvironment
         .toScoutProgress(monitor)
-        .init(getName(), workForOperation + workForCommit);
+        .init(workForOperation + workForCommit, getName());
 
     runWithWorkingCopyManager(() -> executeWithWorkingCopyManager(progress.newChild(workForOperation)), () -> progress.newChild(workForCommit).monitor());
   }

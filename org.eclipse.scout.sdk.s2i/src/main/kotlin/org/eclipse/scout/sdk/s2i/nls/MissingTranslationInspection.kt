@@ -13,16 +13,18 @@ package org.eclipse.scout.sdk.s2i.nls
 import com.intellij.codeInspection.*
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtil
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.nls.query.MissingTranslationQuery
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput
 import org.eclipse.scout.sdk.core.s.util.search.FileRange
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.toIdeaProgress
 import org.eclipse.scout.sdk.s2i.toNioPath
+import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
@@ -32,32 +34,33 @@ open class MissingTranslationInspection : LocalInspectionTool() {
     private val m_environmentByProject = ConcurrentHashMap<Project, Pair<IdeaEnvironment, MissingTranslationQuery>>()
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
-        val module = file.containingModule() ?: return ProblemDescriptor.EMPTY_ARRAY
         if (!MissingTranslationQuery.supportedFileTypes().contains(file.virtualFile.extension)) {
             return ProblemDescriptor.EMPTY_ARRAY
         }
 
+        val module = file.containingModule(false) ?: return ProblemDescriptor.EMPTY_ARRAY
+        val progress = ProgressManager.getInstance().progressIndicator
         return if (isOnTheFly) {
             // single file: create short living environment for this file only
             val query = MissingTranslationQuery()
-            IdeaEnvironment.callInIdeaEnvironmentSync(file.project, toIdeaProgress(null)) { e, _ ->
-                checkFile(file, module, query, manager, true, e)
+            IdeaEnvironment.callInIdeaEnvironmentSync(file.project, progress.toScoutProgress()) { e, p ->
+                checkFile(file, module, query, manager, true, e, p)
             }
         } else {
             // batch inspection run: create environment and query in cache. Will be removed and closed in cleanup function
             val cache = m_environmentByProject.computeIfAbsent(file.project) { project ->
                 Pair(IdeaEnvironment.createUnsafeFor(project) { }, MissingTranslationQuery())
             }
-            checkFile(file, module, cache.second, manager, false, cache.first)
+            checkFile(file, module, cache.second, manager, false, cache.first, progress.toScoutProgress())
         }
     }
 
-    fun checkFile(file: PsiFile, module: Module, query: IFileQuery, manager: InspectionManager, isOnTheFly: Boolean, environment: IdeaEnvironment): Array<ProblemDescriptor> {
+    fun checkFile(file: PsiFile, module: Module, query: IFileQuery, manager: InspectionManager, isOnTheFly: Boolean, environment: IdeaEnvironment, progress: IProgress): Array<ProblemDescriptor> {
         val path = file.virtualFile.toNioPath()
         val modulePath = Paths.get(ModuleUtil.getModuleDirPath(module))
         val queryInput = FileQueryInput(path, modulePath) { file.textToCharArray() }
 
-        query.searchIn(queryInput, environment, toIdeaProgress(null))
+        query.searchIn(queryInput, environment, progress)
 
         return query.result(path)
                 .filter { it.severity() >= Level.WARNING.intValue() } // only report important findings

@@ -92,7 +92,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     Ensure.notBlank(getClientPackage(), "No package provided");
     Ensure.notNull(getSuperType(), "Super type does not exist");
 
-    progress.init(toString(), getTotalWork());
+    progress.init(getTotalWork(), toString());
 
     // calc names
     String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getClientPackage());

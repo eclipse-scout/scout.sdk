@@ -59,13 +59,13 @@ public class LanguageTest {
   }
 
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "EqualsBetweenInconvertibleTypes", "ConstantConditions", "SimplifiableJUnitAssertion", "EqualsWithItself"})
   public void testLanguage() {
     Locale locale = new Locale("test");
     Language lang = new Language(locale);
     assertSame(locale, lang.locale());
-    assertEquals("test", lang.dispalyName());
-    assertEquals("default", Language.LANGUAGE_DEFAULT.dispalyName());
+    assertEquals("test", lang.displayName());
+    assertEquals("default", Language.LANGUAGE_DEFAULT.displayName());
     assertEquals("test", lang.toString());
     assertEquals(locale.getDisplayName(Locale.US).hashCode(), lang.hashCode());
     assertFalse(lang.equals(""));

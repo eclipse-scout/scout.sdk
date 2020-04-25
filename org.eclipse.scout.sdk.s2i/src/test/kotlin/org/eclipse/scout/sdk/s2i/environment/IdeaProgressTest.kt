@@ -31,7 +31,7 @@ class IdeaProgressTest : TestCase() {
     fun testProgressWithChild() = runWithIndicatorMock { percent, progress ->
         val delta = 0.0000001
 
-        progress.init("MyProgress", 10)
+        progress.init(10, "MyProgress")
         assertEquals(0.0, percent.get(), delta)
 
         progress.worked(3)
@@ -40,7 +40,7 @@ class IdeaProgressTest : TestCase() {
         val child = progress.newChild(2)
         assertEquals(0.3, percent.get(), delta)
 
-        child.init("Child", 4)
+        child.init(4, "Child")
         assertEquals(0.3, percent.get(), delta)
 
         child.worked(3)
@@ -61,7 +61,7 @@ class IdeaProgressTest : TestCase() {
 
     fun testNewChildEnhancesProgress() = runWithIndicatorMock { percent, progress ->
         val delta = 0.0000001
-        progress.init("test", 10)
+        progress.init(10, "test")
         progress.newChild(2)
         assertEquals(0.0, percent.get(), delta)
         progress.newChild(3)

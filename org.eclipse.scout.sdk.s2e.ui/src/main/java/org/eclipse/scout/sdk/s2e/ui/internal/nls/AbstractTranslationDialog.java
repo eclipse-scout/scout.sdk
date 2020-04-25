@@ -188,7 +188,7 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
     for (Language l : languages) {
       Composite txtFieldContainer = new Composite(translationGroup, SWT.NONE);
       TabItem tabItem = new TabItem(translationGroup, SWT.NULL);
-      tabItem.setText(l.dispalyName());
+      tabItem.setText(l.displayName());
       tabItem.setControl(txtFieldContainer);
 
       GridDataFactory

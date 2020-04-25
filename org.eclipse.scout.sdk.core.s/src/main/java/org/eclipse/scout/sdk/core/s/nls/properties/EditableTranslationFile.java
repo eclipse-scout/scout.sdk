@@ -68,7 +68,7 @@ public class EditableTranslationFile extends AbstractTranslationPropertiesFile {
 
   @Override
   protected void writeEntries(Map<String, String> entries, IEnvironment env, IProgress progress) {
-    progress.init("Write translation properties file", 100);
+    progress.init(100, "Write translation properties file");
 
     // remove empty texts
     Map<String, String> filteredTexts = entries.entrySet().stream()

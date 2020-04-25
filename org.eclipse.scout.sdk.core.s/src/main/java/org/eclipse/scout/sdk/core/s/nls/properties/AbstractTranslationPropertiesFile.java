@@ -80,25 +80,18 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
 
   @Override
   public boolean load(IProgress progress) {
-    progress.init("Load translation properties file", 100);
-
-    Map<String, String> newEntries = readEntries(progress.newChild(99));
-    try {
-      if (m_entries != null && m_entries.equals(newEntries)) {
-        return false;
-      }
-
-      m_entries = newEntries;
-      return true;
+    Map<String, String> newEntries = readEntries(progress);
+    if (m_entries != null && m_entries.equals(newEntries)) {
+      return false;
     }
-    finally {
-      progress.setWorkRemaining(0);
-    }
+
+    m_entries = newEntries;
+    return true;
   }
 
   private Map<String, String> readEntries(IProgress progress) {
     try (InputStream in = Ensure.notNull(m_inputSupplier.get())) {
-      return parse(in, progress.newChild(90));
+      return parse(in, progress);
     }
     catch (IOException e) {
       throw new SdkException(e);
@@ -146,13 +139,7 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
    * @return The mapping.
    */
   public static Map<String, String> parse(InputStream in, IProgress progress) {
-    progress.init("Reading properties file", 100);
-
-    Set<Entry<Object, Object>> entrySet = loadProperties(in, progress.newChild(90)).entrySet();
-
-    IProgress loopProgress = progress
-        .newChild(10)
-        .setWorkRemaining(entrySet.size());
+    Set<Entry<Object, Object>> entrySet = loadProperties(in, progress).entrySet();
     Map<String, String> result = new HashMap<>(entrySet.size());
     for (Entry<Object, Object> entry : entrySet) {
       Object key = entry.getKey();
@@ -160,7 +147,6 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
       if (key != null && translation != null) {
         result.put(key.toString(), translation.toString());
       }
-      loopProgress.worked(1);
     }
     return result;
   }

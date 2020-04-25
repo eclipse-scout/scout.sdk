@@ -204,8 +204,8 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
    *          it is created.
    * @param progress
    *          The {@link EclipseProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(String, int)} on the argument. Must not be
-   *          {@code null}.
+   *          method. The write operation will call {@link IProgress#init(int, String, Object...)} on the argument. Must
+   *          not be {@code null}.
    */
   public void writeResource(CharSequence content, IFile file, EclipseProgress progress) {
     doWriteResource(file, content, progress, true).awaitDoneThrowingOnErrorOrCancel();
@@ -225,8 +225,8 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
    *          it is created.
    * @param progress
    *          The {@link EclipseProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(String, int)} on the argument. Must not be
-   *          {@code null}.
+   *          method. The write operation will call {@link IProgress#init(int, String, Object...)} on the argument. Must
+   *          not be {@code null}.
    * @return An {@link IFuture} that can be used to wait until the file has been written. If there was an exception
    *         writing the resource, this exception will be thrown on result access of this {@link IFuture}.
    */
@@ -289,6 +289,12 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   @Override
   public Optional<IJavaEnvironment> findJavaEnvironment(Path root) {
     return findJavaProject(root).map(this::toScoutJavaEnvironment);
+  }
+
+  @Override
+  public Path rootOfJavaEnvironment(IJavaEnvironment environment) {
+    JavaEnvironmentWithJdt javaEnv = (JavaEnvironmentWithJdt) Ensure.notNull(environment).unwrap();
+    return javaEnv.javaProject().getProject().getLocation().toFile().toPath();
   }
 
   public Optional<IJavaProject> findJavaProject(Path root) {

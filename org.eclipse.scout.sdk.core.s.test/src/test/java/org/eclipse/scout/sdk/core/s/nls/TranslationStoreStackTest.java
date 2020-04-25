@@ -204,7 +204,7 @@ public class TranslationStoreStackTest {
     entries01.computeIfAbsent(key, k -> new HashMap<>()).put(Language.LANGUAGE_DEFAULT, "text01");
     entries02.computeIfAbsent(key, k -> new HashMap<>()).put(Language.LANGUAGE_DEFAULT, "text02");
     TranslationStoreStack stack = new TranslationStoreStack(
-        Arrays.asList(
+        Stream.of(
             createStoreMock(200.00d, entries02),
             createStoreMock(100.00d, entries01)));
 
@@ -261,7 +261,7 @@ public class TranslationStoreStackTest {
     key0301.put(Language.LANGUAGE_DEFAULT, "03_k1_en");
 
     TranslationStoreStack stack = new TranslationStoreStack(
-        Arrays.asList(
+        Stream.of(
             createStoreMock(200.00d, entries02),
             createStoreMock(300.00d, entries01),
             createStoreMock(100.00d, entries03)));

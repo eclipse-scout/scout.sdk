@@ -18,7 +18,7 @@ package org.eclipse.scout.sdk.core.s.environment;
 public class NullProgress implements IProgress {
 
   @Override
-  public IProgress init(String name, int totalWork) {
+  public IProgress init(int totalWork, String name, Object... args) {
     return this;
   }
 

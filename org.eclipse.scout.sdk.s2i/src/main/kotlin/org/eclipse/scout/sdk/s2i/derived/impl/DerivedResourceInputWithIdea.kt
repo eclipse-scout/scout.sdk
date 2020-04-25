@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.resolvePsi
 import org.eclipse.scout.sdk.s2i.resolveSourceRoot
 import org.eclipse.scout.sdk.s2i.toIdea
-import org.eclipse.scout.sdk.s2i.toScoutTypeIfInProject
+import org.eclipse.scout.sdk.s2i.toScoutType
 import java.util.*
 
 
@@ -30,7 +30,7 @@ open class DerivedResourceInputWithIdea(val type: PsiClass) : IDerivedResourceIn
 
     override fun getSourceType(env: IEnvironment): Optional<IType> =
             try {
-                Optional.ofNullable(type.toScoutTypeIfInProject(env.toIdea()))
+                Optional.ofNullable(type.toScoutType(env.toIdea(), false))
             } catch (e: MissingTypeException) {
                 SdkLog.info("Unable to update DTO for '{}' because there are compile errors in the compilation unit.", toString(), e)
                 Optional.empty()

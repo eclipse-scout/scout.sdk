@@ -83,9 +83,9 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   @Override
   public Stream<? extends IJavaElement> children() {
     Comparator<IJavaElement> c = Comparator.comparing(e -> e.source().map(ISourceRange::start).orElse(0));
-    Stream<? extends IJavaElement> fieldsAndMethos = Stream.concat(fields().stream(), methods().stream());
+    Stream<? extends IJavaElement> fieldsAndMethods = Stream.concat(fields().stream(), methods().stream());
     Stream<? extends IJavaElement> innerTypesAndTypeParams = Stream.concat(innerTypes().stream(), typeParameters());
-    return Stream.concat(Stream.concat(innerTypesAndTypeParams, fieldsAndMethos), annotations().stream())
+    return Stream.concat(Stream.concat(innerTypesAndTypeParams, fieldsAndMethods), annotations().stream())
         .sorted(c);
   }
 
@@ -415,5 +415,10 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   @Override
   public ITypeGenerator<?> toWorkingCopy() {
     return toWorkingCopy(null);
+  }
+
+  @Override
+  public String toString() {
+    return name();
   }
 }

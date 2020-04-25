@@ -311,7 +311,7 @@ public class WebServiceEditor extends FormEditor {
     new RebuildArtifactsOperation(getJavaProject()).accept(env, progress);
   }
 
-  protected BiConsumer<IEnvironment, IProgress> pageToOperation(EclipseEnvironment env, WebServiceFormPage page) {
+  protected static BiConsumer<IEnvironment, IProgress> pageToOperation(EclipseEnvironment env, WebServiceFormPage page) {
     WebServiceUpdateOperation op = new WebServiceUpdateOperation();
     page.fillOperation(op, env);
     return op;

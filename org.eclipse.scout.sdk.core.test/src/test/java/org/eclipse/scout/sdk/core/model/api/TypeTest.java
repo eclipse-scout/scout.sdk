@@ -45,7 +45,6 @@ import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithS
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -159,7 +158,7 @@ public class TypeTest {
   @Test
   public void testToString(IJavaEnvironment env) {
     IType childClassType = env.requireType(ChildClass.class.getName());
-    assertFalse(Strings.isBlank(childClassType.toString()));
+    assertEquals(childClassType.name(), childClassType.toString());
   }
 
   @Test

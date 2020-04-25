@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.function.Predicate.isEqual;
+import static java.util.stream.Collectors.toCollection;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createAddLanguageEvent;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createAddTranslationEvent;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createChangeKeyEvent;
@@ -51,8 +52,8 @@ import org.eclipse.scout.sdk.core.util.Strings;
  * Represents a stack of {@link ITranslationStore}s as available at runtime. In the Scout runtime such a stack is
  * represented by all {@code org.eclipse.scout.rt.shared.services.common.text.ITextProviderService}s available.
  * <p>
- * Use {@link TranslationStores#createFullStack(Path, IEnvironment, IProgress)} to create a
- * {@link TranslationStoreStack} for a specific {@link Path}.
+ * Use {@link TranslationStores#createStack(Path, IEnvironment, IProgress)} to create a {@link TranslationStoreStack}
+ * for a specific {@link Path}.
  *
  * @since 7.0.0
  */
@@ -63,63 +64,17 @@ public class TranslationStoreStack {
   private final List<TranslationStoreStackEvent> m_eventBuffer;
   private int m_changing;
 
-  protected TranslationStoreStack(Collection<ITranslationStore> stores) {
-    List<ITranslationStore> l = new ArrayList<>(stores);
+  protected TranslationStoreStack(Stream<ITranslationStore> stores) {
+    m_eventBuffer = new ArrayList<>();
+    m_listeners = new EventListenerList();
+
     P_TranslationStoreComparator comparator = new P_TranslationStoreComparator();
-    l.sort(comparator);
+    m_stores = stores
+        .sorted(comparator)
+        .collect(toCollection(ArrayDeque::new));
     if (!comparator.duplicateOrders().isEmpty()) {
       SdkLog.warning("There are TextProviderServices with the same @Order value: {}", comparator.duplicateOrders());
     }
-    m_eventBuffer = new ArrayList<>();
-    m_listeners = new EventListenerList();
-    m_stores = new ArrayDeque<>(l);
-  }
-
-  protected static Optional<TranslationStoreStack> create(Path file, IEnvironment env, IProgress progress) {
-    Ensure.notNull(file);
-    return createStack(findAllTranslationStores(file, env, progress));
-  }
-
-  private static Optional<TranslationStoreStack> createStack(Collection<ITranslationStore> stores) {
-    if (stores.isEmpty()) {
-      return Optional.empty();
-    }
-    return Optional.of(new TranslationStoreStack(stores));
-  }
-
-  private static Collection<ITranslationStore> findAllTranslationStores(Path file, IEnvironment env, IProgress progress) {
-    int ticksBySupplier = 1000;
-    List<ITranslationStoreSupplier> suppliers = TranslationStores.storeSuppliers();
-    progress.init("Search translation stores for " + Ensure.notNull(file), suppliers.size() * ticksBySupplier);
-
-    List<ITranslationStore> unsortedStores = new ArrayList<>();
-    for (ITranslationStoreSupplier supplier : suppliers) {
-      Stream<? extends ITranslationStore> stores = supplier.all(file, env, progress.newChild(ticksBySupplier));
-      if (stores != null) {
-        stores
-            .filter(TranslationStoreStack::isContentAvailable)
-            .forEach(unsortedStores::add);
-      }
-    }
-    return unsortedStores;
-  }
-
-  private static boolean isContentAvailable(ITranslationStore s) {
-    if (s == null) {
-      return false;
-    }
-
-    if (!s.languages().findAny().isPresent()) {
-      SdkLog.warning("{} contains no languages! Please check the configuration.", s);
-      return false;
-    }
-
-    if (s.languages().noneMatch(l -> l == Language.LANGUAGE_DEFAULT)) {
-      SdkLog.warning("{} does not contain a default language!", s);
-      return false;
-    }
-
-    return true;
   }
 
   /**
@@ -445,14 +400,14 @@ public class TranslationStoreStack {
    */
   public synchronized void reload(IProgress progress) {
     runAndFireChanged(() -> {
-      progress.init("Reload all translation stores.", m_stores.size());
+      progress.init(m_stores.size(), "Reload all translation stores.");
       allStores().forEach(s -> s.reload(progress.newChild(1)));
       return createReloadEvent(this);
     });
   }
 
   /**
-   * @return All {@link ITranslationStore}s of this stack.
+   * @return All {@link ITranslationStore}s of this stack ordered by the text provider service order.
    */
   public Stream<ITranslationStore> allStores() {
     return m_stores.stream();

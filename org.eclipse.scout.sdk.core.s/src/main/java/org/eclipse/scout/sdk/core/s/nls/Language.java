@@ -62,13 +62,13 @@ public final class Language implements Comparable<Language> {
   /**
    * @return The display name of the {@link Language}. Is the same as {@link Locale#getDisplayName()}.
    */
-  public String dispalyName() {
+  public String displayName() {
     return m_displayName;
   }
 
   @Override
   public int hashCode() {
-    return dispalyName().hashCode();
+    return displayName().hashCode();
   }
 
   @Override
@@ -80,12 +80,12 @@ public final class Language implements Comparable<Language> {
       return false;
     }
     Language other = (Language) obj;
-    return dispalyName().equals(other.dispalyName());
+    return displayName().equals(other.displayName());
   }
 
   @Override
   public String toString() {
-    return dispalyName();
+    return displayName();
   }
 
   /**
@@ -144,6 +144,6 @@ public final class Language implements Comparable<Language> {
     if (o == LANGUAGE_DEFAULT) {
       return 1;
     }
-    return dispalyName().compareTo(o.dispalyName());
+    return displayName().compareTo(o.displayName());
   }
 }

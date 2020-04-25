@@ -81,7 +81,7 @@ public class CompilationUnitWriteOperation implements IResourceWriteOperation {
 
   @Override
   public void accept(EclipseProgress progress) {
-    progress.init(toString(), 5);
+    progress.init(5, toString());
 
     try {
       String newSource = getSourceFormatted(getContent().toString(), m_project, progress.newChild(1));

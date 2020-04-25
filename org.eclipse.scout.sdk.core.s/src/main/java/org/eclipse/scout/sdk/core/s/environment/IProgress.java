@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s.environment;
 
+import org.eclipse.scout.sdk.core.log.MessageFormatter;
+
 /**
  * <h3>{@link IProgress}</h3>
  * <p>
@@ -21,7 +23,7 @@ package org.eclipse.scout.sdk.core.s.environment;
  *
  * <pre>
  * void doSomething(final IProgress progress) {
- *   progress.init("task name", 100);
+ *   progress.init(100, "task name");
  *
  *   if (condition) {
  *     // Use 50% of the progress to do some work
@@ -43,7 +45,7 @@ package org.eclipse.scout.sdk.core.s.environment;
  *
  * <pre>
  * void doSomething(final IProgress progress, final Collection<?> someCollection) {
- *   progress.init("Task", 100);
+ *   progress.init(100, "Task '{}'.", taskName);
  *
  *   // Create a new progress monitor that uses 70% of the main progress and will allocate one tick
  *   // for each element of the given collection.
@@ -71,13 +73,17 @@ public interface IProgress {
   /**
    * Initializes this {@link IProgress} with the specified name and total work ticks.
    *
-   * @param name
-   *          The task description
    * @param totalWork
    *          the total number of work units into which the main task is been subdivided.
+   * @param name
+   *          The task description
+   * @param args
+   *          Optional arguments to use for replacing the hooks in the name. May be {@code null}. If the name contains
+   *          place holders ({@value MessageFormatter#ARG_REPLACE_PATTERN}), the arguments are used to fill the place
+   *          holders.
    * @return this instance.
    */
-  IProgress init(String name, int totalWork);
+  IProgress init(int totalWork, String name, Object... args);
 
   /**
    * Creates a sub {@link IProgress} that will consume the given number of ticks from the receiver. See
@@ -86,7 +92,7 @@ public interface IProgress {
    * It is not necessary to allocate ticks on the result. In that case the ticks will be consumed as soon as the next
    * child {@link IProgress} is created.<br>
    * However, the resulting progress monitor will not report any intermediate work before ticks are allocated. Ticks may
-   * be allocated by calling {@link #init(String, int)} or {@link #setWorkRemaining(int)}.
+   * be allocated by calling {@link #init(int, String, Object...)} or {@link #setWorkRemaining(int)}.
    * <p>
    * This method must throw a specific {@link RuntimeException} if called on an {@link IProgress} that has been
    * canceled!

@@ -48,7 +48,7 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
         SdkConsole.setConsoleSpi(this)
 
         if (isRunningInSandbox()) {
-            m_textLog.setLevel(org.apache.log4j.Level.ALL)
+            m_textLog.setLevel(org.apache.log4j.Level.DEBUG)
         }
     }
 
@@ -71,14 +71,17 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
         // nop
     }
 
-    override fun isRelevant(level: Level): Boolean {
+    override fun isEnabled(level: Level): Boolean {
         if (level == Level.OFF) {
             return false
         }
-        if (m_textLog.isDebugEnabled || m_textLog.isTraceEnabled) {
-            return true // accept all
+        if (level == Level.FINE) {
+            return m_textLog.isDebugEnabled
         }
-        return level.intValue() >= Level.INFO.intValue()
+        if (level.intValue() < Level.FINE.intValue()) {
+            return m_textLog.isTraceEnabled
+        }
+        return true
     }
 
     override fun println(msg: LogMessage) {
@@ -98,7 +101,7 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
     }
 
     protected fun logToTextFile(msg: LogMessage) {
-        val exception = msg.throwables()
+        val exception: Throwable? = msg.throwables()
                 .filter { it !is ControlFlowException } // ControlFlowExceptions should not be logged. See com.intellij.openapi.diagnostic.Logger.checkException
                 .findFirst()
                 .orElse(null)
@@ -107,7 +110,11 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
             Level.SEVERE -> m_textLog.error(msg.text(), exception)
             Level.WARNING -> m_textLog.warn(msg.text(), exception)
             Level.INFO -> m_textLog.info(msg.text(), exception)
-            else -> m_textLog.debug(msg.text(), exception)
+            Level.FINE -> m_textLog.debug(msg.text(), exception)
+            else -> {
+                m_textLog.trace(msg.text())
+                exception?.let { m_textLog.trace(it) }
+            }
         }
     }
 

@@ -24,7 +24,7 @@ open class FileWriter(val targetFile: Path, private val content: CharSequence, v
     override fun file(): Path = targetFile
 
     override fun commit(progress: IdeaProgress): Boolean {
-        progress.init("Write file " + targetFile.fileName, 4)
+        progress.init(4, "Write file {}", targetFile.fileName)
 
         var existingFile = vFile ?: LocalFileSystem.getInstance().findFileByIoFile(targetFile.toFile())
         if (existingFile?.exists() != true) {

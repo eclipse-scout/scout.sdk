@@ -63,7 +63,7 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
   public void accept(EclipseEnvironment env, EclipseProgress progress) {
     Ensure.isTrue(JdtUtils.exists(getServerModule()), "Target module pom file could not be found.");
     Ensure.notBlank(getArtifactId());
-    progress.init(toString(), 100);
+    progress.init(100, toString());
 
     try {
       // get pom from target project

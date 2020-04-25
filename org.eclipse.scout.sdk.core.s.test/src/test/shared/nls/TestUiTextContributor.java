@@ -15,6 +15,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.security.ScoutSecurityTextProviderService;
 import org.eclipse.scout.rt.ui.html.IUiTextContributor;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStoreSupplierExtension;
 
 public class TestUiTextContributor implements IUiTextContributor {
   @Override
@@ -24,12 +25,12 @@ public class TestUiTextContributor implements IUiTextContributor {
 
     // ignored by comment: textKeys.addAll(BEANS.get(DoesNotExistTextProviderService.class).getTextMap(null).keySet());
 
+    textKeys.add(TranslationStoreSupplierExtension.TRANSLATION_KEY_1);
+    textKeys.add(TranslationStoreSupplierExtension.TRANSLATION_KEY_2);
     textKeys.add("testKey1FromUiContributor");
+
     textKeys.add("testKey2FromUiContributor");
     textKeys.add("testKey3FromUiContributor");
-
     textKeys.add("testKey4FromUiContributor");
-    textKeys.add("testKey5FromUiContributor");
-    textKeys.add("testKey6FromUiContributor");
   }
 }

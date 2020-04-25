@@ -21,7 +21,10 @@ import org.eclipse.scout.sdk.core.s.environment.IProgress;
 /**
  * <h3>{@link ITranslationStoreSupplier}</h3>
  * <p>
- * Supplier of {@link ITranslationStore}s.
+ * Supplier of {@link ITranslationStore}s. For each type of store a corresponding supplier must be provided.
+ * <p>
+ * E.g. for stores based on properties files (resource bundle) a supplier may be provided. Or for stores based on
+ * translations in the database a supplier may be provided.
  * <p>
  * Implementations of this interface must be registered using
  * {@link TranslationStores#registerStoreSupplier(ITranslationStoreSupplier)}.
@@ -40,9 +43,9 @@ public interface ITranslationStoreSupplier {
    *          The {@link IEnvironment} of the request. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Must not be {@code null}.
-   * @return
+   * @return A {@link Stream} with all stores the supplier can provide for the path given. Is never {@code null}.
    */
-  Stream<? extends ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress);
+  Stream<ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress);
 
   /**
    * Creates a {@link ITranslationStore} holding all data of this single store.
@@ -53,5 +56,5 @@ public interface ITranslationStoreSupplier {
    *          The {@link IProgress} monitor. Must not be {@code null}.
    * @return An {@link Optional} holding the store if it could be parsed for the {@link IType} given.
    */
-  Optional<? extends ITranslationStore> single(IType textService, IProgress progress);
+  Optional<ITranslationStore> single(IType textService, IProgress progress);
 }

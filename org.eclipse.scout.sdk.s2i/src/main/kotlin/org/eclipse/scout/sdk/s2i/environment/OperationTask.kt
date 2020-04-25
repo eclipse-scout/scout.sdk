@@ -39,7 +39,7 @@ open class OperationTask(title: String, project: Project, private val transactio
         val scoutProgress = indicator.toScoutProgress()
         val workForCommit = 10
         val workForTask = 1000
-        scoutProgress.init(m_name, workForTask + workForCommit)
+        scoutProgress.init(workForTask + workForCommit, m_name)
         if (transactionManager == null) {
             // new independent top level transaction
             callInNewTransaction(project, { scoutProgress.newChild(workForCommit) }) {

@@ -468,7 +468,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
 
     private void execute(IEnvironment env, EclipseProgress progress, int numOperations) {
       int workByHandler = 100;
-      progress.init("", numOperations * workByHandler);
+      progress.init(numOperations * workByHandler, "");
       Collection<IFuture<?>> executedFileWrites = new ArrayList<>(numOperations);
       for (int i = 1; i <= numOperations; i++) {
         if (isAborted()) {

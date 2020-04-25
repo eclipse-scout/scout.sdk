@@ -22,6 +22,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiModifier
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
@@ -43,17 +44,17 @@ import java.util.stream.Stream
 
 open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActivity, DumbAware, Disposable {
 
-    override fun all(modulePath: Path, env: IEnvironment, progress: IProgress): Stream<out ITranslationStore> =
+    override fun all(modulePath: Path, env: IEnvironment, progress: IProgress): Stream<ITranslationStore> =
             modulePath.toVirtualFile()
                     ?.containingModule(env.toIdea().project)
                     ?.let { findTranslationStoresVisibleIn(it, env.toIdea(), progress.toIdea()) }
                     ?: Stream.empty()
 
-    override fun single(textService: IType, progress: IProgress): Optional<out ITranslationStore> {
+    override fun single(textService: IType, progress: IProgress): Optional<ITranslationStore> {
         val psi = textService.resolvePsi() ?: return Optional.empty()
         val module = psi.containingModule() ?: return Optional.empty()
-        progress.init("Load text provider service", 1)
-        return createTranslationStore(textService, psi, module, progress)
+        progress.init(1, "Load text provider service")
+        return createTranslationStore(textService, psi, module, progress.newChild(1))
     }
 
     /**
@@ -71,8 +72,8 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
         TranslationStores.removeStoreSupplier(this)
     }
 
-    protected fun findTranslationStoresVisibleIn(module: Module, env: IdeaEnvironment, progress: IdeaProgress): Stream<out ITranslationStore> {
-        progress.init("Search properties text provider services.", 20)
+    protected fun findTranslationStoresVisibleIn(module: Module, env: IdeaEnvironment, progress: IdeaProgress): Stream<ITranslationStore> {
+        progress.init(20, "Search properties text provider services.")
 
         val moduleScope = module.getModuleWithDependenciesAndLibrariesScope(false)
         val javaEnv: IJavaEnvironment = env.toScoutJavaEnvironment(module) ?: return Stream.empty()
@@ -89,15 +90,18 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
                 .filter { it.scoutType != null }
                 .toList()
 
-        val progressForLoad = progress.worked(10).newChild(10).init("Load properties file contents", types.size)
-        return types.mapNotNull { createTranslationStore(it.scoutType!!, it.psiClass, module, progressForLoad).orElse(null) }
-                .stream()
+        val progressForLoad = progress.worked(10).newChild(10).init(types.size, "Load properties file contents")
+        val result = types.mapNotNull { createTranslationStore(it.scoutType!!, it.psiClass, module, progressForLoad).orElse(null) }
+
+        SdkLog.debug("Found translation stores on Java classpath of module '{}': {}", module.name, result)
+        return result.stream()
     }
 
-    protected fun createTranslationStore(textService: IType, psiClass: PsiClass, module: Module, progress: IProgress): Optional<out ITranslationStore> {
+    protected fun createTranslationStore(textService: IType, psiClass: PsiClass, module: Module, progress: IProgress): Optional<ITranslationStore> {
         return PropertiesTextProviderService.create(textService)
                 .map { svc -> PropertiesTranslationStore(svc) }
                 .filter { store -> loadTranslationFiles(module, psiClass, store, progress) }
+                .map { store -> store }
     }
 
     protected fun loadTranslationFiles(module: Module, psiClass: PsiClass, store: PropertiesTranslationStore, progress: IProgress): Boolean {
@@ -113,7 +117,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
                 .filter { !it.isDirectory }
                 .filter { resourceMatchesPrefix(it.name, prefix) }
                 .map { toTranslationPropertiesFile(it, psiClass.isWritable) }
-        store.load(translationFiles, progress.newChild(1))
+        store.load(translationFiles, progress)
         return true
     }
 

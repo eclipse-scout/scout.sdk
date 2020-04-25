@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.createFullStack;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.createStack;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.registerStoreSupplier;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.registerUiTextContributor;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.removeStoreSupplier;
@@ -99,7 +99,7 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
   }
 
   public static TranslationStoreStack testingStack(IEnvironment env) {
-    return createFullStack(Paths.get(""), env, new NullProgress())
+    return createStack(Paths.get(""), env, new NullProgress())
         .orElseThrow(TranslationStoreSupplierExtension::createExtensionNotRegisteredError);
   }
 
@@ -186,14 +186,14 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
     }
 
     @Override
-    public Stream<? extends ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress) {
+    public Stream<ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress) {
       return Stream.of(
           createTestingStore(env, false, m_dir),
           createTestingStore(env, true, m_dir));
     }
 
     @Override
-    public Optional<? extends ITranslationStore> single(IType textService, IProgress progress) {
+    public Optional<ITranslationStore> single(IType textService, IProgress progress) {
       return Optional.of(createTestingStore(textService, false, m_dir));
     }
   }

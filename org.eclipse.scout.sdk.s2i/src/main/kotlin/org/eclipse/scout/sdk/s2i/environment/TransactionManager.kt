@@ -13,9 +13,11 @@ package org.eclipse.scout.sdk.s2i.environment
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.ReadonlyStatusHandler
+import com.intellij.psi.PsiDocumentManager
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.util.CoreUtils.callInContext
 import org.eclipse.scout.sdk.core.util.Ensure
@@ -95,15 +97,20 @@ class TransactionManager constructor(val project: Project) {
                 // write operations are only allowed in the UI thread
                 // see http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html
                 result.computeIfAbsent {
-                    WriteAction.compute<T, RuntimeException> { computeInCommandProcessor(project, callable) }
+                    WriteAction.compute<T, RuntimeException> { computeInSmartModeAndCommandProcessor(project, callable) }
                 }
             }
             return result.get()
         }
 
-        private fun <T> computeInCommandProcessor(project: Project, callable: () -> T): T {
+        private fun <T> computeInSmartModeAndCommandProcessor(project: Project, callable: () -> T): T {
             val result = FinalValue<T>()
-            CommandProcessor.getInstance().executeCommand(project, { result.computeIfAbsent(callable) }, null, null)
+            CommandProcessor.getInstance().executeCommand(project, {
+                DumbService.getInstance(project).runReadActionInSmartMode {
+                    result.computeIfAbsent(callable)
+                    PsiDocumentManager.getInstance(project).commitAllDocuments()
+                }
+            }, null, null)
             return result.get()
         }
     }
@@ -168,7 +175,7 @@ class TransactionManager constructor(val project: Project) {
 
     private fun commitAllAsync(progress: IdeaProgress): Boolean {
         val workForEnsureWritable = 1
-        progress.init("Flush file content", size() + workForEnsureWritable)
+        progress.init(size() + workForEnsureWritable, "Flush file content")
 
         val fileSystem = LocalFileSystem.getInstance()
         val existingFiles = m_members.keys

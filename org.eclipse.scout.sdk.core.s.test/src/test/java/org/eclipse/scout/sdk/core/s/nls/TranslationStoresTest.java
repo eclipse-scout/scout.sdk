@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.isContentAvailable;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.registerStoreSupplier;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.removeStoreSupplier;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.storeSuppliers;
@@ -17,9 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
-
 
 public class TranslationStoresTest {
   @Test
@@ -37,5 +40,20 @@ public class TranslationStoresTest {
     finally {
       removeStoreSupplier(supplier);
     }
+  }
+
+  @Test
+  public void testIsContentAvailable() {
+    assertFalse(isContentAvailable(null));
+
+    ITranslationStore store = mock(ITranslationStore.class);
+    when(store.languages()).thenAnswer(invocation -> Stream.empty());
+    assertFalse(isContentAvailable(store));
+
+    when(store.languages()).thenAnswer(invocation -> Stream.of(Language.parseThrowingOnError("es")));
+    assertFalse(isContentAvailable(store));
+
+    when(store.languages()).thenAnswer(invocation -> Stream.of(Language.LANGUAGE_DEFAULT));
+    assertTrue(isContentAvailable(store));
   }
 }

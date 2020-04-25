@@ -51,7 +51,7 @@ public class ResourceWriteOperation implements IResourceWriteOperation {
 
   @Override
   public void accept(EclipseProgress progress) {
-    progress.init("Write " + m_file.getProjectRelativePath(), 3);
+    progress.init(3, "Write {}", m_file.getProjectRelativePath());
 
     try {
       // check if write is necessary
@@ -66,7 +66,7 @@ public class ResourceWriteOperation implements IResourceWriteOperation {
     }
   }
 
-  protected void writeFile(EclipseProgress progress) throws IOException, CoreException {
+  protected void writeFile(@SuppressWarnings("TypeMayBeWeakened") EclipseProgress progress) throws IOException, CoreException {
     String charsetName = m_file.getCharset();
     try (InputStream stream = new CharSequenceInputStream(m_content, charsetName)) {
       if (!m_file.exists()) {

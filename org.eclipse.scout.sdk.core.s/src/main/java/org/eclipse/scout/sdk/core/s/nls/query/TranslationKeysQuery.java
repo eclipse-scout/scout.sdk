@@ -110,7 +110,7 @@ public class TranslationKeysQuery implements IFileQuery {
       return;
     }
 
-    progress.init(name(), m_searchKeys.size());
+    progress.init(m_searchKeys.size(), name());
     String fileContent = new String(candidate.fileContent());
     for (String search : m_searchKeys) {
       int pos = 0;

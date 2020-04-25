@@ -42,7 +42,7 @@ public class WizardFinishTask<OP extends BiConsumer<? super EclipseEnvironment, 
   public void accept(EclipseEnvironment environment, EclipseProgress progress) {
     int workForMapping = 1;
     int workForOperation = 1000;
-    progress.init("Values from UI to operation", workForMapping + workForOperation);
+    progress.init(workForMapping + workForOperation, "Values from UI to operation");
     OP operation = Ensure.notNull(operation());
     mapper().accept(new PageToOperationMappingInput(environment, progress.newChild(workForMapping)), operation);
     operation.accept(environment, progress.newChild(workForOperation));

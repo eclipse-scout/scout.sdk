@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
+import org.eclipse.scout.sdk.core.log.MessageFormatter.arrayFormat
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 
 open class IdeaProgress(ind: ProgressIndicator?) : IProgress {
@@ -24,10 +26,13 @@ open class IdeaProgress(ind: ProgressIndicator?) : IProgress {
     private var m_percentDone = 0.0
     private var m_percentToConsume = 1.0
 
-    override fun init(name: String?, totalWork: Int): IdeaProgress {
+    override fun init(totalWork: Int, name: String?, vararg args: Any?): IdeaProgress {
+        val msg = arrayFormat(name, *args).message()
+        SdkLog.debug(msg)
+
         m_totalTicks = totalWork
         m_ticksDone = 0
-        indicator.text = name
+        indicator.text = msg
         if (m_totalTicks > 0) {
             m_step = m_percentToConsume / m_totalTicks
             indicator.isIndeterminate = false
@@ -67,7 +72,9 @@ open class IdeaProgress(ind: ProgressIndicator?) : IProgress {
         indicator.checkCanceled()
         m_ticksDone += work
         m_percentDone += (work * m_step)
-        indicator.fraction = m_percentDone
+        if (!indicator.isIndeterminate) {
+            indicator.fraction = m_percentDone
+        }
         return this
     }
 }

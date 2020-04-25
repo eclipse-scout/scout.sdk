@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -102,7 +104,10 @@ public final class TranslationStores {
   }
 
   /**
-   * Creates a {@link TranslationStoreStack} for a Java/JavaScript module.
+   * Creates a {@link TranslationStoreStack} for a Java/JavaScript module.<br>
+   * The {@link TranslationStoreStack} contains all {@link ITranslationStore}s of the module in the correct order
+   * according to the @Order annotation of the corresponding Scout TextProviderService. It also handles translation
+   * overriding and modifications to the {@link ITranslationStore}s.
    * 
    * @param modulePath
    *          The modulePath for which the stack (containing all accessible stores) should be returned. Points to the
@@ -114,16 +119,86 @@ public final class TranslationStores {
    * @return A new {@link TranslationStoreStack} for the specified {@link Path}.
    * @see TranslationStoreStack
    */
-  public static Optional<TranslationStoreStack> createFullStack(Path modulePath, IEnvironment env, IProgress progress) {
+  public static Optional<TranslationStoreStack> createStack(Path modulePath, IEnvironment env, IProgress progress) {
     Ensure.notNull(modulePath);
     Ensure.notNull(env);
     Ensure.notNull(progress);
-    return TranslationStoreStack.create(modulePath, env, progress);
+    return Optional.of(new TranslationStoreStack(getAllStoresForModule(modulePath, env, progress)))
+        .filter(stack -> stack.allStores().count() > 0);
+  }
+
+  /**
+   * Gets all accessible {@link ITranslationStore}s for the module at the path given. The stores are in no particular
+   * order. <br/>
+   * For ordered stores use {@link #createStack(Path, IEnvironment, IProgress)}.
+   * 
+   * @param modulePath
+   *          The modulePath for which the {@link ITranslationStore}s should be returned. Points to the root folder of
+   *          the Java/JavaScript module. Must not be {@code null}.
+   * @param env
+   *          The {@link IEnvironment} of the request. Must not be {@code null}.
+   * @param progress
+   *          The {@link IProgress} monitor. Must not be {@code null}.
+   * @return all accessible {@link ITranslationStore}s for the module at the path given in no particular order.
+   */
+  public static Stream<ITranslationStore> allForModule(Path modulePath, IEnvironment env, IProgress progress) {
+    Ensure.notNull(modulePath);
+    Ensure.notNull(env);
+    Ensure.notNull(progress);
+    return getAllStoresForModule(modulePath, env, progress);
+  }
+
+  /**
+   * Gets all accessible {@link ITranslationStore}s for the Java module at the path given.
+   * 
+   * @param modulePath
+   *          The modulePath for which the {@link ITranslationStore}s should be returned. Points to the root folder of
+   *          the Java module (the folder holding e.g. the source folder). Must not be {@code null}.
+   * @param env
+   *          The {@link IEnvironment} of the request. Must not be {@code null}.
+   * @param progress
+   *          The {@link IProgress} monitor. Must not be {@code null}.
+   * @return all {@link ITranslationStore}s accessible to the Java code of the module given in no particular order.
+   */
+  public static Stream<ITranslationStore> allForJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
+    Ensure.notNull(modulePath);
+    Ensure.notNull(env);
+    Ensure.notNull(progress);
+
+    int ticksBySupplier = 1000;
+    List<ITranslationStoreSupplier> suppliers = storeSuppliers();
+    progress.init(suppliers.size() * ticksBySupplier, "Search translation stores for {}", modulePath);
+
+    return suppliers.stream()
+        .flatMap(supplier -> supplier.all(modulePath, env, progress.newChild(ticksBySupplier)))
+        .filter(TranslationStores::isContentAvailable);
+  }
+
+  /**
+   * Gets all accessible {@link ITranslationStore}s for the web (npm) module at the path given.
+   * 
+   * @param modulePath
+   *          The modulePath for which the {@link ITranslationStore}s should be returned. Points to the root folder of
+   *          the web module (the folder containing the package.json file). Must not be {@code null}.
+   * @param env
+   *          The {@link IEnvironment} of the request. Must not be {@code null}.
+   * @param progress
+   *          The {@link IProgress} monitor. Must not be {@code null}.
+   * @return all {@link ITranslationStore}s accessible to the EcmaScript code of the module given in no particular
+   *         order.
+   */
+  public static Stream<ITranslationStore> allForWebModule(Path modulePath, IEnvironment env, IProgress progress) {
+    Ensure.notNull(modulePath);
+    Ensure.notNull(env);
+    Ensure.notNull(progress);
+
+    return WebModuleTranslationStores.allForModule(modulePath, env, progress)
+        .filter(TranslationStores::isContentAvailable);
   }
 
   /**
    * Creates a {@link ITranslationStore} holding all data of this single store.
-   * 
+   *
    * @param textService
    *          The text provider service for which the data should be loaded. Must not be {@code null}.
    * @param progress
@@ -133,9 +208,10 @@ public final class TranslationStores {
   public static Optional<? extends ITranslationStore> create(IType textService, IProgress progress) {
     Ensure.notNull(textService);
     Ensure.notNull(progress);
+
     int ticksBySupplier = 1000;
     List<ITranslationStoreSupplier> suppliers = storeSuppliers();
-    progress.init("Creating translation store", ticksBySupplier * suppliers.size());
+    progress.init(ticksBySupplier * suppliers.size(), "Creating translation store for service '{}'.", textService);
     return suppliers.stream()
         .map(supplier -> supplier.single(textService, progress.newChild(ticksBySupplier)))
         .filter(Optional::isPresent)
@@ -143,25 +219,26 @@ public final class TranslationStores {
         .findFirst();
   }
 
-  /**
-   * Calculates all {@link ITranslation} keys accessible for a specific module. It takes Scout UiTextContributors into
-   * account for JavaScript modules and TextProviderServices for Java modules.
-   * 
-   * @param modulePath
-   *          The path for which the stack (containing all accessible stores) should be returned. Points to the root
-   *          folder of the Java/JavaScript module. Must not be {@code null}.
-   * @param env
-   *          The {@link IEnvironment} of the request. Must not be {@code null}.
-   * @param progress
-   *          The {@link IProgress} monitor. Must not be {@code null}.
-   * @return An {@link Optional} holding the {@link AccessibleTranslationKeys}. The {@link Optional} is empty in case it
-   *         is not Scout module (no TextProviderService and no UiTextContributor could be found).
-   * @see AccessibleTranslationKeys
-   */
-  public static Optional<AccessibleTranslationKeys> keysAccessibleForModule(Path modulePath, IEnvironment env, IProgress progress) {
-    Ensure.notNull(modulePath);
-    Ensure.notNull(env);
-    Ensure.notNull(modulePath);
-    return AccessibleTranslationKeys.create(modulePath, env, progress);
+  static Stream<ITranslationStore> getAllStoresForModule(Path modulePath, IEnvironment env, IProgress progress) {
+    progress.init(20000, "Resolve all translation stores for module '{}'.", modulePath);
+    return Stream.concat(allForJavaModule(modulePath, env, progress.newChild(10000)), allForWebModule(modulePath, env, progress.newChild(10000)));
+  }
+
+  static boolean isContentAvailable(ITranslationStore s) {
+    if (s == null) {
+      return false;
+    }
+
+    if (!s.languages().findAny().isPresent()) {
+      SdkLog.warning("{} contains no languages! Please check the configuration.", s);
+      return false;
+    }
+
+    if (s.languages().noneMatch(l -> l == Language.LANGUAGE_DEFAULT)) {
+      SdkLog.warning("{} does not contain a default language!", s);
+      return false;
+    }
+
+    return true;
   }
 }

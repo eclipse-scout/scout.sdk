@@ -67,7 +67,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     Ensure.notBlank(getPackage(), "No package name provided");
     Ensure.notNull(getSuperType(), "No supertype provided");
 
-    progress.init(toString(), 4);
+    progress.init(4, toString());
 
     String svcName = getLookupCallName();
     String suffix = "Call";

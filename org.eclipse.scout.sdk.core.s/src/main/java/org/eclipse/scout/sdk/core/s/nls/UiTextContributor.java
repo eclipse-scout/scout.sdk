@@ -52,7 +52,7 @@ public class UiTextContributor {
     m_keys = new FinalValue<>();
   }
 
-  public IType uiTextContributor() {
+  public IType type() {
     return m_contributor;
   }
 
@@ -68,7 +68,7 @@ public class UiTextContributor {
 
   protected Set<String> loadAllKeys(IProgress progress) {
     String methodName = "contributeUiTextKeys";
-    return uiTextContributor()
+    return type()
         .methods()
         .withName(methodName)
         .first()
@@ -78,7 +78,7 @@ public class UiTextContributor {
         .flatMap(Strings::notBlank)
         .map(src -> loadAllKeys(src, progress))
         .orElseThrow(() -> new SdkException("Could not calculate available translation keys for {}. No source code for method '{}' could be found in type '{}'.",
-            JavaTypes.simpleName(IScoutRuntimeTypes.UiTextContributor), methodName, uiTextContributor().name()));
+            JavaTypes.simpleName(IScoutRuntimeTypes.UiTextContributor), methodName, type().name()));
   }
 
   protected Set<String> loadAllKeys(CharSequence methodSource, IProgress progress) {
@@ -92,7 +92,7 @@ public class UiTextContributor {
   }
 
   protected Stream<String> loadReferencedTextProviderServices(CharSequence contributeUiTextKeysMethodSource, IProgress progress) {
-    IType contributor = uiTextContributor();
+    IType contributor = type();
     List<IType> referencedTextServices = allMatches(TEXT_SERVICE_CLASS_LITERAL_PAT, contributeUiTextKeysMethodSource)
         .map(match -> match.group(1))
         .map(contributor::resolveSimpleName)
@@ -100,11 +100,37 @@ public class UiTextContributor {
         .map(Optional::get)
         .filter(type -> type.isInstanceOf(IScoutRuntimeTypes.ITextProviderService))
         .collect(toList());
-    progress.init("Load referenced text provider service", referencedTextServices.size());
+    progress.init(referencedTextServices.size(), "Load referenced text provider service");
     return referencedTextServices.stream()
         .map(txtService -> TranslationStores.create(txtService, progress.newChild(1)))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .flatMap(ITranslationStore::keys);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(UiTextContributor.class.getSimpleName()).append(" [")
+        .append(type().name()).append(']');
+    return builder.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return type().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+
+    UiTextContributor other = (UiTextContributor) obj;
+    return type().equals(other.type());
   }
 }

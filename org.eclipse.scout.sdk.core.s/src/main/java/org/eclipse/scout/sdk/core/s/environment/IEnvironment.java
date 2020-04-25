@@ -51,8 +51,19 @@ public interface IEnvironment {
   Optional<IJavaEnvironment> findJavaEnvironment(Path root);
 
   /**
-   * Tries to find all types with the fully qualified name given. The {@link IEnvironment} tries to find all accessible
-   * matches. This may include matches in {@link IJavaEnvironment}s not yet used.
+   * Gets the root directory of the module the given {@link IJavaEnvironment} was created on.
+   * 
+   * @param environment
+   *          The {@link IJavaEnvironment} for which the module root path should be returned. Must not be {@code null}.
+   * @return The root path of the module the given {@link IJavaEnvironment} was created on.
+   * @throws IllegalArgumentException
+   *           if the environment is {@code null}.
+   */
+  Path rootOfJavaEnvironment(IJavaEnvironment environment);
+
+  /**
+   * Tries to find all types with given fully qualified name inside the whole {@link IEnvironment}. This may include
+   * matches in {@link IJavaEnvironment}s not yet used.
    * 
    * @param fqn
    *          The fully qualified name to find. Must not be empty.
@@ -89,8 +100,8 @@ public interface IEnvironment {
    *          {@link IClasspathEntry#isSourceFolder()} must be {@code true}.
    * @param progress
    *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(String, int)} on the argument. May be
-   *          {@code null} if no progress indication is required.
+   *          method. The write operation will call {@link IProgress#init(int, String, Object...)} on the argument. May
+   *          be {@code null} if no progress indication is required.
    * @return The created {@link IType} within the specified {@link ICompilationUnitGenerator} that has the same
    *         {@link IJavaElement#elementName()} as the generator.
    * @throws RuntimeException
@@ -123,8 +134,8 @@ public interface IEnvironment {
    *          {@link IClasspathEntry#isSourceFolder()} must be {@code true}.
    * @param progress
    *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(String, int)} on the argument. May be
-   *          {@code null} if no progress indication is required.
+   *          method. The write operation will call {@link IProgress#init(int, String, Object...)} on the argument. May
+   *          be {@code null} if no progress indication is required.
    * @return An {@link IFuture} that can be used to access the created {@link IType} within the specified
    *         {@link ICompilationUnitGenerator} that has the same {@link IJavaElement#elementName()} as the generator. If
    *         there was an exception writing the Java file, this exception will be thrown on result access of this
@@ -161,8 +172,8 @@ public interface IEnvironment {
    *          The absolute path to the file to write. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(String, int)} on the argument. May be
-   *          {@code null} if no progress indication is required.
+   *          method. The write operation will call {@link IProgress#init(int, String, Object...)} on the argument. May
+   *          be {@code null} if no progress indication is required.
    * @throws RuntimeException
    *           if there is a problem writing the resource.
    */
@@ -178,8 +189,8 @@ public interface IEnvironment {
    *          The absolute path to the file to write. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(String, int)} on the argument. May be
-   *          {@code null} if no progress indication is required.
+   *          method. The write operation will call {@link IProgress#init(int, String, Object...)} on the argument. May
+   *          be {@code null} if no progress indication is required.
    * @throws RuntimeException
    *           if there is a problem writing the {@link ISourceGenerator}.
    */
@@ -209,8 +220,8 @@ public interface IEnvironment {
    *          The absolute path to the file to write. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(String, int)} on the argument. May be
-   *          {@code null} if no progress indication is required.
+   *          method. The write operation will call {@link IProgress#init(int, String, Object...)} on the argument. May
+   *          be {@code null} if no progress indication is required.
    * @return An {@link IFuture} that can be used to wait until the file has been written. If there was an exception
    *         writing the resource, this exception will be thrown on result access of this {@link IFuture}.
    * @throws RuntimeException
@@ -240,8 +251,8 @@ public interface IEnvironment {
    *          The absolute path to the file to write. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(String, int)} on the argument. May be
-   *          {@code null} if no progress indication is required.
+   *          method. The write operation will call {@link IProgress#init(int, String, Object...)} on the argument. May
+   *          be {@code null} if no progress indication is required.
    * @return An {@link IFuture} that can be used to wait until the file has been written. If there was an exception
    *         writing the resource, this exception will be thrown on result access of this {@link IFuture}.
    */

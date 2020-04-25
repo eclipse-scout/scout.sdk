@@ -61,8 +61,8 @@ public final class SdkConsole {
     spi.println(message);
   }
 
-  static synchronized boolean isRelevant(Level level) {
-    return spi.isRelevant(level);
+  static synchronized boolean isEnabled(Level level) {
+    return level != null && spi.isEnabled(level);
   }
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")

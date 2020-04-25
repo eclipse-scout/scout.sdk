@@ -67,7 +67,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
 
   @Override
   @SuppressWarnings("resource") // false positive
-  public Stream<? extends ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress) {
+  public Stream<ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress) {
     EclipseEnvironment e = EclipseEnvironment.narrow(env);
     EclipseProgress p = EclipseEnvironment.toScoutProgress(progress);
     return e.findJavaProject(modulePath)
@@ -76,13 +76,13 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
   }
 
   @Override
-  public Optional<? extends ITranslationStore> single(org.eclipse.scout.sdk.core.model.api.IType textService, IProgress progress) {
-    progress.init("Search properties text provider service.", 1);
+  public Optional<ITranslationStore> single(org.eclipse.scout.sdk.core.model.api.IType textService, IProgress progress) {
+    progress.init(1, "Search properties text provider service.");
     return createTranslationStore(textService, progress);
   }
 
-  private static Stream<? extends ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, @SuppressWarnings("TypeMayBeWeakened") EclipseProgress progress) {
-    progress.init("Search properties text provider services.", 20);
+  private static Stream<ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, @SuppressWarnings("TypeMayBeWeakened") EclipseProgress progress) {
+    progress.init(20, "Search properties text provider services.");
 
     Predicate<IType> filter = new PublicPrimaryTypeFilter() {
       @Override
@@ -111,10 +111,11 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
         .map(Optional::get);
   }
 
-  private static Optional<PropertiesTranslationStore> createTranslationStore(org.eclipse.scout.sdk.core.model.api.IType textProviderServiceType, IProgress progress) {
+  private static Optional<ITranslationStore> createTranslationStore(org.eclipse.scout.sdk.core.model.api.IType textProviderServiceType, IProgress progress) {
     return PropertiesTextProviderService.create(textProviderServiceType)
         .map(PropertiesTranslationStore::new)
-        .filter(s -> loadStore(s, progress.newChild(1)));
+        .filter(s -> loadStore(s, progress.newChild(1)))
+        .map(s -> s);
   }
 
   private static boolean loadStore(PropertiesTranslationStore store, IProgress progress) {

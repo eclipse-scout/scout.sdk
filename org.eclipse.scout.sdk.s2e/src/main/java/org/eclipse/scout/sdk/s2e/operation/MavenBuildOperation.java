@@ -109,7 +109,7 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
     Ensure.isFalse(getBuild().getGoals().isEmpty());
     Ensure.notNull(getBuild().getWorkingDirectory());
 
-    progress.init(toString(), 10);
+    progress.init(10, toString());
 
     m_artifactGenCompleted = new CountDownLatch(1);
     try {

@@ -13,7 +13,9 @@ package org.eclipse.scout.sdk.core.s.nls.query;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.groupingBy;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.keysAccessibleForModule;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.allForModule;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInCode;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInString;
 
@@ -34,8 +36,8 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.nls.AccessibleTranslationKeys;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
+import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
@@ -77,7 +79,7 @@ public class MissingTranslationQuery implements IFileQuery {
 
   @Override
   public String name() {
-    return "Search for text keys that are used in the code but cannot be found in the TextProviderServices";
+    return "Search for text keys that are used in the code but cannot be found";
   }
 
   protected static boolean acceptCandidate(FileQueryInput candidate) {
@@ -98,11 +100,12 @@ public class MissingTranslationQuery implements IFileQuery {
 
     List<AbstractTranslationSearch> patterns = SEARCH_PATTERNS.get(candidate.fileExtension());
     CharSequence content = CharBuffer.wrap(candidate.fileContent());
-    progress.init(name(), patterns.size());
+    int ticksByPattern = 10000;
+    progress.init(patterns.size() * ticksByPattern, "{}. File: {}", name(), candidate.file());
     for (AbstractTranslationSearch search : patterns) {
       Matcher matcher = search.pattern().matcher(content);
       while (matcher.find()) {
-        checkMatch(matcher, search, candidate, env, progress.newChild(1));
+        checkMatch(matcher, search, candidate, env, progress.newChild(ticksByPattern));
       }
     }
   }
@@ -167,9 +170,17 @@ public class MissingTranslationQuery implements IFileQuery {
   }
 
   protected Optional<Set<String>> accessibleKeysForModule(Path modulePath, IEnvironment env, IProgress progress) {
-    return m_keysByModuleCache
-        .computeIfAbsent(modulePath, mp -> keysAccessibleForModule(mp, env, progress)
-            .map(AccessibleTranslationKeys::all));
+    return m_keysByModuleCache.computeIfAbsent(modulePath, mp -> computeAccessibleKeysForModule(mp, env, progress));
+  }
+
+  protected static Optional<Set<String>> computeAccessibleKeysForModule(Path modulePath, IEnvironment env, IProgress progress) {
+    List<ITranslationStore> stores = allForModule(modulePath, env, progress).collect(toList());
+    if (stores.isEmpty()) {
+      return Optional.empty(); // no stores found: it is no scout module. This module will be ignored in the search (no missing translations).
+    }
+    return Optional.of(stores.stream()
+        .flatMap(ITranslationStore::keys)
+        .collect(toSet()));
   }
 
   @Override

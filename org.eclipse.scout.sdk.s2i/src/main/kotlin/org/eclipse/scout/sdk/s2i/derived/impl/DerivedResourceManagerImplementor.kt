@@ -162,7 +162,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         val start = System.currentTimeMillis()
         val transaction = TransactionManager.current()
         val runningFileWrites = ArrayList<IFuture<*>>()
-        progress.init("Update derived resources", handlers.size * workForHandler)
+        progress.init(handlers.size * workForHandler, "Update derived resources")
 
         handlers.parallelStream().forEach {
             if (progress.indicator.isCanceled) {

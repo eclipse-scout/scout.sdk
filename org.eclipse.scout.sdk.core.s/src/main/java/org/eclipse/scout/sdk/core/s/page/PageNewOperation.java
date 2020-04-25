@@ -72,7 +72,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     Ensure.notBlank(getPackage(), "No package name provided");
     Ensure.notNull(getSuperType(), "No supertype provided");
 
-    progress.init(toString(), 10);
+    progress.init(10, toString());
 
     String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getPackage());
     Optional<IType> superType = getClientSourceFolder().javaEnvironment().findType(JavaTypes.erasure(getSuperType()));

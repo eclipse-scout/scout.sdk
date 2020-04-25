@@ -106,7 +106,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     }
     Ensure.notBlank(getPackage(), "Target package cannot be empty.");
 
-    progress.init(toString(), 100);
+    progress.init(100, toString());
 
     // create new java project
     if (isCreateNewModule()) {
