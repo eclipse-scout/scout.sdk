@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2i.environment
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -22,6 +23,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.util.CoreUtils.callInContext
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.s2i.toNioPath
 import java.nio.file.Path
 
 class TransactionManager constructor(val project: Project) {
@@ -86,6 +88,8 @@ class TransactionManager constructor(val project: Project) {
         /**
          * Executes the [callable] specified holding all necessary write locks.
          *
+         * The [callable] is executed in the UI thread but the call to this method waits until it is completed.
+         *
          * @param project The [Project] for which the [callable] should be executed.
          * @param callable The task to execute
          * @return The result of the [callable].
@@ -108,7 +112,6 @@ class TransactionManager constructor(val project: Project) {
             CommandProcessor.getInstance().executeCommand(project, {
                 DumbService.getInstance(project).runReadActionInSmartMode {
                     result.computeIfAbsent(callable)
-                    PsiDocumentManager.getInstance(project).commitAllDocuments()
                 }
             }, null, null)
             return result.get()
@@ -166,33 +169,52 @@ class TransactionManager constructor(val project: Project) {
             if (!save || progress.indicator.isCanceled) {
                 return false
             }
-            return computeInWriteAction(project) { commitAllAsync(progress) }
+            return computeInWriteAction(project) { commitAllInUiThread(progress) }
         } finally {
             m_members.clear()
             m_size = 0
         }
     }
 
-    private fun commitAllAsync(progress: IdeaProgress): Boolean {
+    private fun commitAllInUiThread(progress: IdeaProgress): Boolean {
         val workForEnsureWritable = 1
         progress.init(size() + workForEnsureWritable, "Flush file content")
 
         val fileSystem = LocalFileSystem.getInstance()
-        val existingFiles = m_members.keys
+        val files = m_members.keys
                 .map(Path::toFile)
                 .mapNotNull(fileSystem::findFileByIoFile)
 
-        val status = ReadonlyStatusHandler.getInstance(project).ensureFilesWritable(existingFiles)
+        val status = ReadonlyStatusHandler.getInstance(project).ensureFilesWritable(files)
         if (status.hasReadonlyFiles()) {
             SdkLog.info("Unable to make all resources writable. Transaction will be discarded. Message: ${status.readonlyFilesMessage}")
             return false
         }
         progress.worked(workForEnsureWritable)
 
-        return m_members.values
+        val success = m_members.values
                 .flatten()
                 .map { commitMember(it, progress.newChild(1)) }
                 .all { committed -> committed }
+        if (success) {
+            commitPsiDocuments(m_members.keys)
+        }
+        return success
+    }
+
+    private fun commitPsiDocuments(files: Set<Path>) {
+        val psiDocManager = PsiDocumentManager.getInstance(project)
+        if (!psiDocManager.hasUncommitedDocuments()) {
+            return
+        }
+
+        val fileDocManager = FileDocumentManager.getInstance()
+        val uncommittedDocuments = psiDocManager.uncommittedDocuments
+        uncommittedDocuments
+                .associate { it to fileDocManager.getFile(it) }
+                .filter { files.contains(it.value?.toNioPath()) }
+                .map { it.key }
+                .forEach { psiDocManager.commitDocument(it) }
     }
 
     private fun commitMember(member: TransactionMember, progress: IdeaProgress) =
