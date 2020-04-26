@@ -15,6 +15,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import org.eclipse.scout.sdk.core.log.MessageFormatter.arrayFormat
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.util.Strings
 
 open class IdeaProgress(ind: ProgressIndicator?) : IProgress {
 
@@ -28,7 +29,9 @@ open class IdeaProgress(ind: ProgressIndicator?) : IProgress {
 
     override fun init(totalWork: Int, name: String?, vararg args: Any?): IdeaProgress {
         val msg = arrayFormat(name, *args).message()
-        SdkLog.debug(msg)
+        if (Strings.hasText(msg)) {
+            SdkLog.debug(msg)
+        }
 
         m_totalTicks = totalWork
         m_ticksDone = 0
