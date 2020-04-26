@@ -190,6 +190,7 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
         }
       }
       else {
+        SdkLog.debug("Asynchronous task completed with exception", error);
         completeExceptionally(error);
       }
     }
