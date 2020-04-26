@@ -201,7 +201,7 @@ public class MissingTranslationQuery implements IFileQuery {
     return unmodifiableSet(ranges);
   }
 
-  protected static abstract class AbstractTranslationSearch {
+  protected abstract static class AbstractTranslationSearch {
 
     protected static final String NLS_KEY_PAT = ITranslation.KEY_REGEX.pattern();
     protected static final String JS_FILE_EXTENSION = "js";
