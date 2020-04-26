@@ -49,6 +49,7 @@ import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import java.lang.reflect.InvocationTargetException
 import java.nio.file.Path
 import java.util.function.Function
+import java.util.logging.Level
 import java.util.stream.Stream
 
 private val useLegacyMatcher: FinalValue<Boolean> = FinalValue()
@@ -197,7 +198,9 @@ private fun isUseLegacyMatcher() =
             findMatchesMethodNew()
             false
         } catch (e: NoSuchMethodException) {
-            SdkLog.debug("Using legacy structural search API", e)
+            // only log the exception in trace level
+            val exception = if (SdkLog.isLevelEnabled(Level.FINER)) e else null
+            SdkLog.debug("Using legacy structural search API", exception)
             true
         }
 
