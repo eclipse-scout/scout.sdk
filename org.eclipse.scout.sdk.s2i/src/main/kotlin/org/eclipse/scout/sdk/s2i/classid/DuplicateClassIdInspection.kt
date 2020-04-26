@@ -38,6 +38,7 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
     private val m_duplicateClassIdsByValue = ConcurrentHashMap<Project, Map<String?, List<ClassIdAnnotation>>>()
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
+        val start = System.currentTimeMillis()
         try {
             if (isOnTheFly) {
                 // use optimized implementation for single file
@@ -52,6 +53,8 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
         } catch (e: ProcessCanceledException) {
             SdkLog.debug("Duplicate @ClassId inspection canceled.", e)
             return ProblemDescriptor.EMPTY_ARRAY
+        } finally {
+            SdkLog.debug("Duplicate @ClassId inspection took {}ms.", System.currentTimeMillis() - start)
         }
     }
 
