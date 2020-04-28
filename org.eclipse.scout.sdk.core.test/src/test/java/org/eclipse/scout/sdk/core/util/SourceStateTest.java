@@ -27,6 +27,7 @@ public class SourceStateTest {
   public void testLineComment() {
     doTestLineComment(getLineCommentSrc('"'));
     doTestLineComment(getLineCommentSrc('\''));
+    doTestLineComment(getLineCommentSrc('`'));
   }
 
   private static char[] getLineCommentSrc(char stringDelim) {
@@ -41,6 +42,7 @@ public class SourceStateTest {
   public void testIsInCode() {
     doTestInCode(getLineCommentSrc('"'));
     doTestInCode(getLineCommentSrc('\''));
+    doTestInCode(getLineCommentSrc('`'));
   }
 
   private static void doTestInCode(char[] src) {
@@ -256,5 +258,40 @@ public class SourceStateTest {
     assertEquals(State.AboutToEnterComment, parse(src, 31));
     assertEquals(State.InLineComment, parse(src, 32));
     assertEquals(State.Default, parse(src, 36));
+  }
+
+  @Test
+  public void testWithBackTicksJs() {
+    String src = "a`b\\`c`d";
+    assertFalse(isInString(src, 0));
+    assertTrue(isInString(src, 1));
+    assertTrue(isInString(src, 2));
+    assertTrue(isInString(src, 3));
+    assertTrue(isInString(src, 4));
+    assertTrue(isInString(src, 5));
+    assertTrue(isInString(src, 6));
+    assertFalse(isInString(src, 7));
+  }
+
+  @Test
+  public void testWithDifferentStringDelimiterInsideString1() {
+    String src = "a'inside\"still-inside'b";
+    assertFalse(isInString(src, 0));
+    assertTrue(isInString(src, 1));
+    assertTrue(isInString(src, 8));
+    assertTrue(isInString(src, 13));
+    assertTrue(isInString(src, 21));
+    assertFalse(isInString(src, 22));
+  }
+
+  @Test
+  public void testWithDifferentStringDelimiterInsideString2() {
+    String src = "a'inside`still-inside'b";
+    assertFalse(isInString(src, 0));
+    assertTrue(isInString(src, 1));
+    assertTrue(isInString(src, 8));
+    assertTrue(isInString(src, 13));
+    assertTrue(isInString(src, 21));
+    assertFalse(isInString(src, 22));
   }
 }

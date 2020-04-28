@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
+import static java.nio.CharBuffer.wrap;
+
 /**
  * Utility class to determine the state of a certain position in Java or JavaScript sources.<br/>
  * It is possible to query if a certain index is within a comment (line or block) or within a string or char literal.
@@ -18,6 +20,155 @@ package org.eclipse.scout.sdk.core.util;
 public final class SourceState {
 
   private SourceState() {
+  }
+
+  private interface IState {
+    IState next(char c);
+
+    State toState();
+  }
+
+  private static final class InLineCommentState implements IState {
+    private static final IState INSTANCE = new InLineCommentState();
+
+    @Override
+    public IState next(char c) {
+      if (c == '\n') {
+        return DefaultState.INSTANCE;
+      }
+      return this;
+    }
+
+    @Override
+    public State toState() {
+      return State.InLineComment;
+    }
+  }
+
+  private static final class InBlockCommentState implements IState {
+    private static final IState INSTANCE = new InBlockCommentState();
+
+    @Override
+    public IState next(char c) {
+      if (c == '*') {
+        return AboutToExitBlockCommentState.INSTANCE;
+      }
+      return this;
+    }
+
+    @Override
+    public State toState() {
+      return State.InBlockComment;
+    }
+  }
+
+  private static final class AboutToExitBlockCommentState implements IState {
+    private static final IState INSTANCE = new AboutToExitBlockCommentState();
+
+    @Override
+    public IState next(char c) {
+      switch (c) {
+        case '*':
+          return this;
+        case '/':
+          return DefaultState.INSTANCE;
+        default:
+          return InBlockCommentState.INSTANCE;
+      }
+    }
+
+    @Override
+    public State toState() {
+      return State.AboutToExitBlockComment;
+    }
+  }
+
+  private static final class AboutToEnterCommentState implements IState {
+    private static final IState INSTANCE = new AboutToEnterCommentState();
+
+    @Override
+    public IState next(char c) {
+      switch (c) {
+        case '*':
+          return InBlockCommentState.INSTANCE;
+        case '/':
+          return InLineCommentState.INSTANCE;
+        default:
+          return DefaultState.INSTANCE;
+      }
+    }
+
+    @Override
+    public State toState() {
+      return State.AboutToEnterComment;
+    }
+  }
+
+  private static final class EscapeStringState implements IState {
+
+    private final char m_delimiter;
+
+    private EscapeStringState(char delimiter) {
+      m_delimiter = delimiter;
+    }
+
+    @Override
+    public IState next(char c) {
+      return new InStringState(m_delimiter);
+    }
+
+    @Override
+    public State toState() {
+      return State.EscapeString;
+    }
+  }
+
+  private static final class InStringState implements IState {
+
+    private final char m_delimiter;
+
+    private InStringState(char delimiter) {
+      m_delimiter = delimiter;
+    }
+
+    @Override
+    public IState next(char c) {
+      if (c == m_delimiter) {
+        return DefaultState.INSTANCE;
+      }
+      if (c == '\\') {
+        return new EscapeStringState(m_delimiter);
+      }
+      return this;
+    }
+
+    @Override
+    public State toState() {
+      return State.InString;
+    }
+  }
+
+  private static final class DefaultState implements IState {
+    private static final IState INSTANCE = new DefaultState();
+
+    @Override
+    public IState next(char c) {
+      switch (c) {
+        case '"':
+        case '`':
+        case '\'':
+          return new InStringState(c);
+        case '/':
+          return AboutToEnterCommentState.INSTANCE;
+        default:
+          return this;
+      }
+    }
+
+    @Override
+    public State toState() {
+      return State.Default;
+    }
   }
 
   /**
@@ -34,15 +185,7 @@ public final class SourceState {
      * The first slash is NOT part of InLineComment state but it is the AboutToEnterComment state instead. Please note
      * that this state may also be a simple division within the code and is therefore no comment state.
      */
-    InLineComment {
-      @Override
-      State next(char c) {
-        if (c == '\n') {
-          return Default;
-        }
-        return InLineComment;
-      }
-    },
+    InLineComment,
     /**
      * Describes positions within a multi or single line block comment. Such comments start with /* and end with
      * &#42;/.<br/>
@@ -50,98 +193,33 @@ public final class SourceState {
      * ending indicator and therefore belong to AboutToExitBlockComment). While the starting slash is
      * AboutToEnterComment state the ending slash is already Default state.
      */
-    InBlockComment {
-      @Override
-      State next(char c) {
-        if (c == '*') {
-          return AboutToExitBlockComment;
-        }
-        return InBlockComment;
-      }
-    },
+    InBlockComment,
     /**
      * Indicates a * character within a block comment: /* ** &#42;/. The two stars in between belong to the state
      * AboutToExitBlockComment. But as no slash follows it stays in the AboutToExitBlockComment state or turns into
      * InBlockComment again.<br>
      * So state AboutToExitBlockComment also indicates to be within a block comment (like InBlockComment does).
      */
-    AboutToExitBlockComment {
-      @Override
-      State next(char c) {
-        switch (c) {
-          case '*':
-            return AboutToExitBlockComment;
-          case '/':
-            return Default;
-          default:
-            return InBlockComment;
-        }
-      }
-    },
+    AboutToExitBlockComment,
     /**
      * Indicates a / character which is not within a string or char literal and ist not within a comment. This state
      * might indicate that a comment is about to begin or it could also belong to e.g. a division.
      */
-    AboutToEnterComment {
-      @Override
-      State next(char c) {
-        switch (c) {
-          case '*':
-            return InBlockComment;
-          case '/':
-            return InLineComment;
-          default:
-            return Default;
-        }
-      }
-    },
+    AboutToEnterComment,
     /**
      * Indicates a backslash character within a String or char literal. This state (together with InString) also means
      * the position is within a String or char literal
      */
-    EscapeString {
-      @Override
-      State next(char c) {
-        return InString;
-      }
-    },
+    EscapeString,
     /**
      * Describes positions within a String or char literal. While the starting " or ' is already in state InString, the
      * ending character is not.
      */
-    InString {
-      @Override
-      State next(char c) {
-        switch (c) {
-          case '"':
-          case '\'':
-            return Default;
-          case '\\':
-            return EscapeString;
-          default:
-            return InString;
-        }
-      }
-    },
+    InString,
     /**
      * Describes positions that do not belong to any of the other states.
      */
-    Default {
-      @Override
-      State next(char c) {
-        switch (c) {
-          case '"':
-          case '\'':
-            return InString;
-          case '/':
-            return AboutToEnterComment;
-          default:
-            return Default;
-        }
-      }
-    };
-
-    abstract State next(char c);
+    Default
   }
 
   /**
@@ -155,8 +233,12 @@ public final class SourceState {
    * @see State
    */
   public static State parse(char[] src, int pos) {
+    return parse(wrap(src), pos);
+  }
+
+  public static State parse(CharSequence src, int pos) {
     int limit = limit(src, pos);
-    return parseImpl(src, limit);
+    return parseImpl(src, limit).toState();
   }
 
   /**
@@ -173,12 +255,20 @@ public final class SourceState {
    *         {@code true} if the position points to the starting or ending delimiters (" or ').
    */
   public static boolean isInString(char[] src, int pos) {
+    return isInString(wrap(src), pos);
+  }
+
+  /**
+   * @see #isInString(char[], int)
+   */
+  public static boolean isInString(CharSequence src, int pos) {
     int limit = limit(src, pos);
-    State state = parseImpl(src, limit);
+    IState state = parseImpl(src, limit);
     if (isStringEnd(state, src, limit)) {
       return true;
     }
-    return state == State.InString || state == State.EscapeString;
+    State result = state.toState();
+    return result == State.InString || result == State.EscapeString;
   }
 
   /**
@@ -200,15 +290,23 @@ public final class SourceState {
    *         and the starting and ending / for comments.
    */
   public static boolean isInCode(char[] src, int pos) {
+    return isInCode(wrap(src), pos);
+  }
+
+  /**
+   * @see #isInCode(char[], int)
+   */
+  public static boolean isInCode(CharSequence src, int pos) {
     int limit = limit(src, pos);
-    State state = parseImpl(src, limit);
+    IState state = parseImpl(src, limit);
     if (isStringEnd(state, src, limit)) {
       return false;
     }
     if (isCommentBoundary(state, src, limit)) {
       return false;
     }
-    return state == State.Default || state == State.AboutToEnterComment;
+    return state == DefaultState.INSTANCE
+        || state == AboutToEnterCommentState.INSTANCE;
   }
 
   /**
@@ -225,52 +323,61 @@ public final class SourceState {
    *         to the starting or ending slashes or stars.
    */
   public static boolean isInComment(char[] src, int pos) {
+    return isInComment(wrap(src), pos);
+  }
+
+  /**
+   * @see #isInString(char[], int)
+   */
+  public static boolean isInComment(CharSequence src, int pos) {
     int limit = limit(src, pos);
-    State state = parseImpl(src, limit);
+    IState state = parseImpl(src, limit);
     if (isCommentBoundary(state, src, limit)) {
       return true;
     }
-    return state == State.InBlockComment || state == State.InLineComment || state == State.AboutToExitBlockComment;
+    return state == InBlockCommentState.INSTANCE
+        || state == InLineCommentState.INSTANCE
+        || state == AboutToExitBlockCommentState.INSTANCE;
   }
 
-  static boolean isCommentBoundary(State calculatedState, char[] src, int limit) {
-    if (calculatedState == State.Default) {
-      return previousState(State.Default, src, limit) == State.AboutToEnterComment;
+  static boolean isCommentBoundary(IState calculatedState, CharSequence src, int limit) {
+    if (calculatedState == DefaultState.INSTANCE) {
+      return previousState(DefaultState.INSTANCE, src, limit) == AboutToEnterCommentState.INSTANCE;
     }
-    if (calculatedState != State.AboutToEnterComment) {
+    if (calculatedState != AboutToEnterCommentState.INSTANCE) {
       return false;
     }
-    State next = nextState(calculatedState, src, limit);
-    return next == State.InBlockComment || next == State.InLineComment;
+    IState next = nextState(calculatedState, src, limit);
+    return next == InBlockCommentState.INSTANCE || next == InLineCommentState.INSTANCE;
   }
 
-  static boolean isStringEnd(State calculatedState, char[] src, int limit) {
-    return calculatedState == State.Default && previousState(State.Default, src, limit) == State.InString;
+  static boolean isStringEnd(IState calculatedState, CharSequence src, int limit) {
+    return calculatedState == DefaultState.INSTANCE && previousState(DefaultState.INSTANCE, src, limit).toState() == State.InString;
   }
 
-  static State parseImpl(char[] chars, int end) {
-    State state = State.Default;
+  static IState parseImpl(CharSequence chars, int end) {
+    IState state = DefaultState.INSTANCE;
     for (int i = 0; i < end; i++) {
-      state = state.next(chars[i]);
+      state = state.next(chars.charAt(i));
     }
     return state;
   }
 
-  static int limit(char[] src, int pos) {
-    return Math.min(Ensure.notNull(src.length), pos + 1);
+  static int limit(CharSequence src, int pos) {
+    return Math.min(Ensure.notNull(src.length()), pos + 1);
   }
 
-  static State previousState(State calculatedState, char[] src, int limit) {
+  static IState previousState(IState calculatedState, CharSequence src, int limit) {
     if (limit <= 0) {
-      return State.Default;
+      return DefaultState.INSTANCE;
     }
-    return calculatedState.next(src[limit - 1]);
+    return calculatedState.next(src.charAt(limit - 1));
   }
 
-  static State nextState(State calculatedState, char[] src, int limit) {
-    if (src.length <= limit) {
+  static IState nextState(IState calculatedState, CharSequence src, int limit) {
+    if (src.length() <= limit) {
       return calculatedState;
     }
-    return calculatedState.next(src[limit]);
+    return calculatedState.next(src.charAt(limit));
   }
 }
