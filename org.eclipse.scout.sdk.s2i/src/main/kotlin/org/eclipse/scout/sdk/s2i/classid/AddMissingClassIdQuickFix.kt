@@ -67,6 +67,9 @@ open class AddMissingClassIdQuickFix : LocalQuickFix {
             override fun file() = targetFile
 
             override fun commit(progress: IdeaProgress): Boolean {
+                if (targetClass.hasAnnotation(IScoutRuntimeTypes.ClassId)) {
+                    return true // nothing to do
+                }
                 targetClass.modifierList?.addAfter(annotationToAdd, anchor)
                 JavaCodeStyleManager.getInstance(targetClass.project).shortenClassReferences(targetClass)
                 return true

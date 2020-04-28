@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2i.classid
 import com.intellij.codeInsight.daemon.HighlightDisplayKey
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.DumbService
-import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.profile.codeInspection.InspectionProjectProfileManager
 import com.intellij.psi.*
@@ -25,10 +24,10 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
 import java.util.Collections.newSetFromMap
 import java.util.concurrent.ConcurrentHashMap
-import java.util.logging.Level
 
 open class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(), ClassIdCache {
 
@@ -69,7 +68,6 @@ open class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(
             return
         }
         AppExecutorUtil.getAppExecutorService().submit {
-            DumbService.getInstance(project).waitForSmartMode()
             setup()
             duplicates().forEach { SdkLog.debug("Duplicate @ClassId value '{}' found for types {}.", it.key, it.value) }
         }
@@ -80,23 +78,15 @@ open class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(
             return
         }
 
-        var retry = true
-        while (retry) {
-            try {
-                if (project.isDisposed || !project.isOpen) {
-                    return
-                }
+        try {
+            TransactionManager.repeatUntilPassesWithIndex(project) {
+                DumbService.getInstance(project).waitForSmartMode()
                 trySetupCache()
-                retry = false
                 PsiManager.getInstance(project).addPsiTreeChangeListener(this) // initial cache is ready, register listener to keep it up to date
                 m_cacheReady = true
-            } catch (e: IndexNotReadyException) {
-                val exception = if (SdkLog.isLevelEnabled(Level.FINER)) e else null
-                SdkLog.debug("Project entered dump mode. Retry building @ClassId cache.", exception)
-            } catch (t: Exception) {
-                retry = false
-                SdkLog.warning("Error building @ClassId value cache.", t)
             }
+        } catch (t: Exception) {
+            SdkLog.warning("Error building @ClassId value cache.", t)
         }
     }
 

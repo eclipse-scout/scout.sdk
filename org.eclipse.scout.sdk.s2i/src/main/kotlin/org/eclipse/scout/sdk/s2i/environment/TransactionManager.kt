@@ -14,7 +14,9 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.ReadonlyStatusHandler
@@ -25,6 +27,7 @@ import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.toNioPath
 import java.nio.file.Path
+import java.util.logging.Level
 
 class TransactionManager constructor(val project: Project) {
 
@@ -96,12 +99,15 @@ class TransactionManager constructor(val project: Project) {
          */
         fun <T> computeInWriteAction(project: Project, callable: () -> T): T {
             val result = FinalValue<T>()
-            ApplicationManager.getApplication().invokeAndWait {
-                // this is executed in the UI thread! keep short to prevent freezes!
-                // write operations are only allowed in the UI thread
-                // see http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html
-                result.computeIfAbsent {
-                    WriteAction.compute<T, RuntimeException> { computeInSmartModeAndCommandProcessor(project, callable) }
+            // repeat outside the write lock to release the UI thread between retries (prevent freezes)
+            repeatUntilPassesWithIndex(project) {
+                ApplicationManager.getApplication().invokeAndWait {
+                    // this is executed in the UI thread! keep short to prevent freezes!
+                    // write operations are only allowed in the UI thread
+                    // see http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html
+                    result.computeIfAbsent {
+                        WriteAction.compute<T, RuntimeException> { computeInSmartModeAndCommandProcessor(project, callable) }
+                    }
                 }
             }
             return result.get()
@@ -109,7 +115,7 @@ class TransactionManager constructor(val project: Project) {
 
         private fun <T> computeInSmartModeAndCommandProcessor(project: Project, callable: () -> T): T {
             val result = FinalValue<T>()
-            if (project.isDisposed || !project.isOpen) {
+            if (!project.isInitialized) {
                 return result.get()
             }
             CommandProcessor.getInstance().executeCommand(project, {
@@ -118,6 +124,21 @@ class TransactionManager constructor(val project: Project) {
                 }
             }, null, null)
             return result.get()
+        }
+
+        fun <T> repeatUntilPassesWithIndex(project: Project, callable: () -> T): T {
+            while (true) {
+                try {
+                    if (project.isInitialized) { // includes !disposed & open
+                        return callable.invoke()
+                    } else {
+                        throw ProcessCanceledException()
+                    }
+                } catch (e: IndexNotReadyException) {
+                    val exception = if (SdkLog.isLevelEnabled(Level.FINER)) e else null
+                    SdkLog.debug("Project entered dump mode unexpectedly. Retrying task.", exception)
+                }
+            }
         }
     }
 
@@ -225,13 +246,18 @@ class TransactionManager constructor(val project: Project) {
                 .forEach { psiDocManager.commitDocument(it) }
     }
 
-    private fun commitMember(member: TransactionMember, progress: IdeaProgress) =
-            try {
-                member.commit(progress)
-            } catch (e: Exception) {
-                SdkLog.warning("Error committing transaction member '$member'.", e)
-                false
-            }
+    private fun commitMember(member: TransactionMember, progress: IdeaProgress): Boolean {
+        try {
+            return member.commit(progress)
+        } catch (indexException: IndexNotReadyException) {
+            throw indexException // will be handled by the retry
+        } catch (cancelException: ProcessCanceledException) {
+            SdkLog.debug("Transaction member '{}' was cancelled.", member)
+        } catch (e: Exception) {
+            SdkLog.warning("Error committing transaction member '$member'.", e)
+        }
+        return false
+    }
 
     private fun ensureOpen() {
         Ensure.isTrue(m_open, "Transaction has already been committed.")
