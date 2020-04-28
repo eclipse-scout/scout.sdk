@@ -16,6 +16,7 @@ import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.nls.query.MissingTranslationQuery
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput
@@ -56,16 +57,19 @@ open class MissingTranslationInspection : LocalInspectionTool() {
     }
 
     fun checkFile(file: PsiFile, module: Module, query: IFileQuery, manager: InspectionManager, isOnTheFly: Boolean, environment: IdeaEnvironment, progress: IProgress): Array<ProblemDescriptor> {
+        val start = System.currentTimeMillis()
         val path = file.virtualFile.toNioPath()
         val modulePath = Paths.get(ModuleUtil.getModuleDirPath(module))
         val queryInput = FileQueryInput(path, modulePath) { file.textToCharArray() }
 
         query.searchIn(queryInput, environment, progress)
 
-        return query.result(path)
+        val result = query.result(path)
                 .filter { it.severity() >= Level.WARNING.intValue() } // only report important findings
                 .mapNotNull { toProblemDescription(it, file, manager, isOnTheFly) }
                 .toTypedArray()
+        SdkLog.debug("Missing translation inspection took {}ms", System.currentTimeMillis() - start)
+        return result
     }
 
     protected fun toProblemDescription(range: FileRange, file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {

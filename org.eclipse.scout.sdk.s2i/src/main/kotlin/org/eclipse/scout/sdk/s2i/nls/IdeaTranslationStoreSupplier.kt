@@ -10,14 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2i.nls
 
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.startup.StartupActivity
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
@@ -42,7 +40,7 @@ import java.util.*
 import java.util.function.Supplier
 import java.util.stream.Stream
 
-open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActivity, DumbAware, Disposable {
+open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActivity, DumbAware {
 
     override fun all(modulePath: Path, env: IEnvironment, progress: IProgress): Stream<ITranslationStore> =
             modulePath.toVirtualFile()
@@ -61,15 +59,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
      * Executed on [Project] open
      */
     override fun runActivity(project: Project) {
-        Disposer.register(project, this)
         TranslationStores.registerStoreSupplier(this)
-    }
-
-    /**
-     * Executed on [Project] close
-     */
-    override fun dispose() {
-        TranslationStores.removeStoreSupplier(this)
     }
 
     protected fun findTranslationStoresVisibleIn(module: Module, env: IdeaEnvironment, progress: IdeaProgress): Stream<ITranslationStore> {

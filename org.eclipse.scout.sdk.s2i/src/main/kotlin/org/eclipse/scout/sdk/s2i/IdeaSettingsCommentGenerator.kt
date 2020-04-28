@@ -14,12 +14,10 @@ import com.intellij.copyright.CopyrightManager
 import com.intellij.ide.fileTemplates.FileTemplate
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.lang.java.JavaLanguage
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
@@ -42,30 +40,13 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import java.nio.file.Path
 import java.util.*
 
-open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, StartupActivity, DumbAware, Disposable {
-
-    private var m_previousCommentGenerator: IDefaultElementCommentGeneratorSpi? = null
+open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, StartupActivity, DumbAware {
 
     /**
      * Executed on [Project] open
      */
     override fun runActivity(project: Project) {
-        val existingCommentGenerator = JavaElementCommentBuilder.getCommentGeneratorSpi()
-        if (existingCommentGenerator == this) {
-            return
-        }
-
-        Disposer.register(project, this)
-        m_previousCommentGenerator = existingCommentGenerator
         JavaElementCommentBuilder.setCommentGeneratorSpi(this)
-    }
-
-    /**
-     * Executed on [Project] close
-     */
-    override fun dispose() {
-        JavaElementCommentBuilder.setCommentGeneratorSpi(m_previousCommentGenerator)
-        m_previousCommentGenerator = null
     }
 
     override fun createCompilationUnitComment(target: ICompilationUnitGenerator<*>): ISourceGenerator<ICommentBuilder<*>> {

@@ -15,24 +15,22 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.Key
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
+import org.eclipse.scout.sdk.s2i.settings.ScoutSettings.Current.isAutoCreateClassIdAnnotations
 import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
 
-open class AutoCreateClassIdStartup : StartupActivity, DumbAware, Disposable {
+open class AutoCreateClassIdStartup : StartupActivity, DumbAware {
 
-    private var m_settingsChangedListener: SettingsChangedListener? = null
+    private val m_classIdSettingsListenerKey = Key.create<SettingsChangedListener>("scout.CLASS_ID_SETTINGS_LISTENER_KEY")
 
     /**
      * Executed on [Project] open
      */
     override fun runActivity(project: Project) {
-        if (m_settingsChangedListener != null) {
-            // listener already registered
-            return
-        }
+        Disposer.register(project, Disposable { dispose(project) })
 
-        Disposer.register(project, this)
         val settingsChangedListener = object : SettingsChangedListener {
             override fun changed(key: String, oldVal: String?, newVal: String?) {
                 if (ScoutSettings.KEY_AUTO_CREATE_CLASS_ID == key) {
@@ -40,21 +38,19 @@ open class AutoCreateClassIdStartup : StartupActivity, DumbAware, Disposable {
                 }
             }
         }
-        m_settingsChangedListener = settingsChangedListener
         ScoutSettings.addListener(settingsChangedListener)
+        project.putUserData(m_classIdSettingsListenerKey, settingsChangedListener)
         updateClassIdAutoGeneration(project)
     }
 
     /**
      * Executed on [Project] close
      */
-    override fun dispose() {
-        val listener = m_settingsChangedListener ?: return
+    fun dispose(project: Project) {
+        val listener = project.getUserData(m_classIdSettingsListenerKey) ?: return
         ScoutSettings.removeListener(listener)
-        m_settingsChangedListener = null
+        project.putUserData(m_classIdSettingsListenerKey, null)
     }
-
-    protected fun isAutoCreateClassIdAnnotations(project: Project): Boolean = ScoutSettings.isAutoCreateClassIdAnnotations(project)
 
     protected fun updateClassIdAutoGeneration(project: Project) {
         // the settings are retrieved from the project given

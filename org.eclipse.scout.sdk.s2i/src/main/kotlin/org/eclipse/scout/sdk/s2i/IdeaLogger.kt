@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2i
 
 import com.intellij.notification.NotificationGroup
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.Logger
@@ -19,34 +18,23 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.ui.MessageType
-import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.log.ISdkConsoleSpi
 import org.eclipse.scout.sdk.core.log.LogMessage
 import org.eclipse.scout.sdk.core.log.SdkConsole
 import org.eclipse.scout.sdk.core.util.Strings
 import java.util.logging.Level
 
-open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
+open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
 
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
     @Suppress("MissingRecentApi") // method does not exist on the companion, but static access is available -> ok
     private val m_balloonLog = NotificationGroup.balloonGroup("Scout")
-    private var m_previousConsoleSpi: ISdkConsoleSpi? = null
 
     /**
      * Executed on [Project] open
      */
     override fun runActivity(project: Project) {
-        val existingConsoleSpi = SdkConsole.getConsoleSpi()
-        if (existingConsoleSpi == this) {
-            // there is already a project open which registered the logger already
-            return
-        }
-
-        Disposer.register(project, this)
-        m_previousConsoleSpi = existingConsoleSpi
         SdkConsole.setConsoleSpi(this)
-
         if (isRunningInSandbox()) {
             m_textLog.setLevel(org.apache.log4j.Level.DEBUG)
         }
@@ -57,14 +45,6 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware, Disposable {
         return Strings.countMatches(PathManager.getPluginsPath(), sandbox) > 0
                 || Strings.countMatches(PathManager.getConfigPath(), sandbox) > 0
                 || Strings.countMatches(PathManager.getSystemPath(), sandbox) > 0
-    }
-
-    /**
-     * Executed on [Project] close
-     */
-    override fun dispose() {
-        SdkConsole.setConsoleSpi(m_previousConsoleSpi)
-        m_previousConsoleSpi = null
     }
 
     override fun clear() {

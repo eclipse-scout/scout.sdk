@@ -109,6 +109,9 @@ class TransactionManager constructor(val project: Project) {
 
         private fun <T> computeInSmartModeAndCommandProcessor(project: Project, callable: () -> T): T {
             val result = FinalValue<T>()
+            if (project.isDisposed || !project.isOpen) {
+                return result.get()
+            }
             CommandProcessor.getInstance().executeCommand(project, {
                 DumbService.getInstance(project).runReadActionInSmartMode {
                     result.computeIfAbsent(callable)
@@ -124,6 +127,9 @@ class TransactionManager constructor(val project: Project) {
     @Volatile
     private var m_open = true
 
+    /**
+     * @return true if all transactions members returned true (which means successful)
+     */
     private fun finishTransaction(save: Boolean, progress: IdeaProgress): Boolean = synchronized(this) {
         try {
             return finishTransactionImpl(save, progress)
@@ -166,10 +172,12 @@ class TransactionManager constructor(val project: Project) {
         }
 
         try {
-            if (!save || progress.indicator.isCanceled) {
+            if (!save || (progress.indicator.isCanceled)) {
                 return false
             }
-            return computeInWriteAction(project) { commitAllInUiThread(progress) }
+            // the boolean result might be null in case the callable was not executed because the project is closing
+            val result: Boolean? = computeInWriteAction(project) { commitAllInUiThread(progress) }
+            return result ?: return false
         } finally {
             m_members.clear()
             m_size = 0

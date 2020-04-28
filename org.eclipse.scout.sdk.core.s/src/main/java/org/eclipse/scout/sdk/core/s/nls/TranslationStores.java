@@ -77,7 +77,7 @@ public final class TranslationStores {
    * 
    * @param supplier
    *          The new supplier. Must not be {@code null}.
-   * @return {@code true} if this element has not been registred yet. {@code false} if it was already registered and
+   * @return {@code true} if this element has not been registered yet. {@code false} if it was already registered and
    *         therefore has been replaced.
    */
   public static synchronized boolean registerStoreSupplier(ITranslationStoreSupplier supplier) {

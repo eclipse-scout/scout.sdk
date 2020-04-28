@@ -10,11 +10,9 @@
  */
 package org.eclipse.scout.sdk.s2i
 
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
@@ -31,34 +29,16 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager
 import org.jetbrains.idea.maven.utils.MavenUtil
 import java.util.*
 
-open class IdeaMavenRunner : IMavenRunnerSpi, StartupActivity, DumbAware, Disposable {
-
-    private var m_previousRunner: IMavenRunnerSpi? = null
+open class IdeaMavenRunner : IMavenRunnerSpi, StartupActivity, DumbAware {
 
     /**
      * Executed on [Project] open
      */
     override fun runActivity(project: Project) {
-        val existingRunner = MavenRunner.get()
-        if (existingRunner == this) {
-            return
-        }
-
-        Disposer.register(project, this)
+        MavenRunner.set(this)
 
         // Scout requires sources to be present e.g. to parse text services (NLS)
         MavenProjectsManager.getInstance(project).importingSettings.isDownloadSourcesAutomatically = true
-
-        m_previousRunner = existingRunner
-        MavenRunner.set(this)
-    }
-
-    /**
-     * Executed on [Project] close
-     */
-    override fun dispose() {
-        MavenRunner.set(m_previousRunner)
-        m_previousRunner = null
     }
 
     override fun execute(build: MavenBuild, env: IEnvironment, progress: IProgress) {
