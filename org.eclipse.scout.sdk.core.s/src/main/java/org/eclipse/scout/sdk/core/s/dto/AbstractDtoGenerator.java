@@ -54,6 +54,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYPE>> extends TypeGenerator<TYPE> {
 
+  public static final String FORMDATA_CLASSID_SUFFIX = "-formdata";
   private final IType m_modelType;
   private final IJavaEnvironment m_targetEnvironment;
   private boolean m_setupExecuted;
@@ -91,7 +92,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     IAnnotationGenerator<?> result = a.toWorkingCopy();
     if (IScoutRuntimeTypes.ClassId.equals(a.type().name())) {
       String id = a.element("value").get().value().as(String.class);
-      result.withElement("value", b -> b.stringLiteral(id + "-formdata"));
+      result.withElement("value", b -> b.stringLiteral(id + FORMDATA_CLASSID_SUFFIX));
     }
     return result;
   }

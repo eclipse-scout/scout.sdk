@@ -14,35 +14,60 @@ import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 
 open class ClassIdAnnotation private constructor(val psiClass: PsiClass, val psiAnnotation: PsiAnnotation) {
 
     private val m_value = FinalValue<String>()
+    private val m_ownerFqn = FinalValue<String>()
 
     companion object {
 
-        const val VALUE_ATTRIBUTE_NAME = "value"
+        const val VALUE_ATTRIBUTE_NAME = org.eclipse.scout.sdk.core.s.annotation.ClassIdAnnotation.VALUE_ELEMENT_NAME
+        val CLASS_ID_SIMPLE_NAME: String = JavaTypes.simpleName(IScoutRuntimeTypes.ClassId)
 
         fun of(annotation: PsiAnnotation?): ClassIdAnnotation? {
-            if (annotation == null) {
-                return null
-            }
-            val owner = IdeaEnvironment.computeInReadAction(annotation.project) {
-                PsiTreeUtil.getParentOfType(annotation, PsiClass::class.java)
-            } ?: return null
-            return ClassIdAnnotation(owner, annotation)
+            return of(annotation, null)
         }
 
         fun of(owner: PsiClass?): ClassIdAnnotation? {
-            if (owner == null) {
+            return of(null, owner)
+        }
+
+        fun of(annotation: PsiAnnotation?, owner: PsiClass?): ClassIdAnnotation? {
+            if (owner == null && annotation == null) {
                 return null
             }
-            val classIdAnnotation = IdeaEnvironment.computeInReadAction(owner.project) {
-                owner.getAnnotation(IScoutRuntimeTypes.ClassId)
+
+            val declaringClass = owner ?: IdeaEnvironment.computeInReadAction(annotation!!.project) {
+                PsiTreeUtil.getParentOfType(annotation, PsiClass::class.java)
             } ?: return null
-            return ClassIdAnnotation(owner, classIdAnnotation)
+            val annotationElement = resolveAnnotation(annotation, declaringClass) ?: return null
+
+            return ClassIdAnnotation(declaringClass, annotationElement)
+        }
+
+        private fun resolveAnnotation(annotation: PsiAnnotation?, owner: PsiClass): PsiAnnotation? {
+            if (annotation == null) {
+                return IdeaEnvironment.computeInReadAction(owner.project) { owner.getAnnotation(IScoutRuntimeTypes.ClassId) }
+            }
+
+            val annotationName = IdeaEnvironment.computeInReadAction(annotation.project) {
+                // do not use annotation.qualifiedName here because it requires a resolve (slow and might not be allowed in contexts like psi change listeners)
+                annotation.nameReferenceElement?.referenceName
+            } ?: return null
+            if (CLASS_ID_SIMPLE_NAME == annotationName || IScoutRuntimeTypes.ClassId == annotationName) {
+                return annotation
+            }
+            return null
+        }
+    }
+
+    fun ownerFqn(): String? = m_ownerFqn.computeIfAbsentAndGet {
+        IdeaEnvironment.computeInReadAction(psiClass.project) {
+            psiClass.qualifiedName
         }
     }
 

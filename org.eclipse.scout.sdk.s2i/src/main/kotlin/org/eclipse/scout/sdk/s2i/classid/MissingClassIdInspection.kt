@@ -29,12 +29,13 @@ open class MissingClassIdInspection : AbstractBaseJavaLocalInspectionTool() {
     private val m_template = EclipseScoutBundle.message("missing.classid.annotation")
 
     override fun checkClass(aClass: PsiClass, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
-        val hasClassIdValue = ClassIdAnnotation.of(aClass)?.hasValue() ?: false
-        if (hasClassIdValue) {
+
+        if (!supportsClassId(aClass) || !isInSourceRoot(aClass)) {
             return ProblemDescriptor.EMPTY_ARRAY
         }
 
-        if (!supportsClassId(aClass) || !isInSourceRoot(aClass)) {
+        val hasClassIdValue = ClassIdAnnotation.of(aClass)?.hasValue() ?: false
+        if (hasClassIdValue) {
             return ProblemDescriptor.EMPTY_ARRAY
         }
 

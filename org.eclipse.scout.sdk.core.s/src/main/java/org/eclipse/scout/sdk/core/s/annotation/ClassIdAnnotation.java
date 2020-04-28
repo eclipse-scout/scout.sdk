@@ -15,35 +15,25 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
 
 /**
- * <h3>{@link OrderAnnotation}</h3>
+ * <h3>{@link ClassIdAnnotation}</h3>
  *
  * @since 5.2.0
  */
-public class OrderAnnotation extends AbstractManagedAnnotation {
+public class ClassIdAnnotation extends AbstractManagedAnnotation {
 
-  public static final String TYPE_NAME = IScoutRuntimeTypes.Order;
+  public static final String TYPE_NAME = IScoutRuntimeTypes.ClassId;
   public static final String VALUE_ELEMENT_NAME = "value";
 
-  public static double valueOf(IAnnotatable owner, boolean isBean) {
-    Optional<OrderAnnotation> first = owner.annotations()
-        .withManagedWrapper(OrderAnnotation.class)
-        .first();
-
-    //don't evaluate as stream to prevent auto boxing
-    if (first.isPresent()) {
-      return first.get().value();
-    }
-
-    if (isBean) {
-      return ISdkProperties.DEFAULT_BEAN_ORDER;
-    }
-    return ISdkProperties.DEFAULT_VIEW_ORDER;
+  public static Optional<String> valueOf(IAnnotatable owner) {
+    return owner.annotations()
+        .withManagedWrapper(ClassIdAnnotation.class)
+        .first()
+        .map(ClassIdAnnotation::value);
   }
 
-  public double value() {
-    return getValue(VALUE_ELEMENT_NAME, double.class, null);
+  public String value() {
+    return getValue(VALUE_ELEMENT_NAME, String.class, null);
   }
 }

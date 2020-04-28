@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.core.util.SdkException;
  */
 public abstract class AbstractManagedAnnotation {
 
-  public static final String TYPE_NAME_FIELD_NAME = "TYPE_NAME";
+  protected static final String TYPE_NAME_FIELD_NAME = "TYPE_NAME";
 
   private IAnnotation m_ann;
 

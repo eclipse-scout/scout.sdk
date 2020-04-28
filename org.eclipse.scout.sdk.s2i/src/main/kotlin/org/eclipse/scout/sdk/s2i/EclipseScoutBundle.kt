@@ -16,6 +16,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.util.Disposer
+import org.eclipse.scout.sdk.s2i.classid.ClassIdCache
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.jetbrains.annotations.PropertyKey
 import java.lang.ref.Reference
@@ -29,6 +30,7 @@ class EclipseScoutBundle : StartupActivity, DumbAware {
      */
     override fun runActivity(project: Project) {
         Disposer.register(project, derivedResourceManager(project))
+        Disposer.register(project, classIdCache(project))
     }
 
     companion object {
@@ -41,6 +43,8 @@ class EclipseScoutBundle : StartupActivity, DumbAware {
 
         fun derivedResourceManager(project: Project): DerivedResourceManager =
                 ServiceManager.getService(project, DerivedResourceManager::class.java)
+
+        fun classIdCache(project: Project): ClassIdCache = ServiceManager.getService(project, ClassIdCache::class.java)
 
         private fun getBundle(): ResourceBundle {
             val cachedBundle = com.intellij.reference.SoftReference.dereference(ourBundle)

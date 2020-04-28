@@ -54,6 +54,8 @@
 
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager"
                     serviceImplementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor"/>
+    <projectService serviceInterface="org.eclipse.scout.sdk.s2i.classid.ClassIdCache"
+                    serviceImplementation="org.eclipse.scout.sdk.s2i.classid.ClassIdCacheImplementor"/>
 
     <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                          instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
