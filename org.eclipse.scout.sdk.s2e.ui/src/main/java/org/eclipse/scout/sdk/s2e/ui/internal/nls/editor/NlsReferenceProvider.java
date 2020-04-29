@@ -16,27 +16,27 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
-import org.eclipse.scout.sdk.core.s.util.search.FileRange;
+import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 
 /**
  * <h4>NlsReferenceProvider</h4>
  */
 public class NlsReferenceProvider {
-  private final Map<String, ? extends Collection<FileRange>> m_matches;
+  private final Map<String, ? extends Collection<FileQueryMatch>> m_matches;
 
-  public NlsReferenceProvider(Map<String, ? extends Collection<FileRange>> matches) {
+  public NlsReferenceProvider(Map<String, ? extends Collection<FileQueryMatch>> matches) {
     m_matches = matches;
   }
 
-  public Collection<FileRange> getReferencesFor(ITranslation entry) {
+  public Collection<FileQueryMatch> getReferencesFor(ITranslation entry) {
     if (entry == null) {
       return emptySet();
     }
     return getReferencesFor(entry.key());
   }
 
-  public Collection<FileRange> getReferencesFor(String key) {
-    Collection<FileRange> references = m_matches.get(key);
+  public Collection<FileQueryMatch> getReferencesFor(String key) {
+    Collection<FileQueryMatch> references = m_matches.get(key);
     if (references == null) {
       return emptySet();
     }

@@ -56,7 +56,7 @@ public final class Ensure {
    * @throws IllegalArgumentException
    *           if the given expression is {@code false}.
    */
-  public static void isTrue(boolean expression, String msg, Object... msgArgs) {
+  public static void isTrue(boolean expression, CharSequence msg, Object... msgArgs) {
     if (!expression) {
       fail(msg, msgArgs);
     }
@@ -86,7 +86,7 @@ public final class Ensure {
    * @throws IllegalArgumentException
    *           if the given expression is {@code true}.
    */
-  public static void isFalse(boolean expression, String msg, Object... msgArgs) {
+  public static void isFalse(boolean expression, CharSequence msg, Object... msgArgs) {
     isTrue(!expression, msg, msgArgs);
   }
 
@@ -116,7 +116,7 @@ public final class Ensure {
    * @throws IllegalArgumentException
    *           if the given {@link Path} is {@code null} or not a file.
    */
-  public static Path isFile(Path candidate, String msg, Object... msgArgs) {
+  public static Path isFile(Path candidate, CharSequence msg, Object... msgArgs) {
     if (candidate == null || !Files.isReadable(candidate) || !Files.isRegularFile(candidate)) {
       fail(msg, msgArgs);
     }
@@ -149,7 +149,7 @@ public final class Ensure {
    * @throws IllegalArgumentException
    *           if the given {@link Path} is {@code null} or not a directory.
    */
-  public static Path isDirectory(Path candidate, String msg, Object... msgArgs) {
+  public static Path isDirectory(Path candidate, CharSequence msg, Object... msgArgs) {
     if (candidate == null || !Files.isReadable(candidate) || !Files.isDirectory(candidate)) {
       fail(msg, msgArgs);
     }
@@ -190,7 +190,7 @@ public final class Ensure {
    * @throws IllegalArgumentException
    *           if the object is {@code null}.
    */
-  public static <T> T notNull(T o, String msg, Object... msgArgs) {
+  public static <T> T notNull(T o, CharSequence msg, Object... msgArgs) {
     if (o == null) {
       fail(msg, msgArgs);
     }
@@ -227,7 +227,7 @@ public final class Ensure {
    * @see Strings#isBlank(CharSequence)
    * @see Strings#notBlank(CharSequence)
    */
-  public static <T extends CharSequence> T notBlank(T in, String msg, Object... msgArgs) {
+  public static <T extends CharSequence> T notBlank(T in, CharSequence msg, Object... msgArgs) {
     if (Strings.isBlank(in)) {
       fail(msg, msgArgs);
     }
@@ -262,7 +262,7 @@ public final class Ensure {
    * @throws IllegalArgumentException
    *           if a is not same as b.
    */
-  public static void same(Object a, Object b, String msg, Object... msgArgs) {
+  public static void same(Object a, Object b, CharSequence msg, Object... msgArgs) {
     if (a != b) {
       fail(msg, msgArgs);
     }
@@ -298,11 +298,11 @@ public final class Ensure {
    * @throws IllegalArgumentException
    *           if a is not same as b.
    */
-  public static int same(int a, int b, String msg, Object... msgArgs) {
+  public static int same(int a, int b, CharSequence msg, Object... msgArgs) {
     return sameInt(a, b, msg, msgArgs);
   }
 
-  private static int sameInt(int a, int b, String msg, Object... msgArgs) {
+  private static int sameInt(int a, int b, CharSequence msg, Object... msgArgs) {
     if (a != b) {
       fail(msg, msgArgs);
     }
@@ -343,7 +343,7 @@ public final class Ensure {
    * @see Class#cast(Object)
    * @see MessageFormatter
    */
-  public static <T> T instanceOf(Object a, Class<T> type, String msg, Object... msgArgs) {
+  public static <T> T instanceOf(Object a, Class<T> type, CharSequence msg, Object... msgArgs) {
     if (!notNull(type).isAssignableFrom(notNull(a).getClass())) {
       fail(msg, msgArgs);
     }
@@ -360,7 +360,7 @@ public final class Ensure {
    * @throws IllegalArgumentException
    *           on any call to that method.
    */
-  public static void fail(String msg, Object... msgArgs) {
+  public static void fail(CharSequence msg, Object... msgArgs) {
     throw newFail(msg, msgArgs);
   }
 
@@ -384,7 +384,7 @@ public final class Ensure {
    *          The arguments to be placed into the formatting anchors of the given message. See {@link MessageFormatter}.
    * @return A new {@link IllegalArgumentException} with given message.
    */
-  public static IllegalArgumentException newFail(String msg, Object... msgArgs) {
+  public static IllegalArgumentException newFail(CharSequence msg, Object... msgArgs) {
     FormattingTuple tuple = MessageFormatter.arrayFormat(msg, msgArgs);
     return new IllegalArgumentException(tuple.message(), tuple.firstThrowable().orElse(null));
   }

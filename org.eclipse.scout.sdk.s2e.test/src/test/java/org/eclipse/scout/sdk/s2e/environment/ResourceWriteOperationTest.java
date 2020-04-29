@@ -55,7 +55,7 @@ public class ResourceWriteOperationTest {
   }
 
   protected static void assertResourceEquals(String existingContent, CharSequence newContent) {
-    assertTrue(ResourceWriteOperation.areContentsEqual(createMock(true, existingContent), newContent, 3));
+    assertTrue(ResourceWriteOperation.areContentsEqual(createMock(true, existingContent), newContent));
   }
 
   protected static void assertResourceNotEquals(String existingContent, CharSequence newContent) {
@@ -63,7 +63,7 @@ public class ResourceWriteOperationTest {
   }
 
   protected static void assertResourceNotEquals(String existingContent, CharSequence newContent, boolean fileExists) {
-    assertFalse(ResourceWriteOperation.areContentsEqual(createMock(fileExists, existingContent), newContent, 3));
+    assertFalse(ResourceWriteOperation.areContentsEqual(createMock(fileExists, existingContent), newContent));
   }
 
   protected static IFile createMock(boolean exists, String fileContent) {

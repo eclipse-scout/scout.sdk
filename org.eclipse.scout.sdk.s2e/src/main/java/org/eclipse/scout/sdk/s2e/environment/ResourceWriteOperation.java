@@ -14,8 +14,6 @@ import static java.util.Collections.singletonList;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -24,7 +22,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.Chars;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.util.CharSequenceInputStream;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
@@ -86,44 +86,17 @@ public class ResourceWriteOperation implements IResourceWriteOperation {
   }
 
   public static boolean areContentsEqual(IFile file, CharSequence newContent) {
-    return areContentsEqual(file, newContent, 2048);
-  }
-
-  protected static boolean areContentsEqual(IFile file, CharSequence newContent, int blockSize) {
-    if (!file.exists()) {
+    if (file == null || !file.exists()) {
       return false;
     }
-    char[] buffer = new char[blockSize];
-    int length;
-    int blockStart = 0;
-    int total = 0;
-    try (Reader in = new InputStreamReader(file.getContents(), file.getCharset())) {
-      while ((length = in.read(buffer)) != -1) {
-        total += length;
-        if (newContent.length() < blockStart + length) {
-          return false;
-        }
-
-        if (!equalsBlock(buffer, blockStart, length, newContent)) {
-          return false;
-        }
-        blockStart += length;
-      }
-      return total == newContent.length();
+    try (InputStream in = file.getContents()) {
+      StringBuilder fileContent = Strings.fromInputStream(in, file.getCharset());
+      return Chars.equals(fileContent, newContent);
     }
     catch (IOException | CoreException e) {
       SdkLog.warning("Unable to read contents of file '{}'.", file, e);
       return false; // anyway try to write it
     }
-  }
-
-  protected static boolean equalsBlock(char[] a, int start, int length, CharSequence ref) {
-    for (int i = 0; i < length; i++) {
-      if (a[i] != ref.charAt(start + i)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   public static void mkdirs(IResource dir, IProgressMonitor monitor) throws CoreException {

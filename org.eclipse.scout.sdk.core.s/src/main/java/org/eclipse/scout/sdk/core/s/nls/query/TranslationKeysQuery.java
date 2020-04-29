@@ -12,15 +12,10 @@ package org.eclipse.scout.sdk.core.s.nls.query;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableSet;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-import java.nio.CharBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,11 +32,13 @@ import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsonTextKeySearch;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
+import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery;
+import org.eclipse.scout.sdk.core.util.Chars;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -56,8 +53,9 @@ public class TranslationKeysQuery implements IFileQuery {
 
   private final String m_name;
   private final List<String> m_searchKeys;
-  private final Map<Path, Map<String /* key */, Set<FileRange>>> m_result;
+  private final Map<Path, Map<String /* key */, Set<FileQueryMatch>>> m_result;
   private final Set<String> m_acceptedFileExtensions;
+  private final Map<char[], char[]> m_suffixAndPrefix;
 
   /**
    * @param nlsKey
@@ -80,23 +78,25 @@ public class TranslationKeysQuery implements IFileQuery {
   }
 
   protected TranslationKeysQuery(Collection<String> searchKeys, String queryName) {
+    Ensure.notNull(searchKeys);
     m_name = Ensure.notBlank(queryName);
 
-    List<String> searchPats = new ArrayList<>(Ensure.notNull(searchKeys).size() * 2);
-    for (String key : searchKeys) {
-      searchPats.add('"' + key + '"');
-      searchPats.add('\'' + key + '\''); // e.g. for search in .js files
-    }
-    m_searchKeys = unmodifiableList(searchPats);
-    m_acceptedFileExtensions = unmodifiableSet(new HashSet<>(Arrays.asList(JavaTypes.JAVA_FILE_EXTENSION, "js", "html")));
+    m_suffixAndPrefix = new HashMap<>();
+    m_suffixAndPrefix.put(new char[]{'"'}, new char[]{'"'});
+    m_suffixAndPrefix.put(new char[]{'`'}, new char[]{'`'});
+    m_suffixAndPrefix.put(new char[]{'\''}, new char[]{'\''});
+    m_suffixAndPrefix.put(JsonTextKeySearch.JSON_TEXT_KEY_PREFIX.toCharArray(), JsonTextKeySearch.JSON_TEXT_KEY_SUFFIX.toCharArray());
+
+    m_searchKeys = new ArrayList<>(searchKeys);
+    m_acceptedFileExtensions = TranslationPatterns.supportedFileExtensions();
     m_result = new ConcurrentHashMap<>();
   }
 
-  protected static List<String> getEditableKeys(TranslationStoreStack project) {
+  protected static Set<String> getEditableKeys(TranslationStoreStack project) {
     return project.allEntries()
         .filter(e -> e.store().isEditable())
         .map(ITranslationEntry::key)
-        .collect(toList());
+        .collect(toSet());
   }
 
   protected boolean acceptCandidate(FileQueryInput candidate) {
@@ -110,31 +110,42 @@ public class TranslationKeysQuery implements IFileQuery {
       return;
     }
 
-    progress.init(m_searchKeys.size(), name());
-    String fileContent = new String(candidate.fileContent());
-    for (String search : m_searchKeys) {
-      int pos = 0;
-      int index;
-      while ((index = fileContent.indexOf(search, pos)) >= 0) {
-        FileRange match = new FileRange(candidate.file(), CharBuffer.wrap(candidate.fileContent(), index, search.length()), index, index + search.length());
-        String key = search.substring(1, search.length() - 1); // remove starting and ending quotes
-        acceptNlsKeyMatch(key, match);
-        pos = index + search.length();
+    progress.init(m_suffixAndPrefix.size(), name());
+    char[] fileContent = candidate.fileContent();
+    for (Entry<char[], char[]> suffixAndPrefix : m_suffixAndPrefix.entrySet()) {
+      for (String key : m_searchKeys) {
+        char[] suffix = suffixAndPrefix.getKey();
+        char[] search = buildSearchPattern(suffix, key, suffixAndPrefix.getValue());
+        int pos = 0;
+        int index;
+        while ((index = Chars.indexOf(search, fileContent, pos)) >= 0) {
+          FileRange match = new FileRange(candidate.file(), key, index + suffix.length, index + suffix.length + key.length());
+          acceptNlsKeyMatch(key, match);
+          pos = index + search.length;
+        }
       }
       progress.worked(1);
     }
+  }
+
+  private static char[] buildSearchPattern(char[] prefix, String key, char[] suffix) {
+    char[] pat = new char[prefix.length + key.length() + suffix.length];
+    System.arraycopy(prefix, 0, pat, 0, prefix.length);
+    System.arraycopy(key.toCharArray(), 0, pat, prefix.length, key.length());
+    System.arraycopy(suffix, 0, pat, prefix.length + key.length(), suffix.length);
+    return pat;
   }
 
   protected void acceptNlsKeyMatch(String nlsKey, FileRange match) {
     m_result
         .computeIfAbsent(match.file(), file -> new ConcurrentHashMap<>())
         .computeIfAbsent(nlsKey, k -> ConcurrentHashMap.newKeySet())
-        .add(match);
+        .add(FileQueryMatch.fromFileRange(match));
   }
 
   @Override
-  public Set<FileRange> result(Path file) {
-    Map<String, Set<FileRange>> result = m_result.get(file);
+  public Set<FileQueryMatch> result(Path file) {
+    Map<String, Set<FileQueryMatch>> result = m_result.get(file);
     if (result == null) {
       return emptySet();
     }
@@ -145,7 +156,7 @@ public class TranslationKeysQuery implements IFileQuery {
   }
 
   @Override
-  public Stream<FileRange> result() {
+  public Stream<FileQueryMatch> result() {
     return m_result
         .values().stream()
         .map(Map::values)
@@ -156,10 +167,10 @@ public class TranslationKeysQuery implements IFileQuery {
   /**
    * @return A {@link Map} holding all findings grouped by {@link Translation} key.
    */
-  public Map<String, Set<FileRange>> resultByKey() {
-    Map<String, Set<FileRange>> resultByKey = new HashMap<>();
-    for (Map<String, Set<FileRange>> l : m_result.values()) {
-      for (Entry<String, Set<FileRange>> e : l.entrySet()) {
+  public Map<String, Set<FileQueryMatch>> resultByKey() {
+    Map<String, Set<FileQueryMatch>> resultByKey = new HashMap<>();
+    for (Map<String, Set<FileQueryMatch>> l : m_result.values()) {
+      for (Entry<String, Set<FileQueryMatch>> e : l.entrySet()) {
         resultByKey.computeIfAbsent(e.getKey(), k -> new HashSet<>()).addAll(e.getValue());
       }
     }
@@ -171,7 +182,7 @@ public class TranslationKeysQuery implements IFileQuery {
    *          The {@link Translation} key for which the findings should be returned.
    * @return All findings for a specific {@link Translation} key.
    */
-  public Stream<FileRange> result(String nlsKey) {
+  public Stream<FileQueryMatch> result(String nlsKey) {
     return m_result.values().stream()
         .map(map -> map.get(nlsKey))
         .filter(Objects::nonNull)

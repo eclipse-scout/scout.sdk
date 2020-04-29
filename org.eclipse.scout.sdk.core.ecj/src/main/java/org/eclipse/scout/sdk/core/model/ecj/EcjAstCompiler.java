@@ -16,6 +16,7 @@ import static org.eclipse.jdt.internal.compiler.DefaultErrorHandlingPolicies.pro
 
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.CharBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -180,7 +181,7 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
       if (!SdkLog.isLevelEnabled(VERBOSE_LOG_LEVEL)) {
         return;
       }
-      SdkLog.log(VERBOSE_LOG_LEVEL, new String(buffer, off, len));
+      SdkLog.log(VERBOSE_LOG_LEVEL, CharBuffer.wrap(buffer, off, len));
     }
 
     @Override

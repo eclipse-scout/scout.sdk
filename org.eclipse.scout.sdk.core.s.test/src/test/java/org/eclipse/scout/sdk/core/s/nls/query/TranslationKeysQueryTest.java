@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
@@ -29,6 +28,7 @@ import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
+import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -51,13 +51,14 @@ public class TranslationKeysQueryTest {
     searchIn(query, fileName, prefix + '"' + keyToFind1 + '"' + suffix, env);
     assertEquals(1, query.result().count());
 
-    int expectedEnd = prefix.length() + keyToFind1.length() + 2 /*leading and trailing '"' */;
-    FileRange finding = query.result(keyToFind1).findAny().get();
+    int expectedStart = prefix.length() + 1; /* leading '"' */
+    int expectedEnd = expectedStart + keyToFind1.length();
+    FileQueryMatch finding = query.result(keyToFind1).findAny().get();
     assertEquals(fileName, finding.file().toString());
-    assertEquals(keyToFind1.length() + 2/*leading and trailing '"' */, finding.length());
-    assertEquals(prefix.length(), finding.start());
+    assertEquals(keyToFind1.length(), finding.length());
+    assertEquals(expectedStart, finding.start());
     assertEquals(expectedEnd, finding.end());
-    assertEquals("FileRange [file=test.java, start=" + prefix.length() + ", end=" + expectedEnd + ", severity=" + Level.OFF.intValue() + "]", finding.toString());
+    assertEquals("FileRange [file=test.java, text=" + keyToFind1 + ", start=" + expectedStart + ", end=" + expectedEnd + "]", finding.toString());
 
     assertEquals(finding, finding);
     assertFalse(finding.equals(null));
@@ -81,7 +82,13 @@ public class TranslationKeysQueryTest {
     searchIn(query, "test2.html", "test content whatever html", env);
     searchIn(query, "test2.xml", "test content whatever xml \"" + keyToFind1 + '"', env);
 
-    assertEquals(4, query.result().count());
+    searchIn(query, "test2.js", "'${textKey:" + keyToFind1 + "}'", env);
+    searchIn(query, "test3.js", "`${textKey:" + keyToFind1 + "}`", env);
+    searchIn(query, "test4.js", "\"${textKey:" + keyToFind1 + "}\"", env);
+    searchIn(query, "test5.js", '"' + keyToFind1 + '"', env);
+    searchIn(query, "test6.js", '`' + keyToFind1 + '`', env);
+
+    assertEquals(9, query.result().count());
     assertEquals(0, query.result(Paths.get("notexisting")).size());
     assertEquals(2, query.result(Paths.get("test.js")).size());
 
@@ -90,11 +97,11 @@ public class TranslationKeysQueryTest {
         .map(Path::toString)
         .collect(toSet());
 
-    assertEquals(2, files.size());
+    assertEquals(7, files.size());
     assertTrue(files.contains(fileJs));
     assertTrue(files.contains(fileJava));
 
-    Map<String, Set<FileRange>> resultByKey = query.resultByKey();
+    Map<String, Set<FileQueryMatch>> resultByKey = query.resultByKey();
     assertEquals(2, resultByKey.size());
 
     Set<String> find2 = resultByKey.get(keyToFind2).stream().map(FileRange::file).map(Path::toString).collect(toSet());

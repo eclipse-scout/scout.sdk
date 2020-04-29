@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.nls.query;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.s.nls.query.TranslationKeysQueryTest.searchIn;
+import static org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.HtmlScoutMessageSearch.textToNextNewLine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +33,7 @@ import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvi
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
+import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
@@ -47,6 +49,7 @@ public class MissingTranslationQueryTest {
     String existingKey = "key";
 
     String htmlTestFile = "test.html";
+    String htmlTestFile4 = "test4.html";
     String javaTestFile2 = "test2.java";
     String javaTestFile3 = "test3.java";
     String javaTestFile4 = "test4.java";
@@ -60,6 +63,11 @@ public class MissingTranslationQueryTest {
     String jsTestFile2 = "test2.js";
     String jsTestFileWithNonExistingVariable = "test6.js";
     String jsTestFileWithUnresolvableConstant = "test8.js";
+
+    String jsTestFile15 = "test15.js";
+    String jsTestFile16 = "test16.js";
+    String jsTestFile17 = "test17.js";
+    String jsTestFile18 = "test18.js";
 
     MissingTranslationQuery query = createQueryWithKeys(existingKey);
 
@@ -79,9 +87,9 @@ public class MissingTranslationQueryTest {
 
     searchIn(query, jsTestFile1, "abc '${textKey:ee}' def", env); // finding
     searchIn(query, jsTestFile2, "abc session.text('ff') def", env); // finding
-    searchIn(query, "test3.js", "abc session.text('gg') def " + MissingTranslationQuery.IGNORE_MARKER, env); // ignore by marker
-    searchIn(query, "test4.js", "abc session.text('hh') def " + MissingTranslationQuery.IGNORE_MARKER + "\nnextline", env); // ignore by marker
-    searchIn(query, "test5.js", "abc session.text('ii') def " + MissingTranslationQuery.IGNORE_MARKER + "\r\nnextline", env); // ignore by marker
+    searchIn(query, "test3.js", "abc session.text('gg') def " + TranslationPatterns.IGNORE_MARKER, env); // ignore by marker
+    searchIn(query, "test4.js", "abc session.text('hh') def " + TranslationPatterns.IGNORE_MARKER + "\nnextline", env); // ignore by marker
+    searchIn(query, "test5.js", "abc session.text('ii') def " + TranslationPatterns.IGNORE_MARKER + "\r\nnextline", env); // ignore by marker
     searchIn(query, jsTestFileWithNonExistingVariable, "abc session.text(variable) def", env); // weak finding
     searchIn(query, "test7.js", "let variable = '" + existingKey + "'; abc; session.text(variable)} def", env); // ignored because key exists
     searchIn(query, jsTestFileWithUnresolvableConstant, "let variable = 'non_existing'; abc; session.text(variable)} def", env); // finding
@@ -90,11 +98,16 @@ public class MissingTranslationQueryTest {
     searchIn(query, "test11.js", "abc session.text('ii'+suffix) def \r\nnextline", env); // ignore because of suffix concatenation
     searchIn(query, "test12.js", "abc session.text('" + existingKey + "', param, param2) def \r\nnextline", env); // ignored because key exists
     searchIn(query, "test13.js", "abc ${textKey:ee} def", env); // ignored because json pattern is not in string
-    searchIn(query, "test14.js", "abc '${textKey:ee}' def // " + MissingTranslationQuery.IGNORE_MARKER, env); // ignored by marker
+    searchIn(query, "test14.js", "abc '${textKey:ee}' def // " + TranslationPatterns.IGNORE_MARKER, env); // ignored by marker
+    searchIn(query, jsTestFile15, "abc \"${textKey:ee}\" def", env); // finding
+    searchIn(query, jsTestFile16, "abc session.text(\"ff\") def", env); // finding
+    searchIn(query, jsTestFile17, "abc `${textKey:ee}` def", env); // finding
+    searchIn(query, jsTestFile18, "abc session.text(`ff`) def", env); // finding
 
     searchIn(query, htmlTestFile, "abc <scout:message key=\"jj\"> def", env); // finding
-    searchIn(query, "test2.html", "abc <scout:message key=\"jj\"> def <!-- " + MissingTranslationQuery.IGNORE_MARKER + " -->", env); // ignored by marker
+    searchIn(query, "test2.html", "abc <scout:message key=\"jj\"> def <!-- " + TranslationPatterns.IGNORE_MARKER + " -->", env); // ignored by marker
     searchIn(query, "test3.html", "abc <scout:message akey=\"jj\"> def", env); // ignored because wrong attribute
+    searchIn(query, htmlTestFile4, "abc <scout:message key='jj'> def", env); // finding
     searchIn(query, "test.xml", "abc <scout:message key=\"kk\"> def", env); // ignore because of file type
     searchIn(query, "abc/src/main/resources/archetype-resources/test.html", "abc <scout:message key=\"ll\"> def", env); // path ignored
 
@@ -111,7 +124,12 @@ public class MissingTranslationQueryTest {
         jsTestFile2,
         jsTestFileWithNonExistingVariable,
         jsTestFileWithUnresolvableConstant,
-        htmlTestFile)
+        jsTestFile15,
+        jsTestFile16,
+        jsTestFile17,
+        jsTestFile18,
+        htmlTestFile,
+        htmlTestFile4)
         .sorted()
         .collect(toList()),
         query.result()
@@ -168,11 +186,19 @@ public class MissingTranslationQueryTest {
             .collect(toList()));
   }
 
+  @Test
+  public void testTextToNextNewLine() {
+    assertEquals("abc", textToNextNewLine("abc\ndd".toCharArray(), 0).toString());
+    assertEquals("", textToNextNewLine("abc\ndd\r\nxx".toCharArray(), 3).toString());
+    assertEquals("dd", textToNextNewLine("abc\ndd\r\nxxdd".toCharArray(), 4).toString());
+    assertEquals("xdd", textToNextNewLine("abc\ndd\r\nxxdd".toCharArray(), 9).toString());
+  }
+
   protected static void assertFileRange(MissingTranslationQuery query, String fileName, int expectedStart, int expectedEnd, int expectedSeverity) {
-    Set<FileRange> htmlFileResult = query.result(Paths.get(fileName));
+    Set<FileQueryMatch> htmlFileResult = query.result(Paths.get(fileName));
     assertEquals(1, htmlFileResult.size());
 
-    FileRange finding = htmlFileResult.iterator().next();
+    FileQueryMatch finding = htmlFileResult.iterator().next();
     assertEquals(expectedStart, finding.start());
     assertEquals(expectedEnd, finding.end());
     assertEquals(expectedSeverity, finding.severity());

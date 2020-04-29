@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.nls.query.MissingTranslationQuery
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput
-import org.eclipse.scout.sdk.core.s.util.search.FileRange
+import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
@@ -72,7 +72,7 @@ open class MissingTranslationInspection : LocalInspectionTool() {
         return result
     }
 
-    protected fun toProblemDescription(range: FileRange, file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
+    protected fun toProblemDescription(range: FileQueryMatch, file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
         return IdeaEnvironment.computeInReadAction(file.project) {
             val element = file.findElementAt(range.start()) ?: return@computeInReadAction null
             val type = julLevelToProblemHighlightType(range.severity())

@@ -348,23 +348,6 @@ public final class JavaTypes {
     }
   }
 
-  private static int indexOf(char toBeFound, CharSequence array) {
-    return indexOf(toBeFound, array, 0);
-  }
-
-  private static int indexOf(char toBeFound, CharSequence array, int start) {
-    return indexOf(toBeFound, array, start, array.length());
-  }
-
-  private static int indexOf(char toBeFound, CharSequence searchIn, int start, int end) {
-    for (int i = start; i < end; i++) {
-      if (toBeFound == searchIn.charAt(i)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
   /**
    * Returns a string containing the package of the given name. Returns the empty string if it is not qualified.
    * <p>
@@ -386,22 +369,12 @@ public final class JavaTypes {
    *           if name is null
    */
   public static String qualifier(CharSequence name) {
-    int firstGenericStart = indexOf(C_GENERIC_START, name);
-    int lastDot = lastIndexOf(C_DOT, name, 0, firstGenericStart == -1 ? name.length() - 1 : firstGenericStart);
+    int firstGenericStart = Chars.indexOf(C_GENERIC_START, name);
+    int lastDot = Chars.lastIndexOf(C_DOT, name, 0, firstGenericStart == -1 ? name.length() - 1 : firstGenericStart);
     if (lastDot == -1) {
       return "";
     }
     return name.subSequence(0, lastDot).toString();
-  }
-
-  @SuppressWarnings("squid:S881")
-  private static int lastIndexOf(char toBeFound, CharSequence array, int startIndex, int endIndex) {
-    for (int i = endIndex; --i >= startIndex;) {
-      if (toBeFound == array.charAt(i)) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   /**
@@ -485,7 +458,7 @@ public final class JavaTypes {
    *           if the given type is syntactically incorrect
    */
   public static String erasure(CharSequence parameterizedType) {
-    int firstParamIndex = indexOf(C_GENERIC_START, parameterizedType);
+    int firstParamIndex = Chars.indexOf(C_GENERIC_START, parameterizedType);
     if (firstParamIndex < 0) {
       return parameterizedType.toString();
     }
@@ -662,7 +635,7 @@ public final class JavaTypes {
         return end + 1;
       }
 
-      int arrayStart = indexOf(C_ARRAY, src, fqnStart, end);
+      int arrayStart = Chars.indexOf(C_ARRAY, src, fqnStart, end);
       boolean isArray = arrayStart > fqnStart;
 
       CharSequence fqn = src.subSequence(fqnStart, isArray ? arrayStart : end);

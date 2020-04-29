@@ -22,11 +22,13 @@ import org.slf4j.helpers.MessageFormatter;
  *
  * @since 5.2.0
  */
+@SuppressWarnings("SerializableDeserializableClassInSecureContext")
 public class SimpleLogger extends MarkerIgnoringBase {
 
   private static final long serialVersionUID = 1L;
   private final String m_name;
 
+  @SuppressWarnings("unused")
   static void init() {
     // required! see org.slf4j.impl.MavenSlf4jSimpleFriend
   }
@@ -190,7 +192,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
     log(Level.SEVERE, msg, t);
   }
 
-  private static void log(Level level, String message, Throwable t) {
+  private static void log(Level level, CharSequence message, Throwable t) {
     SdkLog.log(level, message, t);
   }
 

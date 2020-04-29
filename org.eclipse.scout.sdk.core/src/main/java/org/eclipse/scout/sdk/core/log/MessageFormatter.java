@@ -39,14 +39,14 @@ public final class MessageFormatter {
    * corresponding argument in the given array.
    *
    * @param msg
-   *          The {@link String} that holds the message with the formatting anchors.
+   *          The {@link CharSequence} that holds the message with the formatting anchors.
    * @param args
    *          The arguments.
    * @return A {@link FormattingTuple} with the parsed values. In this result all formatting anchors have been replaced
    *         with the corresponding values.
    */
-  public static FormattingTuple arrayFormat(String msg, Object... args) {
-    String rawMessage = msg;
+  public static FormattingTuple arrayFormat(CharSequence msg, Object... args) {
+    CharSequence rawMessage = msg;
     if (rawMessage == null) {
       rawMessage = "";
     }

@@ -24,13 +24,13 @@ public interface IFileQueryResult {
    *          The file for which the matches should be returned.
    * @return The {@link FileRange ranges} in the file specified that match the query search.
    */
-  Set<FileRange> result(Path file);
+  Set<FileQueryMatch> result(Path file);
 
   /**
    * @return All {@link FileRange matches} of the query. The result depends on the scope on which the query has been
    *         executed.
    */
-  Stream<FileRange> result();
+  Stream<FileQueryMatch> result();
 
   /**
    * @return The name or description of the query.

@@ -83,7 +83,7 @@ public interface IProgress {
    *          holders.
    * @return this instance.
    */
-  IProgress init(int totalWork, String name, Object... args);
+  IProgress init(int totalWork, CharSequence name, Object... args);
 
   /**
    * Creates a sub {@link IProgress} that will consume the given number of ticks from the receiver. See
@@ -92,7 +92,7 @@ public interface IProgress {
    * It is not necessary to allocate ticks on the result. In that case the ticks will be consumed as soon as the next
    * child {@link IProgress} is created.<br>
    * However, the resulting progress monitor will not report any intermediate work before ticks are allocated. Ticks may
-   * be allocated by calling {@link #init(int, String, Object...)} or {@link #setWorkRemaining(int)}.
+   * be allocated by calling {@link #init(int, CharSequence, Object...)} or {@link #setWorkRemaining(int)}.
    * <p>
    * This method must throw a specific {@link RuntimeException} if called on an {@link IProgress} that has been
    * canceled!

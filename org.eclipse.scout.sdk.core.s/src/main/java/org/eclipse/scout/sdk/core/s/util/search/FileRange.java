@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.s.util.search;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.logging.Level;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
 
@@ -27,7 +26,6 @@ public class FileRange {
   private final CharSequence m_textOfRange;
   private final int m_start;
   private final int m_end;
-  private final int m_severity;
 
   /**
    * @param file
@@ -40,27 +38,10 @@ public class FileRange {
    *          The zero based end index.
    */
   public FileRange(Path file, CharSequence textOfRange, int start, int end) {
-    this(file, textOfRange, start, end, Level.OFF.intValue());
-  }
-
-  /**
-   * @param file
-   *          The file {@link Path}
-   * @param textOfRange
-   *          The text in the file at the range specified
-   * @param start
-   *          The zero based start index.
-   * @param end
-   *          The zero based end index.
-   * @param severity
-   *          The severity of the section. One of the {@link Level} constants.
-   */
-  public FileRange(Path file, CharSequence textOfRange, int start, int end, int severity) {
     m_file = Ensure.notNull(file);
     m_textOfRange = Ensure.notNull(textOfRange);
     m_start = start;
     m_end = end;
-    m_severity = severity;
   }
 
   /**
@@ -98,13 +79,6 @@ public class FileRange {
     return m_end - m_start;
   }
 
-  /**
-   * @return The severity of the {@link FileRange}. One of the {@link Level} constants.
-   */
-  public int severity() {
-    return m_severity;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -116,22 +90,22 @@ public class FileRange {
     FileRange fileRange = (FileRange) o;
     return m_start == fileRange.m_start
         && m_end == fileRange.m_end
-        && m_severity == fileRange.m_severity
+        && m_textOfRange.equals(fileRange.m_textOfRange)
         && m_file.equals(fileRange.m_file);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_file, m_start, m_end, m_severity);
+    return Objects.hash(m_file, m_textOfRange, m_start, m_end);
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", FileRange.class.getSimpleName() + " [", "]")
         .add("file=" + m_file)
+        .add("text=" + m_textOfRange)
         .add("start=" + m_start)
         .add("end=" + m_end)
-        .add("severity=" + m_severity)
         .toString();
   }
 }

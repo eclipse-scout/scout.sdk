@@ -69,7 +69,7 @@ public final class SdkLog {
    *          there are more arguments than place holders in the message, the remaining arguments are searched for
    *          {@link Throwable}s whose stack trace is logged as well (see examples above).
    */
-  public static void log(Level level, String msg, Object... args) {
+  public static void log(Level level, CharSequence msg, Object... args) {
     if (level == null) {
       level = DEFAULT_LOG_LEVEL;
     }
@@ -101,7 +101,7 @@ public final class SdkLog {
    * Logs the given {@link Throwable}s with {@link Level#FINE}.
    *
    * @param args
-   *          The {@link Throwable}s to log. See {@link #log(Level, String, Object...)} for details.
+   *          The {@link Throwable}s to log. See {@link #log(Level, CharSequence, Object...)} for details.
    */
   public static void debug(Object... args) {
     debug(null, args);
@@ -113,9 +113,9 @@ public final class SdkLog {
    * @param message
    *          The message. May be {@code null}.
    * @param args
-   *          Arguments. See {@link #log(Level, String, Object...)} for details.
+   *          Arguments. See {@link #log(Level, CharSequence, Object...)} for details.
    */
-  public static void debug(String message, Object... args) {
+  public static void debug(CharSequence message, Object... args) {
     log(Level.FINE, message, args);
   }
 
@@ -123,7 +123,7 @@ public final class SdkLog {
    * Logs the given {@link Throwable}s with {@link Level#INFO}.
    *
    * @param args
-   *          The {@link Throwable}s to log. See {@link #log(Level, String, Object...)} for details.
+   *          The {@link Throwable}s to log. See {@link #log(Level, CharSequence, Object...)} for details.
    */
   public static void info(Object... args) {
     info(null, args);
@@ -135,9 +135,9 @@ public final class SdkLog {
    * @param message
    *          The message. May be {@code null}.
    * @param args
-   *          Arguments. See {@link #log(Level, String, Object...)} for details.
+   *          Arguments. See {@link #log(Level, CharSequence, Object...)} for details.
    */
-  public static void info(String message, Object... args) {
+  public static void info(CharSequence message, Object... args) {
     log(Level.INFO, message, args);
   }
 
@@ -145,7 +145,7 @@ public final class SdkLog {
    * Logs the given {@link Throwable}s with {@link Level#WARNING}.
    *
    * @param args
-   *          The {@link Throwable}s to log. See {@link #log(Level, String, Object...)} for details.
+   *          The {@link Throwable}s to log. See {@link #log(Level, CharSequence, Object...)} for details.
    */
   public static void warning(Object... args) {
     warning(null, args);
@@ -157,9 +157,9 @@ public final class SdkLog {
    * @param message
    *          The message. May be {@code null}.
    * @param args
-   *          Arguments. See {@link #log(Level, String, Object...)} for details.
+   *          Arguments. See {@link #log(Level, CharSequence, Object...)} for details.
    */
-  public static void warning(String message, Object... args) {
+  public static void warning(CharSequence message, Object... args) {
     log(Level.WARNING, message, args);
   }
 
@@ -167,7 +167,7 @@ public final class SdkLog {
    * Logs the given {@link Throwable}s with {@link Level#SEVERE}.
    *
    * @param args
-   *          The {@link Throwable}s to log. See {@link #log(Level, String, Object...)} for details.
+   *          The {@link Throwable}s to log. See {@link #log(Level, CharSequence, Object...)} for details.
    */
   public static void error(Object... args) {
     error("", args);
@@ -179,9 +179,9 @@ public final class SdkLog {
    * @param message
    *          The message. May be {@code null}.
    * @param args
-   *          Arguments. See {@link #log(Level, String, Object...)} for details.
+   *          Arguments. See {@link #log(Level, CharSequence, Object...)} for details.
    */
-  public static void error(String message, Object... args) {
+  public static void error(CharSequence message, Object... args) {
     log(Level.SEVERE, message, args);
   }
 

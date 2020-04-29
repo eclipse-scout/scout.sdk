@@ -40,7 +40,7 @@ public class SdkException extends RuntimeException {
    *          optional arguments to substitute formatting anchors in the message, with the last argument used as the
    *          exception's cause if of type {@link Throwable} and not referenced in the message.
    */
-  public SdkException(String message, Object... args) {
+  public SdkException(CharSequence message, Object... args) {
     this(MessageFormatter.arrayFormat(message, args));
   }
 

@@ -27,7 +27,7 @@ open class IdeaProgress(ind: ProgressIndicator?) : IProgress {
     private var m_percentDone = 0.0
     private var m_percentToConsume = 1.0
 
-    override fun init(totalWork: Int, name: String?, vararg args: Any?): IdeaProgress {
+    override fun init(totalWork: Int, name: CharSequence?, vararg args: Any?): IdeaProgress {
         val msg = arrayFormat(name, *args).message()
         if (Strings.hasText(msg)) {
             SdkLog.debug(msg)

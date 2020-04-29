@@ -456,7 +456,7 @@ public final class S2eUiUtils {
    * @see IFileQueryResult
    * @see EclipseWorkspaceWalker
    */
-  public static void queryResultToSearchResult(Stream<FileRange> from, FileSearchResult to) {
+  public static void queryResultToSearchResult(Stream<? extends FileRange> from, FileSearchResult to) {
     to.removeAll();
     from
         .map(S2eUiUtils::toEclipseMatch)
