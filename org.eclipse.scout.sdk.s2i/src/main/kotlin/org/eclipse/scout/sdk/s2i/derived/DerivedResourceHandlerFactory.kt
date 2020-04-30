@@ -12,11 +12,8 @@ package org.eclipse.scout.sdk.s2i.derived
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.SearchScope
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment
-import org.eclipse.scout.sdk.core.s.environment.IFuture
-import org.eclipse.scout.sdk.core.s.environment.IProgress
-import java.util.function.BiFunction
+import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler
 
 interface DerivedResourceHandlerFactory {
-    fun createHandlersFor(scope: SearchScope, project: Project): Sequence<BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>>
+    fun createHandlersFor(scope: SearchScope, project: Project): Sequence<IDerivedResourceHandler>
 }

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.environment;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.unmodifiableCollection;
+import static org.eclipse.scout.sdk.core.log.SdkLog.onTrace;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -106,7 +107,7 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
         throw new SdkException(e);
       }
       catch (CancellationException e) {
-        SdkLog.debug("Cancellation silently ignored", e);
+        SdkLog.debug("Cancellation silently ignored", onTrace(e));
       }
     }
     if (errors.isEmpty()) {
@@ -170,7 +171,7 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
       join();
     }
     catch (CancellationException e) {
-      SdkLog.debug("Cancellation silently ignored", e);
+      SdkLog.debug("Cancellation silently ignored", onTrace(e));
     }
     return this;
   }

@@ -55,17 +55,19 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
     m_source = new FinalValue<>();
   }
 
-  protected static TypeBinding ensureResolvedType(Scope scope, Expression r) {
+  protected TypeBinding ensureResolvedType(Scope scope, Expression r) {
     TypeBinding resolvedType = r.resolvedType;
     if (resolvedType != null) {
       return resolvedType;
     }
 
-    if (scope instanceof ClassScope) {
-      r.resolveType((ClassScope) scope);
-    }
-    else {
-      r.resolveType((BlockScope) scope);
+    synchronized (javaEnvWithEcj().lock()) {
+      if (scope instanceof ClassScope) {
+        r.resolveType((ClassScope) scope);
+      }
+      else {
+        r.resolveType((BlockScope) scope);
+      }
     }
     return r.resolvedType;
   }

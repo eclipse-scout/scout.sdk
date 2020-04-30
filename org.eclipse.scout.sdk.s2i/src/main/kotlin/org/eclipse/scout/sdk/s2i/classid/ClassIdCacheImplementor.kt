@@ -14,6 +14,7 @@ import com.intellij.codeInsight.daemon.HighlightDisplayKey
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.profile.codeInspection.InspectionProjectProfileManager
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
@@ -27,9 +28,12 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInRe
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
 import java.util.Collections.newSetFromMap
+import java.util.concurrent.CompletableFuture.completedFuture
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 
-open class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(), ClassIdCache {
+class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(), ClassIdCache {
 
     private val m_classIdCache = ConcurrentHashMap<String /* class id */, MutableSet<String /* fqn */>>()
     private val m_fileCache = ConcurrentHashMap<String /* file path */, MutableMap<String /* fqn */, String /* classid */>>()
@@ -38,7 +42,7 @@ open class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(
     private var m_cacheReady = false
 
     init {
-        scheduleCacheSetup()
+        Disposer.register(project, this) // ensure it is disposed when the project closes
     }
 
     fun isCacheRequired(): Boolean = !project.isDisposed && project.isOpen
@@ -63,14 +67,11 @@ open class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(
 
     override fun isCacheReady() = m_cacheReady
 
-    internal fun scheduleCacheSetup() {
+    override fun scheduleCacheSetupIfEnabled(): Future<*> {
         if (!isCacheRequired()) {
-            return
+            return completedFuture(null)
         }
-        AppExecutorUtil.getAppExecutorService().submit {
-            setup()
-            duplicates().forEach { SdkLog.debug("Duplicate @ClassId value '{}' found for types {}.", it.key, it.value) }
-        }
+        return AppExecutorUtil.getAppScheduledExecutorService().schedule(this::setup, 5, TimeUnit.SECONDS)
     }
 
     override fun setup() = synchronized(m_classIdCache) {
@@ -85,6 +86,7 @@ open class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(
                 PsiManager.getInstance(project).addPsiTreeChangeListener(this) // initial cache is ready, register listener to keep it up to date
                 m_cacheReady = true
             }
+            duplicates().forEach { SdkLog.debug("Duplicate @ClassId value '{}' found for types {}.", it.key, it.value) }
         } catch (t: Exception) {
             SdkLog.warning("Error building @ClassId value cache.", t)
         }

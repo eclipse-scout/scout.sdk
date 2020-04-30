@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IResource;
@@ -39,6 +38,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -69,7 +69,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   private final P_ResourceChangeEventCheckJob m_javaDeltaCheckJob;
 
   // queue that buffers all trigger operations that need to be executed
-  private final BlockingQueue<BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>>> m_triggerHandlers;
+  private final BlockingQueue<IDerivedResourceHandler> m_triggerHandlers;
   // job that executes all the buffered trigger operations (visible to the user)
   private final P_RunQueuedTriggerHandlersJob m_runQueuedTriggerHandlersJob;
 
@@ -152,7 +152,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     boolean added = false;
     try {
       IJavaSearchScope searchScope = JdtUtils.createJavaSearchScope(resources);
-      for (BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>> handler : createOperations(resources, searchScope)) {
+      for (IDerivedResourceHandler handler : createOperations(resources, searchScope)) {
         if (!m_triggerHandlers.contains(handler)) {
           if (addElementToQueueSecure(m_triggerHandlers, handler, handler.toString(), -1, null)) {
             //ok, continue
@@ -197,11 +197,11 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     return false;
   }
 
-  protected Collection<BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>>> createOperations(Set<IResource> resources, IJavaSearchScope searchScope) {
-    List<BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>>> all = null;
+  protected Collection<IDerivedResourceHandler> createOperations(Set<IResource> resources, IJavaSearchScope searchScope) {
+    List<IDerivedResourceHandler> all = null;
     for (IDerivedResourceHandlerFactory factory : m_updateHandlerFactories) {
       try {
-        List<BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>>> ops = factory.createHandlersFor(resources, searchScope);
+        List<IDerivedResourceHandler> ops = factory.createHandlersFor(resources, searchScope);
         if (ops != null && !ops.isEmpty()) {
           if (all == null) {
             all = new ArrayList<>();
@@ -404,10 +404,10 @@ public class DerivedResourceManager implements IDerivedResourceManager {
    */
   private static final class P_RunQueuedTriggerHandlersJob extends AbstractJob {
 
-    private final BlockingQueue<BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>>> m_queueToConsume;
+    private final BlockingQueue<IDerivedResourceHandler> m_queueToConsume;
     private boolean m_isAborted;
 
-    private P_RunQueuedTriggerHandlersJob(BlockingQueue<BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>>> queueToConsume) {
+    private P_RunQueuedTriggerHandlersJob(BlockingQueue<IDerivedResourceHandler> queueToConsume) {
       super("Auto-updating derived resources");
       setRule(RunTriggerHandlersJobRule.INSTANCE);
       setPriority(Job.DECORATE);
@@ -477,7 +477,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         }
 
         // already remove the operation here. if there is a problem with this operation we don't want to keep trying
-        BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>> handler = m_queueToConsume.poll();
+        IDerivedResourceHandler handler = m_queueToConsume.poll();
         if (handler == null) {
           continue;
         }
@@ -506,7 +506,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       SdkFuture.awaitAllLoggingOnError(executedFileWrites); // wait until all write operations are executed. otherwise the java environment might already be closed while writing jobs are using it
     }
 
-    private static Collection<? extends IFuture<?>> executeHandler(BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>> handler, IEnvironment env, IProgress progress) {
+    private static Collection<? extends IFuture<?>> executeHandler(IDerivedResourceHandler handler, IEnvironment env, IProgress progress) {
       long start = System.currentTimeMillis();
       try {
         return handler.apply(env, progress);

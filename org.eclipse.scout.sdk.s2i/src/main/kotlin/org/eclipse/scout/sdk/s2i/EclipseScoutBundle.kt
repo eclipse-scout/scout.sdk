@@ -15,7 +15,6 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.s2i.classid.ClassIdCache
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.jetbrains.annotations.PropertyKey
@@ -29,8 +28,8 @@ class EclipseScoutBundle : StartupActivity, DumbAware {
      * Executed on [Project] open
      */
     override fun runActivity(project: Project) {
-        Disposer.register(project, derivedResourceManager(project))
-        Disposer.register(project, classIdCache(project))
+        derivedResourceManager(project).start() // it will dispose itself
+        classIdCache(project).scheduleCacheSetupIfEnabled() // it will dispose itself
     }
 
     companion object {

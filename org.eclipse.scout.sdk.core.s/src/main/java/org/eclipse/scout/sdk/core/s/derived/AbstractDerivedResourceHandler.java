@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.s.derived;
 import static java.util.Collections.emptyList;
 
 import java.util.Collection;
-import java.util.function.BiFunction;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -29,7 +28,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
  *
  * @since 5.2.0
  */
-public abstract class AbstractDerivedResourceHandler implements BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>> {
+public abstract class AbstractDerivedResourceHandler implements IDerivedResourceHandler {
 
   private final IDerivedResourceInput m_input;
 

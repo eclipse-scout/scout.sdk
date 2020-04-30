@@ -135,9 +135,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     if (desc.getArrayDimension() > 0) {
       TypeBinding b = Ensure.notNull(((AbstractTypeWithEcj) result).getInternalBinding(), "Cannot find internal binding to create array type.");
       ArrayBinding arrayType;
-      synchronized (lock()) {
-        arrayType = getCompiler().lookupEnvironment.createArrayType(b, desc.getArrayDimension());
-      }
+      arrayType = getCompiler().lookupEnvironment.createArrayType(b, desc.getArrayDimension());
       return SpiWithEcjUtils.bindingToType(this, arrayType);
     }
     return result;
@@ -416,149 +414,193 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
 
   public VoidTypeWithEcj createVoidType() {
     assertInitialized();
-    return (VoidTypeWithEcj) m_elements.computeIfAbsent(VoidTypeWithEcj.class, k -> new VoidTypeWithEcj(this));
+    synchronized (lock()) {
+      return (VoidTypeWithEcj) m_elements.computeIfAbsent(VoidTypeWithEcj.class, k -> new VoidTypeWithEcj(this));
+    }
   }
 
   public WildcardOnlyTypeWithEcj createWildcardOnlyType() {
     assertInitialized();
-    return (WildcardOnlyTypeWithEcj) m_elements.computeIfAbsent(WildcardOnlyTypeWithEcj.class, k -> new WildcardOnlyTypeWithEcj(this));
+    synchronized (lock()) {
+      return (WildcardOnlyTypeWithEcj) m_elements.computeIfAbsent(WildcardOnlyTypeWithEcj.class, k -> new WildcardOnlyTypeWithEcj(this));
+    }
   }
 
   public BindingAnnotationWithEcj createBindingAnnotation(AnnotatableSpi owner, AnnotationBinding binding) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(binding);
-    return (BindingAnnotationWithEcj) m_elements.computeIfAbsent(key, k -> new BindingAnnotationWithEcj(this, owner, binding));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(binding);
+      return (BindingAnnotationWithEcj) m_elements.computeIfAbsent(key, k -> new BindingAnnotationWithEcj(this, owner, binding));
+    }
   }
 
   public BindingAnnotationElementWithEcj createBindingAnnotationValue(AnnotationSpi owner, ElementValuePair bindingPair, boolean syntheticDefaultValue) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(owner, bindingPair);
-    return (BindingAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new BindingAnnotationElementWithEcj(this, owner, bindingPair, syntheticDefaultValue));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(owner, bindingPair);
+      return (BindingAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new BindingAnnotationElementWithEcj(this, owner, bindingPair, syntheticDefaultValue));
+    }
   }
 
   public NullAnnotationElementWithEcj createNullAnnotationValue(AnnotationSpi owner, String name, boolean syntheticDefaultValue) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(NullAnnotationElementWithEcj.class, owner, name);
-    return (NullAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new NullAnnotationElementWithEcj(this, owner, name, syntheticDefaultValue));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(NullAnnotationElementWithEcj.class, owner, name);
+      return (NullAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new NullAnnotationElementWithEcj(this, owner, name, syntheticDefaultValue));
+    }
   }
 
   public BindingArrayTypeWithEcj createBindingArrayType(ArrayBinding binding, boolean isWildcard) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(binding, isWildcard);
-    return (BindingArrayTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingArrayTypeWithEcj(this, binding, isWildcard));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(binding, isWildcard);
+      return (BindingArrayTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingArrayTypeWithEcj(this, binding, isWildcard));
+    }
   }
 
   public BindingBaseTypeWithEcj createBindingBaseType(BaseTypeBinding binding) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(binding);
-    return (BindingBaseTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingBaseTypeWithEcj(this, binding));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(binding);
+      return (BindingBaseTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingBaseTypeWithEcj(this, binding));
+    }
   }
 
   public BindingFieldWithEcj createBindingField(AbstractTypeWithEcj declaringType, FieldBinding binding) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(binding);
-    return (BindingFieldWithEcj) m_elements.computeIfAbsent(key, k -> new BindingFieldWithEcj(this, declaringType, binding));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(binding);
+      return (BindingFieldWithEcj) m_elements.computeIfAbsent(key, k -> new BindingFieldWithEcj(this, declaringType, binding));
+    }
   }
 
   public BindingMethodWithEcj createBindingMethod(BindingTypeWithEcj declaringType, MethodBinding binding) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(binding);
-    return (BindingMethodWithEcj) m_elements.computeIfAbsent(key, k -> new BindingMethodWithEcj(this, declaringType, binding));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(binding);
+      return (BindingMethodWithEcj) m_elements.computeIfAbsent(key, k -> new BindingMethodWithEcj(this, declaringType, binding));
+    }
   }
 
   public BindingMethodParameterWithEcj createBindingMethodParameter(BindingMethodWithEcj declaringMethod, TypeBinding binding, char[] name, int flags, int index) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(BindingMethodParameterWithEcj.class, declaringMethod, binding, index);
-    return (BindingMethodParameterWithEcj) m_elements.computeIfAbsent(key, k -> new BindingMethodParameterWithEcj(this, declaringMethod, binding, name, flags, index));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(BindingMethodParameterWithEcj.class, declaringMethod, binding, index);
+      return (BindingMethodParameterWithEcj) m_elements.computeIfAbsent(key, k -> new BindingMethodParameterWithEcj(this, declaringMethod, binding, name, flags, index));
+    }
   }
 
   public BindingTypeWithEcj createBindingType(ReferenceBinding binding, BindingTypeWithEcj declaringType, boolean isWildcard) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(binding, isWildcard);
-    return (BindingTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingTypeWithEcj(this, binding, declaringType, isWildcard));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(binding, isWildcard);
+      return (BindingTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingTypeWithEcj(this, binding, declaringType, isWildcard));
+    }
   }
 
   public BindingTypeParameterWithEcj createBindingTypeParameter(AbstractMemberWithEcj<?> declaringMember, TypeVariableBinding binding, int index) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(declaringMember, binding, index);
-    return (BindingTypeParameterWithEcj) m_elements.computeIfAbsent(key, k -> new BindingTypeParameterWithEcj(this, declaringMember, binding, index));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(declaringMember, binding, index);
+      return (BindingTypeParameterWithEcj) m_elements.computeIfAbsent(key, k -> new BindingTypeParameterWithEcj(this, declaringMember, binding, index));
+    }
   }
 
   public DeclarationAnnotationWithEcj createDeclarationAnnotation(AnnotatableSpi owner, Annotation astNode) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(astNode);
-    return (DeclarationAnnotationWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationAnnotationWithEcj(this, owner, astNode));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(astNode);
+      return (DeclarationAnnotationWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationAnnotationWithEcj(this, owner, astNode));
+    }
   }
 
   public DeclarationAnnotationElementWithEcj createDeclarationAnnotationValue(AnnotationSpi declaringAnnotation, MemberValuePair astNode, boolean syntheticDefaultValue) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(astNode);
-    return (DeclarationAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationAnnotationElementWithEcj(this, declaringAnnotation, astNode, syntheticDefaultValue));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(astNode);
+      return (DeclarationAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationAnnotationElementWithEcj(this, declaringAnnotation, astNode, syntheticDefaultValue));
+    }
   }
 
   public DeclarationCompilationUnitWithEcj createDeclarationCompilationUnit(CompilationUnitDeclaration astNode) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(astNode);
-    return (DeclarationCompilationUnitWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationCompilationUnitWithEcj(this, astNode));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(astNode);
+      return (DeclarationCompilationUnitWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationCompilationUnitWithEcj(this, astNode));
+    }
   }
 
   public DeclarationFieldWithEcj createDeclarationField(DeclarationTypeWithEcj declaringType, FieldDeclaration astNode) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(astNode);
-    return (DeclarationFieldWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationFieldWithEcj(this, declaringType, astNode));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(astNode);
+      return (DeclarationFieldWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationFieldWithEcj(this, declaringType, astNode));
+    }
   }
 
   public DeclarationImportWithEcj createDeclarationImport(DeclarationCompilationUnitWithEcj owner, ImportReference astNode) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(astNode);
-    return (DeclarationImportWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationImportWithEcj(this, owner, astNode));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(astNode);
+      return (DeclarationImportWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationImportWithEcj(this, owner, astNode));
+    }
   }
 
   public DeclarationMethodWithEcj createDeclarationMethod(DeclarationTypeWithEcj declaringType, AbstractMethodDeclaration astNode) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(astNode);
-    return (DeclarationMethodWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationMethodWithEcj(this, declaringType, astNode));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(astNode);
+      return (DeclarationMethodWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationMethodWithEcj(this, declaringType, astNode));
+    }
   }
 
   public DeclarationMethodParameterWithEcj createDeclarationMethodParameter(DeclarationMethodWithEcj declaringMethod, Argument astNode, int index) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(astNode);
-    return (DeclarationMethodParameterWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationMethodParameterWithEcj(this, declaringMethod, astNode, index));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(astNode);
+      return (DeclarationMethodParameterWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationMethodParameterWithEcj(this, declaringMethod, astNode, index));
+    }
   }
 
   public DeclarationTypeWithEcj createDeclarationType(CompilationUnitSpi cu, DeclarationTypeWithEcj declaringType, TypeDeclaration astNode) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(astNode);
-    return (DeclarationTypeWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationTypeWithEcj(this, cu, declaringType, astNode));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(astNode);
+      return (DeclarationTypeWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationTypeWithEcj(this, cu, declaringType, astNode));
+    }
   }
 
   public DeclarationTypeParameterWithEcj createDeclarationTypeParameter(AbstractMemberWithEcj<?> declaringMember, TypeParameter astNode, int index) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(astNode);
-    return (DeclarationTypeParameterWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationTypeParameterWithEcj(this, declaringMember, astNode, index));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(astNode);
+      return (DeclarationTypeParameterWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationTypeParameterWithEcj(this, declaringMember, astNode, index));
+    }
   }
 
   public PackageWithEcj createPackage(String name) {
     assertInitialized();
-    CompositeObject key = new CompositeObject(PackageWithEcj.class, name);
-    return (PackageWithEcj) m_elements.computeIfAbsent(key, k -> new PackageWithEcj(this, name));
+    synchronized (lock()) {
+      CompositeObject key = new CompositeObject(PackageWithEcj.class, name);
+      return (PackageWithEcj) m_elements.computeIfAbsent(key, k -> new PackageWithEcj(this, name));
+    }
+  }
+
+  public PackageWithEcj createDefaultPackage() {
+    return createPackage(null);
   }
 
   @Override
   public PackageSpi getPackage(String name) {
-    assertInitialized();
     return createPackage(name);
-  }
-
-  public PackageWithEcj createDefaultPackage() {
-    assertInitialized();
-    return createPackage(null);
   }
 
   public SyntheticCompilationUnitWithEcj createSyntheticCompilationUnit(BindingTypeWithEcj mainType) {
     assertInitialized();
-    SameCompositeObject key = new SameCompositeObject(SyntheticCompilationUnitWithEcj.class, mainType);
-    return (SyntheticCompilationUnitWithEcj) m_elements.computeIfAbsent(key, k -> new SyntheticCompilationUnitWithEcj(this, mainType));
+    synchronized (lock()) {
+      SameCompositeObject key = new SameCompositeObject(SyntheticCompilationUnitWithEcj.class, mainType);
+      return (SyntheticCompilationUnitWithEcj) m_elements.computeIfAbsent(key, k -> new SyntheticCompilationUnitWithEcj(this, mainType));
+    }
   }
 
   /**
@@ -567,7 +609,9 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
    */
   public Map<String, ElementValuePair> getBindingAnnotationSyntheticDefaultValues(ReferenceBinding annotationType) {
     assertInitialized();
-    return m_evpCache.computeIfAbsent(annotationType, JavaEnvironmentWithEcj::computeBindingAnnotationSyntheticDefaultValues);
+    synchronized (lock()) {
+      return m_evpCache.computeIfAbsent(annotationType, JavaEnvironmentWithEcj::computeBindingAnnotationSyntheticDefaultValues);
+    }
   }
 
   protected static Map<String, ElementValuePair> computeBindingAnnotationSyntheticDefaultValues(ReferenceBinding annotationType) {
@@ -595,7 +639,9 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
 
   public Map<String, MemberValuePair> getDeclarationAnnotationSyntheticDefaultValues(TypeBinding typeBinding) {
     assertInitialized();
-    return m_mvpCache.computeIfAbsent(typeBinding, JavaEnvironmentWithEcj::computeDeclarationAnnotationSyntheticDefaultValues);
+    synchronized (lock()) {
+      return m_mvpCache.computeIfAbsent(typeBinding, JavaEnvironmentWithEcj::computeDeclarationAnnotationSyntheticDefaultValues);
+    }
   }
 
   protected static Map<String, MemberValuePair> computeDeclarationAnnotationSyntheticDefaultValues(TypeBinding typeBinding) {

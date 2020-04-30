@@ -453,7 +453,7 @@ public final class SpiWithEcjUtils {
    * {@link FieldBinding}, {@link AnnotationBinding}
    */
   @SuppressWarnings("pmd:NPathComplexity")
-  static Object compileExpression(Expression expression, ClassScope scopeForTypeLookup) {
+  static Object compileExpression(Expression expression, ClassScope scopeForTypeLookup, JavaEnvironmentWithEcj env) {
     if (expression == null) {
       return null;
     }
@@ -472,7 +472,7 @@ public final class SpiWithEcjUtils {
         int n = array.length;
         Object[] values = new Object[n];
         for (int i = 0; i < n; i++) {
-          values[i] = compileExpression(array[i], scopeForTypeLookup);
+          values[i] = compileExpression(array[i], scopeForTypeLookup, env);
         }
         return values;
       }
@@ -484,7 +484,7 @@ public final class SpiWithEcjUtils {
       if (inner instanceof Literal) {
         int id = getTypeIdForLiteral((Literal) inner);
         if (id > 0) {
-          Object candidate = compileExpression(inner, scopeForTypeLookup);
+          Object candidate = compileExpression(inner, scopeForTypeLookup, env);
           if (candidate instanceof Constant) {
             return Constant.computeConstantOperation((Constant) candidate, id, ((expression.bits & ASTNode.OperatorMASK) >> ASTNode.OperatorSHIFT));
           }
@@ -497,7 +497,9 @@ public final class SpiWithEcjUtils {
         TypeReference type = ((ClassLiteralAccess) expression).type;
         if (type != null) {
           if (type.resolvedType == null && scopeForTypeLookup != null) {
-            type.resolveType(scopeForTypeLookup);
+            synchronized (env.lock()) {
+              type.resolveType(scopeForTypeLookup);
+            }
           }
           val = type.resolvedType;
         }
@@ -508,7 +510,9 @@ public final class SpiWithEcjUtils {
       Annotation annotation = (Annotation) expression;
       AnnotationBinding compilerAnnotation = annotation.getCompilerAnnotation();
       if (compilerAnnotation == null) {
-        annotation.resolveType(scopeForTypeLookup.referenceContext.staticInitializerScope);
+        synchronized (env.lock()) {
+          annotation.resolveType(scopeForTypeLookup.referenceContext.staticInitializerScope);
+        }
       }
       return annotation.getCompilerAnnotation();
     }
@@ -545,8 +549,8 @@ public final class SpiWithEcjUtils {
 
   /**
    * transform a raw annotation value from {@link ElementValuePair#getValue(Expression)} or compiled expression value
-   * from {@link #compileExpression(Expression, ClassScope)} to a {@link IMetaValue} that can be wrapped inside a
-   * {@link AnnotationElementSpi}
+   * from {@link #compileExpression(Expression, ClassScope, JavaEnvironmentWithEcj)} to a {@link IMetaValue} that can be
+   * wrapped inside a {@link AnnotationElementSpi}
    */
   @SuppressWarnings("pmd:NPathComplexity")
   static IMetaValue resolveCompiledValue(JavaEnvironmentWithEcj env, AnnotatableSpi owner, Object compiledValue) {

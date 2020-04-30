@@ -10,20 +10,15 @@
  */
 package org.eclipse.scout.sdk.s2e.derived;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.environment.IFuture;
-import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler;
 
 /**
  * <h3>{@link IDerivedResourceHandlerFactory}</h3>
@@ -34,7 +29,7 @@ import org.eclipse.scout.sdk.core.s.environment.IProgress;
 public interface IDerivedResourceHandlerFactory {
 
   /**
-   * Creates all {@link BiConsumer}s to update the resources derived from the given resource {@link Set}.
+   * Creates all {@link IDerivedResourceHandler}s to update the resources derived from the given resource {@link Set}.
    *
    * @param resources
    *          The {@link Set} of {@link IResource}s for which the derived resources should be updated. Such an
@@ -45,9 +40,9 @@ public interface IDerivedResourceHandlerFactory {
    *          The {@link IJavaSearchScope} covering the given resources or {@code null} if no {@link IJavaElement}s are
    *          in the given resources. Note: The searchScope may not contain all resources given. Only the ones that
    *          belong to an {@link IJavaElement} are part of the search scope.
-   * @return All {@link BiFunction}s that are based on the given resources.
+   * @return All {@link IDerivedResourceHandler}s that are based on the given resources.
    * @throws CoreException
    *           if there is an error
    */
-  List<BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>>> createHandlersFor(Set<IResource> resources, IJavaSearchScope searchScope) throws CoreException;
+  List<IDerivedResourceHandler> createHandlersFor(Set<IResource> resources, IJavaSearchScope searchScope) throws CoreException;
 }

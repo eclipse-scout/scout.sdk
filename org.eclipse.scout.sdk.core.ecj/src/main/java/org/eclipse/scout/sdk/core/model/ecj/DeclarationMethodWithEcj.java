@@ -91,7 +91,9 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
       if (m_astNode instanceof MethodDeclaration) {
         TypeReference ref = ((MethodDeclaration) m_astNode).returnType;
         if (ref.resolvedType == null) {
-          ref.resolveType(m_astNode.scope);
+          synchronized (javaEnvWithEcj().lock()) {
+            ref.resolveType(m_astNode.scope);
+          }
         }
         return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), ref.resolvedType);
       }
@@ -165,7 +167,9 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
       List<TypeSpi> result = new ArrayList<>(exceptions.length);
       for (TypeReference r : exceptions) {
         if (r.resolvedType == null) {
-          r.resolveType(SpiWithEcjUtils.classScopeOf(this));
+          synchronized (javaEnvWithEcj().lock()) {
+            r.resolveType(SpiWithEcjUtils.classScopeOf(this));
+          }
         }
         TypeSpi t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), r.resolvedType);
         if (t != null) {

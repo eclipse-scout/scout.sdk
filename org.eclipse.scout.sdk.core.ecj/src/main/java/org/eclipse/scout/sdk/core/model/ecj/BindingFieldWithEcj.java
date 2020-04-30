@@ -123,7 +123,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
       if (refBinding instanceof SourceTypeBinding) {
         SourceTypeBinding stb = (SourceTypeBinding) refBinding;
         Expression initEx = stb.scope.referenceContext.declarationOf(origBinding).initialization;
-        return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, SpiWithEcjUtils.compileExpression(initEx, SpiWithEcjUtils.classScopeOf(this)));
+        return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, SpiWithEcjUtils.compileExpression(initEx, SpiWithEcjUtils.classScopeOf(this), javaEnvWithEcj()));
       }
       return null;
     });

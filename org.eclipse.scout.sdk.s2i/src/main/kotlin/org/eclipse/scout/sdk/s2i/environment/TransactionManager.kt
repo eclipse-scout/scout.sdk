@@ -22,12 +22,12 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.ReadonlyStatusHandler
 import com.intellij.psi.PsiDocumentManager
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.util.CoreUtils.callInContext
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.toNioPath
 import java.nio.file.Path
-import java.util.logging.Level
 
 class TransactionManager constructor(val project: Project) {
 
@@ -134,11 +134,23 @@ class TransactionManager constructor(val project: Project) {
                     } else {
                         throw ProcessCanceledException()
                     }
-                } catch (e: IndexNotReadyException) {
-                    val exception = if (SdkLog.isLevelEnabled(Level.FINER)) e else null
-                    SdkLog.debug("Project entered dump mode unexpectedly. Retrying task.", exception)
+                } catch (e: RuntimeException) {
+                    val rootException = unwrap(e)
+                    if (rootException is IndexNotReadyException) {
+                        SdkLog.debug("Project entered dumb mode unexpectedly. Retrying task.", onTrace(e))
+                    } else {
+                        throw e
+                    }
                 }
             }
+        }
+
+        internal fun unwrap(throwable: Throwable): Throwable {
+            var t = throwable
+            while (t.cause != null && t.cause != t) {
+                t = t.cause!!
+            }
+            return t
         }
     }
 
@@ -175,7 +187,7 @@ class TransactionManager constructor(val project: Project) {
      * @param member The [TransactionMember] to register.
      */
     fun register(member: TransactionMember) = synchronized(this) {
-        ensureOpen()
+        ensureOpen(member)
         m_members.computeIfAbsent(member.file()) { ArrayList() }
                 .add(member)
         m_size++
@@ -187,7 +199,7 @@ class TransactionManager constructor(val project: Project) {
     fun size(): Int = m_size // do not use m_members.flatMap().size() here because this would require synchronization. Then the size() method could not longer be called from commitAllAsync -> deadlock!
 
     private fun finishTransactionImpl(save: Boolean, progress: IdeaProgress): Boolean {
-        ensureOpen()
+        ensureOpen(null)
         if (m_members.isEmpty()) {
             return true
         }
@@ -259,7 +271,7 @@ class TransactionManager constructor(val project: Project) {
         return false
     }
 
-    private fun ensureOpen() {
-        Ensure.isTrue(m_open, "Transaction has already been committed.")
+    private fun ensureOpen(member: TransactionMember?) {
+        Ensure.isTrue(m_open, "Transaction has already been committed. Tried to register member '{}'.", member)
     }
 }

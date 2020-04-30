@@ -68,7 +68,7 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
   public IMetaValue getMetaValue() {
     return m_value.computeIfAbsentAndGet(() -> {
       ClassScope scope = SpiWithEcjUtils.classScopeOf(m_declaringAnnotation.getOwner());
-      Object compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.value, scope);
+      Object compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.value, scope, javaEnvWithEcj());
       IMetaValue value = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), compiledValue);
       if (value != null) {
         return value;

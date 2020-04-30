@@ -84,7 +84,9 @@ public class DeclarationMethodParameterWithEcj extends AbstractJavaElementWithEc
   public TypeSpi getDataType() {
     return m_dataType.computeIfAbsentAndGet(() -> {
       if (m_astNode.type.resolvedType == null) {
-        m_astNode.type.resolveType(m_declaringMethod.getInternalMethodDeclaration().scope);
+        synchronized (javaEnvWithEcj().lock()) {
+          m_astNode.type.resolveType(m_declaringMethod.getInternalMethodDeclaration().scope);
+        }
       }
       return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), m_astNode.type.resolvedType);
     });

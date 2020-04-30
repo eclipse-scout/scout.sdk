@@ -90,7 +90,7 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   @Override
   public IMetaValue getConstantValue() {
     return m_constRef.computeIfAbsentAndGet(() -> {
-      Object compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.initialization, null);
+      Object compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.initialization, null, javaEnvWithEcj());
       return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, compiledValue);
     });
   }
@@ -104,7 +104,9 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
       }
       TypeBinding tb = m_astNode.type.resolvedType;
       if (tb == null) {
-        tb = m_astNode.type.resolveType(SpiWithEcjUtils.classScopeOf(this));
+        synchronized (javaEnvWithEcj().lock()) {
+          tb = m_astNode.type.resolveType(SpiWithEcjUtils.classScopeOf(this));
+        }
       }
       return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), tb);
     });

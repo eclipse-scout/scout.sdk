@@ -34,6 +34,7 @@ import com.intellij.util.CollectionQuery
 import com.intellij.util.Query
 import com.intellij.util.containers.stream
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
@@ -44,19 +45,23 @@ import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import java.lang.reflect.InvocationTargetException
 import java.nio.file.Path
 import java.util.function.Function
-import java.util.logging.Level
 import java.util.stream.Stream
 
 private val useLegacyMatcher: FinalValue<Boolean> = FinalValue()
 
 fun IType.resolvePsi(): PsiClass? {
     val module = this.javaEnvironment().toIdea().module
-    return IdeaEnvironment.computeInReadAction(module.project) { module.project.findTypesByName(name(), GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, true)).firstOrNull() }
+    return computeInReadAction(module.project) {
+        module.project
+                .findTypesByName(name(), GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, true))
+                .firstOrNull()
+    }
 }
 
 fun ProgressIndicator.toScoutProgress(): IdeaProgress = IdeaProgress(this)
@@ -86,7 +91,7 @@ fun PsiClass.toScoutType(env: IdeaEnvironment, returnReferencingModuleIfNotInFil
                 ?.let { toScoutType(it) }
 
 fun PsiClass.toScoutType(env: IJavaEnvironment): IType? {
-    val fqn = IdeaEnvironment.computeInReadAction(this.project) { this.qualifiedName }
+    val fqn = computeInReadAction(this.project) { this.qualifiedName }
     return env.findType(fqn).orElse(null)
 }
 
@@ -99,13 +104,13 @@ fun PsiClass.toScoutType(env: IJavaEnvironment): IType? {
  *
  */
 fun PsiElement.containingModule(returnReferencingModuleIfNotInFilesystem: Boolean = true): Module? {
-    val isInProject = containingFile.virtualFile.isInLocalFileSystem
+    val isInProject = containingFile?.virtualFile?.isInLocalFileSystem ?: true /* a psi element which has not a file (e.g. PsiDirectory) */
     if (!returnReferencingModuleIfNotInFilesystem && !isInProject) {
         return null
     }
 
     val searchElement = if (isInProject) this else containingFile ?: this
-    return IdeaEnvironment.computeInReadAction(this.project) {
+    return computeInReadAction(this.project) {
         this
                 .takeIf { it.isValid }
                 ?.let { ModuleUtil.findModuleForPsiElement(searchElement) }
@@ -198,9 +203,7 @@ private fun isUseLegacyMatcher() =
             findMatchesMethodNew()
             false
         } catch (e: NoSuchMethodException) {
-            // only log the exception in trace level
-            val exception = if (SdkLog.isLevelEnabled(Level.FINER)) e else null
-            SdkLog.debug("Using legacy structural search API", exception)
+            SdkLog.debug("Using legacy structural search API", onTrace(e))
             true
         }
 
@@ -215,7 +218,7 @@ private fun findMatchesLegacy(matcher: Matcher, result: MatchResultSink, options
 fun Project.findTypesByName(fqn: String) = findTypesByName(fqn, GlobalSearchScope.allScope(this))
 
 fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
-        IdeaEnvironment.computeInReadAction(this) {
+        computeInReadAction(this) {
             JavaPsiFacade.getInstance(this)
                     .findClasses(fqn, scope)
                     .toSet()
@@ -232,7 +235,7 @@ fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResu
 }
 
 fun PsiClass.isInstanceOf(vararg parentFqn: String): Boolean =
-        IdeaEnvironment.computeInReadAction(project) {
+        computeInReadAction(project) {
             visitSupers(IBreadthFirstVisitor { element, _, _ ->
                 if (parentFqn.contains(element.qualifiedName))
                     TreeVisitResult.TERMINATE

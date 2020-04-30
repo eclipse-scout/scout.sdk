@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -29,15 +28,13 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler;
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.environment.IFuture;
-import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandlerFactory {
 
   @Override
-  public List<BiFunction<IEnvironment, IProgress, Collection<? extends IFuture<?>>>> createHandlersFor(Set<IResource> resources, IJavaSearchScope searchScope) throws JavaModelException {
+  public List<IDerivedResourceHandler> createHandlersFor(Set<IResource> resources, IJavaSearchScope searchScope) throws JavaModelException {
     Collection<IType> baseTypes = new HashSet<>();
     findScopeCandidates(searchScope, baseTypes);
     findResourceCandidates(resources, baseTypes);

@@ -30,6 +30,13 @@ class TransactionManagerTest : TestCase() {
         assertEquals(4, mgr.size())
     }
 
+    fun testUnwrap() {
+        val exWithoutCause = RuntimeException()
+        val exWithCause = RuntimeException(exWithoutCause)
+        assertSame(exWithoutCause, TransactionManager.unwrap(exWithoutCause))
+        assertSame(exWithoutCause, TransactionManager.unwrap(exWithCause))
+    }
+
     private class TestingMember(val file: Path) : TransactionMember {
         override fun file(): Path {
             return file

@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.SdkException
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.toIdeaProgress
 import java.io.File
 import java.nio.file.Path
 
@@ -104,10 +105,19 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
                         ?: throw SdkException("Cannot write '$targetFile' because the directory could not be created.")
                 progress.worked(1)
 
-                dir.add(psi)
+                // check again in case it changed in the meantime (must be idempotent)
+                val existingFile = dir.findFile(targetFile.fileName.toString())
+                if (existingFile == null) {
+                    dir.add(psi)
+                } else {
+                    // it has been created in the meantime -> perform an update instead
+                    FileWriter(targetFile, psi.text, psi.project, existingFile.virtualFile).commit(toIdeaProgress(null))
+                }
                 progress.worked(1)
                 return true
             }
+
+            override fun toString() = "Write compilation unit $targetFile"
         }
     }
 }

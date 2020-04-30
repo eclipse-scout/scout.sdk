@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2i.classid
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.psi.search.SearchScope
+import java.util.concurrent.Future
 
 /**
  * Class to search for @ClassIds
@@ -32,6 +33,12 @@ interface ClassIdCache : Disposable {
      * @return A [Sequence] holding all findings
      */
     fun findAllClassIds(scope: SearchScope, indicator: ProgressIndicator? = null): Sequence<ClassIdAnnotation>
+
+    /**
+     * Schedules the setup of the @ClassId cache if the DuplicateClassId inspection is active on the project.
+     * @return The [Future] of the asynchronous cache creation.
+     */
+    fun scheduleCacheSetupIfEnabled(): Future<*>
 
     /**
      * Builds the cache. If the cache is already ready, this method does nothing.

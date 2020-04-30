@@ -55,7 +55,12 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
 
   @Override
   public TypeSpi findType(String fqn) {
-    Object elem = m_typeCache.computeIfAbsent(fqn, this::doFindTypeInternal);
+    Object elem = m_typeCache.get(fqn); // fast check without synchronizing
+    if (elem == null) {
+      synchronized (lock()) { // do not use computeIfAbsent outside the instance lock because the map uses its own lock which might lead to deadlocks
+        elem = m_typeCache.computeIfAbsent(fqn, this::doFindTypeInternal);
+      }
+    }
     if (elem == NULL_OBJECT) {
       return null;
     }
@@ -85,8 +90,10 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
   protected abstract Collection<JavaElementSpi> allElements();
 
   protected void reinitialize() {
-    m_typeCache.clear();
-    m_api.spiChanged();
+    synchronized (lock()) { // ensure instance lock is acquired because the clear of the map uses its own lock as well which might lead to deadlocks
+      m_typeCache.clear();
+      m_api.spiChanged();
+    }
   }
 
   protected Object removeTypeFromCache(String fqn) {

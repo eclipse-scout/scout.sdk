@@ -15,7 +15,9 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.GlobalSearchScope.fileScope
@@ -23,7 +25,8 @@ import com.intellij.psi.search.SearchScope
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.messages.MessageBusConnection
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment
+import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
+import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
@@ -39,30 +42,41 @@ import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
 import java.util.Collections.emptyList
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
-import java.util.function.BiFunction
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.streams.toList
+
 
 class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceManager, SettingsChangedListener {
 
     private val m_updateHandlerFactories = HashMap<Class<*>, DerivedResourceHandlerFactory>() // use a map so that there is always only one factory of the same type
     private val m_eventBuffer = ArrayList<SearchScope>()
-    private val m_pendingFutures = ConcurrentLinkedQueue<ScheduledFuture<*>>()
-    private val m_executorService = AppExecutorUtil.getAppScheduledExecutorService()
+    private val m_lock = ReentrantLock()
+    private val m_dataAvailable = m_lock.newCondition()
+
+    @Volatile
     private var m_busConnection: MessageBusConnection? = null
+    @Volatile
+    private var m_workerEnabled = false
 
     init {
+        Disposer.register(project, this) // ensure it is disposed when the project closes
+    }
+
+    override fun start() {
         addDerivedResourceHandlerFactory(DtoUpdateHandlerFactory())
         ScoutSettings.addListener(this)
         updateSubscription()
+        m_workerEnabled = true // must be before the schedule. otherwise it ends immediately.
+        AppExecutorUtil.getAppExecutorService().submit(this::dispatchWork)
     }
 
     override fun dispose() {
+        m_workerEnabled = false
         unsubscribe()
         ScoutSettings.removeListener(this)
         m_updateHandlerFactories.clear()
-        consumeAllBufferedEvents()
     }
 
     override fun changed(key: String, oldVal: String?, newVal: String?) {
@@ -96,52 +110,62 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
 
     override fun trigger(scope: SearchScope) {
         SdkLog.debug("Derived resource update event for scope $scope")
-        cancelPendingFutures() // already scheduled but not started futures are no longer necessary because a new one is scheduled that will handle all scopes in the buffer
-        registerEvent(scope)
-        m_pendingFutures.add(m_executorService.schedule(this::scheduleHandlerCreation, 2, TimeUnit.SECONDS))
-    }
-
-    private fun cancelPendingFutures() {
-        val it = m_pendingFutures.iterator()
-        while (it.hasNext()) {
-            it.next().cancel(false) // do not interrupt running task these must complete otherwise derived resources might not be updated
-            it.remove()
+        m_lock.withLock {
+            m_eventBuffer.add(scope)
+            m_dataAvailable.signalAll()
         }
     }
 
-    private fun registerEvent(scope: SearchScope) = synchronized(m_eventBuffer) {
-        m_eventBuffer.add(scope)
+    private fun dispatchWork() {
+        while (m_workerEnabled) {
+            val scope = getWork()
+            if (scope != GlobalSearchScope.EMPTY_SCOPE) {
+                try {
+                    performUpdateAsync(scope).awaitDoneThrowingOnError()
+                } catch (e: Throwable) { // use throwable here otherwise the worker will be killed an will not start again. This way it has the chance to recover.
+                    SdkLog.warning("Derived resource update for scope '{}' failed.", scope, e)
+                }
+            }
+        }
     }
 
-    private fun consumeAllBufferedEvents(): SearchScope = synchronized(m_eventBuffer) {
+    private fun getWork(): SearchScope {
+        waitUntilDataAvailable() // wait until some data arrived
+        if (m_workerEnabled) {
+            Thread.sleep(TimeUnit.SECONDS.toMillis(2)) // wait for more work to come
+        }
+        return consumeAllBufferedEvents() // the complete work
+    }
+
+    private fun waitUntilDataAvailable() = m_lock.withLock {
+        while (m_eventBuffer.isEmpty()) {
+            m_dataAvailable.await()
+        }
+    }
+
+    private fun consumeAllBufferedEvents(): SearchScope = m_lock.withLock {
         if (m_eventBuffer.isEmpty()) {
             return GlobalSearchScope.EMPTY_SCOPE
         }
-
         var union = GlobalSearchScope.EMPTY_SCOPE
         for (scope in m_eventBuffer) {
             union = union.union(scope)
         }
-
         m_eventBuffer.clear()
-        m_pendingFutures.clear() // there is no more work. also ensures that the current future is removed
         return union
     }
 
-    private fun scheduleHandlerCreation() {
-        val scope = consumeAllBufferedEvents()
+    private fun performUpdateAsync(scope: SearchScope): IFuture<Unit> = callInIdeaEnvironment(project, "Update derived resources") { env, progress ->
         SdkLog.debug("Check for derived resource updates in scope $scope")
-        callInIdeaEnvironment(project, "Update derived resources") { env, progress ->
-            val start = System.currentTimeMillis()
-            val factories = synchronized(this) { ArrayList(m_updateHandlerFactories.values) }
-            val handlers = factories
-                    .parallelStream()
-                    .flatMap { executeDerivedResourceHandlerFactory(it, scope) }
-                    .toList()
-            SdkLog.debug("Derived resource handler creation took {}ms. Number of created handlers: {}", System.currentTimeMillis() - start, handlers.size)
-            if (handlers.isNotEmpty() && !progress.indicator.isCanceled) {
-                executeAllHandlersAndWait(handlers, env, progress)
-            }
+        val start = System.currentTimeMillis()
+        val factories = synchronized(m_updateHandlerFactories) { ArrayList(m_updateHandlerFactories.values) }
+        val handlers = factories
+                .parallelStream()
+                .flatMap { executeDerivedResourceHandlerFactory(it, scope) }
+                .toList()
+        SdkLog.debug("Derived resource handler creation took {}ms. Number of created handlers: {}", System.currentTimeMillis() - start, handlers.size)
+        if (handlers.isNotEmpty() && !progress.indicator.isCanceled) {
+            executeAllHandlersAndWait(handlers, env, progress)
         }
     }
 
@@ -149,28 +173,35 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         factory.createHandlersFor(scope, project).toList().stream() // create a list first (terminal operation) so that the factory is executed here!
     }
 
-    override fun addDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory) = synchronized(this) {
+    override fun addDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory) = synchronized(m_updateHandlerFactories) {
         m_updateHandlerFactories[factory::class.java] = factory
     }
 
-    override fun removeDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory): Boolean = synchronized(this) {
+    override fun removeDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory): Boolean = synchronized(m_updateHandlerFactories) {
         return m_updateHandlerFactories.keys.remove(factory::class.java)
     }
 
-    private fun executeAllHandlersAndWait(handlers: List<BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>>, env: IdeaEnvironment, progress: IdeaProgress) {
+    private fun executeAllHandlersAndWait(handlers: List<IDerivedResourceHandler>, env: IdeaEnvironment, progress: IdeaProgress) {
         val workForHandler = 1000
         val start = System.currentTimeMillis()
         val transaction = TransactionManager.current()
-        val runningFileWrites = ArrayList<IFuture<*>>()
+        val runningFileWrites = ConcurrentLinkedQueue<IFuture<*>>()
+        val indicator = progress.indicator
         progress.init(handlers.size * workForHandler, "Update derived resources")
 
-        handlers.parallelStream().forEach {
-            if (progress.indicator.isCanceled) {
-                return@forEach
+        handlers.forEach {
+            try {
+                if (indicator.isCanceled) {
+                    return@forEach
+                }
+                indicator.text2 = it.toString()
+                runningFileWrites.addAll(executeHandler(it, transaction, env, progress.newChild(workForHandler)))
+                commitTransactionIfNecessary(transaction, runningFileWrites, indicator)
+            } catch (t: Throwable) {
+                // catch throwable here because parallel streams return early: the first thread having this throwable would report to the caller which quits the transaction and kills the java environment. but other threads may still try to use it -> boom.
+                indicator.cancel() // fatal error: abort all
+                SdkLog.error("Fatal error while: {}", it, t)
             }
-            runningFileWrites.addAll(executeHandler(it, transaction, env))
-            commitTransactionIfNecessary(transaction)
-            progress.worked(workForHandler)
         }
 
         // wait for the remaining file writes to participate in the current transaction.
@@ -182,16 +213,17 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         }
     }
 
-    private fun executeHandler(handler: BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>, transaction: TransactionManager, env: IdeaEnvironment): Collection<IFuture<*>> {
+    private fun executeHandler(handler: IDerivedResourceHandler, transaction: TransactionManager, env: IdeaEnvironment, progress: IProgress): Collection<IFuture<*>> {
         val start = System.currentTimeMillis()
+
         try {
             return TransactionManager.callInExistingTransaction(transaction) {
                 SdkLog.debug("About to execute derived resource handler: {}", handler)
-                return@callInExistingTransaction handler.apply(env, IdeaEnvironment.toIdeaProgress(null))
+                return@callInExistingTransaction handler.apply(env, progress)
             }
         } catch (e: ProcessCanceledException) {
-            throw e // so that it is not logged below and cancels the transaction. In the end its handles by the IntelliJ framework
-        } catch (e: Exception) {
+            SdkLog.debug("Derived resources update canceled.", onTrace(e))
+        } catch (e: RuntimeException) {
             // log the exception but continue processing. The failure of one handler does not abort the transaction
             SdkLog.error("Error while: {}", handler, e)
         } finally {
@@ -200,12 +232,21 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         return emptyList()
     }
 
-    private fun commitTransactionIfNecessary(transaction: TransactionManager) {
-        if (transaction.size() < 1000) {
+    private fun commitTransactionIfNecessary(transaction: TransactionManager, runningFileWrites: MutableCollection<IFuture<*>>, indicator: ProgressIndicator) {
+        if (indicator.isCanceled) {
             return
         }
-        // to save memory the running transaction is committed in chunk blocks of 1000 items
+
+        // to save memory the running transaction is committed in chunk blocks of 100 items
         // bigger chunks are faster (less events in the IDE and less IO) but require more memory to store the transaction members
+        val chunkSize = 100
+        if (transaction.size() < chunkSize) {
+            return
+        }
+
+        SdkFuture.awaitAllLoggingOnError(runningFileWrites)
+        runningFileWrites.clear()
+
         SdkLog.debug("Derived resource update transaction chunk size reached. Performing intermediate commit.")
         transaction.checkpoint(null)
     }

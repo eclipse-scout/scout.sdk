@@ -17,16 +17,13 @@ import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.SearchScope
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment
-import org.eclipse.scout.sdk.core.s.environment.IFuture
-import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceHandlerFactory
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
-import java.util.function.BiFunction
 
 
 open class DtoUpdateHandlerFactory : DerivedResourceHandlerFactory {
-    override fun createHandlersFor(scope: SearchScope, project: Project): Sequence<BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>> {
+    override fun createHandlersFor(scope: SearchScope, project: Project): Sequence<IDerivedResourceHandler> {
         val elements = project.findAllTypesAnnotatedWith(IScoutRuntimeTypes.Data, scope) +
                 project.findAllTypesAnnotatedWith(IScoutRuntimeTypes.FormData, scope) +
                 project.findAllTypesAnnotatedWith(IScoutRuntimeTypes.PageData, scope)
@@ -36,7 +33,7 @@ open class DtoUpdateHandlerFactory : DerivedResourceHandlerFactory {
                 .flatMap(this::typeToHandlers)
     }
 
-    fun typeToHandlers(type: PsiClass): Sequence<BiFunction<IEnvironment, IProgress, Collection<IFuture<*>>>> =
+    fun typeToHandlers(type: PsiClass): Sequence<IDerivedResourceHandler> =
             sequenceOf(DtoUpdateHandler(DerivedResourceInputWithIdea(type)))
 
     protected fun acceptClass(type: PsiClass): Boolean = type.isValid

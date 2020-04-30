@@ -44,4 +44,6 @@ open class FileWriter(val targetFile: Path, private val content: CharSequence, v
         progress.worked(1)
         return true
     }
+
+    override fun toString() = "Write file $targetFile"
 }

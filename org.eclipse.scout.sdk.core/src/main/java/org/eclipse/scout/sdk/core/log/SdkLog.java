@@ -268,6 +268,48 @@ public final class SdkLog {
     return isLevelEnabled(Level.SEVERE);
   }
 
+  /**
+   * Returns the object given if at least the debug level ({@link Level#FINE}) is active. Otherwise it returns
+   * {@code null}.
+   * 
+   * @param t
+   *          The object
+   * @return the object given if at least the debug level ({@link Level#FINE}) is active. Otherwise it returns
+   *         {@code null}.
+   */
+  public static <T> T onDebug(T t) {
+    return onLevel(t, Level.FINE);
+  }
+
+  /**
+   * Returns the object given if at least the trace level ({@link Level#FINER}) is active. Otherwise it returns
+   * {@code null}.
+   * 
+   * @param t
+   *          The object
+   * @return the object given if at least the trace level ({@link Level#FINER}) is active. Otherwise it returns
+   *         {@code null}.
+   */
+  public static <T> T onTrace(T t) {
+    return onLevel(t, Level.FINER);
+  }
+
+  /**
+   * Returns the object given if at least the given {@link Level} is active. Otherwise it returns {@code null}.
+   * 
+   * @param t
+   *          The object
+   * @param level
+   *          The level
+   * @return the object given if at least the given {@link Level} is active. Otherwise it returns {@code null}.
+   */
+  public static <T> T onLevel(T t, Level level) {
+    if (isLevelEnabled(level)) {
+      return t;
+    }
+    return null;
+  }
+
   static Level parseLevel(String lvl) {
     if (Strings.isBlank(lvl)) {
       return DEFAULT_LOG_LEVEL;

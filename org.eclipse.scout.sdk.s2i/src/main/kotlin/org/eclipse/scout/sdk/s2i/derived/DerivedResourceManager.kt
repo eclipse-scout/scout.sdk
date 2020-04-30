@@ -15,6 +15,8 @@ import com.intellij.psi.search.SearchScope
 
 interface DerivedResourceManager : Disposable {
 
+    fun start()
+
     fun trigger(scope: SearchScope)
 
     fun addDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory)
