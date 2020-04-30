@@ -15,6 +15,7 @@ import java.time.Clock
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
 
+val KOTLIN_VERSION = "1.3.61"
 val SCOUT_SDK_VERSION = "10.0.0-SNAPSHOT"
 val SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
 
@@ -43,7 +44,8 @@ repositories {
 dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", SCOUT_SDK_VERSION)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", SCOUT_SDK_VERSION)
-    implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.3.61")
+    implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", KOTLIN_VERSION)
+    implementation("org.jetbrains.kotlin", "kotlin-reflect", KOTLIN_VERSION)
     testImplementation("org.mockito", "mockito-core", "3.3.3")
 }
 
