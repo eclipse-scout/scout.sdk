@@ -18,7 +18,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IFuture
-import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.EventListenerList
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.callInExistingTransaction
@@ -31,7 +30,6 @@ open class OperationTask(title: String, project: Project, private val transactio
 
     private val m_progress = FinalValue<ProgressIndicator>()
     private val m_listeners = EventListenerList()
-    private val m_name = CoreUtils.toStringIfOverwritten(task).orElse(null)
 
     override fun run(indicator: ProgressIndicator) {
         m_progress.setIfAbsent(indicator)
@@ -39,10 +37,10 @@ open class OperationTask(title: String, project: Project, private val transactio
         val scoutProgress = indicator.toScoutProgress()
         val workForCommit = 10
         val workForTask = 1000
-        scoutProgress.init(workForTask + workForCommit, m_name)
+        scoutProgress.init(workForTask + workForCommit, title)
         if (transactionManager == null) {
             // new independent top level transaction
-            callInNewTransaction(project, { scoutProgress.newChild(workForCommit) }) {
+            callInNewTransaction(project, title, { scoutProgress.newChild(workForCommit) }) {
                 task.invoke(scoutProgress.newChild(workForTask))
             }
         } else {
@@ -99,32 +97,35 @@ open class OperationTask(title: String, project: Project, private val transactio
 
     override fun onFinished() {
         super.onFinished()
-        try {
-            m_listeners.get(OperationTaskListener::class.java)
-                    .forEach { it.onFinished(this) }
-        } catch (e: RuntimeException) {
-            SdkLog.error("Error in {} when finishing task {}.", OperationTaskListener::class.java.simpleName, m_name, e)
+        m_listeners.get(OperationTaskListener::class.java).forEach {
+            try {
+                it.onFinished(this)
+            } catch (e: RuntimeException) {
+                SdkLog.error("Error in {} '{}' when finishing task {}.", OperationTaskListener::class.java.simpleName, it, title, e)
+            }
         }
     }
 
     override fun onThrowable(error: Throwable) {
         // no super call here
-        try {
-            m_listeners.get(OperationTaskListener::class.java)
-                    .forEach { it.onThrowable(this, error) }
-        } catch (e: RuntimeException) {
-            SdkLog.error("Unable to complete task. Original error:", error)
-            SdkLog.error("Error in {} when finishing task {} exceptionally. See previous log for details about the original error of the task.", OperationTaskListener::class.java.simpleName, m_name, e)
+        m_listeners.get(OperationTaskListener::class.java).forEach {
+            try {
+                it.onThrowable(this, error)
+            } catch (e: RuntimeException) {
+                SdkLog.error("Unable to complete task. Original error:", error)
+                SdkLog.error("Error in {} '{}' when finishing task {} exceptionally. See previous log for details about the original error of the task.", OperationTaskListener::class.java.simpleName, it, title, e)
+            }
         }
     }
 
     override fun onCancel() {
         super.onCancel()
-        try {
-            m_listeners.get(OperationTaskListener::class.java)
-                    .forEach { it.onCancel(this) }
-        } catch (e: RuntimeException) {
-            SdkLog.error("Error in {} when cancelling task {}.", OperationTaskListener::class.java.simpleName, m_name, e)
+        m_listeners.get(OperationTaskListener::class.java).forEach {
+            try {
+                it.onCancel(this)
+            } catch (e: RuntimeException) {
+                SdkLog.error("Error in {} '{}' when cancelling task {}.", OperationTaskListener::class.java.simpleName, it, title, e)
+            }
         }
     }
 }

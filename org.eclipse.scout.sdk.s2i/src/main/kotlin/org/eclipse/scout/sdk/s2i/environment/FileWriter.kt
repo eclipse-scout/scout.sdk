@@ -10,24 +10,23 @@
  */
 package org.eclipse.scout.sdk.s2i.environment
 
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.vfs.VirtualFile
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.s2i.toVirtualFile
 import java.nio.file.Path
 
-open class FileWriter(val targetFile: Path, private val content: CharSequence, val project: Project, private val vFile: VirtualFile?) : TransactionMember {
-
-    constructor(file: Path, content: CharSequence, project: Project) : this(file, content, project, null)
+open class FileWriter(val targetFile: Path, private val content: CharSequence, val project: Project) : TransactionMember {
 
     override fun file(): Path = targetFile
 
     override fun commit(progress: IdeaProgress): Boolean {
-        progress.init(4, "Write file {}", targetFile.fileName)
+        progress.init(4, "Write file {}", targetFile)
 
-        var existingFile = vFile ?: LocalFileSystem.getInstance().findFileByIoFile(targetFile.toFile())
-        if (existingFile?.exists() != true) {
+        var existingFile = targetFile.toVirtualFile()
+        progress.worked(1)
+        if (existingFile == null || !existingFile.exists() || !existingFile.isValid) {
             // new file
             val dir = VfsUtil.createDirectoryIfMissing(targetFile.parent.toString())
             if (dir == null) {
@@ -35,12 +34,20 @@ open class FileWriter(val targetFile: Path, private val content: CharSequence, v
                 return false
             }
             progress.worked(1)
+            SdkLog.debug("Adding new file '{}'.", targetFile)
             existingFile = dir.createChildData(this, targetFile.fileName.toString())
             progress.worked(1)
         }
         progress.setWorkRemaining(1)
 
-        existingFile.setBinaryContent(content.toString().toByteArray(existingFile.charset))
+
+        val documentManager = FileDocumentManager.getInstance()
+        val document = documentManager.getDocument(existingFile)
+        if (document == null) {
+            SdkLog.warning("Cannot load document for file '{}' to change its content.", targetFile)
+            return false
+        }
+        document.setText(content)
         progress.worked(1)
         return true
     }

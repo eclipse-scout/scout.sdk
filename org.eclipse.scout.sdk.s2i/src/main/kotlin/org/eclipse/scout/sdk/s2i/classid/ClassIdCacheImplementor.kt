@@ -10,28 +10,22 @@
  */
 package org.eclipse.scout.sdk.s2i.classid
 
-import com.intellij.codeInsight.daemon.HighlightDisplayKey
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.intellij.profile.codeInspection.InspectionProjectProfileManager
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
 import java.util.Collections.newSetFromMap
-import java.util.concurrent.CompletableFuture.completedFuture
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
 
 class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(), ClassIdCache {
 
@@ -44,9 +38,6 @@ class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(), Cl
     init {
         Disposer.register(project, this) // ensure it is disposed when the project closes
     }
-
-    fun isCacheRequired(): Boolean = !project.isDisposed && project.isOpen
-            && InspectionProjectProfileManager.getInstance(project).currentProfile.isToolEnabled(HighlightDisplayKey.find(DuplicateClassIdInspection.SHORT_NAME))
 
     override fun findAllClassIds(scope: SearchScope, indicator: ProgressIndicator?) =
             project.findAllTypesAnnotatedWith(IScoutRuntimeTypes.ClassId, scope, indicator)
@@ -67,26 +58,20 @@ class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(), Cl
 
     override fun isCacheReady() = m_cacheReady
 
-    override fun scheduleCacheSetupIfEnabled(): Future<*> {
-        if (!isCacheRequired()) {
-            return completedFuture(null)
-        }
-        return AppExecutorUtil.getAppScheduledExecutorService().schedule(this::setup, 5, TimeUnit.SECONDS)
-    }
-
     override fun setup() = synchronized(m_classIdCache) {
         if (isCacheReady()) {
             return
         }
 
         try {
-            TransactionManager.repeatUntilPassesWithIndex(project) {
-                DumbService.getInstance(project).waitForSmartMode()
+            TransactionManager.repeatUntilPassesWithIndex(project, false) {
                 trySetupCache()
                 PsiManager.getInstance(project).addPsiTreeChangeListener(this) // initial cache is ready, register listener to keep it up to date
                 m_cacheReady = true
             }
             duplicates().forEach { SdkLog.debug("Duplicate @ClassId value '{}' found for types {}.", it.key, it.value) }
+        } catch (e: ProcessCanceledException) {
+            SdkLog.debug("@ClassId value cache creation canceled. Retry on next use.", onTrace(e))
         } catch (t: Exception) {
             SdkLog.warning("Error building @ClassId value cache.", t)
         }
@@ -109,11 +94,9 @@ class ClassIdCacheImplementor(val project: Project) : PsiTreeChangeAdapter(), Cl
         SdkLog.debug("Starting to build @ClassId value cache.")
         val start = System.currentTimeMillis()
         val fileCache = fileCache()
-        val allClassIds = computeInReadAction(project) {
-            findAllClassIds(GlobalSearchScope.projectScope(project))
-                    .filter { !ignoreClassId(it) }
-                    .toList() // collect to list so that it is executed in the read action (terminal operation)
-        }
+        val allClassIds = findAllClassIds(GlobalSearchScope.projectScope(project))
+                .filter { !ignoreClassId(it) }
+                .toList() // collect to list so that it is executed in the read action (terminal operation)
 
         allClassIds.forEach {
             val fqn = it.ownerFqn() ?: return@forEach

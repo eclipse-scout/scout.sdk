@@ -14,10 +14,12 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.log.SdkLog.onTrace;
 import static org.eclipse.scout.sdk.core.util.Ensure.fail;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.CharBuffer;
+import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +58,7 @@ import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.SourceRange;
 import org.eclipse.scout.sdk.core.model.ecj.SourcePositionComparators.MethodBindingComparator;
@@ -392,7 +395,22 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   protected FileSystemWithOverride getNameEnvironment() {
-    return m_fs.computeIfAbsentAndGet(() -> new FileSystemWithOverride(new ClasspathBuilder(javaHome(), m_rawClassPath)));
+    return m_fs.computeIfAbsentAndGet(this::buildNameEnvironment);
+  }
+
+  private FileSystemWithOverride buildNameEnvironment() {
+    // classpath registers a system wide file system but does not handle the fact that it might already have been created.
+    // see org.eclipse.jdt.internal.compiler.batch.ClasspathMultiReleaseJar.initialize
+    ClasspathBuilder cp = new ClasspathBuilder(javaHome(), m_rawClassPath);
+    while (true) {
+      try {
+        // optimistic creation without locking
+        return new FileSystemWithOverride(cp);
+      }
+      catch (FileSystemAlreadyExistsException e) {
+        SdkLog.debug("Concurrent registration of process wide filesystem.", onTrace(e));
+      }
+    }
   }
 
   /**

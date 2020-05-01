@@ -45,7 +45,6 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", SCOUT_SDK_VERSION)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", SCOUT_SDK_VERSION)
     implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", KOTLIN_VERSION)
-    implementation("org.jetbrains.kotlin", "kotlin-reflect", KOTLIN_VERSION)
     testImplementation("org.mockito", "mockito-core", "3.3.3")
 }
 

@@ -19,7 +19,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
-import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
@@ -136,8 +136,7 @@ fun PsiClass.newSubTypeHierarchy(scope: SearchScope, checkDeep: Boolean, include
     return CollectionQuery(resultWithRoot)
 }
 
-fun Path.toVirtualFile() = LocalFileSystem.getInstance()
-        .findFileByIoFile(this.toFile())
+fun Path.toVirtualFile() = VfsUtil.findFile(this, true)
         ?.takeIf { it.isValid }
 
 fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope) = findAllTypesAnnotatedWith(annotation, scope, null)
@@ -198,6 +197,7 @@ private fun expandInvocationTargetException(e: InvocationTargetException): Runti
     return SdkException(original)
 }
 
+// Can be removed if the supported min. IJ version is 2020.1
 private fun isUseLegacyMatcher() =
         try {
             findMatchesMethodNew()

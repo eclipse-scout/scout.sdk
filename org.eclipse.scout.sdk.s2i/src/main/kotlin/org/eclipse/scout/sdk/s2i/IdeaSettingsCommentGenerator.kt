@@ -19,7 +19,6 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
 import com.maddyhome.idea.copyright.pattern.EntityUtil
 import com.maddyhome.idea.copyright.pattern.VelocityHelper
@@ -97,7 +96,7 @@ open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, St
         }
 
         val project = module.project
-        val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(path.toFile()) ?: return null
+        val virtualFile = path.toVirtualFile() ?: return null
         val psiFile = IdeaEnvironment.computeInReadAction(project) { psiManager.findFile(virtualFile) } ?: return null
 
         val raw = copyrightManager.getCopyrightOptions(psiFile)?.notice ?: return null

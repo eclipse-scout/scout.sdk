@@ -13,12 +13,12 @@ package org.eclipse.scout.sdk.s2i.environment
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.ReadonlyStatusHandler
 import com.intellij.psi.PsiDocumentManager
 import org.eclipse.scout.sdk.core.log.SdkLog
@@ -26,25 +26,28 @@ import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.util.CoreUtils.callInContext
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
-import org.eclipse.scout.sdk.s2i.toNioPath
+import org.eclipse.scout.sdk.s2i.toVirtualFile
+import java.lang.reflect.Method
 import java.nio.file.Path
 
-class TransactionManager constructor(val project: Project) {
+class TransactionManager constructor(val project: Project, val transactionName: String? = null) {
 
     companion object {
 
         private val CURRENT = ThreadLocal.withInitial<TransactionManager> { null }
+        private val BULK_MODE_METHOD = FinalValue<Method?>()
 
         /**
          * Executes a task within a [TransactionManager] and commits all members on successful completion of the transaction.
          *
          * Successful completion means the given progress monitor is not canceled and no exception is thrown from the [runnable].
          * @param project The [Project] for which the transaction should be started
+         * @param name The name that represents the transaction to the user. E.g. when undoing actions (the confirmation dialog will show this text).
          * @param progressProvider A provider for a progress indicator to use when committing the transaction. This provider is also used to determine if the task has been canceled. Only if not canceled the transaction will be committed.
          * @param runnable The runnable to execute
          */
-        fun runInNewTransaction(project: Project, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, runnable: () -> Unit) {
-            callInNewTransaction(project, progressProvider) {
+        fun runInNewTransaction(project: Project, name: String? = null, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, runnable: () -> Unit) {
+            callInNewTransaction(project, name, progressProvider) {
                 runnable.invoke()
             }
         }
@@ -54,12 +57,13 @@ class TransactionManager constructor(val project: Project) {
          *
          * Successful completion means the given progress monitor is not canceled and no exception is thrown from the [callable].
          * @param project The [Project] for which the transaction should be started
+         * @param name The name that represents the transaction to the user. E.g. when undoing actions (the confirmation dialog will show this text).
          * @param progressProvider A provider for a progress indicator to use when committing the transaction. This provider is also used to determine if the task has been canceled. Only if not canceled the transaction will be committed.
          * @param callable The runnable to execute
          */
-        fun <R> callInNewTransaction(project: Project, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, callable: () -> R?): R? {
+        fun <R> callInNewTransaction(project: Project, name: String? = null, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, callable: () -> R?): R? {
             var save = false
-            val transactionManager = TransactionManager(project)
+            val transactionManager = TransactionManager(project, name)
             val result: R?
             try {
                 result = callInExistingTransaction(transactionManager, callable)
@@ -94,26 +98,27 @@ class TransactionManager constructor(val project: Project) {
          * The [callable] is executed in the UI thread but the call to this method waits until it is completed.
          *
          * @param project The [Project] for which the [callable] should be executed.
+         * @param name The name that represents the write action to the user. E.g. when undoing actions (the confirmation dialog will show this text).
          * @param callable The task to execute
          * @return The result of the [callable].
          */
-        fun <T> computeInWriteAction(project: Project, callable: () -> T): T {
+        fun <T> computeInWriteAction(project: Project, name: String? = null, callable: () -> T): T {
             val result = FinalValue<T>()
             // repeat outside the write lock to release the UI thread between retries (prevent freezes)
-            repeatUntilPassesWithIndex(project) {
+            repeatUntilPassesWithIndex(project, false/* not allowed because entering a write action afterwards */) {
                 ApplicationManager.getApplication().invokeAndWait {
                     // this is executed in the UI thread! keep short to prevent freezes!
                     // write operations are only allowed in the UI thread
                     // see http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html
                     result.computeIfAbsent {
-                        WriteAction.compute<T, RuntimeException> { computeInSmartModeAndCommandProcessor(project, callable) }
+                        WriteAction.compute<T, RuntimeException> { computeInCommandProcessor(project, name, callable) }
                     }
                 }
             }
             return result.get()
         }
 
-        private fun <T> computeInSmartModeAndCommandProcessor(project: Project, callable: () -> T): T {
+        private fun <T> computeInCommandProcessor(project: Project, name: String? = null, callable: () -> T): T {
             val result = FinalValue<T>()
             if (!project.isInitialized) {
                 return result.get()
@@ -122,15 +127,19 @@ class TransactionManager constructor(val project: Project) {
                 DumbService.getInstance(project).runReadActionInSmartMode {
                     result.computeIfAbsent(callable)
                 }
-            }, null, null)
+            }, name, null)
             return result.get()
         }
 
-        fun <T> repeatUntilPassesWithIndex(project: Project, callable: () -> T): T {
+        internal fun <T> repeatUntilPassesWithIndex(project: Project, executeInReadAction: Boolean, callable: () -> T): T {
             while (true) {
                 try {
                     if (project.isInitialized) { // includes !disposed & open
-                        return callable.invoke()
+                        return if (executeInReadAction) {
+                            DumbService.getInstance(project).runReadActionInSmartMode(callable)
+                        } else {
+                            callable.invoke()
+                        }
                     } else {
                         throw ProcessCanceledException()
                     }
@@ -151,6 +160,15 @@ class TransactionManager constructor(val project: Project) {
                 t = t.cause!!
             }
             return t
+        }
+
+        private fun setInBulkUpdateMethod() = BULK_MODE_METHOD.computeIfAbsentAndGet {
+            try {
+                return@computeIfAbsentAndGet Document::class.java.getMethod("setInBulkUpdate", Boolean::class.java)
+            } catch (e: NoSuchMethodException) {
+                SdkLog.debug("Not using bulk mode for large document modifications because not supported by the platform.", onTrace(e))
+                return@computeIfAbsentAndGet null
+            }
         }
     }
 
@@ -209,7 +227,7 @@ class TransactionManager constructor(val project: Project) {
                 return false
             }
             // the boolean result might be null in case the callable was not executed because the project is closing
-            val result: Boolean? = computeInWriteAction(project) { commitAllInUiThread(progress) }
+            val result: Boolean? = computeInWriteAction(project, transactionName) { commitAllInUiThread(progress) }
             return result ?: return false
         } finally {
             m_members.clear()
@@ -219,13 +237,10 @@ class TransactionManager constructor(val project: Project) {
 
     private fun commitAllInUiThread(progress: IdeaProgress): Boolean {
         val workForEnsureWritable = 1
-        progress.init(size() + workForEnsureWritable, "Flush file content")
+        progress.init(size() + workForEnsureWritable, "Starting to commit transaction. Number of members: {}", size())
 
-        val fileSystem = LocalFileSystem.getInstance()
-        val files = m_members.keys
-                .map(Path::toFile)
-                .mapNotNull(fileSystem::findFileByIoFile)
-
+        // make file writable
+        val files = m_members.keys.mapNotNull(Path::toVirtualFile)
         val status = ReadonlyStatusHandler.getInstance(project).ensureFilesWritable(files)
         if (status.hasReadonlyFiles()) {
             SdkLog.info("Unable to make all resources writable. Transaction will be discarded. Message: ${status.readonlyFilesMessage}")
@@ -233,29 +248,63 @@ class TransactionManager constructor(val project: Project) {
         }
         progress.worked(workForEnsureWritable)
 
-        val success = m_members.values
-                .flatten()
-                .map { commitMember(it, progress.newChild(1)) }
-                .all { committed -> committed }
-        if (success) {
-            commitPsiDocuments(m_members.keys)
+        // validate documents
+        val documentManager = FileDocumentManager.getInstance()
+        val documents = files.map { file -> documentManager.getDocument(file) }
+        val documentsReady = documents.all { documentReady(it, documentManager) }
+        if (!documentsReady) {
+            SdkLog.warning("Cannot commit all transaction members because at least one document cannot be written.")
+            return false
         }
-        return success
+
+        // commit
+        return commitDocuments(documents.filterNotNull(), documentManager, progress)
     }
 
-    private fun commitPsiDocuments(files: Set<Path>) {
-        val psiDocManager = PsiDocumentManager.getInstance(project)
-        if (!psiDocManager.hasUncommitedDocuments()) {
-            return
+    @Suppress("MissingRecentApi")
+    private fun commitDocuments(documents: List<Document>, documentManager: FileDocumentManager, progress: IdeaProgress): Boolean {
+        val setInBulkUpdate = setInBulkUpdateMethod() // Can be removed if the supported min. IJ version is 2019.3
+        val useBulkMode = setInBulkUpdate != null && documents.size >= 100
+        try {
+            if (useBulkMode) {
+                documents.forEach { doc -> setInBulkUpdate!!.invoke(doc, true) }
+            }
+            val success = commitMembers(documents, progress)
+            if (success) {
+                documents.forEach { documentManager.saveDocument(it) }
+            }
+            return success
+        } finally {
+            if (useBulkMode) {
+                documents.forEach { doc -> setInBulkUpdate!!.invoke(doc, false) }
+            }
         }
+    }
 
-        val fileDocManager = FileDocumentManager.getInstance()
-        val uncommittedDocuments = psiDocManager.uncommittedDocuments
-        uncommittedDocuments
-                .associate { it to fileDocManager.getFile(it) }
-                .filter { files.contains(it.value?.toNioPath()) }
-                .map { it.key }
-                .forEach { psiDocManager.commitDocument(it) }
+    private fun commitMembers(documents: List<Document>, progress: IdeaProgress): Boolean {
+        val psiDocumentManager = PsiDocumentManager.getInstance(project)
+        try {
+            return m_members.values
+                    .flatten()
+                    .map { commitMember(it, progress.newChild(1)) }
+                    .all { committed -> committed }
+        } finally {
+            documents.forEach { psiDocumentManager.commitDocument(it) }
+        }
+    }
+
+    private fun documentReady(document: Document?, documentManager: FileDocumentManager): Boolean {
+        if (document == null) {
+            return false
+        }
+        if (!document.isWritable) {
+            return false
+        }
+        if (documentManager.isDocumentUnsaved(document)) {
+            // save before overwriting to ensure there are no conflicts afterwards
+            documentManager.saveDocument(document)
+        }
+        return true
     }
 
     private fun commitMember(member: TransactionMember, progress: IdeaProgress): Boolean {

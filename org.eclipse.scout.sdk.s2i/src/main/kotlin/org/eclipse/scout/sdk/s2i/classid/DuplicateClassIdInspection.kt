@@ -25,10 +25,6 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInRe
 
 open class DuplicateClassIdInspection : LocalInspectionTool() {
 
-    companion object {
-        const val SHORT_NAME = "DuplicateClassId"
-    }
-
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
         return try {
             val javaFile = if (file is PsiJavaFile) file else null ?: return ProblemDescriptor.EMPTY_ARRAY

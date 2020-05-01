@@ -14,7 +14,6 @@ import com.intellij.codeInsight.actions.OptimizeImportsProcessor
 import com.intellij.ide.util.DirectoryUtil
 import com.intellij.openapi.fileTypes.StdFileTypes
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
@@ -48,7 +47,8 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
         progress.init(3, "Write {}", cuPath.fileName())
 
         // create in memory file
-        val newPsi = PsiFileFactory.getInstance(project).createFileFromText(cuPath.fileName(), StdFileTypes.JAVA, source, LocalTimeCounter.currentTime(), false, false)
+        val newPsi = PsiFileFactory.getInstance(project)
+                .createFileFromText(cuPath.fileName(), StdFileTypes.JAVA, source, LocalTimeCounter.currentTime(), false, false)
         progress.worked(1)
 
         formatSource(newPsi)
@@ -57,7 +57,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
         optimizeImports(newPsi)
         progress.worked(1)
 
-        registerCompilationUnit(newPsi)
+        TransactionManager.current().register(CompilationUnitWriter(cuPath.targetFile(), newPsi))
 
         createdPsi = newPsi
     }
@@ -78,40 +78,26 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
         }
     }
 
-    protected fun registerCompilationUnit(psi: PsiFile) {
-        val existingFile = LocalFileSystem.getInstance().findFileByIoFile(cuPath.targetFile().toFile())
-        if (existingFile?.exists() == true) {
-            // update existing file
-            TransactionManager
-                    .current()
-                    .register(FileWriter(cuPath.targetFile(), psi.text, project, existingFile))
-        } else {
-            // new file
-            TransactionManager
-                    .current()
-                    .register(NewCompilationUnitWriter(psi, cuPath.targetFile()))
-        }
-    }
 
     companion object {
-        private class NewCompilationUnitWriter(val psi: PsiFile, val targetFile: Path) : TransactionMember {
+        private class CompilationUnitWriter(val targetFile: Path, val psi: PsiFile) : TransactionMember {
 
             override fun file() = targetFile
 
             override fun commit(progress: IdeaProgress): Boolean {
-                progress.init(2, "Write {}", psi.name)
+                progress.init(2, "Write compilation unit {}", psi.name)
+
                 val targetDirectory = targetFile.parent
                 val dir = DirectoryUtil.mkdirs(PsiManager.getInstance(psi.project), targetDirectory.toString().replace(File.separatorChar, '/'))
                         ?: throw SdkException("Cannot write '$targetFile' because the directory could not be created.")
                 progress.worked(1)
 
-                // check again in case it changed in the meantime (must be idempotent)
                 val existingFile = dir.findFile(targetFile.fileName.toString())
                 if (existingFile == null) {
+                    SdkLog.debug("Add new compilation unit '{}'.", psi.name)
                     dir.add(psi)
                 } else {
-                    // it has been created in the meantime -> perform an update instead
-                    FileWriter(targetFile, psi.text, psi.project, existingFile.virtualFile).commit(toIdeaProgress(null))
+                    FileWriter(targetFile, psi.text, psi.project).commit(toIdeaProgress(null))
                 }
                 progress.worked(1)
                 return true

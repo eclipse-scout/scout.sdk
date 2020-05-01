@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.core.util.*
 import org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.s2i.*
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.repeatUntilPassesWithIndex
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import org.jetbrains.jps.model.serialization.PathMacroUtil
 import java.nio.file.Path
@@ -69,8 +69,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
             return job.schedule({ result.get() })
         }
 
-        fun <T> computeInReadAction(project: Project, callable: () -> T): T =
-                DumbService.getInstance(project).runReadActionInSmartMode(callable)
+        fun <T> computeInReadAction(project: Project, callable: () -> T): T = repeatUntilPassesWithIndex(project, true, callable)
 
         fun toIdeaProgress(progress: IProgress?): IdeaProgress = progress?.toIdea() ?: IdeaProgress(null)
     }

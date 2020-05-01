@@ -29,7 +29,6 @@ class EclipseScoutBundle : StartupActivity, DumbAware {
      */
     override fun runActivity(project: Project) {
         derivedResourceManager(project).start() // it will dispose itself
-        classIdCache(project).scheduleCacheSetupIfEnabled() // it will dispose itself
     }
 
     companion object {
