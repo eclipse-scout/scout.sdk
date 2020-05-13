@@ -250,8 +250,9 @@ class TransactionManager constructor(val project: Project, val transactionName: 
 
         // validate documents
         val documentManager = FileDocumentManager.getInstance()
+        val psiDocumentManager = PsiDocumentManager.getInstance(project)
         val documents = files.map { file -> documentManager.getDocument(file) }
-        val documentsReady = documents.all { documentReady(it, documentManager) }
+        val documentsReady = documents.all { documentReady(it, documentManager, psiDocumentManager) }
         if (!documentsReady) {
             SdkLog.warning("Cannot commit all transaction members because at least one document cannot be written.")
             return false
@@ -289,16 +290,23 @@ class TransactionManager constructor(val project: Project, val transactionName: 
                     .map { commitMember(it, progress.newChild(1)) }
                     .all { committed -> committed }
         } finally {
-            documents.forEach { psiDocumentManager.commitDocument(it) }
+            documents.forEach {
+                psiDocumentManager.doPostponedOperationsAndUnblockDocument(it)
+                psiDocumentManager.commitDocument(it)
+            }
         }
     }
 
-    private fun documentReady(document: Document?, documentManager: FileDocumentManager): Boolean {
+    private fun documentReady(document: Document?, documentManager: FileDocumentManager, psiDocumentManager: PsiDocumentManager): Boolean {
         if (document == null) {
             return false
         }
         if (!document.isWritable) {
             return false
+        }
+        if (psiDocumentManager.isUncommited(document)) {
+            // commit before overwriting to ensure the psi can be modified (it is not allowed to modify a psi of an uncommited document).
+            psiDocumentManager.commitDocument(document)
         }
         if (documentManager.isDocumentUnsaved(document)) {
             // save before overwriting to ensure there are no conflicts afterwards
