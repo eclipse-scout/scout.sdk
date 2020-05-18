@@ -10,6 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileVisitResult;
@@ -392,5 +397,63 @@ public final class CoreUtils {
     }
 
     return Strings.notBlank(val);
+  }
+
+  /**
+   * @return the clipboard content as plain text or {@code null} if there is no plain text in the clipboard.
+   */
+  public static String getTextFromClipboard() {
+    if (GraphicsEnvironment.isHeadless()) {
+      return null;
+    }
+    try {
+      Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      Object data = systemClipboard.getData(DataFlavor.stringFlavor);
+      if (data != null) {
+        return data.toString();
+      }
+    }
+    catch (Exception e) {
+      SdkLog.debug("Unable to read plain text from system clipboard.", e);
+    }
+    return null;
+  }
+
+  /**
+   * Sets the given {@link String} into the system clipboard
+   *
+   * @param text
+   *          The text to set
+   * @return {@code true} if the text has been successfully set to the system clipboard.
+   */
+  public static boolean setTextToClipboard(String text) {
+    return setTextToClipboard(text, null);
+  }
+
+  /**
+   * Sets the given {@link String} into the system clipboard
+   * 
+   * @param text
+   *          The text to set
+   * @param ownershipLostCallback
+   *          An optional callback invoked if the owner ship of the clipboard is lost.
+   * @return {@code true} if the text has been successfully set to the system clipboard.
+   */
+  public static boolean setTextToClipboard(String text, ClipboardOwner ownershipLostCallback) {
+    if (GraphicsEnvironment.isHeadless() || text == null) {
+      return false;
+    }
+
+    try {
+      StringSelection stringSelection = new StringSelection(text);
+      ClipboardOwner owner = ownershipLostCallback == null ? stringSelection : ownershipLostCallback;
+      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      clipboard.setContents(stringSelection, owner);
+      return true;
+    }
+    catch (Exception e) {
+      SdkLog.debug("Error setting text to system clipboard.", e);
+      return false;
+    }
   }
 }

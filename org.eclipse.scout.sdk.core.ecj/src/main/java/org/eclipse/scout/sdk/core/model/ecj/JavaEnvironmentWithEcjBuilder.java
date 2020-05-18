@@ -338,8 +338,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
       return false;
     }
 
-    //noinspection resource
-    String s = Strings.replace(f.toString(), f.getFileSystem().getSeparator(), "/");
+    CharSequence s = f.toString().replace(File.separatorChar, '/');
     for (Pattern p : exclusions) {
       if (p.matcher(s).matches()) {
         return true;

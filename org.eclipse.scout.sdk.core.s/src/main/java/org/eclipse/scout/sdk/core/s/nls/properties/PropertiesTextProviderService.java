@@ -84,16 +84,6 @@ public class PropertiesTextProviderService extends TextProviderService {
     return Optional.of(new PropertiesTextProviderService(txtSvc, folderName.toString(), filePrefix));
   }
 
-  public static boolean resourceMatchesPrefix(String resourceName, String prefix) {
-    if (resourceName == null) {
-      return false;
-    }
-    if (prefix == null) {
-      return false;
-    }
-    return resourceName.matches(prefix + "(?:_[a-zA-Z]{2}){0,3}\\.properties");
-  }
-
   /**
    * @return The module relative folder name without leading and ending folder delimiter.
    */

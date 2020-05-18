@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -221,7 +224,20 @@ public final class TranslationStores {
 
   static Stream<ITranslationStore> getAllStoresForModule(Path modulePath, IEnvironment env, IProgress progress) {
     progress.init(20000, "Resolve all translation stores for module '{}'.", modulePath);
-    return Stream.concat(allForJavaModule(modulePath, env, progress.newChild(10000)), allForWebModule(modulePath, env, progress.newChild(10000)));
+    return Stream.concat(allForJavaModule(modulePath, env, progress.newChild(10000)), allForWebModule(modulePath, env, progress.newChild(10000)))
+        .collect(toMap(s -> s.service().type().name(), identity(), TranslationStores::keepLargerStore))
+        .values().stream();
+  }
+
+  /**
+   * In case the same store is part of the java module list and the web module list: keep the one that contains more
+   * elements (unfiltered)
+   */
+  private static ITranslationStore keepLargerStore(ITranslationStore a, ITranslationStore b) {
+    if (a.size() >= b.size()) {
+      return a;
+    }
+    return b;
   }
 
   static boolean isContentAvailable(ITranslationStore s) {

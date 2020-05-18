@@ -44,6 +44,7 @@ repositories {
 dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", SCOUT_SDK_VERSION)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", SCOUT_SDK_VERSION)
+    api("org.apache.commons", "commons-csv", "1.8")
     implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", KOTLIN_VERSION)
     testImplementation("org.mockito", "mockito-core", "3.3.3")
 }
@@ -54,7 +55,7 @@ intellij {
     version = "IU-2019.2.3"
     downloadSources = true
 
-    setPlugins("java", "maven", "copyright", "properties")
+    setPlugins("java", "maven", "copyright", "properties", "CSS", "JavaScriptLanguage")
     updateSinceUntilBuild = false
 
     tasks {
@@ -64,12 +65,12 @@ intellij {
     }
 }
 
-tasks.withType<JavaCompile> {
+tasks.withType<JavaCompile>().configureEach {
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
 }
 
-tasks.withType<KotlinCompile> {
+tasks.withType<KotlinCompile>().configureEach {
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
     kotlinOptions {

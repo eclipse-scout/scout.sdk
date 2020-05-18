@@ -50,6 +50,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import java.lang.reflect.InvocationTargetException
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.function.Function
 import java.util.stream.Stream
 
@@ -228,6 +229,8 @@ fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
 fun VirtualFile.toNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath()
 
 fun VirtualFile.containingModule(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
+
+fun Module.moduleDirPath(): Path = Paths.get(ModuleUtil.getModuleDirPath(this))
 
 fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResult {
     val supplier: Function<PsiClass, Stream<out PsiClass>> = Function { a -> a.supers.stream() }

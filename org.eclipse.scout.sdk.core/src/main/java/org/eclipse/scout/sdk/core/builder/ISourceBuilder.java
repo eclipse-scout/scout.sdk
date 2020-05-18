@@ -129,6 +129,17 @@ public interface ISourceBuilder<TYPE extends ISourceBuilder<TYPE>> {
   TYPE append(long l);
 
   /**
+   * Appends the {@link CharSequence} given to this builder and adds a line separator afterwards.
+   * 
+   * @param s
+   *          The {@link CharSequence} to append. Must not be {@code null}.
+   * @return This builder
+   * @see #nl()
+   * @see #append(CharSequence)
+   */
+  TYPE appendLine(CharSequence s);
+
+  /**
    * Appends a newline delimiter to this {@link ISourceBuilder}. The delimiter is specified by the
    * {@link IBuilderContext#lineDelimiter()} associated with this {@link ISourceBuilder}.
    *

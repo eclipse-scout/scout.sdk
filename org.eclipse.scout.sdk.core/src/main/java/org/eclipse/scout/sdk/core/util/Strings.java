@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.util;
 
 import static java.lang.System.lineSeparator;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.beans.Introspector;
 import java.io.IOException;
@@ -29,8 +30,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * <h3>{@link Strings}</h3><br>
- * Static utility methods to work with {@link String}s.<br>
+ * <h3>{@link Strings}</h3> Static utility methods to work with character sequences like {@link String},
+ * {@link CharSequence}, {@link StringBuilder} or {@code char[]}.
  *
  * @since 6.1.0
  */
@@ -39,6 +40,519 @@ public final class Strings {
   private static final int INDEX_NOT_FOUND = -1;
 
   private Strings() {
+  }
+
+  /**
+   * Checks if the two arrays have the same content comparing the character case sensitive.
+   *
+   * <pre>
+   *   first=null & second=null -> true
+   *   first=a & second=a -> true
+   *   first=abc & second=def -> false
+   *   first=null & second=a -> false
+   * </pre>
+   *
+   * @param first
+   *          The first array
+   * @param second
+   *          The second array
+   * @return {@code true} if both have equal content or both are {@code null}.
+   */
+  public static boolean equals(char[] first, char[] second) {
+    //noinspection ArrayEquality
+    if (first == second) {
+      return true;
+    }
+    if (first == null || second == null) {
+      return false;
+    }
+    if (first.length != second.length) {
+      return false;
+    }
+    for (int i = first.length; --i >= 0;) {
+      if (first[i] != second[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the two arrays have the same content comparing the character using the case sensitivity given. See
+   * {@link #equals(char[], char[])} for more details.
+   *
+   * @param first
+   *          The first array
+   * @param second
+   *          The second array
+   * @param isCaseSensitive
+   *          specifies whether or not the equality should be case sensitive
+   * @return {@code true} if the two arrays are identical character by character according to the value of
+   *         isCaseSensitive or if both are {@code null}.
+   */
+  public static boolean equals(char[] first, char[] second, boolean isCaseSensitive) {
+    if (isCaseSensitive) {
+      return equals(first, second);
+    }
+    //noinspection ArrayEquality
+    if (first == second) {
+      return true;
+    }
+    if (first == null || second == null) {
+      return false;
+    }
+    if (first.length != second.length) {
+      return false;
+    }
+    for (int i = first.length; --i >= 0;) {
+      if (Character.toLowerCase(first[i]) != Character.toLowerCase(second[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the two {@link CharSequence}s have the same content comparing the character case sensitive.
+   *
+   * <pre>
+   *   first=null & second=null -> true
+   *   first=a & second=a -> true
+   *   first=abc & second=def -> false
+   *   first=null & second=a -> false
+   * </pre>
+   *
+   * @param first
+   *          The first {@link CharSequence}
+   * @param second
+   *          The second {@link CharSequence}
+   * @return {@code true} if both have equal content or both are {@code null}.
+   */
+  public static boolean equals(CharSequence first, CharSequence second) {
+    if (first == second) {
+      return true;
+    }
+    if (first == null || second == null) {
+      return false;
+    }
+    if (first.length() != second.length()) {
+      return false;
+    }
+    for (int i = first.length(); --i >= 0;) {
+      if (first.charAt(i) != second.charAt(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the two {@link CharSequence}s have the same content comparing the character using the case sensitivity
+   * given. See {@link #equals(CharSequence, CharSequence)} for more details.
+   *
+   * @param first
+   *          The first {@link CharSequence}
+   * @param second
+   *          The second {@link CharSequence}
+   * @param isCaseSensitive
+   *          specifies whether or not the equality should be case sensitive
+   * @return {@code true} if the two sequences are identical character by character according to the value of
+   *         isCaseSensitive or if both are {@code null}.
+   */
+  public static boolean equals(CharSequence first, CharSequence second, boolean isCaseSensitive) {
+    if (isCaseSensitive) {
+      return equals(first, second);
+    }
+
+    if (first == second) {
+      return true;
+    }
+    if (first == null || second == null) {
+      return false;
+    }
+    if (first.length() != second.length()) {
+      return false;
+    }
+    for (int i = first.length(); --i >= 0;) {
+      if (Character.toLowerCase(first.charAt(i)) != Character.toLowerCase(second.charAt(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Gets the first index having the character given.
+   *
+   * @param toBeFound
+   *          The character to search
+   * @param searchIn
+   *          The array to search in. Must not be {@code null}.
+   * @return The first zero based index having the character given.
+   * @throws NullPointerException
+   *           if the array is {@code null}.
+   */
+  public static int indexOf(char toBeFound, char[] searchIn) {
+    return indexOf(toBeFound, searchIn, 0);
+  }
+
+  /**
+   * Gets the first index having the character given. It starts searching at index start (inclusive) and searches to the
+   * end of the array.
+   *
+   * @param toBeFound
+   *          The character to search
+   * @param searchIn
+   *          The array to search in. Must not be {@code null}.
+   * @param start
+   *          The first index to consider.
+   * @return The first zero based index between start and the end of the array.
+   * @throws NullPointerException
+   *           if the array is {@code null}.
+   */
+  public static int indexOf(char toBeFound, char[] searchIn, int start) {
+    return indexOf(toBeFound, searchIn, start, searchIn.length);
+  }
+
+  /**
+   * Gets the first index having the character given. It starts searching at index start (inclusive) and stops before
+   * index end (exclusive).
+   *
+   * @param toBeFound
+   *          The character to search
+   * @param searchIn
+   *          The array to search in. Must not be {@code null}.
+   * @param start
+   *          The first index to consider.
+   * @param end
+   *          Where to stop searching (exclusive)
+   * @return The first zero based index between start and end having the character given.
+   * @throws NullPointerException
+   *           if the array is {@code null}.
+   */
+  public static int indexOf(char toBeFound, char[] searchIn, int start, int end) {
+    int limit = Math.min(end, searchIn.length);
+    for (int i = start; i < limit; ++i) {
+      if (toBeFound == searchIn[i]) {
+        return i;
+      }
+    }
+    return INDEX_NOT_FOUND;
+  }
+
+  /**
+   * Gets the first index having the character given.
+   *
+   * @param toBeFound
+   *          The character to search
+   * @param searchIn
+   *          The {@link CharSequence} to search in. Must not be {@code null}.
+   * @return The first zero based index having the character given.
+   * @throws NullPointerException
+   *           if the {@link CharSequence} is {@code null}.
+   */
+  public static int indexOf(char toBeFound, CharSequence searchIn) {
+    return indexOf(toBeFound, searchIn, 0);
+  }
+
+  /**
+   * Gets the first index having the character given. It starts searching at index start (inclusive) and searches to the
+   * end of the array.
+   *
+   * @param toBeFound
+   *          The character to search
+   * @param searchIn
+   *          The {@link CharSequence} to search in. Must not be {@code null}.
+   * @param start
+   *          The first index to consider.
+   * @return The first zero based index between start and the end of the array.
+   * @throws NullPointerException
+   *           if the {@link CharSequence} is {@code null}.
+   */
+  public static int indexOf(char toBeFound, CharSequence searchIn, int start) {
+    return indexOf(toBeFound, searchIn, start, searchIn.length());
+  }
+
+  /**
+   * Gets the first index having the character given. It starts searching at index start (inclusive) and stops before
+   * index end (exclusive).
+   *
+   * @param toBeFound
+   *          The character to search
+   * @param searchIn
+   *          The {@link CharSequence} to search in. Must not be {@code null}.
+   * @param start
+   *          The first index to consider.
+   * @param end
+   *          Where to stop searching (exclusive)
+   * @return The first zero based index between start and end having the character given.
+   * @throws NullPointerException
+   *           if the {@link CharSequence} is {@code null}.
+   */
+  public static int indexOf(char toBeFound, CharSequence searchIn, int start, int end) {
+    int limit = Math.max(Math.min(end, searchIn.length()), 0);
+    for (int i = start; i < limit; i++) {
+      if (toBeFound == searchIn.charAt(i)) {
+        return i;
+      }
+    }
+    return INDEX_NOT_FOUND;
+  }
+
+  /**
+   * Like {@link #indexOf(char[], char[])}.
+   */
+  public static int indexOf(CharSequence toBeFound, CharSequence searchIn) {
+    return indexOf(toBeFound, searchIn, 0);
+  }
+
+  /**
+   * Like {@link #indexOf(char[], char[], int)}.
+   */
+  public static int indexOf(CharSequence toBeFound, CharSequence searchIn, int start) {
+    return indexOf(toBeFound, searchIn, start, searchIn.length());
+  }
+
+  /**
+   * Like {@link #indexOf(char[], char[], int, int)}.
+   */
+  public static int indexOf(CharSequence toBeFound, CharSequence searchIn, int start, int end) {
+    int toBeFoundLength = toBeFound.length();
+    if (toBeFoundLength > end || start < 0) {
+      return INDEX_NOT_FOUND;
+    }
+    if (toBeFoundLength == 0) {
+      return 0;
+    }
+    arrayLoop: for (int i = start, max = end - toBeFoundLength + 1; i < max; i++) {
+      if (searchIn.charAt(i) == toBeFound.charAt(0)) {
+        for (int j = 1; j < toBeFoundLength; j++) {
+          if (searchIn.charAt(i + j) != toBeFound.charAt(j)) {
+            continue arrayLoop;
+          }
+        }
+        return i;
+      }
+    }
+    return INDEX_NOT_FOUND;
+  }
+
+  /**
+   * Like {@link #indexOf(char[], char[], int, int, boolean)} but performs a case sensitive search in the full array.
+   */
+  public static int indexOf(char[] toBeFound, char[] searchIn) {
+    return indexOf(toBeFound, searchIn, 0);
+  }
+
+  /**
+   * Like {@link #indexOf(char[], char[], int, int, boolean)} but performs a case sensitive search from the given start
+   * (inclusive) to the end of the array.
+   */
+  public static int indexOf(char[] toBeFound, char[] searchIn, int start) {
+    return indexOf(toBeFound, searchIn, start, searchIn.length);
+  }
+
+  /**
+   * Like {@link #indexOf(char[], char[], int, int, boolean)} but performs a case sensitive search.
+   */
+  public static int indexOf(char[] toBeFound, char[] searchIn, int start, int end) {
+    return indexOf(toBeFound, searchIn, start, end, true);
+  }
+
+  /**
+   * Answers the first index in searchIn for which toBeFound is a matching followup array. Answers -1 if no match is
+   * found.<br>
+   * Examples:
+   * <ol>
+   * <li>
+   *
+   * <pre>
+   * toBeFound = { 'c' }
+   * searchIn = { ' a', 'b', 'c', 'd' }
+   * result => 2
+   * </pre>
+   *
+   * </li>
+   * <li>
+   *
+   * <pre>
+   * toBeFound = { 'e' }
+   * searchIn = { ' a', 'b', 'c', 'd' }
+   * result => -1
+   * </pre>
+   *
+   * </li>
+   * <li>
+   *
+   * <pre>
+   * toBeFound = { 'b', 'c' }
+   * searchIn = { ' a', 'b', 'c', 'd' }
+   * result => 1
+   * </pre>
+   *
+   * </li>
+   * </ol>
+   *
+   * @param toBeFound
+   *          the subarray to search. Must not be {@code null}.
+   * @param searchIn
+   *          the array to be searched in. Must not be {@code null}.
+   * @param start
+   *          the starting index (inclusive) describing where in searchIn to begin searching.
+   * @param end
+   *          the end index (exclusive) describing where in searchIn to stop searching.
+   * @param isCaseSensitive
+   *          describes if the comparation should be case sensitive or not.
+   * @return the first index in searchIn for which the toBeFound array is a matching followup array or -1 if it cannot
+   *         be found.
+   * @throws NullPointerException
+   *           if searchIn is {@code null} or toBeFound is {@code null}
+   */
+  public static int indexOf(char[] toBeFound, char[] searchIn, int start, int end, boolean isCaseSensitive) {
+    int toBeFoundLength = toBeFound.length;
+    if (toBeFoundLength > end || start < 0) {
+      return INDEX_NOT_FOUND;
+    }
+    if (toBeFoundLength == 0) {
+      return 0;
+    }
+    if (isCaseSensitive) {
+      arrayLoop: for (int i = start, max = end - toBeFoundLength + 1; i < max; i++) {
+        if (searchIn[i] == toBeFound[0]) {
+          for (int j = 1; j < toBeFoundLength; j++) {
+            if (searchIn[i + j] != toBeFound[j]) {
+              continue arrayLoop;
+            }
+          }
+          return i;
+        }
+      }
+    }
+    else {
+      arrayLoop: for (int i = start, max = end - toBeFoundLength + 1; i < max; i++) {
+        if (Character.toLowerCase(searchIn[i]) == Character.toLowerCase(toBeFound[0])) {
+          for (int j = 1; j < toBeFoundLength; j++) {
+            if (Character.toLowerCase(searchIn[i + j]) != Character.toLowerCase(toBeFound[j])) {
+              continue arrayLoop;
+            }
+          }
+          return i;
+        }
+      }
+    }
+    return INDEX_NOT_FOUND;
+  }
+
+  /**
+   * Searches for the last index in the {@link CharSequence} which has the character given.
+   *
+   * @param toBeFound
+   *          The character to find
+   * @param searchIn
+   *          The {@link CharSequence} to search in.
+   * @return The last zero based index or -1 if it could not be found.
+   * @throws NullPointerException
+   *           if the sequence is {@code null}.
+   */
+  public static int lastIndexOf(char toBeFound, CharSequence searchIn) {
+    return lastIndexOf(toBeFound, searchIn, 0);
+  }
+
+  /**
+   * Searches for the last index after the given startIndex which has the character specified.
+   *
+   * @param toBeFound
+   *          The character to find.
+   * @param searchIn
+   *          The {@link CharSequence} to search in.
+   * @param startIndex
+   *          The index to start.
+   * @return The last zero based index after the startIndex or -1 if it could not be found.
+   * @throws NullPointerException
+   *           if the sequence is {@code null}.
+   */
+  public static int lastIndexOf(char toBeFound, CharSequence searchIn, int startIndex) {
+    return lastIndexOf(toBeFound, searchIn, startIndex, searchIn.length());
+  }
+
+  /**
+   * Searches for the last index between the startIndex and the endIndex having the given character.
+   *
+   * @param toBeFound
+   *          The character to find.
+   * @param searchIn
+   *          The {@link CharSequence} to search in.
+   * @param startIndex
+   *          The index where to start the search.
+   * @param endIndex
+   *          The index where to end the search.
+   * @returnThe last zero based index between the startIndex and the endIndex or -1 if it could not be found in this
+   *            section.
+   * @throws NullPointerException
+   *           if the sequence is {@code null}.
+   */
+  @SuppressWarnings("squid:S881")
+  public static int lastIndexOf(char toBeFound, CharSequence searchIn, int startIndex, int endIndex) {
+    for (int i = endIndex; --i >= startIndex;) {
+      if (toBeFound == searchIn.charAt(i)) {
+        return i;
+      }
+    }
+    return INDEX_NOT_FOUND;
+  }
+
+  /**
+   * Gets the next index after the given offset at which the current line ends. If invoked for the last line, the array
+   * length (end) is returned.
+   *
+   * @param searchIn
+   *          The array to search in.
+   * @param offset
+   *          The offset within the array where to start the search.
+   * @return The next line end character after the given offset. If no one can be found the array length is returned.
+   */
+  @SuppressWarnings("HardcodedLineSeparator")
+  public static int nextLineEnd(char[] searchIn, int offset) {
+    int nlPos = indexOf('\n', searchIn, offset);
+    if (nlPos < 0) {
+      return searchIn.length; // no more newline found: search to the end of searchIn
+    }
+    if (nlPos > 0 && searchIn[nlPos - 1] == '\r') {
+      nlPos--;
+    }
+    return nlPos;
+  }
+
+  /**
+   * Replaces all occurrences of a character in the specified {@link CharSequence} with another character.
+   *
+   * @param text
+   *          The text in which the characters should be replaced.
+   * @param search
+   *          The character to be replaced.
+   * @param replacement
+   *          The new character to insert instead.
+   * @return A {@link CharSequence} with the new content or {@code null} if the input text is {@code null}.
+   */
+  public static CharSequence replace(CharSequence text, char search, char replacement) {
+    if (text == null) {
+      return null;
+    }
+    if (text.length() < 1) {
+      return "";
+    }
+
+    StringBuilder result = new StringBuilder(text.length());
+    for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
+      if (c == search) {
+        result.append(replacement);
+      }
+      else {
+        result.append(c);
+      }
+    }
+    return result;
   }
 
   /**
@@ -59,7 +573,7 @@ public final class Strings {
 
   /**
    * <p>
-   * Repeat a String n times to form a new {@link String}.
+   * Repeat a {@link CharSequence} n times to form a new {@link CharSequence}.
    * </p>
    * <b>Examples:</b>
    *
@@ -73,12 +587,12 @@ public final class Strings {
    * </pre>
    *
    * @param str
-   *          the {@link String} to repeat, may be {@code null}.
+   *          the {@link CharSequence} to repeat, may be {@code null}.
    * @param n
    *          number of times to repeat, negative treated as zero.
-   * @return a new String consisting of the original String repeated
+   * @return a new {@link CharSequence} consisting of the original CharSequence repeated
    */
-  public static String repeat(String str, int n) {
+  public static CharSequence repeat(CharSequence str, int n) {
     if (str == null) {
       return null;
     }
@@ -89,12 +603,12 @@ public final class Strings {
     for (int i = 0; i < n; i++) {
       b.append(str);
     }
-    return b.toString();
+    return b;
   }
 
   /**
    * <p>
-   * Replaces a String with another String inside a larger String
+   * Replaces a {@link CharSequence} with another {@link CharSequence} inside a larger {@link CharSequence}
    * </p>
    * <p>
    * A {@code null} reference passed to this method is a no-op.
@@ -119,17 +633,17 @@ public final class Strings {
    * @param text
    *          text to search and replace in, may be {@code null}.
    * @param searchString
-   *          the String to search for, may be {@code null}.
+   *          the {@link CharSequence} to search for, may be {@code null}.
    * @param replacement
-   *          the String to replace it with, may be {@code null}.
-   * @return the text with any replacements processed, {@code null} if {@code null} String input.
+   *          the {@link CharSequence} to replace it with, may be {@code null}.
+   * @return the text with any replacements processed, {@code null} if {@code null} input.
    */
-  public static String replace(String text, String searchString, String replacement) {
+  public static CharSequence replace(CharSequence text, CharSequence searchString, CharSequence replacement) {
     if (isEmpty(text) || isEmpty(searchString) || replacement == null || Objects.equals(searchString, replacement)) {
       return text;
     }
     int start = 0;
-    int end = text.indexOf(searchString, start);
+    int end = indexOf(searchString, text, start);
     if (end == INDEX_NOT_FOUND) {
       return text;
     }
@@ -141,50 +655,18 @@ public final class Strings {
     while (end != INDEX_NOT_FOUND) {
       buf.append(text, start, end).append(replacement);
       start = end + replLength;
-      end = text.indexOf(searchString, start);
+      end = indexOf(searchString, text, start);
     }
-    buf.append(text.substring(start));
-    return buf.toString();
-  }
-
-  /**
-   * Replaces all occurrences of a character in the specified {@link CharSequence} with another character.
-   *
-   * @param text
-   *          The text in which the characters should be replaced.
-   * @param search
-   *          The character to be replaced.
-   * @param replacement
-   *          The new character to insert instead.
-   * @return A {@link String} with the new content or {@code null} if the input text is {@code null}.
-   */
-  public static String replace(CharSequence text, char search, char replacement) {
-    if (text == null) {
-      return null;
-    }
-    if (text.length() < 1) {
-      return "";
-    }
-
-    StringBuilder result = new StringBuilder(text.length());
-    for (int i = 0; i < text.length(); i++) {
-      char c = text.charAt(i);
-      if (c == search) {
-        result.append(replacement);
-      }
-      else {
-        result.append(c);
-      }
-    }
-    return result.toString();
+    buf.append(text.subSequence(start, text.length()));
+    return buf;
   }
 
   /**
    * <p>
-   * Counts how many times the substring appears in the larger {@link String}.
+   * Counts how many times the substring appears in the larger {@link CharSequence}.
    * </p>
    * <p>
-   * A {@code null} or empty ("") {@link String} input returns {@code 0}.
+   * A {@code null} or empty ("") {@link CharSequence} input returns {@code 0}.
    * </p>
    * <p>
    * <p>
@@ -201,18 +683,18 @@ public final class Strings {
    * </pre>
    *
    * @param str
-   *          the {@link String} to check, may be {@code null}.
+   *          the {@link CharSequence} to check, may be {@code null}.
    * @param sub
    *          the substring to count, may be {@code null}.
-   * @return the number of occurrences, 0 if either {@link String} is {@code null}.
+   * @return the number of occurrences, 0 if either {@link CharSequence} is {@code null}.
    */
-  public static int countMatches(String str, String sub) {
+  public static int countMatches(CharSequence str, CharSequence sub) {
     if (isEmpty(str) || isEmpty(sub)) {
       return 0;
     }
     int count = 0;
     int idx = 0;
-    while ((idx = str.indexOf(sub, idx)) != INDEX_NOT_FOUND) {
+    while ((idx = indexOf(sub, str, idx)) != INDEX_NOT_FOUND) {
       count++;
       idx += sub.length();
     }
@@ -347,27 +829,6 @@ public final class Strings {
   }
 
   /**
-   * Converts the given input string literal into the representing original string.<br>
-   * This is the inverse function of {@link #toStringLiteral(String)}.
-   *
-   * @param s
-   *          The literal with leading and ending double-quotes
-   * @return the original (un-escaped) string. if it is no valid literal string, {@code null} is returned.
-   */
-  public static String fromStringLiteral(String s) {
-    if (s == null) {
-      return null;
-    }
-
-    int len = s.length();
-    if (len < 2 || s.charAt(0) != '"' || s.charAt(len - 1) != '"') {
-      return null;
-    }
-
-    return replaceLiterals(s.substring(1, len - 1), true);
-  }
-
-  /**
    * Converts the stack trace of the given {@link Throwable} into a {@link String}.
    * <p>
    * The resulting {@link String} contains no leading or trailing line separators.
@@ -389,11 +850,26 @@ public final class Strings {
     }
   }
 
-  private static String replaceLiterals(String result, boolean fromLiteral) {
+  /**
+   * Converts the given input string literal into the representing original string.<br>
+   * This is the inverse function of {@link #toStringLiteral(CharSequence)}.
+   *
+   * @param s
+   *          The literal with leading and ending double-quotes
+   * @return the original (un-escaped) string. if it is no valid literal string, {@code null} is returned.
+   */
+  public static CharSequence fromStringLiteral(CharSequence s) {
+    if (s == null) {
+      return null;
+    }
+    return replaceLiterals(withoutQuotes(s), true);
+  }
+
+  private static CharSequence replaceLiterals(CharSequence result, boolean fromLiteral) {
     //noinspection HardcodedLineSeparator
-    String[] a = {"\b", "\t", "\n", "\f", "\r", "\"", "\\", "\0", "\1", "\2", "\3", "\4", "\5", "\6", "\7"};
+    CharSequence[] a = {"\b", "\t", "\n", "\f", "\r", "\"", "\\", "\0", "\1", "\2", "\3", "\4", "\5", "\6", "\7"};
     //noinspection HardcodedLineSeparator
-    String[] b = {"\\b", "\\t", "\\n", "\\f", "\\r", "\\\"", "\\\\", "\\0", "\\1", "\\2", "\\3", "\\4", "\\5", "\\6", "\\7"};
+    CharSequence[] b = {"\\b", "\\t", "\\n", "\\f", "\\r", "\\\"", "\\\\", "\\0", "\\1", "\\2", "\\3", "\\4", "\\5", "\\6", "\\7"};
 
     if (fromLiteral) {
       return replaceEach(result, b, a);
@@ -402,15 +878,15 @@ public final class Strings {
   }
 
   /**
-   * Converts the given string into a string literal with leading and ending double-quotes including escaping of the
-   * given string.<br>
-   * This is the inverse function of {@link #fromStringLiteral(String)}.
+   * Converts the given {@link CharSequence} into a string literal with leading and ending double-quotes including
+   * escaping of the given string.<br>
+   * This is the inverse function of {@link #fromStringLiteral(CharSequence)}.
    *
    * @param s
    *          the string to convert.
    * @return the literal string ready to be directly inserted into java source or null if the input string is null.
    */
-  public static String toStringLiteral(String s) {
+  public static CharSequence toStringLiteral(CharSequence s) {
     if (s == null) {
       return null;
     }
@@ -419,11 +895,51 @@ public final class Strings {
     b.append('"'); // opening delimiter
     b.append(replaceLiterals(s, false));
     b.append('"'); // closing delimiter
-    return b.toString();
+    return b;
   }
 
   /**
-   * ensures the given java name starts with an upper case character.<br>
+   * Removes leading or trailing double quotes ("), single quotes (') or back ticks (`) from the input.
+   * 
+   * @param literal
+   *          The literal from which the quotes should be removed.
+   * @return The input with removed quotes.
+   */
+  public static CharSequence withoutQuotes(CharSequence literal) {
+    return withoutQuotes(literal, true, true, true);
+  }
+
+  /**
+   * Removes leading and trailing quotes (if existing) from the literal given.<br>
+   * Only the first quotes are removed. If there are nested quotes, the are part of the result.
+   * 
+   * @param literal
+   *          The literal from which the quotes should be removed.
+   * @param removeDouble
+   *          {@code true} if double quotes (") should be removed if found.
+   * @param removeSingle
+   *          {@code true} if single quotes (') should be removed if found.
+   * @param removeBackTick
+   *          {@code true} if back ticks (`) should be removed if found.
+   * @return The input with removed leading and trailing quotes respecting the enabled quote types.
+   */
+  public static CharSequence withoutQuotes(CharSequence literal, boolean removeDouble, boolean removeSingle, boolean removeBackTick) {
+    if (literal == null || literal.length() < 2 || (!removeDouble && !removeSingle && !removeBackTick)) {
+      return literal;
+    }
+
+    boolean[] enabled = new boolean[]{removeDouble, removeSingle, removeBackTick};
+    char[] toRemove = new char[]{'"', '\'', '`'};
+    for (int i = 0; i < toRemove.length; i++) {
+      if (enabled[i] && literal.charAt(0) == toRemove[i] && literal.charAt(literal.length() - 1) == toRemove[i]) {
+        return literal.subSequence(1, literal.length() - 1);
+      }
+    }
+    return literal;
+  }
+
+  /**
+   * Ensures the given name starts with an upper case character.<br>
    * <br>
    * <b>Note:</b><br>
    * To ensure the first char starts with a lower case letter use {@link Introspector#decapitalize(String)}
@@ -433,14 +949,13 @@ public final class Strings {
    * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
    *         Otherwise the input string is returned with the first character modified to upper case.
    */
-  public static String ensureStartWithUpperCase(String name) {
+  public static CharSequence ensureStartWithUpperCase(CharSequence name) {
     if (isEmpty(name) || Character.isUpperCase(name.charAt(0))) {
       return name;
     }
-
-    char[] chars = name.toCharArray();
-    chars[0] = Character.toUpperCase(chars[0]);
-    return new String(chars);
+    return new StringBuilder(name.length())
+        .append(Character.toUpperCase(name.charAt(0)))
+        .append(name, 1, name.length());
   }
 
   /**
@@ -450,15 +965,15 @@ public final class Strings {
    *          The input HTML.
    * @return The escaped version.
    */
-  public static String escapeHtml(String html) {
+  public static CharSequence escapeHtml(CharSequence html) {
     return replaceEach(html,
-        new String[]{"\"", "&", "<", ">", "'", "/"},
-        new String[]{"&quot;", "&amp;", "&lt;", "&gt;", "&apos;", "&#47;"});
+        new CharSequence[]{"\"", "&", "<", ">", "'", "/"},
+        new CharSequence[]{"&#92;", "&#38;", "&#60;", "&#62;", "&#39;", "&#47;"});
   }
 
   /**
    * <p>
-   * Replaces all occurrences of Strings within another String.
+   * Replaces all occurrences of strings within another string.
    * </p>
    * <p>
    * A {@code null} reference passed to this method is a no-op, or if any "search string" or "string to replace" is
@@ -483,16 +998,16 @@ public final class Strings {
    * @param text
    *          text to search and replace in, no-op if {@code null}.
    * @param searchList
-   *          the Strings to search for, no-op if {@code null}.
+   *          the strings to search for, no-op if {@code null}.
    * @param replacementList
-   *          the Strings to replace them with, no-op if {@code null}.
-   * @return the text with any replacements processed, {@code null} if {@code null} String input.
+   *          the strings to replace them with, no-op if {@code null}.
+   * @return the text with any replacements processed, {@code null} if {@code null} input.
    * @throws IllegalArgumentException
    *           if the lengths of the arrays are not the same ({@code null} is ok, and/or size 0)
    */
   @SuppressWarnings("pmd:NPathComplexity")
-  public static String replaceEach(String text, String[] searchList, String[] replacementList) {
-    if (text == null || text.isEmpty()) {
+  public static CharSequence replaceEach(CharSequence text, CharSequence[] searchList, CharSequence[] replacementList) {
+    if (text == null || text.length() == 0) {
       return text;
     }
     if (searchList == null || searchList.length == 0) {
@@ -504,37 +1019,31 @@ public final class Strings {
 
     int searchLength = searchList.length;
     int replacementLength = replacementList.length;
-
-    // make sure lengths are ok, these need to be equal
-    if (searchLength != replacementLength) {
-      throw new IllegalArgumentException("Search and Replace array lengths don't match: "
-          + searchLength
-          + " vs "
-          + replacementLength);
+    if (searchLength != replacementLength) { // make sure lengths are ok, these need to be equal
+      throw newFail("Search and Replace array lengths don't match: {} vs {}", searchLength, replacementLength);
     }
 
     // keep track of which still have matches
     boolean[] noMoreMatchesForReplIndex = new boolean[searchLength];
 
     // index on index that the match was found
-    int textIndex = -1;
-    int replaceIndex = -1;
+    int textIndex = INDEX_NOT_FOUND;
+    int replaceIndex = INDEX_NOT_FOUND;
     int tempIndex;
 
     // index of replace array that will replace the search string found
     for (int i = 0; i < searchLength; i++) {
-      if (noMoreMatchesForReplIndex[i] || searchList[i] == null ||
-          searchList[i].isEmpty() || replacementList[i] == null) {
+      if (noMoreMatchesForReplIndex[i] || searchList[i] == null || searchList[i].length() == 0 || replacementList[i] == null) {
         continue;
       }
-      tempIndex = text.indexOf(searchList[i]);
+      tempIndex = indexOf(searchList[i], text);
 
       // see if we need to keep searching for this
-      if (tempIndex == -1) {
+      if (tempIndex == INDEX_NOT_FOUND) {
         noMoreMatchesForReplIndex[i] = true;
       }
       else {
-        if (textIndex == -1 || tempIndex < textIndex) {
+        if (textIndex == INDEX_NOT_FOUND || tempIndex < textIndex) {
           textIndex = tempIndex;
           replaceIndex = i;
         }
@@ -542,7 +1051,7 @@ public final class Strings {
     }
 
     // no search strings found, we are done
-    if (textIndex == -1) {
+    if (textIndex == INDEX_NOT_FOUND) {
       return text;
     }
 
@@ -550,9 +1059,8 @@ public final class Strings {
 
     // get a good guess on the size of the result buffer so it doesn't have to double if it goes over a bit
     int increase = getLengthIncreaseGuess(text, searchList, replacementList);
-
     StringBuilder result = new StringBuilder(text.length() + increase);
-    while (textIndex != -1) {
+    while (textIndex != INDEX_NOT_FOUND) {
 
       for (int i = start; i < textIndex; i++) {
         result.append(text.charAt(i));
@@ -561,22 +1069,21 @@ public final class Strings {
 
       start = textIndex + searchList[replaceIndex].length();
 
-      textIndex = -1;
-      replaceIndex = -1;
+      textIndex = INDEX_NOT_FOUND;
+      replaceIndex = INDEX_NOT_FOUND;
       // find the next earliest match
       for (int i = 0; i < searchLength; i++) {
-        if (noMoreMatchesForReplIndex[i] || searchList[i] == null ||
-            searchList[i].isEmpty() || replacementList[i] == null) {
+        if (noMoreMatchesForReplIndex[i] || searchList[i] == null || searchList[i].length() == 0 || replacementList[i] == null) {
           continue;
         }
-        tempIndex = text.indexOf(searchList[i], start);
+        tempIndex = indexOf(searchList[i], text, start);
 
         // see if we need to keep searching for this
-        if (tempIndex == -1) {
+        if (tempIndex == INDEX_NOT_FOUND) {
           noMoreMatchesForReplIndex[i] = true;
         }
         else {
-          if (textIndex == -1 || tempIndex < textIndex) {
+          if (textIndex == INDEX_NOT_FOUND || tempIndex < textIndex) {
             textIndex = tempIndex;
             replaceIndex = i;
           }
@@ -587,24 +1094,23 @@ public final class Strings {
     for (int i = start; i < textLength; i++) {
       result.append(text.charAt(i));
     }
-    return result.toString();
+    return result;
   }
 
-  private static int getLengthIncreaseGuess(CharSequence text, String[] searchList, String[] replacementList) {
+  private static int getLengthIncreaseGuess(CharSequence text, CharSequence[] searchList, CharSequence[] replacementList) {
     int increase = 0;
     // count the replacement text elements that are larger than their corresponding text being replaced
     for (int i = 0; i < searchList.length; i++) {
       if (searchList[i] == null || replacementList[i] == null) {
         continue;
       }
-      int greater = replacementList[i].length() - searchList[i].length();
-      if (greater > 0) {
-        increase += 3 * greater; // assume 3 matches
+      int longer = replacementList[i].length() - searchList[i].length();
+      if (longer > 0) {
+        increase += 3 * longer; // assume 3 matches
       }
     }
     // have upper-bound at 20% increase, then let Java take over
-    increase = Math.min(increase, text.length() / 5);
-    return increase;
+    return Math.min(increase, text.length() / 5);
   }
 
   /**
@@ -731,6 +1237,15 @@ public final class Strings {
    * @see String#compareTo(String)
    */
   public static int compareTo(CharSequence a, CharSequence b) {
+    if (a == null && b == null) {
+      return 0;
+    }
+    if (a == null) {
+      return INDEX_NOT_FOUND;
+    }
+    if (b == null) {
+      return 1;
+    }
     int limit = Math.min(a.length(), b.length());
     for (int i = 0; i < limit; i++) {
       char x = a.charAt(i);

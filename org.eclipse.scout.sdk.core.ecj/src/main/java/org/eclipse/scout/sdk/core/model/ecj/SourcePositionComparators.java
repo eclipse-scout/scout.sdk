@@ -73,10 +73,6 @@ final class SourcePositionComparators {
 
     static int getSourcePosition(MethodBinding mb) {
       MethodBinding methodBinding = SpiWithEcjUtils.nvl(mb.original(), mb);
-      if (methodBinding == null) {
-        return UNKNOWN_SOURCE_POS;
-      }
-
       AbstractMethodDeclaration decl = SpiWithEcjUtils.sourceMethodOf(methodBinding);
       if (decl == null) {
         return UNKNOWN_SOURCE_POS;
@@ -102,10 +98,6 @@ final class SourcePositionComparators {
 
     static int getSourcePosition(FieldBinding fb) {
       FieldBinding fieldBinding = SpiWithEcjUtils.nvl(fb.original(), fb);
-      if (fieldBinding == null) {
-        return UNKNOWN_SOURCE_POS;
-      }
-
       FieldDeclaration decl = fieldBinding.sourceField();
       if (decl == null) {
         return UNKNOWN_SOURCE_POS;

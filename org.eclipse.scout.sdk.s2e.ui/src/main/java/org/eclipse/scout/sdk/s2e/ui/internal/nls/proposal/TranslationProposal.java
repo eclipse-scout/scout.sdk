@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.proposal;
 
+import static org.eclipse.scout.sdk.core.util.Strings.escapeHtml;
+import static org.eclipse.scout.sdk.core.util.Strings.replaceEach;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,7 +23,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.Language;
-import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.swt.graphics.Image;
@@ -56,10 +58,9 @@ public class TranslationProposal extends AbstractTranslationProposal {
 
     StringBuilder b = new StringBuilder();
     for (Entry<Language, String> e : allTranslations.entrySet()) {
-      String text = e.getValue();
       //noinspection HardcodedLineSeparator
-      text = Strings.replaceEach(Strings.escapeHtml(text), new String[]{"\n", "\r"}, new String[]{"<br>", ""});
-      b.append("<b>").append(text).append("</b> [").append(e.getKey().displayName()).append("]<br>");
+      CharSequence text = replaceEach(escapeHtml(e.getValue()), new String[]{"\n", "\r"}, new String[]{"<br>", ""});
+      b.append("<b>").append(text).append("</b> [").append(escapeHtml(e.getKey().displayName())).append("]<br>");
     }
     return b.toString();
   }

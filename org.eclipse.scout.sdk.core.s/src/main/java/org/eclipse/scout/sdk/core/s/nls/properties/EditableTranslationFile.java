@@ -10,28 +10,21 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
-import static java.util.stream.Collectors.toMap;
+import static org.eclipse.scout.sdk.core.util.Strings.isBlank;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.generator.properties.PropertiesGenerator;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link EditableTranslationFile}</h3>
@@ -43,8 +36,8 @@ public class EditableTranslationFile extends AbstractTranslationPropertiesFile {
   private final Path m_file;
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  public EditableTranslationFile(Path file) {
-    super(parseFromFileNameOrThrow(file.getFileName().toString()), () -> toStream(file));
+  public EditableTranslationFile(Path file, Language language) {
+    super(language, () -> toStream(file));
     m_file = Ensure.notNull(file);
   }
 
@@ -67,66 +60,30 @@ public class EditableTranslationFile extends AbstractTranslationPropertiesFile {
   }
 
   @Override
-  protected void writeEntries(Map<String, String> entries, IEnvironment env, IProgress progress) {
+  protected void writeEntries(PropertiesGenerator content, IEnvironment env, IProgress progress) {
     progress.init(100, "Write translation properties file");
 
     // remove empty texts
-    Map<String, String> filteredTexts = entries.entrySet().stream()
-        .filter(e -> !Strings.isBlank(e.getValue()))
-        .collect(toMap(Entry::getKey, Entry::getValue));
+    content.properties().entrySet().removeIf(entry -> isBlank(entry.getValue()) || isBlank(entry.getKey()));
+    progress.worked(10);
 
-    if (filteredTexts.isEmpty()) {
+    if (content.properties().isEmpty()) {
       // this file has no more texts: remove it
       try {
-        Files.deleteIfExists(file());
+        Files.deleteIfExists(path());
       }
       catch (IOException e) {
-        throw new SdkException("Unable to remove file '{}'.", file(), e);
+        throw new SdkException("Unable to remove file '{}'.", path(), e);
       }
-      progress.worked(100);
+      progress.worked(90);
       return;
     }
 
-    String[] propertiesEncodedLines = propertiesEncode(filteredTexts);
-    progress.worked(20);
-
-    Arrays.sort(propertiesEncodedLines);
-    progress.worked(10);
-
-    env.writeResource(b -> appendLines(b, propertiesEncodedLines), file(), progress.newChild(70));
+    env.writeResource(content, path(), progress.newChild(70));
+    progress.worked(90);
   }
 
-  private static void appendLines(ISourceBuilder<?> builder, String[] linesSorted) {
-    for (int i = firstNonCommentLine(linesSorted); i < linesSorted.length; i++) {
-      builder.append(linesSorted[i]).nl();
-    }
-  }
-
-  private static int firstNonCommentLine(String[] lines) {
-    int i = 0;
-    while (lines.length > i && lines[i].startsWith("#")) {
-      i++;
-    }
-    return i;
-  }
-
-  private static String[] propertiesEncode(Map<String, String> entries) {
-    Properties prop = new Properties();
-    //noinspection UseOfPropertiesAsHashtable
-    prop.putAll(entries);
-
-    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      prop.store(out, null);
-      String content = out.toString(StandardCharsets.ISO_8859_1.name());
-      String systemNl = System.lineSeparator();
-      return Pattern.compile(systemNl).split(content);
-    }
-    catch (IOException e) {
-      throw new SdkException("Error encoding translations", e);
-    }
-  }
-
-  public Path file() {
+  public Path path() {
     return m_file;
   }
 }

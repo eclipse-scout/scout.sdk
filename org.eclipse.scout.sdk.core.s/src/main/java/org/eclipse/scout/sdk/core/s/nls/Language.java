@@ -29,7 +29,7 @@ public final class Language implements Comparable<Language> {
   /**
    * The regular expression of a valid {@link String} representation of a {@link Language}.
    */
-  public static final String LANGUAGE_REGEX = "([^_]+)(?:_([\\w]{2}))?(?:_([\\w]{2}))?";
+  public static final String LANGUAGE_REGEX = "([^_]+)(?:_([^_]+))?(?:_(.+))?";
 
   /**
    * Represents the default language used if no other language matches.
@@ -99,8 +99,7 @@ public final class Language implements Comparable<Language> {
    *           if the specified name is not valid according to {@link #LANGUAGE_REGEX}.
    */
   public static Language parseThrowingOnError(CharSequence name) {
-    return parse(name)
-        .orElseThrow(() -> newFail("Invalid language name '{}'. Language cannot be parsed.", name));
+    return parse(name).orElseThrow(() -> newFail("Invalid language name '{}'. Language cannot be parsed.", name));
   }
 
   /**
@@ -114,8 +113,7 @@ public final class Language implements Comparable<Language> {
   public static Optional<Language> parse(CharSequence name) {
     Matcher matcher = LANGUAGE_PATTERN.matcher(name);
     if (matcher.matches()) {
-      if (matcher.group(2) == null
-          && LANGUAGE_DEFAULT.locale().toString().equals(matcher.group(1))) {
+      if (matcher.group(2) == null && LANGUAGE_DEFAULT.locale().toString().equals(matcher.group(1))) {
         return Optional.of(LANGUAGE_DEFAULT);
       }
 
@@ -127,6 +125,9 @@ public final class Language implements Comparable<Language> {
       String variantIso = matcher.group(3);
       if (variantIso == null) {
         variantIso = "";
+      }
+      else if (variantIso.startsWith("_")) {
+        variantIso = variantIso.substring(1);
       }
       return Optional.of(new Language(new Locale(languageIso, countryIso, variantIso)));
     }

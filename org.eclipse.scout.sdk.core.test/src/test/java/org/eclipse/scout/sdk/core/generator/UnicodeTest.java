@@ -48,7 +48,7 @@ public class UnicodeTest {
     testApiOfClassWithUnicode(type);
 
     assertEquals(ClassWithUnicode.UNICODE, type.fields().first().get().constantValue().get().as(String.class));
-    assertEqualsRefFile(REF_FILE_FOLDER + "MethodWithUnicode.txt", type.methods().first().get().source().get().asCharSequence().toString());
+    assertEqualsRefFile(REF_FILE_FOLDER + "MethodWithUnicode.txt", type.methods().first().get().source().get().asCharSequence());
     assertEqualsRefFile(env, REF_FILE_FOLDER + "ClassWithUnicode.txt", type.toWorkingCopy());
   }
 

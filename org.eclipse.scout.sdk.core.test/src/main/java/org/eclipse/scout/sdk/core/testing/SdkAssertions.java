@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.opentest4j.AssertionFailedError;
 
 /**
  * <h3>{@link SdkAssertions}</h3>
@@ -120,7 +121,7 @@ public final class SdkAssertions {
    *          The {@link ISourceGenerator} to use. Must not be {@code null}.
    */
   public static void assertEqualsRefFile(IJavaEnvironment env, String fileWithExpectedContent, ISourceGenerator<ISourceBuilder<?>> generator) {
-    String src = Ensure.notNull(generator).toSource(identity(), new JavaBuilderContext(Ensure.notNull(env))).toString();
+    CharSequence src = Ensure.notNull(generator).toSource(identity(), new JavaBuilderContext(Ensure.notNull(env)));
     assertEqualsRefFile(fileWithExpectedContent, src);
   }
 
@@ -132,15 +133,19 @@ public final class SdkAssertions {
    * @param actualContent
    *          The actual content to compare against.
    */
-  public static void assertEqualsRefFile(String fileWithExpectedContent, String actualContent) {
-    String refSrc;
+  public static void assertEqualsRefFile(String fileWithExpectedContent, CharSequence actualContent) {
+    CharSequence refSrc;
     try (InputStream in = SdkAssertions.class.getClassLoader().getResourceAsStream(Ensure.notNull(fileWithExpectedContent))) {
-      refSrc = Strings.fromInputStream(Ensure.notNull(in, "File '{}' could not be found on classpath.", fileWithExpectedContent), StandardCharsets.UTF_8).toString();
+      refSrc = Strings.fromInputStream(Ensure.notNull(in, "File '{}' could not be found on classpath.", fileWithExpectedContent), StandardCharsets.UTF_8);
     }
     catch (IOException e) {
       throw new SdkException(e);
     }
-    assertEquals(normalizeNewLines(refSrc), normalizeNewLines(actualContent));
+    CharSequence expected = normalizeNewLines(refSrc);
+    CharSequence actual = normalizeNewLines(actualContent);
+    if (!Strings.equals(expected, actual)) {
+      throw new AssertionFailedError(null, expected, actual);
+    }
   }
 
   /**

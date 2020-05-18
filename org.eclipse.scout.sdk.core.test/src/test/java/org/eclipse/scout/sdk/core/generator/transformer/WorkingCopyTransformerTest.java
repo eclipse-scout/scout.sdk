@@ -263,7 +263,7 @@ public class WorkingCopyTransformerTest {
             .withElementName("toString")) // override toString
         .withAllMethodsImplemented(transformer); // override all methods required by super types.
 
-    assertEqualsRefFile(env, REF_FILE_FOLDER + "TranformerTest1.txt", generator);
+    assertEqualsRefFile(env, REF_FILE_FOLDER + "TransformerTest1.txt", generator);
   }
 
   /**

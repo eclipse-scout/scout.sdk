@@ -11,8 +11,9 @@
 package org.eclipse.scout.sdk.s2e.nls;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
-import static org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTextProviderService.resourceMatchesPrefix;
+import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseLanguageFromFileName;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -46,7 +47,6 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStoreSupplier;
-import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.ITranslationPropertiesFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTextProviderService;
@@ -133,10 +133,10 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
 
   private static boolean loadStoreFromWorkspace(IType jdtType, PropertiesTranslationStore store, IProgress progress) {
     try {
-      store.load(filesFromWorkspace(jdtType, store), progress);
+      store.load(filesFromWorkspace(jdtType, store.service()), progress);
       return true;
     }
-    catch (CoreException e) {
+    catch (JavaModelException e) {
       SdkLog.warning("Unable to load properties files of type '{}'.", jdtType.getFullyQualifiedName(), e);
       return false;
     }
@@ -159,30 +159,34 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     }
   }
 
-  private static Collection<ITranslationPropertiesFile> filesFromWorkspace(IJavaElement jdtType, @SuppressWarnings("TypeMayBeWeakened") PropertiesTranslationStore store) throws CoreException {
-    IPath translationPath = new org.eclipse.core.runtime.Path(store.service().folder());
-    List<IFile> propertiesFiles = getAllTranslations(jdtType.getJavaProject(), translationPath, store.service().filePrefix());
-
-    Collection<ITranslationPropertiesFile> translationFiles = new ArrayList<>(propertiesFiles.size());
-    for (IFile file : propertiesFiles) {
-      translationFiles.add(new EditableTranslationFile(file.getLocation().toFile().toPath()));
-    }
-    return translationFiles;
+  private static Collection<ITranslationPropertiesFile> filesFromWorkspace(IJavaElement jdtType, PropertiesTextProviderService service) throws JavaModelException {
+    IPath translationPath = new org.eclipse.core.runtime.Path(service.folder());
+    return getFiles(jdtType.getJavaProject(), translationPath, service.filePrefix());
   }
 
-  private static List<IFile> getAllTranslations(IJavaProject toLookAt, IPath path, String fileNamePrefix) throws CoreException {
-    return getAllTranslations(getFoldersOfProject(toLookAt, path), fileNamePrefix);
+  private static List<ITranslationPropertiesFile> getFiles(IJavaProject toLookAt, IPath path, String fileNamePrefix) throws JavaModelException {
+    return getFoldersOfProject(toLookAt, path)
+        .flatMap(EclipseTranslationStoreSupplier::filesInFolder)
+        .map(file -> toEditableTranslationFile(file, fileNamePrefix))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toList());
   }
 
-  private static List<IFolder> getFoldersOfProject(IJavaProject project, IPath path) throws JavaModelException {
+  private static Optional<ITranslationPropertiesFile> toEditableTranslationFile(IResource file, String fileNamePrefix) {
+    return parseLanguageFromFileName(file.getName(), fileNamePrefix)
+        .map(lang -> new EditableTranslationFile(file.getLocation().toFile().toPath(), lang));
+  }
+
+  private static Stream<IFolder> getFoldersOfProject(IJavaProject project, IPath path) throws JavaModelException {
     if (!JdtUtils.exists(project) || !project.getProject().isAccessible()) {
-      return emptyList();
+      return Stream.empty();
     }
 
     // check runtime dir
     IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     IClasspathEntry[] clEntries = project.getRawClasspath();
-    List<IFolder> folders = new ArrayList<>();
+    Collection<IFolder> folders = new ArrayList<>();
     for (IClasspathEntry entry : clEntries) {
       if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
         IPath toCheck = entry.getPath().append(path);
@@ -198,22 +202,18 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     if (foundFolder != null && foundFolder.exists()) {
       folders.add(foundFolder);
     }
-    return folders;
+    return folders.stream();
   }
 
-  private static List<IFile> getAllTranslations(Iterable<IFolder> folders, String fileNamePrefix) throws CoreException {
-    List<IFile> files = new ArrayList<>();
-    for (IFolder folder : folders) {
-      if (folder.exists()) {
-        IResource[] resources = folder.members(IResource.NONE);
-        for (IResource resource : resources) {
-          if (resource instanceof IFile && resourceMatchesPrefix(resource.getName(), fileNamePrefix)) {
-            files.add((IFile) resource);
-          }
-        }
-      }
+  private static Stream<IFile> filesInFolder(IFolder folder) {
+    try {
+      return Stream.of(folder.members(IResource.NONE))
+          .filter(member -> member instanceof IFile)
+          .map(member -> (IFile) member);
     }
-    return files;
+    catch (CoreException e) {
+      throw new SdkException("Cannot read content of folder '{}'.", folder, e);
+    }
   }
 
   private static Collection<ITranslationPropertiesFile> filesFromPlatform(IPackageFragmentRoot r, @SuppressWarnings("TypeMayBeWeakened") PropertiesTranslationStore store) throws JavaModelException {
@@ -230,10 +230,9 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     for (Object o : textFolder.getNonJavaResources()) {
       if (o instanceof IStorage) {
         IStorage f = (IStorage) o;
-        String fileName = f.getName();
-        if (resourceMatchesPrefix(fileName, fileNamePrefix)) {
-          translationFiles.add(new ReadOnlyTranslationFile(() -> contentsOf(f), AbstractTranslationPropertiesFile.parseFromFileNameOrThrow(fileName)));
-        }
+        parseLanguageFromFileName(f.getName(), fileNamePrefix)
+            .map(lang -> new ReadOnlyTranslationFile(() -> contentsOf(f), lang, f))
+            .ifPresent(translationFiles::add);
       }
     }
     return translationFiles;

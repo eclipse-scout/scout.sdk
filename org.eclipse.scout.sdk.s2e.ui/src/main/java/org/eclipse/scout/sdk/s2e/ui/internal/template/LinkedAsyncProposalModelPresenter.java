@@ -72,7 +72,7 @@ public final class LinkedAsyncProposalModelPresenter {
     if (endPosition != null) {
       offset = endPosition.getOffset();
     }
-    if (offset != -1 && endPosition != null) {
+    if (offset != -1) {
       ui.setExitPosition(viewer, offset + endPosition.getLength(), 0, Integer.MAX_VALUE);
     }
     else if (!switchedEditor) {

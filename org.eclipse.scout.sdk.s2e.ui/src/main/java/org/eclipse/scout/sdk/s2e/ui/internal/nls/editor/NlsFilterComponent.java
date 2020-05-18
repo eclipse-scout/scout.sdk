@@ -150,7 +150,7 @@ public class NlsFilterComponent extends Composite {
         text = "";
       }
       else {
-        text = Strings.replace(text, "&", "");
+        text = Strings.replace(text, "&", "").toString();
       }
       return CharOperation.match(m_pattern, text.toCharArray(), false);
     }

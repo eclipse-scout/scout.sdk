@@ -36,6 +36,7 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    *          Specifies if a new line should be created for each array element.
    * @return This builder
    */
+  @SuppressWarnings("HtmlTagCanBeJavadocTag")
   TYPE array(Stream<? extends ISourceGenerator<ISourceBuilder<?>>> elements, boolean formatWithNewlines);
 
   /**
@@ -47,7 +48,7 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    *          The name of the enum field to reference. Must not be {@code null}.
    * @return This builder
    */
-  TYPE enumValue(String enumType, CharSequence enumField);
+  TYPE enumValue(CharSequence enumType, CharSequence enumField);
 
   /**
    * Appends a class literal for the given type.
@@ -61,9 +62,9 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
   TYPE classLiteral(CharSequence reference);
 
   /**
-   * Appends a {@link String} literal with given value. The value is automatically escaped as necessary and surrounded
-   * with quotes.<br>
-   * If the specified value is {@code null}, a null literal is appended (see {@link #nullLiteral()}).
+   * Appends a string literal with given value. The value is automatically escaped as necessary and surrounded with
+   * double quotes.<br>
+   * If the specified value is {@code null}, a null literal is appended instead (see {@link #nullLiteral()}).
    * <p>
    * <b>Example:</b> {@code abc"def} -> {@code "abc\"def"}
    *
@@ -71,7 +72,7 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    *          The literal value without leading and trailing quotes or {@code null}.
    * @return This builder
    */
-  TYPE stringLiteral(String literalValue);
+  TYPE stringLiteral(CharSequence literalValue);
 
   /**
    * Appends {@code null}.
@@ -81,8 +82,8 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
   TYPE nullLiteral();
 
   /**
-   * Appends a {@link String} array with the elements from the specified {@link Stream}. The values are automatically
-   * escaped as necessary and surrounded with quotes.
+   * Appends a string array with the elements from the specified {@link Stream}. The values are automatically escaped as
+   * necessary and surrounded with quotes.
    *
    * @param elements
    *          The raw elements of the array. Must not be {@code null}. If a value in the {@link Stream} is {@code null},
@@ -90,13 +91,13 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    * @param formatWithNewlines
    *          Specifies if a new line should be created for each array element.
    * @return This builder
-   * @see #stringLiteral(String)
+   * @see #stringLiteral(CharSequence)
    * @see #nullLiteral()
    */
-  TYPE stringLiteralArray(Stream<String> elements, boolean formatWithNewlines);
+  TYPE stringLiteralArray(Stream<? extends CharSequence> elements, boolean formatWithNewlines);
 
   /**
-   * Appends a {@link String} array with the elements from the specified array. The values are automatically escaped as
+   * Appends a string array with the elements from the specified array. The values are automatically escaped as
    * necessary and surrounded with quotes.
    *
    * @param elements
@@ -105,13 +106,13 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    * @param formatWithNewlines
    *          Specifies if a new line should be created for each array element.
    * @return This builder
-   * @see #stringLiteral(String)
+   * @see #stringLiteral(CharSequence)
    * @see #nullLiteral()
    */
-  TYPE stringLiteralArray(String[] elements, boolean formatWithNewlines);
+  TYPE stringLiteralArray(CharSequence[] elements, boolean formatWithNewlines);
 
   /**
-   * Appends a {@link String} array with the elements from the specified array. The values are automatically escaped as
+   * Appends a string array with the elements from the specified array. The values are automatically escaped as
    * necessary and surrounded with quotes.
    *
    * @param elements
@@ -120,14 +121,14 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    * @param formatWithNewlines
    *          Specifies if a new line should be created for each array element.
    * @param stringLiteralOnSingleElementArray
-   *          If {@code true} and the given element array exactly contains one element, a {@link String} literal is
-   *          appended instead of an array with one {@link String} literal. This may be useful e.g. for annotation
-   *          element values: An element of type {@link String} array may also be filled with a {@link String} literal.
+   *          If {@code true} and the given element array exactly contains one element, a string literal is appended
+   *          instead of an array with one string literal. This may be useful e.g. for annotation element values: An
+   *          element of type string array may also be filled with a string literal.
    * @return This builder
-   * @see #stringLiteral(String)
+   * @see #stringLiteral(CharSequence)
    * @see #nullLiteral()
    */
-  TYPE stringLiteralArray(String[] elements, boolean formatWithNewlines, boolean stringLiteralOnSingleElementArray);
+  TYPE stringLiteralArray(CharSequence[] elements, boolean formatWithNewlines, boolean stringLiteralOnSingleElementArray);
 
   /**
    * Appends the default value for the given data type. This method has no effect if the given data type has no default
@@ -137,7 +138,7 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    *          The fully qualified data type.
    * @return This builder
    */
-  TYPE appendDefaultValueOf(String dataTypeFqn);
+  TYPE appendDefaultValueOf(CharSequence dataTypeFqn);
 
   /**
    * Appends a {@code new} clause including a trailing space.

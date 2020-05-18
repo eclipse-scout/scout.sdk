@@ -99,8 +99,9 @@ public final class CoreTestingUtils {
    *          The text in which the new line characters should be normalized.
    * @return The input text with all {@code \r} removed.
    */
-  public static String normalizeNewLines(String text) {
-    return Strings.replace(text, Character.toString('\r'), "");
+  public static CharSequence normalizeNewLines(CharSequence text) {
+    //noinspection HardcodedLineSeparator
+    return Strings.replace(text, "\r", "");
   }
 
   /**

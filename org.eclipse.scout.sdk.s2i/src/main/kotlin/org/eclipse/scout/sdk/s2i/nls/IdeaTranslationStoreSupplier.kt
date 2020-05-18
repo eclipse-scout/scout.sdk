@@ -30,9 +30,9 @@ import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStoreSupplier
 import org.eclipse.scout.sdk.core.s.nls.TranslationStores
 import org.eclipse.scout.sdk.core.s.nls.properties.*
-import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseFromFileNameOrThrow
-import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTextProviderService.resourceMatchesPrefix
+import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseLanguageFromFileName
 import org.eclipse.scout.sdk.s2i.*
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import java.nio.file.Path
@@ -51,7 +51,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
     override fun single(textService: IType, progress: IProgress): Optional<ITranslationStore> {
         val psi = textService.resolvePsi() ?: return Optional.empty()
         val module = psi.containingModule() ?: return Optional.empty()
-        progress.init(1, "Load text provider service")
+        progress.init(1, message("load.text.service"))
         return createTranslationStore(textService, psi, module, progress.newChild(1))
     }
 
@@ -63,7 +63,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
     }
 
     protected fun findTranslationStoresVisibleIn(module: Module, env: IdeaEnvironment, progress: IdeaProgress): Stream<ITranslationStore> {
-        progress.init(20, "Search properties text provider services.")
+        progress.init(20, message("search.text.services"))
 
         val moduleScope = module.getModuleWithDependenciesAndLibrariesScope(false)
         val javaEnv: IJavaEnvironment = env.toScoutJavaEnvironment(module) ?: return Stream.empty()
@@ -80,7 +80,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
                 .filter { it.scoutType != null }
                 .toList()
 
-        val progressForLoad = progress.worked(10).newChild(10).init(types.size, "Load properties file contents")
+        val progressForLoad = progress.worked(10).newChild(10).init(types.size, message("load.properties.content"))
         val result = types.mapNotNull { createTranslationStore(it.scoutType!!, it.psiClass, module, progressForLoad).orElse(null) }
 
         SdkLog.debug("Found translation stores on Java classpath of module '{}': {}", module.name, result)
@@ -96,17 +96,16 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
 
     protected fun loadTranslationFiles(module: Module, psiClass: PsiClass, store: PropertiesTranslationStore, progress: IProgress): Boolean {
         val rootType = if (psiClass.isWritable) OrderRootType.SOURCES else OrderRootType.CLASSES
-        val root = findRootDirectories(module, psiClass, rootType) ?: return false
+        val roots = findRootDirectories(module, psiClass, rootType) ?: return false
 
         val prefix = store.service().filePrefix()
         val folder = store.service().folder()
-        val translationFiles = root
+        val translationFiles = roots
                 .mapNotNull { it.findFileByRelativePath(folder) }
                 .filter { it.isDirectory }
                 .flatMap { it.children.asIterable() }
                 .filter { !it.isDirectory }
-                .filter { resourceMatchesPrefix(it.name, prefix) }
-                .map { toTranslationPropertiesFile(it, psiClass.isWritable) }
+                .mapNotNull { toTranslationPropertiesFile(it, prefix, psiClass.isWritable) }
         store.load(translationFiles, progress)
         return true
     }
@@ -125,11 +124,12 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
                 ?.asList()
     }
 
-    protected fun toTranslationPropertiesFile(file: VirtualFile, isEditable: Boolean): ITranslationPropertiesFile {
+    protected fun toTranslationPropertiesFile(file: VirtualFile, prefix: String, isEditable: Boolean): ITranslationPropertiesFile? {
+        val language = parseLanguageFromFileName(file.name, prefix).orElse(null) ?: return null
         if (isEditable) {
-            return EditableTranslationFile(file.toNioPath())
+            return EditableTranslationFile(file.toNioPath(), language)
         }
-        return ReadOnlyTranslationFile(Supplier { file.inputStream }, parseFromFileNameOrThrow(file.name))
+        return ReadOnlyTranslationFile(Supplier { file.inputStream }, language, file)
     }
 
     private data class TypeMapping(val scoutType: IType?, val psiClass: PsiClass)

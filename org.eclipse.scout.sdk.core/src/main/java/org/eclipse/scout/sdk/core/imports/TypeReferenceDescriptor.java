@@ -10,10 +10,16 @@
  */
 package org.eclipse.scout.sdk.core.imports;
 
+import static org.eclipse.scout.sdk.core.util.JavaTypes.isPrimitive;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.qualifier;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.simpleName;
+import static org.eclipse.scout.sdk.core.util.Strings.isBlank;
+import static org.eclipse.scout.sdk.core.util.Strings.isEmpty;
+import static org.eclipse.scout.sdk.core.util.Strings.replace;
+
 import java.util.Objects;
 
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link TypeReferenceDescriptor}</h3>
@@ -34,7 +40,7 @@ class TypeReferenceDescriptor {
 
   TypeReferenceDescriptor(CharSequence fqn, boolean isTypeArg) {
     m_isTypeArg = isTypeArg;
-    m_isBaseType = JavaTypes.isPrimitive(fqn);
+    m_isBaseType = isPrimitive(fqn);
     if (isBaseType()) {
       m_packageName = null;
       m_simpleName = fqn.toString();
@@ -42,13 +48,13 @@ class TypeReferenceDescriptor {
       m_qualifiedName = m_simpleName;
     }
     else {
-      String nameWithoutDollar = Strings.replace(fqn, JavaTypes.C_DOLLAR, JavaTypes.C_DOT);
-      String qualifier = JavaTypes.qualifier(fqn);
-      String qualifierFromNameWithoutDollar = JavaTypes.qualifier(nameWithoutDollar);
-      m_qualifier = Strings.isBlank(qualifierFromNameWithoutDollar) ? null : qualifierFromNameWithoutDollar;
-      m_packageName = Strings.isBlank(qualifier) ? null : qualifier;
-      m_simpleName = JavaTypes.simpleName(nameWithoutDollar);
-      m_qualifiedName = Strings.isEmpty(m_qualifier) ? m_simpleName : m_qualifier + JavaTypes.C_DOT + m_simpleName;
+      CharSequence nameWithoutDollar = replace(fqn, JavaTypes.C_DOLLAR, JavaTypes.C_DOT);
+      String qualifier = qualifier(fqn);
+      String qualifierFromNameWithoutDollar = qualifier(nameWithoutDollar);
+      m_qualifier = isBlank(qualifierFromNameWithoutDollar) ? null : qualifierFromNameWithoutDollar;
+      m_packageName = isBlank(qualifier) ? null : qualifier;
+      m_simpleName = simpleName(nameWithoutDollar);
+      m_qualifiedName = isEmpty(m_qualifier) ? m_simpleName : (m_qualifier + JavaTypes.C_DOT + m_simpleName);
     }
   }
 

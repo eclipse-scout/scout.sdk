@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
  *
  * @since 6.1.0
  */
+@SuppressWarnings("HardcodedLineSeparator")
 public class TestingElementCommentGenerator implements IDefaultElementCommentGeneratorSpi {
 
   @Override

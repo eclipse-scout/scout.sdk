@@ -23,10 +23,10 @@ public class FormDataOrderTest {
 
   @Test
   public void testSortOrderStabilityOfFormData() {
-    createFormDataAssertNoCompileErrors(SimpleForm.class.getName(), this::compareWithRefFile);
+    createFormDataAssertNoCompileErrors(SimpleForm.class.getName(), FormDataOrderTest::compareWithRefFile);
   }
 
-  protected void compareWithRefFile(IType createdFormData) {
-    assertEqualsRefFile(REF_FILE_FOLDER + "FormDataOrder.txt", createdFormData.requireCompilationUnit().source().get().asCharSequence().toString());
+  protected static void compareWithRefFile(IType createdFormData) {
+    assertEqualsRefFile(REF_FILE_FOLDER + "FormDataOrder.txt", createdFormData.requireCompilationUnit().source().get().asCharSequence());
   }
 }

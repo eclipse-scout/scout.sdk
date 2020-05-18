@@ -101,7 +101,7 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
    *          The name of the class the generated (derived) element is based on. Must not be blank.
    * @return A new {@code Generated} {@link IAnnotationGenerator} with the specified value and a default comment.
    */
-  public static IAnnotationGenerator<?> createGenerated(String typeThatGeneratedTheCode) {
+  public static IAnnotationGenerator<?> createGenerated(CharSequence typeThatGeneratedTheCode) {
     return createGenerated(typeThatGeneratedTheCode, "This class is auto generated. No manual modifications recommended.");
   }
 
@@ -112,13 +112,11 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
    *          The comment value of the {@code Generated} annotation. May be {@code null}.
    * @return A new {@code Generated} {@link IAnnotationGenerator} with the specified value and comment.
    */
-  public static IAnnotationGenerator<?> createGenerated(String typeThatGeneratedTheCode, String comments) {
+  public static IAnnotationGenerator<?> createGenerated(CharSequence typeThatGeneratedTheCode, CharSequence comments) {
     IAnnotationGenerator<?> result = new AnnotationGenerator<>()
         .withElementName(GeneratedAnnotation.TYPE_NAME)
         .withElement(GeneratedAnnotation.VALUE_ELEMENT_NAME, b -> b.stringLiteral(Ensure.notBlank(typeThatGeneratedTheCode)));
-
-    Strings.notBlank(comments)
-        .ifPresent(c -> result.withElement(GeneratedAnnotation.COMMENTS_ELEMENT_NAME, b -> b.stringLiteral(c)));
+    Strings.notBlank(comments).ifPresent(c -> result.withElement(GeneratedAnnotation.COMMENTS_ELEMENT_NAME, b -> b.stringLiteral(c)));
     return result;
   }
 
@@ -135,7 +133,7 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
    *          The tokens to suppress. May not be {@code null}.
    * @return A new {@link SuppressWarnings} {@link IAnnotationGenerator} with the specified suppression values.
    */
-  public static IAnnotationGenerator<?> createSupressWarnings(String... values) {
+  public static IAnnotationGenerator<?> createSuppressWarnings(CharSequence... values) {
     return new AnnotationGenerator<>()
         .withElementName(SuppressWarnings.class.getName())
         .withElement("value", b -> b.stringLiteralArray(values, false, true));

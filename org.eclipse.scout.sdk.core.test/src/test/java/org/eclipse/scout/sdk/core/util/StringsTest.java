@@ -11,9 +11,30 @@
 package org.eclipse.scout.sdk.core.util;
 
 import static java.lang.System.lineSeparator;
+import static org.eclipse.scout.sdk.core.util.Strings.compareTo;
+import static org.eclipse.scout.sdk.core.util.Strings.countMatches;
+import static org.eclipse.scout.sdk.core.util.Strings.endsWith;
+import static org.eclipse.scout.sdk.core.util.Strings.ensureStartWithUpperCase;
+import static org.eclipse.scout.sdk.core.util.Strings.escapeHtml;
 import static org.eclipse.scout.sdk.core.util.Strings.fromFileAsCharSequence;
 import static org.eclipse.scout.sdk.core.util.Strings.fromFileAsChars;
 import static org.eclipse.scout.sdk.core.util.Strings.fromFileAsString;
+import static org.eclipse.scout.sdk.core.util.Strings.fromInputStream;
+import static org.eclipse.scout.sdk.core.util.Strings.fromStringLiteral;
+import static org.eclipse.scout.sdk.core.util.Strings.fromThrowable;
+import static org.eclipse.scout.sdk.core.util.Strings.hasText;
+import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
+import static org.eclipse.scout.sdk.core.util.Strings.isBlank;
+import static org.eclipse.scout.sdk.core.util.Strings.lastIndexOf;
+import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
+import static org.eclipse.scout.sdk.core.util.Strings.notBlank;
+import static org.eclipse.scout.sdk.core.util.Strings.notEmpty;
+import static org.eclipse.scout.sdk.core.util.Strings.repeat;
+import static org.eclipse.scout.sdk.core.util.Strings.replace;
+import static org.eclipse.scout.sdk.core.util.Strings.replaceEach;
+import static org.eclipse.scout.sdk.core.util.Strings.toCharArray;
+import static org.eclipse.scout.sdk.core.util.Strings.toStringLiteral;
+import static org.eclipse.scout.sdk.core.util.Strings.withoutQuotes;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,20 +63,20 @@ public class StringsTest {
   @Test
   public void testInputStreamToString() throws IOException {
     String testData = "my test data";
-    assertEquals(testData, Strings.fromInputStream(new ByteArrayInputStream(testData.getBytes(StandardCharsets.UTF_16LE)), StandardCharsets.UTF_16LE).toString());
-    assertEquals(testData, Strings.fromInputStream(new ByteArrayInputStream(testData.getBytes(StandardCharsets.UTF_16BE)), StandardCharsets.UTF_16BE.name()).toString());
+    assertEquals(testData, fromInputStream(new ByteArrayInputStream(testData.getBytes(StandardCharsets.UTF_16LE)), StandardCharsets.UTF_16LE).toString());
+    assertEquals(testData, fromInputStream(new ByteArrayInputStream(testData.getBytes(StandardCharsets.UTF_16BE)), StandardCharsets.UTF_16BE.name()).toString());
   }
 
   @Test
   public void testToCharArray() {
-    assertArrayEquals("".toCharArray(), Strings.toCharArray(new StringBuilder()));
-    assertArrayEquals("abc".toCharArray(), Strings.toCharArray(new StringBuilder("abc")));
-    assertThrows(IllegalArgumentException.class, () -> Strings.toCharArray(null));
+    assertArrayEquals("".toCharArray(), toCharArray(new StringBuilder()));
+    assertArrayEquals("abc".toCharArray(), toCharArray(new StringBuilder("abc")));
+    assertThrows(IllegalArgumentException.class, () -> toCharArray(null));
   }
 
   @Test
   public void testFromThrowable() {
-    String s = Strings.fromThrowable(new Exception());
+    String s = fromThrowable(new Exception());
     assertFalse(s.startsWith(lineSeparator()));
     assertFalse(s.endsWith(lineSeparator()));
   }
@@ -88,139 +110,404 @@ public class StringsTest {
 
   @Test
   public void testRepeat() {
-    assertNull(Strings.repeat(null, 1));
-    assertEquals("", Strings.repeat("", 10));
-    assertEquals("", Strings.repeat("asdf", 0));
-    assertEquals("", Strings.repeat("asdf", -1));
-    assertEquals("aaa", Strings.repeat("a", 3));
-    assertEquals("abab", Strings.repeat("ab", 2));
+    assertNull(repeat(null, 1));
+    assertEquals("", repeat("", 10));
+    assertEquals("", repeat("asdf", 0));
+    assertEquals("", repeat("asdf", -1));
+    assertEquals("aaa", repeat("a", 3).toString());
+    assertEquals("abab", repeat("ab", 2).toString());
   }
 
   @Test
   public void testEndsWith() {
-    assertTrue(Strings.endsWith("", ""));
-    assertTrue(Strings.endsWith("abc", ""));
-    assertFalse(Strings.endsWith(null, ""));
-    assertFalse(Strings.endsWith("abc", null));
-    assertFalse(Strings.endsWith("", null));
-    assertFalse(Strings.endsWith(null, null));
-    assertFalse(Strings.endsWith(null, "abc"));
-    assertFalse(Strings.endsWith("abc", "de"));
-    assertFalse(Strings.endsWith("abc", "abcde"));
-    assertTrue(Strings.endsWith("aabc", "bc"));
-    assertTrue(Strings.endsWith("aa  ", " "));
-    assertTrue(Strings.endsWith("", ""));
-    assertTrue(Strings.endsWith("abcd", "abcd"));
+    assertTrue(endsWith("", ""));
+    assertTrue(endsWith("abc", ""));
+    assertFalse(endsWith(null, ""));
+    assertFalse(endsWith("abc", null));
+    assertFalse(endsWith("", null));
+    assertFalse(endsWith(null, null));
+    assertFalse(endsWith(null, "abc"));
+    assertFalse(endsWith("abc", "de"));
+    assertFalse(endsWith("abc", "abcde"));
+    assertTrue(endsWith("aabc", "bc"));
+    assertTrue(endsWith("aa  ", " "));
+    assertTrue(endsWith("", ""));
+    assertTrue(endsWith("abcd", "abcd"));
   }
 
   @Test
   public void testReplace() {
-    assertNull(Strings.replace(null, null, null));
-    assertEquals("", Strings.replace("", null, null));
-    assertEquals("asdf", Strings.replace("asdf", null, "ff"));
-    assertEquals("asdf", Strings.replace("asdf", "f", null));
-    assertEquals("asdf", Strings.replace("asdf", "", null));
-    assertEquals("sdf", Strings.replace("asdf", "a", ""));
-    assertEquals("gsdf", Strings.replace("asdf", "a", "g"));
-    assertEquals("asdf", Strings.replace("asdf", "xx", "g"));
-  }
-
-  @Test
-  public void testReplaceSequence() {
-    assertNull(Strings.replace(null, 'a', 'b'));
-    assertEquals("", Strings.replace("", 'a', 'b'));
-    assertEquals("akdf", Strings.replace("asdf", 's', 'k'));
-    assertEquals("ksdf", Strings.replace("asdf", 'a', 'k'));
-    assertEquals("asdk", Strings.replace("asdf", 'f', 'k'));
+    assertNull(replace(null, null, null));
+    assertEquals("", replace("", null, null));
+    assertEquals("asdf", replace("asdf", null, "ff"));
+    assertEquals("asdf", replace("asdf", "f", null));
+    assertEquals("asdf", replace("asdf", "", null));
+    assertEquals("sdf", replace("asdf", "a", "").toString());
+    assertEquals("gsdf", replace("asdf", "a", "g").toString());
+    assertEquals("asdf", replace("asdf", "xx", "g").toString());
   }
 
   @Test
   public void testCountMatches() {
-    assertEquals(0, Strings.countMatches(null, "asdf"));
-    assertEquals(0, Strings.countMatches("", "sss"));
-    assertEquals(0, Strings.countMatches("abba", null));
-    assertEquals(0, Strings.countMatches("abba", ""));
-    assertEquals(2, Strings.countMatches("abba", "a"));
-    assertEquals(1, Strings.countMatches("abba", "ab"));
-    assertEquals(0, Strings.countMatches("abba", "xxx"));
+    assertEquals(0, countMatches(null, "asdf"));
+    assertEquals(0, countMatches("", "sss"));
+    assertEquals(0, countMatches("abba", null));
+    assertEquals(0, countMatches("abba", ""));
+    assertEquals(2, countMatches("abba", "a"));
+    assertEquals(1, countMatches("abba", "ab"));
+    assertEquals(0, countMatches("abba", "xxx"));
   }
 
   @Test
   public void testInputStreamToStringWrongCharset() {
-    assertThrows(IOException.class, () -> Strings.fromInputStream(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_16LE)), "not-existing"));
+    assertThrows(IOException.class, () -> fromInputStream(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_16LE)), "not-existing"));
   }
 
   @Test
   public void testEscapeHtml() {
-    assertEquals("", Strings.escapeHtml(""));
-    assertEquals("a&amp;&lt;&gt;&quot;&#47;&apos;&apos;b", Strings.escapeHtml("a&<>\"/''b"));
-    assertNull(Strings.escapeHtml(null));
+    assertEquals("", escapeHtml(""));
+    assertEquals("a&#38;&#60;&#62;&#92;&#47;&#39;&#39;b", escapeHtml("a&<>\"/''b").toString());
+    assertNull(escapeHtml(null));
   }
 
   @Test
   public void testIsBlankHasText() {
-    assertTrue(Strings.isBlank(null));
-    assertTrue(Strings.isBlank(""));
-    assertTrue(Strings.isBlank(" "));
-    assertFalse(Strings.isBlank("bob"));
-    assertFalse(Strings.isBlank("  bob  "));
-    assertTrue(Strings.isBlank("  \t\r\n  "));
+    assertTrue(isBlank(null));
+    assertTrue(isBlank(""));
+    assertTrue(isBlank(" "));
+    assertFalse(isBlank("bob"));
+    assertFalse(isBlank("  bob  "));
+    assertTrue(isBlank("  \t\r\n  "));
 
-    assertFalse(Strings.hasText(null));
-    assertFalse(Strings.hasText(""));
-    assertFalse(Strings.hasText(" "));
-    assertTrue(Strings.hasText("bob"));
-    assertTrue(Strings.hasText("  bob  "));
-    assertFalse(Strings.hasText("  \t\r\n  "));
+    assertFalse(hasText(null));
+    assertFalse(hasText(""));
+    assertFalse(hasText(" "));
+    assertTrue(hasText("bob"));
+    assertTrue(hasText("  bob  "));
+    assertFalse(hasText("  \t\r\n  "));
   }
 
   @Test
   public void testFromStringLiteral() {
-    assertNull(Strings.fromStringLiteral(null));
-    assertNull(Strings.fromStringLiteral("a"));
-    assertNull(Strings.fromStringLiteral("\"a\\nb"));
-    assertNull(Strings.fromStringLiteral("aaa\""));
-    assertEquals("a\nb", Strings.fromStringLiteral("\"a\\nb\""));
-    assertEquals("", Strings.fromStringLiteral("\"\""));
-    assertEquals("a\"b", Strings.fromStringLiteral("\"a\\\"b\""));
+    assertNull(fromStringLiteral(null));
+    assertEquals("a", fromStringLiteral("a"));
+    assertEquals("\"a\nb", fromStringLiteral("\"a\\nb").toString());
+    assertEquals("aaa\"", fromStringLiteral("aaa\"").toString());
+    assertEquals("a\nb", fromStringLiteral("\"a\\nb\"").toString());
+    assertEquals("", fromStringLiteral("\"\"").toString());
+    assertEquals("a\"b", fromStringLiteral("\"a\\\"b\"").toString());
   }
 
   @Test
   public void testToStringLiteral() {
-    assertEquals("\"a\\nb\"", Strings.toStringLiteral("a\nb"));
-    assertEquals("\"a\\\"b\"", Strings.toStringLiteral("a\"b"));
-    assertNull(Strings.toStringLiteral(null));
-    String in = "teststring \na\"";
-    assertEquals(in, Strings.fromStringLiteral(Strings.toStringLiteral(in)));
+    assertEquals("\"a\\nb\"", toStringLiteral("a\nb").toString());
+    assertEquals("\"a\\\"b\"", toStringLiteral("a\"b").toString());
+    assertNull(toStringLiteral(null));
+    CharSequence in = "teststring \na\"";
+    assertEquals(in, fromStringLiteral(toStringLiteral(in)).toString());
+  }
+
+  @Test
+  public void testWithoutQuotes() {
+    assertEquals("", withoutQuotes(""));
+    assertNull(withoutQuotes(null));
+    assertEquals("a", withoutQuotes("a"));
+    assertEquals("aaa", withoutQuotes("aaa"));
+
+    assertEquals("aaa", withoutQuotes("'aaa'"));
+    assertEquals("'aaa'", withoutQuotes("'aaa'", true, false, true));
+
+    assertEquals("aaa", withoutQuotes("`aaa`"));
+    assertEquals("`aaa`", withoutQuotes("`aaa`", true, true, false));
+
+    assertEquals("aaa", withoutQuotes("\"aaa\""));
+    assertEquals("\"aaa\"", withoutQuotes("\"aaa\"", false, true, false));
+
+    assertEquals("'aaa'", withoutQuotes("'aaa'", false, false, false));
+    assertEquals("'`aaa`'", withoutQuotes("'`aaa`'", false, false, true));
+    assertEquals("'aaa'", withoutQuotes("''aaa''", false, true, false));
   }
 
   @Test
   public void testReplaceEach() {
-    assertNull(Strings.replaceEach(null, new String[]{"aa"}, new String[]{"bb"}));
-    assertEquals("", Strings.replaceEach("", new String[]{"aa"}, new String[]{"bb"}));
-    assertEquals("aba", Strings.replaceEach("aba", null, null));
-    assertEquals("aba", Strings.replaceEach("aba", new String[0], null));
-    assertEquals("aba", Strings.replaceEach("aba", null, new String[0]));
-    assertEquals("aba", Strings.replaceEach("aba", new String[]{"a"}, null));
-    assertEquals("b", Strings.replaceEach("aba", new String[]{"a"}, new String[]{""}));
-    assertEquals("aba", Strings.replaceEach("aba", new String[]{null}, new String[]{"a"}));
-    assertEquals("aba", Strings.replaceEach("aba", new String[]{"b"}, new String[]{null}));
-    assertEquals("wcte", Strings.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"w", "t"}));
-    assertEquals("abcde", Strings.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{}));
-    assertThrows(IllegalArgumentException.class, () -> assertEquals("abcde", Strings.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"a"})));
+    assertNull(replaceEach(null, new String[]{"aa"}, new String[]{"bb"}));
+    assertEquals("", replaceEach("", new String[]{"aa"}, new String[]{"bb"}));
+    assertEquals("aba", replaceEach("aba", null, null));
+    assertEquals("aba", replaceEach("aba", new String[0], null));
+    assertEquals("aba", replaceEach("aba", null, new String[0]));
+    assertEquals("aba", replaceEach("aba", new String[]{"a"}, null));
+    assertEquals("b", replaceEach("aba", new String[]{"a"}, new String[]{""}).toString());
+    assertEquals("aba", replaceEach("aba", new String[]{null}, new String[]{"a"}).toString());
+    assertEquals("aba", replaceEach("aba", new String[]{"b"}, new String[]{null}).toString());
+    assertEquals("wcte", replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"w", "t"}).toString());
+    assertEquals("abcde", replaceEach("abcde", new String[]{"ab", "d"}, new String[]{}).toString());
+    assertThrows(IllegalArgumentException.class, () -> assertEquals("abcde", replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"a"}).toString()));
   }
 
   @Test
   public void testEnsureStartWithUpperCase() {
-    assertNull(Strings.ensureStartWithUpperCase(null));
-    assertEquals("", Strings.ensureStartWithUpperCase(""));
-    assertEquals("  ", Strings.ensureStartWithUpperCase("  "));
-    assertEquals("A", Strings.ensureStartWithUpperCase("a"));
-    assertEquals("Ab", Strings.ensureStartWithUpperCase("ab"));
-    assertEquals("A", Strings.ensureStartWithUpperCase("A"));
-    assertEquals("Ab", Strings.ensureStartWithUpperCase("Ab"));
-    assertEquals("ABC", Strings.ensureStartWithUpperCase("ABC"));
-    assertEquals("Abc", Strings.ensureStartWithUpperCase("abc"));
-    assertEquals("ABC", Strings.ensureStartWithUpperCase("aBC"));
+    assertNull(ensureStartWithUpperCase(null));
+    assertEquals("", ensureStartWithUpperCase(""));
+    assertEquals("  ", ensureStartWithUpperCase("  ").toString());
+    assertEquals("A", ensureStartWithUpperCase("a").toString());
+    assertEquals("Ab", ensureStartWithUpperCase("ab").toString());
+    assertEquals("A", ensureStartWithUpperCase("A").toString());
+    assertEquals("Ab", ensureStartWithUpperCase("Ab").toString());
+    assertEquals("ABC", ensureStartWithUpperCase("ABC").toString());
+    assertEquals("Abc", ensureStartWithUpperCase("abc").toString());
+    assertEquals("ABC", ensureStartWithUpperCase("aBC").toString());
+  }
+
+  @Test
+  public void testEqualsCharArray() {
+    char[] a = "".toCharArray();
+    char[] b = "xx".toCharArray();
+    char[] c = "xx".toCharArray();
+    char[] d = "yy".toCharArray();
+    char[] e = "xxx".toCharArray();
+    assertTrue(Strings.equals(a, a));
+    assertTrue(Strings.equals(c, b));
+    assertFalse(Strings.equals(null, b));
+    assertFalse(Strings.equals(a, null));
+    assertFalse(Strings.equals(c, d));
+    assertFalse(Strings.equals(c, e));
+    assertTrue(Strings.equals(null, (char[]) null));
+  }
+
+  @Test
+  public void testEqualsCharArrayIgnoreCase() {
+    char[] a = "".toCharArray();
+    char[] b = "xx".toCharArray();
+    char[] c = "xx".toCharArray();
+    char[] d = "yy".toCharArray();
+    char[] e = "xxx".toCharArray();
+    char[] f = "xXx".toCharArray();
+    assertTrue(Strings.equals(a, a, true));
+    assertTrue(Strings.equals(c, b, true));
+    assertFalse(Strings.equals(null, b, true));
+    assertFalse(Strings.equals(a, null, true));
+    assertFalse(Strings.equals(c, d, true));
+    assertFalse(Strings.equals(c, e, true));
+    assertTrue(Strings.equals(null, (char[]) null, true));
+
+    assertTrue(Strings.equals(a, a, false));
+    assertTrue(Strings.equals(c, b, false));
+    assertFalse(Strings.equals(null, b, false));
+    assertFalse(Strings.equals(a, null, false));
+    assertFalse(Strings.equals(c, d, false));
+    assertFalse(Strings.equals(c, e, false));
+    assertTrue(Strings.equals(null, (char[]) null, false));
+    assertTrue(Strings.equals(e, f, false));
+  }
+
+  @Test
+  public void testEqualsCharSequence() {
+    CharSequence a = "";
+    CharSequence b = CharBuffer.wrap("xx".toCharArray());
+    CharSequence c = "xx";
+    CharSequence d = "yy";
+    CharSequence e = "xxx";
+    assertTrue(Strings.equals(a, a));
+    assertTrue(Strings.equals(c, b));
+    assertFalse(Strings.equals(null, b));
+    assertFalse(Strings.equals(a, null));
+    assertFalse(Strings.equals(c, d));
+    assertFalse(Strings.equals(c, e));
+    assertTrue(Strings.equals(null, (CharSequence) null));
+  }
+
+  @Test
+  public void testEqualsCharSequenceIgnoreCase() {
+    CharSequence a = "";
+    CharSequence b = CharBuffer.wrap("xx".toCharArray());
+    CharSequence c = "xx";
+    CharSequence d = "yy";
+    CharSequence e = "xxx";
+    CharSequence f = "xXx";
+    assertTrue(Strings.equals(a, a, true));
+    assertTrue(Strings.equals(c, b, true));
+    assertFalse(Strings.equals(null, b, true));
+    assertFalse(Strings.equals(a, null, true));
+    assertFalse(Strings.equals(c, d, true));
+    assertFalse(Strings.equals(c, e, true));
+    assertTrue(Strings.equals(null, (CharSequence) null, true));
+
+    assertTrue(Strings.equals(a, a, false));
+    assertTrue(Strings.equals(c, b, false));
+    assertFalse(Strings.equals(null, b, false));
+    assertFalse(Strings.equals(a, null, false));
+    assertFalse(Strings.equals(c, d, false));
+    assertFalse(Strings.equals(c, e, false));
+    assertTrue(Strings.equals(null, (CharSequence) null, false));
+    assertTrue(Strings.equals(e, f, false));
+  }
+
+  @Test
+  public void testIndexOfCharArray() {
+    assertEquals(3, indexOf('d', "abcdraqrd".toCharArray(), 0, 4));
+    assertEquals(-1, indexOf('d', "abcdgaerd".toCharArray(), 0, 3));
+    assertEquals(3, indexOf('d', "abcdw4easd".toCharArray(), 0, 100));
+    assertEquals(-1, indexOf('x', "abcd".toCharArray(), 0, 100));
+    assertEquals(-1, indexOf('a', "abcdrgtd".toCharArray(), 1));
+    assertEquals(-1, indexOf('d', "abcd".toCharArray(), 1, 3));
+    assertEquals(-1, indexOf('x', "abcd".toCharArray()));
+    assertEquals(3, indexOf('d', "abcdasdfd".toCharArray()));
+  }
+
+  @Test
+  public void testIndexOfCharSequence() {
+    assertEquals(3, indexOf('d', "abcdraqrd", 0, 4));
+    assertEquals(-1, indexOf('d', "abcdgaerd", 0, 3));
+    assertEquals(3, indexOf('d', "abcdw4easd", 0, 100));
+    assertEquals(-1, indexOf('x', "abcd", 0, 100));
+    assertEquals(-1, indexOf('a', "abcdrgtd", 1));
+    assertEquals(-1, indexOf('d', "abcd", 1, 3));
+    assertEquals(-1, indexOf('x', "abcd"));
+    assertEquals(3, indexOf('d', "abcdasdfd"));
+  }
+
+  @Test
+  public void testIndexOfCharsInChars() {
+    assertEquals(-1, indexOf("abcdd".toCharArray(), "abc".toCharArray()));
+    assertEquals(-1, indexOf("abcdd".toCharArray(), "abc".toCharArray(), -1));
+    assertEquals(-1, indexOf("abcdd".toCharArray(), "abc".toCharArray(), -1, 3));
+    assertEquals(-1, indexOf("x".toCharArray(), "abc".toCharArray(), -1));
+    assertEquals(0, indexOf("".toCharArray(), "abcdd".toCharArray()));
+
+    assertEquals(-1, indexOf("abc".toCharArray(), "xxabcxx".toCharArray(), 0, 3));
+    assertEquals(-1, indexOf("abc".toCharArray(), "xxabcxx".toCharArray(), 3, 6));
+    assertEquals(2, indexOf("abc".toCharArray(), "xxabcxx".toCharArray(), 0, 5));
+    assertEquals(0, indexOf("abc".toCharArray(), "abc".toCharArray()));
+    assertEquals(-1, indexOf("abx".toCharArray(), "abc".toCharArray()));
+    assertEquals(-1, indexOf("abx".toCharArray(), "abcddd".toCharArray()));
+
+    assertEquals(-1, indexOf("abc".toCharArray(), "xxabcxx".toCharArray(), 0, 3, false));
+    assertEquals(-1, indexOf("abc".toCharArray(), "xxabcxx".toCharArray(), 3, 6, false));
+    assertEquals(2, indexOf("abc".toCharArray(), "xxabcxx".toCharArray(), 0, 5, false));
+    assertEquals(0, indexOf("abc".toCharArray(), "abc".toCharArray(), 0, 3, false));
+    assertEquals(-1, indexOf("abx".toCharArray(), "abc".toCharArray(), 0, 3, false));
+    assertEquals(-1, indexOf("abx".toCharArray(), "abcddd".toCharArray(), 0, 6, false));
+
+    assertEquals(-1, indexOf("abc".toCharArray(), "abc".toCharArray(), 3, 3, false));
+  }
+
+  @Test
+  public void testIndexOfCharsInChars2() {
+    char[] array = new char[]{'a', 'b', 'c'};
+    char[] array2 = new char[]{'a', 'b', 'c', 'a', 'a'};
+    assertTrue(indexOf(array, array2, -1, array2.length, true) < 0);
+  }
+
+  @Test
+  public void testIndexOfCharsInChars3() {
+    char[] array = new char[]{'a', 'b', 'c'};
+    char[] array2 = new char[]{'a', 'b', 'c', 'a', 'a'};
+    assertTrue(indexOf(array, array2, -1, array2.length, false) < 0);
+  }
+
+  @Test
+  public void testIndexOfCharSequenceInCharSequence() {
+    assertEquals(-1, indexOf("abcdd", "abc"));
+    assertEquals(-1, indexOf("abcdd", "abc", -1));
+    assertEquals(-1, indexOf("abcdd", "abc", -1, 3));
+    assertEquals(-1, indexOf("x", "abc", -1));
+    assertEquals(0, indexOf("", "abcdd"));
+
+    assertEquals(-1, indexOf("abc", "xxabcxx", 0, 3));
+    assertEquals(-1, indexOf("abc", "xxabcxx", 3, 6));
+    assertEquals(2, indexOf("abc", "xxabcxx", 0, 5));
+    assertEquals(0, indexOf("abc", "abc"));
+    assertEquals(-1, indexOf("abx", "abc"));
+    assertEquals(-1, indexOf("abx", "abcddd"));
+
+    assertEquals(-1, indexOf("abc", "xxabcxx", 0, 3));
+    assertEquals(-1, indexOf("abc", "xxabcxx", 3, 6));
+    assertEquals(2, indexOf("abc", "xxabcxx", 0, 5));
+    assertEquals(0, indexOf("abc", "abc", 0, 3));
+    assertEquals(-1, indexOf("abx", "abc", 0, 3));
+    assertEquals(-1, indexOf("abx", "abcddd", 0, 6));
+
+    assertEquals(-1, indexOf("abc", "abc", 3, 3));
+  }
+
+  @Test
+  public void testIndexOfCharSequenceInCharSequence2() {
+    CharSequence array = "abc";
+    CharSequence array2 = "abcaa";
+    assertTrue(indexOf(array, array2, -1, array2.length()) < 0);
+  }
+
+  @Test
+  public void testIndexOfCharSequenceInCharSequence3() {
+    CharSequence array = "abc";
+    CharSequence array2 = "abcaa";
+    assertTrue(indexOf(array, array2, -1, array2.length()) < 0);
+  }
+
+  @Test
+  public void testNextLineEnd() {
+    assertEquals(3, nextLineEnd("abc".toCharArray(), 0));
+    assertEquals(5, nextLineEnd("first\nsecond\nthird".toCharArray(), 0));
+    assertEquals(12, nextLineEnd("first\nsecond\nthird".toCharArray(), 6));
+    assertEquals(12, nextLineEnd("first\nsecond\r\nthird".toCharArray(), 6));
+    assertEquals(19, nextLineEnd("first\nsecond\r\nthird".toCharArray(), 14));
+    assertEquals(19, nextLineEnd("first\nsecond\r\nthird".toCharArray(), 100));
+    assertEquals(3, nextLineEnd("abc\n".toCharArray(), 0));
+    assertEquals(3, nextLineEnd("abc\r\n".toCharArray(), 0));
+    assertEquals(3, nextLineEnd("abc\r\n".toCharArray(), 3));
+    assertEquals(3, nextLineEnd("abc\r\n".toCharArray(), 4));
+    assertEquals(0, nextLineEnd("\nsecond".toCharArray(), 0));
+  }
+
+  @Test
+  public void testLastIndexOf() {
+    assertEquals(-1, lastIndexOf('x', "abc"));
+    assertEquals(1, lastIndexOf('x', "axc"));
+    assertEquals(3, lastIndexOf('x', "axcxd"));
+
+    assertEquals(-1, lastIndexOf('x', "abcxd", 0, 3));
+    assertEquals(1, lastIndexOf('x', "axcxd", 0, 3));
+    assertEquals(3, lastIndexOf('x', "axcxd", 0, 4));
+    assertEquals(5, lastIndexOf('x', "axcbbxd", 2));
+    assertEquals(-1, lastIndexOf('x', "axcbbxd", 2, 4));
+  }
+
+  @Test
+  public void testReplaceSequence() {
+    assertNull(replace(null, 'a', 'b'));
+    assertEquals("", replace("", 'a', 'b'));
+    assertEquals("akdf", replace("asdf", 's', 'k').toString());
+    assertEquals("ksdf", replace("asdf", 'a', 'k').toString());
+    assertEquals("asdk", replace("asdf", 'f', 'k').toString());
+  }
+
+  @Test
+  public void testNotEmpty() {
+    assertFalse(notEmpty(null).isPresent());
+    assertTrue(notEmpty("a").isPresent());
+    assertTrue(notEmpty(" ").isPresent());
+    assertTrue(notEmpty(" a ").isPresent());
+    assertFalse(notEmpty("").isPresent());
+  }
+
+  @Test
+  public void testNotBlank() {
+    assertFalse(notBlank(null).isPresent());
+    assertTrue(notBlank("a").isPresent());
+    assertFalse(notBlank(" ").isPresent());
+    assertTrue(notBlank(" a ").isPresent());
+    assertFalse(notBlank("").isPresent());
+  }
+
+  @Test
+  public void testCompareTo() {
+    assertTrue(compareTo(null, "a") < 0);
+    assertTrue(compareTo("b", null) > 0);
+    assertTrue(compareTo("b", "a") > 0);
+    assertTrue(compareTo("a", "b") < 0);
+    assertEquals(0, compareTo("a", "a"));
+    assertEquals(0, compareTo(null, null));
+    assertEquals(0, compareTo("", ""));
+    assertTrue(compareTo("a", "ab") < 0);
   }
 }

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.nls.query;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInCode;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInString;
+import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
 
 import java.nio.CharBuffer;
 import java.util.Locale;
@@ -25,8 +26,8 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
-import org.eclipse.scout.sdk.core.util.Chars;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public final class TranslationPatterns {
 
@@ -65,9 +66,9 @@ public final class TranslationPatterns {
     }
 
     protected static boolean lineEndsWithIgnoreMarker(char[] content, int offset) {
-      int lineEnd = Chars.nextLineEnd(content, offset); // because of the regex patterns the full content cannot be shorter than the ignore marker -> no need to check for the bounds
+      int lineEnd = Strings.nextLineEnd(content, offset); // because of the regex patterns the full content cannot be shorter than the ignore marker -> no need to check for the bounds
       CharBuffer end = CharBuffer.wrap(content, lineEnd - IGNORE_MARKER.length(), IGNORE_MARKER.length());
-      return Chars.equals(IGNORE_MARKER, end, false);
+      return Strings.equals(IGNORE_MARKER, end, false);
     }
 
     protected static boolean isKeyInCode(char[] content, int offset) {
@@ -220,7 +221,6 @@ public final class TranslationPatterns {
     public Optional<FileRange> keyRangeIfAccept(MatchResult match, FileQueryInput fileQueryInput) {
       int keyGroup = 1;
       boolean isIgnored = textToNextNewLine(fileQueryInput.fileContent(), match.end(keyGroup))
-          .toString()
           .toUpperCase(Locale.ENGLISH)
           .endsWith(IGNORE_MARKER + " -->");
       if (isIgnored) {
@@ -229,9 +229,9 @@ public final class TranslationPatterns {
       return Optional.of(toFileRange(match, fileQueryInput, keyGroup));
     }
 
-    public static CharSequence textToNextNewLine(char[] searchIn, int offset) {
-      int lineEnd = Chars.nextLineEnd(searchIn, offset);
-      return CharBuffer.wrap(searchIn, offset, lineEnd - offset);
+    public static String textToNextNewLine(char[] searchIn, int offset) {
+      int lineEnd = nextLineEnd(searchIn, offset);
+      return new String(searchIn, offset, lineEnd - offset);
     }
   }
 }

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.operation;
 import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.manipulation.JavaManipulation;
 import org.eclipse.jdt.core.manipulation.OrganizeImportsOperation;
@@ -48,7 +49,7 @@ public class OrganizeImportOperation implements Consumer<EclipseProgress> {
     ICompilationUnit unit = getCompilationUnit();
     try {
       CodeGenerationSettings settings = JavaPreferencesSettings.getCodeGenerationSettings(unit.getJavaProject());
-      OrganizeImportsOperation organizeImps = new OrganizeImportsOperation(unit, null, settings.importIgnoreLowercase, !unit.isWorkingCopy(), true, null);
+      ICoreRunnable organizeImps = new OrganizeImportsOperation(unit, null, settings.importIgnoreLowercase, !unit.isWorkingCopy(), true, null);
       organizeImps.run(t.monitor());
     }
     catch (CoreException e) {

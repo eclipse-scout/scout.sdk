@@ -51,7 +51,7 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
   }
 
   @Override
-  public TYPE appendTextsGet(String textKey) {
+  public TYPE appendTextsGet(CharSequence textKey) {
     return ref(IScoutRuntimeTypes.TEXTS).dot().append("get").parenthesisOpen().stringLiteral(textKey).parenthesisClose();
   }
 

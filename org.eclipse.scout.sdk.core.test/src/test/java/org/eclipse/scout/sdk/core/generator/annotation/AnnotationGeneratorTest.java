@@ -64,8 +64,8 @@ public class AnnotationGeneratorTest {
 
   @Test
   public void testSuppressWarnings() {
-    assertEquals("@SuppressWarnings({\"checked\", \"all\"})", AnnotationGenerator.createSupressWarnings("checked", "all").toJavaSource().toString());
-    assertEquals("@SuppressWarnings(\"checked\")", AnnotationGenerator.createSupressWarnings("checked").toJavaSource().toString());
+    assertEquals("@SuppressWarnings({\"checked\", \"all\"})", AnnotationGenerator.createSuppressWarnings("checked", "all").toJavaSource().toString());
+    assertEquals("@SuppressWarnings(\"checked\")", AnnotationGenerator.createSuppressWarnings("checked").toJavaSource().toString());
   }
 
   @Test

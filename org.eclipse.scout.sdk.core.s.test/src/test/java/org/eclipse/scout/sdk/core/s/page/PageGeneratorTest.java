@@ -60,7 +60,7 @@ public class PageGeneratorTest {
       IType createdSvcIfc = assertNoCompileErrors(env, svcIfcGenerator);
 
       // page
-      PageGenerator<?> pageBuilder = new PageGenerator<>()
+      PageGenerator<?> pageGenerator = new PageGenerator<>()
           .withPackageName("org.eclipse.scout.sdk.core.s.test")
           .withElementName("MyTablePage" + i)
           .withClassIdValue("whatever")
@@ -72,8 +72,8 @@ public class PageGeneratorTest {
           .withNlsMethod(i == 1)
           .withPageServiceInterface(createdSvcIfc.name());
 
-      assertEqualsRefFile(env, REF_FILE_FOLDER + "PageTest" + (i + 1) + ".txt", pageBuilder);
-      assertNoCompileErrors(env, pageBuilder);
+      assertEqualsRefFile(env, REF_FILE_FOLDER + "PageTest" + (i + 1) + ".txt", pageGenerator);
+      assertNoCompileErrors(env, pageGenerator);
     }
   }
 
@@ -81,14 +81,14 @@ public class PageGeneratorTest {
   public void testPageWithNodes(IJavaEnvironment env) {
     for (int i = 0; i < 2; i++) {
       // page
-      PageGenerator<?> pageBuilder = new PageGenerator<>()
+      PageGenerator<?> pageGenerator = new PageGenerator<>()
           .withElementName("MyNodePage" + i)
           .withClassIdValue("whatever")
           .asPageWithTable(false)
           .withFlags(i == 1 ? Flags.AccAbstract : Flags.AccPublic);
 
-      assertEqualsRefFile(env, REF_FILE_FOLDER + "NodePageTest" + (i + 1) + ".txt", pageBuilder);
-      assertNoCompileErrors(env, pageBuilder);
+      assertEqualsRefFile(env, REF_FILE_FOLDER + "NodePageTest" + (i + 1) + ".txt", pageGenerator);
+      assertNoCompileErrors(env, pageGenerator);
     }
   }
 }

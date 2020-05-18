@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.nls
+package org.eclipse.scout.sdk.s2i.nls.inspection
 
 import com.intellij.codeInspection.*
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
@@ -22,11 +21,12 @@ import org.eclipse.scout.sdk.core.s.nls.query.MissingTranslationQuery
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
+import org.eclipse.scout.sdk.s2i.moduleDirPath
 import org.eclipse.scout.sdk.s2i.toNioPath
 import org.eclipse.scout.sdk.s2i.toScoutProgress
-import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 
@@ -59,8 +59,7 @@ open class MissingTranslationInspection : LocalInspectionTool() {
     fun checkFile(file: PsiFile, module: Module, query: IFileQuery, manager: InspectionManager, isOnTheFly: Boolean, environment: IdeaEnvironment, progress: IProgress): Array<ProblemDescriptor> {
         val start = System.currentTimeMillis()
         val path = file.virtualFile.toNioPath()
-        val modulePath = Paths.get(ModuleUtil.getModuleDirPath(module))
-        val queryInput = FileQueryInput(path, modulePath) { file.textToCharArray() }
+        val queryInput = FileQueryInput(path, module.moduleDirPath()) { file.textToCharArray() }
 
         query.searchIn(queryInput, environment, progress)
 
@@ -77,10 +76,11 @@ open class MissingTranslationInspection : LocalInspectionTool() {
             val element = file.findElementAt(range.start()) ?: return@computeInReadAction null
             val type = julLevelToProblemHighlightType(range.severity())
             val msg = when (range.severity()) {
-                Level.INFO.intValue() -> "Possibly missing translation key. Check manually and suppress if valid."
-                else -> "Missing translation for key '${range.text()}'"
+                Level.INFO.intValue() -> message("possibly.missing.translation")
+                else -> message("missing.translation.for.key.x", range.text())
             }
-            return@computeInReadAction manager.createProblemDescriptor(element, msg, isOnTheFly, LocalQuickFix.EMPTY_ARRAY, type)
+            val fixes = if (isOnTheFly) arrayOf(AddMissingTranslationQuickFix(range.text())) else LocalQuickFix.EMPTY_ARRAY
+            return@computeInReadAction manager.createProblemDescriptor(element, msg, isOnTheFly, fixes, type)
         }
     }
 

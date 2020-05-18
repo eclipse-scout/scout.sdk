@@ -432,7 +432,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
   @SuppressWarnings("squid:UnusedPrivateMethod") // used as method-reference
   private void addPropertyDto(PropertyBean desc) {
     String lowerCaseBeanName = Introspector.decapitalize(desc.name());
-    String upperCaseBeanName = Strings.ensureStartWithUpperCase(desc.name());
+    CharSequence upperCaseBeanName = Strings.ensureStartWithUpperCase(desc.name());
 
     String propName = upperCaseBeanName + ISdkProperties.SUFFIX_DTO_PROPERTY;
     String propDataType = desc.type().reference();

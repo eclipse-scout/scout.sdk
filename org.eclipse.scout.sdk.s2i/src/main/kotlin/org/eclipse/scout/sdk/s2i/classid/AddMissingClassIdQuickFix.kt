@@ -32,7 +32,7 @@ open class AddMissingClassIdQuickFix : LocalQuickFix {
 
     override fun getFamilyName(): String = quickFixName
 
-    override fun applyFix(project: Project, descriptor: ProblemDescriptor) /*= runInNewTransaction(project, quickFixName)*/ {
+    override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val psiClass = PsiTreeUtil.getParentOfType(descriptor.psiElement, PsiClass::class.java)
                 ?: throw Ensure.newFail("No class found to add @ClassId. Element: '{}'.", descriptor.psiElement)
         if (psiClass.hasAnnotation(IScoutRuntimeTypes.ClassId)) {

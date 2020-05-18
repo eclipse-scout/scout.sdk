@@ -177,7 +177,7 @@ public enum ScoutTier implements Predicate<IJavaElement> {
     if (to == this) {
       return name;
     }
-    return Strings.replace(name, '.' + tierName(), '.' + to.tierName());
+    return Strings.replace(name, '.' + tierName(), '.' + to.tierName()).toString();
   }
 
 }

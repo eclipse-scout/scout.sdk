@@ -20,18 +20,24 @@
       Eclipse Scout integration for IntelliJ IDEA
       </p>
       <p>
-      Includes support for:
+      Includes:
         <br>
         <ul>
-          <li>Derived resource update for FormData & PageData</li>
-          <li>@ClassId validation inspections</li>
-          <li>NLS validation inspections</li>
+          <li>Derived resource update for FormData and PageData</li>
+          <li>@ClassId validation inspections (missing, duplicates)</li>
+          <li>Editor for Scout nls files</li>
+          <li>Inspection for missing translations</li>
+          <li>Code completion for Scout nls keys in Java, JavaScript and HTML</li>
         </ul>
         </p>
   ]]></description>
 
   <change-notes><![CDATA[
-        Includes fixes and performance improvements
+        <ul>
+          <li>Adds an editor for Scout nls files.</li>
+          <li>Adds a quick-fix for the 'Missing translation' inspection.</li>
+          <li>Adds code completion for Scout nls keys in Java, JavaScript and HTML.</li>
+        </ul>
   ]]></change-notes>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -43,6 +49,7 @@
   <depends>org.jetbrains.idea.maven</depends>
   <depends>com.intellij.copyright</depends>
   <depends>com.intellij.properties</depends>
+  <depends optional="true" config-file="withJavaScript.xml">JavaScript</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
@@ -51,35 +58,25 @@
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaMavenRunner"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdStartup"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.EclipseScoutBundle"/>
-
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager"
                     serviceImplementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.classid.ClassIdCache"
                     serviceImplementation="org.eclipse.scout.sdk.s2i.classid.ClassIdCacheImplementor"/>
-
     <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                          instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
     <macro implementation="org.eclipse.scout.sdk.s2i.IdeaHomePathMacro"/>
-    <localInspection language="JAVA"
-                     shortName="MissingClassId"
-                     groupName="Scout"
-                     enabledByDefault="false"
-                     level="ERROR"
-                     key="missing.classid.annotation"
+    <localInspection language="JAVA" shortName="MissingClassId" groupName="Scout" enabledByDefault="false" level="ERROR" key="missing.classid.annotation"
                      implementationClass="org.eclipse.scout.sdk.s2i.classid.MissingClassIdInspection"/>
-    <localInspection language="JAVA"
-                     shortName="DuplicateClassId"
-                     groupName="Scout"
-                     enabledByDefault="false"
-                     level="ERROR"
-                     key="duplicate.classid.inspection.displayName"
+    <localInspection language="JAVA" shortName="DuplicateClassId" groupName="Scout" enabledByDefault="false" level="ERROR" key="duplicate.classid.inspection.displayName"
                      implementationClass="org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection"/>
-    <localInspection shortName="MissingTranslation"
-                     groupName="Scout"
-                     enabledByDefault="true"
-                     level="WARNING"
-                     key="missing.translation.inspection.displayName"
-                     implementationClass="org.eclipse.scout.sdk.s2i.nls.MissingTranslationInspection"/>
+    <localInspection shortName="MissingTranslation" groupName="Scout" enabledByDefault="true" level="WARNING" key="missing.translation.inspection.displayName"
+                     implementationClass="org.eclipse.scout.sdk.s2i.nls.inspection.MissingTranslationInspection"/>
+    <fileType name="Scout National Language Support" extensions="nls" fieldName="INSTANCE" implementationClass="org.eclipse.scout.sdk.s2i.nls.NlsFileType"/>
+    <fileEditorProvider implementation="org.eclipse.scout.sdk.s2i.nls.editor.NlsFileEditorProvider"/>
+    <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJava" id="scoutNlsCompletionJava" order="before propertiesCompletion"/>
+    <completion.contributor language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForHtml" id="scoutNlsCompletionHtml" order="before html"/>
+    <lang.documentationProvider language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForJava" id="scoutNlsKeyDocumentationJava" order="first"/>
+    <lang.documentationProvider language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForHtml" id="scoutNlsKeyDocumentationHtml" order="first"/>
   </extensions>
 
   <actions>

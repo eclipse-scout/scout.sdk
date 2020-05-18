@@ -10,14 +10,20 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreSupplierExtension.testingStore;
+import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.getPropertiesFileName;
+import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseLanguageFromFileName;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.nls.Language;
@@ -27,6 +33,7 @@ import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -70,12 +77,38 @@ public class TranslationPropertiesFileTest {
   }
 
   @Test
+  public void testParseWithAllLocales() {
+    String prefix = "prefix";
+    String[] availableLocaleNames = Stream.of(Locale.getAvailableLocales())
+        .map(Locale::toString)
+        .toArray(String[]::new);
+    List<Language> languages = Stream.of(availableLocaleNames)
+        .map(locale -> Strings.notBlank(locale).orElseGet(() -> Language.LANGUAGE_DEFAULT.locale().toString()))
+        .map(Language::parseThrowingOnError)
+        .collect(toList());
+
+    List<Language> parsedLanguages = languages.stream()
+        .map(lang -> getPropertiesFileName(prefix, lang))
+        .map(fileName -> parseLanguageFromFileName(fileName, prefix).get())
+        .collect(toList());
+    String[] parsedLocaleNames = parsedLanguages.stream()
+        .map(lang -> lang == Language.LANGUAGE_DEFAULT ? Locale.ROOT : lang.locale())
+        .map(Locale::toString)
+        .toArray(String[]::new);
+
+    assertEquals(languages, parsedLanguages);
+    assertArrayEquals(availableLocaleNames, parsedLocaleNames);
+  }
+
+  @Test
   public void testParse() {
-    assertSame(Language.LANGUAGE_DEFAULT, AbstractTranslationPropertiesFile.parseFromFileNameOrThrow("prefix.properties"));
-    assertEquals(new Language(new Locale("test")), AbstractTranslationPropertiesFile.parseFromFileNameOrThrow("prefix_test.properties"));
-    assertEquals(new Language(new Locale("de", "FR", "xx")), AbstractTranslationPropertiesFile.parseFromFileNameOrThrow("prefix_de_FR_xx.properties"));
-    assertEquals(new Language(new Locale("de", "FR")), AbstractTranslationPropertiesFile.parseFromFileNameOrThrow("prefix_de_FR.properties"));
-    assertEquals(new Language(new Locale("de")), AbstractTranslationPropertiesFile.parseFromFileNameOrThrow("prefix_de.properties"));
-    assertThrows(IllegalArgumentException.class, () -> AbstractTranslationPropertiesFile.parseFromFileNameOrThrow("abc"));
+    assertSame(Language.LANGUAGE_DEFAULT, parseLanguageFromFileName("prefix.properties", "prefix").get());
+    assertEquals(new Language(new Locale("test")), parseLanguageFromFileName("prefix_test.properties", "prefix").get());
+    assertEquals(new Language(new Locale("de", "FR", "xx")), parseLanguageFromFileName("prefix_de_FR_xx.properties", "prefix").get());
+    assertEquals(new Language(new Locale("de", "FR")), parseLanguageFromFileName("prefix_de_FR.properties", "prefix").get());
+    assertEquals(new Language(new Locale("de")), parseLanguageFromFileName("prefix_de.properties", "prefix").get());
+    assertFalse(parseLanguageFromFileName("abc", "abc").isPresent());
+    assertFalse(parseLanguageFromFileName(null, "").isPresent());
+    assertFalse(parseLanguageFromFileName("prefix_test.properties", "text").isPresent());
   }
 }

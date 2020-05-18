@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.core.util;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toSet;
+import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
+import static org.eclipse.scout.sdk.core.util.Strings.lastIndexOf;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -369,8 +371,8 @@ public final class JavaTypes {
    *           if name is null
    */
   public static String qualifier(CharSequence name) {
-    int firstGenericStart = Chars.indexOf(C_GENERIC_START, name);
-    int lastDot = Chars.lastIndexOf(C_DOT, name, 0, firstGenericStart == -1 ? name.length() - 1 : firstGenericStart);
+    int firstGenericStart = indexOf(C_GENERIC_START, name);
+    int lastDot = lastIndexOf(C_DOT, name, 0, firstGenericStart == -1 ? name.length() - 1 : firstGenericStart);
     if (lastDot == -1) {
       return "";
     }
@@ -458,7 +460,7 @@ public final class JavaTypes {
    *           if the given type is syntactically incorrect
    */
   public static String erasure(CharSequence parameterizedType) {
-    int firstParamIndex = Chars.indexOf(C_GENERIC_START, parameterizedType);
+    int firstParamIndex = indexOf(C_GENERIC_START, parameterizedType);
     if (firstParamIndex < 0) {
       return parameterizedType.toString();
     }
@@ -635,7 +637,7 @@ public final class JavaTypes {
         return end + 1;
       }
 
-      int arrayStart = Chars.indexOf(C_ARRAY, src, fqnStart, end);
+      int arrayStart = indexOf(C_ARRAY, src, fqnStart, end);
       boolean isArray = arrayStart > fqnStart;
 
       CharSequence fqn = src.subSequence(fqnStart, isArray ? arrayStart : end);

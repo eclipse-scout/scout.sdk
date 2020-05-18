@@ -11,9 +11,9 @@
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
 import java.io.InputStream;
-import java.util.Map;
 import java.util.function.Supplier;
 
+import org.eclipse.scout.sdk.core.generator.properties.PropertiesGenerator;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.Language;
@@ -25,8 +25,19 @@ import org.eclipse.scout.sdk.core.s.nls.Language;
  */
 public class ReadOnlyTranslationFile extends AbstractTranslationPropertiesFile {
 
+  private final Object m_source;
+
   public ReadOnlyTranslationFile(Supplier<InputStream> contentSupplier, Language language) {
+    this(contentSupplier, language, null);
+  }
+
+  public ReadOnlyTranslationFile(Supplier<InputStream> contentSupplier, Language language, Object source) {
     super(language, contentSupplier);
+    m_source = source;
+  }
+
+  public Object source() {
+    return m_source;
   }
 
   @Override
@@ -35,7 +46,7 @@ public class ReadOnlyTranslationFile extends AbstractTranslationPropertiesFile {
   }
 
   @Override
-  protected void writeEntries(Map<String, String> entries, IEnvironment env, IProgress progress) {
-    // nop
+  protected void writeEntries(PropertiesGenerator content, IEnvironment env, IProgress progress) {
+    throwIfReadOnly();
   }
 }

@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.core.s.nls.query;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toSet;
+import static org.eclipse.scout.sdk.core.util.Strings.hasText;
+import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -37,9 +39,7 @@ import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery;
-import org.eclipse.scout.sdk.core.util.Chars;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link TranslationKeysQuery}</h3>
@@ -101,7 +101,7 @@ public class TranslationKeysQuery implements IFileQuery {
 
   protected boolean acceptCandidate(FileQueryInput candidate) {
     String actualExtension = candidate.fileExtension();
-    return Strings.hasText(actualExtension) && m_acceptedFileExtensions.contains(actualExtension);
+    return hasText(actualExtension) && m_acceptedFileExtensions.contains(actualExtension);
   }
 
   @Override
@@ -118,7 +118,7 @@ public class TranslationKeysQuery implements IFileQuery {
         char[] search = buildSearchPattern(suffix, key, suffixAndPrefix.getValue());
         int pos = 0;
         int index;
-        while ((index = Chars.indexOf(search, fileContent, pos)) >= 0) {
+        while ((index = indexOf(search, fileContent, pos)) >= 0) {
           FileRange match = new FileRange(candidate.file(), key, index + suffix.length, index + suffix.length + key.length());
           acceptNlsKeyMatch(key, match);
           pos = index + search.length;

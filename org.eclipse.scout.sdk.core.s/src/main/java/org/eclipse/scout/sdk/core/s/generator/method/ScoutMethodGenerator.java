@@ -61,7 +61,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
         .withBody(b -> b.returnClause().appendGetFieldByClass(fieldFqn).semicolon());
   }
 
-  public static IScoutMethodGenerator<?, ?> createNlsMethod(String methodName, String nlsKeyName) {
+  public static IScoutMethodGenerator<?, ?> createNlsMethod(String methodName, CharSequence nlsKeyName) {
     return create()
         .withAnnotation(AnnotationGenerator.createOverride())
         .asProtected()

@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor;
 
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.isForbidden;
+
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
+import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.util.EventListenerList;
 import org.eclipse.scout.sdk.s2e.ui.internal.nls.TranslationInputValidator;
@@ -217,7 +220,8 @@ public class NlsTableCursor {
   private IStatus validateEditingText() {
     int selectedColumn = getCursor().getColumn();
     if (selectedColumn == NlsTableController.INDEX_COLUMN_KEYS) {
-      return TranslationInputValidator.validateNlsKey(m_controller.stack(), m_editingText.getText());
+      ITranslationStore storeOfSelectedRow = getSelection().get().store();
+      return TranslationInputValidator.validateNlsKey(m_controller.stack(), storeOfSelectedRow, m_editingText.getText());
     }
     return Status.OK_STATUS;
   }
@@ -244,11 +248,11 @@ public class NlsTableCursor {
     m_editingText = new TableTextEditor(getCursor(), isKeyColumn ? SWT.NONE : SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
     m_editingText.setText(input);
     m_editingText.addModifyListener(e -> {
-      if (validateEditingText().isOK()) {
-        m_editingText.setForeground(null);
+      if (isForbidden(validateEditingText().getCode())) {
+        m_editingText.setForeground(m_editingText.getDisplay().getSystemColor(SWT.COLOR_RED));
       }
       else {
-        m_editingText.setForeground(m_editingText.getDisplay().getSystemColor(SWT.COLOR_RED));
+        m_editingText.setForeground(null);
       }
     });
     if (defaultText != null) {
@@ -321,7 +325,7 @@ public class NlsTableCursor {
       return;
     }
 
-    if (!validateEditingText().isOK()) {
+    if (isForbidden(validateEditingText().getCode())) {
       disposeText();
       return;
     }

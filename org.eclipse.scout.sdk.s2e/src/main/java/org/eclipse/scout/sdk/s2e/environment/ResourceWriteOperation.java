@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.util.Chars;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.util.CharSequenceInputStream;
@@ -91,7 +90,7 @@ public class ResourceWriteOperation implements IResourceWriteOperation {
     }
     try (InputStream in = file.getContents()) {
       StringBuilder fileContent = Strings.fromInputStream(in, file.getCharset());
-      return Chars.equals(fileContent, newContent);
+      return Strings.equals(fileContent, newContent);
     }
     catch (IOException | CoreException e) {
       SdkLog.warning("Unable to read contents of file '{}'.", file, e);

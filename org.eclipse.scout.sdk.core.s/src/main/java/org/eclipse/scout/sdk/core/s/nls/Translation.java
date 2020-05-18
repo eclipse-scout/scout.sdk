@@ -61,6 +61,15 @@ public class Translation implements ITranslation {
     }
   }
 
+  @Override
+  public Translation merged(ITranslation translation) {
+    Translation merged = new Translation(this);
+    if (translation != null) {
+      translation.texts().forEach(merged::putText);
+    }
+    return merged;
+  }
+
   /**
    * Replaces all translations with the specified ones.
    *

@@ -16,11 +16,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
-import org.eclipse.scout.sdk.core.s.testing.IntegrationTest;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * <h3>{@link ScoutProjectNewTest}</h3>

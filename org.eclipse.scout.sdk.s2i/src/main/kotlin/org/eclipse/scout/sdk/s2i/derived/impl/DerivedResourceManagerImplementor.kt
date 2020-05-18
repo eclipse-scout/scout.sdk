@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.JavaTypes
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceHandlerFactory
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
@@ -155,7 +156,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         return union
     }
 
-    private fun performUpdateAsync(scope: SearchScope): IFuture<Unit> = callInIdeaEnvironment(project, "Update derived resources") { env, progress ->
+    private fun performUpdateAsync(scope: SearchScope): IFuture<Unit> = callInIdeaEnvironment(project, message("update.derived.resources")) { env, progress ->
         SdkLog.debug("Check for derived resource updates in scope $scope")
         val start = System.currentTimeMillis()
         val factories = synchronized(m_updateHandlerFactories) { ArrayList(m_updateHandlerFactories.values) }
@@ -187,7 +188,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         val transaction = TransactionManager.current()
         val runningFileWrites = ConcurrentLinkedQueue<IFuture<*>>()
         val indicator = progress.indicator
-        progress.init(handlers.size * workForHandler, "Update derived resources")
+        progress.init(handlers.size * workForHandler, message("update.derived.resources"))
 
         handlers.forEach {
             try {

@@ -75,7 +75,7 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
   }
 
   @Override
-  public TYPE stringLiteral(String literalValue) {
+  public TYPE stringLiteral(CharSequence literalValue) {
     if (literalValue == null) {
       return nullLiteral();
     }
@@ -83,7 +83,7 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
   }
 
   @Override
-  public TYPE appendDefaultValueOf(String dataTypeFqn) {
+  public TYPE appendDefaultValueOf(CharSequence dataTypeFqn) {
     String defaultVal = JavaTypes.defaultValueOf(dataTypeFqn);
     if (defaultVal != null) {
       return append(defaultVal);
@@ -92,17 +92,17 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
   }
 
   @Override
-  public TYPE enumValue(String enumType, CharSequence enumField) {
+  public TYPE enumValue(CharSequence enumType, CharSequence enumField) {
     return ref(enumType).dot().append(Ensure.notNull(enumField));
   }
 
   @Override
-  public TYPE stringLiteralArray(String[] elements, boolean formatWithNewlines) {
+  public TYPE stringLiteralArray(CharSequence[] elements, boolean formatWithNewlines) {
     return stringLiteralArray(elements, formatWithNewlines, false);
   }
 
   @Override
-  public TYPE stringLiteralArray(String[] elements, boolean formatWithNewlines, boolean stringLiteralOnSingleElementArray) {
+  public TYPE stringLiteralArray(CharSequence[] elements, boolean formatWithNewlines, boolean stringLiteralOnSingleElementArray) {
     Ensure.notNull(elements);
     if (stringLiteralOnSingleElementArray && elements.length == 1) {
       return stringLiteral(elements[0]);
@@ -111,7 +111,7 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
   }
 
   @Override
-  public TYPE stringLiteralArray(Stream<String> elements, boolean formatWithNewlines) {
+  public TYPE stringLiteralArray(Stream<? extends CharSequence> elements, boolean formatWithNewlines) {
     Stream<ISourceGenerator<ISourceBuilder<?>>> stringLiteralGenerators = Ensure.notNull(elements)
         .<ISourceGenerator<IExpressionBuilder<?>>> map(e -> b -> b.stringLiteral(e))
         .map(g -> g.generalize(ExpressionBuilder::create));

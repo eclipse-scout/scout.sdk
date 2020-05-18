@@ -14,6 +14,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.toVirtualFile
 import java.nio.file.Path
 
@@ -22,7 +23,7 @@ open class FileWriter(val targetFile: Path, private val content: CharSequence, v
     override fun file(): Path = targetFile
 
     override fun commit(progress: IdeaProgress): Boolean {
-        progress.init(4, "Write file {}", targetFile)
+        progress.init(4, toString())
 
         var existingFile = targetFile.toVirtualFile()
         progress.worked(1)
@@ -40,7 +41,6 @@ open class FileWriter(val targetFile: Path, private val content: CharSequence, v
         }
         progress.setWorkRemaining(1)
 
-
         val documentManager = FileDocumentManager.getInstance()
         val document = documentManager.getDocument(existingFile)
         if (document == null) {
@@ -52,5 +52,5 @@ open class FileWriter(val targetFile: Path, private val content: CharSequence, v
         return true
     }
 
-    override fun toString() = "Write file $targetFile"
+    override fun toString() = message("write.file.x", targetFile)
 }

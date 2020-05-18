@@ -51,6 +51,7 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-csv:1.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:aapt-proto-jarjar:2019.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:annotations:2019.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:asm-5.0.3:2019.2.3" level="project" />
@@ -354,6 +355,34 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css-openapi:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-192.6817.14-withSources">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2019.2.3/5442cc61648265370e631b2f5f7f329410abe347/ideaIU-2019.2.3/plugins/CSS/lib/resources_en.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2019.2.3/f09035cd0dc18d7f89bf011c76b9e3d3407d2cd1/ideaIC-2019.2.3-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:javascript-openapi:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:JavaScriptLanguage:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:js-test-common:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-192.6817.14-withSources">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2019.2.3/5442cc61648265370e631b2f5f7f329410abe347/ideaIU-2019.2.3/plugins/JavaScriptLanguage/lib/resources_en.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2019.2.3/f09035cd0dc18d7f89bf011c76b9e3d3407d2cd1/ideaIC-2019.2.3-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:semver4j-2.2.0:ideaIU-IU-192.6817.14-withSources" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.61" level="project" />
     <orderEntry type="library" name="Gradle: wsdl4j:wsdl4j:1.6.2" level="project" />
     <orderEntry type="library" name="Gradle: org.eclipse.jdt:ecj:3.21.0" level="project" />

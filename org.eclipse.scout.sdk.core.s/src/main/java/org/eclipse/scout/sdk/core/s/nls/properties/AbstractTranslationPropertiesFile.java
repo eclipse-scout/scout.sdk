@@ -15,22 +15,21 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.generator.properties.PropertiesGenerator;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link AbstractTranslationPropertiesFile}</h3>
@@ -39,12 +38,13 @@ import org.eclipse.scout.sdk.core.util.SdkException;
  */
 public abstract class AbstractTranslationPropertiesFile implements ITranslationPropertiesFile {
 
-  private static final Pattern FILE_PATTERN = Pattern.compile("^[^_]*(?:_(" + Language.LANGUAGE_REGEX + "))?\\.properties$");
+  public static final String FILE_SUFFIX = ".properties";
+  public static final Pattern FILE_PATTERN = Pattern.compile("^[^_]+(?:_(" + Language.LANGUAGE_REGEX + "))?\\" + FILE_SUFFIX + "$");
 
   private final Language m_language;
   private final Supplier<InputStream> m_inputSupplier;
 
-  private Map<String, String> m_entries;
+  private PropertiesGenerator m_fileContent;
 
   protected AbstractTranslationPropertiesFile(Language language, Supplier<InputStream> contentSupplier) {
     m_language = Ensure.notNull(language);
@@ -52,10 +52,10 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
   }
 
   private Map<String, String> entries() {
-    if (m_entries == null) {
+    if (m_fileContent == null) {
       throw newFail("Properties file has not been loaded yet.");
     }
-    return m_entries;
+    return m_fileContent.properties();
   }
 
   @Override
@@ -80,31 +80,31 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
 
   @Override
   public boolean load(IProgress progress) {
-    Map<String, String> newEntries = readEntries(progress);
-    if (m_entries != null && m_entries.equals(newEntries)) {
+    PropertiesGenerator newContent = readEntries();
+    if (Objects.equals(m_fileContent, newContent)) {
       return false;
     }
-
-    m_entries = newEntries;
+    m_fileContent = newContent;
     return true;
   }
 
-  private Map<String, String> readEntries(IProgress progress) {
+  private PropertiesGenerator readEntries() {
     try (InputStream in = Ensure.notNull(m_inputSupplier.get())) {
-      return parse(in, progress);
+      return PropertiesGenerator.create(in);
     }
     catch (IOException e) {
-      throw new SdkException(e);
+      throw new SdkException("Error reading properties file for language '{}'.", language(), e);
     }
   }
 
   @Override
   public boolean setTranslation(String key, String text) {
     throwIfReadOnly();
+    Ensure.notBlank(key);
     if (text == null) {
       return removeTranslation(key);
     }
-    String oldTranslation = entries().put(Ensure.notBlank(key), text);
+    String oldTranslation = entries().put(key, text);
     return !text.equals(oldTranslation);
   }
 
@@ -117,72 +117,59 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
   @Override
   public void flush(IEnvironment env, IProgress progress) {
     throwIfReadOnly();
-    writeEntries(entries(), env, progress);
+    writeEntries(m_fileContent, env, progress);
   }
 
-  private void throwIfReadOnly() {
+  protected void throwIfReadOnly() {
     if (!isEditable()) {
       throw new UnsupportedOperationException("Cannot modify a ready-only resource.");
     }
   }
 
-  protected abstract void writeEntries(Map<String, String> entries, IEnvironment env, IProgress progress);
+  protected abstract void writeEntries(PropertiesGenerator content, IEnvironment env, IProgress progress);
 
   /**
-   * Reads the contents of the specified {@link InputStream} as {@code .properties} file and returns the key-value
-   * mappings.
-   *
-   * @param in
-   *          The {@link InputStream} to load the data from. Must not be {@code null}.
-   * @param progress
-   *          The {@link IProgress} monitor.
-   * @return The mapping.
-   */
-  public static Map<String, String> parse(InputStream in, IProgress progress) {
-    Set<Entry<Object, Object>> entrySet = loadProperties(in, progress).entrySet();
-    Map<String, String> result = new HashMap<>(entrySet.size());
-    for (Entry<Object, Object> entry : entrySet) {
-      Object key = entry.getKey();
-      Object translation = entry.getValue();
-      if (key != null && translation != null) {
-        result.put(key.toString(), translation.toString());
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Parses the language from the specified {@code .properties} file name.
-   *
+   * Parses the language from a translation .properties file respecting the given prefix.<br>
+   * The inverse operation is {@link #getPropertiesFileName(String, Language)}.
+   * 
    * @param fileName
-   *          The file name to parse. Must not be {@code null}.
-   * @return The parsed {@link Language}
-   * @throws IllegalArgumentException
-   *           if it cannot be parsed because it is no valid name.
+   *          The file name to parse. E.g. {@code "Texts_en_GB.properties"}. May not be {@code null}.
+   * @param prefix
+   *          An optional prefix the given file name must have to be accepted.
+   * @return An {@link Optional} holding the language of the given file name or an empty {@link Optional} if it cannot
+   *         be parsed (which might be because the prefix does not match).
    */
-  public static Language parseFromFileNameOrThrow(CharSequence fileName) {
-    Matcher matcher = FILE_PATTERN.matcher(fileName);
-    if (matcher.matches()) {
-      String languagePart = matcher.group(1);
-      if (languagePart == null) {
-        return Language.LANGUAGE_DEFAULT;
-      }
-      return Language.parseThrowingOnError(languagePart);
+  public static Optional<Language> parseLanguageFromFileName(String fileName, String prefix) {
+    if (Strings.isBlank(fileName)) {
+      return Optional.empty();
     }
-    throw newFail("Invalid file name '{}'. Language cannot be parsed.", fileName);
+    if (Strings.hasText(prefix) && !fileName.startsWith(prefix)) {
+      return Optional.empty();
+    }
+
+    Matcher matcher = FILE_PATTERN.matcher(fileName);
+    if (!matcher.matches()) {
+      return Optional.empty();
+    }
+
+    String languagePart = matcher.group(1);
+    if (Strings.isBlank(languagePart)) {
+      return Optional.of(Language.LANGUAGE_DEFAULT);
+    }
+    return Language.parse(languagePart);
   }
 
-  private static Map<Object, Object> loadProperties(InputStream in, IProgress progress) {
-    try {
-      Properties props = new Properties();
-      props.load(in);
-      return props;
-    }
-    catch (IOException e) {
-      throw new SdkException(e);
-    }
-    finally {
-      progress.setWorkRemaining(0);
-    }
+  /**
+   * Gets the filename for a {@code .properties} file using the specified prefix and {@link Language}.<br>
+   * This the inverse operation is {@link #parseLanguageFromFileName(String, String)}.
+   *
+   * @param prefix
+   *          The file prefix. Must not be {@code null}.
+   * @param language
+   *          The language. Must not be {@code null}.
+   * @return The file name.
+   */
+  public static String getPropertiesFileName(String prefix, Language language) {
+    return prefix + '_' + language.locale() + FILE_SUFFIX;
   }
 }

@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
+import static java.util.Collections.unmodifiableMap;
+import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.getPropertiesFileName;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.file.Path;
@@ -182,29 +184,16 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
         .map(f -> (EditableTranslationFile) f)
         .findAny()
         .orElseThrow(() -> newFail("Cannot create new language because the store '{}' is not editable.", this))
-        .file()
+        .path()
         .getParent();
 
     String fileName = getPropertiesFileName(service().filePrefix(), language);
-    ITranslationPropertiesFile newFile = new EditableTranslationFile(directory.resolve(fileName));
+    ITranslationPropertiesFile newFile = new EditableTranslationFile(directory.resolve(fileName), language);
     newFile.load(new NullProgress());
 
     setDirty(true);
     translationFiles().put(language, newFile);
     m_newFiles.add(newFile);
-  }
-
-  /**
-   * Gets the filename for a {@code .properties} file using the specified prefix and {@link Language}.
-   *
-   * @param prefix
-   *          The file prefix. Must not be {@code null}.
-   * @param language
-   *          The language. Must not be {@code null}.
-   * @return The file name.
-   */
-  public static String getPropertiesFileName(String prefix, Language language) {
-    return prefix + '_' + language.locale() + ".properties";
   }
 
   @Override
@@ -245,8 +234,18 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   }
 
   @Override
+  public boolean containsLanguage(Language language) {
+    return m_files.containsKey(language);
+  }
+
+  @Override
   public Stream<String> keys() {
     return m_translations.keySet().stream();
+  }
+
+  @Override
+  public long size() {
+    return m_translations.size();
   }
 
   @Override
@@ -293,6 +292,10 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
 
   protected Map<Language, ITranslationPropertiesFile> translationFiles() {
     return m_files;
+  }
+
+  public Map<Language, ITranslationPropertiesFile> files() {
+    return unmodifiableMap(m_files);
   }
 
   @Override

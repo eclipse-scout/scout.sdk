@@ -72,7 +72,7 @@ public class MethodGeneratorTest {
         .asPublic()
         .asAbstract()
         .withAnnotation(AnnotationGenerator.createOverride())
-        .withAnnotation(AnnotationGenerator.createSupressWarnings("checked"))
+        .withAnnotation(AnnotationGenerator.createSuppressWarnings("checked"))
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withElementName("testMethod")
         .withException(IOException.class.getName())

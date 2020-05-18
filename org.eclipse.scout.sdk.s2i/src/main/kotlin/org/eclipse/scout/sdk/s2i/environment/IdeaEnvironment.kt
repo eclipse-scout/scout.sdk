@@ -10,7 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2i.environment
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.util.ProgressIndicatorUtils
+import com.intellij.openapi.progress.util.ProgressIndicatorUtils.runWithWriteActionPriority
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
@@ -34,6 +39,7 @@ import org.eclipse.scout.sdk.core.util.*
 import org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.s2i.*
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.repeatUntilPassesWithIndex
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import org.jetbrains.jps.model.serialization.PathMacroUtil
@@ -60,7 +66,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
 
         fun <T> callInIdeaEnvironment(project: Project, title: String, task: (IdeaEnvironment, IdeaProgress) -> T): IFuture<T> {
             val result = FinalValue<T>()
-            val name = Strings.notBlank(title).orElseGet { toStringIfOverwritten(task).orElse("Unnamed Task: $task") }
+            val name = Strings.notBlank(title).orElseGet { toStringIfOverwritten(task).orElse(message("unnamed.task.x", task)) }
             val job = OperationTask(name, project) { pr ->
                 callInIdeaEnvironmentSync(project, pr) { e, p ->
                     result.setIfAbsent(task.invoke(e, p))
@@ -70,6 +76,24 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         }
 
         fun <T> computeInReadAction(project: Project, callable: () -> T): T = repeatUntilPassesWithIndex(project, true, callable)
+
+        fun <T> computeInLongReadAction(project: Project, progressIndicator: ProgressIndicator, callable: () -> T): T {
+            if (ApplicationManager.getApplication().isReadAccessAllowed) {
+                return callable.invoke()
+            }
+
+            val result = FinalValue<T>()
+            var success = false
+            while (!success && !progressIndicator.isCanceled) {
+                /* do not pass outer progress indicator. otherwise it might be canceled inside but then it is not possible to perform a retry (it is canceled already) */
+                /* therefore use a fresh indicator for each retry and use the outer indicator to stop retrying */
+                success = runWithWriteActionPriority({ result.set(computeInReadAction(project, callable)) }, EmptyProgressIndicator())
+                if (!success) {
+                    ProgressIndicatorUtils.yieldToPendingWriteActions()
+                }
+            }
+            return result.get()
+        }
 
         fun toIdeaProgress(progress: IProgress?): IdeaProgress = progress?.toIdea() ?: IdeaProgress(null)
     }
@@ -85,11 +109,18 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
             .mapNotNull { it.toScoutType(this) }
             .stream()
 
-    override fun findJavaEnvironment(root: Path?): Optional<IJavaEnvironment> =
-            Optional.ofNullable(
-                    root?.toVirtualFile()
-                            ?.containingModule(project)
-                            ?.let { toScoutJavaEnvironment(it) })
+    override fun findJavaEnvironment(root: Path?): Optional<IJavaEnvironment> {
+        var path = root
+        while (path != null) {
+            val env = path.toVirtualFile()?.containingModule(project)?.let { toScoutJavaEnvironment(it) }
+            if (env != null) {
+                return Optional.of(env)
+            }
+            path = path.parent
+        }
+        return Optional.empty()
+    }
+
 
     override fun rootOfJavaEnvironment(environment: IJavaEnvironment?): Path {
         val spi = environment?.unwrap() ?: throw newFail("Java environment must not be null")
@@ -97,7 +128,6 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         val moduleDirPath = PathMacroUtil.getModuleDir(ideaEnv.module.moduleFilePath) ?: throw newFail("Java environment '{}' has no root directory.", ideaEnv)
         return Paths.get(moduleDirPath)
     }
-
 
     fun toScoutJavaEnvironment(module: Module?): IJavaEnvironment? =
             module

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.log;
 
 import static java.util.Collections.singletonList;
+import static org.eclipse.scout.sdk.core.util.Strings.repeat;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -86,7 +87,7 @@ public final class SdkLog {
   static String defaultPrefixFor(Level level) {
     int levelColWidth = 8;
     String levelName = level.getName();
-    String spaces = Strings.repeat(" ", levelColWidth - levelName.length());
+    CharSequence spaces = repeat(" ", levelColWidth - levelName.length());
     return new StringBuilder().append(logTime())
         .append(" [").append(levelName).append(']')
         .append(spaces).toString();

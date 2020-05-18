@@ -55,7 +55,7 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
    *          the class id value to use
    * @return the created source builder
    */
-  public static IAnnotationGenerator<?> createClassId(String classIdValue) {
+  public static IAnnotationGenerator<?> createClassId(CharSequence classIdValue) {
     return create()
         .withElementName(IScoutRuntimeTypes.ClassId)
         .withElement("value", b -> b.stringLiteral(classIdValue));

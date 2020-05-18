@@ -82,7 +82,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetConfiguredTitle() {
     String nlsKeyName = elementName().orElseThrow(() -> newFail("Form has no name."));
     if (nlsKeyName.endsWith(ISdkProperties.SUFFIX_FORM)) {
-      nlsKeyName = Strings.ensureStartWithUpperCase(nlsKeyName.substring(0, nlsKeyName.length() - ISdkProperties.SUFFIX_FORM.length()));
+      nlsKeyName = Strings.ensureStartWithUpperCase(nlsKeyName.substring(0, nlsKeyName.length() - ISdkProperties.SUFFIX_FORM.length())).toString();
     }
     return ScoutMethodGenerator.createNlsMethod("getConfiguredTitle", nlsKeyName);
   }

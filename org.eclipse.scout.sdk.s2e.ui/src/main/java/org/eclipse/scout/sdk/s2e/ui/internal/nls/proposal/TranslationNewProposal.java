@@ -66,7 +66,7 @@ public class TranslationNewProposal extends AbstractTranslationProposal {
       proposalFieldText = "";
     }
     else {
-      proposalFieldText = Strings.fromStringLiteral('"' + searchText + '"');
+      proposalFieldText = Strings.fromStringLiteral('"' + searchText + '"').toString();
     }
 
     String key = m_stack.generateNewKey(proposalFieldText);

@@ -15,6 +15,7 @@ import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.registerStoreSu
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.registerUiTextContributor;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.removeStoreSupplier;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.removeUiTextContributor;
+import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseLanguageFromFileName;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.spy;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.security.ScoutSecurityTextProviderService;
 import org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -41,6 +43,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
+import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.ITranslationPropertiesFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTextProviderService;
@@ -59,6 +62,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  */
 public class TranslationStoreSupplierExtension implements BeforeEachCallback, AfterEachCallback {
 
+  public static final String PROPERTIES_FILE_NAME_PREFIX = "Prefix";
   public static final String TEST_DEPENDENCY_NAME = "@bsi-sdk/testdependency";
   public static final String TEST_UI_CONTRIBUTOR_FQN = "nls.TestUiTextContributor";
 
@@ -110,7 +114,7 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
   }
 
   public static PropertiesTranslationStore createReadOnlyStore(IEnvironment env) {
-    return createTestingStore(env, true, null);
+    return createTestingStore(env, true, ScoutTextProviderService.class.getName(), null);
   }
 
   public static PropertiesTranslationStore createEmptyStore(IJavaEnvironment env) {
@@ -121,8 +125,8 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
     return newFail("No translation store supplier available. Ensure the '{}' extension is registered in the unit test.", TranslationStoreSupplierExtension.class.getName());
   }
 
-  protected static PropertiesTranslationStore createTestingStore(IEnvironment env, boolean readOnly, Path dir) {
-    IType txtSvcType = ((TestingEnvironment) env).primaryEnvironment().requireType(ScoutTextProviderService.class.getName());
+  protected static PropertiesTranslationStore createTestingStore(IEnvironment env, boolean readOnly, String svcFqn, Path dir) {
+    IType txtSvcType = ((TestingEnvironment) env).primaryEnvironment().requireType(svcFqn);
     return createTestingStore(txtSvcType, readOnly, dir);
   }
 
@@ -152,9 +156,9 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
         when(txtSvc.order()).thenReturn(10000.0);
       }
       else {
-        translationFiles.add(createTranslationFile(directory.resolve("Prefix.properties"), def));
-        translationFiles.add(createTranslationFile(directory.resolve("Prefix_en_US.properties"), en));
-        translationFiles.add(createTranslationFile(directory.resolve("Prefix_es.properties"), null));
+        translationFiles.add(createTranslationFile(directory.resolve(PROPERTIES_FILE_NAME_PREFIX + AbstractTranslationPropertiesFile.FILE_SUFFIX), def));
+        translationFiles.add(createTranslationFile(directory.resolve(PROPERTIES_FILE_NAME_PREFIX + "_en_US" + AbstractTranslationPropertiesFile.FILE_SUFFIX), en));
+        translationFiles.add(createTranslationFile(directory.resolve(PROPERTIES_FILE_NAME_PREFIX + "_es" + AbstractTranslationPropertiesFile.FILE_SUFFIX), null));
       }
     }
     catch (IOException e) {
@@ -172,7 +176,8 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
       }
     }
 
-    EditableTranslationFile props = new EditableTranslationFile(file);
+    Language language = parseLanguageFromFileName(file.getFileName().toString(), PROPERTIES_FILE_NAME_PREFIX).get();
+    EditableTranslationFile props = new EditableTranslationFile(file, language);
     assertTrue(props.load(new NullProgress()));
     return props;
   }
@@ -188,8 +193,8 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
     @Override
     public Stream<ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress) {
       return Stream.of(
-          createTestingStore(env, false, m_dir),
-          createTestingStore(env, true, m_dir));
+          createTestingStore(env, false, ScoutTextProviderService.class.getName(), m_dir),
+          createTestingStore(env, true, ScoutSecurityTextProviderService.class.getName(), m_dir));
     }
 
     @Override

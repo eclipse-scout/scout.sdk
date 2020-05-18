@@ -10,12 +10,18 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls;
 
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.isForbidden;
+import static org.eclipse.scout.sdk.s2e.ui.internal.nls.TranslationInputValidator.validateDefaultTranslation;
+import static org.eclipse.scout.sdk.s2e.ui.internal.nls.TranslationInputValidator.validateNlsKey;
+import static org.eclipse.scout.sdk.s2e.ui.internal.nls.TranslationInputValidator.validateTranslationStore;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.TranslationValidator;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizardPage;
@@ -39,20 +45,23 @@ public class TranslationNewDialog extends AbstractTranslationDialog {
 
   @Override
   protected void revalidate() {
-    MultiStatus status = new MultiStatus(S2ESdkUiActivator.PLUGIN_ID, -1, "multi status", null);
-    status.add(TranslationInputValidator.validateNlsKey(getNlsProject(), getKeyField().getText()));
+    MultiStatus status = new MultiStatus(S2ESdkUiActivator.PLUGIN_ID, TranslationValidator.OK, "multi status", null);
+
+    status.add(validateTranslationStore(getSelectedStore().orElse(null)));
+    getSelectedStore().ifPresent(store -> status.add(validateNlsKey(getNlsProject(), store, getKeyField().getText())));
 
     TextField defaultLanguageField = getTranslationField(Language.LANGUAGE_DEFAULT);
     if (defaultLanguageField != null) {
-      status.add(TranslationInputValidator.validateDefaultTranslation(defaultLanguageField.getText()));
+      status.add(validateDefaultTranslation(defaultLanguageField.getText()));
     }
 
+    IStatus worst = AbstractWizardPage.getHighestSeverityStatus(status);
     if (status.isOK()) {
-      setMessage("Create a new translation entry.");
+      setMessage("Create a new translation.");
     }
     else {
-      setMessage(AbstractWizardPage.getHighestSeverityStatus(status));
+      setMessage(worst);
     }
-    getButton(Window.OK).setEnabled(status.getSeverity() != IStatus.ERROR);
+    getButton(Window.OK).setEnabled(!isForbidden(worst.getCode()));
   }
 }

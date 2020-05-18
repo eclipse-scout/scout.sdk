@@ -19,6 +19,9 @@ import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.create
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createReloadEvent;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createRemoveTranslationEvent;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createUpdateTranslationEvent;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.isForbidden;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateKey;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateTranslation;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.file.Path;
@@ -28,13 +31,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -191,54 +194,102 @@ public class TranslationStoreStack {
    * @param target
    *          The target {@link ITranslationStore}. May be {@code null}. In that case the
    *          {@link #primaryEditableStore()} is used.
+   * @return The created {@link ITranslationEntry}.
    * @throws IllegalArgumentException
    *           if one of the mentioned condition is not fulfilled.
    */
-  public synchronized void addNewTranslation(ITranslation newTranslation, ITranslationStore target) {
+  public synchronized ITranslationEntry addNewTranslation(ITranslation newTranslation, ITranslationStore target) {
     IEditableTranslationStore editableStore = toEditableStore(
         Optional.ofNullable(target)
             .orElseGet(() -> primaryEditableStore()
                 .orElseThrow(() -> newFail("Cannot create new entries. All translation stores are read-only."))));
 
     // validate input
-    validateTranslation(newTranslation);
+    Ensure.isTrue(validateTranslation(newTranslation) == TranslationValidator.OK);
     Ensure.isFalse(editableStore.containsKey(newTranslation.key()), "Key '{}' already exists in store {}", newTranslation.key(), editableStore);
     Ensure.isTrue(m_stores.contains(editableStore), "Store of wrong stack.");
 
-    // create new text
-    runAndFireChanged(() -> createAddTranslationEvent(this, editableStore.addNewTranslation(newTranslation)));
+    return addNewTranslationInternal(newTranslation, editableStore);
+  }
+
+  protected ITranslationEntry addNewTranslationInternal(ITranslation newTranslation, IEditableTranslationStore target) {
+    Optional<? extends ITranslationEntry> existingEntryWithSameKey = translation(newTranslation.key());
+    ITranslationEntry createdTranslation = target.addNewTranslation(newTranslation);
+
+    setChanging(true);
+    try {
+      if (existingEntryWithSameKey.isPresent()) {
+        if (existingEntryWithSameKey.get().store().service().order() < target.service().order()) {
+          // there is already an entry with the same key that overrides the just created.
+          // the just created will not be visible -> fire no events
+          return createdTranslation;
+        }
+
+        // the just created entry overrides an existing: remove the existing as it will not be visible anymore
+        fireStackChanged(createRemoveTranslationEvent(this, existingEntryWithSameKey.get()));
+      }
+      fireStackChanged(createAddTranslationEvent(this, createdTranslation));
+      return createdTranslation;
+    }
+    finally {
+      setChanging(false);
+    }
   }
 
   /**
    * Merges the {@link ITranslation} specified into this stack.
    * <p>
-   * If an entry with the same key as the {@link ITranslation} provided already exists in this stack, this entry is
-   * updated within the same {@link ITranslationStore} as it already exists.
+   * If an editable entry with the same key as the {@link ITranslation} provided already exists in this stack, this
+   * entry is updated within the same {@link ITranslationStore} as it already exists.
    * <p>
-   * If no entry with the same key as the {@link ITranslation} provided exists, a new translation is created within the
-   * {@link ITranslationStore} provided.
+   * Otherwise, a new translation is created within the {@link ITranslationStore} provided.
    * <p>
    * If the {@link ITranslation} provided contains more {@link Language languages} than the store in which it will be
    * created/updated, languages will be created as needed.
-   * 
+   *
    * @param newTranslation
    *          The new {@link ITranslation} that should be merged into this store. Must not be {@code null}.
    * @param targetInCaseNew
-   *          The {@link ITranslationStore} in which the entry should be created in case it does not yet exist. May be
-   *          {@code null} which means the primary (first) editable stored available in this stack is used.
+   *          An optional {@link ITranslationStore} in which the entry should be created in case it does not yet exist.
+   *          May be {@code null} which means the primary (first) editable store available in this stack is used.
+   * @return The created or updated {@link ITranslationEntry}.
    * @throws IllegalArgumentException
    *           if the given translation is invalid, the given store does not belong to this stack or is not editable.
    * @see #addNewTranslation(ITranslation, ITranslationStore)
    * @see #updateTranslation(ITranslation)
    */
-  public synchronized void mergeTranslation(ITranslation newTranslation, ITranslationStore targetInCaseNew) {
-    Ensure.notNull(newTranslation, "A translation must be specified.");
-    if (containsKey(newTranslation.key())) {
-      updateTranslation(newTranslation);
-    }
-    else {
-      addNewTranslation(newTranslation, targetInCaseNew);
-    }
+  public synchronized ITranslationEntry mergeTranslation(ITranslation newTranslation, ITranslationStore targetInCaseNew) {
+    ITranslation merged = translation(Ensure.notNull(newTranslation).key())
+        .map(t -> t.merged(newTranslation))
+        .orElse(newTranslation);
+    return updateTranslation(merged)
+        .orElseGet(() -> addNewTranslation(merged, targetInCaseNew));
+  }
+
+  /**
+   * Imports translations from tabular data.
+   * <p>
+   * Stores the texts in the first editable {@link ITranslationStore} that contains the corresponding key.
+   * <p>
+   * For new {@link ITranslation translations} the store given is used. If no specific target is specified, the first
+   * editable store in this stack is used.
+   *
+   * @param rawTableData
+   *          The tabular data to import. The {@link List} must contain a header row specifying the languages and the
+   *          key column. Only rows after such a header row are imported.
+   * @param targetInCaseNew
+   *          The {@link ITranslationStore} in which the entry should be created in case it does not yet exist. May be *
+   *          {@code null} which means the primary (first) editable store available in this stack is used.
+   * @param keyColumnName
+   *          The text that identifies the key column in the header row. Must not be {@code null} or an empty
+   *          {@link String}.
+   * @return An {@link ITranslationImportInfo} describing the result of the import. It allows to access e.g. the
+   *         imported entries, ignored columns or rows.
+   */
+  public synchronized ITranslationImportInfo importTranslations(List<List<String>> rawTableData, String keyColumnName, ITranslationStore targetInCaseNew) {
+    TranslationImporter importer = new TranslationImporter(this, rawTableData, keyColumnName, targetInCaseNew);
+    importer.tryImport();
+    return importer;
   }
 
   /**
@@ -254,24 +305,40 @@ public class TranslationStoreStack {
   public synchronized void changeKey(String oldKey, String newKey) {
     Ensure.notBlank(oldKey, "Cannot change a blank key.");
     Ensure.notBlank(newKey, "Cannot update to a blank key.");
-    Ensure.isFalse(translation(newKey).isPresent(), "Cannot change key '{}' to '{}' because the new key already exists.", oldKey, newKey);
+    if (oldKey.equals(newKey)) {
+      return;
+    }
+
+    Optional<IEditableTranslationStore> targetStore = firstEditableStoreWithKey(oldKey);
+    if (!targetStore.isPresent()) {
+      return;
+    }
+    IEditableTranslationStore store = targetStore.get();
+    Ensure.isFalse(isForbidden(validateKey(this, store, newKey)), "Cannot change key '{}' to '{}' because the new key is not valid.", oldKey, newKey);
 
     setChanging(true);
     try {
-      firstEditableStoreWithKey(oldKey)
-          .ifPresent(store -> {
-            // update key in first store
-            fireStackChanged(createChangeKeyEvent(this, store.changeKey(oldKey, newKey), oldKey));
+      Optional<? extends ITranslationEntry> existingEntryWithNewKey = translation(newKey);
+      ITranslationEntry changedEntry = store.changeKey(oldKey, newKey);
 
-            // if the old key is still present: we changed an overridden translation key. So it is no longer overridden now.
-            // create a synthetic event describing that a new one has been added (the one that is no longer overridden).
-            allStores()
-                .filter(s -> s.containsKey(oldKey))
-                .findAny()
-                .flatMap(s -> s.get(oldKey))
-                .ifPresent(entry -> fireStackChanged(createAddTranslationEvent(this, entry)));
-
-          });
+      if (existingEntryWithNewKey.isPresent()) {
+        // the new key already existed in another service before the update. so the changed entry was a normal and is now an overriding or overridden entry.
+        if (existingEntryWithNewKey.get().store().service().order() < changedEntry.store().service().order()) {
+          // it is an overridden entry: remove it
+          fireStackChanged(createRemoveTranslationEvent(this, changedEntry));
+        }
+        else {
+          // it is now an overriding entry: delete existing
+          fireStackChanged(createChangeKeyEvent(this, changedEntry, oldKey));
+          fireStackChanged(createRemoveTranslationEvent(this, existingEntryWithNewKey.get()));
+        }
+      }
+      else {
+        // if the old key is still present: the entry changed from overriding to normal.
+        // create a synthetic event describing that a new one has been added (the one that is no longer overridden).
+        fireStackChanged(createChangeKeyEvent(this, changedEntry, oldKey));
+        translation(oldKey).ifPresent(entry -> fireStackChanged(createAddTranslationEvent(this, entry)));
+      }
     }
     finally {
       setChanging(false);
@@ -279,10 +346,9 @@ public class TranslationStoreStack {
   }
 
   protected Optional<IEditableTranslationStore> firstEditableStoreWithKey(String key) {
-    return allEditableStores()
+    return allEditableStoresInternal()
         .filter(s -> s.containsKey(key))
-        .findAny()
-        .map(TranslationStoreStack::toEditableStore);
+        .findFirst();
   }
 
   /**
@@ -292,16 +358,24 @@ public class TranslationStoreStack {
    *          The keys of the entries to remove. Must not be {@code null}.
    */
   public synchronized void removeTranslations(Stream<String> keys) {
-    Ensure.notNull(keys)
-        .filter(Strings::hasText)
-        .forEach(key -> firstEditableStoreWithKey(key)
-            .ifPresent(s -> runAndFireChanged(() -> createRemoveTranslationEvent(this, s.removeTranslation(key)))));
+    setChanging(true);
+    try {
+      Ensure.notNull(keys)
+          .filter(Strings::hasText)
+          .forEach(key -> firstEditableStoreWithKey(key)
+              .ifPresent(s -> runAndFireChanged(() -> createRemoveTranslationEvent(this, removeTranslationInternal(s, key)))));
+    }
+    finally {
+      setChanging(false);
+    }
   }
 
-  protected static void validateTranslation(ITranslation translation) {
-    Ensure.notNull(translation, "A translation must be specified.");
-    Ensure.notBlank(translation.key(), "Key must be specified.");
-    Ensure.isFalse(Strings.isEmpty(translation.text(Language.LANGUAGE_DEFAULT).orElse(null)), "Default language translation must be specified.");
+  protected ITranslationEntry removeTranslationInternal(IEditableTranslationStore store, String key) {
+    ITranslationEntry removedEntry = store.removeTranslation(key);
+    Optional<? extends ITranslationEntry> translationAfterRemoval = translation(key);
+    // an overriding entry has been removed. The previously overridden entry becomes visible now
+    translationAfterRemoval.ifPresent(previouslyOverridden -> fireStackChanged(createAddTranslationEvent(this, previouslyOverridden)));
+    return removedEntry;
   }
 
   /**
@@ -311,16 +385,24 @@ public class TranslationStoreStack {
    * If the {@link ITranslation} provided contains more {@link Language languages} than the store in which it exists,
    * languages will be created as needed.
    *
-   * @param newEntry
+   * @param newTranslation
    *          The new entry.
+   * @return An {@link Optional} holding the updated entry. The {@link Optional} is empty if no editable
+   *         {@link ITranslationStore} containing the key of the {@link ITranslation} given could be found.
    * @throws IllegalArgumentException
    *           if the specified {@link ITranslation} is {@code null}, has no valid key or does not contain a text for
    *           the {@link Language#LANGUAGE_DEFAULT}.
    */
-  public synchronized void updateTranslation(ITranslation newEntry) {
-    validateTranslation(newEntry);
-    firstEditableStoreWithKey(newEntry.key())
-        .ifPresent(store -> runAndFireChanged(() -> createUpdateTranslationEvent(this, store.updateTranslation(newEntry))));
+  public synchronized Optional<ITranslationEntry> updateTranslation(ITranslation newTranslation) {
+    Ensure.isTrue(validateTranslation(newTranslation) == TranslationValidator.OK);
+    return firstEditableStoreWithKey(newTranslation.key())
+        .map(store -> updateTranslationInternal(newTranslation, store));
+  }
+
+  protected ITranslationEntry updateTranslationInternal(ITranslation newEntry, IEditableTranslationStore storeToUpdate) {
+    ITranslationEntry updateTranslation = storeToUpdate.updateTranslation(newEntry);
+    fireStackChanged(createUpdateTranslationEvent(this, updateTranslation));
+    return updateTranslation;
   }
 
   /**
@@ -353,7 +435,7 @@ public class TranslationStoreStack {
    * @return A {@link Stream} with all not overridden {@link ITranslationEntry} instances.
    */
   public synchronized Stream<ITranslationEntry> allEntries() {
-    Map<String, ITranslationEntry> allEntries = new HashMap<>();
+    Map<String, ITranslationEntry> allEntries = new TreeMap<>();
     Iterator<ITranslationStore> storesHighestOrderFirst = m_stores.descendingIterator();
     while (storesHighestOrderFirst.hasNext()) {
       ITranslationStore store = storesHighestOrderFirst.next();
@@ -386,7 +468,7 @@ public class TranslationStoreStack {
    */
   public synchronized void flush(IEnvironment env, IProgress progress) {
     runAndFireChanged(() -> {
-      allEditableStores().forEach(store -> toEditableStore(store).flush(env, progress));
+      allEditableStoresInternal().forEach(store -> store.flush(env, progress));
       return createFlushEvent(this);
     });
   }

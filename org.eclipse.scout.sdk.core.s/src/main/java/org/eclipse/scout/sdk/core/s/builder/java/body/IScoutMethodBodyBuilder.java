@@ -31,7 +31,7 @@ public interface IScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TY
 
   TYPE appendGetPropertyByClass(CharSequence propName);
 
-  TYPE appendTextsGet(String textKey);
+  TYPE appendTextsGet(CharSequence textKey);
 
   TYPE appendPermissionCheck(CharSequence permission);
 

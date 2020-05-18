@@ -45,7 +45,7 @@ public class LogMessage {
 
   /**
    * @return The main message to log. It corresponds to the message entered in
-   *         {@link SdkLog#log(Level, String, Object...)}. If the message used placeholders (see
+   *         {@link SdkLog#log(Level, CharSequence, Object...)}. If the message used placeholders (see
    *         {@link MessageFormatter}) these have already been replaced. Is never {@code null}.
    */
   public String text() {

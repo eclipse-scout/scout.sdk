@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.eclipse.scout.sdk.core.util.Strings.repeat;
 
 import java.util.List;
 
@@ -31,7 +32,6 @@ import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link BindingArrayTypeWithEcj}</h3>
@@ -110,7 +110,7 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
       String componentTypeName = getLeafComponentType().getName();
       StringBuilder b = new StringBuilder(componentTypeName.length() + (2 * m_arrayDimension));
       b.append(componentTypeName);
-      b.append(Strings.repeat("[]", m_arrayDimension));
+      b.append(repeat("[]", m_arrayDimension));
       return b.toString();
     });
   }

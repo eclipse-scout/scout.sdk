@@ -28,7 +28,7 @@ public final class DtoMemberSortObjectFactory {
    *          The name of the property. E.g. "PersonNrProperty".
    * @return The sort order for the FormData Property getter
    */
-  public static Object[] forMethodFormDataProperty(String propertyName) {
+  public static Object[] forMethodFormDataProperty(CharSequence propertyName) {
     return SortedMemberEntry.createDefaultMethodPos(propertyName, 20);
   }
 
@@ -40,7 +40,7 @@ public final class DtoMemberSortObjectFactory {
    *          The name of the property. E.g. "PersonNr".
    * @return The sort order for the FormData legacy Property getter and setter
    */
-  public static Object[] forMethodFormDataPropertyLegacy(String propertyName) {
+  public static Object[] forMethodFormDataPropertyLegacy(CharSequence propertyName) {
     return forMethodFormDataFormField(propertyName);
   }
 
@@ -52,7 +52,7 @@ public final class DtoMemberSortObjectFactory {
    *          The name of the FormField. E.g. "LastName" without getter or setter prefix and without "Field" Suffix.
    * @return The sort order for the FormField getter
    */
-  public static Object[] forMethodFormDataFormField(String name) {
+  public static Object[] forMethodFormDataFormField(CharSequence name) {
     return SortedMemberEntry.createDefaultMethodPos(name, 10);
   }
 
@@ -63,7 +63,7 @@ public final class DtoMemberSortObjectFactory {
    * @param name The name of the method (e.g. "getRowType").
    * @return The sort order for the TableFieldBeanData method
    */
-  public static Object[] forMethodTableData(String name) {
+  public static Object[] forMethodTableData(CharSequence name) {
     return forMethodFormDataFormField(name);
   }
 
@@ -75,7 +75,7 @@ public final class DtoMemberSortObjectFactory {
    *          The name of the property. E.g. "PersonNrProperty".
    * @return The sort order for the FormData Property type
    */
-  public static Object[] forTypeFormDataProperty(String propertyName) {
+  public static Object[] forTypeFormDataProperty(CharSequence propertyName) {
     return forTypeFormDataFormField(propertyName);
   }
 
@@ -87,7 +87,7 @@ public final class DtoMemberSortObjectFactory {
    *          The name of the FormField. E.g. "LastName" without "Field" Suffix.
    * @return The sort order for the FormField type
    */
-  public static Object[] forTypeFormDataFormField(String name) {
+  public static Object[] forTypeFormDataFormField(CharSequence name) {
     return SortedMemberEntry.createDefaultTypePos(name);
   }
 
@@ -96,7 +96,7 @@ public final class DtoMemberSortObjectFactory {
    * @param name The name of the TableRowData type
    * @return The sort order for the RowData type.
    */
-  public static Object[] forTypeTableRowData(String name) {
+  public static Object[] forTypeTableRowData(CharSequence name) {
     return forTypeFormDataFormField(name);
   }
 }

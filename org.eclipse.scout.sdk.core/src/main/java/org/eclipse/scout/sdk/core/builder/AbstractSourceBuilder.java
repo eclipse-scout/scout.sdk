@@ -48,6 +48,11 @@ public abstract class AbstractSourceBuilder<TYPE extends ISourceBuilder<TYPE>> i
   }
 
   @Override
+  public TYPE appendLine(CharSequence s) {
+    return append(s).nl();
+  }
+
+  @Override
   public TYPE append(boolean b) {
     return append(Boolean.toString(b));
   }

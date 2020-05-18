@@ -31,7 +31,6 @@ public class LookupCallGenerator<TYPE extends LookupCallGenerator<TYPE>> extends
 
   @Override
   protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
-
     mainType
         .withAnnotation(classIdValue()
             .map(ScoutAnnotationGenerator::createClassId)

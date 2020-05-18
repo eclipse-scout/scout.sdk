@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <h3>{@link FormattingTuple}</h3> Use {@link MessageFormatter#arrayFormat(String, Object...)} to obtain a
+ * <h3>{@link FormattingTuple}</h3> Use {@link MessageFormatter#arrayFormat(CharSequence, Object...)} to obtain a
  * {@link FormattingTuple} instance.
  *
  * @since 6.1.0

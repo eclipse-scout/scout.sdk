@@ -37,9 +37,21 @@ public interface ITranslationStore {
   boolean isEditable();
 
   /**
+   * @param language
+   *          The {@link Language} to search.
+   * @return {@code true} if this store contains the specified {@link Language}. {@code false} otherwise.
+   */
+  boolean containsLanguage(Language language);
+
+  /**
    * @return A {@link Stream} providing all keys that exist in this store.
    */
   Stream<String> keys();
+
+  /**
+   * @return The number of entries in this store.
+   */
+  long size();
 
   /**
    * @param key

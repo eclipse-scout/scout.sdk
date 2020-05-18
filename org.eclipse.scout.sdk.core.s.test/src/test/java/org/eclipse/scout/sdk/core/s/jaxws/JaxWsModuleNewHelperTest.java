@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.jaxws;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -21,7 +22,6 @@ import java.nio.file.StandardOpenOption;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -58,7 +58,7 @@ public class JaxWsModuleNewHelperTest {
       }
 
       Path relPath = dir.relativize(result);
-      assertEquals(expectedPath, Strings.replace(relPath.toString(), relPath.getFileSystem().getSeparator(), "/"));
+      assertEquals(expectedPath, relPath.toString().replace(File.separatorChar, '/'));
     }
     finally {
       CoreUtils.deleteDirectory(dir);

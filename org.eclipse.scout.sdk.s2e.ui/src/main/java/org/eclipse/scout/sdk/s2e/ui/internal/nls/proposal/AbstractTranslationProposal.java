@@ -110,18 +110,18 @@ public abstract class AbstractTranslationProposal implements IJavaCompletionProp
   protected static Point findKeyRange(IDocument document, int offset) throws BadLocationException {
     IRegion lineRange = document.getLineInformationOfOffset(offset);
     // find start
-    int startOffest = -1;
+    int startOffset = -1;
     int index = offset - 1;
     while (index > 0 && index > lineRange.getOffset()) {
       if (document.getChar(index) == '"') {
         if (index > 1) {
           if (document.getChar(index - 1) != '\\') {
-            startOffest = index + 1;
+            startOffset = index + 1;
             break;
           }
         }
         else {
-          startOffest = index + 1;
+          startOffset = index + 1;
           break;
         }
       }
@@ -146,12 +146,12 @@ public abstract class AbstractTranslationProposal implements IJavaCompletionProp
       index++;
     }
 
-    if (startOffest > -1) {
+    if (startOffset > -1) {
       if (endOffset < 0) {
         // no end found: use the line end
         endOffset = lineRange.getOffset() + lineRange.getLength();
       }
-      return new Point(startOffest, endOffset);
+      return new Point(startOffset, endOffset);
     }
     return null;
   }

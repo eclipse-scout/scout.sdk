@@ -74,7 +74,7 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
     }
   }
 
-  protected static BiConsumer<EclipseEnvironment, EclipseProgress> createUpdateAnnotationInJavaSourceOperation(IType annotationOwner, String newId) {
+  protected static BiConsumer<EclipseEnvironment, EclipseProgress> createUpdateAnnotationInJavaSourceOperation(IType annotationOwner, CharSequence newId) {
     return new AnnotationNewOperation(ScoutAnnotationGenerator.createClassId(newId), annotationOwner);
   }
 }

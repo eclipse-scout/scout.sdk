@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.SdkException
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.toIdeaProgress
 import java.io.File
 import java.nio.file.Path
@@ -39,12 +40,12 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
     }
 
     fun schedule(resultSupplier: () -> IType?): IFuture<IType?> {
-        val task = OperationTask("Write " + cuPath.fileName(), project, TransactionManager.current(), this::doWriteCompilationUnit)
+        val task = OperationTask(message("write.cu.x", cuPath.fileName()), project, TransactionManager.current(), this::doWriteCompilationUnit)
         return task.schedule(resultSupplier, hidden = true)
     }
 
     protected fun doWriteCompilationUnit(progress: IdeaProgress) {
-        progress.init(3, "Write {}", cuPath.fileName())
+        progress.init(3, message("write.cu.x", cuPath.fileName()))
 
         // create in memory file
         val newPsi = PsiFileFactory.getInstance(project)
@@ -85,7 +86,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
             override fun file() = targetFile
 
             override fun commit(progress: IdeaProgress): Boolean {
-                progress.init(2, "Write compilation unit {}", psi.name)
+                progress.init(2, message("write.cu.x", psi.name))
 
                 val targetDirectory = targetFile.parent
                 val dir = DirectoryUtil.mkdirs(PsiManager.getInstance(psi.project), targetDirectory.toString().replace(File.separatorChar, '/'))
@@ -103,7 +104,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
                 return true
             }
 
-            override fun toString() = "Write compilation unit $targetFile"
+            override fun toString() = message("write.cu.x", targetFile)
         }
     }
 }

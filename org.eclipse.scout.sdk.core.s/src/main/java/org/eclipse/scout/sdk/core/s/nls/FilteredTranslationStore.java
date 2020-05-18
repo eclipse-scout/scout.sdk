@@ -88,8 +88,18 @@ public class FilteredTranslationStore implements IEditableTranslationStore {
   }
 
   @Override
+  public long size() {
+    return keys().count();
+  }
+
+  @Override
   public boolean containsKey(String key) {
     return keysFilter().contains(key) && m_store.containsKey(key);
+  }
+
+  @Override
+  public boolean containsLanguage(Language language) {
+    return languages().anyMatch(lang -> Objects.equals(lang, language));
   }
 
   @Override

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.testing;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.util.Strings.toStringLiteral;
 
 import java.beans.Introspector;
 import java.lang.reflect.Field;
@@ -57,7 +58,7 @@ public class ApiTestGenerator {
     List<IMethodParameter> parameterTypes = method.parameters().stream().collect(toList());
     if (!parameterTypes.isEmpty()) {
       for (int i = 0; i < parameterTypes.size(); i++) {
-        source.append('"').append(parameterTypes.get(i).dataType().reference()).append('"');
+        source.append(toStringLiteral(parameterTypes.get(i).dataType().reference()));
         if (i < parameterTypes.size() - 1) {
           source.append(", ");
         }
@@ -82,7 +83,7 @@ public class ApiTestGenerator {
 
   protected static void buildField(IField field, String fieldVarName, StringBuilder source, String flagsRef) {
     source.append("assertHasFlags(").append(fieldVarName).append(", ").append(getFlagsSource(field.flags(), flagsRef)).append(");").append(NL);
-    source.append("assertFieldType(").append(fieldVarName).append(", ").append('"').append(field.dataType().reference()).append("\");").append(NL);
+    source.append("assertFieldType(").append(fieldVarName).append(", ").append(toStringLiteral(field.dataType().reference())).append(");").append(NL);
     createAnnotationsAsserts(field, source, fieldVarName);
   }
 
@@ -173,7 +174,7 @@ public class ApiTestGenerator {
     if (!interfaces.isEmpty()) {
       source.append("assertHasSuperInterfaces(").append(typeVarName).append(", new String[]{");
       for (int i = 0; i < interfaces.size(); i++) {
-        source.append('"').append(interfaces.get(i).reference()).append('"');
+        source.append(toStringLiteral(interfaces.get(i).reference()));
         if (i < interfaces.size() - 1) {
           source.append(", ");
         }

@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
-import static org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTextProviderService.resourceMatchesPrefix;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -49,22 +48,6 @@ public class PropertiesTextProviderServiceTest {
     assertEquals("formdata/shared/texts", txtSvc.folder());
     assertEquals(11.2, txtSvc.order(), 0.001);
     assertSame(txtSvcType, txtSvc.type());
-  }
-
-  @Test
-  @SuppressWarnings("ConstantConditions")
-  public void testResourceMatchesPrefix() {
-    assertFalse(resourceMatchesPrefix("MyName.properties", "Text"));
-    assertFalse(resourceMatchesPrefix("MyName.properties", null));
-    assertFalse(resourceMatchesPrefix(null, "Text"));
-
-    assertTrue(resourceMatchesPrefix("Text.properties", "Text"));
-    assertTrue(resourceMatchesPrefix("Text_en.properties", "Text"));
-    assertTrue(resourceMatchesPrefix("Text_en_GB.properties", "Text"));
-    assertTrue(resourceMatchesPrefix("Text_en_GB_ll.properties", "Text"));
-    assertFalse(resourceMatchesPrefix("Text_en_GB_ll_dd.properties", "Text"));
-
-    assertFalse(resourceMatchesPrefix("Text_en_GB_ll.js", "Text"));
   }
 
   @Test

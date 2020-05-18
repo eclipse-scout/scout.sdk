@@ -20,15 +20,19 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.ReadonlyStatusHandler
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.util.FileContentUtilCore
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.util.CoreUtils.callInContext
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.toVirtualFile
 import java.lang.reflect.Method
 import java.nio.file.Path
+import java.util.Collections.singletonList
 
 class TransactionManager constructor(val project: Project, val transactionName: String? = null) {
 
@@ -237,80 +241,110 @@ class TransactionManager constructor(val project: Project, val transactionName: 
 
     private fun commitAllInUiThread(progress: IdeaProgress): Boolean {
         val workForEnsureWritable = 1
-        progress.init(size() + workForEnsureWritable, "Starting to commit transaction. Number of members: {}", size())
+        progress.init(size() + workForEnsureWritable, message("starting.commit.transaction.x", size()))
+
+        // map member path to virtual files
+        val files = m_members.keys.associateWith { it.toVirtualFile() }.toMap()
 
         // make file writable
-        val files = m_members.keys.mapNotNull(Path::toVirtualFile)
-        val status = ReadonlyStatusHandler.getInstance(project).ensureFilesWritable(files)
+        val status = ReadonlyStatusHandler.getInstance(project).ensureFilesWritable(files.values.filterNotNull())
         if (status.hasReadonlyFiles()) {
             SdkLog.info("Unable to make all resources writable. Transaction will be discarded. Message: ${status.readonlyFilesMessage}")
             return false
         }
         progress.worked(workForEnsureWritable)
 
-        // validate documents
+        // map to documents
         val documentManager = FileDocumentManager.getInstance()
+        val documents = files
+                .map { pair -> pair.key to pair.value?.let { Pair(it, documentManager.getDocument(it)) } }
+                .toMap(HashMap())
+
+        // validate documents and prepare for modification
         val psiDocumentManager = PsiDocumentManager.getInstance(project)
-        val documents = files.map { file -> documentManager.getDocument(file) }
-        val documentsReady = documents.all { documentReady(it, documentManager, psiDocumentManager) }
+        val documentsReady = documents.values.filterNotNull().all { documentReady(it.second, psiDocumentManager) }
         if (!documentsReady) {
             SdkLog.warning("Cannot commit all transaction members because at least one document cannot be written.")
             return false
         }
 
-        // commit
-        return commitDocuments(documents.filterNotNull(), documentManager, progress)
+        // commit transaction members
+        return commitTransaction(documents, documentManager, psiDocumentManager, progress)
     }
 
     @Suppress("MissingRecentApi")
-    private fun commitDocuments(documents: List<Document>, documentManager: FileDocumentManager, progress: IdeaProgress): Boolean {
+    private fun commitTransaction(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, documentManager: FileDocumentManager, psiDocumentManager: PsiDocumentManager, progress: IdeaProgress): Boolean {
         val setInBulkUpdate = setInBulkUpdateMethod() // Can be removed if the supported min. IJ version is 2019.3
-        val useBulkMode = setInBulkUpdate != null && documents.size >= 100
+        val useBulkMode = setInBulkUpdate != null && documentMappings.size >= 100
+        val documents = documentMappings.values.filterNotNull().mapNotNull { it.second }
         try {
             if (useBulkMode) {
-                documents.forEach { doc -> setInBulkUpdate!!.invoke(doc, true) }
+                documents.forEach { setInBulkUpdate!!.invoke(it, true) }
             }
-            val success = commitMembers(documents, progress)
+            val success = commitAllMembers(documentMappings, documentManager, progress)
             if (success) {
-                documents.forEach { documentManager.saveDocument(it) }
+                // here the documents of the new files have been added. therefore don't use documentMappings
+                documentMappings.values.filterNotNull().mapNotNull { it.second }.forEach { commitDocument(it, documentManager, psiDocumentManager) }
             }
             return success
         } finally {
             if (useBulkMode) {
-                documents.forEach { doc -> setInBulkUpdate!!.invoke(doc, false) }
+                documents.forEach { setInBulkUpdate!!.invoke(it, false) }
             }
         }
     }
 
-    private fun commitMembers(documents: List<Document>, progress: IdeaProgress): Boolean {
-        val psiDocumentManager = PsiDocumentManager.getInstance(project)
-        try {
-            return m_members.values
-                    .flatten()
-                    .map { commitMember(it, progress.newChild(1)) }
-                    .all { committed -> committed }
-        } finally {
-            documents.forEach {
-                psiDocumentManager.doPostponedOperationsAndUnblockDocument(it)
-                psiDocumentManager.commitDocument(it)
-            }
+    private fun commitDocument(document: Document, documentManager: FileDocumentManager, psiDocumentManager: PsiDocumentManager) {
+        if (psiDocumentManager.isDocumentBlockedByPsi(document)) {
+            psiDocumentManager.doPostponedOperationsAndUnblockDocument(document)
         }
+        if (psiDocumentManager.isUncommited(document)) {
+            psiDocumentManager.commitDocument(document)
+        }
+        documentManager.saveDocument(document)
     }
 
-    private fun documentReady(document: Document?, documentManager: FileDocumentManager, psiDocumentManager: PsiDocumentManager): Boolean {
+    private fun commitAllMembers(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, documentManager: FileDocumentManager, progress: IdeaProgress): Boolean {
+        return m_members.entries
+                .map { commitMembers(it.key, it.value, documentMappings, documentManager, progress) }
+                .min() ?: false
+    }
+
+    private fun commitMembers(path: Path, members: List<TransactionMember>, fileMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, documentManager: FileDocumentManager, progress: IdeaProgress): Boolean {
+        val success = members
+                .map { member -> commitMember(member, progress.newChild(1)) }
+                .min() ?: false
+        if (success) {
+            val mapping = fileMappings[path]
+            var vFile = mapping?.first
+            if (vFile == null) {
+                vFile = path.toVirtualFile()
+            }
+            // IDEA might change the file settings on modifications.
+            // This is e.g. done for .properties files where the encoding might be changed in the project settings.
+            // After this the indices are no longer valid and throw exceptions. To solve this: re-parse the file in case something changed.
+            // this must be executed right after the transaction members of that file and before the psi or document is saved!
+            FileContentUtilCore.reparseFiles(singletonList(vFile))
+            var doc = mapping?.second
+            if (doc == null && vFile != null) {
+                doc = documentManager.getDocument(vFile)
+            }
+            if (vFile != null) {
+                fileMappings[path] = Pair(vFile, doc)
+            }
+        }
+        return success
+    }
+
+    private fun documentReady(document: Document?, psiDocumentManager: PsiDocumentManager): Boolean {
         if (document == null) {
-            return false
+            return true// no document exists yet: new file
         }
         if (!document.isWritable) {
             return false
         }
-        if (psiDocumentManager.isUncommited(document)) {
-            // commit before overwriting to ensure the psi can be modified (it is not allowed to modify a psi of an uncommited document).
-            psiDocumentManager.commitDocument(document)
-        }
-        if (documentManager.isDocumentUnsaved(document)) {
-            // save before overwriting to ensure there are no conflicts afterwards
-            documentManager.saveDocument(document)
+        if (psiDocumentManager.isDocumentBlockedByPsi(document)) {
+            psiDocumentManager.doPostponedOperationsAndUnblockDocument(document)
         }
         return true
     }

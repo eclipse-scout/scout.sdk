@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.util.Strings.withoutQuotes;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -141,15 +142,9 @@ public class JreInfo {
       if (Strings.isBlank(line)) {
         continue;
       }
-
       if (line.toUpperCase(Locale.ENGLISH).startsWith(prefix)) {
-        String value = line.substring(prefix.length()).trim();
+        String value = withoutQuotes(line.substring(prefix.length()).trim()).toString();
         if (value.length() > 0) {
-          // strip quotes
-          if (value.length() > 2 && value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"') {
-            value = value.substring(1, value.length() - 1);
-          }
-
           return parseVersion(value);
         }
       }
