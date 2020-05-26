@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter
 val KOTLIN_VERSION = "1.3.61"
 val SCOUT_SDK_VERSION = "10.0.0-SNAPSHOT"
 val SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
+val JAVA_VERSION = JavaVersion.VERSION_1_8
 
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
@@ -49,7 +50,6 @@ dependencies {
     testImplementation("org.mockito", "mockito-core", "3.3.3")
 }
 
-
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = "IU-2019.2.3"
@@ -65,16 +65,21 @@ intellij {
     }
 }
 
+allprojects {
+    configure<JavaPluginConvention> {
+        sourceCompatibility = JAVA_VERSION
+        targetCompatibility = JAVA_VERSION
+    }
+}
+
 tasks.withType<JavaCompile>().configureEach {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
+    sourceCompatibility = JAVA_VERSION.toString()
+    targetCompatibility = JAVA_VERSION.toString()
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JAVA_VERSION.toString()
         apiVersion = "1.3"
         languageVersion = "1.3"
     }
