@@ -20,13 +20,7 @@ import com.intellij.psi.search.SearchScope
 interface ClassIdCache : Disposable {
 
     /**
-     * @param classId The @ClassId value to search
-     * @return A [Set] holding all fully qualified class names in the project having the id specified.
-     */
-    fun typesWithClassId(classId: String): Set<String>
-
-    /**
-     * Finds all [ClassIdAnnotation]s in the [SearchScope] specified. This method does not use the cache but calculates the result anew.
+     * Finds all [ClassIdAnnotation]s in the [SearchScope] specified. This method does not use the cache but calculates the result from scratch.
      * @param scope The [SearchScope] in which should be searched.
      * @param indicator An optional [ProgressIndicator] to use.
      * @return A [Sequence] holding all findings
@@ -44,21 +38,27 @@ interface ClassIdCache : Disposable {
     fun isCacheReady(): Boolean
 
     /**
+     * @param classId The @ClassId value to search
+     * @return A [List] holding all fully qualified class names in the project having the id specified.
+     */
+    fun typesWithClassId(classId: String): List<String>
+
+    /**
      * @return A [Map] holding all @ClassId values that exist more than once in the cache.
-     * The key of the map is the @ClassId value, the value of the Map is a [Set] of fully qualified class names that have the corresponding @ClassId value.
+     * The key of the map is the @ClassId value, the value of the Map is a [List] of fully qualified class names that have the corresponding @ClassId value.
      *
      * This method only returns a result if the cache has been created (see [isCacheReady] and [setup])
      */
-    fun duplicates(): Map<String, Set<String>>
+    fun duplicates(): Map<String, List<String>>
 
     /**
      * @param absoluteFilePath A [String] holding an absolute path on the local file system pointing to the file for which the duplicates should be returned.
      * The cache only contains entries of the current project. This means the file must be within the project to return a result.
      * @return A [Map] holding all duplicate @ClassId values for the given file path.
-     * The key of the map is the @ClassId value, the value of the Map is a [Set] of fully qualified class names that have the corresponding @ClassId value.
+     * The key of the map is the @ClassId value, the value of the Map is a [List] of fully qualified class names that have the corresponding @ClassId value.
      * This means at least one class in the set of each entry must be within the file specified.
      *
      * This method only returns a result if the cache has been created (see [isCacheReady] and [setup])
      */
-    fun duplicates(absoluteFilePath: String): Map<String, Set<String>>
+    fun duplicates(absoluteFilePath: String): Map<String, List<String>>
 }

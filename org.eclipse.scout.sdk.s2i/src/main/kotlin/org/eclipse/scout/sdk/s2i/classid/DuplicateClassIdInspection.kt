@@ -42,11 +42,11 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
         }
     }
 
-    protected fun createProblemFor(duplicates: Set<String>, file: PsiJavaFile, manager: InspectionManager, isOnTheFly: Boolean) =
+    protected fun createProblemFor(duplicates: Collection<String>, file: PsiJavaFile, manager: InspectionManager, isOnTheFly: Boolean) =
             resolvePsi(duplicates, file)
                     .mapNotNull { createProblemFor(duplicates, it, manager, isOnTheFly) }
 
-    protected fun createProblemFor(duplicates: Set<String>, clazz: PsiClass, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
+    protected fun createProblemFor(duplicates: Collection<String>, clazz: PsiClass, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
         val myName = computeInReadAction(clazz.project) { clazz.qualifiedName }
         val othersWithSameValue = duplicates
                 .filter { d -> d != myName }
@@ -57,7 +57,7 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
         return manager.createProblemDescriptor(annotation.psiAnnotation, message, isOnTheFly, arrayOf(quickFix), ProblemHighlightType.ERROR)
     }
 
-    protected fun resolvePsi(duplicates: Set<String>, file: PsiJavaFile): List<PsiClass> = computeInReadAction(file.project) {
+    protected fun resolvePsi(duplicates: Collection<String>, file: PsiJavaFile): List<PsiClass> = computeInReadAction(file.project) {
         return@computeInReadAction PsiTreeUtil.findChildrenOfType(file, PsiClass::class.java)
                 .associateBy { it.qualifiedName }
                 .filter { it.key != null }
