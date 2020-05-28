@@ -226,7 +226,10 @@ fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
         }
                 .filter { it.isValid }
 
-fun VirtualFile.toNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath()
+/**
+ * @return A [Path] representing this [VirtualFile].
+ */
+fun VirtualFile.getNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath() // don't use toNioPath as method name because this name already exists in VirtualFile since IJ 2020.2
 
 fun VirtualFile.containingModule(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
 

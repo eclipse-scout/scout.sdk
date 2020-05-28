@@ -24,8 +24,8 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInLongReadAction
+import org.eclipse.scout.sdk.s2i.getNioPath
 import org.eclipse.scout.sdk.s2i.moduleDirPath
-import org.eclipse.scout.sdk.s2i.toNioPath
 import org.eclipse.scout.sdk.s2i.toScoutProgress
 
 class TranslationStoreStackLoader private constructor() {
@@ -92,7 +92,7 @@ class TranslationStoreStackLoader private constructor() {
         }
 
         private fun findPrimaryStore(nlsFile: VirtualFile, stack: TranslationStoreStack): ITranslationStore {
-            val nlsFilePath = nlsFile.toNioPath()
+            val nlsFilePath = nlsFile.getNioPath()
             return NlsFile(nlsFilePath)
                     .findMatchingStoreIn(stack)
                     .orElseGet {

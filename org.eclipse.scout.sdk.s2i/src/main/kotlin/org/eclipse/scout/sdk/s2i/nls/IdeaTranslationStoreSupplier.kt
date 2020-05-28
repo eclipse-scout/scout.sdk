@@ -127,7 +127,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
     protected fun toTranslationPropertiesFile(file: VirtualFile, prefix: String, isEditable: Boolean): ITranslationPropertiesFile? {
         val language = parseLanguageFromFileName(file.name, prefix).orElse(null) ?: return null
         if (isEditable) {
-            return EditableTranslationFile(file.toNioPath(), language)
+            return EditableTranslationFile(file.getNioPath(), language)
         }
         return ReadOnlyTranslationFile(Supplier { file.inputStream }, language, file)
     }

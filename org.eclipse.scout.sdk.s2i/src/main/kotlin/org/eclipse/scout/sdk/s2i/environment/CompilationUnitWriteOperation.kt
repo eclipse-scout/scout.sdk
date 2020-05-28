@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.codeInsight.actions.OptimizeImportsProcessor
+import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.util.DirectoryUtil
-import com.intellij.openapi.fileTypes.StdFileTypes
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
@@ -49,7 +49,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
 
         // create in memory file
         val newPsi = PsiFileFactory.getInstance(project)
-                .createFileFromText(cuPath.fileName(), StdFileTypes.JAVA, source, LocalTimeCounter.currentTime(), false, false)
+                .createFileFromText(cuPath.fileName(), JavaFileType.INSTANCE, source, LocalTimeCounter.currentTime(), false, false)
         progress.worked(1)
 
         formatSource(newPsi)

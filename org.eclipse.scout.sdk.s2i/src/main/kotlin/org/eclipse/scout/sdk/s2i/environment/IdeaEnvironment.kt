@@ -143,7 +143,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
 
     protected fun findClasspathEntry(file: VirtualFile, env: IJavaEnvironment): IClasspathEntry? =
             env.sourceFolders()
-                    .filter { it.path().startsWith(file.toNioPath()) }
+                    .filter { it.path().startsWith(file.getNioPath()) }
                     .findAny()
                     .orElse(null)
 

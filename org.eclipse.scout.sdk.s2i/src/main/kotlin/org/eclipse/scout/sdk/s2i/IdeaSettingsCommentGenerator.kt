@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2i
 import com.intellij.copyright.CopyrightManager
 import com.intellij.ide.fileTemplates.FileTemplate
 import com.intellij.ide.fileTemplates.FileTemplateManager
-import com.intellij.lang.java.JavaLanguage
+import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -70,7 +70,7 @@ open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, St
             }
 
             if (cuComment.isNotBlank()) {
-                val fileType = FileTypeUtil.getInstance().getFileTypeByName(JavaLanguage.INSTANCE.id)
+                val fileType = JavaFileType.INSTANCE
                 val opts = copyrightManager.options.getMergedOptions(fileType.name)
                 val cmt = FileTypeUtil.buildComment(fileType, cuComment.toString(), opts)
                 val commentText = StringUtil.convertLineSeparators(cmt)

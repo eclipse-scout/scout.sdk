@@ -24,8 +24,8 @@ import org.eclipse.scout.sdk.core.s.util.search.IFileQuery
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
+import org.eclipse.scout.sdk.s2i.getNioPath
 import org.eclipse.scout.sdk.s2i.moduleDirPath
-import org.eclipse.scout.sdk.s2i.toNioPath
 import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
@@ -59,7 +59,7 @@ open class MissingTranslationInspection : LocalInspectionTool() {
 
     fun checkFile(file: PsiFile, module: Module, query: IFileQuery, manager: InspectionManager, isOnTheFly: Boolean, environment: IdeaEnvironment, progress: IProgress): Array<ProblemDescriptor> {
         val start = System.currentTimeMillis()
-        val path = file.virtualFile.toNioPath()
+        val path = file.virtualFile.getNioPath()
         val queryInput = FileQueryInput(path, module.moduleDirPath()) { file.textToCharArray() }
 
         query.searchIn(queryInput, environment, progress)

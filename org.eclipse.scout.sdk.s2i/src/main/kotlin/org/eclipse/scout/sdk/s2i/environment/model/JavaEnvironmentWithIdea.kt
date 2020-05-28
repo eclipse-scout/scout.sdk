@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.core.model.ecj.ClasspathEntry
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcj
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi
 import org.eclipse.scout.sdk.core.util.SdkException
-import org.eclipse.scout.sdk.s2i.toNioPath
+import org.eclipse.scout.sdk.s2i.getNioPath
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -47,7 +47,7 @@ open class JavaEnvironmentWithIdea(val module: Module) : JavaEnvironmentWithEcj(
         }
 
         protected fun toClasspathEntry(entry: VirtualFile, type: Int): ClasspathEntry? {
-            var absolutePath = entry.toNioPath()
+            var absolutePath = entry.getNioPath()
             if (absolutePath.nameCount < 1) {
                 return null
             }
