@@ -33,9 +33,10 @@ import java.util.logging.Level
 open class MissingTranslationInspection : LocalInspectionTool() {
 
     private val m_environmentByProject = ConcurrentHashMap<Project, Pair<IdeaEnvironment, MissingTranslationQuery>>()
+    private val m_supportedFileTypes = MissingTranslationQuery.supportedFileTypes()
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
-        if (!MissingTranslationQuery.supportedFileTypes().contains(file.virtualFile.extension)) {
+        if (!m_supportedFileTypes.contains(file.virtualFile.extension)) {
             return ProblemDescriptor.EMPTY_ARRAY
         }
 

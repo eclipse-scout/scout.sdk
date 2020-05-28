@@ -10,9 +10,12 @@
  */
 package org.eclipse.scout.sdk.core.s;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.lang.reflect.Field;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JavaTextsGetPattern;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -33,6 +36,12 @@ public class ScoutRuntimeTypesTest {
   public void testApi(IJavaEnvironment env) throws IllegalAccessException {
     testFields(IScoutRuntimeTypes.class.getFields(), env);
     testFields(JavaTypes.class.getFields(), env);
+  }
+
+  @Test
+  public void testNlsMethods(IJavaEnvironment env) {
+    assertTrue(env.requireType(IScoutRuntimeTypes.TEXTS).methods().withName(JavaTextsGetPattern.GET_METHOD_NAME).existsAny());
+    assertTrue(env.requireType(IScoutRuntimeTypes.TEXTS).methods().withName(JavaTextsGetPattern.GET_WITH_FALLBACK_METHOD_NAME).existsAny());
   }
 
   private static void testFields(Field[] fields, IJavaEnvironment env) throws IllegalAccessException {

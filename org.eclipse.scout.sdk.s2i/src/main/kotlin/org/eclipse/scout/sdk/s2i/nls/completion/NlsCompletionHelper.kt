@@ -51,7 +51,7 @@ class NlsCompletionHelper private constructor() {
             presentation.isItemTextItalic = isReadOnly
             presentation.icon = AllIcons.Nodes.ResourceBundle
 
-            presentation.appendTailText("=" + translation.text(Language.LANGUAGE_DEFAULT).get(), true)
+            translation.text(Language.LANGUAGE_DEFAULT).ifPresent { presentation.appendTailText("=$it", true) }
 
             var storeName = store.service().type().elementName()
             if (storeName.endsWith(serviceSuffix)) {

@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.s.nls.query;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.s.nls.query.TranslationKeysQueryTest.searchIn;
-import static org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.HtmlScoutMessageSearch.textToNextNewLine;
+import static org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.HtmlScoutMessagePattern.textToNextNewLine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -188,10 +188,10 @@ public class MissingTranslationQueryTest {
 
   @Test
   public void testTextToNextNewLine() {
-    assertEquals("abc", textToNextNewLine("abc\ndd".toCharArray(), 0).toString());
-    assertEquals("", textToNextNewLine("abc\ndd\r\nxx".toCharArray(), 3).toString());
-    assertEquals("dd", textToNextNewLine("abc\ndd\r\nxxdd".toCharArray(), 4).toString());
-    assertEquals("xdd", textToNextNewLine("abc\ndd\r\nxxdd".toCharArray(), 9).toString());
+    assertEquals("abc", textToNextNewLine("abc\ndd".toCharArray(), 0));
+    assertEquals("", textToNextNewLine("abc\ndd\r\nxx".toCharArray(), 3));
+    assertEquals("dd", textToNextNewLine("abc\ndd\r\nxxdd".toCharArray(), 4));
+    assertEquals("xdd", textToNextNewLine("abc\ndd\r\nxxdd".toCharArray(), 9));
   }
 
   protected static void assertFileRange(MissingTranslationQuery query, String fileName, int expectedStart, int expectedEnd, int expectedSeverity) {

@@ -13,17 +13,17 @@ package org.eclipse.scout.sdk.s2i.nls.completion
 import com.intellij.codeInsight.completion.*
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.s2i.containingModule
-import org.eclipse.scout.sdk.s2i.nls.PsiNlsPatterns.Companion.textsGetPattern
+import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns
 import org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionHelper.Companion.computeLookupElements
 import kotlin.streams.toList
 
 class NlsCompletionContributorForJava : CompletionContributor() {
 
     init {
-        extend(CompletionType.BASIC, textsGetPattern(), DefaultNlsCompletionProvider())
+        extend(CompletionType.BASIC, PsiTranslationPatterns.JAVA_TEXTS_GET_PATTERN, DefaultNlsCompletionProvider())
     }
 
-    internal class DefaultNlsCompletionProvider : CompletionProvider<CompletionParameters>() {
+    class DefaultNlsCompletionProvider : CompletionProvider<CompletionParameters>() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
             val module = parameters.position.containingModule() ?: return
             result.addAllElements(computeLookupElements(module).toList())

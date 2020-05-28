@@ -22,7 +22,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.s2i.containingModule
-import org.eclipse.scout.sdk.s2i.nls.PsiNlsPatterns.Companion.startsWithIgnoringQuotes
+import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns.Companion.startsWithIgnoringQuotes
 import kotlin.streams.toList
 
 class NlsCompletionContributorForJs : CompletionContributor() {
@@ -36,7 +36,7 @@ class NlsCompletionContributorForJs : CompletionContributor() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
             val module = parameters.position.containingModule() ?: return
             val elements = NlsCompletionHelper.computeLookupElements(module) {
-                TranslationPatterns.JsonTextKeySearch.JSON_TEXT_KEY_PREFIX + it.key() + TranslationPatterns.JsonTextKeySearch.JSON_TEXT_KEY_SUFFIX
+                TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX + it.key() + TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX
             }.toList()
             result.addAllElements(elements)
             result.stopHere()
@@ -45,12 +45,12 @@ class NlsCompletionContributorForJs : CompletionContributor() {
 
 
     /**
-     * These patterns are here and not in [org.eclipse.scout.sdk.s2i.nls.PsiNlsPatterns] because the dependency to the JS module is optional!
+     * These patterns are here and not in [org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns] because the dependency to the JS module is optional!
      */
     companion object {
         fun sessionTextPattern() = psiElement().withParent(isJsCallWithLiteralArgument("session", "text", 0))
 
-        fun textKeyPattern() = psiElement().withParent(jsLiteralExpression().withText(startsWithIgnoringQuotes(TranslationPatterns.JsonTextKeySearch.JSON_TEXT_KEY_PREFIX, true)))
+        fun textKeyPattern() = psiElement().withParent(jsLiteralExpression().withText(startsWithIgnoringQuotes(TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX, true)))
 
         fun allNlsPatternsInJs() = or(sessionTextPattern(), textKeyPattern())
 

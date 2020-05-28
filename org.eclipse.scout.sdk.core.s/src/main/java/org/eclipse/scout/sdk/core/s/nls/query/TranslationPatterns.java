@@ -11,21 +11,27 @@
 package org.eclipse.scout.sdk.core.s.nls.query;
 
 import static java.util.stream.Collectors.toSet;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.simpleName;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInCode;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInString;
 import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
 
 import java.nio.CharBuffer;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -34,13 +40,46 @@ public final class TranslationPatterns {
   public static final String IGNORE_MARKER = "NO-NLS-CHECK";
   private static final String JS_FILE_EXTENSION = "js";
 
-  public static Stream<AbstractTranslationPattern> all() {
-    return Stream.of(JavaTextsGetSearch.INSTANCE,
-        JsSessionTextSearch.INSTANCE,
-        JsonTextKeySearch.INSTANCE,
-        HtmlScoutMessageSearch.INSTANCE);
+  private static final Map<Class<? extends AbstractTranslationPattern>, AbstractTranslationPattern> PATTERN_MAP = new HashMap<>();
+  static {
+    Stream.of(JavaTextsGetPattern.INSTANCE, JsSessionTextPattern.INSTANCE, JsonTextKeyPattern.INSTANCE, HtmlScoutMessagePattern.INSTANCE)
+        .forEach(TranslationPatterns::registerPattern);
   }
 
+  /**
+   * Adds an {@link AbstractTranslationPattern} to the list of known patterns.
+   * 
+   * @param pattern
+   *          The {@link AbstractTranslationPattern} to add. Must not be {@code null}.
+   * @return {@code true} if the element was already registered (and was replaced), {@code false} if this pattern was
+   *         not yet registered.
+   */
+  public synchronized static boolean registerPattern(AbstractTranslationPattern pattern) {
+    return PATTERN_MAP.put(Ensure.notNull(pattern).getClass(), pattern) != null;
+  }
+
+  /**
+   * Remove a pattern from the list of known patterns.
+   * 
+   * @param pattern
+   *          The {@link AbstractTranslationPattern} to remove. Must not be {@code null}.
+   * @return {@code true} if it was successfully removed, {@code false} if the element was not in the list and therefore
+   *         was not removed.
+   */
+  public synchronized static boolean removePattern(AbstractTranslationPattern pattern) {
+    return PATTERN_MAP.remove(Ensure.notNull(pattern).getClass()) != null;
+  }
+
+  /**
+   * @return All {@link AbstractTranslationPattern} known.
+   */
+  public synchronized static Stream<AbstractTranslationPattern> all() {
+    return new HashSet<>(PATTERN_MAP.values()).stream();
+  }
+
+  /**
+   * @return A {@link Set} containing all file extensions in which Scout translation may exist.
+   */
   public static Set<String> supportedFileExtensions() {
     return all()
         .map(AbstractTranslationPattern::fileExtension)
@@ -49,8 +88,6 @@ public final class TranslationPatterns {
 
   public abstract static class AbstractTranslationPattern {
     protected static final String NLS_KEY_PAT = ITranslation.KEY_REGEX.pattern();
-
-    public abstract Pattern buildPattern(String keyPart);
 
     public abstract Pattern pattern();
 
@@ -95,17 +132,12 @@ public final class TranslationPatterns {
     }
   }
 
-  public static final class JsSessionTextSearch extends AbstractTranslationPattern {
+  public static final class JsSessionTextPattern extends AbstractTranslationPattern {
 
-    public static final AbstractTranslationPattern INSTANCE = new JsSessionTextSearch();
-    public static final Pattern REGEX = INSTANCE.buildPattern(NLS_KEY_PAT);
+    public static final AbstractTranslationPattern INSTANCE = new JsSessionTextPattern();
+    public static final Pattern REGEX = Pattern.compile("session\\.text\\((['`\"]?)(" + NLS_KEY_PAT + ")(['`\"]?)\\s*[,)]");
 
-    private JsSessionTextSearch() {
-    }
-
-    @Override
-    public Pattern buildPattern(String keyPart) {
-      return Pattern.compile("session\\.text\\((['`\"]?)(" + NLS_KEY_PAT + ")(['`\"]?)\\s*[,)]");
+    private JsSessionTextPattern() {
     }
 
     @Override
@@ -124,19 +156,14 @@ public final class TranslationPatterns {
     }
   }
 
-  public static final class JsonTextKeySearch extends AbstractTranslationPattern {
+  public static final class JsonTextKeyPattern extends AbstractTranslationPattern {
 
     public static final String JSON_TEXT_KEY_PREFIX = "${textKey:";
     public static final String JSON_TEXT_KEY_SUFFIX = "}";
-    public static final AbstractTranslationPattern INSTANCE = new JsonTextKeySearch();
-    public static final Pattern REGEX = INSTANCE.buildPattern(NLS_KEY_PAT);
+    public static final AbstractTranslationPattern INSTANCE = new JsonTextKeyPattern();
+    public static final Pattern REGEX = Pattern.compile(Pattern.quote(JSON_TEXT_KEY_PREFIX) + '(' + NLS_KEY_PAT + ')');
 
-    private JsonTextKeySearch() {
-    }
-
-    @Override
-    public Pattern buildPattern(String keyPart) {
-      return Pattern.compile(Pattern.quote(JSON_TEXT_KEY_PREFIX) + '(' + keyPart + ')');
+    private JsonTextKeyPattern() {
     }
 
     @Override
@@ -165,17 +192,14 @@ public final class TranslationPatterns {
     }
   }
 
-  public static final class JavaTextsGetSearch extends AbstractTranslationPattern {
+  public static final class JavaTextsGetPattern extends AbstractTranslationPattern {
 
-    public static final AbstractTranslationPattern INSTANCE = new JavaTextsGetSearch();
-    public static final Pattern REGEX = INSTANCE.buildPattern(NLS_KEY_PAT);
+    public static final String GET_METHOD_NAME = "get";
+    public static final String GET_WITH_FALLBACK_METHOD_NAME = "getWithFallback";
+    public static final AbstractTranslationPattern INSTANCE = new JavaTextsGetPattern();
+    public static final Pattern REGEX = Pattern.compile(simpleName(IScoutRuntimeTypes.TEXTS) + "\\." + GET_METHOD_NAME + "\\((?:[a-zA-Z0-9_]+,\\s*)?(\")?(" + NLS_KEY_PAT + ")(\")?\\s*[,)]");
 
-    private JavaTextsGetSearch() {
-    }
-
-    @Override
-    public Pattern buildPattern(String keyPart) {
-      return Pattern.compile("TEXTS\\.get\\((?:[a-zA-Z0-9_]+,\\s*)?(\")?(" + keyPart + ")(\")?\\s*[,)]");
+    private JavaTextsGetPattern() {
     }
 
     @Override
@@ -194,17 +218,13 @@ public final class TranslationPatterns {
     }
   }
 
-  public static final class HtmlScoutMessageSearch extends AbstractTranslationPattern {
+  public static final class HtmlScoutMessagePattern extends AbstractTranslationPattern {
 
-    public static final AbstractTranslationPattern INSTANCE = new HtmlScoutMessageSearch();
-    public static final Pattern REGEX = INSTANCE.buildPattern(NLS_KEY_PAT);
+    public static final String ATTRIBUTE_NAME = "key";
+    public static final AbstractTranslationPattern INSTANCE = new HtmlScoutMessagePattern();
+    public static final Pattern REGEX = Pattern.compile("\\s+" + ATTRIBUTE_NAME + "=['\"](" + NLS_KEY_PAT + ")[\"']"); // there is no 'key' attribute in html. so no need to check for the scout:message tag
 
-    private HtmlScoutMessageSearch() {
-    }
-
-    @Override
-    public Pattern buildPattern(String keyPart) {
-      return Pattern.compile("\\s+key=['\"](" + keyPart + ")[\"']"); // there is no 'key' attribute in html. so no need to check for the scout:message tag
+    private HtmlScoutMessagePattern() {
     }
 
     @Override

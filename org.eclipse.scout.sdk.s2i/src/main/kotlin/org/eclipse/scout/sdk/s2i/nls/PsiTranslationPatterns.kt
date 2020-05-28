@@ -22,15 +22,39 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.xml.XmlAttributeValue
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
+import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.util.Strings.fromStringLiteral
 import org.eclipse.scout.sdk.core.util.Strings.withoutQuotes
 import java.util.*
 
-class PsiNlsPatterns {
+class PsiTranslationPatterns {
     /**
      * The JS patterns are in [org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJs] because the dependency to the JS module is optional!
      */
     companion object {
+
+        val HTML_KEY_PATTERN = htmlKeyPattern()
+        val JAVA_TEXTS_GET_PATTERN = javaTextsGetPattern()
+        private val JAVA_PATTERNS: MutableSet<ElementPattern<out PsiElement>> = HashSet()
+
+        init {
+            registerJavaPattern(JAVA_TEXTS_GET_PATTERN)
+        }
+
+        fun registerJavaPattern(pattern: ElementPattern<out PsiElement>): Boolean = synchronized(this) {
+            return JAVA_PATTERNS.add(pattern)
+        }
+
+        @Suppress("unused")
+        fun removeJavaPattern(pattern: ElementPattern<out PsiElement>): Boolean = synchronized(this) {
+            return JAVA_PATTERNS.remove(pattern)
+        }
+
+        fun allJavaPatterns(): List<ElementPattern<out PsiElement>> = synchronized(this) {
+            return@synchronized ArrayList(JAVA_PATTERNS)
+        }
+
+        fun anyJavaPatternAccepts(element: PsiElement?) = allJavaPatterns().any { it.accepts(element) }
 
         fun startsWithIgnoringQuotes(s: CharSequence, unescape: Boolean): StringPattern {
             return string().with(object : PatternCondition<String>("startsWithIgnoringQuotes=$s") {
@@ -41,29 +65,29 @@ class PsiNlsPatterns {
             })
         }
 
-        fun keyPattern(): PsiElementPattern.Capture<PsiElement> = PlatformPatterns.psiElement()
+        private fun htmlKeyPattern(): PsiElementPattern.Capture<PsiElement> = PlatformPatterns.psiElement()
                 .withParent(XmlAttributeValue::class.java)
-                .withSuperParent(2, xmlAttribute("key"))
+                .withSuperParent(2, xmlAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME))
                 .withSuperParent(3, xmlTag().withName("scout:message"))
 
-        fun textsGetPattern(): PsiJavaElementPattern.Capture<out PsiElement> {
+        private fun javaTextsGetPattern(): PsiJavaElementPattern.Capture<out PsiElement> {
             val stringFqn = String::class.java.name
             val localeFqn = Locale::class.java.name
             val wildcardArgument = ".."
             val getWithoutLocale = psiMethod()
-                    .withName("get")
+                    .withName(TranslationPatterns.JavaTextsGetPattern.GET_METHOD_NAME)
                     .definedInClass(IScoutRuntimeTypes.TEXTS)
                     .withParameters(stringFqn, wildcardArgument)
             val getWithLocale = psiMethod()
-                    .withName("get")
+                    .withName(TranslationPatterns.JavaTextsGetPattern.GET_METHOD_NAME)
                     .definedInClass(IScoutRuntimeTypes.TEXTS)
                     .withParameters(localeFqn, stringFqn, wildcardArgument)
             val getWithFallbackWithoutLocale = psiMethod()
-                    .withName("getWithFallback")
+                    .withName(TranslationPatterns.JavaTextsGetPattern.GET_WITH_FALLBACK_METHOD_NAME)
                     .definedInClass(IScoutRuntimeTypes.TEXTS)
                     .withParameters(stringFqn, stringFqn, wildcardArgument)
             val getWithFallbackWithLocale = psiMethod()
-                    .withName("getWithFallback")
+                    .withName(TranslationPatterns.JavaTextsGetPattern.GET_WITH_FALLBACK_METHOD_NAME)
                     .definedInClass(IScoutRuntimeTypes.TEXTS)
                     .withParameters(localeFqn, stringFqn, stringFqn, wildcardArgument)
             val oneOfTextsGetOverloads = or(

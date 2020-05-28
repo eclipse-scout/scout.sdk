@@ -20,8 +20,8 @@ class NlsDocumentationProviderForJs : AbstractNlsDocumentationProvider() {
 
     override fun psiElementToKey(element: PsiElement): String? {
         var text = withoutQuotes(element.text).toString()
-        val jsonPrefix = TranslationPatterns.JsonTextKeySearch.JSON_TEXT_KEY_PREFIX
-        val jsonSuffix = TranslationPatterns.JsonTextKeySearch.JSON_TEXT_KEY_SUFFIX
+        val jsonPrefix = TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX
+        val jsonSuffix = TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX
         if (text.startsWith(jsonPrefix) && text.endsWith(jsonSuffix)) {
             text = text.substring(jsonPrefix.length, text.length - jsonSuffix.length)
         }

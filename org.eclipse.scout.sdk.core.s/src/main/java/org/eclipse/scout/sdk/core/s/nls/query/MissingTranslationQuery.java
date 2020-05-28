@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.AbstractTranslationPattern;
@@ -55,25 +54,21 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class MissingTranslationQuery implements IFileQuery {
 
-  private static final Map<String, List<AbstractTranslationPattern>> SEARCH_PATTERNS;
   public static final String JAVA_TEXTS_FILE_NAME = JavaTypes.simpleName(IScoutRuntimeTypes.TEXTS) + JavaTypes.JAVA_FILE_SUFFIX;
   public static final String JS_TEXTS_FILE_NAME = "texts.js";
 
+  private final Map<String, List<AbstractTranslationPattern>> m_searchPatterns;
   private final Map<Path, Optional<Set<String>>> m_keysByModuleCache;
   private final Map<Path, Set<FileQueryMatch>> m_matches;
 
-  static {
-    SEARCH_PATTERNS = TranslationPatterns.all()
-        .collect(groupingBy(AbstractTranslationPattern::fileExtension));
-  }
-
   public static Set<String> supportedFileTypes() {
-    return unmodifiableSet(SEARCH_PATTERNS.keySet());
+    return TranslationPatterns.all().map(AbstractTranslationPattern::fileExtension).collect(toSet());
   }
 
   public MissingTranslationQuery() {
     m_keysByModuleCache = new ConcurrentHashMap<>();
     m_matches = new ConcurrentHashMap<>();
+    m_searchPatterns = TranslationPatterns.all().collect(groupingBy(AbstractTranslationPattern::fileExtension));
   }
 
   @Override
@@ -81,12 +76,12 @@ public class MissingTranslationQuery implements IFileQuery {
     return "Search for text keys that are used in the code but cannot be found";
   }
 
-  protected static boolean acceptCandidate(FileQueryInput candidate) {
+  protected boolean acceptCandidate(FileQueryInput candidate) {
     String fullPath = candidate.file().toString().replace('\\', '/');
     if (fullPath.contains("/archetype-resources/") || fullPath.contains("/generated-resources/")) {
       return false;
     }
-    return SEARCH_PATTERNS.containsKey(candidate.fileExtension())
+    return m_searchPatterns.containsKey(candidate.fileExtension())
         && !candidate.file().endsWith(JAVA_TEXTS_FILE_NAME)
         && !candidate.file().endsWith(JS_TEXTS_FILE_NAME);
   }
@@ -97,7 +92,7 @@ public class MissingTranslationQuery implements IFileQuery {
       return;
     }
 
-    List<AbstractTranslationPattern> patterns = SEARCH_PATTERNS.get(candidate.fileExtension());
+    List<AbstractTranslationPattern> patterns = m_searchPatterns.get(candidate.fileExtension());
     CharSequence content = CharBuffer.wrap(candidate.fileContent());
     int ticksByPattern = 10000;
     progress.init(patterns.size() * ticksByPattern, "{}. File: {}", name(), candidate.file());
@@ -198,20 +193,15 @@ public class MissingTranslationQuery implements IFileQuery {
 
   private static final class AssignmentPattern extends AbstractTranslationPattern {
 
-    private final String m_constantName;
+    private final Pattern m_pattern;
 
     private AssignmentPattern(String constantName) {
-      m_constantName = constantName;
-    }
-
-    @Override
-    public Pattern buildPattern(String keyPart) {
-      return Pattern.compile("\\s+" + m_constantName + "\\s*=\\s*[\"`'](" + keyPart + ")[\"`'];");
+      m_pattern = Pattern.compile("\\s+" + constantName + "\\s*=\\s*[\"`'](" + NLS_KEY_PAT + ")[\"`'];");
     }
 
     @Override
     public Pattern pattern() {
-      return buildPattern(ITranslation.KEY_REGEX.pattern());
+      return m_pattern;
     }
 
     @Override

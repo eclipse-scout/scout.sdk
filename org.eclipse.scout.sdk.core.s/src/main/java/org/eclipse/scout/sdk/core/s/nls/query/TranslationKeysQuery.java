@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
-import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsonTextKeySearch;
+import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsonTextKeyPattern;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
@@ -85,7 +85,7 @@ public class TranslationKeysQuery implements IFileQuery {
     m_suffixAndPrefix.put(new char[]{'"'}, new char[]{'"'});
     m_suffixAndPrefix.put(new char[]{'`'}, new char[]{'`'});
     m_suffixAndPrefix.put(new char[]{'\''}, new char[]{'\''});
-    m_suffixAndPrefix.put(JsonTextKeySearch.JSON_TEXT_KEY_PREFIX.toCharArray(), JsonTextKeySearch.JSON_TEXT_KEY_SUFFIX.toCharArray());
+    m_suffixAndPrefix.put(JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX.toCharArray(), JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX.toCharArray());
 
     m_searchKeys = new ArrayList<>(searchKeys);
     m_acceptedFileExtensions = TranslationPatterns.supportedFileExtensions();

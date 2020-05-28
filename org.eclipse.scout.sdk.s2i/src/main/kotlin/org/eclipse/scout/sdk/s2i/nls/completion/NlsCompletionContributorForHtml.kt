@@ -12,10 +12,10 @@ package org.eclipse.scout.sdk.s2i.nls.completion
 
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionType
-import org.eclipse.scout.sdk.s2i.nls.PsiNlsPatterns.Companion.keyPattern
+import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns
 
 class NlsCompletionContributorForHtml : CompletionContributor() {
     init {
-        extend(CompletionType.BASIC, keyPattern(), NlsCompletionContributorForJava.DefaultNlsCompletionProvider())
+        extend(CompletionType.BASIC, PsiTranslationPatterns.HTML_KEY_PATTERN, NlsCompletionContributorForJava.DefaultNlsCompletionProvider())
     }
 }
