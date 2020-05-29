@@ -11,23 +11,24 @@
 package org.eclipse.scout.sdk.s2i.nls.editor
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ValidationInfo
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
-import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
+import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.Translation
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 
-class TranslationNewDialog(project: Project, store: ITranslationStore, stack: TranslationStoreStack, initialKey: String? = null) : AbstractTranslationDialog(project, store, stack, initialKey) {
-
-    private var m_createdTranslation: ITranslationEntry? = null
+class TranslationEditDialog(project: Project, val translation: ITranslationEntry, stack: TranslationStoreStack, initialLanguageShown: Language? = null) : AbstractTranslationDialog(project, translation.store(), stack, translation.key(), initialLanguageShown) {
 
     init {
-        title = EclipseScoutBundle.message("create.new.translation.in.x", store.service().type().elementName())
+        title = EclipseScoutBundle.message("edit.translation.x", translation.key())
+        translation.texts().forEach { languageTextField(it.key)?.text = it.value }
+        keyTextField().isEnabled = false
     }
+
+    override fun validateKeyField(): ValidationInfo? = null
 
     override fun doSave(result: Translation) {
-        m_createdTranslation = stack.addNewTranslation(result, store)
+        stack.updateTranslation(result).orElse(null)
     }
-
-    fun createdTranslation() = m_createdTranslation
 }

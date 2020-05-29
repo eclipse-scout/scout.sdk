@@ -29,6 +29,7 @@ import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.JBColor
+import com.intellij.ui.PopupHandler
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
@@ -69,16 +70,13 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
 
     private var m_balloon: Balloon? = null
     private var m_balloonContent: JBLabel? = null
-
-    companion object {
-        const val TEXT_COLUMN_WIDTH = 350
-        const val KEY_COLUMN_WIDTH = 250
-    }
+    var contextMenu: JPopupMenu? = null
 
     init {
         m_table = TablePreservingSelection(m_model, { index -> m_model.translationForRow(index) }, { row -> m_model.rowForTranslation(row as ITranslationEntry) })
         m_table.tableColumnsChangedCallback = { adjustView() }
         m_table.tableChangedCallback = { adjustRowHeights(it) }
+        m_table.columnWidthSupplier = { if (it.modelIndex == KEY_COLUMN_INDEX) 250 else 350 }
         m_table.fillsViewportHeight = true
         m_table.autoResizeMode = JTable.AUTO_RESIZE_OFF
         m_table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
@@ -91,6 +89,21 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
         m_table.gridColor = JBColor.border()
         m_table.tableHeader.reorderingAllowed = false
         m_table.addKeyListener(TableKeyListener())
+        m_table.addMouseListener(object : PopupHandler() {
+            override fun invokePopup(comp: Component?, x: Int, y: Int) {
+                val selectedTranslations = selectedTranslations()
+                if (selectedTranslations.size > 1) {
+                    val hasReadOnlyRows = selectedTranslations.map { it.store() }.any { !it.isEditable }
+                    // ActionPopupMenuImpl show a 'Nothing here' menu if all menu items are invisible
+                    // Currently this is the case if it is a multi-selection and includes read-only stores
+                    // in that case don't show the popup
+                    if (hasReadOnlyRows) {
+                        return
+                    }
+                }
+                contextMenu?.show(comp, x, y)
+            }
+        })
         m_table.addPropertyChangeListener {
             // reset row height on cell editor cancel
             if ("tableCellEditor" == it.propertyName && it.newValue == null && it.oldValue != null) {
@@ -100,7 +113,6 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
         }
         m_table.rowSorter = m_tableSorterFilter
         m_tableSorterFilter.sortKeys = listOf(RowSorter.SortKey(0, SortOrder.ASCENDING), RowSorter.SortKey(1, SortOrder.ASCENDING))
-
         border = null
         setViewportView(m_table)
     }
@@ -109,13 +121,10 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
         val columnModel = m_table.columnModel
         for (i in 0 until columnModel.columnCount) {
             val column = columnModel.getColumn(i)
-            if (i == KEY_COLUMN_INDEX) {
-                column.preferredWidth = KEY_COLUMN_WIDTH
-            } else {
-                column.preferredWidth = TEXT_COLUMN_WIDTH
+            if (column.cellRenderer !is MultiLineTextCellRenderer) {
+                column.cellRenderer = MultiLineTextCellRenderer()
+                column.cellEditor = MultiLineTextCellEditor(i != KEY_COLUMN_INDEX)
             }
-            column.cellRenderer = MultiLineTextCellRenderer()
-            column.cellEditor = MultiLineTextCellEditor(i != KEY_COLUMN_INDEX)
         }
         adjustRowHeights()
     }
@@ -146,17 +155,19 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
 
     private fun fontHeight() = getFontMetrics(m_table.font).height
 
-    private fun adjustRowHeight(rowIndex: Int, fontHeight: Int, additionalText: String? = null) {
+    private fun adjustRowHeight(rowIndex: Int, fontHeight: Int, additionalText: String? = null): Int {
         val rowsRequired = maxLinesForRow(rowIndex, additionalText)
         val height = (rowsRequired * fontHeight) + 6
         m_table.setRowHeight(rowIndex, height)
+        return rowsRequired
     }
 
-    private fun adjustEditingRowHeight(additionalText: String? = null) {
+    private fun adjustEditingRowHeight(additionalText: String? = null): Int {
         val editingRowIndexView = m_table.editingRow
         if (editingRowIndexView >= 0) {
-            adjustRowHeight(editingRowIndexView, fontHeight(), additionalText)
+            return adjustRowHeight(editingRowIndexView, fontHeight(), additionalText)
         }
+        return -1
     }
 
     private fun maxLinesForRow(rowIndex: Int, additionalText: String? = null): Int {
@@ -262,7 +273,7 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
 
     private inner class TableKeyListener : KeyAdapter() {
         override fun keyPressed(e: KeyEvent) {
-            if (e.keyCode == KeyEvent.VK_F2) {
+            if (e.keyCode == KeyEvent.VK_F2 || e.keyCode == KeyEvent.VK_ENTER) {
                 val editStarted = m_table.editCellAt(m_table.selectedRow, m_table.selectedColumn, m_editStartEvent)
                 if (editStarted) {
                     e.consume()

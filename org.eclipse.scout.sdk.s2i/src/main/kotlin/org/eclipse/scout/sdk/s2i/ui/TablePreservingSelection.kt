@@ -20,7 +20,7 @@ import javax.swing.table.TableColumn
 import javax.swing.table.TableModel
 
 /**
- * A [JBTable] which tries to preserve selection and sort order when the table data or structure changes.
+ * A [JBTable] which tries to preserve selection, column width and sort order when the table data or structure changes.
  */
 open class TablePreservingSelection(model: TableModel, private val indexToRowMapper: (Int) -> Any, private val rowToIndexMapper: (Any) -> Int) : JBTable(model) {
 
@@ -28,9 +28,16 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
     private val m_selectedRows = ArrayList<Any>()
     var tableColumnsChangedCallback: ((TableModelEvent?) -> Unit)? = null
     var tableChangedCallback: ((TableModelEvent?) -> Unit)? = null
+    var columnWidthSupplier: ((TableColumn) -> Int)? = null
+        set(value) {
+            if (value != null) {
+                (0 until columnModel.columnCount).map { columnModel.getColumn(it) }.map { it.preferredWidth = value(it) }
+            }
+            field = value
+        }
 
     init {
-        selectionModel.addListSelectionListener { saveSelection() }
+        selectionModel.addListSelectionListener { backupRowSelection() }
     }
 
     override fun tableChanged(e: TableModelEvent?) {
@@ -52,11 +59,9 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
     }
 
     private fun runPreservingSelectionAndSorting(runnable: () -> Unit) {
-        // backup column selection
-        val selectedHeaders = selectedColumns.map { columnModel.getColumn(it).headerValue }
-
-        // backup sort keys and order
-        val sorting = rowSorter.sortKeys.associate { columnModel.getColumn(it.column).headerValue to it.sortOrder }
+        val selectedHeaders = backupColumnSelection()
+        val columnWidths = backupColumnWidths()
+        val sorting = backupSortOrder()
 
         m_selectionListenerArmed = false
         try {
@@ -66,7 +71,9 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
         }
 
         // restore sorting before the selection otherwise the view-model-index map in the JTable is wrong
-        restoreSorting(sorting)
+        restoreSortOrder(sorting)
+
+        restoreColumnWidth(columnWidths)
 
         // compute new indices
         val newRowIndices = m_selectedRows
@@ -86,6 +93,22 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
         revealSelection(selectedRows.toList(), selectedColumns.toList())
     }
 
+    private fun backupSortOrder() = rowSorter.sortKeys
+            .associate { columnModel.getColumn(it.column).headerValue to it.sortOrder }
+
+    private fun backupColumnSelection() = selectedColumns
+            .map { columnModel.getColumn(it).headerValue }
+
+    private fun backupColumnWidths() = (0 until columnModel.columnCount)
+            .map { columnModel.getColumn(it) }
+            .map { it.headerValue to it.preferredWidth }
+            .toMap()
+
+    private fun restoreColumnWidth(columnWidths: Map<Any, Int>) =
+            (0 until columnModel.columnCount)
+                    .map { columnModel.getColumn(it) }
+                    .map { col -> (columnWidths[col.headerValue] ?: columnWidthSupplier?.invoke(col))?.let { col.preferredWidth = it } }
+
     private fun revealSelection(rowIndices: List<Int>, colIndices: List<Int>) {
         if (rowIndices.isEmpty() || colIndices.isEmpty()) {
             return // nothing to reveal
@@ -96,19 +119,15 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
         val viewRect = viewport.viewRect
 
         rect.setLocation(rect.x - viewRect.x, rect.y - viewRect.y)
-        var centerX = (viewRect.width - rect.width) / 2
         var centerY = (viewRect.height - rect.height) / 2
-        if (rect.x < centerX) {
-            centerX = -centerX
-        }
         if (rect.y < centerY) {
             centerY = -centerY
         }
-        rect.translate(centerX, centerY)
+        rect.translate(0, centerY)
         viewport.scrollRectToVisible(rect)
     }
 
-    private fun restoreSorting(sorting: Map<Any, SortOrder>) {
+    private fun restoreSortOrder(sorting: Map<Any, SortOrder>) {
         rowSorter.sortKeys = sorting.entries
                 .associate { findColumnWithHeaderValue(it.key) to it.value }
                 .filter { it.key != null }
@@ -130,7 +149,7 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
         return null
     }
 
-    private fun saveSelection() {
+    private fun backupRowSelection() {
         if (!m_selectionListenerArmed) {
             return
         }

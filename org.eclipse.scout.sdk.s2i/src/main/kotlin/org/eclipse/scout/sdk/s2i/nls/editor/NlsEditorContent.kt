@@ -88,6 +88,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         tableLayout.insets = Insets(8, 8, 0, 0)
         tableLayout.weightx = 1.0
         tableLayout.weighty = 1.0
+        m_table.contextMenu = createContextMenu()
         add(m_table, tableLayout)
 
         val actionsLayout = GridBagConstraints()
@@ -149,16 +150,30 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         }.asPredicate()
     }
 
+    private fun createContextMenu() = ActionManager.getInstance()
+            .createActionPopupMenu(ActionPlaces.UNKNOWN, createContextMenuActionGroup())
+            .component
+
+    private fun createContextMenuActionGroup(): DefaultActionGroup {
+        val group = DefaultActionGroup()
+        group.add(TranslationEditAction(true))
+        group.add(TranslationRemoveAction(true))
+        group.addSeparator()
+        group.add(TranslationLocateActionGroup(true))
+        return group
+    }
+
     private fun createToolbar(): JComponent {
         return ActionManager.getInstance()
-                .createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, createActionGroup(), false)
+                .createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, createToolbarActionGroup(), false)
                 .component
     }
 
-    private fun createActionGroup(): ActionGroup {
+    private fun createToolbarActionGroup(): ActionGroup {
         val result = DefaultActionGroup()
+        result.add(TranslationEditAction())
         result.add(TranslationNewActionGroup())
-        result.add(RemoveTranslationsAction())
+        result.add(TranslationRemoveAction())
         result.addSeparator()
         result.add(TranslationLocateActionGroup())
         result.add(ReloadAction())
@@ -186,6 +201,22 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         balloon.show(RelativePoint(m_table, Point(m_table.visibleRect.width / 2, 0)), Balloon.Position.above)
     }
 
+    private inner class TranslationEditAction(val hideWhenDisabled: Boolean = false) : DumbAwareAction(message("edit.translation"), null, AllIcons.Actions.Edit) {
+        override fun update(e: AnActionEvent) {
+            val selectedTranslations = m_table.selectedTranslations()
+            e.presentation.isEnabled = selectedTranslations.size == 1
+                    && selectedTranslations[0].store().isEditable
+            e.presentation.isVisible = !hideWhenDisabled || e.presentation.isEnabled
+        }
+
+        override fun actionPerformed(e: AnActionEvent) {
+            val translation = m_table.selectedTranslations().firstOrNull() ?: return
+            val language = m_table.selectedLanguages().firstOrNull()
+            val dialog = TranslationEditDialog(project, translation, stack, language)
+            dialog.showAndGet()
+        }
+    }
+
     private inner class TranslationNewActionGroup : AbstractEditableStoresAction(message("create.new.translation"), message("create.new.translation.in"), AllIcons.General.Add, {
         TranslationNewDialogOpenAction(it)
     })
@@ -201,11 +232,16 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         }
     }
 
-    private inner class RemoveTranslationsAction : DumbAwareAction(message("remove.selected.rows"), null, AllIcons.General.Remove) {
+    private inner class TranslationRemoveAction(val hideWhenDisabled: Boolean = false) : DumbAwareAction(message("remove.selected.rows"), null, AllIcons.General.Remove) {
         override fun update(e: AnActionEvent) {
             val selectedTranslations = m_table.selectedTranslations()
-            e.presentation.isEnabled = selectedTranslations.isNotEmpty()
-                    && selectedTranslations.map { it.store() }.all { it.isEditable }
+            e.presentation.isEnabled = selectedTranslations.isNotEmpty() && selectedTranslations.map { it.store() }.all { it.isEditable }
+            e.presentation.isVisible = !hideWhenDisabled || e.presentation.isEnabled
+            if (selectedTranslations.size > 1) {
+                e.presentation.text = message("remove.selected.rows")
+            } else {
+                e.presentation.text = message("remove.selected.row")
+            }
         }
 
         override fun actionPerformed(e: AnActionEvent) {
@@ -216,9 +252,10 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         }
     }
 
-    private inner class TranslationLocateActionGroup : DumbAwareAction(message("jump.to.declaration"), null, AllIcons.General.Locate) {
+    private inner class TranslationLocateActionGroup(val hideWhenDisabled: Boolean = false) : DumbAwareAction(message("jump.to.declaration"), null, AllIcons.General.Locate) {
         override fun update(e: AnActionEvent) {
             e.presentation.isEnabled = m_table.selectedTranslations().size == 1
+            e.presentation.isVisible = !hideWhenDisabled || e.presentation.isEnabled
         }
 
         override fun actionPerformed(e: AnActionEvent) {
@@ -229,10 +266,15 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
             val selectedTranslation = selection[0]
             val selectedLanguages = m_table.selectedLanguages()
             if (selectedLanguages.size == 1) {
-                // open chooser: jump to service or property?
-                val group = DefaultActionGroup(listOf(TranslationServiceLocateAction(selectedTranslation), TranslationTextLocateAction(selectedTranslation, selectedLanguages[0])))
-                val popup = JBPopupFactory.getInstance().createActionGroupPopup(templatePresentation.text, group, e.dataContext, JBPopupFactory.ActionSelectionAid.NUMBERING, false)
-                popup.showUnderneathOf(e.inputEvent.component)
+                val textLocateAction = TranslationTextLocateAction(selectedTranslation, selectedLanguages[0])
+                if (e.isFromActionToolbar) {
+                    // open chooser: jump to service or property?
+                    val group = DefaultActionGroup(listOf(TranslationServiceLocateAction(selectedTranslation), textLocateAction))
+                    val popup = JBPopupFactory.getInstance().createActionGroupPopup(templatePresentation.text, group, e.dataContext, JBPopupFactory.ActionSelectionAid.NUMBERING, false)
+                    popup.showUnderneathOf(e.inputEvent.component)
+                } else {
+                    textLocateAction.actionPerformed(e)
+                }
             } else {
                 TranslationServiceLocateAction(selectedTranslation).actionPerformed(e)
             }
