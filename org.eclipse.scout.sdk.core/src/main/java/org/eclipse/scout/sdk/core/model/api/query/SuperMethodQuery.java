@@ -111,6 +111,6 @@ public class SuperMethodQuery extends AbstractQuery<IMethod> {
         .withStartType(isIncludeSelf())
         .withSuperClasses(isIncludeSuperClasses())
         .withSuperInterfaces(isIncludeSuperInterfaces())
-        .build(getMethod().declaringType(), level -> MethodQuery.findMatchingMethods(level, getMethodIdentifier()));
+        .build(getMethod().requireDeclaringType(), level -> MethodQuery.findMatchingMethods(level, getMethodIdentifier()));
   }
 }

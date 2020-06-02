@@ -78,7 +78,7 @@ public class QueryTest {
     assertEquals(1, acc.methods().withName("blub").first().get().superMethods().stream().limit(1).count());
     assertEquals(1, acc.methods().withName("blub").first().get().superMethods().withSelf(false).stream().count());
     assertEquals(1, acc.methods().withName("blub").first().get().superMethods().withSuperClasses(false).stream().count());
-    assertEquals(1, acc.methods().withName("blub").first().get().superMethods().stream().filter(element -> AbstractBaseClass.class.getName().equals(element.declaringType().name())).count());
+    assertEquals(1, acc.methods().withName("blub").first().get().superMethods().stream().filter(element -> AbstractBaseClass.class.getName().equals(element.requireDeclaringType().name())).count());
   }
 
   @Test

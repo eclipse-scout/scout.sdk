@@ -127,7 +127,7 @@ public class StructuredType implements IStructuredType {
 
   private static IMethod getOverwrittenMethod(IMethod method) {
     String refSig = method.identifier();
-    return method.declaringType().methods()
+    return method.requireDeclaringType().methods()
         .withSuperClasses(true).stream()
         .filter(element -> !method.equals(element) && refSig.equals(element.identifier()))
         .findAny()

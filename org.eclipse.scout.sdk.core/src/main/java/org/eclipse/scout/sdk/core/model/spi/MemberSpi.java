@@ -35,6 +35,7 @@ public interface MemberSpi extends AnnotatableSpi {
    * @return The {@link TypeSpi} this member is defined in. Never returns {@code null} for {@link MethodSpi} and
    *         {@link FieldSpi}. For {@link TypeSpi} this is the enclosing type that may be null.
    */
+  @SuppressWarnings("ClassReferencesSubclass")
   TypeSpi getDeclaringType();
 
   /**

@@ -15,14 +15,22 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
+import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 
 public abstract class AbstractMemberImplementor<SPI extends MemberSpi> extends AbstractAnnotatableImplementor<SPI> implements IMember {
 
   protected AbstractMemberImplementor(SPI spi) {
     super(spi);
+  }
+
+  @Override
+  public Optional<IType> declaringType() {
+    return Optional.ofNullable(m_spi.getDeclaringType())
+        .map(TypeSpi::wrap);
   }
 
   @Override

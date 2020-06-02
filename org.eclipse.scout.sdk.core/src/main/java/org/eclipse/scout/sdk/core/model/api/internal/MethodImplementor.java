@@ -45,7 +45,7 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
   }
 
   @Override
-  public IType declaringType() {
+  public IType requireDeclaringType() {
     return m_spi.getDeclaringType().wrap();
   }
 
@@ -69,7 +69,7 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
   @Override
   public IType requireReturnType() {
     return returnType()
-        .orElseThrow(() -> newFail("Method {} in type {} is a constructor and therefore has no return type.", identifier(true), declaringType().name()));
+        .orElseThrow(() -> newFail("Method {} in type {} is a constructor and therefore has no return type.", identifier(true), requireDeclaringType().name()));
   }
 
   @Override
@@ -89,7 +89,7 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
 
   @Override
   public AnnotationQuery<IAnnotation> annotations() {
-    return new AnnotationQuery<>(declaringType(), m_spi);
+    return new AnnotationQuery<>(requireDeclaringType(), m_spi);
   }
 
   @Override

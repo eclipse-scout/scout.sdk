@@ -45,7 +45,7 @@ public class MethodTest {
 
     // constructor
     IMethod constr = childClassType.methods().first().get();
-    assertEquals(childClassType, constr.declaringType());
+    assertEquals(childClassType, constr.requireDeclaringType());
     assertEquals(0, constr.exceptionTypes().count());
     assertEquals(Flags.AccPublic, constr.flags());
     assertEquals(childClassType.elementName(), constr.elementName());
@@ -57,7 +57,7 @@ public class MethodTest {
 
     // methodInChildClass
     IMethod methodInChildClass = childClassType.methods().item(1).get();
-    assertEquals(childClassType, methodInChildClass.declaringType());
+    assertEquals(childClassType, methodInChildClass.requireDeclaringType());
     assertEquals(1, methodInChildClass.exceptionTypes().count());
     assertEquals(IOException.class.getName(), methodInChildClass.exceptionTypes().findAny().get().name());
     assertEquals(Flags.AccProtected | Flags.AccSynchronized, methodInChildClass.flags());
@@ -70,7 +70,7 @@ public class MethodTest {
 
     // firstCase
     IMethod firstCase = childClassType.methods().item(2).get();
-    assertEquals(childClassType, firstCase.declaringType());
+    assertEquals(childClassType, firstCase.requireDeclaringType());
     assertEquals(0, firstCase.exceptionTypes().count());
     assertEquals(Flags.AccPrivate, firstCase.flags());
     assertEquals("firstCase", firstCase.elementName());
@@ -103,7 +103,7 @@ public class MethodTest {
 
     // methodInBaseClass
     IMethod methodInBaseClass = baseClassType.methods().first().get();
-    assertEquals(baseClassType, methodInBaseClass.declaringType());
+    assertEquals(baseClassType, methodInBaseClass.requireDeclaringType());
     assertEquals(2, methodInBaseClass.exceptionTypes().count());
     assertEquals(IOError.class.getName(), methodInBaseClass.exceptionTypes().findAny().get().name());
     assertEquals(FileNotFoundException.class.getName(), methodInBaseClass.exceptionTypes().skip(1).findAny().get().name());
@@ -118,7 +118,7 @@ public class MethodTest {
 
     // method2InBaseClass
     IMethod method2InBaseClass = baseClassType.methods().item(1).get();
-    assertEquals(baseClassType, method2InBaseClass.declaringType());
+    assertEquals(baseClassType, method2InBaseClass.requireDeclaringType());
     assertEquals(0, method2InBaseClass.exceptionTypes().count());
     assertEquals(Flags.AccPublic | Flags.AccSynchronized | Flags.AccFinal, method2InBaseClass.flags());
     assertEquals("method2InBaseClass", method2InBaseClass.elementName());

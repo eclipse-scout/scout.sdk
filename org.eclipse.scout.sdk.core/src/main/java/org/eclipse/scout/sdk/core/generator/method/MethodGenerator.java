@@ -106,7 +106,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     }
 
     // add interface flag on method if declaring type is an interface
-    if (method.declaringType().isInterface()) {
+    if (method.requireDeclaringType().isInterface()) {
       withFlags(flags() | Flags.AccInterface);
     }
   }

@@ -96,7 +96,7 @@ public interface IMethod extends IMember {
   /**
    * @return The {@link IType} this {@link IMethod} is declared in.
    */
-  IType declaringType();
+  IType requireDeclaringType();
 
   /**
    * Returns the unique identifier for this {@link IMethod}. The identifier looks like

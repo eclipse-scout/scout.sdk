@@ -61,7 +61,7 @@ public class MethodParameterImplementor extends AbstractAnnotatableImplementor<M
 
   @Override
   public AnnotationQuery<IAnnotation> annotations() {
-    return new AnnotationQuery<>(declaringMethod().declaringType(), m_spi);
+    return new AnnotationQuery<>(declaringMethod().requireDeclaringType(), m_spi);
   }
 
   @Override

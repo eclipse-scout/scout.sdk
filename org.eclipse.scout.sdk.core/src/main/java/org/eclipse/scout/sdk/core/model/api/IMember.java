@@ -61,6 +61,12 @@ public interface IMember extends IAnnotatable {
   boolean hasTypeParameters();
 
   /**
+   * @return An {@link Optional} with the declaring {@link IType} of this member. The resulting {@link Optional} is
+   *         empty if this {@link IMember} has no declaring type (e.g. if it is a primary type).
+   */
+  Optional<IType> declaringType();
+
+  /**
    * Gets the java doc source for this {@link IMember}.
    *
    * @return The {@link ISourceRange} for the java doc of this {@link IMember}.

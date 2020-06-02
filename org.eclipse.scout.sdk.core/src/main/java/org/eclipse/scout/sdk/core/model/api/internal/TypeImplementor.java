@@ -59,12 +59,6 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   @Override
-  public Optional<IType> declaringType() {
-    return Optional.ofNullable(m_spi.getDeclaringType())
-        .map(TypeSpi::wrap);
-  }
-
-  @Override
   public boolean isArray() {
     return m_spi.getArrayDimension() > 0;
   }

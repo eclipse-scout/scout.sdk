@@ -136,7 +136,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   }
 
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createDefaultOverrideGenerator(IMethod template) {
-    boolean isFromInterface = isInterface(template.declaringType().flags());
+    boolean isFromInterface = isInterface(template.requireDeclaringType().flags());
     boolean needsImplementation = isFromInterface || isAbstract(template.flags());
 
     IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> innerGenerator =

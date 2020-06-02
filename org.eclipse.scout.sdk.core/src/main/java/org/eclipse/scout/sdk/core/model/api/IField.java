@@ -50,7 +50,7 @@ public interface IField extends IMember {
   /**
    * @return The {@link IType} this {@link IField} is declared in.
    */
-  IType declaringType();
+  IType requireDeclaringType();
 
   @Override
   FieldSpi unwrap();

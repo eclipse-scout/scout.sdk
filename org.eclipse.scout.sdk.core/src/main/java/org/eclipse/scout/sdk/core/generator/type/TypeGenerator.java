@@ -556,7 +556,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     protected static Stream<IMethod> getUnimplementedMethods(IType type) {
       Map<String, IMethod> abstractMethodIds = type.methods().withSuperTypes(true).stream()
           .filter(method -> !isDefaultMethod(method.flags()) && !Flags.isStatic(method.flags()))
-          .filter(method -> isAbstract(method.flags()) || isInterface(method.flags()) || isInterface(method.declaringType().flags()))
+          .filter(method -> isAbstract(method.flags()) || isInterface(method.flags()) || isInterface(method.requireDeclaringType().flags()))
           .collect(toMap(m -> m.identifier(true), identity(), (u, v) -> u));
 
       // remove all implemented methods

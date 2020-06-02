@@ -78,7 +78,7 @@ public final class SimpleGenerators {
         return b -> b.classLiteral(mv.as(IType.class).reference(true));
       case Enum:
         IField field = mv.as(IField.class);
-        return b -> b.enumValue(field.declaringType().name(), field.elementName());
+        return b -> b.enumValue(field.requireDeclaringType().name(), field.elementName());
       case Annotation:
         return transformAnnotation(mv.as(IAnnotation.class), transformer)
             .<ISourceGenerator<IExpressionBuilder<?>>> map(g -> b -> b.append(g))

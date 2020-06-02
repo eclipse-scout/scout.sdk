@@ -32,7 +32,7 @@ public class FieldImplementor extends AbstractMemberImplementor<FieldSpi> implem
   }
 
   @Override
-  public IType declaringType() {
+  public IType requireDeclaringType() {
     return m_spi.getDeclaringType().wrap();
   }
 
@@ -58,7 +58,7 @@ public class FieldImplementor extends AbstractMemberImplementor<FieldSpi> implem
 
   @Override
   public AnnotationQuery<IAnnotation> annotations() {
-    return new AnnotationQuery<>(declaringType(), m_spi);
+    return new AnnotationQuery<>(requireDeclaringType(), m_spi);
   }
 
   @Override

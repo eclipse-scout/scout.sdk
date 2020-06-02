@@ -40,7 +40,7 @@ public class FieldTest {
 
     assertEquals("myStringValue", myStringField.constantValue().get().as(String.class));
     assertEquals(String.class.getName(), myStringField.dataType().name());
-    assertEquals(childClassType, myStringField.declaringType());
+    assertEquals(childClassType, myStringField.requireDeclaringType());
     assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myStringField.flags());
     assertEquals("myString", myStringField.elementName());
   }
@@ -73,7 +73,7 @@ public class FieldTest {
     assertEquals(MetaValueType.Null, mTestField.constantValue().get().type());
     assertEquals(JavaTypes._int, mTestField.dataType().leafComponentType().get().name());
     assertEquals(2, mTestField.dataType().arrayDimension());
-    assertEquals(childClassType, mTestField.declaringType());
+    assertEquals(childClassType, mTestField.requireDeclaringType());
     assertEquals(Flags.AccProtected | Flags.AccFinal, mTestField.flags());
     assertEquals("m_test", mTestField.elementName());
   }
@@ -102,7 +102,7 @@ public class FieldTest {
     IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
     IField myLongField = baseClassType.fields().first().get();
     assertEquals(JavaTypes.Long, myLongField.dataType().name());
-    assertEquals(baseClassType, myLongField.declaringType());
+    assertEquals(baseClassType, myLongField.requireDeclaringType());
     assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myLongField.flags());
     assertEquals("myLong", myLongField.elementName());
   }
@@ -125,7 +125,7 @@ public class FieldTest {
     assertFalse(anonymousClassField.constantValue().isPresent());
     assertEquals(Runnable.class.getName(), anonymousClassField.dataType().name());
     assertEquals(0, anonymousClassField.dataType().arrayDimension());
-    assertEquals(baseClassType, anonymousClassField.declaringType());
+    assertEquals(baseClassType, anonymousClassField.requireDeclaringType());
     assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, anonymousClassField.flags());
     assertEquals("ANONYMOUS_CLASS", anonymousClassField.elementName());
   }

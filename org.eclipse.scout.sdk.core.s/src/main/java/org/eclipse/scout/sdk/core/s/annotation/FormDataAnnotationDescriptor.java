@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
@@ -159,7 +160,7 @@ public class FormDataAnnotationDescriptor {
           descriptorToFill.setGenericOrdinalDefinitionType((IType) element);
         }
         else if (element instanceof IMethod) {
-          descriptorToFill.setGenericOrdinalDefinitionType(((IMethod) element).declaringType());
+          descriptorToFill.setGenericOrdinalDefinitionType(((IMethod) element).requireDeclaringType());
         }
       }
     }
@@ -171,7 +172,7 @@ public class FormDataAnnotationDescriptor {
     }
 
     // correction
-    boolean isMemberType = element instanceof IType && ((IType) element).declaringType().isPresent();
+    boolean isMemberType = element instanceof IMember && ((IMember) element).declaringType().isPresent();
     if (isOwner && sdkCommand == SdkCommand.USE && dtoType != null && isMemberType) {
       descriptorToFill.setSuperType(dtoType);
       descriptorToFill.setFormDataType(null);

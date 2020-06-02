@@ -319,12 +319,6 @@ public interface IType extends IMember {
   Optional<IType> resolveSimpleName(String simpleName);
 
   /**
-   * @return An {@link Optional} with the declaring {@link IType} of this type. The resulting {@link Optional} is empty
-   *         if this {@link IType} is the primary type already.
-   */
-  Optional<IType> declaringType();
-
-  /**
    * @return The qualifier of this {@link IType}.<br>
    *         If this is a nested type, the fully qualified name of the declaring {@link IType} is returned. In this case
    *         inner classes are separated by {@code $}.<br>
