@@ -233,9 +233,13 @@ public class ImportCollector implements IImportCollector {
   }
 
   public static StringBuilder createImportDeclaration(boolean isStatic, CharSequence fullImportExpr) {
-    StringBuilder b = new StringBuilder(15 + fullImportExpr.length()).append("import ");
+    String importPart = "import ";
+    String staticPart = "static ";
+
+    StringBuilder b = new StringBuilder(importPart.length() + staticPart.length() + fullImportExpr.length() + 1);
+    b.append(importPart);
     if (isStatic) {
-      b.append("static ");
+      b.append(staticPart);
     }
     return b.append(fullImportExpr).append(';');
   }
