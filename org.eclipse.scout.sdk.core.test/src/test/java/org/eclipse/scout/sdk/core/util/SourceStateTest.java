@@ -87,20 +87,20 @@ public class SourceStateTest {
   }
 
   private static void doTestLineComment(char[] src) {
-    assertEquals(State.Default, parse(src, 0));
-    assertEquals(State.Default, parse(src, 31));
-    assertEquals(State.InString, parse(src, 33));
-    assertEquals(State.EscapeString, parse(src, 38));
-    assertEquals(State.InString, parse(src, 39));
-    assertEquals(State.InString, parse(src, 56));
-    assertEquals(State.Default, parse(src, 69));
-    assertEquals(State.AboutToEnterComment, parse(src, 74));
-    assertEquals(State.InLineComment, parse(src, 75));
-    assertEquals(State.InLineComment, parse(src, 88));
-    assertEquals(State.Default, parse(src, 90));
-    assertEquals(State.Default, parse(src, src.length));
-    assertEquals(State.Default, parse(new char[]{}, 0));
-    assertEquals(State.Default, parse(new char[]{}, 1));
+    assertEquals(State.DEFAULT, parse(src, 0));
+    assertEquals(State.DEFAULT, parse(src, 31));
+    assertEquals(State.IN_STRING, parse(src, 33));
+    assertEquals(State.ESCAPE_STRING, parse(src, 38));
+    assertEquals(State.IN_STRING, parse(src, 39));
+    assertEquals(State.IN_STRING, parse(src, 56));
+    assertEquals(State.DEFAULT, parse(src, 69));
+    assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 74));
+    assertEquals(State.IN_LINE_COMMENT, parse(src, 75));
+    assertEquals(State.IN_LINE_COMMENT, parse(src, 88));
+    assertEquals(State.DEFAULT, parse(src, 90));
+    assertEquals(State.DEFAULT, parse(src, src.length));
+    assertEquals(State.DEFAULT, parse(new char[]{}, 0));
+    assertEquals(State.DEFAULT, parse(new char[]{}, 1));
 
     assertFalse(isInComment(src, 73));
     assertTrue(isInComment(src, 74)); // /
@@ -157,21 +157,21 @@ public class SourceStateTest {
   }
 
   private static void doTestBlockComment(char[] src) {
-    assertEquals(State.Default, parse(src, 0));
-    assertEquals(State.Default, parse(src, 31));
+    assertEquals(State.DEFAULT, parse(src, 0));
+    assertEquals(State.DEFAULT, parse(src, 31));
 
-    assertEquals(State.InString, parse(src, 33));
-    assertEquals(State.EscapeString, parse(src, 38));
-    assertEquals(State.InString, parse(src, 39));
-    assertEquals(State.InString, parse(src, 56));
-    assertEquals(State.InString, parse(src, 69));
-    assertEquals(State.Default, parse(src, 75));
-    assertEquals(State.AboutToEnterComment, parse(src, 77));
-    assertEquals(State.InBlockComment, parse(src, 78));
-    assertEquals(State.InBlockComment, parse(src, 88));
-    assertEquals(State.AboutToExitBlockComment, parse(src, 94));
-    assertEquals(State.Default, parse(src, 95));
-    assertEquals(State.Default, parse(src, src.length));
+    assertEquals(State.IN_STRING, parse(src, 33));
+    assertEquals(State.ESCAPE_STRING, parse(src, 38));
+    assertEquals(State.IN_STRING, parse(src, 39));
+    assertEquals(State.IN_STRING, parse(src, 56));
+    assertEquals(State.IN_STRING, parse(src, 69));
+    assertEquals(State.DEFAULT, parse(src, 75));
+    assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 77));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 78));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 88));
+    assertEquals(State.ABOUT_TO_EXIT_BLOCK_COMMENT, parse(src, 94));
+    assertEquals(State.DEFAULT, parse(src, 95));
+    assertEquals(State.DEFAULT, parse(src, src.length));
 
     assertFalse(isInComment(src, 76));
     assertTrue(isInComment(src, 77)); // /
@@ -193,10 +193,10 @@ public class SourceStateTest {
   @Test
   public void testOutOfBounds() {
     char[] src = "/*".toCharArray();
-    assertEquals(State.AboutToEnterComment, parse(src, 0));
-    assertEquals(State.InBlockComment, parse(src, 1));
-    assertEquals(State.InBlockComment, parse(src, 100));
-    assertEquals(State.Default, parse(src, -1));
+    assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 0));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 1));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 100));
+    assertEquals(State.DEFAULT, parse(src, -1));
   }
 
   @Test
@@ -209,21 +209,21 @@ public class SourceStateTest {
         " * multi block\n" +
         " */x").toCharArray();
 
-    assertEquals(State.AboutToEnterComment, parse(src, 0));
-    assertEquals(State.InBlockComment, parse(src, 5));
-    assertEquals(State.AboutToExitBlockComment, parse(src, 7));
-    assertEquals(State.InBlockComment, parse(src, 8));
-    assertEquals(State.InBlockComment, parse(src, 19));
-    assertEquals(State.AboutToExitBlockComment, parse(src, 24));
-    assertEquals(State.Default, parse(src, 26));
-    assertEquals(State.Default, parse(src, 27));
-    assertEquals(State.AboutToEnterComment, parse(src, 33));
-    assertEquals(State.InBlockComment, parse(src, 34));
-    assertEquals(State.AboutToExitBlockComment, parse(src, 40));
-    assertEquals(State.InBlockComment, parse(src, 53));
-    assertEquals(State.InBlockComment, parse(src, 54));
-    assertEquals(State.AboutToExitBlockComment, parse(src, 55));
-    assertEquals(State.Default, parse(src, 56));
+    assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 0));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 5));
+    assertEquals(State.ABOUT_TO_EXIT_BLOCK_COMMENT, parse(src, 7));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 8));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 19));
+    assertEquals(State.ABOUT_TO_EXIT_BLOCK_COMMENT, parse(src, 24));
+    assertEquals(State.DEFAULT, parse(src, 26));
+    assertEquals(State.DEFAULT, parse(src, 27));
+    assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 33));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 34));
+    assertEquals(State.ABOUT_TO_EXIT_BLOCK_COMMENT, parse(src, 40));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 53));
+    assertEquals(State.IN_BLOCK_COMMENT, parse(src, 54));
+    assertEquals(State.ABOUT_TO_EXIT_BLOCK_COMMENT, parse(src, 55));
+    assertEquals(State.DEFAULT, parse(src, 56));
 
     assertTrue(isInComment(src, 0)); // /
     assertTrue(isInComment(src, 1)); // *
@@ -248,16 +248,16 @@ public class SourceStateTest {
             "12343/12\n" +
             "// */\n").toCharArray();
 
-    assertEquals(State.AboutToEnterComment, parse(src, 0));
-    assertEquals(State.InLineComment, parse(src, 1));
-    assertEquals(State.Default, parse(src, 15));
-    assertEquals(State.AboutToEnterComment, parse(src, 16));
-    assertEquals(State.InLineComment, parse(src, 17));
-    assertEquals(State.Default, parse(src, 21));
-    assertEquals(State.Default, parse(src, 23));
-    assertEquals(State.AboutToEnterComment, parse(src, 31));
-    assertEquals(State.InLineComment, parse(src, 32));
-    assertEquals(State.Default, parse(src, 36));
+    assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 0));
+    assertEquals(State.IN_LINE_COMMENT, parse(src, 1));
+    assertEquals(State.DEFAULT, parse(src, 15));
+    assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 16));
+    assertEquals(State.IN_LINE_COMMENT, parse(src, 17));
+    assertEquals(State.DEFAULT, parse(src, 21));
+    assertEquals(State.DEFAULT, parse(src, 23));
+    assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 31));
+    assertEquals(State.IN_LINE_COMMENT, parse(src, 32));
+    assertEquals(State.DEFAULT, parse(src, 36));
   }
 
   @Test

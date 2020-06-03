@@ -69,7 +69,7 @@ public final class Strings {
     if (first.length != second.length) {
       return false;
     }
-    for (int i = first.length; --i >= 0;) {
+    for (int i = first.length - 1; i >= 0; i--) {
       if (first[i] != second[i]) {
         return false;
       }
@@ -104,7 +104,7 @@ public final class Strings {
     if (first.length != second.length) {
       return false;
     }
-    for (int i = first.length; --i >= 0;) {
+    for (int i = first.length - 1; i >= 0; i--) {
       if (Character.toLowerCase(first[i]) != Character.toLowerCase(second[i])) {
         return false;
       }
@@ -138,7 +138,7 @@ public final class Strings {
     if (first.length() != second.length()) {
       return false;
     }
-    for (int i = first.length(); --i >= 0;) {
+    for (int i = first.length() - 1; i >= 0; i--) {
       if (first.charAt(i) != second.charAt(i)) {
         return false;
       }
@@ -173,7 +173,7 @@ public final class Strings {
     if (first.length() != second.length()) {
       return false;
     }
-    for (int i = first.length(); --i >= 0;) {
+    for (int i = first.length() - 1; i >= 0; i--) {
       if (Character.toLowerCase(first.charAt(i)) != Character.toLowerCase(second.charAt(i))) {
         return false;
       }
@@ -924,7 +924,8 @@ public final class Strings {
    * @return The input with removed leading and trailing quotes respecting the enabled quote types.
    */
   public static CharSequence withoutQuotes(CharSequence literal, boolean removeDouble, boolean removeSingle, boolean removeBackTick) {
-    if (literal == null || literal.length() < 2 || (!removeDouble && !removeSingle && !removeBackTick)) {
+    boolean needsProcessing = removeDouble || removeSingle || removeBackTick;
+    if (literal == null || literal.length() < 2 || !needsProcessing) {
       return literal;
     }
 

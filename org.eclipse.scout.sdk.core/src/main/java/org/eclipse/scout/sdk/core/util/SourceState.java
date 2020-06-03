@@ -41,7 +41,7 @@ public final class SourceState {
 
     @Override
     public State toState() {
-      return State.InLineComment;
+      return State.IN_LINE_COMMENT;
     }
   }
 
@@ -58,7 +58,7 @@ public final class SourceState {
 
     @Override
     public State toState() {
-      return State.InBlockComment;
+      return State.IN_BLOCK_COMMENT;
     }
   }
 
@@ -79,7 +79,7 @@ public final class SourceState {
 
     @Override
     public State toState() {
-      return State.AboutToExitBlockComment;
+      return State.ABOUT_TO_EXIT_BLOCK_COMMENT;
     }
   }
 
@@ -100,7 +100,7 @@ public final class SourceState {
 
     @Override
     public State toState() {
-      return State.AboutToEnterComment;
+      return State.ABOUT_TO_ENTER_COMMENT;
     }
   }
 
@@ -119,7 +119,7 @@ public final class SourceState {
 
     @Override
     public State toState() {
-      return State.EscapeString;
+      return State.ESCAPE_STRING;
     }
   }
 
@@ -144,7 +144,7 @@ public final class SourceState {
 
     @Override
     public State toState() {
-      return State.InString;
+      return State.IN_STRING;
     }
   }
 
@@ -167,7 +167,7 @@ public final class SourceState {
 
     @Override
     public State toState() {
-      return State.Default;
+      return State.DEFAULT;
     }
   }
 
@@ -185,7 +185,7 @@ public final class SourceState {
      * The first slash is NOT part of InLineComment state but it is the AboutToEnterComment state instead. Please note
      * that this state may also be a simple division within the code and is therefore no comment state.
      */
-    InLineComment,
+    IN_LINE_COMMENT,
     /**
      * Describes positions within a multi or single line block comment. Such comments start with /* and end with
      * &#42;/.<br/>
@@ -193,33 +193,33 @@ public final class SourceState {
      * ending indicator and therefore belong to AboutToExitBlockComment). While the starting slash is
      * AboutToEnterComment state the ending slash is already Default state.
      */
-    InBlockComment,
+    IN_BLOCK_COMMENT,
     /**
      * Indicates a * character within a block comment: /* ** &#42;/. The two stars in between belong to the state
      * AboutToExitBlockComment. But as no slash follows it stays in the AboutToExitBlockComment state or turns into
      * InBlockComment again.<br>
      * So state AboutToExitBlockComment also indicates to be within a block comment (like InBlockComment does).
      */
-    AboutToExitBlockComment,
+    ABOUT_TO_EXIT_BLOCK_COMMENT,
     /**
      * Indicates a / character which is not within a string or char literal and ist not within a comment. This state
      * might indicate that a comment is about to begin or it could also belong to e.g. a division.
      */
-    AboutToEnterComment,
+    ABOUT_TO_ENTER_COMMENT,
     /**
      * Indicates a backslash character within a String or char literal. This state (together with InString) also means
      * the position is within a String or char literal
      */
-    EscapeString,
+    ESCAPE_STRING,
     /**
      * Describes positions within a String or char literal. While the starting " or ' is already in state InString, the
      * ending character is not.
      */
-    InString,
+    IN_STRING,
     /**
      * Describes positions that do not belong to any of the other states.
      */
-    Default
+    DEFAULT
   }
 
   /**
@@ -268,7 +268,7 @@ public final class SourceState {
       return true;
     }
     State result = state.toState();
-    return result == State.InString || result == State.EscapeString;
+    return result == State.IN_STRING || result == State.ESCAPE_STRING;
   }
 
   /**
@@ -352,7 +352,7 @@ public final class SourceState {
   }
 
   static boolean isStringEnd(IState calculatedState, CharSequence src, int limit) {
-    return calculatedState == DefaultState.INSTANCE && previousState(DefaultState.INSTANCE, src, limit).toState() == State.InString;
+    return calculatedState == DefaultState.INSTANCE && previousState(DefaultState.INSTANCE, src, limit).toState() == State.IN_STRING;
   }
 
   static IState parseImpl(CharSequence chars, int end) {

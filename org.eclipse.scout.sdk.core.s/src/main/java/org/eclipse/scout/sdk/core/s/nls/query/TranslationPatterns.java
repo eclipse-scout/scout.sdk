@@ -46,6 +46,9 @@ public final class TranslationPatterns {
         .forEach(TranslationPatterns::registerPattern);
   }
 
+  private TranslationPatterns() {
+  }
+
   /**
    * Adds an {@link AbstractTranslationPattern} to the list of known patterns.
    * 
@@ -54,7 +57,7 @@ public final class TranslationPatterns {
    * @return {@code true} if the element was already registered (and was replaced), {@code false} if this pattern was
    *         not yet registered.
    */
-  public synchronized static boolean registerPattern(AbstractTranslationPattern pattern) {
+  public static synchronized boolean registerPattern(AbstractTranslationPattern pattern) {
     return PATTERN_MAP.put(Ensure.notNull(pattern).getClass(), pattern) != null;
   }
 
@@ -66,14 +69,14 @@ public final class TranslationPatterns {
    * @return {@code true} if it was successfully removed, {@code false} if the element was not in the list and therefore
    *         was not removed.
    */
-  public synchronized static boolean removePattern(AbstractTranslationPattern pattern) {
+  public static synchronized boolean removePattern(AbstractTranslationPattern pattern) {
     return PATTERN_MAP.remove(Ensure.notNull(pattern).getClass()) != null;
   }
 
   /**
    * @return All {@link AbstractTranslationPattern} known.
    */
-  public synchronized static Stream<AbstractTranslationPattern> all() {
+  public static synchronized Stream<AbstractTranslationPattern> all() {
     return new HashSet<>(PATTERN_MAP.values()).stream();
   }
 
