@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>10.0.0-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.sdk</relativePath>
   </parent>
 
@@ -130,15 +130,15 @@
               *
             </Import-Package>
             <Require-Bundle>
-              org.eclipse.core.runtime;bundle-version="[3.16,4)";visibility:=reexport,
-              org.eclipse.core.resources;bundle-version="[3.13,4)";visibility:=reexport,
-              org.eclipse.jdt.core;bundle-version="[3.19,4)";visibility:=reexport,
-              org.eclipse.jdt.core.manipulation;bundle-version="[1.12,2)";visibility:=reexport,
-              org.eclipse.jdt.launching;bundle-version="[3.15,4)";visibility:=reexport,
-              org.eclipse.text;bundle-version="[3.9,4)";visibility:=reexport,
-              org.eclipse.m2e.maven.runtime;bundle-version="[1.13,2)";visibility:=reexport,
-              org.eclipse.m2e.archetype.common;bundle-version="[1.13,2)";visibility:=reexport,
-              org.eclipse.m2e.core;bundle-version="[1.13,2)";visibility:=reexport
+              org.eclipse.core.runtime;bundle-version="[3.17.100,4)";visibility:=reexport,
+              org.eclipse.core.resources;bundle-version="[3.13.700,4)";visibility:=reexport,
+              org.eclipse.jdt.core;bundle-version="[3.21,4)";visibility:=reexport,
+              org.eclipse.jdt.core.manipulation;bundle-version="[1.13.100,2)";visibility:=reexport,
+              org.eclipse.jdt.launching;bundle-version="[3.17,4)";visibility:=reexport,
+              org.eclipse.text;bundle-version="[3.10.100,4)";visibility:=reexport,
+              org.eclipse.m2e.maven.runtime;bundle-version="[1.15,2)";visibility:=reexport,
+              org.eclipse.m2e.archetype.common;bundle-version="[1.15,2)";visibility:=reexport,
+              org.eclipse.m2e.core;bundle-version="[1.15,2)";visibility:=reexport
             </Require-Bundle>
 
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.S2ESdkActivator</Bundle-Activator>

@@ -14,7 +14,7 @@
 <feature
       id="org.eclipse.scout.sdk-feature"
       label="%featureName"
-      version="10.0.0.qualifier"
+      version="11.0.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.scout.sdk.s2e"
       license-feature="org.eclipse.license"
@@ -38,9 +38,9 @@
    </url>
 
    <requires>
-      <import feature="org.eclipse.platform" version="4.13.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jdt" version="3.18.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.m2e.feature" version="1.13.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.platform" version="4.15.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.jdt" version="3.18.300" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.feature" version="1.15.0" match="greaterOrEqual"/>
       <import plugin="javax.wsdl" version="1.6.2" match="greaterOrEqual"/> <!-- Is included in the p2 update site via category.xml -->
    </requires>
 

@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>10.0.0-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.sdk</relativePath>
   </parent>
 
@@ -29,7 +29,7 @@
   <properties>
     <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
     <bundle.namespace>${project.artifactId}</bundle.namespace>
-    <bundle.version>10.0.0</bundle.version>
+    <bundle.version>11.0</bundle.version>
   </properties>
 
   <dependencies>
@@ -60,7 +60,7 @@
           <instructions>
             <Bundle-Name>Scout SDK Documentation</Bundle-Name>
             <Require-Bundle>
-              org.eclipse.help;bundle-version="[3.8,4)"
+              org.eclipse.help;bundle-version="[3.8.700,4)"
             </Require-Bundle>
           </instructions>
         </configuration>
