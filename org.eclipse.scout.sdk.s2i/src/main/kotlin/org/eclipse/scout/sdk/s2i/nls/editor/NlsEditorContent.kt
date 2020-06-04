@@ -172,8 +172,11 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
     private fun createToolbarActionGroup(): ActionGroup {
         val result = DefaultActionGroup()
         result.add(TranslationEditAction())
-        result.add(TranslationNewActionGroup())
+        result.add(TranslationNewAction())
         result.add(TranslationRemoveAction())
+        if (stack.allEditableStores().count() > 1) {
+            result.add(TranslationNewActionGroup())
+        }
         result.addSeparator()
         result.add(TranslationLocateActionGroup())
         result.add(ReloadAction())
@@ -217,7 +220,16 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         }
     }
 
-    private inner class TranslationNewActionGroup : AbstractEditableStoresAction(message("create.new.translation"), message("create.new.translation.in"), AllIcons.General.Add, {
+    private inner class TranslationNewAction : DumbAwareAction(message("create.new.translation.in.x", primaryStore.service().type().elementName()), null, AllIcons.General.Add) {
+
+        override fun update(e: AnActionEvent) {
+            e.presentation.isEnabled = primaryStore.isEditable
+        }
+
+        override fun actionPerformed(e: AnActionEvent) = TranslationNewDialogOpenAction(primaryStore).actionPerformed(e)
+    }
+
+    private inner class TranslationNewActionGroup : AbstractEditableStoresAction(message("create.new.translation.in.service"), message("create.new.translation.in"), AllIcons.CodeStyle.AddNewSectionRule, {
         TranslationNewDialogOpenAction(it)
     })
 
@@ -318,9 +330,12 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
     }
 
     private inner class LanguageNewAction : DumbAwareAction(message("add.new.language"), null, AllIcons.ToolbarDecorator.AddLink) {
-        override fun actionPerformed(e: AnActionEvent) {
-            LanguageNewDialog(project, primaryStore, stack).show()
+
+        override fun update(e: AnActionEvent) {
+            e.presentation.isEnabled = primaryStore.isEditable
         }
+
+        override fun actionPerformed(e: AnActionEvent) = LanguageNewDialog(project, primaryStore, stack).show()
     }
 
     private inner class ReloadAction : DumbAwareAction(message("reload.from.filesystem"), null, AllIcons.Actions.Refresh) {
@@ -335,6 +350,11 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
     }
 
     private inner class ImportFromClipboardAction : DumbAwareAction(message("import.translations.from.clipboard"), null, AllIcons.ToolbarDecorator.Import) {
+
+        override fun update(e: AnActionEvent) {
+            e.presentation.isEnabled = primaryStore.isEditable
+        }
+
         override fun actionPerformed(e: AnActionEvent) {
             val clipboardContent: String? = CoreUtils.getTextFromClipboard()
             if (clipboardContent == null) {
