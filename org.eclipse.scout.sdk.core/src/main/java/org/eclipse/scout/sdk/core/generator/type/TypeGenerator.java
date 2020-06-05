@@ -85,7 +85,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   private String m_superType;
   private String m_declaringFullyQualifiedName;
   private IJavaElementGenerator<?> m_declaringGenerator;
-  private boolean m_addAllNecessaryMehtods;
+  private boolean m_addAllNecessaryMethods;
   private IWorkingCopyTransformer m_unimplementedMethodsTransformer;
 
   protected TypeGenerator() {
@@ -246,14 +246,14 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     Stream<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> unimplementedMethods =
         UnimplementedMethodGenerator.create(this, builder.context().environment().orElseThrow(() -> newFail("Unimplemented methods can only be added if running with a java environment.")), m_unimplementedMethodsTransformer)
             .sorted(comparing(g -> g.elementName().orElse("")));
-    String startDelim;
+    String startDelimiter;
     if (m_members.size() == 1) {
-      startDelim = builder.context().lineDelimiter();
+      startDelimiter = builder.context().lineDelimiter();
     }
     else {
-      startDelim = null;
+      startDelimiter = null;
     }
-    builder.append(unimplementedMethods, startDelim, builder.context().lineDelimiter(), null);
+    builder.append(unimplementedMethods, startDelimiter, builder.context().lineDelimiter(), null);
   }
 
   @Override
@@ -398,7 +398,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     return m_members.stream()
         .filter(SortedMemberEntry::isMethod)
         .map(SortedMemberEntry::generator)
-        .map(g -> (IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>) g);
+        .map(g -> (IMethodGenerator<?, ?>) g);
   }
 
   @Override
@@ -440,14 +440,14 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   @Override
   public TYPE withoutAllMethodsImplemented() {
-    m_addAllNecessaryMehtods = false;
+    m_addAllNecessaryMethods = false;
     m_unimplementedMethodsTransformer = null;
     return currentInstance();
   }
 
   @Override
   public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded) {
-    m_addAllNecessaryMehtods = true;
+    m_addAllNecessaryMethods = true;
     m_unimplementedMethodsTransformer = callbackForMethodsAdded;
     return currentInstance();
   }
@@ -459,7 +459,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   @Override
   public boolean isWithAllMethodsImplemented() {
-    return m_addAllNecessaryMehtods;
+    return m_addAllNecessaryMethods;
   }
 
   @Override

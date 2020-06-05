@@ -83,7 +83,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
       return defaultTypeOrder((ITypeGenerator<?>) generator, m_index);
     }
     if (isMethod()) {
-      return defaultMethodOrder((IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>) generator, m_index);
+      return defaultMethodOrder((IMethodGenerator<?, ?>) generator, m_index);
     }
     return defaultFieldOrder((IFieldGenerator<?>) generator, m_index);
   }
