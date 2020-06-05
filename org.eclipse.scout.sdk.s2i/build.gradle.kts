@@ -16,7 +16,7 @@ import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
 
 val KOTLIN_VERSION = "1.3.61"
-val SCOUT_SDK_VERSION = "11.0-SNAPSHOT"
+val SCOUT_SDK_VERSION = "11.0.0-SNAPSHOT"
 val SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
 val JAVA_VERSION = JavaVersion.VERSION_1_8
 

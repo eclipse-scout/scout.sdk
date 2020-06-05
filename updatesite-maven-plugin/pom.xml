@@ -23,12 +23,12 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>updatesite-maven-plugin</artifactId>
-  <version>11.0-SNAPSHOT</version>
+  <version>11.0.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
-    <scout.base.version>11.0</scout.base.version>
+    <scout.base.version>11.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <maven.model.dependency.version>3.6.0</maven.model.dependency.version>
     <junit.version>5.5.1</junit.version>

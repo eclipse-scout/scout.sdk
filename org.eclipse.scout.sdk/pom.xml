@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk</artifactId>
-  <version>11.0-SNAPSHOT</version>
+  <version>11.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK</name>
   <description>Eclipse Scout SDK</description>
@@ -46,7 +46,7 @@
   </modules>
 
   <properties>
-    <scout.base.version>11.0</scout.base.version>
+    <scout.base.version>11.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt_version>11.0-SNAPSHOT</org.eclipse.scout.rt_version> <!-- Don't replace version number with scout.base.version: Required by regex replacement -->
 
@@ -127,78 +127,78 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.ecj</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2i</groupId>
         <artifactId>org.eclipse.scout.sdk.s2i</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
       </dependency>
 
       <!-- Build Dependencies -->
