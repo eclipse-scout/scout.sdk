@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import org.jetbrains.intellij.tasks.*
-import org.jetbrains.kotlin.gradle.tasks.*
+import org.jetbrains.intellij.tasks.PatchPluginXmlTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Clock
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
@@ -85,15 +85,14 @@ tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
-// https://docs.gradle.org/current/dsl/org.gradle.plugins.ide.idea.model.IdeaModule.html
-idea {
-    module {
-        // Fix problems caused by separate output directories for classes/resources in IntelliJ IDEA
-        inheritOutputDirs = true
-    }
-}
-
 tasks.jar {
     from("about.html")
     from("epl-v10.html")
+}
+
+publishing {
+    publications.register<MavenPublication>("eclipse.scout.sdk") {
+        from(components["java"])
+        artifact(project.buildDir.resolve("distributions/$group-$version.zip"))
+    }
 }
