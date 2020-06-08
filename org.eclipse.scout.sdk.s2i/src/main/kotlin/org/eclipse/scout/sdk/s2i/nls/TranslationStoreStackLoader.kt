@@ -59,15 +59,48 @@ class TranslationStoreStackLoader private constructor() {
 
     companion object {
 
+        /**
+         * Creates a [ModalLoader] to asynchronously create a [TranslationStoreStackLoaderResult].
+         * Use [ModalLoader.withStackCreatedHandler] and [ModalLoader.withErrorHandler] to register callbacks to be executed when the load finishes.
+         * [ModalLoader.queue] starts the computation. During the computation a modal progress indicator is displayed to the user.
+         *
+         * @param module The module for which the stack should be created.
+         * @param nlsFile An optional *.nls file within that module
+         * @param title An optional title to display in the modal progress bar
+         */
         fun createModalLoader(module: Module, nlsFile: VirtualFile? = null, title: String? = null) = ModalLoader(module, nlsFile, title)
 
+        /**
+         * Creates a [ModalLoader] to asynchronously create a [TranslationStoreStackLoaderResult].
+         * Use [ModalLoader.withStackCreatedHandler] and [ModalLoader.withErrorHandler] to register callbacks to be executed when the load finishes.
+         * [ModalLoader.queue] starts the computation. During the computation a modal progress indicator is displayed to the user.
+         *
+         * @param nlsFile The *.nls file that should be loaded
+         * @param project The [Project] in which it should loaded
+         * @param title An optional title to display in the modal progress bar
+         */
         fun createModalLoader(nlsFile: VirtualFile, project: Project, title: String? = null): ModalLoader {
             val module = nlsFile.containingModule(project) ?: throw newFail("Module of file '{}' not found.", nlsFile)
             return createModalLoader(module, nlsFile, title)
         }
 
+        /**
+         * Loads the [TranslationStoreStack] for the given [Module].
+         *
+         * The load is executed synchronously and may take some time. Therefore it is recommended to use [createModalLoader] instead which executes the load asynchronously showing a progress bar.
+         * @param module The module for which the stack should be created.
+         * @return A [TranslationStoreStackLoaderResult] which holds the [TranslationStoreStack] (amongst others). The result may be null if not stack can be found for the given [Module] (e.g. if it is no Scout module).
+         */
         fun createStack(module: Module) = createStack(module, null)?.stack
 
+        /**
+         * Loads the [TranslationStoreStack] for the given [Module].
+         *
+         * The load is executed synchronously and may take some time. Therefore it is recommended to use [createModalLoader] instead which executes the load asynchronously showing a progress bar.
+         * @param module The module for which the stack should be created.
+         * @param nlsFile An optional [VirtualFile] that points to a *.nls file. This file will then be used to calculate the primary store of the stack.
+         * @return A [TranslationStoreStackLoaderResult] which holds the [TranslationStoreStack] (amongst others). The result may be null if not stack can be found for the given [Module] (e.g. if it is no Scout module).
+         */
         fun createStack(module: Module, nlsFile: VirtualFile? = null): TranslationStoreStackLoaderResult? {
             val start = System.currentTimeMillis()
             return try {
