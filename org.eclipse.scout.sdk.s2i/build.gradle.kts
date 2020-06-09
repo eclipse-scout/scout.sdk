@@ -15,7 +15,6 @@ import java.time.Clock
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
 
-val KOTLIN_VERSION = "1.3.61"
 val SCOUT_SDK_VERSION = "10.0.0-SNAPSHOT"
 val SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
 val JAVA_VERSION = JavaVersion.VERSION_1_8
@@ -31,7 +30,7 @@ plugins {
     id("maven-publish")
     id("idea")
     id("org.jetbrains.intellij") version "0.4.21"
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.3.72"
 }
 
 group = "org.eclipse.scout.sdk.s2i"
@@ -46,7 +45,7 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", SCOUT_SDK_VERSION)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", SCOUT_SDK_VERSION)
     api("org.apache.commons", "commons-csv", "1.8")
-    implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", KOTLIN_VERSION)
+    implementation(kotlin("stdlib-jdk8"))
     testImplementation("org.mockito", "mockito-core", "3.3.3")
 }
 
@@ -88,11 +87,4 @@ tasks.withType<KotlinCompile>().configureEach {
 tasks.jar {
     from("about.html")
     from("epl-v10.html")
-}
-
-publishing {
-    publications.register<MavenPublication>("eclipse.scout.sdk") {
-        from(components["java"])
-        artifact(project.buildDir.resolve("distributions/$group-$version.zip"))
-    }
 }
