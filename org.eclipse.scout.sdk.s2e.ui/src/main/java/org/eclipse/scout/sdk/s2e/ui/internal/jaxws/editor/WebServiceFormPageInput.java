@@ -494,6 +494,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
       Path wsdlFolderRelativePath = AbstractWebServiceNewOperation.getWsdlRootFolder(projectPath).relativize(getWsdl());
       List<String> paths = JaxWsUtils.getBindingPathsFromPom(pomDocument, wsdlFolderRelativePath.toString().replace('\\', '/'));
       if (paths.isEmpty()) {
+        //noinspection NestedTryStatement
         try (Stream<Path> ps = Files.list(bindingFolder)) {
           ps.filter(Files::isReadable)
               .filter(Files::isRegularFile)

@@ -31,7 +31,7 @@ class NlsCompletionHelper private constructor() {
             }
         }
 
-        fun computeLookupElements(module: Module, lookupStringProvider: (ITranslationEntry) -> String = { it.key() }) =
+        fun computeLookupElements(module: Module, lookupStringProvider: (ITranslationEntry) -> String = { it.key() }): Stream<LookupElementBuilder> =
                 createStack(module)
                         ?.allEntries()
                         ?.map { lookupElementFor(it, lookupStringProvider) } ?: Stream.empty()
