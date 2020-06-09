@@ -42,7 +42,7 @@ public abstract class AbstractBooleanPermutationArgumentsProvider implements Arg
   protected static Object[] toBoolArray(int numBits, long mask) {
     Object[] result = new Object[numBits];
     for (int pos = 0; pos < result.length; pos++) {
-      result[pos] = (mask & (1 << pos)) != 0;
+      result[pos] = (mask & (1L << pos)) != 0;
     }
     return result;
   }

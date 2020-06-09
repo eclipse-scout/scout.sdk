@@ -62,15 +62,12 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
     }
 
     Optional<DataAnnotationDescriptor> dataAnnotation = findDataAnnotationForRowData(modelType);
-    if (dataAnnotation.isPresent()) {
-      return getInput()
-          .getSourceFolderOf(dataAnnotation.get().getDataType(), env)
-          .flatMap(derivedSourceFolder -> DtoGeneratorFactory
-              .createTableRowDataGenerator(modelType, derivedSourceFolder.javaEnvironment(), dataAnnotation.get())
-              .map(g -> env.writeCompilationUnitAsync(g, derivedSourceFolder, progress)));
-    }
+    return dataAnnotation.flatMap(dataAnnotationDescriptor -> getInput()
+        .getSourceFolderOf(dataAnnotationDescriptor.getDataType(), env)
+        .flatMap(derivedSourceFolder -> DtoGeneratorFactory
+            .createTableRowDataGenerator(modelType, derivedSourceFolder.javaEnvironment(), dataAnnotationDescriptor)
+            .map(g -> env.writeCompilationUnitAsync(g, derivedSourceFolder, progress))));
 
-    return Optional.empty();
   }
 
   protected static Optional<FormDataAnnotationDescriptor> findDataAnnotationForFormData(IType model) {

@@ -9,13 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import org.jetbrains.intellij.tasks.*
-import org.jetbrains.kotlin.gradle.tasks.*
+import org.jetbrains.intellij.tasks.PatchPluginXmlTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Clock
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
 
-val KOTLIN_VERSION = "1.3.61"
 val SCOUT_SDK_VERSION = "11.0.0-SNAPSHOT"
 val SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
 val JAVA_VERSION = JavaVersion.VERSION_1_8
@@ -31,7 +30,7 @@ plugins {
     id("maven-publish")
     id("idea")
     id("org.jetbrains.intellij") version "0.4.21"
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.3.72"
 }
 
 group = "org.eclipse.scout.sdk.s2i"
@@ -46,7 +45,7 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", SCOUT_SDK_VERSION)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", SCOUT_SDK_VERSION)
     api("org.apache.commons", "commons-csv", "1.8")
-    implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", KOTLIN_VERSION)
+    implementation(kotlin("stdlib-jdk8"))
     testImplementation("org.mockito", "mockito-core", "3.3.3")
 }
 
@@ -82,14 +81,6 @@ tasks.withType<KotlinCompile>().configureEach {
         jvmTarget = JAVA_VERSION.toString()
         apiVersion = "1.3"
         languageVersion = "1.3"
-    }
-}
-
-// https://docs.gradle.org/current/dsl/org.gradle.plugins.ide.idea.model.IdeaModule.html
-idea {
-    module {
-        // Fix problems caused by separate output directories for classes/resources in IntelliJ IDEA
-        inheritOutputDirs = true
     }
 }
 

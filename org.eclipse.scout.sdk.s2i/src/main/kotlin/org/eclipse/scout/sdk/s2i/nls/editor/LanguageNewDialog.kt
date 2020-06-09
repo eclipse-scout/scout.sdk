@@ -40,7 +40,7 @@ class LanguageNewDialog(val project: Project, val store: ITranslationStore, val 
                 .filter { !store.containsLanguage(it) }
                 .sorted()
                 .toTypedArray()
-        val comboBox = ComboBox<Language>(allLanguages)
+        val comboBox = ComboBox(allLanguages)
         rootPanel.add(comboBox)
         m_comboBox = comboBox
         return rootPanel
