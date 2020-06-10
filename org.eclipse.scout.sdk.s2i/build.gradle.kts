@@ -88,3 +88,13 @@ tasks.jar {
     from("about.html")
     from("epl-v10.html")
 }
+
+publishing {
+    publications {
+        // add plugin zip to publications so that it is included in the deployed artifacts
+        create<MavenPublication>("mavenJava") {
+            artifact("$buildDir/distributions/$group-$version.zip")
+            from(components["java"])
+        }
+    }
+}
