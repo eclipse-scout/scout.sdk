@@ -56,6 +56,9 @@ import java.util.stream.Stream
 
 private val useLegacyMatcher: FinalValue<Boolean> = FinalValue()
 
+/**
+ * @return The [PsiClass] corresponding to this [IType].
+ */
 fun IType.resolvePsi(): PsiClass? {
     val module = this.javaEnvironment().toIdea().module
     return computeInReadAction(module.project) {
@@ -67,6 +70,9 @@ fun IType.resolvePsi(): PsiClass? {
 
 fun ProgressIndicator.toScoutProgress(): IdeaProgress = IdeaProgress(this)
 
+/**
+ * @return the module source root (source folder) or library source root in which this PsiElement exists.
+ */
 fun PsiElement.resolveSourceRoot(): VirtualFile? {
     return this.containingFile
             ?.virtualFile
@@ -91,6 +97,10 @@ fun PsiClass.toScoutType(env: IdeaEnvironment, returnReferencingModuleIfNotInFil
                 ?.let { env.toScoutJavaEnvironment(it) }
                 ?.let { toScoutType(it) }
 
+/**
+ * @param env The [IJavaEnvironment] in which the type should be searched.
+ * @return The [IType] within the given [IJavaEnvironment] that corresponds to this [PsiClass]
+ */
 fun PsiClass.toScoutType(env: IJavaEnvironment): IType? {
     val fqn = computeInReadAction(this.project) { this.qualifiedName }
     return env.findType(fqn).orElse(null)
@@ -120,12 +130,22 @@ fun PsiElement.containingModule(returnReferencingModuleIfNotInFilesystem: Boolea
 
 fun IProgress.toIdea(): IdeaProgress = this as IdeaProgress
 
+/**
+ * @return true if this [Module] has a Java SDK.
+ */
 fun Module.isJavaModule(): Boolean = ModuleRootManager.getInstance(this).sdk?.sdkType == JavaSdk.getInstance()
 
 fun IEnvironment.toIdea(): IdeaEnvironment = this as IdeaEnvironment
 
 fun IJavaEnvironment.toIdea(): JavaEnvironmentWithIdea = this.unwrap() as JavaEnvironmentWithIdea
 
+/**
+ * @param scope The scope in which the PsiClasses should be searched.
+ * @param checkDeep true if deep search should be performed.
+ * @param includeAnonymous true if anonymous sub classes should be returned as well.
+ * @param includeRoot true if the root [PsiClass] should be returned as well.
+ * @return all sub types of this [PsiClass] that fulfill the given filter options.
+ */
 fun PsiClass.newSubTypeHierarchy(scope: SearchScope, checkDeep: Boolean, includeAnonymous: Boolean, includeRoot: Boolean): Query<PsiClass> {
     val children = ClassInheritorsSearch.search(this, scope, checkDeep, true, includeAnonymous)
     if (!includeRoot) {
@@ -137,12 +157,19 @@ fun PsiClass.newSubTypeHierarchy(scope: SearchScope, checkDeep: Boolean, include
     return CollectionQuery(resultWithRoot)
 }
 
+/**
+ * @return The [VirtualFile] that corresponds to this [Path].
+ */
 fun Path.toVirtualFile() = VfsUtil.findFile(this, true)
         ?.takeIf { it.isValid }
 
-fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope) = findAllTypesAnnotatedWith(annotation, scope, null)
-
-fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, indicator: ProgressIndicator?): Sequence<PsiClass> {
+/**
+ * @param annotation The fully qualified name of the annotation the class must have.
+ * @param scope The scope in which the classes should be searched.
+ * @param indicator An optional indicator to report progress.
+ * @return All PsiClasses within the given [scope] that have an annotation with the given fully qualified name.
+ */
+fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, indicator: ProgressIndicator? = null): Sequence<PsiClass> {
     val options = MatchOptions()
     options.dialect = JavaLanguage.INSTANCE
     options.isCaseSensitiveMatch = true
@@ -162,6 +189,12 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, in
             .map { it as PsiClass }
 }
 
+/**
+ * Performs the given structural search query.
+ * @param query The search to execute
+ * @param indicator An optional indicator to report progress
+ * @return A [MatchResult] sequence
+ */
 fun Project.structuralSearch(query: MatchOptions, indicator: ProgressIndicator?): Sequence<MatchResult> {
     val progress = indicator ?: EmptyProgressIndicator()
     val result = object : CollectingMatchResultSink() {
@@ -216,36 +249,59 @@ private fun findMatchesNew(matcher: Matcher, result: MatchResultSink) = findMatc
 
 private fun findMatchesLegacy(matcher: Matcher, result: MatchResultSink, options: MatchOptions) = findMatchesMethodLegacy().invoke(matcher, result, options)
 
+/**
+ * Finds all PsiClasses in this project having the given fully qualified name.
+ * @param fqn The fully qualified name to search
+ * @return A [Set] with all [PsiClass] instances having the given fully qualified name.
+ */
 fun Project.findTypesByName(fqn: String) = findTypesByName(fqn, GlobalSearchScope.allScope(this))
 
+/**
+ * @param fqn The fully qualified name to search
+ * @param scope The scope filter
+ * @return all PsiClasses within the given [GlobalSearchScope] having the given fully qualified name.
+ */
 fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
-        computeInReadAction(this) {
-            JavaPsiFacade.getInstance(this)
-                    .findClasses(fqn, scope)
-                    .toSet()
-        }
+        computeInReadAction(this) { JavaPsiFacade.getInstance(this).findClasses(fqn, scope) }
                 .filter { it.isValid }
+                .toSet()
 
 /**
  * @return A [Path] representing this [VirtualFile].
  */
-fun VirtualFile.getNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath() // don't use toNioPath as method name because this name already exists in VirtualFile since IJ 2020.2
+fun VirtualFile.getNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath() // don't use toNioPath as method name because this name already exists in VirtualFile since IJ 2020.2. Can be removed if IJ 2020.2 is the oldest supported release.
 
+/**
+ * @return The [Module] within the given [Project] in which this file exists.
+ */
 fun VirtualFile.containingModule(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
 
+/**
+ * @return The directory [Path] of this [Module].
+ */
 fun Module.moduleDirPath(): Path = Paths.get(ModuleUtil.getModuleDirPath(this))
 
+/**
+ * Executes the given [IBreadthFirstVisitor] on all super classes. The starting [PsiClass] is visited as well.
+ * @param visitor The [IBreadthFirstVisitor] to execute.
+ * @return The result from the last call to the visitor.
+ */
 fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResult {
     val supplier: Function<PsiClass, Stream<out PsiClass>> = Function { a -> a.supers.stream() }
     return TreeTraversals.create(visitor, supplier).traverse(this)
 }
 
-fun PsiClass.isInstanceOf(vararg parentFqn: String): Boolean =
-        computeInReadAction(project) {
-            visitSupers(IBreadthFirstVisitor { element, _, _ ->
-                if (parentFqn.contains(element.qualifiedName))
-                    TreeVisitResult.TERMINATE
-                else
-                    TreeVisitResult.CONTINUE
-            }) == TreeVisitResult.TERMINATE
-        }
+/**
+ * Checks if this [PsiClass] has at least one of the given fully qualified names in its super hierarchy.
+ * @param parentFqn The fully qualified names to check
+ * @return true if this [PsiClass] is instanceof at least one of the names given.
+ */
+fun PsiClass.isInstanceOf(vararg parentFqn: String): Boolean = computeInReadAction(project) {
+    val visitor: IBreadthFirstVisitor<PsiClass> = IBreadthFirstVisitor { element, _, _ ->
+        if (parentFqn.contains(element.qualifiedName))
+            TreeVisitResult.TERMINATE
+        else
+            TreeVisitResult.CONTINUE
+    }
+    visitSupers(visitor) == TreeVisitResult.TERMINATE
+}
