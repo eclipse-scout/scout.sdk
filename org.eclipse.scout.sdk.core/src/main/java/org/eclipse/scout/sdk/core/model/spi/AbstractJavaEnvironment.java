@@ -89,11 +89,18 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
    */
   protected abstract Collection<JavaElementSpi> allElements();
 
-  protected void reinitialize() {
+  protected void cleanup() {
     synchronized (lock()) { // ensure instance lock is acquired because the clear of the map uses its own lock as well which might lead to deadlocks
       m_typeCache.clear();
       m_api.spiChanged();
     }
+  }
+
+  protected void onReloadStart() {
+    cleanup();
+  }
+
+  protected void onReloadEnd() {
   }
 
   protected Object removeTypeFromCache(String fqn) {
@@ -111,25 +118,26 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
   @SuppressWarnings("unchecked")
   public void reload() {
     synchronized (lock()) {
-
       // this includes all TypeSPIs as well. So no need to include m_typeCache from here.
       Iterable<JavaElementSpi> detachedSpiElements = new ArrayList<>(allElements()); // create a new list here because the elements are cleared afterwards in reinitialize
+      onReloadStart();
+      try {
+        // reconnect all new SPI/API mappings
+        for (JavaElementSpi old : detachedSpiElements) {
+          AbstractSpiElement<? extends IJavaElement> oldSpiElement = (AbstractSpiElement<? extends IJavaElement>) old;
+          AbstractJavaElementImplementor<JavaElementSpi> apiElement = (AbstractJavaElementImplementor<JavaElementSpi>) oldSpiElement.wrap();
+          JavaElementSpi newSpiElement = oldSpiElement.internalFindNewElement();
 
-      reinitialize();
-      m_api.spiChanged(); // flush caches
+          apiElement.internalSetSpi(newSpiElement);
+          if (newSpiElement != null) {
+            ((AbstractSpiElement<IJavaElement>) newSpiElement).internalSetApi(apiElement);
+          }
 
-      // reconnect all new SPI/API mappings
-      for (JavaElementSpi old : detachedSpiElements) {
-        AbstractSpiElement<? extends IJavaElement> oldSpiElement = (AbstractSpiElement<? extends IJavaElement>) old;
-        AbstractJavaElementImplementor<JavaElementSpi> apiElement = (AbstractJavaElementImplementor<JavaElementSpi>) oldSpiElement.wrap();
-        JavaElementSpi newSpiElement = oldSpiElement.internalFindNewElement();
-
-        apiElement.internalSetSpi(newSpiElement);
-        if (newSpiElement != null) {
-          ((AbstractSpiElement<IJavaElement>) newSpiElement).internalSetApi(apiElement);
+          oldSpiElement.internalSetApi(null); // detach old SPI from API
         }
-
-        oldSpiElement.internalSetApi(null); // detach old SPI from API
+      }
+      finally {
+        onReloadEnd();
       }
     }
   }

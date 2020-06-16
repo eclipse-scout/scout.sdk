@@ -98,6 +98,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   private FinalValue<FileSystemWithOverride> m_fs;
   private FinalValue<EcjAstCompiler> m_compiler;
   private FinalValue<List<ClasspathSpi>> m_classpath;
+  private FileSystemWithOverride m_oldFsDuringReload;
 
   // state
   private volatile boolean m_initialized;
@@ -194,12 +195,14 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   @Override
-  protected void reinitialize() {
-    runPreservingOverrides(this, this, this::doReinitialize);
+  protected void onReloadStart() {
+    runPreservingOverrides(this, this, this::doReloadStart);
   }
 
-  private void doReinitialize() {
-    clear();
+  private void doReloadStart() {
+    // backup old FS so that it can be closed after the reload
+    m_oldFsDuringReload = m_fs.get();
+    clear(false); // old FS is still used during reload (to find new SPIs). Do not close it here already.
     m_initialized = true;
   }
 
@@ -220,24 +223,34 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   private void doClose() {
-    clear();
+    clear(true);
     m_initialized = false;
   }
 
-  private void clear() {
-    super.reinitialize();
+  private void clear(boolean closeFs) {
+    cleanup();
     m_elements.clear();
     m_evpCache.clear();
     m_mvpCache.clear();
     m_sourceCache.clear();
 
-    FileSystemWithOverride filesystem = m_fs.get();
-    m_fs = new FinalValue<>(); // remove the current filesystem before closing it
-    if (filesystem != null) {
-      filesystem.cleanup();
+    FileSystemWithOverride oldFs = m_fs.get();
+    m_fs = new FinalValue<>(); // remove the current file system before closing it
+    if (closeFs && oldFs != null) {
+      oldFs.cleanup();
     }
     m_compiler = new FinalValue<>();
     m_classpath = new FinalValue<>();
+  }
+
+  @Override
+  protected void onReloadEnd() {
+    super.onReloadEnd();
+    FileSystemWithOverride oldFs = m_oldFsDuringReload;
+    if (oldFs != null) {
+      oldFs.cleanup();
+      m_oldFsDuringReload = null;
+    }
   }
 
   @Override

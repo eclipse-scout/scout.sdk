@@ -166,7 +166,7 @@ public class StringsTest {
   @Test
   public void testEscapeHtml() {
     assertEquals("", escapeHtml(""));
-    assertEquals("a&#38;&#60;&#62;&#92;&#47;&#39;&#39;b", escapeHtml("a&<>\"/''b").toString());
+    assertEquals("a&#38;&#60;&#62;&#34;&#47;&#39;&#39;b", escapeHtml("a&<>\"/''b").toString());
     assertNull(escapeHtml(null));
   }
 
