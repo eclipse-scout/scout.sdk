@@ -221,9 +221,9 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
   }
 
   @Override
-  protected void reinitialize() {
+  protected void cleanup() {
     m_classpath = new FinalValue<>();
-    super.reinitialize();
+    super.cleanup();
   }
 
   @Override
