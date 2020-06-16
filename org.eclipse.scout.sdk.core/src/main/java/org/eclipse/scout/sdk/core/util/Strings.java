@@ -408,6 +408,7 @@ public final class Strings {
    * @throws NullPointerException
    *           if searchIn is {@code null} or toBeFound is {@code null}
    */
+  @SuppressWarnings("IfStatementWithIdenticalBranches")
   public static int indexOf(char[] toBeFound, char[] searchIn, int start, int end, boolean isCaseSensitive) {
     int toBeFoundLength = toBeFound.length;
     if (toBeFoundLength > end || start < 0) {
@@ -747,7 +748,7 @@ public final class Strings {
 
   /**
    * Creates a {@link String} holding the content of the file specified.
-   * 
+   *
    * @param file
    *          The file to load. Must not be {@code null}.
    * @param charset
@@ -900,7 +901,7 @@ public final class Strings {
 
   /**
    * Removes leading or trailing double quotes ("), single quotes (') or back ticks (`) from the input.
-   * 
+   *
    * @param literal
    *          The literal from which the quotes should be removed.
    * @return The input with removed quotes.
@@ -912,7 +913,7 @@ public final class Strings {
   /**
    * Removes leading and trailing quotes (if existing) from the literal given.<br>
    * Only the first quotes are removed. If there are nested quotes, the are part of the result.
-   * 
+   *
    * @param literal
    *          The literal from which the quotes should be removed.
    * @param removeDouble
@@ -969,7 +970,7 @@ public final class Strings {
   public static CharSequence escapeHtml(CharSequence html) {
     return replaceEach(html,
         new CharSequence[]{"\"", "&", "<", ">", "'", "/"},
-        new CharSequence[]{"&#92;", "&#38;", "&#60;", "&#62;", "&#39;", "&#47;"});
+        new CharSequence[]{"&#34;", "&#38;", "&#60;", "&#62;", "&#39;", "&#47;"});
   }
 
   /**
