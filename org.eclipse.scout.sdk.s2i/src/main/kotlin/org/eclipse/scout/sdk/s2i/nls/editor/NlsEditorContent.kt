@@ -370,7 +370,8 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         }
 
         fun parseCsv(content: String): List<List<String>>? {
-            return listOf(CSVFormat.TDF, CSVFormat.EXCEL, CSVFormat.DEFAULT, CSVFormat.RFC4180, CSVFormat.POSTGRESQL_CSV, CSVFormat.POSTGRESQL_TEXT, CSVFormat.MYSQL, CSVFormat.ORACLE)
+            return CSVFormat.Predefined.values()
+                    .map { it.format }
                     .mapNotNull { tryParseUsing(it, content) }
                     .firstOrNull()
         }
@@ -383,9 +384,16 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
                 }
                 val result = ArrayList<ArrayList<String>>(lines.size)
                 for (record in lines) {
+                    if (record.size() < 2) {
+                        // it cannot be a valid row: not enough columns
+                        continue
+                    }
                     val row = ArrayList<String>(record.size())
                     row.addAll(record)
                     result.add(row)
+                }
+                if (result.isEmpty()) {
+                    return null
                 }
                 return result
             } catch (e: Exception) {

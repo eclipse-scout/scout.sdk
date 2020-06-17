@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.function.Predicate.isEqual;
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createAddLanguageEvent;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createAddTranslationEvent;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createChangeKeyEvent;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -214,7 +216,7 @@ public class TranslationStoreStack {
 
   protected ITranslationEntry addNewTranslationInternal(ITranslation newTranslation, IEditableTranslationStore target) {
     Optional<? extends ITranslationEntry> existingEntryWithSameKey = translation(newTranslation.key());
-    ITranslationEntry createdTranslation = target.addNewTranslation(newTranslation);
+    ITranslationEntry createdTranslation = editStoreObservingLanguages(target, s -> s.addNewTranslation(newTranslation));
 
     setChanging(true);
     try {
@@ -400,9 +402,26 @@ public class TranslationStoreStack {
   }
 
   protected ITranslationEntry updateTranslationInternal(ITranslation newEntry, IEditableTranslationStore storeToUpdate) {
-    ITranslationEntry updateTranslation = storeToUpdate.updateTranslation(newEntry);
+    ITranslationEntry updateTranslation = editStoreObservingLanguages(storeToUpdate, s -> s.updateTranslation(newEntry));
     fireStackChanged(createUpdateTranslationEvent(this, updateTranslation));
     return updateTranslation;
+  }
+
+  protected <T> T editStoreObservingLanguages(IEditableTranslationStore storeToObserve, Function<IEditableTranslationStore, T> task) {
+    Set<Language> oldLanguages = storeToObserve.languages().collect(toSet());
+    try {
+      return task.apply(storeToObserve);
+    }
+    finally {
+      fireAddLanguageForCreatedLanguages(storeToObserve, oldLanguages);
+    }
+  }
+
+  protected void fireAddLanguageForCreatedLanguages(ITranslationStore storeToObserve, Collection<Language> oldLanguages) {
+    storeToObserve.languages()
+        .filter(newLang -> !oldLanguages.contains(newLang))
+        .map(lang -> TranslationStoreStackEvent.createAddLanguageEvent(this, lang))
+        .forEach(this::fireStackChanged);
   }
 
   /**

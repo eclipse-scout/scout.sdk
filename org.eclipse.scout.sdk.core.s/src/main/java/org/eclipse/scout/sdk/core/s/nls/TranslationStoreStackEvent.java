@@ -10,8 +10,13 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
 import java.util.Objects;
 import java.util.Optional;
+import java.util.StringJoiner;
+
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link TranslationStoreStackEvent}</h3>
@@ -165,6 +170,43 @@ public final class TranslationStoreStackEvent {
    */
   public Optional<Language> language() {
     return Optional.ofNullable(m_language);
+  }
+
+  static String typeName(int type) {
+    switch (type) {
+      case TYPE_NEW_TRANSLATION:
+        return "NewTranslation";
+      case TYPE_KEY_CHANGED:
+        return "KeyChange";
+      case TYPE_REMOVE_TRANSLATION:
+        return "RemoveTranslation";
+      case TYPE_NEW_LANGUAGE:
+        return "NewLanguage";
+      case TYPE_RELOAD:
+        return "Reload";
+      case TYPE_UPDATE_TRANSLATION:
+        return "UpdateTranslation";
+      case TYPE_FLUSH:
+        return "Flush";
+      default:
+        throw newFail("Unknown event type '{}'.", type);
+    }
+  }
+
+  @Override
+  public String toString() {
+    StringJoiner joiner = new StringJoiner(", ", TranslationStoreStackEvent.class.getSimpleName() + " [", "]")
+        .add("type=" + typeName(m_type));
+    if (Strings.hasText(m_key)) {
+      joiner.add("key=" + m_key);
+    }
+    if (m_type == TYPE_KEY_CHANGED && m_entry != null) {
+      joiner.add("newKey=" + m_entry.key());
+    }
+    if (m_language != null) {
+      joiner.add("language=" + m_language);
+    }
+    return joiner.toString();
   }
 
   @Override

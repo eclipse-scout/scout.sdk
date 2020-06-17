@@ -61,6 +61,16 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
 
     fun rowForTranslation(translation: ITranslationEntry) = translations().indexOf(translation)
 
+    fun rowForTranslationWithKey(key: String): Int {
+        val translations = translations()
+        for (i in 0 until translations.size) {
+            if (translations[i].key() == key) {
+                return i
+            }
+        }
+        return -1
+    }
+
     private fun acceptFilter(candidate: ITranslationEntry) = m_filter?.test(candidate) ?: true
 
     private fun buildCache(forceReload: Boolean = false): Boolean {
@@ -191,7 +201,10 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
         }
 
         private fun translationsUpdated(event: TranslationStoreStackEvent) = event.entry().ifPresent {
-            val index = rowForTranslation(it)
+            val index = rowForTranslationWithKey(it.key())
+            if (index < 0) {
+                return@ifPresent
+            }
             fireTableRowsUpdated(index, index)
         }
 
@@ -203,7 +216,10 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
         }
 
         private fun translationsRemoved(event: TranslationStoreStackEvent) = event.entry().ifPresent {
-            val index = rowForTranslation(it)
+            val index = rowForTranslationWithKey(it.key())
+            if (index < 0) {
+                return@ifPresent
+            }
             translations().removeAt(index)
             fireTableRowsDeleted(index, index)
         }

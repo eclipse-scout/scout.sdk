@@ -15,6 +15,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreSupplierExtension.testingStack;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -115,6 +116,33 @@ public class TranslationStoreStackTest {
     assertThrows(IllegalArgumentException.class, () -> stack.addNewLanguage(deCh, stack.allStores().filter(s -> !s.isEditable()).findAny().get()));
     assertThrows(IllegalArgumentException.class, () -> stack.addNewLanguage(null, stack.primaryEditableStore().get()));
     assertThrows(IllegalArgumentException.class, () -> stack.addNewLanguage(deCh, newStore));
+  }
+
+  @Test
+  public void testAutoCreateNewLanguage(TestingEnvironment env) {
+    TranslationStoreStack stack = testingStack(env);
+    List<TranslationStoreStackEvent> eventProtocol = new ArrayList<>();
+    stack.addListener(events -> events.forEach(eventProtocol::add));
+
+    Translation update = new Translation(TranslationStoreSupplierExtension.TRANSLATION_KEY_2);
+    Language newLang = Language.parseThrowingOnError("ru_DE");
+    update.putText(Language.LANGUAGE_DEFAULT, "default");
+    update.putText(newLang, "ru-de");
+    stack.updateTranslation(update);
+
+    String newKey = "newKeyWithExtraLang";
+    Translation add = new Translation(newKey);
+    Language addLang = Language.parseThrowingOnError("tr_DE");
+    add.putText(Language.LANGUAGE_DEFAULT, "default");
+    add.putText(addLang, "tr-de");
+    stack.addNewTranslation(add);
+
+    assertTrue(stack.primaryEditableStore().get().containsLanguage(newLang));
+    assertTrue(stack.primaryEditableStore().get().containsLanguage(addLang));
+
+    assertEquals(4, eventProtocol.size());
+    List<TranslationStoreStackEvent> newLangEvents = eventProtocol.stream().filter(e -> e.type() == TranslationStoreStackEvent.TYPE_NEW_LANGUAGE).collect(toList());
+    assertEquals(2, newLangEvents.size());
   }
 
   @Test
