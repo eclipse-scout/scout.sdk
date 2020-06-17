@@ -211,11 +211,17 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
     }
 
     fun selectTranslation(translation: ITranslationEntry) {
-        val row = m_table.convertRowIndexToView(m_model.rowForTranslation(translation))
-        if (row >= 0) {
-            m_table.setRowSelectionInterval(row, row)
-            m_table.scrollToSelection()
+        val modelRow = m_model.rowForTranslation(translation)
+        if (modelRow < 0) {
+            return
         }
+
+        val row = m_table.convertRowIndexToView(modelRow)
+        if (row < 0) {
+            return
+        }
+        m_table.setRowSelectionInterval(row, row)
+        m_table.scrollToSelection()
     }
 
     fun setFilter(newFilter: Predicate<ITranslationEntry>?) {
