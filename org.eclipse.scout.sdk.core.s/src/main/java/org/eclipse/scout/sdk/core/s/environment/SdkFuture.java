@@ -125,6 +125,7 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
    * @param futures
    *          The futures to wait for
    */
+  @SuppressWarnings("squid:S1166") // Log or rethrow composite exception not necessary
   public static void awaitAllLoggingOnError(Iterable<IFuture<?>> futures) {
     try {
       awaitAll(futures);
