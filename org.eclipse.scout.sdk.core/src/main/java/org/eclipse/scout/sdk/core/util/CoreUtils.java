@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.util;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
@@ -400,26 +399,6 @@ public final class CoreUtils {
   }
 
   /**
-   * @return the clipboard content as plain text or {@code null} if there is no plain text in the clipboard.
-   */
-  public static String getTextFromClipboard() {
-    if (GraphicsEnvironment.isHeadless()) {
-      return null;
-    }
-    try {
-      Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      Object data = systemClipboard.getData(DataFlavor.stringFlavor);
-      if (data != null) {
-        return data.toString();
-      }
-    }
-    catch (Exception e) {
-      SdkLog.debug("Unable to read plain text from system clipboard.", e);
-    }
-    return null;
-  }
-
-  /**
    * Sets the given {@link String} into the system clipboard
    *
    * @param text
@@ -440,7 +419,7 @@ public final class CoreUtils {
    * @return {@code true} if the text has been successfully set to the system clipboard.
    */
   public static boolean setTextToClipboard(String text, ClipboardOwner ownershipLostCallback) {
-    if (GraphicsEnvironment.isHeadless() || text == null) {
+    if (GraphicsEnvironment.isHeadless()) {
       return false;
     }
 
