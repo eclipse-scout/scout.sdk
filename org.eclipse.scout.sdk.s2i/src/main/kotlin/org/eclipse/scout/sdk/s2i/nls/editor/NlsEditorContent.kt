@@ -14,6 +14,8 @@ import com.intellij.find.impl.RegExHelpPopup
 import com.intellij.icons.AllIcons
 import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.fileChooser.FileChooser
+import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -31,9 +33,7 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
-import org.apache.commons.csv.CSVFormat
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.s.nls.*
 import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
 import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
@@ -41,16 +41,18 @@ import org.eclipse.scout.sdk.core.s.nls.properties.ReadOnlyTranslationFile
 import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.getNioPath
 import org.eclipse.scout.sdk.s2i.resolvePsi
 import org.eclipse.scout.sdk.s2i.toScoutProgress
 import org.eclipse.scout.sdk.s2i.toVirtualFile
 import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
+import org.eclipse.scout.sdk.s2i.util.XlsxReader
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
 import java.awt.Point
-import java.io.StringReader
+import java.text.NumberFormat
 import java.util.concurrent.TimeUnit
 import java.util.function.Predicate
 import java.util.regex.Pattern
@@ -183,7 +185,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         result.addSeparator()
         result.add(LanguageNewAction())
         result.addSeparator()
-        result.add(ImportFromClipboardAction())
+        result.add(ImportFromExcelAction())
         result.add(ExportToClipboardAction())
         return result
     }
@@ -349,63 +351,35 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         }
     }
 
-    private inner class ImportFromClipboardAction : DumbAwareAction(message("import.translations.from.clipboard"), null, AllIcons.ToolbarDecorator.Import) {
+    private inner class ImportFromExcelAction : DumbAwareAction(message("import.translations.from.excel"), null, AllIcons.ToolbarDecorator.Import) {
 
         override fun update(e: AnActionEvent) {
             e.presentation.isEnabled = primaryStore.isEditable
         }
 
         override fun actionPerformed(e: AnActionEvent) {
-            val clipboardContent: String? = CoreUtils.getTextFromClipboard()
-            if (clipboardContent == null) {
-                showBalloon(message("clipboard.no.text.content"), MessageType.ERROR)
-                return
-            }
-            val data = parseCsv(clipboardContent)
-            if (data == null) {
-                showBalloon(message("clipboard.no.valid.content"), MessageType.ERROR)
-                return
-            }
-            handleResult(stack.importTranslations(data, NlsTableModel.KEY_COLUMN_HEADER_NAME, primaryStore))
-        }
-
-        fun parseCsv(content: String): List<List<String>>? {
-            return CSVFormat.Predefined.values()
-                    .map { it.format }
-                    .mapNotNull { tryParseUsing(it, content) }
-                    .firstOrNull()
-        }
-
-        private fun tryParseUsing(format: CSVFormat, content: String): List<List<String>>? {
+            val descriptor = FileChooserDescriptor(true, false, false, false, false, false)
+                    .withDescription(message("please.choose.the.xlsx.file.to.import"))
+                    .withTitle(message("import.translations.from.excel"))
+                    .withFileFilter { it.isValid && it.exists() && it.extension == "xlsx" }
+            val file = FileChooser.chooseFile(descriptor, project, null) ?: return
             try {
-                val lines = format.parse(StringReader(content)).records
-                if (lines.size < 2) {
-                    return null
+                val data = XlsxReader().parse(file.getNioPath().toFile())
+                if (data.isEmpty()) {
+                    showBalloon(message("file.no.valid.content"), MessageType.ERROR)
+                    return
                 }
-                val result = ArrayList<ArrayList<String>>(lines.size)
-                for (record in lines) {
-                    if (record.size() < 2) {
-                        // it cannot be a valid row: not enough columns
-                        continue
-                    }
-                    val row = ArrayList<String>(record.size())
-                    row.addAll(record)
-                    result.add(row)
-                }
-                if (result.isEmpty()) {
-                    return null
-                }
-                return result
-            } catch (e: Exception) {
-                SdkLog.debug("Unable to parse clipboard content as csv using format '{}'.", format, onTrace(e))
-                return null
+                handleResult(stack.importTranslations(data, NlsTableModel.KEY_COLUMN_HEADER_NAME, primaryStore))
+            } catch (e: RuntimeException) {
+                SdkLog.error("Unable to import xlsx file '{}'.", file, e)
+                showBalloon(message("error.importing.translations"), MessageType.ERROR)
             }
         }
 
         private fun handleResult(importInfo: ITranslationImportInfo) {
             val result = importInfo.result()
             if (result < 1) {
-                showBalloon(message("clipboard.content.no.mapping"), MessageType.ERROR)
+                showBalloon(message("file.content.no.mapping"), MessageType.ERROR)
                 return
             }
             val listSeparator = ", "
@@ -415,7 +389,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
             val logMessages = ArrayList<String>()
             val duplicateKeys = importInfo.duplicateKeys()
             val maxNumItemsInBalloon = 3
-            balloonMessages.add(message("import.successful.x.rows", result))
+            balloonMessages.add(message("import.successful.x.rows", NumberFormat.getInstance().format(result)))
             if (duplicateKeys.isNotEmpty()) {
                 val balloonList = duplicateKeys.joinToString(listSeparator, listPrefix, listPostfix, maxNumItemsInBalloon)
                 balloonMessages.add(message("import.duplicate.keys", balloonList))

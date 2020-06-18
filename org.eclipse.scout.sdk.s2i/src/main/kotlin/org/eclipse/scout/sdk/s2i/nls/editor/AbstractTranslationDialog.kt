@@ -114,7 +114,7 @@ abstract class AbstractTranslationDialog(val project: Project, val store: ITrans
     }
 
     private fun createTabPane(): JBTabbedPane {
-        val tabPane = JBTabbedPane(SwingConstants.TOP, JTabbedPane.SCROLL_TAB_LAYOUT)
+        val tabPane = JBTabbedPane(SwingConstants.TOP, JTabbedPane.WRAP_TAB_LAYOUT)
         store.languages().sorted().forEach {
             val txt = JBTextArea()
             txt.font = keyTextField().font
