@@ -57,7 +57,6 @@
     <master_unitTest_failureIgnore>false</master_unitTest_failureIgnore>
 
     <!-- Sonar properties -->
-    <sonar.branch>releases_11.0</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
 
     <!-- exclude fixtures -->
