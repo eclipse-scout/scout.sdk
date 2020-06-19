@@ -10,20 +10,11 @@
  */
 package org.eclipse.scout.sdk.s2i.util
 
-import org.apache.poi.openxml4j.opc.OPCPackage
-import org.apache.poi.openxml4j.opc.PackageAccess
-import org.apache.poi.ss.usermodel.DataFormatter
-import org.apache.poi.util.XMLHelper
-import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable
-import org.apache.poi.xssf.eventusermodel.XSSFReader
-import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler
-import org.apache.poi.xssf.model.SharedStrings
-import org.apache.poi.xssf.model.Styles
-import org.apache.poi.xssf.usermodel.XSSFComment
+import org.apache.poi.ss.formula.BaseFormulaEvaluator
+import org.apache.poi.ss.formula.ConditionalFormattingEvaluator
+import org.apache.poi.ss.usermodel.*
 import org.eclipse.scout.sdk.core.util.SdkException
-import org.xml.sax.InputSource
 import java.io.File
-import java.io.InputStream
 
 
 class XlsxReader {
@@ -34,50 +25,40 @@ class XlsxReader {
      * @return the table content of the first sheet of the workbook.
      * @throws SdkException if there is an error parsing the file.
      */
-    fun parse(file: File): List<List<String>> {
+    fun parse(file: File): List<List<String?>> {
         try {
-            OPCPackage.open(file, PackageAccess.READ).use {
-                val reader = XSSFReader(it)
-                return processFirstSheet(ReadOnlySharedStringsTable(it), reader.stylesTable, reader.sheetsData)
+            WorkbookFactory.create(file, null, true).use {
+                val sheets = it.sheetIterator()
+                if (!sheets.hasNext()) {
+                    return emptyList()
+                }
+                val formulaEvaluator = it.creationHelper.createFormulaEvaluator() as BaseFormulaEvaluator
+                val cfEvaluator = ConditionalFormattingEvaluator(it, formulaEvaluator)
+                return processFirstSheet(sheets.next(), formulaEvaluator, cfEvaluator)
             }
         } catch (e: Exception) {
             throw SdkException(e)
         }
     }
 
-    private fun processFirstSheet(strings: SharedStrings, styles: Styles, sheets: Iterator<InputStream>): List<List<String>> {
-        if (!sheets.hasNext()) {
-            return emptyList()
+    private fun processFirstSheet(sheet: Sheet, formulaEvaluator: FormulaEvaluator, cfEvaluator: ConditionalFormattingEvaluator): List<List<String?>> {
+        val firstRowIndex = sheet.firstRowNum
+        val lastRowIndex = sheet.lastRowNum
+        val data = ArrayList<ArrayList<String?>>(lastRowIndex - firstRowIndex + 1)
+        val formatter = DataFormatter()
+
+        for (rowIndex in firstRowIndex..lastRowIndex) {
+            val row = sheet.getRow(rowIndex) ?: continue
+            val firstCellIndex = row.firstCellNum
+            val lastCellIndex = row.lastCellNum
+            val rowData = ArrayList<String?>(lastCellIndex - firstCellIndex + 1)
+            data.add(rowData)
+            for (colIndex in firstCellIndex..lastCellIndex) {
+                val text = row.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL)
+                        ?.let { formatter.formatCellValue(it, formulaEvaluator, cfEvaluator) }
+                rowData.add(text)
+            }
         }
-        sheets.next().use { sheetInputStream ->
-            val formatter = DataFormatter()
-            val dataCollector = SheetDataCollector()
-            val sheetParser = XMLHelper.newXMLReader()
-            sheetParser.contentHandler = XSSFSheetXMLHandler(styles, null, strings, dataCollector, formatter, false)
-            sheetParser.parse(InputSource(sheetInputStream))
-            return dataCollector.tableData()
-        }
-    }
-
-    private class SheetDataCollector : XSSFSheetXMLHandler.SheetContentsHandler {
-
-        private val m_table: MutableList<List<String>> = ArrayList()
-        private var m_currentRow: MutableList<String>? = null
-
-        override fun startRow(rowNum: Int) {
-            val nextRow = ArrayList<String>()
-            m_currentRow = nextRow
-            m_table.add(nextRow)
-        }
-
-        override fun endRow(rowNum: Int) {
-            m_currentRow = null
-        }
-
-        override fun cell(cellReference: String?, formattedValue: String?, comment: XSSFComment?) {
-            m_currentRow!!.add(formattedValue ?: "")
-        }
-
-        fun tableData() = m_table
+        return data
     }
 }
