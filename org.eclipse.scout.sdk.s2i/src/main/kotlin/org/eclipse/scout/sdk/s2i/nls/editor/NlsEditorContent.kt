@@ -362,16 +362,21 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
                     .withDescription(message("please.choose.the.xlsx.file.to.import"))
                     .withTitle(message("import.translations.from.excel"))
                     .withFileFilter { it.isValid && it.exists() && it.extension == "xlsx" }
-            val file = FileChooser.chooseFile(descriptor, project, null) ?: return
+            val vFile = FileChooser.chooseFile(descriptor, project, null) ?: return
             try {
-                val data = XlsxReader().parse(file.getNioPath().toFile())
+                val file = vFile.getNioPath().toFile()
+                if (!file.exists()) {
+                    showBalloon(message("file.not.found"), MessageType.ERROR)
+                    return
+                }
+                val data = XlsxReader().parse(file)
                 if (data.isEmpty()) {
                     showBalloon(message("file.no.valid.content"), MessageType.ERROR)
                     return
                 }
                 handleResult(stack.importTranslations(data, NlsTableModel.KEY_COLUMN_HEADER_NAME, primaryStore))
             } catch (e: RuntimeException) {
-                SdkLog.error("Unable to import xlsx file '{}'.", file, e)
+                SdkLog.error("Unable to import xlsx file '{}'.", vFile, e)
                 showBalloon(message("error.importing.translations"), MessageType.ERROR)
             }
         }
