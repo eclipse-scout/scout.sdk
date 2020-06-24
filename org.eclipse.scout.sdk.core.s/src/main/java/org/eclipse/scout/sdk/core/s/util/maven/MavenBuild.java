@@ -237,7 +237,7 @@ public class MavenBuild {
    * Adds the given no-value-property.
    *
    * @param noValueProperty
-   *          The property to add.
+   *          The property to add without "-D" prefix. Must not be {@code null}.
    * @return this
    */
   public MavenBuild withProperty(String noValueProperty) {
@@ -245,10 +245,10 @@ public class MavenBuild {
   }
 
   /**
-   * Adds a new property to the maven build
+   * Adds a new property to the maven build.
    *
    * @param key
-   *          The key of the property (E.g. "myKey"). May not be {@code null}.
+   *          The key of the property (E.g. "myKey") without "-D" prefix. Must not be {@code null}.
    * @param value
    *          The value of the property. May be {@code null}.
    */
@@ -258,7 +258,7 @@ public class MavenBuild {
   }
 
   @Override
-  @SuppressWarnings("pmd:NPathComplexity")
+  @SuppressWarnings({"pmd:NPathComplexity", "NonFinalFieldReferencedInHashCode"})
   public int hashCode() {
     int prime = 31;
     int result = 1;
@@ -270,6 +270,7 @@ public class MavenBuild {
   }
 
   @Override
+  @SuppressWarnings("NonFinalFieldReferenceInEquals")
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

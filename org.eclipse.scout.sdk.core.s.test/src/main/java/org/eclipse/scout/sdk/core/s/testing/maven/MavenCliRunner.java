@@ -60,9 +60,10 @@ public class MavenCliRunner implements IMavenRunnerSpi {
   @Override
   public void execute(MavenBuild build, IEnvironment env, IProgress progress) {
     assertNotNull(build);
+    assertNotNull(build.getWorkingDirectory());
+
     try (URLClassLoader loader = MavenSandboxClassLoaderFactory.build()) {
       SdkLog.debug("Executing embedded {}", build.toString());
-      assertNotNull(build.getWorkingDirectory());
       execute(build.getWorkingDirectory(), build.getOptions(), build.getGoals(), build.getProperties(), loader);
     }
     catch (IOException e) {
@@ -110,6 +111,17 @@ public class MavenCliRunner implements IMavenRunnerSpi {
     if (!props.containsKey(mavenExtClassPath)) {
       props.put(mavenExtClassPath, "");
     }
+
+    String testForkJvmMemoryConfigKey = "master_test_jvmMemory";
+    if (!props.containsKey(testForkJvmMemoryConfigKey)) {
+      // reduce default memory consumption in forked tests
+      String testForkJvmMemoryConfigValue = System.getProperty(testForkJvmMemoryConfigKey);
+      if (Strings.isBlank(testForkJvmMemoryConfigValue)) {
+        testForkJvmMemoryConfigValue = "-Xms256m -Xmx768m";
+      }
+      props.put(testForkJvmMemoryConfigKey, testForkJvmMemoryConfigValue);
+    }
+
     if (SdkLog.isDebugEnabled()) {
       options.add(Character.toString(CLIManager.DEBUG));
       options.add(Character.toString(CLIManager.ERRORS));
