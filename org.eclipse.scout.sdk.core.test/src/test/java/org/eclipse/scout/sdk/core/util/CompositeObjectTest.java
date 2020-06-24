@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 6.1.0
  */
+@SuppressWarnings({"UnnecessaryBoxing", "SimplifiableJUnitAssertion", "ConstantConditions", "RedundantArrayCreation", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
 public class CompositeObjectTest {
 
   @Test
@@ -70,6 +71,7 @@ public class CompositeObjectTest {
   }
 
   @Test
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   public void testCompareTo() {
     CompositeObject o1 = new CompositeObject(1, 2, 3);
     CompositeObject o2 = new CompositeObject(1, 2, 3);
