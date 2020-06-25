@@ -51,7 +51,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "IU-2019.2.3"
+    version = "IU-2020.1.2"
     downloadSources = true
 
     setPlugins("java", "maven", "copyright", "properties", "CSS", "JavaScriptLanguage")

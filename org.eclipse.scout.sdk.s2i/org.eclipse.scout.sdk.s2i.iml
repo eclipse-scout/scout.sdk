@@ -26,7 +26,7 @@
               <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.72/6ca8bee3d88957eaaaef077c41c908c9940492d8/kotlin-stdlib-common-1.3.72.jar" />
               <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.72/8032138f12c0180bc4e51fe139d4c52b46db6109/kotlin-stdlib-1.3.72.jar" />
               <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core/1.2.1/3839faf625f4197acaeceeb6da000f011a2acb49/kotlinx-coroutines-core-1.2.1.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar" />
+              <option value="$MAVEN_REPOSITORY$/org/jetbrains/annotations/13.0/annotations-13.0.jar" />
             </array>
           </option>
           <option name="errors">
@@ -48,341 +48,375 @@
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
-    <orderEntry type="jdk" jdkName="IntelliJ IDEA IU-192" jdkType="IDEA JDK" />
+    <orderEntry type="jdk" jdkName="IntelliJ IDEA IU-201.7846.76" jdkType="IDEA JDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml:4.1.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:aapt-proto-jarjar:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:asm-5.0.3:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:asm-all-7.0.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:asm-analysis-5.0.3:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:asm-tree-5.0.3:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:assertj-core-3.13.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:async-profiler-1.5-1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:automaton-1.12-1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:baksmali-2.2.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-anim-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-awt-util-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-bridge-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-constants-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-css-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-dom-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-ext-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-gvt-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-parser-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-svg-dom-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-svggen-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-transcoder-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-util-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-xml-1.12.0-8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:bcpkix-jdk15on-1.62:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:bcprov-jdk15on-1.62:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:bootstrap:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:built-in-server:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:cglib-nodep-3.2.4:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:cli-parser-1.1.5:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:cloud-config-client:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:common-image-3.4.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:common-io-3.4.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:common-lang-3.4.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-codec-1.13:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-collections-3.2.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-compress-1.18:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-httpclient-3.1-patched:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-imaging-1.0-RC-1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-io-2.6:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-lang-2.4:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-logging-1.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-net-3.6:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:configuration-store-impl:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:credential-store:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:cucumber-java-1.2.5:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:dbus-java-3.0.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:delight-rhino-sandbox-0.0.10:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:dexlib2-2.2.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:eddsa-0.2.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:error_prone_annotations-2.3.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:exception-analyzer-api-1.0.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:extensions:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:external-system-rt:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:FastInfoset-1.2.15:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:fluent-hc-4.5.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:forms-1.1-preview:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:forms_rt:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:groovy-all-2.4.17:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:gson-2.8.5:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:guava-25.1-jre:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:hamcrest-core-1.3:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:httpclient-4.5.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:httpcore-4.4.11:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:httpmime-4.5.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:icons:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ide-model-0.191.40:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:idea:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:idea_rt:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:imageio-core-3.4.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:imageio-metadata-3.4.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:imageio-tiff-3.4.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:images:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:imgscalr-lib-4.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ini4j-0.5.5-2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:intellij-coverage-agent-1.0.508:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:intellij-dvcs:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:intellij-test-discovery-agent-1.0.508:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:intellij-xml:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ion-java-1.5.0-1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:isorelax-20030108:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:istack-commons-runtime-3.0.7:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jackson-annotations-2.9.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jackson-core-2.9.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jackson-databind-2.9.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:java-compatibility-1.0.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:java-utils-1.0.5:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:javac2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:javassist-3.22.0-GA:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:javax.activation-1.2.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:javax.annotation-api-1.3.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jaxb-api-2.3.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jaxb-runtime-2.3.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jaxen-1.2.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jbcrypt-1.0.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jcip-annotations-1.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jdkAnnotations:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jdom:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jediterm-pty-2.20:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jetCheck-0.2.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jettison-1.4.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jing-20030619:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jna-platform:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jna:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jps-model:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch-0.1.55:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.connector-factory-0.0.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.core-0.0.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.jsch-0.0.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.pageant-0.0.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.sshagent-0.0.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.sshj-0.0.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.usocket-jna-0.0.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.usocket-nc-0.0.9:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jshell-frontend:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:json:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsoup-1.11.3:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsp-api:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:junit-4.12:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jzlib-1.1.3:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlin-reflect-1.3.31:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlin-test-1.3.31:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlin-test-common-1.3.31:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlinx-coroutines-core-1.2.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlinx-coroutines-jdk8-1.2.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kryo-2.24.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kxml2-2.3.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:log4j:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:lz4-java-1.6.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:markdown4j-2.2-cj-1.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:markdownj-core-0.4.2-SNAPSHOT:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:microba:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:miglayout-core-5.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:miglayout-swing-5.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:minlog-1.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:nanoxml-2.2.3:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:nekohtml-1.9.22:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-buffer-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-codec-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-codec-http-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-codec-http2-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-codec-socks-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-common-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-handler-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-handler-proxy-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-resolver-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-transport-4.1.38.Final:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:objenesis-3.0.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:openapi:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.lsp4j-0.7.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.lsp4j.jsonrpc-0.7.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.xtend.lib-2.14.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.xtend.lib.macro-2.14.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.xtext.xbase.lib-2.14.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:oro-2.0.8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:picocontainer-1.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-api:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-concurrency:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-core-ui:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-ide-util-io:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-impl:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-objectSerializer-annotations:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-objectSerializer:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-util-ex:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-util-ui:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:plexus-utils-3.0.22:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:protobuf-java-3.5.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:proxy-vole-1.0.5-jb.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:pty4j-0.9.4:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:purejavacomm-0.0.11.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:randomForestRegressor-0.0.11:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rd-core-0.191.63:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rd-framework-0.191.63:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rd-swing-0.191.63:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:reactive-streams-1.0.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:resources:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:resources_en:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rhino-1.7.11:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rngom-20051226-patched:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rxjava-2.2.8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:sa-jdwp-1.12:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:serviceMessages:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:servlet-api:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:slf4j-api-1.7.25:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:slf4j-log4j12-1.7.25:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:snakeyaml-1.24:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:spellchecker:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:sqlite-jdbc-3.21.0.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:sshj-0.27.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:stax-api-1.0.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:stax-ex-1.8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:streamex-0.6.8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:swingx-core-1.6.2-2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:trang-core:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:trilead-ssh2-build-217-jenkins-14:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:trove4j:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:txw2-2.3.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:util-2.2.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:util:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:velocity-1.7:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:winp-1.28:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xercesImpl-2.12.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xml-apis-ext-1.3.04:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xml-resolver-1.2:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xmlbeans-2.6.0:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xmlgraphics-commons-2.3:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xmlpull-1.1.3.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xmlrpc-2.0.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xpp3_min-1.1.4c:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xstream-1.4.11.1:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xz-1.8:2019.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-api-1.1.0:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-connector-basic-1.1.0:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-dependency-resolver:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-impl-1.1.0:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-spi-1.1.0:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-transport-file-1.1.0:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-transport-http-1.1.0:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-util-1.1.0:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:commons-lang3-3.4:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:debugger-memory-agent-0.0.11:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:duplicates-java-analysis:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:duplicates-java:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:ecj-4.10:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jam-support-impl:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jam-support-openapi:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-api:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-duplicatesDetection:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-impl:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:javac2:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java_resources_en:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jdkAnnotations:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jgoodies-common-1.4.0:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jmc-common-7.1.0-1:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jmc-flightrecorder-7.1.0-1:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-builders-6:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-builders:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-launcher:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jshell-protocol:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-aether-provider-3.3.9:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-artifact-3.3.9:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-builder-support-3.3.9:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-model-3.3.9:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-model-builder-3.3.9:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-repository-metadata-3.3.9:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:plexus-component-annotations-1.6:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:plexus-interpolation-1.21:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:plexus-utils-3.0.22:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:profiler-ultimate:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:resources:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:wadl-core:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m2:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m3:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m31:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:lucene-core-2.4.1:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-errorProne-compiler:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-event-listener:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-jps-plugin:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-server-api:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven2-server-impl:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven3-server-common:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven3-server-impl:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven30-server-impl:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven36-server-impl:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:plexus-archiver-3.0.3:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:aapt2-proto-0.3.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:asm-all-7.0.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:async-profiler-1.5-1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:automaton-1.12-1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:baksmali-2.2.4:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-anim-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-awt-util-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-bridge-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-codec-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-constants-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-css-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-dom-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-ext-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-gvt-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-parser-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-svg-dom-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-svggen-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-transcoder-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-util-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:batik-xml-1.12.0-8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:bcpkix-jdk15on-1.64:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:bcprov-jdk15on-1.64:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:bootstrap:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:built-in-server:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:byte-buddy-agent-1.10.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:cglib-nodep-3.2.4:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:cli-parser-1.1.5:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:cloud-config-client:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:common-image-3.4.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:common-io-3.4.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:common-lang-3.4.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-codec-1.14:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-collections-3.2.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-compress-1.20:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-httpclient-3.1-patched:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-imaging-1.0-RC-1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-io-2.6:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-lang-2.4:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-lang3-3.9:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-logging-1.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:commons-net-3.6:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:configuration-store-impl:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:coverage-common:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:credential-store:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:dbus-java-3.0.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:delight-rhino-sandbox-0.0.11:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:dexlib2-2.2.4:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:dom-impl:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:dom-openapi:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:eddsa-0.2.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:error_prone_annotations-2.3.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:extensions:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:external-system-rt:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:failureaccess-1.0.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:FastInfoset-1.2.15:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:fluent-hc-4.5.12:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:forms-1.1-preview:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:forms_rt:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:groovy-all-2.4.17:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:gson-2.8.6:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:guava-28.2-jre:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:hamcrest-core-1.3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:HdrHistogram-2.1.4:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:httpclient-4.5.12:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:httpcore-4.4.13:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:httpmime-4.5.12:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:icons:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:idea:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:idea_rt:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:imageio-core-3.4.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:imageio-metadata-3.4.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:imageio-tiff-3.4.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:imgscalr-lib-4.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ini4j-0.5.5-2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:intellij-coverage-agent-1.0.508:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:intellij-dvcs:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:intellij-test-discovery-agent-1.0.508:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:intellij-xml:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ion-java-1.5.2-2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:isorelax-20030108:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:istack-commons-runtime-3.0.7:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:j2objc-annotations-1.3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jackson-annotations-2.10.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jackson-core-2.10.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jackson-databind-2.10.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jackson-module-kotlin-2.10.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:java-compatibility-1.0.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:java-ultimate-icons:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:java-utils-1.0.5:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:java_proto-26.6.0.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:javac2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:javassist-3.22.0-GA:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:javax.activation-1.2.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:javax.annotation-api-1.3.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jaxb-api-2.3.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jaxb-runtime-2.3.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jaxen-1.2.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jb-jdi-1.7:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jbcrypt-1.0.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jcef-3.3683.1920.g9f41a27-3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jcip-annotations-1.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jdkAnnotations:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jdom:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jediterm-pty-2.27:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jetCheck-0.2.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jettison-1.4.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jing-20030619:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jna-platform:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jna:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jps-model:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch-0.1.55:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.connector-factory-0.0.9:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.core-0.0.9:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.jsch-0.0.9:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.pageant-0.0.9:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.sshagent-0.0.9:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.sshj-0.0.9:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.usocket-jna-0.0.9:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsch.agentproxy.usocket-nc-0.0.9:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jshell-frontend:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:json-simple-1.1.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:json:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsoup-1.12.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsp-api:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jsp-base-openapi:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jts-core-1.16.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jts-io-common-1.16.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:junit-4.12:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:jzlib-1.1.3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlin-gradle-plugin-model-1.3.70:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlin-reflect-1.3.70:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlin-test-1.3.61:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlin-test-common-1.3.61:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlinx-coroutines-core-1.3.4:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kotlinx-coroutines-jdk8-1.3.4:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kryo-2.24.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:kxml2-2.3.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:log4j:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:lz4-java-1.7.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:markdown4j-2.2-cj-1.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:markdownj-core-0.4.2-SNAPSHOT:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-artifact-3.6.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-builder-support-3.6.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-model-3.6.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-model-builder-3.6.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-repository-metadata-3.6.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-resolver-api-1.3.3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-resolver-impl-1.3.3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-resolver-provider-3.6.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-resolver-spi-1.3.3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:maven-resolver-util-1.3.3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:microba:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:miglayout-core-5.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:miglayout-swing-5.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:minlog-1.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:nanoxml-2.2.3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:nekohtml-1.9.22:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-buffer-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-codec-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-codec-http-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-codec-http2-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-codec-socks-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-common-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-handler-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-handler-proxy-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-resolver-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:netty-transport-4.1.47.Final:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:objenesis-3.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:openapi:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.lsp4j-0.7.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.lsp4j.jsonrpc-0.7.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.xtend.lib-2.17.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.xtend.lib.macro-2.17.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:org.eclipse.xtext.xbase.lib-2.17.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:oro-2.0.8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:owasp-java-html-sanitizer-20191001.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-api:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-concurrency:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-core-ui:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-diagnostic:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-ide-util-io:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-impl:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-objectSerializer-annotations:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-objectSerializer:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-serviceContainer:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-statistics-devkit:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-statistics-uploader:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-statistics:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-util-ex:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:platform-util-ui:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:plexus-component-annotations-1.7.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:plexus-interpolation-1.25:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:plexus-utils-3.2.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:protobuf-java-3.5.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:protos-26.6.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:proxy-vole-1.0.5-jb.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:pty4j-0.9.6:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:purejavacomm-0.0.11.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:qdox-2.0-M10:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rd-core-0.193.101:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rd-swing-0.193.101:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:resources:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:resources_en:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rhino-1.7.12:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:rngom-20051226-patched:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:serviceMessages-2019.1.4:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:servlet-api:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:slf4j-api-1.7.25:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:slf4j-log4j12-1.7.25:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:snakeyaml-1.26:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:snakeyaml-engine-2.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:spellchecker:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:sqlite-jdbc-3.21.0.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:sshj-0.27.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:stax-api-1.0.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:stax-ex-1.8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:streamex-0.7.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:swingx-core-1.6.2-2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:testFramework-java:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:testFramework.core:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:testFramework:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:tests_bootstrap:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:tips-intellij-idea-201.16:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:trang-core:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:trilead-ssh2-build-217-jenkins-14:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:trove4j:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:txw2-2.3.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:uast-tests:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:util-2.2.4:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:util:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:velocity-1.7:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:winp-1.28:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xercesImpl-2.12.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xml-apis-ext-1.3.04:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xml-resolver-1.2:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xmlbeans-2.6.0:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xmlgraphics-commons-2.3:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xmlpull-1.1.3.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xmlrpc-2.0.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xpp3_min-1.1.4c:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xstream-1.4.11.1:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:xz-1.8:2020.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-dependency-resolver:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-java-0.1.4:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:debugger-memory-agent-0.0.11:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:duplicates-java-analysis:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:duplicates-java:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:ecj-4.13:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jam-support-impl:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jam-support-openapi:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-api:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-duplicatesDetection:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-impl:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:javac2:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java_resources_en:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jdkAnnotations:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jgoodies-common-1.4.0:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jmc-common-7.1.0-2:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jmc-flightrecorder-7.1.0-2:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-builders-6:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-builders:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-launcher:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jshell-protocol:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-resolver-connector-basic-1.3.3:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-resolver-transport-file-1.3.3:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-resolver-transport-http-1.3.3:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:microservices-uast:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:profiler-ultimate:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:resources:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:sa-jdwp-1.14:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m2:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m3:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m31:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:lucene-core-2.4.1:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-errorProne-compiler:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-event-listener:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-jps-plugin:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-server-api:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven2-server-impl:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven3-server-common:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven3-server-impl:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven30-server-impl:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven36-server-impl:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:plexus-archiver-3.0.3:ideaIU-IU-201.7846.76-withSources" level="project" />
     <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-192.6817.14-withSources">
+      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-201.7846.76-withSources">
         <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2019.2.3/5442cc61648265370e631b2f5f7f329410abe347/ideaIU-2019.2.3/plugins/maven/lib/resources_en.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2020.1.2/13c0df9eec16f4c4e6e6a4fb86987e616b7b038f/ideaIU-2020.1.2/plugins/maven/lib/resources_en.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2019.2.3/f09035cd0dc18d7f89bf011c76b9e3d3407d2cd1/ideaIC-2019.2.3-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2020.1.2/ec46ceccd2d3701947c9b40f5ca1facc9da5a1e1/ideaIC-2020.1.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:copyright:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:copyright:ideaIU-IU-201.7846.76-withSources" level="project" />
     <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-192.6817.14-withSources">
+      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-201.7846.76-withSources">
         <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2019.2.3/5442cc61648265370e631b2f5f7f329410abe347/ideaIU-2019.2.3/plugins/copyright/lib/resources_en.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2020.1.2/13c0df9eec16f4c4e6e6a4fb86987e616b7b038f/ideaIU-2020.1.2/plugins/copyright/lib/resources_en.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2019.2.3/f09035cd0dc18d7f89bf011c76b9e3d3407d2cd1/ideaIC-2019.2.3-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2020.1.2/ec46ceccd2d3701947c9b40f5ca1facc9da5a1e1/ideaIC-2020.1.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:properties:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:properties:ideaIU-IU-201.7846.76-withSources" level="project" />
     <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-192.6817.14-withSources">
+      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-201.7846.76-withSources">
         <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2019.2.3/5442cc61648265370e631b2f5f7f329410abe347/ideaIU-2019.2.3/plugins/properties/lib/resources_en.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2020.1.2/13c0df9eec16f4c4e6e6a4fb86987e616b7b038f/ideaIU-2020.1.2/plugins/properties/lib/resources_en.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2019.2.3/f09035cd0dc18d7f89bf011c76b9e3d3407d2cd1/ideaIC-2019.2.3-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2020.1.2/ec46ceccd2d3701947c9b40f5ca1facc9da5a1e1/ideaIC-2020.1.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css-openapi:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css-openapi:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css:ideaIU-IU-201.7846.76-withSources" level="project" />
     <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-192.6817.14-withSources">
+      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-201.7846.76-withSources">
         <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2019.2.3/5442cc61648265370e631b2f5f7f329410abe347/ideaIU-2019.2.3/plugins/CSS/lib/resources_en.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2020.1.2/13c0df9eec16f4c4e6e6a4fb86987e616b7b038f/ideaIU-2020.1.2/plugins/CSS/lib/resources_en.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2019.2.3/f09035cd0dc18d7f89bf011c76b9e3d3407d2cd1/ideaIC-2019.2.3-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2020.1.2/ec46ceccd2d3701947c9b40f5ca1facc9da5a1e1/ideaIC-2020.1.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:javascript-openapi:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:JavaScriptLanguage:ideaIU-IU-192.6817.14-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:js-test-common:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-js-0.0.5:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:javascript-openapi:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:JavaScriptLanguage:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:js-test-common:ideaIU-IU-201.7846.76-withSources" level="project" />
     <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-192.6817.14-withSources">
+      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-201.7846.76-withSources">
         <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2019.2.3/5442cc61648265370e631b2f5f7f329410abe347/ideaIU-2019.2.3/plugins/JavaScriptLanguage/lib/resources_en.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2020.1.2/13c0df9eec16f4c4e6e6a4fb86987e616b7b038f/ideaIU-2020.1.2/plugins/JavaScriptLanguage/lib/resources_en.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2019.2.3/f09035cd0dc18d7f89bf011c76b9e3d3407d2cd1/ideaIC-2019.2.3-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2020.1.2/ec46ceccd2d3701947c9b40f5ca1facc9da5a1e1/ideaIC-2020.1.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:semver4j-2.2.0:ideaIU-IU-192.6817.14-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:semver4j-2.2.0:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:platform-images:ideaIU-IU-201.7846.76-withSources" level="project" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-201.7846.76-withSources">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2020.1.2/13c0df9eec16f4c4e6e6a4fb86987e616b7b038f/ideaIU-2020.1.2/plugins/platform-images/lib/resources_en.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2020.1.2/ec46ceccd2d3701947c9b40f5ca1facc9da5a1e1/ideaIC-2020.1.2-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:repository-search:ideaIU-IU-201.7846.76-withSources" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.72" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.3.72" level="project" />
