@@ -2,7 +2,3 @@ autoEnabled=true
 eclipse.preferences.version=1
 extraProperties=
 fileExclusions=
-idePrefixKey=
-projectKey=org.eclipse.scout.sdk\:org.eclipse.scout.sdk\:releases_9.0.x
-serverId=Scout
-sqPrefixKey=org.eclipse.scout.sdk.core.test
