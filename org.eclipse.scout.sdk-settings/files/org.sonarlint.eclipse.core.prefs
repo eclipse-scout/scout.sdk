@@ -1,4 +1,4 @@
-autoEnabled=true
+autoEnabled=false
 eclipse.preferences.version=1
 extraProperties=
 moduleKey=org.eclipse.scout.sdk\:org.eclipse.scout.sdk\:releases_10.0
