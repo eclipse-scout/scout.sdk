@@ -10,7 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s;
 
-import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toSet;
+import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.*;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * <h3>{@link ScoutModelHierarchy}</h3>
@@ -32,152 +34,183 @@ public final class ScoutModelHierarchy {
 
   static {
     // containers
-    addContainerElement(IScoutRuntimeTypes.AbstractActionNode, IScoutRuntimeTypes.IActionNode);
-    addContainerElement(IScoutRuntimeTypes.AbstractActionNodeExtension, IScoutRuntimeTypes.IActionNode);
-    addContainerElement(IScoutRuntimeTypes.AbstractActionExtension, IScoutRuntimeTypes.IAction);
-    addContainerElement(IScoutRuntimeTypes.AbstractCalendarItemProvider, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractCalendarItemProviderExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractCalendar, IScoutRuntimeTypes.ICalendarItemProvider);
-    addContainerElement(IScoutRuntimeTypes.AbstractCalendar, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractCalendarExtension, IScoutRuntimeTypes.ICalendarItemProvider);
-    addContainerElement(IScoutRuntimeTypes.AbstractCalendarExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractPlanner, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractPlannerExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractTable, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractTable, IScoutRuntimeTypes.ITableControl);
-    addContainerElement(IScoutRuntimeTypes.AbstractTable, IScoutRuntimeTypes.IColumn);
-    addContainerElement(IScoutRuntimeTypes.AbstractTable, IScoutRuntimeTypes.IKeyStroke);
-    addContainerElement(IScoutRuntimeTypes.AbstractTableExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractTableExtension, IScoutRuntimeTypes.ITableControl);
-    addContainerElement(IScoutRuntimeTypes.AbstractTableExtension, IScoutRuntimeTypes.IColumn);
-    addContainerElement(IScoutRuntimeTypes.AbstractTableExtension, IScoutRuntimeTypes.IKeyStroke);
-    addContainerElement(IScoutRuntimeTypes.AbstractTree, IScoutRuntimeTypes.IKeyStroke);
-    addContainerElement(IScoutRuntimeTypes.AbstractTree, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeExtension, IScoutRuntimeTypes.IKeyStroke);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeNode, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeNodeExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractPageWithTable, IScoutRuntimeTypes.ITable);
-    addContainerElement(IScoutRuntimeTypes.AbstractPageWithTableExtension, IScoutRuntimeTypes.ITable);
-    addContainerElement(IScoutRuntimeTypes.AbstractDesktop, IScoutRuntimeTypes.IAction);
-    addContainerElement(IScoutRuntimeTypes.AbstractDesktopExtension, IScoutRuntimeTypes.IAction);
-    addContainerElement(IScoutRuntimeTypes.AbstractButton, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractButtonExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractCalendarField, IScoutRuntimeTypes.ICalendar);
-    addContainerElement(IScoutRuntimeTypes.AbstractCalendarFieldExtension, IScoutRuntimeTypes.ICalendar);
-    addContainerElement(IScoutRuntimeTypes.AbstractComposerField, IScoutRuntimeTypes.ITree);
-    addContainerElement(IScoutRuntimeTypes.AbstractComposerFieldExtension, IScoutRuntimeTypes.ITree);
-    addContainerElement(IScoutRuntimeTypes.AbstractGroupBox, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractGroupBoxExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractImageField, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractImageFieldExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractListBox, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractListBox, IScoutRuntimeTypes.ITable);
-    addContainerElement(IScoutRuntimeTypes.AbstractListBoxExtension, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractListBoxExtension, IScoutRuntimeTypes.ITable);
-    addContainerElement(IScoutRuntimeTypes.AbstractPlannerField, IScoutRuntimeTypes.IPlanner);
-    addContainerElement(IScoutRuntimeTypes.AbstractPlannerFieldExtension, IScoutRuntimeTypes.IPlanner);
-    addContainerElement(IScoutRuntimeTypes.AbstractRadioButtonGroup, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractRadioButtonGroupExtension, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractTabBox, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractTabBoxExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractTableField, IScoutRuntimeTypes.ITable);
-    addContainerElement(IScoutRuntimeTypes.AbstractTableFieldExtension, IScoutRuntimeTypes.ITable);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeBox, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeBox, IScoutRuntimeTypes.ITree);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeBoxExtension, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeBoxExtension, IScoutRuntimeTypes.ITree);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeField, IScoutRuntimeTypes.ITree);
-    addContainerElement(IScoutRuntimeTypes.AbstractTreeFieldExtension, IScoutRuntimeTypes.ITree);
-    addContainerElement(IScoutRuntimeTypes.AbstractCompositeField, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractCompositeFieldExtension, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractFormField, IScoutRuntimeTypes.IKeyStroke);
-    addContainerElement(IScoutRuntimeTypes.AbstractFormFieldExtension, IScoutRuntimeTypes.IKeyStroke);
-    addContainerElement(IScoutRuntimeTypes.AbstractValueField, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractValueFieldExtension, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractForm, IScoutRuntimeTypes.IFormHandler);
-    addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IFormHandler);
-    addContainerElement(IScoutRuntimeTypes.AbstractFormExtension, IScoutRuntimeTypes.IFormField);
-    addContainerElement(IScoutRuntimeTypes.AbstractWizard, IScoutRuntimeTypes.IWizardStep);
-    addContainerElement(IScoutRuntimeTypes.AbstractWizardExtension, IScoutRuntimeTypes.IWizardStep);
-    addContainerElement(IScoutRuntimeTypes.AbstractCodeTypeWithGeneric, IScoutRuntimeTypes.ICode);
-    addContainerElement(IScoutRuntimeTypes.AbstractCodeTypeWithGenericExtension, IScoutRuntimeTypes.ICode);
-    addContainerElement(IScoutRuntimeTypes.AbstractCode, IScoutRuntimeTypes.ICode);
-    addContainerElement(IScoutRuntimeTypes.AbstractCodeExtension, IScoutRuntimeTypes.ICode);
-    addContainerElement(IScoutRuntimeTypes.AbstractDataModel, IScoutRuntimeTypes.IDataModelAttribute);
-    addContainerElement(IScoutRuntimeTypes.AbstractDataModel, IScoutRuntimeTypes.IDataModelEntity);
-    addContainerElement(IScoutRuntimeTypes.AbstractDataModelEntity, IScoutRuntimeTypes.IDataModelAttribute);
-    addContainerElement(IScoutRuntimeTypes.AbstractDataModelEntity, IScoutRuntimeTypes.IDataModelEntity);
-    addContainerElement(IScoutRuntimeTypes.AbstractDataModelEntity, IScoutRuntimeTypes.IDataModelEntity);
-    addContainerElement(IScoutRuntimeTypes.AbstractDataModelEntityExtension, IScoutRuntimeTypes.IDataModelAttribute);
-    addContainerElement(IScoutRuntimeTypes.IContextMenuOwner, IScoutRuntimeTypes.IMenu);
-    addContainerElement(IScoutRuntimeTypes.AbstractExtension, IScoutRuntimeTypes.IExtension);
+    addContainerElement(AbstractAccordion, IGroup);
+    addContainerElement(AbstractAccordionField, IAccordion);
+    addContainerElement(AbstractAccordionFieldExtension, IAccordion);
+    addContainerElement(AbstractActionExtension, IAction);
+    addContainerElement(AbstractActionNode, IActionNode);
+    addContainerElement(AbstractActionNodeExtension, IActionNode);
+    addContainerElement(AbstractButton, IMenu);
+    addContainerElement(AbstractButtonExtension, IMenu);
+    addContainerElement(AbstractCalendar, ICalendarItemProvider);
+    addContainerElement(AbstractCalendar, IMenu);
+    addContainerElement(AbstractCalendarExtension, ICalendarItemProvider);
+    addContainerElement(AbstractCalendarExtension, IMenu);
+    addContainerElement(AbstractCalendarField, ICalendar);
+    addContainerElement(AbstractCalendarFieldExtension, ICalendar);
+    addContainerElement(AbstractCalendarItemProvider, IMenu);
+    addContainerElement(AbstractCalendarItemProviderExtension, IMenu);
+    addContainerElement(AbstractCode, ICode);
+    addContainerElement(AbstractCodeExtension, ICode);
+    addContainerElement(AbstractCodeTypeWithGeneric, ICode);
+    addContainerElement(AbstractCodeTypeWithGenericExtension, ICode);
+    addContainerElement(AbstractComposerField, ITree);
+    addContainerElement(AbstractComposerFieldExtension, ITree);
+    addContainerElement(AbstractCompositeField, IFormField);
+    addContainerElement(AbstractCompositeFieldExtension, IFormField);
+    addContainerElement(AbstractDataModel, IDataModelAttribute);
+    addContainerElement(AbstractDataModel, IDataModelEntity);
+    addContainerElement(AbstractDataModelEntity, IDataModelAttribute);
+    addContainerElement(AbstractDataModelEntity, IDataModelEntity);
+    addContainerElement(AbstractDataModelEntityExtension, IDataModelAttribute);
+    addContainerElement(AbstractDataModelEntityExtension, IDataModelEntity);
+    addContainerElement(AbstractDesktop, IAction);
+    addContainerElement(AbstractDesktopExtension, IAction);
+    addContainerElement(AbstractExtension, IExtension);
+    addContainerElement(AbstractForm, IFormHandler);
+    addContainerElement(AbstractFormExtension, IFormField);
+    addContainerElement(AbstractFormExtension, IFormHandler);
+    addContainerElement(AbstractFormField, IKeyStroke);
+    addContainerElement(AbstractFormFieldExtension, IKeyStroke);
+    addContainerElement(AbstractGroup, IWidget);
+    addContainerElement(AbstractGroupExtension, IWidget);
+    addContainerElement(AbstractGroupBox, IMenu);
+    addContainerElement(AbstractGroupBoxExtension, IMenu);
+    addContainerElement(AbstractImageField, IMenu);
+    addContainerElement(AbstractImageFieldExtension, IMenu);
+    addContainerElement(AbstractListBox, IFormField);
+    addContainerElement(AbstractListBox, ITable);
+    addContainerElement(AbstractListBoxExtension, IFormField);
+    addContainerElement(AbstractListBoxExtension, ITable);
+    addContainerElement(AbstractModeSelectorField, IMode);
+    addContainerElement(AbstractPageWithTable, ITable);
+    addContainerElement(AbstractPageWithTableExtension, ITable);
+    addContainerElement(AbstractRadioButtonGroup, IFormField);
+    addContainerElement(AbstractRadioButtonGroupExtension, IFormField);
+    addContainerElement(AbstractTabBox, IMenu);
+    addContainerElement(AbstractTabBoxExtension, IMenu);
+    addContainerElement(AbstractTable, IColumn);
+    addContainerElement(AbstractTable, IKeyStroke);
+    addContainerElement(AbstractTable, IMenu);
+    addContainerElement(AbstractTable, ITableControl);
+    addContainerElement(AbstractTableExtension, IColumn);
+    addContainerElement(AbstractTableExtension, IKeyStroke);
+    addContainerElement(AbstractTableExtension, IMenu);
+    addContainerElement(AbstractTableExtension, ITableControl);
+    addContainerElement(AbstractTableField, ITable);
+    addContainerElement(AbstractTableFieldExtension, ITable);
+    addContainerElement(AbstractTileField, ITileGrid);
+    addContainerElement(AbstractTileFieldExtension, ITileGrid);
+    addContainerElement(AbstractTileGrid, IMenu);
+    addContainerElement(AbstractTileGrid, ITile);
+    addContainerElement(AbstractTileGridExtension, IMenu);
+    addContainerElement(AbstractTileGridExtension, ITile);
+    addContainerElement(AbstractTree, IKeyStroke);
+    addContainerElement(AbstractTree, IMenu);
+    addContainerElement(AbstractTreeExtension, IKeyStroke);
+    addContainerElement(AbstractTreeExtension, IMenu);
+    addContainerElement(AbstractTreeBox, IFormField);
+    addContainerElement(AbstractTreeBox, ITree);
+    addContainerElement(AbstractTreeBoxExtension, IFormField);
+    addContainerElement(AbstractTreeBoxExtension, ITree);
+    addContainerElement(AbstractTreeField, ITree);
+    addContainerElement(AbstractTreeFieldExtension, ITree);
+    addContainerElement(AbstractTreeNode, IMenu);
+    addContainerElement(AbstractTreeNodeExtension, IMenu);
+    addContainerElement(AbstractValueField, IMenu);
+    addContainerElement(AbstractValueFieldExtension, IMenu);
+    addContainerElement(AbstractWizard, IWizardStep);
+    addContainerElement(AbstractWizardExtension, IWizardStep);
+    addContainerElement(IContextMenuOwner, IMenu);
 
     // hierarchy
-    addInterfaceSuperType(IScoutRuntimeTypes.IAction, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.IAction, IScoutRuntimeTypes.IOrdered);
-    addInterfaceSuperType(IScoutRuntimeTypes.IActionNode, IScoutRuntimeTypes.IAction);
-    addInterfaceSuperType(IScoutRuntimeTypes.IBigDecimalField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IBooleanField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IButton, IScoutRuntimeTypes.IFormField);
-    addInterfaceSuperType(IScoutRuntimeTypes.ICalendar, IScoutRuntimeTypes.IContextMenuOwner);
-    addInterfaceSuperType(IScoutRuntimeTypes.ICalendarField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.ICode, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.ICode, IScoutRuntimeTypes.IOrdered);
-    addInterfaceSuperType(IScoutRuntimeTypes.ICodeType, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.IColumn, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.ICompositeField, IScoutRuntimeTypes.IFormField);
-    addInterfaceSuperType(IScoutRuntimeTypes.ICompositeFieldExtension, IScoutRuntimeTypes.IExtension);
-    addInterfaceSuperType(IScoutRuntimeTypes.IDataModelAttribute, IScoutRuntimeTypes.IOrdered);
-    addInterfaceSuperType(IScoutRuntimeTypes.IDataModelEntity, IScoutRuntimeTypes.IOrdered);
-    addInterfaceSuperType(IScoutRuntimeTypes.IDateField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IDesktopExtension, IScoutRuntimeTypes.IExtension);
-    addInterfaceSuperType(IScoutRuntimeTypes.IFileChooserField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IFormExtension, IScoutRuntimeTypes.IExtension);
-    addInterfaceSuperType(IScoutRuntimeTypes.IFormField, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.IFormField, IScoutRuntimeTypes.IOrdered);
-    addInterfaceSuperType(IScoutRuntimeTypes.IFormFieldExtension, IScoutRuntimeTypes.IExtension);
-    addInterfaceSuperType(IScoutRuntimeTypes.IGroupBox, IScoutRuntimeTypes.ICompositeField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IGroupBox, IScoutRuntimeTypes.IContextMenuOwner);
-    addInterfaceSuperType(IScoutRuntimeTypes.IHtmlField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IImageField, IScoutRuntimeTypes.IFormField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IKeyStroke, IScoutRuntimeTypes.IAction);
-    addInterfaceSuperType(IScoutRuntimeTypes.ILabelField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IListBox, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IListBox, IScoutRuntimeTypes.ICompositeField);
-    addInterfaceSuperType(IScoutRuntimeTypes.ILongField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IMenu, IScoutRuntimeTypes.IActionNode);
-    addInterfaceSuperType(IScoutRuntimeTypes.IOutline, IScoutRuntimeTypes.ITree);
-    addInterfaceSuperType(IScoutRuntimeTypes.IOutline, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.IOutline, IScoutRuntimeTypes.IOrdered);
-    addInterfaceSuperType(IScoutRuntimeTypes.IPage, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.IPageWithNodes, IScoutRuntimeTypes.IPage);
-    addInterfaceSuperType(IScoutRuntimeTypes.IPageWithTable, IScoutRuntimeTypes.IPage);
-    addInterfaceSuperType(IScoutRuntimeTypes.IPageWithTableExtension, IScoutRuntimeTypes.IExtension);
-    addInterfaceSuperType(IScoutRuntimeTypes.IPlanner, IScoutRuntimeTypes.IContextMenuOwner);
-    addInterfaceSuperType(IScoutRuntimeTypes.IPlannerField, IScoutRuntimeTypes.IFormField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IProposalField, IScoutRuntimeTypes.ISmartField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IRadioButton, IScoutRuntimeTypes.IButton);
-    addInterfaceSuperType(IScoutRuntimeTypes.IRadioButtonGroup, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IRadioButtonGroup, IScoutRuntimeTypes.ICompositeField);
-    addInterfaceSuperType(IScoutRuntimeTypes.ISequenceBox, IScoutRuntimeTypes.ICompositeField);
-    addInterfaceSuperType(IScoutRuntimeTypes.ISmartField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IStringField, IScoutRuntimeTypes.IValueField);
-    addInterfaceSuperType(IScoutRuntimeTypes.ITabBox, IScoutRuntimeTypes.ICompositeField);
-    addInterfaceSuperType(IScoutRuntimeTypes.ITabBox, IScoutRuntimeTypes.IContextMenuOwner);
-    addInterfaceSuperType(IScoutRuntimeTypes.ITable, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.ITable, IScoutRuntimeTypes.IContextMenuOwner);
-    addInterfaceSuperType(IScoutRuntimeTypes.ITableControl, IScoutRuntimeTypes.IAction);
-    addInterfaceSuperType(IScoutRuntimeTypes.ITableExtension, IScoutRuntimeTypes.IExtension);
-    addInterfaceSuperType(IScoutRuntimeTypes.ITableField, IScoutRuntimeTypes.IFormField);
-    addInterfaceSuperType(IScoutRuntimeTypes.ITree, IScoutRuntimeTypes.IContextMenuOwner);
-    addInterfaceSuperType(IScoutRuntimeTypes.ITreeField, IScoutRuntimeTypes.IFormField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IValueField, IScoutRuntimeTypes.IFormField);
-    addInterfaceSuperType(IScoutRuntimeTypes.IValueField, IScoutRuntimeTypes.IContextMenuOwner);
-    addInterfaceSuperType(IScoutRuntimeTypes.IViewButton, IScoutRuntimeTypes.IAction);
-    addInterfaceSuperType(IScoutRuntimeTypes.IWizard, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.IWizardStep, IScoutRuntimeTypes.ITypeWithClassId);
-    addInterfaceSuperType(IScoutRuntimeTypes.IWizardStep, IScoutRuntimeTypes.IOrdered);
+    addInterfaceSuperType(IAccordion, IWidget);
+    addInterfaceSuperType(IAccordionField, IFormField);
+    addInterfaceSuperType(IAction, IOrdered);
+    addInterfaceSuperType(IAction, IWidget);
+    addInterfaceSuperType(IActionNode, IAction);
+    addInterfaceSuperType(IBigDecimalField, IValueField);
+    addInterfaceSuperType(IBooleanField, IValueField);
+    addInterfaceSuperType(IBrowserField, IFormField);
+    addInterfaceSuperType(IButton, IContextMenuOwner);
+    addInterfaceSuperType(IButton, IFormField);
+    addInterfaceSuperType(ICalendar, IContextMenuOwner);
+    addInterfaceSuperType(ICalendar, IWidget);
+    addInterfaceSuperType(ICalendarField, IValueField);
+    addInterfaceSuperType(ICode, IOrdered);
+    addInterfaceSuperType(ICode, ITypeWithClassId);
+    addInterfaceSuperType(ICodeType, ITypeWithClassId);
+    addInterfaceSuperType(IColumn, IOrdered);
+    addInterfaceSuperType(IColumn, ITypeWithClassId);
+    addInterfaceSuperType(ICompositeField, IFormField);
+    addInterfaceSuperType(ICompositeFieldExtension, IFormFieldExtension);
+    addInterfaceSuperType(IDataModelAttribute, IOrdered);
+    addInterfaceSuperType(IDataModelAttribute, ITypeWithClassId);
+    addInterfaceSuperType(IDataModelEntity, IOrdered);
+    addInterfaceSuperType(IDataModelEntity, ITypeWithClassId);
+    addInterfaceSuperType(IDateField, IValueField);
+    addInterfaceSuperType(IDesktop, IContextMenuOwner);
+    addInterfaceSuperType(IDesktop, IWidget);
+    addInterfaceSuperType(IDesktopExtension, IExtension);
+    addInterfaceSuperType(IFileChooserButton, IValueField);
+    addInterfaceSuperType(IFileChooserField, IValueField);
+    addInterfaceSuperType(IFormExtension, IExtension);
+    addInterfaceSuperType(IFormField, IOrdered);
+    addInterfaceSuperType(IFormField, IWidget);
+    addInterfaceSuperType(IFormFieldExtension, IExtension);
+    addInterfaceSuperType(IGroup, IOrdered);
+    addInterfaceSuperType(IGroup, IWidget);
+    addInterfaceSuperType(IGroupBox, ICompositeField);
+    addInterfaceSuperType(IGroupBox, IContextMenuOwner);
+    addInterfaceSuperType(IHtmlField, IValueField);
+    addInterfaceSuperType(IImageField, IContextMenuOwner);
+    addInterfaceSuperType(IImageField, IFormField);
+    addInterfaceSuperType(IKeyStroke, IAction);
+    addInterfaceSuperType(ILabelField, IValueField);
+    addInterfaceSuperType(IListBox, ICompositeField);
+    addInterfaceSuperType(IListBox, IValueField);
+    addInterfaceSuperType(ILongField, IValueField);
+    addInterfaceSuperType(IMenu, IActionNode);
+    addInterfaceSuperType(IMode, IAction);
+    addInterfaceSuperType(IModeSelectorField, IValueField);
+    addInterfaceSuperType(IOutline, IOrdered);
+    addInterfaceSuperType(IOutline, ITree);
+    addInterfaceSuperType(IPage, ITreeNode);
+    addInterfaceSuperType(IPage, ITypeWithClassId);
+    addInterfaceSuperType(IPageWithNodes, IPage);
+    addInterfaceSuperType(IPageWithTable, IPage);
+    addInterfaceSuperType(IPageWithTableExtension, IExtension);
+    addInterfaceSuperType(IProposalField, ISmartField);
+    addInterfaceSuperType(IRadioButton, IButton);
+    addInterfaceSuperType(IRadioButtonGroup, ICompositeField);
+    addInterfaceSuperType(IRadioButtonGroup, IValueField);
+    addInterfaceSuperType(ISequenceBox, ICompositeField);
+    addInterfaceSuperType(ISmartField, IValueField);
+    addInterfaceSuperType(IStringField, IValueField);
+    addInterfaceSuperType(ITabBox, ICompositeField);
+    addInterfaceSuperType(ITabBox, IContextMenuOwner);
+    addInterfaceSuperType(ITable, IContextMenuOwner);
+    addInterfaceSuperType(ITable, IWidget);
+    addInterfaceSuperType(ITableControl, IAction);
+    addInterfaceSuperType(ITableExtension, IExtension);
+    addInterfaceSuperType(ITableField, IFormField);
+    addInterfaceSuperType(ITagField, IValueField);
+    addInterfaceSuperType(ITile, IOrdered);
+    addInterfaceSuperType(ITile, IWidget);
+    addInterfaceSuperType(ITileField, IFormField);
+    addInterfaceSuperType(ITileGrid, IContextMenuOwner);
+    addInterfaceSuperType(ITileGrid, IWidget);
+    addInterfaceSuperType(ITree, IContextMenuOwner);
+    addInterfaceSuperType(ITree, IWidget);
+    addInterfaceSuperType(ITreeField, IFormField);
+    addInterfaceSuperType(ITreeNode, IContextMenuOwner);
+    addInterfaceSuperType(IValueField, IContextMenuOwner);
+    addInterfaceSuperType(IValueField, IFormField);
+    addInterfaceSuperType(IViewButton, IAction);
+    addInterfaceSuperType(IWidget, ITypeWithClassId);
+    addInterfaceSuperType(IWizard, ITypeWithClassId);
+    addInterfaceSuperType(IWizardStep, IOrdered);
+    addInterfaceSuperType(IWizardStep, ITypeWithClassId);
   }
 
   private ScoutModelHierarchy() {
@@ -198,17 +231,48 @@ public final class ScoutModelHierarchy {
   /**
    * Gets all interface fully qualified names of elements that may be added inside the given element.
    *
-   * @param scoutClassFqn
-   *          The fully qualified interface name of the container.
-   * @return A {@link Set} with the fully qualified interface names.
+   * @param superTypesOfDeclaringType
+   *          The fully qualified super type names of the container.
+   * @return A {@link Set} with the fully qualified interface names of possible children.
    * @see IScoutRuntimeTypes
    */
-  public static Set<String> getPossibleChildren(String scoutClassFqn) {
-    Set<String> result = POSSIBLE_CHILDREN_BY_CONTAINER.get(scoutClassFqn);
-    if (result == null || result.isEmpty()) {
-      return emptySet();
+  @SuppressWarnings("DuplicatedCode")
+  public static Set<String> getPossibleChildren(Collection<String> superTypesOfDeclaringType) {
+    if (superTypesOfDeclaringType.contains(AbstractTabBox) || superTypesOfDeclaringType.contains(AbstractTabBoxExtension)) {
+      // tab boxes are composites but only allow a reduced set of items
+      Set<String> possibleChildrenIfcFqn = new HashSet<>(3);
+      possibleChildrenIfcFqn.add(IGroupBox);
+      possibleChildrenIfcFqn.add(IMenu);
+      possibleChildrenIfcFqn.add(IKeyStroke);
+      return possibleChildrenIfcFqn;
     }
-    return result;
+    if (superTypesOfDeclaringType.contains(AbstractListBox) || superTypesOfDeclaringType.contains(AbstractTreeBox) ||
+        superTypesOfDeclaringType.contains(AbstractListBoxExtension) || superTypesOfDeclaringType.contains(AbstractTreeBoxExtension)) {
+      // list boxes and tree boxes are composites but only allow a reduced set of items
+      Set<String> possibleChildrenIfcFqn = new HashSet<>(2);
+      possibleChildrenIfcFqn.add(IMenu);
+      possibleChildrenIfcFqn.add(IKeyStroke);
+      return possibleChildrenIfcFqn;
+    }
+    if (superTypesOfDeclaringType.contains(AbstractRadioButtonGroup) || superTypesOfDeclaringType.contains(AbstractRadioButtonGroupExtension)) {
+      // radiobutton groups are composites but only allow a reduced set of items
+      Set<String> possibleChildrenIfcFqn = new HashSet<>(3);
+      possibleChildrenIfcFqn.add(IRadioButton);
+      possibleChildrenIfcFqn.add(IMenu);
+      possibleChildrenIfcFqn.add(IKeyStroke);
+      return possibleChildrenIfcFqn;
+    }
+    return superTypesOfDeclaringType.stream()
+        .flatMap(ScoutModelHierarchy::getPossibleChildren)
+        .collect(toSet());
+  }
+
+  static Stream<String> getPossibleChildren(String superClass) {
+    Set<String> children = POSSIBLE_CHILDREN_BY_CONTAINER.get(superClass);
+    if (children == null || children.isEmpty()) {
+      return Stream.empty();
+    }
+    return children.stream();
   }
 
   /**

@@ -18,7 +18,7 @@ import com.intellij.psi.PsiFile
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.util.Strings.escapeHtml
 import org.eclipse.scout.sdk.s2i.containingModule
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.Companion.createStack
+import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
 
 abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider() {
     override fun getCustomDocumentationElement(editor: Editor, file: PsiFile, contextElement: PsiElement?): PsiElement? {

@@ -1,0 +1,11 @@
+public class $name$Button extends $super$<$declaringTypeArg(#IValueField#, #TYPE_PARAM_VALUEFIELD__VALUE#, box)$> {
+  @java.lang.Override
+  protected java.lang.String getConfiguredLabel() {
+    return #TEXTS#.get("$nls$");
+  }
+
+  @Override
+  protected $declaringTypeArg(#IValueField#, #TYPE_PARAM_VALUEFIELD__VALUE#, box)$ getConfiguredRadioValue() {
+    return $declaringTypeArg(#IValueField#, #TYPE_PARAM_VALUEFIELD__VALUE#, default)$;
+  }$END$
+}

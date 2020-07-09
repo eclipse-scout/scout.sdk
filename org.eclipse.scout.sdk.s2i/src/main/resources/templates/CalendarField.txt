@@ -1,0 +1,19 @@
+public class $name$Field extends $super$<$name$Field.Calendar> {
+  @#ClassId#("$newClassId()$")
+  public class Calendar extends #AbstractCalendar# {
+    @#Order#(1000)
+    public class MyCalendarItemProvider extends #AbstractCalendarItemProvider# {
+      $END$
+    }
+  }
+
+  @java.lang.Override
+  protected int getConfiguredGridH() {
+    return 6;
+  }
+
+  @java.lang.Override
+  protected boolean getConfiguredLabelVisible() {
+    return $boolLabelVisible$;
+  }
+}

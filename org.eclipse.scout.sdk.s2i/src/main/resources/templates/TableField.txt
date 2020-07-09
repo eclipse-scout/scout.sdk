@@ -1,0 +1,16 @@
+public class $name$Field extends $super$<$name$Field.Table> {
+  @java.lang.Override
+  protected java.lang.String getConfiguredLabel() {
+    return #TEXTS#.get("$nls$");
+  }
+
+  @java.lang.Override
+  protected int getConfiguredGridH() {
+    return 6;
+  }
+
+  @#ClassId#("$newClassId()$")
+  public class Table extends #AbstractTable# {
+    $END$
+  }
+}

@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
-import static org.eclipse.scout.sdk.core.util.MatcherStream.allMatches;
+import static org.eclipse.scout.sdk.core.util.StreamUtils.allMatchResults;
 
 import java.util.Collections;
 import java.util.List;
@@ -87,13 +87,13 @@ public class UiTextContributor {
   }
 
   protected static Stream<String> loadDirectLiterals(CharSequence contributeUiTextKeysMethodSource) {
-    return allMatches(KEY_LITERAL_PAT, contributeUiTextKeysMethodSource)
+    return allMatchResults(KEY_LITERAL_PAT, contributeUiTextKeysMethodSource)
         .map(match -> match.group(1));
   }
 
   protected Stream<String> loadReferencedTextProviderServices(CharSequence contributeUiTextKeysMethodSource, IProgress progress) {
     IType contributor = type();
-    List<IType> referencedTextServices = allMatches(TEXT_SERVICE_CLASS_LITERAL_PAT, contributeUiTextKeysMethodSource)
+    List<IType> referencedTextServices = allMatchResults(TEXT_SERVICE_CLASS_LITERAL_PAT, contributeUiTextKeysMethodSource)
         .map(match -> match.group(1))
         .map(contributor::resolveSimpleName)
         .filter(Optional::isPresent)

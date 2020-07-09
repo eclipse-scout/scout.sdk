@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -429,6 +430,45 @@ public class AstNodeFactory {
         .withOverride(true)
         .withReturnType(getAst().newPrimitiveType(PrimitiveType.INT))
         .withBody(body);
+  }
+
+  /**
+   * Creates a KeyStroke.combineKeyStrokes() method with the given elements as parameters.
+   * <p>
+   * <b>Examples:</b>
+   * <ul>
+   * <li>for input ["CONTROL", "C"]: {@code KeyStroke.combineKeyStrokes(IKeyStroke.CONTROL, "C")}</li>
+   * <li>for input ["ALT", "F6"]: {@code KeyStroke.combineKeyStrokes(IKeyStroke.ALT, IKeyStroke.F6)}</li>
+   * </ul>
+   *
+   * @param elementsToCombine
+   *          Elements to pass to the combineKeyStrokes method. Elements with length=1 are considered to be string
+   *          literals, all other elements are inserted as references to IKeyStroke
+   * @return The created {@link MethodInvocation}
+   */
+  @SuppressWarnings("unchecked")
+  public MethodInvocation newCombineKeyStrokes(String... elementsToCombine) {
+    AST ast = getAst();
+    String iKeyStroke = getImportRewrite().addImport(IScoutRuntimeTypes.IKeyStroke);
+    MethodInvocation combineKeyStrokes = ast.newMethodInvocation();
+    combineKeyStrokes.setName(ast.newSimpleName("combineKeyStrokes"));
+    Type keyStrokeRef = newTypeReference(IScoutRuntimeTypes.KeyStroke);
+    combineKeyStrokes.setExpression(ast.newSimpleName(keyStrokeRef.toString()));
+    List<Expression> arguments = combineKeyStrokes.arguments();
+
+    for (String element : elementsToCombine) {
+      if (element.length() < 2) {
+        // String literal value
+        StringLiteral literal = ast.newStringLiteral();
+        literal.setLiteralValue(element);
+        arguments.add(literal);
+      }
+      else {
+        // reference to IKeyStroke
+        arguments.add(ast.newQualifiedName(ast.newName(iKeyStroke), ast.newSimpleName(element)));
+      }
+    }
+    return combineKeyStrokes;
   }
 
   @SuppressWarnings("unchecked")

@@ -1,0 +1,10 @@
+public $staticIfInExtension$ class $name$Handler extends $super$ {
+  @java.lang.Override
+  protected void execLoad() {
+    $END$
+  }
+
+  @java.lang.Override
+  protected void execStore() {
+  }
+}

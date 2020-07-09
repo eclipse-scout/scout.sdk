@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link CoreScoutUtils}</h3>
@@ -43,12 +44,24 @@ public final class CoreScoutUtils {
    *          the declaring type.
    * @return the new order value that should be used.
    */
-  @SuppressWarnings("squid:S2589") // second arg is required so that the compiler is happy
   public static double getNewViewOrderValue(IType declaringType, String orderDefinitionType, int pos) {
     IType[] siblings = findSiblings(declaringType, pos, orderDefinitionType);
     Double orderValueBefore = getOrderAnnotationValue(siblings[0]);
     Double orderValueAfter = getOrderAnnotationValue(siblings[1]);
+    return getNewViewOrderValue(orderValueBefore, orderValueAfter);
+  }
 
+  /**
+   * Gets a new view order value in between of the two values specified.
+   * 
+   * @param orderValueBefore
+   *          The lower bound. May be {@code null}.
+   * @param orderValueAfter
+   *          The upper bound. May be {@code null}.
+   * @return A new value in the middle between the two values given. The algorithm tries to avoid decimals as possible.
+   */
+  @SuppressWarnings("squid:S2589") // second arg is required so that the compiler is happy
+  public static double getNewViewOrderValue(Double orderValueBefore, Double orderValueAfter) {
     // calculate next values
     if (orderValueBefore != null && orderValueAfter == null) {
       // insert at last position
@@ -153,5 +166,30 @@ public final class CoreScoutUtils {
 
   static boolean isDoubleDifferent(double d1, double d2) {
     return CoreUtils.isDoubleDifferent(d1, d2, 0.0000000001);
+  }
+
+  /**
+   * Converts the given double to a {@link String} suitable to place into an @Order annotation value. The algorithm
+   * tries to avoid decimal places and literal specifiers as possible.
+   * 
+   * @param order
+   *          The order to format as Java source {@link String}.
+   * @return The created source {@link String} ready to be placed into a Java file. Never returns {@code null}.
+   */
+  public static String convertOrderToJavaSourceString(double order) {
+    NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
+    f.setGroupingUsed(false);
+    String newOrderStr = f.format(order);
+
+    String zeroSuffix = JavaTypes.C_DOT + "0";
+    if (newOrderStr.endsWith(zeroSuffix)) {
+      newOrderStr = newOrderStr.substring(0, newOrderStr.length() - zeroSuffix.length());
+    }
+
+    if (order > Integer.MAX_VALUE && newOrderStr.indexOf(JavaTypes.C_DOT) < 0) {
+      // we must specify the double data type because we do not have a decimal separator and we do not fit into an integer literal.
+      newOrderStr += 'd';
+    }
+    return newOrderStr;
   }
 }

@@ -14,7 +14,7 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns
-import org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionHelper.Companion.computeLookupElements
+import org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionHelper.computeLookupElements
 import kotlin.streams.toList
 
 class NlsCompletionContributorForJava : CompletionContributor() {

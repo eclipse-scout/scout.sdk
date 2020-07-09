@@ -28,6 +28,7 @@
           <li>Editor for Scout nls files</li>
           <li>Inspection for missing translations</li>
           <li>Code completion for Scout nls keys in Java, JavaScript and HTML</li>
+          <li>Java code completion for Scout elements like FormFields, Menus, KeyStrokes, Codes and much more.</li>
         </ul>
         </p>
   ]]></description>
@@ -37,6 +38,7 @@
           <li>Adds an editor for Scout nls files.</li>
           <li>Adds a quick-fix for the 'Missing translation' inspection.</li>
           <li>Adds code completion for Scout nls keys in Java, JavaScript and HTML.</li>
+          <li>Adds Java code completion for Scout elements like FormFields, Menus, KeyStrokes, Codes and much more.</li>
         </ul>
   ]]></change-notes>
 
@@ -75,8 +77,12 @@
     <fileEditorProvider implementation="org.eclipse.scout.sdk.s2i.nls.editor.NlsFileEditorProvider"/>
     <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJava" id="scoutNlsCompletionJava" order="before propertiesCompletion"/>
     <completion.contributor language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForHtml" id="scoutNlsCompletionHtml" order="before html"/>
+    <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.template.TemplateCompletionContributor" id="scoutTemplateCompletionJava" order="first"/>
     <lang.documentationProvider language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForJava" id="scoutNlsKeyDocumentationJava" order="first"/>
     <lang.documentationProvider language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForHtml" id="scoutNlsKeyDocumentationHtml" order="first"/>
+    <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.DescendantAbstractClassesEnumMacro"/>
+    <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro"/>
+    <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.PsiExpressionEnumMacro"/>
   </extensions>
 
   <actions>

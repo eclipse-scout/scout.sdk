@@ -1,0 +1,11 @@
+public class $name$Box extends $super$ {
+  @java.lang.Override
+  protected java.lang.String getConfiguredLabel() {
+    return #TEXTS#.get("$nls$");
+  }
+
+  @java.lang.Override
+  protected boolean getConfiguredAutoCheckFromTo() {
+    return $boolAutoCheckFromTo$;
+  }$END$
+}

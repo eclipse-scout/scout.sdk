@@ -38,6 +38,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
 
     private val m_fileCache = ConcurrentHashMap<String /* file path */, MutableMap<String /* fqn */, String /* classid */>>()
     private val m_stopTypes: Array<Class<out PsiElement>> = arrayOf(PsiClass::class.java, PsiModifierList::class.java, PsiTypeElement::class.java, PsiTypeParameter::class.java, PsiJavaFile::class.java)
+
     @Volatile
     private var m_cacheReady = false
 

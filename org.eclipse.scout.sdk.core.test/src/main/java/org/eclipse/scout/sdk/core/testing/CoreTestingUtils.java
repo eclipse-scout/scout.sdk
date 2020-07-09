@@ -53,7 +53,7 @@ public final class CoreTestingUtils {
    * @param env
    *          The {@link IJavaEnvironment} in which the override should be registered.
    * @param qualifier
-   *          The package qualifier of the compilation unit.
+   *          The package qualifier of the compilation unit or {@code null} for the default package.
    * @param simpleName
    *          The simple name of the compilation unit (this is the Java file name without file extension. Corresponds to
    *          the name of the main type).

@@ -1,0 +1,16 @@
+public class $name$Field extends $super$<$name$Field.TileGrid> {
+  @java.lang.Override
+  protected java.lang.String getConfiguredLabel() {
+    return #TEXTS#.get("$nls$");
+  }
+
+  @java.lang.Override
+  protected int getConfiguredGridW() {
+    return FULL_WIDTH;
+  }
+
+  @#ClassId#("$newClassId()$")
+  public class TileGrid extends #AbstractTileGrid#<#ITile#> {
+   $END$
+  }
+}

@@ -37,6 +37,7 @@ public interface IScoutRuntimeTypes {
   String Data = "org.eclipse.scout.rt.client.dto.Data";
   String DtoRelevant = "org.eclipse.scout.rt.platform.annotations.DtoRelevant";
   String Extends = "org.eclipse.scout.rt.platform.extension.Extends";
+  String FormData = "org.eclipse.scout.rt.client.dto.FormData";
   String Handler = "org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler";
   String Order = "org.eclipse.scout.rt.platform.Order";
   String PageData = "org.eclipse.scout.rt.client.dto.PageData";
@@ -48,11 +49,14 @@ public interface IScoutRuntimeTypes {
   String Test = "org.junit.Test";
   String TunnelToServer = "org.eclipse.scout.rt.shared.TunnelToServer";
   String WebServiceEntryPoint = "org.eclipse.scout.rt.server.jaxws.provider.annotation.WebServiceEntryPoint";
-  String FormData = "org.eclipse.scout.rt.client.dto.FormData";
 
   // abstract implementations
+  String AbstractAccordion = "org.eclipse.scout.rt.client.ui.accordion.AbstractAccordion";
+  String AbstractAccordionField = "org.eclipse.scout.rt.client.ui.form.fields.accordionfield.AbstractAccordionField";
+  String AbstractActionNode = "org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode";
   String AbstractBigDecimalField = "org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField";
   String AbstractBooleanField = "org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField";
+  String AbstractBrowserField = "org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField";
   String AbstractButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton";
   String AbstractCalendar = "org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar";
   String AbstractCalendarField = "org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendarField";
@@ -70,12 +74,14 @@ public interface IScoutRuntimeTypes {
   String AbstractDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension";
   String AbstractDynamicNlsTextProviderService = "org.eclipse.scout.rt.platform.text.AbstractDynamicNlsTextProviderService";
   String AbstractExtension = "org.eclipse.scout.rt.shared.extension.AbstractExtension";
+  String AbstractFileChooserButton = "org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton.AbstractFileChooserButton";
   String AbstractFileChooserField = "org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileChooserField";
   String AbstractForm = "org.eclipse.scout.rt.client.ui.form.AbstractForm";
   String AbstractFormData = "org.eclipse.scout.rt.shared.data.form.AbstractFormData";
   String AbstractFormField = "org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField";
   String AbstractFormFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData";
   String AbstractFormHandler = "org.eclipse.scout.rt.client.ui.form.AbstractFormHandler";
+  String AbstractGroup = "org.eclipse.scout.rt.client.ui.group.AbstractGroup";
   String AbstractGroupBox = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox";
   String AbstractHtmlField = "org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField";
   String AbstractImageField = "org.eclipse.scout.rt.client.ui.form.fields.imagefield.AbstractImageField";
@@ -85,13 +91,13 @@ public interface IScoutRuntimeTypes {
   String AbstractLongField = "org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField";
   String AbstractLookupService = "org.eclipse.scout.rt.server.services.lookup.AbstractLookupService";
   String AbstractMenu = "org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu";
+  String AbstractMode = "org.eclipse.scout.rt.client.ui.form.fields.mode.AbstractMode";
+  String AbstractModeSelectorField = "org.eclipse.scout.rt.client.ui.form.fields.modeselector.AbstractModeSelectorField";
   String AbstractOkButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton";
   String AbstractPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage";
   String AbstractPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes";
   String AbstractPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable";
   String AbstractPermission = "org.eclipse.scout.rt.security.AbstractPermission";
-  String AbstractPlanner = "org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner";
-  String AbstractPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField";
   String AbstractPropertyData = "org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData";
   String AbstractProposalField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField";
   String AbstractRadioButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton";
@@ -107,6 +113,10 @@ public interface IScoutRuntimeTypes {
   String AbstractTableFieldBeanData = "org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData";
   String AbstractTablePageData = "org.eclipse.scout.rt.shared.data.page.AbstractTablePageData";
   String AbstractTableRowData = "org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData";
+  String AbstractTagField = "org.eclipse.scout.rt.client.ui.form.fields.tagfield.AbstractTagField";
+  String AbstractTile = "org.eclipse.scout.rt.client.ui.tile.AbstractTile";
+  String AbstractTileField = "org.eclipse.scout.rt.client.ui.form.fields.tilefield.AbstractTileField";
+  String AbstractTileGrid = "org.eclipse.scout.rt.client.ui.tile.AbstractTileGrid";
   String AbstractTree = "org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree";
   String AbstractTreeBox = "org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox";
   String AbstractTreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField";
@@ -115,12 +125,15 @@ public interface IScoutRuntimeTypes {
   String AbstractValueFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData";
   String AbstractWebServiceClient = "org.eclipse.scout.rt.server.jaxws.consumer.AbstractWebServiceClient";
   String AbstractWizard = "org.eclipse.scout.rt.client.ui.wizard.AbstractWizard";
-  String AbstractActionNode = "org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode";
 
   // interfaces
+  String IAccordion = "org.eclipse.scout.rt.client.ui.accordion.IAccordion";
+  String IAccordionField = "org.eclipse.scout.rt.client.ui.form.fields.accordionfield.IAccordionField";
+  String IAction = "org.eclipse.scout.rt.client.ui.action.IAction";
   String IActionNode = "org.eclipse.scout.rt.client.ui.action.tree.IActionNode";
   String IBigDecimalField = "org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField";
   String IBooleanField = "org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField";
+  String IBrowserField = "org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField";
   String IButton = "org.eclipse.scout.rt.client.ui.form.fields.button.IButton";
   String ICalendar = "org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar";
   String ICalendarField = "org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField";
@@ -139,6 +152,7 @@ public interface IScoutRuntimeTypes {
   String IDesktop = "org.eclipse.scout.rt.client.ui.desktop.IDesktop";
   String IDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension";
   String IExtension = "org.eclipse.scout.rt.shared.extension.IExtension";
+  String IFileChooserButton = "org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton.IFileChooserButton";
   String IFileChooserField = "org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField";
   String IForm = "org.eclipse.scout.rt.client.ui.form.IForm";
   String IFormExtension = "org.eclipse.scout.rt.client.extension.ui.form.IFormExtension";
@@ -146,6 +160,7 @@ public interface IScoutRuntimeTypes {
   String IFormFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension";
   String IFormFieldMenu = "org.eclipse.scout.rt.client.ui.action.menu.form.fields.IFormFieldMenu";
   String IFormHandler = "org.eclipse.scout.rt.client.ui.form.IFormHandler";
+  String IGroup = "org.eclipse.scout.rt.client.ui.group.IGroup";
   String IGroupBox = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox";
   String IHtmlField = "org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField";
   String IImageField = "org.eclipse.scout.rt.client.ui.form.fields.imagefield.IImageField";
@@ -158,14 +173,14 @@ public interface IScoutRuntimeTypes {
   String ILookupService = "org.eclipse.scout.rt.shared.services.lookup.ILookupService";
   String IMenu = "org.eclipse.scout.rt.client.ui.action.menu.IMenu";
   String IMenuType = "org.eclipse.scout.rt.client.ui.action.menu.IMenuType";
+  String IMode = "org.eclipse.scout.rt.client.ui.form.fields.mode.IMode";
+  String IModeSelectorField = "org.eclipse.scout.rt.client.ui.form.fields.modeselector.IModeSelectorField";
   String IOrdered = "org.eclipse.scout.rt.platform.IOrdered";
   String IOutline = "org.eclipse.scout.rt.client.ui.desktop.outline.IOutline";
   String IPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage";
   String IPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes";
   String IPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable";
   String IPageWithTableExtension = "org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension";
-  String IPlanner = "org.eclipse.scout.rt.client.ui.basic.planner.IPlanner";
-  String IPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField";
   String IPrettyPrintDataObjectMapper = "org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper";
   String IProposalField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField";
   String IRadioButton = "org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton";
@@ -181,18 +196,24 @@ public interface IScoutRuntimeTypes {
   String ITableControl = "org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl";
   String ITableExtension = "org.eclipse.scout.rt.client.extension.ui.basic.table.ITableExtension";
   String ITableField = "org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField";
+  String ITagField = "org.eclipse.scout.rt.client.ui.form.fields.tagfield.ITagField";
   String ITextProviderService = "org.eclipse.scout.rt.platform.text.ITextProviderService";
+  String ITile = "org.eclipse.scout.rt.client.ui.tile.ITile";
+  String ITileField = "org.eclipse.scout.rt.client.ui.form.fields.tilefield.ITileField";
+  String ITileGrid = "org.eclipse.scout.rt.client.ui.tile.ITileGrid";
   String ITree = "org.eclipse.scout.rt.client.ui.basic.tree.ITree";
   String ITreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField";
+  String ITreeNode = "org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode";
   String ITypeWithClassId = "org.eclipse.scout.rt.platform.classid.ITypeWithClassId";
   String IUuId = "org.eclipse.scout.rt.dataobject.id.IUuId";
   String IValueField = "org.eclipse.scout.rt.client.ui.form.fields.IValueField";
   String IViewButton = "org.eclipse.scout.rt.client.ui.action.view.IViewButton";
+  String IWidget = "org.eclipse.scout.rt.client.ui.IWidget";
   String IWizard = "org.eclipse.scout.rt.client.ui.wizard.IWizard";
   String IWizardStep = "org.eclipse.scout.rt.client.ui.wizard.IWizardStep";
-  String IAction = "org.eclipse.scout.rt.client.ui.action.IAction";
 
   // other runtime classes
+  String ACCESS = "org.eclipse.scout.rt.security.ACCESS";
   String ArgumentMatchers = "org.mockito.ArgumentMatchers";
   String BEANS = "org.eclipse.scout.rt.platform.BEANS";
   String BasicAuthenticationMethod = "org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod";
@@ -201,6 +222,7 @@ public interface IScoutRuntimeTypes {
   String ClientTestRunner = "org.eclipse.scout.rt.testing.client.runner.ClientTestRunner";
   String CollectionUtility = "org.eclipse.scout.rt.platform.util.CollectionUtility";
   String ConfigFileCredentialVerifier = "org.eclipse.scout.rt.platform.security.ConfigFileCredentialVerifier";
+  String KeyStroke = "org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke";
   String LogHandler = "org.eclipse.scout.rt.server.jaxws.handler.LogHandler";
   String Logger = "org.slf4j.Logger";
   String LookupCall = "org.eclipse.scout.rt.shared.services.lookup.LookupCall";
@@ -217,30 +239,41 @@ public interface IScoutRuntimeTypes {
   String VetoException = "org.eclipse.scout.rt.platform.exception.VetoException";
   String WsConsumerCorrelationIdHandler = "org.eclipse.scout.rt.server.jaxws.handler.WsConsumerCorrelationIdHandler";
   String WsProviderCorrelationIdHandler = "org.eclipse.scout.rt.server.jaxws.handler.WsProviderCorrelationIdHandler";
-  String ACCESS = "org.eclipse.scout.rt.security.ACCESS";
 
   // Menu Types
   String CalendarMenuType = "org.eclipse.scout.rt.client.ui.action.menu.CalendarMenuType";
+  String ImageFieldMenuType = "org.eclipse.scout.rt.client.ui.action.menu.ImageFieldMenuType";
   String TabBoxMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TabBoxMenuType";
+  String TableMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TableMenuType";
+  String TileGridMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TileGridMenuType";
   String TreeMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType";
   String ValueFieldMenuType = "org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType";
-  String TableMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TableMenuType";
 
   String CalendarMenuType_CalendarComponent = "CalendarComponent";
   String CalendarMenuType_EmptySpace = "EmptySpace";
+  String ImageFieldMenuType_Null = "Null";
+  String ImageFieldMenuType_ImageId = "ImageId";
+  String ImageFieldMenuType_ImageUrl = "ImageUrl";
+  String ImageFieldMenuType_Image = "Image";
   String TabBoxMenuType_Header = "Header";
   String TableMenuType_EmptySpace = "EmptySpace";
   String TableMenuType_Header = "Header";
   String TableMenuType_MultiSelection = "MultiSelection";
+  String TableMenuType_SingleSelection = "SingleSelection";
+  String TileGridMenuType_EmptySpace = "EmptySpace";
+  String TileGridMenuType_SingleSelection = "SingleSelection";
+  String TileGridMenuType_MultiSelection = "MultiSelection";
   String TreeMenuType_EmptySpace = "EmptySpace";
   String TreeMenuType_MultiSelection = "MultiSelection";
   String TreeMenuType_SingleSelection = "SingleSelection";
+  String TreeMenuType_Header = "Header";
   String ValueFieldMenuType_NotNull = "NotNull";
   String ValueFieldMenuType_Null = "Null";
-  String TableMenuType_SingleSelection = "SingleSelection";
 
   // extensions
+  String AbstractAccordionFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.accordionfield.AbstractAccordionFieldExtension";
   String AbstractActionExtension = "org.eclipse.scout.rt.client.extension.ui.action.AbstractActionExtension";
+  String AbstractActionNodeExtension = "org.eclipse.scout.rt.client.extension.ui.action.tree.AbstractActionNodeExtension";
   String AbstractButtonExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.button.AbstractButtonExtension";
   String AbstractCalendarExtension = "org.eclipse.scout.rt.client.extension.ui.basic.calendar.AbstractCalendarExtension";
   String AbstractCalendarFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.calendarfield.AbstractCalendarFieldExtension";
@@ -253,22 +286,22 @@ public interface IScoutRuntimeTypes {
   String AbstractFormExtension = "org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension";
   String AbstractFormFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension";
   String AbstractGroupBoxExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.AbstractGroupBoxExtension";
+  String AbstractGroupExtension = "org.eclipse.scout.rt.client.extension.ui.group.AbstractGroupExtension";
   String AbstractImageFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.AbstractImageFieldExtension";
   String AbstractListBoxExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.AbstractListBoxExtension";
   String AbstractPageWithTableExtension = "org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.AbstractPageWithTableExtension";
-  String AbstractPlannerExtension = "org.eclipse.scout.rt.client.extension.ui.basic.planner.AbstractPlannerExtension";
-  String AbstractPlannerFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.AbstractPlannerFieldExtension";
   String AbstractRadioButtonGroupExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroupExtension";
   String AbstractTabBoxExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.AbstractTabBoxExtension";
   String AbstractTableExtension = "org.eclipse.scout.rt.client.extension.ui.basic.table.AbstractTableExtension";
   String AbstractTableFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.AbstractTableFieldExtension";
+  String AbstractTileFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.tilefield.AbstractTileFieldExtension";
+  String AbstractTileGridExtension = "org.eclipse.scout.rt.client.extension.ui.tile.AbstractTileGridExtension";
   String AbstractTreeBoxExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.AbstractTreeBoxExtension";
   String AbstractTreeExtension = "org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeExtension";
   String AbstractTreeFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.AbstractTreeFieldExtension";
   String AbstractTreeNodeExtension = "org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension";
   String AbstractValueFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension";
   String AbstractWizardExtension = "org.eclipse.scout.rt.client.extension.ui.wizard.AbstractWizardExtension";
-  String AbstractActionNodeExtension = "org.eclipse.scout.rt.client.extension.ui.action.tree.AbstractActionNodeExtension";
 
   String WebService = "javax.jws.WebService";
   String WebServiceClient = "javax.xml.ws.WebServiceClient";

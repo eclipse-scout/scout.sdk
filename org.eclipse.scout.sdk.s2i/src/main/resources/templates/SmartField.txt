@@ -1,0 +1,6 @@
+public class $name$Field extends $super$<$type$> {
+  @java.lang.Override
+  protected java.lang.String getConfiguredLabel() {
+    return #TEXTS#.get("$nls$");
+  }$END$
+}

@@ -10,30 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2i.environment
 
-import com.intellij.openapi.roots.LanguageLevelProjectExtension
-import com.intellij.pom.java.LanguageLevel
-import com.intellij.testFramework.builders.JavaModuleFixtureBuilder
-import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase
-import com.intellij.testFramework.fixtures.ModuleFixture
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator
-import org.eclipse.scout.sdk.core.model.ecj.JreInfo
+import org.eclipse.scout.sdk.s2i.AbstractTestCaseWithRunningClasspathModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
 
 
-class IdeaEnvironmentTest : JavaCodeInsightFixtureTestCase() {
-
-    override fun setUp() {
-        super.setUp()
-        LanguageLevelProjectExtension.getInstance(project).languageLevel = LanguageLevel.JDK_1_8
-    }
-
-    override fun tuneFixture(moduleBuilder: JavaModuleFixtureBuilder<ModuleFixture>) {
-        super.tuneFixture(moduleBuilder)
-        moduleBuilder
-                .addJdk(JreInfo.getRunningJavaHome().toString())
-                .setLanguageLevel(LanguageLevel.JDK_1_8)
-    }
-
+class IdeaEnvironmentTest : AbstractTestCaseWithRunningClasspathModule() {
 
     fun testAsyncWriteOperationInheritsTransaction() {
         callInIdeaEnvironment(project, "Test") { env, progress ->

@@ -15,13 +15,16 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Strings.withoutQuotes;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.StringTokenizer;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.internal.compiler.util.JRTUtil;
@@ -29,6 +32,7 @@ import org.eclipse.jdt.internal.compiler.util.Util;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.StreamUtils;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -221,8 +225,47 @@ public class JreInfo {
     return parent.resolve("src.zip");
   }
 
-  public static Path getRunningJavaHome() {
+  /**
+   * @return The {@link Path} to the Java home directory running the current application. Is never {@code null}.
+   * @throws IllegalArgumentException
+   *           if the {@link Path} cannot be calculated.
+   */
+  public static Path runningJavaHome() {
     return Ensure.notNull(Util.getJavaHome(), "Cannot calculate the running Java home. Please specify a JRE home explicitly.").toPath();
+  }
+
+  /**
+   * @return The {@link JreInfo} describing the Java runtime of the running application. Is never {@code null}.
+   */
+  public static JreInfo runningJreInfo() {
+    return new JreInfo(runningJavaHome());
+  }
+
+  /**
+   * Gets all entries in the system property "java.class.path".<br>
+   * Entries pointing to the given Java directory are not part of the result.
+   *
+   * @param javaHome
+   *          The path to the Java home directory or {@code null} if the running Java home should be used. Classpath
+   *          entries below this home directory are not part of the result.
+   * @return A {@link Stream} holding all user classpath elements as specified in the "java.class.path" system property.
+   */
+  public static Stream<Path> runningUserClassPath(Path javaHome) {
+    //noinspection AccessOfSystemProperties
+    String javaClassPathRaw = System.getProperty("java.class.path");
+    if (Strings.isBlank(javaClassPathRaw)) {
+      return Stream.empty();
+    }
+
+    Path jreHome = Optional.ofNullable(javaHome).orElseGet(JreInfo::runningJavaHome);
+    return StreamUtils.toStream(new StringTokenizer(javaClassPathRaw, File.pathSeparator))
+        .map(Object::toString)
+        .map(Paths::get)
+        .filter(classpathItem -> !isJreLib(classpathItem, jreHome));
+  }
+
+  protected static boolean isJreLib(Path candidate, Path javaHome) {
+    return candidate != null && candidate.startsWith(javaHome);
   }
 
   @Override

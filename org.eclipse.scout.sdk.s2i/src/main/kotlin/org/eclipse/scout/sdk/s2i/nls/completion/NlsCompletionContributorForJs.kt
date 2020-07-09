@@ -22,7 +22,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.s2i.containingModule
-import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns.Companion.startsWithIgnoringQuotes
+import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns.startsWithIgnoringQuotes
 import kotlin.streams.toList
 
 class NlsCompletionContributorForJs : CompletionContributor() {
