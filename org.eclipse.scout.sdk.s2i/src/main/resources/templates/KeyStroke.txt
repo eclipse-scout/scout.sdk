@@ -1,0 +1,11 @@
+public class $name$KeyStroke extends $super$ {
+  @java.lang.Override
+  protected java.lang.String getConfiguredKeyStroke() {
+    return $keystrokes$;
+  }
+
+  @java.lang.Override
+  protected void execAction() {
+    $END$
+  }
+}

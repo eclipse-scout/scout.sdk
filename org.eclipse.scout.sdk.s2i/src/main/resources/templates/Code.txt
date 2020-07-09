@@ -1,0 +1,14 @@
+public static class $name$Code extends $super$<$declaringTypeArg(#ICodeType#, #TYPE_PARAM_CODETYPE__CODE_ID#, box)$> {
+  private static final long serialVersionUID = 1L;
+  public static final $declaringTypeArg(#ICodeType#, #TYPE_PARAM_CODETYPE__CODE_ID#, unbox)$ ID = $declaringTypeArg(#ICodeType#, #TYPE_PARAM_CODETYPE__CODE_ID#, default)$;
+
+  @java.lang.Override
+  protected java.lang.String getConfiguredText() {
+    return #TEXTS#.get("$nls$");
+  }
+
+  @java.lang.Override
+  public $declaringTypeArg(#ICodeType#, #TYPE_PARAM_CODETYPE__CODE_ID#, box)$ getId() {
+    return ID;
+  }$END$
+}

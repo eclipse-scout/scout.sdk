@@ -1,0 +1,7 @@
+@#FormData#(sdkCommand = #FormData#.SdkCommand.IGNORE)
+public class $name$Field extends $super$ {
+  @java.lang.Override
+  protected java.lang.String getConfiguredLabel() {
+    return #TEXTS#.get("$nls$");
+  }$END$
+}

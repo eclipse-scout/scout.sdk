@@ -16,6 +16,7 @@ import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
 
 val SCOUT_SDK_VERSION = "11.0.0-SNAPSHOT"
+val SCOUT_RT_VERSION = "11.0-SNAPSHOT"
 val SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
 val JAVA_VERSION = JavaVersion.VERSION_1_8
 
@@ -47,10 +48,13 @@ dependencies {
     api("org.apache.poi", "poi-ooxml", "4.1.2")
     implementation(kotlin("stdlib-jdk8"))
     testImplementation("org.mockito", "mockito-core", "3.3.3")
+    testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", SCOUT_RT_VERSION)
+    testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", SCOUT_SDK_VERSION)
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
+    // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
     version = "IU-2020.1.2"
     downloadSources = true
 
@@ -82,6 +86,12 @@ tasks.withType<KotlinCompile>().configureEach {
         apiVersion = "1.3"
         languageVersion = "1.3"
     }
+}
+
+tasks.withType<Test> {
+    // see com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
+    // this Property allows AbstractTestCaseWithRunningClasspathModule to access all libraries of the running user classpath
+    systemProperty("NO_FS_ROOTS_ACCESS_CHECK", project.findProperty("NO_FS_ROOTS_ACCESS_CHECK") ?: "true")
 }
 
 tasks.jar {

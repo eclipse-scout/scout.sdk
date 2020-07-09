@@ -28,22 +28,17 @@ import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractImageField
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractKeyStroke;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractLabelField;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractListBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractListBoxExtension;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractLongField;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractMenu;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractProposalField;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractRadioButton;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractRadioButtonGroup;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractRadioButtonGroupExtension;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractSequenceBox;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractSmartField;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractStringColumn;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractStringField;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractTabBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractTabBoxExtension;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractTableField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractTreeBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractTreeBoxExtension;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractTreeField;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IBigDecimalField;
 import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IBooleanField;
@@ -147,8 +142,8 @@ public final class ScoutTemplateProposalFactory {
   private ScoutTemplateProposalFactory() {
   }
 
+  @SuppressWarnings("PublicStaticCollectionField")
   public static final Map<String, TemplateProposalDescriptor> TEMPLATES = new ConcurrentHashMap<>();
-
   static {
     int relevance = 10000;
     TEMPLATES.put(IStringField,
@@ -219,7 +214,7 @@ public final class ScoutTemplateProposalFactory {
       return emptyList();
     }
 
-    Collection<String> possibleChildrenIfcFqn = getPossibleChildInterfaceNames(superTypesOfDeclaringType);
+    Collection<String> possibleChildrenIfcFqn = ScoutModelHierarchy.getPossibleChildren(superTypesOfDeclaringType);
     if (possibleChildrenIfcFqn.isEmpty()) {
       return emptyList();
     }
@@ -253,41 +248,6 @@ public final class ScoutTemplateProposalFactory {
       superTypesOfDeclaringType.add(superType.getFullyQualifiedName());
     }
     return superTypesOfDeclaringType;
-  }
-
-  private static Collection<String> getPossibleChildInterfaceNames(Collection<String> superTypesOfDeclaringType) {
-    Collection<String> possibleChildrenIfcFqn = new HashSet<>();
-    if (superTypesOfDeclaringType.contains(AbstractTabBox)
-        || superTypesOfDeclaringType.contains(AbstractTabBoxExtension)) {
-      // special case for tab boxes
-      possibleChildrenIfcFqn.add(IGroupBox);
-      possibleChildrenIfcFqn.add(IMenu);
-      possibleChildrenIfcFqn.add(IKeyStroke);
-    }
-    else if (superTypesOfDeclaringType.contains(AbstractListBox)
-        || superTypesOfDeclaringType.contains(AbstractTreeBox)
-        || superTypesOfDeclaringType.contains(AbstractListBoxExtension)
-        || superTypesOfDeclaringType.contains(AbstractTreeBoxExtension)) {
-      // special case for list boxes & tree boxes
-      possibleChildrenIfcFqn.add(IMenu);
-      possibleChildrenIfcFqn.add(IKeyStroke);
-    }
-    else if (superTypesOfDeclaringType.contains(AbstractRadioButtonGroup)
-        || superTypesOfDeclaringType.contains(AbstractRadioButtonGroupExtension)) {
-      // special case for radio button groups
-      possibleChildrenIfcFqn.add(IRadioButton);
-      possibleChildrenIfcFqn.add(IMenu);
-      possibleChildrenIfcFqn.add(IKeyStroke);
-    }
-    else {
-      for (String superType : superTypesOfDeclaringType) {
-        Set<String> possibleChildren = ScoutModelHierarchy.getPossibleChildren(superType);
-        if (!possibleChildren.isEmpty()) {
-          possibleChildrenIfcFqn.addAll(possibleChildren);
-        }
-      }
-    }
-    return possibleChildrenIfcFqn;
   }
 
   private static final class P_JavaEnvironmentPreloader implements Callable<EclipseEnvironment>, ICompletionListener {

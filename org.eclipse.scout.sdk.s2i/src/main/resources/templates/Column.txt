@@ -1,0 +1,11 @@
+public class $name$Column extends $super$ {
+  @java.lang.Override
+  protected java.lang.String getConfiguredHeaderText() {
+    return #TEXTS#.get("$nls$");
+  }
+
+  @java.lang.Override
+  protected int getConfiguredWidth() {
+    return $width$;
+  }$END$
+}

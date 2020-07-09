@@ -1,0 +1,16 @@
+public class $name$Field extends $super$ {
+  @#ClassId#("$newClassId()$")
+  public class Tree extends #AbstractTree# {
+    $END$
+  }
+
+  @java.lang.Override
+  protected java.lang.String getConfiguredLabel() {
+    return #TEXTS#.get("$nls$");
+  }
+
+  @java.lang.Override
+  protected int getConfiguredGridH() {
+    return 6;
+  }
+}

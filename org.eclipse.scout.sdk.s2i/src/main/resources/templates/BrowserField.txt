@@ -1,0 +1,21 @@
+public class $name$Field extends $super$ {
+  @java.lang.Override
+  protected int getConfiguredGridH() {
+    return $height$;
+  }
+
+  @java.lang.Override
+  protected int getConfiguredGridW() {
+    return $width$;
+  }
+
+  @java.lang.Override
+  protected boolean getConfiguredLabelVisible() {
+    return $boolLabelVisible$;
+  }
+
+  @java.lang.Override
+  protected boolean getConfiguredScrollBarEnabled() {
+    return $boolScrollBarEnabled$;
+  }$END$
+}

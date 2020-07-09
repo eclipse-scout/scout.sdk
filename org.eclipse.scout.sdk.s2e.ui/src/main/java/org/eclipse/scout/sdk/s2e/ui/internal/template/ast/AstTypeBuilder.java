@@ -10,10 +10,10 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import java.text.NumberFormat;
+import static org.eclipse.scout.sdk.core.s.util.CoreScoutUtils.convertOrderToJavaSourceString;
+
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -210,6 +210,7 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
     if (isCreateOrderAnnotation()) {
       double newOrder = ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       if (isCalculateOrderValue()) {
+        //noinspection resource
         IJavaEnvironment environment = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
         newOrder = CoreScoutUtils.getNewViewOrderValue(environment.requireType(declaringTypeFqn), getOrderDefinitionType(), getInsertPosition());
       }
@@ -247,23 +248,6 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
       typeRewrite.insertAfter(m_resultType, previousNode, null);
     }
     return m_return;
-  }
-
-  protected static String convertOrderToJavaSourceString(double order) {
-    NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
-    f.setGroupingUsed(false);
-    String newOrderStr = f.format(order);
-
-    String zeroSuffix = JavaTypes.C_DOT + "0";
-    if (newOrderStr.endsWith(zeroSuffix)) {
-      newOrderStr = newOrderStr.substring(0, newOrderStr.length() - zeroSuffix.length());
-    }
-
-    if (order > Integer.MAX_VALUE && newOrderStr.indexOf(JavaTypes.C_DOT) < 0) {
-      // we must specify the double data type because we do not have a decimal separator and we do not fit into an integer literal.
-      newOrderStr += 'd';
-    }
-    return newOrderStr;
   }
 
   private static final class P_EnsureElementInRewriteFilter implements Predicate<ASTNode> {

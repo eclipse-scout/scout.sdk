@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static org.eclipse.scout.sdk.core.model.ecj.JreInfo.runningUserClassPath;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -22,7 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -35,7 +36,6 @@ import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.RunningJava
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link JavaEnvironmentWithEcjBuilder}</h3> Used to create an {@link IJavaEnvironment} based on ECJ. This is the
@@ -58,6 +58,13 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   private boolean m_parseMethodBodies;
   private boolean m_includeRunningClasspath = true;
   private boolean m_includeSources = true;
+
+  /**
+   * @return A new JavaEnvironmentWithEcjBuilder instance.
+   */
+  public static JavaEnvironmentWithEcjBuilder<?> create() {
+    return new JavaEnvironmentWithEcjBuilder<>();
+  }
 
   /**
    * Include current running classpath, default is {@code true}.
@@ -289,24 +296,8 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   }
 
   protected void collectRunningClassPath(Collection<ClasspathEntry> collector, Collection<Path> sourceAttachmentFor) {
-    //noinspection AccessOfSystemProperties
-    String javaClassPathRaw = System.getProperty("java.class.path");
-    if (Strings.isBlank(javaClassPathRaw)) {
-      return;
-    }
-
-    Path jreHome = Optional.ofNullable(javaHome()).orElseGet(JreInfo::getRunningJavaHome);
-    StringTokenizer tokenizer = new StringTokenizer(javaClassPathRaw, File.pathSeparator);
-    while (tokenizer.hasMoreTokens()) {
-      Path classpathItem = Paths.get(tokenizer.nextToken());
-      if (!isJreLib(classpathItem, jreHome)) {
-        filterAndAppendBinaryPath(classpathItem, sourceAttachmentFor, collector);
-      }
-    }
-  }
-
-  protected static boolean isJreLib(Path candidate, Path javaHome) {
-    return candidate != null && candidate.startsWith(javaHome);
+    runningUserClassPath(javaHome())
+        .forEach(classpathItem -> filterAndAppendBinaryPath(classpathItem, sourceAttachmentFor, collector));
   }
 
   /**

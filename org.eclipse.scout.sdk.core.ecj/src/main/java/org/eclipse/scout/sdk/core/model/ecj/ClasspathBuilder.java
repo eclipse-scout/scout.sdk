@@ -52,7 +52,7 @@ public class ClasspathBuilder {
    *          The runtime classpath entries.
    */
   protected ClasspathBuilder(Path jreHome, Collection<? extends ClasspathEntry> paths) {
-    Path javaHome = Optional.ofNullable(jreHome).orElseGet(JreInfo::getRunningJavaHome).normalize();
+    Path javaHome = Optional.ofNullable(jreHome).orElseGet(JreInfo::runningJavaHome).normalize();
     m_jreInfo = JRE_INFOS.computeIfAbsent(javaHome, JreInfo::new);
 
     Map<ClasspathEntry, Classpath> classpath = toClasspath(paths);
@@ -112,7 +112,6 @@ public class ClasspathBuilder {
     }
     else {
       SdkLog.debug("Using Boot Classpath based on the jars in the lib folder of Java home: {}.", jreHome);
-
       // append RT src.zip first
       appendSrcClasspathToEnd(result, rtSrcZip, null /* use default encoding */);
 

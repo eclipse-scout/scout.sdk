@@ -1,0 +1,16 @@
+public class $name$Field extends $super$<$name$Field.Accordion> {
+  @java.lang.Override
+  protected boolean getConfiguredLabelVisible() {
+    return $boolLabelVisible$;
+  }
+
+  @java.lang.Override
+  protected int getConfiguredGridW() {
+    return FULL_WIDTH;
+  }
+
+  @#ClassId#("$newClassId()$")
+  public class Accordion extends #AbstractAccordion# {
+    $END$
+  }
+}

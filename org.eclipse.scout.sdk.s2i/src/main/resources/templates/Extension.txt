@@ -1,0 +1,5 @@
+public class $name$Extension extends $super$<$complete$> {
+  public $name$Extension($complete$ owner) {
+    super(owner);
+  }$END$
+}

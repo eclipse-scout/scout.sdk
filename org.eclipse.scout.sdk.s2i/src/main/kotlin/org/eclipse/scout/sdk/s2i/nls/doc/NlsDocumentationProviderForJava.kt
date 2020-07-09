@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2i.nls.doc
 
 import com.intellij.psi.PsiElement
 import org.eclipse.scout.sdk.core.util.Strings.withoutQuotes
-import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns.Companion.anyJavaPatternAccepts
+import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns.anyJavaPatternAccepts
 
 open class NlsDocumentationProviderForJava : AbstractNlsDocumentationProvider() {
 

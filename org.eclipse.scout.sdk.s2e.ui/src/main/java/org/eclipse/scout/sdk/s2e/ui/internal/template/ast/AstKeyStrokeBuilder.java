@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
@@ -53,11 +53,9 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
   protected void addGetConfiguredKeyStroke() {
     AST ast = getFactory().getAst();
 
-    String iKsSimpleName = getFactory().getImportRewrite().addImport(IScoutRuntimeTypes.IKeyStroke);
-    QualifiedName keyStrokeRef = ast.newQualifiedName(ast.newName(iKsSimpleName), ast.newSimpleName("F6"));
-
+    MethodInvocation defaultValue = getFactory().newCombineKeyStrokes("ALT", "F6");
     ReturnStatement returnStatement = ast.newReturnStatement();
-    returnStatement.setExpression(keyStrokeRef);
+    returnStatement.setExpression(defaultValue);
 
     Block body = ast.newBlock();
     body.statements().add(returnStatement);
@@ -73,7 +71,8 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      ITrackedNodePosition typeNamePos = getFactory().getRewrite().track(keyStrokeRef);
+      String iKsSimpleName = getFactory().getImportRewrite().addImport(IScoutRuntimeTypes.IKeyStroke);
+      ITrackedNodePosition typeNamePos = getFactory().getRewrite().track(defaultValue);
       links.addLinkedPosition(typeNamePos, true, AstNodeFactory.KEY_STROKE_GROUP);
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".F1");
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".F2");
@@ -96,9 +95,9 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".RIGHT");
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".UP");
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".DOWN");
-      links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".CONTROL + " + iKsSimpleName + ".KEY_STROKE_SEPARATOR + " + "'C'");
-      links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".SHIFT + " + iKsSimpleName + ".KEY_STROKE_SEPARATOR + " + '4');
-      links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".ALT + " + iKsSimpleName + ".KEY_STROKE_SEPARATOR + " + iKsSimpleName + ".F6");
+      links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, getFactory().newCombineKeyStrokes("CONTROL", "C").toString());
+      links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, getFactory().newCombineKeyStrokes("SHIFT", "4").toString());
+      links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, getFactory().newCombineKeyStrokes("ALT", "F6").toString());
 
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IKeyStroke);
     }

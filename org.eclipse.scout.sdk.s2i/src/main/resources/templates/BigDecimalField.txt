@@ -1,0 +1,16 @@
+public class $name$Field extends $super$ {
+  @java.lang.Override
+  protected java.lang.String getConfiguredLabel() {
+    return #TEXTS#.get("$nls$");
+  }
+
+  @java.lang.Override
+  protected java.math.BigDecimal getConfiguredMinValue() {
+    return new java.math.BigDecimal("$min$");
+  }
+
+  @java.lang.Override
+  protected java.math.BigDecimal getConfiguredMaxValue() {
+    return new java.math.BigDecimal("$max$");
+  }$END$
+}

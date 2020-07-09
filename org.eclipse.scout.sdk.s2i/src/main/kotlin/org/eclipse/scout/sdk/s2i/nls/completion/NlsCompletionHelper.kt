@@ -18,46 +18,43 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.module.Module
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.s.nls.Language
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.Companion.createStack
+import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
 import java.util.stream.Stream
 
-class NlsCompletionHelper private constructor() {
+object NlsCompletionHelper {
 
-    companion object {
-
-        private val RENDERER = object : LookupElementRenderer<LookupElement>() {
-            override fun renderElement(element: LookupElement, presentation: LookupElementPresentation) {
-                renderLookupElement(element, presentation)
-            }
+    private val RENDERER = object : LookupElementRenderer<LookupElement>() {
+        override fun renderElement(element: LookupElement, presentation: LookupElementPresentation) {
+            renderLookupElement(element, presentation)
         }
+    }
 
-        fun computeLookupElements(module: Module, lookupStringProvider: (ITranslationEntry) -> String = { it.key() }): Stream<LookupElementBuilder> =
-                createStack(module)
-                        ?.allEntries()
-                        ?.map { lookupElementFor(it, lookupStringProvider) } ?: Stream.empty()
+    fun computeLookupElements(module: Module, lookupStringProvider: (ITranslationEntry) -> String = { it.key() }): Stream<LookupElementBuilder> =
+            createStack(module)
+                    ?.allEntries()
+                    ?.map { lookupElementFor(it, lookupStringProvider) } ?: Stream.empty()
 
-        private fun lookupElementFor(translation: ITranslationEntry, lookupStringProvider: (ITranslationEntry) -> String) =
-                LookupElementBuilder.create(translation, lookupStringProvider.invoke(translation))
-                        .withCaseSensitivity(false)
-                        .withRenderer(RENDERER)
+    private fun lookupElementFor(translation: ITranslationEntry, lookupStringProvider: (ITranslationEntry) -> String) =
+            LookupElementBuilder.create(translation, lookupStringProvider.invoke(translation))
+                    .withCaseSensitivity(true)
+                    .withRenderer(RENDERER)
 
-        private fun renderLookupElement(element: LookupElement, presentation: LookupElementPresentation) {
-            val translation = element.getObject() as ITranslationEntry
-            val store = translation.store()
-            val isReadOnly = !store.isEditable
-            val serviceSuffix = "TextProviderService"
+    private fun renderLookupElement(element: LookupElement, presentation: LookupElementPresentation) {
+        val translation = element.getObject() as ITranslationEntry
+        val store = translation.store()
+        val isReadOnly = !store.isEditable
+        val serviceSuffix = "TextProviderService"
 
-            presentation.itemText = translation.key()
-            presentation.isItemTextItalic = isReadOnly
-            presentation.icon = AllIcons.Nodes.ResourceBundle
+        presentation.itemText = translation.key()
+        presentation.isItemTextItalic = isReadOnly
+        presentation.icon = AllIcons.Nodes.ResourceBundle
 
-            translation.text(Language.LANGUAGE_DEFAULT).ifPresent { presentation.appendTailText("=$it", true) }
+        translation.text(Language.LANGUAGE_DEFAULT).ifPresent { presentation.appendTailText("=$it", true) }
 
-            var storeName = store.service().type().elementName()
-            if (storeName.endsWith(serviceSuffix)) {
-                storeName = storeName.substring(0, storeName.length - serviceSuffix.length)
-            }
-            presentation.typeText = storeName
+        var storeName = store.service().type().elementName()
+        if (storeName.endsWith(serviceSuffix)) {
+            storeName = storeName.substring(0, storeName.length - serviceSuffix.length)
         }
+        presentation.typeText = storeName
     }
 }

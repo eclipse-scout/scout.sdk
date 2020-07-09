@@ -33,10 +33,10 @@ class EclipseScoutBundle : StartupActivity, DumbAware {
 
     companion object {
 
-        private const val BUNDLE = "messages.EclipseScoutBundle"
+        const val RESOURCE_BUNDLE = "messages.EclipseScoutBundle"
         private var ourBundle: Reference<ResourceBundle>? = null
 
-        fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String =
+        fun message(@PropertyKey(resourceBundle = RESOURCE_BUNDLE) key: String, vararg params: Any): String =
                 BundleBase.message(getBundle(), key, *params)
 
         fun derivedResourceManager(project: Project): DerivedResourceManager =
@@ -50,7 +50,7 @@ class EclipseScoutBundle : StartupActivity, DumbAware {
                 return cachedBundle
             }
 
-            val bundle = ResourceBundle.getBundle(BUNDLE)
+            val bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE)
             ourBundle = SoftReference(bundle)
             return bundle
         }

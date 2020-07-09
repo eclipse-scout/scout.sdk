@@ -1,0 +1,12 @@
+public class $name$Menu extends $super$ {
+  @java.lang.Override
+  protected java.lang.String getConfiguredText() {
+    return #TEXTS#.get("$nls$");
+  }
+
+  $getConfiguredMenuTypes$
+  @java.lang.Override
+  protected void execAction() {
+    $END$
+  }
+}
