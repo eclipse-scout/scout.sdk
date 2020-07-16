@@ -516,7 +516,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   @Override
   public Optional<String> getDeclaringFullyQualifiedName() {
-    return Optional.ofNullable(m_declaringFullyQualifiedName);
+    return Strings.notBlank(m_declaringFullyQualifiedName);
   }
 
   @Override

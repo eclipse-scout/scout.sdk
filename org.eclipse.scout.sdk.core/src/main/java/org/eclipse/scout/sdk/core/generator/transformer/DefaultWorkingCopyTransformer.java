@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.generator.transformer;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.PackageGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
@@ -84,7 +85,7 @@ public class DefaultWorkingCopyTransformer implements IWorkingCopyTransformer {
   }
 
   @Override
-  public String transformPackage(ITransformInput<IPackage, String> input) {
+  public PackageGenerator transformPackage(ITransformInput<IPackage, PackageGenerator> input) {
     return transformElement(input);
   }
 

@@ -21,12 +21,14 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
  */
 public class ExtendsAnnotation extends AbstractManagedAnnotation {
   public static final String TYPE_NAME = IScoutRuntimeTypes.Extends;
+  public static final String VALUE_ELEMENT_NAME = "value";
+  public static final String PATH_TO_CONTAINER_ELEMENT_NAME = "value";
 
   public IType value() {
-    return getValue("value", IType.class, null);
+    return getValue(VALUE_ELEMENT_NAME, IType.class, null);
   }
 
   public IType[] pathToContainer() {
-    return getValue("pathToContainer", IType[].class, null);
+    return getValue(PATH_TO_CONTAINER_ELEMENT_NAME, IType[].class, null);
   }
 }

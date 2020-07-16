@@ -140,7 +140,7 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
   }
 
   @Override
-  public TYPE withElement(String name, String valueSrc) {
+  public TYPE withElement(String name, CharSequence valueSrc) {
     return withElement(name, ISourceGenerator.raw(valueSrc));
   }
 

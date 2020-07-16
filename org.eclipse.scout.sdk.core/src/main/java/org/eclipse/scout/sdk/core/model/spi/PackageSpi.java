@@ -20,13 +20,20 @@ import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
  *
  * @since 5.1.0
  */
-public interface PackageSpi extends JavaElementSpi {
+public interface PackageSpi extends AnnotatableSpi {
 
   /**
    * @return The name of the package or {@code null} if it is the default package.
    */
   @Override
   String getElementName();
+
+  TypeSpi getPackageInfo();
+
+  /**
+   * @return The parent package. If this is {@code org.eclipse.scout} the parent would be {@code org.eclipse}
+   */
+  PackageSpi getParentPackage();
 
   @Override
   default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {

@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.SimpleGenerators;
+import org.eclipse.scout.sdk.core.generator.PackageGenerator;
 import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
@@ -58,7 +58,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYPE>> extends AbstractJavaElementGenerator<TYPE> implements ICompilationUnitGenerator<TYPE> {
 
-  private String m_packageName;
+  private PackageGenerator m_package;
   private final List<CharSequence> m_declaredImports;
   private final List<CharSequence> m_declaredStaticImports;
   private final Collection<SortedMemberEntry> m_types;
@@ -74,7 +74,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   protected CompilationUnitGenerator(ICompilationUnit cu, IWorkingCopyTransformer transformer) {
     super(cu);
 
-    m_packageName = transformPackage(cu.containingPackage(), transformer).orElse(null);
+    m_package = transformPackage(cu.containingPackage(), transformer).orElse(null);
     m_declaredImports = cu.imports()
         .filter(i -> !i.isStatic())
         .map(i -> transformImport(i, transformer))
@@ -88,6 +88,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
         .map(Optional::get)
         .collect(toList());
     m_types = cu.types().stream()
+        .filter(t -> !t.elementName().equals(JavaTypes.PackageInfo))
         .map(t -> transformType(t, transformer)
             .map(g -> new SortedMemberEntry(g, t)))
         .filter(Optional::isPresent)
@@ -146,15 +147,11 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
     StringBuilder typeSource = buildTypeSource(builder.context()); // pre build type source so that all imports are defined
     String nl = builder.context().lineDelimiter();
 
-    ISourceGenerator<ISourceBuilder<?>> packageBuilder = packageName()
-        .map(SimpleGenerators::createPackageGenerator)
-        .<ISourceGenerator<ISourceBuilder<?>>> map(g -> b -> b.append(g).nl().nl())
-        .orElseGet(ISourceGenerator::empty);
-
     builder
-        .append(packageBuilder)
-        .append(builder.context().validator().importCollector().createImportDeclarations()
-            .map(ISourceGenerator::raw), null, nl, nl)
+        .append(getPackage()
+            .filter(pck -> pck.elementName().isPresent())
+            .map(pck -> b -> b.append(pck).nl().nl())) // only add newlines if a package is available
+        .append(builder.context().validator().importCollector().createImportDeclarations().map(ISourceGenerator::raw), null, nl, nl)
         .append(typeSource)
         .nl()
         .append(footers()
@@ -177,13 +174,27 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   }
 
   @Override
+  public Optional<PackageGenerator> getPackage() {
+    return Optional.ofNullable(m_package);
+  }
+
+  @Override
   public Optional<String> packageName() {
-    return Strings.notBlank(m_packageName);
+    return getPackage().flatMap(PackageGenerator::elementName);
+  }
+
+  @Override
+  public TYPE withPackage(PackageGenerator generator) {
+    m_package = generator;
+    return currentInstance();
   }
 
   @Override
   public TYPE withPackageName(String name) {
-    m_packageName = name;
+    if (m_package == null) {
+      m_package = PackageGenerator.create();
+    }
+    m_package.withElementName(name);
     return currentInstance();
   }
 
@@ -263,7 +274,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   }
 
   @Override
-  public TYPE withType(ITypeGenerator<? extends ITypeGenerator<?>> generator, Object... sortObjects) {
+  public TYPE withType(ITypeGenerator<?> generator, Object... sortObjects) {
     m_types.add(new SortedMemberEntry(applyConnection(generator, this), sortObjects));
     return currentInstance();
   }

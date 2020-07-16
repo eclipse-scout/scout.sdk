@@ -37,9 +37,10 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.model.api.PropertyBean
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
+import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.convertToJavaSource
+import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.getNewViewOrderValue
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.core.s.uniqueid.UniqueIds
-import org.eclipse.scout.sdk.core.s.util.CoreScoutUtils
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.JavaTypes
@@ -280,7 +281,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val pref
         val siblings = findOrderSiblings()
         val first = OrderAnnotation.valueOf(siblings[0])
         val second = OrderAnnotation.valueOf(siblings[1])
-        val orderValue = CoreScoutUtils.convertOrderToJavaSourceString(CoreScoutUtils.getNewViewOrderValue(first, second))
+        val orderValue = convertToJavaSource(getNewViewOrderValue(first, second))
         return "@${IScoutRuntimeTypes.Order}($orderValue)"
     }
 

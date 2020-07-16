@@ -36,6 +36,16 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
   Optional<String> elementName();
 
   /**
+   * Sets the fully qualified name of the annotation type (e.g. java.lang.Override).
+   * 
+   * @param newName
+   *          The new fully qualified annotation name or {@code null}.
+   * @return this generator
+   */
+  @Override
+  TYPE withElementName(String newName);
+
+  /**
    * Adds a new element to this {@link IAnnotationGenerator} using the specified name and raw value. If there exists a
    * value with given name already, the existing one is replaced.
    *
@@ -46,7 +56,7 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
    * @return This generator
    * @see ISourceGenerator#raw(CharSequence)
    */
-  TYPE withElement(String name, String rawSrc);
+  TYPE withElement(String name, CharSequence rawSrc);
 
   /**
    * Adds a new element to this {@link IAnnotationGenerator} using the specified name and value generator. If there

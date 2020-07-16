@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.s.util;
+package org.eclipse.scout.sdk.core.s.annotation;
 
-import static org.eclipse.scout.sdk.core.s.util.CoreScoutUtils.getNewViewOrderValue;
-import static org.eclipse.scout.sdk.core.s.util.CoreScoutUtils.getOrderValueInBetween;
+import static org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.getNewViewOrderValue;
+import static org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.getOrderValueInBetween;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -26,13 +26,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import formdata.client.ui.forms.FormWithHighOrders;
 
 /**
- * <h3>{@link CoreScoutUtilsTest}</h3>
+ * <h3>{@link OrderAnnotationTest}</h3>
  *
  * @since 5.2.0
  */
 @ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(ScoutClientJavaEnvironmentFactory.class)
-public class CoreScoutUtilsTest {
+public class OrderAnnotationTest {
 
   private static final double DELTA = 0.00000000001;
 

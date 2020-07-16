@@ -12,11 +12,19 @@ package org.eclipse.scout.sdk.core.model.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.nio.file.Paths;
+
+import org.eclipse.scout.sdk.core.fixture.AbstractBaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
+import org.eclipse.scout.sdk.core.fixture.sub.ImportTestClass2;
+import org.eclipse.scout.sdk.core.fixture.sub.PackageAnnotation;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +56,36 @@ public class PackageTest {
     IPackage pck = childClass.containingPackage();
     assertEquals(FIXTURE_PACKAGE, pck.elementName());
     assertEquals("package " + FIXTURE_PACKAGE + ';', pck.toString());
+  }
+
+  @Test
+  public void testPackageAnnotationNotExisting(IJavaEnvironment env) {
+    IType testClass = env.requireType(AbstractBaseClass.class.getName());
+    IPackage pck = testClass.containingPackage();
+    assertEquals(0, pck.annotations().stream().count());
+  }
+
+  @Test
+  public void testPackageAnnotation(IJavaEnvironment env) {
+    IType testClass = env.requireType(ImportTestClass2.class.getName());
+    IPackage pck = testClass.containingPackage();
+    String expectedPackageName = ImportTestClass2.class.getPackage().getName();
+    assertEquals(expectedPackageName, pck.elementName());
+    assertNotNull(pck.packageInfo().orElse(null));
+    IPackage org = pck.parent()
+        .flatMap(IPackage::parent)
+        .flatMap(IPackage::parent)
+        .flatMap(IPackage::parent)
+        .flatMap(IPackage::parent)
+        .flatMap(IPackage::parent)
+        .get();
+    assertEquals("org", org.elementName());
+    assertNull(org.parent().get().elementName());
+    assertFalse(org.parent().get().parent().isPresent());
+    assertEquals(1, pck.children().count());
+    assertEquals(Paths.get(expectedPackageName.replace(JavaTypes.C_DOT, '/')), pck.asPath());
+    IAnnotation pckAnnotation = pck.annotations().withName(PackageAnnotation.class.getName()).first().get();
+    assertEquals("testValue", pckAnnotation.element("testAttrib").get().value().as(String.class));
   }
 
   @Test

@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
@@ -32,12 +31,10 @@ import org.eclipse.scout.sdk.core.model.api.IArrayMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IImport;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.IUnresolvedType;
 import org.eclipse.scout.sdk.core.model.api.MetaValueType;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 public final class SimpleGenerators {
 
@@ -109,17 +106,6 @@ public final class SimpleGenerators {
       return empty();
     }
     return b -> b.append(ae.elementName()).equalSign().append(ae.value().toWorkingCopy(transformer).generalize(ExpressionBuilder::create));
-  }
-
-  public static ISourceGenerator<ISourceBuilder<?>> createPackageGenerator(@SuppressWarnings("TypeMayBeWeakened") IPackage p) {
-    return createPackageGenerator(p.elementName());
-  }
-
-  public static ISourceGenerator<ISourceBuilder<?>> createPackageGenerator(String packageName) {
-    return Strings.notBlank(packageName)
-        .<ISourceGenerator<IJavaSourceBuilder<?>>> map(s -> b -> b.append("package ").append(s).semicolon())
-        .map(g -> g.generalize(ExpressionBuilder::create))
-        .orElseGet(ISourceGenerator::empty);
   }
 
   public static ITypeGenerator<?> createUnresolvedTypeGenerator(IUnresolvedType ut, IWorkingCopyTransformer transformer) {
