@@ -29,21 +29,20 @@ import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.ClassInheritorsSearch
 import com.intellij.psi.util.InheritanceUtil
 import com.intellij.psi.util.PsiUtil
-import com.intellij.structuralsearch.*
+import com.intellij.structuralsearch.MatchOptions
+import com.intellij.structuralsearch.MatchResult
+import com.intellij.structuralsearch.MatchVariableConstraint
+import com.intellij.structuralsearch.Matcher
 import com.intellij.structuralsearch.plugin.util.CollectingMatchResultSink
 import com.intellij.util.CollectionQuery
 import com.intellij.util.Query
 import com.intellij.util.containers.stream
-import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
-import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.JavaTypes
-import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult
@@ -51,14 +50,11 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
-import java.lang.reflect.InvocationTargetException
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.function.Function
 import java.util.regex.Pattern
 import java.util.stream.Stream
-
-private val useLegacyMatcher: FinalValue<Boolean> = FinalValue()
 
 /**
  * @return The [PsiClass] corresponding to this [IType].
@@ -269,52 +265,9 @@ fun Project.structuralSearch(query: MatchOptions, indicator: ProgressIndicator?)
             return progress
         }
     }
-    findMatches(Matcher(this, query), result, query)
+    Matcher(this, query).findMatches(result)
     return result.matches.asSequence()
 }
-
-private fun findMatches(matcher: Matcher, result: MatchResultSink, options: MatchOptions) {
-    // sample taken from com.intellij.structuralsearch.plugin.ui.SearchCommand
-    // the API is different in IntelliJ 19x than in 20x
-    try {
-        if (useLegacyMatcher.computeIfAbsentAndGet { isUseLegacyMatcher() }) {
-            findMatchesLegacy(matcher, result, options)
-        } else {
-            findMatchesNew(matcher, result)
-        }
-    } catch (e: InvocationTargetException) {
-        throw expandInvocationTargetException(e)
-    }
-}
-
-private fun expandInvocationTargetException(e: InvocationTargetException): RuntimeException {
-    var original: Throwable? = e
-    while (original is InvocationTargetException) {
-        original = e.cause
-    }
-    if (original is RuntimeException) {
-        return original
-    }
-    return SdkException(original)
-}
-
-// Can be removed if the supported min. IJ version is 2020.1
-private fun isUseLegacyMatcher() =
-        try {
-            findMatchesMethodNew()
-            false
-        } catch (e: NoSuchMethodException) {
-            SdkLog.debug("Using legacy structural search API", onTrace(e))
-            true
-        }
-
-private fun findMatchesMethodNew() = Matcher::class.java.getMethod("findMatches", MatchResultSink::class.java)
-
-private fun findMatchesMethodLegacy() = Matcher::class.java.getMethod("findMatches", MatchResultSink::class.java, MatchOptions::class.java)
-
-private fun findMatchesNew(matcher: Matcher, result: MatchResultSink) = findMatchesMethodNew().invoke(matcher, result)
-
-private fun findMatchesLegacy(matcher: Matcher, result: MatchResultSink, options: MatchOptions) = findMatchesMethodLegacy().invoke(matcher, result, options)
 
 /**
  * Finds all PsiClasses in this project having the given fully qualified name.

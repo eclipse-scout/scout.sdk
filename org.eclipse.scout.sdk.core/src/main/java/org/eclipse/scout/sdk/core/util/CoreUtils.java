@@ -383,7 +383,7 @@ public final class CoreUtils {
       }
     }
     catch (NoSuchMethodException e) {
-      SdkLog.debug("Cannot get toString method of operation {}", o.getClass(), e);
+      SdkLog.debug("Cannot get toString method of object {}", o.getClass(), e);
       return Optional.empty();
     }
 
@@ -392,7 +392,7 @@ public final class CoreUtils {
       val = o.toString();
     }
     catch (Throwable t) {
-      SdkLog.warning("Failed toString() invocation on an object of type [" + o.getClass().getName() + ']', t);
+      SdkLog.warning("Failed toString() invocation on an object of type [{}]", o.getClass().getName(), t);
     }
 
     return Strings.notBlank(val);

@@ -30,7 +30,6 @@ import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
 import org.eclipse.scout.sdk.s2i.toVirtualFile
-import java.lang.reflect.Method
 import java.nio.file.Path
 import java.util.Collections.singletonList
 
@@ -38,8 +37,8 @@ class TransactionManager constructor(val project: Project, val transactionName: 
 
     companion object {
 
+        const val BULK_UPDATE_LIMIT = 100
         private val CURRENT = ThreadLocal.withInitial<TransactionManager> { null }
-        private val BULK_MODE_METHOD = FinalValue<Method?>()
 
         /**
          * Executes a task within a [TransactionManager] and commits all members on successful completion of the transaction.
@@ -165,20 +164,13 @@ class TransactionManager constructor(val project: Project, val transactionName: 
             }
             return t
         }
-
-        private fun setInBulkUpdateMethod() = BULK_MODE_METHOD.computeIfAbsentAndGet {
-            try {
-                return@computeIfAbsentAndGet Document::class.java.getMethod("setInBulkUpdate", Boolean::class.java)
-            } catch (e: NoSuchMethodException) {
-                SdkLog.debug("Not using bulk mode for large document modifications because not supported by the platform.", onTrace(e))
-                return@computeIfAbsentAndGet null
-            }
-        }
     }
 
     private val m_members = HashMap<Path, MutableList<TransactionMember>>()
+
     @Volatile
     private var m_size = 0
+
     @Volatile
     private var m_open = true
 
@@ -272,24 +264,22 @@ class TransactionManager constructor(val project: Project, val transactionName: 
         return commitTransaction(documents, documentManager, psiDocumentManager, progress)
     }
 
-    @Suppress("MissingRecentApi")
     private fun commitTransaction(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, documentManager: FileDocumentManager, psiDocumentManager: PsiDocumentManager, progress: IdeaProgress): Boolean {
-        val setInBulkUpdate = setInBulkUpdateMethod() // Can be removed if the supported min. IJ version is 2019.3
-        val useBulkMode = setInBulkUpdate != null && documentMappings.size >= 100
-        val documents = documentMappings.values.filterNotNull().mapNotNull { it.second }
+        val useBulkUpdate = documentMappings.size >= BULK_UPDATE_LIMIT
+        val initialDocuments = documentMappings.values.mapNotNull { it?.second }
         try {
-            if (useBulkMode) {
-                documents.forEach { setInBulkUpdate!!.invoke(it, true) }
+            if (useBulkUpdate) {
+                initialDocuments.forEach { it.isInBulkUpdate = true }
             }
             val success = commitAllMembers(documentMappings, documentManager, progress)
             if (success) {
-                // here the documents of the new files have been added. therefore don't use documentMappings
-                documentMappings.values.filterNotNull().mapNotNull { it.second }.forEach { commitDocument(it, documentManager, psiDocumentManager) }
+                // here the documents of the new files have been added. therefore don't use "initialDocuments" variable
+                documentMappings.values.mapNotNull { it?.second }.forEach { commitDocument(it, documentManager, psiDocumentManager) }
             }
             return success
         } finally {
-            if (useBulkMode) {
-                documents.forEach { setInBulkUpdate!!.invoke(it, false) }
+            if (useBulkUpdate) {
+                initialDocuments.forEach { it.isInBulkUpdate = false }
             }
         }
     }

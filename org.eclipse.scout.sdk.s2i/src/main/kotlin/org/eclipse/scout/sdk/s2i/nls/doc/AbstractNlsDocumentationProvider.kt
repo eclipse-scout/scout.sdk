@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
 
 abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider() {
-    override fun getCustomDocumentationElement(editor: Editor, file: PsiFile, contextElement: PsiElement?): PsiElement? {
+    override fun getCustomDocumentationElement(editor: Editor, file: PsiFile, contextElement: PsiElement?, targetOffset: Int): PsiElement? {
         if (accept(contextElement)) {
             return contextElement
         }

@@ -238,9 +238,9 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
             return
         }
 
-        // to save memory the running transaction is committed in chunk blocks of 100 items
-        // bigger chunks are faster (less events in the IDE and less IO) but require more memory to store the transaction members
-        val chunkSize = 100
+        // to save memory the running transaction is committed in chunk blocks
+        // bigger chunks are faster (less events in the IDE) but require more memory to store the transaction members
+        val chunkSize = TransactionManager.BULK_UPDATE_LIMIT
         if (transaction.size() < chunkSize) {
             return
         }
