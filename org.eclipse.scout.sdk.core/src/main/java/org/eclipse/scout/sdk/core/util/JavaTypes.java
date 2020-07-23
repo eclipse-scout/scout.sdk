@@ -162,6 +162,14 @@ public final class JavaTypes {
    */
   public static final String CLASS_FILE_SUFFIX = C_DOT + CLASS_FILE_EXTENSION;
   /**
+   * package info base name: {@code package-info}.
+   */
+  public static final String PackageInfo = "package-info";
+  /**
+   * package info java file name: {@code package-info.java}.
+   */
+  public static final String PackageInfoJava = PackageInfo + JAVA_FILE_SUFFIX;
+  /**
    * module info base name: {@code module-info}.
    */
   public static final String ModuleInfo = "module-info";

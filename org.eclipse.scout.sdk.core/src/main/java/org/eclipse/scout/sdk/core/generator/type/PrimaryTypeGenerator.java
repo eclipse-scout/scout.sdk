@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.PackageGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
@@ -80,7 +81,7 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
     ICompilationUnitGenerator<?> cu = CompilationUnitGenerator.create()
         .withComment(m_compilationUnit.comment().orElse(null))
         .withElementName(m_compilationUnit.elementName().orElseThrow(() -> newFail("Type name is missing.")))
-        .withPackageName(packageName().orElse(null))
+        .withPackage(getPackage().orElse(null))
         .withType(primary());
     m_compilationUnit.imports()
         .forEach(cu::withImport);
@@ -115,6 +116,11 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   }
 
   @Override
+  public Optional<PackageGenerator> getPackage() {
+    return m_compilationUnit.getPackage();
+  }
+
+  @Override
   public Optional<String> packageName() {
     return m_compilationUnit.packageName();
   }
@@ -123,6 +129,18 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   public TYPE withPackageName(String newPackage) {
     m_compilationUnit.withPackageName(newPackage);
     setDeclaringFullyQualifiedName(newPackage);
+    return currentInstance();
+  }
+
+  @Override
+  public TYPE withPackage(PackageGenerator generator) {
+    m_compilationUnit.withPackage(generator);
+    if (generator == null) {
+      setDeclaringFullyQualifiedName(null);
+    }
+    else {
+      setDeclaringFullyQualifiedName(generator.elementName().orElse(null));
+    }
     return currentInstance();
   }
 
@@ -325,8 +343,8 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   }
 
   @Override
-  public TYPE withType(ITypeGenerator<? extends ITypeGenerator<?>> builder, Object... sortObject) {
-    primary().withType(builder, sortObject);
+  public TYPE withType(ITypeGenerator<?> generator, Object... sortObject) {
+    primary().withType(generator, sortObject);
     return currentInstance();
   }
 

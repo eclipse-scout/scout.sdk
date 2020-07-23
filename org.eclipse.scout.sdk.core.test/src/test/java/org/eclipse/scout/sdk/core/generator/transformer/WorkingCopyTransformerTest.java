@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.core.fixture.AnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.PackageGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
@@ -90,9 +91,9 @@ public class WorkingCopyTransformerTest {
        * Tests a package move
        */
       @Override
-      public String transformPackage(ITransformInput<IPackage, String> input) {
+      public PackageGenerator transformPackage(ITransformInput<IPackage, PackageGenerator> input) {
         super.transformPackage(input);
-        return newPackage;
+        return input.requestDefaultWorkingCopy().withElementName(newPackage);
       }
 
       /**
@@ -542,7 +543,7 @@ public class WorkingCopyTransformerTest {
     }
 
     @Override
-    public String transformPackage(ITransformInput<IPackage, String> input) {
+    public PackageGenerator transformPackage(ITransformInput<IPackage, PackageGenerator> input) {
       remember(input.model(), "package");
       return super.transformPackage(input);
     }

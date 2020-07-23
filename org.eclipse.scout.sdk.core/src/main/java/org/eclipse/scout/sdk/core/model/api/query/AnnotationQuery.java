@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
+import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
@@ -48,7 +49,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
   private Class<AbstractManagedAnnotation> m_managedWrapperType;
 
   public AnnotationQuery(IType containerType, JavaElementSpi owner) {
-    m_containerType = Ensure.notNull(containerType);
+    m_containerType = containerType;
 
     if (owner instanceof TypeSpi) {
       m_ownerInLevelFinder = Optional::of;
@@ -65,11 +66,15 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
           .andThen(method -> method
               .flatMap(m -> ((IMethod) m).parameters().item(param.getIndex())));
     }
+    else if (owner instanceof PackageSpi) {
+      m_ownerInLevelFinder = Optional::of;
+    }
     else {
       throw new IllegalArgumentException("Unsupported annotation container: " + owner.getClass().getName());
     }
   }
 
+  @SuppressWarnings("TypeMayBeWeakened")
   protected static Function<IType, Optional<? extends IAnnotatable>> getMethodLookup(MethodSpi method) {
     String methodId = method.wrap().identifier();
     return level -> level.methods().withMethodIdentifier(methodId).first();
@@ -184,7 +189,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
         .withSuperClasses(isIncludeSuperClasses())
         .withSuperInterfaces(isIncludeSuperInterfaces())
         .withStartType(true)
-        .build(getType(), levelSpliteratorProvider)
+        .build(Ensure.notNull(getType()), levelSpliteratorProvider)
         .filter(this);
 
     Class<AbstractManagedAnnotation> wrapperClass = getManagedWrapper();

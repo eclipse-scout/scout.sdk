@@ -18,10 +18,13 @@ import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.annotation.ClassIdAnnotation;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotation;
+import org.eclipse.scout.sdk.core.s.annotation.ExtendsAnnotation;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
+import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
@@ -32,20 +35,15 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE>> extends AnnotationGenerator<TYPE> {
 
   public static IAnnotationGenerator<?> createOrder(double orderNr) {
-    String orderStr = Double.toString(orderNr);
-    String zeroSuffix = ".0";
-    if (orderStr.endsWith(zeroSuffix)) {
-      orderStr = orderStr.substring(0, orderStr.length() - zeroSuffix.length());
-    }
     return create()
         .withElementName(IScoutRuntimeTypes.Order)
-        .withElement("value", orderStr);
+        .withElement(OrderAnnotation.VALUE_ELEMENT_NAME, OrderAnnotation.convertToJavaSource(orderNr));
   }
 
   public static IAnnotationGenerator<?> createExtends(CharSequence extendedType) {
     return create()
         .withElementName(IScoutRuntimeTypes.Extends)
-        .withElement("value", b -> b.classLiteral(extendedType));
+        .withElement(ExtendsAnnotation.VALUE_ELEMENT_NAME, b -> b.classLiteral(extendedType));
   }
 
   /**
@@ -58,7 +56,7 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
   public static IAnnotationGenerator<?> createClassId(CharSequence classIdValue) {
     return create()
         .withElementName(IScoutRuntimeTypes.ClassId)
-        .withElement("value", b -> b.stringLiteral(classIdValue));
+        .withElement(ClassIdAnnotation.VALUE_ELEMENT_NAME, b -> b.stringLiteral(classIdValue));
   }
 
   public static IAnnotationGenerator<?> createBefore() {

@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.PackageGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
@@ -243,8 +244,8 @@ public interface IWorkingCopyTransformer {
    * @return The {@link String} to use as package (without package key word and semicolon) or an empty {@link Optional}
    *         if the package should be removed (move to the default package).
    */
-  static Optional<String> transformPackage(IPackage p, IWorkingCopyTransformer transformer) {
-    return transform(transformer, p, p::elementName, (t, i) -> t.transformPackage(i));
+  static Optional<PackageGenerator> transformPackage(IPackage p, IWorkingCopyTransformer transformer) {
+    return transform(transformer, p, () -> p.toWorkingCopy(transformer), (t, i) -> t.transformPackage(i));
   }
 
   /**
@@ -436,15 +437,15 @@ public interface IWorkingCopyTransformer {
   ITypeGenerator<?> transformUnresolvedType(ITransformInput<IUnresolvedType, ITypeGenerator<?>> input);
 
   /**
-   * Transforms an {@link IPackage} to a {@link String}.
+   * Transforms an {@link IPackage} to a {@link PackageGenerator}.
    *
    * @param input
-   *          The transformation input providing the source {@link IPackage} and a default {@link String} as package
-   *          declaration (same as {@link IPackage#elementName()}). Is never {@code null}.
-   * @return The {@link String} to use as package (without package key word and semicolon). May be {@code null} if the
-   *         default package should be used.
+   *          The transformation input providing the source {@link IPackage} and a default {@link PackageGenerator}. Is
+   *          never {@code null}.
+   * @return The {@link PackageGenerator} to use as working copy. May be {@code null} if the default package should be
+   *         used.
    */
-  String transformPackage(ITransformInput<IPackage, String> input);
+  PackageGenerator transformPackage(ITransformInput<IPackage, PackageGenerator> input);
 
   /**
    * Transforms an {@link IAnnotationElement} to an {@link ISourceGenerator}. Either the default working copy can be

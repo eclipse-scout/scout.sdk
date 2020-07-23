@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.PackageGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -46,9 +47,33 @@ public interface ICompilationUnitGenerator<TYPE extends ICompilationUnitGenerato
   Optional<String> fileName();
 
   /**
+   * Sets the name of this {@link ICompilationUnitGenerator}. The name may include the ".java" file suffix or not.
+   *
+   * @param newName
+   *          The new name (optionally including the ".java" file suffix) or {@code null}.
+   * @return This generator
+   */
+  @Override
+  TYPE withElementName(String newName);
+
+  /**
+   * @return The {@link PackageGenerator} or an empty {@link Optional} if it is the default package.
+   */
+  Optional<PackageGenerator> getPackage();
+
+  /**
    * @return The package name or an empty {@link Optional} if it is the default package.
    */
   Optional<String> packageName();
+
+  /**
+   * Sets the {@link PackageGenerator} of this {@link ICompilationUnitGenerator}.
+   *
+   * @param generator
+   *          The new {@link PackageGenerator}.
+   * @return this generator.
+   */
+  TYPE withPackage(PackageGenerator generator);
 
   /**
    * Sets the package of this {@link ICompilationUnitGenerator}.
@@ -137,7 +162,7 @@ public interface ICompilationUnitGenerator<TYPE extends ICompilationUnitGenerato
    * @return This generator.
    * @see TypeGenerator#create()
    */
-  TYPE withType(ITypeGenerator<? extends ITypeGenerator<?>> generator, Object... sortObjects);
+  TYPE withType(ITypeGenerator<?> generator, Object... sortObjects);
 
   /**
    * Removes the {@link ITypeGenerator} with given {@link #elementName()} from this {@link ICompilationUnitGenerator}.

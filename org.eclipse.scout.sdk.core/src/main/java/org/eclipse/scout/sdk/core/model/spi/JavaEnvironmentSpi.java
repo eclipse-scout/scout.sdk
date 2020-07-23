@@ -23,6 +23,11 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
  */
 public interface JavaEnvironmentSpi {
 
+  /**
+   * @param name
+   *          The name of the package (e.g. {@code org.eclipse.scout}). Use {@code null} for the default package.
+   * @return The {@link PackageSpi} for the given package name.
+   */
   PackageSpi getPackage(String name);
 
   /**
