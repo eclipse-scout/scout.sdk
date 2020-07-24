@@ -21,7 +21,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 @Mojo(name = "publish")
 public class PublishMojo extends AbstractStagingMojo {
 
-  @Parameter(expression="${updatesite.staging.area}" defaultValue = "/home/data/httpd/download.eclipse.org/scout/stagingArea")
+  @Parameter(expression = "${updatesite.staging.area}", defaultValue = "/home/data/httpd/download.eclipse.org/scout/stagingArea")
   private String stagingArea;
 
   @Override
