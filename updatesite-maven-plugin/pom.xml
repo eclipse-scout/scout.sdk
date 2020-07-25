@@ -102,12 +102,6 @@
               <goal>descriptor</goal>
             </goals>
           </execution>
-          <execution>
-            <id>help-goal</id>
-            <goals>
-              <goal>helpmojo</goal>
-            </goals>
-          </execution>
         </executions>
       </plugin>
     </plugins>
@@ -140,7 +134,6 @@
                     <versionRange>[3.2,)</versionRange>
                     <goals>
                       <goal>descriptor</goal>
-                      <goal>helpmojo</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
