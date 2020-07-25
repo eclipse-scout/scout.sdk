@@ -64,7 +64,7 @@ if [[ "$TAG" ]]; then
 fi
 _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
-mvn -f updatesite-maven-plugin -P release.setversion -N -Dmaster_release_newVersion=$SCOUT_RT -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
+mvn -f updatesite-maven-plugin -P release.setversion -N -Dmaster_release_newVersion=$OSGI_VERSION -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
 mvn -f scout-helloworld-app -P release.setversion -N -Dmaster_release_newVersion=$SCOUT_RT -Dorg.eclipse.scout.rt_version=$SCOUT_RT $_MAVEN_OPTS
 processError
