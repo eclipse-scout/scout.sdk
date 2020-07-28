@@ -13,11 +13,38 @@ package org.eclipse.scout.sdk.s2i.util
 import org.apache.poi.ss.formula.BaseFormulaEvaluator
 import org.apache.poi.ss.formula.ConditionalFormattingEvaluator
 import org.apache.poi.ss.usermodel.*
+import org.apache.poi.ss.util.WorkbookUtil
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.eclipse.scout.sdk.core.util.SdkException
+import java.io.BufferedOutputStream
 import java.io.File
+import java.io.FileOutputStream
 
 
-class XlsxReader {
+object Xlsx {
+
+    /**
+     * Exports the given table data into an xlsx file
+     * @param tableData The data to export
+     * @param sheetName The name of the sheet holding the data
+     * @param file The file to export to
+     */
+    fun write(tableData: List<List<String?>>, sheetName: String, file: File) {
+        val wb = XSSFWorkbook()
+        val sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(sheetName))
+        for (rowIndex in tableData.indices) {
+            val row = sheet.createRow(rowIndex)
+            val rowData = tableData[rowIndex]
+            for (colIndex in rowData.indices) {
+                row.createCell(colIndex)
+                        .setCellValue(rowData[colIndex])
+            }
+        }
+
+        BufferedOutputStream(FileOutputStream(file)).use {
+            wb.write(it)
+        }
+    }
 
     /**
      * Parses the first sheet of the given [File] and returns its cell values.

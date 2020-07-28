@@ -187,6 +187,8 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
             .map { m_table.convertRowIndexToModel(it) }
             .map { m_model.translationForRow(it) }
 
+    fun visibleRowCount() = m_table.rowCount
+
     fun visibleData(): List<List<String>> {
         val numAdditionalRows = 1 // header row
         val data = ArrayList<List<String>>(m_table.rowCount + numAdditionalRows)

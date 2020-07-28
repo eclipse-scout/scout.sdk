@@ -16,6 +16,8 @@ import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
+import com.intellij.openapi.fileChooser.FileChooserFactory
+import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -38,20 +40,21 @@ import org.eclipse.scout.sdk.core.s.nls.*
 import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
 import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
 import org.eclipse.scout.sdk.core.s.nls.properties.ReadOnlyTranslationFile
-import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.environment.OperationTask
 import org.eclipse.scout.sdk.s2i.getNioPath
 import org.eclipse.scout.sdk.s2i.resolvePsi
 import org.eclipse.scout.sdk.s2i.toScoutProgress
 import org.eclipse.scout.sdk.s2i.toVirtualFile
 import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
-import org.eclipse.scout.sdk.s2i.util.XlsxReader
+import org.eclipse.scout.sdk.s2i.util.Xlsx
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
 import java.awt.Point
+import java.io.File
 import java.text.NumberFormat
 import java.util.concurrent.TimeUnit
 import java.util.function.Predicate
@@ -186,7 +189,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         result.add(LanguageNewAction())
         result.addSeparator()
         result.add(ImportFromExcelAction())
-        result.add(ExportToClipboardAction())
+        result.add(ExportToExcelAction())
         return result
     }
 
@@ -369,7 +372,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
                     showBalloon(message("file.not.found"), MessageType.ERROR)
                     return
                 }
-                val data = XlsxReader().parse(file)
+                val data = Xlsx.parse(file)
                 if (data.isEmpty()) {
                     showBalloon(message("file.no.valid.content"), MessageType.ERROR)
                     return
@@ -427,32 +430,29 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         }
     }
 
-    private inner class ExportToClipboardAction : DumbAwareAction(message("export.table.to.clipboard"), null, AllIcons.ToolbarDecorator.Export) {
+    private inner class ExportToExcelAction : DumbAwareAction(message("export.table.to.excel"), null, AllIcons.ToolbarDecorator.Export) {
+
+        override fun update(e: AnActionEvent) {
+            e.presentation.isEnabled = m_table.visibleRowCount() > 0
+        }
+
         override fun actionPerformed(e: AnActionEvent) {
+            val fileSaverDescriptor = FileSaverDescriptor(message("export.translations"), message("export.translations.desc"), "xlsx")
+            val file = FileChooserFactory.getInstance().createSaveFileDialog(fileSaverDescriptor, project)
+                    .save(null, null)
+                    ?.file ?: return
             val tableData = m_table.visibleData()
-            val table = toTable(tableData)
-            if (CoreUtils.setTextToClipboard(table)) {
-                showBalloon(message("table.content.copied.to.clipboard"), MessageType.INFO)
+            OperationTask(message("export.translations"), project) { doExport(tableData, file) }.schedule<Unit>()
+        }
+
+        private fun doExport(tableData: List<List<String>>, file: File) {
+            try {
+                Xlsx.write(tableData, message("nls.export.sheet.name"), file)
+                showBalloon(message("table.data.successfully.exported"), MessageType.INFO)
+            } catch (e: Exception) {
+                SdkLog.warning("Unable to export to xlsx file '{}'.", file, e)
+                showBalloon(message("error.exporting.translations"), MessageType.ERROR)
             }
-        }
-
-        fun toTable(data: List<List<String>>): String {
-            val prefix = "<html><head><meta charset=\"utf-8\"></head><body><table>\n"
-            val postfix = "</table></body></html>\n"
-            return data.indices
-                    .associateWith { data[it] }
-                    .map { encodeRow(it.key, it.value) }
-                    .joinToString("\n", prefix, postfix)
-        }
-
-        fun encodeRow(index: Int, row: List<String>): String {
-            val tag = if (index == 0) "th" else "td"
-            return row
-                    .map { Strings.escapeHtml(it) }
-                    .map { Strings.replaceEach(it, arrayOf("\r", "\n", " "), arrayOf("", "<br style=\"mso-data-placement:same-cell;\"/>", "&#32;")) }
-                    .joinToString("", "<tr>", "</tr>") {
-                        "<$tag>$it</$tag>"
-                    }
         }
     }
 
