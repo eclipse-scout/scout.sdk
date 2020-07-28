@@ -20,6 +20,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
+import com.intellij.openapi.vfs.newvfs.events.VFileMoveEvent
 import com.intellij.openapi.vfs.newvfs.events.VFilePropertyChangeEvent
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
@@ -171,6 +172,9 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
         private fun toFileIfRemoved(event: VFileEvent): String? {
             if (event is VFileDeleteEvent) {
                 return event.file.path // deleted
+            }
+            if (event is VFileMoveEvent) {
+                return event.file.path // moved (e.g. refactor)
             }
             if (event is VFilePropertyChangeEvent && event.propertyName == VirtualFile.PROP_NAME && event.requestor != FileContentUtilCore.FORCE_RELOAD_REQUESTOR) {
                 return event.oldPath // renamed
