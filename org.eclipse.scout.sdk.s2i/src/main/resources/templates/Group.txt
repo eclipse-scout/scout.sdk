@@ -1,6 +1,6 @@
-public class $name$Group extends $super$ {
-  @#ClassId#("$newClassId()$")
-  public class Body extends #AbstractTileGrid#<#ITile#> {
-   $END$
+public class ${dollar}name${dollar}Group extends ${dollar}super${dollar} {
+  @${ClassId}("${dollar}newClassId()${dollar}")
+  public class Body extends ${AbstractTileGrid}<${ITile}> {
+   ${dollar}END${dollar}
   }
 }

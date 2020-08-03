@@ -1,16 +1,16 @@
-public class $name$Field extends $super$ {
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar} {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override
   protected java.lang.Long getConfiguredMinValue() {
-    return $min$L;
+    return ${dollar}min${dollar}L;
   }
 
   @java.lang.Override
   protected java.lang.Long getConfiguredMaxValue() {
-    return $max$L;
-  }$END$
+    return ${dollar}max${dollar}L;
+  }${dollar}END${dollar}
 }

@@ -1,5 +1,5 @@
-public class $name$Extension extends $super$<$complete$> {
-  public $name$Extension($complete$ owner) {
+public class ${dollar}name${dollar}Extension extends ${dollar}super${dollar}<${dollar}complete${dollar}> {
+  public ${dollar}name${dollar}Extension(${dollar}complete${dollar} owner) {
     super(owner);
-  }$END$
+  }${dollar}END${dollar}
 }

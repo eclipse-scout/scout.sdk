@@ -1,6 +1,6 @@
-public class $name$Group extends $super$<$type$> {
+public class ${dollar}name${dollar}Group extends ${dollar}super${dollar}<${dollar}type${dollar}> {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
-  }$END$
+    return ${TEXTS}.get("${dollar}nls${dollar}");
+  }${dollar}END${dollar}
 }

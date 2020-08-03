@@ -1,11 +1,11 @@
-public class $name$Box extends $super$ {
+public class ${dollar}name${dollar}Box extends ${dollar}super${dollar} {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override
   protected boolean getConfiguredAutoCheckFromTo() {
-    return $boolAutoCheckFromTo$;
-  }$END$
+    return ${dollar}boolAutoCheckFromTo${dollar};
+  }${dollar}END${dollar}
 }

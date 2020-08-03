@@ -1,29 +1,29 @@
-public class $name$Field extends $super$<$type$> {
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar}<${dollar}type${dollar}> {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override
   protected int getConfiguredGridW() {
-    return $width$;
+    return ${dollar}width${dollar};
   }
 
-  @#Order#(1000)
-  @#ClassId#("$newClassId()$")
-  public class Mode1 extends #AbstractMode#<$type$> {
+  @${Order}(1000)
+  @${ClassId}("${dollar}newClassId()${dollar}")
+  public class Mode1 extends ${AbstractMode}<${dollar}type${dollar}> {
     @java.lang.Override
     protected java.lang.String getConfiguredText() {
       return "Mode 1";
     }
   }
 
-  @#Order#(2000)
-  @#ClassId#("$newClassId()$")
-  public class Mode2 extends #AbstractMode#<$type$> {
+  @${Order}(2000)
+  @${ClassId}("${dollar}newClassId()${dollar}")
+  public class Mode2 extends ${AbstractMode}<${dollar}type${dollar}> {
     @java.lang.Override
     protected java.lang.String getConfiguredText() {
       return "Mode 2";
     }
-  }$END$
+  }${dollar}END${dollar}
 }

@@ -270,11 +270,12 @@ public class WorkingCopyTransformerTest {
   /**
    * If changes in this method are necessary also update the corresponding example on {@link IWorkingCopyTransformer}
    * class javadoc.
-   * 
+   *
    * @param env
    *          The environment passed
    */
   @Test
+  @SuppressWarnings("unused")
   public void testTransformerDocumentation(IJavaEnvironment env) {
     IWorkingCopyTransformer transformer = new DefaultWorkingCopyTransformer() {
       @Override

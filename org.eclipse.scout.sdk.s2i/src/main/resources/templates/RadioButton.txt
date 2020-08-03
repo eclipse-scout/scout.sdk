@@ -1,11 +1,11 @@
-public class $name$Button extends $super$<$declaringTypeArg(#IValueField#, #TYPE_PARAM_VALUEFIELD__VALUE#, box)$> {
+public class ${dollar}name${dollar}Button extends ${dollar}super${dollar}<${dollar}declaringTypeArg(${IValueField}, ${TYPE_PARAM_VALUEFIELD__VALUE}, box)${dollar}> {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @Override
-  protected $declaringTypeArg(#IValueField#, #TYPE_PARAM_VALUEFIELD__VALUE#, box)$ getConfiguredRadioValue() {
-    return $declaringTypeArg(#IValueField#, #TYPE_PARAM_VALUEFIELD__VALUE#, default)$;
-  }$END$
+  protected ${dollar}declaringTypeArg(${IValueField}, ${TYPE_PARAM_VALUEFIELD__VALUE}, box)${dollar} getConfiguredRadioValue() {
+    return ${dollar}declaringTypeArg(${IValueField}, ${TYPE_PARAM_VALUEFIELD__VALUE}, default)${dollar};
+  }${dollar}END${dollar}
 }

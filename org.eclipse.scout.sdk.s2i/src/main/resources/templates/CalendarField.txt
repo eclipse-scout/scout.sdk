@@ -1,9 +1,9 @@
-public class $name$Field extends $super$<$name$Field.Calendar> {
-  @#ClassId#("$newClassId()$")
-  public class Calendar extends #AbstractCalendar# {
-    @#Order#(1000)
-    public class MyCalendarItemProvider extends #AbstractCalendarItemProvider# {
-      $END$
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar}<${dollar}name${dollar}Field.Calendar> {
+  @${ClassId}("${dollar}newClassId()${dollar}")
+  public class Calendar extends ${AbstractCalendar} {
+    @${Order}(1000)
+    public class MyCalendarItemProvider extends ${AbstractCalendarItemProvider} {
+      ${dollar}END${dollar}
     }
   }
 
@@ -14,6 +14,6 @@ public class $name$Field extends $super$<$name$Field.Calendar> {
 
   @java.lang.Override
   protected boolean getConfiguredLabelVisible() {
-    return $boolLabelVisible$;
+    return ${dollar}boolLabelVisible${dollar};
   }
 }

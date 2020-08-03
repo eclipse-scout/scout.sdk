@@ -1,14 +1,14 @@
-public static class $name$Code extends $super$<$declaringTypeArg(#ICodeType#, #TYPE_PARAM_CODETYPE__CODE_ID#, box)$> {
+public static class ${dollar}name${dollar}Code extends ${dollar}super${dollar}<${dollar}declaringTypeArg(${ICodeType}, ${TYPE_PARAM_CODETYPE__CODE_ID}, box)${dollar}> {
   private static final long serialVersionUID = 1L;
-  public static final $declaringTypeArg(#ICodeType#, #TYPE_PARAM_CODETYPE__CODE_ID#, unbox)$ ID = $declaringTypeArg(#ICodeType#, #TYPE_PARAM_CODETYPE__CODE_ID#, default)$;
+  public static final ${dollar}declaringTypeArg(${ICodeType}, ${TYPE_PARAM_CODETYPE__CODE_ID}, unbox)${dollar} ID = ${dollar}declaringTypeArg(${ICodeType}, ${TYPE_PARAM_CODETYPE__CODE_ID}, default)${dollar};
 
   @java.lang.Override
   protected java.lang.String getConfiguredText() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override
-  public $declaringTypeArg(#ICodeType#, #TYPE_PARAM_CODETYPE__CODE_ID#, box)$ getId() {
+  public ${dollar}declaringTypeArg(${ICodeType}, ${TYPE_PARAM_CODETYPE__CODE_ID}, box)${dollar} getId() {
     return ID;
-  }$END$
+  }${dollar}END${dollar}
 }

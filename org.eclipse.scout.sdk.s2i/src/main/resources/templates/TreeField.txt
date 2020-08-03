@@ -1,12 +1,12 @@
-public class $name$Field extends $super$ {
-  @#ClassId#("$newClassId()$")
-  public class Tree extends #AbstractTree# {
-    $END$
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar} {
+  @${ClassId}("${dollar}newClassId()${dollar}")
+  public class Tree extends ${AbstractTree} {
+    ${dollar}END${dollar}
   }
 
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override

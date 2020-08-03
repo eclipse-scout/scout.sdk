@@ -1,6 +1,6 @@
-public class $name$Box extends $super$ {
+public class ${dollar}name${dollar}Box extends ${dollar}super${dollar} {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
-  }$END$
+    return ${TEXTS}.get("${dollar}nls${dollar}");
+  }${dollar}END${dollar}
 }

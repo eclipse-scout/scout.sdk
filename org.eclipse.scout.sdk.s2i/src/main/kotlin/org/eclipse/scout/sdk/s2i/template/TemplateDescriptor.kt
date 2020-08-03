@@ -10,39 +10,61 @@
  */
 package org.eclipse.scout.sdk.s2i.template
 
+import com.intellij.codeInsight.template.impl.TemplateImpl
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
+import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
+import org.eclipse.scout.sdk.core.util.Strings.toStringLiteral
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro
+import org.eclipse.scout.sdk.s2i.template.variable.AbstractClassesEnumVariableAdapter
+import org.eclipse.scout.sdk.s2i.template.variable.BoolVariableAdapter
+import org.eclipse.scout.sdk.s2i.template.variable.EnumVariableAdapter
+import org.eclipse.scout.sdk.s2i.template.variable.VariableDescriptor
 
 class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader = TemplateDescriptor::class.java.classLoader) {
 
     companion object {
         const val VARIABLE_NAME = "name"
-        const val VARIABLE_PREFIX_NLS = "nls"
-        const val VARIABLE_PREFIX_BOOL = "bool"
-        const val PREDEFINED_VARIABLE_KEYSTROKES = "keystrokes"
+
         const val PREDEFINED_VARIABLE_SUPER = "super"
+        const val PREDEFINED_VARIABLE_MENU_TYPES = "menuTypes"
+        const val PREDEFINED_VARIABLE_KEYSTROKES = "keystrokes"
         const val PREDEFINED_VARIABLE_COMPLETE = "complete"
-        const val PREDEFINED_VARIABLE_CONFIGURED_MENU_TYPES = "getConfiguredMenuTypes"
-        const val PREDEFINED_VARIABLE_STATIC_IN_EXTENSION = "staticIfInExtension"
+
+        const val PREDEFINED_CONSTANT_IN_EXTENSION = "inExtension"
+        const val PREDEFINED_CONSTANT_MENU_SUPPORTED = "menuSupported"
     }
 
     private var m_name: String? = null
     private var m_description: String? = null
     private var m_superClassInfo: SuperClassInfo? = null
     private var m_orderDefinitionType: String? = null
-    private var m_innerTypeGetterContainer: InnerTypeGetterInfo? = null
     private val m_source = FinalValue<String>()
-    private val m_variables = HashMap<String, VariableDescriptor>()
+    private var m_innerTypeGetterInfos = LinkedHashSet<InnerTypeGetterInfo>()
+    private val m_variables = HashMap<String, (TemplateEngine) -> VariableDescriptor?>()
     private val m_alias = HashSet<String>()
+
+    init {
+        // append predefined variables
+        withVariable(PREDEFINED_VARIABLE_MENU_TYPES, EnumVariableAdapter(PREDEFINED_VARIABLE_MENU_TYPES, PsiExpressionEnumMacro.NAME) {
+            it.menuTypes.map { candidate -> "${IScoutRuntimeTypes.CollectionUtility}.hashSet($candidate)" }
+        })
+        withVariable(PREDEFINED_VARIABLE_KEYSTROKES, EnumVariableAdapter(PREDEFINED_VARIABLE_KEYSTROKES, PsiExpressionEnumMacro.NAME) {
+            it.keyStrokes
+        })
+        withVariable(PREDEFINED_VARIABLE_SUPER, AbstractClassesEnumVariableAdapter(PREDEFINED_VARIABLE_SUPER))
+        withVariable(PREDEFINED_VARIABLE_COMPLETE) { VariableDescriptor(PREDEFINED_VARIABLE_COMPLETE, "complete()") }
+    }
 
     constructor(original: TemplateDescriptor) : this(original.id, original.resourceLoader) {
         m_name = original.m_name
         m_description = original.m_description
         m_superClassInfo = original.m_superClassInfo
         m_orderDefinitionType = original.m_orderDefinitionType
-        m_innerTypeGetterContainer = original.m_innerTypeGetterContainer
+        m_innerTypeGetterInfos.addAll(original.m_innerTypeGetterInfos)
         m_variables.putAll(original.m_variables)
         m_alias.addAll(original.m_alias)
     }
@@ -50,12 +72,18 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
     fun withName(name: String) = apply { m_name = name }
     fun name() = m_name ?: ""
 
-    @Suppress("unused")
     fun withDescription(description: String) = apply { m_description = description }
     fun description() = m_description ?: message("template.desc", name())
 
-    fun withVariable(name: String, vararg values: String) = withVariable(name, values.toList())
-    fun withVariable(name: String, values: Collection<String>) = apply { m_variables[name] = VariableDescriptor(name, values) }
+    fun withEnumVariable(name: String, values: Iterable<String>, macroName: String? = null) = withVariable(name, EnumVariableAdapter(name, macroName, values))
+    fun withBoolVariable(name: String, defaultValue: Boolean) = withVariable(name, BoolVariableAdapter(name, defaultValue.toString()))
+    fun withNlsVariable(name: String, defaultValue: String? = null) = withVariable(name) { VariableDescriptor(name, "${NlsKeysEnumMacro.NAME}()", toStringLiteral(defaultValue)?.toString()) }
+    fun withVariable(name: String, value: String) = withVariable(name) { VariableDescriptor(name, null, toStringLiteral(value)?.toString()) }
+    fun withVariable(name: String, variableAdapter: (TemplateEngine) -> VariableDescriptor?) = apply {
+        Ensure.isFalse(TemplateImpl.INTERNAL_VARS_SET.contains(name), "Variable name '{}' is reserved for internal use.", name)
+        m_variables[name] = variableAdapter
+    }
+
     fun variable(name: String) = m_variables[name]
 
     fun withAliasName(alias: String) = apply { m_alias.add(alias) }
@@ -68,8 +96,8 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
     fun withOrderDefinitionType(fqn: String) = apply { m_orderDefinitionType = fqn }
     fun orderDefinitionType() = m_orderDefinitionType
 
-    fun withInnerTypeGetterContainer(containerFqn: String, methodName: String) = apply { m_innerTypeGetterContainer = InnerTypeGetterInfo(containerFqn, methodName) }
-    fun innerTypeGetterContainer() = m_innerTypeGetterContainer
+    fun withInnerTypeGetterInfo(containerFqn: String, methodName: String, lookupType: InnerTypeGetterLookupType = InnerTypeGetterLookupType.CLOSEST) = apply { m_innerTypeGetterInfos.add(InnerTypeGetterInfo(containerFqn, methodName, lookupType)) }
+    fun innerTypeGetterInfos(): Set<InnerTypeGetterInfo> = m_innerTypeGetterInfos
 
     fun source(): String = m_source.computeIfAbsentAndGet {
         val templatePath = id.replace('.', '/') + ".txt"
@@ -78,9 +106,9 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
 
     fun copy() = TemplateDescriptor(this)
 
-    data class VariableDescriptor(val name: String, val values: Collection<String>)
-
     data class SuperClassInfo(val baseFqn: String, val defaultValue: String)
 
-    data class InnerTypeGetterInfo(val definitionClassFqn: String, val methodName: String)
+    data class InnerTypeGetterInfo(val definitionClassFqn: String, val methodName: String, val lookupType: InnerTypeGetterLookupType = InnerTypeGetterLookupType.CLOSEST)
+
+    enum class InnerTypeGetterLookupType { CLOSEST, FARTHEST }
 }
