@@ -1,7 +1,7 @@
-public class $name$Field extends $super$<$name$Field.TileGrid> {
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar}<${dollar}name${dollar}Field.TileGrid> {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override
@@ -9,8 +9,8 @@ public class $name$Field extends $super$<$name$Field.TileGrid> {
     return FULL_WIDTH;
   }
 
-  @#ClassId#("$newClassId()$")
-  public class TileGrid extends #AbstractTileGrid#<#ITile#> {
-   $END$
+  @${ClassId}("${dollar}newClassId()${dollar}")
+  public class TileGrid extends ${AbstractTileGrid}<${ITile}> {
+   ${dollar}END${dollar}
   }
 }

@@ -1,11 +1,11 @@
-public class $name$Field extends $super$ {
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar} {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override
   protected int getConfiguredMaxLength() {
-    return $max$;
-  }$END$
+    return ${dollar}max${dollar};
+  }${dollar}END${dollar}
 }

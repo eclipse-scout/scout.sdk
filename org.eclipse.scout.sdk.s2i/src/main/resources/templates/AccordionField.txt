@@ -1,7 +1,7 @@
-public class $name$Field extends $super$<$name$Field.Accordion> {
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar}<${dollar}name${dollar}Field.Accordion> {
   @java.lang.Override
   protected boolean getConfiguredLabelVisible() {
-    return $boolLabelVisible$;
+    return ${dollar}boolLabelVisible${dollar};
   }
 
   @java.lang.Override
@@ -9,8 +9,8 @@ public class $name$Field extends $super$<$name$Field.Accordion> {
     return FULL_WIDTH;
   }
 
-  @#ClassId#("$newClassId()$")
-  public class Accordion extends #AbstractAccordion# {
-    $END$
+  @${ClassId}("${dollar}newClassId()${dollar}")
+  public class Accordion extends ${AbstractAccordion} {
+    ${dollar}END${dollar}
   }
 }

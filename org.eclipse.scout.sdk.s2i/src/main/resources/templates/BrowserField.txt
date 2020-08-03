@@ -1,21 +1,21 @@
-public class $name$Field extends $super$ {
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar} {
   @java.lang.Override
   protected int getConfiguredGridH() {
-    return $height$;
+    return ${dollar}height${dollar};
   }
 
   @java.lang.Override
   protected int getConfiguredGridW() {
-    return $width$;
+    return ${dollar}width${dollar};
   }
 
   @java.lang.Override
   protected boolean getConfiguredLabelVisible() {
-    return $boolLabelVisible$;
+    return ${dollar}boolLabelVisible${dollar};
   }
 
   @java.lang.Override
   protected boolean getConfiguredScrollBarEnabled() {
-    return $boolScrollBarEnabled$;
-  }$END$
+    return ${dollar}boolScrollBarEnabled${dollar};
+  }${dollar}END${dollar}
 }

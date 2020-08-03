@@ -1,21 +1,21 @@
-public class $name$Field extends $super$ {
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar} {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override
   protected boolean getConfiguredAutoFit() {
-    return $boolAutoFit$;
+    return ${dollar}boolAutoFit${dollar};
   }
 
   @java.lang.Override
   protected int getConfiguredGridH() {
-    return $width$;
+    return ${dollar}width${dollar};
   }
 
   @java.lang.Override
   protected boolean getConfiguredLabelVisible() {
-    return $boolLabelVisible$;
-  }$END$
+    return ${dollar}boolLabelVisible${dollar};
+  }${dollar}END${dollar}
 }

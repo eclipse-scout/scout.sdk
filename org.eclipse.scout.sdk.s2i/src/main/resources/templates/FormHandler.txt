@@ -1,7 +1,7 @@
-public $staticIfInExtension$ class $name$Handler extends $super$ {
+public #if( $inExtension ) static #end class ${dollar}name${dollar}Handler extends ${dollar}super${dollar} {
   @java.lang.Override
   protected void execLoad() {
-    $END$
+    ${dollar}END$
   }
 
   @java.lang.Override

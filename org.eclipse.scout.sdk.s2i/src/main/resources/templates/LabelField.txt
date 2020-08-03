@@ -1,7 +1,7 @@
-@#FormData#(sdkCommand = #FormData#.SdkCommand.IGNORE)
-public class $name$Field extends $super$ {
+@${FormData}(sdkCommand = ${FormData}.SdkCommand.IGNORE)
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar} {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
-  }$END$
+    return ${TEXTS}.get("${dollar}nls${dollar}");
+  }${dollar}END${dollar}
 }

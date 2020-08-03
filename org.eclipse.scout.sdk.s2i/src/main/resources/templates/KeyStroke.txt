@@ -1,11 +1,11 @@
-public class $name$KeyStroke extends $super$ {
+public class ${dollar}name${dollar}KeyStroke extends ${dollar}super${dollar} {
   @java.lang.Override
   protected java.lang.String getConfiguredKeyStroke() {
-    return $keystrokes$;
+    return ${dollar}keystrokes${dollar};
   }
 
   @java.lang.Override
   protected void execAction() {
-    $END$
+    ${dollar}END${dollar}
   }
 }

@@ -1,11 +1,11 @@
-public class $name$Column extends $super$ {
+public class ${dollar}name${dollar}Column extends ${dollar}super${dollar} {
   @java.lang.Override
   protected java.lang.String getConfiguredHeaderText() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override
   protected int getConfiguredWidth() {
-    return $width$;
-  }$END$
+    return ${dollar}width${dollar};
+  }${dollar}END${dollar}
 }

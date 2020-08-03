@@ -1,7 +1,7 @@
-public class $name$Field extends $super$<$name$Field.Table> {
+public class ${dollar}name${dollar}Field extends ${dollar}super${dollar}<${dollar}name${dollar}Field.Table> {
   @java.lang.Override
   protected java.lang.String getConfiguredLabel() {
-    return #TEXTS#.get("$nls$");
+    return ${TEXTS}.get("${dollar}nls${dollar}");
   }
 
   @java.lang.Override
@@ -9,8 +9,8 @@ public class $name$Field extends $super$<$name$Field.Table> {
     return 6;
   }
 
-  @#ClassId#("$newClassId()$")
-  public class Table extends #AbstractTable# {
-    $END$
+  @${ClassId}("${dollar}newClassId()${dollar}")
+  public class Table extends ${AbstractTable} {
+    ${dollar}END${dollar}
   }
 }
