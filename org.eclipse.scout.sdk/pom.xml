@@ -407,6 +407,12 @@
 
       <dependency>
         <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.osgi</artifactId>
+        <version>${org.eclipse.osgi-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.runtime</artifactId>
         <version>${org.eclipse.core.runtime-maven}</version>
       </dependency>
@@ -541,6 +547,42 @@
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ltk.ui.refactoring</artifactId>
         <version>${org.eclipse.ltk.ui.refactoring-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.core.contenttype</artifactId>
+        <version>${org.eclipse.core.contenttype-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.core.jobs</artifactId>
+        <version>${org.eclipse.core.jobs-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.ui.workbench.texteditor</artifactId>
+        <version>${org.eclipse.ui.workbench.texteditor-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.jface</artifactId>
+        <version>${org.eclipse.jface-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.ui.views</artifactId>
+        <version>${org.eclipse.ui.views-maven}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.ui.forms</artifactId>
+        <version>${org.eclipse.ui.forms-maven}</version>
       </dependency>
 
       <dependency>
