@@ -11,17 +11,15 @@
 
 package org.eclipse.scout.sdk.s2e.environment;
 
-import static java.util.Collections.unmodifiableSet;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -41,23 +39,20 @@ public class CharSequenceInputStreamTest {
 
   static {
     StringBuilder buffer = new StringBuilder();
-    for (int i = 0; i < 100; i++) {
-      buffer.append(TEST_STRING);
-    }
+    buffer.append(TEST_STRING.repeat(100));
     LARGE_TEST_STRING = buffer.toString();
   }
 
+  @SuppressWarnings("UnsecureRandomNumberGeneration")
   private final Random m_random = new Random();
 
   private static Iterable<String> getRequiredCharsetNames() {
-    Set<String> m = new HashSet<>();
-    m.add(StandardCharsets.ISO_8859_1.name());
-    m.add(StandardCharsets.US_ASCII.name());
-    m.add(StandardCharsets.UTF_16.name());
-    m.add(StandardCharsets.UTF_16BE.name());
-    m.add(StandardCharsets.UTF_16LE.name());
-    m.add(StandardCharsets.UTF_8.name());
-    return unmodifiableSet(m);
+    return Set.of(StandardCharsets.ISO_8859_1.name(),
+        StandardCharsets.US_ASCII.name(),
+        StandardCharsets.UTF_16.name(),
+        StandardCharsets.UTF_16BE.name(),
+        StandardCharsets.UTF_16LE.name(),
+        StandardCharsets.UTF_8.name());
   }
 
   private void testBufferedRead(String testString, String charsetName) throws IOException {
@@ -112,6 +107,7 @@ public class CharSequenceInputStreamTest {
     char[] inputChars = {(char) 0xE0, (char) 0xB2, (char) 0xA0};
     Charset charset = Charset.forName(csName); // infinite loop for US-ASCII, UTF-8 OK
     try (InputStream stream = new CharSequenceInputStream(new String(inputChars), charset, 512)) {
+      //noinspection StatementWithEmptyBody
       while (stream.read() != -1) {
       }
     }
@@ -132,7 +128,7 @@ public class CharSequenceInputStreamTest {
 
       for (int i = 0; i < readFirst; i++) {
         int ch = is.read();
-        assertFalse(ch == -1);
+        assertNotEquals(ch, -1);
       }
 
       is.mark(dataSize);
@@ -291,7 +287,9 @@ public class CharSequenceInputStreamTest {
       for (byte b : bytes) {
         int read = in.read();
         assertTrue(read >= 0, "read " + read + " >=0 ");
+        //noinspection ConstantConditions
         assertTrue(read <= 255, "read " + read + " <= 255");
+        //noinspection NumericCastThatLosesPrecision
         assertEquals(b, (byte) read, "Should agree with input");
       }
       assertEquals(-1, in.read());
@@ -321,6 +319,7 @@ public class CharSequenceInputStreamTest {
       assertEquals(1, r.skip(1));
       assertEquals(2, r.skip(2));
       assertEquals('t', r.read(), csName);
+      //noinspection ResultOfMethodCallIgnored
       r.skip(100);
       assertEquals(-1, r.read(), csName);
     }

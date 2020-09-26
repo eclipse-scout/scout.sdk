@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2i.util
 
 import org.apache.velocity.VelocityContext
 import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.s2i.replaceAll
 import org.jetbrains.java.generate.velocity.VelocityFactory
 import java.io.StringWriter
 import java.util.regex.Pattern
@@ -50,7 +49,7 @@ class VelocityRunner {
         for (postProcessor in m_postProcessors) {
             val pattern = postProcessor.key
             val replacer = postProcessor.value
-            evaluated = pattern.replaceAll(evaluated, replacer)
+            evaluated = pattern.matcher(evaluated).replaceAll(replacer)
         }
         return evaluated
     }

@@ -46,7 +46,7 @@ public class DataAnnotationDescriptor {
     }
 
     Optional<IType> dtoType = getDataAnnotationValue(type);
-    if (!dtoType.isPresent()) {
+    if (dtoType.isEmpty()) {
       return Optional.empty();
     }
 

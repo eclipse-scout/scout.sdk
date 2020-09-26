@@ -209,7 +209,7 @@ public class PropertyBean {
   }
 
   protected static Optional<String> nameOf(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m, boolean setter) {
-    if (!m.returnType().isPresent()) {
+    if (m.returnType().isEmpty()) {
       return Optional.empty();
     }
     CharSequence methodName = m.elementName().orElseThrow(() -> newFail("Method name is missing."));
@@ -223,7 +223,7 @@ public class PropertyBean {
 
   protected static Optional<String> nameOf(IMethod m, boolean setter) {
     Optional<IType> returnType = m.returnType();
-    if (!returnType.isPresent()) {
+    if (returnType.isEmpty()) {
       return Optional.empty();
     }
 

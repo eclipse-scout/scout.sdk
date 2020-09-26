@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.permission;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
@@ -35,7 +36,7 @@ public class PermissionGenerator<TYPE extends PermissionGenerator<TYPE>> extends
         .withMethod(createConstructor(mainType));
   }
 
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createConstructor(ITypeGenerator<? extends ITypeGenerator<?>> constructorOwner) {
+  protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createConstructor(IJavaElementGenerator<?> constructorOwner) {
     String permissionName = constructorOwner.elementName().orElseThrow(() -> newFail("Permission name is missing"));
     return MethodGenerator.create()
         .asPublic()

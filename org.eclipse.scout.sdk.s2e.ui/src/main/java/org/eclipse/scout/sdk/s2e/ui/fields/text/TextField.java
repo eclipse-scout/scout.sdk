@@ -95,6 +95,7 @@ public class TextField extends Composite {
     super(parent, SWT.NONE);
     m_labelColumnWidth = labelWidth;
     m_type = type;
+    //noinspection ThisEscapedInObjectConstruction
     createContent(this);
   }
 

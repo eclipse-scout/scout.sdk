@@ -16,6 +16,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.eclipse.scout.sdk.core.util.StreamUtils.allMatchResults;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -57,9 +58,7 @@ public class UiTextContributor {
   }
 
   public Stream<String> keys() {
-    return m_keys.opt()
-        .map(Set::stream)
-        .orElseGet(Stream::empty); // not yet loaded or load failed
+    return m_keys.opt().stream().flatMap(Collection::stream); // not yet loaded or load failed
   }
 
   public boolean load(IProgress progress) {
@@ -96,15 +95,13 @@ public class UiTextContributor {
     List<IType> referencedTextServices = allMatchResults(TEXT_SERVICE_CLASS_LITERAL_PAT, contributeUiTextKeysMethodSource)
         .map(match -> match.group(1))
         .map(contributor::resolveSimpleName)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .filter(type -> type.isInstanceOf(IScoutRuntimeTypes.ITextProviderService))
         .collect(toList());
     progress.init(referencedTextServices.size(), "Load referenced text provider service");
     return referencedTextServices.stream()
         .map(txtService -> TranslationStores.create(txtService, progress.newChild(1)))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .flatMap(ITranslationStore::keys);
   }
 

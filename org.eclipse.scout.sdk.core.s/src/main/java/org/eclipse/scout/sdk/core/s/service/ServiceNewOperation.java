@@ -94,7 +94,7 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
       Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> existingMehtod = implBuilder
           .mainType()
           .flatMap(mainType -> mainType.method(msb.identifier(true)));
-      if (!existingMehtod.isPresent()) {
+      if (existingMehtod.isEmpty()) {
         boolean existsInInterface = isInterface(msb.flags()) || isPublic(msb.flags());
         if (existsInInterface) {
           msb.withAnnotation(AnnotationGenerator.createOverride());
@@ -128,7 +128,7 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
       if (isPublic(msb.flags()) || isInterface(msb.flags())) {
         Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> existingMethod = ifcBuilder.mainType()
             .flatMap(mainType -> mainType.method(msb.identifier()));
-        if (!existingMethod.isPresent()) {
+        if (existingMethod.isEmpty()) {
           ifcBuilder.mainType().ifPresent(t -> t
               .withMethod(msb
                   .withoutFlags(Flags.AccPublic)

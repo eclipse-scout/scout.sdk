@@ -111,7 +111,7 @@ public final class CoreUtils {
       return;
     }
 
-    Files.walkFileTree(toDelete, new SimpleFileVisitor<Path>() {
+    Files.walkFileTree(toDelete, new SimpleFileVisitor<>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         Files.delete(file);
@@ -166,7 +166,7 @@ public final class CoreUtils {
       Files.move(sourceDir, targetPath, StandardCopyOption.REPLACE_EXISTING);
     }
     else {
-      Files.walkFileTree(sourceDir, new SimpleFileVisitor<Path>() {
+      Files.walkFileTree(sourceDir, new SimpleFileVisitor<>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           Files.copy(file, targetPath.resolve(sourceDir.relativize(file)));
@@ -231,9 +231,7 @@ public final class CoreUtils {
 
     // Construct the relative path
     StringBuilder sb = new StringBuilder();
-    for (int j = 0; j < (bParts.length - i); j++) {
-      sb.append("../");
-    }
+    sb.append("../".repeat(Math.max(0, bParts.length - i)));
     for (int j = i; j < cParts.length; j++) {
       if (j != i) {
         sb.append('/');

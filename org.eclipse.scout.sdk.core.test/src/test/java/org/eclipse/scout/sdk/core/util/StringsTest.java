@@ -113,9 +113,9 @@ public class StringsTest {
     assertNull(repeat(null, 1));
     assertEquals("", repeat("", 10));
     assertEquals("", repeat("asdf", 0));
-    assertEquals("", repeat("asdf", -1));
     assertEquals("aaa", repeat("a", 3).toString());
     assertEquals("abab", repeat("ab", 2).toString());
+    assertThrows(IllegalArgumentException.class, () -> repeat("asdf", -1));
   }
 
   @Test

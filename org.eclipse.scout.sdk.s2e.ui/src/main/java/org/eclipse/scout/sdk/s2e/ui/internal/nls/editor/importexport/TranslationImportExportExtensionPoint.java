@@ -10,9 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor.importexport;
 
-import static java.util.Collections.unmodifiableList;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -83,7 +82,7 @@ public final class TranslationImportExportExtensionPoint {
   @SuppressWarnings("unchecked")
   private static List<TranslationImportExportWizardExtension> loadExtensionPoints(String id) {
     IExtensionRegistry reg = Platform.getExtensionRegistry();
-    List<TranslationImportExportWizardExtension> wizardExtensions = new ArrayList<>();
+    Collection<TranslationImportExportWizardExtension> wizardExtensions = new ArrayList<>();
     IExtensionPoint xp = reg.getExtensionPoint(S2ESdkUiActivator.PLUGIN_ID, id);
     IExtension[] exts = xp.getExtensions();
     for (IExtension extension : exts) {
@@ -111,6 +110,6 @@ public final class TranslationImportExportExtensionPoint {
         }
       }
     }
-    return unmodifiableList(new ArrayList<>(wizardExtensions));
+    return List.copyOf(wizardExtensions);
   }
 }

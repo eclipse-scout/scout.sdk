@@ -55,7 +55,7 @@ public final class StreamUtils {
    */
   public static Stream<MatchResult> allMatchResults(Pattern pattern, CharSequence input) {
     Matcher matcher = pattern.matcher(input);
-    Spliterator<MatchResult> spliterator = new AbstractSpliterator<MatchResult>(Long.MAX_VALUE,
+    Spliterator<MatchResult> spliterator = new AbstractSpliterator<>(Long.MAX_VALUE,
         Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE) {
       @Override
       public boolean tryAdvance(Consumer<? super MatchResult> action) {
@@ -88,7 +88,7 @@ public final class StreamUtils {
    */
   public static <T> Stream<T> toStream(Enumeration<T> e) {
     Ensure.notNull(e);
-    Spliterator<T> spliterator = new AbstractSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED) {
+    Spliterator<T> spliterator = new AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED) {
       @Override
       public boolean tryAdvance(Consumer<? super T> action) {
         if (!e.hasMoreElements()) {

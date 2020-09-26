@@ -280,12 +280,12 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
 
     org.eclipse.scout.sdk.core.model.api.IType scoutSuperType = m_provider.toScoutType(serviceImplSuperType);
     Optional<Stream<org.eclipse.scout.sdk.core.model.api.IType>> superClassKeyValue = scoutSuperType.resolveTypeParamValue(IScoutRuntimeTypes.TYPE_PARAM_LOOKUP_SERVICE_KEY_TYPE, IScoutRuntimeTypes.ILookupService);
-    if (!superClassKeyValue.isPresent()) {
+    if (superClassKeyValue.isEmpty()) {
       return Status.OK_STATUS;
     }
 
     Optional<org.eclipse.scout.sdk.core.model.api.IType> bound = superClassKeyValue.get().findFirst();
-    if (!bound.isPresent() || Object.class.getName().equals(bound.get().name())) {
+    if (bound.isEmpty() || Object.class.getName().equals(bound.get().name())) {
       return Status.OK_STATUS;
     }
 
@@ -339,7 +339,7 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
     setPropertyWithChangingControl(m_serverSourceFolder, () -> setServerSourceFolderInternal(serverSourceFolder), field -> field.acceptProposal(serverSourceFolder));
   }
 
-  protected boolean setServerSourceFolderInternal(IPackageFragmentRoot serverSourceFolder) {
+  protected boolean setServerSourceFolderInternal(@SuppressWarnings("TypeMayBeWeakened") IPackageFragmentRoot serverSourceFolder) {
     if (setProperty(PROP_SERVER_SOURCE_FOLDER, serverSourceFolder)) {
       if (serverSourceFolder != null) {
         setServerJavaProjectInternal(serverSourceFolder.getJavaProject());

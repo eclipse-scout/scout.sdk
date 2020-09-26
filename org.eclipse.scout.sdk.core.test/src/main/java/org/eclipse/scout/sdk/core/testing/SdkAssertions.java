@@ -29,7 +29,6 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -105,8 +104,8 @@ public final class SdkAssertions {
     }
 
     String errors = String.join("\n", compileErrors);
-    SdkLog.error("Compilation Failure: \n{}", t.requireCompilationUnit().source().get());
-    throw new AssertionError(errors);
+    String msg = "Compilation Failure: \n" + errors + "\nSource:\n" + t.requireCompilationUnit().source().get();
+    throw new AssertionError(msg);
   }
 
   /**
@@ -164,7 +163,7 @@ public final class SdkAssertions {
     assertNotNull(declaringType);
 
     Optional<IType> type = declaringType.innerTypes().withSimpleName(typeName).first();
-    if (!type.isPresent()) {
+    if (type.isEmpty()) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Type '").append(typeName).append('\'');
         messageBuilder.append(" in type '").append(declaringType.name()).append('\'');

@@ -50,7 +50,7 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
     m_type = type;
   }
 
-  protected static Spliterator<IMethod> findMatchingMethods(IType container, String id) {
+  protected static Spliterator<IMethod> findMatchingMethods(@SuppressWarnings("TypeMayBeWeakened") IType container, String id) {
     if (id == null) {
       return new WrappingSpliterator<>(container.unwrap().getMethods());
     }

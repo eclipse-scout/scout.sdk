@@ -312,7 +312,7 @@ public class TranslationStoreStack {
     }
 
     Optional<IEditableTranslationStore> targetStore = firstEditableStoreWithKey(oldKey);
-    if (!targetStore.isPresent()) {
+    if (targetStore.isEmpty()) {
       return;
     }
     IEditableTranslationStore store = targetStore.get();

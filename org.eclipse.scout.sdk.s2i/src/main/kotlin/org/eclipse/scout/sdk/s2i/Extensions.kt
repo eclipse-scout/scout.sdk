@@ -53,7 +53,6 @@ import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.function.Function
-import java.util.regex.Pattern
 import java.util.stream.Stream
 
 /**
@@ -332,55 +331,4 @@ fun PsiClass.isInstanceOf(vararg parentFqn: String): Boolean = computeInReadActi
             TreeVisitResult.CONTINUE
     }
     visitSupers(visitor) == TreeVisitResult.TERMINATE
-}
-
-/**
- * Replaces every subsequence of the [text] that matches this
- * pattern with the result of applying the given [replacer] function to the
- * match result of this pattern corresponding to that subsequence.
- * Exceptions thrown by the function are relayed to the caller.
- *
- * <p> It then scans the [text] looking for matches of the pattern.
- * Characters that are not part of any match are appended directly to the result string;
- * each match is replaced in the result by the applying the replacer function that
- * returns a replacement string. Each replacement string may contain
- * references to captured subsequences as in the [java.util.regex.Matcher.appendReplacement] method.
- *
- * <p> Note that backslashes ({@code \}) and dollar signs ({@code $}) in
- * a replacement string may cause the results to be different than if it
- * were being treated as a literal replacement string. Dollar signs may be
- * treated as references to captured subsequences as described above, and
- * backslashes are used to escape literal characters in the replacement
- * string.
- *
- * <p> The replacer function should not modify this matcher's state during
- * replacement!
- *
- * <p> The state of each match result passed to the replacer function is
- * guaranteed to be constant only for the duration of the replacer function
- * call and only if the replacer function does not modify this matcher's
- * state.
- *
- * <p> This method is a copy of the Java 9 replaceAll method.
- * It can be removed as soon as Java 8 is no longer supported.
- *
- * @param text The input text
- * @param replacer The function to be applied to the match result of this matcher that returns a replacement string.
- * @return The string constructed by replacing each matching subsequence with the result of applying the replacer
- * function to that matched subsequence, substituting captured subsequences as needed.
- */
-fun Pattern.replaceAll(text: CharSequence, replacer: (java.util.regex.MatchResult) -> String): String {
-    val matcher = matcher(text)
-    var found: Boolean = matcher.find()
-    if (!found) {
-        return text.toString()
-    }
-
-    val sb = StringBuffer()
-    do {
-        matcher.appendReplacement(sb, replacer.invoke(matcher))
-        found = matcher.find()
-    } while (found)
-    matcher.appendTail(sb)
-    return sb.toString()
 }

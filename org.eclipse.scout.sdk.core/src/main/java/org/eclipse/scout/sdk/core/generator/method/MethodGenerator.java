@@ -84,14 +84,12 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
     m_typeParameters = method.typeParameters()
         .map(p -> transformTypeParameter(p, transformer))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toList());
 
     m_parameters = method.parameters().stream()
         .map(mp -> transformMethodParameter(mp, transformer))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toList());
 
     m_exceptions = method.exceptionTypes()

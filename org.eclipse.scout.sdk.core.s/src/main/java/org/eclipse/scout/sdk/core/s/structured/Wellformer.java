@@ -62,7 +62,7 @@ public class Wellformer {
   }
 
   protected void appendMemberSource(IMember m, StringBuilder builder) {
-    if (!m.source().isPresent()) {
+    if (m.source().isEmpty()) {
       return;
     }
 
@@ -101,7 +101,7 @@ public class Wellformer {
   }
 
   public boolean buildSource(IType type, StringBuilder builder) {
-    if (!type.source().isPresent()) {
+    if (type.source().isEmpty()) {
       return false;
     }
 

@@ -90,6 +90,7 @@ public class SuperTypeHierarchySpliterator implements Spliterator<IType> {
     action.accept(moveToNext());
   }
 
+  @SuppressWarnings("ConstantConditions")
   protected void moveToNextValidElement() {
     while (isDataAvailable()) {
       IType next = m_dek.peekFirst();

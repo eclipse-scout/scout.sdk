@@ -38,7 +38,7 @@ public class DepthFirstVisitorTypeAdapter<T, U extends T> implements IDepthFirst
    */
   public static <S> IDepthFirstVisitor<S> functionToPreOrderVisitor(Function<S, TreeVisitResult> visitor) {
     Ensure.notNull(visitor);
-    return new DefaultDepthFirstVisitor<S>() {
+    return new DefaultDepthFirstVisitor<>() {
       @Override
       public TreeVisitResult preVisit(S element, int level, int index) {
         return visitor.apply(element);

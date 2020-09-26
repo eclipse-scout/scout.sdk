@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.classid;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
  */
 public final class ClassIds {
 
-  public static final List<Function<String, String>> STORE = new CopyOnWriteArrayList<>();
+  public static final Collection<Function<String, String>> STORE = new CopyOnWriteArrayList<>();
   static {
     STORE.add(context -> UUID.randomUUID().toString());
   }

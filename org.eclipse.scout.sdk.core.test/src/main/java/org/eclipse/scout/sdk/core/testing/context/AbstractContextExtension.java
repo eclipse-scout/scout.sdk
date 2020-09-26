@@ -42,6 +42,7 @@ public abstract class AbstractContextExtension<T, C extends Annotation> implemen
   private final Class<? extends Annotation> m_annotationType;
   private final Class<T> m_contextType;
 
+  @SuppressWarnings("ThisEscapedInObjectConstruction")
   protected AbstractContextExtension(String contextKey) {
     m_contextType = getTypeArgument(this, 0);
     m_annotationType = getTypeArgument(this, 1);

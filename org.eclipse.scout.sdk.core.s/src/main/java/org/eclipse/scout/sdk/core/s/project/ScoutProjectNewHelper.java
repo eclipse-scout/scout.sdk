@@ -69,7 +69,7 @@ public final class ScoutProjectNewHelper {
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"/<>=:]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z][a-z0-9_]{0,32}(?:\\.[a-z][a-z0-9_]{0,32}){0,16}$");
-  public static final String DEFAULT_JAVA_ENV = "1.8";
+  public static final String DEFAULT_JAVA_ENV = "11";
 
   private ScoutProjectNewHelper() {
   }

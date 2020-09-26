@@ -60,6 +60,7 @@ public class NlsTablePage extends Composite {
     m_stack = Ensure.notNull(stack);
 
     FormToolkit toolkit = new FormToolkit(getDisplay());
+    //noinspection ThisEscapedInObjectConstruction
     Form form = toolkit.createForm(this);
     form.setText("Translations");
     createContent(toolkit, form.getBody());

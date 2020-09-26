@@ -138,7 +138,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
 
   protected TYPE withExtendsAnnotationIfNecessary(IType element) {
     Optional<IType> extendedTypeOpt = getExtendedType(element);
-    if (!extendedTypeOpt.isPresent()) {
+    if (extendedTypeOpt.isEmpty()) {
       return currentInstance();
     }
     IType extendedType = extendedTypeOpt.get();
@@ -247,7 +247,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
       return Optional.empty();
     }
 
-    boolean isPrimaryType = !modelType.declaringType().isPresent();
+    boolean isPrimaryType = modelType.declaringType().isEmpty();
     if (isPrimaryType) {
       // model type is a primary type (form, template) and we have a corresponding DTO type.
       return Optional.of(primaryType);
@@ -299,7 +299,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
       }
 
       Optional<IType> declaringType = recursiveDeclaringType.declaringType();
-      if (!declaringType.isPresent()) {
+      if (declaringType.isEmpty()) {
         // primary type
         if (FormDataAnnotationDescriptor.isCreate(formDataAnnotation) || FormDataAnnotationDescriptor.isSdkCommandUse(formDataAnnotation)) {
           return formDataAnnotation.getFormDataType();

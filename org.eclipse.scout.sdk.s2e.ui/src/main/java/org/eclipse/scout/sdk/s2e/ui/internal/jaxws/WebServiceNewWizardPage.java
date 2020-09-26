@@ -420,7 +420,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       artifactId = Pom.artifactId(pom);
     }
 
-    if (!artifactId.isPresent()) {
+    if (artifactId.isEmpty()) {
       return;
     }
 
@@ -515,7 +515,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       }
 
       Optional<IPackageFragmentRoot> primarySourceFolderOpt = S2eUtils.primarySourceFolder(jp);
-      if (!primarySourceFolderOpt.isPresent()) {
+      if (primarySourceFolderOpt.isEmpty()) {
         return false;
       }
 

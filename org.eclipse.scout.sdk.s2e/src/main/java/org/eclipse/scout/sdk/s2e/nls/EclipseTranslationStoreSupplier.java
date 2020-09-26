@@ -107,8 +107,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     return dynamicNlsTextProviderServices.stream()
         .map(env::toScoutType)
         .map(svc -> createTranslationStore(svc, loopProgress))
-        .filter(Optional::isPresent)
-        .map(Optional::get);
+        .flatMap(Optional::stream);
   }
 
   private static Optional<ITranslationStore> createTranslationStore(org.eclipse.scout.sdk.core.model.api.IType textProviderServiceType, IProgress progress) {
@@ -168,8 +167,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     return getFoldersOfProject(toLookAt, path)
         .flatMap(EclipseTranslationStoreSupplier::filesInFolder)
         .map(file -> toEditableTranslationFile(file, fileNamePrefix))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toList());
   }
 

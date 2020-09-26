@@ -44,8 +44,7 @@ public abstract class AbstractAnnotatableGenerator<TYPE extends IAnnotatableGene
     super(element);
     m_annotations = element.annotations().stream()
         .map(a -> transformAnnotation(a, transformer))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toList());
   }
 

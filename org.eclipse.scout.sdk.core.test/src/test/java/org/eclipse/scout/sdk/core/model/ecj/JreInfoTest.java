@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.Test;
  * @since 9.0.0
  */
 public class JreInfoTest {
+
   @Test
   public void testParseVersion() {
     String java11Content = "IMPLEMENTOR=\"Oracle Corporation\"\n" +
@@ -65,8 +68,8 @@ public class JreInfoTest {
     assertIsJavaVersion("12.2", java122Content);
   }
 
-  protected void assertIsJavaVersion(String expectedJavaVersion, String fileContent) {
-    String version = JreInfo.parseVersion(asList(fileContent.split("\\n")));
+  protected static void assertIsJavaVersion(String expectedJavaVersion, String fileContent) {
+    String version = JreInfo.parseVersion(asList(Pattern.compile("\\n").split(fileContent)));
     assertEquals(expectedJavaVersion, version);
   }
 }

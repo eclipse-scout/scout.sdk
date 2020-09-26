@@ -159,8 +159,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       IJavaProject ownerProject = builderCtx.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
       List<String> paramNames = target.parameters()
           .map(IMethodParameterGenerator::elementName)
-          .filter(Optional::isPresent)
-          .map(Optional::get)
+          .flatMap(Optional::stream)
           .collect(toList());
       List<String> exceptionNames = target.exceptions()
           .collect(toList());

@@ -217,8 +217,7 @@ public final class TranslationStores {
     progress.init(ticksBySupplier * suppliers.size(), "Creating translation store for service '{}'.", textService);
     return suppliers.stream()
         .map(supplier -> supplier.single(textService, progress.newChild(ticksBySupplier)))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .findFirst();
   }
 
@@ -245,7 +244,7 @@ public final class TranslationStores {
       return false;
     }
 
-    if (!s.languages().findAny().isPresent()) {
+    if (s.languages().findAny().isEmpty()) {
       SdkLog.warning("{} contains no languages! Please check the configuration.", s);
       return false;
     }

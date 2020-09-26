@@ -42,12 +42,8 @@ public class PropertySupport {
   }
 
   public PropertySupport(Object source) {
-    if (source == null) {
-      m_source = this;
-    }
-    else {
-      m_source = source;
-    }
+    //noinspection ThisEscapedInObjectConstruction
+    m_source = Objects.requireNonNullElse(source, this);
     m_props = new HashMap<>();
   }
 
@@ -56,12 +52,8 @@ public class PropertySupport {
   }
 
   public PropertySupport(Object source, int size) {
-    if (source == null) {
-      m_source = this;
-    }
-    else {
-      m_source = source;
-    }
+    //noinspection ThisEscapedInObjectConstruction
+    m_source = Objects.requireNonNullElse(source, this);
     m_props = new HashMap<>(size);
   }
 

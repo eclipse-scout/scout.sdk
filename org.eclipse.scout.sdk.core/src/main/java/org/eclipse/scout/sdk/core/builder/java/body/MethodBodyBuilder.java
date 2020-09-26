@@ -93,7 +93,7 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
       append(prefixSource);
     }
 
-    boolean isConstructor = !surroundingMethod().returnType().isPresent();
+    boolean isConstructor = surroundingMethod().returnType().isEmpty();
     if (!isConstructor) {
       dot()
           .append(surroundingMethod().elementName().orElseThrow(() -> newFail("Cannot create a super call because method has no name.")));

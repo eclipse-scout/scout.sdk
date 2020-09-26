@@ -55,7 +55,7 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
     m_finishTask
         .withOperation(WebServiceNewOperation::new)
         .withMapper(this::mapPageToOperation)
-        .withUiAction(this::afterOperation);
+        .withUiAction(WebServiceNewWizard::afterOperation);
 
     setWindowTitle(getWebServiceNewWizardPage().getTitle());
     setHelpAvailable(true);
@@ -104,7 +104,7 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
     op.setPackage(getWebServiceNewWizardPage().getTargetPackage());
   }
 
-  protected void afterOperation(WebServiceNewOperation op, Display d) {
+  protected static void afterOperation(WebServiceNewOperation op, Display d) {
     showJaxwsEditor(op, d);
     WebServiceMessageDialog.open(op, d);
   }

@@ -107,7 +107,7 @@ public class FormDataAnnotationDescriptor {
   @SuppressWarnings("pmd:NPathComplexity")
   private static void fillFormDataAnnotation(IAnnotatable element, FormDataAnnotationDescriptor descriptorToFill, boolean isOwner, boolean cumulativeAttributesOnly) {
     Optional<FormDataAnnotation> optFda = element.annotations().withManagedWrapper(FormDataAnnotation.class).first();
-    if (!optFda.isPresent()) {
+    if (optFda.isEmpty()) {
       return;
     }
 

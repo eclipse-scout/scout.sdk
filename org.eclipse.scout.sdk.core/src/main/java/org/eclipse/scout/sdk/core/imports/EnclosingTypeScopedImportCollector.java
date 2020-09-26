@@ -43,8 +43,7 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
     // inner types
     m_enclosedSimpleNames = enclosingTypeGenerator.types()
         .map(ITypeGenerator::elementName)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toSet());
 
     IJavaEnvironment env = getJavaEnvironment();
@@ -53,17 +52,14 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
     }
 
     Stream<String> superTypeSignatures = Stream.concat(
-        enclosingTypeGenerator.superClass()
-            .map(Stream::of)
-            .orElseGet(Stream::empty),
+        enclosingTypeGenerator.superClass().stream(),
         enclosingTypeGenerator.interfaces());
 
     superTypeSignatures
         .map(JavaTypes::erasure)
         .peek(m_enclosingQualifiers::add)
         .map(env::findType)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .map(IType::superTypes)
         .flatMap(SuperTypeQuery::stream)
         .filter(s -> !Object.class.getName().equals(s.name()))

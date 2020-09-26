@@ -41,6 +41,7 @@ public abstract class AbstractWizardPage extends WizardPage {
 
   protected AbstractWizardPage(String pageName) {
     super(pageName, null, null);
+    //noinspection ThisEscapedInObjectConstruction
     m_propertySupport = new PropertySupport(this);
   }
 

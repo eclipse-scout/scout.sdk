@@ -202,7 +202,7 @@ public class NlsTableCursor {
 
   private void createEditableText(String input) {
     Optional<NlsTableCell> selection = getSelection();
-    if (!selection.isPresent()) {
+    if (selection.isEmpty()) {
       return;
     }
 

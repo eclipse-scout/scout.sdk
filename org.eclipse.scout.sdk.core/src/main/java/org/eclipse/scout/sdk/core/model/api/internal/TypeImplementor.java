@@ -207,9 +207,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   protected static void buildReferenceRec(IType type, boolean erasureOnly, StringBuilder builder) {
     if (type.isArray()) {
       buildReferenceRec(type.leafComponentType().get(), erasureOnly, builder);
-      for (int i = 0; i < type.arrayDimension(); i++) {
-        builder.append("[]");
-      }
+      builder.append("[]".repeat(type.arrayDimension()));
       return;
     }
 
@@ -280,7 +278,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   public Optional<Stream<IType>> resolveTypeParamValue(int typeParamIndex) {
     return typeArguments().skip(typeParamIndex).findAny()
         .map(t -> t.isParameterType() ? Stream.concat(
-            t.superClass().map(Stream::of).orElseGet(Stream::empty),
+            t.superClass().stream(),
             t.superInterfaces())
             : Stream.of(t));
   }
@@ -291,7 +289,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
       return Optional.empty();
     }
     Optional<ICompilationUnit> optCu = compilationUnit();
-    if (!optCu.isPresent()) {
+    if (optCu.isEmpty()) {
       return Optional.empty(); // simple types cannot resolve anything
     }
     IJavaEnvironment env = javaEnvironment();
@@ -329,8 +327,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
         .map(imp -> toImportName(imp, simpleName))
         .filter(Objects::nonNull)
         .map(env::findType)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .findAny();
   }
 

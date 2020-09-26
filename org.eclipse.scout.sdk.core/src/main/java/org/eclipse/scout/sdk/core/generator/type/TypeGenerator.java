@@ -102,8 +102,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     m_qualifier = new FinalValue<>();
     m_typeParameters = type.typeParameters()
         .map(p -> transformTypeParameter(p, transformer))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toList());
 
     m_superType = type.superClass()
@@ -118,20 +117,17 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     type.fields().stream()
         .map(f -> transformField(f, transformer)
             .map(g -> new SortedMemberEntry(g, f)))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toCollection(() -> m_members));
     type.methods().stream()
         .map(m -> transformMethod(m, transformer)
             .map(g -> new SortedMemberEntry(g, m)))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toCollection(() -> m_members));
     type.innerTypes().stream()
         .map(t -> transformType(t, transformer)
             .map(g -> new SortedMemberEntry(g, t)))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .peek(s -> applyConnection(s.generator(), this))
         .collect(toCollection(() -> m_members));
 

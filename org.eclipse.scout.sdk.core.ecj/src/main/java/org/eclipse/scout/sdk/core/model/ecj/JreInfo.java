@@ -42,6 +42,8 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class JreInfo {
 
+  public static final String VERSION_1_8 = "1.8";
+
   private final Path m_rtSrcZip;
   private final boolean m_supportsJrtModules;
   private final Path m_jreHome;
@@ -129,7 +131,7 @@ public class JreInfo {
   protected static String computeVersion(Path jreHome) {
     Path release = jreHome.resolve("release");
     if (!Files.isReadable(release) || !Files.isRegularFile(release)) {
-      return "1.8";
+      return VERSION_1_8;
     }
 
     try {

@@ -120,8 +120,7 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
       IType curSuperType = currentRowDataSuperType.get();
       curSuperType.fields().withFlags(ROW_DATA_FIELD_FLAGS).stream()
           .map(IField::constantValue)
-          .filter(Optional::isPresent)
-          .map(Optional::get)
+          .flatMap(Optional::stream)
           .filter(val -> val.type() == MetaValueType.String)
           .map(val -> val.as(String.class))
           .forEach(usedColumnBeanNames::add);
@@ -160,7 +159,7 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
     withFlags(flags);
 
     // super interface (for extensions)
-    if (!superClass().isPresent()) {
+    if (superClass().isEmpty()) {
       withInterface(Serializable.class.getName());
     }
 

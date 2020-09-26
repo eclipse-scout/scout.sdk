@@ -480,7 +480,7 @@ public class CompilationUnitNewWizardPage extends AbstractWizardPage {
     setPropertyWithChangingControl(m_sourceFolderField, () -> setSourceFolderInternal(sourceFolder), field -> field.acceptProposal(sourceFolder));
   }
 
-  protected boolean setSourceFolderInternal(IPackageFragmentRoot sourceFolder) {
+  protected boolean setSourceFolderInternal(@SuppressWarnings("TypeMayBeWeakened") IPackageFragmentRoot sourceFolder) {
     if (setProperty(PROP_SOURCE_FOLDER, sourceFolder)) {
       handleSourceFolderChanged();
       if (sourceFolder != null) {

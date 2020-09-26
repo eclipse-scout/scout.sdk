@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 public class ApiTest {
   @Test
   public void testAstUtilsApi() throws NoSuchMethodException {
-    ASTParser parser = ASTParser.newParser(AST.JLS13);
+    ASTParser parser = ASTParser.newParser(AST.JLS14);
     parser.setBindingsRecovery(false);
     parser.setIgnoreMethodBodies(true);
     parser.setKind(ASTParser.K_COMPILATION_UNIT);

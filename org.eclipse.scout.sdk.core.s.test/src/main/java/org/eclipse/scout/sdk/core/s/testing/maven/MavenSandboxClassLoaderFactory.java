@@ -44,31 +44,13 @@ public final class MavenSandboxClassLoaderFactory {
    * @return a new {@link URLClassLoader} capable to run the {@link MavenCliRunner}.
    */
   public static URLClassLoader build() {
-    ClassLoader parent;
-    if (isJava8()) {
-      // can be removed as soon as java 8 is no longer supported
-      parent = null;
-    }
-    else {
-      try {
-        parent = (ClassLoader) ClassLoader.class.getMethod("getPlatformClassLoader").invoke(null);
-      }
-      catch (ReflectiveOperationException e) {
-        throw new SdkException(e);
-      }
-    }
-    return URLClassLoader.newInstance(getMavenJarsUrls(), parent);
-  }
-
-  static boolean isJava8() {
-    // can be removed as soon as Java 8 is no longer supported.
-    return "1.8".equals(System.getProperty("java.specification.version"));
+    return URLClassLoader.newInstance(getMavenJarsUrls(), ClassLoader.getPlatformClassLoader());
   }
 
   static URL[] getMavenJarsUrls() {
     // contains a sample class of all jars required by the maven runtime.
     // the codesource of these classes will be the source of the classpath of the sandbox classloader.
-    Collection<String> baseClasses = new ArrayList<>(Arrays.asList(
+    Collection<String> baseClasses = Arrays.asList(
         MavenCliRunner.class.getName(),
         "javax.annotation.PostConstruct", // javax.annotation-api
         "org.apache.commons.lang3.StringUtils", // apache-commons-lang3 for guice
@@ -111,16 +93,11 @@ public final class MavenSandboxClassLoaderFactory {
         "okhttp3.ConnectionPool", // okhttp
         "okio.Okio", // okio
         "org.slf4j.ILoggerFactory", //slf4j-api
-        "org.apache.maven.wagon.AbstractWagon" // wagon-provider-api
-    ));
-    if (!isJava8()) {
-      baseClasses.addAll(Arrays.asList(
-          "javax.annotation.processing.RoundEnvironment", // javax.annotations.processing (APT)
-          "javax.jws.WebService", // javax.jws-api
-          "javax.annotation.PostConstruct" // javax.annotations-api
-      ));
-    }
-
+        "org.apache.maven.wagon.AbstractWagon", // wagon-provider-api
+        "javax.annotation.processing.RoundEnvironment", // javax.annotations.processing (APT)
+        "javax.jws.WebService", // javax.jws-api
+        "javax.annotation.PostConstruct" // javax.annotations-api
+    );
     return getJarsUrls(baseClasses);
   }
 

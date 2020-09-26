@@ -94,7 +94,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    * @return this
    */
   public T withoutScoutSdk() {
-    exclude(".*" + Pattern.quote("wsdl4j") + ".*");
+    excludeIfContains("wsdl4j");
     return exclude(".*" + Pattern.quote(".scout.sdk.") + ".*target/classes");
   }
 
@@ -129,6 +129,17 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     m_sourceExcludes.put(regex, pat);
     m_binaryExcludes.put(regex, pat);
     return currentInstance();
+  }
+
+  /**
+   * Exclude all classpaths that contain the specified {@link String}.
+   * 
+   * @param string
+   *          All paths (having '/' as delimiter) containing this {@link String} are excluded from the classpath.
+   * @return this
+   */
+  public T excludeIfContains(String string) {
+    return exclude(".*" + Pattern.quote(string) + ".*");
   }
 
   /**

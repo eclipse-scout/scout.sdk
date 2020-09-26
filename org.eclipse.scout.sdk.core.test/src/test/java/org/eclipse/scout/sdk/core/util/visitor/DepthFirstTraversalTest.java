@@ -28,7 +28,7 @@ public class DepthFirstTraversalTest {
 
   @Test
   public void testWithNullChildren() {
-    IDepthFirstVisitor<Object> visitor = new DefaultDepthFirstVisitor<Object>() {
+    IDepthFirstVisitor<Object> visitor = new DefaultDepthFirstVisitor<>() {
       @Override
       public boolean postVisit(Object element, int level, int index) {
         return element == m_root;

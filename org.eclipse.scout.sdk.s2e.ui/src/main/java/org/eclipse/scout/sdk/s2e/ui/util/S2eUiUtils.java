@@ -83,7 +83,7 @@ public final class S2eUiUtils {
    */
   public static PackageContainer getClientPackageOfSelection(ISelection selection) {
 
-    Comparator<IJavaElement> elementComparator = new Comparator<IJavaElement>() {
+    Comparator<IJavaElement> elementComparator = new Comparator<>() {
 
       @Override
       public int compare(IJavaElement o1, IJavaElement o2) {
@@ -100,7 +100,7 @@ public final class S2eUiUtils {
 
       private int getRanking(IJavaElement element) {
         Optional<S2eScoutTier> tier = S2eScoutTier.valueOf(element);
-        if (!tier.isPresent()) {
+        if (tier.isEmpty()) {
           return 100;
         }
 
@@ -460,8 +460,7 @@ public final class S2eUiUtils {
     to.removeAll();
     from
         .map(S2eUiUtils::toEclipseMatch)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .forEach(to::addMatch);
   }
 

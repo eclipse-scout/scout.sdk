@@ -55,7 +55,7 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
    * @return The {@link IJavaProject} of the given {@link ScoutTier} type that belongs to the given input
    *         {@link IJavaProject} or {@code null} if no such {@link IJavaProject} could be found in the workspace.
    */
-  public Optional<IJavaProject> convert(ScoutTier to, IJavaProject origin) {
+  public Optional<IJavaProject> convert(ScoutTier to, @SuppressWarnings("TypeMayBeWeakened") IJavaProject origin) {
     if (!JdtUtils.exists(origin) || to == null) {
       return Optional.empty();
     }
@@ -67,7 +67,7 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
     }
 
     Optional<ScoutTier> projectTier = valueOf(project).map(S2eScoutTier::unwrap);
-    if (!projectTier.isPresent()) {
+    if (projectTier.isEmpty()) {
       return Optional.empty();
     }
     if (to == projectTier.get()) {
@@ -89,13 +89,13 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
    * @return The converted {@link IPackageFragment} or {@code null} if no matching {@link IPackageFragment} could be
    *         found.
    */
-  public Optional<IPackageFragment> convert(ScoutTier to, IPackageFragment origin) {
+  public Optional<IPackageFragment> convert(ScoutTier to, @SuppressWarnings("TypeMayBeWeakened") IPackageFragment origin) {
     if (!JdtUtils.exists(origin) || to == null) {
       return Optional.empty();
     }
 
     Optional<IPackageFragmentRoot> targetSrcFolder = convert(to, JdtUtils.getSourceFolder(origin));
-    if (!targetSrcFolder.isPresent()) {
+    if (targetSrcFolder.isEmpty()) {
       return Optional.empty();
     }
 
@@ -121,13 +121,13 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
    * @return The converted {@link IPackageFragmentRoot} or {@code null} if no matching {@link IPackageFragmentRoot}
    *         could be found.
    */
-  public Optional<IPackageFragmentRoot> convert(ScoutTier to, IPackageFragmentRoot origin) {
+  public Optional<IPackageFragmentRoot> convert(ScoutTier to, @SuppressWarnings("TypeMayBeWeakened") IPackageFragmentRoot origin) {
     if (!JdtUtils.exists(origin) || to == null) {
       return Optional.empty();
     }
 
     Optional<IJavaProject> targetProject = convert(to, origin.getJavaProject());
-    if (!targetProject.isPresent()) {
+    if (targetProject.isEmpty()) {
       return Optional.empty();
     }
 

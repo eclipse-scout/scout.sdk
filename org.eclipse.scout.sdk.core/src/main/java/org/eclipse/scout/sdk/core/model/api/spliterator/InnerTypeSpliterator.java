@@ -47,7 +47,7 @@ public class InnerTypeSpliterator implements Spliterator<IType> {
     m_innerTypes = innerTypesFirstLevel;
   }
 
-  public static Spliterator<IType> innerTypesOf(IType focusType) {
+  public static Spliterator<IType> innerTypesOf(@SuppressWarnings("TypeMayBeWeakened") IType focusType) {
     return new WrappingSpliterator<>(focusType.unwrap().getTypes());
   }
 

@@ -189,7 +189,14 @@ class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
         assertNoCompileErrors(testClassName, psiFile.text)
     }
 
-    private fun assertNoCompileErrors(simpleName: String, source: String) = JavaEnvironmentWithEcjBuilder.create().withoutScoutSdk().accept {
-        assertNoCompileErrors(it, null, simpleName, source)
+    private fun assertNoCompileErrors(simpleName: String, source: String) {
+        // exclude IntelliJ jars as these are not required
+        JavaEnvironmentWithEcjBuilder.create()
+                .withoutScoutSdk()
+                .excludeIfContains("/com.jetbrains.intellij.idea/")
+                .excludeIfContains("/org.jetbrains.kotlin/")
+                .accept {
+                    assertNoCompileErrors(it, null, simpleName, source)
+                }
     }
 }

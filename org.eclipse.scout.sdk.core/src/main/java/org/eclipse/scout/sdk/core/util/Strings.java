@@ -597,14 +597,7 @@ public final class Strings {
     if (str == null) {
       return null;
     }
-    if (n < 1 || str.length() < 1) {
-      return "";
-    }
-    StringBuilder b = new StringBuilder(str.length() * n);
-    for (int i = 0; i < n; i++) {
-      b.append(str);
-    }
-    return b;
+    return str.toString().repeat(n);
   }
 
   /**

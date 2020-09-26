@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 public class SameCompositeObjectTest {
 
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "UnnecessaryBoxing", "RedundantArrayCreation", "SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testSameness() {
     Long a = Long.valueOf(300);
     Long b = Long.valueOf(300);

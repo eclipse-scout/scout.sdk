@@ -126,7 +126,7 @@ public class ClasspathBuilder {
   private Map<ClasspathEntry, Classpath> toClasspath(Collection<? extends ClasspathEntry> paths) {
     Map<ClasspathEntry, Classpath> result = new LinkedHashMap<>(paths.size());
     String version = jreInfo().version();
-    if ("1.8".equals(version)) {
+    if (JreInfo.VERSION_1_8.equals(version)) {
       version = null; // multi release JARs are not supported before Java 9.
     }
 

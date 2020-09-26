@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
+@file:Suppress("PropertyName")
+
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Clock
@@ -18,7 +20,7 @@ import java.time.format.DateTimeFormatter
 val SCOUT_SDK_VERSION = "11.0.0-SNAPSHOT"
 val SCOUT_RT_VERSION = "11.0-SNAPSHOT"
 val SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
-val JAVA_VERSION = JavaVersion.VERSION_1_8
+val JAVA_VERSION = JavaVersion.VERSION_11
 
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
@@ -30,7 +32,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "0.4.21"
+    id("org.jetbrains.intellij") version "0.4.26"
     kotlin("jvm") version "1.3.72"
 }
 
@@ -47,7 +49,7 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", SCOUT_SDK_VERSION)
     api("org.apache.poi", "poi-ooxml", "4.1.2")
     implementation(kotlin("stdlib-jdk8"))
-    testImplementation("org.mockito", "mockito-core", "3.3.3")
+    testImplementation("org.mockito", "mockito-core", "3.5.13")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", SCOUT_RT_VERSION)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", SCOUT_SDK_VERSION)
 }

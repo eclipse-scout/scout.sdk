@@ -58,7 +58,7 @@
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.4.1</version>
+          <version>1.6.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -110,8 +110,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_2020_03</id>
-              <url>http://download.eclipse.org/releases/2020-03/</url>
+              <id>eclipse_2020_09</id>
+              <url>http://download.eclipse.org/releases/2020-09/</url>
               <layout>p2</layout>
             </repository>
           </source>

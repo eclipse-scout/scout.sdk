@@ -166,7 +166,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
   }
 
   protected static CompositeObject defaultMethodOrder(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator, long insertionOrder) {
-    boolean isConstructor = !generator.returnType().isPresent();
+    boolean isConstructor = generator.returnType().isEmpty();
     int pos;
     if (isConstructor) {
       pos = 1000;

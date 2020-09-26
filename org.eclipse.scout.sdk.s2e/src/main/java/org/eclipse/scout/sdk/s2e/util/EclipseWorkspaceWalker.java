@@ -133,7 +133,7 @@ public class EclipseWorkspaceWalker {
   }
 
   protected static void executeQueryInFile(IFileQuery query, WorkspaceFile file, IEnvironment env, IProgress progress) {
-    if (!file.inWorkspace().isPresent()) {
+    if (file.inWorkspace().isEmpty()) {
       SdkLog.warning("File '{}' could not be found in the current Eclipse Workspace.", file.path());
       return;
     }
@@ -192,7 +192,7 @@ public class EclipseWorkspaceWalker {
   protected void searchInFolder(BiConsumer<WorkspaceFile, IProgress> visitor, Path folder, Charset charset, Collection<Path> outputFolders, IProgressMonitor monitor) {
     try {
       Files.walkFileTree(folder,
-          new SimpleFileVisitor<Path>() {
+          new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
               if (monitor.isCanceled()) {

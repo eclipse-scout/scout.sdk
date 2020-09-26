@@ -78,21 +78,18 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
     m_declaredImports = cu.imports()
         .filter(i -> !i.isStatic())
         .map(i -> transformImport(i, transformer))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toList());
     m_declaredStaticImports = cu.imports()
         .filter(IImport::isStatic)
         .map(i -> transformImport(i, transformer))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .collect(toList());
     m_types = cu.types().stream()
         .filter(t -> !t.elementName().equals(JavaTypes.PackageInfo))
         .map(t -> transformType(t, transformer)
             .map(g -> new SortedMemberEntry(g, t)))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .peek(entry -> applyConnection((ITypeGenerator<?>) entry.generator(), this))
         .collect(toList());
     m_footerSourceBuilders = new ArrayList<>();

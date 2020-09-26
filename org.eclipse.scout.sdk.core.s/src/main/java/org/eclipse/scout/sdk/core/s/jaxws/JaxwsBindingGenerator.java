@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.jaxws;
 import static java.util.Collections.emptyList;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
@@ -86,12 +87,7 @@ public class JaxwsBindingGenerator implements ISourceGenerator<ISourceBuilder<?>
   }
 
   public JaxwsBindingGenerator withNames(Iterable<JaxWsBindingMapping> names) {
-    if (names == null) {
-      m_names = emptyList();
-    }
-    else {
-      m_names = names;
-    }
+    m_names = Objects.requireNonNullElse(names, emptyList());
     return this;
   }
 }
