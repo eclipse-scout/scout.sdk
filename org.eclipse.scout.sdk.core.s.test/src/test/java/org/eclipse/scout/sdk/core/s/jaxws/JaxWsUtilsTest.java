@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
 public class JaxWsUtilsTest {
 
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "ConstantConditions", "SimplifiableJUnitAssertion", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testJaxWsBindingMapping() {
     JaxWsBindingMapping m = new JaxWsBindingMapping(true, "wsdlName", "className");
     assertFalse(m.equals(null));
@@ -81,7 +81,7 @@ public class JaxWsUtilsTest {
     String correct = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
-        "        <groupId>com.helger.maven</groupId>" +
+        "        <groupId>com.sun.xml.ws</groupId>" +
         "        <artifactId>jaxws-maven-plugin</artifactId>" +
         "        <executions>" +
         "          <execution>" +
@@ -126,7 +126,7 @@ public class JaxWsUtilsTest {
     String correctWithEmptyBinding = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
-        "        <groupId>com.helger.maven</groupId>" +
+        "        <groupId>com.sun.xml.ws</groupId>" +
         "        <artifactId>jaxws-maven-plugin</artifactId>" +
         "        <executions>" +
         "          <execution>" +
@@ -155,7 +155,7 @@ public class JaxWsUtilsTest {
     String correctCaseMismatch = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
-        "        <groupId>com.helger.maven</groupId>" +
+        "        <groupId>com.sun.xml.ws</groupId>" +
         "        <artifactId>jaxws-maven-plugin</artifactId>" +
         "        <executions>" +
         "          <execution>" +
@@ -229,7 +229,7 @@ public class JaxWsUtilsTest {
     String wrongNamespace = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/5.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
-        "        <groupId>com.helger.maven</groupId>" +
+        "        <groupId>com.sun.xml.ws</groupId>" +
         "        <artifactId>jaxws-maven-plugin</artifactId>" +
         "        <executions>" +
         "          <execution>" +

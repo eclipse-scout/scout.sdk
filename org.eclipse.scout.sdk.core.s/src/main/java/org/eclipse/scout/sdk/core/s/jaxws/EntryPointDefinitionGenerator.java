@@ -42,7 +42,7 @@ public class EntryPointDefinitionGenerator<TYPE extends EntryPointDefinitionGene
         .asInterface()
         .withAnnotation(AnnotationGenerator.create()
             .withElementName(IScoutRuntimeTypes.WebServiceEntryPoint)
-            .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_ENDPOINTINTERFACE_ATTRIBUTE, b -> b.classLiteral(portTypeFqn()
+            .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_ENDPOINT_INTERFACE_ATTRIBUTE, b -> b.classLiteral(portTypeFqn()
                 .orElseThrow(() -> newFail("Fully qualified name of the PortType must be specified."))))
             .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_PACKAGE_ATTRIBUTE, b -> b.stringLiteral(entryPointPackage()
                 .orElseThrow(() -> newFail("Entry point package must be specified."))))

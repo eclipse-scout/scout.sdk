@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 public final class JaxWsUtils {
 
   public static final String WSDL_FILE_EXTENSION = ".wsdl";
-  public static final String ENTRY_POINT_DEFINITION_ENDPOINTINTERFACE_ATTRIBUTE = "endpointInterface";
+  public static final String ENTRY_POINT_DEFINITION_ENDPOINT_INTERFACE_ATTRIBUTE = "endpointInterface";
   public static final String ENTRY_POINT_DEFINITION_NAME_ATTRIBUTE = "entryPointName";
   public static final String ENTRY_POINT_DEFINITION_SERVICE_NAME_ATTRIBUTE = "serviceName";
   public static final String ENTRY_POINT_DEFINITION_PORT_NAME_ATTRIBUTE = "portName";
@@ -65,7 +65,7 @@ public final class JaxWsUtils {
   public static final String WSDL_FOLDER_NAME = "wsdl";
   public static final String BINDING_FOLDER_NAME = "binding";
   public static final String WSIMPORT_TOOL_NAME = "wsimport";
-  public static final String JAXWS_MAVEN_PLUGIN_GROUP_ID = "com.helger.maven";
+  public static final String JAXWS_MAVEN_PLUGIN_GROUP_ID = "com.sun.xml.ws";
   public static final String JAXWS_MAVEN_PLUGIN_ARTIFACT_ID = "jaxws-maven-plugin";
 
   public static final String PACKAGE_XPATH = "wsdl:definitions";

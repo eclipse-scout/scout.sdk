@@ -217,7 +217,7 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
 
   protected static ISourceGenerator<IExpressionBuilder<?>> rewriteEntryPointDefinitionAnnotationElements(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input, EntryPointDefinitionUpdate up) {
     if (IScoutRuntimeTypes.WebServiceEntryPoint.equals(input.model().declaringAnnotation().name())) {
-      if (JaxWsUtils.ENTRY_POINT_DEFINITION_ENDPOINTINTERFACE_ATTRIBUTE.equals(input.model().elementName())) {
+      if (JaxWsUtils.ENTRY_POINT_DEFINITION_ENDPOINT_INTERFACE_ATTRIBUTE.equals(input.model().elementName())) {
         String newPortTypeFqn = up.getPortTypePackage() + JavaTypes.C_DOT + up.getPortTypeName();
         return b -> b.classLiteral(newPortTypeFqn);
       }
