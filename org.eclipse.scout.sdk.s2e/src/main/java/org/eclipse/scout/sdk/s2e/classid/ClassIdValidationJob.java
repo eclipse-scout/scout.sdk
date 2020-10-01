@@ -10,9 +10,11 @@
  */
 package org.eclipse.scout.sdk.s2e.classid;
 
+import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.s2e.util.JdtUtils.isOnClasspath;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +39,6 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.ReferenceMatch;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchMatch;
@@ -48,7 +49,9 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi.ClassId;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
@@ -80,38 +83,12 @@ public final class ClassIdValidationJob extends AbstractJob {
   private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(IProgressMonitor monitor) {
     Set<IAnnotation> result = new HashSet<>();
     try {
-      SearchEngine e = new SearchEngine();
-      IJavaSearchScope workspaceScope = SearchEngine.createWorkspaceScope();
-      SearchRequestor requestor = new SearchRequestor() {
-        @Override
-        public void acceptSearchMatch(SearchMatch match) {
-          if (monitor.isCanceled()) {
-            throw new OperationCanceledException("ClassId annotation search canceled by monitor.");
-          }
-          Object owner = match.getElement();
-          if (owner instanceof IType) {
-            IType ownerType = (IType) owner;
-            if (JdtUtils.exists(ownerType)) {
-              IJavaElement element = ((ReferenceMatch) match).getLocalElement();
-              if (element == null) {
-                // e.g. when the annotation is fully qualified. try reading from owner
-                element = JdtUtils.getAnnotation(ownerType, IScoutRuntimeTypes.ClassId);
-              }
-              if (element instanceof IAnnotation && JdtUtils.exists(element)) {
-                result.add((IAnnotation) element);
-              }
-            }
-          }
-        }
-      };
-
       for (IType classIdType : m_classIdTypes) {
         if (monitor.isCanceled()) {
           return result;
         }
         if (JdtUtils.exists(classIdType)) {
-          SearchPattern pattern = SearchPattern.createPattern(classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH);
-          e.search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, workspaceScope, requestor, monitor);
+          collectAllClassIdAnnotationsInWorkspace(classIdType, result, monitor);
         }
       }
     }
@@ -132,6 +109,38 @@ public final class ClassIdValidationJob extends AbstractJob {
       SdkLog.error("unable to find @ClassId annotation references in workspace.", ex);
     }
     return result;
+  }
+
+  static void collectAllClassIdAnnotationsInWorkspace(IType classIdType, Collection<IAnnotation> collector, IProgressMonitor monitor) throws CoreException {
+    String classIdFqn = classIdType.getFullyQualifiedName();
+    SearchRequestor requestor = new SearchRequestor() {
+      @Override
+      public void acceptSearchMatch(SearchMatch match) {
+        if (monitor.isCanceled()) {
+          throw new OperationCanceledException("ClassId annotation search canceled by monitor.");
+        }
+        Object owner = match.getElement();
+        if (!(owner instanceof IType)) {
+          return;
+        }
+        IType ownerType = (IType) owner;
+        if (!JdtUtils.exists(ownerType)) {
+          return;
+        }
+
+        IJavaElement element = ((ReferenceMatch) match).getLocalElement();
+        if (element == null) {
+          // e.g. when the annotation is fully qualified. try reading from owner
+          element = JdtUtils.getAnnotation(ownerType, classIdFqn);
+        }
+
+        if (element instanceof IAnnotation && JdtUtils.exists(element)) {
+          collector.add((IAnnotation) element);
+        }
+      }
+    };
+    SearchPattern pattern = SearchPattern.createPattern(classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH);
+    new SearchEngine().search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, SearchEngine.createWorkspaceScope(), requestor, monitor);
   }
 
   @Override
@@ -172,7 +181,7 @@ public final class ClassIdValidationJob extends AbstractJob {
   }
 
   private static void createDuplicateMarkers(Map<String, List<IAnnotation>> annotations) throws CoreException {
-    if(annotations == null || annotations.isEmpty()) {
+    if (annotations == null || annotations.isEmpty()) {
       return;
     }
     for (Entry<String, List<IAnnotation>> matches : annotations.entrySet()) {
@@ -237,7 +246,12 @@ public final class ClassIdValidationJob extends AbstractJob {
 
           // get the class id type outside of the validation job
           // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
-          Set<IType> classIds = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ClassId);
+          Set<IType> classIds = ScoutApi.allKnown()
+              .map(IScoutApi::ClassId)
+              .map(ClassId::fqn)
+              .distinct()
+              .flatMap(fqn -> JdtUtils.resolveJdtTypes(fqn).stream())
+              .collect(toSet());
           if (classIds.isEmpty()) {
             return;
           }

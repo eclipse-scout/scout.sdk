@@ -10,11 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.classid;
 
-import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironment;
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironmentSync;
 
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
@@ -36,8 +37,9 @@ import org.eclipse.jdt.ui.text.java.IQuickAssistProcessor;
 import org.eclipse.jdt.ui.text.java.correction.CUCorrectionProposal;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 import org.eclipse.text.edits.TextEdit;
@@ -60,25 +62,26 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
   public IJavaCompletionProposal[] getAssists(IInvocationContext context, IProblemLocation[] locations) {
     ClassIdTarget selectedType = getTarget(context.getCoveringNode());
     if (selectedType != null && !JdtUtils.exists(selectedType.m_annotation)) {
-      CompilationUnitRewrite rewrite = createRewrite(selectedType.m_type, selectedType.m_td);
+      CompilationUnitRewrite rewrite = createRewrite(selectedType);
       return new IJavaCompletionProposal[]{new ClassIdAddProposal(rewrite)};
     }
     return null;
   }
 
-  private static CompilationUnitRewrite createRewrite(IType type, TypeDeclaration td) {
+  private static CompilationUnitRewrite createRewrite(ClassIdTarget target) {
+    IType type = target.m_type;
+    TypeDeclaration td = target.m_td;
     CompilationUnitRewrite cuRewrite = new CompilationUnitRewrite(DefaultWorkingCopyOwner.PRIMARY, type.getCompilationUnit(), (CompilationUnit) td.getRoot());
 
     ListRewrite listRewrite = cuRewrite.getASTRewrite().getListRewrite(td, td.getModifiersProperty());
 
-    // annotation
-    SingleMemberAnnotation classIdAnnotation = callInEclipseEnvironment(
-        (e, p) -> new AstNodeFactory(td, type.getCompilationUnit(), e)
-            .newClassIdAnnotation(type.getFullyQualifiedName()))
-                .result();
+    // create annotation element
+    SingleMemberAnnotation classIdAnnotation = callInEclipseEnvironmentSync(
+        (e, p) -> new AstNodeFactory(td, type.getCompilationUnit(), e, target.m_scoutApi).newClassIdAnnotation(type.getFullyQualifiedName()),
+        new NullProgressMonitor());
 
     // imports
-    cuRewrite.getImportRewrite().addImport(IScoutRuntimeTypes.ClassId);
+    cuRewrite.getImportRewrite().addImport(classIdAnnotation.getTypeName().getFullyQualifiedName());
 
     // add the annotation
     ASTNode sibling = AstUtils.getAnnotationSibling(td, classIdAnnotation);
@@ -118,9 +121,11 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
             try {
               if (!t.isBinary() && !t.isAnonymous()) {
                 ITypeHierarchy superTypeHierarchy = t.newSupertypeHierarchy(null);
-                if (JdtUtils.hierarchyContains(superTypeHierarchy, IScoutRuntimeTypes.ITypeWithClassId)) {
-                  IAnnotation annotation = JdtUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
-                  return new ClassIdTarget(typeDecl, t, annotation);
+                IScoutApi scoutApi = ApiHelper.requireScoutApiFor(t);
+                String classIdFqn = scoutApi.ClassId().fqn();
+                if (JdtUtils.hierarchyContains(superTypeHierarchy, scoutApi.ITypeWithClassId().fqn())) {
+                  IAnnotation annotation = JdtUtils.getAnnotation(t, classIdFqn);
+                  return new ClassIdTarget(typeDecl, t, annotation, scoutApi);
                 }
               }
             }
@@ -158,11 +163,13 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     private final TypeDeclaration m_td;
     private final IType m_type;
     private final IAnnotation m_annotation;
+    private final IScoutApi m_scoutApi;
 
-    private ClassIdTarget(TypeDeclaration td, IType type, IAnnotation annotation) {
+    private ClassIdTarget(TypeDeclaration td, IType type, IAnnotation annotation, IScoutApi api) {
       m_td = td;
       m_type = type;
       m_annotation = annotation;
+      m_scoutApi = api;
     }
   }
 }

@@ -171,7 +171,7 @@ public class JavaTypesTest {
     IMethod method = type.methods().item(1).get();
     assertEquals("methodInChildClass(java.lang.String,java.util.List<java.lang.Runnable>)", method.identifier());
     assertEquals("methodInChildClass(java.lang.String,java.util.List)", method.identifier(true));
-    assertEquals("methodInChildClass(java.lang.String,java.util.List<java.lang.Runnable>)", method.toWorkingCopy().identifier());
+    assertEquals("methodInChildClass(java.lang.String,java.util.List<java.lang.Runnable>)", method.toWorkingCopy().identifier(env));
     assertEquals("methodInChildClass()", JavaTypes.createMethodIdentifier("methodInChildClass", null));
   }
 

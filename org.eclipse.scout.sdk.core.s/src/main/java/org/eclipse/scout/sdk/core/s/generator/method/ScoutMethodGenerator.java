@@ -10,18 +10,22 @@
  */
 package org.eclipse.scout.sdk.core.s.generator.method;
 
+import java.util.function.Function;
+
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.builder.java.body.IScoutMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.s.builder.java.body.ScoutMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link ScoutMethodGenerator}</h3>
@@ -62,12 +66,17 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
   }
 
   public static IScoutMethodGenerator<?, ?> createNlsMethod(String methodName, CharSequence nlsKeyName) {
+    return createNlsMethod(null, api -> methodName, nlsKeyName);
+  }
+
+  public static <API extends IApiSpecification> IScoutMethodGenerator<?, ?> createNlsMethod(Class<API> api, Function<API, String> methodFunction, CharSequence nlsKeyName) {
     return create()
         .withAnnotation(AnnotationGenerator.createOverride())
         .asProtected()
-        .withElementName(methodName)
+        .withElementNameFrom(api, methodFunction)
         .withReturnType(String.class.getName())
         .withBody(b -> b.appendTodo("verify translation")
-            .returnClause().ref(IScoutRuntimeTypes.TEXTS).append(".get").parenthesisOpen().stringLiteral(nlsKeyName).parenthesisClose().semicolon());
+            .returnClause().refClassFrom(IScoutApi.class, IScoutVariousApi::TEXTS)
+            .append(".get").parenthesisOpen().stringLiteral(nlsKeyName).parenthesisClose().semicolon());
   }
 }

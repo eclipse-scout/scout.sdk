@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.builder.java.expression;
 
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
@@ -21,6 +22,8 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link ExpressionBuilder}</h3>
@@ -50,8 +53,12 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
 
   @Override
   public TYPE classLiteral(CharSequence reference) {
-    return ref(reference)
-        .append(JavaTypes.CLASS_FILE_SUFFIX);
+    return ref(reference).append(JavaTypes.CLASS_FILE_SUFFIX);
+  }
+
+  @Override
+  public <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, IClassNameSupplier> referenceProvider) {
+    return refClassFrom(apiClass, referenceProvider).append(JavaTypes.CLASS_FILE_SUFFIX);
   }
 
   @Override
@@ -88,12 +95,17 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
     if (defaultVal != null) {
       return append(defaultVal);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE enumValue(CharSequence enumType, CharSequence enumField) {
     return ref(enumType).dot().append(Ensure.notNull(enumField));
+  }
+
+  @Override
+  public TYPE stringLiteralArray(CharSequence... elements) {
+    return stringLiteralArray(elements, false);
   }
 
   @Override

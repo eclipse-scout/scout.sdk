@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2i.template
 
 import com.intellij.codeInsight.template.impl.TemplateImpl
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.core.util.FinalValue
@@ -50,7 +49,7 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
     init {
         // append predefined variables
         withVariable(PREDEFINED_VARIABLE_MENU_TYPES, EnumVariableAdapter(PREDEFINED_VARIABLE_MENU_TYPES, PsiExpressionEnumMacro.NAME) {
-            it.menuTypes.map { candidate -> "${IScoutRuntimeTypes.CollectionUtility}.hashSet($candidate)" }
+            it.menuTypes.map { candidate -> "${it.context.scoutApi.CollectionUtility().fqn()}.${it.context.scoutApi.CollectionUtility().hashSetMethodName()}($candidate)" }
         })
         withVariable(PREDEFINED_VARIABLE_KEYSTROKES, EnumVariableAdapter(PREDEFINED_VARIABLE_KEYSTROKES, PsiExpressionEnumMacro.NAME) {
             it.keyStrokes

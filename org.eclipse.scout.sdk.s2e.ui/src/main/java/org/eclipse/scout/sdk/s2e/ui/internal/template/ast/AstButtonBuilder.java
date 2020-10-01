@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 
 /**
  * <h3>{@link AstButtonBuilder}</h3>
@@ -32,10 +31,10 @@ public class AstButtonBuilder extends AstTypeBuilder<AstButtonBuilder> {
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IButton);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IButton().fqn());
     }
 
-    m_execClickAction = getFactory().newExecMethod("execClickAction")
+    m_execClickAction = getFactory().newExecMethod(getFactory().getScoutApi().AbstractButton().execClickActionMethodName())
         .in(get())
         .insert()
         .get();

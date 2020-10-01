@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.code;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -23,11 +24,13 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.ICodeType;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
@@ -35,7 +38,7 @@ import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.StrictHierarchyTypeContentProvider;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
-import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
+import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -47,20 +50,29 @@ import org.eclipse.ui.PlatformUI;
  *
  * @since 5.2.0
  */
-public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
+public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage {
 
   private final ProposalTextField[] m_typeArgFields;
   private static final int NUM_ARG_FIELDS = 3;
   private EclipseEnvironment m_provider;
 
   public CodeTypeNewWizardPage(PackageContainer packageContainer) {
-    super(CodeTypeNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_CODE_TYPE, IScoutRuntimeTypes.ICodeType, IScoutRuntimeTypes.AbstractCodeType, ScoutTier.Shared);
+    super(CodeTypeNewWizardPage.class.getName(), packageContainer, ISdkConstants.SUFFIX_CODE_TYPE, ScoutTier.Shared);
     setTitle("Create a new CodeType");
     setDescription(getTitle());
     setIcuGroupName("New CodeType Details");
 
     m_typeArgFields = new ProposalTextField[NUM_ARG_FIELDS];
+  }
 
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+    return scoutApi().map(IScoutApi::AbstractCodeType);
+  }
+
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
+    return scoutApi().map(IScoutApi::ICodeType);
   }
 
   @Override
@@ -154,7 +166,7 @@ public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
     }
   }
 
-  public String getSuperClassReference() {
+  public String getSuperClassReference(EclipseEnvironment environment) {
     IType superType = getSuperType();
     StringBuilder superTypeBuilder = new StringBuilder(superType.getFullyQualifiedName());
     try {
@@ -169,7 +181,10 @@ public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
           boolean appendCodeGeneric = false;
           if (i < NUM_ARG_FIELDS) {
             IType selectedProposal = (IType) m_typeArgFields[i].getSelectedProposal();
-            appendCodeGeneric = selectedProposal.getTypeParameters().length > 0 && JdtUtils.hierarchyContains(selectedProposal.newSupertypeHierarchy(null), IScoutRuntimeTypes.ICode);
+            Optional<IScoutApi> scoutApi = scoutApi();
+            appendCodeGeneric = selectedProposal.getTypeParameters().length > 0
+                && scoutApi.isPresent()
+                && JdtUtils.hierarchyContains(selectedProposal.newSupertypeHierarchy(null), scoutApi.get().ICode().fqn());
             param = selectedProposal.getFullyQualifiedName();
           }
           else {
@@ -178,7 +193,7 @@ public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
           superTypeBuilder.append(param);
           if (appendCodeGeneric) {
             superTypeBuilder.append(JavaTypes.C_GENERIC_START);
-            superTypeBuilder.append(getCodeIdDataType());
+            superTypeBuilder.append(getCodeIdDataType(environment));
             superTypeBuilder.append(JavaTypes.C_GENERIC_END);
           }
         }
@@ -192,19 +207,21 @@ public class CodeTypeNewWizardPage extends CompilationUnitNewWizardPage {
     return superTypeBuilder.toString();
   }
 
-  public String getCodeIdDataType() {
-    return getCodeTypeTypeArgDatatype(IScoutRuntimeTypes.TYPE_PARAM_CODETYPE__CODE_ID);
+  public String getCodeIdDataType(EclipseEnvironment environment) {
+    ICodeType iCodeTypeApi = scoutApi().get().ICodeType();
+    return getCodeTypeTypeArgDatatype(iCodeTypeApi.codeIdTypeParamIndex(), iCodeTypeApi, environment);
   }
 
-  public String getCodeTypeIdDataType() {
-    return getCodeTypeTypeArgDatatype(IScoutRuntimeTypes.TYPE_PARAM_CODETYPE__CODE_TYPE_ID);
+  public String getCodeTypeIdDataType(EclipseEnvironment environment) {
+    ICodeType iCodeTypeApi = scoutApi().get().ICodeType();
+    return getCodeTypeTypeArgDatatype(iCodeTypeApi.codeTypeIdTypeParamIndex(), iCodeTypeApi, environment);
   }
 
-  protected String getCodeTypeTypeArgDatatype(int typeParamIndex) {
-    org.eclipse.scout.sdk.core.model.api.IType superType = m_provider.toScoutType(getSuperType());
+  protected String getCodeTypeTypeArgDatatype(int typeParamIndex, ICodeType iCodeTypeApi, EclipseEnvironment environment) {
+    org.eclipse.scout.sdk.core.model.api.IType superType = environment.toScoutType(getSuperType()); // don't use m_provider here because it might already have been closed.
     org.eclipse.scout.sdk.core.model.api.IType codeTypeIdArg = superType.superTypes()
         .withSelf(false)
-        .withName(IScoutRuntimeTypes.ICodeType)
+        .withName(iCodeTypeApi.fqn())
         .first().get()
         .typeArguments()
         .skip(typeParamIndex)

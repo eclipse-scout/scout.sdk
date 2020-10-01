@@ -15,10 +15,12 @@ import static java.util.stream.Collectors.toMap;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -26,10 +28,13 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutChartApi;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * Main access for Scout translation related data.
@@ -40,9 +45,21 @@ public final class TranslationStores {
   }
 
   private static final Set<ITranslationStoreSupplier> SUPPLIERS = new HashSet<>();
-  private static final Map<String /*npm dependency name*/, String /* UiTextContributor FQN */> UI_TEXT_CONTRIBUTORS = new HashMap<>();
+  private static final Map<String /*npm dependency name*/, Set<String> /* UiTextContributor FQNs */> UI_TEXT_CONTRIBUTORS = new HashMap<>();
   static {
-    UI_TEXT_CONTRIBUTORS.put("@eclipse-scout/core", IScoutRuntimeTypes.UiTextContributor);
+    ScoutApi.allKnown()
+        .map(TranslationStores::getPredefinedTextContributorMappings)
+        .map(Map::entrySet)
+        .flatMap(Collection::stream)
+        .distinct()
+        .forEach(mapping -> registerUiTextContributor(mapping.getKey(), mapping.getValue().fqn()));
+  }
+
+  private static Map<String /* node module name */, IClassNameSupplier /* text contributor */> getPredefinedTextContributorMappings(IScoutApi api) {
+    Map<String, IClassNameSupplier> mappings = new HashMap<>(2);
+    mappings.put("@eclipse-scout/core", api.UiTextContributor());
+    api.optApi(IScoutChartApi.class).ifPresent(chartApi -> mappings.put("@eclipse-scout/chart", chartApi.ChartUiTextContributor()));
+    return mappings;
   }
 
   /**
@@ -55,11 +72,11 @@ public final class TranslationStores {
    * @return {@code true} if there was already a mapping for this Node module registered (and has been replaced).
    */
   public static synchronized boolean registerUiTextContributor(String ownerNodeModuleName, String contributorFqn) {
-    return UI_TEXT_CONTRIBUTORS.put(Ensure.notBlank(ownerNodeModuleName), Ensure.notBlank(contributorFqn)) != null;
+    return !UI_TEXT_CONTRIBUTORS.computeIfAbsent(ownerNodeModuleName, k -> new HashSet<>()).add(Ensure.notBlank(contributorFqn));
   }
 
   /**
-   * Removes the UiTextContributor mapping for the given Node module.
+   * Removes all UiTextContributor mappings for the given Node module.
    * 
    * @param ownerNodeModuleName
    *          The Node module name for which the contributor should be removed.
@@ -72,8 +89,12 @@ public final class TranslationStores {
   /**
    * @return A copy of all currently registered 'Node module name' to 'UiTextContributor' mappings.
    */
-  public static synchronized Map<String, String> uiTextContributorMappings() {
-    return new HashMap<>(UI_TEXT_CONTRIBUTORS);
+  public static synchronized Map<String, Set<String>> uiTextContributorMappings() {
+    Map<String, Set<String>> copy = new HashMap<>(UI_TEXT_CONTRIBUTORS.size());
+    for (Entry<String, Set<String>> entry : UI_TEXT_CONTRIBUTORS.entrySet()) {
+      copy.put(entry.getKey(), new HashSet<>(entry.getValue()));
+    }
+    return copy;
   }
 
   /**

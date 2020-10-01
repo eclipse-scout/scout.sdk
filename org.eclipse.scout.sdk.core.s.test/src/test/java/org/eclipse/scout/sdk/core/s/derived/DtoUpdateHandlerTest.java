@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -45,26 +46,30 @@ public class DtoUpdateHandlerTest {
 
   @Test
   public void testFindDataAnnotationForPageData(IJavaEnvironment env) {
+    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+
     // no table page
-    assertFalse(findDataAnnotationForPageData(env.requireType(ThirdIntegerColumn.class.getName())).isPresent());
+    assertFalse(findDataAnnotationForPageData(env.requireType(ThirdIntegerColumn.class.getName()), scoutApi).isPresent());
 
     // IPageWithTable
-    assertTrue(findDataAnnotationForPageData(env.requireType(BaseTablePage.class.getName())).isPresent());
+    assertTrue(findDataAnnotationForPageData(env.requireType(BaseTablePage.class.getName()), scoutApi).isPresent());
   }
 
   @Test
   public void testFindDataAnnotationForRowData(IJavaEnvironment env) {
+    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+
     // IColumn
-    assertTrue(findDataAnnotationForRowData(env.requireType(ThirdIntegerColumn.class.getName())).isPresent());
+    assertTrue(findDataAnnotationForRowData(env.requireType(ThirdIntegerColumn.class.getName()), scoutApi).isPresent());
 
     // ITableExtension
-    assertTrue(findDataAnnotationForRowData(env.requireType(MultiColumnExtension.class.getName())).isPresent());
+    assertTrue(findDataAnnotationForRowData(env.requireType(MultiColumnExtension.class.getName()), scoutApi).isPresent());
 
     // IPageWithTableExtension with nested ITableExtensions (may contain columns)
-    assertTrue(findDataAnnotationForRowData(env.requireType(PageWithTableExtension.class.getName())).isPresent());
+    assertTrue(findDataAnnotationForRowData(env.requireType(PageWithTableExtension.class.getName()), scoutApi).isPresent());
 
     // IPageWithTableExtension without nested ITableExtensions (may not contain columns)
-    assertFalse(findDataAnnotationForRowData(env.requireType(PageWithoutTableExtension.class.getName())).isPresent());
+    assertFalse(findDataAnnotationForRowData(env.requireType(PageWithoutTableExtension.class.getName()), scoutApi).isPresent());
   }
 
 }

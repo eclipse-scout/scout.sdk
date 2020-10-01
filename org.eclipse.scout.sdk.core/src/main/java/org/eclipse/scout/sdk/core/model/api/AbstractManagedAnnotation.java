@@ -11,16 +11,22 @@
 package org.eclipse.scout.sdk.core.model.api;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link AbstractManagedAnnotation}</h3> Base class for managed annotation implementations. <br>
  * <br>
  * <b>Important:</b><br>
- * Implementors must provide an empty constructor and a field with name "TYPE_NAME" to define the managed annotation
- * fully qualified name it supports!
+ * Implementors must provide an empty constructor and a field with name {@value TYPE_NAME_FIELD_NAME} and data type
+ * {@code ApiFunction<?, IClassNameSupplier>} to define the managed annotation fully qualified name it supports!
  *
  * @since 5.1.0
  */
@@ -56,21 +62,35 @@ public abstract class AbstractManagedAnnotation {
   /**
    * @return the value of the static field {@value #TYPE_NAME_FIELD_NAME} each managed annotation must have.
    */
-  public static String typeName(Class<? extends AbstractManagedAnnotation> a) {
+  @SuppressWarnings("unchecked")
+  public static ApiFunction<?, IClassNameSupplier> typeName(Class<? extends AbstractManagedAnnotation> a) {
     if (a == null) {
       return null;
     }
 
     try {
-      return (String) a.getField(TYPE_NAME_FIELD_NAME).get(null);
+      Field field = a.getDeclaredField(TYPE_NAME_FIELD_NAME);
+      field.setAccessible(true);
+      return Ensure.instanceOf(field.get(null), ApiFunction.class);
     }
     catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-      throw new SdkException("Failed to read field {} of {}. Each managed annotation must define its fully qualified name using a field called '{}'.", TYPE_NAME_FIELD_NAME, a, TYPE_NAME_FIELD_NAME, e);
+      throw new SdkException("Failed to read field {} of {}. Each managed annotation must define its {} using a field called '{}' of type {}.",
+          TYPE_NAME_FIELD_NAME, a, IClassNameSupplier.class.getSimpleName(), TYPE_NAME_FIELD_NAME, e, ApiFunction.class.getSimpleName());
     }
   }
 
   protected void postConstruct(IAnnotation ann) {
     m_ann = ann;
+  }
+
+  protected <A extends IApiSpecification> String getNameFromApi(Class<A> apiDefinition, Function<A, String> nameSupplier) {
+    A api = Ensure.notNull(m_ann.javaEnvironment().requireApi(apiDefinition));
+    return Ensure.notBlank(nameSupplier.apply(api));
+  }
+
+  protected <A extends IApiSpecification, T> T getValueFrom(Class<A> apiDefinition, Function<A, String> nameSupplier, Class<T> expectedType, Supplier<T> optionalCustomDefaultValueSupplier) {
+    String name = getNameFromApi(apiDefinition, nameSupplier);
+    return getValue(name, expectedType, optionalCustomDefaultValueSupplier);
   }
 
   /**
@@ -115,6 +135,15 @@ public abstract class AbstractManagedAnnotation {
     }
 
     return av.value().as(expectedType);
+  }
+
+  protected <A extends IApiSpecification, T extends Enum<T>> T getValueAsEnumFrom(Class<A> apiDefinition, Function<A, String> nameSupplier, Class<T> enumType) {
+    return getValueAsEnumFrom(apiDefinition, nameSupplier, enumType, null);
+  }
+
+  protected <A extends IApiSpecification, T extends Enum<T>> T getValueAsEnumFrom(Class<A> apiDefinition, Function<A, String> nameSupplier, Class<T> enumType, Supplier<T> optionalCustomDefaultValueSupplier) {
+    String name = getNameFromApi(apiDefinition, nameSupplier);
+    return getValueAsEnum(name, enumType, optionalCustomDefaultValueSupplier);
   }
 
   /**
@@ -188,6 +217,10 @@ public abstract class AbstractManagedAnnotation {
         .element(name)
         .map(IAnnotationElement::isDefault)
         .orElseThrow(() -> elementNotExistingException(name));
+  }
+
+  protected <A extends IApiSpecification> boolean isDefault(Class<A> apiDefinition, Function<A, String> nameSupplier) {
+    return isDefault(getNameFromApi(apiDefinition, nameSupplier));
   }
 
   /**

@@ -20,14 +20,14 @@ import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -39,7 +39,9 @@ import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
+import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -51,6 +53,7 @@ public final class CoreScoutTestingUtils {
 
   public static final String PROJECT_GROUP_ID = "group";
   public static final String PROJECT_ARTIFACT_ID = "artifact";
+  public static final String SCOUT_VERSION_KEY = "org.eclipse.scout.rt_version";
 
   private CoreScoutTestingUtils() {
   }
@@ -82,8 +85,27 @@ public final class CoreScoutTestingUtils {
     // The testing runner does not make use of the environment and the progress: pass empty mocks
     //noinspection AccessOfSystemProperties
     ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", System.getProperty("java.specification.version"),
-        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION, mock(IEnvironment.class), mock(IProgress.class));
+        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, currentScoutVersion(), mock(IEnvironment.class), mock(IProgress.class));
     return targetDirectory;
+  }
+
+  @SuppressWarnings("AccessOfSystemProperties")
+  public static String currentScoutVersion() {
+    String prop = System.getProperty(SCOUT_VERSION_KEY);
+    if (Strings.hasText(prop)) {
+      return prop.trim();
+    }
+    return new JavaEnvironmentWithEcjBuilder<>()
+        .withoutScoutSdk()
+        .call(ScoutApi::version)
+        .map(ApiVersion::asString)
+        .orElseGet(CoreScoutTestingUtils::latestScoutVersion);
+  }
+
+  static String latestScoutVersion() {
+    String latestSnapshot = ScoutApi.latestMajorVersion() + ".0-SNAPSHOT";
+    SdkLog.warning("Unable to determine Scout version for tests. Fallback to latest supported snapshot: {}", latestSnapshot);
+    return latestSnapshot;
   }
 
   /**
@@ -94,16 +116,19 @@ public final class CoreScoutTestingUtils {
    *          module.
    * @param artifactId
    *          The jax-ws-module artifact id.
+   * @param env
+   *          The {@link IEnvironment} to use. It is required to compute the Scout version of the target server module.
+   *          Must not be {@code null}.
    * @return The created module root {@link Path}.
    * @throws IOException
    *           if there is an error creating the new module.
    */
-  public static Path createJaxWsModule(Path serverModuleDir, String artifactId) throws IOException {
+  public static Path createJaxWsModule(Path serverModuleDir, String artifactId, IEnvironment env) throws IOException {
     ensureMavenRunnerCreated();
     addMetroDependency(serverModuleDir.resolve(IMavenConstants.POM));
 
     // The testing runner does not make use of the environment and the progress: pass empty mocks
-    return JaxWsModuleNewHelper.createModule(serverModuleDir.resolve(IMavenConstants.POM), artifactId, mock(IEnvironment.class), mock(IProgress.class));
+    return JaxWsModuleNewHelper.createModule(serverModuleDir.resolve(IMavenConstants.POM), artifactId, env, mock(IProgress.class));
   }
 
   static void addMetroDependency(Path pomFile) throws IOException {
@@ -127,8 +152,7 @@ public final class CoreScoutTestingUtils {
       dependenciesElement.appendChild(metroDependencyElement);
 
       // write
-      Transformer transformer = Xml.createTransformer(true);
-      transformer.transform(new DOMSource(pom), new StreamResult(pomFile.toFile()));
+      Xml.writeDocument(pom, true, pomFile);
     }
     catch (ParserConfigurationException | SAXException | TransformerException e) {
       throw new SdkException("Unable to register Metro test dependency in '{}'.", pomFile, e);

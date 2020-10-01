@@ -12,11 +12,17 @@ package org.eclipse.scout.sdk.core.generator.annotation;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link IAnnotationGenerator}</h3>
@@ -35,6 +41,8 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
   @Override
   Optional<String> elementName();
 
+  Optional<String> elementName(IJavaEnvironment context);
+
   /**
    * Sets the fully qualified name of the annotation type (e.g. java.lang.Override).
    * 
@@ -44,6 +52,8 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
    */
   @Override
   TYPE withElementName(String newName);
+
+  <A extends IApiSpecification> TYPE withElementNameFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier);
 
   /**
    * Adds a new element to this {@link IAnnotationGenerator} using the specified name and raw value. If there exists a
@@ -57,6 +67,10 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
    * @see ISourceGenerator#raw(CharSequence)
    */
   TYPE withElement(String name, CharSequence rawSrc);
+
+  <A extends IApiSpecification> TYPE withElementFrom(Class<A> apiDefinition, Function<A, String> elementNameSupplier, CharSequence valueSrc);
+
+  <A extends IApiSpecification> TYPE withElementFrom(Class<A> apiDefinition, Function<A, String> elementNameSupplier, ISourceGenerator<IExpressionBuilder<?>> value);
 
   /**
    * Adds a new element to this {@link IAnnotationGenerator} using the specified name and value generator. If there
@@ -78,7 +92,7 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
    *          The name for which the associated {@link ISourceGenerator} should be returned.
    * @return An {@link Optional} holding the {@link ISourceGenerator} for this element name.
    */
-  Optional<ISourceGenerator<IExpressionBuilder<?>>> element(String name);
+  Optional<ISourceGenerator<IExpressionBuilder<?>>> element(Predicate<ApiFunction<?, String>> selector);
 
   /**
    * Gets a {@link Map} with all elements of this {@link IAnnotationGenerator}.
@@ -90,7 +104,7 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
    *
    * @return An unmodifiable {@link Map} with the elements and the associated {@link ISourceGenerator}s.
    */
-  Map<String, ISourceGenerator<IExpressionBuilder<?>>> elements();
+  Map<ApiFunction<?, String>, ISourceGenerator<IExpressionBuilder<?>>> elements();
 
   /**
    * Removes the element with specified name from this {@link IAnnotationGenerator}.
@@ -99,5 +113,5 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
    *          The name of the element to remove.
    * @return This generator
    */
-  TYPE withoutElement(String name);
+  TYPE withoutElement(Predicate<ApiFunction<?, String>> toRemove);
 }

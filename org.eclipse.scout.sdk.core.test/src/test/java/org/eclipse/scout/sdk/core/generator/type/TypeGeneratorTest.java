@@ -93,7 +93,7 @@ public class TypeGeneratorTest {
         .withElementName("TestClass")
         .withInterfaces(interfaces)
         .withInterface(Serializable.class.getName())
-        .withoutInterface(Serializable.class.getName())
+        .withoutInterface(af -> af.apply(env).orElse("").equals(Serializable.class.getName()))
         .withSuperClass(AbstractMap.class.getName())
         .withField(
             FieldGenerator.create()
@@ -103,7 +103,7 @@ public class TypeGeneratorTest {
         .withField(FieldGenerator.createSerialVersionUid(), 0, -100, "whatever")
         .withField(FieldGenerator.create()
             .withElementName("willBeRemoved"))
-        .withoutField("willBeRemoved")
+        .withoutField(f -> "willBeRemoved".equals(f.elementName().get()))
         .withMethod(MethodGenerator.create()
             .asPublic()
             .withElementName("TestClass"))
@@ -113,7 +113,7 @@ public class TypeGeneratorTest {
             .withReturnType(JavaTypes._void), 0, -200, "whatever")
         .withMethod(MethodGenerator.create()
             .withElementName("toRemove"))
-        .withoutMethod("toRemove")
+        .withoutMethod(m -> "toRemove".equals(m.elementName().get()))
         .withType(TypeGenerator.create()
             .asPublic()
             .withElementName("InnerType"))
@@ -123,9 +123,9 @@ public class TypeGeneratorTest {
             .withElementName("FirstInnerType"), 0, -300, "whatever")
         .withType(TypeGenerator.create()
             .withElementName("RemovedType"))
-        .withoutType("RemovedType")
+        .withoutType(t -> "RemovedType".equals(t.elementName().get()))
         .withTypeParameter(TypeParameterGenerator.create()
-            .withBound(Comparable.class.getName())
+            .withBinding(Comparable.class.getName())
             .withElementName("T"))
         .withTypeParameter(TypeParameterGenerator.create()
             .withElementName("willBeRemoved"))
@@ -134,10 +134,10 @@ public class TypeGeneratorTest {
         .setDeclaringFullyQualifiedName("a.b.c");
 
     assertEquals("a.b.c.TestClass", generator.fullyQualifiedName());
-    assertEquals(AbstractMap.class.getName(), generator.superClass().get());
+    assertEquals(AbstractMap.class.getName(), generator.superClass().map(af -> af.apply(env).get()).get());
     assertEquals(2, generator.fields().count());
     assertEquals(2, generator.methods().count());
-    assertTrue(generator.method("testMethod()").isPresent());
+    assertTrue(generator.method("testMethod()", env, true).isPresent());
     assertEquals(2, generator.types().count());
     assertEquals(1, generator.typeParameters().count());
 
@@ -147,9 +147,9 @@ public class TypeGeneratorTest {
   @Test
   public void testTypeParameterWithoutName() {
     ITypeParameterGenerator<?> typeParamGenerator = TypeParameterGenerator.create()
-        .withBound(CharSequence.class.getName())
-        .withBound(Iterable.class.getName())
-        .withBound(Comparable.class.getName());
+        .withBinding(CharSequence.class.getName())
+        .withBinding(Iterable.class.getName())
+        .withBinding(Comparable.class.getName());
     assertEquals(3, typeParamGenerator.bounds().count());
 
     String src = TypeGenerator.create()
@@ -213,9 +213,6 @@ public class TypeGeneratorTest {
   @Test
   public void testDefaultMethodSortOrder() {
     assertMethodOrder(1000, MethodGenerator.create().withElementName("Ctor"));
-    assertMethodOrder(2000, MethodGenerator.create().withReturnType(JavaTypes._int).withElementName("getMyValue"));
-    assertMethodOrder(2000, MethodGenerator.create().withReturnType(JavaTypes._void).withElementName("setMyValue"));
-    assertMethodOrder(2000, MethodGenerator.create().withReturnType(JavaTypes._boolean).withElementName("isMyValue"));
     assertMethodOrder(3000, MethodGenerator.create().asStatic().withReturnType(JavaTypes._int).withElementName("getMyStaticValue"));
     assertMethodOrder(4000, MethodGenerator.create().withReturnType(JavaTypes._int).withElementName("otherOperation"));
   }

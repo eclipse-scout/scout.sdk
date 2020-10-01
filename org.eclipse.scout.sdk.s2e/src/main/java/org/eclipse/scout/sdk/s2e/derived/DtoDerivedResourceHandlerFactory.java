@@ -17,7 +17,9 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -26,9 +28,13 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler;
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler;
+import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandlerFactory {
@@ -53,46 +59,52 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
       IJavaElement javaElement = JavaCore.create(r);
       if (JdtUtils.exists(javaElement) && javaElement.getElementType() == IJavaElement.COMPILATION_UNIT) {
         ICompilationUnit icu = (ICompilationUnit) javaElement;
-        for (IType candidate : icu.getTypes()) {
-          if (acceptType(candidate) && JdtUtils.exists(JdtUtils.getFirstAnnotationInSupertypeHierarchy(candidate, IScoutRuntimeTypes.Data, IScoutRuntimeTypes.FormData, IScoutRuntimeTypes.PageData))) {
-            collector.add(candidate);
+        Optional<IScoutApi> api = ApiHelper.scoutApiFor(icu.getJavaProject());
+        if (api.isPresent()) {
+          String[] dtoNames = dtoMarkerAnnotationNames(api.get());
+          for (IType candidate : icu.getTypes()) {
+            if (acceptType(candidate) && JdtUtils.exists(JdtUtils.getFirstAnnotationInSupertypeHierarchy(candidate, dtoNames))) {
+              collector.add(candidate);
+            }
           }
         }
       }
     }
   }
 
-  protected static void findScopeCandidates(IJavaSearchScope scope, Collection<IType> collector) throws JavaModelException {
+  protected static String[] dtoMarkerAnnotationNames(IScoutAnnotationApi scoutApi) {
+    return new String[]{scoutApi.FormData().fqn(), scoutApi.PageData().fqn(), scoutApi.Data().fqn()};
+  }
+
+  protected static void findScopeCandidates(IJavaSearchScope scope, Collection<IType> collector) {
     if (scope == null) {
       return;
     }
 
-    for (IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.Data, scope, null)) {
-      if (acceptType(candidate)) {
-        collector.add(candidate);
-      }
-    }
-    for (IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.FormData, scope, null)) {
-      if (acceptType(candidate)) {
-        collector.add(candidate);
-      }
-    }
-    for (IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.PageData, scope, null)) {
-      if (acceptType(candidate)) {
-        collector.add(candidate);
-      }
-    }
+    ScoutApi.allKnown()
+        .map(DtoDerivedResourceHandlerFactory::dtoMarkerAnnotationNames)
+        .flatMap(Stream::of)
+        .distinct()
+        .flatMap(fqn -> JdtUtils.findAllTypesAnnotatedWith(fqn, scope, null).stream())
+        .filter(DtoDerivedResourceHandlerFactory::acceptType)
+        .forEach(collector::add);
   }
 
   @SuppressWarnings("squid:S1067")
-  protected static boolean acceptType(IType jdtType) throws JavaModelException {
-    //fast check before doing expensive source parsing
-    return JdtUtils.exists(jdtType)
-        && JdtUtils.exists(jdtType.getJavaProject()) // required!
-        && !jdtType.isAnonymous()
-        && !jdtType.isBinary()
-        && jdtType.getDeclaringType() == null
-        && isPublic(jdtType.getFlags());
-  }
+  protected static boolean acceptType(IType jdtType) {
+    // fast check before doing expensive source parsing
+    if (!JdtUtils.exists(jdtType)
+        || !JdtUtils.exists(jdtType.getJavaProject()) // required!
+        || jdtType.isBinary()
+        || jdtType.getDeclaringType() != null) {
+      return false;
+    }
 
+    try {
+      return !jdtType.isAnonymous() && isPublic(jdtType.getFlags());
+    }
+    catch (JavaModelException e) {
+      throw new SdkException(e);
+    }
+  }
 }

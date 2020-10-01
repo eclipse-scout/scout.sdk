@@ -32,47 +32,19 @@ import com.intellij.psi.codeStyle.JavaCodeStyleSettings
 import com.intellij.psi.util.InheritanceUtil.findEnclosingInstanceInScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ThrowableRunnable
-import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.model.api.PropertyBean
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
-import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.findTypeByName
 import org.eclipse.scout.sdk.s2i.isInstanceOf
-import java.lang.reflect.Method
+import org.eclipse.scout.sdk.s2i.util.CompatibilityHelper
 
 /**
  * Handler that inserts a selected [TemplateDescriptor].
  */
-class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val prefix: String) : InsertHandler<LookupElement> {
-
-    companion object {
-        private val CREATE_TEMP_SETTINGS_METHOD = FinalValue<Method>()
-
-        private fun createTempSettings(origSettings: CodeStyleSettings, settingsManager: CodeStyleSettingsManager): CodeStyleSettings {
-            val createTemporarySettings = CREATE_TEMP_SETTINGS_METHOD.computeIfAbsentAndGet { createTemporarySettingsMethod() }
-            if (createTemporarySettings != null) {
-                // use createTemporarySettings() factory method in IJ 2020.2 and newer
-                val tempSettings = createTemporarySettings.invoke(settingsManager) as CodeStyleSettings
-                tempSettings.copyFrom(origSettings)
-                return tempSettings
-            }
-
-            // use clone method until IJ 2020.1
-            // Can be removed if the supported min. IJ version is 2020.2
-            return CodeStyleSettings::class.java.getMethod("clone").invoke(origSettings) as CodeStyleSettings
-        }
-
-        private fun createTemporarySettingsMethod() =
-                try {
-                    CodeStyleSettingsManager::class.java.getMethod("createTemporarySettings")
-                } catch (e: NoSuchMethodException) {
-                    SdkLog.debug("Using legacy temporary CodeStyleSettings creation.", onTrace(e))
-                    null
-                }
-    }
+class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scoutApi: IScoutApi, val prefix: String) : InsertHandler<LookupElement> {
 
     private lateinit var m_engine: TemplateEngine
 
@@ -80,7 +52,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val pref
         val editor = context.editor
         val declaringClass = item.getObject() as PsiClass
         val containingModule = declaringClass.containingModule() ?: return
-        m_engine = TemplateEngine(templateDescriptor, TemplateEngine.TemplateContext(declaringClass, containingModule, editor.caretModel.offset))
+        m_engine = TemplateEngine(templateDescriptor, TemplateEngine.TemplateContext(declaringClass, containingModule, scoutApi, editor.caretModel.offset))
 
         startTemplateWithTempSettings(buildTemplate(), editor)
     }
@@ -94,7 +66,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val pref
         val project = editor.project
         val settingsManager = CodeStyleSettingsManager.getInstance(project)
         val origTempSettings = settingsManager.temporarySettings
-        val tempSettings = createTempSettings(CodeStyle.getSettings(editor), settingsManager)
+        val tempSettings = CompatibilityHelper.createTempSettings(CodeStyle.getSettings(editor), settingsManager)
         val tempJavaSettings = tempSettings.getCustomSettings(JavaCodeStyleSettings::class.java)
         tempJavaSettings.isInsertInnerClassImports = false
 

@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
+import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceHandlerFactory
@@ -44,22 +45,16 @@ import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
 import java.util.Collections.emptyList
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 import kotlin.streams.toList
 
 
 class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceManager, SettingsChangedListener {
 
     private val m_updateHandlerFactories = HashMap<Class<*>, DerivedResourceHandlerFactory>() // use a map so that there is always only one factory of the same type
-    private val m_eventBuffer = ArrayList<SearchScope>()
-    private val m_lock = ReentrantLock()
-    private val m_dataAvailable = m_lock.newCondition()
-
-    @Volatile
+    private val m_delayedProcessor = DelayedBuffer<SearchScope>(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true) { events ->
+        scheduleUpdate(union(events))
+    }
     private var m_busConnection: MessageBusConnection? = null
-    @Volatile
-    private var m_workerEnabled = false
 
     init {
         Disposer.register(project, this) // ensure it is disposed when the project closes
@@ -69,12 +64,9 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         addDerivedResourceHandlerFactory(DtoUpdateHandlerFactory())
         ScoutSettings.addListener(this)
         updateSubscription()
-        m_workerEnabled = true // must be before the schedule. otherwise it ends immediately.
-        AppExecutorUtil.getAppExecutorService().submit(this::dispatchWork)
     }
 
     override fun dispose() {
-        m_workerEnabled = false
         unsubscribe()
         ScoutSettings.removeListener(this)
         m_updateHandlerFactories.clear()
@@ -111,56 +103,29 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
 
     override fun trigger(scope: SearchScope) {
         SdkLog.debug("Derived resource update event for scope $scope")
-        m_lock.withLock {
-            m_eventBuffer.add(scope)
-            m_dataAvailable.signalAll()
-        }
+        m_delayedProcessor.submit(scope)
     }
 
-    private fun dispatchWork() {
-        while (m_workerEnabled) {
-            val scope = getWork()
-            if (scope != GlobalSearchScope.EMPTY_SCOPE) {
-                try {
-                    performUpdateAsync(scope).awaitDoneThrowingOnError()
-                } catch (e: Throwable) { // use throwable here otherwise the worker will be killed an will not start again. This way it has the chance to recover.
-                    SdkLog.warning("Derived resource update for scope '{}' failed.", scope, e)
-                }
-            }
-        }
-    }
-
-    private fun getWork(): SearchScope {
-        waitUntilDataAvailable() // wait until some data arrived
-        if (m_workerEnabled) {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(2)) // wait for more work to come
-        }
-        return consumeAllBufferedEvents() // the complete work
-    }
-
-    private fun waitUntilDataAvailable() = m_lock.withLock {
-        while (m_eventBuffer.isEmpty()) {
-            m_dataAvailable.await()
-        }
-    }
-
-    private fun consumeAllBufferedEvents(): SearchScope = m_lock.withLock {
-        if (m_eventBuffer.isEmpty()) {
-            return GlobalSearchScope.EMPTY_SCOPE
-        }
+    private fun union(events: List<SearchScope>): SearchScope {
         var union = GlobalSearchScope.EMPTY_SCOPE
-        for (scope in m_eventBuffer) {
+        for (scope in events) {
             union = union.union(scope)
         }
-        m_eventBuffer.clear()
         return union
     }
 
-    private fun performUpdateAsync(scope: SearchScope): IFuture<Unit> = callInIdeaEnvironment(project, message("update.derived.resources")) { env, progress ->
+    private fun scheduleUpdate(scope: SearchScope): IFuture<Unit> = callInIdeaEnvironment(project, message("update.derived.resources")) { env, progress ->
+        try {
+            performUpdateAsync(scope, env, progress)
+        } catch (e: Exception) {
+            SdkLog.warning("Derived resource update for scope '{}' failed.", scope, e)
+        }
+    }
+
+    private fun performUpdateAsync(scope: SearchScope, env: IdeaEnvironment, progress: IdeaProgress) = synchronized(m_updateHandlerFactories) /* only one at a time */ {
         SdkLog.debug("Check for derived resource updates in scope $scope")
         val start = System.currentTimeMillis()
-        val factories = synchronized(m_updateHandlerFactories) { ArrayList(m_updateHandlerFactories.values) }
-        val handlers = factories
+        val handlers = m_updateHandlerFactories.values
                 .parallelStream()
                 .flatMap { executeDerivedResourceHandlerFactory(it, scope) }
                 .toList()

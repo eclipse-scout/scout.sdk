@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.core.model.api;
 
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 
 /**

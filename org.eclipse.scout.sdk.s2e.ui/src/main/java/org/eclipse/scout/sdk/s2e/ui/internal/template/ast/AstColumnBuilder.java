@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
 /**
@@ -42,20 +42,21 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IColumn);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IColumn().fqn());
     }
 
     return this;
   }
 
   protected void addColumnGetter() {
+    IScoutApi scoutApi = getFactory().getScoutApi();
     MethodInvocation getColumnSet = getFactory().getAst().newMethodInvocation();
-    getColumnSet.setName(getFactory().getAst().newSimpleName("getColumnSet"));
+    getColumnSet.setName(getFactory().getAst().newSimpleName(scoutApi.ITable().getColumnSetMethodName()));
 
-    if (AstUtils.isInstanceOf(getFactory().getDeclaringTypeBinding(), IScoutRuntimeTypes.IExtension)) {
+    if (AstUtils.isInstanceOf(getFactory().getDeclaringTypeBinding(), scoutApi.IExtension().fqn())) {
       // column in table extension
       MethodInvocation getOwner = getFactory().getAst().newMethodInvocation();
-      getOwner.setName(getFactory().getAst().newSimpleName("getOwner"));
+      getOwner.setName(getFactory().getAst().newSimpleName(scoutApi.IExtension().getOwnerMethodName()));
       getColumnSet.setExpression(getOwner);
     }
 
@@ -63,7 +64,7 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
     Type columnGetterReturnType = AstUtils.getInnerTypeReturnType(columnSimpleName, getDeclaringType());
 
     getFactory().newInnerTypeGetter()
-        .withMethodNameToFindInnerType("getColumnByClass")
+        .withMethodNameToFindInnerType(scoutApi.ColumnSet().getColumnByClassMethodName())
         .withMethodToFindInnerTypeExpression(getColumnSet)
         .withName(getTypeName())
         .withReadOnlySuffix(getReadOnlySuffix())

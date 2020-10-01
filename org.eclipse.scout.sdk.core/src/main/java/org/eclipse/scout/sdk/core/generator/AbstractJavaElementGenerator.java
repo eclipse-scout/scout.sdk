@@ -36,18 +36,18 @@ public abstract class AbstractJavaElementGenerator<TYPE extends IJavaElementGene
   }
 
   protected AbstractJavaElementGenerator(IJavaElement element) {
-    m_elementName = Ensure.notNull(element).elementName();
+    withElementName(Ensure.notNull(element).elementName());
   }
 
   @SuppressWarnings("unchecked")
-  protected TYPE currentInstance() {
+  protected TYPE thisInstance() {
     return (TYPE) this;
   }
 
   @Override
   public TYPE withElementName(String newName) {
     m_elementName = newName;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -99,7 +99,7 @@ public abstract class AbstractJavaElementGenerator<TYPE extends IJavaElementGene
   @Override
   public TYPE withComment(ISourceGenerator<IJavaElementCommentBuilder<?>> commentBuilder) {
     m_comment = commentBuilder;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override

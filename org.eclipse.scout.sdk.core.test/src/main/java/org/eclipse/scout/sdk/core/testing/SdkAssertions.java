@@ -16,14 +16,18 @@ import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.normalizeNewLi
 import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.registerCompilationUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
@@ -41,6 +45,9 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.Api;
+import org.eclipse.scout.sdk.core.util.apidef.Api.ChildElementType;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 import org.opentest4j.AssertionFailedError;
 
 /**
@@ -299,5 +306,35 @@ public final class SdkAssertions {
       }
       fail(message);
     }
+  }
+
+  public static <A extends IApiSpecification> void assertApiValid(Class<A> api, IJavaEnvironment environment) {
+    assertApiValid(api, environment, null);
+  }
+
+  public static <A extends IApiSpecification> void assertApiValid(Class<A> apiSpec, IJavaEnvironment environment, BiPredicate<IType, A> validateOthers) {
+    A api = environment.requireApi(apiSpec);
+    Api.dump(api).forEach((key, value) -> assertApiClassValid(key, value, environment, api, validateOthers));
+  }
+
+  static <A extends IApiSpecification> void assertApiClassValid(String fqn, Map<ChildElementType, Map<String, String>> children, IJavaEnvironment env, A api, BiPredicate<IType, A> validateOthers) {
+    IType type = env.requireType(fqn);
+    testMethods(children.get(ChildElementType.METHOD_NAME).values(), type);
+    testMethods(children.get(ChildElementType.ANNOTATION_ELEMENT_NAME).values(), type);
+    Map<String, String> notMatchingConvention = children.get(ChildElementType.OTHER);
+    if (notMatchingConvention == null || notMatchingConvention.isEmpty()) {
+      return;
+    }
+    if (validateOthers != null && validateOthers.test(type, api)) {
+      return;
+    }
+    fail("The following methods in class '" + fqn + "' do not follow the naming convention:" + System.lineSeparator() + notMatchingConvention.values());
+  }
+
+  static void testMethods(Collection<String> methodNames, IType owner) {
+    if (methodNames == null || methodNames.isEmpty()) {
+      return;
+    }
+    methodNames.forEach(methodName -> assertTrue(owner.methods().withName(methodName).existsAny(), () -> "Method '" + methodName + "' cannot be found in type '" + owner.name() + "'."));
   }
 }

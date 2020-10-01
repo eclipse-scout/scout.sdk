@@ -14,7 +14,9 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link ClassIdAnnotation}</h3>
@@ -23,8 +25,7 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
  */
 public class ClassIdAnnotation extends AbstractManagedAnnotation {
 
-  public static final String TYPE_NAME = IScoutRuntimeTypes.ClassId;
-  public static final String VALUE_ELEMENT_NAME = "value";
+  protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(IScoutApi.class, IScoutApi::ClassId);
 
   public static Optional<String> valueOf(IAnnotatable owner) {
     return owner.annotations()
@@ -34,6 +35,6 @@ public class ClassIdAnnotation extends AbstractManagedAnnotation {
   }
 
   public String value() {
-    return getValue(VALUE_ELEMENT_NAME, String.class, null);
+    return getValueFrom(IScoutApi.class, api -> api.ClassId().valueElementName(), String.class, null);
   }
 }

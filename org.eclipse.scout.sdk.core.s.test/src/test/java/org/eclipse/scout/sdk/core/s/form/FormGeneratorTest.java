@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.permission.PermissionGenerator;
 import org.eclipse.scout.sdk.core.s.service.ServiceInterfaceGenerator;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
@@ -54,7 +54,7 @@ public class FormGeneratorTest {
     PrimaryTypeGenerator<?> formDataGenerator = PrimaryTypeGenerator.create()
         .withElementName("MyFormData")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.shared")
-        .withSuperClass(IScoutRuntimeTypes.AbstractFormData);
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractFormData().fqn());
     assertEqualsRefFile(env, REF_FILE_FOLDER + "FormTest2.txt", formDataGenerator);
     IType createdFormData = assertNoCompileErrors(env, formDataGenerator);
 
@@ -63,7 +63,7 @@ public class FormGeneratorTest {
         .withElementName("IMyFormService")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.shared")
         .withMethod(MethodGenerator.create()
-            .withElementName(FormGenerator.SERVICE_PREPARECREATE_METHOD_NAME)
+            .withElementName(FormGenerator.SERVICE_PREPARE_CREATE_METHOD_NAME)
             .withFlags(Flags.AccInterface)
             .withReturnType(createdFormData.name())
             .withParameter(MethodParameterGenerator.create()
@@ -111,7 +111,7 @@ public class FormGeneratorTest {
     FormGenerator<?> formGenerator = new FormGenerator<>()
         .withElementName("MyForm")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.client")
-        .withSuperClass(IScoutRuntimeTypes.AbstractForm)
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractForm().fqn())
         .withClassIdValues(classIdValues)
         .withFormData(createdFormData.name())
         .withServiceInterface(createdSvcIfc.name())

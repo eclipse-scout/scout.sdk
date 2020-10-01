@@ -45,6 +45,6 @@ public class MemberBuilder<TYPE extends IMemberBuilder<TYPE>> extends JavaSource
   @Override
   public TYPE appendFlags(int flags) {
     append(Flags.toString(flags, true));
-    return currentInstance();
+    return thisInstance();
   }
 }

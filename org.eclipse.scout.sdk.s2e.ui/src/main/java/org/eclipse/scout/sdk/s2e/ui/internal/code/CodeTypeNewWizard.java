@@ -46,8 +46,8 @@ public class CodeTypeNewWizard extends AbstractWizard implements INewWizard {
     op.setCodeTypeName(m_page1.getIcuName());
     op.setPackage(m_page1.getTargetPackage());
     op.setSharedSourceFolder(input.environment().toScoutSourceFolder(m_page1.getSourceFolder()));
-    op.setCodeTypeIdDataType(m_page1.getCodeTypeIdDataType());
-    op.setSuperType(m_page1.getSuperClassReference());
+    op.setCodeTypeIdDataType(m_page1.getCodeTypeIdDataType(input.environment()));
+    op.setSuperType(m_page1.getSuperClassReference(input.environment()));
   }
 
   @Override

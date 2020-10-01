@@ -21,8 +21,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
  */
 public class ListBoxFieldProposal extends FormFieldProposal {
 
-  protected static final String VALUE_TYPE_GROUP = "VALUE_TYPE";
-
   public ListBoxFieldProposal(String name, int relevance, String imageId, ICompilationUnit cu, TypeProposalContext context) {
     super(name, relevance, imageId, cu, context);
   }

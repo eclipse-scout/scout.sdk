@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.core.model.api;
 
 import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.query.AnnotationQuery;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 

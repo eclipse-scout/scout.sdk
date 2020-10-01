@@ -11,10 +11,13 @@
 package org.eclipse.scout.sdk.core.generator.field;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.member.IMemberGenerator;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link IFieldGenerator}</h3>
@@ -28,7 +31,7 @@ public interface IFieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends IMe
   /**
    * @return The data type of this {@link IFieldGenerator}.
    */
-  Optional<String> dataType();
+  Optional<ApiFunction<?, String>> dataType();
 
   /**
    * Sets the data type of this {@link IFieldGenerator}.
@@ -38,6 +41,8 @@ public interface IFieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends IMe
    * @return This generator.
    */
   TYPE withDataType(String reference);
+
+  <A extends IApiSpecification> TYPE withDataTypeFrom(Class<A> apiDefinition, Function<A, String> dataTypeSupplier);
 
   /**
    * @return The value {@link ISourceGenerator} of this {@link IFieldGenerator}.

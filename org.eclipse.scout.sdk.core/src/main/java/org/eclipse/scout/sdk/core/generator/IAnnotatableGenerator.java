@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.generator;
 
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
@@ -39,12 +41,14 @@ public interface IAnnotatableGenerator<TYPE extends IAnnotatableGenerator<TYPE>>
    *          The fully qualified name of the {@link IAnnotationGenerator}s to remove.
    * @return This generator
    */
-  TYPE withoutAnnotation(String annotationFqn);
+  TYPE withoutAnnotation(Predicate<IAnnotationGenerator<?>> removalFilter);
 
   /**
    * @return A {@link Stream} returning all {@link IAnnotationGenerator}s that exist for this generator.
    */
   Stream<IAnnotationGenerator<?>> annotations();
+
+  Optional<IAnnotationGenerator<?>> annotation(String annotationFqn);
 
   /**
    * Removes all annotations from this generator.

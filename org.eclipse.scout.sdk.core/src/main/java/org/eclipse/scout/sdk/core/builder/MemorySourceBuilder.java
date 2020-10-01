@@ -42,55 +42,55 @@ public class MemorySourceBuilder extends AbstractSourceBuilder<MemorySourceBuild
   @Override
   public MemorySourceBuilder append(String s) {
     source().append(Ensure.notNull(s));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public MemorySourceBuilder append(char c) {
     source().append(c);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public MemorySourceBuilder append(CharSequence cs) {
     source().append(Ensure.notNull(cs));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public MemorySourceBuilder append(char[] c) {
     source().append(Ensure.notNull(c));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public MemorySourceBuilder append(boolean b) {
     source().append(b);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public MemorySourceBuilder append(double d) {
     source().append(d);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public MemorySourceBuilder append(float f) {
     source().append(f);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public MemorySourceBuilder append(int i) {
     source().append(i);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public MemorySourceBuilder append(long l) {
     source().append(l);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override

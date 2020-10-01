@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.builder.java;
 
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -20,6 +22,7 @@ import org.eclipse.scout.sdk.core.imports.ImportCollector;
 import org.eclipse.scout.sdk.core.imports.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.PropertySupport;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link JavaBuilderContext}</h3>
@@ -76,6 +79,18 @@ public class JavaBuilderContext implements IJavaBuilderContext {
   @Override
   public IImportValidator validator() {
     return m_validator;
+  }
+
+  @Override
+  public <A extends IApiSpecification> Optional<A> api(Class<A> apiDefinition) {
+    return environment().flatMap(env -> env.api(apiDefinition));
+  }
+
+  @Override
+  public <A extends IApiSpecification> A requireApi(Class<A> apiDefinition) {
+    return environment()
+        .map(env -> env.requireApi(apiDefinition))
+        .orElseThrow(() -> newFail("Cannot compute API because no Java environment is available."));
   }
 
   public IBuilderContext builderContext() {

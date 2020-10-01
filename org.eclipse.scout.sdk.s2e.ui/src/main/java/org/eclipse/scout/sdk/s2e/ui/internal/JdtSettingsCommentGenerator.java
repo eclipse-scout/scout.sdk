@@ -41,6 +41,8 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
+import org.eclipse.scout.sdk.core.builder.IBuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi;
@@ -51,7 +53,6 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.PropertySupport;
@@ -81,7 +82,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      IJavaProject ownerProject = builderCtx.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
+      IJavaProject ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
       Template template = getCodeTemplate(CodeTemplateContextType.FILECOMMENT_ID, ownerProject);
       if (template != null) {
         TemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, b.context().lineDelimiter());
@@ -110,7 +111,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      IJavaProject ownerProject = builderCtx.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
+      IJavaProject ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
       Template template = getCodeTemplate(CodeTemplateContextType.TYPECOMMENT_ID, ownerProject);
       if (template == null) {
         return;
@@ -156,14 +157,18 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      IJavaProject ownerProject = builderCtx.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
+      IJavaProject ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+      IJavaBuilderContext builderContext = (IJavaBuilderContext) b.context();
       List<String> paramNames = target.parameters()
           .map(IMethodParameterGenerator::elementName)
           .flatMap(Optional::stream)
           .collect(toList());
       List<String> exceptionNames = target.exceptions()
+          .map(func -> func.apply(builderContext))
+          .filter(Optional::isPresent)
+          .map(Optional::get)
           .collect(toList());
-      Optional<String> returnTypeName = target.returnType();
+      Optional<String> returnTypeName = target.returnType().flatMap(af -> af.apply(builderContext));
 
       String fieldTypeSimpleName = UNDEFINED_VAR_VALUE;
       String templateName;
@@ -177,7 +182,8 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
         case METHOD_TYPE_SETTER:
           templateName = CodeTemplateContextType.SETTERCOMMENT_ID;
           Optional<String> firstParam = target.parameters().findAny()
-              .flatMap(IMethodParameterGenerator::dataType);
+              .flatMap(IMethodParameterGenerator::dataType)
+              .flatMap(af -> af.apply(builderContext));
           if (firstParam.isPresent()) {
             fieldTypeSimpleName = JavaTypes.simpleName(firstParam.get());
           }
@@ -258,22 +264,27 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createFieldComment(IFieldGenerator<?> target) {
     return b -> {
-      PropertySupport builderCtx = b.context().properties();
+      IJavaBuilderContext builderContext = (IJavaBuilderContext) b.context();
+      PropertySupport builderCtx = builderContext.properties();
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      IJavaProject ownerProject = builderCtx.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
+      IJavaProject ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
       Template template = getCodeTemplate(CodeTemplateContextType.FIELDCOMMENT_ID, ownerProject);
       if (template != null) {
-        TemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, b.context().lineDelimiter());
-        context.setVariable(CodeTemplateContextType.FIELD_TYPE, JavaTypes.simpleName(target.dataType().orElse(null)));
-        context.setVariable(CodeTemplateContextType.FIELD, target.elementName().orElse(null));
+        TemplateContext templateContext = new CodeTemplateContext(template.getContextTypeId(), ownerProject, builderContext.lineDelimiter());
+        String dataType = target.dataType()
+            .flatMap(af -> af.apply(builderContext))
+            .map(JavaTypes::simpleName)
+            .orElse(null);
+        templateContext.setVariable(CodeTemplateContextType.FIELD_TYPE, dataType);
+        templateContext.setVariable(CodeTemplateContextType.FIELD, target.elementName().orElse(null));
         if (JdtUtils.exists(ownerProject)) {
-          context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+          templateContext.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
         }
-        context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
-        context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
-        String comment = evaluateTemplate(context, template);
+        templateContext.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
+        templateContext.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
+        String comment = evaluateTemplate(templateContext, template);
         if (comment != null) {
           b.append(comment);
           ensureEndsWithNewline(b, comment);
@@ -286,7 +297,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
     if (map == null) {
       return false;
     }
-    IJavaProject jp = map.getProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, IJavaProject.class);
+    IJavaProject jp = map.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
     if (jp == null) {
       return false;
     }
@@ -368,7 +379,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       }
       buf.append("@param ").append(paramName);
     }
-    if (returnType != null && !"void".equals(returnType)) {
+    if (returnType != null && !JavaTypes._void.equals(returnType)) {
       if (buf.length() > 0) {
         buf.append(lineDelimiter).append(lineStart);
       }

@@ -12,12 +12,13 @@ package org.eclipse.scout.sdk.s2i.template
 
 import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.core.s.uniqueid.UniqueIds
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.core.util.Strings
+import org.eclipse.scout.sdk.core.util.apidef.Api
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.util.VelocityRunner
 import java.util.Collections.emptyList
@@ -26,7 +27,7 @@ import java.util.regex.Pattern
 
 class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: TemplateContext) {
 
-    data class TemplateContext(val declaringClass: PsiClass, val module: Module, val fileInsertPosition: Int)
+    data class TemplateContext(val declaringClass: PsiClass, val module: Module, val scoutApi: IScoutApi, val fileInsertPosition: Int)
 
     companion object {
         const val VALUE_OPTION_BOX = "box"
@@ -38,80 +39,21 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
         private val ENCLOSING_INSTANCE_FQN_REGEX = Pattern.compile("\\\$enclosingInstanceInScopeFqn\\((.*)\\)\\\$")
         private val CLASS_ID_REGEX = Pattern.compile("\\\$newClassId\\(\\)\\\$")
         private val UNIQUE_ID_REGEX = Pattern.compile("\\\$newUniqueId\\((.+)\\)\\\$")
-        private val SCOUT_RT_CONSTANTS = IScoutRuntimeTypes::class.java
-                .fields
-                .map { it.name to it.get(null).toString() }
-                .toMap()
-        private val MENU_TYPE_MAPPING = buildMenuTypeMapping()
-
-        private fun buildMenuTypeMapping(): Map<String, List<String>> {
-            val mapping = HashMap<String, List<String>>()
-
-            val tableEmpty = "${IScoutRuntimeTypes.TableMenuType}.${IScoutRuntimeTypes.TableMenuType_EmptySpace}"
-            val tableHeader = "${IScoutRuntimeTypes.TableMenuType}.${IScoutRuntimeTypes.TableMenuType_Header}"
-            val tableMulti = "${IScoutRuntimeTypes.TableMenuType}.${IScoutRuntimeTypes.TableMenuType_MultiSelection}"
-            val tableSingle = "${IScoutRuntimeTypes.TableMenuType}.${IScoutRuntimeTypes.TableMenuType_SingleSelection}"
-            val treeEmpty = "${IScoutRuntimeTypes.TreeMenuType}.${IScoutRuntimeTypes.TreeMenuType_EmptySpace}"
-            val treeHeader = "${IScoutRuntimeTypes.TreeMenuType}.${IScoutRuntimeTypes.TreeMenuType_Header}"
-            val treeMulti = "${IScoutRuntimeTypes.TreeMenuType}.${IScoutRuntimeTypes.TreeMenuType_MultiSelection}"
-            val treeSingle = "${IScoutRuntimeTypes.TreeMenuType}.${IScoutRuntimeTypes.TreeMenuType_SingleSelection}"
-            val calendarComponent = "${IScoutRuntimeTypes.CalendarMenuType}.${IScoutRuntimeTypes.CalendarMenuType_CalendarComponent}"
-            val calendarEmpty = "${IScoutRuntimeTypes.CalendarMenuType}.${IScoutRuntimeTypes.CalendarMenuType_EmptySpace}"
-            val valueFieldEmpty = "${IScoutRuntimeTypes.ValueFieldMenuType}.${IScoutRuntimeTypes.ValueFieldMenuType_Null}"
-            val valueFieldNotEmpty = "${IScoutRuntimeTypes.ValueFieldMenuType}.${IScoutRuntimeTypes.ValueFieldMenuType_NotNull}"
-            val imageFieldEmpty = "${IScoutRuntimeTypes.ImageFieldMenuType}.${IScoutRuntimeTypes.ImageFieldMenuType_Null}"
-            val imageFieldImageId = "${IScoutRuntimeTypes.ImageFieldMenuType}.${IScoutRuntimeTypes.ImageFieldMenuType_ImageId}"
-            val imageFieldImageUrl = "${IScoutRuntimeTypes.ImageFieldMenuType}.${IScoutRuntimeTypes.ImageFieldMenuType_ImageUrl}"
-            val imageFieldImage = "${IScoutRuntimeTypes.ImageFieldMenuType}.${IScoutRuntimeTypes.ImageFieldMenuType_Image}"
-            val tileGridEmpty = "${IScoutRuntimeTypes.TileGridMenuType}.${IScoutRuntimeTypes.TileGridMenuType_EmptySpace}"
-            val tileGridMulti = "${IScoutRuntimeTypes.TileGridMenuType}.${IScoutRuntimeTypes.TileGridMenuType_MultiSelection}"
-            val tileGridSingle = "${IScoutRuntimeTypes.TileGridMenuType}.${IScoutRuntimeTypes.TileGridMenuType_SingleSelection}"
-
-            val treeMappings = listOf("$treeSingle, $treeMulti", "$treeEmpty, $treeHeader", "$treeSingle, $treeMulti, $treeHeader, $treeEmpty")
-            val calendarMappings = listOf(calendarComponent, calendarEmpty, "$calendarComponent, $calendarEmpty")
-
-            mapping[IScoutRuntimeTypes.ITable] = listOf("$tableSingle, $tableMulti", "$tableEmpty, $tableHeader", "$tableSingle, $tableMulti, $tableHeader, $tableEmpty")
-            mapping[IScoutRuntimeTypes.ITree] = treeMappings
-            mapping[IScoutRuntimeTypes.ITreeNode] = treeMappings
-            mapping[IScoutRuntimeTypes.ITabBox] = listOf("${IScoutRuntimeTypes.TabBoxMenuType}.${IScoutRuntimeTypes.TabBoxMenuType_Header}")
-            mapping[IScoutRuntimeTypes.ICalendarItemProvider] = calendarMappings
-            mapping[IScoutRuntimeTypes.ICalendar] = calendarMappings
-            mapping[IScoutRuntimeTypes.IValueField] = listOf(valueFieldNotEmpty, valueFieldEmpty, "$valueFieldNotEmpty, $valueFieldEmpty")
-            mapping[IScoutRuntimeTypes.IImageField] = listOf("$imageFieldImageId, $imageFieldImageUrl, $imageFieldImage", imageFieldEmpty, "$imageFieldImageId, $imageFieldImageUrl, $imageFieldImage, $imageFieldEmpty")
-            mapping[IScoutRuntimeTypes.ITileGrid] = listOf("$tileGridSingle, $tileGridMulti", tileGridEmpty, "$tileGridSingle, $tileGridMulti, $tileGridEmpty")
-            return mapping
-        }
-
-        fun getKeyStrokeOptions(): List<String> {
-            val fKeys = (1..12).map { "${IScoutRuntimeTypes.IKeyStroke}.F$it" }
-            val actionKeys = listOf("${IScoutRuntimeTypes.IKeyStroke}.ENTER", "${IScoutRuntimeTypes.IKeyStroke}.INSERT", "${IScoutRuntimeTypes.IKeyStroke}.DELETE",
-                    "${IScoutRuntimeTypes.IKeyStroke}.ESCAPE", "${IScoutRuntimeTypes.IKeyStroke}.SPACE", "${IScoutRuntimeTypes.IKeyStroke}.TAB", "${IScoutRuntimeTypes.IKeyStroke}.BACKSPACE")
-            val cursors = listOf("${IScoutRuntimeTypes.IKeyStroke}.LEFT", "${IScoutRuntimeTypes.IKeyStroke}.RIGHT", "${IScoutRuntimeTypes.IKeyStroke}.UP", "${IScoutRuntimeTypes.IKeyStroke}.DOWN")
-            val ctrl = "${IScoutRuntimeTypes.IKeyStroke}.CONTROL"
-            val shift = "${IScoutRuntimeTypes.IKeyStroke}.SHIFT"
-            val alt = "${IScoutRuntimeTypes.IKeyStroke}.ALT"
-            val combinedSamples = listOf(
-                    "$ctrl, \"C\"",
-                    "$ctrl, $shift, \"E\"",
-                    "$alt, ${IScoutRuntimeTypes.IKeyStroke}.F11")
-                    .map { "${IScoutRuntimeTypes.KeyStroke}.combineKeyStrokes($it)" }
-            return fKeys + actionKeys + cursors + combinedSamples
-        }
     }
 
     private val m_resolvedTypeArgs = HashMap<Pair<String, Int>, String>()
     private val m_superClassBase = templateDescriptor.superClassInfo()
             ?.baseFqn
             ?.let { context.module.findTypeByName(it) }
-    val menuTypes: List<String> = MENU_TYPE_MAPPING.entries
+    val menuTypes: List<String> = menuTypeMapping().entries
             .firstOrNull { context.declaringClass.isInstanceOf(it.key) }
             ?.value ?: emptyList()
     val keyStrokes = getKeyStrokeOptions()
 
     fun buildTemplate(): String {
         val templateSource = VelocityRunner()
-                .withProperties(SCOUT_RT_CONSTANTS)
-                .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_IN_EXTENSION, context.declaringClass.isInstanceOf(IScoutRuntimeTypes.IExtension))
+                .withProperties(buildScoutRtConstants())
+                .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_IN_EXTENSION, context.declaringClass.isInstanceOf(context.scoutApi.IExtension()))
                 .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_MENU_SUPPORTED, menuTypes.isNotEmpty())
                 .withPostProcessor(DECLARING_TYPE_ARG_REGEX, this::resolveDeclaringTypeArgument)
                 .withPostProcessor(UNIQUE_ID_REGEX) { UniqueIds.next(it.group(1)) }
@@ -124,9 +66,99 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
         return "$order $classId $templateSource"
     }
 
+    /**
+     * Builds the Scout RT constants containing all elements of the [IScoutApi].
+     *
+     * Form:
+     *
+     * "TEXTS"="org.eclipse.scout.rt.platform.text.TEXTS"
+     *
+     * "TEXTS_getMethodName"="get"
+     *
+     * "ICodeType_codeIdTypeParamIndex"="1"
+     */
+    private fun buildScoutRtConstants(): Map<String, String> {
+        val result = HashMap<String, String>()
+        Api.dump(context.scoutApi)
+                .map { flattenRtConstants(it.key, it.value.values) }
+                .forEach { result.putAll(it) }
+        return result
+    }
+
+    private fun flattenRtConstants(fqn: String, children: Collection<Map<String, String>>): Map<String, String> {
+        val simpleName = JavaTypes.simpleName(fqn)
+        val result = HashMap<String, String>()
+        result[simpleName] = fqn
+        children.forEach { it.forEach { (k, v) -> result[simpleName + '_' + k] = v } }
+        return result
+    }
+
+    private fun getKeyStrokeOptions(): List<String> {
+        val iKeyStroke = context.scoutApi.IKeyStroke().fqn()
+        val fKeys = (1..12).map { "$iKeyStroke.F$it" }
+        val actionKeys = listOf("$iKeyStroke.ENTER", "$iKeyStroke.INSERT", "$iKeyStroke.DELETE",
+                "$iKeyStroke.ESCAPE", "$iKeyStroke.SPACE", "$iKeyStroke.TAB", "$iKeyStroke.BACKSPACE")
+        val cursors = listOf("$iKeyStroke.LEFT", "$iKeyStroke.RIGHT", "$iKeyStroke.UP", "$iKeyStroke.DOWN")
+        val ctrl = "$iKeyStroke.CONTROL"
+        val shift = "$iKeyStroke.SHIFT"
+        val alt = "$iKeyStroke.ALT"
+        val combinedSamples = listOf(
+                "$ctrl, \"C\"",
+                "$ctrl, $shift, \"E\"",
+                "$alt, $iKeyStroke.F11")
+                .map { "${context.scoutApi.AbstractAction().fqn()}.${context.scoutApi.AbstractAction().combineKeyStrokesMethodName()}($it)" }
+        return fKeys + actionKeys + cursors + combinedSamples
+    }
+
+    private fun menuTypeMapping(): Map<String, List<String>> {
+        val scoutApi = context.scoutApi
+        val tableMenuType = scoutApi.TableMenuType()
+        val treeMenuType = scoutApi.TreeMenuType()
+        val calendarMenuType = scoutApi.CalendarMenuType()
+        val valueFieldMenuType = scoutApi.ValueFieldMenuType()
+        val imageFieldMenuType = scoutApi.ImageFieldMenuType()
+        val tileGridMenuType = scoutApi.TileGridMenuType()
+        val tabBoxMenuType = scoutApi.TabBoxMenuType()
+
+        val tableEmpty = "${tableMenuType.fqn()}.${tableMenuType.EmptySpace()}"
+        val tableHeader = "${tableMenuType.fqn()}.${tableMenuType.Header()}"
+        val tableMulti = "${tableMenuType.fqn()}.${tableMenuType.MultiSelection()}"
+        val tableSingle = "${tableMenuType.fqn()}.${tableMenuType.SingleSelection()}"
+        val treeEmpty = "${treeMenuType.fqn()}.${treeMenuType.EmptySpace()}"
+        val treeHeader = "${treeMenuType.fqn()}.${treeMenuType.Header()}"
+        val treeMulti = "${treeMenuType.fqn()}.${treeMenuType.MultiSelection()}"
+        val treeSingle = "${treeMenuType.fqn()}.${treeMenuType.SingleSelection()}"
+        val calendarComponent = "${calendarMenuType.fqn()}.${calendarMenuType.CalendarComponent()}"
+        val calendarEmpty = "${calendarMenuType.fqn()}.${calendarMenuType.EmptySpace()}"
+        val valueFieldEmpty = "${valueFieldMenuType.fqn()}.${valueFieldMenuType.Null()}"
+        val valueFieldNotEmpty = "${valueFieldMenuType.fqn()}.${valueFieldMenuType.NotNull()}"
+        val imageFieldEmpty = "${imageFieldMenuType.fqn()}.${imageFieldMenuType.Null()}"
+        val imageFieldImageId = "${imageFieldMenuType.fqn()}.${imageFieldMenuType.ImageId()}"
+        val imageFieldImageUrl = "${imageFieldMenuType.fqn()}.${imageFieldMenuType.ImageUrl()}"
+        val imageFieldImage = "${imageFieldMenuType.fqn()}.${imageFieldMenuType.Image()}"
+        val tileGridEmpty = "${tileGridMenuType.fqn()}.${tileGridMenuType.EmptySpace()}"
+        val tileGridMulti = "${tileGridMenuType.fqn()}.${tileGridMenuType.MultiSelection()}"
+        val tileGridSingle = "${tileGridMenuType.fqn()}.${tileGridMenuType.SingleSelection()}"
+
+        val treeMappings = listOf("$treeSingle, $treeMulti", "$treeEmpty, $treeHeader", "$treeSingle, $treeMulti, $treeHeader, $treeEmpty")
+        val calendarMappings = listOf(calendarComponent, calendarEmpty, "$calendarComponent, $calendarEmpty")
+
+        val mapping = HashMap<String, List<String>>()
+        mapping[scoutApi.ITable().fqn()] = listOf("$tableSingle, $tableMulti", "$tableEmpty, $tableHeader", "$tableSingle, $tableMulti, $tableHeader, $tableEmpty")
+        mapping[scoutApi.ITree().fqn()] = treeMappings
+        mapping[scoutApi.ITreeNode().fqn()] = treeMappings
+        mapping[scoutApi.ITabBox().fqn()] = listOf("${tabBoxMenuType.fqn()}.${tabBoxMenuType.Header()}")
+        mapping[scoutApi.ICalendarItemProvider().fqn()] = calendarMappings
+        mapping[scoutApi.ICalendar().fqn()] = calendarMappings
+        mapping[scoutApi.IValueField().fqn()] = listOf(valueFieldNotEmpty, valueFieldEmpty, "$valueFieldNotEmpty, $valueFieldEmpty")
+        mapping[scoutApi.IImageField().fqn()] = listOf("$imageFieldImageId, $imageFieldImageUrl, $imageFieldImage", imageFieldEmpty, "$imageFieldImageId, $imageFieldImageUrl, $imageFieldImage, $imageFieldEmpty")
+        mapping[scoutApi.ITileGrid().fqn()] = listOf("$tileGridSingle, $tileGridMulti", tileGridEmpty, "$tileGridSingle, $tileGridMulti, $tileGridEmpty")
+        return mapping
+    }
+
     private fun resolveEnclosingInstanceFqn(match: MatchResult): String {
         val queryType = match.group(1)
-        return context.declaringClass.findEnclosingClass(queryType, true)
+        return context.declaringClass.findEnclosingClass(queryType, context.scoutApi, true)
                 ?.qualifiedName ?: ""
     }
 
@@ -135,7 +167,7 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
         val typeArgIndex = Integer.valueOf(match.group(2))
         val postProcessing = match.group(3)
         val type = m_resolvedTypeArgs.computeIfAbsent(typeArgDeclaringClassFqn to typeArgIndex) {
-            val owner = context.declaringClass.findEnclosingClass(typeArgDeclaringClassFqn, true)
+            val owner = context.declaringClass.findEnclosingClass(typeArgDeclaringClassFqn, context.scoutApi, true)
             owner?.resolveTypeArgument(typeArgIndex, typeArgDeclaringClassFqn)
                     ?.getCanonicalText(false)
                     ?: Object::class.java.name
@@ -153,10 +185,11 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
             return null
         }
         val siblings = findOrderSiblings()
-        val first = OrderAnnotation.valueOf(siblings[0])
-        val second = OrderAnnotation.valueOf(siblings[1])
+        val first = OrderAnnotation.valueOf(siblings[0], context.scoutApi)
+        val second = OrderAnnotation.valueOf(siblings[1], context.scoutApi)
         val orderValue = org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.convertToJavaSource(org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.getNewViewOrderValue(first, second))
-        return "@${IScoutRuntimeTypes.Order}($orderValue)"
+        val orderAnnotationFqn = context.scoutApi.Order().fqn()
+        return "@$orderAnnotationFqn($orderValue)"
     }
 
     private fun findOrderSiblings(): Array<PsiClass?> {
@@ -179,10 +212,11 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
             return null
         }
         val classIdValue = Strings.toStringLiteral(ClassIds.next(context.declaringClass.qualifiedName)) ?: return null
-        return "@${IScoutRuntimeTypes.ClassId}($classIdValue)"
+        val classIdFqn = context.scoutApi.ClassId().fqn()
+        return "@$classIdFqn($classIdValue)"
     }
 
-    private fun isOrderSupported() = m_superClassBase?.isInstanceOf(IScoutRuntimeTypes.IOrdered) ?: false
+    private fun isOrderSupported() = m_superClassBase?.isInstanceOf(context.scoutApi.IOrdered()) ?: false
 
-    private fun isClassIdSupported() = m_superClassBase?.isInstanceOf(IScoutRuntimeTypes.ITypeWithClassId) ?: false
+    private fun isClassIdSupported() = m_superClassBase?.isInstanceOf(context.scoutApi.ITypeWithClassId()) ?: false
 }

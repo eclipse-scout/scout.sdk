@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.generator.PackageGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 
 /**

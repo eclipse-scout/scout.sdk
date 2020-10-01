@@ -76,7 +76,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
       BundleContext bundleContext = S2ESdkActivator.getDefault().getBundle().getBundleContext();
       String version = bundleContext.getProperty(TEMPLATE_VERSION);
       if (Strings.isBlank(version)) {
-        version = ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION;
+        version = null; // will use the latest
       }
 
       String artifactId;

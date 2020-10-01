@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -106,7 +107,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   protected JavaEnvironmentWithEcj(Path javaHome, Collection<? extends ClasspathEntry> classpath, CompilerOptions options) {
     m_javaHome = javaHome;
     m_options = options;
-    m_rawClassPath = new ArrayList<>(classpath);
+    m_rawClassPath = withoutNullElements(classpath);
 
     m_elements = new ConcurrentHashMap<>();
     m_evpCache = new ConcurrentHashMap<>();
@@ -116,6 +117,19 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     m_compiler = new FinalValue<>();
     m_classpath = new FinalValue<>();
     m_initialized = true;
+  }
+
+  protected static <T> List<T> withoutNullElements(Collection<T> list) {
+    if (list == null || list.isEmpty()) {
+      return emptyList();
+    }
+    List<T> result = new ArrayList<>(list.size());
+    for (T t : list) {
+      if (t != null) {
+        result.add(t);
+      }
+    }
+    return result;
   }
 
   @Override
@@ -188,7 +202,8 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   /**
-   * @return A {@link Path} to the JRE (not JDK!) home. Never returns {@code null}.
+   * @return A {@link Path} to the JRE (not JDK!) home. May be {@code null}. In that case the running Java home will be
+   *         used.
    */
   public Path javaHome() {
     return m_javaHome;
@@ -430,15 +445,12 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
    * Only use the compiler under lock of {@link #lock()}!
    */
   private EcjAstCompiler getCompiler() {
-    return m_compiler.computeIfAbsentAndGet(() -> {
-      CompilerOptions opts = m_options == null ? EcjAstCompiler.createDefaultOptions() : m_options;
-      return new EcjAstCompiler(getNameEnvironment(), opts, lock());
-    });
+    return m_compiler.computeIfAbsentAndGet(() -> new EcjAstCompiler(getNameEnvironment(), m_options, lock()));
   }
 
   @Override
   public List<ClasspathSpi> getClasspath() {
-    return m_classpath.computeIfAbsentAndGet(() -> getNameEnvironment().classpath().stream()
+    return m_classpath.computeIfAbsentAndGet(() -> m_rawClassPath.stream()
         .map(this::classpathEntryToSpi)
         .collect(collectingAndThen(toList(), Collections::unmodifiableList)));
   }

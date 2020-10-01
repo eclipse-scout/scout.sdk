@@ -20,6 +20,7 @@ import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.allForModule;
 
 import java.nio.CharBuffer;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,7 +32,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
@@ -43,6 +45,7 @@ import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link MissingTranslationQuery}</h3>
@@ -54,7 +57,11 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class MissingTranslationQuery implements IFileQuery {
 
-  public static final String JAVA_TEXTS_FILE_NAME = JavaTypes.simpleName(IScoutRuntimeTypes.TEXTS) + JavaTypes.JAVA_FILE_SUFFIX;
+  private static final Set<String> JAVA_TEXTS_FILE_NAMES = ScoutApi.allKnown()
+      .map(IScoutVariousApi::TEXTS)
+      .map(IClassNameSupplier::simpleName)
+      .map(name -> name + JavaTypes.JAVA_FILE_SUFFIX)
+      .collect(toSet());
   public static final String JS_TEXTS_FILE_NAME = "texts.js";
 
   private final Map<String, List<AbstractTranslationPattern>> m_searchPatterns;
@@ -77,13 +84,30 @@ public class MissingTranslationQuery implements IFileQuery {
   }
 
   protected boolean acceptCandidate(FileQueryInput candidate) {
-    String fullPath = candidate.file().toString().replace('\\', '/');
-    if (fullPath.contains("/archetype-resources/") || fullPath.contains("/generated-resources/")) {
+    if (!m_searchPatterns.containsKey(candidate.fileExtension())) {
       return false;
     }
-    return m_searchPatterns.containsKey(candidate.fileExtension())
-        && !candidate.file().endsWith(JAVA_TEXTS_FILE_NAME)
-        && !candidate.file().endsWith(JS_TEXTS_FILE_NAME);
+
+    Path fullPath = candidate.file();
+    if (pathContainsSegment(fullPath, "archetype-resources")
+        || pathContainsSegment(fullPath, "generated-resources")
+        || fullPath.endsWith(JS_TEXTS_FILE_NAME)) {
+      return false;
+    }
+
+    String fileName = fullPath.getFileName().toString();
+    return JAVA_TEXTS_FILE_NAMES.stream()
+        .noneMatch(texts -> texts.equals(fileName));
+  }
+
+  protected static boolean pathContainsSegment(Iterable<Path> path, String name) {
+    Path toSearch = Paths.get(name);
+    for (Path segment : path) {
+      if (segment.equals(toSearch)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

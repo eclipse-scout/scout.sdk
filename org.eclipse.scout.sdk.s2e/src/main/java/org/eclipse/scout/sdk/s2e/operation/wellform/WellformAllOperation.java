@@ -10,16 +10,21 @@
  */
 package org.eclipse.scout.sdk.s2e.operation.wellform;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
@@ -40,13 +45,13 @@ public class WellformAllOperation implements BiConsumer<EclipseEnvironment, Ecli
     progress.subTask("Searching for classes...");
 
     Set<IType> types = new HashSet<>();
-    String[] roots = {IScoutRuntimeTypes.ICodeType, IScoutRuntimeTypes.IDesktop, IScoutRuntimeTypes.IDesktopExtension, IScoutRuntimeTypes.IForm, IScoutRuntimeTypes.IWizard, IScoutRuntimeTypes.IPage, IScoutRuntimeTypes.IOutline};
+    Set<String> roots = getRootClasses();
     for (String root : roots) {
       Set<IType> rootTypes = JdtUtils.resolveJdtTypes(root);
       for (IType t : rootTypes) {
         try {
-          ITypeHierarchy codeTypeHierarchy = t.newTypeHierarchy(null);
-          for (IType candidate : codeTypeHierarchy.getAllClasses()) {
+          ITypeHierarchy typeHierarchy = t.newTypeHierarchy(null);
+          for (IType candidate : typeHierarchy.getAllClasses()) {
             if (JdtUtils.exists(candidate) && !candidate.isInterface() && !candidate.isBinary() && !candidate.isAnonymous() && candidate.getDeclaringType() == null) {
               types.add(candidate);
             }
@@ -63,7 +68,18 @@ public class WellformAllOperation implements BiConsumer<EclipseEnvironment, Ecli
     }
 
     progress.subTask("Wellform classes...");
-    new WellformScoutTypeOperation(types, true).accept(env, p.newChild(numTicks - (searchStepTicks * roots.length)));
+    new WellformScoutTypeOperation(types, true).accept(env, p.newChild(numTicks - (searchStepTicks * roots.size())));
+  }
+
+  protected static Set<String> getRootClasses() {
+    return ScoutApi.allKnown()
+        .flatMap(WellformAllOperation::getRootClasses)
+        .map(IClassNameSupplier::fqn)
+        .collect(toSet());
+  }
+
+  protected static Stream<IClassNameSupplier> getRootClasses(IScoutInterfaceApi api) {
+    return Stream.of(api.ICodeType(), api.IDesktop(), api.IDesktopExtension(), api.IForm(), api.IWizard(), api.IPage(), api.IOutline());
   }
 
   @Override

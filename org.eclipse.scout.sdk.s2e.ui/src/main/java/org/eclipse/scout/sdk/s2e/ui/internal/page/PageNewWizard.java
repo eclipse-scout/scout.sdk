@@ -14,7 +14,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.page.PageNewOperation;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
@@ -70,10 +71,11 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
     IJavaProject serverProject;
     if (JdtUtils.exists(selectedServerFolder)) {
       serverProject = selectedServerFolder.getJavaProject();
-      op.setServerSourceFolder(input.environment().toScoutSourceFolder(selectedServerFolder));
-
+      IClasspathEntry serverSourceFolder = input.environment().toScoutSourceFolder(selectedServerFolder);
+      op.setServerSourceFolder(serverSourceFolder);
+      IScoutApi scoutApi = serverSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
       if (op.getTestSourceFolder() == null) {
-        IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(selectedServerFolder, IScoutRuntimeTypes.ServerTestRunner, "service test");
+        IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(selectedServerFolder, scoutApi.ServerTestRunner().fqn(), "service test");
         if (serviceTestSourceFolder != null) {
           op.setTestSourceFolder(input.environment().toScoutSourceFolder(serviceTestSourceFolder));
         }

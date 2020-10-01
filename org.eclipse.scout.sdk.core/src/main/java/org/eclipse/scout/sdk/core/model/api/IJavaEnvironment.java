@@ -12,10 +12,13 @@ package org.eclipse.scout.sdk.core.model.api;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link IJavaEnvironment}</h3> Represents a lookup environment (classpath) capable to resolve {@link IType}s by
@@ -52,6 +55,10 @@ public interface IJavaEnvironment {
    */
   Optional<IType> findType(String fqn);
 
+  Optional<IType> findType(IClassNameSupplier fqn);
+
+  <A extends IApiSpecification> Optional<IType> findTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier);
+
   /**
    * Same as {@link #findType(String)} but throws an {@link IllegalArgumentException} if the type could not be found.
    *
@@ -64,6 +71,10 @@ public interface IJavaEnvironment {
    * @see #findType(String)
    */
   IType requireType(String fqn);
+
+  IType requireType(IClassNameSupplier nameSupplier);
+
+  <A extends IApiSpecification> IType requireTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier);
 
   /**
    * Checks if an {@link IType} with given fully qualified name exists on the classpath of this
@@ -195,4 +206,8 @@ public interface IJavaEnvironment {
    * @see IClasspathEntry#isSourceFolder()
    */
   Stream<IClasspathEntry> sourceFolders();
+
+  <A extends IApiSpecification> Optional<A> api(Class<A> apiDefinition);
+
+  <A extends IApiSpecification> A requireApi(Class<A> apiDefinition);
 }

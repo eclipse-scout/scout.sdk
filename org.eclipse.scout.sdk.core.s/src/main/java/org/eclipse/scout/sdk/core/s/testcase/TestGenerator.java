@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.testcase;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.CommentBuilder;
@@ -21,6 +22,9 @@ import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link TestGenerator}</h3>
@@ -30,7 +34,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class TestGenerator<TYPE extends TestGenerator<TYPE>> extends PrimaryTypeGenerator<TYPE> {
 
   private String m_runner;
-  private String m_session;
+  private ApiFunction<?, IClassNameSupplier> m_session;
   private ISourceGenerator<IExpressionBuilder<?>> m_runWithSubjectValueGenerator;
   private boolean m_isClientTest;
 
@@ -48,10 +52,8 @@ public class TestGenerator<TYPE extends TestGenerator<TYPE>> extends PrimaryType
 
     // @RunWithSession
     if (isClientTest()) {
-      mainType
-          .withAnnotation(ScoutAnnotationGenerator
-              .createRunWithClientSession(session()
-                  .orElse(null)));
+        mainType
+            .withAnnotation(ScoutAnnotationGenerator.createRunWithClientSession(session().orElse(null)));
     }
     else {
       session()
@@ -78,16 +80,25 @@ public class TestGenerator<TYPE extends TestGenerator<TYPE>> extends PrimaryType
 
   public TYPE withRunner(String runner) {
     m_runner = runner;
-    return currentInstance();
+    return thisInstance();
   }
 
-  public Optional<String> session() {
-    return Strings.notBlank(m_session);
+  public Optional<ApiFunction<?, IClassNameSupplier>> session() {
+    return Optional.ofNullable(m_session);
   }
 
-  public TYPE withSession(String session) {
-    m_session = session;
-    return currentInstance();
+  public TYPE withSession(CharSequence session) {
+    return withSessionFrom(null, api -> IClassNameSupplier.raw(session));
+  }
+
+  public <API extends IApiSpecification> TYPE withSessionFrom(Class<API> apiSpec, Function<API, IClassNameSupplier> sessionFunction) {
+    if (sessionFunction == null) {
+      m_session = null;
+    }
+    else {
+      m_session = new ApiFunction<>(apiSpec, sessionFunction);
+    }
+    return thisInstance();
   }
 
   public boolean isClientTest() {
@@ -96,7 +107,7 @@ public class TestGenerator<TYPE extends TestGenerator<TYPE>> extends PrimaryType
 
   public TYPE asClientTest(boolean isClientTest) {
     m_isClientTest = isClientTest;
-    return currentInstance();
+    return thisInstance();
   }
 
   public ISourceGenerator<IExpressionBuilder<?>> runWithSubjectValueGenerator() {
@@ -111,6 +122,6 @@ public class TestGenerator<TYPE extends TestGenerator<TYPE>> extends PrimaryType
    */
   public TYPE withRunWithSubjectValueBuilder(ISourceGenerator<IExpressionBuilder<?>> runWithSubjectValueGenerator) {
     m_runWithSubjectValueGenerator = runWithSubjectValueGenerator;
-    return currentInstance();
+    return thisInstance();
   }
 }

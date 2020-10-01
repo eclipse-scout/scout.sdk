@@ -12,17 +12,18 @@ package org.eclipse.scout.sdk.core.generator;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotation;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformAnnotation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -53,14 +54,26 @@ public abstract class AbstractAnnotatableGenerator<TYPE extends IAnnotatableGene
     if (generator != null) {
       m_annotations.add(generator);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutAnnotation(String annotationFqn) {
+  public TYPE withoutAnnotation(Predicate<IAnnotationGenerator<?>> removalFilter) {
+    if(removalFilter == null) {
+      m_annotations.clear();
+    }
+    else {
+      m_annotations.removeIf(removalFilter);
+    }
+    return thisInstance();
+  }
+
+  @Override
+  public Optional<IAnnotationGenerator<?>> annotation(String annotationFqn) {
     Ensure.notNull(annotationFqn);
-    m_annotations.removeIf(g -> annotationFqn.equals(g.elementName().orElse(null)));
-    return currentInstance();
+    return m_annotations.stream()
+        .filter(g -> annotationFqn.equals(g.elementName().orElse(null)))
+        .findAny();
   }
 
   @Override
@@ -71,7 +84,7 @@ public abstract class AbstractAnnotatableGenerator<TYPE extends IAnnotatableGene
   @Override
   public TYPE clearAnnotations() {
     m_annotations.clear();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override

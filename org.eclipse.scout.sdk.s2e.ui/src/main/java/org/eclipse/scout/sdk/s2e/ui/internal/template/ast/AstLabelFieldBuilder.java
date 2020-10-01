@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import org.eclipse.jdt.core.dom.Annotation;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
 /**
@@ -34,7 +33,7 @@ public class AstLabelFieldBuilder extends AstTypeBuilder<AstLabelFieldBuilder> {
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.ILabelField);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ILabelField().fqn());
     }
 
     return this;

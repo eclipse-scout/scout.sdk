@@ -12,16 +12,17 @@ package org.eclipse.scout.sdk.core.generator.compilationunit;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformImport;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformPackage;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformImport;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformPackage;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformType;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
@@ -36,9 +37,6 @@ import org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.PackageGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.SortedMemberEntry;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
@@ -47,6 +45,9 @@ import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IImport;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -183,7 +184,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   @Override
   public TYPE withPackage(PackageGenerator generator) {
     m_package = generator;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -192,19 +193,19 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
       m_package = PackageGenerator.create();
     }
     m_package.withElementName(name);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withImport(CharSequence name) {
     m_declaredImports.add(Ensure.notBlank(name));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withoutImport(CharSequence name) {
     m_declaredImports.remove(name);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -215,13 +216,13 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   @Override
   public TYPE withStaticImport(CharSequence name) {
     m_declaredStaticImports.add(Ensure.notBlank(name));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withoutStaticImport(CharSequence name) {
     m_declaredStaticImports.remove(name);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -233,7 +234,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   public TYPE withoutAllImports() {
     m_declaredImports.clear();
     m_declaredStaticImports.clear();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -273,22 +274,21 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   @Override
   public TYPE withType(ITypeGenerator<?> generator, Object... sortObjects) {
     m_types.add(new SortedMemberEntry(applyConnection(generator, this), sortObjects));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutType(String elementName) {
-    Ensure.notNull(elementName);
+  public TYPE withoutType(Predicate<ITypeGenerator<?>> removalFilter) {
     for (Iterator<SortedMemberEntry> it = m_types.iterator(); it.hasNext();) {
       @SuppressWarnings("unchecked")
       ITypeGenerator<? extends IMemberBuilder<?>> generator = (ITypeGenerator<? extends IMemberBuilder<?>>) it.next().generator();
-      if (elementName.equals(generator.elementName().orElse(null))) {
+      if (removalFilter == null || removalFilter.test(generator)) {
         it.remove();
         applyConnection(generator, null);
-        return currentInstance();
+        return thisInstance();
       }
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   protected static ITypeGenerator<?> applyConnection(ITypeGenerator<?> child, IJavaElementGenerator<?> parent) {
@@ -303,7 +303,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
     if (builder != null) {
       m_footerSourceBuilders.add(builder);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override

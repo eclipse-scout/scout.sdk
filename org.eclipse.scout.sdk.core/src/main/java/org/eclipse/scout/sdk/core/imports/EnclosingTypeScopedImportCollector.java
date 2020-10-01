@@ -29,8 +29,8 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  */
 public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
   private final String m_qualifier;
-  private final Set<String> m_enclosingQualifiers;    // as far as these types exist already!
-  private final Set<String> m_enclosedSimpleNames;    // as far as these types exist already!
+  private final Set<String> m_enclosingQualifiers; // as far as these types exist already!
+  private final Set<String> m_enclosedSimpleNames; // as far as these types exist already!
 
   public EnclosingTypeScopedImportCollector(IImportCollector inner, ITypeGenerator<?> enclosingTypeGenerator) {
     super(inner);
@@ -52,8 +52,12 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
     }
 
     Stream<String> superTypeSignatures = Stream.concat(
-        enclosingTypeGenerator.superClass().stream(),
-        enclosingTypeGenerator.interfaces());
+        enclosingTypeGenerator.superClass()
+            .flatMap(af -> af.apply(env))
+            .stream(),
+        enclosingTypeGenerator.interfaces()
+            .map(af -> af.apply(env))
+            .flatMap(Optional::stream));
 
     superTypeSignatures
         .map(JavaTypes::erasure)

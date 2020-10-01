@@ -49,12 +49,12 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
   private final Object m_lock;
 
   protected EcjAstCompiler(INameEnvironment nameEnv, CompilerOptions opts, Object lock) {
-    super(nameEnv, proceedWithAllProblems(), opts, new EmptyCompilerRequestor(), new CollectingProblemFactory(), new PrintWriter(new SdkLogWriter()), null);
+    super(nameEnv, proceedWithAllProblems(), opts == null ? createDefaultOptions() : opts, new EmptyCompilerRequestor(), new CollectingProblemFactory(), new PrintWriter(new SdkLogWriter()), null);
     m_lock = lock;
     lookupEnvironment.completeTypeBindings(); // must be called once so that the initial state is ready
   }
 
-  static CompilerOptions createDefaultOptions() {
+  public static CompilerOptions createDefaultOptions() {
     CompilerOptions result = new CompilerOptions();
     result.produceDebugAttributes = 0;
     result.complianceLevel = ClassFileConstants.getLatestJDKLevel();

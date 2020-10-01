@@ -52,11 +52,11 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.util.CharSequenceInputStream;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.environment.model.JavaEnvironmentWithJdt;
 import org.eclipse.scout.sdk.s2e.testing.MockFactory;
-import org.eclipse.scout.sdk.s2e.util.CharSequenceInputStream;
 import org.junit.jupiter.api.Test;
 
 /**

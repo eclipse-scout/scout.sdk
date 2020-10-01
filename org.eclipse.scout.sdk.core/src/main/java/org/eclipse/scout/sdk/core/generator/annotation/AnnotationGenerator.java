@@ -12,30 +12,39 @@ package org.eclipse.scout.sdk.core.generator.annotation;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toMap;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotationElement;
-import static org.eclipse.scout.sdk.core.util.Ensure.failOnDuplicates;
+import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.raw;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformAnnotationElement;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import java.util.AbstractMap.SimpleEntry;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link AnnotationGenerator}</h3>
@@ -44,16 +53,23 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extends AbstractJavaElementGenerator<TYPE> implements IAnnotationGenerator<TYPE> {
 
-  private final Map<String, ISourceGenerator<IExpressionBuilder<?>>> m_values;
+  private final Map<ApiFunction<?, String> /* element name */, ISourceGenerator<IExpressionBuilder<?>>> m_values;
+  private ApiFunction<?, IClassNameSupplier> m_name;
 
   protected AnnotationGenerator(IAnnotation annotation, IWorkingCopyTransformer transformer) {
     super(annotation);
     withElementName(annotation.type().name());
     m_values = annotation.elements().values().stream()
         .filter(ae -> !ae.isDefault())
-        .map(ae -> new SimpleEntry<>(ae.elementName(), transformAnnotationElement(ae, transformer)))
-        .filter(ae -> ae.getValue().isPresent())
-        .collect(toMap(SimpleEntry::getKey, se -> se.getValue().get(), failOnDuplicates(), LinkedHashMap::new));
+        .map(ae -> transformAndAssociateWithName(ae, transformer))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toMap(Entry::getKey, Entry::getValue, Ensure::failOnDuplicates, LinkedHashMap::new));
+  }
+
+  protected static Optional<Entry<ApiFunction<?, String>, ISourceGenerator<IExpressionBuilder<?>>>> transformAndAssociateWithName(IAnnotationElement ae, IWorkingCopyTransformer transformer) {
+    return transformAnnotationElement(ae, transformer)
+        .map(g -> new SimpleImmutableEntry<>(new ApiFunction<>(ae.elementName()), g));
   }
 
   protected AnnotationGenerator() {
@@ -114,7 +130,7 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
    */
   public static IAnnotationGenerator<?> createGenerated(CharSequence typeThatGeneratedTheCode, CharSequence comments) {
     IAnnotationGenerator<?> result = new AnnotationGenerator<>()
-        .withElementName(GeneratedAnnotation.TYPE_NAME)
+        .withElementName(GeneratedAnnotation.FQN)
         .withElement(GeneratedAnnotation.VALUE_ELEMENT_NAME, b -> b.stringLiteral(Ensure.notBlank(typeThatGeneratedTheCode)));
     Strings.notBlank(comments).ifPresent(c -> result.withElement(GeneratedAnnotation.COMMENTS_ELEMENT_NAME, b -> b.stringLiteral(c)));
     return result;
@@ -140,39 +156,79 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
   }
 
   @Override
+  public TYPE withElementName(String newName) {
+    IClassNameSupplier annotationName = IClassNameSupplier.raw(newName);
+    return withElementNameFrom(null, api -> annotationName);
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withElementNameFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier) {
+    if (nameSupplier == null) {
+      m_name = null;
+      super.withElementName(null);
+    }
+    else {
+      m_name = new ApiFunction<>(apiDefinition, nameSupplier);
+      if (apiDefinition == null) {
+        super.withElementName(nameSupplier.apply(null).fqn());
+      }
+      else {
+        super.withElementName(null);
+      }
+    }
+    return thisInstance();
+  }
+
+  @Override
   public TYPE withElement(String name, CharSequence valueSrc) {
-    return withElement(name, ISourceGenerator.raw(valueSrc));
+    return withElement(name, raw(valueSrc));
   }
 
   @Override
   public TYPE withElement(String name, ISourceGenerator<IExpressionBuilder<?>> value) {
-    if (value != null) {
-      m_values.put(Ensure.notBlank(name), value);
+    return withElementFrom(null, api -> name, value);
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withElementFrom(Class<A> apiDefinition, Function<A, String> elementNameSupplier, CharSequence valueSrc) {
+    return withElementFrom(apiDefinition, elementNameSupplier, raw(valueSrc));
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withElementFrom(Class<A> apiDefinition, Function<A, String> elementNameSupplier, ISourceGenerator<IExpressionBuilder<?>> value) {
+    if (value == null) {
+      return thisInstance();
     }
-    return currentInstance();
+    m_values.put(new ApiFunction<>(apiDefinition, elementNameSupplier), value);
+    return thisInstance();
   }
 
   @Override
-  public Optional<ISourceGenerator<IExpressionBuilder<?>>> element(String name) {
-    return Optional.ofNullable(m_values.get(name));
+  public Optional<ISourceGenerator<IExpressionBuilder<?>>> element(Predicate<ApiFunction<?, String>> selector) {
+    Ensure.notNull(selector, "Element selector must not be null.");
+    return m_values
+        .entrySet().stream()
+        .filter(entry -> selector.test(entry.getKey()))
+        .reduce((a, b) -> b) // find last
+        .map(Entry::getValue);
   }
 
   @Override
-  public Map<String, ISourceGenerator<IExpressionBuilder<?>>> elements() {
+  public Map<ApiFunction<?, String>, ISourceGenerator<IExpressionBuilder<?>>> elements() {
     return unmodifiableMap(m_values);
   }
 
   @Override
-  public TYPE withoutElement(String name) {
-    m_values.remove(name);
-    return currentInstance();
+  public TYPE withoutElement(Predicate<ApiFunction<?, String>> toRemove) {
+    m_values.keySet().removeIf(toRemove);
+    return thisInstance();
   }
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     super.build(builder);
 
-    builder.at().ref(elementName().orElseThrow(() -> newFail("Annotation name missing for generator {}", this)));
+    builder.at().ref(elementName(builder.context().environment().orElse(null)).orElseThrow(() -> newFail("Annotation name missing for generator {}", this)));
 
     if (m_values.isEmpty()) {
       return;
@@ -183,31 +239,65 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
     builder.parenthesisClose();
   }
 
-  protected void buildElements(IExpressionBuilder<?> builder) {
-    if (m_values.size() == 1 && m_values.containsKey("value")) {
-      buildSingleValueAnnotation(builder);
-      return;
-    }
-    buildMultiValueAnnotation(builder);
+  @Override
+  public Optional<String> elementName(IJavaEnvironment context) {
+    return Optional.ofNullable(m_name)
+        .flatMap(api -> api.apply(context))
+        .map(IClassNameSupplier::fqn)
+        .filter(Strings::hasText);
   }
 
-  protected void buildMultiValueAnnotation(IExpressionBuilder<?> builder) {
+  protected void buildElements(IExpressionBuilder<?> builder) {
+    // evaluate the elementName function and collect to a map
+    IJavaBuilderContext context = builder.context();
+    Map<String, ISourceGenerator<IExpressionBuilder<?>>> elementMap = m_values.entrySet()
+        .stream()
+        .map(entry -> evaluateElementName(entry, context))
+        .collect(toMap(Entry::getKey, Entry::getValue, (a, b) -> b /* last element with a certain name wins */, LinkedHashMap::new));
+
+    boolean isSingleValueAnnotation = buildSingleValueAnnotation(elementMap, builder);
+    if (!isSingleValueAnnotation) {
+      buildNamedValueAnnotation(elementMap, builder);
+    }
+  }
+
+  protected static void buildNamedValueAnnotation(Map<String, ISourceGenerator<IExpressionBuilder<?>>> elementMap, IExpressionBuilder<?> builder) {
     StringBuilder elementDelimiter = new StringBuilder(3);
     elementDelimiter.append(JavaTypes.C_COMMA);
-    if (m_values.size() > 4) {
+    if (elementMap.size() > 4) {
       elementDelimiter.append(builder.context().lineDelimiter());
     }
     else {
       elementDelimiter.append(JavaTypes.C_SPACE);
     }
 
-    Stream<ISourceGenerator<ISourceBuilder<?>>> elementGenerators = m_values.entrySet().stream()
-        .<ISourceGenerator<IJavaSourceBuilder<?>>> map(e -> b -> b.append(e.getKey()).equalSign().append(e.getValue().generalize(builder)))
-        .map(jb -> jb.generalize(builder));
+    Stream<ISourceGenerator<ISourceBuilder<?>>> elementGenerators = elementMap
+        .entrySet().stream()
+        .map(e -> toElementGenerator(builder, e.getKey(), e.getValue()))
+        .map(g -> g.generalize(builder));
     builder.append(elementGenerators, null, elementDelimiter, null);
   }
 
-  protected void buildSingleValueAnnotation(IExpressionBuilder<?> builder) {
-    m_values.values().iterator().next().generate(builder);
+  protected static Entry<String, ISourceGenerator<IExpressionBuilder<?>>> evaluateElementName(Entry<ApiFunction<?, String>, ISourceGenerator<IExpressionBuilder<?>>> entry, IJavaBuilderContext context) {
+    String elementName = entry.getKey().apply(context).orElseThrow(() -> newFail(""));
+    return new SimpleImmutableEntry<>(elementName, entry.getValue());
+  }
+
+  protected static ISourceGenerator<IJavaSourceBuilder<?>> toElementGenerator(IExpressionBuilder<?> builder, String elementName, ISourceGenerator<IExpressionBuilder<?>> valueGenerator) {
+    return b -> b.append(elementName).equalSign().append(valueGenerator.generalize(builder));
+  }
+
+  protected static boolean buildSingleValueAnnotation(Map<String, ISourceGenerator<IExpressionBuilder<?>>> elementMap, IExpressionBuilder<?> builder) {
+    if (elementMap.size() != 1) {
+      return false;
+    }
+    Entry<String, ISourceGenerator<IExpressionBuilder<?>>> element = elementMap.entrySet().iterator().next();
+    String elementName = element.getKey();
+    ISourceGenerator<IExpressionBuilder<?>> valueGenerator = element.getValue();
+    if (!"value".equals(elementName)) {
+      return false;
+    }
+    valueGenerator.generate(builder);
+    return true;
   }
 }

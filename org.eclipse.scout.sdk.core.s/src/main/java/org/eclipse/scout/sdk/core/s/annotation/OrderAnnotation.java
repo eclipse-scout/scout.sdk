@@ -20,10 +20,12 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link OrderAnnotation}</h3>
@@ -32,8 +34,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  */
 public class OrderAnnotation extends AbstractManagedAnnotation {
 
-  public static final String TYPE_NAME = IScoutRuntimeTypes.Order;
-  public static final String VALUE_ELEMENT_NAME = "value";
+  protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(IScoutApi.class, IScoutApi::Order);
 
   public static double valueOf(IAnnotatable owner, boolean isBean) {
     Optional<OrderAnnotation> first = owner.annotations()
@@ -46,9 +47,13 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
     }
 
     if (isBean) {
-      return ISdkProperties.DEFAULT_BEAN_ORDER;
+      return ISdkConstants.DEFAULT_BEAN_ORDER;
     }
-    return ISdkProperties.DEFAULT_VIEW_ORDER;
+    return ISdkConstants.DEFAULT_VIEW_ORDER;
+  }
+
+  public static double getNewViewOrderValue(IType declaringType, IClassNameSupplier orderDefinitionType, int pos) {
+    return getNewViewOrderValue(declaringType, orderDefinitionType.fqn(), pos);
   }
 
   /**
@@ -86,18 +91,18 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
       // insert at last position
       double orderValueBeforeAsDouble = orderValueBefore;
       validateOrderRange(orderValueBeforeAsDouble);
-      double v = Math.ceil(orderValueBeforeAsDouble / ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
-      return v + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      double v = Math.ceil(orderValueBeforeAsDouble / ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      return v + ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }
     if (orderValueBefore == null && orderValueAfter != null) {
       // insert at first position
       double orderValueAfterAsDouble = orderValueAfter;
       validateOrderRange(orderValueAfterAsDouble);
-      double v = Math.floor(orderValueAfterAsDouble / ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
-      if (v > ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP) {
-        return ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      double v = Math.floor(orderValueAfterAsDouble / ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      if (v > ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP) {
+        return ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       }
-      return v - ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      return v - ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }
     //noinspection ConstantConditions
     if (orderValueBefore != null && orderValueAfter != null) {
@@ -110,11 +115,11 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
     }
 
     // other cases. e.g. first item in a container
-    return ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+    return ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
   }
 
   private static void validateOrderRange(double order) {
-    if (order > ISdkProperties.DEFAULT_VIEW_ORDER) {
+    if (order > ISdkConstants.DEFAULT_VIEW_ORDER) {
       NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
       f.setGroupingUsed(false);
       String orderAsString = f.format(order);
@@ -147,7 +152,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
   /**
    * Gets an order value that is between the two given values.<br>
    * The algorithm tries to stick to numbers without decimal places as long as possible.<br>
-   * If a common pattern (like normal steps according to {@link ISdkProperties#VIEW_ORDER_ANNOTATION_VALUE_STEP}) are
+   * If a common pattern (like normal steps according to {@link ISdkConstants#VIEW_ORDER_ANNOTATION_VALUE_STEP}) are
    * found, the corresponding pattern is followed.
    *
    * @param a
@@ -168,8 +173,8 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
 
     // special case for stepwise increase
     //noinspection NumericCastThatLosesPrecision
-    if ((int) low % ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP == 0 && low + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP < high) {
-      return low + ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+    if ((int) low % ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP == 0 && low + ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP < high) {
+      return low + ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }
 
     if (isDoubleDifferent(lowFloor, highFloor) && ((isDoubleDifferent(lowFloor, low) && isDoubleDifferent(highFloor, high)) || dif > 1.0)) {
@@ -213,6 +218,6 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
   }
 
   public double value() {
-    return getValue(VALUE_ELEMENT_NAME, double.class, null);
+    return getValueFrom(IScoutApi.class, api -> api.Order().valueElementName(), double.class, null);
   }
 }

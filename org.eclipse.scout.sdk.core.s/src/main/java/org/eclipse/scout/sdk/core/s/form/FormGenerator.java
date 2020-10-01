@@ -23,9 +23,9 @@ import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -39,15 +39,13 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryTypeGenerator<TYPE> {
 
-  public static final String STORE_METHOD_NAME = "execStore";
-  public static final String LOAD_METHOD_NAME = "execLoad";
   public static final String SERVICE_LOAD_METHOD_NAME = "load";
   public static final String SERVICE_STORE_METHOD_NAME = "store";
-  public static final String MODIFY_HANDLER_NAME = "ModifyHandler";
+  public static final String MODIFY_HANDLER_NAME = "Modify" + ISdkConstants.SUFFIX_FORM_HANDLER;
 
-  public static final String SERVICE_PREPARECREATE_METHOD_NAME = "prepareCreate";
+  public static final String SERVICE_PREPARE_CREATE_METHOD_NAME = "prepareCreate";
   public static final String SERVICE_CREATE_METHOD_NAME = "create";
-  public static final String NEW_HANDLER_NAME = "NewHandler";
+  public static final String NEW_HANDLER_NAME = "New" + ISdkConstants.SUFFIX_FORM_HANDLER;
 
   public static final int NUM_CLASS_IDS = 5;
 
@@ -81,10 +79,10 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
 
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetConfiguredTitle() {
     String nlsKeyName = elementName().orElseThrow(() -> newFail("Form has no name."));
-    if (nlsKeyName.endsWith(ISdkProperties.SUFFIX_FORM)) {
-      nlsKeyName = Strings.ensureStartWithUpperCase(nlsKeyName.substring(0, nlsKeyName.length() - ISdkProperties.SUFFIX_FORM.length())).toString();
+    if (nlsKeyName.endsWith(ISdkConstants.SUFFIX_FORM)) {
+      nlsKeyName = Strings.ensureStartWithUpperCase(nlsKeyName.substring(0, nlsKeyName.length() - ISdkConstants.SUFFIX_FORM.length())).toString();
     }
-    return ScoutMethodGenerator.createNlsMethod("getConfiguredTitle", nlsKeyName);
+    return ScoutMethodGenerator.createNlsMethod(IScoutApi.class, api -> api.AbstractForm().getConfiguredTitleMethodName(), nlsKeyName);
   }
 
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createStartMethod(String methodName, String handlerSimpleName) {
@@ -95,10 +93,10 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
         .withReturnType(JavaTypes._void)
         .withBody(b -> {
           if (MODIFY_HANDLER_NAME.equals(handlerSimpleName)) {
-            b.append("startInternalExclusive");
+            b.appendFrom(IScoutApi.class, api -> api.AbstractForm().startInternalExclusiveMethodName());
           }
           else {
-            b.append("startInternal");
+            b.appendFrom(IScoutApi.class, api -> api.AbstractForm().startInternalMethodName());
           }
           b.parenthesisOpen().appendNew().ref(modifyHandlerFqn).parenthesisOpen().parenthesisClose().parenthesisClose().semicolon();
         });
@@ -106,34 +104,34 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
 
   protected ITypeGenerator<? extends ITypeGenerator<?>> createMainBox() {
     String groupBoxName = "GroupBox";
-    String okButtonName = "Ok" + ISdkProperties.SUFFIX_BUTTON;
-    String cancelButtonName = "Cancel" + ISdkProperties.SUFFIX_BUTTON;
+    String okButtonName = "Ok" + ISdkConstants.SUFFIX_BUTTON;
+    String cancelButtonName = "Cancel" + ISdkConstants.SUFFIX_BUTTON;
     String mainBoxName = "MainBox";
 
     ITypeGenerator<? extends ITypeGenerator<?>> mainBox = TypeGenerator.create()
         .asPublic()
-        .withAnnotation(ScoutAnnotationGenerator.createOrder(ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP))
+        .withAnnotation(ScoutAnnotationGenerator.createOrder(ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
         .withAnnotation(classIdGenerator(1).orElse(null))
         .withElementName(mainBoxName)
-        .withSuperClass(IScoutRuntimeTypes.AbstractGroupBox)
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractGroupBox().fqn())
         .withType(TypeGenerator.create()
             .asPublic()
             .withElementName(groupBoxName)
-            .withAnnotation(ScoutAnnotationGenerator.createOrder(ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP))
+            .withAnnotation(ScoutAnnotationGenerator.createOrder(ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
             .withAnnotation(classIdGenerator(4).orElse(null))
-            .withSuperClass(IScoutRuntimeTypes.AbstractGroupBox), 100)
+            .withSuperClassFrom(IScoutApi.class, api -> api.AbstractGroupBox().fqn()), 100)
         .withType(TypeGenerator.create()
             .asPublic()
             .withElementName(okButtonName)
-            .withAnnotation(ScoutAnnotationGenerator.createOrder(2 * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP))
+            .withAnnotation(ScoutAnnotationGenerator.createOrder(2 * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
             .withAnnotation(classIdGenerator(2).orElse(null))
-            .withSuperClass(IScoutRuntimeTypes.AbstractOkButton), 200)
+            .withSuperClassFrom(IScoutApi.class, api -> api.AbstractOkButton().fqn()), 200)
         .withType(TypeGenerator.create()
             .asPublic()
             .withElementName(cancelButtonName)
-            .withAnnotation(ScoutAnnotationGenerator.createOrder(3 * ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP))
+            .withAnnotation(ScoutAnnotationGenerator.createOrder(3 * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
             .withAnnotation(classIdGenerator(3).orElse(null))
-            .withSuperClass(IScoutRuntimeTypes.AbstractCancelButton), 300)
+            .withSuperClassFrom(IScoutApi.class, api -> api.AbstractCancelButton().fqn()), 300)
         .setDeclaringFullyQualifiedName(fullyQualifiedName());
 
     // form field getters
@@ -156,17 +154,17 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
     return TypeGenerator.create()
         .asPublic()
         .withElementName(name)
-        .withSuperClass(IScoutRuntimeTypes.AbstractFormHandler)
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractFormHandler().fqn())
         .withMethod(MethodGenerator.create()
             .asProtected()
             .withReturnType(JavaTypes._void)
-            .withElementName(LOAD_METHOD_NAME)
+            .withElementNameFrom(IScoutApi.class, api -> api.AbstractFormHandler().execLoadMethodName())
             .withBody(b -> createHandlerMethodBodyGenerator(isModify, true).generate(b))
             .withAnnotation(AnnotationGenerator.createOverride()))
         .withMethod(MethodGenerator.create()
             .asProtected()
             .withReturnType(JavaTypes._void)
-            .withElementName(STORE_METHOD_NAME)
+            .withElementNameFrom(IScoutApi.class, api -> api.AbstractFormHandler().execStoreMethodName())
             .withBody(b -> createHandlerMethodBodyGenerator(isModify, false).generate(b))
             .withAnnotation(AnnotationGenerator.createOverride()));
   }
@@ -194,7 +192,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
 
   public TYPE withFormData(String formData) {
     m_formData = formData;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<String> serviceInterface() {
@@ -203,7 +201,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
 
   public TYPE withServiceInterface(String serviceIfc) {
     m_serviceIfc = serviceIfc;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<String> permissionUpdate() {
@@ -212,7 +210,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
 
   public TYPE withPermissionUpdate(String updatePermission) {
     m_updatePermission = updatePermission;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<String> permissionCreate() {
@@ -221,7 +219,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
 
   public TYPE withPermissionCreate(String createPermission) {
     m_createPermission = createPermission;
-    return currentInstance();
+    return thisInstance();
   }
 
   public String[] classIdValues() {
@@ -238,6 +236,6 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
   public TYPE withClassIdValues(String[] classIdValues) {
     Ensure.same(Ensure.notNull(classIdValues).length, NUM_CLASS_IDS);
     m_classIdValues = Arrays.copyOf(classIdValues, classIdValues.length);
-    return currentInstance();
+    return thisInstance();
   }
 }

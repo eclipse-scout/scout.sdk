@@ -12,8 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 
 /**
  * <h3>{@link AstTreeFieldBuilder}</h3>
@@ -35,8 +34,8 @@ public class AstTreeFieldBuilder extends AstTypeBuilder<AstTreeFieldBuilder> {
         .insert();
 
     // inner calendar
-    Type treeSuperType = getFactory().newTypeReference(IScoutRuntimeTypes.AbstractTree);
-    getFactory().newType(ISdkProperties.INNER_TREE_TYPE_NAME)
+    Type treeSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractTree().fqn());
+    getFactory().newType(ISdkConstants.INNER_TREE_TYPE_NAME)
         .withCalculatedOrder(false)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withNlsMethod(null)
@@ -50,7 +49,7 @@ public class AstTreeFieldBuilder extends AstTypeBuilder<AstTreeFieldBuilder> {
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.ITreeField);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ITreeField().fqn());
     }
 
     return this;

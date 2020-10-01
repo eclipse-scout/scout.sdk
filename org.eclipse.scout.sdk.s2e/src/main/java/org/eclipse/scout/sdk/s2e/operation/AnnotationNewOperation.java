@@ -95,9 +95,10 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
     }
   }
 
-  protected ISourceRange getAnnotationReplaceRange(IDocument sourceDocument, CharSequence newLine, CharSequence newAnnotationSource) throws JavaModelException, BadLocationException {
-    String sn = JavaTypes.simpleName(m_sourceBuilder.elementName().orElseThrow(() -> newFail("Annotation generator is missing the name.")));
-    String fqn = JavaTypes.qualifier(m_sourceBuilder.elementName().get()) + JavaTypes.C_DOT + sn;
+  protected ISourceRange getAnnotationReplaceRange(IDocument sourceDocument, CharSequence newLine, CharSequence newAnnotationSource, IJavaEnvironment env) throws JavaModelException, BadLocationException {
+    String annotationFqn = getSourceBuilder().elementName(env).orElseThrow(() -> newFail("Annotation generator is missing the name."));
+    String sn = JavaTypes.simpleName(annotationFqn);
+    String fqn = JavaTypes.qualifier(annotationFqn) + JavaTypes.C_DOT + sn;
     int newLineLength = newLine.length();
 
     IRegion lineOfMemberName = sourceDocument.getLineInformationOfOffset(m_declaringMember.getNameRange().getOffset());
@@ -111,7 +112,7 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
     while (lineInfo.getOffset() >= lastLineStart) {
       String lineSource = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
       if (lineSource != null) {
-        lineSource = CoreUtils.removeComments(lineSource);
+        lineSource = CoreUtils.removeComments(lineSource).trim();
         if (!lineSource.isEmpty()) {
           if (!isInBlockComment && lineSource.endsWith("*/")) {
             isInBlockComment = true;
@@ -158,7 +159,7 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
       StringBuilder src = getSourceBuilder().toJavaSource(new JavaBuilderContext(new BuilderContext(nl, properties), validator));
 
       // find insert/replace range
-      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, nl, src);
+      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, nl, src, validator.importCollector().getJavaEnvironment());
 
       // insert indentation at the beginning
       src.insert(0, getIndent(sourceDocument, replaceRange));

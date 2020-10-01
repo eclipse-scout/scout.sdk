@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.service.ServiceInterfaceGenerator;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -54,7 +54,7 @@ public class PageGeneratorTest {
               .withReturnType(BaseTablePageData.class.getName())
               .withParameter(MethodParameterGenerator.create()
                   .withElementName("filter")
-                  .withDataType(IScoutRuntimeTypes.SearchFilter)));
+                  .withDataTypeFrom(IScoutApi.class, api -> api.SearchFilter().fqn())));
 
       assertEqualsRefFile(env, REF_FILE_FOLDER + "ServiceTest" + (i + 1) + ".txt", svcIfcGenerator);
       IType createdSvcIfc = assertNoCompileErrors(env, svcIfcGenerator);

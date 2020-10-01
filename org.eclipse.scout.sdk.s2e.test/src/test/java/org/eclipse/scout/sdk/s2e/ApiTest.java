@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
-import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 import org.junit.jupiter.api.Test;
 
@@ -45,12 +44,6 @@ public class ApiTest {
 
     // test for org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory.resolveTypeBinding(String)
     Method m = resolver.getClass().getDeclaredMethod("getTypeBinding", TypeBinding.class);
-    assertNotNull(m);
-  }
-
-  @Test
-  public void testLinkedModeUIApi() throws NoSuchMethodException {
-    Method m = LinkedModeUI.class.getDeclaredMethod("triggerContentAssist");
     assertNotNull(m);
   }
 }

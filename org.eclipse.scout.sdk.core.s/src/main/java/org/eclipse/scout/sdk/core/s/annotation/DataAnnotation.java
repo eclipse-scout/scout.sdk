@@ -15,18 +15,18 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
- * <h3>{@link DataAnnotation}</h3> Describes a {@link IScoutRuntimeTypes#Data} or {@link IScoutRuntimeTypes#PageData}
- * annotation.
+ * <h3>{@link DataAnnotation}</h3> Describes a Data or PageData annotation.
  *
  * @since 5.2.0
  */
 public class DataAnnotation extends AbstractManagedAnnotation {
 
-  public static final String VALUE_ELEMENT_NAME = "value";
-  public static final String TYPE_NAME = IScoutRuntimeTypes.Data;
+  protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(IScoutApi.class, IScoutApi::Data);
 
   public static Optional<IType> valueOf(IAnnotatable owner) {
     return owner.annotations()
@@ -36,6 +36,6 @@ public class DataAnnotation extends AbstractManagedAnnotation {
   }
 
   public IType value() {
-    return getValue(VALUE_ELEMENT_NAME, IType.class, null);
+    return getValueFrom(IScoutApi.class, api -> api.Data().valueElementName(), IType.class, null);
   }
 }

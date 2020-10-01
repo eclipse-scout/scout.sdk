@@ -14,7 +14,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.form.FormNewOperation;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
@@ -58,8 +59,10 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     FormNewWizardPage page = m_page1;
 
     op.setClientPackage(page.getTargetPackage());
-    op.setClientSourceFolder(input.environment().toScoutSourceFolder(page.getSourceFolder()));
-    IPackageFragmentRoot formTestSourceFolder = S2eUiUtils.getTestSourceFolder(page.getSourceFolder(), IScoutRuntimeTypes.ClientTestRunner, "form test");
+    IClasspathEntry clientSourceFolder = input.environment().toScoutSourceFolder(page.getSourceFolder());
+    IScoutApi scoutApi = clientSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
+    op.setClientSourceFolder(clientSourceFolder);
+    IPackageFragmentRoot formTestSourceFolder = S2eUiUtils.getTestSourceFolder(page.getSourceFolder(), scoutApi.ClientTestRunner().fqn(), "form test");
     if (JdtUtils.exists(formTestSourceFolder)) {
       op.setClientTestSourceFolder(input.environment().toScoutSourceFolder(formTestSourceFolder));
     }
@@ -72,8 +75,7 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     if (page.isCreateService()) {
       op.setServerSourceFolder(input.environment().toScoutSourceFolder(page.getServerSourceFolder()));
       serverProject = page.getServerSourceFolder().getJavaProject();
-
-      IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(page.getServerSourceFolder(), IScoutRuntimeTypes.ServerTestRunner, "service test");
+      IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(page.getServerSourceFolder(), scoutApi.ServerTestRunner().fqn(), "service test");
       if (JdtUtils.exists(serviceTestSourceFolder)) {
         op.setServerTestSourceFolder(input.environment().toScoutSourceFolder(serviceTestSourceFolder));
       }

@@ -10,26 +10,26 @@
  */
 package org.eclipse.scout.sdk.core.generator.method;
 
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformMethodParameter;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformTypeParameter;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isDefaultMethod;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isVarargs;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformMethodParameter;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformTypeParameter;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.beans.Introspector;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.MethodBodyBuilder;
@@ -42,18 +42,21 @@ import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.member.AbstractMemberGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link MethodGenerator}</h3>
@@ -64,15 +67,16 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
   protected final List<IMethodParameterGenerator<?>> m_parameters;
   protected final List<ITypeParameterGenerator<?>> m_typeParameters;
-  protected final Set<String> m_exceptions;
+  protected final List<ApiFunction<?, String>> m_exceptions;
 
-  private String m_returnType;
+  private ApiFunction<?, String> m_returnType;
   private ISourceGenerator<BODY> m_body;
+  private ApiFunction<?, String> m_methodName;
 
   protected MethodGenerator() {
     m_parameters = new ArrayList<>();
     m_typeParameters = new ArrayList<>();
-    m_exceptions = new LinkedHashSet<>();
+    m_exceptions = new ArrayList<>();
   }
 
   protected MethodGenerator(IMethod method, IWorkingCopyTransformer transformer) {
@@ -80,6 +84,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
     m_returnType = method.returnType()
         .map(IType::reference)
+        .map(ApiFunction::new)
         .orElse(null);
 
     m_typeParameters = method.typeParameters()
@@ -94,7 +99,8 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
     m_exceptions = method.exceptionTypes()
         .map(IType::reference)
-        .collect(toCollection(LinkedHashSet::new));
+        .map(ApiFunction::new)
+        .collect(toList());
 
     if (canHaveBody(method.flags())) {
       m_body = method.sourceOfBody()
@@ -143,9 +149,12 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    *          The {@link IFieldGenerator} for which the getter should be created. Must not be {@code null}.
    * @return The new {@link IMethodGenerator}.
    */
+  @SuppressWarnings("unchecked")
   public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetter(IFieldGenerator<?> fieldGenerator) {
-    return createGetter(Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create getter for field because it has no name.")),
-        fieldGenerator.dataType().orElseThrow(() -> newFail("Cannot create getter for field because it has no data type.")));
+    ApiFunction<IApiSpecification, String> dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
+        .orElseThrow(() -> newFail("Cannot create getter for field because it has no data type."));
+    String fieldName = Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create getter for field because it has no name."));
+    return createGetter(fieldName, dataType.apiClass().orElse(null), dataType.apiFunction(), Flags.AccPublic);
   }
 
   /**
@@ -173,10 +182,15 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    * @return A new {@link IMethodGenerator} that creates a getter for the specified field.
    */
   public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetter(String fieldName, String dataType, int flags) {
+    return createGetter(fieldName, null, api -> dataType, flags);
+  }
+
+  public static <A extends IApiSpecification> IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetter(String fieldName, Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags) {
+    String methodBaseName = getGetterSetterBaseName(fieldName);
     return create()
-        .withElementName(PropertyBean.getterPrefixFor(dataType) + getGetterSetterBaseName(fieldName))
+        .withElementNameFrom(apiDefinition, api -> PropertyBean.getterPrefixFor(dataTypeFunction.apply(api)) + methodBaseName)
         .withFlags(flags)
-        .withReturnType(dataType)
+        .withReturnTypeFrom(apiDefinition, dataTypeFunction)
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withBody(b -> b.returnClause().append(fieldName).semicolon());
   }
@@ -188,9 +202,12 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    *          The {@link IFieldGenerator} for which the setter should be created. Must not be {@code null}.
    * @return The new {@link IMethodGenerator}.
    */
+  @SuppressWarnings("unchecked")
   public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(IFieldGenerator<?> fieldGenerator) {
+    ApiFunction<IApiSpecification, String> dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
+        .orElseThrow(() -> newFail("Cannot create setter for field because it has no data type."));
     return createSetter(Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create setter for field because it has no name.")),
-        fieldGenerator.dataType().orElseThrow(() -> newFail("Cannot create setter for field because it has no data type.")));
+        dataType.apiClass().orElse(null), dataType.apiFunction(), Flags.AccPublic, null);
   }
 
   /**
@@ -235,6 +252,11 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    * @return The new {@link IMethodGenerator}
    */
   public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(String fieldName, String dataType, int flags, String paramNamePrefix) {
+    return createSetter(fieldName, null, api -> dataType, flags, paramNamePrefix);
+  }
+
+  public static <A extends IApiSpecification> IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(String fieldName,
+      Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags, String paramNamePrefix) {
     String setterBaseName = getGetterSetterBaseName(fieldName); // starts with an uppercase char
     String parameterName = getPrefixedMethodParameterName(paramNamePrefix, setterBaseName);
     return create()
@@ -243,7 +265,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
         .withReturnType(JavaTypes._void)
         .withParameter(
             MethodParameterGenerator.create()
-                .withDataType(dataType)
+                .withDataTypeFrom(apiDefinition, dataTypeFunction)
                 .withElementName(parameterName))
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withBody(b -> b.append(fieldName).equalSign().append(parameterName).semicolon());
@@ -295,10 +317,10 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     builder.append(typeParameters(), "<", ", ", "> ");
 
     // return type
-    returnType().ifPresent(t -> builder.ref(t).space());
+    returnType().ifPresent(t -> builder.refFrom(t).space());
 
     // method name
-    builder.append(ensureValidJavaName(elementName().orElseThrow(() -> newFail("Method must have a name."))));
+    builder.append(ensureValidJavaName(elementName(builder.context()).orElseThrow(() -> newFail("Method must have a name."))));
 
     // parameters
     if (isVarargs && !m_parameters.isEmpty()) {
@@ -310,7 +332,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     builder.parenthesisClose();
 
     // exceptions
-    builder.appendReferences(exceptions(), " throws ", ", ", null);
+    builder.appendFrom(exceptions(), " throws ", ", ", null);
 
     if (canHaveBody(flags)) {
       buildBodySource(builder);
@@ -357,20 +379,24 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
   @Override
   protected IJavaElementCommentBuilder<?> createCommentBuilder(ISourceBuilder<?> builder) {
-    if (PropertyBean.getterName(this).isPresent()) {
+    //noinspection TypeMayBeWeakened
+    IJavaSourceBuilder<?> javaSourceBuilder = (IJavaSourceBuilder<?>) builder;
+    IJavaEnvironment context = javaSourceBuilder.context().environment().orElse(null);
+    if (PropertyBean.getterName(this, context).isPresent()) {
       return JavaElementCommentBuilder.createForMethodGetter(builder, this);
     }
-    if (PropertyBean.setterName(this).isPresent()) {
+    if (PropertyBean.setterName(this, context).isPresent()) {
       return JavaElementCommentBuilder.createForMethodSetter(builder, this);
     }
     return JavaElementCommentBuilder.createForMethod(builder, this);
   }
 
   @Override
-  public String identifier(boolean useErasureOnly) {
+  public String identifier(IJavaEnvironment context, boolean useErasureOnly) {
     List<String> methodParamTypes = m_parameters.stream()
         .map(IMethodParameterGenerator::dataType)
         .map(d -> d.orElseThrow(() -> newFail("Cannot calculate the method identifier because the datatype is missing.")))
+        .map(af -> af.apply(context).orElseThrow(() -> newFail("Cannot compute parameter data type of method '{}'.", elementName().orElse(null))))
         .map(d -> typeErasureIfNecessary(d, useErasureOnly))
         .collect(toList());
 
@@ -386,36 +412,86 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   @Override
-  public String identifier() {
-    return identifier(false);
+  public String identifier(IJavaEnvironment context) {
+    return identifier(context, false);
   }
 
   @Override
-  public Optional<String> returnType() {
-    return Strings.notBlank(m_returnType);
+  public Optional<String> elementName() {
+    return elementName((IJavaEnvironment) null);
+  }
+
+  @Override
+  public Optional<String> elementName(IJavaBuilderContext context) {
+    return elementNameFunction().flatMap(func -> func.apply(context));
+  }
+
+  @Override
+  public Optional<String> elementName(IJavaEnvironment context) {
+    return elementNameFunction().flatMap(func -> func.apply(context));
+  }
+
+  public Optional<ApiFunction<?, String>> elementNameFunction() {
+    return Optional.ofNullable(m_methodName);
+  }
+
+  @Override
+  public TYPE withElementName(String newName) {
+    return withElementNameFrom(null, api -> newName);
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withElementNameFrom(Class<A> apiDefinition, Function<A, String> nameSupplier) {
+    if (nameSupplier == null) {
+      m_methodName = null;
+    }
+    else {
+      m_methodName = new ApiFunction<>(apiDefinition, nameSupplier);
+    }
+    return thisInstance();
+  }
+
+  @Override
+  public Optional<ApiFunction<?, String>> returnType() {
+    return Optional.ofNullable(m_returnType);
   }
 
   @Override
   public TYPE withReturnType(String returnType) {
-    m_returnType = returnType;
-    return currentInstance();
+    return withReturnTypeFrom(null, api -> returnType);
   }
 
   @Override
-  public Stream<String> exceptions() {
+  public <A extends IApiSpecification> TYPE withReturnTypeFrom(Class<A> apiDefinition, Function<A, String> returnTypeSupplier) {
+    if (returnTypeSupplier == null) {
+      m_returnType = null;
+    }
+    else {
+      m_returnType = new ApiFunction<>(apiDefinition, returnTypeSupplier);
+    }
+    return thisInstance();
+  }
+
+  @Override
+  public Stream<ApiFunction<?, String>> exceptions() {
     return m_exceptions.stream();
   }
 
   @Override
   public TYPE withException(String exceptionReference) {
-    m_exceptions.add(Ensure.notBlank(exceptionReference));
-    return currentInstance();
+    return withExceptionFrom(null, api -> exceptionReference);
   }
 
   @Override
-  public TYPE withoutException(String exceptionReference) {
-    m_exceptions.remove(exceptionReference);
-    return currentInstance();
+  public <A extends IApiSpecification> TYPE withExceptionFrom(Class<A> apiDefinition, Function<A, String> exceptionSupplier) {
+    m_exceptions.add(new ApiFunction<>(apiDefinition, exceptionSupplier));
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withoutException(Predicate<ApiFunction<?, String>> toRemove) {
+    m_exceptions.removeIf(toRemove);
+    return thisInstance();
   }
 
   @Override
@@ -426,7 +502,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   @Override
   public TYPE withBody(ISourceGenerator<BODY> body) {
     m_body = body;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -439,7 +515,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     if (parameter != null) {
       m_parameters.add(parameter);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -449,10 +525,10 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
       IMethodParameterGenerator<?> parameter = it.next();
       if (parameterName.equals(parameter.elementName().orElse(null))) {
         it.remove();
-        return currentInstance();
+        return thisInstance();
       }
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -460,7 +536,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     if (typeParameter != null) {
       m_typeParameters.add(typeParameter);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -472,7 +548,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   public TYPE withoutTypeParameter(String elementName) {
     Ensure.notNull(elementName);
     m_typeParameters.removeIf(generator -> elementName.equals(generator.elementName().orElse(null)));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override

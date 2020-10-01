@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -105,7 +104,8 @@ public final class WebModuleTranslationStores {
   static Stream<String> getTextContributorsReferencedInPackageJson(String packageJsonContent) {
     return uiTextContributorMappings().entrySet().stream()
         .filter(entry -> packageJsonContent.contains(entry.getKey()))
-        .map(Entry::getValue);
+        .flatMap(entry -> entry.getValue().stream())
+        .distinct();
   }
 
   static Optional<String> loadPackageJson(Path modulePath) {

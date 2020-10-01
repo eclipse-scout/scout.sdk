@@ -107,6 +107,6 @@ public class EnsureTest {
 
   @Test
   public void testFailOnDuplicates() {
-    assertThrows(IllegalArgumentException.class, () -> failOnDuplicates().apply(null, null));
+    assertThrows(IllegalArgumentException.class, () -> failOnDuplicates(null, null));
   }
 }

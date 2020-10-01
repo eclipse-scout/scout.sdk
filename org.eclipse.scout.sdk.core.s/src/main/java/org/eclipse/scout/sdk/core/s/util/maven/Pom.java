@@ -89,7 +89,7 @@ public final class Pom {
     Element documentElement = pom.getDocumentElement();
     Optional<String> directlySpecified = Xml.firstChildElement(documentElement, tagName)
         .map(Element::getTextContent)
-        .flatMap(Strings::notBlank);
+        .filter(Strings::hasText);
     if (directlySpecified.isPresent()) {
       return directlySpecified;
     }

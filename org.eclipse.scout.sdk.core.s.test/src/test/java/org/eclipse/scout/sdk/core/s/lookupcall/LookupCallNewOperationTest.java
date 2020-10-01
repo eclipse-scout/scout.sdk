@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.core.s.lookupcall;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.AbstractBooleanPermutationArgumentsProvider;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutServerJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
@@ -39,22 +39,24 @@ public class LookupCallNewOperationTest {
   @ParameterizedTest(name = "withLookupService={0}, withServer={1}, withTest={2}")
   @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutServerJavaEnvironmentFactory.class))
   public void testLookupCallCreation(boolean lookupServiceSuperTypeFqn, boolean serverSourceFolder, boolean testSourceFolder, TestingEnvironment env) {
+    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
+
     LookupCallNewOperation op = new LookupCallNewOperation();
     op.setKeyType(JavaTypes.Double);
-    op.setLookupCallName("My" + ISdkProperties.SUFFIX_LOOKUP_CALL);
+    op.setLookupCallName("My" + ISdkConstants.SUFFIX_LOOKUP_CALL);
     if (lookupServiceSuperTypeFqn) {
-      op.setLookupServiceSuperType(IScoutRuntimeTypes.AbstractLookupService);
+      op.setLookupServiceSuperType(scoutApi.AbstractLookupService().fqn());
     }
     op.setPackage("org.eclipse.scout.sdk.s2e.shared.test");
     if (serverSourceFolder) {
       op.setServerSourceFolder(env.getTestingSourceFolder());
     }
     op.setSharedSourceFolder(env.getTestingSourceFolder());
-    op.setSuperType(IScoutRuntimeTypes.LookupCall);
+    op.setSuperType(scoutApi.LookupCall().fqn());
     if (testSourceFolder) {
       op.setTestSourceFolder(env.getTestingSourceFolder());
     }
-    op.setServerSession(IScoutRuntimeTypes.IServerSession);
+    op.setServerSession(scoutApi.IServerSession().fqn());
 
     env.run(op);
 

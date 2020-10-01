@@ -14,7 +14,7 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFi
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -33,17 +33,19 @@ public class CodeTypeGeneratorTest {
 
   @Test
   public void testCodeTypeAllParams(IJavaEnvironment env) {
-    String superType = IScoutRuntimeTypes.AbstractCodeType + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_COMMA + JavaTypes.Long + JavaTypes.C_GENERIC_END;
-
     CodeTypeGenerator<?> ctg = new CodeTypeGenerator<>()
         .withPackageName("org.eclipse.scout.sdk.core.s.test")
         .withElementName("MyCodeType")
         .withClassIdValue("whocares")
         .withCodeTypeIdDataType(String.class.getName())
         .withIdValueBuilder(b -> b.stringLiteral("id_value"))
-        .withSuperClass(superType);
+        .withSuperClassFrom(IScoutApi.class, CodeTypeGeneratorTest::buildSuperClass);
 
     assertEqualsRefFile(env, "org/eclipse/scout/sdk/core/s/generator/codetype/CodeTypeTest1.txt", ctg);
     assertNoCompileErrors(env, ctg);
+  }
+
+  protected static String buildSuperClass(IScoutApi scoutApi) {
+    return scoutApi.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_COMMA + JavaTypes.Long + JavaTypes.C_GENERIC_END;
   }
 }

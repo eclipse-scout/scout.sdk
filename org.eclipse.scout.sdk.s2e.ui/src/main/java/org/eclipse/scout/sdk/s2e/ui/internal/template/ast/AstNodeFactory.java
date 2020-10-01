@@ -49,9 +49,10 @@ import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
 import org.eclipse.jdt.ui.CodeStyleConfiguration;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation;
+import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi.TEXTS;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.uniqueid.UniqueIds;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -103,20 +104,22 @@ public class AstNodeFactory {
   private final ICompilationUnit m_icu;
   private final IJavaProject m_javaProject;
   private final ILinkedPositionHolder m_linkedPosHolder;
+  private final IScoutApi m_scoutApi;
 
-  public AstNodeFactory(TypeDeclaration type, ICompilationUnit icu, EclipseEnvironment envProvider) {
-    this(type, icu, envProvider, Ensure.notNull(type).resolveBinding());
+  public AstNodeFactory(TypeDeclaration type, ICompilationUnit icu, EclipseEnvironment envProvider, IScoutApi api) {
+    this(type, icu, envProvider, api, Ensure.notNull(type).resolveBinding());
   }
 
-  public AstNodeFactory(TypeDeclaration type, ICompilationUnit icu, EclipseEnvironment envProvider, ITypeBinding declaringTypeBinding) {
-    this(type, icu, envProvider, declaringTypeBinding, null);
+  public AstNodeFactory(TypeDeclaration type, ICompilationUnit icu, EclipseEnvironment envProvider, IScoutApi api, ITypeBinding declaringTypeBinding) {
+    this(type, icu, envProvider, api, declaringTypeBinding, null);
   }
 
-  public AstNodeFactory(TypeDeclaration type, ICompilationUnit icu, EclipseEnvironment envProvider, ITypeBinding declaringTypeBinding, ILinkedPositionHolder linkHolder) {
+  public AstNodeFactory(TypeDeclaration type, ICompilationUnit icu, EclipseEnvironment envProvider, IScoutApi api, ITypeBinding declaringTypeBinding, ILinkedPositionHolder linkHolder) {
     m_declaringType = Ensure.notNull(type);
     m_declaringTypeBinding = Ensure.notNull(declaringTypeBinding);
     m_javaEnvProvider = Ensure.notNull(envProvider);
     m_icu = Ensure.notNull(icu);
+    m_scoutApi = Ensure.notNull(api);
 
     m_ast = m_declaringType.getAST();
     m_rewrite = ASTRewrite.create(m_ast);
@@ -151,16 +154,16 @@ public class AstNodeFactory {
         .withClassId(true)
         .withName(name)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD, ModifierKeyword.STATIC_KEYWORD)
-        .withNlsMethod("getConfiguredText")
+        .withNlsMethod(getScoutApi().AbstractCode().getConfiguredTextMethodName())
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.ICode);
+        .withOrderDefinitionType(getScoutApi().ICode().fqn());
   }
 
   public AstButtonBuilder newButton(String name) {
     return new AstButtonBuilder(this)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withClassId(true)
         .withName(name);
   }
@@ -170,7 +173,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -179,7 +182,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -187,7 +190,7 @@ public class AstNodeFactory {
     return new AstCalendarFieldBuilder(this)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withClassId(true)
         .withName(name);
   }
@@ -196,11 +199,11 @@ public class AstNodeFactory {
     return new AstColumnBuilder(this)
         .withClassId(true)
         .withName(name)
-        .withNlsMethod("getConfiguredHeaderText")
+        .withNlsMethod(getScoutApi().AbstractColumn().getConfiguredHeaderTextMethodName())
         .withCalculatedOrder(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IColumn);
+        .withOrderDefinitionType(getScoutApi().IColumn().fqn());
   }
 
   public AstDateFieldBuilder newDateField(String name) {
@@ -208,7 +211,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -217,7 +220,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -226,7 +229,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -235,7 +238,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -244,7 +247,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -264,7 +267,7 @@ public class AstNodeFactory {
         .withCalculatedOrder(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IKeyStroke);
+        .withOrderDefinitionType(getScoutApi().IKeyStroke().fqn());
   }
 
   public AstListBoxBuilder newListBox(String name) {
@@ -272,7 +275,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -281,7 +284,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withName(name)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withOrder(true);
   }
 
@@ -290,7 +293,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -299,7 +302,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -308,7 +311,7 @@ public class AstNodeFactory {
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getScoutApi().IFormField().fqn())
         .withName(name);
   }
 
@@ -319,8 +322,8 @@ public class AstNodeFactory {
         .withCalculatedOrder(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
         .withOrder(true)
-        .withNlsMethod("getConfiguredText")
-        .withOrderDefinitionType(IScoutRuntimeTypes.IMenu);
+        .withNlsMethod(getScoutApi().AbstractAction().getConfiguredTextMethodName())
+        .withOrderDefinitionType(getScoutApi().IMenu().fqn());
   }
 
   public AstTypeBuilder<?> newExtension(String name) {
@@ -371,12 +374,12 @@ public class AstNodeFactory {
 
   @SuppressWarnings("unchecked")
   public NormalAnnotation newFormDataIgnoreAnnotation() {
-    String formDataRef = getImportRewrite().addImport(IScoutRuntimeTypes.FormData, getContext());
+    String formDataRef = getImportRewrite().addImport(getScoutApi().FormData().fqn(), getContext());
     NormalAnnotation formData = getAst().newNormalAnnotation();
     formData.setTypeName(getAst().newName(formDataRef));
 
     MemberValuePair sdkCommand = getAst().newMemberValuePair();
-    sdkCommand.setName(getAst().newSimpleName(FormDataAnnotation.SDK_COMMAND_ELEMENT_NAME));
+    sdkCommand.setName(getAst().newSimpleName(getScoutApi().FormData().sdkCommandElementName()));
     sdkCommand.setValue(getAst().newQualifiedName(getAst().newQualifiedName(getAst().newSimpleName(formDataRef),
         getAst().newSimpleName(SdkCommand.class.getSimpleName())),
         getAst().newSimpleName(SdkCommand.IGNORE.toString())));
@@ -386,7 +389,8 @@ public class AstNodeFactory {
   }
 
   public SingleMemberAnnotation newClassIdAnnotation(String fqn) {
-    String classIdRef = getImportRewrite().addImport(IScoutRuntimeTypes.ClassId, getContext());
+    String classIdFqn = getScoutApi().ClassId().fqn();
+    String classIdRef = getImportRewrite().addImport(classIdFqn, getContext());
 
     SingleMemberAnnotation classIdAnnotation = getAst().newSingleMemberAnnotation();
     classIdAnnotation.setTypeName(getAst().newName(classIdRef));
@@ -404,11 +408,11 @@ public class AstNodeFactory {
   }
 
   public AstMethodBuilder<?> newGetConfiguredGridH(int gridHValue) {
-    return newGetConfigured(gridHValue, "getConfiguredGridH", GRID_H_GROUP);
+    return newGetConfigured(gridHValue, getScoutApi().AbstractFormField().getConfiguredGridHMethodName(), GRID_H_GROUP);
   }
 
   public AstMethodBuilder<?> newGetConfiguredWidth(int width) {
-    return newGetConfigured(width, "getConfiguredWidth", WIDTH_VALUE_GROUP);
+    return newGetConfigured(width, getScoutApi().AbstractColumn().getConfiguredWidthMethodName(), WIDTH_VALUE_GROUP);
   }
 
   @SuppressWarnings("unchecked")
@@ -433,12 +437,12 @@ public class AstNodeFactory {
   }
 
   /**
-   * Creates a KeyStroke.combineKeyStrokes() method with the given elements as parameters.
+   * Creates a AbstractAction.combineKeyStrokes() method with the given elements as parameters.
    * <p>
    * <b>Examples:</b>
    * <ul>
-   * <li>for input ["CONTROL", "C"]: {@code KeyStroke.combineKeyStrokes(IKeyStroke.CONTROL, "C")}</li>
-   * <li>for input ["ALT", "F6"]: {@code KeyStroke.combineKeyStrokes(IKeyStroke.ALT, IKeyStroke.F6)}</li>
+   * <li>for input ["CONTROL", "C"]: {@code AbstractAction.combineKeyStrokes(IKeyStroke.CONTROL, "C")}</li>
+   * <li>for input ["ALT", "F6"]: {@code AbstractAction.combineKeyStrokes(IKeyStroke.ALT, IKeyStroke.F6)}</li>
    * </ul>
    *
    * @param elementsToCombine
@@ -449,10 +453,10 @@ public class AstNodeFactory {
   @SuppressWarnings("unchecked")
   public MethodInvocation newCombineKeyStrokes(String... elementsToCombine) {
     AST ast = getAst();
-    String iKeyStroke = getImportRewrite().addImport(IScoutRuntimeTypes.IKeyStroke);
+    String iKeyStroke = getImportRewrite().addImport(getScoutApi().IKeyStroke().fqn());
     MethodInvocation combineKeyStrokes = ast.newMethodInvocation();
-    combineKeyStrokes.setName(ast.newSimpleName("combineKeyStrokes"));
-    Type keyStrokeRef = newTypeReference(IScoutRuntimeTypes.KeyStroke);
+    combineKeyStrokes.setName(ast.newSimpleName(getScoutApi().AbstractAction().combineKeyStrokesMethodName()));
+    Type keyStrokeRef = newTypeReference(getScoutApi().AbstractAction().fqn());
     combineKeyStrokes.setExpression(ast.newSimpleName(keyStrokeRef.toString()));
     List<Expression> arguments = combineKeyStrokes.arguments();
 
@@ -475,8 +479,9 @@ public class AstNodeFactory {
   public AstMethodBuilder<?> newNlsMethod(String methodName) {
     AST ast = getAst();
     MethodInvocation get = ast.newMethodInvocation();
-    get.setName(ast.newSimpleName("get"));
-    String textsRef = getImportRewrite().addImport(IScoutRuntimeTypes.TEXTS, getContext());
+    TEXTS textsApi = getScoutApi().TEXTS();
+    get.setName(ast.newSimpleName(textsApi.getMethodName()));
+    String textsRef = getImportRewrite().addImport(textsApi.fqn(), getContext());
     get.setExpression(ast.newName(textsRef));
     StringLiteral nlsKeyString = ast.newStringLiteral();
     nlsKeyString.setLiteralValue("MyNlsKey");
@@ -523,7 +528,7 @@ public class AstNodeFactory {
       links.addLinkedPositionProposalsBoolean(LABEL_VISIBLE_GROUP);
     }
 
-    return newMethod("getConfiguredLabelVisible")
+    return newMethod(getScoutApi().AbstractFormField().getConfiguredLabelVisibleMethodName())
         .withModifiers(ModifierKeyword.PROTECTED_KEYWORD)
         .withOverride(true)
         .withReturnType(ast.newPrimitiveType(PrimitiveType.BOOLEAN))
@@ -534,7 +539,7 @@ public class AstNodeFactory {
   public FieldDeclaration newSerialVersionUid() {
     AST ast = getAst();
     VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
-    fragment.setName(ast.newSimpleName("serialVersionUID"));
+    fragment.setName(ast.newSimpleName(FieldGenerator.SERIAL_VERSION_UID));
     fragment.setInitializer(ast.newNumberLiteral("1L"));
 
     FieldDeclaration declaration = ast.newFieldDeclaration(fragment);
@@ -619,6 +624,10 @@ public class AstNodeFactory {
 
   public EclipseEnvironment getScoutElementProvider() {
     return m_javaEnvProvider;
+  }
+
+  public IScoutApi getScoutApi() {
+    return m_scoutApi;
   }
 
   protected boolean isCreateOverrideAnnotationSetting() {

@@ -65,8 +65,8 @@ public class CompilationUnitGeneratorTest {
         .withType(TypeGenerator.create()
             .asPublic()
             .withElementName("TestClass"))
-        .withoutType("SecondClassInFile")
-        .withoutType("NotExisting");
+        .withoutType(t -> "SecondClassInFile".equals(t.elementName().get()))
+        .withoutType(t -> "NotExisting".equals(t.elementName().get()));
     assertEqualsRefFile(env, REF_FILE_FOLDER + "CompilationUnitGeneratorTest1.txt", generator);
     assertNoCompileErrors(env, generator);
   }

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGene
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -47,7 +47,8 @@ public class HugeCodeTypeTest {
 
     assertFalse(isBlank(javaSource));
 
-    String superType = IScoutRuntimeTypes.AbstractCodeType + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_COMMA + JavaTypes.Long + JavaTypes.C_GENERIC_END;
+    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+    String superType = scoutApi.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_COMMA + JavaTypes.Long + JavaTypes.C_GENERIC_END;
     String packageName = HugeCodeType.class.getPackage().getName();
     CodeTypeGenerator<?> ctg = new CodeTypeGenerator<>()
         .withPackageName(packageName)

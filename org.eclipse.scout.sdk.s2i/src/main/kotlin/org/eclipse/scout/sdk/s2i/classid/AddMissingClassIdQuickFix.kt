@@ -19,11 +19,11 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
+import org.eclipse.scout.sdk.s2i.requireScoutApi
 
 
 open class AddMissingClassIdQuickFix : LocalQuickFix {
@@ -35,23 +35,25 @@ open class AddMissingClassIdQuickFix : LocalQuickFix {
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val psiClass = PsiTreeUtil.getParentOfType(descriptor.psiElement, PsiClass::class.java)
                 ?: throw Ensure.newFail("No class found to add @ClassId. Element: '{}'.", descriptor.psiElement)
-        if (psiClass.hasAnnotation(IScoutRuntimeTypes.ClassId)) {
+        val classId = psiClass.requireScoutApi().ClassId()
+        val classIdFqn = classId.fqn()
+        if (psiClass.hasAnnotation(classIdFqn)) {
             return // nothing to do
         }
         val psiElementFactory = JavaPsiFacade.getElementFactory(project)
         val javaAnnotationSupport = LanguageAnnotationSupport.INSTANCE.forLanguage(psiClass.language)
         val classIdValue = ClassIds.next(psiClass.qualifiedName)
         val psiLiteral = javaAnnotationSupport.createLiteralValue(classIdValue, psiClass)
-        val anchor = findAnchor(psiClass, classIdValue)
-        val classIdAnnotation = psiElementFactory.createAnnotationFromText("@" + IScoutRuntimeTypes.ClassId, psiClass)
-        classIdAnnotation.setDeclaredAttributeValue(ClassIdAnnotation.VALUE_ATTRIBUTE_NAME, psiLiteral)
+        val anchor = findAnchor(psiClass, classIdValue, classIdFqn)
+        val classIdAnnotation = psiElementFactory.createAnnotationFromText("@$classIdFqn", psiClass)
+        classIdAnnotation.setDeclaredAttributeValue(classId.valueElementName(), psiLiteral)
 
         psiClass.modifierList?.addAfter(classIdAnnotation, anchor)
         JavaCodeStyleManager.getInstance(project).shortenClassReferences(psiClass)
     }
 
-    protected fun findAnchor(psiClass: PsiClass, classIdValue: String): PsiElement? {
-        val newClassIdAnnotationLength = JavaTypes.simpleName(IScoutRuntimeTypes.ClassId).length + classIdValue.length + 5 // 5 extra for @, (), ""
+    protected fun findAnchor(psiClass: PsiClass, classIdValue: String, classIdFqn: String): PsiElement? {
+        val newClassIdAnnotationLength = JavaTypes.simpleName(classIdFqn).length + classIdValue.length + 5 // 5 extra for @, (), ""
         for (i in psiClass.annotations.size - 1 downTo 0) {
             val annotation = psiClass.annotations[i]
             if (annotation.textLength < newClassIdAnnotationLength) {

@@ -21,8 +21,8 @@ import java.util.Map;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.MetaValueType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
@@ -59,10 +59,11 @@ public class CodeTypeNewOperationTest {
   }
 
   protected static IType testCodeTypeCreation(String codeTypeIdFqn, String codeIdFqn, TestingEnvironment env) {
-    String superTypeFqn = IScoutRuntimeTypes.AbstractCodeType + JavaTypes.C_GENERIC_START + codeTypeIdFqn + ", " + codeIdFqn + JavaTypes.C_GENERIC_END;
+    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
+    String superTypeFqn = scoutApi.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + codeTypeIdFqn + ", " + codeIdFqn + JavaTypes.C_GENERIC_END;
     CodeTypeNewOperation op = new CodeTypeNewOperation();
     op.setCodeTypeIdDataType(codeTypeIdFqn);
-    op.setCodeTypeName("My" + ISdkProperties.SUFFIX_CODE_TYPE);
+    op.setCodeTypeName("My" + ISdkConstants.SUFFIX_CODE_TYPE);
     op.setPackage("org.eclipse.scout.sdk.s2e.shared.test");
     op.setSharedSourceFolder(env.getTestingSourceFolder());
     op.setSuperType(superTypeFqn);

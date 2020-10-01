@@ -15,9 +15,10 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
@@ -43,6 +44,7 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
   }
 
   protected Optional<IFuture<IType>> writeDerivedTypeOf(IType modelType, IEnvironment env, IProgress progress) {
+    IScoutApi scoutApi = modelType.javaEnvironment().requireApi(IScoutApi.class);
     Optional<FormDataAnnotationDescriptor> formDataAnnotation = findDataAnnotationForFormData(modelType);
     if (formDataAnnotation.isPresent()) {
       return getInput()
@@ -52,7 +54,7 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
               .map(g -> env.writeCompilationUnitAsync(g, derivedSourceFolder, progress)));
     }
 
-    Optional<DataAnnotationDescriptor> pageDataAnnotation = findDataAnnotationForPageData(modelType);
+    Optional<DataAnnotationDescriptor> pageDataAnnotation = findDataAnnotationForPageData(modelType, scoutApi);
     if (pageDataAnnotation.isPresent()) {
       return getInput()
           .getSourceFolderOf(pageDataAnnotation.get().getDataType(), env)
@@ -61,7 +63,7 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
               .map(g -> env.writeCompilationUnitAsync(g, derivedSourceFolder, progress)));
     }
 
-    Optional<DataAnnotationDescriptor> dataAnnotation = findDataAnnotationForRowData(modelType);
+    Optional<DataAnnotationDescriptor> dataAnnotation = findDataAnnotationForRowData(modelType, scoutApi);
     return dataAnnotation.flatMap(dataAnnotationDescriptor -> getInput()
         .getSourceFolderOf(dataAnnotationDescriptor.getDataType(), env)
         .flatMap(derivedSourceFolder -> DtoGeneratorFactory
@@ -77,29 +79,27 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
         .filter(d -> d.getFormDataType() != null);
   }
 
-  protected static Optional<DataAnnotationDescriptor> findDataAnnotationForPageData(IType model) {
+  protected static Optional<DataAnnotationDescriptor> findDataAnnotationForPageData(IType model, IScoutInterfaceApi api) {
     return Optional.of(model)
-        .filter(m -> m.isInstanceOf(IScoutRuntimeTypes.IPageWithTable))
+        .filter(m -> m.isInstanceOf(api.IPageWithTable()))
         .flatMap(DataAnnotationDescriptor::of);
   }
 
-  protected static Optional<DataAnnotationDescriptor> findDataAnnotationForRowData(IType model) {
+  protected static Optional<DataAnnotationDescriptor> findDataAnnotationForRowData(IType model, IScoutInterfaceApi api) {
     // direct column or table extension
-    if (model.isInstanceOf(IScoutRuntimeTypes.IColumn) || model.isInstanceOf(IScoutRuntimeTypes.ITableExtension)) {
+    if (model.isInstanceOf(api.IColumn()) || model.isInstanceOf(api.ITableExtension())) {
       return DataAnnotationDescriptor.of(model);
     }
 
     // check for table extension in IPageWithTableExtension
     return Optional.of(model)
-        .filter(m -> m.isInstanceOf(IScoutRuntimeTypes.IPageWithTableExtension))
-        .filter(DtoUpdateHandler::containsTableExtension)
+        .filter(m -> m.isInstanceOf(api.IPageWithTableExtension()))
+        .filter(m -> containsTableExtension(m, api))
         .flatMap(DataAnnotationDescriptor::of);
   }
 
-  protected static boolean containsTableExtension(IType model) {
-    return model.innerTypes()
-        .withInstanceOf(IScoutRuntimeTypes.ITableExtension)
-        .existsAny();
+  protected static boolean containsTableExtension(IType model, IScoutInterfaceApi api) {
+    return model.innerTypes().withInstanceOf(api.ITableExtension()).existsAny();
   }
 
   @Override

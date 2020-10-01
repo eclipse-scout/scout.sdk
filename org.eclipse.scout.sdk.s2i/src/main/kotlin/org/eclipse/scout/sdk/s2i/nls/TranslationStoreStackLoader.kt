@@ -24,9 +24,9 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInLongReadAction
-import org.eclipse.scout.sdk.s2i.getNioPath
 import org.eclipse.scout.sdk.s2i.moduleDirPath
 import org.eclipse.scout.sdk.s2i.toScoutProgress
+import org.eclipse.scout.sdk.s2i.util.getNioPath
 
 object TranslationStoreStackLoader {
 
@@ -124,12 +124,18 @@ object TranslationStoreStackLoader {
 
     private fun findPrimaryStore(nlsFile: VirtualFile, stack: TranslationStoreStack): ITranslationStore {
         val nlsFilePath = nlsFile.getNioPath()
-        return NlsFile(nlsFilePath)
-                .findMatchingStoreIn(stack)
-                .orElseGet {
-                    stack.allStores()
-                            .findFirst()
-                            .orElseThrow { newFail("No translation stores found for nls file '{}'.", nlsFilePath) }
-                }
+        val file = NlsFile(nlsFilePath)
+        return file.findMatchingStoreIn(stack)
+                .orElseGet { fallbackStore(file, stack) }
+    }
+
+    private fun fallbackStore(nlsFile: NlsFile, stack: TranslationStoreStack): ITranslationStore? {
+        val fallback = stack.allStores()
+                .findFirst()
+                .orElseThrow { newFail("No translation stores found for nls file '{}'.", nlsFile.path()) }
+        nlsFile.nlsClassFqn().ifPresent {
+            SdkLog.warning("Translation store '{}' specified in file '{}' could not be found. Fallback to '{}'.", it, nlsFile.path(), fallback.service().type().name())
+        }
+        return fallback
     }
 }

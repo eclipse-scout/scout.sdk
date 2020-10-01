@@ -42,7 +42,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
@@ -55,6 +55,7 @@ import org.eclipse.scout.sdk.core.s.nls.properties.ReadOnlyTranslationFile;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicPrimaryTypeFilter;
 
@@ -84,6 +85,11 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
   private static Stream<ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, @SuppressWarnings("TypeMayBeWeakened") EclipseProgress progress) {
     progress.init(20, "Search properties text provider services.");
 
+    Optional<IScoutApi> scoutApi = ApiHelper.scoutApiFor(jp, env);
+    if (scoutApi.isEmpty()) {
+      return Stream.empty();
+    }
+
     Predicate<IType> filter = new PublicPrimaryTypeFilter() {
       @Override
       public boolean test(IType candidate) {
@@ -99,7 +105,8 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
       }
     };
 
-    Set<IType> dynamicNlsTextProviderServices = JdtUtils.findTypesInStrictHierarchy(jp, IScoutRuntimeTypes.AbstractDynamicNlsTextProviderService, progress.newChild(10).monitor(), filter);
+    String abstractDynamicNlsTextProviderSvcFqn = scoutApi.get().AbstractDynamicNlsTextProviderService().fqn();
+    Set<IType> dynamicNlsTextProviderServices = JdtUtils.findTypesInStrictHierarchy(jp, abstractDynamicNlsTextProviderSvcFqn, progress.newChild(10).monitor(), filter);
     EclipseProgress loopProgress = progress
         .newChild(10)
         .setWorkRemaining(dynamicNlsTextProviderServices.size());

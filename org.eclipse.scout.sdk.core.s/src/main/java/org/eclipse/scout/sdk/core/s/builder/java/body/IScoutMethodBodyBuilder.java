@@ -10,7 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.s.builder.java.body;
 
+import java.util.function.Function;
+
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link IScoutMethodBodyBuilder}</h3>
@@ -26,6 +30,8 @@ public interface IScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TY
   TYPE appendImportFormData(CharSequence formDataVarName);
 
   TYPE appendBeansGet(CharSequence bean);
+
+  <T extends IApiSpecification> TYPE appendBeansGetFrom(Class<T> apiClass, Function<T, IClassNameSupplier> beanNameProvider);
 
   TYPE appendGetFieldByClass(CharSequence fieldFqn);
 

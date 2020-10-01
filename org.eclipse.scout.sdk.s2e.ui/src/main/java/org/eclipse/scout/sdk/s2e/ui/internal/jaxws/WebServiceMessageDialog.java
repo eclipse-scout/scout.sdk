@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
 
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -22,12 +23,15 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl.WebServiceNames;
-import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
+import org.eclipse.scout.sdk.s2e.operation.jaxws.WebServiceNewOperation;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -56,30 +60,29 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
   public static final String HIDE_CONSUMER_MSG = "hideWebServiceConsumerInfoMessage";
   public static final String HIDE_PROVIDER_MSG = "hideWebServiceProviderInfoMessage";
 
+  private final IJavaProject m_jaxWsProject;
   private boolean m_isCopyToClipboard;
 
   protected WebServiceMessageDialog(Shell parentShell, String dialogTitle, Image image, String msg, int dialogImageType, String[] dialogButtonLabels, int defaultIndex,
-      String toggleMessage, boolean toggleState) {
+      String toggleMessage, boolean toggleState, IJavaProject jaxWsProject) {
     super(parentShell, dialogTitle, image, msg, dialogImageType, dialogButtonLabels, defaultIndex, toggleMessage, toggleState);
+    m_jaxWsProject = jaxWsProject;
   }
 
-  @SuppressWarnings("ConstantConditions")
-  protected static String getScoutJaxWsDocumentationUrl() {
+  protected String getScoutJaxWsDocumentationUrl() {
+    String majorAndMinor = ApiHelper.scoutVersionOf(m_jaxWsProject, null)
+        .map(ApiVersion::segments)
+        .filter(s -> s.length >= 2)
+        .map(s -> s[0] + "." + s[1])
+        .orElseGet(() -> {
+          SdkLog.warning("Cannot detect used Scout version. Fallback to latest version.");
+          return ScoutApi.latestMajorVersion() + ".0";
+        });
     String base = "http://eclipsescout.github.io/";
-    String version = ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION;
-    int firstDotPos = version.indexOf('.');
-    if (firstDotPos < 0) {
-      SdkLog.warning("Cannot parse current Scout version");
-      return base;
-    }
-    int secondDotPos = version.indexOf('.', firstDotPos + 1);
-    if (secondDotPos > 0) {
-      version = version.substring(0, secondDotPos);
-    }
-    return base + version + "/technical-guide.html#webservices-with-jax-ws";
+    return base + majorAndMinor + "/technical-guide.html#webservices-with-jax-ws";
   }
 
-  public static void open(AbstractWebServiceNewOperation op, Display d) {
+  public static void open(WebServiceNewOperation op, Display d) {
     d.asyncExec(() -> {
       Shell shell = d.getActiveShell();
       if (shell == null) {
@@ -95,7 +98,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
     });
   }
 
-  public static WebServiceMessageDialog open(AbstractWebServiceNewOperation op, Shell shell) {
+  public static WebServiceMessageDialog open(WebServiceNewOperation op, Shell shell) {
     String message;
     String dialogTitle;
     String prefKey;
@@ -117,7 +120,8 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
       return null;
     }
 
-    WebServiceMessageDialog dialog = new WebServiceMessageDialog(shell, dialogTitle, null, message, INFORMATION, new String[]{IDialogConstants.OK_LABEL}, 0, "Do not show this dialog again.", false);
+    WebServiceMessageDialog dialog = new WebServiceMessageDialog(shell, dialogTitle, null, message, INFORMATION, new String[]{IDialogConstants.OK_LABEL}, 0,
+        "Do not show this dialog again.", false, op.getJaxWsProject());
     int style = SWT.SHEET;
     dialog.setShellStyle(dialog.getShellStyle() | style);
     dialog.setPrefStore(store);
@@ -125,7 +129,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
     dialog.open();
     if (dialog.isCopyToClipboard()) {
       Clipboard clipboard = new Clipboard(shell.getDisplay());
-      clipboard.setContents(new Object[]{message + "\n\nJAX-WS Documentation: " + getScoutJaxWsDocumentationUrl()}, new Transfer[]{TextTransfer.getInstance()});
+      clipboard.setContents(new Object[]{message + "\n\nJAX-WS Documentation: " + dialog.getScoutJaxWsDocumentationUrl()}, new Transfer[]{TextTransfer.getInstance()});
       clipboard.dispose();
     }
     return dialog;

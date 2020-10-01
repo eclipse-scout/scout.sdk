@@ -43,7 +43,7 @@ public class WebServiceProviderGenerator<TYPE extends WebServiceProviderGenerato
 
   public TYPE withPortType(String portType) {
     m_portType = portType;
-    return currentInstance();
+    return thisInstance();
   }
 
 }

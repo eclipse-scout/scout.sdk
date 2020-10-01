@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.query.InnerTypeQuery;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 

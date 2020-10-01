@@ -33,7 +33,7 @@ public abstract class AbstractSourceBuilder<TYPE extends ISourceBuilder<TYPE>> i
   }
 
   @SuppressWarnings("unchecked")
-  protected TYPE currentInstance() {
+  protected TYPE thisInstance() {
     return (TYPE) this;
   }
 
@@ -95,7 +95,7 @@ public abstract class AbstractSourceBuilder<TYPE extends ISourceBuilder<TYPE>> i
   @Override
   public TYPE append(ISourceGenerator<ISourceBuilder<?>> generator) {
     Ensure.notNull(generator).generate(this);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -107,12 +107,12 @@ public abstract class AbstractSourceBuilder<TYPE extends ISourceBuilder<TYPE>> i
   public TYPE append(Stream<? extends ISourceGenerator<ISourceBuilder<?>>> generators, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
     //noinspection ResultOfMethodCallIgnored
     Ensure.notNull(generators).collect(collector(prefix, delimiter, suffix));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(Optional<? extends ISourceGenerator<ISourceBuilder<?>>> opt) {
     Ensure.notNull(opt).ifPresent(this::append);
-    return currentInstance();
+    return thisInstance();
   }
 }

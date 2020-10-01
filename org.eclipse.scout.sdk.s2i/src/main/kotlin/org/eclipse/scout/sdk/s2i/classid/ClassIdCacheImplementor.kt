@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2i.classid
 
 import com.intellij.lang.java.JavaLanguage
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
@@ -27,18 +28,27 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.FileContentUtilCore
+import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator
+import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
+import org.eclipse.scout.sdk.s2i.containingModule
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
+import org.eclipse.scout.sdk.s2i.util.ApiHelper
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
+import kotlin.streams.asSequence
 
 class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
 
     private val m_fileCache = ConcurrentHashMap<String /* file path */, MutableMap<String /* fqn */, String /* classid */>>()
     private val m_stopTypes: Array<Class<out PsiElement>> = arrayOf(PsiClass::class.java, PsiModifierList::class.java, PsiTypeElement::class.java, PsiTypeParameter::class.java, PsiJavaFile::class.java)
+    private val m_delayedProcessor = DelayedBuffer<PsiFile>(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::processFileEvents)
 
     @Volatile
     private var m_cacheReady = false
@@ -79,9 +89,15 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     }
 
     override fun findAllClassIds(scope: SearchScope, indicator: ProgressIndicator?) =
-            project.findAllTypesAnnotatedWith(IScoutRuntimeTypes.ClassId, scope, indicator)
+            ScoutApi.allKnown().asSequence()
+                    .map { it.ClassId().fqn() to it }
+                    .distinctBy { it.first }
+                    .flatMap { findAllClassIds(it.second, scope, indicator) }
+
+    private fun findAllClassIds(scoutApi: IScoutApi, scope: SearchScope, indicator: ProgressIndicator?) =
+            project.findAllTypesAnnotatedWith(scoutApi.ClassId().fqn(), scope, indicator)
                     .filter { it.isValid }
-                    .mapNotNull { ClassIdAnnotation.of(it) }
+                    .mapNotNull { ClassIdAnnotation.of(null, it, scoutApi) }
                     .filter { it.hasValue() }
 
     override fun typesWithClassId(classId: String): List<String> = usageByClassId()[classId] ?: emptyList()
@@ -123,36 +139,59 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
 
     internal fun fileCache() = m_fileCache // for testing
 
+    internal fun processFileEvents(events: List<PsiFile>) = events
+            .toHashSet()
+            .groupBy { it.containingModule() }
+            .forEach {
+                it.key?.let { module -> processModule(module, it.value) }
+            }
+
+    internal fun processModule(module: Module, files: List<PsiFile>) {
+        val scoutApi = ApiHelper.scoutApiFor(module) ?: return
+        files.forEach {
+            computeInReadAction(module.project) {
+                processFile(scoutApi, it)
+            }
+        }
+    }
+
+    internal fun processFile(scoutApi: IScoutApi, file: PsiFile) {
+        val path = file.virtualFile.path
+        val mappingsInFile = HashMap<String /* fqn */, String /* classid value */>()
+        file.accept(object : JavaRecursiveElementWalkingVisitor() {
+            override fun visitLiteralExpression(expression: PsiLiteralExpression) {
+                if (expression.parent !is PsiNameValuePair) {
+                    return
+                }
+                val declaringAnnotation = PsiTreeUtil.getParentOfType(expression, PsiAnnotation::class.java, false, *m_stopTypes) ?: return
+                val classId = ClassIdAnnotation.of(declaringAnnotation, scoutApi) ?: return
+                if (ignoreClassId(classId)) {
+                    return
+                }
+                val value = classId.value() ?: return
+                val qualifiedName = classId.ownerFqn() ?: return
+                mappingsInFile[qualifiedName] = value
+            }
+
+            override fun visitMethod(method: PsiMethod?) {
+                // do not step into methods
+            }
+        })
+
+        if (mappingsInFile.isEmpty()) {
+            m_fileCache.remove(path)
+        } else {
+            m_fileCache[path] = mappingsInFile
+        }
+    }
+
     private inner class PsiListener : PsiTreeChangeAdapter() {
         override fun childrenChanged(event: PsiTreeChangeEvent) {
             val file = event.file ?: return
             if (file.language != JavaLanguage.INSTANCE || !file.isPhysical) {
                 return
             }
-            val path = file.virtualFile.path
-
-            val mappingsInFile = ConcurrentHashMap<String /* fqn */, String /* classid value */>()
-            file.accept(object : JavaRecursiveElementWalkingVisitor() {
-                override fun visitLiteralExpression(expression: PsiLiteralExpression) {
-                    if (expression.parent !is PsiNameValuePair) {
-                        return
-                    }
-                    val declaringAnnotation = PsiTreeUtil.getParentOfType(expression, PsiAnnotation::class.java, false, *m_stopTypes) ?: return
-                    val classId = ClassIdAnnotation.of(declaringAnnotation) ?: return
-                    if (ignoreClassId(classId)) {
-                        return
-                    }
-                    val value = classId.value() ?: return
-                    val qualifiedName = classId.ownerFqn() ?: return
-                    mappingsInFile[qualifiedName] = value
-                }
-            })
-
-            if (mappingsInFile.isEmpty()) {
-                m_fileCache.remove(path)
-            } else {
-                m_fileCache[path] = mappingsInFile
-            }
+            m_delayedProcessor.submit(file)
         }
     }
 

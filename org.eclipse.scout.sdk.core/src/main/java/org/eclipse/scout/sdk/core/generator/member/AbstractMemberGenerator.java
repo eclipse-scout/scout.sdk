@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.generator.member;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
@@ -42,7 +42,7 @@ public abstract class AbstractMemberGenerator<TYPE extends IMemberGenerator<TYPE
   @Override
   public TYPE withFlags(int flags) {
     m_flags |= flags;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -53,7 +53,7 @@ public abstract class AbstractMemberGenerator<TYPE extends IMemberGenerator<TYPE
   @Override
   public TYPE withoutFlags(int flags) {
     m_flags &= ~flags;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override

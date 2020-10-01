@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.model.api;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 
 /**

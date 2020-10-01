@@ -23,7 +23,7 @@ import com.intellij.psi.PsiModifier
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
+import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.nio.file.Path
 import java.util.*
 import java.util.stream.Stream
@@ -67,20 +68,22 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
 
         val moduleScope = module.getModuleWithDependenciesAndLibrariesScope(false)
         val javaEnv: IJavaEnvironment = env.toScoutJavaEnvironment(module) ?: return Stream.empty()
-
-        val types = computeInReadAction(module.project) {
-            module.project.findTypesByName(IScoutRuntimeTypes.AbstractDynamicNlsTextProviderService, moduleScope)
-                    .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false) }
-                    .asSequence()
-                    .filter { !it.isDeprecated }
-                    .filter { !it.isEnum }
-                    .filter { it.hasModifierProperty(PsiModifier.PUBLIC) }
-                    .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
-                    .filter { it.scope is PsiJavaFile }
-                    .map { TypeMapping(it.toScoutType(javaEnv), it) }
-                    .filter { it.scoutType != null }
-                    .toList()
+        val scoutApi = javaEnv.api(IScoutApi::class.java)
+        if (!scoutApi.isPresent) {
+            return Stream.empty()
         }
+        val types = module.project.findTypesByName(scoutApi.get().AbstractDynamicNlsTextProviderService().fqn(), moduleScope)
+                .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false) }
+                .asSequence()
+                .filter { computeInReadAction(module.project) { !it.isDeprecated } }
+                .filter { !it.isEnum }
+                .filter { it.hasModifierProperty(PsiModifier.PUBLIC) }
+                .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
+                .filter { it.scope is PsiJavaFile }
+                .filter { it.canNavigateToSource() }
+                .map { TypeMapping(it.toScoutType(javaEnv), it) }
+                .filter { it.scoutType != null }
+                .toList()
 
         val progressForLoad = progress.worked(10).newChild(10).init(types.size, message("load.properties.content"))
         val result = types.mapNotNull { createTranslationStore(it.scoutType!!, it.psiClass, module, progressForLoad).orElse(null) }
@@ -134,5 +137,13 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
         return ReadOnlyTranslationFile({ file.inputStream }, language, file)
     }
 
-    private data class TypeMapping(val scoutType: IType?, val psiClass: PsiClass)
+    private data class TypeMapping(val scoutType: IType?, val psiClass: PsiClass) {
+        init {
+            if (scoutType == null) {
+                // warn if a class cannot be found. This may happen if e.g. the packages are wrong configured.
+                val fqn = computeInReadAction(psiClass.project) { psiClass.qualifiedName }
+                SdkLog.warning("Unable to resolve class '{}'.", fqn)
+            }
+        }
+    }
 }

@@ -14,16 +14,15 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isFinal;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isPrivate;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isStatic;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.member.IMemberGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
-import org.eclipse.scout.sdk.core.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -130,7 +129,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
     int flags = generator.flags();
     boolean isFinal = isFinal(flags);
     boolean isConstant = isStatic(flags) && isFinal;
-    boolean isSerialVersionUid = isConstant && isPrivate(flags) && "serialVersionUID".equals(generator.elementName().orElse(null));
+    boolean isSerialVersionUid = isConstant && isPrivate(flags) && FieldGenerator.SERIAL_VERSION_UID.equals(generator.elementName().orElse(null));
 
     int pos;
     if (isSerialVersionUid) {
@@ -175,16 +174,8 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
       pos = 3000;
     }
     else {
-      CharSequence methodName = generator.elementName().orElseThrow(() -> newFail("Method name is missing for generator {}", generator));
-      boolean isGetterOrSetter = PropertyBean.BEAN_METHOD_NAME.matcher(methodName).matches();
-      if (isGetterOrSetter) {
-        pos = 2000;
-      }
-      else {
-        pos = 4000;
-      }
+      pos = 4000;
     }
-
     return new CompositeObject(DEFAULT_ORDER, METHOD_ORDER, pos, insertionOrder);
   }
 

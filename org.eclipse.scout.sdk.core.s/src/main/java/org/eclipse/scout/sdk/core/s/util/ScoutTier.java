@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -104,33 +104,32 @@ public enum ScoutTier implements Predicate<IJavaElement> {
   }
 
   public static Optional<ScoutTier> valueOf(IJavaEnvironment env) {
-    if (env == null) {
-      return Optional.empty();
-    }
-    return valueOf(env::exists);
+    return Optional.ofNullable(env)
+        .flatMap(e -> e.api(IScoutApi.class))
+        .flatMap(api -> valueOf(env::exists, api));
   }
 
-  public static Optional<ScoutTier> valueOf(Predicate<String> typeLookupStrategy) {
-    if (typeLookupStrategy == null) {
+  public static Optional<ScoutTier> valueOf(Predicate<String> typeLookupStrategy, IScoutApi api) {
+    if (typeLookupStrategy == null || api == null) {
       return Optional.empty();
     }
 
-    boolean uiAvailable = typeLookupStrategy.test(IScoutRuntimeTypes.UiServlet);
+    boolean uiAvailable = typeLookupStrategy.test(api.UiServlet().fqn());
     if (uiAvailable) {
       return Optional.of(HtmlUi);
     }
 
-    boolean clientAvailable = typeLookupStrategy.test(IScoutRuntimeTypes.IClientSession);
+    boolean clientAvailable = typeLookupStrategy.test(api.IClientSession().fqn());
     if (clientAvailable) {
       return Optional.of(Client);
     }
 
-    boolean serverAvailable = typeLookupStrategy.test(IScoutRuntimeTypes.IServerSession);
+    boolean serverAvailable = typeLookupStrategy.test(api.IServerSession().fqn());
     if (serverAvailable) {
       return Optional.of(Server);
     }
 
-    boolean sharedAvailable = typeLookupStrategy.test(IScoutRuntimeTypes.ISession);
+    boolean sharedAvailable = typeLookupStrategy.test(api.ISession().fqn());
     if (sharedAvailable) {
       return Optional.of(Shared);
     }

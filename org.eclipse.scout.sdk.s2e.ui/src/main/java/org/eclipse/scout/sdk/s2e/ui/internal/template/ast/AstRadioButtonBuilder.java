@@ -25,7 +25,7 @@ import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.IValueField;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
@@ -38,6 +38,7 @@ import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 @SuppressWarnings("unchecked")
 public class AstRadioButtonBuilder extends AstTypeBuilder<AstRadioButtonBuilder> {
 
+  @SuppressWarnings("PublicStaticCollectionField")
   public static final Set<String> PROPOSAL_RADIO_DATA_TYPES = new ConcurrentSkipListSet<>();
 
   static {
@@ -71,7 +72,7 @@ public class AstRadioButtonBuilder extends AstTypeBuilder<AstRadioButtonBuilder>
       ITrackedNodePosition dataTypeTracker = getFactory().getRewrite().track(genericFromRadioButtonGroupType);
       links.addLinkedPosition(dataTypeTracker, true, AstNodeFactory.RADIO_VALUE_TYPE_GROUP);
 
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IRadioButton);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IRadioButton().fqn());
 
       String[] proposalTypes = PROPOSAL_RADIO_DATA_TYPES.toArray(new String[0]);
       for (String fqn : proposalTypes) {
@@ -87,8 +88,10 @@ public class AstRadioButtonBuilder extends AstTypeBuilder<AstRadioButtonBuilder>
 
   protected String parseValueTypeTypeFromGroup() {
     IType typeBinding = Ensure.notNull(AstUtils.getTypeBinding(getDeclaringType()));
+    //noinspection resource
     org.eclipse.scout.sdk.core.model.api.IType scoutType = getFactory().getScoutElementProvider().toScoutType(typeBinding);
-    return scoutType.resolveTypeParamValue(IScoutRuntimeTypes.TYPE_PARAM_VALUEFIELD__VALUE, IScoutRuntimeTypes.IValueField)
+    IValueField iValueField = getFactory().getScoutApi().IValueField();
+    return scoutType.resolveTypeParamValue(iValueField.valueTypeParamIndex(), iValueField.fqn())
         .flatMap(Stream::findFirst)
         .map(org.eclipse.scout.sdk.core.model.api.IType::name)
         .orElse(Object.class.getName());
@@ -104,7 +107,7 @@ public class AstRadioButtonBuilder extends AstTypeBuilder<AstRadioButtonBuilder>
     body.statements().add(returnStatement);
 
     Type simpleDataType = getFactory().newTypeReference(valueTypeFqn);
-    getFactory().newMethod("getConfiguredRadioValue")
+    getFactory().newMethod(getFactory().getScoutApi().AbstractRadioButton().getConfiguredRadioValueMethodName())
         .withModifiers(ModifierKeyword.PROTECTED_KEYWORD)
         .withOverride(true)
         .withReturnType(simpleDataType)

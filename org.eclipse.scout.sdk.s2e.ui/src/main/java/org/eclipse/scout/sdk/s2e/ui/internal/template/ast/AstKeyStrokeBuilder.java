@@ -18,7 +18,6 @@ import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 
 /**
  * <h3>{@link AstKeyStrokeBuilder}</h3>
@@ -41,7 +40,7 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
     addGetConfiguredKeyStroke();
 
     // execAction
-    m_execAction = getFactory().newExecMethod("execAction")
+    m_execAction = getFactory().newExecMethod(getFactory().getScoutApi().AbstractAction().execActionMethodName())
         .in(get())
         .insert()
         .get();
@@ -61,7 +60,7 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
     body.statements().add(returnStatement);
 
     Type stringType = getFactory().newTypeReference(String.class.getName());
-    getFactory().newMethod("getConfiguredKeyStroke")
+    getFactory().newMethod(getFactory().getScoutApi().AbstractAction().getConfiguredKeyStrokeMethodName())
         .withModifiers(ModifierKeyword.PROTECTED_KEYWORD)
         .withOverride(true)
         .withReturnType(stringType)
@@ -71,7 +70,8 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      String iKsSimpleName = getFactory().getImportRewrite().addImport(IScoutRuntimeTypes.IKeyStroke);
+      String iKeyStroke = getFactory().getScoutApi().IKeyStroke().fqn();
+      String iKsSimpleName = getFactory().getImportRewrite().addImport(iKeyStroke);
       ITrackedNodePosition typeNamePos = getFactory().getRewrite().track(defaultValue);
       links.addLinkedPosition(typeNamePos, true, AstNodeFactory.KEY_STROKE_GROUP);
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".F1");
@@ -99,7 +99,7 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, getFactory().newCombineKeyStrokes("SHIFT", "4").toString());
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, getFactory().newCombineKeyStrokes("ALT", "F6").toString());
 
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IKeyStroke);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, iKeyStroke);
     }
   }
 

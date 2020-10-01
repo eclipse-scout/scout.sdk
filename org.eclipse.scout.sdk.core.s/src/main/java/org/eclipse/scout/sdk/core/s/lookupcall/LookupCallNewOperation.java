@@ -23,8 +23,8 @@ import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -74,7 +74,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     if (svcName.endsWith(suffix)) {
       svcName = svcName.substring(0, svcName.length() - suffix.length());
     }
-    svcName += ISdkProperties.SUFFIX_SERVICE;
+    svcName += ISdkConstants.SUFFIX_SERVICE;
 
     setCreatedLookupServiceIfc(createLookupServiceIfc(svcName, env, progress.newChild(1)));
 
@@ -94,16 +94,17 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
       return null;
     }
 
+    IScoutApi scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
     ScoutTier targetTier = ScoutTier.valueOf(testSourceFolder.javaEnvironment())
         .orElseThrow(() -> newFail("Test-source-folder {} has no access to Scout classes", testSourceFolder));
     String testPackage = ScoutTier.Shared.convert(targetTier, getPackage());
     boolean isClient = ScoutTier.Client.isIncludedIn(targetTier);
     String runnerFqn;
     if (isClient) {
-      runnerFqn = IScoutRuntimeTypes.ClientTestRunner;
+      runnerFqn = scoutApi.ClientTestRunner().fqn();
     }
     else {
-      runnerFqn = IScoutRuntimeTypes.ServerTestRunner;
+      runnerFqn = scoutApi.ServerTestRunner().fqn();
     }
 
     // validate source folder
@@ -115,7 +116,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
 
     String createLookupCallMethodName = "createLookupCall";
     TestGenerator<?> lookupCallTestBuilder = new TestGenerator<>()
-        .withElementName(getLookupCallName() + ISdkProperties.SUFFIX_TEST)
+        .withElementName(getLookupCallName() + ISdkConstants.SUFFIX_TEST)
         .withPackageName(testPackage)
         .asClientTest(isClient)
         .withRunner(runnerFqn)
@@ -124,9 +125,9 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
             .withElementName(createLookupCallMethodName)
             .withReturnType(getCreatedLookupCall().name())
             .withBody(b -> b.returnClause().appendNew().ref(getCreatedLookupCall()).parenthesisOpen().parenthesisClose().semicolon()))
-        .withMethod(createTestMethod(createLookupCallMethodName, "All"))
-        .withMethod(createTestMethod(createLookupCallMethodName, "Key"))
-        .withMethod(createTestMethod(createLookupCallMethodName, "Text"));
+        .withMethod(createTestMethod(createLookupCallMethodName, scoutApi.LookupCall().getDataByAllMethodName()))
+        .withMethod(createTestMethod(createLookupCallMethodName, scoutApi.LookupCall().getDataByKeyMethodName()))
+        .withMethod(createTestMethod(createLookupCallMethodName, scoutApi.LookupCall().getDataByTextMethodName()));
     if (!isClient && Strings.hasText(getServerSession())) {
       lookupCallTestBuilder.withSession(getServerSession());
     }
@@ -134,28 +135,30 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     return env.writeCompilationUnit(lookupCallTestBuilder, testSourceFolder, progress);
   }
 
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createTestMethod(String lookupCallCreateMethodName, String suffix) {
+  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createTestMethod(String createLookupCallMethodName, String getDataByMethodName) {
     return MethodGenerator.create()
         .withAnnotation(ScoutAnnotationGenerator.createTest())
         .asPublic()
         .withReturnType(JavaTypes._void)
-        .withElementName("testLookupBy" + suffix)
+        .withElementName("test" + Strings.ensureStartWithUpperCase(getDataByMethodName))
         .withBody(b -> {
           String callVarName = "call";
+          IScoutApi scoutApi = b.context().requireApi(IScoutApi.class);
           String dataType = new StringBuilder(List.class.getName()).append(JavaTypes.C_GENERIC_START)
-              .append("? extends ").append(IScoutRuntimeTypes.ILookupRow).append(JavaTypes.C_GENERIC_START).append(getKeyType())
+              .append("? extends ").append(scoutApi.ILookupRow().fqn()).append(JavaTypes.C_GENERIC_START).append(getKeyType())
               .append(JavaTypes.C_GENERIC_END).append(JavaTypes.C_GENERIC_END).toString();
 
-          b.ref(getCreatedLookupCall()).space().append(callVarName).equalSign().append(lookupCallCreateMethodName).parenthesisOpen().parenthesisClose().semicolon().nl()
+          b.ref(getCreatedLookupCall()).space().append(callVarName).equalSign().append(createLookupCallMethodName).parenthesisOpen().parenthesisClose().semicolon().nl()
               .appendTodo("fill call")
-              .ref(dataType).space().append("data").equalSign().append(callVarName).dot().append("getDataBy").append(suffix).parenthesisOpen().parenthesisClose().semicolon().nl()
+              .ref(dataType).space().append("data").equalSign().append(callVarName).dot().append(getDataByMethodName).parenthesisOpen().parenthesisClose().semicolon().nl()
               .appendTodo("verify data");
         });
   }
 
   protected IType createLookupServiceIfc(String svcName, IEnvironment env, IProgress progress) {
     String ifcName = 'I' + svcName;
-    StringBuilder superTypeBuilder = new StringBuilder(IScoutRuntimeTypes.ILookupService);
+    IScoutApi scoutApi = getSharedSourceFolder().javaEnvironment().requireApi(IScoutApi.class);
+    StringBuilder superTypeBuilder = new StringBuilder(scoutApi.ILookupService().fqn());
     superTypeBuilder.append(JavaTypes.C_GENERIC_START);
     superTypeBuilder.append(getKeyType());
     superTypeBuilder.append(JavaTypes.C_GENERIC_END);

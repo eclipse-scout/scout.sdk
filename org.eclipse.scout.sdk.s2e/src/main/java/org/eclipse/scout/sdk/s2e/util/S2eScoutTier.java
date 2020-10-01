@@ -150,8 +150,9 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
     if (!JdtUtils.exists(t)) {
       return Optional.empty();
     }
-    Optional<ScoutTier> tier = ScoutTier.valueOf(fqn -> JdtUtils.exists(lookupJdtType(t, fqn)));
-    return tier.map(S2eScoutTier::wrap);
+    return ApiHelper.scoutApiFor(t.getJavaProject())
+        .flatMap(api -> ScoutTier.valueOf(fqn -> JdtUtils.exists(lookupJdtType(t, fqn)), api))
+        .map(S2eScoutTier::wrap);
   }
 
   static IType lookupJdtType(IJavaElement t, String fqn) {

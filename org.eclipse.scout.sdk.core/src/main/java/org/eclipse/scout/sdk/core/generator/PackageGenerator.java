@@ -11,9 +11,9 @@
 package org.eclipse.scout.sdk.core.generator;
 
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
 
 public class PackageGenerator extends AbstractAnnotatableGenerator<PackageGenerator> {

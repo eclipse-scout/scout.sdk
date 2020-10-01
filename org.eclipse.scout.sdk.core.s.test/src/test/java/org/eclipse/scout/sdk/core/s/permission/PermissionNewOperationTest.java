@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.core.s.permission;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
@@ -33,11 +33,13 @@ public class PermissionNewOperationTest {
 
   @Test
   public void testPermissionCreation(TestingEnvironment env) {
+    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
+
     PermissionNewOperation op = new PermissionNewOperation();
     op.setPackage("org.eclipse.scout.sdk.s2e.shared.test");
-    op.setPermissionName("My" + ISdkProperties.SUFFIX_PERMISSION);
+    op.setPermissionName("My" + ISdkConstants.SUFFIX_PERMISSION);
     op.setSharedSourceFolder(env.getTestingSourceFolder());
-    op.setSuperType(IScoutRuntimeTypes.AbstractPermission);
+    op.setSuperType(scoutApi.AbstractPermission().fqn());
     env.run(op);
     assertNotNull(op.getCreatedPermission());
   }

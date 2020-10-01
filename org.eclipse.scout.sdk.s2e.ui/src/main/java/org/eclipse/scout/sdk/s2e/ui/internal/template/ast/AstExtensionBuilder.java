@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 
 /**
  * <h3>{@link AstExtensionBuilder}</h3>
@@ -79,7 +78,7 @@ public class AstExtensionBuilder extends AstTypeBuilder<AstExtensionBuilder> {
       links.addLinkedPosition(getFactory().getRewrite().track(typeArg), true, AstNodeFactory.VALUE_TYPE_GROUP);
       links.addLinkedPosition(getFactory().getRewrite().track(constrArg), false, AstNodeFactory.VALUE_TYPE_GROUP);
 
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IExtension);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IExtension().fqn());
     }
 
     return this;

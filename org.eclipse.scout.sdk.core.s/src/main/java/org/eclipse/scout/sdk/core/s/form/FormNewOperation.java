@@ -15,6 +15,7 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
@@ -27,8 +28,9 @@ import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.builder.java.body.IScoutMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
@@ -97,8 +99,8 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     // calc names
     String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getClientPackage());
     String baseName = getFormName();
-    if (baseName.endsWith(ISdkProperties.SUFFIX_FORM)) {
-      baseName = baseName.substring(0, baseName.length() - ISdkProperties.SUFFIX_FORM.length());
+    if (baseName.endsWith(ISdkConstants.SUFFIX_FORM)) {
+      baseName = baseName.substring(0, baseName.length() - ISdkConstants.SUFFIX_FORM.length());
     }
 
     // DTO
@@ -108,7 +110,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
     // permissions
     if (isCreatePermissions()) {
-      String permissionBaseName = baseName + ISdkProperties.SUFFIX_PERMISSION;
+      String permissionBaseName = baseName + ISdkConstants.SUFFIX_PERMISSION;
       setCreatedReadPermission(createReadPermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
       setCreatedUpdatePermission(createUpdatePermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
       setCreatedCreatePermission(createCreatePermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
@@ -153,11 +155,11 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     env.writeCompilationUnit(formDataGenerator.get(), getFormDataSourceFolder(), progress);
   }
 
-  protected TestGenerator<?> createFormTestBuilder() {
+  protected TestGenerator<?> createFormTestBuilder(IScoutVariousApi scoutApi) {
     TestGenerator<?> testBuilder = new TestGenerator<>()
-        .withElementName(getCreatedForm().elementName() + ISdkProperties.SUFFIX_TEST)
+        .withElementName(getCreatedForm().elementName() + ISdkConstants.SUFFIX_TEST)
         .withPackageName(getClientPackage())
-        .withRunner(IScoutRuntimeTypes.ClientTestRunner)
+        .withRunner(scoutApi.ClientTestRunner().fqn())
         .asClientTest(true);
     if (isCreateService() && isCreateFormData()) {
       // prepare mock
@@ -183,7 +185,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
               String varName = "answer";
               String formDataName = getCreatedFormData().name();
               b.ref(formDataName).space().append(varName).equalSign().appendNew().ref(formDataName).parenthesisOpen().parenthesisClose().semicolon().nl();
-              appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_PREPARECREATE_METHOD_NAME);
+              appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_PREPARE_CREATE_METHOD_NAME);
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_CREATE_METHOD_NAME);
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_LOAD_METHOD_NAME);
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_STORE_METHOD_NAME);
@@ -191,8 +193,8 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected static void appendMockSource(IMethodBodyBuilder<?> builder, String formDataVarName, String mockVarName, String methodToMock) {
-    builder.ref(IScoutRuntimeTypes.Mockito).dot().append("when").parenthesisOpen().append(mockVarName).dot().append(methodToMock).parenthesisOpen()
-        .ref(IScoutRuntimeTypes.ArgumentMatchers).dot().append("any").parenthesisOpen().parenthesisClose().parenthesisClose().parenthesisClose()
+    builder.refClassFrom(IScoutApi.class, IScoutApi::Mockito).dot().appendFrom(IScoutApi.class, api -> api.Mockito().whenMethodName()).parenthesisOpen().append(mockVarName).dot().append(methodToMock).parenthesisOpen()
+        .refClassFrom(IScoutApi.class, IScoutApi::ArgumentMatchers).dot().appendFrom(IScoutApi.class, api -> api.ArgumentMatchers().anyMethodName()).parenthesisOpen().parenthesisClose().parenthesisClose().parenthesisClose()
         .dot().append("thenReturn").parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon().nl();
   }
 
@@ -201,8 +203,8 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     if (testSourceFolder == null) {
       return null;
     }
-
-    TestGenerator<?> formTestBuilder = createFormTestBuilder();
+    IScoutApi scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
+    TestGenerator<?> formTestBuilder = createFormTestBuilder(scoutApi);
     return env.writeCompilationUnit(formTestBuilder, testSourceFolder, progress);
   }
 
@@ -211,9 +213,10 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     if (testSourceFolder == null) {
       return null;
     }
+    IScoutApi scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
     String serverPackage = ScoutTier.Client.convert(ScoutTier.Server, getClientPackage());
     String baseName = getCreatedServiceImpl().elementName();
-    String elementName = baseName + ISdkProperties.SUFFIX_TEST;
+    String elementName = baseName + ISdkConstants.SUFFIX_TEST;
 
     Optional<IType> existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
     if (existingServiceTest.isPresent()) {
@@ -224,7 +227,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     TestGenerator<?> testBuilder = new TestGenerator<>()
         .withElementName(elementName)
         .withPackageName(serverPackage)
-        .withRunner(IScoutRuntimeTypes.ServerTestRunner)
+        .withRunner(scoutApi.ServerTestRunner().fqn())
         .asClientTest(false);
     if (getServerSession() != null) {
       testBuilder.withSession(getServerSession());
@@ -240,7 +243,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     serviceNewOperation.setServerSourceFolder(getServerSourceFolder());
 
     // add service methods
-    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_PREPARECREATE_METHOD_NAME));
+    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_PREPARE_CREATE_METHOD_NAME));
     serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_CREATE_METHOD_NAME));
     serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_LOAD_METHOD_NAME));
     serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_STORE_METHOD_NAME));
@@ -297,27 +300,28 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
       return;
     }
 
-    String returnType = builder.surroundingMethod().returnType().get();
+    String returnType = builder.surroundingMethodReturnType().get();
     builder
         .returnClause()
-        .append(getParamNameOfType(builder.surroundingMethod(), returnType)
+        .append(getParamNameHavingDataType(builder.surroundingMethod(), returnType, builder.context())
             .orElseGet(() -> JavaTypes.defaultValueOf(returnType)))
         .semicolon();
   }
 
-  protected static Optional<String> getParamNameOfType(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb, String returnType) {
+  protected static Optional<String> getParamNameHavingDataType(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb, String returnType, IJavaBuilderContext context) {
     return msb.parameters()
         .filter(p -> returnType.equals(p.dataType()
-            .orElseThrow(() -> newFail("Type parameter {} in method {} is missing a data type.", p.elementName().orElse(null), msb.elementName().orElse(null)))))
+            .flatMap(af -> af.apply(context))
+            .orElseThrow(() -> newFail("Parameter {} in method {} is missing a data type.", p.elementName().orElse(null), msb.elementName().orElse(null)))))
         .findAny()
         .flatMap(IMethodParameterGenerator::elementName);
   }
 
   protected IType createFormData(String sharedPackage, IEnvironment env, IProgress progress) {
     PrimaryTypeGenerator<?> formDataGenerator = PrimaryTypeGenerator.create()
-        .withElementName(getFormName() + ISdkProperties.SUFFIX_DTO)
+        .withElementName(getFormName() + ISdkConstants.SUFFIX_DTO)
         .withPackageName(sharedPackage)
-        .withSuperClass(IScoutRuntimeTypes.AbstractFormData);
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractFormData().fqn());
     return env.writeCompilationUnit(formDataGenerator, getFormDataSourceFolder(), progress);
   }
 

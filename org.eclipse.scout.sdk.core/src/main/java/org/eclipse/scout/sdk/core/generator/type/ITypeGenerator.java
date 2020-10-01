@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.core.generator.type;
 
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
@@ -23,10 +25,11 @@ import org.eclipse.scout.sdk.core.generator.member.IMemberGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.ITransformInput;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
+import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
@@ -34,6 +37,8 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link ITypeGenerator}</h3>
@@ -44,10 +49,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemberGenerator<TYPE> {
 
-  /**
-   * @return A {@link Stream} returning all direct interfaces of this type.
-   */
-  Stream<String> interfaces();
+  Stream<ApiFunction<?, String>> interfaces();
 
   /**
    * Adds the specified interface reference to this type.
@@ -62,6 +64,8 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    */
   TYPE withInterface(String interfaceReference);
 
+  <A extends IApiSpecification> TYPE withInterfaceFrom(Class<A> apiDefinition, Function<A, String> interfaceSupplier);
+
   /**
    * Adds all interface references of the specified {@link Stream} to the interfaces of this {@link ITypeGenerator}.
    *
@@ -73,19 +77,9 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    */
   TYPE withInterfaces(Stream<String> interfaceReferences);
 
-  /**
-   * Removes the specified interface reference from the interfaces of this {@link ITypeGenerator}.
-   *
-   * @param interfaceReference
-   *          The interface reference to remove. Must not be blank (see {@link Strings#isBlank(CharSequence)}).
-   * @return This generator.
-   */
-  TYPE withoutInterface(String interfaceReference);
+  TYPE withoutInterface(Predicate<ApiFunction<?, String>> filter);
 
-  /**
-   * @return The super class reference of this {@link ITypeGenerator}.
-   */
-  Optional<String> superClass();
+  Optional<ApiFunction<?, String>> superClass();
 
   /**
    * Sets the super class of this {@link ITypeGenerator}.
@@ -95,6 +89,8 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @return This generator.
    */
   TYPE withSuperClass(String superType);
+
+  <A extends IApiSpecification> TYPE withSuperClassFrom(Class<A> apiDefinition, Function<A, String> superClassSupplier);
 
   /**
    * Builds the fully qualified name this type will have when generated.
@@ -161,7 +157,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    *          The name of the field to remove. Must not be {@code null}.
    * @return This generator.
    */
-  TYPE withoutField(String fieldName);
+  TYPE withoutField(Predicate<IFieldGenerator<?>> removalFilter);
 
   /**
    * @return A {@link Stream} returning all {@link IMethodGenerator}s in this {@link ITypeGenerator}.
@@ -192,7 +188,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    *          The name of the method to remove. Must not be {@code null}.
    * @return This generator.
    */
-  TYPE withoutMethod(String methodName);
+  TYPE withoutMethod(Predicate<IMethodGenerator<?, ?>> removalFilter);
 
   /**
    * Gets the {@link IMethodGenerator} in this {@link ITypeGenerator} having the specified method identifier.
@@ -200,12 +196,18 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @param methodId
    *          The method identifier for which a matching {@link IMethodGenerator} should be searched. Must not be
    *          {@code null}.
+   * @param context
+   *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
+   *          method parameter data types may be API dependent (see
+   *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
+   * @param useErasureOnly
+   *          If {@code true} only the type erasure is used for all method parameter types.
    * @return The {@link IMethodGenerator} with the specified method id or an empty {@link Optional}.
-   * @see IMethodGenerator#identifier()
+   * @see IMethodGenerator#identifier(IJavaEnvironment, boolean)
    * @see IMethod#identifier()
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    */
-  Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId);
+  Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean useErasureOnly);
 
   /**
    * @return A {@link Stream} returning all member {@link ITypeGenerator}s in this {@link ITypeGenerator}.
@@ -246,7 +248,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @return This generator.
    * @see ITypeGenerator#elementName()
    */
-  TYPE withoutType(String elementName);
+  TYPE withoutType(Predicate<ITypeGenerator<?>> removalFilter);
 
   /**
    * @return A {@link Stream} returning all {@link ITypeParameterGenerator}s of this {@link ITypeGenerator}.

@@ -12,7 +12,9 @@ package org.eclipse.scout.sdk.core.s.annotation;
 
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link FormDataAnnotation}</h3> Represents one single @FormData annotation occurrence
@@ -21,52 +23,46 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
  */
 public class FormDataAnnotation extends AbstractManagedAnnotation {
 
-  public static final String VALUE_ELEMENT_NAME = "value";
-  public static final String INTERFACES_ELEMENT_NAME = "interfaces";
-  public static final String GENERIC_ORDINAL_ELEMENT_NAME = "genericOrdinal";
-  public static final String DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME = "defaultSubtypeSdkCommand";
-  public static final String SDK_COMMAND_ELEMENT_NAME = "sdkCommand";
-
-  public static final String TYPE_NAME = IScoutRuntimeTypes.FormData;
+  protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(IScoutApi.class, IScoutApi::FormData);
 
   public IType value() {
-    return getValue(VALUE_ELEMENT_NAME, IType.class, null);
+    return getValueFrom(IScoutApi.class, api -> api.FormData().valueElementName(), IType.class, null);
   }
 
   public SdkCommand sdkCommand() {
-    return getValueAsEnum(SDK_COMMAND_ELEMENT_NAME, SdkCommand.class);
+    return getValueAsEnumFrom(IScoutApi.class, api -> api.FormData().sdkCommandElementName(), SdkCommand.class);
   }
 
   public DefaultSubtypeSdkCommand defaultSubtypeSdkCommand() {
-    return getValueAsEnum(DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME, DefaultSubtypeSdkCommand.class);
+    return getValueAsEnumFrom(IScoutApi.class, api -> api.FormData().defaultSubtypeSdkCommandElementName(), DefaultSubtypeSdkCommand.class);
   }
 
   public int genericOrdinal() {
-    return getValue(GENERIC_ORDINAL_ELEMENT_NAME, int.class, null);
+    return getValueFrom(IScoutApi.class, api -> api.FormData().genericOrdinalElementName(), int.class, null);
   }
 
   public IType[] interfaces() {
-    return getValue(INTERFACES_ELEMENT_NAME, IType[].class, null);
+    return getValueFrom(IScoutApi.class, api -> api.FormData().interfacesElementName(), IType[].class, null);
   }
 
   public boolean isValueDefault() {
-    return isDefault(VALUE_ELEMENT_NAME);
+    return isDefault(IScoutApi.class, api -> api.FormData().valueElementName());
   }
 
   public boolean isSdkCommandDefault() {
-    return isDefault(SDK_COMMAND_ELEMENT_NAME);
+    return isDefault(IScoutApi.class, api -> api.FormData().sdkCommandElementName());
   }
 
   public boolean isDefaultSubtypeSdkCommandDefault() {
-    return isDefault(DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME);
+    return isDefault(IScoutApi.class, api -> api.FormData().defaultSubtypeSdkCommandElementName());
   }
 
   public boolean isGenericOrdinalDefault() {
-    return isDefault(GENERIC_ORDINAL_ELEMENT_NAME);
+    return isDefault(IScoutApi.class, api -> api.FormData().genericOrdinalElementName());
   }
 
   public boolean isInterfacesDefault() {
-    return isDefault(INTERFACES_ELEMENT_NAME);
+    return isDefault(IScoutApi.class, api -> api.FormData().interfacesElementName());
   }
 
   public enum SdkCommand {

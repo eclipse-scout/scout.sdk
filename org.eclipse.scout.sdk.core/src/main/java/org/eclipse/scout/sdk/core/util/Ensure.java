@@ -390,7 +390,7 @@ public final class Ensure {
   }
 
   /**
-   * Returns a merge function, suitable for use in {@link Map#merge(Object, Object, BiFunction) Map.merge()} or
+   * Represents a merge function, suitable for use in {@link Map#merge(Object, Object, BiFunction) Map.merge()} or
    * {@link Collectors#toMap(Function, Function, BinaryOperator) toMap()}, which always throws
    * {@code IllegalArgumentException}.
    * <p>
@@ -398,9 +398,7 @@ public final class Ensure {
    *
    * @return a merge function which always throw {@code IllegalArgumentException}
    */
-  public static <T> BinaryOperator<T> failOnDuplicates() {
-    return (u, v) -> {
-      throw newFail("Unexpected duplicates found: '{}' and '{}'.", u, v);
-    };
+  public static <T> T failOnDuplicates(T a, T b) {
+    throw newFail("Unexpected duplicates found: '{}' and '{}'.", a, b);
   }
 }

@@ -37,7 +37,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils;
 import org.eclipse.scout.sdk.core.s.jaxws.WebServiceUpdateOperation;
 import org.eclipse.scout.sdk.core.s.jaxws.WebServiceUpdateOperation.BindingClassUpdate;
@@ -58,7 +58,7 @@ import org.eclipse.scout.sdk.s2e.ui.fields.text.StyledTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
-import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
+import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -256,7 +256,7 @@ public class WebServiceFormPage extends FormPage {
           .grab(true, false)
           .span(numPortTypesInThisService, 1)
           .applyTo(webServiceNameField);
-      webServiceNameField.setReadOnlySuffix(ISdkProperties.SUFFIX_WS_SERVICE);
+      webServiceNameField.setReadOnlySuffix(ISdkConstants.SUFFIX_WS_SERVICE);
       webServiceNameField.setText(webservice.getElementName());
 
       m_webServices.put(webServiceNameField, webservice);
@@ -327,7 +327,7 @@ public class WebServiceFormPage extends FormPage {
           .applyTo(entryPointNameField);
       String nameInDefinition = getInput().getEntryPointNameFromDefinition(portType);
       if (Strings.hasText(nameInDefinition)) {
-        entryPointNameField.setReadOnlySuffix(ISdkProperties.SUFFIX_WS_ENTRY_POINT);
+        entryPointNameField.setReadOnlySuffix(ISdkConstants.SUFFIX_WS_ENTRY_POINT);
         entryPointNameField.setText(nameInDefinition);
       }
       IType entryPoint = getInput().getEntryPoint(portType);
@@ -538,7 +538,7 @@ public class WebServiceFormPage extends FormPage {
     String nameInBinding = portType.getElementName();
     if (Strings.hasText(nameInBinding)) {
       portTypeNameField.setReadOnlyPrefix("I");
-      portTypeNameField.setReadOnlySuffix(ISdkProperties.SUFFIX_WS_PORT_TYPE);
+      portTypeNameField.setReadOnlySuffix(ISdkConstants.SUFFIX_WS_PORT_TYPE);
       portTypeNameField.setText(nameInBinding);
     }
     m_portTypes.put(portTypeNameField, portType);
@@ -758,7 +758,7 @@ public class WebServiceFormPage extends FormPage {
   protected boolean isValidJavaName(Iterable<StyledTextField> fields) {
     for (StyledTextField field : fields) {
       if (field.isEnabled()) {
-        IStatus status = CompilationUnitNewWizardPage.validateJavaName(field.getText(), field.getReadOnlySuffix());
+        IStatus status = AbstractCompilationUnitNewWizardPage.validateJavaName(field.getText(), field.getReadOnlySuffix());
         if (!status.isOK()) {
           setMessage(status);
           return false;
@@ -771,7 +771,7 @@ public class WebServiceFormPage extends FormPage {
   protected boolean isValidPackage(Iterable<? extends TextField> fields) {
     for (TextField field : fields) {
       if (field.isEnabled()) {
-        IStatus status = CompilationUnitNewWizardPage.validatePackageName(field.getText());
+        IStatus status = AbstractCompilationUnitNewWizardPage.validatePackageName(field.getText());
         if (!status.isOK()) {
           setMessage(status);
           return false;

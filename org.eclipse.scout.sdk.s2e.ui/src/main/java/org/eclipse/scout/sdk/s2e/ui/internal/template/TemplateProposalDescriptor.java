@@ -21,11 +21,10 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
-import org.eclipse.scout.sdk.core.s.ScoutModelHierarchy;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutModelHierarchy;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -81,16 +80,13 @@ public class TemplateProposalDescriptor {
     m_proposalClass = proposal;
   }
 
-  public boolean isActiveFor(Collection<String> possibleChildren, IJavaProject context, String searchString) {
-    if (context == null) {
-      return false;
-    }
+  public boolean isActiveFor(Collection<String> possibleChildren, ScoutModelHierarchy hierarchy, String searchString) {
     if (possibleChildren == null || possibleChildren.isEmpty()) {
       return false;
     }
 
     for (String possibleChild : possibleChildren) {
-      if (ScoutModelHierarchy.isSubtypeOf(m_proposalIfcTypeFqn, possibleChild) && acceptSearchString(searchString)) {
+      if (hierarchy.isSubtypeOf(m_proposalIfcTypeFqn, possibleChild) && acceptSearchString(searchString)) {
         return true;
       }
     }
@@ -113,8 +109,8 @@ public class TemplateProposalDescriptor {
 
     for (String defaultSuperType : m_defaultSuperTypeFqns) {
       String simpleName = JavaTypes.simpleName(defaultSuperType);
-      if (simpleName.startsWith(ISdkProperties.PREFIX_ABSTRACT)) {
-        simpleName = simpleName.substring(ISdkProperties.PREFIX_ABSTRACT.length());
+      if (simpleName.startsWith(ISdkConstants.PREFIX_ABSTRACT)) {
+        simpleName = simpleName.substring(ISdkConstants.PREFIX_ABSTRACT.length());
       }
       if (simpleName.toLowerCase(Locale.ENGLISH).contains(searchString)) {
         return true;
@@ -129,9 +125,10 @@ public class TemplateProposalDescriptor {
     return false;
   }
 
-  public ICompletionProposal createProposal(ICompilationUnit icu, int pos, ISourceRange surroundingTypeNameRange, Future<EclipseEnvironment> provider, String searchString) {
+  public ICompletionProposal createProposal(ICompilationUnit icu, int pos, ScoutModelHierarchy hierarchy, ISourceRange surroundingTypeNameRange, Future<EclipseEnvironment> provider, String searchString) {
     try {
       TypeProposalContext context = new TypeProposalContext();
+      context.setScoutModelHierarchy(hierarchy);
       context.setProvider(provider);
       context.setDefaultName(getDefaultNameOfNewType());
       context.setDefaultSuperClasses(getDefaultSuperTypeFqns());

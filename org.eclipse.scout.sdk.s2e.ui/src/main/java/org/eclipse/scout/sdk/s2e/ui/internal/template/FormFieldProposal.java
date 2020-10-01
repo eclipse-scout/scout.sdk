@@ -31,7 +31,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jdt.internal.corext.dom.Bindings;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstInnerTypeGetterBuilder;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
@@ -64,9 +64,10 @@ public class FormFieldProposal extends AbstractTypeProposal {
 
     SimpleName formFieldSimpleName = ast.newSimpleName(getProposalContext().getDefaultName() + getProposalContext().getSuffix());
     Type formFieldGetterReturnType = AstUtils.getInnerTypeReturnType(formFieldSimpleName, getProposalContext().getDeclaringType());
+    IScoutApi scoutApi = factory.getScoutApi();
 
     AstInnerTypeGetterBuilder formFieldGetter = factory.newInnerTypeGetter()
-        .withMethodNameToFindInnerType("getFieldByClass")
+        .withMethodNameToFindInnerType(scoutApi.IForm().getFieldByClassMethodName())
         .withName(getProposalContext().getDefaultName())
         .withReadOnlySuffix(getProposalContext().getSuffix())
         .withReturnType(formFieldGetterReturnType);
@@ -74,10 +75,10 @@ public class FormFieldProposal extends AbstractTypeProposal {
     ITypeBinding iExtensionSuperType = getIExtensionSuperType();
     if (iExtensionSuperType != null) {
       MethodInvocation getOwner = ast.newMethodInvocation();
-      getOwner.setName(ast.newSimpleName("getOwner"));
+      getOwner.setName(ast.newSimpleName(scoutApi.IExtension().getOwnerMethodName()));
       formFieldGetter.withMethodToFindInnerTypeExpression(getOwner);
 
-      if (AstUtils.isInstanceOf(factory.getDeclaringTypeBinding(), IScoutRuntimeTypes.IFormExtension)) {
+      if (AstUtils.isInstanceOf(factory.getDeclaringTypeBinding(), scoutApi.IFormExtension().fqn())) {
         ITypeBinding[] typeArguments = iExtensionSuperType.getTypeArguments();
         if (typeArguments.length > 0) {
           ITypeBinding extendedForm = typeArguments[0];
@@ -85,16 +86,16 @@ public class FormFieldProposal extends AbstractTypeProposal {
           collectCompositeTypes(extendedForm, composites);
           if (!composites.isEmpty()) {
             // add @Extends to FormFields in FormExtensions
-            SingleMemberAnnotation extendsAnnot = ast.newSingleMemberAnnotation();
-            String extendsTypeName = factory.getImportRewrite().addImport(IScoutRuntimeTypes.Extends, factory.getContext());
-            extendsAnnot.setTypeName(ast.newSimpleName(extendsTypeName));
+            SingleMemberAnnotation extendsAnnotation = ast.newSingleMemberAnnotation();
+            String extendsTypeName = factory.getImportRewrite().addImport(scoutApi.Extends().fqn(), factory.getContext());
+            extendsAnnotation.setTypeName(ast.newSimpleName(extendsTypeName));
 
             ITypeBinding first = composites.iterator().next();
             TypeLiteral typeLiteral = ast.newTypeLiteral();
             Type type = factory.newTypeReference(Bindings.getFullyQualifiedName(first));
             typeLiteral.setType(type);
-            extendsAnnot.setValue(typeLiteral);
-            AstUtils.addAnnotationTo(extendsAnnot, formFieldType);
+            extendsAnnotation.setValue(typeLiteral);
+            AstUtils.addAnnotationTo(extendsAnnotation, formFieldType);
 
             addLinkedPosition(factory.getRewrite().track(type), false, AstNodeFactory.EXTENDS_TYPE_GROUP);
             for (ITypeBinding composite : composites) {
@@ -117,12 +118,12 @@ public class FormFieldProposal extends AbstractTypeProposal {
     }
   }
 
-  protected static void collectCompositeTypes(ITypeBinding owner, Collection<ITypeBinding> collector) {
+  protected void collectCompositeTypes(ITypeBinding owner, Collection<ITypeBinding> collector) {
     if (owner == null) {
       return;
     }
     for (ITypeBinding innerType : owner.getDeclaredTypes()) {
-      if (AstUtils.isInstanceOf(innerType, IScoutRuntimeTypes.ICompositeField)) {
+      if (AstUtils.isInstanceOf(innerType, getFactory().getScoutApi().ICompositeField().fqn())) {
         collector.add(innerType);
         collectCompositeTypes(innerType, collector);
       }
@@ -132,7 +133,7 @@ public class FormFieldProposal extends AbstractTypeProposal {
   protected ITypeBinding getIExtensionSuperType() {
     ITypeBinding[] result = new ITypeBinding[1];
     AstUtils.visitHierarchy(getFactory().getDeclaringTypeBinding(), type -> {
-      if (IScoutRuntimeTypes.IExtension.equals(type.getErasure().getQualifiedName())) {
+      if (getFactory().getScoutApi().IExtension().fqn().equals(type.getErasure().getQualifiedName())) {
         result[0] = type;
       }
       return result[0] == null;
@@ -147,7 +148,7 @@ public class FormFieldProposal extends AbstractTypeProposal {
         .withOrder(true)
         .withClassId(true)
         .withProposalBaseFqn(getProposalContext().getProposalInterfaceFqn())
-        .withOrderDefinitionType(IScoutRuntimeTypes.IFormField)
+        .withOrderDefinitionType(getFactory().getScoutApi().IFormField().fqn())
         .withReadOnlyNameSuffix(getProposalContext().getSuffix())
         .withSuperType(superType)
         .in(getProposalContext().getDeclaringType())
@@ -157,7 +158,7 @@ public class FormFieldProposal extends AbstractTypeProposal {
   }
 
   protected String getNlsMethodName() {
-    return "getConfiguredLabel";
+    return getFactory().getScoutApi().AbstractFormField().getConfiguredLabelMethodName();
   }
 
   private void addFormFieldImport(Deque<TypeDeclaration> parentTypes) throws CoreException {

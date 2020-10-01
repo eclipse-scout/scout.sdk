@@ -10,7 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.fixture.managed;
 
+import static org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier.raw;
+
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link AnnotationWithArrayValues}</h3>
@@ -18,7 +22,7 @@ import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
  * @since 6.1.0
  */
 public class AnnotationWithArrayValues extends AbstractManagedAnnotation {
-  public static final String TYPE_NAME = org.eclipse.scout.sdk.core.fixture.AnnotationWithArrayValues.class.getName();
+  protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(raw(org.eclipse.scout.sdk.core.fixture.AnnotationWithArrayValues.class.getName()));
 
   public AnnotationWithSingleValues[] annos() {
     return getValue("annos", AnnotationWithSingleValues[].class, null);

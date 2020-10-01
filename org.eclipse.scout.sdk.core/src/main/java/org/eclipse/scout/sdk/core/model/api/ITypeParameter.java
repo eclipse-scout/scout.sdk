@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.model.api;
 
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 

@@ -50,7 +50,11 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi.Clazz;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi.WebServiceEntryPoint;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi.WebService;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi.WebServiceClient;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl;
@@ -84,6 +88,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   private final Map<IType /*port type*/, QName> m_portTypeNamesInWsdl;
   private final Map<IType, QName /*service name in wsdl*/> m_webServices;
   private final List<Path> m_jaxwsBindingFiles;
+  private final IScoutApi m_scoutApi;
   private ParsedWsdl m_servicesFromWsdl;
 
   // consumer
@@ -99,13 +104,14 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   private final Map<IType /*port type*/, IType> m_authVerifierFromDefinitions;
   private final Map<IType /*port type*/, List<IType>> m_handlersFromDefinitions;
 
-  public WebServiceFormPageInput(Path wsdl, IJavaProject javaProject) {
+  public WebServiceFormPageInput(Path wsdl, IJavaProject javaProject, IScoutApi api) {
     m_wsdl = Ensure.notNull(wsdl);
     Ensure.isFile(m_wsdl);
     Ensure.isTrue(JdtUtils.exists(javaProject));
     m_javaProject = javaProject;
     m_displayName = calcDisplayName();
     m_hash = m_wsdl.hashCode();
+    m_scoutApi = Ensure.notNull(api);
 
     int defaultSize = 3;
     m_bindings = new ArrayList<>(defaultSize);
@@ -191,7 +197,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
     Predicate<IType> webServiceClientsFilter = element -> {
       try {
         ITypeHierarchy superTypeHierarchy = getSuperTypeHierarchy(element);
-        return JdtUtils.hierarchyContains(superTypeHierarchy, IScoutRuntimeTypes.AbstractWebServiceClient);
+        return JdtUtils.hierarchyContains(superTypeHierarchy, getScoutApi().AbstractWebServiceClient().fqn());
       }
       catch (SdkException e) {
         SdkLog.warning("Unable to check if element '{}' is a web service client.", element.getFullyQualifiedName(), e);
@@ -221,7 +227,8 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   protected void loadEntryPoint() {
-    Predicate<IType> portTypeFilter = element -> JdtUtils.exists(JdtUtils.getAnnotation(element, IScoutRuntimeTypes.WebService));
+    String webServiceFqn = getScoutApi().WebService().fqn();
+    Predicate<IType> portTypeFilter = element -> JdtUtils.exists(JdtUtils.getAnnotation(element, webServiceFqn));
     visitPortTypes(portType -> {
       IType entryPoint = getPortTypeChildClass(portType, portTypeFilter);
       if (JdtUtils.exists(entryPoint)) {
@@ -231,7 +238,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   protected void loadEntryPointDefinitions() throws JavaModelException {
-    Set<IType> webServiceEntryPointDefinitions = findAllTypesAnnotatedWith(IScoutRuntimeTypes.WebServiceEntryPoint);
+    Set<IType> webServiceEntryPointDefinitions = findAllTypesAnnotatedWith(getScoutApi().WebServiceEntryPoint().fqn());
     if (webServiceEntryPointDefinitions.isEmpty()) {
       return;
     }
@@ -253,13 +260,14 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   protected void loadEntryPointDefinition(IType entryPointDefCandidate, IType portType, String entryPointFqn) throws JavaModelException {
-    IAnnotation annotation = JdtUtils.getAnnotation(entryPointDefCandidate, IScoutRuntimeTypes.WebServiceEntryPoint);
+    WebServiceEntryPoint entryPointApi = getScoutApi().WebServiceEntryPoint();
+    IAnnotation annotation = JdtUtils.getAnnotation(entryPointDefCandidate, entryPointApi.fqn());
     if (!JdtUtils.exists(annotation)) {
       return;
     }
 
-    String pck = JdtUtils.getAnnotationValueString(annotation, JaxWsUtils.ENTRY_POINT_DEFINITION_PACKAGE_ATTRIBUTE);
-    String name = JdtUtils.getAnnotationValueString(annotation, JaxWsUtils.ENTRY_POINT_DEFINITION_NAME_ATTRIBUTE);
+    String pck = JdtUtils.getAnnotationValueString(annotation, entryPointApi.entryPointPackageElementName());
+    String name = JdtUtils.getAnnotationValueString(annotation, entryPointApi.entryPointNameElementName());
 
     // use defaults as specified by the jaxws annotation processor (see WebServiceEntryPoint annotation documentation)
     if (Strings.isBlank(pck)) {
@@ -275,22 +283,23 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
       m_entryPointPackageFromDefinitions.put(portType, pck);
 
       for (IMemberValuePair mvp : annotation.getMemberValuePairs()) {
-        if (JaxWsUtils.ENTRY_POINT_DEFINITION_AUTH_ATTRIBUTE.equals(mvp.getMemberName())) {
+        if (entryPointApi.authenticationElementName().equals(mvp.getMemberName())) {
           Object value = mvp.getValue();
           // load Auth
           if (value instanceof IAnnotation) {
             IAnnotation authentication = (IAnnotation) value;
+
             for (IMemberValuePair authElement : authentication.getMemberValuePairs()) {
-              if ("method".equals(authElement.getMemberName()) && authElement.getValueKind() == IMemberValuePair.K_ANNOTATION) {
+              if (getScoutApi().Authentication().methodElementName().equals(authElement.getMemberName()) && authElement.getValueKind() == IMemberValuePair.K_ANNOTATION) {
                 m_authMethodFromDefinitions.put(portType, getClazzAnnotationValue((IAnnotation) authElement.getValue(), entryPointDefCandidate));
               }
-              else if ("verifier".equals(authElement.getMemberName()) && authElement.getValueKind() == IMemberValuePair.K_ANNOTATION) {
+              else if (getScoutApi().Authentication().verifierElementName().equals(authElement.getMemberName()) && authElement.getValueKind() == IMemberValuePair.K_ANNOTATION) {
                 m_authVerifierFromDefinitions.put(portType, getClazzAnnotationValue((IAnnotation) authElement.getValue(), entryPointDefCandidate));
               }
             }
           }
         }
-        else if (JaxWsUtils.ENTRY_POINT_DEFINITION_HANDLER_CHAIN_ATTRIBUTE.equals(mvp.getMemberName())) {
+        else if (entryPointApi.handlerChainElementName().equals(mvp.getMemberName())) {
           // load handlers
           Object value = mvp.getValue();
           if (value instanceof Object[]) {
@@ -312,9 +321,10 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   protected void loadHandlersFromDefinition(Iterable<IAnnotation> handlers, IType owner, IType portType) throws JavaModelException {
+    String handlerValueElementName = getScoutApi().Handler().valueElementName();
     for (IAnnotation handler : handlers) {
       for (IMemberValuePair mvp : handler.getMemberValuePairs()) {
-        if ("value".equals(mvp.getMemberName()) && mvp.getValueKind() == IMemberValuePair.K_ANNOTATION) {
+        if (handlerValueElementName.equals(mvp.getMemberName()) && mvp.getValueKind() == IMemberValuePair.K_ANNOTATION) {
           IAnnotation clazzAnnotation = (IAnnotation) mvp.getValue();
           IType handlerType = getClazzAnnotationValue(clazzAnnotation, owner);
           if (JdtUtils.exists(handlerType)) {
@@ -325,25 +335,24 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
     }
   }
 
-  protected static IType getClazzAnnotationValue(IAnnotation clazzAnnotation, IType owner) throws JavaModelException {
+  protected IType getClazzAnnotationValue(IAnnotation clazzAnnotation, IType owner) throws JavaModelException {
     if (!JdtUtils.exists(clazzAnnotation)) {
       return null;
     }
-    String qualifiedName = JdtUtils.getAnnotationValueString(clazzAnnotation, "qualifiedName");
+    Clazz clazzApi = getScoutApi().Clazz();
+    String qualifiedName = JdtUtils.getAnnotationValueString(clazzAnnotation, clazzApi.qualifiedNameElementName());
     IJavaProject javaProject = owner.getJavaProject();
     if (Strings.hasText(qualifiedName)) {
       return javaProject.findType(qualifiedName);
     }
 
-    String value = JdtUtils.getAnnotationValueString(clazzAnnotation, "value");
+    String value = JdtUtils.getAnnotationValueString(clazzAnnotation, clazzApi.valueElementName());
     if (Strings.isBlank(value)) {
       return null;
     }
 
-    String nullClazzSimpleName = JavaTypes.simpleName(IScoutRuntimeTypes.NullClazz.replace(JavaTypes.C_DOLLAR, JavaTypes.C_DOT));
-    if (value.equals(nullClazzSimpleName)
-        || value.endsWith(JavaTypes.C_DOT + nullClazzSimpleName)
-        || value.endsWith(JavaTypes.C_DOLLAR + nullClazzSimpleName)) {
+    String nullClazzSimpleName = getScoutApi().NullClazz().simpleName().replace(JavaTypes.C_DOLLAR, JavaTypes.C_DOT);
+    if (value.equals(nullClazzSimpleName) || value.endsWith(JavaTypes.C_DOT + nullClazzSimpleName) || value.endsWith(JavaTypes.C_DOLLAR + nullClazzSimpleName)) {
       return null;
     }
 
@@ -367,15 +376,16 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   protected void loadServiceImplementations() {
+    String webServiceFqn = getScoutApi().WebService().fqn();
     Predicate<IType> serviceImplFilter = element -> {
-      if (JdtUtils.exists(JdtUtils.getAnnotation(element, IScoutRuntimeTypes.WebService))) {
+      if (JdtUtils.exists(JdtUtils.getAnnotation(element, webServiceFqn))) {
         return false; // exclude entry points
       }
 
       // exclude web service clients
       try {
         ITypeHierarchy superTypeHierarchy = getSuperTypeHierarchy(element);
-        return !JdtUtils.hierarchyContains(superTypeHierarchy, IScoutRuntimeTypes.AbstractWebServiceClient);
+        return !JdtUtils.hierarchyContains(superTypeHierarchy, getScoutApi().AbstractWebServiceClient().fqn());
       }
       catch (SdkException e) {
         SdkLog.warning("Unable to check if element '{}' is a web service client.", element.getFullyQualifiedName(), e);
@@ -403,14 +413,15 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
     if (getServicesFromWsdl().isEmpty()) {
       return;
     }
-    Set<IType> candidates = findAllTypesAnnotatedWith(IScoutRuntimeTypes.WebServiceClient);
+    WebServiceClient webServiceClientApi = getScoutApi().WebServiceClient();
+    Set<IType> candidates = findAllTypesAnnotatedWith(webServiceClientApi.fqn());
     if (candidates.isEmpty()) {
       return;
     }
     for (IType candidate : candidates) {
-      IAnnotation annotation = JdtUtils.getAnnotation(candidate, IScoutRuntimeTypes.WebServiceClient);
-      String name = JdtUtils.getAnnotationValueString(annotation, "name");
-      String targetNamespace = JdtUtils.getAnnotationValueString(annotation, "targetNamespace");
+      IAnnotation annotation = JdtUtils.getAnnotation(candidate, webServiceClientApi.fqn());
+      String name = JdtUtils.getAnnotationValueString(annotation, webServiceClientApi.nameElementName());
+      String targetNamespace = JdtUtils.getAnnotationValueString(annotation, webServiceClientApi.targetNamespaceElementName());
       for (Service info : getServicesFromWsdl().getWebServices().keySet()) {
         QName webServiceName = info.getQName();
         if (Objects.equals(name, webServiceName.getLocalPart()) && Objects.equals(targetNamespace, webServiceName.getNamespaceURI())) {
@@ -425,15 +436,16 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
     if (getServicesFromWsdl().isEmpty()) {
       return;
     }
-    Set<IType> candidates = findAllTypesAnnotatedWith(IScoutRuntimeTypes.WebService);
+    WebService webServiceApi = getScoutApi().WebService();
+    Set<IType> candidates = findAllTypesAnnotatedWith(webServiceApi.fqn());
     if (candidates.isEmpty()) {
       return;
     }
     for (IType candidate : candidates) {
       if (candidate.isInterface()) {
-        IAnnotation annotation = JdtUtils.getAnnotation(candidate, IScoutRuntimeTypes.WebService);
-        String name = JdtUtils.getAnnotationValueString(annotation, "name");
-        String targetNamespace = JdtUtils.getAnnotationValueString(annotation, "targetNamespace");
+        IAnnotation annotation = JdtUtils.getAnnotation(candidate, webServiceApi.fqn());
+        String name = JdtUtils.getAnnotationValueString(annotation, webServiceApi.nameElementName());
+        String targetNamespace = JdtUtils.getAnnotationValueString(annotation, webServiceApi.targetNamespaceElementName());
         for (Entry<String, QName> port : getServicesFromWsdl().getPorts(service).entrySet()) {
           QName portTypeName = port.getValue();
           if (Objects.equals(name, portTypeName.getLocalPart()) && Objects.equals(targetNamespace, portTypeName.getNamespaceURI())) {
@@ -653,6 +665,10 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
 
   public IJavaProject getJavaProject() {
     return m_javaProject;
+  }
+
+  public IScoutApi getScoutApi() {
+    return m_scoutApi;
   }
 
   @Override

@@ -10,6 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toSet;
+
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -27,7 +33,7 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.scout.sdk.core.builder.java.comment.JavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.log.SdkConsole;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
@@ -57,6 +63,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
 
     // init Sdk log level
     getPreferenceStore().setDefault(SdkLog.LOG_LEVEL_PROPERTY_NAME, SdkLog.DEFAULT_LOG_LEVEL.getName());
+    @SuppressWarnings("AccessOfSystemProperties")
     boolean isLoggingConfiguredInSystem = Strings.hasText(System.getProperty(SdkLog.LOG_LEVEL_PROPERTY_NAME));
     boolean isLoggingConfiguredInWorkspace = !getPreferenceStore().isDefault(SdkLog.LOG_LEVEL_PROPERTY_NAME);
     if (!isLoggingConfiguredInWorkspace && !isLoggingConfiguredInSystem && (Platform.inDebugMode() || Platform.inDevelopmentMode())) {
@@ -103,8 +110,21 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   }
 
   private void registerDetailFormatters() {
-    String src = "return " + IScoutRuntimeTypes.BEANS + ".get(" + IScoutRuntimeTypes.IPrettyPrintDataObjectMapper + ".class).writeValue(this);";
-    m_iDataObjectDetailFormatter = new DetailFormatter(IScoutRuntimeTypes.IDataObject, src, true);
+    ScoutApi.allKnown()
+        .collect(groupingBy(api -> api.IDataObject().fqn(),
+            mapping(api -> new SimpleEntry<>(api.BEANS().fqn(), api.IPrettyPrintDataObjectMapper().fqn()), toSet())))
+        .forEach(this::registerDetailFormatter);
+  }
+
+  private void registerDetailFormatter(String iDataObjectFqn, Collection<SimpleEntry<String, String>> fqn) {
+    if (fqn.size() > 1) {
+      SdkLog.warning("Ambiguous formatter specifications for object '{}'. Using the first.", iDataObjectFqn);
+    }
+    SimpleEntry<String, String> entry = fqn.iterator().next();
+    String beans = entry.getKey();
+    String iPrettyPrintDataObjectMapper = entry.getValue();
+    String src = "return " + beans + ".get(" + iPrettyPrintDataObjectMapper + ".class).writeValue(this);";
+    m_iDataObjectDetailFormatter = new DetailFormatter(iDataObjectFqn, src, true);
     JavaDetailFormattersManager.getDefault().setAssociatedDetailFormatter(m_iDataObjectDetailFormatter);
   }
 

@@ -27,8 +27,9 @@ import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -69,14 +70,15 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     progress.init(2, toString());
 
     String serverPackage = ScoutTier.Shared.convert(ScoutTier.Server, getSharedPackage());
-    String svcName = getServiceName() + ISdkProperties.SUFFIX_SERVICE;
+    String svcName = getServiceName() + ISdkConstants.SUFFIX_SERVICE;
 
     setCreatedServiceInterface(createServiceIfc(svcName, getSharedPackage(), env, progress.newChild(1)));
     setCreatedServiceImpl(createServiceImpl(svcName, serverPackage, env, progress.newChild(1)));
   }
 
   protected ICompilationUnitGenerator<?> createServiceImplBuilder(String svcName, String serverPackage) {
-    Optional<IType> existingServiceImpl = getServerSourceFolder().javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + svcName);
+    IJavaEnvironment javaEnvironment = getServerSourceFolder().javaEnvironment();
+    Optional<IType> existingServiceImpl = javaEnvironment.findType(serverPackage + JavaTypes.C_DOT + svcName);
     ICompilationUnitGenerator<?> implBuilder;
     if (existingServiceImpl.isPresent()) {
       ICompilationUnit compilationUnit = existingServiceImpl.get().requireCompilationUnit();
@@ -91,10 +93,11 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     }
 
     for (IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb : getMethods()) {
-      Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> existingMehtod = implBuilder
+      String methodIdToSearch = msb.identifier(javaEnvironment, true);
+      Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> existingMethod = implBuilder
           .mainType()
-          .flatMap(mainType -> mainType.method(msb.identifier(true)));
-      if (existingMehtod.isEmpty()) {
+          .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, true));
+      if (existingMethod.isEmpty()) {
         boolean existsInInterface = isInterface(msb.flags()) || isPublic(msb.flags());
         if (existsInInterface) {
           msb.withAnnotation(AnnotationGenerator.createOverride());
@@ -116,7 +119,8 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
 
   protected ICompilationUnitGenerator<?> createServiceIfcBuilder(String svcName, String sharedPackage) {
     String ifcName = 'I' + svcName;
-    Optional<IType> existingServiceIfc = getSharedSourceFolder().javaEnvironment().findType(sharedPackage + JavaTypes.C_DOT + ifcName);
+    IJavaEnvironment javaEnvironment = getSharedSourceFolder().javaEnvironment();
+    Optional<IType> existingServiceIfc = javaEnvironment.findType(sharedPackage + JavaTypes.C_DOT + ifcName);
     ICompilationUnitGenerator<?> ifcBuilder;
     ifcBuilder = existingServiceIfc
         .<ICompilationUnitGenerator<?>> map(iType -> iType.requireCompilationUnit().toWorkingCopy())
@@ -126,8 +130,9 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
 
     for (IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb : getMethods()) {
       if (isPublic(msb.flags()) || isInterface(msb.flags())) {
+        String methodIdToSearch = msb.identifier(javaEnvironment, true);
         Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> existingMethod = ifcBuilder.mainType()
-            .flatMap(mainType -> mainType.method(msb.identifier()));
+            .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, true));
         if (existingMethod.isEmpty()) {
           ifcBuilder.mainType().ifPresent(t -> t
               .withMethod(msb

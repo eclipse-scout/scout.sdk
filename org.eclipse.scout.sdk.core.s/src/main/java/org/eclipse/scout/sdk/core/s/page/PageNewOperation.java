@@ -23,8 +23,8 @@ import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -75,13 +75,12 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     progress.init(10, toString());
 
     String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getPackage());
-    Optional<IType> superType = getClientSourceFolder().javaEnvironment().findType(JavaTypes.erasure(getSuperType()));
-    boolean isPageWithTable = superType.isPresent() && superType.get().isInstanceOf(IScoutRuntimeTypes.IPageWithTable);
+    boolean isPageWithTable = isPageWithTable();
     boolean isCreatePageData = isPageWithTable && getPageDataSourceFolder() != null;
 
     if (isCreatePageData) {
       if (isCreateAbstractPage()) {
-        setCreatedAbstractPageData(createPageData(ISdkProperties.PREFIX_ABSTRACT + getPageName(), sharedPackage, env, progress.newChild(1)));
+        setCreatedAbstractPageData(createPageData(ISdkConstants.PREFIX_ABSTRACT + getPageName(), sharedPackage, env, progress.newChild(1)));
       }
       setCreatedPageData(createPageData(getPageName(), sharedPackage, env, progress.newChild(1)));
     }
@@ -111,6 +110,19 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     progress.setWorkRemaining(0);
   }
 
+  protected boolean isPageWithTable() {
+    return getClientSourceFolder()
+        .javaEnvironment()
+        .findType(JavaTypes.erasure(getSuperType()))
+        .map(PageNewOperation::isPageWithTable)
+        .orElse(false);
+  }
+
+  protected static boolean isPageWithTable(IType type) {
+    IScoutApi scoutApi = type.javaEnvironment().requireApi(IScoutApi.class);
+    return type.isInstanceOf(scoutApi.IPageWithTable());
+  }
+
   protected void updatePageDatas(IEnvironment env, IProgress progress) {
     if (isCreateAbstractPage()) {
       Optional<ICompilationUnitGenerator<?>> abstractPageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedAbstractPage(), getPageDataSourceFolder().javaEnvironment());
@@ -132,7 +144,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
   protected String calcPageBaseName() {
     String name = getPageName();
-    String[] suffixes = {ISdkProperties.SUFFIX_PAGE_WITH_NODES, ISdkProperties.SUFFIX_PAGE_WITH_TABLE, "Page"};
+    String[] suffixes = {ISdkConstants.SUFFIX_PAGE_WITH_NODES, ISdkConstants.SUFFIX_PAGE_WITH_TABLE, ISdkConstants.SUFFIX_OUTLINE_PAGE};
     for (String suffix : suffixes) {
       int suffixLen = suffix.length();
       int strOffset = name.length() - suffixLen;
@@ -148,30 +160,32 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected IType createServiceTest(IEnvironment env, IProgress progress) {
-    if (getTestSourceFolder() == null) {
+    IClasspathEntry testSourceFolder = getTestSourceFolder();
+    if (testSourceFolder == null) {
       return null;
     }
 
     String serverPackage = JavaTypes.qualifier(getCreatedServiceImpl().name());
     String baseName = getCreatedServiceImpl().elementName();
-    String elementName = baseName + ISdkProperties.SUFFIX_TEST;
+    String elementName = baseName + ISdkConstants.SUFFIX_TEST;
 
-    Optional<IType> existingServiceTest = getTestSourceFolder().javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
+    Optional<IType> existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
     if (existingServiceTest.isPresent()) {
       // service test class already exists
       return existingServiceTest.get();
     }
 
+    IScoutApi scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
     TestGenerator<?> testBuilder = new TestGenerator<>()
         .withElementName(elementName)
         .withPackageName(serverPackage)
-        .withRunner(IScoutRuntimeTypes.ServerTestRunner)
+        .withRunner(scoutApi.ServerTestRunner().fqn())
         .asClientTest(false);
     if (Strings.hasText(getServerSession())) {
       testBuilder.withSession(getServerSession());
     }
 
-    return env.writeCompilationUnit(testBuilder, getTestSourceFolder(), progress);
+    return env.writeCompilationUnit(testBuilder, testSourceFolder, progress);
   }
 
   protected void createService(String sharedPackage, String baseName, IEnvironment env, IProgress progress) {
@@ -195,7 +209,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .withElementName(getDataFetchMethodName())
         .withParameter(MethodParameterGenerator.create()
             .withElementName("filter")
-            .withDataType(IScoutRuntimeTypes.SearchFilter))
+            .withDataTypeFrom(IScoutApi.class, api -> api.SearchFilter().fqn()))
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withBody(b -> {
           String varName = "pageData";
@@ -212,7 +226,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   protected PageGenerator<?> createPageBuilder(boolean isPageWithTable, boolean isAbstractPage) {
     String name = getPageName();
     if (isAbstractPage) {
-      name = ISdkProperties.PREFIX_ABSTRACT + name;
+      name = ISdkConstants.PREFIX_ABSTRACT + name;
     }
     String fqn = getPackage() + JavaTypes.C_DOT + name;
     PageGenerator<?> pageBuilder = new PageGenerator<>()
@@ -258,10 +272,10 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
   protected IType createPageData(String pageName, String sharedPackage, IEnvironment env, IProgress progress) {
     PrimaryTypeGenerator<?> pageDataGenerator = PrimaryTypeGenerator.create()
-        .withElementName(pageName + ISdkProperties.SUFFIX_DTO)
+        .withElementName(pageName + ISdkConstants.SUFFIX_DTO)
         .withPackageName(sharedPackage)
         .asPublic()
-        .withSuperClass(IScoutRuntimeTypes.AbstractTablePageData);
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractTablePageData().fqn());
     return env.writeCompilationUnit(pageDataGenerator, getPageDataSourceFolder(), progress);
   }
 

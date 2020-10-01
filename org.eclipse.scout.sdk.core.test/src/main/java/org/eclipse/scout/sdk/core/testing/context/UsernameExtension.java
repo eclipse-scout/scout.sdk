@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.ExtensionContext.Store;
  */
 public class UsernameExtension implements BeforeAllCallback, AfterAllCallback {
 
-  public static final String USERNAME_KEY = "usrname";
+  public static final String USERNAME_KEY = "scout_username";
   public static final String USERNAME = "anonymous";
 
   @Override

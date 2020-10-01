@@ -20,7 +20,6 @@ import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
@@ -39,10 +38,11 @@ import com.intellij.util.Query
 import com.intellij.util.containers.stream
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.util.JavaTypes
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult
@@ -50,6 +50,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
+import org.eclipse.scout.sdk.s2i.util.ApiHelper
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.function.Function
@@ -106,11 +107,12 @@ fun PsiClass.toScoutType(env: IJavaEnvironment): IType? {
 /**
  * Tries to find a declaring [PsiClass] which is instanceof the given [typeFilterFqn].
  * @param typeFilterFqn The filter condition. The first declaring class which has a type with this fully qualified name in its super hierarchy is returned.
+ * @param scoutApi The [IScoutApi] of this [PsiElement]
  * @param acceptExtensionOwner Specifies how to handle IExtensions: if true and a declaring class is an extension, the extension owner is evaluated as well.
  * If it fulfills the type filter it is returned. The default is false.
  * @return The first [PsiClass] in the declaring classes of this [PsiElement] that fulfills the given type filter honoring extension owners if requested.
  */
-fun PsiElement.findEnclosingClass(typeFilterFqn: String, acceptExtensionOwner: Boolean = false): PsiClass? {
+fun PsiElement.findEnclosingClass(typeFilterFqn: String, scoutApi: IScoutApi, acceptExtensionOwner: Boolean = false): PsiClass? {
     var place: PsiElement = this
     val module = containingModule()
     while (place !is PsiFile) {
@@ -118,12 +120,15 @@ fun PsiElement.findEnclosingClass(typeFilterFqn: String, acceptExtensionOwner: B
             if (place.isInstanceOf(typeFilterFqn)) {
                 return place
             }
-            if (acceptExtensionOwner && place.isInstanceOf(IScoutRuntimeTypes.IExtension)) {
-                val extensionOwner = place.resolveTypeArgument(IScoutRuntimeTypes.TYPE_PARAM_EXTENSION__OWNER, IScoutRuntimeTypes.IExtension)
-                        ?.getCanonicalText(false)
-                        ?.let { module?.findTypeByName(it) }
-                if (extensionOwner != null && extensionOwner.isInstanceOf(typeFilterFqn)) {
-                    return extensionOwner
+            if (acceptExtensionOwner) {
+                val iExtension = scoutApi.IExtension()
+                if (place.isInstanceOf(iExtension)) {
+                    val extensionOwner = place.resolveTypeArgument(iExtension.ownerTypeParamIndex(), iExtension.fqn())
+                            ?.getCanonicalText(false)
+                            ?.let { module?.findTypeByName(it) }
+                    if (extensionOwner != null && extensionOwner.isInstanceOf(typeFilterFqn)) {
+                        return extensionOwner
+                    }
                 }
             }
         }
@@ -189,6 +194,10 @@ fun PsiElement.containingModule(returnReferencingModuleIfNotInFilesystem: Boolea
                 ?.let { ModuleUtil.findModuleForPsiElement(searchElement) }
     }
 }
+
+fun PsiElement.scoutApi() = ApiHelper.scoutApiFor(this)
+
+fun PsiElement.requireScoutApi() = ApiHelper.requireScoutApiFor(this)
 
 fun IProgress.toIdea(): IdeaProgress = this as IdeaProgress
 
@@ -294,11 +303,6 @@ fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
 fun Module.findTypeByName(fqn: String) = project.findTypesByName(fqn, moduleWithDependenciesAndLibrariesScope(this, true)).firstOrNull()
 
 /**
- * @return A [Path] representing this [VirtualFile].
- */
-fun VirtualFile.getNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath() // don't use toNioPath as method name because this name already exists in VirtualFile since IJ 2020.2. Can be removed if IJ 2020.2 is the oldest supported release.
-
-/**
  * @return The [Module] within the given [Project] in which this file exists.
  */
 fun VirtualFile.containingModule(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
@@ -317,6 +321,8 @@ fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResu
     val supplier: Function<PsiClass, Stream<out PsiClass>> = Function { a -> a.supers.stream() }
     return TreeTraversals.create(visitor, supplier).traverse(this)
 }
+
+fun PsiClass.isInstanceOf(classNameSupplier: IClassNameSupplier) = isInstanceOf(classNameSupplier.fqn())
 
 /**
  * Checks if this [PsiClass] has at least one of the given fully qualified names in its super hierarchy.

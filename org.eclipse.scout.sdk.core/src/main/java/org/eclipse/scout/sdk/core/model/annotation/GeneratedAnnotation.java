@@ -10,7 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.model.annotation;
 
+import static org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier.raw;
+
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link GeneratedAnnotation}</h3> Managed annotation for Generated
@@ -19,11 +23,12 @@ import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
  */
 public class GeneratedAnnotation extends AbstractManagedAnnotation {
 
-  public static final String COMMENTS_ELEMENT_NAME = "comments";
-  public static final String DATE_ELEMENT_NAME = "date";
   public static final String VALUE_ELEMENT_NAME = "value";
+  public static final String DATE_ELEMENT_NAME = "date";
+  public static final String COMMENTS_ELEMENT_NAME = "comments";
 
-  public static final String TYPE_NAME = "javax.annotation.Generated";
+  public static final String FQN = "javax.annotation.Generated";
+  protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(raw(FQN));
 
   public String[] value() {
     return getValue(VALUE_ELEMENT_NAME, String[].class, null);

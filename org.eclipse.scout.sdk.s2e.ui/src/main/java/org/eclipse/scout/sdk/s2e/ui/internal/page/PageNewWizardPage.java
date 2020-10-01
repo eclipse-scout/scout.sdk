@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.page;
 
+import java.util.Optional;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -20,16 +22,17 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.StrictHierarchyTypeContentProvider;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
-import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
+import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
 import org.eclipse.swt.SWT;
@@ -45,7 +48,7 @@ import org.eclipse.ui.PlatformUI;
  *
  * @since 5.2.0
  */
-public class PageNewWizardPage extends CompilationUnitNewWizardPage {
+public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
 
   public static final String PROP_SHARED_SOURCE_FOLDER = "sharedSourceFolder";
   public static final String PROP_SERVER_SOURCE_FOLDER = "serverSourceFolder";
@@ -57,10 +60,20 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
   private boolean m_isPageWithTable;
 
   public PageNewWizardPage(PackageContainer packageContainer) {
-    super(PageNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_PAGE_WITH_TABLE, IScoutRuntimeTypes.IPage, IScoutRuntimeTypes.AbstractPageWithTable, ScoutTier.Client);
+    super(PageNewWizardPage.class.getName(), packageContainer, ISdkConstants.SUFFIX_PAGE_WITH_TABLE, ScoutTier.Client);
     setTitle("Create a new Page");
     setDescription(getTitle());
     setIcuGroupName("New Page Details");
+  }
+
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+    return scoutApi().map(IScoutApi::AbstractPageWithTable);
+  }
+
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
+    return scoutApi().map(IScoutApi::IPage);
   }
 
   @Override
@@ -72,14 +85,15 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
   protected void createContent(Composite parent) {
     super.createContent(parent);
 
-    guessSharedFolders();
+    guessSharedAndServerFolders();
 
     createPageServiceGroup(parent);
     createOptionsGroup(parent);
 
     // remove AbstractPage from the proposal list
     StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
-    superTypeContentProvider.setTypeProposalFilter(superTypeContentProvider.getTypeProposalFilter().and(element -> !IScoutRuntimeTypes.AbstractPage.equals(element.getFullyQualifiedName())));
+    superTypeContentProvider.setTypeProposalFilter(superTypeContentProvider.getTypeProposalFilter()
+        .and(element -> !scoutApi().get().AbstractPage().fqn().equals(element.getFullyQualifiedName())));
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PAGE_NEW_WIZARD_PAGE);
   }
@@ -111,7 +125,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
   @Override
   protected void handleJavaProjectChanged() {
     super.handleJavaProjectChanged();
-    guessSharedFolders();
+    guessSharedAndServerFolders();
   }
 
   @Override
@@ -125,12 +139,12 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
 
     try {
       ITypeHierarchy supertypeHierarchy = superType.newSupertypeHierarchy(null);
-      setIsPageWithTable(JdtUtils.hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IPageWithTable));
+      setIsPageWithTable(JdtUtils.hierarchyContains(supertypeHierarchy, scoutApi().get().IPageWithTable().fqn()));
       if (isPageWithTable()) {
-        setReadOnlySuffix(ISdkProperties.SUFFIX_PAGE_WITH_TABLE);
+        setReadOnlySuffix(ISdkConstants.SUFFIX_PAGE_WITH_TABLE);
       }
       else {
-        setReadOnlySuffix(ISdkProperties.SUFFIX_PAGE_WITH_NODES);
+        setReadOnlySuffix(ISdkConstants.SUFFIX_PAGE_WITH_NODES);
       }
       setViewSharedSourceFolder();
       setViewServerSourceFolder();
@@ -154,7 +168,7 @@ public class PageNewWizardPage extends CompilationUnitNewWizardPage {
     m_sharedSourceFolder.setEnabled(isPageWithTable());
   }
 
-  protected void guessSharedFolders() {
+  protected void guessSharedAndServerFolders() {
     IPackageFragmentRoot clientSourceFolder = getSourceFolder();
     if (!JdtUtils.exists(clientSourceFolder)) {
       return;

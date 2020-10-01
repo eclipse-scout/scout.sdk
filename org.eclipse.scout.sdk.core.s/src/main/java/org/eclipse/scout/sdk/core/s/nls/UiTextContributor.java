@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.core.util.StreamUtils.allMatchResults;
 
 import java.util.Collection;
@@ -27,13 +28,11 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -66,7 +65,7 @@ public class UiTextContributor {
   }
 
   protected Set<String> loadAllKeys(IProgress progress) {
-    String methodName = "contributeUiTextKeys";
+    String methodName = type().javaEnvironment().requireApi(IScoutApi.class).UiTextContributor().contributeUiTextKeysMethodName();
     return type()
         .methods()
         .withName(methodName)
@@ -76,8 +75,7 @@ public class UiTextContributor {
         .map(CoreUtils::removeComments)
         .flatMap(Strings::notBlank)
         .map(src -> loadAllKeys(src, progress))
-        .orElseThrow(() -> new SdkException("Could not calculate available translation keys for {}. No source code for method '{}' could be found in type '{}'.",
-            JavaTypes.simpleName(IScoutRuntimeTypes.UiTextContributor), methodName, type().name()));
+        .orElseThrow(() -> newFail("Could not calculate available translation keys for '{}'. No source code for method '{}' could be found.", type().name(), methodName));
   }
 
   protected Set<String> loadAllKeys(CharSequence methodSource, IProgress progress) {
@@ -92,11 +90,12 @@ public class UiTextContributor {
 
   protected Stream<String> loadReferencedTextProviderServices(CharSequence contributeUiTextKeysMethodSource, IProgress progress) {
     IType contributor = type();
+    IScoutApi scoutApi = contributor.javaEnvironment().requireApi(IScoutApi.class);
     List<IType> referencedTextServices = allMatchResults(TEXT_SERVICE_CLASS_LITERAL_PAT, contributeUiTextKeysMethodSource)
         .map(match -> match.group(1))
         .map(contributor::resolveSimpleName)
         .flatMap(Optional::stream)
-        .filter(type -> type.isInstanceOf(IScoutRuntimeTypes.ITextProviderService))
+        .filter(type -> type.isInstanceOf(scoutApi.ITextProviderService()))
         .collect(toList());
     progress.init(referencedTextServices.size(), "Load referenced text provider service");
     return referencedTextServices.stream()

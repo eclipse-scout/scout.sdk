@@ -12,31 +12,29 @@ package org.eclipse.scout.sdk.s2i.classid
 
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.AbstractClassAnnotation
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 
-open class ClassIdAnnotation private constructor(psiClass: PsiClass, psiAnnotation: PsiAnnotation) : AbstractClassAnnotation(psiClass, psiAnnotation) {
+open class ClassIdAnnotation private constructor(psiClass: PsiClass, psiAnnotation: PsiAnnotation, scoutApi: IScoutApi) : AbstractClassAnnotation(psiClass, psiAnnotation, scoutApi) {
 
     private val m_value = FinalValue<String>()
 
     companion object {
+        fun of(annotation: PsiAnnotation?, scoutApi: IScoutApi) = of(annotation, null, scoutApi)
 
-        const val VALUE_ATTRIBUTE_NAME = org.eclipse.scout.sdk.core.s.annotation.ClassIdAnnotation.VALUE_ELEMENT_NAME
+        fun of(owner: PsiClass?, scoutApi: IScoutApi) = of(null, owner, scoutApi)
 
-        fun of(annotation: PsiAnnotation?) = of(annotation, null)
-
-        fun of(owner: PsiClass?) = of(null, owner)
-
-        fun of(annotation: PsiAnnotation?, owner: PsiClass?) = classAnnotation(IScoutRuntimeTypes.ClassId, annotation, owner)
-                ?.let { ClassIdAnnotation(it.first, it.second) }
+        fun of(annotation: PsiAnnotation?, owner: PsiClass?, scoutApi: IScoutApi) = classAnnotation(scoutApi.ClassId().fqn(), annotation, owner)
+                ?.let { ClassIdAnnotation(it.first, it.second, scoutApi) }
     }
 
     fun value(): String? = m_value.computeIfAbsentAndGet {
+        val valueElementName = scoutApi.ClassId().valueElementName()
         computeInReadAction(psiClass.project) {
-            psiAnnotation.findAttributeValue(VALUE_ATTRIBUTE_NAME)?.valueAs(String::class.java)
+            psiAnnotation.findAttributeValue(valueElementName)?.valueAs(String::class.java)
         }
     }
 

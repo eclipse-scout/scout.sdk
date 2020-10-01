@@ -11,17 +11,24 @@
 package org.eclipse.scout.sdk.core.generator.method;
 
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.member.IMemberGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
+import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link IMethodGenerator}</h3>
@@ -36,33 +43,39 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    * Returns a unique identifier for this {@link IMethod}. The identifier looks like
    * 'methodName(dataTypeParam1,dataTypeParam2)'.
    *
+   * @param context
+   *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
+   *          method parameter data types may be API dependent (see
+   *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
    * @return The created identifier
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    * @see IMethod#identifier()
    */
-  String identifier();
+  String identifier(IJavaEnvironment context);
 
   /**
    * Returns the unique identifier for this {@link IMethodGenerator}. The identifier looks like
    * 'methodName(dataTypeParam1,dataTypeParam2)'.
    *
+   * @param context
+   *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
+   *          method parameter data types may be API dependent (see
+   *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
    * @param useErasureOnly
    *          If {@code true} only the type erasure is used for all method parameter types.
    * @return The created identifier
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    * @see IMethod#identifier(boolean)
    */
-  String identifier(boolean useErasureOnly);
+  String identifier(IJavaEnvironment context, boolean useErasureOnly);
 
-  /**
-   * Gets the return type of this {@link IMethodGenerator}.
-   * <p>
-   * The resulting {@link Optional} is empty if this is a constructor. The {@link Optional} may contain
-   * {@link JavaTypes#_void}.
-   *
-   * @return An {@link Optional} describing the return type of this {@link IMethodGenerator}.
-   */
-  Optional<String> returnType();
+  Optional<ApiFunction<?, String>> returnType();
+
+  <A extends IApiSpecification> TYPE withElementNameFrom(Class<A> apiDefinition, Function<A, String> nameSupplier);
+
+  Optional<String> elementName(IJavaBuilderContext context);
+
+  Optional<String> elementName(IJavaEnvironment context);
 
   /**
    * Sets the return type of this {@link IMethodGenerator}.
@@ -74,11 +87,13 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    */
   TYPE withReturnType(String returnType);
 
+  <A extends IApiSpecification> TYPE withReturnTypeFrom(Class<A> apiDefinition, Function<A, String> returnTypeSupplier);
+
   /**
    * @return A {@link Stream} with all {@link Exception} types of the {@code throws} clause of this
    *         {@link IMethodGenerator}.
    */
-  Stream<String> exceptions();
+  Stream<ApiFunction<?, String>> exceptions();
 
   /**
    * Adds the given reference to the {@link Exception}s of this {@link IMethodGenerator}. They will be printed in the
@@ -92,6 +107,8 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    */
   TYPE withException(String exceptionReference);
 
+  <A extends IApiSpecification> TYPE withExceptionFrom(Class<A> apiDefinition, Function<A, String> exceptionSupplier);
+
   /**
    * Removes the specified reference from the exception list of this {@link IMethodGenerator}.
    *
@@ -99,7 +116,7 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    *          The reference to remove.
    * @return This generator.
    */
-  TYPE withoutException(String exceptionReference);
+  TYPE withoutException(Predicate<ApiFunction<?, String>> toRemove);
 
   /**
    * @return The {@link ISourceGenerator} that creates the method body content.

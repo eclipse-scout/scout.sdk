@@ -12,37 +12,34 @@ package org.eclipse.scout.sdk.s2i
 
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
-import org.eclipse.scout.sdk.core.s.ISdkProperties
+import org.eclipse.scout.sdk.core.s.ISdkConstants
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 
-class OrderAnnotation private constructor(psiClass: PsiClass, psiAnnotation: PsiAnnotation) : AbstractClassAnnotation(psiClass, psiAnnotation) {
+class OrderAnnotation private constructor(psiClass: PsiClass, psiAnnotation: PsiAnnotation, scoutApi: IScoutApi) : AbstractClassAnnotation(psiClass, psiAnnotation, scoutApi) {
 
     private val m_value = FinalValue<Double>()
 
     companion object {
+        fun of(annotation: PsiAnnotation?, scoutApi: IScoutApi) = of(annotation, null, scoutApi)
 
-        const val VALUE_ATTRIBUTE_NAME = org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.VALUE_ELEMENT_NAME
+        fun of(owner: PsiClass?, scoutApi: IScoutApi) = of(null, owner, scoutApi)
 
-        fun of(annotation: PsiAnnotation?) = of(annotation, null)
+        fun of(annotation: PsiAnnotation?, owner: PsiClass?, scoutApi: IScoutApi) = classAnnotation(scoutApi.Order().fqn(), annotation, owner)
+                ?.let { OrderAnnotation(it.first, it.second, scoutApi) }
 
-        fun of(owner: PsiClass?) = of(null, owner)
-
-        fun of(annotation: PsiAnnotation?, owner: PsiClass?) =
-                classAnnotation(IScoutRuntimeTypes.Order, annotation, owner)
-                        ?.let { OrderAnnotation(it.first, it.second) }
-
-        fun valueOf(owner: PsiClass?) = of(owner)?.value()
+        fun valueOf(owner: PsiClass?, scoutApi: IScoutApi) = of(null, owner, scoutApi)?.value()
     }
 
     fun value(): Double = m_value.computeIfAbsentAndGet {
+        val valueElementName = scoutApi.ClassId().valueElementName()
         IdeaEnvironment.computeInReadAction(psiClass.project) {
-            psiAnnotation.findAttributeValue(VALUE_ATTRIBUTE_NAME)
+            psiAnnotation.findAttributeValue(valueElementName)
                     ?.valueAs(Number::class.java)
                     ?.toDouble() ?: defaultOrder()
         }
     }
 
-    private fun defaultOrder() = if (psiClass.isInstanceOf(IScoutRuntimeTypes.IOrdered)) ISdkProperties.DEFAULT_VIEW_ORDER else ISdkProperties.DEFAULT_BEAN_ORDER
+    fun defaultOrder() = if (psiClass.isInstanceOf(scoutApi.IOrdered())) ISdkConstants.DEFAULT_VIEW_ORDER else ISdkConstants.DEFAULT_BEAN_ORDER
 }

@@ -15,25 +15,25 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformField;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformMethod;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformType;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformTypeParameter;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAnnotation;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isDefaultMethod;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isEnum;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isPrivate;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformField;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformMethod;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformType;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformTypeParameter;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
@@ -53,9 +53,6 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.imports.EnclosingTypeScopedImportCollector;
 import org.eclipse.scout.sdk.core.imports.IImportValidator;
@@ -65,10 +62,15 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link TypeGenerator}</h3>
@@ -78,11 +80,11 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMemberGenerator<TYPE> implements ITypeGenerator<TYPE> {
 
   private final List<ITypeParameterGenerator<?>> m_typeParameters;
-  private final Set<String> m_interfaces;
+  private final List<ApiFunction<?, String>> m_interfaces;
   private final List<SortedMemberEntry> m_members;
   private final FinalValue<String> m_fullyQualifiedName;
   private final FinalValue<String> m_qualifier;
-  private String m_superType;
+  private ApiFunction<?, String> m_superClass;
   private String m_declaringFullyQualifiedName;
   private IJavaElementGenerator<?> m_declaringGenerator;
   private boolean m_addAllNecessaryMethods;
@@ -90,7 +92,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   protected TypeGenerator() {
     m_typeParameters = new ArrayList<>();
-    m_interfaces = new LinkedHashSet<>();
+    m_interfaces = new ArrayList<>();
     m_members = new ArrayList<>();
     m_fullyQualifiedName = new FinalValue<>();
     m_qualifier = new FinalValue<>();
@@ -105,13 +107,15 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
         .flatMap(Optional::stream)
         .collect(toList());
 
-    m_superType = type.superClass()
+    m_superClass = type.superClass()
         .map(IType::reference)
+        .map(ApiFunction::new)
         .orElse(null);
 
     m_interfaces = type.superInterfaces()
         .map(IType::reference)
-        .collect(toCollection(LinkedHashSet::new));
+        .map(ApiFunction::new)
+        .collect(toList());
 
     m_members = new ArrayList<>();
     type.fields().stream()
@@ -214,14 +218,21 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     builder.append(typeParameters(), "<", ", ", ">");
 
     // super type
-    superClass()
-        .filter(sup -> !isInterface)
-        .filter(sup -> !Object.class.getName().equals(sup))
-        .ifPresent(sup -> builder.append(" extends ").ref(sup));
+    if (!isInterface) {
+      superClass()
+          .flatMap(af -> af.apply(builder.context()))
+          .filter(sup -> !Object.class.getName().equals(sup))
+          .ifPresent(sup -> builder.append(" extends ").ref(sup));
+    }
 
     // interfaces
-    String prefix = isInterface ? " extends " : " implements ";
-    builder.appendReferences(interfaces(), prefix, ", ", null);
+    Stream<String> ifcReferences = interfaces()
+        .map(af -> af.apply(builder.context()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .distinct();
+    String prefix = " " + (isInterface ? JavaTypes.EXTENDS : JavaTypes.IMPLEMENTS) + " ";
+    builder.appendReferences(ifcReferences, prefix, ", ", null);
   }
 
   protected void buildTypeBody(IJavaSourceBuilder<?> builder) {
@@ -273,37 +284,53 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public Stream<String> interfaces() {
+  public Stream<ApiFunction<?, String>> interfaces() {
     return m_interfaces.stream();
   }
 
   @Override
   public TYPE withInterface(String interfaceReference) {
-    m_interfaces.add(Ensure.notBlank(interfaceReference));
-    return currentInstance();
+    Ensure.notBlank(interfaceReference);
+    return withInterfaceFrom(null, api -> interfaceReference);
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withInterfaceFrom(Class<A> apiDefinition, Function<A, String> interfaceSupplier) {
+    m_interfaces.add(new ApiFunction<>(apiDefinition, interfaceSupplier));
+    return thisInstance();
   }
 
   @Override
   public TYPE withInterfaces(Stream<String> interfaceReferences) {
     Ensure.notNull(interfaceReferences).forEach(this::withInterface);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutInterface(String interfaceReference) {
-    m_interfaces.remove(Ensure.notBlank(interfaceReference));
-    return currentInstance();
+  public TYPE withoutInterface(Predicate<ApiFunction<?, String>> filter) {
+    m_interfaces.removeIf(filter);
+    return thisInstance();
   }
 
   @Override
-  public Optional<String> superClass() {
-    return Strings.notBlank(m_superType);
+  public Optional<ApiFunction<?, String>> superClass() {
+    return Optional.ofNullable(m_superClass);
   }
 
   @Override
   public TYPE withSuperClass(String superType) {
-    m_superType = superType;
-    return currentInstance();
+    return withSuperClassFrom(null, api -> superType);
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withSuperClassFrom(Class<A> apiDefinition, Function<A, String> superClassSupplier) {
+    if (superClassSupplier == null) {
+      m_superClass = null;
+    }
+    else {
+      m_superClass = new ApiFunction<>(apiDefinition, superClassSupplier);
+    }
+    return thisInstance();
   }
 
   @Override
@@ -367,26 +394,29 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   @Override
   public TYPE withField(IFieldGenerator<?> builder, Object... sortObject) {
     m_members.add(new SortedMemberEntry(builder, sortObject));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutField(String elementName) {
-    removeMember(IFieldGenerator.class, elementName);
-    return currentInstance();
+  public TYPE withoutField(Predicate<IFieldGenerator<?>> removalFilter) {
+    removeMemberIf(IFieldGenerator.class, removalFilter);
+    return thisInstance();
   }
 
   @SuppressWarnings("unchecked")
-  protected <T extends IMemberGenerator<?>> T removeMember(Class<T> type, String memberName) {
-    Ensure.notNull(memberName);
+  protected <T extends IMemberGenerator<?>, P extends IMemberGenerator<?>> List<P> removeMemberIf(Class<T> type, Predicate<P> removalFilter) {
+    List<P> removed = new ArrayList<>();
     for (Iterator<SortedMemberEntry> it = m_members.iterator(); it.hasNext();) {
       SortedMemberEntry entry = it.next();
-      if (entry.hasType(type) && memberName.equals(entry.generator().elementName().orElse(null))) {
-        it.remove();
-        return (T) entry.generator();
+      if (entry.hasType(type)) {
+        P generator = (P) entry.generator();
+        if (removalFilter == null || removalFilter.test(generator)) {
+          it.remove();
+          removed.add(generator);
+        }
       }
     }
-    return null;
+    return removed;
   }
 
   @Override
@@ -400,20 +430,20 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   @Override
   public TYPE withMethod(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> builder, Object... sortObject) {
     m_members.add(new SortedMemberEntry(applyConnection(builder, this), sortObject));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutMethod(String elementName) {
-    applyConnection(removeMember(IMethodGenerator.class, elementName), null);
-    return currentInstance();
+  public TYPE withoutMethod(Predicate<IMethodGenerator<?, ?>> removalFilter) {
+    removeMemberIf(IMethodGenerator.class, removalFilter).forEach(removed -> applyConnection(removed, null));
+    return thisInstance();
   }
 
   @Override
-  public Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId) {
+  public Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean useErasureOnly) {
     Ensure.notBlank(methodId);
     return methods()
-        .filter(m -> methodId.equals(m.identifier()))
+        .filter(m -> methodId.equals(m.identifier(context, useErasureOnly)))
         .findAny();
   }
 
@@ -438,14 +468,14 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   public TYPE withoutAllMethodsImplemented() {
     m_addAllNecessaryMethods = false;
     m_unimplementedMethodsTransformer = null;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded) {
     m_addAllNecessaryMethods = true;
     m_unimplementedMethodsTransformer = callbackForMethodsAdded;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -463,13 +493,13 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     Ensure.isFalse(generator instanceof ICompilationUnitGenerator<?>,
         "A {} cannot be added as nested type. Use a {} instead.", PrimaryTypeGenerator.class.getSimpleName(), TypeGenerator.class.getSimpleName());
     m_members.add(new SortedMemberEntry(applyConnection(generator, this), sortObject));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutType(String elementName) {
-    applyConnection(removeMember(ITypeGenerator.class, elementName), null);
-    return currentInstance();
+  public TYPE withoutType(Predicate<ITypeGenerator<?>> removalFilter) {
+    removeMemberIf(ITypeGenerator.class, removalFilter).forEach(removed -> applyConnection(removed, null));
+    return thisInstance();
   }
 
   protected static <T extends IMemberGenerator<?>> T applyConnection(T child, ITypeGenerator<?> parent) {
@@ -490,14 +520,14 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   @Override
   public TYPE withTypeParameter(ITypeParameterGenerator<?> typeParameter) {
     m_typeParameters.add(Ensure.notNull(typeParameter));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withoutTypeParameter(String elementName) {
     Ensure.notNull(elementName);
     m_typeParameters.removeIf(generator -> elementName.equals(generator.elementName().orElse(null)));
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -507,7 +537,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   public TYPE withDeclaringGenerator(IJavaElementGenerator<?> parent) {
     m_declaringGenerator = parent;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -518,7 +548,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   @Override
   public TYPE setDeclaringFullyQualifiedName(String parentFullyQualifiedName) {
     m_declaringFullyQualifiedName = parentFullyQualifiedName;
-    return currentInstance();
+    return thisInstance();
   }
 
   private static class UnimplementedMethodGenerator extends MethodOverrideGenerator<UnimplementedMethodGenerator, IMethodBodyBuilder<?>> {

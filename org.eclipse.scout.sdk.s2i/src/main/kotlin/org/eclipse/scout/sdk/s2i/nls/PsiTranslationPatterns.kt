@@ -19,9 +19,11 @@ import com.intellij.patterns.StandardPatterns.string
 import com.intellij.patterns.XmlPatterns.xmlAttribute
 import com.intellij.patterns.XmlPatterns.xmlTag
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.xml.XmlAttributeValue
 import com.intellij.util.ProcessingContext
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.util.Strings.fromStringLiteral
 import org.eclipse.scout.sdk.core.util.Strings.withoutQuotes
@@ -69,27 +71,36 @@ object PsiTranslationPatterns {
             .withSuperParent(2, xmlAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME))
             .withSuperParent(3, xmlTag().withName("scout:message"))
 
-    private fun javaTextsGetPattern(): PsiJavaElementPattern.Capture<out PsiElement> {
+    private fun javaTextsGetPattern(): PsiJavaElementPattern.Capture<PsiElement> {
+        val patternsForAllScoutVersions = ScoutApi.allKnown()
+                .map { it.TEXTS() }
+                .distinct()
+                .map { javaTextsGetPattern(it) }
+                .toArray<ElementPattern<PsiLiteralExpression>> { len -> arrayOfNulls(len) }
+        return PsiJavaPatterns.psiElement().withParent(or(*patternsForAllScoutVersions))
+    }
+
+    private fun javaTextsGetPattern(texts: IScoutVariousApi.TEXTS): ElementPattern<PsiLiteralExpression> {
         val stringFqn = String::class.java.name
         val localeFqn = Locale::class.java.name
         val wildcardArgument = ".."
         val getWithoutLocale = psiMethod()
-                .withName(TranslationPatterns.JavaTextsGetPattern.GET_METHOD_NAME)
-                .definedInClass(IScoutRuntimeTypes.TEXTS)
+                .withName(texts.methodName)
+                .definedInClass(texts.fqn())
                 .withParameters(stringFqn, wildcardArgument)
         val getWithLocale = psiMethod()
-                .withName(TranslationPatterns.JavaTextsGetPattern.GET_METHOD_NAME)
-                .definedInClass(IScoutRuntimeTypes.TEXTS)
+                .withName(texts.methodName)
+                .definedInClass(texts.fqn())
                 .withParameters(localeFqn, stringFqn, wildcardArgument)
         val getWithFallbackWithoutLocale = psiMethod()
-                .withName(TranslationPatterns.JavaTextsGetPattern.GET_WITH_FALLBACK_METHOD_NAME)
-                .definedInClass(IScoutRuntimeTypes.TEXTS)
+                .withName(texts.withFallbackMethodName)
+                .definedInClass(texts.fqn())
                 .withParameters(stringFqn, stringFqn, wildcardArgument)
         val getWithFallbackWithLocale = psiMethod()
-                .withName(TranslationPatterns.JavaTextsGetPattern.GET_WITH_FALLBACK_METHOD_NAME)
-                .definedInClass(IScoutRuntimeTypes.TEXTS)
+                .withName(texts.withFallbackMethodName)
+                .definedInClass(texts.fqn())
                 .withParameters(localeFqn, stringFqn, stringFqn, wildcardArgument)
-        val oneOfTextsGetOverloads = or(
+        return or(
                 literalExpression().methodCallParameter(0, getWithoutLocale),
                 literalExpression().methodCallParameter(1, getWithLocale),
                 literalExpression().methodCallParameter(0, getWithFallbackWithoutLocale),
@@ -97,6 +108,5 @@ object PsiTranslationPatterns {
                 literalExpression().methodCallParameter(1, getWithFallbackWithLocale),
                 literalExpression().methodCallParameter(2, getWithFallbackWithLocale)
         )
-        return PsiJavaPatterns.psiElement().withParent(oneOfTextsGetOverloads)
     }
 }

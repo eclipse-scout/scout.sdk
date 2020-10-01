@@ -32,6 +32,7 @@ import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.s.structured.IStructuredType;
 import org.eclipse.scout.sdk.core.s.structured.StructuredType;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -126,7 +127,7 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
       withModifiers(ModifierKeyword.PUBLIC_KEYWORD);
     }
     if (getReadOnlyPrefix() == null) {
-      withReadOnlyPrefix("get");
+      withReadOnlyPrefix(PropertyBean.GETTER_PREFIX);
     }
     if (getReadOnlySuffix() == null) {
       withReadOnlySuffix("");

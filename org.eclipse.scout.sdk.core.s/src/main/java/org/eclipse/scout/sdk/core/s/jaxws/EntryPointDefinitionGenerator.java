@@ -20,7 +20,8 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -41,23 +42,23 @@ public class EntryPointDefinitionGenerator<TYPE extends EntryPointDefinitionGene
     mainType
         .asInterface()
         .withAnnotation(AnnotationGenerator.create()
-            .withElementName(IScoutRuntimeTypes.WebServiceEntryPoint)
-            .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_ENDPOINT_INTERFACE_ATTRIBUTE, b -> b.classLiteral(portTypeFqn()
+            .withElementNameFrom(IScoutApi.class, IScoutApi::WebServiceEntryPoint)
+            .withElementFrom(IScoutApi.class, api -> api.WebServiceEntryPoint().endpointInterfaceElementName(), b -> b.classLiteral(portTypeFqn()
                 .orElseThrow(() -> newFail("Fully qualified name of the PortType must be specified."))))
-            .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_PACKAGE_ATTRIBUTE, b -> b.stringLiteral(entryPointPackage()
+            .withElementFrom(IScoutApi.class, api -> api.WebServiceEntryPoint().entryPointPackageElementName(), b -> b.stringLiteral(entryPointPackage()
                 .orElseThrow(() -> newFail("Entry point package must be specified."))))
-            .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_NAME_ATTRIBUTE, b -> b.stringLiteral(entryPointName()
+            .withElementFrom(IScoutApi.class, api -> api.WebServiceEntryPoint().entryPointNameElementName(), b -> b.stringLiteral(entryPointName()
                 .orElseThrow(() -> newFail("Entry point name must be specified"))))
-            .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_SERVICE_NAME_ATTRIBUTE, b -> b.stringLiteral(serviceName()
+            .withElementFrom(IScoutApi.class, api -> api.WebServiceEntryPoint().serviceNameElementName(), b -> b.stringLiteral(serviceName()
                 .orElseThrow(() -> newFail("Service name must be specified."))))
-            .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_PORT_NAME_ATTRIBUTE, b -> b.stringLiteral(portName()
+            .withElementFrom(IScoutApi.class, api -> api.WebServiceEntryPoint().portNameElementName(), b -> b.stringLiteral(portName()
                 .orElseThrow(() -> newFail("Port name must be specified."))))
-            .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_HANDLER_CHAIN_ATTRIBUTE, b -> b.array(
+            .withElementFrom(IScoutApi.class, api -> api.WebServiceEntryPoint().handlerChainElementName(), b -> b.array(
                 Stream.of(
-                    createHandler(IScoutRuntimeTypes.WsProviderCorrelationIdHandler),
-                    createHandler(IScoutRuntimeTypes.LogHandler)),
+                    createHandler(IScoutApi.class, IScoutVariousApi::WsProviderCorrelationIdHandler),
+                    createHandler(IScoutApi.class, IScoutVariousApi::LogHandler)),
                 true))
-            .withElement(JaxWsUtils.ENTRY_POINT_DEFINITION_AUTH_ATTRIBUTE, b -> createAuthentication().generate(b)));
+            .withElementFrom(IScoutApi.class, api -> api.WebServiceEntryPoint().authenticationElementName(), b -> createAuthentication().generate(b)));
   }
 
   public Optional<String> portTypeFqn() {
@@ -66,7 +67,7 @@ public class EntryPointDefinitionGenerator<TYPE extends EntryPointDefinitionGene
 
   public TYPE withPortTypeFqn(String portTypeFqn) {
     m_portTypeFqn = portTypeFqn;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<String> entryPointPackage() {
@@ -75,7 +76,7 @@ public class EntryPointDefinitionGenerator<TYPE extends EntryPointDefinitionGene
 
   public TYPE withEntryPointPackage(String entryPointPackage) {
     m_entryPointPackage = entryPointPackage;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<String> serviceName() {
@@ -84,7 +85,7 @@ public class EntryPointDefinitionGenerator<TYPE extends EntryPointDefinitionGene
 
   public TYPE withServiceName(String serviceName) {
     m_serviceName = serviceName;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<String> portName() {
@@ -93,7 +94,7 @@ public class EntryPointDefinitionGenerator<TYPE extends EntryPointDefinitionGene
 
   public TYPE withPortName(String portName) {
     m_portName = portName;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<String> entryPointName() {
@@ -102,6 +103,6 @@ public class EntryPointDefinitionGenerator<TYPE extends EntryPointDefinitionGene
 
   public TYPE withEntryPointName(String entryPointName) {
     m_entryPointName = entryPointName;
-    return currentInstance();
+    return thisInstance();
   }
 }

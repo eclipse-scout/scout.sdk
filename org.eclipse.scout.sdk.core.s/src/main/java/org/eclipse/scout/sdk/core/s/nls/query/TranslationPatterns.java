@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.s.nls.query;
 
 import static java.util.stream.Collectors.toSet;
-import static org.eclipse.scout.sdk.core.util.JavaTypes.simpleName;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInCode;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInString;
 import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
@@ -25,9 +24,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi.TEXTS;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
@@ -197,10 +199,21 @@ public final class TranslationPatterns {
 
   public static final class JavaTextsGetPattern extends AbstractTranslationPattern {
 
-    public static final String GET_METHOD_NAME = "get";
-    public static final String GET_WITH_FALLBACK_METHOD_NAME = "getWithFallback";
     public static final AbstractTranslationPattern INSTANCE = new JavaTextsGetPattern();
-    public static final Pattern REGEX = Pattern.compile(simpleName(IScoutRuntimeTypes.TEXTS) + "\\." + GET_METHOD_NAME + "\\((?:[a-zA-Z0-9_]+,\\s*)?(\")?(" + NLS_KEY_PAT + ")(\")?\\s*[,)]");
+
+    public static final Pattern REGEX = Pattern.compile(computeTextsGetRegex());
+
+    private static String computeTextsGetRegex() {
+      return ScoutApi.allKnown()
+          .map(JavaTextsGetPattern::toTextsGetRegex)
+          .distinct()
+          .collect(Collectors.joining("|"));
+    }
+
+    private static String toTextsGetRegex(IScoutVariousApi api) {
+      TEXTS texts = api.TEXTS();
+      return texts.simpleName() + "\\." + texts.getMethodName() + "\\((?:[a-zA-Z0-9_]+,\\s*)?(\")?(" + NLS_KEY_PAT + ")(\")?\\s*[,)]";
+    }
 
     private JavaTextsGetPattern() {
     }

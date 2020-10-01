@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.core.generator.type;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
@@ -27,8 +29,11 @@ import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitGener
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link PrimaryTypeGenerator}</h3>
@@ -94,7 +99,7 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   }
 
   @SuppressWarnings("unchecked")
-  protected TYPE currentInstance() {
+  protected TYPE thisInstance() {
     return (TYPE) this;
   }
 
@@ -129,7 +134,7 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   public TYPE withPackageName(String newPackage) {
     m_compilationUnit.withPackageName(newPackage);
     setDeclaringFullyQualifiedName(newPackage);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -141,13 +146,13 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
     else {
       setDeclaringFullyQualifiedName(generator.elementName().orElse(null));
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withFlags(int flags) {
     primary().withFlags(flags);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -158,61 +163,61 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE withoutFlags(int flags) {
     primary().withoutFlags(flags);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asPublic() {
     primary().asPublic();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asAbstract() {
     primary().asAbstract();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asPrivate() {
     primary().asPrivate();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asPackagePrivate() {
     primary().asPackagePrivate();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asProtected() {
     primary().asProtected();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asStatic() {
     primary().asStatic();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asFinal() {
     primary().asFinal();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withAnnotation(IAnnotationGenerator<?> builder) {
     primary().withAnnotation(builder);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutAnnotation(String annotationFqn) {
-    primary().withoutAnnotation(annotationFqn);
-    return currentInstance();
+  public TYPE withoutAnnotation(Predicate<IAnnotationGenerator<?>> removalFilter) {
+    primary().withoutAnnotation(removalFilter);
+    return thisInstance();
   }
 
   @Override
@@ -221,15 +226,20 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   }
 
   @Override
+  public Optional<IAnnotationGenerator<?>> annotation(String annotationFqn) {
+    return primary().annotation(annotationFqn);
+  }
+
+  @Override
   public TYPE clearAnnotations() {
     primary().clearAnnotations();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withComment(ISourceGenerator<IJavaElementCommentBuilder<?>> commentBuilder) {
     primary().withComment(commentBuilder);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -241,7 +251,7 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   public TYPE withElementName(String newName) {
     primary().withElementName(newName);
     m_compilationUnit.withElementName(newName);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -250,37 +260,49 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   }
 
   @Override
-  public Stream<String> interfaces() {
+  public Stream<ApiFunction<?, String>> interfaces() {
     return primary().interfaces();
   }
 
   @Override
   public TYPE withInterface(String interfaceReference) {
     primary().withInterface(interfaceReference);
-    return currentInstance();
+    return thisInstance();
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withInterfaceFrom(Class<A> apiDefinition, Function<A, String> interfaceSupplier) {
+    primary().withInterfaceFrom(apiDefinition, interfaceSupplier);
+    return thisInstance();
   }
 
   @Override
   public TYPE withInterfaces(Stream<String> interfaceReferences) {
     primary().withInterfaces(interfaceReferences);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutInterface(String interfaceReference) {
-    primary().withoutInterface(interfaceReference);
-    return currentInstance();
+  public TYPE withoutInterface(Predicate<ApiFunction<?, String>> filter) {
+    primary().withoutInterface(filter);
+    return thisInstance();
   }
 
   @Override
-  public Optional<String> superClass() {
+  public Optional<ApiFunction<?, String>> superClass() {
     return primary().superClass();
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withSuperClassFrom(Class<A> apiDefinition, Function<A, String> superClassSupplier) {
+    primary().withSuperClassFrom(apiDefinition, superClassSupplier);
+    return thisInstance();
   }
 
   @Override
   public TYPE withSuperClass(String superType) {
     primary().withSuperClass(superType);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -301,13 +323,13 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE withField(IFieldGenerator<?> builder, Object... sortObject) {
     primary().withField(builder, sortObject);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutField(String elementName) {
-    primary().withoutField(elementName);
-    return currentInstance();
+  public TYPE withoutField(Predicate<IFieldGenerator<?>> removalFilter) {
+    primary().withoutField(removalFilter);
+    return thisInstance();
   }
 
   @Override
@@ -318,18 +340,18 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE withMethod(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> builder, Object... sortObject) {
     primary().withMethod(builder, sortObject);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutMethod(String methodName) {
-    primary().withoutMethod(methodName);
-    return currentInstance();
+  public TYPE withoutMethod(Predicate<IMethodGenerator<?, ?>> removalFilter) {
+    primary().withoutMethod(removalFilter);
+    return thisInstance();
   }
 
   @Override
-  public Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId) {
-    return primary().method(methodId);
+  public Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean useErasureOnly) {
+    return primary().method(methodId, context, useErasureOnly);
   }
 
   @Override
@@ -345,13 +367,13 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE withType(ITypeGenerator<?> generator, Object... sortObject) {
     primary().withType(generator, sortObject);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
-  public TYPE withoutType(String elementName) {
-    primary().withoutType(elementName);
-    return currentInstance();
+  public TYPE withoutType(Predicate<ITypeGenerator<?>> removalFilter) {
+    primary().withoutType(removalFilter);
+    return thisInstance();
   }
 
   @Override
@@ -362,31 +384,31 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE withTypeParameter(ITypeParameterGenerator<?> typeParameter) {
     primary().withTypeParameter(typeParameter);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withoutTypeParameter(String elementName) {
     primary().withoutTypeParameter(elementName);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asInterface() {
     primary().asInterface();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asAnnotationType() {
     primary().asAnnotationType();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE asEnum() {
     primary().asEnum();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -402,25 +424,25 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE setDeclaringFullyQualifiedName(String parentFullyQualifiedName) {
     primary().setDeclaringFullyQualifiedName(parentFullyQualifiedName);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withoutAllMethodsImplemented() {
     primary().withoutAllMethodsImplemented();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withAllMethodsImplemented() {
     primary().withAllMethodsImplemented();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded) {
     primary().withAllMethodsImplemented(callbackForMethodsAdded);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -431,13 +453,13 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE withImport(CharSequence name) {
     m_compilationUnit.withImport(name);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withoutImport(CharSequence name) {
     m_compilationUnit.withoutImport(name);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -448,13 +470,13 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE withStaticImport(CharSequence name) {
     m_compilationUnit.withStaticImport(name);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withoutStaticImport(CharSequence name) {
     m_compilationUnit.withoutStaticImport(name);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -465,13 +487,13 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE withoutAllImports() {
     m_compilationUnit.withoutAllImports();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE withFooter(ISourceGenerator<ICommentBuilder<?>> builder) {
     m_compilationUnit.withFooter(builder);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override

@@ -25,9 +25,11 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.ILookupService;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
@@ -35,7 +37,7 @@ import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.StrictHierarchyTypeContentProvider;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
-import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
+import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicAbstractPrimaryTypeFilter;
 import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
@@ -49,7 +51,7 @@ import org.eclipse.ui.PlatformUI;
  *
  * @since 5.2.0
  */
-public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
+public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPage {
 
   public static final String PROP_SVC_IMPL_SUPER_TYPE_BASE = "svcImplSuperTypeBase";
   public static final String PROP_SVC_IMPL_SUPER_TYPE = "svcImplSuperType";
@@ -64,11 +66,20 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
   protected ProposalTextField m_keyTypeField;
 
   public LookupCallNewWizardPage(PackageContainer packageContainer) {
-    super(LookupCallNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_LOOKUP_CALL, IScoutRuntimeTypes.ILookupCall, IScoutRuntimeTypes.LookupCall, ScoutTier.Shared);
+    super(LookupCallNewWizardPage.class.getName(), packageContainer, ISdkConstants.SUFFIX_LOOKUP_CALL, ScoutTier.Shared);
     setTitle("Create a new LookupCall");
     setDescription(getTitle());
     setIcuGroupName("New LookupCall Details");
-    setServiceImplSuperTypeBaseClassInternal(IScoutRuntimeTypes.ILookupService);
+  }
+
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+    return scoutApi().map(IScoutApi::LookupCall);
+  }
+
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
+    return scoutApi().map(IScoutApi::ILookupCall);
   }
 
   @Override
@@ -86,7 +97,8 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
     superTypeContentProvider.setTypeProposalFilter(new PublicAbstractPrimaryTypeFilter() {
       @Override
       public boolean test(IType candidate) {
-        return JdtUtils.exists(candidate) && (IScoutRuntimeTypes.LookupCall.equals(candidate.getFullyQualifiedName()) || super.test(candidate));
+        String lookupCallFqn = scoutApi().map(IScoutApi::LookupCall).map(IClassNameSupplier::fqn).orElse(null);
+        return JdtUtils.exists(candidate) && (candidate.getFullyQualifiedName().equals(lookupCallFqn) || super.test(candidate));
       }
     });
 
@@ -97,7 +109,11 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
   }
 
   protected IType calcServiceImplSuperTypeDefault() {
-    return resolveType(getServerJavaProject(), IScoutRuntimeTypes.AbstractLookupService);
+    return scoutApi()
+        .map(IScoutApi::AbstractLookupService)
+        .map(IClassNameSupplier::fqn)
+        .map(fqn -> resolveType(getServerJavaProject(), fqn))
+        .orElse(null);
   }
 
   protected void createLookupCallPropertiesGroup(Composite p) {
@@ -210,6 +226,7 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
     super.handleJavaProjectChanged();
 
     guessServerFolders();
+    setServiceImplSuperTypeBaseClassInternal(scoutApi().map(IScoutApi::ILookupService).map(IClassNameSupplier::fqn).orElse(null));
 
     if (!isControlCreated()) {
       return;
@@ -279,7 +296,8 @@ public class LookupCallNewWizardPage extends CompilationUnitNewWizardPage {
     }
 
     org.eclipse.scout.sdk.core.model.api.IType scoutSuperType = m_provider.toScoutType(serviceImplSuperType);
-    Optional<Stream<org.eclipse.scout.sdk.core.model.api.IType>> superClassKeyValue = scoutSuperType.resolveTypeParamValue(IScoutRuntimeTypes.TYPE_PARAM_LOOKUP_SERVICE_KEY_TYPE, IScoutRuntimeTypes.ILookupService);
+    ILookupService iLookupService = scoutApi().get().ILookupService();
+    Optional<Stream<org.eclipse.scout.sdk.core.model.api.IType>> superClassKeyValue = scoutSuperType.resolveTypeParamValue(iLookupService.keyTypeTypeParamIndex(), iLookupService.fqn());
     if (superClassKeyValue.isEmpty()) {
       return Status.OK_STATUS;
     }

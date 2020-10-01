@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
-import java.nio.file.Path;
 import java.util.Set;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
@@ -119,8 +118,8 @@ public class FileSystemWithOverride extends FileSystem {
     return m_cpEntries;
   }
 
-  public Path jreHome() {
-    return m_jreInfo.jreHome();
+  public JreInfo jreInfo() {
+    return m_jreInfo;
   }
 
   @Override

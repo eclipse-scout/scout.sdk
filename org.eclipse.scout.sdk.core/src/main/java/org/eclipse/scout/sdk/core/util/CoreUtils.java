@@ -15,6 +15,10 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -342,7 +346,7 @@ public final class CoreUtils {
   /**
    * Gets the file extension of the {@link Path} specified. This is the part after the last dot in the last segment of
    * the given file.
-   * 
+   *
    * @param file
    *          The file for which the extension should be returned.
    * @return The extension if it exists or an empty {@link String} otherwise (never returns {@code null}). The extension
@@ -409,7 +413,7 @@ public final class CoreUtils {
 
   /**
    * Sets the given {@link String} into the system clipboard
-   * 
+   *
    * @param text
    *          The text to set
    * @param ownershipLostCallback
@@ -431,6 +435,29 @@ public final class CoreUtils {
     catch (Exception e) {
       SdkLog.debug("Error setting text to system clipboard.", e);
       return false;
+    }
+  }
+
+  public static Object invokeDefaultMethod(Class<?> ifcClass, Object proxy, Method method, Object[] args) {
+    try {
+      return MethodHandles.lookup()
+          .findSpecial(ifcClass, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()), ifcClass)
+          .bindTo(proxy)
+          .invokeWithArguments(args);
+    }
+    catch (RuntimeException | Error e) {
+      throw e;
+    }
+    catch (InvocationTargetException ite) {
+      SdkLog.debug("Exception calling default method '{}'.", method, ite);
+      Throwable cause = ite.getCause();
+      if (cause instanceof RuntimeException) {
+        throw (RuntimeException) cause;
+      }
+      throw new SdkException(cause);
+    }
+    catch (Throwable e) {
+      throw new SdkException(e);
     }
   }
 }

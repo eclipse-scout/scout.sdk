@@ -11,10 +11,8 @@
 package org.eclipse.scout.sdk.core.s.project;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
@@ -33,11 +31,7 @@ import java.util.Base64.Encoder;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -62,9 +56,9 @@ import org.w3c.dom.NodeList;
  */
 public final class ScoutProjectNewHelper {
 
-  public static final String SCOUT_ARCHETYPES_VERSION = "11.0.0-SNAPSHOT";
   public static final String SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID = "scout-helloworld-app";
   public static final String SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID = "scout-hellojs-app";
+  public static final String SCOUT_ARCHETYPES_JAXWS_MODULE_ID = "scout-jaxws-module";
   public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"/<>=:]+");
@@ -103,11 +97,14 @@ public final class ScoutProjectNewHelper {
     if (Strings.isEmpty(javaVersion)) {
       javaVersion = DEFAULT_JAVA_ENV;
     }
-    if (Strings.isBlank(archetypeGroupId) || Strings.isBlank(archetypeArtifactId) || Strings.isBlank(archetypeVersion)) {
-      // use default
+    if (Strings.isBlank(archetypeGroupId)) {
       archetypeGroupId = SCOUT_ARCHETYPES_GROUP_ID;
+    }
+    if (Strings.isBlank(archetypeArtifactId)) {
       archetypeArtifactId = SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
-      archetypeVersion = SCOUT_ARCHETYPES_VERSION;
+    }
+    if (Strings.isBlank(archetypeVersion)) {
+      archetypeVersion = IMavenConstants.LATEST;
     }
 
     String pck = getPackage(groupId, artifactId);
@@ -202,14 +199,16 @@ public final class ScoutProjectNewHelper {
       }
 
       Document doc = Xml.get(pom);
-      Element modules = Xml.firstChildElement(doc.getDocumentElement(), "modules").get();
+      Element modules = Xml.firstChildElement(doc.getDocumentElement(), IMavenConstants.MODULES).get();
       NodeList childNodes = modules.getChildNodes();
       Collection<Node> nodesToRemove = new ArrayList<>();
       String targetDirectoryName = targetDirectory.getFileName().toString();
       for (int i = 0; i < childNodes.getLength(); i++) {
         Node n = childNodes.item(i);
         if (n.getNodeType() == Node.TEXT_NODE
-            || (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !targetDirectoryName.equals(n.getTextContent().trim()))) {
+            || (n.getNodeType() == Node.ELEMENT_NODE
+                && IMavenConstants.MODULE.equals(((Element) n).getTagName())
+                && !targetDirectoryName.equals(n.getTextContent().trim()))) {
           nodesToRemove.add(n);
         }
       }
@@ -218,19 +217,11 @@ public final class ScoutProjectNewHelper {
       }
 
       Ensure.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");
-      //noinspection NestedTryStatement
-      try (OutputStream out = Files.newOutputStream(pom, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
-        writeDocument(doc, new StreamResult(out));
-      }
+      Xml.writeDocument(doc, false, pom);
     }
     catch (TransformerException e) {
       throw new IOException(e);
     }
-  }
-
-  static void writeDocument(Document document, Result result) throws TransformerException {
-    Transformer transformer = Xml.createTransformer(false);
-    transformer.transform(new DOMSource(document), result);
   }
 
   public static String getDisplayNameErrorMessage(CharSequence displayNameCandidate) {

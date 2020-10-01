@@ -13,11 +13,11 @@ package org.eclipse.scout.sdk.s2e.operation.jaxws;
 import static java.util.Collections.singleton;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
+import static org.eclipse.scout.sdk.s2e.util.ApiHelper.scoutVersionOf;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.ISourceFolders;
@@ -34,8 +33,8 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
-import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
@@ -129,26 +128,9 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
 
   protected void createFactoryPath(IEnvironment env, IProgress progress) {
     Path factoryPathFile = getProjectRoot().resolve(FACTORY_PATH_FILE_NAME);
-    env.writeResource(new FactoryPathGenerator().withRtVersion(getScoutVersion()), factoryPathFile, progress);
-  }
-
-  protected String getScoutVersion() {
-    String prefix = "org.eclipse.scout.rt.platform-";
-    String suffix = ".jar";
-    try {
-      for (IPackageFragmentRoot root : getJaxWsProject().getPackageFragmentRoots()) {
-        String fileName = root.getPath().lastSegment();
-        String fileNameLower = fileName.toLowerCase(Locale.ENGLISH);
-        if (fileNameLower.startsWith(prefix) && fileNameLower.endsWith(suffix)) {
-          return fileName.substring(prefix.length(), fileName.length() - suffix.length());
-        }
-      }
-      SdkLog.info("Unable to calculate Scout version of project {}. Fallback to default.", getJaxWsProject().getElementName());
-    }
-    catch (JavaModelException | RuntimeException e) {
-      SdkLog.warning("Cannot calculate Scout version for .factorypath file.", e);
-    }
-    return ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION;
+    ApiVersion scoutVersion = scoutVersionOf(getJaxWsProject(), EclipseEnvironment.narrow(env))
+        .orElseThrow(() -> newFail("JaxWs module '{}' has no Scout dependency.", getJaxWsProject().getElementName()));
+    env.writeResource(new FactoryPathGenerator().withRtVersion(scoutVersion.asString()), factoryPathFile, progress);
   }
 
   protected void setIgnoreOptionalProblems(String entryPath, IProgressMonitor monitor) {

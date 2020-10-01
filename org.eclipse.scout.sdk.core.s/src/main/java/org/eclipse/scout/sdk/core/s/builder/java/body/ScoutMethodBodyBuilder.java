@@ -10,11 +10,15 @@
  */
 package org.eclipse.scout.sdk.core.s.builder.java.body;
 
+import java.util.function.Function;
+
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.MethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link ScoutMethodBodyBuilder}</h3>
@@ -42,40 +46,46 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
 
   @Override
   public TYPE appendGetFieldByClass(CharSequence fieldFqn) {
-    return append("getFieldByClass").parenthesisOpen().classLiteral(fieldFqn).parenthesisClose();
+    return appendFrom(IScoutApi.class, api -> api.IForm().getFieldByClassMethodName()).parenthesisOpen().classLiteral(fieldFqn).parenthesisClose();
   }
 
   @Override
   public TYPE appendGetPropertyByClass(CharSequence propName) {
-    return append("getPropertyByClass").parenthesisOpen().classLiteral(propName).parenthesisClose();
+    return appendFrom(IScoutApi.class, api -> api.IPropertyHolder().getPropertyByClassMethodName()).parenthesisOpen().classLiteral(propName).parenthesisClose();
   }
 
   @Override
   public TYPE appendTextsGet(CharSequence textKey) {
-    return ref(IScoutRuntimeTypes.TEXTS).dot().append("get").parenthesisOpen().stringLiteral(textKey).parenthesisClose();
+    return refClassFrom(IScoutApi.class, IScoutApi::TEXTS).dot().appendFrom(IScoutApi.class, api -> api.TEXTS().getMethodName()).parenthesisOpen().stringLiteral(textKey).parenthesisClose();
   }
 
   @Override
   public TYPE appendBeansGet(CharSequence bean) {
-    return ref(IScoutRuntimeTypes.BEANS).dot().append("get").parenthesisOpen()
-        .classLiteral(bean).parenthesisClose();
+    IClassNameSupplier beanSupplier = IClassNameSupplier.raw(bean);
+    return appendBeansGetFrom(null, api -> beanSupplier);
+  }
+
+  @Override
+  public <T extends IApiSpecification> TYPE appendBeansGetFrom(Class<T> apiClass, Function<T, IClassNameSupplier> beanNameProvider) {
+    return refClassFrom(IScoutApi.class, IScoutApi::BEANS).dot().appendFrom(IScoutApi.class, api -> api.BEANS().getMethodName()).parenthesisOpen()
+        .classLiteralFrom(apiClass, beanNameProvider).parenthesisClose();
   }
 
   @Override
   public TYPE appendExportFormData(CharSequence formDataVarName) {
-    return append("exportFormData").parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon().nl();
+    return appendFrom(IScoutApi.class, api -> api.IForm().exportFormDataMethodName()).parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon().nl();
   }
 
   @Override
   public TYPE appendPermissionCheck(CharSequence permission) {
-    return appendIf().parenthesisOpen().appendNot().ref(IScoutRuntimeTypes.ACCESS).dot().append("check").parenthesisOpen().appendNew().ref(permission)
+    return appendIf().parenthesisOpen().appendNot().refClassFrom(IScoutApi.class, IScoutApi::ACCESS).dot().appendFrom(IScoutApi.class, api -> api.ACCESS().checkMethodName()).parenthesisOpen().appendNew().ref(permission)
         .parenthesisOpen().parenthesisClose().parenthesisClose().parenthesisClose().space().blockStart().nl()
-        .appendThrow().appendNew().ref(IScoutRuntimeTypes.VetoException).parenthesisOpen().appendTextsGet("AuthorizationFailed").parenthesisClose().semicolon().nl()
+        .appendThrow().appendNew().refClassFrom(IScoutApi.class, IScoutApi::VetoException).parenthesisOpen().appendTextsGet("AuthorizationFailed").parenthesisClose().semicolon().nl()
         .blockEnd().nl();
   }
 
   @Override
   public TYPE appendImportFormData(CharSequence formDataVarName) {
-    return append("importFormData").parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon();
+    return appendFrom(IScoutApi.class, api -> api.IForm().importFormDataMethodName()).parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon();
   }
 }

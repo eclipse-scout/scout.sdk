@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.core.s.form;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.AbstractBooleanPermutationArgumentsProvider;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
@@ -44,7 +44,7 @@ public class FormNewOperationTest {
   @ParameterizedTest(name = "withDTO={0}, withPermission={1}, withService={2}, withClientTest={3}, withServerTest={4}")
   public void testFormCreation(boolean isCreateFormData, boolean isCreatePermissions, boolean isCreateService,
       boolean sourceFolderClientTest, boolean sourceFolderServerTest, TestingEnvironment env) {
-
+    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
     FormNewOperation fno = new FormNewOperation();
     fno.setClientPackage("org.eclipse.scout.sdk.s2e.client.test");
     fno.setClientSourceFolder(env.getTestingSourceFolder());
@@ -55,13 +55,13 @@ public class FormNewOperationTest {
     fno.setCreatePermissions(isCreatePermissions);
     fno.setCreateService(isCreateService);
     fno.setFormDataSourceFolder(env.getTestingSourceFolder());
-    fno.setFormName("My" + ISdkProperties.SUFFIX_FORM);
+    fno.setFormName("My" + ISdkConstants.SUFFIX_FORM);
     fno.setServerSourceFolder(env.getTestingSourceFolder());
     if (sourceFolderServerTest) {
       fno.setServerTestSourceFolder(env.getTestingSourceFolder());
     }
     fno.setSharedSourceFolder(env.getTestingSourceFolder());
-    fno.setSuperType(IScoutRuntimeTypes.AbstractForm);
+    fno.setSuperType(scoutApi.AbstractForm().fqn());
 
     env.run(fno);
 

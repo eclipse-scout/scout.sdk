@@ -37,13 +37,6 @@ import org.w3c.dom.NodeList;
 public final class JaxWsUtils {
 
   public static final String WSDL_FILE_EXTENSION = ".wsdl";
-  public static final String ENTRY_POINT_DEFINITION_ENDPOINT_INTERFACE_ATTRIBUTE = "endpointInterface";
-  public static final String ENTRY_POINT_DEFINITION_NAME_ATTRIBUTE = "entryPointName";
-  public static final String ENTRY_POINT_DEFINITION_SERVICE_NAME_ATTRIBUTE = "serviceName";
-  public static final String ENTRY_POINT_DEFINITION_PORT_NAME_ATTRIBUTE = "portName";
-  public static final String ENTRY_POINT_DEFINITION_PACKAGE_ATTRIBUTE = "entryPointPackage";
-  public static final String ENTRY_POINT_DEFINITION_AUTH_ATTRIBUTE = "authentication";
-  public static final String ENTRY_POINT_DEFINITION_HANDLER_CHAIN_ATTRIBUTE = "handlerChain";
   public static final String BINDINGS_NAME_ATTRIBUTE = "name";
   public static final String BINDINGS_CLASS_ELEMENT_NAME = "class";
   public static final String BINDING_PACKAGE_ELEMENT_NAME = "package";

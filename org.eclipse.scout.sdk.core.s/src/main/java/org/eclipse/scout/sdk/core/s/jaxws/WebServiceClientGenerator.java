@@ -19,15 +19,16 @@ import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.ITransformInput;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.builder.java.body.ScoutMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
@@ -43,10 +44,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
 
   @Override
   protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
-    StringBuilder superTypeFqnBuilder = new StringBuilder(IScoutRuntimeTypes.AbstractWebServiceClient);
-    superTypeFqnBuilder.append(JavaTypes.C_GENERIC_START).append(service()).append(", ").append(portType()).append(JavaTypes.C_GENERIC_END);
-
-    mainType.withSuperClass(superTypeFqnBuilder.toString())
+    mainType.withSuperClassFrom(IScoutApi.class, this::buildSuperType)
         .withInterface(portType())
         .withType(createUrlPropertyType())
         .withMethod(createExecInstallHandlers())
@@ -57,15 +55,21 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
                 .build());
   }
 
+  protected String buildSuperType(IScoutAbstractApi api) {
+    StringBuilder superTypeFqnBuilder = new StringBuilder(api.AbstractWebServiceClient().fqn());
+    superTypeFqnBuilder.append(JavaTypes.C_GENERIC_START).append(service()).append(", ").append(portType()).append(JavaTypes.C_GENERIC_END);
+    return superTypeFqnBuilder.toString();
+  }
+
   @SuppressWarnings("MethodMayBeStatic")
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> fillOverriddenMethods(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
-    return input.requestDefaultWorkingCopy().withBody(b -> b.appendCallToSame("newInvocationContext().getPort()"));
+    return input.requestDefaultWorkingCopy().withBody(b -> b.appendCallToSame(b.context().requireApi(IScoutApi.class).AbstractWebServiceClient().newInvocationContextMethodName() + "().getPort()"));
   }
 
   protected String getBaseName() {
     String name = elementName().orElseThrow(() -> newFail("WebService client has no name."));
-    if (name.endsWith(ISdkProperties.SUFFIX_WS_CLIENT)) {
-      name = name.substring(0, name.length() - ISdkProperties.SUFFIX_WS_CLIENT.length());
+    if (name.endsWith(ISdkConstants.SUFFIX_WS_CLIENT)) {
+      name = name.substring(0, name.length() - ISdkConstants.SUFFIX_WS_CLIENT.length());
     }
     return name;
   }
@@ -75,7 +79,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
   }
 
   protected String getPropertyClassName() {
-    return getBaseName() + ISdkProperties.SUFFIX_WS_URL_PROPERTY;
+    return getBaseName() + ISdkConstants.SUFFIX_WS_URL_PROPERTY;
   }
 
   protected ITypeGenerator<?> createUrlPropertyType() {
@@ -83,33 +87,33 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
         .asPublic()
         .asStatic()
         .withElementName(getPropertyClassName())
-        .withSuperClass(IScoutRuntimeTypes.AbstractStringConfigProperty)
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractStringConfigProperty().fqn())
         .withMethod(MethodGenerator.create()
             .asPublic()
             .withReturnType(String.class.getName())
-            .withElementName("getKey")
+            .withElementNameFrom(IScoutApi.class, api -> api.IConfigProperty().getKeyMethodName())
             .withBody(b -> b.returnClause().stringLiteral(urlPropertyName()).semicolon())
             .withAnnotation(AnnotationGenerator.createOverride()))
         .withMethod(MethodGenerator.create()
             .asPublic()
             .withReturnType(String.class.getName())
-            .withElementName("description")
+            .withElementNameFrom(IScoutApi.class, api -> api.IConfigProperty().descriptionMethodName())
             .withBody(b -> b.returnClause().stringLiteral("").semicolon().appendTodo("documentation"))
             .withAnnotation(AnnotationGenerator.createOverride()));
   }
 
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetConfiguredEndpointUrlProperty() {
     return MethodOverrideGenerator.createOverride()
-        .withElementName("getConfiguredEndpointUrlProperty")
+        .withElementNameFrom(IScoutApi.class, api -> api.AbstractWebServiceClient().getConfiguredEndpointUrlPropertyMethodName())
         .withBody(b -> b.returnClassLiteral(getPropertyClassName()));
   }
 
   protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createExecInstallHandlers() {
     return MethodOverrideGenerator.createOverride()
-        .withElementName("execInstallHandlers")
+        .withElementNameFrom(IScoutApi.class, api -> api.AbstractWebServiceClient().execInstallHandlersMethodName())
         .withBody(b -> ScoutMethodBodyBuilder.create(b)
-            .appendParameterName(0).dot().append("add").parenthesisOpen().appendBeansGet(IScoutRuntimeTypes.LogHandler).parenthesisClose().semicolon().nl()
-            .appendParameterName(0).dot().append("add").parenthesisOpen().appendBeansGet(IScoutRuntimeTypes.WsConsumerCorrelationIdHandler).parenthesisClose().semicolon());
+            .appendParameterName(0).dot().append("add").parenthesisOpen().appendBeansGetFrom(IScoutApi.class, IScoutApi::LogHandler).parenthesisClose().semicolon().nl()
+            .appendParameterName(0).dot().append("add").parenthesisOpen().appendBeansGetFrom(IScoutApi.class, IScoutApi::WsConsumerCorrelationIdHandler).parenthesisClose().semicolon());
   }
 
   public String portType() {
@@ -118,7 +122,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
 
   public TYPE withPortType(String portType) {
     m_portType = Ensure.notBlank(portType);
-    return currentInstance();
+    return thisInstance();
   }
 
   public String service() {
@@ -127,6 +131,6 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
 
   public TYPE withService(String service) {
     m_service = Ensure.notBlank(service);
-    return currentInstance();
+    return thisInstance();
   }
 }

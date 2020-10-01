@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.generator.method;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transform;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transform;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
@@ -28,10 +28,10 @@ import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.ITransformInput;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -41,6 +41,8 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link MethodOverrideGenerator}</h3>
@@ -56,9 +58,9 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   private final IWorkingCopyTransformer m_transformer; // may be null
 
   /**
-   * Creates a new {@link IMethodGenerator} that will override the method (having the same {@link #identifier(boolean)})
-   * in the super hierarchy of the owning {@link ITypeGenerator}. If there is only one overload for a method it is
-   * sufficient to provide the method name.
+   * Creates a new {@link IMethodGenerator} that will override the method (having the same
+   * {@link #identifier(IJavaEnvironment, boolean)}) in the super hierarchy of the owning {@link ITypeGenerator}. If
+   * there is only one overload for a method it is sufficient to provide the method name.
    * <p>
    * The generated method uses the signature, return type and exceptions from the overridden method. An {@link Override}
    * annotation is added automatically. If the overridden method is annotated, these annotations are NOT automatically
@@ -95,9 +97,9 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   }
 
   /**
-   * Creates a new {@link IMethodGenerator} that will override the method (having the same {@link #identifier(boolean)})
-   * in the super hierarchy of the owning {@link ITypeGenerator}. If there is only one overload for a method it is
-   * sufficient to provide the method name.
+   * Creates a new {@link IMethodGenerator} that will override the method (having the same
+   * {@link #identifier(IJavaEnvironment, boolean)}) in the super hierarchy of the owning {@link ITypeGenerator}. If
+   * there is only one overload for a method it is sufficient to provide the method name.
    * <p>
    * By default the generated method uses the signature, return type and exceptions from the overridden method. An
    * {@link Override} annotation is added automatically. If the overridden method is annotated, these annotations are
@@ -135,6 +137,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
     m_transformer = transformer;
   }
 
+  @SuppressWarnings("unchecked")
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createDefaultOverrideGenerator(IMethod template) {
     boolean isFromInterface = isInterface(template.requireDeclaringType().flags());
     boolean needsImplementation = isFromInterface || isAbstract(template.flags());
@@ -155,7 +158,9 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
     innerGenerator.parameters().forEach(IAnnotatableGenerator::clearAnnotations);
 
     // apply return type (may be narrowed)
-    returnType().ifPresent(innerGenerator::withReturnType);
+    returnType()
+        .map(api -> (ApiFunction<IApiSpecification, String>) api)
+        .ifPresent(ret -> innerGenerator.withReturnTypeFrom(ret.apiClass().orElse(null), ret.apiFunction()));
 
     if (isFromInterface) {
       innerGenerator.asPublic();
@@ -181,7 +186,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   protected Optional<IMethod> findMethodToOverride(IType container) {
     Map<String, IMethod> templateCandidates = container.methods()
         .withSuperTypes(true).stream()
-        .filter(m -> m.elementName().equals(elementName().orElseThrow(() -> newFail("To override a method at least the method name must be specified."))))
+        .filter(m -> m.elementName().equals(elementName(container.javaEnvironment()).orElseThrow(() -> newFail("To override a method at least the method name must be specified."))))
         .collect(toMap(m -> m.identifier(true), identity(), (a, b) -> a));
 
     if (templateCandidates.isEmpty()) {
@@ -191,7 +196,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
       return Optional.of(templateCandidates.values().iterator().next());
     }
 
-    return Optional.ofNullable(templateCandidates.get(identifier(true)));
+    return Optional.ofNullable(templateCandidates.get(identifier(container.javaEnvironment(), true)));
   }
 
   @Override
@@ -217,7 +222,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
    */
   public TYPE withDeclaringGenerator(ITypeGenerator<?> declaring) {
     m_typeGenerator = declaring;
-    return currentInstance();
+    return thisInstance();
   }
 
   protected static <T> T callWithTmpType(ITypeGenerator<?> declaringGenerator, IJavaEnvironment env, Function<IType, T> task) {
@@ -233,9 +238,14 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
       StringBuilder tmpTypeSource = PrimaryTypeGenerator.create()
           .withPackageName(targetPackage)
           .withElementName(typeName)
-          .withSuperClass(Ensure.notNull(declaringGenerator).superClass()
+          .withSuperClass(Ensure.notNull(declaringGenerator)
+              .superClass()
+              .flatMap(af -> af.apply(emptyCopy))
               .orElse(Object.class.getName()))
-          .withInterfaces(declaringGenerator.interfaces())
+          .withInterfaces(declaringGenerator.interfaces()
+              .map(af -> af.apply(emptyCopy))
+              .filter(Optional::isPresent)
+              .map(Optional::get))
           .toJavaSource(emptyCopy);
 
       emptyCopy.registerCompilationUnitOverride(targetPackage, typeName + JavaTypes.JAVA_FILE_SUFFIX, tmpTypeSource);

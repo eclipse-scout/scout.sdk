@@ -15,7 +15,9 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link ColumnDataAnnotation}</h3>
@@ -24,9 +26,8 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
  */
 public class ColumnDataAnnotation extends AbstractManagedAnnotation {
 
-  public static final String TYPE_NAME = IScoutRuntimeTypes.ColumnData;
+  protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(IScoutApi.class, IScoutApi::ColumnData);
   public static final SdkColumnCommand DEFAULT_VALUE = SdkColumnCommand.CREATE;
-  public static final String VALUE_ELEMENT_NAME = "value";
 
   /**
    * Gets the {@link SdkColumnCommand} value of the given {@link IAnnotatable}.
@@ -56,11 +57,11 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
    *         value is not explicitly given in the annotation the default value {@link #DEFAULT_VALUE} is returned.
    */
   public SdkColumnCommand value() {
-    return getValueAsEnum(VALUE_ELEMENT_NAME, SdkColumnCommand.class);
+    return getValueAsEnumFrom(IScoutApi.class, api -> api.ColumnData().valueElementName(), SdkColumnCommand.class);
   }
 
   public boolean isValueDefault() {
-    return isDefault("value");
+    return isDefault(IScoutApi.class, api -> api.ColumnData().valueElementName());
   }
 
   public enum SdkColumnCommand {
@@ -68,7 +69,7 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
   }
 
   /**
-   * Parses the possible available {@link IScoutRuntimeTypes#ColumnData} annotation on the given type. The
+   * Parses the possible available ColumnData annotation on the given type. The
    * {@link Optional} is empty if the given type is {@code null} or the column does not define a {@code @ColumnData}
    * annotation (including super classes).
    *
@@ -80,7 +81,8 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
     }
 
     Optional<SdkColumnCommand> sdkColumnCommand = valueOf(type);
-    if (sdkColumnCommand.orElse(DEFAULT_VALUE) == SdkColumnCommand.IGNORE || !type.annotations().withName(IScoutRuntimeTypes.Replace).existsAny()) {
+    String replaceAnnotationFqn = type.javaEnvironment().requireApi(IScoutApi.class).Replace().fqn();
+    if (sdkColumnCommand.orElse(DEFAULT_VALUE) == SdkColumnCommand.IGNORE || !type.annotations().withName(replaceAnnotationFqn).existsAny()) {
       return sdkColumnCommand;
     }
 

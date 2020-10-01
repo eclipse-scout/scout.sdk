@@ -80,5 +80,6 @@ public class FieldGeneratorTest {
   @Test
   public void testSerialVersionUid() {
     assertEquals("private static final long serialVersionUID = 1L;", FieldGenerator.createSerialVersionUid().toJavaSource().toString());
+    assertEquals("private static final long serialVersionUID = 1234L;", FieldGenerator.createSerialVersionUid(1234).toJavaSource().toString());
   }
 }

@@ -19,9 +19,9 @@ import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGene
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.dto.table.PageDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableFieldDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
@@ -85,7 +85,8 @@ public final class DtoGeneratorFactory {
     }
 
     AbstractDtoGenerator<?> formDataTypeSrc;
-    if (superType.isInstanceOf(IScoutRuntimeTypes.AbstractTableFieldBeanData)) {
+    IScoutApi scoutApi = modelType.javaEnvironment().requireApi(IScoutApi.class);
+    if (superType.isInstanceOf(scoutApi.AbstractTableFieldBeanData())) {
       formDataTypeSrc = new TableFieldDataGenerator<>(modelType, formDataAnnotation, sharedEnv);
     }
     else {

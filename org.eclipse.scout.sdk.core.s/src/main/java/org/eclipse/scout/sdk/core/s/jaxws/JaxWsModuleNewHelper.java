@@ -13,20 +13,16 @@ package org.eclipse.scout.sdk.core.s.jaxws;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
@@ -39,6 +35,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
+import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -90,8 +87,27 @@ public final class JaxWsModuleNewHelper {
     return getParentPomOf(projectPomFile, Xml.get(projectPomFile));
   }
 
+  /**
+   * @param targetModulePomFile
+   *          The {@link Path} to the server module pom.xml file for which the jaxws module should be created
+   * @param artifactId
+   *          The artifact id of the jaxws module to be created. Must not be blank.
+   * @param env
+   *          The {@link IEnvironment} in which the module is created.
+   * @param progress
+   *          The progress monitor
+   * @return The path to the created jaxws module directory.
+   * @throws IOException
+   */
   public static Path createModule(Path targetModulePomFile, String artifactId, IEnvironment env, IProgress progress) throws IOException {
     return createModuleImpl(targetModulePomFile, artifactId, env, progress);
+  }
+
+  static String scoutVersionOfModule(Path targetModulePomFile, IEnvironment env) {
+    Path serverModuleDir = targetModulePomFile.getParent();
+    return ScoutApi.version(serverModuleDir, env)
+        .map(ApiVersion::asString)
+        .orElseThrow(() -> newFail("Cannot compute Scout version of module at '{}'.", serverModuleDir));
   }
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
@@ -122,9 +138,9 @@ public final class JaxWsModuleNewHelper {
           .withWorkingDirectory(tempDirectory)
           .withGoal("archetype:generate")
           .withOption(MavenBuild.OPTION_BATCH_MODE)
-          .withProperty("archetypeGroupId", "org.eclipse.scout.archetypes")
-          .withProperty("archetypeArtifactId", "scout-jaxws-module")
-          .withProperty("archetypeVersion", ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION)
+          .withProperty("archetypeGroupId", ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID)
+          .withProperty("archetypeArtifactId", ScoutProjectNewHelper.SCOUT_ARCHETYPES_JAXWS_MODULE_ID)
+          .withProperty("archetypeVersion", scoutVersionOfModule(targetModulePomFile, env))
           .withProperty("groupId", groupId)
           .withProperty("artifactId", artifactId)
           .withProperty("version", version)
@@ -201,7 +217,7 @@ public final class JaxWsModuleNewHelper {
         newVersionElement.setTextContent(version);
       }
 
-      writeDocument(parentPom, parentPomFile);
+      Xml.writeDocument(parentPom, true, parentPomFile);
     }
     catch (TransformerException e) {
       throw new IOException(e);
@@ -219,20 +235,13 @@ public final class JaxWsModuleNewHelper {
     return newDependencyElement;
   }
 
-  static void writeDocument(Document document, Path file) throws TransformerException, IOException {
-    Transformer transformer = Xml.createTransformer(true);
-    try (OutputStream out = Files.newOutputStream(file, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
-      transformer.transform(new DOMSource(document), new StreamResult(out));
-    }
-  }
-
   static void addDependencyToTargetModule(Path targetModulePomFile, String groupId, String artifactId) throws IOException {
     try {
       Document pom = Xml.get(targetModulePomFile);
       Element dependenciesElement = JaxWsUtils.getOrCreateElement(pom.getDocumentElement(), IMavenConstants.DEPENDENCIES);
       Element dependencyElement = createDependencyElement(groupId, artifactId, pom);
       dependenciesElement.appendChild(dependencyElement);
-      writeDocument(pom, targetModulePomFile);
+      Xml.writeDocument(pom, true, targetModulePomFile);
     }
     catch (TransformerException e) {
       throw new IOException(e);

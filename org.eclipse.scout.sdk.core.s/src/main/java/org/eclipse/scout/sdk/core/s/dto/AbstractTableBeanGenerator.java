@@ -20,7 +20,9 @@ import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi.AbstractTableFieldBeanData;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.ITableBeanHolder;
 import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
@@ -35,13 +37,6 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
   public static final String ROW_INDEX_PARAM_NAME = "index";
   public static final String ROWS_PARAM_NAME = "rows";
 
-  public static final String ADD_ROW_METHOD_NAME = "addRow";
-  public static final String GET_ROW_TYPE_METHOD_NAME = "getRowType";
-  public static final String GET_ROWS_METHOD_NAME = "getRows";
-  public static final String ROW_AT_METHOD_NAME = "rowAt";
-  public static final String SET_ROWS_METHOD_NAME = "setRows";
-  public static final String CREATE_ROW_METHOD_NAME = "createRow";
-
   protected AbstractTableBeanGenerator(IType modelType, IJavaEnvironment targetEnv) {
     super(modelType, targetEnv);
   }
@@ -53,7 +48,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
 
     modelType().innerTypes()
         .withSuperClasses(true)
-        .withInstanceOf(IScoutRuntimeTypes.ITable)
+        .withInstanceOf(scoutApi().ITable())
         .first()
         .map(this::withTableBeanContent)
         .orElseGet(this::withAbstractMethodImplementations);
@@ -64,14 +59,22 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
   protected TYPE withTableBeanContent(IType table) {
     String rowDataName = getRowDataName(removeFieldSuffix(modelType().elementName()));
     String tableRowArray = rowDataName + "[]";
+    AbstractTableFieldBeanData abstractTableFieldBeanDataApi = scoutApi().AbstractTableFieldBeanData();
+    String rowAtMethodName = abstractTableFieldBeanDataApi.rowAtMethodName();
+    String setRowsMethodName = abstractTableFieldBeanDataApi.setRowsMethodName();
+    String createRowMethodName = abstractTableFieldBeanDataApi.createRowMethodName();
+    ITableBeanHolder iTableBeanHolderApi = scoutApi().ITableBeanHolder();
+    String addRowMethodName = iTableBeanHolderApi.addRowMethodName();
+    String getRowTypeMethodName = iTableBeanHolderApi.getRowTypeMethodName();
+    String getRowsMethodName = iTableBeanHolderApi.getRowsMethodName();
 
     IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createRow = MethodGenerator.create()
         .asPublic()
         .withReturnType(rowDataName)
         .withAnnotation(AnnotationGenerator.createOverride())
-        .withElementName(CREATE_ROW_METHOD_NAME)
+        .withElementName(createRowMethodName)
         .withBody(b -> b.returnClause().parenthesisOpen().ref(rowDataName).parenthesisClose().space()
-            .superClause().dot().append(ROW_AT_METHOD_NAME).parenthesisOpen().append(ROW_INDEX_PARAM_NAME).parenthesisClose().semicolon());
+            .superClause().dot().append(rowAtMethodName).parenthesisOpen().append(ROW_INDEX_PARAM_NAME).parenthesisClose().semicolon());
     if (isAbstract(table.flags()) || isAbstract(modelType().flags())) {
       createRow.asAbstract();
     }
@@ -87,75 +90,79 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
             .asPublic()
             .withReturnType(rowDataName)
             .withAnnotation(AnnotationGenerator.createOverride())
-            .withElementName(ADD_ROW_METHOD_NAME)
+            .withElementName(addRowMethodName)
             .withBody(b -> b.returnClause().parenthesisOpen().ref(rowDataName).parenthesisClose().space()
-                .superClause().dot().append(ADD_ROW_METHOD_NAME).parenthesisOpen().parenthesisClose().semicolon()),
-            DtoMemberSortObjectFactory.forMethodTableData(ADD_ROW_METHOD_NAME))
+                .superClause().dot().append(addRowMethodName).parenthesisOpen().parenthesisClose().semicolon()),
+            DtoMemberSortObjectFactory.forMethodTableData(addRowMethodName))
         .withMethod(MethodGenerator.create() // addRow(int state)
             .asPublic()
             .withReturnType(rowDataName)
             .withAnnotation(AnnotationGenerator.createOverride())
-            .withElementName(ADD_ROW_METHOD_NAME)
+            .withElementName(addRowMethodName)
             .withParameter(MethodParameterGenerator.create()
                 .withElementName(ROW_STATE_PARAM_NAME)
                 .withDataType(JavaTypes._int))
             .withBody(b -> b.returnClause().parenthesisOpen().ref(rowDataName).parenthesisClose().space()
-                .superClause().dot().append(ADD_ROW_METHOD_NAME).parenthesisOpen().append(ROW_STATE_PARAM_NAME).parenthesisClose().semicolon()),
-            DtoMemberSortObjectFactory.forMethodTableData(ADD_ROW_METHOD_NAME))
+                .superClause().dot().append(addRowMethodName).parenthesisOpen().append(ROW_STATE_PARAM_NAME).parenthesisClose().semicolon()),
+            DtoMemberSortObjectFactory.forMethodTableData(addRowMethodName))
         .withMethod(createRow, DtoMemberSortObjectFactory.forMethodTableData(createRow.elementName().get())) // createRow
         .withMethod(MethodGenerator.create() // getRowType
             .asPublic()
-            .withReturnType(Class.class.getName() + JavaTypes.C_GENERIC_START + JavaTypes.C_QUESTION_MARK + ' ' + JavaTypes.EXTENDS + ' ' + IScoutRuntimeTypes.AbstractTableRowData + JavaTypes.C_GENERIC_END)
+            .withReturnType(Class.class.getName() + JavaTypes.C_GENERIC_START + JavaTypes.C_QUESTION_MARK + ' ' + JavaTypes.EXTENDS + ' ' + scoutApi().AbstractTableRowData().fqn() + JavaTypes.C_GENERIC_END)
             .withAnnotation(AnnotationGenerator.createOverride())
-            .withElementName(GET_ROW_TYPE_METHOD_NAME)
+            .withElementName(getRowTypeMethodName)
             .withBody(b -> b.returnClause().classLiteral(rowDataName).semicolon()),
-            DtoMemberSortObjectFactory.forMethodTableData(GET_ROW_TYPE_METHOD_NAME))
+            DtoMemberSortObjectFactory.forMethodTableData(getRowTypeMethodName))
         .withMethod(MethodGenerator.create() // getRows
             .asPublic()
             .withReturnType(tableRowArray)
-            .withElementName(GET_ROWS_METHOD_NAME)
+            .withElementName(getRowsMethodName)
             .withAnnotation(AnnotationGenerator.createOverride())
             .withBody(b -> b.returnClause().parenthesisOpen().ref(tableRowArray).parenthesisClose().space()
-                .superClause().dot().append(GET_ROWS_METHOD_NAME).parenthesisOpen().parenthesisClose().semicolon()),
-            DtoMemberSortObjectFactory.forMethodTableData(GET_ROWS_METHOD_NAME))
+                .superClause().dot().append(getRowsMethodName).parenthesisOpen().parenthesisClose().semicolon()),
+            DtoMemberSortObjectFactory.forMethodTableData(getRowsMethodName))
         .withMethod(MethodGenerator.create() // rowAt
             .asPublic()
             .withReturnType(rowDataName)
             .withAnnotation(AnnotationGenerator.createOverride())
-            .withElementName(ROW_AT_METHOD_NAME)
+            .withElementName(rowAtMethodName)
             .withParameter(MethodParameterGenerator.create()
                 .withElementName(ROW_INDEX_PARAM_NAME)
                 .withDataType(JavaTypes._int))
             .withBody(b -> b.returnClause().parenthesisOpen().ref(rowDataName).parenthesisClose().space()
-                .superClause().dot().append(ROW_AT_METHOD_NAME).parenthesisOpen().append(ROW_INDEX_PARAM_NAME).parenthesisClose().semicolon()),
-            DtoMemberSortObjectFactory.forMethodTableData(ROW_AT_METHOD_NAME))
+                .superClause().dot().append(rowAtMethodName).parenthesisOpen().append(ROW_INDEX_PARAM_NAME).parenthesisClose().semicolon()),
+            DtoMemberSortObjectFactory.forMethodTableData(rowAtMethodName))
         .withMethod(MethodGenerator.create() // setRows
             .asPublic()
             .withReturnType(JavaTypes._void)
-            .withElementName(SET_ROWS_METHOD_NAME)
+            .withElementName(setRowsMethodName)
             .withParameter(MethodParameterGenerator.create()
                 .withElementName(ROWS_PARAM_NAME)
                 .withDataType(tableRowArray))
             .withBody(IMethodBodyBuilder::appendSuperCall),
-            DtoMemberSortObjectFactory.forMethodTableData(SET_ROWS_METHOD_NAME));
+            DtoMemberSortObjectFactory.forMethodTableData(setRowsMethodName));
   }
 
   protected TYPE withAbstractMethodImplementations() {
+    IScoutApi scoutApi = scoutApi();
+    String getRowTypeMethodName = scoutApi.ITableBeanHolder().getRowTypeMethodName();
+    String createRowMethodName = scoutApi.AbstractTableFieldBeanData().createRowMethodName();
+    String abstractTableRowDataFqn = scoutApi.AbstractTableRowData().fqn();
     return this
         .withMethod(MethodGenerator.create()
             .withAnnotation(AnnotationGenerator.createOverride())
             .asPublic()
-            .withReturnType(IScoutRuntimeTypes.AbstractTableRowData)
-            .withElementName(CREATE_ROW_METHOD_NAME)
-            .withBody(b -> b.returnClause().appendNew().ref(IScoutRuntimeTypes.AbstractTableRowData).parenthesisOpen().parenthesisClose().space().blockStart().nl()
+            .withReturnType(abstractTableRowDataFqn)
+            .withElementName(createRowMethodName)
+            .withBody(b -> b.returnClause().appendNew().ref(abstractTableRowDataFqn).parenthesisOpen().parenthesisClose().space().blockStart().nl()
                 .append(FieldGenerator.createSerialVersionUid()).nl().blockEnd().semicolon()),
-            DtoMemberSortObjectFactory.forMethodTableData(CREATE_ROW_METHOD_NAME))
+            DtoMemberSortObjectFactory.forMethodTableData(createRowMethodName))
         .withMethod(MethodGenerator.create()
             .withAnnotation(AnnotationGenerator.createOverride())
             .asPublic()
-            .withReturnType(Class.class.getName() + JavaTypes.C_GENERIC_START + JavaTypes.C_QUESTION_MARK + ' ' + JavaTypes.EXTENDS + ' ' + IScoutRuntimeTypes.AbstractTableRowData + JavaTypes.C_GENERIC_END)
-            .withElementName(GET_ROW_TYPE_METHOD_NAME)
-            .withBody(b -> b.returnClause().classLiteral(IScoutRuntimeTypes.AbstractTableRowData).semicolon()),
-            DtoMemberSortObjectFactory.forMethodTableData(GET_ROW_TYPE_METHOD_NAME));
+            .withReturnType(Class.class.getName() + JavaTypes.C_GENERIC_START + JavaTypes.C_QUESTION_MARK + ' ' + JavaTypes.EXTENDS + ' ' + abstractTableRowDataFqn + JavaTypes.C_GENERIC_END)
+            .withElementName(getRowTypeMethodName)
+            .withBody(b -> b.returnClause().classLiteral(abstractTableRowDataFqn).semicolon()),
+            DtoMemberSortObjectFactory.forMethodTableData(getRowTypeMethodName));
   }
 }

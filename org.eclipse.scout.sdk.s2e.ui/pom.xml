@@ -70,6 +70,13 @@
       <artifactId>org.eclipse.swt.${osgi.platform}</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <!-- Test dependency -->
+    <dependency>
+    <groupId>org.eclipse.scout.sdk</groupId>
+    <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
+      <scope>test</scope>
+  </dependency>
   </dependencies>
 
 

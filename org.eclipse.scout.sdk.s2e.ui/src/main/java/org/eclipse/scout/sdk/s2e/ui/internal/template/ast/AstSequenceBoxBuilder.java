@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 
 /**
  * <h3>{@link AstSequenceBoxBuilder}</h3>
@@ -48,7 +47,7 @@ public class AstSequenceBoxBuilder extends AstTypeBuilder<AstSequenceBoxBuilder>
     Block body = ast.newBlock();
     body.statements().add(returnStatement);
 
-    getFactory().newMethod("getConfiguredAutoCheckFromTo")
+    getFactory().newMethod(getFactory().getScoutApi().AbstractSequenceBox().getConfiguredAutoCheckFromToMethodName())
         .withModifiers(ModifierKeyword.PROTECTED_KEYWORD)
         .withOverride(true)
         .withReturnType(ast.newPrimitiveType(PrimitiveType.BOOLEAN))
@@ -61,7 +60,7 @@ public class AstSequenceBoxBuilder extends AstTypeBuilder<AstSequenceBoxBuilder>
     if (links != null && isCreateLinks()) {
       links.addLinkedPosition(getFactory().getRewrite().track(literal), true, AstNodeFactory.AUTO_CHECK_GROUP);
       links.addLinkedPositionProposalsBoolean(AstNodeFactory.AUTO_CHECK_GROUP);
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.ISequenceBox);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ISequenceBox().fqn());
     }
   }
 }

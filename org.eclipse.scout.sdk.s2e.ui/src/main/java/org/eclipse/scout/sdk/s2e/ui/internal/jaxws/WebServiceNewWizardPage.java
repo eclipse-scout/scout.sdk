@@ -40,9 +40,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl;
@@ -63,7 +63,8 @@ import org.eclipse.scout.sdk.s2e.ui.fields.text.StyledTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizardPage;
-import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
+import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.swt.SWT;
@@ -81,6 +82,7 @@ import org.w3c.dom.Element;
  *
  * @since 5.2.0
  */
+@SuppressWarnings("DuplicatedCode")
 public class WebServiceNewWizardPage extends AbstractWizardPage {
 
   public static final String PROP_WEB_SERVICE_TYPE = "webServiceType";
@@ -215,7 +217,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     // Provider WSDL Name
     m_providerWsdlNameField = FieldToolkit.createStyledTextField(typeGroupBox, "Web Service Name", TextField.TYPE_LABEL, labelWidth);
     m_providerWsdlNameField.setText(getWsdlName());
-    m_providerWsdlNameField.setReadOnlySuffix(ISdkProperties.SUFFIX_WS_PROVIDER);
+    m_providerWsdlNameField.setReadOnlySuffix(ISdkConstants.SUFFIX_WS_PROVIDER);
     m_providerWsdlNameField.addModifyListener(e -> {
       setWsdlNameInternal(m_providerWsdlNameField.getText());
       pingStateChanging();
@@ -491,7 +493,9 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
 
   protected static boolean isServerProject(IJavaProject jp) {
     try {
-      return JdtUtils.exists(jp.findType(IScoutRuntimeTypes.IServerSession))
+      Optional<IScoutApi> scoutApi = ApiHelper.scoutApiFor(jp);
+      return scoutApi.isPresent()
+          && JdtUtils.exists(jp.findType(scoutApi.get().IServerSession().fqn()))
           && !jp.getProject().getFolder(IScoutSourceFolders.WEBAPP_RESOURCE_FOLDER + "/WEB-INF").exists()
           && !Files.exists(AbstractWebServiceNewOperation.getWsdlRootFolder(jp.getProject().getLocation().toFile().toPath()));
     }
@@ -523,7 +527,11 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       if (!JdtUtils.exists(primarySourceFolder) || !primarySourceFolder.getResource().getProjectRelativePath().toString().toLowerCase(Locale.ENGLISH).contains("java")) {
         return false;
       }
-      if (!JdtUtils.exists(jp.findType(IScoutRuntimeTypes.AbstractWebServiceClient))) {
+      Optional<IScoutApi> scoutApi = ApiHelper.scoutApiFor(jp);
+      if (scoutApi.isEmpty()) {
+        return false;
+      }
+      if (!JdtUtils.exists(jp.findType(scoutApi.get().AbstractWebServiceClient().fqn()))) {
         return false;
       }
 
@@ -583,14 +591,14 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
   }
 
   protected IStatus getStatusPackage() {
-    return CompilationUnitNewWizardPage.validatePackageName(getTargetPackage());
+    return AbstractCompilationUnitNewWizardPage.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusWsdlName() {
     if (WebServiceType.PROVIDER_FROM_EMPTY_WSDL != getWebServiceType()) {
       return Status.OK_STATUS;
     }
-    return CompilationUnitNewWizardPage.validateJavaName(getWsdlName(), m_providerWsdlNameField.getReadOnlySuffix());
+    return AbstractCompilationUnitNewWizardPage.validateJavaName(getWsdlName(), m_providerWsdlNameField.getReadOnlySuffix());
   }
 
   protected IStatus getStatusExistingJaxWsProject() {

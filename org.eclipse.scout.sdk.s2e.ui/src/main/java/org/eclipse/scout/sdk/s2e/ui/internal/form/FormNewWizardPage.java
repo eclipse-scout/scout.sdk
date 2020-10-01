@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.form;
 
+import java.util.Optional;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -17,16 +19,17 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
-import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
+import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
 import org.eclipse.swt.SWT;
@@ -42,7 +45,7 @@ import org.eclipse.ui.PlatformUI;
  *
  * @since 5.2.0
  */
-public class FormNewWizardPage extends CompilationUnitNewWizardPage {
+public class FormNewWizardPage extends AbstractCompilationUnitNewWizardPage {
 
   public static final String PROP_CREATE_FORM_DATA = "createFormData";
   public static final String PROP_CREATE_SERVICE = "createService";
@@ -61,10 +64,20 @@ public class FormNewWizardPage extends CompilationUnitNewWizardPage {
   protected ProposalTextField m_serverSourceFolder;
 
   public FormNewWizardPage(PackageContainer packageContainer) {
-    super(FormNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_FORM, IScoutRuntimeTypes.IForm, IScoutRuntimeTypes.AbstractForm, ScoutTier.Client);
+    super(FormNewWizardPage.class.getName(), packageContainer, ISdkConstants.SUFFIX_FORM, ScoutTier.Client);
     setTitle("Create a new Form");
     setDescription(getTitle());
     setIcuGroupName("New Form Details");
+  }
+
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+    return scoutApi().map(IScoutApi::AbstractForm);
+  }
+
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
+    return scoutApi().map(IScoutApi::IForm);
   }
 
   @Override

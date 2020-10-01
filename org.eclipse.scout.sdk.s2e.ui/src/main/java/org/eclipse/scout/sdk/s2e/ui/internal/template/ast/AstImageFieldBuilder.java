@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 
 /**
  * <h3>{@link AstImageFieldBuilder}</h3>
@@ -34,7 +33,7 @@ public class AstImageFieldBuilder extends AstTypeBuilder<AstImageFieldBuilder> {
   public AstImageFieldBuilder insert() {
     super.insert();
 
-    addGetConfiguredAutoFit("getConfiguredAutoFit", get());
+    addGetConfiguredAutoFit(getFactory().getScoutApi().AbstractImageField().getConfiguredAutoFitMethodName(), get());
 
     getFactory().newGetConfiguredGridH(4)
         .in(get())
@@ -71,7 +70,7 @@ public class AstImageFieldBuilder extends AstTypeBuilder<AstImageFieldBuilder> {
     if (links != null && isCreateLinks()) {
       links.addLinkedPosition(getFactory().getRewrite().track(literal), true, AstNodeFactory.AUTO_FIT_GROUP);
       links.addLinkedPositionProposalsBoolean(AstNodeFactory.AUTO_FIT_GROUP);
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IImageField);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IImageField().fqn());
     }
   }
 }

@@ -13,13 +13,17 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.core.util.apidef.ApiFunction.applyWithApi;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
@@ -36,6 +40,9 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.Api;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link JavaEnvironmentImplementor}</h3>
@@ -45,10 +52,17 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class JavaEnvironmentImplementor implements IJavaEnvironment {
   private final JavaEnvironmentSpi m_spi;
   private FinalValue<List<IClasspathEntry>> m_sourceFoldersSorted;
+  private final Map<Class<? extends IApiSpecification>, IApiSpecification> m_apiCache;
 
   public JavaEnvironmentImplementor(JavaEnvironmentSpi spi) {
     m_spi = spi;
     m_sourceFoldersSorted = new FinalValue<>();
+    m_apiCache = new ConcurrentHashMap<>();
+  }
+
+  @Override
+  public Optional<IType> findType(IClassNameSupplier nameSupplier) {
+    return findType(nameSupplier.fqn());
   }
 
   @Override
@@ -58,9 +72,26 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
+  public <A extends IApiSpecification> Optional<IType> findTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier) {
+    return applyWithApi(apiDefinition, nameSupplier, this)
+        .flatMap(this::findType);
+  }
+
+  @Override
+  public IType requireType(IClassNameSupplier nameSupplier) {
+    return requireType(nameSupplier.fqn());
+  }
+
+  @Override
   public IType requireType(String fqn) {
     return findType(fqn)
         .orElseThrow(() -> newFail("Type '{}' cannot be found.", fqn));
+  }
+
+  @Override
+  public <A extends IApiSpecification> IType requireTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier) {
+    return applyWithApi(apiDefinition, nameSupplier, this)
+        .map(this::requireType).orElseThrow(() -> newFail("Cannot find API '{}' in this context.", apiDefinition.getSimpleName()));
   }
 
   @Override
@@ -119,6 +150,26 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public <A extends IApiSpecification> Optional<A> api(Class<A> apiDefinition) {
+    Class<A> key = apiDefinition == null ? (Class<A>) IApiSpecification.class : apiDefinition;
+    A api = (A) m_apiCache.computeIfAbsent(key, this::createApi);
+    return Optional.ofNullable(api); // is empty in case the apiDefinition class is null or the API could not be found in this environment.
+  }
+
+  @Override
+  public <A extends IApiSpecification> A requireApi(Class<A> apiDefinition) {
+    return api(apiDefinition).orElseThrow(() -> newFail("API '{}' could not be found.", apiDefinition.getSimpleName()));
+  }
+
+  protected <A extends IApiSpecification> A createApi(Class<A> apiDefinition) {
+    if (apiDefinition == IApiSpecification.class) {
+      return null;
+    }
+    return Api.create(apiDefinition, this).orElse(null);
+  }
+
+  @Override
   public Stream<IClasspathEntry> sourceFolders() {
     return sourceFoldersSorted().stream();
   }
@@ -155,6 +206,7 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
 
   public void spiChanged() {
     m_sourceFoldersSorted = new FinalValue<>();
+    m_apiCache.clear();
   }
 
   protected static int priorityOfSourceFolder(IClasspathEntry sf) {

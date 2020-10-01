@@ -1,6 +1,6 @@
-public static class ${dollar}name${dollar}Code extends ${dollar}super${dollar}<${dollar}declaringTypeArg(${ICodeType}, ${TYPE_PARAM_CODETYPE__CODE_ID}, box)${dollar}> {
+public static class ${dollar}name${dollar}Code extends ${dollar}super${dollar}<${dollar}declaringTypeArg(${ICodeType}, ${ICodeType_codeIdTypeParamIndex}, box)${dollar}> {
   private static final long serialVersionUID = 1L;
-  public static final ${dollar}declaringTypeArg(${ICodeType}, ${TYPE_PARAM_CODETYPE__CODE_ID}, unbox)${dollar} ID = ${dollar}declaringTypeArg(${ICodeType}, ${TYPE_PARAM_CODETYPE__CODE_ID}, default)${dollar};
+  public static final ${dollar}declaringTypeArg(${ICodeType}, ${ICodeType_codeIdTypeParamIndex}, unbox)${dollar} ID = ${dollar}declaringTypeArg(${ICodeType}, ${ICodeType_codeIdTypeParamIndex}, default)${dollar};
 
   @java.lang.Override
   protected java.lang.String getConfiguredText() {
@@ -8,7 +8,7 @@ public static class ${dollar}name${dollar}Code extends ${dollar}super${dollar}<$
   }
 
   @java.lang.Override
-  public ${dollar}declaringTypeArg(${ICodeType}, ${TYPE_PARAM_CODETYPE__CODE_ID}, box)${dollar} getId() {
+  public ${dollar}declaringTypeArg(${ICodeType}, ${ICodeType_codeIdTypeParamIndex}, box)${dollar} getId() {
     return ID;
   }${dollar}END${dollar}
 }

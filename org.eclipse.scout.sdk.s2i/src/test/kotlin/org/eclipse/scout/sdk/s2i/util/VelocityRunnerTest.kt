@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2i.util
 
 import junit.framework.TestCase
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import java.util.regex.Pattern
 
 class VelocityRunnerTest : TestCase() {
@@ -20,11 +19,12 @@ class VelocityRunnerTest : TestCase() {
      * tests that properties are replaced and that if variables can be used
      */
     fun testReplaceAndIf() {
+        val propertyValue = "propVal"
         val result = VelocityRunner()
-                .withProperty("TEXTS", IScoutRuntimeTypes.TEXTS)
+                .withProperty("TEXTS", propertyValue)
                 .withProperty("dd", false)
                 .eval("start\$nls\$end\n\${TEXTS}.get()\n\$dd\n#if( \$dd )static #end class\$dollar")
-        assertEquals("start\$nls\$end\n${IScoutRuntimeTypes.TEXTS}.get()\nfalse\n class$", result.toString())
+        assertEquals("start\$nls\$end\n${propertyValue}.get()\nfalse\n class$", result.toString())
     }
 
     /**

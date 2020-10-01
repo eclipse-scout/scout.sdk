@@ -28,6 +28,6 @@ open class ChangeClassIdValueQuickFix(val annotation: ClassIdAnnotation) : Local
         val newClassIdValue = ClassIds.next(annotation.psiClass.qualifiedName)
         val javaAnnotationSupport = LanguageAnnotationSupport.INSTANCE.forLanguage(annotation.psiClass.language)
         val value = javaAnnotationSupport.createLiteralValue(newClassIdValue, annotation.psiAnnotation)
-        annotation.psiAnnotation.setDeclaredAttributeValue(ClassIdAnnotation.VALUE_ATTRIBUTE_NAME, value)
+        annotation.psiAnnotation.setDeclaredAttributeValue(annotation.scoutApi.ClassId().valueElementName(), value)
     }
 }

@@ -18,8 +18,7 @@ import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 
 /**
  * <h3>{@link AstTableFieldBuilder}</h3>
@@ -42,7 +41,7 @@ public class AstTableFieldBuilder extends AstTypeBuilder<AstTableFieldBuilder> {
     // super type
     ParameterizedType parameterizedType = ast.newParameterizedType(getSuperType());
     SimpleType selfQualifier = ast.newSimpleType(ast.newSimpleName(getTypeName() + getReadOnlySuffix()));
-    QualifiedType tableTypeArg = ast.newQualifiedType(selfQualifier, ast.newSimpleName(ISdkProperties.INNER_TABLE_TYPE_NAME));
+    QualifiedType tableTypeArg = ast.newQualifiedType(selfQualifier, ast.newSimpleName(ISdkConstants.INNER_TABLE_TYPE_NAME));
     parameterizedType.typeArguments().add(tableTypeArg);
     withSuperType(parameterizedType);
 
@@ -53,8 +52,8 @@ public class AstTableFieldBuilder extends AstTypeBuilder<AstTableFieldBuilder> {
         .insert();
 
     // inner table
-    Type tableSuperType = getFactory().newTypeReference(IScoutRuntimeTypes.AbstractTable);
-    m_tableDeclaration = getFactory().newType(ISdkProperties.INNER_TABLE_TYPE_NAME)
+    Type tableSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractTable().fqn());
+    m_tableDeclaration = getFactory().newType(ISdkConstants.INNER_TABLE_TYPE_NAME)
         .withCalculatedOrder(false)
         .withClassId(true)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
@@ -72,7 +71,7 @@ public class AstTableFieldBuilder extends AstTypeBuilder<AstTableFieldBuilder> {
     if (links != null && isCreateLinks()) {
       ITrackedNodePosition typeNamePosInGeneric = new WrappedTrackedNodePosition(getFactory().getRewrite().track(selfQualifier), 0, -getReadOnlySuffix().length());
       links.addLinkedPosition(typeNamePosInGeneric, false, AstNodeFactory.TYPE_NAME_GROUP);
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.ITableField);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ITableField().fqn());
     }
 
     return this;

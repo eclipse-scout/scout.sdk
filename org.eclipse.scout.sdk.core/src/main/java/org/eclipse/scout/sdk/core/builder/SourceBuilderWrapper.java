@@ -43,60 +43,60 @@ public class SourceBuilderWrapper<TYPE extends ISourceBuilder<TYPE>> extends Abs
   @Override
   public TYPE space() {
     inner().space();
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(char[] c) {
     inner().append(c);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(String s) {
     inner().append(s);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(char c) {
     inner().append(c);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(CharSequence cs) {
     inner().append(cs);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(boolean b) {
     inner().append(b);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(double d) {
     inner().append(d);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(float f) {
     inner().append(f);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(int i) {
     inner().append(i);
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
   public TYPE append(long l) {
     inner().append(l);
-    return currentInstance();
+    return thisInstance();
   }
 }

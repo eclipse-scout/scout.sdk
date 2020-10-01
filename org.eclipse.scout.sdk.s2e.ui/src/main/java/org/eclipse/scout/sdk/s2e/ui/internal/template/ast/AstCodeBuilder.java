@@ -31,7 +31,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.ICodeType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
@@ -45,6 +45,7 @@ import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
 
   public static final String ID_FIELD_NAME = "ID";
+  @SuppressWarnings("PublicStaticCollectionField")
   public static final Set<String> PROPOSAL_CODE_DATA_TYPES = new ConcurrentSkipListSet<>();
 
   static {
@@ -85,7 +86,7 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
       ITrackedNodePosition dataTypeTracker = getFactory().getRewrite().track(genericFromCodeType);
       links.addLinkedPosition(dataTypeTracker, true, AstNodeFactory.CODE_DATA_TYPE_GROUP);
 
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.ICode);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ICode().fqn());
 
       ITypeBinding typeBinding = getFactory().resolveTypeBinding(genericFromCodeTypeFqn);
       if (typeBinding != null) {
@@ -117,8 +118,10 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
   protected String parseCodeIdTypeFromCodeType() {
     TypeDeclaration codeType = getDeclaringCodeType();
     IType typeBinding = Ensure.notNull(AstUtils.getTypeBinding(codeType));
+    //noinspection resource
     org.eclipse.scout.sdk.core.model.api.IType scoutType = getFactory().getScoutElementProvider().toScoutType(typeBinding);
-    return scoutType.resolveTypeParamValue(IScoutRuntimeTypes.TYPE_PARAM_CODETYPE__CODE_ID, IScoutRuntimeTypes.ICodeType)
+    ICodeType iCodeType = getFactory().getScoutApi().ICodeType();
+    return scoutType.resolveTypeParamValue(iCodeType.codeIdTypeParamIndex(), iCodeType.fqn())
         .flatMap(Stream::findFirst)
         .map(org.eclipse.scout.sdk.core.model.api.IType::name)
         .orElse(JavaTypes.Integer);
@@ -171,7 +174,7 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
     MethodDeclaration getId = ast.newMethodDeclaration();
     getId.setConstructor(false);
     getId.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
-    getId.setName(ast.newSimpleName("getId"));
+    getId.setName(ast.newSimpleName(getFactory().getScoutApi().ICode().getIdMethodName()));
 
     Type simpleDataType = getFactory().newTypeReference(codeIdTypeFqn);
     getId.setReturnType2(simpleDataType);

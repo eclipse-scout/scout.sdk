@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import javax.xml.transform.TransformerException;
@@ -26,18 +27,20 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.ITransformInput;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Xml;
@@ -83,13 +86,18 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
     for (WebServiceImplementationUpdate up : m_webServiceImplUpdates) {
       ICompilationUnit wsImpl = up.getWebServiceImpl().requireCompilationUnit();
       ICompilationUnitGenerator<?> builder = wsImpl.toWorkingCopy();
+      IJavaEnvironment javaEnvironment = wsImpl.javaEnvironment();
 
       builder.mainType().ifPresent(mainType -> {
         // remove the old import to port type
-        mainType.interfaces().forEach(builder::withoutImport);
+        mainType.interfaces()
+            .map(af -> af.apply(javaEnvironment))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .forEach(builder::withoutImport);
 
         // remove old port type super interface
-        removePortTypeSuperInterfaces(mainType);
+        removePortTypeSuperInterfaces(mainType, javaEnvironment);
 
         // new super interface
         String newPortTypeFqn = up.getPackage() + JavaTypes.C_DOT + up.getPortTypeName();
@@ -97,21 +105,24 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
       });
 
       // update wsdl faults (exceptions)
-      updateWsdlFaults(builder, up.getPackage());
+      updateWsdlFaults(builder, up.getPackage(), javaEnvironment);
 
       env.writeCompilationUnit(builder, up.getSourceFolder(), progress);
     }
   }
 
-  protected static void updateWsdlFaults(ICompilationUnitGenerator<?> icuBuilder, String newPackage) {
+  protected static void updateWsdlFaults(ICompilationUnitGenerator<?> icuBuilder, String newPackage, IJavaEnvironment javaEnvironment) {
     icuBuilder
         .mainType()
         .ifPresent(t -> t.methods().forEach(methodBuilder -> {
-          List<String> exceptions = methodBuilder.exceptions().collect(toList());
+          List<String> exceptions = methodBuilder.exceptions()
+              .map(func -> func.apply(javaEnvironment))
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .collect(toList());
+          methodBuilder.withoutException(element -> true); // remove all existing exceptions
           for (String exc : exceptions) {
-            methodBuilder
-                .withoutException(exc)
-                .withException(newPackage + JavaTypes.C_DOT + JavaTypes.simpleName(exc));
+            methodBuilder.withException(newPackage + JavaTypes.C_DOT + JavaTypes.simpleName(exc));
             icuBuilder.withoutImport(exc);
           }
         }));
@@ -124,22 +135,24 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
 
     for (WebServiceClientUpdate up : m_webServiceClientUpdates) {
       ICompilationUnit wsClient = up.getWebServiceClient().requireCompilationUnit();
+      IJavaEnvironment javaEnvironment = wsClient.javaEnvironment();
+      IScoutApi scoutApi = javaEnvironment.requireApi(IScoutApi.class);
       ICompilationUnitGenerator<?> builder = wsClient.toWorkingCopy();
 
       builder.mainType()
           .ifPresent(mainType -> {
             // remove the old imports
-            for (String oldImport : JavaTypes.typeArguments(mainType.superClass().get())) {
+            for (String oldImport : JavaTypes.typeArguments(mainType.superClass().flatMap(af -> af.apply(javaEnvironment)).get())) {
               builder.withoutImport(oldImport);
             }
 
             // remove old port type super interface
-            removePortTypeSuperInterfaces(mainType);
+            removePortTypeSuperInterfaces(mainType, javaEnvironment);
 
             // set new super class and super interface
             String newPortTypeFqn = up.getPackage() + JavaTypes.C_DOT + up.getPortTypeName();
             String newWebServiceFqn = up.getPackage() + JavaTypes.C_DOT + up.getWebServiceName();
-            StringBuilder superTypeFqnBuilder = new StringBuilder(IScoutRuntimeTypes.AbstractWebServiceClient);
+            StringBuilder superTypeFqnBuilder = new StringBuilder(scoutApi.AbstractWebServiceClient().fqn());
             superTypeFqnBuilder.append(JavaTypes.C_GENERIC_START).append(newWebServiceFqn).append(", ").append(newPortTypeFqn).append(JavaTypes.C_GENERIC_END);
             mainType
                 .withInterface(newPortTypeFqn)
@@ -147,15 +160,16 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
           });
 
       // update wsdl faults (exceptions)
-      updateWsdlFaults(builder, up.getPackage());
+      updateWsdlFaults(builder, up.getPackage(), javaEnvironment);
       env.writeCompilationUnit(builder, up.getSourceFolder(), progress);
     }
   }
 
-  protected static void removePortTypeSuperInterfaces(ITypeGenerator<?> generator) {
-    generator.interfaces()
-        .filter(ifc -> ifc.endsWith(ISdkProperties.SUFFIX_WS_PORT_TYPE))
-        .forEach(generator::withoutInterface);
+  protected static void removePortTypeSuperInterfaces(ITypeGenerator<?> generator, IJavaEnvironment environment) {
+    generator.withoutInterface(
+        ifc -> ifc.apply(environment)
+            .filter(ref -> ref.endsWith(ISdkConstants.SUFFIX_WS_PORT_TYPE))
+            .isPresent());
   }
 
   protected void updateJaxWsBinding(IEnvironment env, IProgress progress) {
@@ -191,7 +205,7 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
         packageNameElement.setAttribute(JaxWsUtils.BINDINGS_NAME_ATTRIBUTE, getPackage());
         progress.worked(1);
 
-        env.writeResource(Xml.documentToString(document, true), jaxwsBindingFile, progress.newChild(1));
+        env.writeResource(Xml.writeDocument(document, true), jaxwsBindingFile, progress.newChild(1));
       }
     }
     catch (XPathExpressionException | TransformerException | IOException e) {
@@ -206,25 +220,27 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
         continue;
       }
 
+      IScoutApi scoutApi = entryPointDefinition.javaEnvironment().requireApi(IScoutApi.class);
       ICompilationUnit definition = entryPointDefinition.requireCompilationUnit();
       IWorkingCopyTransformer transformer = new SimpleWorkingCopyTransformerBuilder()
-          .withAnnotationElementMapper(input -> rewriteEntryPointDefinitionAnnotationElements(input, up))
+          .withAnnotationElementMapper(input -> rewriteEntryPointDefAnnotationElements(input, scoutApi, up))
           .build();
       ICompilationUnitGenerator<?> builder = definition.toWorkingCopy(transformer);
       env.writeCompilationUnit(builder, up.getSourceFolder(), progress);
     }
   }
 
-  protected static ISourceGenerator<IExpressionBuilder<?>> rewriteEntryPointDefinitionAnnotationElements(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input, EntryPointDefinitionUpdate up) {
-    if (IScoutRuntimeTypes.WebServiceEntryPoint.equals(input.model().declaringAnnotation().name())) {
-      if (JaxWsUtils.ENTRY_POINT_DEFINITION_ENDPOINT_INTERFACE_ATTRIBUTE.equals(input.model().elementName())) {
+  protected static ISourceGenerator<IExpressionBuilder<?>> rewriteEntryPointDefAnnotationElements(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input,
+      IScoutAnnotationApi scoutApi, EntryPointDefinitionUpdate up) {
+    if (scoutApi.WebServiceEntryPoint().fqn().equals(input.model().declaringAnnotation().name())) {
+      if (scoutApi.WebServiceEntryPoint().endpointInterfaceElementName().equals(input.model().elementName())) {
         String newPortTypeFqn = up.getPortTypePackage() + JavaTypes.C_DOT + up.getPortTypeName();
         return b -> b.classLiteral(newPortTypeFqn);
       }
-      if (JaxWsUtils.ENTRY_POINT_DEFINITION_NAME_ATTRIBUTE.equals(input.model().elementName())) {
+      if (scoutApi.WebServiceEntryPoint().entryPointNameElementName().equals(input.model().elementName())) {
         return b -> b.stringLiteral(up.getEntryPointName());
       }
-      if (JaxWsUtils.ENTRY_POINT_DEFINITION_PACKAGE_ATTRIBUTE.equals(input.model().elementName())) {
+      if (scoutApi.WebServiceEntryPoint().entryPointPackageElementName().equals(input.model().elementName())) {
         return b -> b.stringLiteral(up.getEntryPointPackage());
       }
     }

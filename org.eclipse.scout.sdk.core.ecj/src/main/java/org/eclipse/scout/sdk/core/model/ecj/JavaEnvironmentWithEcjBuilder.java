@@ -73,11 +73,11 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    */
   public T withRunningClasspath(boolean b) {
     m_includeRunningClasspath = b;
-    return currentInstance();
+    return thisInstance();
   }
 
   @SuppressWarnings("unchecked")
-  protected T currentInstance() {
+  protected T thisInstance() {
     return (T) this;
   }
 
@@ -114,7 +114,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    */
   public T withJavaHome(Path javaHome) {
     m_javaHome = javaHome;
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -128,7 +128,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     Pattern pat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
     m_sourceExcludes.put(regex, pat);
     m_binaryExcludes.put(regex, pat);
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -155,7 +155,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   public T include(String regex) {
     m_sourceExcludes.remove(regex);
     m_binaryExcludes.remove(regex);
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -168,7 +168,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    */
   public T withParseMethodBodies(boolean parseBodies) {
     m_parseMethodBodies = parseBodies;
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -189,7 +189,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    */
   public T withSourcesIncluded(boolean includeSources) {
     m_includeSources = includeSources;
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -208,7 +208,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    */
   public T withoutSources(String regex) {
     m_sourceExcludes.put(regex, Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -237,7 +237,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     if (sourceFolder != null) {
       appendSourcePath(m_curDir.resolve(sourceFolder), encoding, m_paths);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -252,7 +252,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     if (classesFolder != null) {
       appendBinaryPath(m_curDir.resolve(classesFolder), m_paths);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -281,7 +281,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     if (sourcePath != null) {
       appendSourcePath(Paths.get(sourcePath), encoding, m_paths);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -296,7 +296,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     if (binaryPath != null) {
       appendBinaryPath(Paths.get(binaryPath), m_paths);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   /**
@@ -443,8 +443,8 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   }
 
   @SuppressWarnings("MethodMayBeStatic")
-  protected JavaEnvironmentWithEcj build(Path javaHome, Collection<? extends ClasspathEntry> classpaths, CompilerOptions options) {
-    return new JavaEnvironmentWithEcj(javaHome, classpaths, options);
+  protected JavaEnvironmentWithEcj build(Path javaHome, Collection<? extends ClasspathEntry> classpath, CompilerOptions options) {
+    return new JavaEnvironmentWithEcj(javaHome, classpath, options);
   }
 
   /**

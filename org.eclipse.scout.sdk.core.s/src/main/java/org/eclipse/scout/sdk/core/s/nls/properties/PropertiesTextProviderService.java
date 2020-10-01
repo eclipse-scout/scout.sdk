@@ -18,7 +18,8 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi.AbstractDynamicNlsTextProviderService;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.TextProviderService;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -27,7 +28,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
 /**
  * <h3>{@link PropertiesTextProviderService}</h3>
  * <p>
- * Text provider service that extends {@link IScoutRuntimeTypes#AbstractDynamicNlsTextProviderService}.
+ * Text provider service that extends {@link IScoutApi#AbstractDynamicNlsTextProviderService()}.
  *
  * @since 7.0.0
  */
@@ -53,9 +54,16 @@ public class PropertiesTextProviderService extends TextProviderService {
    * @return The parsed {@link PropertiesTextProviderService} or an empty {@link Optional} if it cannot be parsed.
    */
   public static Optional<PropertiesTextProviderService> create(IType txtSvc) {
-    return Ensure.notNull(txtSvc)
+    return Ensure.notNull(txtSvc).javaEnvironment().api(IScoutApi.class)
+        .map(IScoutApi::AbstractDynamicNlsTextProviderService)
+        .map(AbstractDynamicNlsTextProviderService::getDynamicNlsBaseNameMethodName)
+        .flatMap(getDynamicNlsBaseName -> create(txtSvc, getDynamicNlsBaseName));
+  }
+
+  protected static Optional<PropertiesTextProviderService> create(IType txtSvc, CharSequence getDynamicNlsBaseName) {
+    return txtSvc
         .methods()
-        .withMethodIdentifier(JavaTypes.createMethodIdentifier("getDynamicNlsBaseName", null))
+        .withMethodIdentifier(JavaTypes.createMethodIdentifier(getDynamicNlsBaseName, null))
         .withSuperClasses(true)
         .first()
         .flatMap(IMethod::sourceOfBody)

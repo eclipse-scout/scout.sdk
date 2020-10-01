@@ -43,4 +43,6 @@ public interface IMavenConstants {
   String NAME = "name";
   String RELATIVE_PATH = "relativePath";
   String SCOPE = "scope";
+
+  String LATEST = "LATEST";
 }

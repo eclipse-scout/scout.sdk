@@ -10,11 +10,14 @@
  */
 package org.eclipse.scout.sdk.core.builder.java.expression;
 
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link IExpressionBuilder}</h3>
@@ -61,6 +64,8 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    */
   TYPE classLiteral(CharSequence reference);
 
+  <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, IClassNameSupplier> referenceProvider);
+
   /**
    * Appends a string literal with given value. The value is automatically escaped as necessary and surrounded with
    * double quotes.<br>
@@ -95,6 +100,8 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    * @see #nullLiteral()
    */
   TYPE stringLiteralArray(Stream<? extends CharSequence> elements, boolean formatWithNewlines);
+
+  TYPE stringLiteralArray(CharSequence... elements);
 
   /**
    * Appends a string array with the elements from the specified array. The values are automatically escaped as

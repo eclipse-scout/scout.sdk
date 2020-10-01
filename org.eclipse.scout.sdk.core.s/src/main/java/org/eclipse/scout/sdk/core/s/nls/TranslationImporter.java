@@ -17,7 +17,6 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateDefaultText;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateKey;
-import static org.eclipse.scout.sdk.core.util.Ensure.failOnDuplicates;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,7 +102,7 @@ public class TranslationImporter implements ITranslationImportInfo {
     try {
       m_importedTranslations.putAll(toImport.values().stream()
           .map(translation -> stack.mergeTranslation(translation, targetForNewTranslations))
-          .collect(toMap(ITranslation::key, Function.identity(), failOnDuplicates())));
+          .collect(toMap(ITranslation::key, Function.identity(), Ensure::failOnDuplicates)));
     }
     finally {
       stack.setChanging(false);

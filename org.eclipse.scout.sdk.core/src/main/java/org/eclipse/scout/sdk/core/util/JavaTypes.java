@@ -12,10 +12,12 @@ package org.eclipse.scout.sdk.core.util;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
 import static org.eclipse.scout.sdk.core.util.Strings.lastIndexOf;
 
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 /**
  * <h3>{@link JavaTypes}</h3>
@@ -142,6 +145,10 @@ public final class JavaTypes {
    */
   public static final String EXTENDS = "extends";
   /**
+   * The Java {@code implements} keyword.
+   */
+  public static final String IMPLEMENTS = "implements";
+  /**
    * The Java {@code super} keyword.
    */
   public static final String SUPER = "super";
@@ -206,7 +213,7 @@ public final class JavaTypes {
   public static Set<String> getJavaKeyWords() {
     return JAVA_KEYWORDS.computeIfAbsentAndGet(() -> {
       String[] keyWords = {"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", EXTENDS, "final", "finally", "float", "for",
-          "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", SUPER, "switch", "synchronized", "this",
+          "goto", "if", IMPLEMENTS, "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", SUPER, "switch", "synchronized", "this",
           "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true", "yield", "var", "_", "record", "sealed", "permits", "non-sealed"};
       return Arrays.stream(keyWords).collect(collectingAndThen(toSet(), Collections::unmodifiableSet));
     });
@@ -447,6 +454,13 @@ public final class JavaTypes {
     }
     methodIdBuilder.append(')');
     return methodIdBuilder.toString();
+  }
+
+  public static String createMethodIdentifier(Method method) {
+    List<String> args = Stream.of(method.getParameterTypes())
+        .map(Class::getName)
+        .collect(toList());
+    return createMethodIdentifier(method.getName(), args);
   }
 
   /**

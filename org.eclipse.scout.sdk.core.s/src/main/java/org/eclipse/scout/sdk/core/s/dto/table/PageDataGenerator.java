@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.core.s.dto.table;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.dto.AbstractTableBeanGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
@@ -35,7 +35,12 @@ public class PageDataGenerator<TYPE extends PageDataGenerator<TYPE>> extends Abs
   protected String computeSuperType() {
     return dataAnnotation().getSuperDataType()
         .map(IType::reference)
-        .orElse(IScoutRuntimeTypes.AbstractTablePageData);
+        .orElseGet(() -> dataAnnotation()
+            .getDataType()
+            .javaEnvironment()
+            .requireApi(IScoutApi.class)
+            .AbstractTablePageData()
+            .fqn());
   }
 
   public DataAnnotationDescriptor dataAnnotation() {

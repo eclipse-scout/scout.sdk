@@ -41,7 +41,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
@@ -55,6 +55,7 @@ import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.operation.jaxws.RebuildArtifactsOperation;
 import org.eclipse.scout.sdk.s2e.ui.internal.jaxws.WebServiceNewWizard;
 import org.eclipse.scout.sdk.s2e.ui.internal.jaxws.WebServiceNewWizardPage;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
 import org.eclipse.swt.SWT;
@@ -239,9 +240,10 @@ public class WebServiceEditor extends FormEditor {
     progress.worked(5);
 
     IJavaSearchScope scope = JdtUtils.createJavaSearchScope(getJavaProject());
-    Set<IType> webServiceEntryPointAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.WebServiceEntryPoint, scope, progress.newChild(10));
-    Set<IType> webServiceClientAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.WebServiceClient, scope, progress.newChild(10));
-    Set<IType> webServiceAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.WebService, scope, progress.newChild(10));
+    IScoutApi scoutApi = ApiHelper.requireScoutApiFor(getJavaProject());
+    Set<IType> webServiceEntryPointAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(scoutApi.WebServiceEntryPoint().fqn(), scope, progress.newChild(10));
+    Set<IType> webServiceClientAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(scoutApi.WebServiceClient().fqn(), scope, progress.newChild(10));
+    Set<IType> webServiceAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(scoutApi.WebService().fqn(), scope, progress.newChild(10));
     if (progress.isCanceled()) {
       return emptySet();
     }
@@ -251,7 +253,7 @@ public class WebServiceEditor extends FormEditor {
           .filter(f -> f.getFileName().toString().toLowerCase(Locale.ENGLISH).endsWith(JaxWsUtils.WSDL_FILE_EXTENSION))
           .filter(Files::isReadable)
           .filter(Files::isRegularFile)
-          .map(f -> new P_PreloadedWebServiceData(f, getJavaProject(), webServiceEntryPointAnnotatedTypes, webServiceClientAnnotatedTypes, webServiceAnnotatedTypes))
+          .map(f -> new P_PreloadedWebServiceData(f, getJavaProject(), scoutApi, webServiceEntryPointAnnotatedTypes, webServiceClientAnnotatedTypes, webServiceAnnotatedTypes))
           .collect(TreeSet::new, Set::add, Set::addAll);
 
       progress.worked(5);
@@ -410,9 +412,9 @@ public class WebServiceEditor extends FormEditor {
     private final Set<IType> m_typesAnnotatedWithWebServiceClient;
     private final Set<IType> m_typesAnnotatedWithWebService;
 
-    private P_PreloadedWebServiceData(Path wsdl, IJavaProject javaProject, Set<IType> typesAnnotatedWithWebServiceEntryPoint, Set<IType> typesAnnotatedWithWebServiceClient,
+    private P_PreloadedWebServiceData(Path wsdl, IJavaProject javaProject, IScoutApi api, Set<IType> typesAnnotatedWithWebServiceEntryPoint, Set<IType> typesAnnotatedWithWebServiceClient,
         Set<IType> typesAnnotatedWithWebService) {
-      super(wsdl, javaProject);
+      super(wsdl, javaProject, api);
       m_typesAnnotatedWithWebServiceEntryPoint = typesAnnotatedWithWebServiceEntryPoint;
       m_typesAnnotatedWithWebServiceClient = typesAnnotatedWithWebServiceClient;
       m_typesAnnotatedWithWebService = typesAnnotatedWithWebService;
@@ -420,16 +422,17 @@ public class WebServiceEditor extends FormEditor {
 
     @Override
     protected Set<IType> findAllTypesAnnotatedWith(String fqn) {
-      switch (fqn) {
-        case IScoutRuntimeTypes.WebServiceEntryPoint:
-          return m_typesAnnotatedWithWebServiceEntryPoint;
-        case IScoutRuntimeTypes.WebServiceClient:
-          return m_typesAnnotatedWithWebServiceClient;
-        case IScoutRuntimeTypes.WebService:
-          return m_typesAnnotatedWithWebService;
-        default:
-          throw new IllegalArgumentException();
+      IScoutApi scoutApi = getScoutApi();
+      if (scoutApi.WebServiceEntryPoint().fqn().equals(fqn)) {
+        return m_typesAnnotatedWithWebServiceEntryPoint;
       }
+      if (scoutApi.WebServiceClient().fqn().equals(fqn)) {
+        return m_typesAnnotatedWithWebServiceClient;
+      }
+      if (scoutApi.WebService().fqn().equals(fqn)) {
+        return m_typesAnnotatedWithWebService;
+      }
+      throw new IllegalArgumentException();
     }
   }
 }

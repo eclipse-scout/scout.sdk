@@ -37,12 +37,11 @@ public class AnnotationGeneratorTest {
         .withElement("fifth", b -> b.append(100L))
         .withElement("sixth", b -> b.append(134L))
         .withComment(b -> b.appendTodo("nothing"))
-        .withoutElement("sixth");
+        .withoutElement(nameFunc -> "sixth".equals(nameFunc.apply().get()));
 
     assertEquals(5, generator.elements().size());
-    assertFalse(generator.element("notExisting").isPresent());
-    assertTrue(generator.element("second").isPresent());
-
+    assertFalse(generator.element(nameSelector -> "notExisting".equals(nameSelector.apply().get())).isPresent());
+    assertTrue(generator.element(nameSelector -> "second".equals(nameSelector.apply().get())).isPresent());
     assertEquals("// TODO [anonymous] nothing\n@TestAnnotation(value = 4,\nsecond = 10.0,\nthird = false,\nfourth = 100.11,\nfifth = 100)", generator.toJavaSource().toString());
   }
 
@@ -72,7 +71,7 @@ public class AnnotationGeneratorTest {
   public void testNoValueAnnotation() {
     String src = AnnotationGenerator.create()
         .withElementName("scout.test.TestAnnotation")
-        .withoutElement("third")
+        .withoutElement(func -> "third".equals(func.apply().get()))
         .toJavaSource()
         .toString();
 

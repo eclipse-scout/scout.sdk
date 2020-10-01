@@ -18,6 +18,7 @@ import java.util.stream.StreamSupport;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.spliterator.InnerTypeSpliterator;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link AbstractInnerTypeQuery}</h3> Inner types query that by default returns the given {@link IType} list.
@@ -127,6 +128,10 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
   public T withInstanceOf(String typeFqn) {
     m_instanceOfFqn = typeFqn;
     return m_thisInstance;
+  }
+
+  public T withInstanceOf(IClassNameSupplier typeFqnSupplier) {
+    return withInstanceOf(typeFqnSupplier.fqn());
   }
 
   protected String getInstanceOf() {

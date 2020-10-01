@@ -14,13 +14,11 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi.PageData;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 
 /**
- * <h3>{@link DataAnnotationDescriptor}</h3> Descriptor holding all meta data of a {@link IScoutRuntimeTypes#Data} or
- * {@link IScoutRuntimeTypes#PageData} annotation.
- *
- * @since @since 3.10.0-M1
+ * <h3>{@link DataAnnotationDescriptor}</h3> Descriptor holding all meta data of a Data or PageData annotation.
  */
 public class DataAnnotationDescriptor {
 
@@ -35,10 +33,8 @@ public class DataAnnotationDescriptor {
   }
 
   /**
-   * Parses the possible available {@link IScoutRuntimeTypes#PageData} or {@link IScoutRuntimeTypes#Data} annotation on
-   * the given type. If the type is not annotated, the returned {@link Optional} will be empty.
-   *
-   * @since 3.10.0-M1
+   * Parses the possible available PageData or Data annotation on the given type. If the type is not annotated, the
+   * returned {@link Optional} will be empty.
    */
   public static Optional<DataAnnotationDescriptor> of(IType type) {
     if (type == null) {
@@ -64,10 +60,8 @@ public class DataAnnotationDescriptor {
   }
 
   /**
-   * Checks whether the given owner is annotated with a {@link IScoutRuntimeTypes#Data} annotation and if so, this
-   * method returns its {@code value()} as {@link IType}.
-   *
-   * @since 3.10.0-M1
+   * Checks whether the given owner is annotated with a Data annotation and if so, this method returns its
+   * {@code value()} as {@link IType}.
    */
   private static Optional<IType> getDataAnnotationValue(IAnnotatable owner) {
     Optional<IType> dataType = DataAnnotation.valueOf(owner);
@@ -76,10 +70,11 @@ public class DataAnnotationDescriptor {
     }
 
     // fall back to legacy name:
+    PageData pageDataApi = owner.javaEnvironment().requireApi(IScoutApi.class).PageData();
     return owner.annotations()
-        .withName(IScoutRuntimeTypes.PageData)
+        .withName(pageDataApi.fqn())
         .first()
-        .flatMap(annotation -> annotation.element("value"))
+        .flatMap(annotation -> annotation.element(pageDataApi.valueElementName()))
         .map(element -> element.value().as(IType.class));
   }
 

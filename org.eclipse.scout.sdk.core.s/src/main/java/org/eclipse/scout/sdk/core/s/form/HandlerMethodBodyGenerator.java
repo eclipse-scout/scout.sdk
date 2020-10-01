@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.builder.java.body.IScoutMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.s.builder.java.body.ScoutMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -46,13 +47,14 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
     @Override
     public void generate(IMethodBodyBuilder<?> builder) {
       IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> declaringMethod = builder.surroundingMethod();
-      boolean isLoad = FormGenerator.LOAD_METHOD_NAME.equals(declaringMethod.elementName().get());
+      String execLoadMethodName = builder.context().requireApi(IScoutApi.class).AbstractFormHandler().execLoadMethodName();
+      boolean isLoad = execLoadMethodName.equals(declaringMethod.elementName(builder.context()).get());
 
       serviceInterface().ifPresent(svcIfc -> buildBackendCall(ScoutMethodBodyBuilder.create(builder), svcIfc, isLoad));
 
       if (isLoad && permission().isPresent()) {
         builder
-            .nl().nl().append("setEnabledPermission").parenthesisOpen().appendNew().ref(permission().get()).parenthesisOpen()
+            .nl().nl().appendFrom(IScoutApi.class, api -> api.IWidget().setEnabledPermissionMethodName()).parenthesisOpen().appendNew().ref(permission().get()).parenthesisOpen()
             .append(permissionArgGenerator()
                 .orElseGet(ISourceGenerator::empty)
                 .generalize(builder))
@@ -101,7 +103,7 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
       if (isModify()) {
         return FormGenerator.SERVICE_LOAD_METHOD_NAME;
       }
-      return FormGenerator.SERVICE_PREPARECREATE_METHOD_NAME;
+      return FormGenerator.SERVICE_PREPARE_CREATE_METHOD_NAME;
     }
 
     if (isModify()) {

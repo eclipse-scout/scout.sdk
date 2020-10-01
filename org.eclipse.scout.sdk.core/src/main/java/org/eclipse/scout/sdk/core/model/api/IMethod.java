@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.query.MethodParameterQuery;
 import org.eclipse.scout.sdk.core.model.api.query.SuperMethodQuery;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
@@ -106,7 +106,7 @@ public interface IMethod extends IMember {
    *          If {@code true} only the type erasure is used for all method parameter types.
    * @return The created identifier
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
-   * @see IMethodGenerator#identifier(boolean)
+   * @see IMethodGenerator#identifier(IJavaEnvironment, boolean)
    */
   String identifier(boolean useErasureOnly);
 
@@ -116,7 +116,7 @@ public interface IMethod extends IMember {
    *
    * @return The created identifier
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
-   * @see IMethodGenerator#identifier()
+   * @see IMethodGenerator#identifier(IJavaEnvironment)
    */
   String identifier();
 

@@ -31,9 +31,10 @@ import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.MetaValueType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.ColumnDataAnnotation;
 import org.eclipse.scout.sdk.core.s.annotation.ColumnDataAnnotation.SdkColumnCommand;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.IColumn;
 import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator;
 import org.eclipse.scout.sdk.core.s.util.ScoutTypeComparators;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -68,12 +69,12 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
     // not necessary for row data
   }
 
-  protected static Optional<String> getColumnValueType(IType columnContainer) {
+  protected Optional<String> getColumnValueType(IType columnContainer) {
     if (columnContainer == null) {
       return Optional.empty();
     }
-
-    return columnContainer.resolveTypeParamValue(IScoutRuntimeTypes.TYPE_PARAM_COLUMN__VALUE_TYPE, IScoutRuntimeTypes.IColumn)
+    IColumn iColumn = scoutApi().IColumn();
+    return columnContainer.resolveTypeParamValue(iColumn.valueTypeParamIndex(), iColumn.fqn())
         .flatMap(Stream::findFirst) // only use first
         .map(IType::reference);
   }
@@ -82,17 +83,18 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
     return Introspector.decapitalize(removeFieldSuffix(column.elementName()));
   }
 
-  protected static Stream<IType> findColumnsToAdd(IType columnContainer, IType rowDataSuperType) {
+  protected Stream<IType> findColumnsToAdd(IType columnContainer, IType rowDataSuperType) {
+    IScoutApi scoutApi = scoutApi();
     // the declaring type is a column itself
-    if (columnContainer.isInstanceOf(IScoutRuntimeTypes.IColumn)) {
+    if (columnContainer.isInstanceOf(scoutApi.IColumn())) {
       return Stream.of(columnContainer);
     }
 
     // the declaring type is a IPageWithTableExtension -> search the inner table extension
-    if (columnContainer.isInstanceOf(IScoutRuntimeTypes.IPageWithTableExtension)) {
+    if (columnContainer.isInstanceOf(scoutApi.IPageWithTableExtension())) {
       Optional<IType> tableExtension = columnContainer.innerTypes()
           .withSuperClasses(true)
-          .withInstanceOf(IScoutRuntimeTypes.ITableExtension)
+          .withInstanceOf(scoutApi.ITableExtension())
           .first();
       columnContainer = tableExtension.orElse(columnContainer); // switch to the table as column holder
     }
@@ -113,10 +115,11 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
   /**
    * @return A {@link Set} with all column bean names of the given rowData (including its super classes).
    */
-  protected static Set<String> columnBeanNamesInRowData(IType rowDataSuperType) {
+  protected Set<String> columnBeanNamesInRowData(IType rowDataSuperType) {
     Set<String> usedColumnBeanNames = new HashSet<>();
     Optional<IType> currentRowDataSuperType = Optional.of(rowDataSuperType);
-    while (currentRowDataSuperType.isPresent() && !IScoutRuntimeTypes.AbstractTableRowData.equals(currentRowDataSuperType.get().name())) {
+    String abstractTableRowDataFqn = scoutApi().AbstractTableRowData().fqn();
+    while (currentRowDataSuperType.isPresent() && !abstractTableRowDataFqn.equals(currentRowDataSuperType.get().name())) {
       IType curSuperType = currentRowDataSuperType.get();
       curSuperType.fields().withFlags(ROW_DATA_FIELD_FLAGS).stream()
           .map(IField::constantValue)
@@ -132,10 +135,10 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
   /**
    * @return A {@link Stream} with all columns of the given model type (including all columns in the super classes).
    */
-  protected static Stream<IType> modelColumnsIn(IType modelType) {
+  protected Stream<IType> modelColumnsIn(IType modelType) {
     // collect all columns that exist in the table and all of its super classes
     return modelType.innerTypes()
-        .withInstanceOf(IScoutRuntimeTypes.IColumn)
+        .withInstanceOf(scoutApi().IColumn())
         .withSuperClasses(true).stream()
         .filter(type -> ColumnDataAnnotation.sdkColumnCommandOf(type).orElse(SdkColumnCommand.CREATE) == SdkColumnCommand.CREATE)
         .sorted(ScoutTypeComparators.orderAnnotationComparator(false));
@@ -159,12 +162,13 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
     withFlags(flags);
 
     // super interface (for extensions)
-    if (superClass().isEmpty()) {
+    Optional<String> superClass = superClass().flatMap(af -> af.apply(modelType().javaEnvironment()));
+    if (superClass.isEmpty()) {
       withInterface(Serializable.class.getName());
     }
 
     // find our super type
-    Optional<IType> rowDataSuperClassType = superClass()
+    Optional<IType> rowDataSuperClassType = superClass
         .map(JavaTypes::erasure)
         .flatMap(targetEnvironment()::findType);
 
@@ -197,23 +201,27 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
 
   @Override
   protected String computeSuperType() {
-    if (m_columnContainer.isInstanceOf(IScoutRuntimeTypes.IExtension) || !(declaringGenerator().orElse(null) instanceof ITypeGenerator)) {
+    IScoutApi scoutApi = scoutApi();
+    if (m_columnContainer.isInstanceOf(scoutApi.IExtension()) || !(declaringGenerator().orElse(null) instanceof ITypeGenerator)) {
       // row data extension. no super class
       return null;
     }
 
-    Supplier<String> defaultSuperClass = () -> IScoutRuntimeTypes.AbstractTableRowData;
-    ITypeGenerator<?> surroundingTableBeanSourceBuilder = (ITypeGenerator<?>) declaringGenerator().get();
-    String superTypeOfSurroundingTableBeanGenerator = surroundingTableBeanSourceBuilder.superClass().get();
-    if (IScoutRuntimeTypes.AbstractTablePageData.equals(superTypeOfSurroundingTableBeanGenerator)
-        || IScoutRuntimeTypes.AbstractTableFieldBeanData.equals(superTypeOfSurroundingTableBeanGenerator)) {
+    Supplier<String> defaultSuperClass = () -> scoutApi.AbstractTableRowData().fqn();
+    String superTypeOfSurroundingTableBeanGenerator = declaringGenerator()
+        .map(jeg -> (ITypeGenerator<?>) jeg)
+        .flatMap(ITypeGenerator::superClass)
+        .flatMap(af -> af.apply(modelType().javaEnvironment()))
+        .get();
+    if (superTypeOfSurroundingTableBeanGenerator.equals(scoutApi.AbstractTablePageData().fqn())
+        || superTypeOfSurroundingTableBeanGenerator.equals(scoutApi.AbstractTableFieldBeanData().fqn())) {
       return defaultSuperClass.get();
     }
 
     // use the row data in the super page data.
     return targetEnvironment().findType(superTypeOfSurroundingTableBeanGenerator)
         .flatMap(s -> s.innerTypes()
-            .withInstanceOf(IScoutRuntimeTypes.AbstractTableRowData)
+            .withInstanceOf(scoutApi.AbstractTableRowData())
             .first())
         .map(IType::reference)
         .orElseGet(defaultSuperClass);

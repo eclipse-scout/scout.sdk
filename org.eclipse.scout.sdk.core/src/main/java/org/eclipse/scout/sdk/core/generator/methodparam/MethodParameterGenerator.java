@@ -13,20 +13,23 @@ package org.eclipse.scout.sdk.core.generator.methodparam;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.MemberBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractAnnotatableGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link MethodParameterGenerator}</h3>
@@ -37,19 +40,20 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
 
   private boolean m_isFinal;
   private boolean m_isVarargs;
-  private String m_dataType;
+  private ApiFunction<?, String> m_dataType;
 
   protected MethodParameterGenerator(IMethodParameter parameter, IWorkingCopyTransformer transformer) {
     super(parameter, transformer);
-    asFinal(Flags.isFinal(parameter.flags()))
-        .withDataType(parameter.dataType().reference());
-
     IMethod declaringMethod = parameter.declaringMethod();
-    if (Flags.isVarargs(declaringMethod.flags()) && parameter.index() == declaringMethod.parameters().stream().count() - 1) {
-      asVarargs(true);
-      //noinspection InstanceVariableUsedBeforeInitialized
-      m_dataType = m_dataType.substring(0, m_dataType.length() - 2); // remove one array dimension because it is printed as varargs
+    boolean isVarargs = Flags.isVarargs(declaringMethod.flags()) && parameter.index() == declaringMethod.parameters().stream().count() - 1;
+    String dataType = parameter.dataType().reference();
+    if (isVarargs) {
+      dataType = dataType.substring(0, dataType.length() - 2); // remove one array dimension because it is printed as varargs
     }
+
+    asFinal(Flags.isFinal(parameter.flags()))
+        .asVarargs(isVarargs)
+        .withDataType(dataType);
   }
 
   protected MethodParameterGenerator() {
@@ -93,7 +97,13 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
     if (isFinal()) {
       builder.appendFlags(Flags.AccFinal);
     }
-    builder.ref(dataType().orElseThrow(() -> newFail("Method parameter data type missing for generator {}", this)));
+
+    String dataType = dataType().orElseThrow(() -> newFail("Method parameter data type missing for generator {}", this))
+        .apply(builder.context())
+        .filter(Strings::hasText)
+        .orElseThrow(() -> newFail("Unable to get method parameter data type for generator {}", this));
+    builder.ref(dataType);
+
     if (isVarargs()) {
       builder.append("...");
     }
@@ -108,14 +118,24 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
   }
 
   @Override
-  public Optional<String> dataType() {
-    return Strings.notBlank(m_dataType);
+  public Optional<ApiFunction<?, String>> dataType() {
+    return Optional.ofNullable(m_dataType);
   }
 
   @Override
   public TYPE withDataType(String dataType) {
-    m_dataType = dataType;
-    return currentInstance();
+    return withDataTypeFrom(null, api -> dataType);
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withDataTypeFrom(Class<A> apiDefinition, Function<A, String> dataTypeSupplier) {
+    if (dataTypeSupplier == null) {
+      m_dataType = null;
+    }
+    else {
+      m_dataType = new ApiFunction<>(apiDefinition, dataTypeSupplier);
+    }
+    return thisInstance();
   }
 
   @Override
@@ -136,7 +156,7 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
   @Override
   public TYPE asFinal(boolean newFinalValue) {
     m_isFinal = newFinalValue;
-    return currentInstance();
+    return thisInstance();
   }
 
   @Override
@@ -157,6 +177,6 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
   @Override
   public TYPE asVarargs(boolean newVarargsValue) {
     m_isVarargs = newVarargsValue;
-    return currentInstance();
+    return thisInstance();
   }
 }

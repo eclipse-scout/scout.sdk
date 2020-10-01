@@ -13,69 +13,15 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractBigDecimalField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractBooleanField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractButton;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractCalendarField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractCode;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractDateField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractExtension;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractFileChooserField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractFormHandler;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractGroupBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractHtmlField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractImageField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractKeyStroke;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractLabelField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractListBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractLongField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractMenu;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractProposalField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractRadioButton;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractRadioButtonGroup;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractSequenceBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractSmartField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractStringColumn;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractStringField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractTabBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractTableField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.AbstractTreeField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IBigDecimalField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IBooleanField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IButton;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.ICalendarField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.ICode;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IColumn;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IDateField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IExtension;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IFileChooserField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IFormHandler;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IGroupBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IHtmlField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IImageField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IKeyStroke;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.ILabelField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IListBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.ILongField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IMenu;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IProposalField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IRadioButton;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IRadioButtonGroup;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.ISequenceBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.ISmartField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.IStringField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.ITabBox;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.ITableField;
-import static org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes.ITreeField;
-import static org.eclipse.scout.sdk.core.s.ISdkProperties.SUFFIX_BUTTON;
-import static org.eclipse.scout.sdk.core.s.ISdkProperties.SUFFIX_CODE;
-import static org.eclipse.scout.sdk.core.s.ISdkProperties.SUFFIX_COLUMN;
-import static org.eclipse.scout.sdk.core.s.ISdkProperties.SUFFIX_COMPOSITE_FIELD;
-import static org.eclipse.scout.sdk.core.s.ISdkProperties.SUFFIX_EXTENSION;
-import static org.eclipse.scout.sdk.core.s.ISdkProperties.SUFFIX_FORM_FIELD;
-import static org.eclipse.scout.sdk.core.s.ISdkProperties.SUFFIX_FORM_HANDLER;
-import static org.eclipse.scout.sdk.core.s.ISdkProperties.SUFFIX_KEY_STROKE;
-import static org.eclipse.scout.sdk.core.s.ISdkProperties.SUFFIX_MENU;
+import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_BUTTON;
+import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_CODE;
+import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_COLUMN;
+import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_COMPOSITE_FIELD;
+import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_EXTENSION;
+import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_FORM_FIELD;
+import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_FORM_HANDLER;
+import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_KEY_STROKE;
+import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_MENU;
 import static org.eclipse.scout.sdk.s2e.ui.ISdkIcons.ButtonAdd;
 import static org.eclipse.scout.sdk.s2e.ui.ISdkIcons.CodeAdd;
 import static org.eclipse.scout.sdk.s2e.ui.ISdkIcons.ColumnAdd;
@@ -100,14 +46,16 @@ import static org.eclipse.scout.sdk.s2e.ui.ISdkIcons.TreeFieldAdd;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
+import java.util.function.BiConsumer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -124,11 +72,14 @@ import org.eclipse.jface.text.source.ContentAssistantFacade;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.ScoutModelHierarchy;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutModelHierarchy;
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.RunnableJob;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.swt.widgets.Display;
 
@@ -139,70 +90,153 @@ import org.eclipse.swt.widgets.Display;
  */
 public final class ScoutTemplateProposalFactory {
 
+  private static final Collection<BiConsumer<Map<String, TemplateProposalDescriptor>, ScoutModelHierarchy>> TEMPLATE_PARTICIPANTS = new HashSet<>();
+
+  public static synchronized void registerTemplateParticipant(BiConsumer<Map<String, TemplateProposalDescriptor>, ScoutModelHierarchy> participant) {
+    TEMPLATE_PARTICIPANTS.add(Ensure.notNull(participant));
+  }
+
+  public static synchronized void unregisterTemplateParticipant(BiConsumer<Map<String, TemplateProposalDescriptor>, ScoutModelHierarchy> participant) {
+    TEMPLATE_PARTICIPANTS.remove(participant);
+  }
+
+  static synchronized Collection<BiConsumer<Map<String, TemplateProposalDescriptor>, ScoutModelHierarchy>> participants() {
+    return new HashSet<>(TEMPLATE_PARTICIPANTS);
+  }
+
   private ScoutTemplateProposalFactory() {
   }
 
-  @SuppressWarnings("PublicStaticCollectionField")
-  public static final Map<String, TemplateProposalDescriptor> TEMPLATES = new ConcurrentHashMap<>();
-  static {
+  static Map<String, TemplateProposalDescriptor> descriptors(ScoutModelHierarchy hierarchy) {
+    Map<String, TemplateProposalDescriptor> templates = new HashMap<>();
     int relevance = 10000;
-    TEMPLATES.put(IStringField,
-        new TemplateProposalDescriptor(IStringField, AbstractStringField, "MyString", SUFFIX_FORM_FIELD, StringFieldAdd, relevance, StringFieldProposal.class, singletonList("textfield")));
-    TEMPLATES.put(IBigDecimalField,
-        new TemplateProposalDescriptor(IBigDecimalField, AbstractBigDecimalField, "MyBigDecimal", SUFFIX_FORM_FIELD, DoubleFieldAdd, relevance, BigDecimalFieldProposal.class, asList("numberfield", "doublefield", "floatfield")));
-    TEMPLATES.put(IBooleanField,
-        new TemplateProposalDescriptor(IBooleanField, AbstractBooleanField, "MyBoolean", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, FormFieldProposal.class, asList("checkboxfield", "tristatefield")));
-    TEMPLATES.put(IButton,
-        new TemplateProposalDescriptor(IButton, AbstractButton, "My", SUFFIX_BUTTON, ButtonAdd, relevance, ButtonProposal.class));
-    TEMPLATES.put(ICalendarField,
-        new TemplateProposalDescriptor(ICalendarField, AbstractCalendarField, "MyCalendar", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, CalendarFieldProposal.class));
-    TEMPLATES.put(IDateField,
-        new TemplateProposalDescriptor(IDateField, AbstractDateField, "MyDate", SUFFIX_FORM_FIELD, DateFieldAdd, relevance, DateFieldProposal.class, singletonList("datetimefield")));
-    TEMPLATES.put(IFileChooserField,
-        new TemplateProposalDescriptor(IFileChooserField, AbstractFileChooserField, "MyFileChooser", SUFFIX_FORM_FIELD, FileChooserFieldAdd, relevance, FormFieldProposal.class));
-    TEMPLATES.put(IGroupBox,
-        new TemplateProposalDescriptor(IGroupBox, AbstractGroupBox, "MyGroup", SUFFIX_COMPOSITE_FIELD, GroupBoxAdd, relevance, FormFieldProposal.class));
-    TEMPLATES.put(IHtmlField,
-        new TemplateProposalDescriptor(IHtmlField, AbstractHtmlField, "MyHtml", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, FormFieldProposal.class));
-    TEMPLATES.put(ILabelField,
-        new TemplateProposalDescriptor(ILabelField, AbstractLabelField, "MyLabel", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, LabelFieldProposal.class));
-    TEMPLATES.put(IListBox,
-        new TemplateProposalDescriptor(IListBox, AbstractListBox, "MyList", SUFFIX_COMPOSITE_FIELD, FormFieldAdd, relevance, ListBoxFieldProposal.class));
-    TEMPLATES.put(IProposalField,
-        new TemplateProposalDescriptor(IProposalField, AbstractProposalField, "MyProposal", SUFFIX_FORM_FIELD, SmartFieldAdd, relevance, ValueTypeFieldProposal.class));
-    TEMPLATES.put(ISmartField,
-        new TemplateProposalDescriptor(ISmartField, AbstractSmartField, "MySmart", SUFFIX_FORM_FIELD, SmartFieldAdd, relevance, ValueTypeFieldProposal.class));
-    TEMPLATES.put(ILongField,
-        new TemplateProposalDescriptor(ILongField, AbstractLongField, "MyLong", SUFFIX_FORM_FIELD, IntegerFieldAdd, relevance, LongFieldProposal.class, asList("integerfield", "numberfield")));
-    TEMPLATES.put(IRadioButtonGroup,
-        new TemplateProposalDescriptor(IRadioButtonGroup, AbstractRadioButtonGroup, "MyRadioButtonGroup", "", RadioButtonGroupAdd, relevance, ValueTypeFieldProposal.class));
-    TEMPLATES.put(ISequenceBox,
-        new TemplateProposalDescriptor(ISequenceBox, AbstractSequenceBox, "MySequence", SUFFIX_COMPOSITE_FIELD, SequenceBoxAdd, relevance, SequenceBoxProposal.class));
-    TEMPLATES.put(ITabBox,
-        new TemplateProposalDescriptor(ITabBox, AbstractTabBox, "MyTab", SUFFIX_COMPOSITE_FIELD, TabBoxAdd, relevance, TabBoxProposal.class));
-    TEMPLATES.put(ITableField,
-        new TemplateProposalDescriptor(ITableField, AbstractTableField, "MyTable", SUFFIX_FORM_FIELD, TableFieldAdd, relevance, TableFieldProposal.class));
-    TEMPLATES.put(ITreeField,
-        new TemplateProposalDescriptor(ITreeField, AbstractTreeField, "MyTree", SUFFIX_FORM_FIELD, TreeFieldAdd, relevance, TreeFieldProposal.class));
-    TEMPLATES.put(IRadioButton,
-        new TemplateProposalDescriptor(IRadioButton, AbstractRadioButton, "MyRadio", SUFFIX_BUTTON, RadioButtonAdd, relevance, RadioButtonProposal.class));
-    TEMPLATES.put(IMenu,
-        new TemplateProposalDescriptor(IMenu, AbstractMenu, "MyMenu", SUFFIX_MENU, MenuAdd, relevance, MenuProposal.class));
-    TEMPLATES.put(IKeyStroke,
-        new TemplateProposalDescriptor(IKeyStroke, AbstractKeyStroke, "My", SUFFIX_KEY_STROKE, KeyStrokeAdd, relevance, KeyStrokeProposal.class));
-    TEMPLATES.put(ICode,
-        new TemplateProposalDescriptor(ICode, AbstractCode, "My", SUFFIX_CODE, CodeAdd, relevance, CodeProposal.class));
-    TEMPLATES.put(IFormHandler,
-        new TemplateProposalDescriptor(IFormHandler, AbstractFormHandler, "My", SUFFIX_FORM_HANDLER, FormHandler, relevance, FormHandlerProposal.class));
-    TEMPLATES.put(IColumn,
-        new TemplateProposalDescriptor(IColumn, AbstractStringColumn, "My", SUFFIX_COLUMN, ColumnAdd, relevance, ColumnProposal.class));
-    TEMPLATES.put(IExtension,
-        new TemplateProposalDescriptor(IExtension, AbstractExtension, "My", SUFFIX_EXTENSION, ExtensionsAdd, relevance, ExtensionProposal.class));
-    TEMPLATES.put(IImageField,
-        new TemplateProposalDescriptor(IImageField, AbstractImageField, "MyImage", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, ImageFieldProposal.class));
+    IScoutApi api = hierarchy.api();
+
+    templates.put(api.IStringField().fqn(), new TemplateProposalDescriptor(
+        api.IStringField().fqn(),
+        api.AbstractStringField().fqn(),
+        "MyString", SUFFIX_FORM_FIELD, StringFieldAdd, relevance, StringFieldProposal.class, singletonList("textfield")));
+    templates.put(api.IBigDecimalField().fqn(), new TemplateProposalDescriptor(
+        api.IBigDecimalField().fqn(),
+        api.AbstractBigDecimalField().fqn(),
+        "MyBigDecimal", SUFFIX_FORM_FIELD, DoubleFieldAdd, relevance, BigDecimalFieldProposal.class, asList("numberfield", "doublefield", "floatfield")));
+    templates.put(api.IBooleanField().fqn(), new TemplateProposalDescriptor(
+        api.IBooleanField().fqn(),
+        api.AbstractBooleanField().fqn(),
+        "MyBoolean", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, FormFieldProposal.class, asList("checkboxfield", "tristatefield")));
+    templates.put(api.IButton().fqn(), new TemplateProposalDescriptor(
+        api.IButton().fqn(),
+        api.AbstractButton().fqn(),
+        "My", SUFFIX_BUTTON, ButtonAdd, relevance, ButtonProposal.class));
+    templates.put(api.ICalendarField().fqn(), new TemplateProposalDescriptor(
+        api.ICalendarField().fqn(),
+        api.AbstractCalendarField().fqn(),
+        "MyCalendar", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, CalendarFieldProposal.class));
+    templates.put(api.IDateField().fqn(), new TemplateProposalDescriptor(
+        api.IDateField().fqn(),
+        api.AbstractDateField().fqn(),
+        "MyDate", SUFFIX_FORM_FIELD, DateFieldAdd, relevance, DateFieldProposal.class, singletonList("datetimefield")));
+    templates.put(api.IFileChooserField().fqn(), new TemplateProposalDescriptor(
+        api.IFileChooserField().fqn(),
+        api.AbstractFileChooserField().fqn(),
+        "MyFileChooser", SUFFIX_FORM_FIELD, FileChooserFieldAdd, relevance, FormFieldProposal.class));
+    templates.put(api.IGroupBox().fqn(), new TemplateProposalDescriptor(
+        api.IGroupBox().fqn(),
+        api.AbstractGroupBox().fqn(),
+        "MyGroup", SUFFIX_COMPOSITE_FIELD, GroupBoxAdd, relevance, FormFieldProposal.class));
+    templates.put(api.IHtmlField().fqn(), new TemplateProposalDescriptor(
+        api.IHtmlField().fqn(),
+        api.AbstractHtmlField().fqn(),
+        "MyHtml", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, FormFieldProposal.class));
+    templates.put(api.ILabelField().fqn(), new TemplateProposalDescriptor(
+        api.ILabelField().fqn(),
+        api.AbstractLabelField().fqn(),
+        "MyLabel", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, LabelFieldProposal.class));
+    templates.put(api.IListBox().fqn(), new TemplateProposalDescriptor(
+        api.IListBox().fqn(),
+        api.AbstractListBox().fqn(),
+        "MyList", SUFFIX_COMPOSITE_FIELD, FormFieldAdd, relevance, ListBoxFieldProposal.class));
+    templates.put(api.IProposalField().fqn(), new TemplateProposalDescriptor(
+        api.IProposalField().fqn(),
+        api.AbstractProposalField().fqn(),
+        "MyProposal", SUFFIX_FORM_FIELD, SmartFieldAdd, relevance, ValueTypeFieldProposal.class));
+    templates.put(api.ISmartField().fqn(), new TemplateProposalDescriptor(
+        api.ISmartField().fqn(),
+        api.AbstractSmartField().fqn(),
+        "MySmart", SUFFIX_FORM_FIELD, SmartFieldAdd, relevance, ValueTypeFieldProposal.class));
+    templates.put(api.ILongField().fqn(), new TemplateProposalDescriptor(
+        api.ILongField().fqn(),
+        api.AbstractLongField().fqn(),
+        "MyLong", SUFFIX_FORM_FIELD, IntegerFieldAdd, relevance, LongFieldProposal.class, asList("integerfield", "numberfield")));
+    templates.put(api.IRadioButtonGroup().fqn(), new TemplateProposalDescriptor(
+        api.IRadioButtonGroup().fqn(),
+        api.AbstractRadioButtonGroup().fqn(),
+        "MyRadioButtonGroup", "", RadioButtonGroupAdd, relevance, ValueTypeFieldProposal.class));
+    templates.put(api.ISequenceBox().fqn(), new TemplateProposalDescriptor(
+        api.ISequenceBox().fqn(),
+        api.AbstractSequenceBox().fqn(),
+        "MySequence", SUFFIX_COMPOSITE_FIELD, SequenceBoxAdd, relevance, SequenceBoxProposal.class));
+    templates.put(api.ITabBox().fqn(), new TemplateProposalDescriptor(
+        api.ITabBox().fqn(),
+        api.AbstractTabBox().fqn(),
+        "MyTab", SUFFIX_COMPOSITE_FIELD, TabBoxAdd, relevance, TabBoxProposal.class));
+    templates.put(api.ITableField().fqn(), new TemplateProposalDescriptor(
+        api.ITableField().fqn(),
+        api.AbstractTableField().fqn(),
+        "MyTable", SUFFIX_FORM_FIELD, TableFieldAdd, relevance, TableFieldProposal.class));
+    templates.put(api.ITreeField().fqn(), new TemplateProposalDescriptor(
+        api.ITreeField().fqn(),
+        api.AbstractTreeField().fqn(),
+        "MyTree", SUFFIX_FORM_FIELD, TreeFieldAdd, relevance, TreeFieldProposal.class));
+    templates.put(api.IRadioButton().fqn(), new TemplateProposalDescriptor(
+        api.IRadioButton().fqn(),
+        api.AbstractRadioButton().fqn(),
+        "MyRadio", SUFFIX_BUTTON, RadioButtonAdd, relevance, RadioButtonProposal.class));
+    templates.put(api.IMenu().fqn(), new TemplateProposalDescriptor(
+        api.IMenu().fqn(),
+        api.AbstractMenu().fqn(),
+        "MyMenu", SUFFIX_MENU, MenuAdd, relevance, MenuProposal.class));
+    templates.put(api.IKeyStroke().fqn(), new TemplateProposalDescriptor(
+        api.IKeyStroke().fqn(),
+        api.AbstractKeyStroke().fqn(),
+        "My", SUFFIX_KEY_STROKE, KeyStrokeAdd, relevance, KeyStrokeProposal.class));
+    templates.put(api.ICode().fqn(), new TemplateProposalDescriptor(
+        api.ICode().fqn(),
+        api.AbstractCode().fqn(),
+        "My", SUFFIX_CODE, CodeAdd, relevance, CodeProposal.class));
+    templates.put(api.IFormHandler().fqn(), new TemplateProposalDescriptor(
+        api.IFormHandler().fqn(),
+        api.AbstractFormHandler().fqn(),
+        "My", SUFFIX_FORM_HANDLER, FormHandler, relevance, FormHandlerProposal.class));
+    templates.put(api.IColumn().fqn(), new TemplateProposalDescriptor(
+        api.IColumn().fqn(),
+        api.AbstractStringColumn().fqn(),
+        "My", SUFFIX_COLUMN, ColumnAdd, relevance, ColumnProposal.class));
+    templates.put(api.IExtension().fqn(), new TemplateProposalDescriptor(
+        api.IExtension().fqn(),
+        api.AbstractExtension().fqn(),
+        "My", SUFFIX_EXTENSION, ExtensionsAdd, relevance, ExtensionProposal.class));
+    templates.put(api.IImageField().fqn(), new TemplateProposalDescriptor(
+        api.IImageField().fqn(),
+        api.AbstractImageField().fqn(),
+        "MyImage", SUFFIX_FORM_FIELD, FormFieldAdd, relevance, ImageFieldProposal.class));
+
+    participants().forEach(part -> part.accept(templates, hierarchy));
+
+    return templates;
   }
 
   public static List<ICompletionProposal> createTemplateProposals(IType declaringType, int offset, String prefix, SourceViewer viewer) {
+    IJavaProject javaProject = declaringType.getJavaProject();
+    if (!JdtUtils.exists(javaProject)) {
+      return emptyList();
+    }
+
+    Optional<IScoutApi> optScoutApi = ApiHelper.scoutApiFor(javaProject);
+    if (optScoutApi.isEmpty()) {
+      return emptyList();
+    }
+
     Set<String> superTypesOfDeclaringType;
     ISourceRange surroundingTypeNameRange;
     try {
@@ -213,8 +247,12 @@ public final class ScoutTemplateProposalFactory {
       SdkLog.error("Unable to calculate supertype hierarchy for '{}'.", declaringType.getFullyQualifiedName(), e);
       return emptyList();
     }
+    if (superTypesOfDeclaringType.isEmpty()) {
+      return emptyList();
+    }
 
-    Collection<String> possibleChildrenIfcFqn = ScoutModelHierarchy.getPossibleChildren(superTypesOfDeclaringType);
+    ScoutModelHierarchy scoutModelHierarchy = optScoutApi.get().hierarchy();
+    Collection<String> possibleChildrenIfcFqn = scoutModelHierarchy.possibleChildrenFor(superTypesOfDeclaringType);
     if (possibleChildrenIfcFqn.isEmpty()) {
       return emptyList();
     }
@@ -230,11 +268,10 @@ public final class ScoutTemplateProposalFactory {
     javaEnvCreatorJob.schedule();
 
     // create proposals
-    IJavaProject javaProject = declaringType.getJavaProject();
     List<ICompletionProposal> result = new ArrayList<>();
-    for (TemplateProposalDescriptor candidate : TEMPLATES.values()) {
-      if (candidate.isActiveFor(possibleChildrenIfcFqn, javaProject, prefix)) {
-        result.add(candidate.createProposal(compilationUnit, offset, surroundingTypeNameRange, javaEnvProviderCreator, prefix));
+    for (TemplateProposalDescriptor candidate : descriptors(scoutModelHierarchy).values()) {
+      if (candidate.isActiveFor(possibleChildrenIfcFqn, scoutModelHierarchy, prefix)) {
+        result.add(candidate.createProposal(compilationUnit, offset, scoutModelHierarchy, surroundingTypeNameRange, javaEnvProviderCreator, prefix));
       }
     }
     return result;

@@ -18,8 +18,7 @@ import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 
 /**
  * <h3>{@link AstCalendarFieldBuilder}</h3>
@@ -42,7 +41,7 @@ public class AstCalendarFieldBuilder extends AstTypeBuilder<AstCalendarFieldBuil
     // calc super type
     ParameterizedType parameterizedType = ast.newParameterizedType(getSuperType());
     SimpleType selfQualifier = ast.newSimpleType(ast.newSimpleName(getTypeName() + getReadOnlySuffix()));
-    QualifiedType calTypeArg = ast.newQualifiedType(selfQualifier, ast.newSimpleName(ISdkProperties.INNER_CALENDAR_TYPE_NAME));
+    QualifiedType calTypeArg = ast.newQualifiedType(selfQualifier, ast.newSimpleName(ISdkConstants.INNER_CALENDAR_TYPE_NAME));
     parameterizedType.typeArguments().add(calTypeArg);
     withSuperType(parameterizedType);
 
@@ -61,8 +60,8 @@ public class AstCalendarFieldBuilder extends AstTypeBuilder<AstCalendarFieldBuil
         .insert();
 
     // inner calendar
-    Type calSuperType = getFactory().newTypeReference(IScoutRuntimeTypes.AbstractCalendar);
-    TypeDeclaration calDeclaration = getFactory().newType(ISdkProperties.INNER_CALENDAR_TYPE_NAME)
+    Type calSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractCalendar().fqn());
+    TypeDeclaration calDeclaration = getFactory().newType(ISdkConstants.INNER_CALENDAR_TYPE_NAME)
         .withCalculatedOrder(false)
         .withCreateLinks(false)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
@@ -76,7 +75,7 @@ public class AstCalendarFieldBuilder extends AstTypeBuilder<AstCalendarFieldBuil
         .get();
 
     // inner provider
-    Type providerSuperType = getFactory().newTypeReference(IScoutRuntimeTypes.AbstractCalendarItemProvider);
+    Type providerSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractCalendarItemProvider().fqn());
     m_providerDeclaration = getFactory().newType("MyCalendarItem")
         .withCalculatedOrder(false)
         .withCreateLinks(false)
@@ -84,7 +83,7 @@ public class AstCalendarFieldBuilder extends AstTypeBuilder<AstCalendarFieldBuil
         .withNlsMethod(null)
         .withOrder(true)
         .withOrderDefinitionType(null)
-        .withReadOnlyNameSuffix(ISdkProperties.SUFFIX_CALENDAR_ITEM_PROVIDER)
+        .withReadOnlyNameSuffix(ISdkConstants.SUFFIX_CALENDAR_ITEM_PROVIDER)
         .withSuperType(providerSuperType)
         .in(calDeclaration)
         .insert()
@@ -95,10 +94,10 @@ public class AstCalendarFieldBuilder extends AstTypeBuilder<AstCalendarFieldBuil
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      ITrackedNodePosition providerTypeNameTracker = new WrappedTrackedNodePosition(getFactory().getRewrite().track(m_providerDeclaration.getName()), 0, -ISdkProperties.SUFFIX_CALENDAR_ITEM_PROVIDER.length());
+      ITrackedNodePosition providerTypeNameTracker = new WrappedTrackedNodePosition(getFactory().getRewrite().track(m_providerDeclaration.getName()), 0, -ISdkConstants.SUFFIX_CALENDAR_ITEM_PROVIDER.length());
       links.addLinkedPosition(providerTypeNameTracker, true, AstNodeFactory.CALENDAR_ITEM_PROVIDER_NAME_GROUP);
 
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.ICalendarField);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ICalendarField().fqn());
 
       ITrackedNodePosition typeNamePosInGeneric = new WrappedTrackedNodePosition(getFactory().getRewrite().track(selfQualifier), 0, -getReadOnlySuffix().length());
       links.addLinkedPosition(typeNamePosInGeneric, false, AstNodeFactory.TYPE_NAME_GROUP);

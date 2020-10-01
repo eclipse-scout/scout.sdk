@@ -189,6 +189,6 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
     if (useLink) {
       append('}');
     }
-    return currentInstance();
+    return thisInstance();
   }
 }

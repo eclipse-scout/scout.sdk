@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.s.service;
 
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 
 /**
@@ -27,7 +27,7 @@ public class ServiceInterfaceGenerator<TYPE extends ServiceInterfaceGenerator<TY
     mainType
         .asPublic()
         .asInterface()
-        .withInterface(IScoutRuntimeTypes.IService)
+        .withInterfaceFrom(IScoutApi.class, api -> api.IService().fqn())
         .withAnnotation(ScoutAnnotationGenerator.createTunnelToServer());
   }
 }

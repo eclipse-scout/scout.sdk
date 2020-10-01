@@ -10,12 +10,16 @@
  */
 package org.eclipse.scout.sdk.core.builder.java;
 
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.JavaTypes.ReferenceParser;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link IJavaSourceBuilder}</h3>
@@ -94,20 +98,6 @@ public interface IJavaSourceBuilder<TYPE extends IJavaSourceBuilder<TYPE>> exten
   TYPE parenthesisClose();
 
   /**
-   * Appends a type parameter start: &lt;
-   *
-   * @return This builder
-   */
-  TYPE genericStart();
-
-  /**
-   * Appends a type parameter end: &gt;
-   *
-   * @return This builder
-   */
-  TYPE genericEnd();
-
-  /**
    * Appends the annotation @ sign.
    *
    * @return This builder
@@ -135,12 +125,6 @@ public interface IJavaSourceBuilder<TYPE extends IJavaSourceBuilder<TYPE>> exten
    */
   TYPE semicolon();
 
-  /**
-   * Appends a comma: ,
-   *
-   * @return This builder
-   */
-  TYPE comma();
 
   /**
    * @return The {@link IJavaBuilderContext} of this {@link IJavaSourceBuilder}.
@@ -167,4 +151,14 @@ public interface IJavaSourceBuilder<TYPE extends IJavaSourceBuilder<TYPE>> exten
    * @see #ref(CharSequence)
    */
   TYPE appendReferences(Stream<? extends CharSequence> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix);
+
+  TYPE appendFrom(Stream<ApiFunction<?, String>> apis, CharSequence prefix, CharSequence delimiter, CharSequence suffix);
+
+  <API extends IApiSpecification> TYPE refFrom(Class<API> apiClass, Function<API, String> sourceProvider);
+
+  <API extends IApiSpecification> TYPE refFrom(ApiFunction<API, String> func);
+
+  <API extends IApiSpecification> TYPE refClassFrom(Class<API> apiClass, Function<API, IClassNameSupplier> sourceProvider);
+
+  <API extends IApiSpecification> TYPE appendFrom(Class<API> apiClass, Function<API, String> sourceProvider);
 }

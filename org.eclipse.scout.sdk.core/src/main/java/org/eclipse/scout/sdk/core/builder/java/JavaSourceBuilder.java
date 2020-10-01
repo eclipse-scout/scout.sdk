@@ -10,6 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.builder.java;
 
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.core.util.apidef.ApiFunction.applyWithApi;
+
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
@@ -18,7 +23,11 @@ import org.eclipse.scout.sdk.core.builder.SourceBuilderWrapper;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link JavaSourceBuilder}</h3>
@@ -113,21 +122,6 @@ public class JavaSourceBuilder extends SourceBuilderWrapper<JavaSourceBuilder> i
   }
 
   @Override
-  public JavaSourceBuilder comma() {
-    return append(JavaTypes.C_COMMA);
-  }
-
-  @Override
-  public JavaSourceBuilder genericStart() {
-    return append(JavaTypes.C_GENERIC_START);
-  }
-
-  @Override
-  public JavaSourceBuilder genericEnd() {
-    return append(JavaTypes.C_GENERIC_END);
-  }
-
-  @Override
   public JavaSourceBuilder equalSign() {
     return append(" = ");
   }
@@ -145,12 +139,49 @@ public class JavaSourceBuilder extends SourceBuilderWrapper<JavaSourceBuilder> i
   @Override
   public JavaSourceBuilder appendReferences(Stream<? extends CharSequence> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
     if (references == null) {
-      return currentInstance();
+      return thisInstance();
     }
 
     Stream<ISourceGenerator<ISourceBuilder<?>>> referenceBuilders = references
         .<ISourceGenerator<IJavaSourceBuilder<?>>> map(s -> builder -> builder.ref(s))
         .map(builder -> builder.generalize(JavaSourceBuilder::create));
     return append(referenceBuilders, prefix, delimiter, suffix);
+  }
+
+  @Override
+  public <API extends IApiSpecification> JavaSourceBuilder refClassFrom(Class<API> apiClass, Function<API, IClassNameSupplier> sourceProvider) {
+    return ref(executeWithApi(apiClass, sourceProvider).fqn());
+  }
+
+  @Override
+  public <API extends IApiSpecification> JavaSourceBuilder refFrom(ApiFunction<API, String> func) {
+    Ensure.notNull(func);
+    return refFrom(func.apiClass().orElse(null), func.apiFunction());
+  }
+
+  @Override
+  public <API extends IApiSpecification> JavaSourceBuilder refFrom(Class<API> apiClass, Function<API, String> refProvider) {
+    return ref(executeWithApi(apiClass, refProvider));
+  }
+
+  @Override
+  public <API extends IApiSpecification> JavaSourceBuilder appendFrom(Class<API> apiClass, Function<API, String> sourceProvider) {
+    return append(executeWithApi(apiClass, sourceProvider));
+  }
+
+  @Override
+  public JavaSourceBuilder appendFrom(Stream<ApiFunction<?, String>> apis, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
+    if (apis == null) {
+      return thisInstance();
+    }
+    return appendReferences(apis
+        .map(af -> af.apply(context()))
+        .filter(Optional::isPresent)
+        .map(Optional::get), prefix, delimiter, suffix);
+  }
+
+  protected <API extends IApiSpecification, R> R executeWithApi(Class<API> apiClass, Function<API, R> apiObjectProvider) {
+    return applyWithApi(apiClass, apiObjectProvider, context().environment().orElse(null))
+        .orElseThrow(() -> newFail("Api object provider could not be executed for api {}. Either the API could not be found or the function did not return a valid value.", apiClass));
   }
 }

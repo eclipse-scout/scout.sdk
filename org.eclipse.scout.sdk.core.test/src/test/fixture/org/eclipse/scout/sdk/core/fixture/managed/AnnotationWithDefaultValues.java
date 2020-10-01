@@ -10,12 +10,16 @@
  */
 package org.eclipse.scout.sdk.core.fixture.managed;
 
+import static org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier.raw;
+
 import java.util.function.Supplier;
 
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link AnnotationWithDefaultValues}</h3> managed wrapper for {@link AnnotationWithDefaultValues}
@@ -23,7 +27,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
  * @since 5.1.0
  */
 public class AnnotationWithDefaultValues extends AbstractManagedAnnotation {
-  public static final String TYPE_NAME = org.eclipse.scout.sdk.core.fixture.AnnotationWithDefaultValues.class.getName();
+  protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(raw(org.eclipse.scout.sdk.core.fixture.AnnotationWithDefaultValues.class.getName()));
 
   public int num() {
     return num(null);

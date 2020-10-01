@@ -42,7 +42,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils.JaxWsBindingMapping;
@@ -81,7 +81,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   private final List<IType> m_createdProviderServiceImpls;
   private final List<String> m_createdUrlProperties;
 
-  private StringBuilder m_wsdlContent;
+  private CharSequence m_wsdlContent;
   private ParsedWsdl m_parsedWsdl;
 
   protected AbstractWebServiceNewOperation() {
@@ -238,7 +238,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
       Path wsdlFolder = getWsdlFolder(baseName);
       Path target = wsdlFolder.resolve(relPath);
       try {
-        StringBuilder content = readXmlFromUrl(sourceUri.toURL());
+        StringBuffer content = readXmlFromUrl(sourceUri.toURL());
         env.writeResource(content, target, progress);
       }
       catch (MalformedURLException e) {
@@ -295,7 +295,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     try {
       Document document = Xml.get(pom);
       JaxWsUtils.addWsdlToPom(document, wsdlFolderRelativePath.toString().replace('\\', '/'), bindingFolderName, bindingFileNames);
-      env.writeResource(Xml.documentToString(document, true), pom, progress);
+      env.writeResource(Xml.writeDocument(document, true), pom, progress);
     }
     catch (IOException | TransformerException e) {
       throw new SdkException(e);
@@ -416,8 +416,8 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     }
     else {
       wsdlFileName = getWsdlName();
-      if (wsdlFileName.endsWith(ISdkProperties.SUFFIX_WS_PROVIDER)) {
-        wsdlFileName = wsdlFileName.substring(0, wsdlFileName.length() - ISdkProperties.SUFFIX_WS_PROVIDER.length());
+      if (wsdlFileName.endsWith(ISdkConstants.SUFFIX_WS_PROVIDER)) {
+        wsdlFileName = wsdlFileName.substring(0, wsdlFileName.length() - ISdkConstants.SUFFIX_WS_PROVIDER.length());
       }
     }
     wsdlFileName += JaxWsUtils.WSDL_FILE_EXTENSION;
@@ -431,9 +431,9 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     return wsdlFile;
   }
 
-  protected static StringBuilder readXmlFromUrl(URL url) {
+  protected static StringBuffer readXmlFromUrl(URL url) {
     try {
-      return Xml.documentToString(Xml.get(url), false);
+      return Xml.writeDocument(Xml.get(url), false);
     }
     catch (IOException | TransformerException e) {
       throw new SdkException(e);
@@ -488,11 +488,11 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     return unmodifiableList(m_createdJaxwsBindingFiles);
   }
 
-  public StringBuilder getWsdlContent() {
+  public CharSequence getWsdlContent() {
     return m_wsdlContent;
   }
 
-  protected void setWsdlContent(StringBuilder wsdlContent) {
+  protected void setWsdlContent(CharSequence wsdlContent) {
     m_wsdlContent = wsdlContent;
   }
 

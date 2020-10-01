@@ -15,7 +15,7 @@ import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createUnreso
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;

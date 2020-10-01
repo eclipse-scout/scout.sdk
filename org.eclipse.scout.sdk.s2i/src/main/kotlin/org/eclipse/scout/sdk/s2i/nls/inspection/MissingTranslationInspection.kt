@@ -24,9 +24,9 @@ import org.eclipse.scout.sdk.core.s.util.search.IFileQuery
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
-import org.eclipse.scout.sdk.s2i.getNioPath
 import org.eclipse.scout.sdk.s2i.moduleDirPath
 import org.eclipse.scout.sdk.s2i.toScoutProgress
+import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 

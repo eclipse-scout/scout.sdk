@@ -11,9 +11,12 @@
 package org.eclipse.scout.sdk.core.generator.methodparam;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link IMethodParameterGenerator}</h3>
@@ -80,10 +83,7 @@ public interface IMethodParameterGenerator<TYPE extends IMethodParameterGenerato
    */
   TYPE asVarargs(boolean newVarargsValue);
 
-  /**
-   * @return The data type of this {@link IMethodParameterGenerator}.
-   */
-  Optional<String> dataType();
+  Optional<ApiFunction<?, String>> dataType();
 
   /**
    * Sets the data type of this {@link IMethodParameterGenerator}.
@@ -93,4 +93,6 @@ public interface IMethodParameterGenerator<TYPE extends IMethodParameterGenerato
    * @return This generator.
    */
   TYPE withDataType(String dataType);
+
+  <A extends IApiSpecification> TYPE withDataTypeFrom(Class<A> apiDefinition, Function<A, String> dataTypeSupplier);
 }

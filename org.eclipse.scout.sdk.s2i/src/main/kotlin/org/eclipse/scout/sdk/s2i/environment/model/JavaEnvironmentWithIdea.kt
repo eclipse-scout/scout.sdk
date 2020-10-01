@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.core.model.ecj.ClasspathEntry
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcj
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi
 import org.eclipse.scout.sdk.core.util.SdkException
-import org.eclipse.scout.sdk.s2i.getNioPath
+import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths

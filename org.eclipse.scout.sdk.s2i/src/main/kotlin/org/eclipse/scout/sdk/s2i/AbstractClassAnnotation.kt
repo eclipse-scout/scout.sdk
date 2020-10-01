@@ -12,11 +12,12 @@ package org.eclipse.scout.sdk.s2i
 
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 
-abstract class AbstractClassAnnotation protected constructor(val psiClass: PsiClass, val psiAnnotation: PsiAnnotation) {
+abstract class AbstractClassAnnotation protected constructor(val psiClass: PsiClass, val psiAnnotation: PsiAnnotation, val scoutApi: IScoutApi) {
 
     private val m_ownerFqn = FinalValue<String>()
 

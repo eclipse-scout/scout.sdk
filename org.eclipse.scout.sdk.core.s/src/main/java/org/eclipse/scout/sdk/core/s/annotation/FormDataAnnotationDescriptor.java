@@ -21,9 +21,9 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 
 /**
  * Descriptor of a form data annotation hierarchy holding all information required to create a derived resource.
@@ -47,7 +47,8 @@ public class FormDataAnnotationDescriptor {
     if (type == null) {
       return anot;
     }
-    if (type.isInstanceOf(IScoutRuntimeTypes.IFormExtension) || type.isInstanceOf(IScoutRuntimeTypes.IFormFieldExtension)) {
+    IScoutApi scoutApi = type.javaEnvironment().requireApi(IScoutApi.class);
+    if (type.isInstanceOf(scoutApi.IFormExtension()) || type.isInstanceOf(scoutApi.IFormFieldExtension())) {
       // extensions are annotated with @Data but behave like normal form fields -> bridge from @Data to @FormData
 
       Optional<DataAnnotationDescriptor> dataAnnotation = DataAnnotationDescriptor.of(type);
@@ -58,28 +59,29 @@ public class FormDataAnnotationDescriptor {
         anot.setGenericOrdinal(-1);
         anot.setSdkCommand(SdkCommand.CREATE);
         anot.setSuperType(dataAnnotationDescriptor.getSuperDataType()
-            .orElseGet(() -> type.javaEnvironment().findType(IScoutRuntimeTypes.AbstractFormFieldData).orElse(null)));
+            .orElseGet(() -> type.javaEnvironment().findType(scoutApi.AbstractFormFieldData()).orElse(null)));
       });
     }
     else {
-      parseFormDataAnnotationRec(anot, type, true);
+      parseFormDataAnnotationRec(anot, type, scoutApi, true);
     }
     return anot;
   }
 
-  private static void parseFormDataAnnotationRec(FormDataAnnotationDescriptor descriptorToFill, IType type, boolean isOwner) {
+  private static void parseFormDataAnnotationRec(FormDataAnnotationDescriptor descriptorToFill, IType type, IScoutApi api, boolean isOwner) {
     if (type == null) {
       return;
     }
 
-    boolean replaceAnnotationPresent = type.annotations().withName(IScoutRuntimeTypes.Replace).existsAny();
+    String replaceAnnotationFqn = type.javaEnvironment().requireApi(IScoutApi.class).Replace().fqn();
+    boolean replaceAnnotationPresent = type.annotations().withName(replaceAnnotationFqn).existsAny();
     IType superType = type.superClass().orElse(null);
 
-    parseFormDataAnnotationRec(descriptorToFill, superType, replaceAnnotationPresent);
+    parseFormDataAnnotationRec(descriptorToFill, superType, api, replaceAnnotationPresent);
     type.superInterfaces()
-        .forEach(superInterface -> parseFormDataAnnotationRec(descriptorToFill, superInterface, replaceAnnotationPresent));
+        .forEach(superInterface -> parseFormDataAnnotationRec(descriptorToFill, superInterface, api, replaceAnnotationPresent));
 
-    if (replaceAnnotationPresent && superType != null && !superType.annotations().withName(IScoutRuntimeTypes.Replace).existsAny()) {
+    if (replaceAnnotationPresent && superType != null && !superType.annotations().withName(replaceAnnotationFqn).existsAny()) {
       // super type is the original field that is going to be replaced by the given type
       // check whether the super type is embedded into a form field that is annotated by @FormData with SdkCommand.IGNORE.
       Optional<IType> declaringType = superType.declaringType();
@@ -99,7 +101,7 @@ public class FormDataAnnotationDescriptor {
     // A field that is once marked so that a DTO should be created, can never be set to ignore again. But an ignored field may be changed to create. Afterwards it can never be set to ignore again.
     // Therefore ignored fields may define all attributes and they are inherited from the first level that declares it to be created.
     // Forms are excluded from this rule: If a form has a @Replace annotation, it even though may define a different dto.
-    boolean cumulativeAttribsOnly = replaceAnnotationPresent && !isIgnore(descriptorToFill) && !type.isInstanceOf(IScoutRuntimeTypes.IForm);
+    boolean cumulativeAttribsOnly = replaceAnnotationPresent && !isIgnore(descriptorToFill) && !type.isInstanceOf(api.IForm());
 
     fillFormDataAnnotation(type, descriptorToFill, isOwner, cumulativeAttribsOnly);
   }

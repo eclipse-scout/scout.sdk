@@ -54,10 +54,10 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
+import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.model.api.internal.JavaEnvironmentImplementor;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.PropertySupport;
@@ -99,13 +99,12 @@ public final class S2eUtils {
    *          The {@link IJavaProject} the map should contain or {@code null}.
    * @param targetPath
    *          The {@link Path} in which the generators source will be stored (as exact as possible)
-   *
    * @return The created {@link PropertySupport}. Never returns {@code null}.
    */
   public static PropertySupport propertyMap(IJavaProject p, Path targetPath) {
     PropertySupport context = new PropertySupport(2);
-    context.setProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, p);
-    context.setProperty(ISdkProperties.CONTEXT_PROPERTY_TARGET_PATH, targetPath);
+    context.setProperty(IBuilderContext.PROPERTY_JAVA_MODULE, p);
+    context.setProperty(IBuilderContext.PROPERTY_TARGET_PATH, targetPath);
     return context;
   }
 
@@ -345,16 +344,21 @@ public final class S2eUtils {
     };
 
     String sessionToFind;
+    Optional<IScoutApi> scoutApi = ApiHelper.scoutApiFor(project);
+    if (scoutApi.isEmpty()) {
+      return Optional.empty();
+    }
+
     switch (tier) {
       case Server:
-        sessionToFind = IScoutRuntimeTypes.IServerSession;
+        sessionToFind = scoutApi.get().IServerSession().fqn();
         break;
       case Client:
       case HtmlUi:
-        sessionToFind = IScoutRuntimeTypes.IClientSession;
+        sessionToFind = scoutApi.get().IClientSession().fqn();
         break;
       default:
-        sessionToFind = IScoutRuntimeTypes.ISession;
+        sessionToFind = scoutApi.get().ISession().fqn();
         break;
     }
     Set<IType> sessions = JdtUtils.findTypesInStrictHierarchy(project, sessionToFind, monitor, filter);

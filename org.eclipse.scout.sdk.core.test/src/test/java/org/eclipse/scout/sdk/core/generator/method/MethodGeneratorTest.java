@@ -78,8 +78,7 @@ public class MethodGeneratorTest {
         .withException(IOException.class.getName())
         .withException(SecurityException.class.getName())
         .withException(RuntimeException.class.getName())
-        .withoutException(RuntimeException.class.getName())
-        .withoutException(RuntimeException.class.getName())
+        .withoutException(filter -> RuntimeException.class.getName().equals(filter.apply().get()))
         .withReturnType(JavaTypes._byte)
         .withParameter(
             MethodParameterGenerator.create()
@@ -107,11 +106,11 @@ public class MethodGeneratorTest {
         .withTypeParameter(
             TypeParameterGenerator.create()
                 .withElementName("T")
-                .withBound(Iterable.class.getName())
+                .withBinding(Iterable.class.getName())
                 .withComment(b -> b.appendJavaDocLine("type param"))
-                .withBound(Serializable.class.getName()));
+                .withBinding(Serializable.class.getName()));
 
-    assertEquals("testMethod(java.lang.Integer,T,int)", generator.identifier());
+    assertEquals("testMethod(java.lang.Integer,T,int)", generator.identifier(env));
 
     assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest1.txt", generator);
   }

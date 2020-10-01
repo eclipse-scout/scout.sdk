@@ -21,6 +21,7 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
 import org.eclipse.scout.sdk.core.builder.BuilderContext
+import org.eclipse.scout.sdk.core.builder.IBuilderContext
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext
@@ -30,7 +31,6 @@ import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGene
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.s.ISdkProperties
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.repeatUntilPassesWithIndex
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
+import org.eclipse.scout.sdk.s2i.util.getNioPath
 import org.jetbrains.jps.model.serialization.PathMacroUtil
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -169,8 +170,8 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
     protected fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, context: IJavaEnvironment, filePath: Path): StringBuilder {
         val env = context.unwrap() as JavaEnvironmentWithIdea
         val props = PropertySupport(2)
-        props.setProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, env.module)
-        props.setProperty(ISdkProperties.CONTEXT_PROPERTY_TARGET_PATH, filePath)
+        props.setProperty(IBuilderContext.PROPERTY_JAVA_MODULE, env.module)
+        props.setProperty(IBuilderContext.PROPERTY_TARGET_PATH, filePath)
 
         // must be \n! see https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/modifying_psi.html
         // do not use CodeStyle.getSettings(project).lineSeparator because the CompilationUnitWriter uses createFileFromText

@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
 /**
@@ -34,24 +34,25 @@ public class AstFormHandlerBuilder extends AstTypeBuilder<AstFormHandlerBuilder>
   public AstFormHandlerBuilder insert() {
     super.insert();
 
-    m_execLoad = getFactory().newExecMethod("execLoad")
+    IScoutApi scoutApi = getFactory().getScoutApi();
+    m_execLoad = getFactory().newExecMethod(scoutApi.AbstractFormHandler().execLoadMethodName())
         .in(get())
         .insert()
         .get();
 
-    m_execStore = getFactory().newExecMethod("execStore")
+    m_execStore = getFactory().newExecMethod(scoutApi.AbstractFormHandler().execStoreMethodName())
         .in(get())
         .insert()
         .get();
 
     // form handlers created in extensions must be static!
-    if (AstUtils.isInstanceOf(getFactory().getDeclaringTypeBinding(), IScoutRuntimeTypes.IExtension)) {
+    if (AstUtils.isInstanceOf(getFactory().getDeclaringTypeBinding(), scoutApi.IExtension().fqn())) {
       get().modifiers().add(getFactory().getAst().newModifier(ModifierKeyword.STATIC_KEYWORD));
     }
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IFormHandler);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, scoutApi.IFormHandler().fqn());
     }
 
     return this;

@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
+import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.normalizeWhitespace;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -59,13 +60,40 @@ public class XmlTest {
   }
 
   @Test
-  public void testXmlDocumentToString() throws TransformerException, ParserConfigurationException, SAXException, IOException {
+  public void testWriteDocumentToString() throws TransformerException, ParserConfigurationException, SAXException, IOException {
     DocumentBuilder b = Xml.createDocumentBuilder();
-    String xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><root><!--comment--><element>whatever</element><element>another</element></root>";
+    String xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        + "<root>"
+        + "<!--comment-->"
+        + "<element>whatever</element>"
+        + "<element>another</element>"
+        + "</root>";
     Document xml = b.parse(new InputSource(new StringReader(xmlContent)));
 
-    String xmlString = Xml.documentToString(xml, false).toString();
+    String xmlString = Xml.writeDocument(xml, false).toString();
     assertEquals(xmlContent, xmlString);
+
+    String expected = normalizeWhitespace("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+        "<root>\n" +
+        "  <!--comment-->\n" +
+        "  <element>whatever</element>\n" +
+        "  <element>another</element>\n" +
+        "</root>\n");
+    String xmlStringFormatted = normalizeWhitespace(Xml.writeDocument(xml, true));
+    assertEquals(expected, xmlStringFormatted);
+  }
+
+  @Test
+  public void testWriteDocument() throws TransformerException, IOException {
+    Path xml = Files.createTempFile("XmlTest", ".xml");
+    try {
+      Document document = Xml.get("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><root></root>");
+      assertNotNull(document);
+      Xml.writeDocument(document, true, xml);
+    }
+    finally {
+      Files.deleteIfExists(xml);
+    }
   }
 
   @Test

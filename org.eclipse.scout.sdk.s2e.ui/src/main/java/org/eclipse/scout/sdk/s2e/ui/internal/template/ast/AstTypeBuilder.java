@@ -29,8 +29,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -208,7 +207,7 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
 
     // order annotation
     if (isCreateOrderAnnotation()) {
-      double newOrder = ISdkProperties.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      double newOrder = ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       if (isCalculateOrderValue()) {
         //noinspection resource
         IJavaEnvironment environment = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
@@ -216,7 +215,7 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
       }
 
       SingleMemberAnnotation order = ast.newSingleMemberAnnotation();
-      String orderRef = getFactory().getImportRewrite().addImport(IScoutRuntimeTypes.Order);
+      String orderRef = getFactory().getImportRewrite().addImport(getFactory().getScoutApi().Order().fqn());
       order.setTypeName(ast.newName(orderRef));
       NumberLiteral orderValue = ast.newNumberLiteral(convertToJavaSource(newOrder));
       order.setValue(orderValue);

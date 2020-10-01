@@ -39,7 +39,7 @@ public class ScoutJavaEnvironmentWithEcjBuilder<T extends ScoutJavaEnvironmentWi
       exclude(rtServer);
       exclude(mom);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   public T withScoutClient(boolean withClient) {
@@ -50,7 +50,7 @@ public class ScoutJavaEnvironmentWithEcjBuilder<T extends ScoutJavaEnvironmentWi
     else {
       exclude(regex);
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   public T withScoutHtmlUi(boolean withHtmlUi) {
@@ -64,6 +64,6 @@ public class ScoutJavaEnvironmentWithEcjBuilder<T extends ScoutJavaEnvironmentWi
       exclude(json);
       exclude(uiHtml);
     }
-    return currentInstance();
+    return thisInstance();
   }
 }

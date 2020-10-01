@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi.AbstractNumberField;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
@@ -35,10 +35,9 @@ public class AstLongFieldBuilder extends AstTypeBuilder<AstLongFieldBuilder> {
   @Override
   public AstLongFieldBuilder insert() {
     super.insert();
-
-    addGetConfigured("getConfiguredMinValue", "-999999999999L", AstNodeFactory.MIN_GROUP, get());
-    addGetConfigured("getConfiguredMaxValue", "999999999999L", AstNodeFactory.MAX_GROUP, get());
-
+    AbstractNumberField abstractNumberFieldApi = getFactory().getScoutApi().AbstractNumberField();
+    addGetConfigured(abstractNumberFieldApi.getConfiguredMinValueMethodName(), "-999999999999L", AstNodeFactory.MIN_GROUP, get());
+    addGetConfigured(abstractNumberFieldApi.getConfiguredMaxValueMethodName(), "999999999999L", AstNodeFactory.MAX_GROUP, get());
     return this;
   }
 
@@ -68,7 +67,7 @@ public class AstLongFieldBuilder extends AstTypeBuilder<AstLongFieldBuilder> {
       ITrackedNodePosition literalTracker = new WrappedTrackedNodePosition(getFactory().getRewrite().track(literal), 0, -1);
       links.addLinkedPosition(literalTracker, true, group);
 
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.ILongField);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ILongField().fqn());
     }
   }
 }

@@ -14,9 +14,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
-import static org.eclipse.scout.sdk.core.util.Strings.toCharArray;
 
-import java.io.CharArrayReader;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -53,7 +51,8 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.util.CharSequenceInputStream;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -266,8 +265,8 @@ public class ParsedWsdl {
    * @throws UnsupportedEncodingException
    *           if the encoding is not supported
    */
-  public static ParsedWsdl create(URI documentBase, StringBuilder wsdlContent, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
-    Definition wsdl = parseWsdl(documentBase, new InputSource(new CharArrayReader(toCharArray(wsdlContent))));
+  public static ParsedWsdl create(URI documentBase, CharSequence wsdlContent, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
+    Definition wsdl = parseWsdl(documentBase, new InputSource(new CharSequenceInputStream(wsdlContent, StandardCharsets.UTF_8)));
     return create(wsdl, loadSchemas);
   }
 
@@ -460,7 +459,7 @@ public class ParsedWsdl {
      * @return The default port type class name for the given portType WSDL name
      */
     public static String getPortTypeClassName(String portTypeNameFromWsdl) {
-      return 'I' + getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_PORT_TYPE;
+      return 'I' + getBaseName(portTypeNameFromWsdl) + ISdkConstants.SUFFIX_WS_PORT_TYPE;
     }
 
     /**
@@ -469,7 +468,7 @@ public class ParsedWsdl {
      * @return The entry point class name (for providers) for the given port type WSDL name.
      */
     public static String getEntryPointClassName(String portTypeNameFromWsdl) {
-      return getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_ENTRY_POINT;
+      return getBaseName(portTypeNameFromWsdl) + ISdkConstants.SUFFIX_WS_ENTRY_POINT;
     }
 
     /**
@@ -478,7 +477,7 @@ public class ParsedWsdl {
      * @return The web service client class name (for consumers) for the given port type WSDL name.
      */
     public static String getWebServiceClientClassName(String portTypeNameFromWsdl) {
-      return getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_CLIENT;
+      return getBaseName(portTypeNameFromWsdl) + ISdkConstants.SUFFIX_WS_CLIENT;
     }
 
     /**
@@ -487,7 +486,7 @@ public class ParsedWsdl {
      * @return The web service provider implementation class name for the given port type WSDL name.
      */
     public static String getWebServiceProviderImplClassName(String portTypeNameFromWsdl) {
-      return getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_PROVIDER;
+      return getBaseName(portTypeNameFromWsdl) + ISdkConstants.SUFFIX_WS_PROVIDER;
     }
 
     /**
@@ -496,7 +495,7 @@ public class ParsedWsdl {
      * @return The entry point definition class name (for providers) for the given port type WSDL name.
      */
     public static String getEntryPointDefinitionClassName(String portTypeNameFromWsdl) {
-      return 'I' + getBaseName(portTypeNameFromWsdl) + ISdkProperties.SUFFIX_WS_ENTRY_POINT_DEFINITION;
+      return 'I' + getBaseName(portTypeNameFromWsdl) + ISdkConstants.SUFFIX_WS_ENTRY_POINT_DEFINITION;
     }
 
     protected static String getBaseName(String wsNameFromWsdl) {
@@ -523,7 +522,7 @@ public class ParsedWsdl {
      * @return The default web service class name
      */
     public String getWebServiceClassName() {
-      return m_wsBaseName + ISdkProperties.SUFFIX_WS_SERVICE;
+      return m_wsBaseName + ISdkConstants.SUFFIX_WS_SERVICE;
     }
   }
 }

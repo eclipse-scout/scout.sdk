@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.classid;
 import static java.util.Collections.addAll;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
 
 import java.util.Collection;
@@ -48,14 +49,17 @@ import org.eclipse.scout.sdk.core.imports.ImportCollector;
 import org.eclipse.scout.sdk.core.imports.ImportValidator;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.operation.AnnotationNewOperation;
 import org.eclipse.scout.sdk.s2e.operation.ImportsCreateOperation;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -131,14 +135,20 @@ public class MissingClassIdsNewOperation implements BiConsumer<EclipseEnvironmen
   }
 
   protected Collection<IType> findCandidates(SubMonitor monitor) {
-    Collection<IType> result = new HashSet<>();
-    Set<IType> startTypes = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
+    Set<IType> startTypes = ScoutApi.allKnown()
+        .map(IScoutInterfaceApi::ITypeWithClassId)
+        .map(IClassNameSupplier::fqn)
+        .distinct()
+        .map(JdtUtils::resolveJdtTypes)
+        .flatMap(Collection::stream)
+        .collect(toSet());
     monitor.setWorkRemaining(startTypes.size());
     monitor.setTaskName("Search for classes...");
     if (startTypes.isEmpty()) {
       return emptyList();
     }
 
+    Collection<IType> result = new HashSet<>();
     for (IType startType : startTypes) {
       ITypeHierarchy hierarchy = createHierarchy(startType, monitor.newChild(1));
       if (hierarchy == null || monitor.isCanceled()) {
@@ -195,7 +205,8 @@ public class MissingClassIdsNewOperation implements BiConsumer<EclipseEnvironmen
     Map<ICompilationUnit, Set<IType>> typesWithoutClassId = new HashMap<>();
     for (IType t : candidates) {
       if (acceptType(t)) {
-        IAnnotation annotation = JdtUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
+        String classIdFqn = ApiHelper.requireScoutApiFor(t, env).ClassId().fqn();
+        IAnnotation annotation = JdtUtils.getAnnotation(t, classIdFqn);
         if (annotation == null) {
           ICompilationUnit icu = t.getCompilationUnit();
           if (typesWithoutClassId.computeIfAbsent(icu, k -> new HashSet<>()).add(t)) {

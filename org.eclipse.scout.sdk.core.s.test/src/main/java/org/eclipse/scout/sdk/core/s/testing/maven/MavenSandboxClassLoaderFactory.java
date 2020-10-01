@@ -49,7 +49,7 @@ public final class MavenSandboxClassLoaderFactory {
 
   static URL[] getMavenJarsUrls() {
     // contains a sample class of all jars required by the maven runtime.
-    // the codesource of these classes will be the source of the classpath of the sandbox classloader.
+    // the code source of these classes will be the source of the classpath of the sandbox classloader.
     Collection<String> baseClasses = Arrays.asList(
         MavenCliRunner.class.getName(),
         "javax.annotation.PostConstruct", // javax.annotation-api

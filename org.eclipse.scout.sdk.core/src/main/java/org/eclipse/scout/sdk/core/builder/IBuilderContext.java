@@ -20,6 +20,24 @@ import org.eclipse.scout.sdk.core.util.PropertySupport;
 public interface IBuilderContext {
 
   /**
+   * Context property for the java project module that is used to resolve imports and in which the source of the
+   * generator will be stored.
+   *
+   * @see IBuilderContext#properties()
+   */
+  String PROPERTY_JAVA_MODULE = "javaModule";
+
+  /**
+   * Context property for the absolute target {@link java.nio.file.Path} in which the source of the generator will be
+   * stored.<br>
+   * This might be the exact path to the target file or a parent folder of the file (if the exact target file is not yet
+   * known).
+   *
+   * @see IBuilderContext#properties()
+   */
+  String PROPERTY_TARGET_PATH = "targetPath";
+
+  /**
    * @return The line delimiter to use.
    */
   String lineDelimiter();

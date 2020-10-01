@@ -10,11 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2e.operation.jaxws;
 
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -28,7 +29,7 @@ public class FactoryPathGenerator implements ISourceGenerator<ISourceBuilder<?>>
 
   @Override
   public void generate(ISourceBuilder<?> builder) {
-    String scoutVersion = rtVersion().orElse(ScoutProjectNewHelper.SCOUT_ARCHETYPES_VERSION);
+    String scoutVersion = rtVersion().orElseThrow(() -> newFail("No Scout version provided"));
     builder.append("<factorypath>").nl();
     builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/org/eclipse/scout/rt/org.eclipse.scout.jaxws.apt/").append(scoutVersion)
         .append("/org.eclipse.scout.jaxws.apt-").append(scoutVersion).append(".jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();

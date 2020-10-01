@@ -29,7 +29,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
@@ -78,7 +78,7 @@ public class WebServiceNewOperationTest {
       });
 
       runInExistingJaxWsModule(projectRoot.get(), env -> {
-        AbstractWebServiceNewOperation executedOperation = createEmptyWebServiceProvider(root, false, "TestEmpty" + ISdkProperties.SUFFIX_WS_PROVIDER, "test.provider.empty", env);
+        AbstractWebServiceNewOperation executedOperation = createEmptyWebServiceProvider(root, false, "TestEmpty" + ISdkConstants.SUFFIX_WS_PROVIDER, "test.provider.empty", env);
         assertEmptyWsdlCorrect(executedOperation);
       });
 
@@ -202,7 +202,7 @@ public class WebServiceNewOperationTest {
       @Override
       protected Path createNewJaxWsModule(IEnvironment e, IProgress progress) {
         try {
-          Path createdProjectDir = CoreScoutTestingUtils.createJaxWsModule(serverModule, jaxWsArtifactId);
+          Path createdProjectDir = CoreScoutTestingUtils.createJaxWsModule(serverModule, jaxWsArtifactId, env);
           ensureGeneratedSourceFoldersExist(createdProjectDir);
           return createdProjectDir;
         }

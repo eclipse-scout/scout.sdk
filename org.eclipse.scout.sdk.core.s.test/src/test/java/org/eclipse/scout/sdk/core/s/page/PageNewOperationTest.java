@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.core.s.page;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.AbstractBooleanPermutationArgumentsProvider;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
@@ -42,6 +42,7 @@ public class PageNewOperationTest {
   @ParameterizedTest(name = "withDTO={0}, withServer={1}, withShared={2}, withTest={3}, isPageWithTable={4}, withAbstractPage={5}")
   public void testPageCreation(boolean dtoSourceFolder, boolean serverSourceFolder, boolean sharedSourceFolder,
       boolean testSourceFolder, boolean isPageWithTable, boolean isCreateAbstractPage, TestingEnvironment env) {
+    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
 
     PageNewOperation pno = new PageNewOperation();
     pno.setClientSourceFolder(env.getTestingSourceFolder());
@@ -49,12 +50,12 @@ public class PageNewOperationTest {
     String suffix;
     String superType;
     if (isPageWithTable) {
-      suffix = ISdkProperties.SUFFIX_PAGE_WITH_TABLE;
-      superType = IScoutRuntimeTypes.AbstractPageWithTable;
+      suffix = ISdkConstants.SUFFIX_PAGE_WITH_TABLE;
+      superType = scoutApi.AbstractPageWithTable().fqn();
     }
     else {
-      suffix = ISdkProperties.SUFFIX_PAGE_WITH_NODES;
-      superType = IScoutRuntimeTypes.AbstractPageWithNodes;
+      suffix = ISdkConstants.SUFFIX_PAGE_WITH_NODES;
+      superType = scoutApi.AbstractPageWithNodes().fqn();
     }
     pno.setCreateAbstractPage(isCreateAbstractPage);
     pno.setPageName("My" + System.currentTimeMillis() + suffix);
@@ -85,7 +86,7 @@ public class PageNewOperationTest {
       }
       if (serverSourceFolder && sharedSourceFolder) {
         if (testSourceFolder) {
-          pno.getCreatedServiceTest();
+          assertNotNull(pno.getCreatedServiceTest());
         }
       }
     }

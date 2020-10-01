@@ -10,22 +10,25 @@
  */
 package org.eclipse.scout.sdk.core.s.generator.annotation;
 
+import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.raw;
+
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.annotation.ClassIdAnnotation;
-import org.eclipse.scout.sdk.core.s.annotation.DataAnnotation;
-import org.eclipse.scout.sdk.core.s.annotation.ExtendsAnnotation;
-import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link ScoutAnnotationGenerator}</h3>
@@ -36,14 +39,14 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
 
   public static IAnnotationGenerator<?> createOrder(double orderNr) {
     return create()
-        .withElementName(IScoutRuntimeTypes.Order)
-        .withElement(OrderAnnotation.VALUE_ELEMENT_NAME, OrderAnnotation.convertToJavaSource(orderNr));
+        .withElementNameFrom(IScoutApi.class, IScoutApi::Order)
+        .withElementFrom(IScoutApi.class, api -> api.Order().valueElementName(), raw(OrderAnnotation.convertToJavaSource(orderNr)));
   }
 
   public static IAnnotationGenerator<?> createExtends(CharSequence extendedType) {
     return create()
-        .withElementName(IScoutRuntimeTypes.Extends)
-        .withElement(ExtendsAnnotation.VALUE_ELEMENT_NAME, b -> b.classLiteral(extendedType));
+        .withElementNameFrom(IScoutApi.class, IScoutApi::Extends)
+        .withElementFrom(IScoutApi.class, api -> api.Extends().valueElementName(), b -> b.classLiteral(extendedType));
   }
 
   /**
@@ -55,52 +58,60 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
    */
   public static IAnnotationGenerator<?> createClassId(CharSequence classIdValue) {
     return create()
-        .withElementName(IScoutRuntimeTypes.ClassId)
-        .withElement(ClassIdAnnotation.VALUE_ELEMENT_NAME, b -> b.stringLiteral(classIdValue));
+        .withElementNameFrom(IScoutApi.class, IScoutApi::ClassId)
+        .withElementFrom(IScoutApi.class, api -> api.ClassId().valueElementName(), b -> b.stringLiteral(classIdValue));
   }
 
   public static IAnnotationGenerator<?> createBefore() {
     return create()
-        .withElementName(IScoutRuntimeTypes.Before);
+        .withElementNameFrom(IScoutApi.class, IScoutApi::Before);
   }
 
   public static IAnnotationGenerator<?> createApplicationScoped() {
     return create()
-        .withElementName(IScoutRuntimeTypes.ApplicationScoped);
+        .withElementNameFrom(IScoutApi.class, IScoutApi::ApplicationScoped);
   }
 
   public static IAnnotationGenerator<?> createBeanMock() {
     return create()
-        .withElementName(IScoutRuntimeTypes.BeanMock);
+        .withElementNameFrom(IScoutApi.class, IScoutApi::BeanMock);
   }
 
   public static IAnnotationGenerator<?> createAuthentication() {
     return create()
-        .withElementName(IScoutRuntimeTypes.Authentication)
-        .withElement("method", b -> createClazz(IScoutRuntimeTypes.BasicAuthenticationMethod).generate(b))
-        .withElement("verifier", b -> createClazz(IScoutRuntimeTypes.ConfigFileCredentialVerifier).generate(b));
+        .withElementNameFrom(IScoutApi.class, IScoutApi::Authentication)
+        .withElementFrom(IScoutApi.class, api -> api.Authentication().methodElementName(), b -> createClazz(IScoutApi.class, IScoutApi::BasicAuthenticationMethod).generate(b))
+        .withElementFrom(IScoutApi.class, api -> api.Authentication().verifierElementName(), b -> createClazz(IScoutApi.class, IScoutApi::BasicAuthenticationMethod).generate(b));
+  }
+
+  public static <API extends IApiSpecification> IAnnotationGenerator<?> createClazz(Class<API> apiClass, Function<API, IClassNameSupplier> referenceProvider) {
+    return create()
+        .withElementNameFrom(IScoutApi.class, IScoutApi::Clazz)
+        .withElementFrom(IScoutApi.class, api -> api.Clazz().valueElementName(), b -> b.classLiteralFrom(apiClass, referenceProvider));
   }
 
   public static IAnnotationGenerator<?> createClazz(CharSequence clazzFqn) {
-    return create()
-        .withElementName(IScoutRuntimeTypes.Clazz)
-        .withElement("value", b -> b.classLiteral(clazzFqn));
+    IClassNameSupplier fqn = IClassNameSupplier.raw(clazzFqn);
+    return createClazz(null, api -> fqn);
   }
 
   public static IAnnotationGenerator<?> createHandler(CharSequence handlerFqn) {
+    IClassNameSupplier fqn = IClassNameSupplier.raw(handlerFqn);
+    return createHandler(null, api -> fqn);
+  }
+
+  public static <API extends IApiSpecification> IAnnotationGenerator<?> createHandler(Class<API> apiClass, Function<API, IClassNameSupplier> referenceProvider) {
     return create()
-        .withElementName(IScoutRuntimeTypes.Handler)
-        .withElement("value", b -> createClazz(handlerFqn).generate(b));
+        .withElementNameFrom(IScoutApi.class, IScoutApi::Handler)
+        .withElementFrom(IScoutApi.class, api -> api.Handler().valueElementName(), b -> createClazz(apiClass, referenceProvider).generate(b));
   }
 
   public static IAnnotationGenerator<?> createTunnelToServer() {
-    return create()
-        .withElementName(IScoutRuntimeTypes.TunnelToServer);
+    return create().withElementNameFrom(IScoutApi.class, IScoutApi::TunnelToServer);
   }
 
   public static IAnnotationGenerator<?> createTest() {
-    return create()
-        .withElementName(IScoutRuntimeTypes.Test);
+    return create().withElementNameFrom(IScoutApi.class, IScoutApi::Test);
   }
 
   /**
@@ -113,9 +124,9 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
    */
   public static IAnnotationGenerator<?> createRunWithSubject(ISourceGenerator<IExpressionBuilder<?>> valueBuilder) {
     return create()
-        .withElementName(IScoutRuntimeTypes.RunWithSubject)
-        .withElement("value", Optional.ofNullable(valueBuilder)
-            .orElseGet(() -> b -> b.stringLiteral("anonymous")));
+        .withElementNameFrom(IScoutApi.class, IScoutApi::RunWithSubject)
+        .withElementFrom(IScoutApi.class, api -> api.RunWithSubject().valueElementName(),
+            Optional.ofNullable(valueBuilder).orElseGet(() -> b -> b.stringLiteral("anonymous")));
   }
 
   /**
@@ -127,29 +138,66 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
    *          used.
    * @return The created {@link IAnnotationGenerator}.
    */
-  public static IAnnotationGenerator<?> createRunWithClientSession(String clientSession) {
-    return create()
-        .withElementName(IScoutRuntimeTypes.RunWithClientSession)
-        .withElement("value", b -> b.classLiteral(Optional.ofNullable(clientSession)
-            .orElse(IScoutRuntimeTypes.TestEnvironmentClientSession)));
+  public static IAnnotationGenerator<?> createRunWithClientSession(CharSequence clientSession) {
+    IClassNameSupplier session = IClassNameSupplier.raw(clientSession);
+    return createRunWithClientSession(null, api -> session);
   }
 
-  public static IAnnotationGenerator<?> createRunWithServerSession(String serverSession) {
-    return create()
-        .withElementName(IScoutRuntimeTypes.RunWithServerSession)
-        .withElement("value", b -> b.classLiteral(Ensure.notNull(serverSession)));
+  public static <API extends IApiSpecification> IAnnotationGenerator<?> createRunWithClientSession(ApiFunction<API, IClassNameSupplier> clientSessionProvider) {
+    if (clientSessionProvider == null) {
+      return createRunWithClientSession(null, null);
+    }
+    return createRunWithClientSession(clientSessionProvider.apiClass().orElse(null), clientSessionProvider.apiFunction());
   }
 
-  public static IAnnotationGenerator<?> createRunWith(String runner) {
+  public static <API extends IApiSpecification> IAnnotationGenerator<?> createRunWithClientSession(Class<API> apiSpec, Function<API, IClassNameSupplier> clientSessionProvider) {
+    ApiFunction<API, IClassNameSupplier> sessionFunction;
+    if (clientSessionProvider == null) {
+      // use default session
+      IClassNameSupplier session = IClassNameSupplier.raw(null);
+      sessionFunction = new ApiFunction<>(null, api -> session);
+    }
+    else {
+      sessionFunction = new ApiFunction<>(apiSpec, clientSessionProvider);
+    }
+
     return create()
-        .withElementName(IScoutRuntimeTypes.RunWith)
-        .withElement("value", b -> b.classLiteral(Ensure.notNull(runner)));
+        .withElementNameFrom(IScoutApi.class, IScoutApi::RunWithClientSession)
+        .withElementFrom(IScoutApi.class, api -> api.RunWithClientSession().valueElementName(),
+            b -> b.classLiteral(
+                sessionFunction.apply(b.context())
+                    .map(IClassNameSupplier::fqn)
+                    .filter(Strings::hasText)
+                    .orElseGet(() -> b.context().requireApi(IScoutApi.class).TestEnvironmentClientSession().fqn())));
   }
 
-  public static IAnnotationGenerator<?> createData(String pageDataType) {
+  public static IAnnotationGenerator<?> createRunWithServerSession(CharSequence serverSession) {
+    IClassNameSupplier session = IClassNameSupplier.raw(serverSession);
+    return createRunWithServerSession(null, api -> session);
+  }
+
+  public static <API extends IApiSpecification> IAnnotationGenerator<?> createRunWithServerSession(ApiFunction<API, IClassNameSupplier> serverSessionProvider) {
+    Ensure.notNull(serverSessionProvider);
+    return createRunWithServerSession(serverSessionProvider.apiClass().orElse(null), serverSessionProvider.apiFunction());
+  }
+
+  public static <API extends IApiSpecification> IAnnotationGenerator<?> createRunWithServerSession(Class<API> apiSpec, Function<API, IClassNameSupplier> serverSessionProvider) {
+    Ensure.notNull(serverSessionProvider);
     return create()
-        .withElementName(IScoutRuntimeTypes.Data)
-        .withElement(DataAnnotation.VALUE_ELEMENT_NAME, b -> b.classLiteral(Ensure.notNull(pageDataType)));
+        .withElementNameFrom(IScoutApi.class, IScoutApi::RunWithServerSession)
+        .withElementFrom(IScoutApi.class, api -> api.RunWithServerSession().valueElementName(), b -> b.classLiteralFrom(apiSpec, serverSessionProvider));
+  }
+
+  public static IAnnotationGenerator<?> createRunWith(CharSequence runner) {
+    return create()
+        .withElementNameFrom(IScoutApi.class, IScoutApi::RunWith)
+        .withElementFrom(IScoutApi.class, api -> api.RunWith().valueElementName(), b -> b.classLiteral(Ensure.notBlank(runner)));
+  }
+
+  public static IAnnotationGenerator<?> createData(CharSequence pageDataType) {
+    return create()
+        .withElementNameFrom(IScoutApi.class, IScoutApi::Data)
+        .withElementFrom(IScoutApi.class, api -> api.Data().valueElementName(), b -> b.classLiteral(Ensure.notBlank(pageDataType)));
   }
 
   public static IAnnotationGenerator<?> createFormData() {
@@ -157,23 +205,21 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
   }
 
   public static IAnnotationGenerator<?> createFormData(CharSequence formDataClass, SdkCommand sdkCommand, DefaultSubtypeSdkCommand defaultSubtypeCommand) {
-    IAnnotationGenerator<?> generator = create()
-        .withElementName(IScoutRuntimeTypes.FormData);
-    if (formDataClass != null) {
-      generator.withElement(FormDataAnnotation.VALUE_ELEMENT_NAME, b -> b.classLiteral(formDataClass));
+    IAnnotationGenerator<?> generator = create().withElementNameFrom(IScoutApi.class, IScoutApi::FormData);
+    if (Strings.hasText(formDataClass)) {
+      generator.withElementFrom(IScoutApi.class, api -> api.FormData().valueElementName(), b -> b.classLiteral(formDataClass));
     }
     if (sdkCommand != null && SdkCommand.DEFAULT != sdkCommand) {
-      generator.withElement(FormDataAnnotation.SDK_COMMAND_ELEMENT_NAME, b -> b.ref(generator.elementName().get()).append(".SdkCommand.").append(sdkCommand.name()));
+      generator.withElementFrom(IScoutApi.class, api -> api.FormData().sdkCommandElementName(), b -> b.refFrom(IScoutApi.class, api -> api.FormData().fqn()).append(".SdkCommand.").append(sdkCommand.name()));
     }
-
     if (defaultSubtypeCommand != null && DefaultSubtypeSdkCommand.DEFAULT != defaultSubtypeCommand) {
-      generator.withElement(FormDataAnnotation.DEFAULT_SUBTYPE_SDK_COMMAND_ELEMENT_NAME, b -> b.ref(generator.elementName().get()).append(".DefaultSubtypeSdkCommand.").append(defaultSubtypeCommand.name()));
+      generator.withElementFrom(IScoutApi.class, api -> api.FormData().defaultSubtypeSdkCommandElementName(),
+          b -> b.ref(generator.elementName().get()).append(".DefaultSubtypeSdkCommand.").append(defaultSubtypeCommand.name()));
     }
     return generator;
   }
 
   public static IAnnotationGenerator<?> createReplace() {
-    return create()
-        .withElementName(IScoutRuntimeTypes.Replace);
+    return create().withElementNameFrom(IScoutApi.class, IScoutApi::Replace);
   }
 }

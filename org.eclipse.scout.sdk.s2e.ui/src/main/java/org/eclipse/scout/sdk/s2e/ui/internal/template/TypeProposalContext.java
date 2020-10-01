@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutModelHierarchy;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -39,6 +40,7 @@ public class TypeProposalContext {
 
   private final FinalValue<TypeDeclaration> m_declaringType;
   private final FinalValue<ITypeBinding> m_declaringTypeBinding;
+  private ScoutModelHierarchy m_scoutModelHierarchy;
   private String m_proposalIfcTypeFqn;
   private int m_pos;
   private List<String> m_defaultSuperClasses;
@@ -159,5 +161,13 @@ public class TypeProposalContext {
 
   void setSurroundingTypeNameRange(ISourceRange surroundingTypeNameRange) {
     m_surroundingTypeNameRange = surroundingTypeNameRange;
+  }
+
+  public ScoutModelHierarchy getScoutModelHierarchy() {
+    return m_scoutModelHierarchy;
+  }
+
+  public void setScoutModelHierarchy(ScoutModelHierarchy scoutModelHierarchy) {
+    m_scoutModelHierarchy = scoutModelHierarchy;
   }
 }

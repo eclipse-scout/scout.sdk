@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.generator.compilationunit;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
@@ -171,7 +172,7 @@ public interface ICompilationUnitGenerator<TYPE extends ICompilationUnitGenerato
    *          The simple name of the {@link ITypeGenerator} to remove. Must not be {@code null}.
    * @return This generator.
    */
-  TYPE withoutType(String elementName);
+  TYPE withoutType(Predicate<ITypeGenerator<?>> removalFilter);
 
   /**
    * Adds the specified footer generator to this {@link ICompilationUnitGenerator}.

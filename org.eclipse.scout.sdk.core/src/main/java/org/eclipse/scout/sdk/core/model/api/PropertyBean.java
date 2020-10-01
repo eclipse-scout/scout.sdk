@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
 
 /**
  * <h3>{@link PropertyBean}</h3><br>
@@ -122,11 +123,13 @@ public class PropertyBean {
    *
    * @param m
    *          The {@link IMethodGenerator}. Must not be {@code null}.
+   * @param context
+   *          Context information to compute the data types from which the setter name depends.
    * @return An {@link Optional} containing the property name if the given {@link IMethodGenerator} is a valid getter.
    *         Otherwise an empty {@link Optional} is returned.
    */
-  public static Optional<String> getterName(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m) {
-    return nameOf(m, false);
+  public static Optional<String> getterName(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m, IJavaEnvironment context) {
+    return nameOf(m, false, context);
   }
 
   /**
@@ -173,11 +176,13 @@ public class PropertyBean {
    *
    * @param m
    *          The {@link IMethodGenerator}. Must not be {@code null}.
+   * @param context
+   *          Context information to compute the data types from which the setter name depends.
    * @return An {@link Optional} containing the property name if the given {@link IMethodGenerator} is a valid setter.
    *         Otherwise an empty {@link Optional} is returned.
    */
-  public static Optional<String> setterName(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m) {
-    return nameOf(m, true);
+  public static Optional<String> setterName(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m, IJavaEnvironment context) {
+    return nameOf(m, true, context);
   }
 
   /**
@@ -208,17 +213,22 @@ public class PropertyBean {
     return Optional.of(matcher.group(2));
   }
 
-  protected static Optional<String> nameOf(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m, boolean setter) {
-    if (m.returnType().isEmpty()) {
+  protected static Optional<String> nameOf(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m, boolean setter, IJavaEnvironment context) {
+    Optional<ApiFunction<?, String>> returnType = m.returnType();
+    if (returnType.isEmpty()) {
       return Optional.empty();
     }
-    CharSequence methodName = m.elementName().orElseThrow(() -> newFail("Method name is missing."));
+    CharSequence methodName = m.elementName(context).orElseThrow(() -> newFail("Method name is missing."));
     //noinspection NumericCastThatLosesPrecision
     int numParams = (int) m.parameters().count();
-    if (setter) {
-      return setterName(methodName, numParams, m.returnType().get());
+    Optional<String> returnTypeRef = returnType.get().apply(context);
+    if (returnTypeRef.isEmpty()) {
+      return Optional.empty();
     }
-    return getterName(methodName, numParams, m.returnType().get());
+    if (setter) {
+      return setterName(methodName, numParams, returnTypeRef.get());
+    }
+    return getterName(methodName, numParams, returnTypeRef.get());
   }
 
   protected static Optional<String> nameOf(IMethod m, boolean setter) {

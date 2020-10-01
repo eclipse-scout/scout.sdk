@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
  *
  * @since 5.2.0
  */
+@SuppressWarnings({"NonFinalFieldReferencedInHashCode", "NonFinalFieldReferenceInEquals"})
 public class PackageContainer {
   private IPackageFragmentRoot m_srcFolder;
   private IPackageFragment m_package;

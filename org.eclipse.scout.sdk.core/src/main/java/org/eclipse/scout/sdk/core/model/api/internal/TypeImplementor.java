@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 @SuppressWarnings("squid:S2160")
 public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implements IType {
@@ -343,6 +344,11 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
       return impName.substring(0, impName.length() - 1 /* only remove the star, keep the dot */) + simpleNameToResolve;
     }
     return null;
+  }
+
+  @Override
+  public boolean isInstanceOf(IClassNameSupplier typeName) {
+    return isInstanceOf(typeName.fqn());
   }
 
   @Override

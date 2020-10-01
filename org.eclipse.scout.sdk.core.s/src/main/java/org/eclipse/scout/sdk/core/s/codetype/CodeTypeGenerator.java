@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -55,7 +56,7 @@ public class CodeTypeGenerator<TYPE extends CodeTypeGenerator<TYPE>> extends Pri
 
   protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createIdGetter() {
     return MethodOverrideGenerator.createOverride()
-        .withElementName("getId")
+        .withElementNameFrom(IScoutApi.class, api -> api.ICodeType().getIdMethodName())
         .withBody(b -> b.returnClause().append(ID_CONSTANT_NAME).semicolon());
   }
 
@@ -79,7 +80,7 @@ public class CodeTypeGenerator<TYPE extends CodeTypeGenerator<TYPE>> extends Pri
 
   public TYPE withCodeTypeIdDataType(String codeTypeIdDataType) {
     m_codeTypeIdDataType = codeTypeIdDataType;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<ISourceGenerator<IExpressionBuilder<?>>> idValueBuilder() {
@@ -88,7 +89,7 @@ public class CodeTypeGenerator<TYPE extends CodeTypeGenerator<TYPE>> extends Pri
 
   public TYPE withIdValueBuilder(ISourceGenerator<IExpressionBuilder<?>> idValueGenerator) {
     m_idValueGenerator = idValueGenerator;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<String> classIdValue() {
@@ -97,6 +98,6 @@ public class CodeTypeGenerator<TYPE extends CodeTypeGenerator<TYPE>> extends Pri
 
   public TYPE withClassIdValue(String classIdValue) {
     m_classIdValue = classIdValue;
-    return currentInstance();
+    return thisInstance();
   }
 }

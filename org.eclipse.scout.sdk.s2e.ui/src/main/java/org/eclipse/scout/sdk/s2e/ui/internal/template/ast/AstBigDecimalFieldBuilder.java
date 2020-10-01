@@ -21,7 +21,7 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi.AbstractNumberField;
 
 /**
  * <h3>{@link AstBigDecimalFieldBuilder}</h3>
@@ -37,10 +37,9 @@ public class AstBigDecimalFieldBuilder extends AstTypeBuilder<AstBigDecimalField
   @Override
   public AstBigDecimalFieldBuilder insert() {
     super.insert();
-
-    addGetConfigured("getConfiguredMinValue", "-9999999999999999999", AstNodeFactory.MIN_GROUP, get());
-    addGetConfigured("getConfiguredMaxValue", "9999999999999999999", AstNodeFactory.MAX_GROUP, get());
-
+    AbstractNumberField abstractNumberFieldApi = getFactory().getScoutApi().AbstractNumberField();
+    addGetConfigured(abstractNumberFieldApi.getConfiguredMinValueMethodName(), "-9999999999999999999", AstNodeFactory.MIN_GROUP, get());
+    addGetConfigured(abstractNumberFieldApi.getConfiguredMaxValueMethodName(), "9999999999999999999", AstNodeFactory.MAX_GROUP, get());
     return this;
   }
 
@@ -76,7 +75,7 @@ public class AstBigDecimalFieldBuilder extends AstTypeBuilder<AstBigDecimalField
     if (links != null && isCreateLinks()) {
       ITrackedNodePosition importPos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(constrArg), 1, -2);
       links.addLinkedPosition(importPos, true, group);
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IBigDecimalField);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IBigDecimalField().fqn());
     }
   }
 }

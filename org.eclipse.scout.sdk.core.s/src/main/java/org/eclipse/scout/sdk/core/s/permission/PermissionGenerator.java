@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 
 /**
  * <h3>{@link PermissionGenerator}</h3>
@@ -32,7 +32,7 @@ public class PermissionGenerator<TYPE extends PermissionGenerator<TYPE>> extends
   protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
     mainType
         .withField(FieldGenerator.createSerialVersionUid())
-        .withSuperClass(IScoutRuntimeTypes.AbstractPermission)
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractPermission().fqn())
         .withMethod(createConstructor(mainType));
   }
 

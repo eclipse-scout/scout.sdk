@@ -30,6 +30,9 @@ import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link AnnotationQuery}</h3> Annotation query that by default returns all annotations directly defined on the
@@ -39,13 +42,13 @@ import org.eclipse.scout.sdk.core.util.Ensure;
  */
 public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IAnnotation> {
 
-  private final IType m_containerType;
+  private final IType m_containerType; // may be null
   private final Function<IType, Optional<? extends IAnnotatable>> m_ownerInLevelFinder;
 
   private boolean m_includeSuperClasses;
   private boolean m_includeSuperInterfaces;
 
-  private String m_name;
+  private ApiFunction<?, IClassNameSupplier> m_name;
   private Class<AbstractManagedAnnotation> m_managedWrapperType;
 
   public AnnotationQuery(IType containerType, JavaElementSpi owner) {
@@ -141,12 +144,21 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    *          The fully qualified name. Default is no filtering.
    * @return this
    */
-  public AnnotationQuery<T> withName(String fullyQualifiedName) {
-    m_name = fullyQualifiedName;
+  public AnnotationQuery<T> withName(CharSequence fullyQualifiedName) {
+    return withNameFrom(null, api -> IClassNameSupplier.raw(fullyQualifiedName));
+  }
+
+  public <API extends IApiSpecification> AnnotationQuery<T> withNameFrom(Class<API> api, Function<API, IClassNameSupplier> nameFunction) {
+    if (nameFunction == null) {
+      m_name = null;
+    }
+    else {
+      m_name = new ApiFunction<>(api, nameFunction);
+    }
     return this;
   }
 
-  protected String getName() {
+  protected ApiFunction<?, IClassNameSupplier> getName() {
     return m_name;
   }
 
@@ -160,7 +172,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
   @SuppressWarnings("unchecked")
   public <A extends AbstractManagedAnnotation> AnnotationQuery<A> withManagedWrapper(Class<A> managedWrapperType) {
     m_managedWrapperType = (Class<AbstractManagedAnnotation>) managedWrapperType;
-    withName(AbstractManagedAnnotation.typeName(managedWrapperType));
+    m_name = AbstractManagedAnnotation.typeName(managedWrapperType);
     return (AnnotationQuery<A>) this;
   }
 
@@ -173,8 +185,12 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    */
   @Override
   public boolean test(IAnnotation a) {
-    String name = getName();
-    return name == null || name.equals(a.name());
+    ApiFunction<?, IClassNameSupplier> name = getName();
+    if (name == null) {
+      return true; // not filtered by name
+    }
+    Optional<String> fqn = name.apply(a.javaEnvironment()).map(IClassNameSupplier::fqn);
+    return fqn.isPresent() && fqn.get().equals(a.name());
   }
 
   @Override
@@ -197,7 +213,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
       return (Stream<T>) result;
     }
 
-    Stream<AbstractManagedAnnotation> converted = result.map(annot -> annot.wrap(wrapperClass));
+    Stream<AbstractManagedAnnotation> converted = result.map(annotation -> annotation.wrap(wrapperClass));
     return (Stream<T>) converted;
   }
 }

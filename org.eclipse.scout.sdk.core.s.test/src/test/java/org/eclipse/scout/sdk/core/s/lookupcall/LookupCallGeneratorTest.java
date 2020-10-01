@@ -16,7 +16,7 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileEr
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -37,13 +37,15 @@ public class LookupCallGeneratorTest {
 
   @Test
   public void testLookupCallAllParams(IJavaEnvironment env) {
+    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+
     // lookup service interface
     PrimaryTypeGenerator<?> lookupSvcIfc = PrimaryTypeGenerator.create()
         .withPackageName("org.eclipse.scout.sdk.core.s.test")
         .asPublic()
         .asInterface()
         .withElementName("IMyLookupService")
-        .withInterface(IScoutRuntimeTypes.ILookupService + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END);
+        .withInterface(scoutApi.ILookupService().fqn() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END);
 
     assertEqualsRefFile(env, REF_FILE_FOLDER + "LookupCall1.txt", lookupSvcIfc);
     IType createdLookupSvcIfc = assertNoCompileErrors(env, lookupSvcIfc);
@@ -52,7 +54,7 @@ public class LookupCallGeneratorTest {
     LookupCallGenerator<?> lookupCallGenerator = new LookupCallGenerator<>()
         .withPackageName("org.eclipse.scout.sdk.core.s.test")
         .withElementName("MyLookupCall")
-        .withSuperClass(IScoutRuntimeTypes.LookupCall + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END)
+        .withSuperClassFrom(IScoutApi.class, api -> api.LookupCall().fqn() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END)
         .withLookupServiceInterface(createdLookupSvcIfc.name());
 
     assertEqualsRefFile(env, REF_FILE_FOLDER + "LookupCall2.txt", lookupCallGenerator);

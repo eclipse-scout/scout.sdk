@@ -22,6 +22,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
+import org.eclipse.scout.sdk.s2i.util.ApiHelper
 
 open class DuplicateClassIdInspection : LocalInspectionTool() {
 
@@ -47,11 +48,12 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
                     .mapNotNull { createProblemFor(duplicates, it, manager, isOnTheFly) }
 
     protected fun createProblemFor(duplicates: Collection<String>, clazz: PsiClass, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
+        val scoutApi = ApiHelper.scoutApiFor(clazz) ?: return null
+        val annotation = ClassIdAnnotation.of(clazz, scoutApi) ?: return null
         val myName = computeInReadAction(clazz.project) { clazz.qualifiedName }
         val othersWithSameValue = duplicates
                 .filter { d -> d != myName }
                 .joinToString()
-        val annotation = ClassIdAnnotation.of(clazz) ?: return null
         val message = EclipseScoutBundle.message("duplicate.classid.value", othersWithSameValue)
         val quickFix = ChangeClassIdValueQuickFix(annotation)
         return manager.createProblemDescriptor(annotation.psiAnnotation, message, isOnTheFly, arrayOf(quickFix), ProblemHighlightType.ERROR)

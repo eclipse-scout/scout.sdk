@@ -10,13 +10,15 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
+import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.dto.form.FormDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableFieldDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
@@ -41,38 +43,40 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
   }
 
   protected void processInnerTypes(IType compositeType) {
+    IScoutApi scoutApi = scoutApi();
     // step into inner form field
     compositeType.innerTypes()
         .withFlags(Flags.AccPublic)
-        .withInstanceOf(IScoutRuntimeTypes.IFormField).stream()
+        .withInstanceOf(scoutApi.IFormField()).stream()
         .forEach(this::processFormField);
 
     // step into formFieldMenus (special menu that may contain more form fields)
     compositeType.innerTypes()
         .withFlags(Flags.AccPublic)
-        .withInstanceOf(IScoutRuntimeTypes.IFormFieldMenu).stream()
+        .withInstanceOf(scoutApi.IFormFieldMenu()).stream()
         .forEach(this::processInnerTypes);
 
     // step into inner extensions
     compositeType.innerTypes()
-        .withInstanceOf(IScoutRuntimeTypes.ICompositeFieldExtension).stream()
+        .withInstanceOf(scoutApi.ICompositeFieldExtension()).stream()
         .forEach(this::processInnerTypes);
 
     // step into inner table extensions of table-fields
     compositeType.innerTypes()
         .withRecursiveInnerTypes(true)
-        .withInstanceOf(IScoutRuntimeTypes.ITableExtension).stream()
+        .withInstanceOf(scoutApi.ITableExtension()).stream()
         .forEach(this::processTableExtension);
   }
 
   protected void processFormField(IType formField) {
+    IScoutApi scoutApi = scoutApi();
     FormDataAnnotationDescriptor fieldAnnotation = FormDataAnnotationDescriptor.of(formField);
     if (FormDataAnnotationDescriptor.isIgnore(fieldAnnotation)) {
       return;
     }
 
     boolean fieldExtendsTemplateField = false;
-    boolean isCompositeField = formField.isInstanceOf(IScoutRuntimeTypes.ICompositeField);
+    boolean isCompositeField = formField.isInstanceOf(scoutApi.ICompositeField());
     if (FormDataAnnotationDescriptor.isCreate(fieldAnnotation)) {
       IType formDataType = fieldAnnotation.getFormDataType();
       String formDataTypeName;
@@ -84,11 +88,11 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
       }
 
       ITypeGenerator<?> dtoGenerator;
-      if (fieldAnnotation.getSuperType().isInstanceOf(IScoutRuntimeTypes.AbstractTableFieldBeanData)) {
+      if (fieldAnnotation.getSuperType().isInstanceOf(scoutApi.AbstractTableFieldBeanData())) {
         // fill table bean
         dtoGenerator = new TableFieldDataGenerator<>(formField, fieldAnnotation, targetEnvironment());
       }
-      else if (isCompositeField && !formField.isInstanceOf(IScoutRuntimeTypes.IValueField)) {
+      else if (isCompositeField && !formField.isInstanceOf(scoutApi.IValueField())) {
         // field extends a field template.
         fieldExtendsTemplateField = true;
         dtoGenerator = new CompositeFormDataGenerator<>(formField, fieldAnnotation, targetEnvironment());
@@ -99,7 +103,7 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
 
         // special case if a property has the same name as a form field -> show warning
         methods()
-            .filter(msb -> (PropertyBean.getterPrefixFor(msb.returnType().get()) + formDataTypeName).equals(msb.elementName().get()))
+            .filter(msb -> hasSimilarNameAs(msb, formDataTypeName))
             .findAny()
             .ifPresent(msb -> dtoGenerator.withComment(b -> b.appendTodo("Duplicate names '" + formDataTypeName + "'. Rename property or form field.")));
       }
@@ -120,6 +124,18 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
     if (isCompositeField && !fieldExtendsTemplateField) {
       processInnerTypes(formField);
     }
+  }
+
+  /**
+   * @return {@code true} if the given {@link IMethodGenerator} has the same method name as a getter for the given
+   *         formDataTypeName would have.
+   */
+  protected boolean hasSimilarNameAs(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb, String formDataTypeName) {
+    String dataType = msb.returnType()
+        .flatMap(af -> af.apply(this.targetEnvironment()))
+        .get();
+    String name = PropertyBean.getterPrefixFor(dataType) + formDataTypeName;
+    return name.equals(msb.elementName().get());
   }
 
   protected void processTableExtension(IType tableExtension) {

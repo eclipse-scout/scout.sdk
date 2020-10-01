@@ -47,7 +47,7 @@ import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler;
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceInput;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -102,10 +102,10 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
   public IFuture<IType> writeCompilationUnitAsync(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress) {
     IType result;
     String className = generator.elementName().get();
-    if (className.endsWith(ISdkProperties.SUFFIX_DTO) && generator.packageName().orElse("").contains(".shared.")) {
+    if (className.endsWith(ISdkConstants.SUFFIX_DTO) && generator.packageName().orElse("").contains(".shared.")) {
       result = CoreTestingUtils.registerCompilationUnit(targetFolder.javaEnvironment(), generator);
       // remember for later validation. As soon as the model type has been created the dto will be updated and validated.
-      String baseName = className.substring(0, className.length() - ISdkProperties.SUFFIX_DTO.length());
+      String baseName = className.substring(0, className.length() - ISdkConstants.SUFFIX_DTO.length());
       m_dtoCache.put(baseName, result);
     }
     else {

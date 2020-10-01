@@ -93,8 +93,10 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
     AstNodeFactory createFactoryFor(AbstractTypeProposal proposal);
   }
 
-  private static volatile IAstNodeFactoryProvider astNodeFactoryProvider = proposal -> new AstNodeFactory(proposal.getProposalContext().getDeclaringType(), proposal.getProposalContext().getIcu(), proposal.getProposalContext().getProvider(),
-      proposal.getProposalContext().getDeclaringTypeBinding(), proposal);
+  private static volatile IAstNodeFactoryProvider astNodeFactoryProvider = proposal -> {
+    TypeProposalContext ctx = proposal.getProposalContext();
+    return new AstNodeFactory(ctx.getDeclaringType(), ctx.getIcu(), ctx.getProvider(), ctx.getScoutModelHierarchy().api(), ctx.getDeclaringTypeBinding(), proposal);
+  };
 
   public static IAstNodeFactoryProvider getAstNodeFactoryProvider() {
     return astNodeFactoryProvider;

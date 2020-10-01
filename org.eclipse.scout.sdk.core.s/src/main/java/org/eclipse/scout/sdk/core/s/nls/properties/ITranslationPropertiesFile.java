@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.Language;
@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.s.nls.Language;
  * <h3>{@link ITranslationPropertiesFile}</h3>
  * <p>
  * Represents a translation {@code .properties} file as used by
- * {@link IScoutRuntimeTypes#AbstractDynamicNlsTextProviderService}.
+ * {@link IScoutApi#AbstractDynamicNlsTextProviderService()}.
  *
  * @since 7.0.0
  */

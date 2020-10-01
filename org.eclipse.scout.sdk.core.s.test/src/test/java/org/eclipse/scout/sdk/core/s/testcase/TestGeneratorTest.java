@@ -15,12 +15,12 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileEr
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.IClientSession;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.UsernameExtension;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -38,36 +38,39 @@ public class TestGeneratorTest {
 
   @Test
   public void testTestSourceBuilderWithDefaultValues(IJavaEnvironment env) {
+    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+
     TestGenerator<?> generator = new TestGenerator<>()
         .asClientTest(true)
         .withElementName("MyTest")
         .withPackageName("org.eclipse.scout.sdk.core.s.test")
-        .withRunner(IScoutRuntimeTypes.ClientTestRunner)
+        .withRunner(scoutApi.ClientTestRunner().fqn())
         .withSession(null)
         .withRunWithSubjectValueBuilder(null);
 
     StringBuilder source = generator.toJavaSource(env);
-    assertTrue(source.indexOf('@' + JavaTypes.simpleName(IScoutRuntimeTypes.RunWithSubject) + "(\"anonymous") >= 0);
-    assertTrue(source.indexOf('@' + JavaTypes.simpleName(IScoutRuntimeTypes.RunWithClientSession) + '(' + JavaTypes.simpleName(IScoutRuntimeTypes.TestEnvironmentClientSession)) >= 0);
+    assertTrue(source.indexOf('@' + scoutApi.RunWithSubject().simpleName() + "(\"anonymous") >= 0);
+    assertTrue(source.indexOf('@' + scoutApi.RunWithClientSession().simpleName() + '(' + scoutApi.TestEnvironmentClientSession().simpleName()) >= 0);
     assertNoCompileErrors(env, generator);
     assertEqualsRefFile(env, REF_FILE_FOLDER + "TestGeneratorTest1.txt", generator);
   }
 
   @Test
   public void testTestSourceBuilderWithSpecificValues(IJavaEnvironment env) {
-
+    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
     String subjectValue = "myvalue";
+    IClientSession iClientSession = scoutApi.IClientSession();
     TestGenerator<?> generator = new TestGenerator<>()
         .asClientTest(true)
         .withElementName("MyTest")
         .withPackageName("org.eclipse.scout.sdk.core.s.test")
-        .withRunner(IScoutRuntimeTypes.ClientTestRunner)
-        .withSession(IScoutRuntimeTypes.IClientSession)
+        .withRunner(scoutApi.ClientTestRunner().fqn())
+        .withSession(iClientSession.fqn())
         .withRunWithSubjectValueBuilder(b -> b.stringLiteral(subjectValue));
 
     StringBuilder source = generator.toJavaSource(env);
-    assertTrue(source.indexOf('@' + JavaTypes.simpleName(IScoutRuntimeTypes.RunWithSubject) + "(\"" + subjectValue) >= 0);
-    assertTrue(source.indexOf('@' + JavaTypes.simpleName(IScoutRuntimeTypes.RunWithClientSession) + '(' + JavaTypes.simpleName(IScoutRuntimeTypes.IClientSession)) >= 0);
+    assertTrue(source.indexOf('@' + scoutApi.RunWithSubject().simpleName() + "(\"" + subjectValue) >= 0);
+    assertTrue(source.indexOf('@' + scoutApi.RunWithClientSession().simpleName() + '(' + iClientSession.simpleName()) >= 0);
     assertNoCompileErrors(env, generator);
     assertEqualsRefFile(env, REF_FILE_FOLDER + "TestGeneratorTest2.txt", generator);
   }

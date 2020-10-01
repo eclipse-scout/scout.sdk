@@ -11,13 +11,15 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.permission;
 
 import java.security.Permission;
+import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
-import org.eclipse.scout.sdk.s2e.ui.wizard.CompilationUnitNewWizardPage;
+import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
@@ -26,13 +28,22 @@ import org.eclipse.ui.PlatformUI;
  *
  * @since 5.2.0
  */
-public class PermissionNewWizardPage extends CompilationUnitNewWizardPage {
+public class PermissionNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   public PermissionNewWizardPage(PackageContainer packageContainer) {
-    super(PermissionNewWizardPage.class.getName(), packageContainer, ISdkProperties.SUFFIX_PERMISSION,
-        Permission.class.getName(), IScoutRuntimeTypes.AbstractPermission, ScoutTier.Shared);
+    super(PermissionNewWizardPage.class.getName(), packageContainer, ISdkConstants.SUFFIX_PERMISSION, ScoutTier.Shared);
     setTitle("Create a new Permission");
     setDescription(getTitle());
     setIcuGroupName("New Permission Details");
+  }
+
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+    return scoutApi().map(IScoutApi::AbstractPermission);
+  }
+
+  @Override
+  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
+    return Optional.of(Permission.class.getName()).map(IClassNameSupplier::raw);
   }
 
   @Override

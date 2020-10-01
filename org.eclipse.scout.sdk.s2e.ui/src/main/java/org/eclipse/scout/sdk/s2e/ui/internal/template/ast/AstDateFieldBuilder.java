@@ -10,8 +10,6 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-
 /**
  * <h3>{@link AstDateFieldBuilder}</h3>
  *
@@ -29,7 +27,7 @@ public class AstDateFieldBuilder extends AstTypeBuilder<AstDateFieldBuilder> {
 
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IDateField);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IDateField().fqn());
     }
 
     return this;

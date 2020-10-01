@@ -54,7 +54,7 @@ public class StreamSourceBuilder extends AbstractSourceBuilder<StreamSourceBuild
   public StreamSourceBuilder append(char c) {
     try {
       source().append(c);
-      return currentInstance();
+      return thisInstance();
     }
     catch (IOException e) {
       throw new SdkException(e);
@@ -65,7 +65,7 @@ public class StreamSourceBuilder extends AbstractSourceBuilder<StreamSourceBuild
   public StreamSourceBuilder append(CharSequence seq) {
     try {
       source().append(seq);
-      return currentInstance();
+      return thisInstance();
     }
     catch (IOException e) {
       throw new SdkException(e);

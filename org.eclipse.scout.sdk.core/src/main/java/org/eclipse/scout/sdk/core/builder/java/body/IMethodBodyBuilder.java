@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.builder.java.body;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
@@ -103,6 +105,8 @@ public interface IMethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> exten
    * @return The {@link IMethodGenerator} this {@link IMethodBodyBuilder} belongs to.
    */
   IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> surroundingMethod();
+
+  Optional<String> surroundingMethodReturnType();
 
   /**
    * @return {@code true} if the method this body belongs to requires a return clause. These are methods that are not

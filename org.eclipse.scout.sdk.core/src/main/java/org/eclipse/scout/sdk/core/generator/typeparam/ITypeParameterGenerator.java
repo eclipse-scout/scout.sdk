@@ -10,9 +10,12 @@
  */
 package org.eclipse.scout.sdk.core.generator.typeparam;
 
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link ITypeParameterGenerator}</h3>
@@ -24,17 +27,19 @@ import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 public interface ITypeParameterGenerator<TYPE extends ITypeParameterGenerator<TYPE>> extends IJavaElementGenerator<TYPE> {
 
   /**
-   * Adds the specified bound to this {@link ITypeParameterGenerator}.
+   * Adds the specified binding to this {@link ITypeParameterGenerator}.
    *
-   * @param bound
-   *          The fully qualified name of the bound to add. Must not be {@code null}.
+   * @param binding
+   *          The fully qualified name of the binding to add. Must not be {@code null}.
    * @return This generator.
    */
-  TYPE withBound(String bound);
+  TYPE withBinding(String binding);
+
+  <A extends IApiSpecification> TYPE withBindingFrom(Class<A> apiDefinition, Function<A, String> bindingSupplier);
 
   /**
    * @return A {@link Stream} returning all type parameter bounds.
    */
-  Stream<String> bounds();
+  Stream<ApiFunction<?, String>> bounds();
 
 }

@@ -17,9 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,6 +33,7 @@ import org.junit.jupiter.api.Test;
 public class ScoutTierTest {
 
   @Test
+  @SuppressWarnings("ConstantConditions")
   public void testFilter() {
     assertTrue(ScoutTier.Shared.isIncludedIn(ScoutTier.Client));
     assertTrue(ScoutTier.Shared.isIncludedIn(ScoutTier.Server));
@@ -70,7 +74,9 @@ public class ScoutTierTest {
 
   @Test
   public void testFilterJavaElement() {
+    IScoutApi scoutApi = ScoutApi.latest();
     IJavaEnvironment p = mock(IJavaEnvironment.class);
+    when(p.api(IScoutApi.class)).thenReturn(Optional.of(scoutApi));
     IType mock = mock(IType.class);
     when(mock.javaEnvironment()).thenReturn(p);
 
@@ -94,25 +100,25 @@ public class ScoutTierTest {
     assertFalse(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
 
-    when(p.exists(IScoutRuntimeTypes.ISession)).thenReturn(Boolean.TRUE);
+    when(p.exists(scoutApi.ISession().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));
     assertFalse(ScoutTier.Client.test(mock));
     assertFalse(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
 
-    when(p.exists(IScoutRuntimeTypes.IServerSession)).thenReturn(Boolean.TRUE);
+    when(p.exists(scoutApi.IServerSession().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));
     assertFalse(ScoutTier.Client.test(mock));
     assertTrue(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
 
-    when(p.exists(IScoutRuntimeTypes.IClientSession)).thenReturn(Boolean.TRUE);
+    when(p.exists(scoutApi.IClientSession().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));
     assertTrue(ScoutTier.Client.test(mock));
     assertFalse(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
 
-    when(p.exists(IScoutRuntimeTypes.UiServlet)).thenReturn(Boolean.TRUE);
+    when(p.exists(scoutApi.UiServlet().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));
     assertTrue(ScoutTier.Client.test(mock));
     assertFalse(ScoutTier.Server.test(mock));

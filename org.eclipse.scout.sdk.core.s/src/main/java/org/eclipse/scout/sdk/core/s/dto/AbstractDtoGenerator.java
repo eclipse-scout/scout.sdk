@@ -35,11 +35,15 @@ import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.annotation.ExtendsAnnotation;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi.AbstractPropertyData;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi.ClassId;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.IExtension;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -57,11 +61,13 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
   public static final String FORMDATA_CLASSID_SUFFIX = "-formdata";
   private final IType m_modelType;
   private final IJavaEnvironment m_targetEnvironment;
+  private final IScoutApi m_scoutApi;
   private boolean m_setupExecuted;
 
   protected AbstractDtoGenerator(IType modelType, IJavaEnvironment targetEnvironment) {
     m_modelType = Ensure.notNull(modelType);
     m_targetEnvironment = Ensure.notNull(targetEnvironment);
+    m_scoutApi = modelType.javaEnvironment().requireApi(IScoutApi.class);
   }
 
   @Override
@@ -73,13 +79,18 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     super.build(builder);
   }
 
+  public IScoutApi scoutApi() {
+    return m_scoutApi;
+  }
+
   protected void copyAnnotations() {
     copyAnnotations(modelType(), this, targetEnvironment());
   }
 
   private static void copyAnnotations(IAnnotatable annotationOwner, ITypeGenerator<?> target, IJavaEnvironment targetEnv) {
+    IScoutApi scoutApi = annotationOwner.javaEnvironment().requireApi(IScoutApi.class);
     annotationOwner.annotations().stream()
-        .filter(a -> isAnnotationDtoRelevant(a.type()))
+        .filter(a -> isAnnotationDtoRelevant(a.type(), scoutApi))
         .filter(a -> targetEnv.exists(a.type()))
         .map(AbstractDtoGenerator::toDtoAnnotationGenerator)
         .forEach(target::withAnnotation);
@@ -90,23 +101,26 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
    */
   private static IAnnotationGenerator<?> toDtoAnnotationGenerator(IAnnotation a) {
     IAnnotationGenerator<?> result = a.toWorkingCopy();
-    if (IScoutRuntimeTypes.ClassId.equals(a.type().name())) {
-      String id = a.element("value").get().value().as(String.class);
-      result.withElement("value", b -> b.stringLiteral(id + FORMDATA_CLASSID_SUFFIX));
+    ClassId classIdApi = a.javaEnvironment().requireApi(IScoutApi.class).ClassId();
+    if (classIdApi.fqn().equals(a.type().name())) {
+      String valueElementName = classIdApi.valueElementName();
+      String id = a.element(valueElementName).get().value().as(String.class);
+      result.withElement(valueElementName, b -> b.stringLiteral(id + FORMDATA_CLASSID_SUFFIX));
     }
     return result;
   }
 
-  private static boolean isAnnotationDtoRelevant(IType annotationType) {
+  private static boolean isAnnotationDtoRelevant(IType annotationType, IScoutAnnotationApi scoutApi) {
     if (annotationType == null) {
       return false;
     }
     String elementName = annotationType.name();
-    boolean isDtoAnnotation =
-        IScoutRuntimeTypes.FormData.equals(elementName)
-            || IScoutRuntimeTypes.PageData.equals(elementName)
-            || IScoutRuntimeTypes.Data.equals(elementName);
-    return !isDtoAnnotation && !IScoutRuntimeTypes.Order.equals(elementName) && annotationType.annotations().withName(IScoutRuntimeTypes.DtoRelevant).existsAny();
+    boolean isDtoAnnotation = elementName.equals(scoutApi.FormData().fqn())
+        || elementName.equals(scoutApi.PageData().fqn())
+        || elementName.equals(scoutApi.Data().fqn());
+    return !isDtoAnnotation
+        && !elementName.equals(scoutApi.Order().fqn())
+        && annotationType.annotations().withName(scoutApi.DtoRelevant().fqn()).existsAny();
   }
 
   /**
@@ -119,7 +133,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
   protected TYPE withAdditionalInterfaces(FormDataAnnotationDescriptor formDataAnnotation) {
     Set<IType> interfaces = formDataAnnotation.getInterfaces();
     if (interfaces.isEmpty()) {
-      return currentInstance();
+      return thisInstance();
     }
 
     Set<String> allSuperInterfaceMethods = interfaces.stream()
@@ -131,41 +145,42 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
         .collect(toSet());
 
     methods()
-        .filter(msb -> allSuperInterfaceMethods.contains(msb.identifier()))
+        .filter(msb -> allSuperInterfaceMethods.contains(msb.identifier(targetEnvironment())))
         .forEach(msb -> msb.withAnnotation(AnnotationGenerator.createOverride()));
-    return currentInstance();
+    return thisInstance();
   }
 
   protected TYPE withExtendsAnnotationIfNecessary(IType element) {
     Optional<IType> extendedTypeOpt = getExtendedType(element);
     if (extendedTypeOpt.isEmpty()) {
-      return currentInstance();
+      return thisInstance();
     }
     IType extendedType = extendedTypeOpt.get();
     IType primaryType = extendedType.primary();
 
     Optional<IType> extendedDto = Optional.empty();
-    if (primaryType.isInstanceOf(IScoutRuntimeTypes.IForm) || primaryType.isInstanceOf(IScoutRuntimeTypes.IFormField)) {
+    IScoutApi api = scoutApi();
+    if (primaryType.isInstanceOf(api.IForm()) || primaryType.isInstanceOf(api.IFormField())) {
       Optional<IType> declaring = extendedType.declaringType();
-      if (extendedType.isInstanceOf(IScoutRuntimeTypes.ITable) && declaring.isPresent()) {
+      if (extendedType.isInstanceOf(api.ITable()) && declaring.isPresent()) {
         Optional<IType> tableFieldDto = getFormDataType(declaring.get());
-        extendedDto = tableFieldDto.flatMap(dto -> dto.innerTypes().withInstanceOf(IScoutRuntimeTypes.AbstractTableRowData).first());
+        extendedDto = tableFieldDto.flatMap(dto -> dto.innerTypes().withInstanceOf(api.AbstractTableRowData()).first());
       }
       else {
         extendedDto = findDtoForForm(primaryType);
       }
     }
-    else if (primaryType.isInstanceOf(IScoutRuntimeTypes.IExtension)) {
+    else if (primaryType.isInstanceOf(api.IExtension())) {
       extendedDto = findDtoForPage(primaryType);
     }
-    else if (primaryType.isInstanceOf(IScoutRuntimeTypes.IPageWithTable)) {
+    else if (primaryType.isInstanceOf(api.IPageWithTable())) {
       Optional<IType> pageDto = findDtoForPage(primaryType);
-      extendedDto = pageDto.flatMap(dto -> dto.innerTypes().withInstanceOf(IScoutRuntimeTypes.AbstractTableRowData).first());
+      extendedDto = pageDto.flatMap(dto -> dto.innerTypes().withInstanceOf(api.AbstractTableRowData()).first());
     }
 
     return extendedDto
         .map(t -> withAnnotation(ScoutAnnotationGenerator.createExtends(t.reference())))
-        .orElseGet(this::currentInstance);
+        .orElseGet(this::thisInstance);
   }
 
   /**
@@ -207,7 +222,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     }
 
     StringBuilder result = new StringBuilder(base.length() + rowDataSuffix.length());
-    String[] suffixes = {"PageData", "FieldData", "Data"};
+    String[] suffixes = {"PageData", "FieldData", ISdkConstants.SUFFIX_DTO};
     for (String suffix : suffixes) {
       if (base.endsWith(suffix)) {
         result.append(base, 0, base.length() - suffix.length());
@@ -222,17 +237,17 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
   }
 
   protected static String removeFieldSuffix(String fieldName) {
-    if (fieldName.endsWith(ISdkProperties.SUFFIX_FORM_FIELD)) {
-      return fieldName.substring(0, fieldName.length() - ISdkProperties.SUFFIX_FORM_FIELD.length());
+    if (fieldName.endsWith(ISdkConstants.SUFFIX_FORM_FIELD)) {
+      return fieldName.substring(0, fieldName.length() - ISdkConstants.SUFFIX_FORM_FIELD.length());
     }
-    if (fieldName.endsWith(ISdkProperties.SUFFIX_BUTTON)) {
-      return fieldName.substring(0, fieldName.length() - ISdkProperties.SUFFIX_BUTTON.length());
+    if (fieldName.endsWith(ISdkConstants.SUFFIX_BUTTON)) {
+      return fieldName.substring(0, fieldName.length() - ISdkConstants.SUFFIX_BUTTON.length());
     }
-    if (fieldName.endsWith(ISdkProperties.SUFFIX_TABLE_COLUMN)) {
-      return fieldName.substring(0, fieldName.length() - ISdkProperties.SUFFIX_TABLE_COLUMN.length());
+    if (fieldName.endsWith(ISdkConstants.SUFFIX_COLUMN)) {
+      return fieldName.substring(0, fieldName.length() - ISdkConstants.SUFFIX_COLUMN.length());
     }
-    if (fieldName.endsWith(ISdkProperties.SUFFIX_OUTLINE_PAGE)) {
-      return fieldName.substring(0, fieldName.length() - ISdkProperties.SUFFIX_OUTLINE_PAGE.length());
+    if (fieldName.endsWith(ISdkConstants.SUFFIX_OUTLINE_PAGE)) {
+      return fieldName.substring(0, fieldName.length() - ISdkConstants.SUFFIX_OUTLINE_PAGE.length());
     }
     return fieldName;
   }
@@ -311,9 +326,9 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     }
   }
 
-  protected static String computeSuperTypeForFormData(IType modelType, FormDataAnnotationDescriptor formDataAnnotation) {
+  protected String computeSuperTypeForFormData(IType modelType, FormDataAnnotationDescriptor formDataAnnotation) {
     // handle replace
-    if (modelType.annotations().withName(IScoutRuntimeTypes.Replace).existsAny()) {
+    if (modelType.annotations().withName(scoutApi().Replace().fqn()).existsAny()) {
       Optional<String> replaced = modelType.superClass()
           .flatMap(AbstractDtoGenerator::getFormDataType)
           .map(IType::reference);
@@ -361,7 +376,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
    *          The extension whose owner should be returned.
    * @return The owner of the given extension or null.
    */
-  private static Optional<IType> getExtendedType(IType modelType) {
+  private Optional<IType> getExtendedType(IType modelType) {
     if (modelType == null) {
       return Optional.empty();
     }
@@ -373,8 +388,9 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     }
 
     // 2. try to read from generic
-    if (modelType.isInstanceOf(IScoutRuntimeTypes.IExtension)) {
-      Optional<Stream<IType>> owner = modelType.resolveTypeParamValue(IScoutRuntimeTypes.TYPE_PARAM_EXTENSION__OWNER, IScoutRuntimeTypes.IExtension);
+    IExtension iExtension = scoutApi().IExtension();
+    if (modelType.isInstanceOf(iExtension)) {
+      Optional<Stream<IType>> owner = modelType.resolveTypeParamValue(iExtension.ownerTypeParamIndex(), iExtension.fqn());
       if (owner.isPresent()) {
         return owner.get().findFirst();
       }
@@ -383,7 +399,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     // 3. try in declaring type
     return modelType
         .declaringType()
-        .flatMap(AbstractDtoGenerator::getExtendedType);
+        .flatMap(this::getExtendedType);
   }
 
   protected void setupBuilder() {
@@ -404,10 +420,10 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
 
   protected TYPE withReplaceIfNecessary() {
     // add replace annotation to DTO if replace annotation is present on the model
-    if (modelType().annotations().withName(IScoutRuntimeTypes.Replace).existsAny()) {
+    if (modelType().annotations().withName(scoutApi().Replace().fqn()).existsAny()) {
       withAnnotation(ScoutAnnotationGenerator.createReplace());
     }
-    return currentInstance();
+    return thisInstance();
   }
 
   protected abstract String computeSuperType();
@@ -417,39 +433,43 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
   }
 
   protected TYPE withPropertyDtos() {
-    Predicate<IMethod> hasDtoAnnotation = method -> method.annotations().withName(IScoutRuntimeTypes.FormData).existsAny()
-        || method.annotations().withName(IScoutRuntimeTypes.Data).existsAny();
+    IScoutApi scoutApi = scoutApi();
+    String formDataFqn = scoutApi.FormData().fqn();
+    String data = scoutApi.Data().fqn();
+    Predicate<IMethod> hasDtoAnnotation = method -> method.annotations().withName(formDataFqn).existsAny() || method.annotations().withName(data).existsAny();
 
     PropertyBean.of(modelType())
         .filter(bean -> bean.readMethod().isPresent() && bean.writeMethod().isPresent())
         .filter(bean -> hasDtoAnnotation.test(bean.readMethod().get()) || hasDtoAnnotation.test(bean.writeMethod().get()))
         .sorted(comparing(PropertyBean::name).thenComparing(PropertyBean::toString))
         .forEach(this::addPropertyDto);
-    return currentInstance();
+    return thisInstance();
   }
 
   @SuppressWarnings("squid:UnusedPrivateMethod") // used as method-reference
   private void addPropertyDto(PropertyBean desc) {
     String lowerCaseBeanName = Introspector.decapitalize(desc.name());
     String upperCaseBeanName = Strings.ensureStartWithUpperCase(desc.name()).toString();
-    String propName = upperCaseBeanName + ISdkProperties.SUFFIX_DTO_PROPERTY;
+    String propName = upperCaseBeanName + ISdkConstants.SUFFIX_DTO_PROPERTY;
     String propDataType = desc.type().reference();
     String propDataTypeBoxed = JavaTypes.boxPrimitive(propDataType);
 
     // property class
+    AbstractPropertyData abstractPropertyDataApi = scoutApi().AbstractPropertyData();
     ITypeGenerator<?> propertyTypeBuilder = TypeGenerator.create()
         .asPublic()
         .asStatic()
         .withElementName(propName)
-        .withSuperClass(IScoutRuntimeTypes.AbstractPropertyData + JavaTypes.C_GENERIC_START + propDataTypeBoxed + JavaTypes.C_GENERIC_END)
+        .withSuperClass(abstractPropertyDataApi.fqn() + JavaTypes.C_GENERIC_START + propDataTypeBoxed + JavaTypes.C_GENERIC_END)
         .withField(FieldGenerator.createSerialVersionUid());
     copyAnnotations(desc.readMethod().get(), propertyTypeBuilder, targetEnvironment());
 
+    String getterName = PropertyBean.GETTER_PREFIX + propName;
     this
         .withType(propertyTypeBuilder, DtoMemberSortObjectFactory.forTypeFormDataProperty(propName))
         .withMethod(ScoutMethodGenerator.create() // getter
             .asPublic()
-            .withElementName(PropertyBean.GETTER_PREFIX + propName)
+            .withElementName(getterName)
             .withReturnType(propName)
             .withBody(b -> b.returnClause().appendGetPropertyByClass(propName).semicolon()),
             DtoMemberSortObjectFactory.forMethodFormDataProperty(upperCaseBeanName))
@@ -459,11 +479,10 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
             .withComment(b -> b.appendJavaDocComment("access method for property " + upperCaseBeanName + JavaTypes.C_DOT))
             .withReturnType(propDataType)
             .withBody(b -> {
-              String suffix = "().getValue()";
-              b.returnClause().append("get").append(propName).append(suffix);
+              String suffix = "()." + abstractPropertyDataApi.getValueMethodName() + "()";
+              b.returnClause().append(getterName).append(suffix);
               if (JavaTypes.isPrimitive(propDataType)) {
-                b.append(" == null ? ")
-                    .appendDefaultValueOf(propDataTypeBoxed).append(" : get").append(propName).append(suffix);
+                b.append(" == ").nullLiteral().append(" ? ").appendDefaultValueOf(propDataTypeBoxed).append(" : ").append(getterName).append(suffix);
               }
               b.semicolon();
             }),
@@ -476,7 +495,8 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
             .withParameter(MethodParameterGenerator.create()
                 .withElementName(lowerCaseBeanName)
                 .withDataType(propDataType))
-            .withBody(b -> b.append("get").append(propName).append("().setValue(").append(lowerCaseBeanName).parenthesisClose().semicolon()),
+            .withBody(b -> b.append(getterName).parenthesisOpen().parenthesisClose()
+                .dot().append(abstractPropertyDataApi.setValueMethodName()).parenthesisOpen().append(lowerCaseBeanName).parenthesisClose().semicolon()),
             DtoMemberSortObjectFactory.forMethodFormDataPropertyLegacy(upperCaseBeanName));
   }
 

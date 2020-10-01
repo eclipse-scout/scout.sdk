@@ -14,6 +14,7 @@ import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createMetaVa
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
@@ -25,13 +26,15 @@ import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.MemberBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.member.AbstractMemberGenerator;
-import org.eclipse.scout.sdk.core.generator.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.generator.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link FieldGenerator}</h3>
@@ -40,7 +43,8 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  */
 public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends AbstractMemberGenerator<TYPE> implements IFieldGenerator<TYPE> {
 
-  private String m_dataType;
+  public static final String SERIAL_VERSION_UID = "serialVersionUID";
+  private ApiFunction<?, String> m_dataType;
   private ISourceGenerator<IExpressionBuilder<?>> m_valueGenerator;
 
   protected FieldGenerator() {
@@ -85,14 +89,20 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
   }
 
   /**
-   * @return An {@link IFieldGenerator} initialized to create a {@code serialVersionUID} field.
+   * @return An {@link IFieldGenerator} initialized to create a {@code serialVersionUID} field with the value {@code 1}.
    */
   public static IFieldGenerator<?> createSerialVersionUid() {
+    return createSerialVersionUid(1);
+  }
+
+  public static IFieldGenerator<?> createSerialVersionUid(long value) {
     return create()
-        .withElementName("serialVersionUID")
+        .withElementName(SERIAL_VERSION_UID)
         .withDataType(JavaTypes._long)
-        .withFlags(Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal)
-        .withValue(ISourceGenerator.raw("1L"));
+        .asPrivate()
+        .asStatic()
+        .asFinal()
+        .withValue(ISourceGenerator.raw(value + "L"));
   }
 
   @Override
@@ -103,15 +113,16 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
 
   protected void buildFieldSource(IMemberBuilder<?> builder) {
     if (elementName().isPresent()) {
+      ApiFunction<?, String> dataType = dataType().orElseThrow(() -> newFail("Field data type missing for builder {}", this));
       builder
           .appendFlags(flags())
-          .ref(dataType().orElseThrow(() -> newFail("Field data type missing for builder {}", this)))
+          .refFrom(dataType)
           .space()
           .append(ensureValidJavaName(elementName().get()));
-      if (value().isPresent()) {
+      value().ifPresent(v -> {
         builder.equalSign();
-        buildFieldValue(ExpressionBuilder.create(builder), value().get());
-      }
+        buildFieldValue(ExpressionBuilder.create(builder), v);
+      });
       builder.semicolon();
     }
     else if (value().isPresent()) {
@@ -125,14 +136,24 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
   }
 
   @Override
-  public Optional<String> dataType() {
+  public Optional<ApiFunction<?, String>> dataType() {
     return Optional.ofNullable(m_dataType);
   }
 
   @Override
-  public TYPE withDataType(String reference) {
-    m_dataType = reference;
-    return currentInstance();
+  public TYPE withDataType(String dataType) {
+    return withDataTypeFrom(null, api -> dataType);
+  }
+
+  @Override
+  public <A extends IApiSpecification> TYPE withDataTypeFrom(Class<A> apiDefinition, Function<A, String> dataTypeSupplier) {
+    if (dataTypeSupplier == null) {
+      m_dataType = null;
+    }
+    else {
+      m_dataType = new ApiFunction<>(apiDefinition, dataTypeSupplier);
+    }
+    return thisInstance();
   }
 
   @Override
@@ -158,6 +179,6 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
   @Override
   public TYPE withValue(ISourceGenerator<IExpressionBuilder<?>> valueGenerator) {
     m_valueGenerator = valueGenerator;
-    return currentInstance();
+    return thisInstance();
   }
 }

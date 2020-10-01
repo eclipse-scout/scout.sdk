@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -39,7 +40,7 @@ public class LookupCallGenerator<TYPE extends LookupCallGenerator<TYPE>> extends
 
     if (lookupServiceInterface().isPresent()) {
       mainType.withMethod(MethodOverrideGenerator.createOverride()
-          .withElementName("getConfiguredService")
+          .withElementNameFrom(IScoutApi.class, api -> api.LookupCall().getConfiguredServiceMethodName())
           .withBody(b -> b.returnClause().classLiteral(lookupServiceInterface().get()).semicolon()));
     }
   }
@@ -50,7 +51,7 @@ public class LookupCallGenerator<TYPE extends LookupCallGenerator<TYPE>> extends
 
   public TYPE withLookupServiceInterface(String lookupServiceIfc) {
     m_lookupServiceInterface = lookupServiceIfc;
-    return currentInstance();
+    return thisInstance();
   }
 
   public Optional<String> classIdValue() {
@@ -59,6 +60,6 @@ public class LookupCallGenerator<TYPE extends LookupCallGenerator<TYPE>> extends
 
   public TYPE withClassIdValue(String classIdValue) {
     m_classIdValue = classIdValue;
-    return currentInstance();
+    return thisInstance();
   }
 }

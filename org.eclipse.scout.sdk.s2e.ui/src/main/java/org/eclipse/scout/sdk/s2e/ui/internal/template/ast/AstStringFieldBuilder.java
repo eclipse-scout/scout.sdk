@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 
 /**
  * <h3>{@link AstStringFieldBuilder}</h3>
@@ -49,7 +48,7 @@ public class AstStringFieldBuilder extends AstTypeBuilder<AstStringFieldBuilder>
     Block body = ast.newBlock();
     body.statements().add(returnStatement);
 
-    getFactory().newMethod("getConfiguredMaxLength")
+    getFactory().newMethod(getFactory().getScoutApi().AbstractStringField().getConfiguredMaxLengthMethodName())
         .withModifiers(ModifierKeyword.PROTECTED_KEYWORD)
         .withOverride(true)
         .withReturnType(ast.newPrimitiveType(PrimitiveType.INT))
@@ -61,7 +60,7 @@ public class AstStringFieldBuilder extends AstTypeBuilder<AstStringFieldBuilder>
     ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPosition(getFactory().getRewrite().track(literal), true, AstNodeFactory.MAX_LEN_GROUP);
-      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, IScoutRuntimeTypes.IStringField);
+      links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IStringField().fqn());
     }
   }
 }

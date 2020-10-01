@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.generator;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.empty;
 import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.raw;
-import static org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer.transformAnnotation;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformAnnotation;
 import static org.eclipse.scout.sdk.core.imports.ImportCollector.createImportDeclaration;
 
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import java.util.List;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
-import org.eclipse.scout.sdk.core.generator.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;

@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.imports.IImportCollector;
 import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link IJavaBuilderContext}</h3>
@@ -35,4 +36,7 @@ public interface IJavaBuilderContext extends IBuilderContext {
    */
   IImportValidator validator();
 
+  <A extends IApiSpecification> Optional<A> api(Class<A> apiDefinition);
+
+  <A extends IApiSpecification> A requireApi(Class<A> apiDefinition);
 }

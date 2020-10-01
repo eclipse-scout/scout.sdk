@@ -26,9 +26,11 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,11 +42,13 @@ import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.model.api.PropertyBean;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTypeComparators;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 public class StructuredType implements IStructuredType {
 
@@ -61,12 +65,14 @@ public class StructuredType implements IStructuredType {
   };
 
   private final IType m_type;
+  private final IScoutApi m_scoutApi;
   private final EnumSet<Categories> m_enabledCategories;
   private final EnumSet<Categories> m_visitedCategories;
   private final Map<Categories, List<? extends IJavaElement>> m_elements;
 
   protected StructuredType(IType type, EnumSet<Categories> enabledCategories) {
     m_type = type;
+    m_scoutApi = type.javaEnvironment().api(IScoutApi.class).orElse(null);
     m_enabledCategories = EnumSet.copyOf(enabledCategories);
     m_visitedCategories = EnumSet.noneOf(Categories.class);
     m_elements = new EnumMap<>(Categories.class);
@@ -83,6 +89,10 @@ public class StructuredType implements IStructuredType {
     m_elements.put(Categories.TYPE_UNCATEGORIZED, types);
   }
 
+  public Optional<IScoutApi> scoutApi() {
+    return Optional.ofNullable(m_scoutApi);
+  }
+
   public static IStructuredType of(IType type) {
     EnumSet<Categories> enabled = EnumSet.of(Categories.FIELD_LOGGER, Categories.FIELD_STATIC, Categories.FIELD_MEMBER, Categories.FIELD_UNKNOWN, Categories.METHOD_CONSTRUCTOR, Categories.METHOD_CONFIG_PROPERTY,
         Categories.METHOD_CONFIG_EXEC, Categories.METHOD_FORM_DATA_BEAN, Categories.METHOD_OVERRIDDEN, Categories.METHOD_START_HANDLER, Categories.METHOD_INNER_TYPE_GETTER, Categories.METHOD_LOCAL_BEAN, Categories.METHOD_UNCATEGORIZED,
@@ -97,13 +107,13 @@ public class StructuredType implements IStructuredType {
       Matcher matcher = PROPERTY_BEAN_REGEX.matcher(method.elementName());
       if (matcher.find()) {
         int getSetOrder = 20;
-        if ("get".equalsIgnoreCase(matcher.group(1))) {
+        if (PropertyBean.GETTER_PREFIX.equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 1;
         }
-        else if ("is".equalsIgnoreCase(matcher.group(1))) {
+        else if (PropertyBean.GETTER_BOOL_PREFIX.equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 2;
         }
-        else if ("set".equalsIgnoreCase(matcher.group(1))) {
+        else if (PropertyBean.SETTER_PREFIX.equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 3;
         }
         else if ("add".equalsIgnoreCase(matcher.group(1))) {
@@ -378,12 +388,13 @@ public class StructuredType implements IStructuredType {
     List<IJavaElement> statics = new ArrayList<>();
     List<IJavaElement> members = new ArrayList<>();
 
+    Optional<String> logger = scoutApi().map(IScoutApi::Logger).map(IClassNameSupplier::fqn);
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IField f = (IField) it.next();
       // static
       if ((f.flags() & Flags.AccStatic) != 0) {
         String fieldDataType = f.dataType().reference();
-        if (IScoutRuntimeTypes.Logger.equals(fieldDataType)) {
+        if (logger.isPresent() && logger.get().equals(fieldDataType)) {
           loggers.add(f);
         }
         else {
@@ -415,30 +426,21 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitMethodConfigExec(Iterable<IJavaElement> workingSet) {
-    Map<CompositeObject, IJavaElement> execMethods = new TreeMap<>();
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IMethod method = (IMethod) it.next();
-      IMethod visitedMethod = method;
-      while (visitedMethod != null) {
-        if (visitedMethod.annotations().withName(IScoutRuntimeTypes.ConfigOperation).existsAny()) {
-          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
-          execMethods.put(key, method);
-          it.remove();
-          break;
-        }
-        visitedMethod = getOverwrittenMethod(visitedMethod);
-      }
-    }
-    m_elements.put(Categories.METHOD_CONFIG_EXEC, new ArrayList<>(execMethods.values()));
+    visitMethodWithPrefix(workingSet, "exec", Categories.METHOD_CONFIG_EXEC);
   }
 
   protected void visitMethodConfigProperty(Iterable<IJavaElement> workingSet) {
+    visitMethodWithPrefix(workingSet, "getConfigured", Categories.METHOD_CONFIG_PROPERTY);
+  }
+
+  protected void visitMethodWithPrefix(Iterable<IJavaElement> workingSet, String prefix, Categories category) {
     Map<CompositeObject, IJavaElement> methods = new TreeMap<>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
       IMethod visitedMethod = method;
       while (visitedMethod != null) {
-        if (visitedMethod.annotations().withName(IScoutRuntimeTypes.ConfigProperty).existsAny()) {
+        String methodName = visitedMethod.elementName();
+        if (methodName.length() > prefix.length() && methodName.startsWith(prefix)) {
           CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
           methods.put(key, method);
           it.remove();
@@ -447,21 +449,26 @@ public class StructuredType implements IStructuredType {
         visitedMethod = getOverwrittenMethod(visitedMethod);
       }
     }
-    m_elements.put(Categories.METHOD_CONFIG_PROPERTY, new ArrayList<>(methods.values()));
+    m_elements.put(category, new ArrayList<>(methods.values()));
   }
 
   protected void visitMethodFormDataBean(Iterable<IJavaElement> workingSet) {
     Map<CompositeObject, IJavaElement> methods = new TreeMap<>();
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IMethod method = (IMethod) it.next();
-      if (method.annotations().withName(IScoutRuntimeTypes.FormData).existsAny()) {
-        CompositeObject methodKey = createPropertyMethodKey(method);
-        if (methodKey != null) {
-          methods.put(methodKey, method);
-          it.remove();
-        }
-        else {
-          SdkLog.warning("could not parse property method '{}'.", method.elementName());
+    Optional<IScoutApi> scoutApi = scoutApi();
+    if (scoutApi.isPresent()) {
+      IScoutApi api = scoutApi.get();
+      String formDataFqn = api.FormData().fqn();
+      for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
+        IMethod method = (IMethod) it.next();
+        if (method.annotations().withName(formDataFqn).existsAny()) {
+          CompositeObject methodKey = createPropertyMethodKey(method);
+          if (methodKey != null) {
+            methods.put(methodKey, method);
+            it.remove();
+          }
+          else {
+            SdkLog.warning("could not parse property method '{}'.", method.elementName());
+          }
         }
       }
     }
@@ -488,7 +495,7 @@ public class StructuredType implements IStructuredType {
       Matcher matcher = START_HANDLER_REGEX.matcher(method.elementName());
       if (matcher.find()) {
         String fieldName = matcher.group(1);
-        if (getType().innerTypes().withRecursiveInnerTypes(true).withSimpleName(fieldName + ISdkProperties.SUFFIX_FORM_HANDLER).existsAny()) {
+        if (getType().innerTypes().withRecursiveInnerTypes(true).withSimpleName(fieldName + ISdkConstants.SUFFIX_FORM_HANDLER).existsAny()) {
           CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
           startHandlerMethods.put(key, method);
           it.remove();
@@ -540,78 +547,82 @@ public class StructuredType implements IStructuredType {
   }
 
   protected void visitTypeFormFields(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IFormField, Categories.TYPE_FORM_FIELD, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::IFormField, Categories.TYPE_FORM_FIELD, orderAnnotationComparator(false));
   }
 
   protected void visitTypeColumns(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IColumn, Categories.TYPE_COLUMN, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::IColumn, Categories.TYPE_COLUMN, orderAnnotationComparator(false));
   }
 
   protected void visitTypeCodes(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.ICode, Categories.TYPE_CODE, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::ICode, Categories.TYPE_CODE, orderAnnotationComparator(false));
   }
 
   protected void visitTypeForms(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IForm, Categories.TYPE_FORM, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::IForm, Categories.TYPE_FORM, orderAnnotationComparator(false));
   }
 
   protected void visitTypeTables(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.ITable, Categories.TYPE_TABLE, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::ITable, Categories.TYPE_TABLE, orderAnnotationComparator(false));
   }
 
   protected void visitTypeTrees(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.ITree, Categories.TYPE_TREE, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::ITree, Categories.TYPE_TREE, orderAnnotationComparator(false));
   }
 
   protected void visitTypeCalendar(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.ICalendar, Categories.TYPE_CALENDAR, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::ICalendar, Categories.TYPE_CALENDAR, orderAnnotationComparator(false));
   }
 
   protected void visitTypeCalendarItemProvider(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.ICalendarItemProvider, Categories.TYPE_CALENDAR_ITEM_PROVIDER, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::ICalendarItemProvider, Categories.TYPE_CALENDAR_ITEM_PROVIDER, orderAnnotationComparator(false));
   }
 
   protected void visitTypeWizards(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IWizard, Categories.TYPE_WIZARD, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::IWizard, Categories.TYPE_WIZARD, orderAnnotationComparator(false));
   }
 
   protected void visitTypeWizardSteps(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IWizardStep, Categories.TYPE_WIZARD_STEP, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::IWizardStep, Categories.TYPE_WIZARD_STEP, orderAnnotationComparator(false));
   }
 
   protected void visitTypeMenus(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IMenu, Categories.TYPE_MENU, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::IMenu, Categories.TYPE_MENU, orderAnnotationComparator(false));
   }
 
   protected void visitTypeViewButtons(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IViewButton, Categories.TYPE_VIEW_BUTTON, orderAnnotationComparator(false));
+    consumeType(workingSet, IScoutApi::IViewButton, Categories.TYPE_VIEW_BUTTON, orderAnnotationComparator(false));
   }
 
   protected void visitTypeKeystrokes(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IKeyStroke, Categories.TYPE_KEYSTROKE, ScoutTypeComparators.BY_NAME);
+    consumeType(workingSet, IScoutApi::IKeyStroke, Categories.TYPE_KEYSTROKE, ScoutTypeComparators.BY_NAME);
   }
 
   protected void visitTypeComposerAttribute(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IDataModelAttribute, Categories.TYPE_COMPOSER_ATTRIBUTE, ScoutTypeComparators.BY_NAME);
+    consumeType(workingSet, IScoutApi::IDataModelAttribute, Categories.TYPE_COMPOSER_ATTRIBUTE, ScoutTypeComparators.BY_NAME);
   }
 
   protected void visitTypeDataModelEntry(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IDataModelEntity, Categories.TYPE_COMPOSER_ENTRY, ScoutTypeComparators.BY_NAME);
+    consumeType(workingSet, IScoutApi::IDataModelEntity, Categories.TYPE_COMPOSER_ENTRY, ScoutTypeComparators.BY_NAME);
   }
 
   protected void visitTypeFormHandlers(Iterable<IJavaElement> workingSet) {
-    consumeType(workingSet, IScoutRuntimeTypes.IFormHandler, Categories.TYPE_FORM_HANDLER, ScoutTypeComparators.BY_NAME);
+    consumeType(workingSet, IScoutApi::IFormHandler, Categories.TYPE_FORM_HANDLER, ScoutTypeComparators.BY_NAME);
   }
 
-  protected void consumeType(Iterable<IJavaElement> workingSet, String typeInterface, Categories category, Comparator<IType> comparator) {
+  protected void consumeType(Iterable<IJavaElement> workingSet, Function<IScoutApi, IClassNameSupplier> typeInterface, Categories category, Comparator<IType> comparator) {
     Set<IType> types = new TreeSet<>(comparator);
-    Predicate<IType> filter = CLASS_FILTER.and(instanceOf(typeInterface));
-    Iterator<IJavaElement> it = workingSet.iterator();
-    while (it.hasNext()) {
-      IType candidate = (IType) it.next();
-      if (filter.test(candidate)) {
-        types.add(candidate);
-        it.remove();
+    IScoutApi scoutApi = scoutApi().orElse(null);
+    if (scoutApi != null) {
+      String fqn = typeInterface.apply(scoutApi).fqn();
+      Predicate<IType> filter = CLASS_FILTER.and(instanceOf(fqn));
+      Iterator<IJavaElement> it = workingSet.iterator();
+      while (it.hasNext()) {
+        IType candidate = (IType) it.next();
+        if (filter.test(candidate)) {
+          types.add(candidate);
+          it.remove();
+        }
       }
     }
     m_elements.put(category, new ArrayList<>(types));
