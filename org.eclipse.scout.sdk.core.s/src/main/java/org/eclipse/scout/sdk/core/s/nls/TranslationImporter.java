@@ -15,6 +15,8 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateDefaultText;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateKey;
 import static org.eclipse.scout.sdk.core.util.Ensure.failOnDuplicates;
 
 import java.util.ArrayList;
@@ -127,7 +129,7 @@ public class TranslationImporter implements ITranslationImportInfo {
       return null;
     }
     String key = row.get(keyColumnIndex());
-    if (Strings.isBlank(key) || !ITranslation.KEY_REGEX.matcher(key).matches()) {
+    if (validateKey(key) != TranslationValidator.OK) {
       m_invalidRows.add(rowIndex);
       return null;
     }
@@ -138,7 +140,7 @@ public class TranslationImporter implements ITranslationImportInfo {
       return null;
     }
     String defaultLangText = row.get(defaultLanguageColumnIndex());
-    if (Strings.isBlank(defaultLangText)) {
+    if (validateDefaultText(defaultLangText) != TranslationValidator.OK) {
       m_invalidRows.add(rowIndex);
       return null;
     }

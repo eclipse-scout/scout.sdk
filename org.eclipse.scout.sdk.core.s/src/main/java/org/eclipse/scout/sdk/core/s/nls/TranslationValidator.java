@@ -10,8 +10,9 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static java.util.Collections.singleton;
+
 import java.util.Collection;
-import java.util.Collections;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -36,9 +37,17 @@ public final class TranslationValidator {
   private TranslationValidator() {
   }
 
+  /**
+   * Checks if the given {@link ITranslation} is valid.
+   * 
+   * @param toValidate
+   *          The {@link ITranslation} to validate. Must not be {@code null}.
+   * @return {@link #KEY_EMPTY_ERROR}, {@link #KEY_INVALID_ERROR}, {@link #DEFAULT_TRANSLATION_MISSING_ERROR},
+   *         {@link #DEFAULT_TRANSLATION_EMPTY_ERROR} or {@link #OK}.
+   */
   public static int validateTranslation(ITranslation toValidate) {
     Ensure.notNull(toValidate, "A translation must be specified.");
-    int result = validateKey(null, null, toValidate.key(), Collections.singleton(toValidate.key()));
+    int result = validateKey(toValidate.key());
     if (result != OK) {
       return result;
     }
@@ -83,6 +92,17 @@ public final class TranslationValidator {
         && result != KEY_OVERRIDES_OTHER_STORE_WARNING
         && result != KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING
         && result != KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING;
+  }
+
+  /**
+   * Checks if the given translation key is valid.
+   * 
+   * @param keyToValidate
+   *          The key to validate
+   * @return {@link #KEY_EMPTY_ERROR}, {@link #KEY_INVALID_ERROR} or {@link #OK}.
+   */
+  public static int validateKey(String keyToValidate) {
+    return validateKey(null, null, keyToValidate, singleton(keyToValidate));
   }
 
   /**

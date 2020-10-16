@@ -83,6 +83,11 @@ public class EditableTranslationFile extends AbstractTranslationPropertiesFile {
     progress.worked(90);
   }
 
+  @Override
+  protected Object source() {
+    return path();
+  }
+
   public Path path() {
     return m_file;
   }

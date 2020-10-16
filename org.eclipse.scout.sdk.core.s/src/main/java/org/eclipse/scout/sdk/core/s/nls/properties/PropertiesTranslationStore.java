@@ -96,9 +96,9 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
 
   protected void loadFileContent(ITranslationPropertiesFile f) {
     f.allEntries()
-        .forEach((key, translation) -> m_translations
+        .forEach((key, value) -> m_translations
             .computeIfAbsent(key, k -> new TranslationEntry(k, this))
-            .putText(f.language(), translation));
+            .putText(f.language(), value));
   }
 
   @Override
