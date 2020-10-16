@@ -36,6 +36,7 @@ public class ReadOnlyTranslationFile extends AbstractTranslationPropertiesFile {
     m_source = source;
   }
 
+  @Override
   public Object source() {
     return m_source;
   }

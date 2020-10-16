@@ -11,11 +11,14 @@
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
 import static java.util.Collections.unmodifiableMap;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateKey;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -24,9 +27,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.properties.PropertiesGenerator;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.Language;
+import org.eclipse.scout.sdk.core.s.nls.TranslationValidator;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -85,7 +90,20 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
       return false;
     }
     m_fileContent = newContent;
+    removeInvalidEntries(newContent.properties().entrySet());
+
     return true;
+  }
+
+  private void removeInvalidEntries(Iterable<Entry<String, String>> entries) {
+    Iterator<Entry<String, String>> iterator = entries.iterator();
+    while (iterator.hasNext()) {
+      Entry<String, String> entry = iterator.next();
+      if (validateKey(entry.getKey()) != TranslationValidator.OK) {
+        SdkLog.warning("Skipping entry '{}={}' found in '{}' because the key is invalid.", entry.getKey(), entry.getValue(), source());
+        iterator.remove();
+      }
+    }
   }
 
   private PropertiesGenerator readEntries() {
@@ -127,6 +145,11 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
   }
 
   protected abstract void writeEntries(PropertiesGenerator content, IEnvironment env, IProgress progress);
+
+  /**
+   * @return The source object this file was loaded from. May be {@code null}.
+   */
+  protected abstract Object source();
 
   /**
    * Parses the language from a translation .properties file respecting the given prefix.<br>
