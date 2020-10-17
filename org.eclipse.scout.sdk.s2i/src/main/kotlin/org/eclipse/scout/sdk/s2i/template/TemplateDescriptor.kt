@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.core.util.Strings.toStringLiteral
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro
 import org.eclipse.scout.sdk.s2i.template.variable.AbstractClassesEnumVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.variable.BoolVariableAdapter

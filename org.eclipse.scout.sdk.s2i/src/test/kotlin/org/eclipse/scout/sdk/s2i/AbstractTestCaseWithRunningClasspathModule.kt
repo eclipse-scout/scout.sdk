@@ -14,7 +14,6 @@ import com.intellij.openapi.roots.LanguageLevelProjectExtension
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.builders.JavaModuleFixtureBuilder
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase
-import com.intellij.testFramework.fixtures.ModuleFixture
 import com.intellij.util.io.isFile
 import org.eclipse.scout.sdk.core.model.ecj.JreInfo
 import org.eclipse.scout.sdk.core.model.ecj.JreInfo.runningUserClassPath
@@ -30,7 +29,7 @@ abstract class AbstractTestCaseWithRunningClasspathModule : JavaCodeInsightFixtu
         LanguageLevelProjectExtension.getInstance(project).languageLevel = m_javaLanguageLevel
     }
 
-    override fun tuneFixture(moduleBuilder: JavaModuleFixtureBuilder<ModuleFixture>) {
+    override fun tuneFixture(moduleBuilder: JavaModuleFixtureBuilder<*>) {
         super.tuneFixture(moduleBuilder)
 
         val jreHome = m_jreInfo.jreHome()

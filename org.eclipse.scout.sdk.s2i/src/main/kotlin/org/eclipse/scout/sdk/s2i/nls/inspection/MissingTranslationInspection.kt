@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.core.s.nls.query.MissingTranslationQuery
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.getNioPath

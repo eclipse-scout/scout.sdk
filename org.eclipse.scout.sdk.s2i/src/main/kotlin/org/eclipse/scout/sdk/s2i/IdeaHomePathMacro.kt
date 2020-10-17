@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2i
 import com.intellij.ide.macro.Macro
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.PathManager
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 
 open class IdeaHomePathMacro : Macro() {
 

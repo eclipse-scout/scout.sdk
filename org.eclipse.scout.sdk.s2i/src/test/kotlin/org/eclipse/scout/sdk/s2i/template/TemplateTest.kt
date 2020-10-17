@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.AbstractTestCaseWithRunningClasspathModule
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 
 
 class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
