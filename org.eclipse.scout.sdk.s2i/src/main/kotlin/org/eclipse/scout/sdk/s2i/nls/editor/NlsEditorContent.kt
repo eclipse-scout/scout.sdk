@@ -41,7 +41,7 @@ import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
 import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
 import org.eclipse.scout.sdk.core.s.nls.properties.ReadOnlyTranslationFile
 import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.OperationTask
 import org.eclipse.scout.sdk.s2i.getNioPath
 import org.eclipse.scout.sdk.s2i.resolvePsi
@@ -439,7 +439,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         override fun actionPerformed(e: AnActionEvent) {
             val fileSaverDescriptor = FileSaverDescriptor(message("export.translations"), message("export.translations.desc"), "xlsx")
             val file = FileChooserFactory.getInstance().createSaveFileDialog(fileSaverDescriptor, project)
-                    .save(null, null)
+                    .save(null as VirtualFile? /* cast required for IJ 2020.3 compatibility (overloads) */, null)
                     ?.file ?: return
             val tableData = m_table.visibleData()
             OperationTask(message("export.translations"), project) { doExport(tableData, file) }.schedule<Unit>()

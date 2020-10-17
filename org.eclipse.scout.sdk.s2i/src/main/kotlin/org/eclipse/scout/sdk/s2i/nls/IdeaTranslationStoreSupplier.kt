@@ -32,12 +32,11 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationStores
 import org.eclipse.scout.sdk.core.s.nls.properties.*
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseLanguageFromFileName
 import org.eclipse.scout.sdk.s2i.*
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import java.nio.file.Path
 import java.util.*
-import java.util.function.Supplier
 import java.util.stream.Stream
 
 open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActivity, DumbAware {
@@ -129,7 +128,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
         if (isEditable) {
             return EditableTranslationFile(file.getNioPath(), language)
         }
-        return ReadOnlyTranslationFile(Supplier { file.inputStream }, language, file)
+        return ReadOnlyTranslationFile({ file.inputStream }, language, file)
     }
 
     private data class TypeMapping(val scoutType: IType?, val psiClass: PsiClass)

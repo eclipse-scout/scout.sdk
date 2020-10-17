@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2i.nls
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.vfs.VirtualFile
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import java.nio.charset.StandardCharsets
 import javax.swing.Icon
 

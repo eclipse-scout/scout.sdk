@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.s.nls.NlsFile
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
 import org.eclipse.scout.sdk.core.s.nls.TranslationStores.createStack
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInLongReadAction

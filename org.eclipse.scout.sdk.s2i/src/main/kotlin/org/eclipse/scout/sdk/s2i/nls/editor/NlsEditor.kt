@@ -21,7 +21,7 @@ import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLabel
 import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader
 import java.awt.BorderLayout
 import java.awt.Graphics

@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.SdkException
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.toIdeaProgress
 import java.io.File
 import java.nio.file.Path

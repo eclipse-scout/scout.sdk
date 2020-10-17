@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
 import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import java.awt.*

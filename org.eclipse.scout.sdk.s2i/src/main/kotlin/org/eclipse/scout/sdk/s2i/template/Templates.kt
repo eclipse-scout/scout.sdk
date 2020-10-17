@@ -15,7 +15,7 @@ import com.intellij.psi.util.InheritanceUtil
 import com.intellij.util.containers.ContainerUtil.emptyList
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes
 import org.eclipse.scout.sdk.core.s.ScoutModelHierarchy
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import java.util.concurrent.ConcurrentHashMap
 
 object Templates {
