@@ -54,7 +54,6 @@
     <master_test_forkCount>1</master_test_forkCount>
     <master_test_timeout>18000</master_test_timeout> <!-- 5 hours -->
     <master_test_forkCount>1</master_test_forkCount>
-    <master_unitTest_failureIgnore>false</master_unitTest_failureIgnore>
     <eclipse_gerrit_username/>
 
     <!-- Sonar properties -->
@@ -899,7 +898,7 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <scope>test</scope>
-        <version>28.1-jre</version>
+        <version>27.1-jre</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>

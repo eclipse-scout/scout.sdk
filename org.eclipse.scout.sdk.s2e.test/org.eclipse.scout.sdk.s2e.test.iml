@@ -44,10 +44,10 @@
     <orderEntry type="library" name="Maven: org.apache.maven.shared:maven-shared-utils:3.2.1" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
     <orderEntry type="library" name="Maven: com.google.inject:guice:no_aop:4.2.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:guava:28.1-jre" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:guava:27.1-jre" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:failureaccess:1.0.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.checkerframework:checker-qual:2.8.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.checkerframework:checker-qual:2.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-utils:3.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-classworlds:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.sisu:org.eclipse.sisu.plexus:0.3.4" level="project" />
