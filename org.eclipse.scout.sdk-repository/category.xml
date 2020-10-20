@@ -25,5 +25,4 @@
    </category-def>
 
    <bundle id="javax.wsdl"/> <!-- Embed the dependency additionally in the P2 update site (via WTP otherwise) -->
-   <bundle id="org.apache.commons.lang3"/> <!-- Embed the dependency additionally in the P2 update site (via WTP otherwise) -->
 </site>
