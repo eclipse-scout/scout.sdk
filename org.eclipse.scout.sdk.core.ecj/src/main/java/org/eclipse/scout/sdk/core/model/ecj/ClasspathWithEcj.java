@@ -97,7 +97,7 @@ public class ClasspathWithEcj extends AbstractSpiElement<IClasspathEntry> implem
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append(ClasspathWithEcj.class.getSimpleName()).append(" [")
         .append("path=").append(getPath())
         .append(", mode=").append(modeName())

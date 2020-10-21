@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.ui.util;
 
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -43,8 +44,8 @@ public class NormalizedPattern {
       return new NormalizedPattern(Character.toString(ANY_STRING), SearchPattern.R_PATTERN_MATCH);
     }
 
-    int length = searchString.length();
-    char last = searchString.charAt(length - 1);
+    var length = searchString.length();
+    var last = searchString.charAt(length - 1);
     if (searchString.indexOf(ANY_STRING) != -1 || searchString.indexOf(ANY_CHAR) != -1) {
       switch (last) {
         case END_SYMBOL:
@@ -75,16 +76,12 @@ public class NormalizedPattern {
    *         wildcard-only pattern is also considered to be empty.
    */
   public boolean isEmpty() {
-    String pattern = getPattern();
+    var pattern = getPattern();
     if (Strings.isBlank(pattern)) {
       return true;
     }
-    for (int i = 0; i < pattern.length(); i++) {
-      if (pattern.charAt(i) != ANY_STRING && pattern.charAt(i) != ANY_CHAR) {
-        return false;
-      }
-    }
-    return true;
+    return IntStream.range(0, pattern.length())
+        .noneMatch(i -> pattern.charAt(i) != ANY_STRING && pattern.charAt(i) != ANY_CHAR);
   }
 
   /**
@@ -136,15 +133,15 @@ public class NormalizedPattern {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append("NormalizedPattern [Pattern=").append(getPattern()).append(", MatchRule=").append(getMatchRule()).append(']');
     return builder.toString();
   }
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + m_matchRule;
     result = prime * result + ((m_pattern == null) ? 0 : m_pattern.hashCode());
     return result;
@@ -161,7 +158,7 @@ public class NormalizedPattern {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    NormalizedPattern other = (NormalizedPattern) obj;
+    var other = (NormalizedPattern) obj;
     return m_matchRule == other.m_matchRule
         && Objects.equals(m_pattern, other.m_pattern);
   }

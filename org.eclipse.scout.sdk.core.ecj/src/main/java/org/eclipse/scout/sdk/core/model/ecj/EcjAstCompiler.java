@@ -55,7 +55,7 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
   }
 
   public static CompilerOptions createDefaultOptions() {
-    CompilerOptions result = new CompilerOptions();
+    var result = new CompilerOptions();
     result.produceDebugAttributes = 0;
     result.complianceLevel = ClassFileConstants.getLatestJDKLevel();
     result.originalComplianceLevel = result.complianceLevel;
@@ -99,7 +99,7 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
       process(unit, 0);
     }
 
-    CategorizedProblem[] errors = unit.compilationResult().getErrors();
+    var errors = unit.compilationResult().getErrors();
     if (errors == null || errors.length < 1) {
       return emptyList();
     }
@@ -149,8 +149,8 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
     public CategorizedProblem createProblem(char[] originatingFileName, int problemId, String[] problemArguments,
         int elaborationId, String[] messageArguments, int severity, int startPosition, int endPosition, int lineNumber, int columnNumber) {
       if ((severity & (ProblemSeverities.Error | ProblemSeverities.Fatal | ProblemSeverities.InternalError)) != 0) {
-        String txt = getLocalizedMessage(problemId, elaborationId, messageArguments);
-        StringBuilder msg = new StringBuilder(txt.length() + 128);
+        var txt = getLocalizedMessage(problemId, elaborationId, messageArguments);
+        var msg = new StringBuilder(txt.length() + 128);
         if (originatingFileName != null) {
           msg.append(originatingFileName).append(':');
         }

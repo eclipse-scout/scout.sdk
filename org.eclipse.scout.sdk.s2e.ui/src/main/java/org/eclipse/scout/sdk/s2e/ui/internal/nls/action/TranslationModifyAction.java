@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.action;
 
-import java.util.Optional;
-
 import org.eclipse.jface.action.Action;
-import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
@@ -45,7 +42,7 @@ public class TranslationModifyAction extends Action {
   @Override
   public void run() {
     AbstractTranslationDialog dialog = new TranslationModifyDialog(m_parentShell, m_project, m_entry);
-    Optional<ITranslation> acceptedTranslation = dialog.show();
+    var acceptedTranslation = dialog.show();
     acceptedTranslation.ifPresent(m_project::updateTranslation);
   }
 }

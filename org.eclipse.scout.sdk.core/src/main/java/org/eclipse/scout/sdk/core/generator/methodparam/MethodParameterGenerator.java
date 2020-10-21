@@ -15,21 +15,20 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.MemberBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractAnnotatableGenerator;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
-import org.eclipse.scout.sdk.core.model.api.Flags;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link MethodParameterGenerator}</h3>
@@ -44,9 +43,9 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
 
   protected MethodParameterGenerator(IMethodParameter parameter, IWorkingCopyTransformer transformer) {
     super(parameter, transformer);
-    IMethod declaringMethod = parameter.declaringMethod();
-    boolean isVarargs = Flags.isVarargs(declaringMethod.flags()) && parameter.index() == declaringMethod.parameters().stream().count() - 1;
-    String dataType = parameter.dataType().reference();
+    var declaringMethod = parameter.declaringMethod();
+    var isVarargs = Flags.isVarargs(declaringMethod.flags()) && parameter.index() == declaringMethod.parameters().stream().count() - 1;
+    var dataType = parameter.dataType().reference();
     if (isVarargs) {
       dataType = dataType.substring(0, dataType.length() - 2); // remove one array dimension because it is printed as varargs
     }
@@ -98,7 +97,7 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
       builder.appendFlags(Flags.AccFinal);
     }
 
-    String dataType = dataType().orElseThrow(() -> newFail("Method parameter data type missing for generator {}", this))
+    var dataType = dataType().orElseThrow(() -> newFail("Method parameter data type missing for generator {}", this))
         .apply(builder.context())
         .filter(Strings::hasText)
         .orElseThrow(() -> newFail("Unable to get method parameter data type for generator {}", this));
@@ -107,7 +106,7 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
     if (isVarargs()) {
       builder.append("...");
     }
-    String parameterName = ensureValidJavaName(elementName().orElseThrow(() -> newFail("Method parameter name missing for generator {}", this)));
+    var parameterName = ensureValidJavaName(elementName().orElseThrow(() -> newFail("Method parameter name missing for generator {}", this)));
     builder.space()
         .append(parameterName);
   }

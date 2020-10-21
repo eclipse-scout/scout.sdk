@@ -18,18 +18,15 @@ import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.fixture.sub.PackageAnnotation;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
-import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Test;
@@ -44,7 +41,7 @@ public class PackageGeneratorTest {
 
   @Test
   public void testPackageGenerator(IJavaEnvironment env) {
-    ICompilationUnitGenerator<?> generator = CompilationUnitGenerator.create()
+    var generator = CompilationUnitGenerator.create()
         .withElementName(JavaTypes.PackageInfo)
         .withPackage(PackageGenerator.create()
             .withElementName("test.pck")
@@ -58,20 +55,20 @@ public class PackageGeneratorTest {
 
   @Test
   public void testPackageTransformationSimple(IJavaEnvironment env) {
-    IType testClass = env.requireType("org.eclipse.scout.sdk.core.fixture.sub.package-info");
-    ICompilationUnitGenerator<?> generator = testClass.requireCompilationUnit().toWorkingCopy();
+    var testClass = env.requireType("org.eclipse.scout.sdk.core.fixture.sub.package-info");
+    var generator = testClass.requireCompilationUnit().toWorkingCopy();
     assertEqualsRefFile(env, REF_FILE_FOLDER + "PackageGeneratorTest2.txt", generator);
     assertNoCompileErrors(registerCompilationUnit(env, generator.packageName().get(), generator.elementName().get(), generator.toJavaSource(env)));
   }
 
   @Test
   public void testPackageTransformationWithTransformation(IJavaEnvironment env) {
-    IType testClass = env.requireType("org.eclipse.scout.sdk.core.fixture.sub.package-info");
-    IWorkingCopyTransformer transformer = new SimpleWorkingCopyTransformerBuilder()
+    var testClass = env.requireType("org.eclipse.scout.sdk.core.fixture.sub.package-info");
+    var transformer = new SimpleWorkingCopyTransformerBuilder()
         .withPackageMapper(PackageGeneratorTest::transformPackage)
         .withAnnotationElementMapper(PackageGeneratorTest::transformAnnotationElement)
         .build();
-    ICompilationUnitGenerator<?> generator = testClass.requireCompilationUnit()
+    var generator = testClass.requireCompilationUnit()
         .toWorkingCopy(transformer)
         .withComment(null);
     assertEqualsRefFile(env, REF_FILE_FOLDER + "PackageGeneratorTest3.txt", generator);

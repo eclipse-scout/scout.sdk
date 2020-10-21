@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
-import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
-import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
@@ -67,9 +65,9 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
   @Override
   public IMetaValue getMetaValue() {
     return m_value.computeIfAbsentAndGet(() -> {
-      ClassScope scope = SpiWithEcjUtils.classScopeOf(m_declaringAnnotation.getOwner());
-      Object compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.value, scope, javaEnvWithEcj());
-      IMetaValue value = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), compiledValue);
+      var scope = SpiWithEcjUtils.classScopeOf(m_declaringAnnotation.getOwner());
+      var compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.value, scope, javaEnvWithEcj());
+      var value = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), compiledValue);
       if (value != null) {
         return value;
       }
@@ -97,7 +95,7 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
   @Override
   public ISourceRange getSourceOfExpression() {
     return m_expressionSource.computeIfAbsentAndGet(() -> {
-      Expression expr = m_astNode.value;
+      var expr = m_astNode.value;
       if (expr == null) {
         return null;
       }

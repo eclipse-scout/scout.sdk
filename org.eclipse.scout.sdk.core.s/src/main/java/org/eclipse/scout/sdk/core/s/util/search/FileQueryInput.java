@@ -78,7 +78,7 @@ public class FileQueryInput {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    FileQueryInput that = (FileQueryInput) o;
+    var that = (FileQueryInput) o;
     return m_file.equals(that.m_file);
   }
 

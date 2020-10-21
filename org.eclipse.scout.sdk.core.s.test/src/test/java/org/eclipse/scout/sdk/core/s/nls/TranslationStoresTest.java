@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 public class TranslationStoresTest {
   @Test
   public void testRegisterStoreSupplier() {
-    ITranslationStoreSupplier supplier = mock(ITranslationStoreSupplier.class);
-    int sizeBeforeModification = storeSuppliers().size();
+    var supplier = mock(ITranslationStoreSupplier.class);
+    var sizeBeforeModification = storeSuppliers().size();
     try {
       assertTrue(registerStoreSupplier(supplier));
       assertEquals(sizeBeforeModification + 1, storeSuppliers().size());
@@ -46,7 +46,7 @@ public class TranslationStoresTest {
   public void testIsContentAvailable() {
     assertFalse(isContentAvailable(null));
 
-    ITranslationStore store = mock(ITranslationStore.class);
+    var store = mock(ITranslationStore.class);
     when(store.languages()).thenAnswer(invocation -> Stream.empty());
     assertFalse(isContentAvailable(store));
 

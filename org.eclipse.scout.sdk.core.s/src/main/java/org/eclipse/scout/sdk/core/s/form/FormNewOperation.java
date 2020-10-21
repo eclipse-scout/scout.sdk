@@ -14,11 +14,11 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
@@ -97,8 +97,8 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     progress.init(getTotalWork(), toString());
 
     // calc names
-    String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getClientPackage());
-    String baseName = getFormName();
+    var sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getClientPackage());
+    var baseName = getFormName();
     if (baseName.endsWith(ISdkConstants.SUFFIX_FORM)) {
       baseName = baseName.substring(0, baseName.length() - ISdkConstants.SUFFIX_FORM.length());
     }
@@ -110,7 +110,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
     // permissions
     if (isCreatePermissions()) {
-      String permissionBaseName = baseName + ISdkConstants.SUFFIX_PERMISSION;
+      var permissionBaseName = baseName + ISdkConstants.SUFFIX_PERMISSION;
       setCreatedReadPermission(createReadPermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
       setCreatedUpdatePermission(createUpdatePermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
       setCreatedCreatePermission(createCreatePermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
@@ -137,7 +137,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected int getTotalWork() {
-    int result = 2; // form & form-tests
+    var result = 2; // form & form-tests
     if (isCreateFormData()) {
       result += 2;// formdata creation & formData update
     }
@@ -151,7 +151,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected void updateFormData(IEnvironment env, IProgress progress) {
-    Optional<ICompilationUnitGenerator<?>> formDataGenerator = DtoGeneratorFactory.createFormDataGenerator(getCreatedForm(), getFormDataSourceFolder().javaEnvironment());
+    var formDataGenerator = DtoGeneratorFactory.createFormDataGenerator(getCreatedForm(), getFormDataSourceFolder().javaEnvironment());
     env.writeCompilationUnit(formDataGenerator.get(), getFormDataSourceFolder(), progress);
   }
 
@@ -169,7 +169,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected void addMock(ITypeGenerator<?> testBuilder) {
-    String mockVarName = "m_mockSvc";
+    var mockVarName = "m_mockSvc";
     testBuilder
         .withField(FieldGenerator.create()
             .withElementName(mockVarName)
@@ -182,8 +182,8 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
             .withReturnType(JavaTypes._void)
             .withAnnotation(ScoutAnnotationGenerator.createBefore())
             .withBody(b -> {
-              String varName = "answer";
-              String formDataName = getCreatedFormData().name();
+              var varName = "answer";
+              var formDataName = getCreatedFormData().name();
               b.ref(formDataName).space().append(varName).equalSign().appendNew().ref(formDataName).parenthesisOpen().parenthesisClose().semicolon().nl();
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_PREPARE_CREATE_METHOD_NAME);
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_CREATE_METHOD_NAME);
@@ -199,26 +199,26 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected IType createFormTest(IEnvironment env, IProgress progress) {
-    IClasspathEntry testSourceFolder = getClientTestSourceFolder();
+    var testSourceFolder = getClientTestSourceFolder();
     if (testSourceFolder == null) {
       return null;
     }
-    IScoutApi scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
-    TestGenerator<?> formTestBuilder = createFormTestBuilder(scoutApi);
+    var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
+    var formTestBuilder = createFormTestBuilder(scoutApi);
     return env.writeCompilationUnit(formTestBuilder, testSourceFolder, progress);
   }
 
   protected IType createServiceTest(IEnvironment env, IProgress progress) {
-    IClasspathEntry testSourceFolder = getServerTestSourceFolder();
+    var testSourceFolder = getServerTestSourceFolder();
     if (testSourceFolder == null) {
       return null;
     }
-    IScoutApi scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
-    String serverPackage = ScoutTier.Client.convert(ScoutTier.Server, getClientPackage());
-    String baseName = getCreatedServiceImpl().elementName();
-    String elementName = baseName + ISdkConstants.SUFFIX_TEST;
+    var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
+    var serverPackage = ScoutTier.Client.convert(ScoutTier.Server, getClientPackage());
+    var baseName = getCreatedServiceImpl().elementName();
+    var elementName = baseName + ISdkConstants.SUFFIX_TEST;
 
-    Optional<IType> existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
+    var existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
     if (existingServiceTest.isPresent()) {
       // service test class already exists
       return existingServiceTest.get();
@@ -236,7 +236,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected void createService(String sharedPackage, String baseName, IEnvironment env, IProgress progress) {
-    ServiceNewOperation serviceNewOperation = new ServiceNewOperation();
+    var serviceNewOperation = new ServiceNewOperation();
     serviceNewOperation.setServiceName(baseName);
     serviceNewOperation.setSharedPackage(sharedPackage);
     serviceNewOperation.setSharedSourceFolder(getSharedSourceFolder());
@@ -262,7 +262,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .withBody(b -> {
           // permission check
           if (isCreatePermissions()) {
-            String methodName = b.surroundingMethod().elementName().orElse(null);
+            var methodName = b.surroundingMethod().elementName().orElse(null);
             String permissionFqn;
             if (FormGenerator.SERVICE_LOAD_METHOD_NAME.equals(methodName)) {
               permissionFqn = getCreatedReadPermission().name();
@@ -300,7 +300,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
       return;
     }
 
-    String returnType = builder.surroundingMethodReturnType().get();
+    var returnType = builder.surroundingMethodReturnType().get();
     builder
         .returnClause()
         .append(getParamNameHavingDataType(builder.surroundingMethod(), returnType, builder.context())
@@ -318,7 +318,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected IType createFormData(String sharedPackage, IEnvironment env, IProgress progress) {
-    PrimaryTypeGenerator<?> formDataGenerator = PrimaryTypeGenerator.create()
+    var formDataGenerator = PrimaryTypeGenerator.create()
         .withElementName(getFormName() + ISdkConstants.SUFFIX_DTO)
         .withPackageName(sharedPackage)
         .withSuperClassFrom(IScoutApi.class, api -> api.AbstractFormData().fqn());
@@ -345,7 +345,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected IType createForm(IEnvironment env, IProgress progress) {
-    FormGenerator<?> formBuilder = createFormBuilder();
+    var formBuilder = createFormBuilder();
     return env.writeCompilationUnit(formBuilder, getClientSourceFolder(), progress);
   }
 
@@ -354,7 +354,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected FormGenerator<?> createFormBuilder() {
-    FormGenerator<?> formBuilder = createFormBuilderInstance()
+    var formBuilder = createFormBuilderInstance()
         .withSuperClass(getSuperType())
         .withElementName(getFormName())
         .withPackageName(getClientPackage());
@@ -371,11 +371,8 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
     // @ClassId
     if (ClassIds.isAutomaticallyCreateClassIdAnnotation()) {
-      String[] classIds = new String[FormGenerator.NUM_CLASS_IDS];
-      String fqn = getClientPackage() + JavaTypes.C_DOT + getFormName();
-      for (int i = 0; i < classIds.length; i++) {
-        classIds[i] = ClassIds.next(fqn);
-      }
+      var fqn = getClientPackage() + JavaTypes.C_DOT + getFormName();
+      var classIds = IntStream.range(0, FormGenerator.NUM_CLASS_IDS).mapToObj(i -> ClassIds.next(fqn)).toArray(String[]::new);
       formBuilder.withClassIdValues(classIds);
     }
     return formBuilder;

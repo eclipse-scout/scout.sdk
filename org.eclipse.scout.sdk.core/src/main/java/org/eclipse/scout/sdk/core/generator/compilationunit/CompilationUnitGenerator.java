@@ -19,7 +19,6 @@ import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.tra
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -41,7 +40,6 @@ import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.SortedMemberEntry;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.imports.CompilationUnitScopedImportCollector;
-import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IImport;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
@@ -135,15 +133,15 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
-    IImportValidator currentValidator = builder.context().validator();
+    var currentValidator = builder.context().validator();
     currentValidator.runWithImportCollector(() -> buildCompilationUnit(builder), inner -> new CompilationUnitScopedImportCollector(inner, packageName().orElse(null), this));
   }
 
   protected void buildCompilationUnit(IJavaSourceBuilder<?> builder) {
     super.build(builder);
 
-    StringBuilder typeSource = buildTypeSource(builder.context()); // pre build type source so that all imports are defined
-    String nl = builder.context().lineDelimiter();
+    var typeSource = buildTypeSource(builder.context()); // pre build type source so that all imports are defined
+    var nl = builder.context().lineDelimiter();
 
     builder
         .append(getPackage()
@@ -279,9 +277,9 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
 
   @Override
   public TYPE withoutType(Predicate<ITypeGenerator<?>> removalFilter) {
-    for (Iterator<SortedMemberEntry> it = m_types.iterator(); it.hasNext();) {
+    for (var it = m_types.iterator(); it.hasNext();) {
       @SuppressWarnings("unchecked")
-      ITypeGenerator<? extends IMemberBuilder<?>> generator = (ITypeGenerator<? extends IMemberBuilder<?>>) it.next().generator();
+      var generator = (ITypeGenerator<? extends IMemberBuilder<?>>) it.next().generator();
       if (removalFilter == null || removalFilter.test(generator)) {
         it.remove();
         applyConnection(generator, null);

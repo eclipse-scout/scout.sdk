@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.util.apidef;
+package org.eclipse.scout.sdk.core.apidef;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.fixture.apidef.AlwaysMissingApiProvider;
 import org.eclipse.scout.sdk.core.fixture.apidef.IAlwaysMissingApi;
 import org.eclipse.scout.sdk.core.fixture.apidef.IJavaApi;
-import org.eclipse.scout.sdk.core.fixture.apidef.JavaApi11;
+import org.eclipse.scout.sdk.core.fixture.apidef.Java11Api;
 import org.eclipse.scout.sdk.core.fixture.apidef.JavaApiProvider;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
@@ -35,8 +35,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class ApiFunctionTest {
   @Test
   public void testFunctionCalledWithoutEnvironment() {
-    char[] val = "result".toCharArray();
-    ApiFunction<IJavaApi, char[]> f = new ApiFunction<>(val);
+    var val = "result".toCharArray();
+    var f = new ApiFunction<IJavaApi, char[]>(val);
     assertSame(val, f.apply().get());
     assertSame(val, f.apply((IApiSpecification) null));
     assertSame(val, f.apply((IJavaSourceBuilder<?>) null).get());
@@ -49,7 +49,7 @@ public class ApiFunctionTest {
   public void testWithContext(IJavaEnvironment env) {
     Api.registerProvider(IJavaApi.class, new JavaApiProvider());
     try {
-      assertEquals(JavaApi11.VALUE, new ApiFunction<>(IJavaApi.class, IJavaApi::method).apply(env).get());
+      assertEquals(Java11Api.VALUE, new ApiFunction<>(IJavaApi.class, IJavaApi::method).apply(env).get());
     }
     finally {
       Api.unregisterProvider(IJavaApi.class);

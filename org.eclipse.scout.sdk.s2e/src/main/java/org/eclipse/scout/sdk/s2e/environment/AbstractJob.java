@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.sdk.s2e.environment;
 
+import static java.util.stream.Collectors.joining;
+
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
@@ -132,14 +135,14 @@ public abstract class AbstractJob extends Job {
 
   @Override
   public final IStatus run(IProgressMonitor monitor) {
-    long start = System.currentTimeMillis();
+    var start = System.currentTimeMillis();
     try {
       m_monitor = monitor;
       return runInternal(monitor);
     }
     finally {
-      long duration = System.currentTimeMillis() - start;
-      String logMsg = "Job '{}' finished after {}ms.";
+      var duration = System.currentTimeMillis() - start;
+      var logMsg = "Job '{}' finished after {}ms.";
       if (SdkLog.isDebugEnabled()) {
         // more details on debug level
         SdkLog.debug(logMsg + " It has been scheduled by:{}", getName(), duration, getCallerStackTrace());
@@ -151,21 +154,19 @@ public abstract class AbstractJob extends Job {
   }
 
   protected String getCallerStackTrace() {
-    int numElementsToRemove = 4;
+    var numElementsToRemove = 4;
     if (m_callerTrace == null || m_callerTrace.length <= numElementsToRemove) {
       // can happen if run() is called directly without scheduling using job manager.
       m_callerTrace = Thread.currentThread().getStackTrace();
       numElementsToRemove = 3;
     }
-    StackTraceElement[] cleaned = new StackTraceElement[m_callerTrace.length - numElementsToRemove];
+    var cleaned = new StackTraceElement[m_callerTrace.length - numElementsToRemove];
     System.arraycopy(m_callerTrace, numElementsToRemove, cleaned, 0, cleaned.length);
 
-    StringBuilder callerStack = new StringBuilder();
-    for (StackTraceElement traceElement : cleaned) {
-      //noinspection HardcodedLineSeparator
-      callerStack.append("\n\tat ").append(traceElement);
-    }
-    return callerStack.toString();
+    //noinspection HardcodedLineSeparator
+    return Arrays.stream(cleaned)
+        .map(traceElement -> "\n\tat " + traceElement)
+        .collect(joining());
   }
 
   private IStatus runInternal(IProgressMonitor monitor) {

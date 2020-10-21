@@ -20,12 +20,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
@@ -34,7 +34,6 @@ import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * Main access for Scout translation related data.
@@ -58,7 +57,7 @@ public final class TranslationStores {
   private static Map<String /* node module name */, IClassNameSupplier /* text contributor */> getPredefinedTextContributorMappings(IScoutApi api) {
     Map<String, IClassNameSupplier> mappings = new HashMap<>(2);
     mappings.put("@eclipse-scout/core", api.UiTextContributor());
-    api.optApi(IScoutChartApi.class).ifPresent(chartApi -> mappings.put("@eclipse-scout/chart", chartApi.ChartUiTextContributor()));
+    api.api(IScoutChartApi.class).ifPresent(chartApi -> mappings.put("@eclipse-scout/chart", chartApi.ChartUiTextContributor()));
     return mappings;
   }
 
@@ -91,7 +90,7 @@ public final class TranslationStores {
    */
   public static synchronized Map<String, Set<String>> uiTextContributorMappings() {
     Map<String, Set<String>> copy = new HashMap<>(UI_TEXT_CONTRIBUTORS.size());
-    for (Entry<String, Set<String>> entry : UI_TEXT_CONTRIBUTORS.entrySet()) {
+    for (var entry : UI_TEXT_CONTRIBUTORS.entrySet()) {
       copy.put(entry.getKey(), new HashSet<>(entry.getValue()));
     }
     return copy;
@@ -190,8 +189,8 @@ public final class TranslationStores {
     Ensure.notNull(env);
     Ensure.notNull(progress);
 
-    int ticksBySupplier = 1000;
-    List<ITranslationStoreSupplier> suppliers = storeSuppliers();
+    var ticksBySupplier = 1000;
+    var suppliers = storeSuppliers();
     progress.init(suppliers.size() * ticksBySupplier, "Search translation stores for {}", modulePath);
 
     return suppliers.stream()
@@ -234,8 +233,8 @@ public final class TranslationStores {
     Ensure.notNull(textService);
     Ensure.notNull(progress);
 
-    int ticksBySupplier = 1000;
-    List<ITranslationStoreSupplier> suppliers = storeSuppliers();
+    var ticksBySupplier = 1000;
+    var suppliers = storeSuppliers();
     progress.init(ticksBySupplier * suppliers.size(), "Creating translation store for service '{}'.", textService);
     return suppliers.stream()
         .map(supplier -> supplier.single(textService, progress.newChild(ticksBySupplier)))

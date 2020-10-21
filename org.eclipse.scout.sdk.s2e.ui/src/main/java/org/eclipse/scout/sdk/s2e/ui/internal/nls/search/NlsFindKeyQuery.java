@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationKeysQuery;
-import org.eclipse.scout.sdk.core.s.util.search.IFileQueryResult;
 import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker;
 import org.eclipse.search.internal.ui.text.FileSearchQuery;
 import org.eclipse.search.internal.ui.text.FileSearchResult;
@@ -53,7 +52,7 @@ public class NlsFindKeyQuery extends FileSearchQuery {
 
   @Override
   public IStatus run(IProgressMonitor monitor) {
-    IFileQueryResult query = EclipseWorkspaceWalker.executeQuerySync(new TranslationKeysQuery(getNlsKey(), getLabel()), monitor);
+    var query = EclipseWorkspaceWalker.executeQuerySync(new TranslationKeysQuery(getNlsKey(), getLabel()), monitor);
     queryResultToSearchResult(query.result(), getSearchResult());
     return Status.OK_STATUS;
   }

@@ -14,6 +14,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -21,14 +23,17 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
@@ -37,7 +42,6 @@ import javax.wsdl.Import;
 import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
-import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ElementExtensible;
 import javax.wsdl.extensions.ExtensibilityElement;
@@ -48,7 +52,6 @@ import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap.SOAPBody;
 import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
@@ -126,18 +129,14 @@ public class ParsedWsdl {
    * @return A {@link Set} holding all {@link PortType}s of the given {@link Service}.
    */
   public Set<PortType> getPortTypes(Service service) {
-    Map<String, QName> portTypesByPort = m_portTypesByService.get(service);
+    var portTypesByPort = m_portTypesByService.get(service);
     if (portTypesByPort == null || portTypesByPort.isEmpty()) {
       return emptySet();
     }
-    Set<PortType> result = new HashSet<>(portTypesByPort.size());
-    for (QName portTypeName : portTypesByPort.values()) {
-      PortType portType = getPortType(portTypeName);
-      if (portType != null) {
-        result.add(portType);
-      }
-    }
-    return result;
+    return portTypesByPort.values().stream()
+        .map(this::getPortType)
+        .filter(Objects::nonNull)
+        .collect(toSet());
   }
 
   /**
@@ -146,7 +145,7 @@ public class ParsedWsdl {
    * @return Gets a {@link Map} holding all ports (key) and the corresponding port type name (value).
    */
   public Map<String, QName> getPorts(Service service) {
-    Map<String, QName> map = m_portTypesByService.get(service);
+    var map = m_portTypesByService.get(service);
     if (map == null) {
       return emptyMap();
     }
@@ -163,13 +162,13 @@ public class ParsedWsdl {
    * @return The port name or {@code null}.
    */
   public String getPortName(Service service, PortType portType) {
-    QName nameToSearch = portType.getQName();
-    for (Entry<String, QName> entry : getPorts(service).entrySet()) {
-      if (entry.getValue().equals(nameToSearch)) {
-        return entry.getKey(); // port name
-      }
-    }
-    return null;
+    var nameToSearch = portType.getQName();
+    // port name
+    return getPorts(service).entrySet().stream()
+        .filter(entry -> entry.getValue().equals(nameToSearch))
+        .findFirst()
+        .map(Entry::getKey)
+        .orElse(null);
   }
 
   /**
@@ -180,12 +179,10 @@ public class ParsedWsdl {
    * @return The {@link PortType} with the given name or {@code null} if it could not be found.
    */
   public PortType getPortType(QName name) {
-    for (PortType candidate : m_portTypes.keySet()) {
-      if (name.equals(candidate.getQName())) {
-        return candidate;
-      }
-    }
-    return null;
+    return m_portTypes.keySet().stream()
+        .filter(candidate -> name.equals(candidate.getQName()))
+        .findFirst()
+        .orElse(null);
   }
 
   /**
@@ -211,15 +208,15 @@ public class ParsedWsdl {
   protected void completeMapping() {
     Collection<Service> usedServices = new HashSet<>(m_services.size());
     Collection<PortType> usedPortTypes = new HashSet<>(m_portTypes.size());
-    for (Service service : m_services.keySet()) {
+    for (var service : m_services.keySet()) {
       Map<String, Port> ports = service.getPorts();
-      for (Port port : ports.values()) {
-        for (ExtensibilityElement element : extensibilityElementsOf(port)) {
+      for (var port : ports.values()) {
+        for (var element : extensibilityElementsOf(port)) {
           if (element instanceof SOAPAddress || element instanceof SOAP12Address) {
             @SuppressWarnings("squid:S2259")
-            Binding binding = port.getBinding();
+            var binding = port.getBinding();
             if (isBindingSupported(binding)) {
-              PortType portType = binding.getPortType();
+              var portType = binding.getPortType();
               if (portType != null) {
                 usedServices.add(service);
                 usedPortTypes.add(portType);
@@ -232,13 +229,13 @@ public class ParsedWsdl {
     }
     m_portTypes.keySet().retainAll(usedPortTypes);
     m_services.keySet().retainAll(usedServices);
-    for (Service s : m_services.keySet()) {
+    for (var s : m_services.keySet()) {
       m_namesByService.put(s, new WebServiceNames(s.getQName().getLocalPart()));
     }
   }
 
   protected static Definition parseWsdl(URI documentBase, InputSource wsdl) throws WSDLException {
-    WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
+    var reader = WSDLFactory.newInstance().newWSDLReader();
     reader.setFeature("javax.wsdl.importDocuments", true);
     reader.setFeature("javax.wsdl.verbose", false);
     String documentBaseUri = null;
@@ -266,7 +263,7 @@ public class ParsedWsdl {
    *           if the encoding is not supported
    */
   public static ParsedWsdl create(URI documentBase, CharSequence wsdlContent, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
-    Definition wsdl = parseWsdl(documentBase, new InputSource(new CharSequenceInputStream(wsdlContent, StandardCharsets.UTF_8)));
+    var wsdl = parseWsdl(documentBase, new InputSource(new CharSequenceInputStream(wsdlContent, StandardCharsets.UTF_8)));
     return create(wsdl, loadSchemas);
   }
 
@@ -288,7 +285,7 @@ public class ParsedWsdl {
    *           if the encoding is not supported
    */
   public static ParsedWsdl create(URI documentBase, InputStream is, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
-    Definition wsdl = parseWsdl(documentBase, new InputSource(Ensure.notNull(is)));
+    var wsdl = parseWsdl(documentBase, new InputSource(Ensure.notNull(is)));
     return create(wsdl, loadSchemas);
   }
 
@@ -297,8 +294,8 @@ public class ParsedWsdl {
       return null;
     }
 
-    ParsedWsdl result = new ParsedWsdl();
-    URI rootDirUri = CoreUtils.getParentURI(URI.create(wsdl.getDocumentBaseURI()));
+    var result = new ParsedWsdl();
+    var rootDirUri = CoreUtils.getParentURI(URI.create(wsdl.getDocumentBaseURI()));
     parseWsdlRec(wsdl, rootDirUri, URI.create(""), result, loadSchemas);
     result.completeMapping();
     return result;
@@ -315,17 +312,17 @@ public class ParsedWsdl {
       return false;
     }
 
-    for (BindingOperation op : ops) {
-      List<ExtensibilityElement> opElements = extensibilityElementsOf(op);
+    for (var op : ops) {
+      var opElements = extensibilityElementsOf(op);
       @SuppressWarnings("squid:S2259")
-      List<ExtensibilityElement> outputElements = extensibilityElementsOf(op.getBindingOutput());
-      List<ExtensibilityElement> inputElements = extensibilityElementsOf(op.getBindingInput());
+      var outputElements = extensibilityElementsOf(op.getBindingOutput());
+      var inputElements = extensibilityElementsOf(op.getBindingInput());
 
-      Collection<ExtensibilityElement> all = new ArrayList<>(opElements.size() + outputElements.size() + inputElements.size());
+      Collection<ExtensibilityElement> all = new ArrayList<>(Stream.of(opElements, outputElements, inputElements).mapToInt(List::size).sum());
       all.addAll(opElements);
       all.addAll(outputElements);
       all.addAll(inputElements);
-      for (ExtensibilityElement element : all) {
+      for (var element : all) {
         // encoded is not supported in JAX WS 2.0
         if (element instanceof SOAPBody && "encoded".equalsIgnoreCase(((SOAPBody) element).getUse())) {
           return false;
@@ -346,39 +343,39 @@ public class ParsedWsdl {
   @SuppressWarnings("unchecked")
   protected static void parseWsdlRec(Definition def, URI rootDefUri, URI relPath, ParsedWsdl collector, boolean loadSchemas) throws UnsupportedEncodingException {
     Map<String, List<Import>> imports = def.getImports();
-    for (List<Import> iv : imports.values()) {
-      for (Import i : iv) {
-        Definition innerDef = i.getDefinition();
+    for (var iv : imports.values()) {
+      for (var i : iv) {
+        var innerDef = i.getDefinition();
         if (innerDef != null) {
-          URI pathRelativeToRoot = relPath.resolve(i.getLocationURI());
-          URI pathAbsolute = URI.create(innerDef.getDocumentBaseURI());
+          var pathRelativeToRoot = relPath.resolve(i.getLocationURI());
+          var pathAbsolute = URI.create(innerDef.getDocumentBaseURI());
           collector.putReferencedResource(pathAbsolute, pathRelativeToRoot);
           parseWsdlRec(innerDef, rootDefUri, CoreUtils.getParentURI(pathRelativeToRoot), collector, loadSchemas);
         }
       }
     }
 
-    URI uriOfCurrentDefinition = URI.create(def.getDocumentBaseURI()); // may differ from the rootDefUri
+    var uriOfCurrentDefinition = URI.create(def.getDocumentBaseURI()); // may differ from the rootDefUri
     // search for services
     Map<QName, Service> services = def.getServices();
-    for (Service service : services.values()) {
+    for (var service : services.values()) {
       collector.putService(service, uriOfCurrentDefinition);
     }
 
     // search for port types
     Map<QName, PortType> portTypes = def.getPortTypes();
-    for (PortType pt : portTypes.values()) {
+    for (var pt : portTypes.values()) {
       collector.putPortType(pt, uriOfCurrentDefinition);
     }
 
     // search for referenced xsd files
-    Types types = def.getTypes();
+    var types = def.getTypes();
     if (types == null) {
       return;
     }
 
     if (loadSchemas) {
-      for (ExtensibilityElement e : extensibilityElementsOf(types)) {
+      for (var e : extensibilityElementsOf(types)) {
         if (e instanceof Schema) {
           parseSchemasRec((Schema) e, rootDefUri, relPath, collector);
         }
@@ -399,7 +396,7 @@ public class ParsedWsdl {
     }
 
     Collection<SchemaReference> references = new ArrayList<>();
-    for (List<SchemaImport> is : imports.values()) {
+    for (var is : imports.values()) {
       references.addAll(is);
     }
     references.addAll(includes);
@@ -407,15 +404,15 @@ public class ParsedWsdl {
       return;
     }
 
-    for (SchemaReference ref : references) {
-      String schemaLocationURI = ref.getSchemaLocationURI();
+    for (var ref : references) {
+      var schemaLocationURI = ref.getSchemaLocationURI();
       URI pathRelativeToRoot;
-      boolean exists = false;
+      var exists = false;
       if (Strings.isBlank(schemaLocationURI)) {
         pathRelativeToRoot = relPath;
       }
       else {
-        URI pathAbsolute = URI.create(schemaLocationURI);
+        var pathAbsolute = URI.create(schemaLocationURI);
         if (Strings.hasText(pathAbsolute.getRawFragment())) {
           // the import is a schema-id inside the current document -> no need to import
           // see http://www.w3.org/TR/wsdl20-primer/#schemaIds.wsdl
@@ -503,12 +500,10 @@ public class ParsedWsdl {
     }
 
     protected static String wsdlNameToJavaName(CharSequence name) {
-      String[] parts = Pattern.compile("[^a-zA-Z0-9]").split(name);
-      StringBuilder nameBuilder = new StringBuilder(name.length());
-      for (String part : parts) {
-        nameBuilder.append(Strings.ensureStartWithUpperCase(part));
-      }
-      return nameBuilder.toString();
+      var parts = Pattern.compile("[^a-zA-Z0-9]").split(name);
+      return Arrays.stream(parts)
+          .map(Strings::ensureStartWithUpperCase)
+          .collect(joining());
     }
 
     /**

@@ -25,7 +25,7 @@ public class AstDateFieldBuilder extends AstTypeBuilder<AstDateFieldBuilder> {
   public AstDateFieldBuilder insert() {
     super.insert();
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IDateField().fqn());
     }

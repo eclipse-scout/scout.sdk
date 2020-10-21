@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
 /**
@@ -34,7 +33,7 @@ public class AstFormHandlerBuilder extends AstTypeBuilder<AstFormHandlerBuilder>
   public AstFormHandlerBuilder insert() {
     super.insert();
 
-    IScoutApi scoutApi = getFactory().getScoutApi();
+    var scoutApi = getFactory().getScoutApi();
     m_execLoad = getFactory().newExecMethod(scoutApi.AbstractFormHandler().execLoadMethodName())
         .in(get())
         .insert()
@@ -50,7 +49,7 @@ public class AstFormHandlerBuilder extends AstTypeBuilder<AstFormHandlerBuilder>
       get().modifiers().add(getFactory().getAst().newModifier(ModifierKeyword.STATIC_KEYWORD));
     }
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, scoutApi.IFormHandler().fqn());
     }

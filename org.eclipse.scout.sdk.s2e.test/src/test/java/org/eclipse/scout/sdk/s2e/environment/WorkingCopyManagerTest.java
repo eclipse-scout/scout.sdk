@@ -29,9 +29,9 @@ public class WorkingCopyManagerTest {
 
   @Test
   public void testLifecycle() {
-    AtomicReference<WorkingCopyManager> manager = new AtomicReference<>();
+    var manager = new AtomicReference<WorkingCopyManager>();
     WorkingCopyManager.runWithWorkingCopyManager(() -> {
-      WorkingCopyManager currentWorkingCopyManager = (WorkingCopyManager) currentWorkingCopyManager();
+      var currentWorkingCopyManager = (WorkingCopyManager) currentWorkingCopyManager();
       manager.set(currentWorkingCopyManager);
       assertTrue(currentWorkingCopyManager.isOpen());
       assertEquals(0, currentWorkingCopyManager.size());

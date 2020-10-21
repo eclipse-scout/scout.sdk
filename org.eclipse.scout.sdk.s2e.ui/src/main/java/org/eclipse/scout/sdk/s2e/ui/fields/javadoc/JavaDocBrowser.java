@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.ui.fields.javadoc;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import org.eclipse.core.runtime.CoreException;
@@ -36,9 +35,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
-import org.osgi.framework.Bundle;
 
 /**
  * <h3>{@link JavaDocBrowser}</h3>
@@ -64,7 +61,7 @@ public final class JavaDocBrowser {
       return null;
     }
 
-    Browser browser = new Browser(parent, SWT.NONE);
+    var browser = new Browser(parent, SWT.NONE);
     browser.setJavascriptEnabled(false);
     browser.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
     browser.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
@@ -89,12 +86,12 @@ public final class JavaDocBrowser {
 
   static String getJavaDocHtml(IJavaElement element) {
     try {
-      String javaDoc = JavadocContentAccess2.getHTMLContent(element, true);
+      var javaDoc = JavadocContentAccess2.getHTMLContent(element, true);
       if (Strings.isBlank(javaDoc)) {
         return null;
       }
 
-      StringBuilder buffer = new StringBuilder();
+      var buffer = new StringBuilder();
 
       // header
       HTMLPrinter.insertPageProlog(buffer, 0, getCssStyles());
@@ -118,13 +115,13 @@ public final class JavaDocBrowser {
 
   static void insertBaseUrl(String javaDoc, IJavaElement element, StringBuilder buffer) {
     try {
-      String base = JavadocContentAccess2.extractBaseURL(javaDoc);
+      var base = JavadocContentAccess2.extractBaseURL(javaDoc);
       if (base == null) {
-        boolean isBinary = element instanceof IMember && ((IMember) element).isBinary();
+        var isBinary = element instanceof IMember && ((IMember) element).isBinary();
         base = JavaDocLocations.getBaseURL(element, isBinary);
       }
       if (base != null) {
-        int endHeadIdx = buffer.indexOf("</head>");
+        var endHeadIdx = buffer.indexOf("</head>");
         buffer.insert(endHeadIdx, "\n<base href='" + base + "'>\n");
       }
     }
@@ -134,19 +131,19 @@ public final class JavaDocBrowser {
   }
 
   static String getCssStyles() {
-    Bundle bundle = Platform.getBundle(JavaUI.ID_PLUGIN);
+    var bundle = Platform.getBundle(JavaUI.ID_PLUGIN);
     if (bundle == null) {
       return null;
     }
-    URL url = bundle.getEntry("/JavadocHoverStyleSheet.css");
+    var url = bundle.getEntry("/JavadocHoverStyleSheet.css");
     if (url == null) {
       return null;
     }
 
     String style = null;
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(FileLocator.toFileURL(url).openStream(), StandardCharsets.UTF_8))) {
-      StringBuilder builder = new StringBuilder(256);
-      String line = reader.readLine();
+    try (var reader = new BufferedReader(new InputStreamReader(FileLocator.toFileURL(url).openStream(), StandardCharsets.UTF_8))) {
+      var builder = new StringBuilder(256);
+      var line = reader.readLine();
       while (line != null) {
         builder.append(line);
         builder.append('\n');
@@ -159,7 +156,7 @@ public final class JavaDocBrowser {
     }
 
     if (style != null) {
-      FontData fontData = JFaceResources.getFontRegistry().getFontData(PreferenceConstants.APPEARANCE_JAVADOC_FONT)[0];
+      var fontData = JFaceResources.getFontRegistry().getFontData(PreferenceConstants.APPEARANCE_JAVADOC_FONT)[0];
       style = HTMLPrinter.convertTopLevelFont(style, fontData);
     }
     return style;

@@ -15,7 +15,6 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.AsyncFileListener
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -52,10 +51,6 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
 
     @Volatile
     private var m_cacheReady = false
-
-    init {
-        Disposer.register(project, this) // ensure it is disposed when the project closes
-    }
 
     override fun isCacheReady() = m_cacheReady
 

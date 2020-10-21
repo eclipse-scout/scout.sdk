@@ -15,9 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -29,7 +27,6 @@ import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
-import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -46,8 +43,8 @@ public class MavenModuleVersionTest {
 
   @Test
   public void testGetFromSourceFolder() {
-    Path modulePath = Paths.get("").toAbsolutePath();
-    Optional<ApiVersion> version = new RunningJavaEnvironmentFactory().get()
+    var modulePath = Paths.get("").toAbsolutePath();
+    var version = new RunningJavaEnvironmentFactory().get()
         .excludeIfContains("scout")
         .withSourceFolder(modulePath.resolve(ISourceFolders.MAIN_JAVA_SOURCE_FOLDER).toString())
         .withSourcesIncluded(false)
@@ -57,7 +54,7 @@ public class MavenModuleVersionTest {
 
   @Test
   public void testNameEnvironmentAndCompilerNotCreated() {
-    JavaEnvForSpy spy = Mockito.spy(new JavaEnvForSpy());
+    var spy = Mockito.spy(new JavaEnvForSpy());
     IJavaEnvironment env = new JavaEnvironmentImplementor(spy);
     assertFalse(MavenModuleVersion.get(ScoutApi.SCOUT_RT_PLATFORM_NAME, env).isPresent());
     verify(spy, never()).getNameEnvironment();

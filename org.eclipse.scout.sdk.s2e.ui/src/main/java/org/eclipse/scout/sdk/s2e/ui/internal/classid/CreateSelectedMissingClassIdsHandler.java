@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.ui.internal.classid;
 
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
 
-import java.util.Set;
 import java.util.function.BiConsumer;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -35,7 +34,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class CreateSelectedMissingClassIdsHandler extends AbstractHandler {
   @Override
   public Object execute(ExecutionEvent event) {
-    Set<IResource> resourcesFromSelection = S2eUiUtils.getResourcesOfSelection(HandlerUtil.getCurrentSelection(event));
+    var resourcesFromSelection = S2eUiUtils.getResourcesOfSelection(HandlerUtil.getCurrentSelection(event));
     if (resourcesFromSelection.isEmpty()) {
       SdkLog.warning("Cannot create missing @ClassIds in the selected scope because no resources are selected.");
       return null;

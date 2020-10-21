@@ -18,10 +18,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.eclipse.scout.sdk.core.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -41,9 +41,6 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
-import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
@@ -80,7 +77,7 @@ public final class CoreScoutTestingUtils {
 
   private static Path createTestProject(String archetypeArtifactId) throws IOException {
     ensureMavenRunnerCreated();
-    Path targetDirectory = Files.createTempDirectory(CoreScoutTestingUtils.class.getSimpleName() + "-projectDir");
+    var targetDirectory = Files.createTempDirectory(CoreScoutTestingUtils.class.getSimpleName() + "-projectDir");
 
     // The testing runner does not make use of the environment and the progress: pass empty mocks
     //noinspection AccessOfSystemProperties
@@ -91,7 +88,7 @@ public final class CoreScoutTestingUtils {
 
   @SuppressWarnings("AccessOfSystemProperties")
   public static String currentScoutVersion() {
-    String prop = System.getProperty(SCOUT_VERSION_KEY);
+    var prop = System.getProperty(SCOUT_VERSION_KEY);
     if (Strings.hasText(prop)) {
       return prop.trim();
     }
@@ -103,7 +100,7 @@ public final class CoreScoutTestingUtils {
   }
 
   static String latestScoutVersion() {
-    String latestSnapshot = ScoutApi.latestMajorVersion() + ".0-SNAPSHOT";
+    var latestSnapshot = ScoutApi.latestMajorVersion() + ".0-SNAPSHOT";
     SdkLog.warning("Unable to determine Scout version for tests. Fallback to latest supported snapshot: {}", latestSnapshot);
     return latestSnapshot;
   }
@@ -133,18 +130,18 @@ public final class CoreScoutTestingUtils {
 
   static void addMetroDependency(Path pomFile) throws IOException {
     try {
-      DocumentBuilder createDocumentBuilder = Xml.createDocumentBuilder();
-      Document pom = createDocumentBuilder.parse(pomFile.toFile());
-      Element dependenciesElement = Xml.firstChildElement(pom.getDocumentElement(), IMavenConstants.DEPENDENCIES)
+      var createDocumentBuilder = Xml.createDocumentBuilder();
+      var pom = createDocumentBuilder.parse(pomFile.toFile());
+      var dependenciesElement = Xml.firstChildElement(pom.getDocumentElement(), IMavenConstants.DEPENDENCIES)
           .orElseThrow(() -> Ensure.newFail("Pom '{}' does not contain a '{}' element.", pomFile, IMavenConstants.DEPENDENCIES));
 
       // add jaxws Metro as test-dependency because the default implementor specific is Metro and it must be present so that the test platform can be started
-      Element metroDependencyElement = pom.createElement(IMavenConstants.DEPENDENCY);
-      Element metroGroupIdElement = pom.createElement(IMavenConstants.GROUP_ID);
+      var metroDependencyElement = pom.createElement(IMavenConstants.DEPENDENCY);
+      var metroGroupIdElement = pom.createElement(IMavenConstants.GROUP_ID);
       metroGroupIdElement.setTextContent("com.sun.xml.ws");
-      Element metroArtifactIdElement = pom.createElement(IMavenConstants.ARTIFACT_ID);
+      var metroArtifactIdElement = pom.createElement(IMavenConstants.ARTIFACT_ID);
       metroArtifactIdElement.setTextContent("jaxws-rt");
-      Element metroScopeElement = pom.createElement(IMavenConstants.SCOPE);
+      var metroScopeElement = pom.createElement(IMavenConstants.SCOPE);
       metroScopeElement.setTextContent("test");
       metroDependencyElement.appendChild(metroGroupIdElement);
       metroDependencyElement.appendChild(metroArtifactIdElement);
@@ -218,7 +215,7 @@ public final class CoreScoutTestingUtils {
 
   private static IType createDtoAssertNoCompileErrors(String modelFqn, IJavaEnvironment clientEnv, IJavaEnvironment sharedEnv, DtoType dtoType) {
     // get model type
-    IType modelType = clientEnv.requireType(modelFqn);
+    var modelType = clientEnv.requireType(modelFqn);
 
     // build source
     Optional<ICompilationUnitGenerator<?>> cuSrc;
@@ -257,12 +254,12 @@ public final class CoreScoutTestingUtils {
    */
   public static void runMavenCommand(Path pomDir, String... goals) {
     ensureMavenRunnerCreated();
-    MavenBuild build = new MavenBuild()
+    var build = new MavenBuild()
         .withWorkingDirectory(pomDir)
         .withOption(MavenBuild.OPTION_BATCH_MODE)
         .withOption(MavenBuild.OPTION_DEBUG);
     if (goals != null && goals.length > 0) {
-      for (String goal : goals) {
+      for (var goal : goals) {
         build.withGoal(goal);
       }
     }

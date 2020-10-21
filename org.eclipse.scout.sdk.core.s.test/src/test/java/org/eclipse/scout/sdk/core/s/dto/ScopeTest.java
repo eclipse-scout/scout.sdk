@@ -21,8 +21,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -60,26 +58,26 @@ public class ScopeTest {
 
     // fields of AbstractScopeTestGroupBoxData
     assertEquals(1, abstractScopeTestGroupBoxData.fields().stream().count(), "field count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData'");
-    IField serialVersionUID = assertFieldExist(abstractScopeTestGroupBoxData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(abstractScopeTestGroupBoxData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, abstractScopeTestGroupBoxData.methods().stream().count(), "method count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData'");
-    IMethod getProcess = assertMethodExist(abstractScopeTestGroupBoxData, "getProcess", new String[]{});
+    var getProcess = assertMethodExist(abstractScopeTestGroupBoxData, "getProcess", new String[]{});
     assertMethodReturnType(getProcess, "formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process");
     assertEquals(0, getProcess.annotations().stream().count(), "annotation count");
 
     assertEquals(1, abstractScopeTestGroupBoxData.innerTypes().stream().count(), "inner types count of 'AbstractScopeTestGroupBoxData'");
     // type Process
-    IType process = assertTypeExists(abstractScopeTestGroupBoxData, "Process");
+    var process = assertTypeExists(abstractScopeTestGroupBoxData, "Process");
     assertHasFlags(process, 9);
     assertHasSuperClass(process, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.util.Set<java.lang.Long>>");
     assertEquals(0, process.annotations().stream().count(), "annotation count");
 
     // fields of Process
     assertEquals(1, process.fields().stream().count(), "field count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process'");
-    IField serialVersionUID1 = assertFieldExist(process, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(process, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
@@ -100,26 +98,26 @@ public class ScopeTest {
 
     // fields of ScopeTestFormData
     assertEquals(1, scopeTestFormData.fields().stream().count(), "field count of 'formdata.shared.scope.orig.ScopeTestFormData'");
-    IField serialVersionUID = assertFieldExist(scopeTestFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(scopeTestFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, scopeTestFormData.methods().stream().count(), "method count of 'formdata.shared.scope.orig.ScopeTestFormData'");
-    IMethod getProcessesBox = assertMethodExist(scopeTestFormData, "getProcessesBox", new String[]{});
+    var getProcessesBox = assertMethodExist(scopeTestFormData, "getProcessesBox", new String[]{});
     assertMethodReturnType(getProcessesBox, "formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox");
     assertEquals(0, getProcessesBox.annotations().stream().count(), "annotation count");
 
     assertEquals(1, scopeTestFormData.innerTypes().stream().count(), "inner types count of 'ScopeTestFormData'");
     // type ProcessesBox
-    IType processesBox = assertTypeExists(scopeTestFormData, "ProcessesBox");
+    var processesBox = assertTypeExists(scopeTestFormData, "ProcessesBox");
     assertHasFlags(processesBox, 9);
     assertHasSuperClass(processesBox, "formdata.shared.scope.field.AbstractScopeTestGroupBoxData");
     assertEquals(0, processesBox.annotations().stream().count(), "annotation count");
 
     // fields of ProcessesBox
     assertEquals(1, processesBox.fields().stream().count(), "field count of 'formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox'");
-    IField serialVersionUID1 = assertFieldExist(processesBox, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(processesBox, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
@@ -141,22 +139,22 @@ public class ScopeTest {
 
     // fields of ExtendedScopeTestFormData
     assertEquals(1, extendedScopeTestFormData.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData'");
-    IField serialVersionUID = assertFieldExist(extendedScopeTestFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(extendedScopeTestFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(2, extendedScopeTestFormData.methods().stream().count(), "method count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData'");
-    IMethod getAnliegenBox = assertMethodExist(extendedScopeTestFormData, "getAnliegenBox", new String[]{});
+    var getAnliegenBox = assertMethodExist(extendedScopeTestFormData, "getAnliegenBox", new String[]{});
     assertMethodReturnType(getAnliegenBox, "formdata.shared.scope.extended.ExtendedScopeTestFormData$AnliegenBox");
     assertEquals(0, getAnliegenBox.annotations().stream().count(), "annotation count");
-    IMethod getExtendedProcess = assertMethodExist(extendedScopeTestFormData, "getExtendedProcess", new String[]{});
+    var getExtendedProcess = assertMethodExist(extendedScopeTestFormData, "getExtendedProcess", new String[]{});
     assertMethodReturnType(getExtendedProcess, "formdata.shared.scope.extended.ExtendedScopeTestFormData$ExtendedProcess");
     assertEquals(0, getExtendedProcess.annotations().stream().count(), "annotation count");
 
     assertEquals(2, extendedScopeTestFormData.innerTypes().stream().count(), "inner types count of 'ExtendedScopeTestFormData'");
     // type AnliegenBox
-    IType anliegenBox = assertTypeExists(extendedScopeTestFormData, "AnliegenBox");
+    var anliegenBox = assertTypeExists(extendedScopeTestFormData, "AnliegenBox");
     assertHasFlags(anliegenBox, 9);
     assertHasSuperClass(anliegenBox, "formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox");
     assertEquals(1, anliegenBox.annotations().stream().count(), "annotation count");
@@ -164,7 +162,7 @@ public class ScopeTest {
 
     // fields of AnliegenBox
     assertEquals(1, anliegenBox.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$AnliegenBox'");
-    IField serialVersionUID1 = assertFieldExist(anliegenBox, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(anliegenBox, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
@@ -173,7 +171,7 @@ public class ScopeTest {
 
     assertEquals(0, anliegenBox.innerTypes().stream().count(), "inner types count of 'AnliegenBox'");
     // type ExtendedProcess
-    IType extendedProcess = assertTypeExists(extendedScopeTestFormData, "ExtendedProcess");
+    var extendedProcess = assertTypeExists(extendedScopeTestFormData, "ExtendedProcess");
     assertHasFlags(extendedProcess, 9);
     assertHasSuperClass(extendedProcess, "formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process");
     assertEquals(1, extendedProcess.annotations().stream().count(), "annotation count");
@@ -181,7 +179,7 @@ public class ScopeTest {
 
     // fields of ExtendedProcess
     assertEquals(1, extendedProcess.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$ExtendedProcess'");
-    IField serialVersionUID2 = assertFieldExist(extendedProcess, "serialVersionUID");
+    var serialVersionUID2 = assertFieldExist(extendedProcess, "serialVersionUID");
     assertHasFlags(serialVersionUID2, 26);
     assertFieldType(serialVersionUID2, "long");
     assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");

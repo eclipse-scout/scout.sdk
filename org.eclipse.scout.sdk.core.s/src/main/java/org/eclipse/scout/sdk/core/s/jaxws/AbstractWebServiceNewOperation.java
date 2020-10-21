@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.jaxws;
 
 import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
@@ -29,12 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
 import javax.xml.transform.TransformerException;
 
@@ -53,7 +51,6 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Xml;
-import org.w3c.dom.Document;
 
 /**
  * <h3>{@link AbstractWebServiceNewOperation}</h3>
@@ -111,7 +108,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     // create new java project
     if (isCreateNewModule()) {
       setProjectRoot(createNewJaxWsModule(env, progress.newChild(39)));
-      IClasspathEntry primarySrcFolderOfNewModule = env.findJavaEnvironment(getProjectRoot())
+      var primarySrcFolderOfNewModule = env.findJavaEnvironment(getProjectRoot())
           .flatMap(IJavaEnvironment::primarySourceFolder)
           .orElseThrow(() -> newFail("Unable to find java environment for newly created jaxws project."));
       setSourceFolder(primarySrcFolderOfNewModule);
@@ -119,9 +116,9 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     progress.setWorkRemaining(61);
 
     // read wsdl data from remote
-    String wsdlBaseName = getWsdlBaseName();
+    var wsdlBaseName = getWsdlBaseName();
     if (isCreateEmptyWsdl()) {
-      EmptyWsdlGenerator generator = new EmptyWsdlGenerator()
+      var generator = new EmptyWsdlGenerator()
           .withName(wsdlBaseName)
           .withPackage(getPackage());
       setWsdlContent(env.createResource(generator, getSourceFolder()));
@@ -140,7 +137,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     progress.worked(8);
 
     // download all resources that belong the WSDL into the project and re-parse the created WSDL with the local paths
-    Path bindingFolder = getBindingFolder(getProjectRoot(), wsdlBaseName);
+    var bindingFolder = getBindingFolder(getProjectRoot(), wsdlBaseName);
     setCreatedWsdlFile(writeWsdlToProject(wsdlBaseName, env, progress.newChild(2)));
     copyReferencedResources(wsdlBaseName, env, progress.newChild(1));
     setParsedWsdl(parseWsdl(getTargetWsdlFileUri(wsdlBaseName))); // re-parse the WSDL using local URI
@@ -148,7 +145,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     // create bindings, add section to pom
     setCreatedJaxbBindingFile(createJaxbBinding(bindingFolder, env, progress.newChild(1)));
     createJaxwsBindings(bindingFolder, env, progress.newChild(2));
-    Path wsdlFolderRelativePath = getWsdlRootFolder(getProjectRoot()).relativize(getCreatedWsdlFile());
+    var wsdlFolderRelativePath = getWsdlRootFolder(getProjectRoot()).relativize(getCreatedWsdlFile());
     addWsdlToPom(wsdlFolderRelativePath, bindingFolder.getFileName().toString(), env, progress.newChild(2));
 
     if (isCreateConsumer()) {
@@ -167,7 +164,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected String getWsdlBaseName() {
-    String wsdlFileName = getWsdlFileName();
+    var wsdlFileName = getWsdlFileName();
     wsdlFileName = wsdlFileName.substring(0, wsdlFileName.length() - JaxWsUtils.WSDL_FILE_EXTENSION.length());
     return JaxWsUtils.removeCommonSuffixes(wsdlFileName);
   }
@@ -177,10 +174,10 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   protected abstract Path createNewJaxWsModule(IEnvironment env, IProgress progress);
 
   protected void createProviderServiceImplementations(IEnvironment env, IProgress progress) {
-    for (Entry<Service, WebServiceNames> service : getParsedWsdl().getServiceNames().entrySet()) {
-      Set<PortType> portTypes = getParsedWsdl().getPortTypes(service.getKey());
-      for (PortType pt : portTypes) {
-        String portTypeName = pt.getQName().getLocalPart();
+    for (var service : getParsedWsdl().getServiceNames().entrySet()) {
+      var portTypes = getParsedWsdl().getPortTypes(service.getKey());
+      for (var pt : portTypes) {
+        var portTypeName = pt.getQName().getLocalPart();
         WebServiceProviderGenerator<?> wspsb = new WebServiceProviderGenerator<>()
             .withElementName(WebServiceNames.getWebServiceProviderImplClassName(portTypeName))
             .withPackageName(getPackage())
@@ -191,11 +188,11 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected void createEntryPointDefinitions(IEnvironment env, IProgress progress) {
-    for (Entry<Service, WebServiceNames> service : getParsedWsdl().getServiceNames().entrySet()) {
-      WebServiceNames names = service.getValue();
-      Set<PortType> portTypes = getParsedWsdl().getPortTypes(service.getKey());
-      for (PortType pt : portTypes) {
-        String portTypeName = pt.getQName().getLocalPart();
+    for (var service : getParsedWsdl().getServiceNames().entrySet()) {
+      var names = service.getValue();
+      var portTypes = getParsedWsdl().getPortTypes(service.getKey());
+      for (var pt : portTypes) {
+        var portTypeName = pt.getQName().getLocalPart();
         EntryPointDefinitionGenerator<?> epdsb = new EntryPointDefinitionGenerator<>()
             .withElementName(WebServiceNames.getEntryPointDefinitionClassName(portTypeName))
             .withPackageName(getPackage())
@@ -210,11 +207,11 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected void createWebServiceClients(IEnvironment env, IProgress progress) {
-    for (Entry<Service, WebServiceNames> service : getParsedWsdl().getServiceNames().entrySet()) {
-      WebServiceNames names = service.getValue();
-      Set<PortType> portTypes = getParsedWsdl().getPortTypes(service.getKey());
-      for (PortType pt : portTypes) {
-        String portTypeName = pt.getQName().getLocalPart();
+    for (var service : getParsedWsdl().getServiceNames().entrySet()) {
+      var names = service.getValue();
+      var portTypes = getParsedWsdl().getPortTypes(service.getKey());
+      for (var pt : portTypes) {
+        var portTypeName = pt.getQName().getLocalPart();
         WebServiceClientGenerator<?> wscsb = new WebServiceClientGenerator<>()
             .withElementName(WebServiceNames.getWebServiceClientClassName(portTypeName))
             .withPackageName(getPackage())
@@ -227,18 +224,18 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected void copyReferencedResources(String baseName, IEnvironment env, IProgress progress) {
-    for (Entry<URI, String> resource : getParsedWsdl().getReferencedResources().entrySet()) {
-      URI sourceUri = resource.getKey();
+    for (var resource : getParsedWsdl().getReferencedResources().entrySet()) {
+      var sourceUri = resource.getKey();
       if (resource.getValue().equals(resource.getKey().toString())) {
         // the rel path is also absolute (don't download absolutely referenced files)
         continue;
       }
 
-      String relPath = resource.getValue();
-      Path wsdlFolder = getWsdlFolder(baseName);
-      Path target = wsdlFolder.resolve(relPath);
+      var relPath = resource.getValue();
+      var wsdlFolder = getWsdlFolder(baseName);
+      var target = wsdlFolder.resolve(relPath);
       try {
-        StringBuffer content = readXmlFromUrl(sourceUri.toURL());
+        var content = readXmlFromUrl(sourceUri.toURL());
         env.writeResource(content, target, progress);
       }
       catch (MalformedURLException e) {
@@ -257,7 +254,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected URI getWsdlBaseUri(String baseName) {
-    URL wsdlUrl = getWsdlUrl();
+    var wsdlUrl = getWsdlUrl();
     if (wsdlUrl == null) {
       return getTargetWsdlFileUri(baseName);
     }
@@ -270,30 +267,29 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected Path getWsdlFolder(String wsBaseName) {
-    String wsdlFolderName = wsBaseName.toLowerCase(Locale.ENGLISH);
+    var wsdlFolderName = wsBaseName.toLowerCase(Locale.ENGLISH);
     return getWsdlRootFolder(getProjectRoot()).resolve(wsdlFolderName);
   }
 
   protected URI getTargetWsdlFileUri(String baseName) {
-    Path wsdlFolder = getWsdlFolder(baseName);
-    Path wsdlFile = wsdlFolder.resolve(getWsdlFileName());
+    var wsdlFolder = getWsdlFolder(baseName);
+    var wsdlFile = wsdlFolder.resolve(getWsdlFileName());
     return wsdlFile.toUri();
   }
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected void addWsdlToPom(Path wsdlFolderRelativePath, String bindingFolderName, IEnvironment env, IProgress progress) {
-    Path pom = getProjectRoot().resolve(IMavenConstants.POM);
+    var pom = getProjectRoot().resolve(IMavenConstants.POM);
     if (!Files.isReadable(pom) || !Files.isRegularFile(pom)) {
       return;
     }
-    Collection<String> bindingFileNames = new ArrayList<>(getCreatedJaxwsBindingFiles().size() + 1);
-    for (Path createdJaxWsBinding : getCreatedJaxwsBindingFiles()) {
-      bindingFileNames.add(createdJaxWsBinding.getFileName().toString());
-    }
+    Collection<String> bindingFileNames = getCreatedJaxwsBindingFiles().stream()
+        .map(createdJaxWsBinding -> createdJaxWsBinding.getFileName().toString())
+        .collect(toList());
     bindingFileNames.add(getCreatedJaxbBindingFile().getFileName().toString());
 
     try {
-      Document document = Xml.get(pom);
+      var document = Xml.get(pom);
       JaxWsUtils.addWsdlToPom(document, wsdlFolderRelativePath.toString().replace('\\', '/'), bindingFolderName, bindingFileNames);
       env.writeResource(Xml.writeDocument(document, true), pom, progress);
     }
@@ -303,32 +299,32 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected static Path getBindingFolder(Path jaxWsProject, String wsBaseName) {
-    String bindingFolderName = wsBaseName.toLowerCase(Locale.ENGLISH);
+    var bindingFolderName = wsBaseName.toLowerCase(Locale.ENGLISH);
     return getBindingRootFolder(jaxWsProject).resolve(bindingFolderName);
   }
 
   protected void createJaxwsBindings(Path wsdlBindingsFolder, IEnvironment env, IProgress progress) {
-    URI parent = wsdlBindingsFolder.toUri();
-    Map<String, StringBuilder> jaxwsBindingContents = getJaxwsBindingContents(getParsedWsdl(), parent, getPackage(), env);
-    for (Entry<String, StringBuilder> binding : jaxwsBindingContents.entrySet()) {
+    var parent = wsdlBindingsFolder.toUri();
+    var jaxwsBindingContents = getJaxwsBindingContents(getParsedWsdl(), parent, getPackage(), env);
+    for (var binding : jaxwsBindingContents.entrySet()) {
       Path jaxwsBindingXmlFile;
       if (jaxwsBindingContents.size() == 1) {
         jaxwsBindingXmlFile = wsdlBindingsFolder.resolve(JaxWsUtils.JAXWS_BINDINGS_FILE_NAME);
       }
       else {
-        String pathFileName = binding.getKey();
+        var pathFileName = binding.getKey();
         if (pathFileName == null) {
           // should not happen because zero len paths are skipped by JaxWsUtils.getJaxwsBindingContents().
           throw new IllegalArgumentException("zero length path found.");
         }
 
-        String partName = pathFileName.toLowerCase(Locale.ENGLISH);
+        var partName = pathFileName.toLowerCase(Locale.ENGLISH);
         if (partName.endsWith(JaxWsUtils.WSDL_FILE_EXTENSION)) {
           partName = partName.substring(0, partName.length() - JaxWsUtils.WSDL_FILE_EXTENSION.length());
         }
 
-        int lastDotPos = JaxWsUtils.JAXWS_BINDINGS_FILE_NAME.lastIndexOf('.');
-        StringBuilder fileName = new StringBuilder();
+        var lastDotPos = JaxWsUtils.JAXWS_BINDINGS_FILE_NAME.lastIndexOf('.');
+        var fileName = new StringBuilder();
         fileName.append(JaxWsUtils.JAXWS_BINDINGS_FILE_NAME, 0, lastDotPos);
         fileName.append('-').append(partName).append(JaxWsUtils.JAXWS_BINDINGS_FILE_NAME.substring(lastDotPos));
         jaxwsBindingXmlFile = wsdlBindingsFolder.resolve(fileName.toString());
@@ -353,16 +349,16 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected Map<String, StringBuilder> getJaxwsBindingContents(ParsedWsdl parsedWsdl, URI rootWsdlUri, String targetPackage, IEnvironment env) {
     Map<URI, Set<JaxWsBindingMapping>> bindingsByFile = new HashMap<>();
-    for (Entry<Service, URI> service : parsedWsdl.getWebServices().entrySet()) {
-      WebServiceNames names = parsedWsdl.getServiceNames().get(service.getKey());
+    for (var service : parsedWsdl.getWebServices().entrySet()) {
+      var names = parsedWsdl.getServiceNames().get(service.getKey());
       bindingsByFile
           .computeIfAbsent(service.getValue(), k -> new HashSet<>())
           .add(new JaxWsBindingMapping(false, names.getWebServiceNameFromWsdl(), names.getWebServiceClassName()));
 
-      Set<PortType> portTypesByService = parsedWsdl.getPortTypes(service.getKey());
-      for (PortType portType : portTypesByService) {
-        URI uriOfPortType = parsedWsdl.getPortTypes().get(portType);
-        String portTypeName = portType.getQName().getLocalPart();
+      var portTypesByService = parsedWsdl.getPortTypes(service.getKey());
+      for (var portType : portTypesByService) {
+        var uriOfPortType = parsedWsdl.getPortTypes().get(portType);
+        var portTypeName = portType.getQName().getLocalPart();
         bindingsByFile
             .computeIfAbsent(uriOfPortType, k -> new HashSet<>())
             .add(new JaxWsBindingMapping(true, portTypeName, WebServiceNames.getPortTypeClassName(portTypeName)));
@@ -370,9 +366,9 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     }
 
     Map<String, StringBuilder> result = new HashMap<>(bindingsByFile.size());
-    for (Entry<URI, Set<JaxWsBindingMapping>> binding : bindingsByFile.entrySet()) {
-      URI uri = binding.getKey();
-      URI relPath = CoreUtils.relativizeURI(rootWsdlUri, uri);
+    for (var binding : bindingsByFile.entrySet()) {
+      var uri = binding.getKey();
+      var relPath = CoreUtils.relativizeURI(rootWsdlUri, uri);
       Path path;
 
       if ("file".equals(uri.getScheme())) {
@@ -385,11 +381,11 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
         SdkLog.warning("Zero length path found for jax-ws binding content of URI '{}'. Skipping.", uri);
       }
       else {
-        JaxwsBindingGenerator generator = new JaxwsBindingGenerator()
+        var generator = new JaxwsBindingGenerator()
             .withNames(binding.getValue())
             .withWsdlLocation(relPath)
             .withWsPackage(targetPackage);
-        StringBuilder jaxwsBindingContent = env.createResource(generator, getSourceFolder());
+        var jaxwsBindingContent = env.createResource(generator, getSourceFolder());
         result.put(path.getFileName().toString(), jaxwsBindingContent);
       }
     }
@@ -397,18 +393,18 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected static Path createJaxbBinding(Path wsdlBindingsFolder, IEnvironment env, IProgress progress) {
-    Path jaxbBindingXmlFile = wsdlBindingsFolder.resolve(JaxWsUtils.JAXB_BINDINGS_FILE_NAME);
+    var jaxbBindingXmlFile = wsdlBindingsFolder.resolve(JaxWsUtils.JAXB_BINDINGS_FILE_NAME);
     env.writeResource(new JaxbBindingGenerator(), jaxbBindingXmlFile, progress);
     return jaxbBindingXmlFile;
   }
 
   protected String getWsdlFileName() {
     String wsdlFileName;
-    URL wsdlUrl = getWsdlUrl();
+    var wsdlUrl = getWsdlUrl();
     if (wsdlUrl != null) {
       wsdlFileName = wsdlUrl.getPath();
-      int lastSlashPos = wsdlFileName.lastIndexOf('/');
-      int lastDotPos = wsdlFileName.lastIndexOf('.');
+      var lastSlashPos = wsdlFileName.lastIndexOf('/');
+      var lastDotPos = wsdlFileName.lastIndexOf('.');
       if (lastDotPos < lastSlashPos) {
         lastDotPos = wsdlFileName.length();
       }
@@ -425,8 +421,8 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected Path writeWsdlToProject(String baseName, IEnvironment env, IProgress progress) {
-    Path wsdlFolder = getWsdlFolder(baseName);
-    Path wsdlFile = wsdlFolder.resolve(getWsdlFileName());
+    var wsdlFolder = getWsdlFolder(baseName);
+    var wsdlFile = wsdlFolder.resolve(getWsdlFileName());
     env.writeResource(getWsdlContent(), wsdlFile, progress);
     return wsdlFile;
   }

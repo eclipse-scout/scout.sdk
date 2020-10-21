@@ -31,9 +31,9 @@ public class ClassIdDuplicateResolutionGenerator implements IMarkerResolutionGen
   public IMarkerResolution[] getResolutions(IMarker marker) {
     try {
       if (marker != null && marker.exists() && ClassIdValidationJob.CLASS_ID_DUPLICATE_MARKER_ID.equals(marker.getType())) {
-        Object annot = marker.getAttribute(ClassIdValidationJob.CLASS_ID_ATTR_ANNOTATION);
+        var annot = marker.getAttribute(ClassIdValidationJob.CLASS_ID_ATTR_ANNOTATION);
         if (annot instanceof IAnnotation) {
-          IAnnotation annotation = (IAnnotation) annot;
+          var annotation = (IAnnotation) annot;
           if (annotation.exists()) {
             return new IMarkerResolution[]{new ClassIdDuplicateResolution(annotation)};
           }

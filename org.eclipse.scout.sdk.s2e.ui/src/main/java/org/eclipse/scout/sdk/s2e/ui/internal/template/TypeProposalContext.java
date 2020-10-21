@@ -18,7 +18,6 @@ import java.util.concurrent.Future;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.ISourceRange;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.NodeFinder;
@@ -59,8 +58,8 @@ public class TypeProposalContext {
 
   public TypeDeclaration getDeclaringType() {
     return m_declaringType.computeIfAbsentAndGet(() -> {
-      CompilationUnit cu = Ensure.notNull(getCompilationUnit(), "No AST found for '{}'.", m_icu.getElementName());
-      ASTNode surroundingTypeName = NodeFinder.perform(cu, getSurroundingTypeNameRange());
+      var cu = Ensure.notNull(getCompilationUnit(), "No AST found for '{}'.", m_icu.getElementName());
+      var surroundingTypeName = NodeFinder.perform(cu, getSurroundingTypeNameRange());
       return Ensure.notNull(ASTNodes.getParent(surroundingTypeName, TypeDeclaration.class));
     });
   }

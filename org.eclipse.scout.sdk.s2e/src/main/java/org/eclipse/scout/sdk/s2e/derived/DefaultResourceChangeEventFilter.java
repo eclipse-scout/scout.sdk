@@ -10,10 +10,11 @@
  */
 package org.eclipse.scout.sdk.s2e.derived;
 
+import static java.util.Collections.addAll;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -56,7 +57,7 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
         JDT_DEBUG_EVENT, ANNOTATION_PROCESSING_JOB, ANOTATION_PROCESSING_BUILD, EXTERNAL_FOLDER_UPDATE, DEBUG_INIT,
         REFRESH_JOB, WORKSPACE_INIT_JOB, TEAM_UPDATES, SEARCH, MARKER_UPDATE};
     m_excludedJobClassNamePrefixes = new ArrayList<>(defaultJobExclusionsFqn.length);
-    Collections.addAll(m_excludedJobClassNamePrefixes, defaultJobExclusionsFqn);
+    addAll(m_excludedJobClassNamePrefixes, defaultJobExclusionsFqn);
 
     m_excludedJobNames = new ArrayList<>(1);
     m_excludedJobNames.add(JAVA_INDEX_UPDATE_JOB_NAME);
@@ -72,12 +73,12 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
       return false;
     }
 
-    boolean ignoreBuildEvents = isIgnoreBuildEvents();
+    var ignoreBuildEvents = isIgnoreBuildEvents();
     if (ignoreBuildEvents && event.getBuildKind() != 0) {
       return false; // ignore build events
     }
 
-    Job curJob = Job.getJobManager().currentJob();
+    var curJob = Job.getJobManager().currentJob();
     if (curJob == null) {
       return false;
     }
@@ -92,15 +93,15 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
       return false;
     }
 
-    String jobFqn = curJob.getClass().getName().replace('$', '.');
-    String jobName = curJob.getName();
+    var jobFqn = curJob.getClass().getName().replace('$', '.');
+    var jobName = curJob.getName();
 
     Predicate<String> excludedClassNamePrefixes = className -> getExcludedJobClassNamePrefixes().stream().anyMatch(className::startsWith);
     Predicate<String> excludedJobNames = name -> getExcludedJobNames().stream().anyMatch(name::equals);
 
     if ("org.eclipse.core.internal.jobs.ThreadJob".equals(jobFqn)) {
       // for thread jobs: check current stack trace
-      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+      var stackTrace = Thread.currentThread().getStackTrace();
       return Arrays.stream(stackTrace)
           .map(StackTraceElement::getClassName)
           .noneMatch(excludedClassNamePrefixes);

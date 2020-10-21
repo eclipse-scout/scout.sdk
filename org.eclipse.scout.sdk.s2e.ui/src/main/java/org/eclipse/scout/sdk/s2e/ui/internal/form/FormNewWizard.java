@@ -11,10 +11,8 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.form;
 
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.form.FormNewOperation;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -56,13 +54,13 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
 
   @SuppressWarnings("resource")
   protected void mapPageToOperation(PageToOperationMappingInput input, FormNewOperation op) {
-    FormNewWizardPage page = m_page1;
+    var page = m_page1;
 
     op.setClientPackage(page.getTargetPackage());
-    IClasspathEntry clientSourceFolder = input.environment().toScoutSourceFolder(page.getSourceFolder());
-    IScoutApi scoutApi = clientSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
+    var clientSourceFolder = input.environment().toScoutSourceFolder(page.getSourceFolder());
+    var scoutApi = clientSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
     op.setClientSourceFolder(clientSourceFolder);
-    IPackageFragmentRoot formTestSourceFolder = S2eUiUtils.getTestSourceFolder(page.getSourceFolder(), scoutApi.ClientTestRunner().fqn(), "form test");
+    var formTestSourceFolder = S2eUiUtils.getTestSourceFolder(page.getSourceFolder(), scoutApi.ClientTestRunner().fqn(), "form test");
     if (JdtUtils.exists(formTestSourceFolder)) {
       op.setClientTestSourceFolder(input.environment().toScoutSourceFolder(formTestSourceFolder));
     }
@@ -75,7 +73,7 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     if (page.isCreateService()) {
       op.setServerSourceFolder(input.environment().toScoutSourceFolder(page.getServerSourceFolder()));
       serverProject = page.getServerSourceFolder().getJavaProject();
-      IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(page.getServerSourceFolder(), scoutApi.ServerTestRunner().fqn(), "service test");
+      var serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(page.getServerSourceFolder(), scoutApi.ServerTestRunner().fqn(), "service test");
       if (JdtUtils.exists(serviceTestSourceFolder)) {
         op.setServerTestSourceFolder(input.environment().toScoutSourceFolder(serviceTestSourceFolder));
       }
@@ -84,7 +82,7 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
       serverProject = null;
     }
     if (page.isCreateFormData()) {
-      IPackageFragmentRoot sharedSourceFolder = S2eUtils.getDtoSourceFolder(page.getSharedSourceFolder());
+      var sharedSourceFolder = S2eUtils.getDtoSourceFolder(page.getSharedSourceFolder());
       op.setFormDataSourceFolder(input.environment().toScoutSourceFolder(sharedSourceFolder));
     }
     if (page.isCreatePermissions() || page.isCreateService()) {

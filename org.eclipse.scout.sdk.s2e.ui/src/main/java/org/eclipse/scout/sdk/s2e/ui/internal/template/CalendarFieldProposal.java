@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstCalendarFieldBuilder;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.WrappedTrackedNodePosition;
 
@@ -40,7 +39,7 @@ public class CalendarFieldProposal extends FormFieldProposal {
 
   @Override
   protected TypeDeclaration createFormFieldType(Type superType) {
-    AstCalendarFieldBuilder calendarFieldBuilder = getFactory().newCalendarField(getProposalContext().getDefaultName())
+    var calendarFieldBuilder = getFactory().newCalendarField(getProposalContext().getDefaultName())
         .withNlsMethod(getNlsMethodName())
         .withReadOnlyNameSuffix(getProposalContext().getSuffix())
         .withSuperType(superType)

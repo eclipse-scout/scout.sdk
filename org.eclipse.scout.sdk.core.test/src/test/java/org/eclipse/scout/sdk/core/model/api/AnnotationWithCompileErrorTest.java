@@ -19,7 +19,6 @@ import javax.annotation.Generated;
 
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationConstants;
 import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithArrayValues;
-import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithSingleValues;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -40,25 +39,25 @@ public class AnnotationWithCompileErrorTest {
 
   @Test
   public void testAnnotationsWithInvalidArrayValue(IJavaEnvironment env) {
-    String className = "ClassWithCompileError";
-    String pck = "test";
-    String testClass = "package " + pck + ";\n\n" +
+    var className = "ClassWithCompileError";
+    var pck = "test";
+    var testClass = "package " + pck + ";\n\n" +
         "@" + Generated.class.getName() + "(null)\n" +
         "public class " + className + " {}\n";
 
     env.registerCompilationUnitOverride(pck, className + JavaTypes.JAVA_FILE_SUFFIX, testClass);
-    IType type = env.requireType(pck + JavaTypes.C_DOT + className);
+    var type = env.requireType(pck + JavaTypes.C_DOT + className);
     assertFalse(env.compileErrors(type).isEmpty());
 
-    String[] generatedValue = type.annotations().withManagedWrapper(GeneratedAnnotation.class).first().get().value();
+    var generatedValue = type.annotations().withManagedWrapper(GeneratedAnnotation.class).first().get().value();
     assertEquals(0, generatedValue.length);
   }
 
   @Test
   public void testAnnotationsWithInvalidManagedArrayValue(IJavaEnvironment env) {
-    String className = "ClassWithCompileError2";
-    String pck = "test";
-    String testClass = "package " + pck + ";\n\n" +
+    var className = "ClassWithCompileError2";
+    var pck = "test";
+    var testClass = "package " + pck + ";\n\n" +
         "import " + org.eclipse.scout.sdk.core.fixture.AnnotationWithArrayValues.class.getName() + ";\n" +
         "import " + ClassWithAnnotationConstants.class.getName() + ";\n" +
         "import " + org.eclipse.scout.sdk.core.fixture.AnnotationWithSingleValues.class.getName() + ";\n" +
@@ -76,10 +75,10 @@ public class AnnotationWithCompileErrorTest {
         "public class " + className + " {}\n";
 
     env.registerCompilationUnitOverride(pck, className + JavaTypes.JAVA_FILE_SUFFIX, testClass);
-    IType type = env.requireType(pck + JavaTypes.C_DOT + className);
+    var type = env.requireType(pck + JavaTypes.C_DOT + className);
     assertFalse(env.compileErrors(type).isEmpty());
 
-    AnnotationWithSingleValues[] nestedAnnotations = type.annotations().withManagedWrapper(AnnotationWithArrayValues.class).first().get().annos();
+    var nestedAnnotations = type.annotations().withManagedWrapper(AnnotationWithArrayValues.class).first().get().annos();
     assertEquals(0, nestedAnnotations.length);
   }
 }

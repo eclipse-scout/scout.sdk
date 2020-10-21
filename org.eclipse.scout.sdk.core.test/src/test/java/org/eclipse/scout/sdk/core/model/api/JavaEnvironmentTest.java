@@ -31,21 +31,21 @@ public class JavaEnvironmentTest {
 
   @Test
   public void testReloadOfIcuMultipleTimes(IJavaEnvironment env) {
-    String packageName = "org.test";
-    String fileName = "TestClass.java";
+    var packageName = "org.test";
+    var fileName = "TestClass.java";
 
-    String firstSrc = "package org.test;\n\n"
+    var firstSrc = "package org.test;\n\n"
         + "public class TestClass {\n"
         + "}\n";
 
-    String secondSrc = "package org.test;\n\n"
+    var secondSrc = "package org.test;\n\n"
         + "public class TestClass {\n"
         + "int a = 0;"
         + "}\n";
 
-    boolean reload = env.registerCompilationUnitOverride(packageName, fileName, firstSrc);
+    var reload = env.registerCompilationUnitOverride(packageName, fileName, firstSrc);
     assertFalse(reload);
-    IType testClass = env.requireType(packageName + ".TestClass");
+    var testClass = env.requireType(packageName + ".TestClass");
     assertFalse(testClass.fields().existsAny());
 
     reload = env.registerCompilationUnitOverride(packageName, fileName, firstSrc);
@@ -72,15 +72,15 @@ public class JavaEnvironmentTest {
   }
 
   protected static void testReloadOfType(IJavaEnvironment env) {
-    String packageName = "java.lang";
-    String fileName = "Long.java";
+    var packageName = "java.lang";
+    var fileName = "Long.java";
 
-    String firstSrc = "package java.lang;\n\n"
+    var firstSrc = "package java.lang;\n\n"
         + "public class Long {\n"
         + "long a = 0;"
         + "}\n";
 
-    IType longType = env.requireType(Long.class.getName());
+    var longType = env.requireType(Long.class.getName());
     assertFalse(longType.fields().withName("a").existsAny());
 
     assertTrue(env.registerCompilationUnitOverride(packageName, fileName, firstSrc));

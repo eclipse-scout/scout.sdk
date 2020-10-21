@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.builder.java.body;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
@@ -91,13 +90,13 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
       append(prefixSource);
     }
 
-    boolean isConstructor = surroundingMethod().returnType().isEmpty();
+    var isConstructor = surroundingMethod().returnType().isEmpty();
     if (!isConstructor) {
       dot()
           .append(surroundingMethod().elementName().orElseThrow(() -> newFail("Cannot create a super call because method has no name.")));
     }
 
-    Stream<ISourceGenerator<ISourceBuilder<?>>> parameterNames = surroundingMethod().parameters()
+    var parameterNames = surroundingMethod().parameters()
         .map(IMethodParameterGenerator::elementName)
         .map(nameOpt -> nameOpt.orElseThrow(() -> newFail("Parameter has no name")))
         .map(ISourceGenerator::raw);

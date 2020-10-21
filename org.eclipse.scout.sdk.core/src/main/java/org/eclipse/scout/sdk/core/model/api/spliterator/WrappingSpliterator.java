@@ -72,18 +72,18 @@ public class WrappingSpliterator<T extends IJavaElement> implements Spliterator<
 
   @Override
   public void forEachRemaining(Consumer<? super T> action) {
-    for (int i = m_pos; i < m_end; i++) {
+    for (var i = m_pos; i < m_end; i++) {
       action.accept(element(i));
     }
   }
 
   @Override
   public Spliterator<T> trySplit() {
-    int split = (m_end - m_pos) / 2;
+    var split = (m_end - m_pos) / 2;
     if (split < 1) {
       return null;
     }
-    int firstForSplit = m_pos + split;
+    var firstForSplit = m_pos + split;
     Spliterator<T> result = new WrappingSpliterator<>(m_spiList, firstForSplit, m_end);
     m_end = firstForSplit;
     return result;

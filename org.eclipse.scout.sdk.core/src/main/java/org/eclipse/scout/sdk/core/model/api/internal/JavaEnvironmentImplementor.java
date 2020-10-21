@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.apidef.ApiFunction.applyWithApi;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.core.util.apidef.ApiFunction.applyWithApi;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +27,9 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
+import org.eclipse.scout.sdk.core.apidef.Api;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -40,9 +43,6 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.Api;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link JavaEnvironmentImplementor}</h3>
@@ -108,7 +108,7 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   @SuppressWarnings("squid:S1166")
   public IUnresolvedType findUnresolvedType(String fqn) {
     try {
-      Optional<IType> t = findType(fqn);
+      var t = findType(fqn);
       if (t.isPresent()) {
         return new UnresolvedTypeImplementor(new UnresolvedTypeSpi(unwrap(), t.get()));
       }
@@ -126,8 +126,8 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
 
   @Override
   public boolean registerCompilationUnitOverride(String packageName, String fileName, CharSequence buf) {
-    char[] arr = new char[buf.length()];
-    for (int i = 0; i < buf.length(); i++) {
+    var arr = new char[buf.length()];
+    for (var i = 0; i < buf.length(); i++) {
       arr[i] = buf.charAt(i);
     }
     return m_spi.registerCompilationUnitOverride(packageName, fileName, arr);
@@ -152,8 +152,8 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   @Override
   @SuppressWarnings("unchecked")
   public <A extends IApiSpecification> Optional<A> api(Class<A> apiDefinition) {
-    Class<A> key = apiDefinition == null ? (Class<A>) IApiSpecification.class : apiDefinition;
-    A api = (A) m_apiCache.computeIfAbsent(key, this::createApi);
+    var key = apiDefinition == null ? (Class<A>) IApiSpecification.class : apiDefinition;
+    var api = (A) m_apiCache.computeIfAbsent(key, this::createApi);
     return Optional.ofNullable(api); // is empty in case the apiDefinition class is null or the API could not be found in this environment.
   }
 
@@ -176,7 +176,7 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
 
   @Override
   public Optional<IClasspathEntry> primarySourceFolder() {
-    List<IClasspathEntry> sourceFoldersSorted = sourceFoldersSorted();
+    var sourceFoldersSorted = sourceFoldersSorted();
     if (sourceFoldersSorted.isEmpty()) {
       return Optional.empty();
     }
@@ -185,10 +185,10 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
 
   protected List<IClasspathEntry> sourceFoldersSorted() {
     return m_sourceFoldersSorted.computeIfAbsentAndGet(() -> {
-      List<ClasspathSpi> src = m_spi.getClasspath();
+      var src = m_spi.getClasspath();
       Collection<P_ClasspathComposite> sorter = new TreeSet<>(comparingInt(P_ClasspathComposite::order).thenComparingInt(P_ClasspathComposite::pos));
-      for (int i = 0; i < src.size(); i++) {
-        ClasspathSpi classpathSpi = src.get(i);
+      for (var i = 0; i < src.size(); i++) {
+        var classpathSpi = src.get(i);
         if (classpathSpi.isSourceFolder()) {
           sorter.add(new P_ClasspathComposite(classpathSpi.wrap(), i));
         }
@@ -224,9 +224,9 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
       return 20;
     }
 
-    int totalSegments = absolutePath.getNameCount();
-    int numEndSegments = Math.min(totalSegments, 3); // last 3 segments or less if the path has less segments
-    Path rel = absolutePath.subpath(totalSegments - numEndSegments, totalSegments);
+    var totalSegments = absolutePath.getNameCount();
+    var numEndSegments = Math.min(totalSegments, 3); // last 3 segments or less if the path has less segments
+    var rel = absolutePath.subpath(totalSegments - numEndSegments, totalSegments);
     if (rel.startsWith(Paths.get(ISourceFolders.MAIN_JAVA_SOURCE_FOLDER).subpath(0, 2))) {
       return 12;
     }

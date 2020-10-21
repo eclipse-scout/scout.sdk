@@ -13,13 +13,13 @@ package org.eclipse.scout.sdk.core.builder.java;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.SourceBuilderWrapper;
 import org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link JavaSourceBuilderWrapper}</h3>
@@ -103,25 +103,25 @@ public class JavaSourceBuilderWrapper<TYPE extends IJavaSourceBuilder<TYPE>> ext
   }
 
   @Override
-  public TYPE appendReferences(Stream<? extends CharSequence> refs, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
-    inner().appendReferences(refs, prefix, delimiter, suffix);
+  public TYPE references(Stream<? extends CharSequence> refs, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
+    inner().references(refs, prefix, delimiter, suffix);
     return thisInstance();
   }
 
   @Override
-  public TYPE appendFrom(Stream<ApiFunction<?, String>> apis, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
-    inner().appendFrom(apis, prefix, delimiter, suffix);
+  public TYPE referencesFrom(Stream<ApiFunction<?, CharSequence>> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
+    inner().referencesFrom(references, prefix, delimiter, suffix);
     return thisInstance();
   }
 
   @Override
-  public <API extends IApiSpecification> TYPE refFrom(Class<API> apiClass, Function<API, String> sourceProvider) {
+  public <API extends IApiSpecification> TYPE refFrom(Class<API> apiClass, Function<API, ? extends CharSequence> sourceProvider) {
     inner().refFrom(apiClass, sourceProvider);
     return thisInstance();
   }
 
   @Override
-  public <API extends IApiSpecification> TYPE refFrom(ApiFunction<API, String> func) {
+  public <API extends IApiSpecification> TYPE refFrom(ApiFunction<API, ? extends CharSequence> func) {
     inner().refFrom(func);
     return thisInstance();
   }
@@ -133,7 +133,7 @@ public class JavaSourceBuilderWrapper<TYPE extends IJavaSourceBuilder<TYPE>> ext
   }
 
   @Override
-  public <API extends IApiSpecification> TYPE appendFrom(Class<API> apiClass, Function<API, String> sourceProvider) {
+  public <API extends IApiSpecification> TYPE appendFrom(Class<API> apiClass, Function<API, ? extends CharSequence> sourceProvider) {
     inner().appendFrom(apiClass, sourceProvider);
     return thisInstance();
   }

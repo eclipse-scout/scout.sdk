@@ -35,8 +35,8 @@ public class ImportValidator implements IImportValidator {
 
   @Override
   public void runWithImportCollector(Runnable r, Function<IImportCollector, IImportCollector> wrappingCollectorProvider) {
-    IImportCollector origImportCollector = importCollector();
-    IImportCollector wrappingCollector = wrappingCollectorProvider.apply(origImportCollector);
+    var origImportCollector = importCollector();
+    var wrappingCollector = wrappingCollectorProvider.apply(origImportCollector);
     try {
       setImportCollector(wrappingCollector);
       r.run();
@@ -52,14 +52,14 @@ public class ImportValidator implements IImportValidator {
   }
 
   protected CharSequence handleTypeReference(CharSequence fqn, boolean isTypeArg) {
-    TypeReferenceDescriptor cand = new TypeReferenceDescriptor(fqn, isTypeArg);
-    IImportCollector collector = importCollector();
-    String use = collector.checkExistingImports(cand);
+    var cand = new TypeReferenceDescriptor(fqn, isTypeArg);
+    var collector = importCollector();
+    var use = collector.checkExistingImports(cand);
     if (use == null) {
       use = collector.checkCurrentScope(cand);
       if (cand.isTypeArg()) {
-        boolean foundInCurrentScope = use != null && use.indexOf(JavaTypes.C_DOT) < 0;
-        boolean inSamePackage = Objects.equals(collector.getQualifier(), cand.getQualifier()) || (Strings.isBlank(collector.getQualifier()) && Strings.isBlank(cand.getQualifier()));
+        var foundInCurrentScope = use != null && use.indexOf(JavaTypes.C_DOT) < 0;
+        var inSamePackage = Objects.equals(collector.getQualifier(), cand.getQualifier()) || (Strings.isBlank(collector.getQualifier()) && Strings.isBlank(cand.getQualifier()));
         if (foundInCurrentScope && inSamePackage) {
           // special case for type argument signature which are simple qualified because in same scope
           collector.registerElement(cand); // ensure it is registered as used so that it appears in the imports for inner types only

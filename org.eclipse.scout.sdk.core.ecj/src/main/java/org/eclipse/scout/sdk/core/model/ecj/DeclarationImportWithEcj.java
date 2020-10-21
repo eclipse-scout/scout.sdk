@@ -44,15 +44,15 @@ public class DeclarationImportWithEcj extends AbstractJavaElementWithEcj<IImport
 
   @Override
   public JavaElementSpi internalFindNewElement() {
-    CompilationUnitSpi newCu = (CompilationUnitSpi) getCompilationUnit().internalFindNewElement();
-    if (newCu != null) {
-      for (ImportSpi i : newCu.getImports()) {
-        if (i.getName().equals(getName()) && i.isStatic() == isStatic()) {
-          return i;
-        }
-      }
+    var newCu = (CompilationUnitSpi) getCompilationUnit().internalFindNewElement();
+    if (newCu == null) {
+      return null;
     }
-    return null;
+    return newCu.getImports().stream()
+        .filter(newImport -> newImport.getName().equals(getName()))
+        .filter(newImport -> newImport.isStatic() == isStatic())
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
@@ -67,7 +67,7 @@ public class DeclarationImportWithEcj extends AbstractJavaElementWithEcj<IImport
   @Override
   public String getName() {
     return m_fqName.computeIfAbsentAndGet(() -> {
-      String name = CharOperation.toString(m_astNode.getImportName());
+      var name = CharOperation.toString(m_astNode.getImportName());
       if (m_astNode.trailingStarPosition > 0) {
         name += ".*";
       }
@@ -83,8 +83,8 @@ public class DeclarationImportWithEcj extends AbstractJavaElementWithEcj<IImport
   @Override
   public String getQualifier() {
     return m_qualifier.computeIfAbsentAndGet(() -> {
-      char[][] importName = m_astNode.tokens;
-      char[][] qualifier = CharOperation.subarray(importName, 0, importName.length - 1);
+      var importName = m_astNode.tokens;
+      var qualifier = CharOperation.subarray(importName, 0, importName.length - 1);
       return CharOperation.toString(qualifier);
     });
   }

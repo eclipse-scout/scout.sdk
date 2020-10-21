@@ -14,10 +14,8 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -26,7 +24,6 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
 
 /**
  * <h3>{@link PropertyBean}</h3><br>
@@ -81,13 +78,13 @@ public class PropertyBean {
    * @see <a href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">JavaBeans Spec</a>
    */
   public static Stream<PropertyBean> of(IType type) {
-    List<IMethod> methods = type.methods()
+    var methods = type.methods()
         .withFlags(Flags.AccPublic).stream()
         .collect(toList());
 
     Map<String, PropertyBean> beans = new HashMap<>();
-    for (IMethod m : methods) {
-      Optional<String> getterName = getterName(m);
+    for (var m : methods) {
+      var getterName = getterName(m);
       if (getterName.isPresent()) {
         beans.computeIfAbsent(getterName.get(),
             key -> new PropertyBean(type, key))
@@ -152,18 +149,18 @@ public class PropertyBean {
       return Optional.empty();
     }
 
-    Matcher matcher = GETTER_METHOD_NAME.matcher(methodName);
+    var matcher = GETTER_METHOD_NAME.matcher(methodName);
     if (!matcher.matches()) {
       return Optional.empty();
     }
 
-    String kind = matcher.group(1);
-    String name = matcher.group(2);
+    var kind = matcher.group(1);
+    var name = matcher.group(2);
 
     if (GETTER_PREFIX.equals(kind)) {
       return Optional.of(name);
     }
-    boolean isBool = JavaTypes._boolean.equals(returnType) || JavaTypes.Boolean.equals(returnType);
+    var isBool = JavaTypes._boolean.equals(returnType) || JavaTypes.Boolean.equals(returnType);
     if (isBool && GETTER_BOOL_PREFIX.equals(kind)) {
       return Optional.of(name);
     }
@@ -205,7 +202,7 @@ public class PropertyBean {
       return Optional.empty();
     }
 
-    Matcher matcher = SETTER_METHOD_NAME.matcher(methodName);
+    var matcher = SETTER_METHOD_NAME.matcher(methodName);
     if (!matcher.matches()) {
       return Optional.empty();
     }
@@ -214,14 +211,14 @@ public class PropertyBean {
   }
 
   protected static Optional<String> nameOf(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m, boolean setter, IJavaEnvironment context) {
-    Optional<ApiFunction<?, String>> returnType = m.returnType();
+    var returnType = m.returnType();
     if (returnType.isEmpty()) {
       return Optional.empty();
     }
     CharSequence methodName = m.elementName(context).orElseThrow(() -> newFail("Method name is missing."));
     //noinspection NumericCastThatLosesPrecision
-    int numParams = (int) m.parameters().count();
-    Optional<String> returnTypeRef = returnType.get().apply(context);
+    var numParams = (int) m.parameters().count();
+    var returnTypeRef = returnType.get().apply(context);
     if (returnTypeRef.isEmpty()) {
       return Optional.empty();
     }
@@ -232,14 +229,14 @@ public class PropertyBean {
   }
 
   protected static Optional<String> nameOf(IMethod m, boolean setter) {
-    Optional<IType> returnType = m.returnType();
+    var returnType = m.returnType();
     if (returnType.isEmpty()) {
       return Optional.empty();
     }
 
     //noinspection NumericCastThatLosesPrecision
-    int numParams = (int) m.parameters().stream().count();
-    String returnDataType = m.requireReturnType().name();
+    var numParams = (int) m.parameters().stream().count();
+    var returnDataType = m.requireReturnType().name();
     if (setter) {
       return setterName(m.elementName(), numParams, returnDataType);
     }
@@ -317,8 +314,8 @@ public class PropertyBean {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + name().hashCode();
     result = prime * result + declaringType().hashCode();
     return result;
@@ -335,7 +332,7 @@ public class PropertyBean {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    PropertyBean other = (PropertyBean) obj;
+    var other = (PropertyBean) obj;
     return declaringType().equals(other.declaringType()) && name().equals(other.name());
   }
 

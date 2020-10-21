@@ -237,7 +237,7 @@ public final class SourceState {
   }
 
   public static State parse(CharSequence src, int pos) {
-    int limit = limit(src, pos);
+    var limit = limit(src, pos);
     return parseImpl(src, limit).toState();
   }
 
@@ -262,12 +262,12 @@ public final class SourceState {
    * @see #isInString(char[], int)
    */
   public static boolean isInString(CharSequence src, int pos) {
-    int limit = limit(src, pos);
-    IState state = parseImpl(src, limit);
+    var limit = limit(src, pos);
+    var state = parseImpl(src, limit);
     if (isStringEnd(state, src, limit)) {
       return true;
     }
-    State result = state.toState();
+    var result = state.toState();
     return result == State.IN_STRING || result == State.ESCAPE_STRING;
   }
 
@@ -297,8 +297,8 @@ public final class SourceState {
    * @see #isInCode(char[], int)
    */
   public static boolean isInCode(CharSequence src, int pos) {
-    int limit = limit(src, pos);
-    IState state = parseImpl(src, limit);
+    var limit = limit(src, pos);
+    var state = parseImpl(src, limit);
     if (isStringEnd(state, src, limit)) {
       return false;
     }
@@ -330,8 +330,8 @@ public final class SourceState {
    * @see #isInString(char[], int)
    */
   public static boolean isInComment(CharSequence src, int pos) {
-    int limit = limit(src, pos);
-    IState state = parseImpl(src, limit);
+    var limit = limit(src, pos);
+    var state = parseImpl(src, limit);
     if (isCommentBoundary(state, src, limit)) {
       return true;
     }
@@ -347,7 +347,7 @@ public final class SourceState {
     if (calculatedState != AboutToEnterCommentState.INSTANCE) {
       return false;
     }
-    IState next = nextState(calculatedState, src, limit);
+    var next = nextState(calculatedState, src, limit);
     return next == InBlockCommentState.INSTANCE || next == InLineCommentState.INSTANCE;
   }
 
@@ -356,8 +356,8 @@ public final class SourceState {
   }
 
   static IState parseImpl(CharSequence chars, int end) {
-    IState state = DefaultState.INSTANCE;
-    for (int i = 0; i < end; i++) {
+    var state = DefaultState.INSTANCE;
+    for (var i = 0; i < end; i++) {
       state = state.next(chars.charAt(i));
     }
     return state;

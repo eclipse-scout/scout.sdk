@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.QualifiedType;
-import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
@@ -36,12 +31,12 @@ public class AstTableFieldBuilder extends AstTypeBuilder<AstTableFieldBuilder> {
   @Override
   @SuppressWarnings("unchecked")
   public AstTableFieldBuilder insert() {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
 
     // super type
-    ParameterizedType parameterizedType = ast.newParameterizedType(getSuperType());
-    SimpleType selfQualifier = ast.newSimpleType(ast.newSimpleName(getTypeName() + getReadOnlySuffix()));
-    QualifiedType tableTypeArg = ast.newQualifiedType(selfQualifier, ast.newSimpleName(ISdkConstants.INNER_TABLE_TYPE_NAME));
+    var parameterizedType = ast.newParameterizedType(getSuperType());
+    var selfQualifier = ast.newSimpleType(ast.newSimpleName(getTypeName() + getReadOnlySuffix()));
+    var tableTypeArg = ast.newQualifiedType(selfQualifier, ast.newSimpleName(ISdkConstants.INNER_TABLE_TYPE_NAME));
     parameterizedType.typeArguments().add(tableTypeArg);
     withSuperType(parameterizedType);
 
@@ -52,7 +47,7 @@ public class AstTableFieldBuilder extends AstTypeBuilder<AstTableFieldBuilder> {
         .insert();
 
     // inner table
-    Type tableSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractTable().fqn());
+    var tableSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractTable().fqn());
     m_tableDeclaration = getFactory().newType(ISdkConstants.INNER_TABLE_TYPE_NAME)
         .withCalculatedOrder(false)
         .withClassId(true)
@@ -67,7 +62,7 @@ public class AstTableFieldBuilder extends AstTypeBuilder<AstTableFieldBuilder> {
         .insert()
         .get();
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       ITrackedNodePosition typeNamePosInGeneric = new WrappedTrackedNodePosition(getFactory().getRewrite().track(selfQualifier), 0, -getReadOnlySuffix().length());
       links.addLinkedPosition(typeNamePosInGeneric, false, AstNodeFactory.TYPE_NAME_GROUP);

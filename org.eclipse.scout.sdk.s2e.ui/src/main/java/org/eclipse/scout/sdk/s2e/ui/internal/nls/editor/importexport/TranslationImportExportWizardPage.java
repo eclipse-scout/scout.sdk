@@ -19,11 +19,9 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
-import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractImportExportWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -50,23 +48,23 @@ public class TranslationImportExportWizardPage extends WizardPage {
 
   @Override
   public void createControl(Composite parent) {
-    Table table = new Table(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
+    var table = new Table(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
     StructuredViewer viewer = new TableViewer(table);
-    P_TableContentProvider provider = new P_TableContentProvider();
+    var provider = new P_TableContentProvider();
     viewer.setLabelProvider(provider);
     viewer.setContentProvider(provider);
     viewer.setInput(provider);
     viewer.addDoubleClickListener(event -> {
-      IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+      var selection = (IStructuredSelection) event.getSelection();
       TranslationImportExportWizardExtension extension = null;
       if (!selection.isEmpty()) {
         extension = (TranslationImportExportWizardExtension) selection.getFirstElement();
       }
       handleWizardExtensionSelected(extension);
-      IWizardPage page = getNextPage();
+      var page = getNextPage();
       if (page != null) {
         // show the next page
-        IWizardContainer container = getWizard().getContainer();
+        var container = getWizard().getContainer();
         if (container != null) {
           container.showPage(page);
 
@@ -74,7 +72,7 @@ public class TranslationImportExportWizardPage extends WizardPage {
       }
     });
     viewer.addSelectionChangedListener(event -> {
-      IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+      var selection = (IStructuredSelection) event.getSelection();
       TranslationImportExportWizardExtension extension = null;
       if (!selection.isEmpty()) {
         extension = (TranslationImportExportWizardExtension) selection.getFirstElement();
@@ -85,9 +83,9 @@ public class TranslationImportExportWizardPage extends WizardPage {
   }
 
   private void handleWizardExtensionSelected(TranslationImportExportWizardExtension extension) {
-    boolean pageComplete = false;
+    var pageComplete = false;
     if (extension != null) {
-      AbstractImportExportWizard wizard = extension.createWizard();
+      var wizard = extension.createWizard();
       wizard.setNlsProject(m_project);
       wizard.addPages();
       if (wizard.getPageCount() > 0) {

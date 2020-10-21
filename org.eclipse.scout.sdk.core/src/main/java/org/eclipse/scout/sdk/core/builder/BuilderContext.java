@@ -54,8 +54,8 @@ public class BuilderContext implements IBuilderContext {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int h = prime + m_nl.hashCode();
+    var prime = 31;
+    var h = prime + m_nl.hashCode();
     return prime * h + m_properties.hashCode();
   }
 
@@ -67,7 +67,7 @@ public class BuilderContext implements IBuilderContext {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    BuilderContext other = (BuilderContext) obj;
+    var other = (BuilderContext) obj;
     return Objects.equals(m_nl, other.m_nl)
         && Objects.equals(m_properties, other.m_properties);
   }

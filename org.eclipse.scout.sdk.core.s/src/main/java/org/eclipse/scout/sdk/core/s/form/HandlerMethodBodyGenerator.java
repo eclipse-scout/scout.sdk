@@ -14,7 +14,6 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.builder.java.body.IScoutMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.s.builder.java.body.ScoutMethodBodyBuilder;
@@ -46,9 +45,9 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
 
     @Override
     public void generate(IMethodBodyBuilder<?> builder) {
-      IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> declaringMethod = builder.surroundingMethod();
-      String execLoadMethodName = builder.context().requireApi(IScoutApi.class).AbstractFormHandler().execLoadMethodName();
-      boolean isLoad = execLoadMethodName.equals(declaringMethod.elementName(builder.context()).get());
+      var declaringMethod = builder.surroundingMethod();
+      var execLoadMethodName = builder.context().requireApi(IScoutApi.class).AbstractFormHandler().execLoadMethodName();
+      var isLoad = execLoadMethodName.equals(declaringMethod.elementName(builder.context()).get());
 
       serviceInterface().ifPresent(svcIfc -> buildBackendCall(ScoutMethodBodyBuilder.create(builder), svcIfc, isLoad));
 
@@ -63,7 +62,7 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
     }
 
   protected void buildBackendCall(IScoutMethodBodyBuilder<?> builder, CharSequence serviceInterface, boolean isLoad) {
-    boolean isDtoAvailable = formDataType().isPresent();
+    var isDtoAvailable = formDataType().isPresent();
 
     builder.appendBeansGetVariable(serviceInterface, SERVICE_VAR_NAME).semicolon().nl();
 
@@ -74,7 +73,7 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
             formDataInstanceCreationGenerator()
                 .orElseGet(() -> b -> b.appendNew().ref(formDataType().get()).parenthesisOpen().parenthesisClose().semicolon().nl())
                 .generalize(builder))
-            .appendExportFormData(FORM_DATA_VAR_NAME);
+            .appendExportFormData(FORM_DATA_VAR_NAME).nl();
         if (isLoad) {
           builder.append(FORM_DATA_VAR_NAME).equalSign();
         }

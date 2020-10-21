@@ -26,7 +26,7 @@ public class JreInfoTest {
 
   @Test
   public void testParseVersion() {
-    String java11Content = "IMPLEMENTOR=\"Oracle Corporation\"\n" +
+    var java11Content = "IMPLEMENTOR=\"Oracle Corporation\"\n" +
         "IMPLEMENTOR_VERSION=\"18.9\"\n" +
         "JAVA_VERSION=\"11.0.1\"\n" +
         "JAVA_VERSION_DATE=\"2018-10-16\"\n" +
@@ -34,7 +34,7 @@ public class JreInfoTest {
         "OS_ARCH=\"x86_64\"\n" +
         "OS_NAME=\"Windows\"\n" +
         "SOURCE=\".:8513ac27b651\"\n";
-    String java10Content = "IMPLEMENTOR=\"Oracle Corporation\"\n" +
+    var java10Content = "IMPLEMENTOR=\"Oracle Corporation\"\n" +
         "IMPLEMENTOR_VERSION=\"18.3\"\n" +
         "JAVA_VERSION=\"10.0.2\"\n" +
         "JAVA_VERSION_DATE=\"2018-07-17\"\n" +
@@ -42,19 +42,19 @@ public class JreInfoTest {
         "OS_ARCH=\"x86_64\"\n" +
         "OS_NAME=\"Windows\"\n" +
         "SOURCE=\".:45b1d041a4ef\"\n";
-    String java9Content = "IMPLEMENTOR=\"N/A\"\n" +
+    var java9Content = "IMPLEMENTOR=\"N/A\"\n" +
         "JAVA_VERSION=\"9\"\n" +
         "MODULES=\"java.base java.datatransfer\"\n" +
         "OS_ARCH=\"x86_64\"\n" +
         "OS_NAME=\"Windows\"\n" +
         "SOURCE=\"\"\n";
-    String java8Content = "JAVA_VERSION=\"1.8.0_45\"\n" +
+    var java8Content = "JAVA_VERSION=\"1.8.0_45\"\n" +
         "OS_NAME=\"Windows\"\n" +
         "OS_VERSION=\"5.1\"\n" +
         "OS_ARCH=\"i586\"\n" +
         "SOURCE=\" .:15b679d327da corba:50fb9bed64c9\"\n" +
         "BUILD_TYPE=\"commercial\"\n";
-    String java122Content = "JAVA_VERSION=\"12.2.0_45\"\n" +
+    var java122Content = "JAVA_VERSION=\"12.2.0_45\"\n" +
         "OS_NAME=\"Windows\"\n" +
         "OS_VERSION=\"5.1\"\n" +
         "OS_ARCH=\"i586\"\n" +
@@ -69,7 +69,7 @@ public class JreInfoTest {
   }
 
   protected static void assertIsJavaVersion(String expectedJavaVersion, String fileContent) {
-    String version = JreInfo.parseVersion(asList(Pattern.compile("\\n").split(fileContent)));
+    var version = JreInfo.parseVersion(asList(Pattern.compile("\\n").split(fileContent)));
     assertEquals(expectedJavaVersion, version);
   }
 }

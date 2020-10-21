@@ -28,22 +28,22 @@ public class TypeNameDescriptor {
 
   public static TypeNameDescriptor of(String fqn) {
     // check for inner types
-    int firstDollarPos = Ensure.notNull(fqn).indexOf(JavaTypes.C_DOLLAR);
-    int arrayDim = getArrayDimension(fqn);
+    var firstDollarPos = Ensure.notNull(fqn).indexOf(JavaTypes.C_DOLLAR);
+    var arrayDim = getArrayDimension(fqn);
     if (arrayDim > 0) {
       // remove array indicators
       fqn = fqn.substring(0, fqn.length() - arrayDim * 2);
     }
     if (firstDollarPos > 0) {
-      String primaryType = fqn.substring(0, firstDollarPos);
-      String innerTypePart = fqn.substring(firstDollarPos + 1);
+      var primaryType = fqn.substring(0, firstDollarPos);
+      var innerTypePart = fqn.substring(firstDollarPos + 1);
       return new TypeNameDescriptor(primaryType, innerTypePart, arrayDim);
     }
     return new TypeNameDescriptor(fqn, null, arrayDim);
   }
 
   protected static int getArrayDimension(String fqn) {
-    int pos = fqn.indexOf("[]");
+    var pos = fqn.indexOf("[]");
     if (pos < 0) {
       return 0;
     }
@@ -74,8 +74,8 @@ public class TypeNameDescriptor {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + m_arrayDimension;
     result = prime * result + ((m_innerTypeNames == null) ? 0 : m_innerTypeNames.hashCode());
     result = prime * result + m_primaryTypeName.hashCode();
@@ -90,7 +90,7 @@ public class TypeNameDescriptor {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    TypeNameDescriptor other = (TypeNameDescriptor) obj;
+    var other = (TypeNameDescriptor) obj;
     if (m_arrayDimension != other.m_arrayDimension) {
       return false;
     }
@@ -100,7 +100,7 @@ public class TypeNameDescriptor {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append("TypeNameDescriptor [");
     builder.append("primaryTypeName=").append(getPrimaryTypeName()).append(", ");
     if (m_innerTypeNames != null) {

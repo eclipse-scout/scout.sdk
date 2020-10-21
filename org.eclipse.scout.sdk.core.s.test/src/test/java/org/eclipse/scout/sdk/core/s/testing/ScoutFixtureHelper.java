@@ -111,7 +111,7 @@ public final class ScoutFixtureHelper {
 
     @Override
     public ScoutJavaEnvironmentWithEcjBuilder<?> get() {
-      boolean withClient = m_withClient || m_withUi;
+      var withClient = m_withClient || m_withUi;
 
       ScoutJavaEnvironmentWithEcjBuilder<?> builder = new ScoutJavaEnvironmentWithEcjBuilder<>()
           .withScoutServer(m_withServer)

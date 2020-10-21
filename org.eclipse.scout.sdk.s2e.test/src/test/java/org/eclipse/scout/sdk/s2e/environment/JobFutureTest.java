@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -49,9 +48,9 @@ public class JobFutureTest {
 
   @Test
   public void testWhenDoneAfterDone() {
-    String result = "testresult";
-    AtomicInteger i = new AtomicInteger(0);
-    JobFuture<String> future = createFixtureJobFuture(result);
+    var result = "testresult";
+    var i = new AtomicInteger(0);
+    var future = createFixtureJobFuture(result);
 
     assertEquals(0, i.get());
     assertFalse(future.isDone());
@@ -68,15 +67,15 @@ public class JobFutureTest {
 
   @Test
   public void testCheckedExceptionResult() {
-    CoreException e = new CoreException(new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "test exception", new Exception("test exception")));
-    AbstractJob j = new AbstractJob("") {
+    var e = new CoreException(new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "test exception", new Exception("test exception")));
+    var j = new AbstractJob("") {
       @Override
       protected void execute(IProgressMonitor monitor) throws CoreException {
         throw e;
       }
     };
     j.setRule(new P_FixtureSchedulingRule());
-    JobFuture<String> future = createFixtureJobFuture(j);
+    var future = createFixtureJobFuture(j);
     future.job().schedule();
 
     assertSame(e, assertThrows(CompletionException.class, future::result).getCause());
@@ -84,17 +83,17 @@ public class JobFutureTest {
 
   @Test
   public void testDeadlockDetection() throws InterruptedException {
-    AtomicReference<IllegalArgumentException> expected = new AtomicReference<>();
-    AbstractJob main = new AbstractJob("main") {
+    var expected = new AtomicReference<IllegalArgumentException>();
+    var main = new AbstractJob("main") {
       @Override
       protected void execute(IProgressMonitor monitor) {
-        AbstractJob inner = new AbstractJob("inner") {
+        var inner = new AbstractJob("inner") {
           @Override
           protected void execute(IProgressMonitor m) {
           }
         };
         inner.setRule(new P_FixtureSchedulingRule());
-        JobFuture<String> future = createFixtureJobFuture(inner);
+        var future = createFixtureJobFuture(inner);
         inner.schedule();
 
         try {
@@ -130,8 +129,8 @@ public class JobFutureTest {
 
   @Test
   public void testWaitingAborted() throws InterruptedException, ExecutionException, TimeoutException {
-    CountDownLatch release = new CountDownLatch(1);
-    JobFuture<String> future = createFixtureJobFuture("", () -> {
+    var release = new CountDownLatch(1);
+    var future = createFixtureJobFuture("", () -> {
       try {
         release.await(1, TimeUnit.MINUTES);
       }
@@ -157,9 +156,9 @@ public class JobFutureTest {
 
   @Test
   public void testWaitTimeout() throws InterruptedException {
-    CountDownLatch jobStarted = new CountDownLatch(1);
-    CountDownLatch release = new CountDownLatch(1);
-    JobFuture<String> future = createFixtureJobFuture("", () -> {
+    var jobStarted = new CountDownLatch(1);
+    var release = new CountDownLatch(1);
+    var future = createFixtureJobFuture("", () -> {
       jobStarted.countDown();
       try {
         release.await(1, TimeUnit.MINUTES);
@@ -188,8 +187,8 @@ public class JobFutureTest {
 
   @Test
   public void testRuntimeExceptionResult() {
-    RuntimeException e = new RuntimeException("test exception");
-    JobFuture<String> future = createFixtureJobFuture("", () -> {
+    var e = new RuntimeException("test exception");
+    var future = createFixtureJobFuture("", () -> {
       throw e;
     });
     future.job().schedule();
@@ -203,10 +202,10 @@ public class JobFutureTest {
 
   @Test
   public void testCancel() throws InterruptedException {
-    CountDownLatch futureStarted = new CountDownLatch(1);
-    CountDownLatch futureCanceled = new CountDownLatch(1);
-    AtomicBoolean finished = new AtomicBoolean(false);
-    JobFuture<String> future = createFixtureJobFuture(new AbstractJob("") {
+    var futureStarted = new CountDownLatch(1);
+    var futureCanceled = new CountDownLatch(1);
+    var finished = new AtomicBoolean(false);
+    var future = createFixtureJobFuture(new AbstractJob("") {
       @Override
       protected void execute(IProgressMonitor monitor) {
         futureStarted.countDown();
@@ -235,16 +234,16 @@ public class JobFutureTest {
   public void testNoResultExtractor() {
     Runnable r = () -> {
     };
-    Object result = new RunnableJob("", r).scheduleWithFuture(0, TimeUnit.MILLISECONDS, null).result();
+    var result = new RunnableJob("", r).scheduleWithFuture(0, TimeUnit.MILLISECONDS, null).result();
     assertNull(result);
   }
 
   @Test
   public void testWhenDoneBeforeDone() {
-    String result = "testresult";
-    AtomicInteger i = new AtomicInteger(0);
-    JobFuture<String> future = createFixtureJobFuture(result);
-    CompletableFuture<Void> postTask = future.thenRun(i::incrementAndGet);
+    var result = "testresult";
+    var i = new AtomicInteger(0);
+    var future = createFixtureJobFuture(result);
+    var postTask = future.thenRun(i::incrementAndGet);
 
     assertEquals(0, i.get());
     future.job().schedule();
@@ -256,13 +255,13 @@ public class JobFutureTest {
 
   @Test
   public void testLazyResult() throws ExecutionException, InterruptedException {
-    AtomicInteger resultSupplierInvokeCounter = new AtomicInteger();
-    String expectedResult = "test result";
+    var resultSupplierInvokeCounter = new AtomicInteger();
+    var expectedResult = "test result";
     Supplier<String> resultSupplier = () -> {
       resultSupplierInvokeCounter.incrementAndGet();
       return expectedResult;
     };
-    JobFuture<String> jf = createFixtureJobFuture(resultSupplier);
+    var jf = createFixtureJobFuture(resultSupplier);
     assertEquals(0, resultSupplierInvokeCounter.get());
     jf.job().schedule();
 
@@ -272,7 +271,7 @@ public class JobFutureTest {
     assertEquals(expectedResult, jf.result()); // here the resultSupplier is invoked
     assertEquals(1, resultSupplierInvokeCounter.get());
 
-    String result = jf.get().get();
+    var result = jf.get().get();
     assertEquals(expectedResult, result); // here the resultSupplier is invoked
     assertSame(result, jf.result());
 

@@ -16,6 +16,8 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
@@ -33,8 +35,6 @@ import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link FieldGenerator}</h3>
@@ -113,7 +113,7 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
 
   protected void buildFieldSource(IMemberBuilder<?> builder) {
     if (elementName().isPresent()) {
-      ApiFunction<?, String> dataType = dataType().orElseThrow(() -> newFail("Field data type missing for builder {}", this));
+      var dataType = dataType().orElseThrow(() -> newFail("Field data type missing for builder {}", this));
       builder
           .appendFlags(flags())
           .refFrom(dataType)

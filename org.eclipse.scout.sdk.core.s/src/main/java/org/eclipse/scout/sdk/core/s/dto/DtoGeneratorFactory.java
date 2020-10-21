@@ -51,8 +51,8 @@ public final class DtoGeneratorFactory {
     TableRowDataGenerator<?> rowDataTypeSrc = new TableRowDataGenerator<>(modelType, modelType, sharedEnv)
         .withExtendsAnnotationIfNecessary(dataAnnotation.getAnnotationHolder());
 
-    String targetPackage = dataAnnotation.getDataType().requireCompilationUnit().containingPackage().elementName();
-    String targetName = dataAnnotation.getDataType().elementName();
+    var targetPackage = dataAnnotation.getDataType().requireCompilationUnit().containingPackage().elementName();
+    var targetName = dataAnnotation.getDataType().elementName();
     return Optional.of(createDtoCuGenerator(modelType, targetName, targetPackage, rowDataTypeSrc));
   }
 
@@ -66,8 +66,8 @@ public final class DtoGeneratorFactory {
       return Optional.empty();
     }
     ITypeGenerator<?> pageDataTypeSrc = new PageDataGenerator<>(modelType, dataAnnotation, sharedEnv);
-    String targetPackage = dataAnnotation.getDataType().requireCompilationUnit().containingPackage().elementName();
-    String targetName = dataAnnotation.getDataType().elementName();
+    var targetPackage = dataAnnotation.getDataType().requireCompilationUnit().containingPackage().elementName();
+    var targetName = dataAnnotation.getDataType().elementName();
     return Optional.of(createDtoCuGenerator(modelType, targetName, targetPackage, pageDataTypeSrc));
   }
 
@@ -79,13 +79,13 @@ public final class DtoGeneratorFactory {
     if (!FormDataAnnotationDescriptor.isCreate(formDataAnnotation) || modelType == null || sharedEnv == null) {
       return Optional.empty();
     }
-    IType superType = formDataAnnotation.getSuperType();
+    var superType = formDataAnnotation.getSuperType();
     if (superType == null) {
       return Optional.empty();
     }
 
     AbstractDtoGenerator<?> formDataTypeSrc;
-    IScoutApi scoutApi = modelType.javaEnvironment().requireApi(IScoutApi.class);
+    var scoutApi = modelType.javaEnvironment().requireApi(IScoutApi.class);
     if (superType.isInstanceOf(scoutApi.AbstractTableFieldBeanData())) {
       formDataTypeSrc = new TableFieldDataGenerator<>(modelType, formDataAnnotation, sharedEnv);
     }
@@ -93,8 +93,8 @@ public final class DtoGeneratorFactory {
       formDataTypeSrc = new CompositeFormDataGenerator<>(modelType, formDataAnnotation, sharedEnv);
     }
 
-    String targetPackage = formDataAnnotation.getFormDataType().requireCompilationUnit().containingPackage().elementName();
-    String targetName = formDataAnnotation.getFormDataType().elementName();
+    var targetPackage = formDataAnnotation.getFormDataType().requireCompilationUnit().containingPackage().elementName();
+    var targetName = formDataAnnotation.getFormDataType().elementName();
     return Optional.of(
         createDtoCuGenerator(modelType, targetName, targetPackage,
             formDataTypeSrc

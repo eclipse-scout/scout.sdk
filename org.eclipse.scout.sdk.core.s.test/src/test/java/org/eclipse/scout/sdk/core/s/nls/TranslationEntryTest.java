@@ -30,24 +30,24 @@ public class TranslationEntryTest {
   @Test
   @SuppressWarnings({"unlikely-arg-type", "ConstantConditions", "SimplifiableJUnitAssertion", "EqualsWithItself", "EqualsBetweenInconvertibleTypes"})
   public void testEntry() {
-    ITranslationStore store = mock(ITranslationStore.class);
-    ITranslationStore store2 = mock(ITranslationStore.class);
-    TranslationEntry a = new TranslationEntry("key", store);
+    var store = mock(ITranslationStore.class);
+    var store2 = mock(ITranslationStore.class);
+    var a = new TranslationEntry("key", store);
 
-    Translation template1 = new Translation("otherKey");
+    var template1 = new Translation("otherKey");
     template1.setKey("otherKey2");
     assertEquals("otherKey2", template1.key());
     template1.putText(Language.LANGUAGE_DEFAULT, "def");
     ITranslation template2 = new Translation(template1);
-    Translation template3 = new Translation(template1);
+    var template3 = new Translation(template1);
     template3.putText(Language.LANGUAGE_DEFAULT, null); // removes the entry
 
     assertEquals("def", template2.text(Language.LANGUAGE_DEFAULT).get());
     assertFalse(template2.text(Language.parseThrowingOnError("notexisting")).isPresent());
     assertFalse(template3.text(Language.LANGUAGE_DEFAULT).isPresent());
 
-    TranslationEntry b = new TranslationEntry(template2, store);
-    TranslationEntry c = new TranslationEntry("key", store2);
+    var b = new TranslationEntry(template2, store);
+    var c = new TranslationEntry("key", store2);
     //noinspection ResultOfObjectAllocationIgnored
     assertThrows(IllegalArgumentException.class, () -> new TranslationEntry("", store));
 

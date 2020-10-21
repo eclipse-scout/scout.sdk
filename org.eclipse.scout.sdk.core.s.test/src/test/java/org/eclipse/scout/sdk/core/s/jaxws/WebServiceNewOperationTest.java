@@ -15,12 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -43,8 +41,6 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Xml;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * <h3>{@link WebServiceNewOperationTest}</h3>
@@ -59,8 +55,8 @@ public class WebServiceNewOperationTest {
 
   @Test
   public void testUnsupportedService() throws IOException, WSDLException, URISyntaxException {
-    try (InputStream in = RPC_ENCODED_WSDL.openStream()) {
-      ParsedWsdl info = ParsedWsdl.create(RPC_ENCODED_WSDL.toURI(), in, true);
+    try (var in = RPC_ENCODED_WSDL.openStream()) {
+      var info = ParsedWsdl.create(RPC_ENCODED_WSDL.toURI(), in, true);
       assertTrue(info.isEmpty());
     }
   }
@@ -68,22 +64,22 @@ public class WebServiceNewOperationTest {
   @Test
   @Tag("IntegrationTest")
   public void testNewWebServicesConsumerFirst() throws IOException {
-    Path root = CoreScoutTestingUtils.createClassicTestProject();
+    var root = CoreScoutTestingUtils.createClassicTestProject();
     try {
-      AtomicReference<Path> projectRoot = new AtomicReference<>();
+      var projectRoot = new AtomicReference<Path>();
       runCreateJaxWsModule(env -> {
-        AbstractWebServiceNewOperation executedOperation = createWebServiceConsumer(root, true, MULTI_FILE_WSDL, "test.consumer", env);
+        var executedOperation = createWebServiceConsumer(root, true, MULTI_FILE_WSDL, "test.consumer", env);
         assertMultiFileWsdlCorrect(executedOperation, true);
         projectRoot.set(executedOperation.getProjectRoot());
       });
 
       runInExistingJaxWsModule(projectRoot.get(), env -> {
-        AbstractWebServiceNewOperation executedOperation = createEmptyWebServiceProvider(root, false, "TestEmpty" + ISdkConstants.SUFFIX_WS_PROVIDER, "test.provider.empty", env);
+        var executedOperation = createEmptyWebServiceProvider(root, false, "TestEmpty" + ISdkConstants.SUFFIX_WS_PROVIDER, "test.provider.empty", env);
         assertEmptyWsdlCorrect(executedOperation);
       });
 
       runInExistingJaxWsModule(projectRoot.get(), env -> {
-        AbstractWebServiceNewOperation executedOperation = createWebServiceProvider(root, false, MULTI_SERVICE_WSDL, "test.provider.multiservice", env);
+        var executedOperation = createWebServiceProvider(root, false, MULTI_SERVICE_WSDL, "test.provider.multiservice", env);
         assertMultiServiceWsdlCorrect(executedOperation, false);
       });
     }
@@ -97,22 +93,22 @@ public class WebServiceNewOperationTest {
   @Test
   @Tag("IntegrationTest")
   public void testNewWebServicesProviderFirst() throws IOException {
-    Path root = CoreScoutTestingUtils.createClassicTestProject();
+    var root = CoreScoutTestingUtils.createClassicTestProject();
     try {
-      AtomicReference<Path> projectRoot = new AtomicReference<>();
+      var projectRoot = new AtomicReference<Path>();
       runCreateJaxWsModule(env -> {
-        AbstractWebServiceNewOperation executedOperation = createWebServiceProvider(root, true, MULTI_FILE_WSDL, "test.provider.multifile", env);
+        var executedOperation = createWebServiceProvider(root, true, MULTI_FILE_WSDL, "test.provider.multifile", env);
         assertMultiFileWsdlCorrect(executedOperation, false);
         projectRoot.set(executedOperation.getProjectRoot());
       });
 
       runInExistingJaxWsModule(projectRoot.get(), env -> {
-        AbstractWebServiceNewOperation executedOperation = createWebServiceConsumer(root, false, MULTI_SERVICE_WSDL, "test.consumer.multiservice", env);
+        var executedOperation = createWebServiceConsumer(root, false, MULTI_SERVICE_WSDL, "test.consumer.multiservice", env);
         assertMultiServiceWsdlCorrect(executedOperation, true);
       });
 
       runInExistingJaxWsModule(projectRoot.get(), env -> {
-        AbstractWebServiceNewOperation executedOperation = createEmptyWebServiceProvider(root, false, "Whatever", "test.provider.empty", env);
+        var executedOperation = createEmptyWebServiceProvider(root, false, "Whatever", "test.provider.empty", env);
         assertEmptyWsdlCorrect(executedOperation);
       });
     }
@@ -194,15 +190,15 @@ public class WebServiceNewOperationTest {
 
   private static AbstractWebServiceNewOperation createWebService(Path root, boolean isConsumer, boolean isEmptyProvider, boolean isCreateNewModule,
       String wsdlName, URL wsdl, String pck, TestingEnvironment env) {
-    String jaxWsArtifactId = CoreScoutTestingUtils.PROJECT_ARTIFACT_ID + ".server.jaxws";
-    Path serverModule = root.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID).resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID + ".server");
-    Path jaxWsModule = root.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID).resolve(jaxWsArtifactId);
+    var jaxWsArtifactId = CoreScoutTestingUtils.PROJECT_ARTIFACT_ID + ".server.jaxws";
+    var serverModule = root.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID).resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID + ".server");
+    var jaxWsModule = root.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID).resolve(jaxWsArtifactId);
 
-    AbstractWebServiceNewOperation op = new AbstractWebServiceNewOperation() {
+    var op = new AbstractWebServiceNewOperation() {
       @Override
       protected Path createNewJaxWsModule(IEnvironment e, IProgress progress) {
         try {
-          Path createdProjectDir = CoreScoutTestingUtils.createJaxWsModule(serverModule, jaxWsArtifactId, env);
+          var createdProjectDir = CoreScoutTestingUtils.createJaxWsModule(serverModule, jaxWsArtifactId, env);
           ensureGeneratedSourceFoldersExist(createdProjectDir);
           return createdProjectDir;
         }
@@ -240,7 +236,7 @@ public class WebServiceNewOperationTest {
     op.setPackage(pck);
     env.run(op);
 
-    Path parentModule = root.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID).resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID);
+    var parentModule = root.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID).resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID);
 
     // ensure the module is present in the parent pom
     assertJaxWsModulePresent(parentModule, jaxWsArtifactId);
@@ -256,13 +252,13 @@ public class WebServiceNewOperationTest {
 
   private static void assertServerModuleHasJaxWsDependency(Path serverModuleDir, String jaxWsArtifactId) {
     try {
-      Document doc = Xml.get(serverModuleDir.resolve(IMavenConstants.POM));
-      String prefix = "p";
-      String p = prefix + ':';
-      StringBuilder builder = new StringBuilder();
+      var doc = Xml.get(serverModuleDir.resolve(IMavenConstants.POM));
+      var prefix = "p";
+      var p = prefix + ':';
+      var builder = new StringBuilder();
       builder.append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.DEPENDENCIES).append('/').append(p).append(IMavenConstants.DEPENDENCY)
           .append("[./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='").append(jaxWsArtifactId).append("']");
-      List<Element> elements = Xml.evaluateXPath(builder.toString(), doc, prefix, IMavenConstants.POM_XML_NAMESPACE);
+      var elements = Xml.evaluateXPath(builder.toString(), doc, prefix, IMavenConstants.POM_XML_NAMESPACE);
       if (elements.isEmpty()) {
         fail("Jax Ws Module has not been added to the dependencies of the server module.");
       }
@@ -274,13 +270,13 @@ public class WebServiceNewOperationTest {
 
   private static void assertJaxWsModulePresent(Path parentModuleDir, String jaxWsArtifactId) {
     try {
-      Document doc = Xml.get(parentModuleDir.resolve(IMavenConstants.POM));
-      String prefix = "p";
-      String p = prefix + ':';
-      StringBuilder builder = new StringBuilder();
+      var doc = Xml.get(parentModuleDir.resolve(IMavenConstants.POM));
+      var prefix = "p";
+      var p = prefix + ':';
+      var builder = new StringBuilder();
       builder.append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.MODULES)
           .append("[./").append(p).append(IMavenConstants.MODULE).append("='../").append(jaxWsArtifactId).append("']");
-      List<Element> elements = Xml.evaluateXPath(builder.toString(), doc, prefix, IMavenConstants.POM_XML_NAMESPACE);
+      var elements = Xml.evaluateXPath(builder.toString(), doc, prefix, IMavenConstants.POM_XML_NAMESPACE);
       if (elements.isEmpty()) {
         fail("Jax Ws Module has not been added to the parent pom modules.");
       }

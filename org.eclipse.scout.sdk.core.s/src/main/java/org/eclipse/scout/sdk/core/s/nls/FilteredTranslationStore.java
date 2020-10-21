@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -99,7 +100,7 @@ public class FilteredTranslationStore implements IEditableTranslationStore {
 
   @Override
   public boolean containsLanguage(Language language) {
-    return languages().anyMatch(lang -> Objects.equals(lang, language));
+    return languages().anyMatch(Predicate.isEqual(language));
   }
 
   @Override
@@ -170,7 +171,7 @@ public class FilteredTranslationStore implements IEditableTranslationStore {
       return false;
     }
 
-    FilteredTranslationStore other = (FilteredTranslationStore) obj;
+    var other = (FilteredTranslationStore) obj;
     return service().equals(other.service())
         && keysFilter().equals(other.keysFilter());
   }

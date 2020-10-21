@@ -46,7 +46,7 @@ public class DtoUpdateHandlerTest {
 
   @Test
   public void testFindDataAnnotationForPageData(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+    var scoutApi = env.requireApi(IScoutApi.class);
 
     // no table page
     assertFalse(findDataAnnotationForPageData(env.requireType(ThirdIntegerColumn.class.getName()), scoutApi).isPresent());
@@ -57,7 +57,7 @@ public class DtoUpdateHandlerTest {
 
   @Test
   public void testFindDataAnnotationForRowData(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+    var scoutApi = env.requireApi(IScoutApi.class);
 
     // IColumn
     assertTrue(findDataAnnotationForRowData(env.requireType(ThirdIntegerColumn.class.getName()), scoutApi).isPresent());

@@ -14,13 +14,11 @@ import static java.util.Collections.unmodifiableMap;
 import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.getPropertiesFileName;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -70,13 +68,13 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   public void load(Collection<ITranslationPropertiesFile> translationFiles, IProgress progress) {
     Ensure.notNull(translationFiles);
 
-    int ticksByFile = 100;
+    var ticksByFile = 100;
     progress.init(translationFiles.size() * ticksByFile, "Load translation files for service '{}'.", service().type().name());
 
-    boolean isEditable = !translationFiles.isEmpty();
+    var isEditable = !translationFiles.isEmpty();
     m_translations.clear();
     translationFiles().clear();
-    for (ITranslationPropertiesFile f : translationFiles) {
+    for (var f : translationFiles) {
       // load data from file
       f.load(progress.newChild(ticksByFile));
 
@@ -104,7 +102,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   @Override
   public ITranslationEntry changeKey(String oldKey, String newKey) {
     setDirty(true);
-    TranslationEntry removed = (TranslationEntry) removeTranslation(oldKey);
+    var removed = (TranslationEntry) removeTranslation(oldKey);
     if (removed == null) {
       SdkLog.warning("Cannot update key '{}' to '{}' because it could not be found.", oldKey, newKey);
       return null;
@@ -116,21 +114,21 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
 
   @Override
   public ITranslationEntry updateTranslation(ITranslation newEntry) {
-    String key = newEntry.key();
-    TranslationEntry entryToModify = (TranslationEntry) get(key).get();
+    var key = newEntry.key();
+    var entryToModify = (TranslationEntry) get(key).get();
     setDirty(true);
 
     ensureAllLanguagesExist(newEntry);
 
     // remove translation from all properties files
-    for (Language l : entryToModify.texts().keySet()) {
+    for (var l : entryToModify.texts().keySet()) {
       translationFiles().get(l).removeTranslation(key);
     }
     // update instance
     entryToModify.setTexts(newEntry.texts());
 
     // add to new properties files
-    for (Entry<Language, String> newTranslations : entryToModify.texts().entrySet()) {
+    for (var newTranslations : entryToModify.texts().entrySet()) {
       translationFiles().get(newTranslations.getKey()).setTranslation(key, newTranslations.getValue());
     }
     return entryToModify;
@@ -145,7 +143,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   @Override
   public ITranslationEntry addNewTranslation(ITranslation newTranslation) {
     throwIfReadOnly();
-    TranslationEntry newEntry = new TranslationEntry(newTranslation, this);
+    var newEntry = new TranslationEntry(newTranslation, this);
     ensureAllLanguagesExist(newEntry);
     setDirty(true);
     addTranslationEntry(newEntry);
@@ -166,7 +164,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   }
 
   protected void updateTextInFile(Language l, String key, String text) {
-    ITranslationPropertiesFile file = translationFiles().get(l);
+    var file = translationFiles().get(l);
     if (file == null) {
       SdkLog.warning("Cannot add text '{}' for key '{}' and language '{}' because this language does not exist in store {}.", text, key, l, this);
       return;
@@ -179,7 +177,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   public void addNewLanguage(Language language) {
     throwIfReadOnly();
     Ensure.notNull(language);
-    Path directory = translationFiles().values().stream()
+    var directory = translationFiles().values().stream()
         .filter(f -> f instanceof EditableTranslationFile)
         .map(f -> (EditableTranslationFile) f)
         .findAny()
@@ -187,7 +185,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
         .path()
         .getParent();
 
-    String fileName = getPropertiesFileName(service().filePrefix(), language);
+    var fileName = getPropertiesFileName(service().filePrefix(), language);
     ITranslationPropertiesFile newFile = new EditableTranslationFile(directory.resolve(fileName), language);
     newFile.load(new NullProgress());
 
@@ -201,7 +199,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     if (!isDirty()) {
       return;
     }
-    for (ITranslationPropertiesFile f : translationFiles().values()) {
+    for (var f : translationFiles().values()) {
       f.flush(env, progress);
     }
     m_newFiles.clear();
@@ -312,7 +310,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
       return false;
     }
 
-    ITranslationStore other = (ITranslationStore) obj;
+    var other = (ITranslationStore) obj;
     return service().equals(other.service());
   }
 

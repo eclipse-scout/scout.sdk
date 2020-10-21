@@ -271,7 +271,7 @@ public class ScoutModelHierarchy {
   }
 
   protected Stream<String> getPossibleChildren(String superClass) {
-    Set<String> children = m_childrenByContainer.get(superClass);
+    var children = m_childrenByContainer.get(superClass);
     if (children == null || children.isEmpty()) {
       return Stream.empty();
     }
@@ -291,7 +291,7 @@ public class ScoutModelHierarchy {
     if (Objects.equals(scoutTypeFqn, scoutSuperTypeFqn)) {
       return true;
     }
-    Set<String> directSuperTypes = m_interfaceHierarchy.get(scoutTypeFqn);
+    var directSuperTypes = m_interfaceHierarchy.get(scoutTypeFqn);
     return !(directSuperTypes == null || directSuperTypes.isEmpty()) && isSubtypeOfRec(scoutSuperTypeFqn, directSuperTypes);
   }
 
@@ -300,8 +300,8 @@ public class ScoutModelHierarchy {
       return true;
     }
 
-    for (String s : directSuperTypes) {
-      boolean found = isSubtypeOf(s, scoutTypeFqn);
+    for (var s : directSuperTypes) {
+      var found = isSubtypeOf(s, scoutTypeFqn);
       if (found) {
         return true;
       }

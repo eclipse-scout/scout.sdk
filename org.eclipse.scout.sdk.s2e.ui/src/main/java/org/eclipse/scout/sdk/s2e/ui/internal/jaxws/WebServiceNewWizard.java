@@ -18,7 +18,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.s2e.operation.jaxws.WebServiceNewOperation;
@@ -71,9 +70,9 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
    *          The operation to fill
    */
   protected void mapPageToOperation(PageToOperationMappingInput input, WebServiceNewOperation op) {
-    WebServiceType webServiceType = getWebServiceNewWizardPage().getWebServiceType();
-    boolean createConsumer = WebServiceType.CONSUMER_FROM_EXISTING_WSDL == webServiceType;
-    boolean createFromEmptyWsdl = WebServiceType.PROVIDER_FROM_EMPTY_WSDL == webServiceType;
+    var webServiceType = getWebServiceNewWizardPage().getWebServiceType();
+    var createConsumer = WebServiceType.CONSUMER_FROM_EXISTING_WSDL == webServiceType;
+    var createFromEmptyWsdl = WebServiceType.PROVIDER_FROM_EMPTY_WSDL == webServiceType;
 
     op.setCreateConsumer(createConsumer);
     op.setCreateEmptyWsdl(createFromEmptyWsdl);
@@ -110,25 +109,25 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
   }
 
   protected static void showJaxwsEditor(WebServiceNewOperation operation, Display d) {
-    IJavaProject jaxWsProject = operation.getJaxWsProject();
+    var jaxWsProject = operation.getJaxWsProject();
     if (!JdtUtils.exists(jaxWsProject)) {
       return;
     }
-    IFile jaxwsFile = findJaxwsFileIn(jaxWsProject.getProject());
+    var jaxwsFile = findJaxwsFileIn(jaxWsProject.getProject());
     if (jaxwsFile == null) {
       return;
     }
     @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-    String wsdlName = operation.getCreatedWsdlFile().getFileName().toString();
+    var wsdlName = operation.getCreatedWsdlFile().getFileName().toString();
     d.asyncExec(() -> openJaxwsEditor(jaxwsFile, wsdlName));
   }
 
   protected static IFile findJaxwsFileIn(IResource owner) {
     try {
-      IFile[] result = new IFile[1];
+      var result = new IFile[1];
       owner.accept((IResourceProxyVisitor) proxy -> {
         if (result[0] == null && proxy.getType() == IResource.FILE && proxy.getName().toLowerCase(Locale.ENGLISH).endsWith('.' + WebServiceEditor.WEB_SERVICE_FILE_EXTENSION)) {
-          IFile resource = (IFile) proxy.requestResource();
+          var resource = (IFile) proxy.requestResource();
           if (resource.exists()) {
             result[0] = resource;
             return false;
@@ -145,7 +144,7 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
   }
 
   protected static void openJaxwsEditor(IFile jaxwsFile, String wsdlName) {
-    WebServiceEditorInput input = new WebServiceEditorInput(jaxwsFile);
+    var input = new WebServiceEditorInput(jaxwsFile);
     input.setPageIdToActivate(wsdlName);
     S2eUiUtils.openInEditor(input, WebServiceEditor.WEB_SERVICE_EDITOR_ID, true);
   }

@@ -10,16 +10,13 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
-import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 import static java.util.stream.Stream.concat;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.core.util.StreamUtils.allMatchResults;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -65,7 +62,7 @@ public class UiTextContributor {
   }
 
   protected Set<String> loadAllKeys(IProgress progress) {
-    String methodName = type().javaEnvironment().requireApi(IScoutApi.class).UiTextContributor().contributeUiTextKeysMethodName();
+    var methodName = type().javaEnvironment().requireApi(IScoutApi.class).UiTextContributor().contributeUiTextKeysMethodName();
     return type()
         .methods()
         .withName(methodName)
@@ -80,7 +77,7 @@ public class UiTextContributor {
 
   protected Set<String> loadAllKeys(CharSequence methodSource, IProgress progress) {
     return concat(loadDirectLiterals(methodSource), loadReferencedTextProviderServices(methodSource, progress))
-        .collect(collectingAndThen(toSet(), Collections::unmodifiableSet));
+        .collect(toUnmodifiableSet());
   }
 
   protected static Stream<String> loadDirectLiterals(CharSequence contributeUiTextKeysMethodSource) {
@@ -89,9 +86,9 @@ public class UiTextContributor {
   }
 
   protected Stream<String> loadReferencedTextProviderServices(CharSequence contributeUiTextKeysMethodSource, IProgress progress) {
-    IType contributor = type();
-    IScoutApi scoutApi = contributor.javaEnvironment().requireApi(IScoutApi.class);
-    List<IType> referencedTextServices = allMatchResults(TEXT_SERVICE_CLASS_LITERAL_PAT, contributeUiTextKeysMethodSource)
+    var contributor = type();
+    var scoutApi = contributor.javaEnvironment().requireApi(IScoutApi.class);
+    var referencedTextServices = allMatchResults(TEXT_SERVICE_CLASS_LITERAL_PAT, contributeUiTextKeysMethodSource)
         .map(match -> match.group(1))
         .map(contributor::resolveSimpleName)
         .flatMap(Optional::stream)
@@ -106,7 +103,7 @@ public class UiTextContributor {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append(UiTextContributor.class.getSimpleName()).append(" [")
         .append(type().name()).append(']');
     return builder.toString();
@@ -126,7 +123,7 @@ public class UiTextContributor {
       return false;
     }
 
-    UiTextContributor other = (UiTextContributor) obj;
+    var other = (UiTextContributor) obj;
     return type().equals(other.type());
   }
 }

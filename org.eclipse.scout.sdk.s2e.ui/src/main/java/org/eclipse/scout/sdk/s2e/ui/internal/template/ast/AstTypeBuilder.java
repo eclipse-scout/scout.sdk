@@ -17,18 +17,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
@@ -165,25 +159,25 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
   @Override
   @SuppressWarnings({"unchecked", "pmd:NPathComplexity"})
   public INSTANCE insert() {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
     if (getReadOnlySuffix() == null) {
       withReadOnlyNameSuffix("");
     }
-    boolean createClassId = isCreateClassIdAnnotation() && ClassIds.isAutomaticallyCreateClassIdAnnotation();
+    var createClassId = isCreateClassIdAnnotation() && ClassIds.isAutomaticallyCreateClassIdAnnotation();
 
     m_resultType = ast.newTypeDeclaration();
     m_resultType.setInterface(false);
-    for (ModifierKeyword mod : getModifiers()) {
+    for (var mod : getModifiers()) {
       m_resultType.modifiers().add(ast.newModifier(mod));
     }
-    SimpleName typeName = ast.newSimpleName(getTypeName() + getReadOnlySuffix());
+    var typeName = ast.newSimpleName(getTypeName() + getReadOnlySuffix());
     m_resultType.setName(typeName);
     if (getSuperType() != null) {
       m_resultType.setSuperclassType(getSuperType());
     }
 
     // linked positions for the type
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       ITrackedNodePosition typeNamePos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(m_resultType.getName()), 0, -getReadOnlySuffix().length());
       links.addLinkedPosition(typeNamePos, true, AstNodeFactory.TYPE_NAME_GROUP);
@@ -210,14 +204,14 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
       double newOrder = ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       if (isCalculateOrderValue()) {
         //noinspection resource
-        IJavaEnvironment environment = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
+        var environment = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
         newOrder = OrderAnnotation.getNewViewOrderValue(environment.requireType(declaringTypeFqn), getOrderDefinitionType(), getInsertPosition());
       }
 
-      SingleMemberAnnotation order = ast.newSingleMemberAnnotation();
-      String orderRef = getFactory().getImportRewrite().addImport(getFactory().getScoutApi().Order().fqn());
+      var order = ast.newSingleMemberAnnotation();
+      var orderRef = getFactory().getImportRewrite().addImport(getFactory().getScoutApi().Order().fqn());
       order.setTypeName(ast.newName(orderRef));
-      NumberLiteral orderValue = ast.newNumberLiteral(convertToJavaSource(newOrder));
+      var orderValue = ast.newNumberLiteral(convertToJavaSource(newOrder));
       order.setValue(orderValue);
 
       AstUtils.addAnnotationTo(order, m_resultType);
@@ -225,8 +219,8 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
 
     // classId annotation
     if (createClassId) {
-      String fqn = new StringBuilder(declaringTypeFqn).append(JavaTypes.C_DOLLAR).append(getTypeName()).toString();
-      SingleMemberAnnotation classIdAnnotation = getFactory().newClassIdAnnotation(fqn);
+      var fqn = new StringBuilder(declaringTypeFqn).append(JavaTypes.C_DOLLAR).append(getTypeName()).toString();
+      var classIdAnnotation = getFactory().newClassIdAnnotation(fqn);
       AstUtils.addAnnotationTo(classIdAnnotation, m_resultType);
     }
 
@@ -238,8 +232,8 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
     }
 
     // add to the declaring node
-    ListRewrite typeRewrite = getFactory().getRewrite().getListRewrite(getDeclaringType(), getDeclaringType().getBodyDeclarationsProperty());
-    ASTNode previousNode = AstUtils.getPreviousNode(getDeclaringType(), getInsertPosition(), new P_EnsureElementInRewriteFilter(typeRewrite));
+    var typeRewrite = getFactory().getRewrite().getListRewrite(getDeclaringType(), getDeclaringType().getBodyDeclarationsProperty());
+    var previousNode = AstUtils.getPreviousNode(getDeclaringType(), getInsertPosition(), new P_EnsureElementInRewriteFilter(typeRewrite));
     if (previousNode == null) {
       typeRewrite.insertFirst(m_resultType, null);
     }

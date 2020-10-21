@@ -17,13 +17,11 @@ import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
-import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.MethodImplementor;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
@@ -120,18 +118,18 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   @Override
   public List<MethodParameterSpi> getParameters() {
     return m_arguments.computeIfAbsentAndGet(() -> {
-      TypeBinding[] arguments = m_binding.parameters;
+      var arguments = m_binding.parameters;
       if (arguments == null || arguments.length < 1) {
         return emptyList();
       }
 
       List<MethodParameterSpi> result = new ArrayList<>(arguments.length);
-      MethodBinding originalBinding = m_binding.original();
-      AbstractMethodDeclaration sourceMethod = m_binding.sourceMethod();
-      AbstractMethodDeclaration originalSourceMethod = originalBinding.sourceMethod();
+      var originalBinding = m_binding.original();
+      var sourceMethod = m_binding.sourceMethod();
+      var originalSourceMethod = originalBinding.sourceMethod();
 
-      for (int i = 0; i < arguments.length; i++) {
-        char[] name = getParamName(m_binding, sourceMethod, i);
+      for (var i = 0; i < arguments.length; i++) {
+        var name = getParamName(m_binding, sourceMethod, i);
         if (name == null) {
           name = getParamName(originalBinding, originalSourceMethod, i);
           if (name == null) {
@@ -139,7 +137,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
           }
         }
 
-        int flags = Flags.AccDefault;
+        var flags = Flags.AccDefault;
         if (sourceMethod != null && sourceMethod.arguments.length > i) {
           flags = sourceMethod.arguments[i].modifiers;
         }
@@ -174,7 +172,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
 
   @Override
   public boolean hasTypeParameters() {
-    TypeVariableBinding[] typeVariables = getTypeVariables();
+    var typeVariables = getTypeVariables();
     return typeVariables != null && typeVariables.length > 0;
   }
 
@@ -196,11 +194,11 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      AbstractMethodDeclaration decl = SpiWithEcjUtils.sourceMethodOf(m_binding);
+      var decl = SpiWithEcjUtils.sourceMethodOf(m_binding);
       if (decl == null) {
         return null;
       }
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+      var cu = m_declaringType.getCompilationUnit();
       return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
     });
   }
@@ -208,11 +206,11 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   @Override
   public ISourceRange getSourceOfBody() {
     return m_bodySource.computeIfAbsentAndGet(() -> {
-      AbstractMethodDeclaration decl = SpiWithEcjUtils.sourceMethodOf(m_binding);
+      var decl = SpiWithEcjUtils.sourceMethodOf(m_binding);
       if (decl == null) {
         return null;
       }
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+      var cu = m_declaringType.getCompilationUnit();
       return javaEnvWithEcj().getSource(cu, decl.bodyStart, decl.bodyEnd);
     });
   }
@@ -220,7 +218,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   @Override
   public ISourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
-      AbstractMethodDeclaration decl = SpiWithEcjUtils.sourceMethodOf(m_binding);
+      var decl = SpiWithEcjUtils.sourceMethodOf(m_binding);
       if (decl == null) {
         return null;
       }

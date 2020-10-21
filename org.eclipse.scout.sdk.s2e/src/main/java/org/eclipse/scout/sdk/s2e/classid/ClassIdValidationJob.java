@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipError;
@@ -34,8 +33,6 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
@@ -83,7 +80,7 @@ public final class ClassIdValidationJob extends AbstractJob {
   private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(IProgressMonitor monitor) {
     Set<IAnnotation> result = new HashSet<>();
     try {
-      for (IType classIdType : m_classIdTypes) {
+      for (var classIdType : m_classIdTypes) {
         if (monitor.isCanceled()) {
           return result;
         }
@@ -112,23 +109,23 @@ public final class ClassIdValidationJob extends AbstractJob {
   }
 
   static void collectAllClassIdAnnotationsInWorkspace(IType classIdType, Collection<IAnnotation> collector, IProgressMonitor monitor) throws CoreException {
-    String classIdFqn = classIdType.getFullyQualifiedName();
-    SearchRequestor requestor = new SearchRequestor() {
+    var classIdFqn = classIdType.getFullyQualifiedName();
+    var requestor = new SearchRequestor() {
       @Override
       public void acceptSearchMatch(SearchMatch match) {
         if (monitor.isCanceled()) {
           throw new OperationCanceledException("ClassId annotation search canceled by monitor.");
         }
-        Object owner = match.getElement();
+        var owner = match.getElement();
         if (!(owner instanceof IType)) {
           return;
         }
-        IType ownerType = (IType) owner;
+        var ownerType = (IType) owner;
         if (!JdtUtils.exists(ownerType)) {
           return;
         }
 
-        IJavaElement element = ((ReferenceMatch) match).getLocalElement();
+        var element = ((ReferenceMatch) match).getLocalElement();
         if (element == null) {
           // e.g. when the annotation is fully qualified. try reading from owner
           element = JdtUtils.getAnnotation(ownerType, classIdFqn);
@@ -139,7 +136,7 @@ public final class ClassIdValidationJob extends AbstractJob {
         }
       }
     };
-    SearchPattern pattern = SearchPattern.createPattern(classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH);
+    var pattern = SearchPattern.createPattern(classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH);
     new SearchEngine().search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, SearchEngine.createWorkspaceScope(), requestor, monitor);
   }
 
@@ -149,19 +146,19 @@ public final class ClassIdValidationJob extends AbstractJob {
   }
 
   private Map<String /*classid*/, List<IAnnotation>> getClassIdOccurrences(IProgressMonitor monitor) {
-    Set<IAnnotation> allClassIdAnnotationsInWorkspace = getAllClassIdAnnotationsInWorkspace(monitor);
+    var allClassIdAnnotationsInWorkspace = getAllClassIdAnnotationsInWorkspace(monitor);
     if (monitor.isCanceled()) {
       return null;
     }
 
     Map<String, List<IAnnotation>> ids = new HashMap<>();
-    for (IAnnotation r : allClassIdAnnotationsInWorkspace) {
+    for (var r : allClassIdAnnotationsInWorkspace) {
       if (monitor.isCanceled()) {
         return null;
       }
 
       if (JdtUtils.exists(r)) {
-        String id = JdtUtils.getAnnotationValueString(r, "value");
+        var id = JdtUtils.getAnnotationValueString(r, "value");
         if (!Strings.isEmpty(id)) {
           ids.computeIfAbsent(id, k -> new ArrayList<>()).add(r);
         }
@@ -171,8 +168,8 @@ public final class ClassIdValidationJob extends AbstractJob {
   }
 
   private static IAnnotation getVisibleDuplicate(IJavaElement current, Iterable<IAnnotation> matchesById) {
-    IJavaProject jp = current.getJavaProject();
-    for (IAnnotation m : matchesById) {
+    var jp = current.getJavaProject();
+    for (var m : matchesById) {
       if (m != current && isOnClasspath(m, jp)) {
         return m;
       }
@@ -184,18 +181,18 @@ public final class ClassIdValidationJob extends AbstractJob {
     if (annotations == null || annotations.isEmpty()) {
       return;
     }
-    for (Entry<String, List<IAnnotation>> matches : annotations.entrySet()) {
-      List<IAnnotation> matchesById = matches.getValue();
+    for (var matches : annotations.entrySet()) {
+      var matchesById = matches.getValue();
       if (matchesById.size() > 1) {
-        for (IAnnotation duplicate : matchesById) {
-          IAnnotation other = getVisibleDuplicate(duplicate, matchesById);
-          IType parent = (IType) duplicate.getAncestor(IJavaElement.TYPE);
+        for (var duplicate : matchesById) {
+          var other = getVisibleDuplicate(duplicate, matchesById);
+          var parent = (IType) duplicate.getAncestor(IJavaElement.TYPE);
           if (JdtUtils.exists(parent) && JdtUtils.exists(other)) {
             @SuppressWarnings("squid:S2259")
-            IType otherParent = (IType) other.getAncestor(IJavaElement.TYPE);
-            ISourceRange sourceRange = duplicate.getSourceRange();
+            var otherParent = (IType) other.getAncestor(IJavaElement.TYPE);
+            var sourceRange = duplicate.getSourceRange();
             if (JdtUtils.exists(otherParent) && SourceRange.isAvailable(sourceRange)) {
-              IMarker marker = duplicate.getResource().createMarker(CLASS_ID_DUPLICATE_MARKER_ID);
+              var marker = duplicate.getResource().createMarker(CLASS_ID_DUPLICATE_MARKER_ID);
               marker.setAttribute(IMarker.MESSAGE, "Duplicate @ClassId. Value '" + matches.getKey() + "' of type '" + parent.getFullyQualifiedName()
                   + "' is the same as of type '" + otherParent.getFullyQualifiedName() + "'.");
               marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
@@ -228,7 +225,7 @@ public final class ClassIdValidationJob extends AbstractJob {
 
   @Override
   protected void execute(IProgressMonitor monitor) throws CoreException {
-    Map<String, List<IAnnotation>> classIdOccurrences = getClassIdOccurrences(monitor);
+    var classIdOccurrences = getClassIdOccurrences(monitor);
     if (monitor.isCanceled()) {
       return;
     }
@@ -246,7 +243,7 @@ public final class ClassIdValidationJob extends AbstractJob {
 
           // get the class id type outside of the validation job
           // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
-          Set<IType> classIds = ScoutApi.allKnown()
+          var classIds = ScoutApi.allKnown()
               .map(IScoutApi::ClassId)
               .map(ClassId::fqn)
               .distinct()

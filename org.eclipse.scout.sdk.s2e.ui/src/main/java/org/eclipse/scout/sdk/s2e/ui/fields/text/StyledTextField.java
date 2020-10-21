@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2e.ui.fields.text;
 
 import java.util.Locale;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -21,7 +20,6 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -64,7 +62,7 @@ public class StyledTextField extends TextField {
   }
 
   public synchronized String getModifiableText() {
-    String text = getText();
+    var text = getText();
     if (m_suffixListener != null && text.length() >= m_suffixListener.getSuffix().length()) {
       text = text.substring(0, text.length() - m_suffixListener.getSuffix().length());
     }
@@ -120,8 +118,8 @@ public class StyledTextField extends TextField {
     if (text == null) {
       text = "";
     }
-    String prefix = "";
-    String suffix = "";
+    var prefix = "";
+    var suffix = "";
 
     if (m_suffixListener != null) {
       prefix = m_suffixListener.getPrefix();
@@ -134,9 +132,9 @@ public class StyledTextField extends TextField {
       }
     }
 
-    int start = 0;
-    int end = text.length();
-    String lowerText = text.toLowerCase(Locale.ENGLISH);
+    var start = 0;
+    var end = text.length();
+    var lowerText = text.toLowerCase(Locale.ENGLISH);
     if (Strings.hasText(prefix) && lowerText.startsWith(prefix.toLowerCase(Locale.ENGLISH))) {
       start = prefix.length();
     }
@@ -144,7 +142,7 @@ public class StyledTextField extends TextField {
       end = text.length() - suffix.length();
     }
 
-    StringBuilder sb = new StringBuilder(end - start + prefix.length() + suffix.length());
+    var sb = new StringBuilder(end - start + prefix.length() + suffix.length());
     sb.append(prefix);
     sb.append(text, start, end);
     sb.append(suffix);
@@ -188,10 +186,10 @@ public class StyledTextField extends TextField {
      * @return replaced regex expression.
      */
     private String replace(String regex, String... replacements) {
-      StringBuilder sb = new StringBuilder(regex);
-      for (int i = 0; i < replacements.length; i++) {
-        int index = 0;
-        String placeholder = "#" + i + '#';
+      var sb = new StringBuilder(regex);
+      for (var i = 0; i < replacements.length; i++) {
+        var index = 0;
+        var placeholder = "#" + i + '#';
         while ((index = sb.indexOf(placeholder, index)) >= 0) {
           sb.replace(index, index + placeholder.length(), replacements[i]);
         }
@@ -201,7 +199,7 @@ public class StyledTextField extends TextField {
 
     @Override
     public void verifyKey(VerifyEvent event) {
-      Event e = new Event();
+      var e = new Event();
       e.keyCode = event.keyCode;
       e.character = event.character;
       e.doit = event.doit;
@@ -216,8 +214,8 @@ public class StyledTextField extends TextField {
     public void handleEvent(Event event) {
       try {
         if (m_revalLock.acquire()) {
-          Point textSelection = getTextComponent().getSelection();
-          Matcher suffixMatcher = m_preSuffixPattern.matcher(getTextComponent().getText());
+          var textSelection = getTextComponent().getSelection();
+          var suffixMatcher = m_preSuffixPattern.matcher(getTextComponent().getText());
           if (suffixMatcher.find()) {
             switch (event.type) {
               case SWT.Verify:
@@ -234,7 +232,7 @@ public class StyledTextField extends TextField {
               case SWT.KeyDown:
               case SWT.MouseDown:
               case SWT.Selection:
-                Point selection = getTextComponent().getSelection();
+                var selection = getTextComponent().getSelection();
                 if (selection.x < suffixMatcher.end(1)) {
                   selection.x = suffixMatcher.end(1);
                   if (selection.x > selection.y) {
@@ -254,7 +252,7 @@ public class StyledTextField extends TextField {
                 }
                 break;
               case SWT.FocusIn:
-                int x = getTextComponent().getSelection().x;
+                var x = getTextComponent().getSelection().x;
                 if (x < suffixMatcher.end(1) || x > suffixMatcher.start(2)) {
                   getTextComponent().setSelection(suffixMatcher.end(1));
                 }
@@ -287,9 +285,9 @@ public class StyledTextField extends TextField {
           // remove old suffix
           StyledText text = getTextComponent();
           if (m_suffixString != null) {
-            Matcher suffixMatcher = m_preSuffixPattern.matcher(text.getText());
+            var suffixMatcher = m_preSuffixPattern.matcher(text.getText());
             if (suffixMatcher.find()) {
-              String newText = text.getText().substring(0, suffixMatcher.start(2));
+              var newText = text.getText().substring(0, suffixMatcher.start(2));
               text.setText(newText);
             }
           }
@@ -316,9 +314,9 @@ public class StyledTextField extends TextField {
           // remove old suffix
           StyledText text = getTextComponent();
           if (m_prefixString != null) {
-            Matcher suffixMatcher = m_preSuffixPattern.matcher(text.getText());
+            var suffixMatcher = m_preSuffixPattern.matcher(text.getText());
             if (suffixMatcher.find()) {
-              String newText = text.getText().substring(suffixMatcher.end(1));
+              var newText = text.getText().substring(suffixMatcher.end(1));
               text.setText(newText);
             }
           }
@@ -337,7 +335,7 @@ public class StyledTextField extends TextField {
     }
 
     private void updateStyleRanges() {
-      Matcher preSuffixMatcher = m_preSuffixPattern.matcher(getTextComponent().getText());
+      var preSuffixMatcher = m_preSuffixPattern.matcher(getTextComponent().getText());
       if (preSuffixMatcher.find()) {
         m_suffixStyleRange.start = preSuffixMatcher.start(2);
         m_suffixStyleRange.length = preSuffixMatcher.end(2) - preSuffixMatcher.start(2);

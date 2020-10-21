@@ -43,7 +43,7 @@ public class CodeTypeNewOperation implements BiConsumer<IEnvironment, IProgress>
   @Override
   public void accept(IEnvironment env, IProgress progress) {
     progress.init(1, toString());
-    IType createCodeType = createCodeType(env, progress.newChild(1));
+    var createCodeType = createCodeType(env, progress.newChild(1));
     setCreatedCodeType(createCodeType);
   }
 
@@ -61,7 +61,7 @@ public class CodeTypeNewOperation implements BiConsumer<IEnvironment, IProgress>
         .withCodeTypeIdDataType(getCodeTypeIdDataType())
         .withClassIdValue(ClassIds.nextIfEnabled(getPackage() + JavaTypes.C_DOT + getCodeTypeName()));
 
-    String idValue = UniqueIds.next(getCodeTypeIdDataType());
+    var idValue = UniqueIds.next(getCodeTypeIdDataType());
     if (Strings.isBlank(idValue)) {
       idValue = JavaTypes.defaultValueOf(getCodeTypeIdDataType());
     }

@@ -66,13 +66,13 @@ public class CommentBuilderTest {
   }
 
   protected static void assertJavaElementCommentEquals(String expectedSrc, String expectedImports, Consumer<IJavaElementCommentBuilder<?>> task, IJavaEnvironment env) {
-    JavaBuilderContext context = new JavaBuilderContext(env);
-    MemorySourceBuilder inner = new MemorySourceBuilder(context);
+    var context = new JavaBuilderContext(env);
+    var inner = new MemorySourceBuilder(context);
     IJavaElementCommentBuilder<?> builder = new JavaElementCommentBuilder<>(inner, () -> null);
 
     task.accept(builder);
 
-    String imports = context.validator()
+    var imports = context.validator()
         .importCollector()
         .createImportDeclarations()
         .collect(joining(", "));
@@ -81,13 +81,13 @@ public class CommentBuilderTest {
   }
 
   protected static void assertJavaDocEquals(String expected, String input) {
-    MemorySourceBuilder inner = new MemorySourceBuilder();
+    var inner = new MemorySourceBuilder();
     new CommentBuilder<>(inner).appendJavaDocComment(input);
     assertEquals(expected, inner.source().toString());
   }
 
   protected static void assertCommentEquals(String expected, String input) {
-    MemorySourceBuilder inner = new MemorySourceBuilder();
+    var inner = new MemorySourceBuilder();
     new CommentBuilder<>(inner).appendBlockComment(input);
     assertEquals(expected, inner.source().toString());
   }

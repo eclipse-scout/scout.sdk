@@ -17,6 +17,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
@@ -32,8 +34,6 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link PrimaryTypeGenerator}</h3>
@@ -83,7 +83,7 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
       setFilled();
     }
 
-    ICompilationUnitGenerator<?> cu = CompilationUnitGenerator.create()
+    var cu = CompilationUnitGenerator.create()
         .withComment(m_compilationUnit.comment().orElse(null))
         .withElementName(m_compilationUnit.elementName().orElseThrow(() -> newFail("Type name is missing.")))
         .withPackage(getPackage().orElse(null))

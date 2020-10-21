@@ -49,7 +49,7 @@ public final class MockFactory {
   }
 
   public static IType createJdtTypeMock(String fqn, IJavaProject jp) {
-    IType type = mock(IType.class);
+    var type = mock(IType.class);
     when(type.getJavaProject()).thenReturn(jp);
     when(type.getFullyQualifiedName()).thenReturn(fqn);
     when(type.exists()).thenReturn(Boolean.TRUE);
@@ -57,12 +57,12 @@ public final class MockFactory {
   }
 
   public static IJavaProject createJavaProjectMock() {
-    IJavaProject jp = mock(IJavaProject.class);
+    var jp = mock(IJavaProject.class);
     new JavaEnvironmentWithEcjBuilder<>()
         .withParseMethodBodies(true)
         .withoutScoutSdk()
         .accept(env -> {
-          IPackageFragmentRoot[] roots = env.classpath()
+          var roots = env.classpath()
               .map(cpe -> cpEntryToPackageRoot(cpe, jp))
               .collect(toList())
               .toArray(new IPackageFragmentRoot[]{});
@@ -78,15 +78,15 @@ public final class MockFactory {
   }
 
   static ICompilationUnit createIcuMock(Map<String, String> icus, String name) {
-    ICompilationUnit icu = mock(ICompilationUnit.class);
+    var icu = mock(ICompilationUnit.class);
     when(icu.exists()).thenAnswer(i -> icus.containsKey(name));
-    String typeName = name.substring(0, name.length() - JavaTypes.JAVA_FILE_SUFFIX.length());
+    var typeName = name.substring(0, name.length() - JavaTypes.JAVA_FILE_SUFFIX.length());
     when(icu.getType(typeName)).then(invocation -> {
-      IType type = mock(IType.class);
+      var type = mock(IType.class);
       when(type.getFullyQualifiedName()).thenReturn(typeName);
       return type;
     });
-    IFile f = mock(IFile.class);
+    var f = mock(IFile.class);
     when(f.exists()).thenAnswer(invocation -> icus.containsKey(name));
     try {
       //noinspection resource,IOResourceOpenedButNotSafelyClosed
@@ -109,7 +109,7 @@ public final class MockFactory {
     }
     when(icu.getResource()).thenReturn(f);
 
-    IBuffer buffer = mock(IBuffer.class);
+    var buffer = mock(IBuffer.class);
     try {
       when(icu.getBuffer()).thenReturn(buffer);
     }
@@ -125,7 +125,7 @@ public final class MockFactory {
   }
 
   static IPackageFragmentRoot cpEntryToPackageRoot(IClasspathEntry entry, IJavaProject parent) {
-    IPackageFragmentRoot root = mock(IPackageFragmentRoot.class);
+    var root = mock(IPackageFragmentRoot.class);
     when(root.getJavaProject()).thenReturn(parent);
     when(root.exists()).thenReturn(Boolean.TRUE);
     try {
@@ -142,7 +142,7 @@ public final class MockFactory {
     }
 
     Map<String, String> icus = new HashMap<>();
-    IPackageFragment fragment = mock(IPackageFragment.class);
+    var fragment = mock(IPackageFragment.class);
     when(fragment.getCompilationUnit(any())).thenAnswer(invocation -> createIcuMock(icus, invocation.getArgument(0)));
 
     try {
@@ -162,11 +162,11 @@ public final class MockFactory {
       throw new SdkException(e);
     }
 
-    IPath path = mock(IPath.class);
+    var path = mock(IPath.class);
     when(path.toFile()).thenReturn(entry.path().toFile());
     when(root.getPath()).thenReturn(path);
 
-    IResource r = mock(IResource.class);
+    var r = mock(IResource.class);
     when(r.getLocation()).thenReturn(path);
     when(r.exists()).thenReturn(true);
     when(r.contains(r)).thenReturn(true);

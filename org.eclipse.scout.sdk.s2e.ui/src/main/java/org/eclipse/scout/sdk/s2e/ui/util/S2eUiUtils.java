@@ -56,8 +56,6 @@ import org.eclipse.search.internal.ui.text.FileSearchResult;
 import org.eclipse.search.ui.text.Match;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -87,7 +85,7 @@ public final class S2eUiUtils {
 
       @Override
       public int compare(IJavaElement o1, IJavaElement o2) {
-        int result = Integer.compare(getRanking(o1), getRanking(o2));
+        var result = Integer.compare(getRanking(o1), getRanking(o2));
         if (result != 0) {
           return result;
         }
@@ -99,7 +97,7 @@ public final class S2eUiUtils {
       }
 
       private int getRanking(IJavaElement element) {
-        Optional<S2eScoutTier> tier = S2eScoutTier.valueOf(element);
+        var tier = S2eScoutTier.valueOf(element);
         if (tier.isEmpty()) {
           return 100;
         }
@@ -127,7 +125,7 @@ public final class S2eUiUtils {
    * @return The {@link PackageContainer} with the information about the given selection.
    */
   public static PackageContainer getSharedPackageOfSelection(ISelection selection) {
-    Comparator<IJavaElement> elementComparator = Comparator.comparing(IJavaElement::getElementName).thenComparing(Object::toString);
+    var elementComparator = Comparator.comparing(IJavaElement::getElementName).thenComparing(Object::toString);
     return getPackageOfSelection(selection, elementComparator, S2eScoutTier.wrap(ScoutTier.Shared));
   }
 
@@ -241,12 +239,12 @@ public final class S2eUiUtils {
   }
 
   private static IEditorPart openInEditor(IFile f, IEditorInput input, String editorId, boolean activate) {
-    IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+    var activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
     if (activeWorkbenchWindow == null) {
       return null;
     }
 
-    IWorkbenchPage activePage = activeWorkbenchWindow.getActivePage();
+    var activePage = activeWorkbenchWindow.getActivePage();
     if (activePage == null) {
       return null;
     }
@@ -270,8 +268,8 @@ public final class S2eUiUtils {
   }
 
   private static PackageContainer getPackageOfSelection(ISelection selection, Comparator<IJavaElement> javaElementComparator, S2eScoutTier expected) {
-    Set<IResource> selectedResources = getResourcesOfSelection(selection);
-    PackageContainer result = new PackageContainer();
+    var selectedResources = getResourcesOfSelection(selection);
+    var result = new PackageContainer();
     if (selectedResources.isEmpty()) {
       return result;
     }
@@ -279,8 +277,8 @@ public final class S2eUiUtils {
     try {
       List<IJavaElement> elements = new ArrayList<>(selectedResources.size());
       List<IJavaElement> unaccepted = new ArrayList<>(selectedResources.size());
-      for (IResource r : selectedResources) {
-        IJavaElement element = JavaCore.create(r);
+      for (var r : selectedResources) {
+        var element = JavaCore.create(r);
         if (JdtUtils.exists(element)) {
           if (expected.test(element)) {
             elements.add(element);
@@ -293,12 +291,12 @@ public final class S2eUiUtils {
 
       if (elements.isEmpty() && !unaccepted.isEmpty()) {
         // try to convert from one tier to another
-        PackageContainer unacceptedResult = new PackageContainer();
+        var unacceptedResult = new PackageContainer();
         fillContainer(unaccepted, unacceptedResult, javaElementComparator);
         if (JdtUtils.exists(unacceptedResult.getProject())) {
-          Optional<S2eScoutTier> foundTier = S2eScoutTier.valueOf(unacceptedResult.getProject());
+          var foundTier = S2eScoutTier.valueOf(unacceptedResult.getProject());
           if (foundTier.isPresent()) {
-            ScoutTier expectedTier = expected.unwrap();
+            var expectedTier = expected.unwrap();
             result.setProject(foundTier.get().convert(expectedTier, unacceptedResult.getProject()).orElse(null));
             result.setSrcFolder(foundTier.get().convert(expectedTier, unacceptedResult.getSrcFolder()).orElse(null));
             result.setPackage(foundTier.get().convert(expectedTier, unacceptedResult.getPackage()).orElse(null));
@@ -322,19 +320,19 @@ public final class S2eUiUtils {
     }
 
     candidates.sort(javaElementComparator);
-    IJavaElement element = candidates.get(0);
+    var element = candidates.get(0);
 
     // package
     result.setPackage((IPackageFragment) element.getAncestor(IJavaElement.PACKAGE_FRAGMENT));
 
     // source folder
-    IPackageFragmentRoot pckFragRoot = JdtUtils.getSourceFolder(element);
+    var pckFragRoot = JdtUtils.getSourceFolder(element);
     if (JdtUtils.exists(pckFragRoot) && pckFragRoot.getKind() == IPackageFragmentRoot.K_SOURCE) {
       result.setSrcFolder(pckFragRoot);
     }
 
     // java project
-    IJavaProject javaProject = (IJavaProject) element.getAncestor(IJavaElement.JAVA_PROJECT);
+    var javaProject = (IJavaProject) element.getAncestor(IJavaElement.JAVA_PROJECT);
     if (JdtUtils.exists(javaProject)) {
       result.setProject(javaProject);
       if (result.getSrcFolder() == null) {
@@ -355,22 +353,22 @@ public final class S2eUiUtils {
    */
   public static Set<IResource> getResourcesOfSelection(ISelection selection) {
     if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
-      IJavaElement activeEditorJavaInput = EditorUtility.getActiveEditorJavaInput();
+      var activeEditorJavaInput = EditorUtility.getActiveEditorJavaInput();
       if (!JdtUtils.exists(activeEditorJavaInput)) {
         return emptySet();
       }
       selection = new StructuredSelection(activeEditorJavaInput);
     }
 
-    IStructuredSelection structSel = (IStructuredSelection) selection;
+    var structSel = (IStructuredSelection) selection;
     Set<IResource> resourceSet = new LinkedHashSet<>(structSel.size());
-    for (Object selElem : structSel) {
+    for (var selElem : structSel) {
       if (selElem instanceof IWorkingSet) {
-        IWorkingSet workingSet = (IWorkingSet) selElem;
+        var workingSet = (IWorkingSet) selElem;
         if (workingSet.isEmpty() && workingSet.isAggregateWorkingSet()) {
           continue;
         }
-        for (IAdaptable workingSetElement : workingSet.getElements()) {
+        for (var workingSetElement : workingSet.getElements()) {
           addAdaptableResource(workingSetElement, resourceSet);
         }
       }
@@ -382,7 +380,7 @@ public final class S2eUiUtils {
   }
 
   private static void addAdaptableResource(IAdaptable a, Collection<IResource> collector) {
-    IResource resource = a.getAdapter(IResource.class);
+    var resource = a.getAdapter(IResource.class);
     if (resource != null && resource.isAccessible()) {
       collector.add(resource);
     }
@@ -399,9 +397,9 @@ public final class S2eUiUtils {
     if (Strings.isBlank(testName)) {
       testName = "tests";
     }
-    IJavaProject javaProject = element.getJavaProject();
+    var javaProject = element.getJavaProject();
     try {
-      IPackageFragmentRoot testSourceFolder = S2eUtils.getTestSourceFolder(javaProject, fqnOfRequiredType);
+      var testSourceFolder = S2eUtils.getTestSourceFolder(javaProject, fqnOfRequiredType);
       if (!JdtUtils.exists(testSourceFolder)) {
         // no result found. log message
         logNoTestSourceFolderFound(javaProject, fqnOfRequiredType, testName);
@@ -418,7 +416,7 @@ public final class S2eUiUtils {
   private static void logNoTestSourceFolderFound(IJavaProject javaProject, String fqnOfRequiredType, String testName) {
     // check if it is because if the class requirement
     try {
-      IPackageFragmentRoot sourceFolderIgnoringRequiredType = S2eUtils.getTestSourceFolder(javaProject, null);
+      var sourceFolderIgnoringRequiredType = S2eUtils.getTestSourceFolder(javaProject, null);
       if (JdtUtils.exists(sourceFolderIgnoringRequiredType)) {
         SdkLog.warning("Could not find a test source folder for project '{}' having access to class '{}'. No {} will be generated.", javaProject.getElementName(), fqnOfRequiredType, testName);
       }

@@ -11,39 +11,29 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
-import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
-import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
-import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite.ImportRewriteContext;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
-import org.eclipse.jdt.internal.compiler.lookup.CompilationUnitScope;
-import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
@@ -52,7 +42,6 @@ import org.eclipse.jdt.ui.CodeStyleConfiguration;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi.TEXTS;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.uniqueid.UniqueIds;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -337,15 +326,15 @@ public class AstNodeFactory {
   }
 
   public Expression newDefaultValueExpression(String fqn, boolean useUniqueId) {
-    String unboxed = JavaTypes.unboxToPrimitive(fqn);
-    boolean isPrimitive = JavaTypes.isPrimitive(unboxed);
+    var unboxed = JavaTypes.unboxToPrimitive(fqn);
+    var isPrimitive = JavaTypes.isPrimitive(unboxed);
     if (useUniqueId) {
-      String uniqueId = UniqueIds.next(fqn);
+      var uniqueId = UniqueIds.next(fqn);
       if (Strings.hasText(uniqueId)) {
         if (isPrimitive) {
           return getAst().newNumberLiteral(uniqueId);
         }
-        StringLiteral literal = getAst().newStringLiteral();
+        var literal = getAst().newStringLiteral();
         literal.setEscapedValue(uniqueId);
         return literal;
       }
@@ -363,22 +352,22 @@ public class AstNodeFactory {
       return getAst().newBooleanLiteral(false);
     }
 
-    String defaultValue = JavaTypes.defaultValueOf(unboxed);
+    var defaultValue = JavaTypes.defaultValueOf(unboxed);
     return getAst().newNumberLiteral(defaultValue);
   }
 
   public Type newTypeReference(String fqn) {
-    String type = getImportRewrite().addImport(fqn, getContext());
+    var type = getImportRewrite().addImport(fqn, getContext());
     return getAst().newSimpleType(getAst().newSimpleName(type));
   }
 
   @SuppressWarnings("unchecked")
   public NormalAnnotation newFormDataIgnoreAnnotation() {
-    String formDataRef = getImportRewrite().addImport(getScoutApi().FormData().fqn(), getContext());
-    NormalAnnotation formData = getAst().newNormalAnnotation();
+    var formDataRef = getImportRewrite().addImport(getScoutApi().FormData().fqn(), getContext());
+    var formData = getAst().newNormalAnnotation();
     formData.setTypeName(getAst().newName(formDataRef));
 
-    MemberValuePair sdkCommand = getAst().newMemberValuePair();
+    var sdkCommand = getAst().newMemberValuePair();
     sdkCommand.setName(getAst().newSimpleName(getScoutApi().FormData().sdkCommandElementName()));
     sdkCommand.setValue(getAst().newQualifiedName(getAst().newQualifiedName(getAst().newSimpleName(formDataRef),
         getAst().newSimpleName(SdkCommand.class.getSimpleName())),
@@ -389,18 +378,18 @@ public class AstNodeFactory {
   }
 
   public SingleMemberAnnotation newClassIdAnnotation(String fqn) {
-    String classIdFqn = getScoutApi().ClassId().fqn();
-    String classIdRef = getImportRewrite().addImport(classIdFqn, getContext());
+    var classIdFqn = getScoutApi().ClassId().fqn();
+    var classIdRef = getImportRewrite().addImport(classIdFqn, getContext());
 
-    SingleMemberAnnotation classIdAnnotation = getAst().newSingleMemberAnnotation();
+    var classIdAnnotation = getAst().newSingleMemberAnnotation();
     classIdAnnotation.setTypeName(getAst().newName(classIdRef));
 
     // value
-    String newId = ClassIds.next(fqn);
+    var newId = ClassIds.next(fqn);
     if (Strings.isBlank(newId)) {
       newId = "UNDEFINED";
     }
-    StringLiteral id = getAst().newStringLiteral();
+    var id = getAst().newStringLiteral();
     id.setLiteralValue(newId);
     classIdAnnotation.setValue(id);
 
@@ -417,14 +406,14 @@ public class AstNodeFactory {
 
   @SuppressWarnings("unchecked")
   protected AstMethodBuilder<?> newGetConfigured(int value, String name, String group) {
-    NumberLiteral literal = getAst().newNumberLiteral(Integer.toString(value));
-    ReturnStatement returnStatement = getAst().newReturnStatement();
+    var literal = getAst().newNumberLiteral(Integer.toString(value));
+    var returnStatement = getAst().newReturnStatement();
     returnStatement.setExpression(literal);
 
-    Block body = getAst().newBlock();
+    var body = getAst().newBlock();
     body.statements().add(returnStatement);
 
-    ILinkedPositionHolder links = getLinkedPositionHolder();
+    var links = getLinkedPositionHolder();
     if (links != null) {
       links.addLinkedPosition(getRewrite().track(literal), true, group);
     }
@@ -452,18 +441,18 @@ public class AstNodeFactory {
    */
   @SuppressWarnings("unchecked")
   public MethodInvocation newCombineKeyStrokes(String... elementsToCombine) {
-    AST ast = getAst();
-    String iKeyStroke = getImportRewrite().addImport(getScoutApi().IKeyStroke().fqn());
-    MethodInvocation combineKeyStrokes = ast.newMethodInvocation();
+    var ast = getAst();
+    var iKeyStroke = getImportRewrite().addImport(getScoutApi().IKeyStroke().fqn());
+    var combineKeyStrokes = ast.newMethodInvocation();
     combineKeyStrokes.setName(ast.newSimpleName(getScoutApi().AbstractAction().combineKeyStrokesMethodName()));
-    Type keyStrokeRef = newTypeReference(getScoutApi().AbstractAction().fqn());
+    var keyStrokeRef = newTypeReference(getScoutApi().AbstractAction().fqn());
     combineKeyStrokes.setExpression(ast.newSimpleName(keyStrokeRef.toString()));
     List<Expression> arguments = combineKeyStrokes.arguments();
 
-    for (String element : elementsToCombine) {
+    for (var element : elementsToCombine) {
       if (element.length() < 2) {
         // String literal value
-        StringLiteral literal = ast.newStringLiteral();
+        var literal = ast.newStringLiteral();
         literal.setLiteralValue(element);
         arguments.add(literal);
       }
@@ -477,22 +466,22 @@ public class AstNodeFactory {
 
   @SuppressWarnings("unchecked")
   public AstMethodBuilder<?> newNlsMethod(String methodName) {
-    AST ast = getAst();
-    MethodInvocation get = ast.newMethodInvocation();
-    TEXTS textsApi = getScoutApi().TEXTS();
+    var ast = getAst();
+    var get = ast.newMethodInvocation();
+    var textsApi = getScoutApi().TEXTS();
     get.setName(ast.newSimpleName(textsApi.getMethodName()));
-    String textsRef = getImportRewrite().addImport(textsApi.fqn(), getContext());
+    var textsRef = getImportRewrite().addImport(textsApi.fqn(), getContext());
     get.setExpression(ast.newName(textsRef));
-    StringLiteral nlsKeyString = ast.newStringLiteral();
+    var nlsKeyString = ast.newStringLiteral();
     nlsKeyString.setLiteralValue("MyNlsKey");
     get.arguments().add(nlsKeyString);
 
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(get);
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
-    ILinkedPositionHolder links = getLinkedPositionHolder();
+    var links = getLinkedPositionHolder();
     if (links != null) {
       ITrackedNodePosition nlsKeyLiteralPos = new WrappedTrackedNodePosition(getRewrite().track(nlsKeyString), 1, -2);
       links.addLinkedPosition(nlsKeyLiteralPos, true, NLS_KEY_GROUP);
@@ -514,15 +503,15 @@ public class AstNodeFactory {
 
   @SuppressWarnings("unchecked")
   public AstMethodBuilder<?> newGetConfiguredLabelVisible() {
-    AST ast = getAst();
-    BooleanLiteral literal = ast.newBooleanLiteral(false);
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var ast = getAst();
+    var literal = ast.newBooleanLiteral(false);
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(literal);
 
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
-    ILinkedPositionHolder links = getLinkedPositionHolder();
+    var links = getLinkedPositionHolder();
     if (links != null) {
       links.addLinkedPosition(getRewrite().track(literal), true, LABEL_VISIBLE_GROUP);
       links.addLinkedPositionProposalsBoolean(LABEL_VISIBLE_GROUP);
@@ -537,12 +526,12 @@ public class AstNodeFactory {
 
   @SuppressWarnings("unchecked")
   public FieldDeclaration newSerialVersionUid() {
-    AST ast = getAst();
-    VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+    var ast = getAst();
+    var fragment = ast.newVariableDeclarationFragment();
     fragment.setName(ast.newSimpleName(FieldGenerator.SERIAL_VERSION_UID));
     fragment.setInitializer(ast.newNumberLiteral("1L"));
 
-    FieldDeclaration declaration = ast.newFieldDeclaration(fragment);
+    var declaration = ast.newFieldDeclaration(fragment);
     declaration.setType(ast.newPrimitiveType(PrimitiveType.LONG));
     declaration.modifiers().add(ast.newModifier(ModifierKeyword.PRIVATE_KEYWORD));
     declaration.modifiers().add(ast.newModifier(ModifierKeyword.STATIC_KEYWORD));
@@ -551,25 +540,25 @@ public class AstNodeFactory {
   }
 
   public MarkerAnnotation newOverrideAnnotation() {
-    String overrideRef = getImportRewrite().addImport(Override.class.getName(), getContext());
-    MarkerAnnotation marker = getAst().newMarkerAnnotation();
+    var overrideRef = getImportRewrite().addImport(Override.class.getName(), getContext());
+    var marker = getAst().newMarkerAnnotation();
     marker.setTypeName(getAst().newName(overrideRef));
     return marker;
   }
 
   public ITypeBinding resolveTypeBinding(String fqn) {
 
-    ITypeBinding wellKnownType = getAst().resolveWellKnownType(fqn);
+    var wellKnownType = getAst().resolveWellKnownType(fqn);
     if (wellKnownType != null) {
       return wellKnownType;
     }
 
     try {
-      Object resolver = AstUtils.getBindingResolver(getAst());
-      CompilationUnitScope unitScope = AstUtils.getCompilationUnitScope(resolver);
-      ReferenceBinding reference = unitScope.environment.getResolvedType(CharOperation.splitOn(JavaTypes.C_DOT, fqn.toCharArray()), unitScope);
+      var resolver = AstUtils.getBindingResolver(getAst());
+      var unitScope = AstUtils.getCompilationUnitScope(resolver);
+      var reference = unitScope.environment.getResolvedType(CharOperation.splitOn(JavaTypes.C_DOT, fqn.toCharArray()), unitScope);
 
-      Method getTypeBinding = resolver.getClass().getDeclaredMethod("getTypeBinding", TypeBinding.class);
+      var getTypeBinding = resolver.getClass().getDeclaredMethod("getTypeBinding", TypeBinding.class);
       getTypeBinding.setAccessible(true);
       return (ITypeBinding) getTypeBinding.invoke(resolver, reference);
     }

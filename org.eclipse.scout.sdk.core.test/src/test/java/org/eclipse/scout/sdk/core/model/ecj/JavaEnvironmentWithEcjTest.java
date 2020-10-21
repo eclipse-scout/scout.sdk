@@ -16,12 +16,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Field;
+import java.nio.CharBuffer;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
+import org.eclipse.jdt.internal.compiler.lookup.ElementValuePair;
+import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
+import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentBinaryOnlyFactory;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -40,15 +47,15 @@ public class JavaEnvironmentWithEcjTest {
    */
   @Test
   public void testRegisterAfterCloseKeepsEnvironmentUntouched() throws ReflectiveOperationException {
-    String pck = "xx.yy";
-    String className = "Test";
-    JavaEnvironmentWithEcj closedEnv = createClosedJavaEnvironment();
+    var pck = "xx.yy";
+    var className = "Test";
+    var closedEnv = createClosedJavaEnvironment();
     assertEnvironmentClosed(closedEnv);
     closedEnv.registerCompilationUnitOverride(pck, className + JavaTypes.JAVA_FILE_SUFFIX, ("package " + pck + "; public class " + className + " {}").toCharArray());
     assertEnvironmentClosed(closedEnv);
     closedEnv.registerCompilationUnitOverride(pck, className + JavaTypes.JAVA_FILE_SUFFIX, ("package " + pck + "; public class " + className + " {}").toCharArray());
 
-    String fqn = pck + '.' + className;
+    var fqn = pck + '.' + className;
     assertThrows(IllegalArgumentException.class, () -> closedEnv.findType(fqn));
     closedEnv.reload();
     assertNotNull(closedEnv.findType(fqn));
@@ -56,25 +63,25 @@ public class JavaEnvironmentWithEcjTest {
   }
 
   private static JavaEnvironmentWithEcj createClosedJavaEnvironment() {
-    AtomicReference<IJavaEnvironment> holder = new AtomicReference<>();
+    var holder = new AtomicReference<IJavaEnvironment>();
     new CoreJavaEnvironmentBinaryOnlyFactory().accept(holder::set);
     return (JavaEnvironmentWithEcj) holder.get().unwrap();
   }
 
   private static void assertEnvironmentClosed(JavaEnvironmentWithEcj candidate) throws ReflectiveOperationException {
     assertNotNull(candidate);
-    assertEquals(0, fieldValue(candidate, "m_elements", Map.class).size());
-    assertEquals(0, fieldValue(candidate, "m_evpCache", Map.class).size());
-    assertEquals(0, fieldValue(candidate, "m_mvpCache", Map.class).size());
-    assertEquals(0, fieldValue(candidate, "m_sourceCache", Map.class).size());
-    assertFalse(fieldValue(candidate, "m_rawClassPath", Collection.class).isEmpty()); // classpath is preserved so that the environment can be reinitialized
-    assertFalse(fieldValue(candidate, "m_compiler", FinalValue.class).isSet());
-    assertFalse(fieldValue(candidate, "m_classpath", FinalValue.class).isSet());
+    assertEquals(0, JavaEnvironmentWithEcjTest.<Map<Object, JavaElementSpi>>fieldValue(candidate, "m_elements").size());
+    assertEquals(0, JavaEnvironmentWithEcjTest.<Map<ReferenceBinding, Map<String, ElementValuePair>>>fieldValue(candidate, "m_evpCache").size());
+    assertEquals(0, JavaEnvironmentWithEcjTest.<Map<TypeBinding, Map<String, MemberValuePair>>>fieldValue(candidate, "m_mvpCache").size());
+    assertEquals(0, JavaEnvironmentWithEcjTest.<Map<CharBuffer, char[]>>fieldValue(candidate, "m_sourceCache").size());
+    assertFalse(JavaEnvironmentWithEcjTest.<Collection<? extends ClasspathEntry>>fieldValue(candidate, "m_rawClassPath").isEmpty()); // classpath is preserved so that the environment can be reinitialized
+    assertFalse(JavaEnvironmentWithEcjTest.<FinalValue<EcjAstCompiler>>fieldValue(candidate, "m_compiler").isSet());
+    assertFalse(JavaEnvironmentWithEcjTest.<FinalValue<List<ClasspathSpi>>>fieldValue(candidate, "m_classpath").isSet());
   }
 
   @SuppressWarnings("unchecked")
-  private static <T> T fieldValue(Object instance, String fieldName, @SuppressWarnings("unused") Class<T> type) throws ReflectiveOperationException {
-    Field field = instance.getClass().getDeclaredField(fieldName);
+  private static <T> T fieldValue(Object instance, String fieldName) throws ReflectiveOperationException {
+    var field = instance.getClass().getDeclaredField(fieldName);
     field.setAccessible(true);
     return (T) field.get(instance);
   }

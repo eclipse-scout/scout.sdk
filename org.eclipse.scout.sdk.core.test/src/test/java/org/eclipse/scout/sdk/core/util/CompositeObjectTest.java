@@ -29,20 +29,20 @@ public class CompositeObjectTest {
   @Test
   @SuppressWarnings("unlikely-arg-type")
   public void testEquality() {
-    Long a = Long.valueOf(400);
-    Long b = Long.valueOf(400);
+    var a = Long.valueOf(400);
+    var b = Long.valueOf(400);
     assertNotSame(a, b);
     assertEquals(a, b);
 
-    CompositeObject o1 = new CompositeObject(a, b);
-    CompositeObject o2 = new CompositeObject(a, a);
-    CompositeObject o3 = new CompositeObject(a, b);
-    CompositeObject o4 = new CompositeObject((Object[]) null);
+    var o1 = new CompositeObject(a, b);
+    var o2 = new CompositeObject(a, a);
+    var o3 = new CompositeObject(a, b);
+    var o4 = new CompositeObject((Object[]) null);
     Object[] arr = {a, null};
-    CompositeObject o5 = new CompositeObject(arr);
-    CompositeObject o6 = new CompositeObject(arr);
-    CompositeObject o7 = new CompositeObject(new Object[]{a, b, null});
-    CompositeObject o8 = new CompositeObject((Object[]) null);
+    var o5 = new CompositeObject(arr);
+    var o6 = new CompositeObject(arr);
+    var o7 = new CompositeObject(new Object[]{a, b, null});
+    var o8 = new CompositeObject((Object[]) null);
 
     assertTrue(o1.equals(o2));
     assertFalse(o1.equals(null));
@@ -73,15 +73,15 @@ public class CompositeObjectTest {
   @Test
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void testCompareTo() {
-    CompositeObject o1 = new CompositeObject(1, 2, 3);
-    CompositeObject o2 = new CompositeObject(1, 2, 3);
-    CompositeObject o3 = new CompositeObject(4, 5, 6);
-    CompositeObject o4 = new CompositeObject((Object[]) null);
-    CompositeObject o5 = new CompositeObject((Object[]) null);
-    CompositeObject o6 = new CompositeObject(1, 2, 3, 4);
-    CompositeObject o7 = new CompositeObject(new Object[]{null});
-    CompositeObject o8 = new CompositeObject(new Object[]{null});
-    CompositeObject o9 = new CompositeObject(new Object());
+    var o1 = new CompositeObject(1, 2, 3);
+    var o2 = new CompositeObject(1, 2, 3);
+    var o3 = new CompositeObject(4, 5, 6);
+    var o4 = new CompositeObject((Object[]) null);
+    var o5 = new CompositeObject((Object[]) null);
+    var o6 = new CompositeObject(1, 2, 3, 4);
+    var o7 = new CompositeObject(new Object[]{null});
+    var o8 = new CompositeObject(new Object[]{null});
+    var o9 = new CompositeObject(new Object());
 
     assertEquals(0, o1.compareTo(o2));
     assertEquals(-1, o1.compareTo(o3));
@@ -105,13 +105,13 @@ public class CompositeObjectTest {
 
   @Test
   public void testToString() {
-    CompositeObject a = new CompositeObject("first", 2, 3.3f);
+    var a = new CompositeObject("first", 2, 3.3f);
     assertEquals("[first, 2, 3.3]", a.toString());
 
-    CompositeObject b = new CompositeObject((Object[]) null);
+    var b = new CompositeObject((Object[]) null);
     assertEquals("[]", b.toString());
 
-    CompositeObject c = new CompositeObject(new Object[]{});
+    var c = new CompositeObject(new Object[]{});
     assertEquals("[]", c.toString());
   }
 }

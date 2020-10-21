@@ -41,12 +41,12 @@ public class AbstractJobTest {
   public void testCallerStackTraceSchedule() throws InterruptedException {
     SdkLog.setLogLevel(Level.FINE); // so that detailed log is created (caller trace)
     try {
-      AtomicReference<String> trace = new AtomicReference<>();
-      RunnableJob j = new RunnableJob("", () -> {
+      var trace = new AtomicReference<String>();
+      var j = new RunnableJob("", () -> {
       }) {
         @Override
         protected String getCallerStackTrace() {
-          String result = super.getCallerStackTrace();
+          var result = super.getCallerStackTrace();
           trace.set(result);
           return result;
         }
@@ -64,12 +64,12 @@ public class AbstractJobTest {
   public void testCallerStackTraceRun() {
     SdkLog.setLogLevel(Level.FINE); // so that detailed log is created (caller trace)
     try {
-      AtomicReference<String> trace = new AtomicReference<>();
-      RunnableJob j = new RunnableJob("", () -> {
+      var trace = new AtomicReference<String>();
+      var j = new RunnableJob("", () -> {
       }) {
         @Override
         protected String getCallerStackTrace() {
-          String result = super.getCallerStackTrace();
+          var result = super.getCallerStackTrace();
           trace.set(result);
           return result;
         }
@@ -84,7 +84,7 @@ public class AbstractJobTest {
 
   @Test
   public void testCancelByException() throws InterruptedException {
-    RunnableJob j = new RunnableJob("", () -> {
+    var j = new RunnableJob("", () -> {
       throw new OperationCanceledException();
     });
     j.schedule();
@@ -94,7 +94,7 @@ public class AbstractJobTest {
 
   @Test
   public void testCancelByMonitor() throws InterruptedException {
-    AbstractJob j = new AbstractJob("") {
+    var j = new AbstractJob("") {
       @Override
       protected void execute(IProgressMonitor monitor) {
         assertTrue(monitor().isPresent());
@@ -109,7 +109,7 @@ public class AbstractJobTest {
 
   @Test
   public void testCheckedExceptionInExecute() throws InterruptedException {
-    AbstractJob j = new AbstractJob("") {
+    var j = new AbstractJob("") {
       @Override
       protected void execute(IProgressMonitor monitor) throws CoreException {
         throw new CoreException(new Status(IStatus.INFO, S2ESdkActivator.PLUGIN_ID, "test exception"));
@@ -122,7 +122,7 @@ public class AbstractJobTest {
 
   @Test
   public void testRuntimeExceptionInExecute() throws InterruptedException {
-    AbstractJob j = new AbstractJob("") {
+    var j = new AbstractJob("") {
       @Override
       protected void execute(IProgressMonitor monitor) {
         throw new IllegalArgumentException("test exception");
@@ -135,12 +135,12 @@ public class AbstractJobTest {
 
   @Test
   public void testWaitForFamily() throws InterruptedException {
-    String family = "testfamily";
-    CountDownLatch familyJobStarted = new CountDownLatch(1);
-    CountDownLatch waitingJobStarted = new CountDownLatch(1);
-    CountDownLatch blockCondition = new CountDownLatch(1);
+    var family = "testfamily";
+    var familyJobStarted = new CountDownLatch(1);
+    var waitingJobStarted = new CountDownLatch(1);
+    var blockCondition = new CountDownLatch(1);
 
-    AbstractJob j = new AbstractJob("a") {
+    var j = new AbstractJob("a") {
       @Override
       protected void execute(IProgressMonitor monitor) {
         familyJobStarted.countDown();
@@ -160,8 +160,8 @@ public class AbstractJobTest {
     j.schedule();
     familyJobStarted.await(1, TimeUnit.MINUTES);
 
-    AtomicReference<Thread> waitingThread = new AtomicReference<>();
-    AbstractJob waitingJob = new AbstractJob("waiting on a") {
+    var waitingThread = new AtomicReference<Thread>();
+    var waitingJob = new AbstractJob("waiting on a") {
       @Override
       protected void execute(IProgressMonitor monitor) {
         waitingThread.set(Thread.currentThread());

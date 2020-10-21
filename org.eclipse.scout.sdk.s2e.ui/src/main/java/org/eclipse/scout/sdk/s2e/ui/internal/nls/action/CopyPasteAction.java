@@ -30,11 +30,11 @@ public class CopyPasteAction extends Action {
 
   @Override
   public void run() {
-    Clipboard clipboard = new Clipboard(m_display);
+    var clipboard = new Clipboard(m_display);
     try {
-      String rtfData = "{\\rtf1\\b\\i " + m_toCopy + '}'; // formatted as bold and italic
-      TextTransfer textTransfer = TextTransfer.getInstance();
-      RTFTransfer rtfTransfer = RTFTransfer.getInstance();
+      var rtfData = "{\\rtf1\\b\\i " + m_toCopy + '}'; // formatted as bold and italic
+      var textTransfer = TextTransfer.getInstance();
+      var rtfTransfer = RTFTransfer.getInstance();
       Transfer[] transfers = {textTransfer, rtfTransfer};
       Object[] data = {m_toCopy, rtfData};
       clipboard.setContents(data, transfers);

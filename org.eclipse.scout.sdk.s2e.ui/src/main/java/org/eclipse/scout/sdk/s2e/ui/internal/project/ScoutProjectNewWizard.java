@@ -13,16 +13,12 @@ package org.eclipse.scout.sdk.s2e.ui.internal.project;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
 import org.eclipse.m2e.core.ui.internal.wizards.MappingDiscoveryJob;
@@ -59,7 +55,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
         .withOperation(ScoutProjectNewOperation::new)
         .withMapper(this::mapPageToOperation)
         .withUiAction((op, d) -> {
-          List<IProject> createdProjects = op.getCreatedProjects();
+          var createdProjects = op.getCreatedProjects();
           if (createdProjects != null && !createdProjects.isEmpty()) {
             new P_MappingDiscoveryJob(createdProjects).schedule();
           }
@@ -121,11 +117,11 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
       super.discoverProposals(discoveryRequest, monitor);
 
       // by default remove all wrong proposals so that only one proposal by execution-id remains -> default selection can choose and is correct by default.
-      for (Entry<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> entry : discoveryRequest.getAllProposals().entrySet()) {
+      for (var entry : discoveryRequest.getAllProposals().entrySet()) {
         if (entry.getKey() instanceof MojoExecutionMappingRequirement) {
-          MojoExecutionMappingRequirement req = (MojoExecutionMappingRequirement) entry.getKey();
+          var req = (MojoExecutionMappingRequirement) entry.getKey();
           if ("default-compile".equals(req.getExecutionId()) || "default-testCompile".equals(req.getExecutionId())) {
-            List<IMavenDiscoveryProposal> proposals = entry.getValue();
+            var proposals = entry.getValue();
             if (proposals != null && proposals.size() > 1) {
               proposals.removeIf(proposal -> proposal == null || !proposal.toString().endsWith("Eclipse JDT Compiler"));
             }

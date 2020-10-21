@@ -16,7 +16,6 @@ import java.beans.PropertyChangeListenerProxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
@@ -85,7 +84,7 @@ public class PropertySupport {
   }
 
   public int getPropertyInt(String name, int defaultValue) {
-    Number n = getProperty(name, Number.class);
+    var n = getProperty(name, Number.class);
     if (n == null) {
       return defaultValue;
     }
@@ -100,7 +99,7 @@ public class PropertySupport {
   }
 
   public double getPropertyDouble(String name, double defaultValue) {
-    Number n = getProperty(name, Number.class);
+    var n = getProperty(name, Number.class);
     if (n == null) {
       return defaultValue;
     }
@@ -115,7 +114,7 @@ public class PropertySupport {
   }
 
   public long getPropertyLong(String name, long defaultValue) {
-    Number n = getProperty(name, Number.class);
+    var n = getProperty(name, Number.class);
     if (n == null) {
       return defaultValue;
     }
@@ -130,7 +129,7 @@ public class PropertySupport {
   }
 
   public boolean getPropertyBool(String name, boolean defaultValue) {
-    Boolean b = getProperty(name, Boolean.class);
+    var b = getProperty(name, Boolean.class);
     if (b == null) {
       return defaultValue;
     }
@@ -178,7 +177,7 @@ public class PropertySupport {
 
   public void addPropertyChangeListener(@SuppressWarnings("TypeMayBeWeakened") PropertyChangeListener listener) {
     if (listener instanceof PropertyChangeListenerProxy) {
-      PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy) listener;
+      var proxy = (PropertyChangeListenerProxy) listener;
       addPropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
       return;
     }
@@ -193,13 +192,13 @@ public class PropertySupport {
 
   public boolean removePropertyChangeListener(@SuppressWarnings("TypeMayBeWeakened") PropertyChangeListener listener) {
     if (listener instanceof PropertyChangeListenerProxy) {
-      PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy) listener;
+      var proxy = (PropertyChangeListenerProxy) listener;
       // Call two argument remove method.
       return removePropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
     }
 
     synchronized (m_props) {
-      boolean removed = false;
+      var removed = false;
       if (m_listeners != null) {
         removed = m_listeners.remove(listener);
         if (m_listeners.isEmpty()) {
@@ -208,9 +207,9 @@ public class PropertySupport {
       }
 
       if (m_childListeners != null) {
-        Iterator<EventListenerList> iterator = m_childListeners.values().iterator();
+        var iterator = m_childListeners.values().iterator();
         while (iterator.hasNext()) {
-          EventListenerList list = iterator.next();
+          var list = iterator.next();
           if (list.remove(listener) && list.isEmpty()) {
             iterator.remove();
             removed = true;
@@ -248,8 +247,8 @@ public class PropertySupport {
         return false;
       }
 
-      EventListenerList childList = m_childListeners.get(propertyName);
-      boolean removed = childList.remove(listener);
+      var childList = m_childListeners.get(propertyName);
+      var removed = childList.remove(listener);
       if (removed && childList.isEmpty()) {
         // remove the map entry as there are no more listeners for that property
         m_childListeners.remove(propertyName);
@@ -266,7 +265,7 @@ public class PropertySupport {
     if (Objects.equals(oldValue, newValue)) {
       return false;
     }
-    PropertyChangeEvent e = new PropertyChangeEvent(m_source, propertyName, oldValue, newValue);
+    var e = new PropertyChangeEvent(m_source, propertyName, oldValue, newValue);
     firePropertyChange(e);
     return true;
   }
@@ -277,7 +276,7 @@ public class PropertySupport {
     }
 
     Collection<PropertyChangeListener> targets = new ArrayList<>();
-    String propertyName = e.getPropertyName();
+    var propertyName = e.getPropertyName();
 
     synchronized (m_props) {
       if (m_listeners != null) {
@@ -289,7 +288,7 @@ public class PropertySupport {
         }
       }
       if (propertyName != null && m_childListeners != null) {
-        EventListenerList propertyListenerList = m_childListeners.get(propertyName);
+        var propertyListenerList = m_childListeners.get(propertyName);
         if (propertyListenerList != null) {
           targets.addAll(propertyListenerList.get(PropertyChangeListener.class));
         }
@@ -300,15 +299,15 @@ public class PropertySupport {
       return;
     }
 
-    for (PropertyChangeListener listener : targets) {
+    for (var listener : targets) {
       listener.propertyChange(e);
     }
   }
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + m_props.hashCode();
     result = prime * result + (m_source == this ? 0 : m_source.hashCode());
     return result;
@@ -327,7 +326,7 @@ public class PropertySupport {
       return false;
     }
 
-    PropertySupport other = (PropertySupport) obj;
+    var other = (PropertySupport) obj;
     if (!m_props.equals(other.m_props)) {
       return false;
     }

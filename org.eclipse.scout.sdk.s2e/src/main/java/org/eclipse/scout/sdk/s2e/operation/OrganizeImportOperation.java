@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.manipulation.JavaManipulation;
 import org.eclipse.jdt.core.manipulation.OrganizeImportsOperation;
-import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -46,9 +45,9 @@ public class OrganizeImportOperation implements Consumer<EclipseProgress> {
       return; // not configured. throws IllegalArgumentException. Do not organize imports
     }
 
-    ICompilationUnit unit = getCompilationUnit();
+    var unit = getCompilationUnit();
     try {
-      CodeGenerationSettings settings = JavaPreferencesSettings.getCodeGenerationSettings(unit.getJavaProject());
+      var settings = JavaPreferencesSettings.getCodeGenerationSettings(unit.getJavaProject());
       ICoreRunnable organizeImps = new OrganizeImportsOperation(unit, null, settings.importIgnoreLowercase, !unit.isWorkingCopy(), true, null);
       organizeImps.run(t.monitor());
     }

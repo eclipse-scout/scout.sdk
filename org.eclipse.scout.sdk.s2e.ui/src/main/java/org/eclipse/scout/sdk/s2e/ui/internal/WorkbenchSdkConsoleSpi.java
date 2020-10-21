@@ -23,12 +23,9 @@ import org.eclipse.scout.sdk.core.log.LogMessage;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 
@@ -36,7 +33,7 @@ public class WorkbenchSdkConsoleSpi implements ISdkConsoleSpi {
 
   @Override
   public void clear() {
-    IOConsole console = currentConsole(false);
+    var console = currentConsole(false);
     if (console != null) {
       console.clearConsole();
     }
@@ -45,7 +42,7 @@ public class WorkbenchSdkConsoleSpi implements ISdkConsoleSpi {
   @Override
   @SuppressWarnings({"squid:S1166", "squid:S1148", "UseOfSystemOutOrSystemErr", "CallToPrintStackTrace"})
   public void println(LogMessage message) {
-    try (IOConsoleOutputStream out = currentConsole(true).newOutputStream()) {
+    try (var out = currentConsole(true).newOutputStream()) {
       if (Level.SEVERE.equals(message.severity())) {
         out.setActivateOnWrite(true);
         setConsoleColorRed(out);
@@ -71,11 +68,11 @@ public class WorkbenchSdkConsoleSpi implements ISdkConsoleSpi {
     if (!PlatformUI.isWorkbenchRunning()) {
       return;
     }
-    IWorkbench workbench = PlatformUI.getWorkbench();
+    var workbench = PlatformUI.getWorkbench();
     if (workbench == null) {
       return;
     }
-    Display display = workbench.getDisplay();
+    var display = workbench.getDisplay();
     if (display == null) {
       return;
     }
@@ -83,7 +80,7 @@ public class WorkbenchSdkConsoleSpi implements ISdkConsoleSpi {
   }
 
   protected static void logToPluginLog(LogMessage message) {
-    S2ESdkActivator activator = S2ESdkActivator.getDefault();
+    var activator = S2ESdkActivator.getDefault();
     if (activator == null) {
       return;
     }
@@ -105,9 +102,9 @@ public class WorkbenchSdkConsoleSpi implements ISdkConsoleSpi {
   public static final String CONSOLE_TYPE = "org.eclipse.scout.sdk";
 
   public static IOConsole currentConsole(boolean autoCreate) {
-    IConsoleManager mgr = ConsolePlugin.getDefault().getConsoleManager();
+    var mgr = ConsolePlugin.getDefault().getConsoleManager();
     IOConsole console = null;
-    for (IConsole c : mgr.getConsoles()) {
+    for (var c : mgr.getConsoles()) {
       if (!CONSOLE_NAME.equals(c.getName())) {
         continue;
       }

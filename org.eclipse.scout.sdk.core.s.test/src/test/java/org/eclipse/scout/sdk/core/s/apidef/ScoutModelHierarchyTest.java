@@ -34,8 +34,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class ScoutModelHierarchyTest {
   @Test
   public void testPossibleChildrenFor(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
-    ScoutModelHierarchy scoutModelHierarchy = scoutApi.hierarchy();
+    var scoutApi = env.requireApi(IScoutApi.class);
+    var scoutModelHierarchy = scoutApi.hierarchy();
     assertEquals(singleton(scoutApi.IMenu().fqn()), scoutModelHierarchy.possibleChildrenFor(singletonList(scoutApi.AbstractValueField().fqn())));
     assertEquals(emptySet(), scoutModelHierarchy.possibleChildrenFor(singletonList(JavaTypes.Float)));
     assertTrue(scoutModelHierarchy.possibleChildrenFor(singletonList(scoutApi.AbstractCompositeField().fqn())).size() > 0);
@@ -43,24 +43,24 @@ public class ScoutModelHierarchyTest {
 
   @Test
   public void testTabBox(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
-    ScoutModelHierarchy scoutModelHierarchy = scoutApi.hierarchy();
+    var scoutApi = env.requireApi(IScoutApi.class);
+    var scoutModelHierarchy = scoutApi.hierarchy();
     assertEquals(3, scoutModelHierarchy.possibleChildrenFor(singletonList(scoutApi.AbstractTabBox().fqn())).size());
     assertEquals(3, scoutModelHierarchy.possibleChildrenFor(singletonList(scoutApi.AbstractTabBoxExtension().fqn())).size());
   }
 
   @Test
   public void testRadioButtonGroup(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
-    ScoutModelHierarchy scoutModelHierarchy = scoutApi.hierarchy();
+    var scoutApi = env.requireApi(IScoutApi.class);
+    var scoutModelHierarchy = scoutApi.hierarchy();
     assertEquals(3, scoutModelHierarchy.possibleChildrenFor(singletonList(scoutApi.AbstractRadioButtonGroup().fqn())).size());
     assertEquals(3, scoutModelHierarchy.possibleChildrenFor(singletonList(scoutApi.AbstractRadioButtonGroupExtension().fqn())).size());
   }
 
   @Test
   public void testListTreeBox(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
-    ScoutModelHierarchy scoutModelHierarchy = scoutApi.hierarchy();
+    var scoutApi = env.requireApi(IScoutApi.class);
+    var scoutModelHierarchy = scoutApi.hierarchy();
     assertEquals(2, scoutModelHierarchy.possibleChildrenFor(singletonList(scoutApi.AbstractListBox().fqn())).size());
     assertEquals(2, scoutModelHierarchy.possibleChildrenFor(singletonList(scoutApi.AbstractListBoxExtension().fqn())).size());
     assertEquals(2, scoutModelHierarchy.possibleChildrenFor(singletonList(scoutApi.AbstractTreeBox().fqn())).size());
@@ -69,9 +69,9 @@ public class ScoutModelHierarchyTest {
 
   @Test
   public void testIsSubtypeOf(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
-    ScoutModelHierarchy scoutModelHierarchy = scoutApi.hierarchy();
-    String iTabBox = scoutApi.ITabBox().fqn();
+    var scoutApi = env.requireApi(IScoutApi.class);
+    var scoutModelHierarchy = scoutApi.hierarchy();
+    var iTabBox = scoutApi.ITabBox().fqn();
     assertTrue(scoutModelHierarchy.isSubtypeOf(iTabBox, scoutApi.ICompositeField().fqn()));
     assertTrue(scoutModelHierarchy.isSubtypeOf(iTabBox, iTabBox));
     assertTrue(scoutModelHierarchy.isSubtypeOf(iTabBox, scoutApi.IOrdered().fqn()));

@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 
 public interface IScoutApi extends IApiSpecification, IScoutAnnotationApi, IScoutInterfaceApi, IScoutAbstractApi, IScoutExtensionApi, IScoutVariousApi {
 

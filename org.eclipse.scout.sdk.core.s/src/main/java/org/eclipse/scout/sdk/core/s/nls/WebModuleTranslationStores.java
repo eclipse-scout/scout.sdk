@@ -42,7 +42,7 @@ public final class WebModuleTranslationStores {
 
   static Stream<ITranslationStore> allForModule(Path modulePath, IEnvironment env, IProgress progress) {
     progress.init(1, "Resolve translation stores visible in npm dependencies of module '{}'.", modulePath);
-    IProgress childProgress = progress.newChild(0);
+    var childProgress = progress.newChild(0);
     Supplier<Stream<ITranslationStore>> packageJsonResolver = () -> resolveStoresReferencedInPackageJson(modulePath, env, childProgress);
     Supplier<Stream<ITranslationStore>> scoutJsBackendModuleResolver = () -> resolveScoutJsBackendModuleStores(modulePath, env, childProgress);
     return Stream.of(packageJsonResolver, scoutJsBackendModuleResolver).flatMap(Supplier::get);
@@ -75,7 +75,7 @@ public final class WebModuleTranslationStores {
   }
 
   static Stream<ITranslationStore> resolveStoresProvidingTranslationsOfContributor(String contributorFqn, IEnvironment env, IProgress progress) {
-    Map<Path, List<UiTextContributor>> textContributorsByModule = env.findType(contributorFqn)
+    var textContributorsByModule = env.findType(contributorFqn)
         .map(type -> createUiTextContributor(type, progress))
         .collect(groupingBy(c -> moduleOfContributor(c, env)));
     return textContributorsByModule
@@ -89,7 +89,7 @@ public final class WebModuleTranslationStores {
 
   static Stream<ITranslationStore> resolveStoresProvidingTranslationsOfContributor(Path modulePath, Collection<UiTextContributor> contributorsInModule, IEnvironment env, IProgress progress) {
     // collect the visible keys once for all stores (faster filter)
-    Set<String> keysOfContributor = contributorsInModule.stream()
+    var keysOfContributor = contributorsInModule.stream()
         .flatMap(UiTextContributor::keys)
         .collect(toSet());
     if (keysOfContributor.isEmpty()) {
@@ -109,7 +109,7 @@ public final class WebModuleTranslationStores {
   }
 
   static Optional<String> loadPackageJson(Path modulePath) {
-    Path packageJsonFile = modulePath.resolve("package.json");
+    var packageJsonFile = modulePath.resolve("package.json");
     if (!Files.isRegularFile(packageJsonFile) || !Files.isReadable(packageJsonFile)) {
       return Optional.empty();
     }
@@ -122,7 +122,7 @@ public final class WebModuleTranslationStores {
   }
 
   static UiTextContributor createUiTextContributor(IType contributorType, IProgress progress) {
-    UiTextContributor contributor = new UiTextContributor(contributorType);
+    var contributor = new UiTextContributor(contributorType);
     try {
       SdkLog.debug("loading ui text contributor '{}'.", contributorType.name());
       contributor.load(progress);

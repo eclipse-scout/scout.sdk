@@ -17,9 +17,7 @@ import org.eclipse.scout.rt.platform.Order;
 public class AbstractTableWithExtKey<KEY_TYPE> extends AbstractTable {
 
   public ExtKeyColumn getExtKeyColumn() {
-    @SuppressWarnings("unchecked")
-    ExtKeyColumn column = getColumnSet().getColumnByClass(ExtKeyColumn.class);
-    return column;
+    return getColumnSet().getColumnByClass(ExtKeyColumn.class);
   }
 
   @Order(100000.0)

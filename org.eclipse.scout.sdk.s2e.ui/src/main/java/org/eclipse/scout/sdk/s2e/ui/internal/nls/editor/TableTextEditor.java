@@ -37,7 +37,7 @@ public class TableTextEditor {
     m_shell.setBounds(computeBounds(parent, style));
     m_shell.setBackground(parent.getShell().getDisplay().getSystemColor(SWT.COLOR_GREEN));
 
-    FillLayout layout = new FillLayout();
+    var layout = new FillLayout();
     layout.marginHeight = BORDER_WIDTH;
     layout.marginWidth = BORDER_WIDTH;
     m_shell.setLayout(layout);
@@ -47,7 +47,7 @@ public class TableTextEditor {
   }
 
   private static Rectangle computeBounds(Control cursor, int style) {
-    Rectangle bounds = new Rectangle(0, 0, 0, 0);
+    var bounds = new Rectangle(0, 0, 0, 0);
     Point size;
     if ((style & SWT.MULTI) != 0) {
       size = new Point(MULTILINE_EDITOR_SIZE.x, MULTILINE_EDITOR_SIZE.y);
@@ -56,13 +56,13 @@ public class TableTextEditor {
       size = new Point(cursor.getBounds().width, cursor.getBounds().height);
     }
     // max size is the table size
-    Rectangle displayBounds = cursor.getDisplay().getBounds();
+    var displayBounds = cursor.getDisplay().getBounds();
     size.x = Math.min(displayBounds.width, size.x);
     size.y = Math.min(displayBounds.height, size.y);
     bounds.width = size.x;
     bounds.height = size.y;
 
-    Point shellPosition = cursor.toDisplay(new Point(0, 0));
+    var shellPosition = cursor.toDisplay(new Point(0, 0));
     bounds.x = shellPosition.x;
     bounds.y = shellPosition.y;
 

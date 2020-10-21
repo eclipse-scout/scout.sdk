@@ -14,16 +14,12 @@ import static java.util.Collections.emptyList;
 
 import java.util.List;
 
-import org.eclipse.jdt.internal.compiler.ast.Expression;
-import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
-import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.FieldImplementor;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
@@ -62,15 +58,15 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
 
   @Override
   public JavaElementSpi internalFindNewElement() {
-    TypeSpi newType = (TypeSpi) getDeclaringType().internalFindNewElement();
-    if (newType != null) {
-      for (FieldSpi newF : newType.getFields()) {
-        if (getElementName().equals(newF.getElementName())) {
-          return newF;
-        }
-      }
+    var newType = (TypeSpi) getDeclaringType().internalFindNewElement();
+    if (newType == null) {
+      return null;
     }
-    return null;
+    var thisElementName = getElementName();
+    return newType.getFields().stream()
+        .filter(newF -> thisElementName.equals(newF.getElementName()))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
@@ -113,16 +109,16 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   @Override
   public IMetaValue getConstantValue() {
     return m_constRef.computeIfAbsentAndGet(() -> {
-      IMetaValue resolvedValue = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, m_binding.constant());
+      var resolvedValue = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, m_binding.constant());
       if (resolvedValue != null) {
         return resolvedValue;
       }
 
-      FieldBinding origBinding = m_binding.original();
-      ReferenceBinding refBinding = origBinding.declaringClass;
+      var origBinding = m_binding.original();
+      var refBinding = origBinding.declaringClass;
       if (refBinding instanceof SourceTypeBinding) {
-        SourceTypeBinding stb = (SourceTypeBinding) refBinding;
-        Expression initEx = stb.scope.referenceContext.declarationOf(origBinding).initialization;
+        var stb = (SourceTypeBinding) refBinding;
+        var initEx = stb.scope.referenceContext.declarationOf(origBinding).initialization;
         return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, SpiWithEcjUtils.compileExpression(initEx, SpiWithEcjUtils.classScopeOf(this), javaEnvWithEcj()));
       }
       return null;
@@ -142,9 +138,9 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      FieldDeclaration decl = m_binding.sourceField();
+      var decl = m_binding.sourceField();
       if (decl != null) {
-        CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+        var cu = m_declaringType.getCompilationUnit();
         return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
       }
       return null;
@@ -154,11 +150,11 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   @Override
   public ISourceRange getSourceOfInitializer() {
     return m_initializerSource.computeIfAbsentAndGet(() -> {
-      FieldDeclaration decl = m_binding.sourceField();
+      var decl = m_binding.sourceField();
       if (decl != null) {
-        Expression expr = decl.initialization;
+        var expr = decl.initialization;
         if (expr != null) {
-          CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+          var cu = m_declaringType.getCompilationUnit();
           return javaEnvWithEcj().getSource(cu, expr.sourceStart, expr.sourceEnd);
         }
       }
@@ -169,7 +165,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   @Override
   public ISourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
-      FieldDeclaration decl = m_binding.sourceField();
+      var decl = m_binding.sourceField();
       if (decl == null) {
         return null;
       }

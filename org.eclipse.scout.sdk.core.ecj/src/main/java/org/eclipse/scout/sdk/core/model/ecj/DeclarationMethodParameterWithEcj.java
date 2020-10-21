@@ -17,7 +17,6 @@ import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.MethodParameterImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
@@ -54,7 +53,7 @@ public class DeclarationMethodParameterWithEcj extends AbstractJavaElementWithEc
 
   @Override
   public JavaElementSpi internalFindNewElement() {
-    MethodSpi newMethod = (MethodSpi) getDeclaringMethod().internalFindNewElement();
+    var newMethod = (MethodSpi) getDeclaringMethod().internalFindNewElement();
     if (newMethod != null && newMethod.getParameters().size() > m_index) {
       return newMethod.getParameters().get(m_index);
     }
@@ -113,8 +112,8 @@ public class DeclarationMethodParameterWithEcj extends AbstractJavaElementWithEc
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      CompilationUnitSpi cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
-      Argument decl = m_astNode;
+      var cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
+      var decl = m_astNode;
       return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
     });
   }

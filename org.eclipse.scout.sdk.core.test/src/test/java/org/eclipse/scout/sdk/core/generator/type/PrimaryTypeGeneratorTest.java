@@ -43,7 +43,7 @@ public class PrimaryTypeGeneratorTest {
 
   @Test
   public void testPrimaryTypeGenerator(IJavaEnvironment env) {
-    PrimaryTypeGenerator<? extends PrimaryTypeGenerator<?>> generator = PrimaryTypeGenerator.create()
+    var generator = PrimaryTypeGenerator.create()
         .withPackageName("a.b.c")
         .withElementName("PrimaryType");
 

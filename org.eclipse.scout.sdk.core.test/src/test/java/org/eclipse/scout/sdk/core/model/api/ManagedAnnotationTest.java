@@ -45,8 +45,8 @@ public class ManagedAnnotationTest {
 
   @Test
   public void testDefaultValuesWhenUsed(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithAnnotationWithDefaultValues.class.getName());
-    AnnotationWithDefaultValues a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
+    var t = env.requireType(ClassWithAnnotationWithDefaultValues.class.getName());
+    var a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
     assertEquals(1, a.num());
     assertEquals("one", a.string());
     assertEquals(env.requireType(RoundingMode.class.getName()).fields().withName("HALF_UP").first().get(), a.enumValue());
@@ -57,8 +57,8 @@ public class ManagedAnnotationTest {
 
   @Test
   public void testDefaultValuesWhenNotUsed(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithAnnotationWithSingleValues.class.getName());
-    AnnotationWithSingleValues a = t.annotations().withManagedWrapper(AnnotationWithSingleValues.class).first().get();
+    var t = env.requireType(ClassWithAnnotationWithSingleValues.class.getName());
+    var a = t.annotations().withManagedWrapper(AnnotationWithSingleValues.class).first().get();
     assertEquals(Integer.MIN_VALUE, a.num());
     assertEquals("alpha", a.string());
     assertEquals(env.requireType(RoundingMode.class.getName()).fields().withName("HALF_UP").first().get(), a.enumValue());
@@ -69,8 +69,8 @@ public class ManagedAnnotationTest {
 
   @Test
   public void testWithAnnotationArrayValue(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithAnnotationWithArrayValues.class.getName());
-    AnnotationWithSingleValues[] annot = t.annotations().withManagedWrapper(AnnotationWithArrayValues.class).first().get().annos();
+    var t = env.requireType(ClassWithAnnotationWithArrayValues.class.getName());
+    var annot = t.annotations().withManagedWrapper(AnnotationWithArrayValues.class).first().get().annos();
     assertEquals(2, annot.length);
 
     assertEquals(JavaTypes.Integer, annot[1].type().name());
@@ -80,8 +80,8 @@ public class ManagedAnnotationTest {
 
   @Test
   public void testDefaultValueOverrideWithNullWhenUsed(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithAnnotationWithDefaultValues.class.getName());
-    AnnotationWithDefaultValues a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
+    var t = env.requireType(ClassWithAnnotationWithDefaultValues.class.getName());
+    var a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
     assertEquals(0, a.num(0));
     assertNull(a.string((String) null));
     assertNull(a.enumValue((IField) null));
@@ -91,8 +91,8 @@ public class ManagedAnnotationTest {
 
   @Test
   public void testDefaultValueOverrideWithNullWhenNotUsed(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithAnnotationWithSingleValues.class.getName());
-    AnnotationWithSingleValues a = t.annotations().withManagedWrapper(AnnotationWithSingleValues.class).first().get();
+    var t = env.requireType(ClassWithAnnotationWithSingleValues.class.getName());
+    var a = t.annotations().withManagedWrapper(AnnotationWithSingleValues.class).first().get();
     assertEquals(Integer.MIN_VALUE, a.num(0));
     assertEquals("alpha", a.string((String) null));
     assertEquals(env.requireType(RoundingMode.class.getName()).fields().withName("HALF_UP").first().get(), a.enumValue((IField) null));
@@ -104,8 +104,8 @@ public class ManagedAnnotationTest {
 
   @Test
   public void testDefaultValueOverrideWithNonNullWhenUsed(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithAnnotationWithDefaultValues.class.getName());
-    AnnotationWithDefaultValues a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
+    var t = env.requireType(ClassWithAnnotationWithDefaultValues.class.getName());
+    var a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
     assertEquals(5, a.num(5));
     assertEquals("two", a.string("two"));
     assertEquals(env.requireType(RoundingMode.class.getName()).fields().withName("HALF_EVEN").first().get(),
@@ -115,8 +115,8 @@ public class ManagedAnnotationTest {
 
   @Test
   public void testDefaultValueOverrideWithNonNullWhenNotUsed(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithAnnotationWithSingleValues.class.getName());
-    AnnotationWithSingleValues a = t.annotations().withManagedWrapper(AnnotationWithSingleValues.class).first().get();
+    var t = env.requireType(ClassWithAnnotationWithSingleValues.class.getName());
+    var a = t.annotations().withManagedWrapper(AnnotationWithSingleValues.class).first().get();
     assertEquals(Integer.MIN_VALUE, a.num(5));
     assertEquals("alpha", a.string("two"));
     assertEquals(env.requireType(RoundingMode.class.getName()).fields().withName("HALF_UP").first().get(),
@@ -133,8 +133,8 @@ public class ManagedAnnotationTest {
    */
   @Test
   public void testValueCoercion(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithAnnotationWithDefaultValues.class.getName());
-    AnnotationWithDefaultValues a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
+    var t = env.requireType(ClassWithAnnotationWithDefaultValues.class.getName());
+    var a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
     assertEquals(1, a.numFromBoxedType());
     assertEquals("HALF_UP", a.enumValueCoercedToString());
     assertEquals(String.class.getName(), a.typeCoercedToString());
@@ -147,8 +147,8 @@ public class ManagedAnnotationTest {
    */
   @Test
   public void testArrayCoercion(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithScalarGeneratedAnnotation.class.getName());
-    GeneratedAnnotation a = t.annotations().withManagedWrapper(GeneratedAnnotation.class).first().get();
+    var t = env.requireType(ClassWithScalarGeneratedAnnotation.class.getName());
+    var a = t.annotations().withManagedWrapper(GeneratedAnnotation.class).first().get();
     assertArrayEquals(new String[]{"g"}, a.value());
   }
 
@@ -159,8 +159,8 @@ public class ManagedAnnotationTest {
    */
   @Test
   public void testNumberCoercion(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithAnnotationWithShortValueForIntField.class.getName());
-    AnnotationWithDefaultValues a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
+    var t = env.requireType(ClassWithAnnotationWithShortValueForIntField.class.getName());
+    var a = t.annotations().withManagedWrapper(AnnotationWithDefaultValues.class).first().get();
     assertEquals(Integer.valueOf(4), a.unwrap().element("num").get().value().as(int.class));
     assertEquals(4, a.num());
   }

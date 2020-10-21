@@ -47,9 +47,9 @@ public class WrappingSpliteratorTest {
   @Test
   public void testSmallSplit() {
     Spliterator<IJavaElement> orig = new WrappingSpliterator<>(createList(2));
-    Spliterator<IJavaElement> split = orig.trySplit();
+    var split = orig.trySplit();
 
-    AtomicReference<String> ref = new AtomicReference<>();
+    var ref = new AtomicReference<String>();
     assertTrue(orig.tryAdvance(t -> ref.set(t.elementName())));
     assertEquals("0", ref.get());
     assertFalse(orig.tryAdvance(t -> {
@@ -65,7 +65,7 @@ public class WrappingSpliteratorTest {
 
   protected static Set<String> collect(int numElements, int numAdvance) {
     Spliterator<IJavaElement> spliterator = new WrappingSpliterator<>(createList(numElements));
-    for (int i = 0; i < numAdvance; i++) {
+    for (var i = 0; i < numAdvance; i++) {
       spliterator.tryAdvance(e -> {
       });
     }
@@ -77,9 +77,9 @@ public class WrappingSpliteratorTest {
 
   private static List<JavaElementSpi> createList(int num) {
     List<JavaElementSpi> result = new ArrayList<>(num);
-    for (int i = 0; i < num; i++) {
-      IJavaElement api = mock(IJavaElement.class);
-      JavaElementSpi spi = mock(JavaElementSpi.class);
+    for (var i = 0; i < num; i++) {
+      var api = mock(IJavaElement.class);
+      var spi = mock(JavaElementSpi.class);
       when(api.unwrap()).thenReturn(spi);
       when(spi.wrap()).thenReturn(api);
       when(api.elementName()).thenReturn(Integer.toString(i));

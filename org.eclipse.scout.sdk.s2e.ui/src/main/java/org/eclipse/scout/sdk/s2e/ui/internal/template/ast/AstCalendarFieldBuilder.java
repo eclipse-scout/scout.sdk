@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.QualifiedType;
-import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
@@ -36,18 +31,18 @@ public class AstCalendarFieldBuilder extends AstTypeBuilder<AstCalendarFieldBuil
   @Override
   @SuppressWarnings("unchecked")
   public AstCalendarFieldBuilder insert() {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
 
     // calc super type
-    ParameterizedType parameterizedType = ast.newParameterizedType(getSuperType());
-    SimpleType selfQualifier = ast.newSimpleType(ast.newSimpleName(getTypeName() + getReadOnlySuffix()));
-    QualifiedType calTypeArg = ast.newQualifiedType(selfQualifier, ast.newSimpleName(ISdkConstants.INNER_CALENDAR_TYPE_NAME));
+    var parameterizedType = ast.newParameterizedType(getSuperType());
+    var selfQualifier = ast.newSimpleType(ast.newSimpleName(getTypeName() + getReadOnlySuffix()));
+    var calTypeArg = ast.newQualifiedType(selfQualifier, ast.newSimpleName(ISdkConstants.INNER_CALENDAR_TYPE_NAME));
     parameterizedType.typeArguments().add(calTypeArg);
     withSuperType(parameterizedType);
 
     super.insert();
 
-    TypeDeclaration createdCalendarField = get();
+    var createdCalendarField = get();
 
     // getConfiguredGridH
     getFactory().newGetConfiguredGridH(10)
@@ -60,8 +55,8 @@ public class AstCalendarFieldBuilder extends AstTypeBuilder<AstCalendarFieldBuil
         .insert();
 
     // inner calendar
-    Type calSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractCalendar().fqn());
-    TypeDeclaration calDeclaration = getFactory().newType(ISdkConstants.INNER_CALENDAR_TYPE_NAME)
+    var calSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractCalendar().fqn());
+    var calDeclaration = getFactory().newType(ISdkConstants.INNER_CALENDAR_TYPE_NAME)
         .withCalculatedOrder(false)
         .withCreateLinks(false)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
@@ -75,7 +70,7 @@ public class AstCalendarFieldBuilder extends AstTypeBuilder<AstCalendarFieldBuil
         .get();
 
     // inner provider
-    Type providerSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractCalendarItemProvider().fqn());
+    var providerSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractCalendarItemProvider().fqn());
     m_providerDeclaration = getFactory().newType("MyCalendarItem")
         .withCalculatedOrder(false)
         .withCreateLinks(false)
@@ -92,7 +87,7 @@ public class AstCalendarFieldBuilder extends AstTypeBuilder<AstCalendarFieldBuil
     calDeclaration.bodyDeclarations().add(m_providerDeclaration);
     createdCalendarField.bodyDeclarations().add(calDeclaration);
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       ITrackedNodePosition providerTypeNameTracker = new WrappedTrackedNodePosition(getFactory().getRewrite().track(m_providerDeclaration.getName()), 0, -ISdkConstants.SUFFIX_CALENDAR_ITEM_PROVIDER.length());
       links.addLinkedPosition(providerTypeNameTracker, true, AstNodeFactory.CALENDAR_ITEM_PROVIDER_NAME_GROUP);

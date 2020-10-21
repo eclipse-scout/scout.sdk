@@ -22,19 +22,18 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
@@ -106,14 +105,14 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
   }
 
   protected void createIcuGroup(Composite p) {
-    String groupName = getIcuGroupName();
+    var groupName = getIcuGroupName();
     if (Strings.isBlank(groupName)) {
       groupName = "New Class Details";
     }
     m_icuGroupField = FieldToolkit.createGroupBox(p, groupName);
 
-    int labelWidth = getLabelWidth();
-    boolean enabled = JdtUtils.exists(getSourceFolder());
+    var labelWidth = getLabelWidth();
+    var enabled = JdtUtils.exists(getSourceFolder());
 
     // source folder
     m_sourceFolderField = FieldToolkit.createSourceFolderField(m_icuGroupField, "Source Folder", m_sourceFolderTier, labelWidth);
@@ -142,7 +141,7 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
     });
 
     // super type
-    IType superType = calcSuperTypeDefault();
+    var superType = calcSuperTypeDefault();
     if (JdtUtils.exists(superType)) {
       setSuperTypeInternal(superType);
     }
@@ -191,7 +190,7 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
 
   protected IType calcSuperTypeDefault() {
     IType defaultSuperType = null;
-    String prefSuperTypeFqn = getDialogSettings().get(PREF_SUPER_TYPE);
+    var prefSuperTypeFqn = getDialogSettings().get(PREF_SUPER_TYPE);
     if (Strings.hasText(prefSuperTypeFqn)) {
       defaultSuperType = resolveType(prefSuperTypeFqn);
     }
@@ -245,7 +244,7 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
   }
 
   protected void handleJavaProjectChanged() {
-    IJavaProject javaProject = getJavaProject();
+    var javaProject = getJavaProject();
     if (javaProject == null) {
       m_scoutApi = null;
     }
@@ -253,7 +252,7 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
       m_scoutApi = ApiHelper.requireScoutApiFor(javaProject, null);
     }
     m_superTypeDefault = calcSuperTypeDefaultFqn().map(IClassNameSupplier::fqn).orElse(null);
-    String newSuperTypeDefaultBase = calcSuperTypeDefaultBaseFqn().map(IClassNameSupplier::fqn).orElse(null);
+    var newSuperTypeDefaultBase = calcSuperTypeDefaultBaseFqn().map(IClassNameSupplier::fqn).orElse(null);
     if (!Objects.equals(m_superTypeDefaultBase, newSuperTypeDefaultBase)) {
       m_superTypeDefaultBase = newSuperTypeDefaultBase;
       setSuperTypeBaseClass(newSuperTypeDefaultBase);
@@ -262,14 +261,14 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
     if (!isControlCreated()) {
       return;
     }
-    boolean isEnabled = JdtUtils.exists(javaProject);
+    var isEnabled = JdtUtils.exists(javaProject);
     m_packageField.setEnabled(isEnabled);
-    PackageContentProvider packageContentProvider = (PackageContentProvider) m_packageField.getContentProvider();
+    var packageContentProvider = (PackageContentProvider) m_packageField.getContentProvider();
     packageContentProvider.setJavaProject(javaProject);
     m_packageField.setText(null);
 
     m_superTypeField.setEnabled(isEnabled);
-    StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) m_superTypeField.getContentProvider();
+    var superTypeContentProvider = (StrictHierarchyTypeContentProvider) m_superTypeField.getContentProvider();
     superTypeContentProvider.setJavaProject(javaProject);
     m_superTypeField.acceptProposal(getSuperType(), true, true);
     if (m_superTypeField.getSelectedProposal() == null) {
@@ -301,11 +300,11 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
   }
 
   protected IStatus getStatusName() {
-    IStatus javaFieldNameStatus = validateJavaName(getIcuName(), getReadOnlySuffix());
+    var javaFieldNameStatus = validateJavaName(getIcuName(), getReadOnlySuffix());
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = validateTypeNotExisting(getSourceFolder(), getTargetPackage(), getIcuName());
+    var existingStatus = validateTypeNotExisting(getSourceFolder(), getTargetPackage(), getIcuName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }
@@ -362,12 +361,10 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
   }
 
   private static String getContainingJavaKeyWord(String s) {
-    for (String keyWord : JavaTypes.getJavaKeyWords()) {
-      if (s.startsWith(keyWord + JavaTypes.C_DOT) || s.endsWith(JavaTypes.C_DOT + keyWord) || s.contains(JavaTypes.C_DOT + keyWord + JavaTypes.C_DOT)) {
-        return keyWord;
-      }
-    }
-    return null;
+    return JavaTypes.getJavaKeyWords().stream()
+        .filter(keyWord -> s.startsWith(keyWord + JavaTypes.C_DOT) || s.endsWith(JavaTypes.C_DOT + keyWord) || s.contains(JavaTypes.C_DOT + keyWord + JavaTypes.C_DOT))
+        .findFirst()
+        .orElse(null);
   }
 
   /**
@@ -397,20 +394,20 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
       pck = "";
     }
 
-    IPackageFragment packageFragment = srcFolder.getPackageFragment(pck);
+    var packageFragment = srcFolder.getPackageFragment(pck);
     if (!JdtUtils.exists(packageFragment)) {
       return Status.OK_STATUS;
     }
 
-    IResource folder = packageFragment.getResource();
+    var folder = packageFragment.getResource();
     if (folder == null || !folder.exists()) {
       return Status.OK_STATUS;
     }
 
-    boolean[] elementFound = new boolean[1];
+    var elementFound = new boolean[1];
 
     if (folder.exists()) {
-      String typeNameComplete = typeName + JavaTypes.JAVA_FILE_SUFFIX;
+      var typeNameComplete = typeName + JavaTypes.JAVA_FILE_SUFFIX;
       try {
         folder.accept(new IResourceProxyVisitor() {
           boolean m_selfVisited;
@@ -453,29 +450,29 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
     if (Strings.isBlank(pckName)) {
       return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "The default package is not allowed.");
     }
-    String invalidPackageName = "The package name is not valid.";
+    var invalidPackageName = "The package name is not valid.";
     // no double points
     if (pckName.contains("..")) {
       return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, invalidPackageName);
     }
     // invalid characters
-    Pattern regexPackageName = Pattern.compile("^[0-9a-zA-Z._]*$");
+    var regexPackageName = Pattern.compile("^[0-9a-zA-Z._]*$");
     if (!regexPackageName.matcher(pckName).matches()) {
       return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, invalidPackageName);
     }
     // no start and end with number or special characters
-    Pattern regexPackageNameStart = Pattern.compile("[a-zA-Z].*$");
-    Pattern regexPackageNameEnd = Pattern.compile("^.*[a-zA-Z]$");
+    var regexPackageNameStart = Pattern.compile("[a-zA-Z].*$");
+    var regexPackageNameEnd = Pattern.compile("^.*[a-zA-Z]$");
     if (!regexPackageNameStart.matcher(pckName).matches() || !regexPackageNameEnd.matcher(pckName).matches()) {
       return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, invalidPackageName);
     }
     // reserved java keywords
-    String jkw = getContainingJavaKeyWord(pckName);
+    var jkw = getContainingJavaKeyWord(pckName);
     if (jkw != null) {
       return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "The package may not contain a reserved Java keyword: '" + jkw + '\'');
     }
     // warn containing upper case characters
-    Pattern regexContainsUpperCase = Pattern.compile(".*[A-Z].*");
+    var regexContainsUpperCase = Pattern.compile(".*[A-Z].*");
     if (regexContainsUpperCase.matcher(pckName).matches()) {
       return new Status(IStatus.WARNING, S2ESdkActivator.PLUGIN_ID, "The package should contain only lower case characters.");
     }
@@ -568,7 +565,7 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
 
   public void setSuperTypeBaseClass(String className) {
     setPropertyWithChangingControl(m_superTypeField, () -> setSuperTypeBaseClassInternal(className), field -> {
-      StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) m_superTypeField.getContentProvider();
+      var superTypeContentProvider = (StrictHierarchyTypeContentProvider) m_superTypeField.getContentProvider();
       superTypeContentProvider.setBaseClassFqn(className);
       m_superTypeField.acceptProposal(calcSuperTypeDefault());
     });

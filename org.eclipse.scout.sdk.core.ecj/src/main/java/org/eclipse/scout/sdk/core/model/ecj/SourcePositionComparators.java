@@ -13,9 +13,6 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
@@ -42,12 +39,12 @@ final class SourcePositionComparators {
     }
 
     static int getSourcePosition(TypeBinding rb) {
-      TypeBinding tb = SpiWithEcjUtils.nvl(rb.original(), rb);
+      var tb = SpiWithEcjUtils.nvl(rb.original(), rb);
       if (!(tb instanceof SourceTypeBinding)) {
         return UNKNOWN_SOURCE_POS;
       }
 
-      TypeDeclaration decl = ((SourceTypeBinding) tb).scope.referenceContext;
+      var decl = ((SourceTypeBinding) tb).scope.referenceContext;
       if (decl == null) {
         return UNKNOWN_SOURCE_POS;
       }
@@ -57,8 +54,8 @@ final class SourcePositionComparators {
 
     @Override
     public int compare(TypeBinding o1, TypeBinding o2) {
-      int pos1 = getSourcePosition(o1);
-      int pos2 = getSourcePosition(o2);
+      var pos1 = getSourcePosition(o1);
+      var pos2 = getSourcePosition(o2);
       return Integer.compare(pos1, pos2);
     }
   }
@@ -72,8 +69,8 @@ final class SourcePositionComparators {
     }
 
     static int getSourcePosition(MethodBinding mb) {
-      MethodBinding methodBinding = SpiWithEcjUtils.nvl(mb.original(), mb);
-      AbstractMethodDeclaration decl = SpiWithEcjUtils.sourceMethodOf(methodBinding);
+      var methodBinding = SpiWithEcjUtils.nvl(mb.original(), mb);
+      var decl = SpiWithEcjUtils.sourceMethodOf(methodBinding);
       if (decl == null) {
         return UNKNOWN_SOURCE_POS;
       }
@@ -82,8 +79,8 @@ final class SourcePositionComparators {
 
     @Override
     public int compare(MethodBinding o1, MethodBinding o2) {
-      int pos1 = getSourcePosition(o1);
-      int pos2 = getSourcePosition(o2);
+      var pos1 = getSourcePosition(o1);
+      var pos2 = getSourcePosition(o2);
       return Integer.compare(pos1, pos2);
     }
   }
@@ -97,8 +94,8 @@ final class SourcePositionComparators {
     }
 
     static int getSourcePosition(FieldBinding fb) {
-      FieldBinding fieldBinding = SpiWithEcjUtils.nvl(fb.original(), fb);
-      FieldDeclaration decl = fieldBinding.sourceField();
+      var fieldBinding = SpiWithEcjUtils.nvl(fb.original(), fb);
+      var decl = fieldBinding.sourceField();
       if (decl == null) {
         return UNKNOWN_SOURCE_POS;
       }
@@ -107,8 +104,8 @@ final class SourcePositionComparators {
 
     @Override
     public int compare(FieldBinding o1, FieldBinding o2) {
-      int pos1 = getSourcePosition(o1);
-      int pos2 = getSourcePosition(o2);
+      var pos1 = getSourcePosition(o1);
+      var pos2 = getSourcePosition(o2);
       return Integer.compare(pos1, pos2);
     }
   }

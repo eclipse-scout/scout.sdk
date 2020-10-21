@@ -67,7 +67,7 @@ public class ResourceWriteOperationTest {
   }
 
   protected static IFile createMock(boolean exists, String fileContent) {
-    IFile file = mock(IFile.class);
+    var file = mock(IFile.class);
     when(file.exists()).thenReturn(exists);
     try {
       if (exists) {

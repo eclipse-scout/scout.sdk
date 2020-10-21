@@ -56,7 +56,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
   }
 
   protected String buildSuperType(IScoutAbstractApi api) {
-    StringBuilder superTypeFqnBuilder = new StringBuilder(api.AbstractWebServiceClient().fqn());
+    var superTypeFqnBuilder = new StringBuilder(api.AbstractWebServiceClient().fqn());
     superTypeFqnBuilder.append(JavaTypes.C_GENERIC_START).append(service()).append(", ").append(portType()).append(JavaTypes.C_GENERIC_END);
     return superTypeFqnBuilder.toString();
   }
@@ -67,7 +67,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
   }
 
   protected String getBaseName() {
-    String name = elementName().orElseThrow(() -> newFail("WebService client has no name."));
+    var name = elementName().orElseThrow(() -> newFail("WebService client has no name."));
     if (name.endsWith(ISdkConstants.SUFFIX_WS_CLIENT)) {
       name = name.substring(0, name.length() - ISdkConstants.SUFFIX_WS_CLIENT.length());
     }

@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,7 @@ import org.junit.jupiter.api.Test;
 public class EnsureTest {
   @Test
   public void testInstanceOf() {
-    CharSequence result = Ensure.instanceOf("", CharSequence.class);
+    var result = Ensure.instanceOf("", CharSequence.class);
     assertNotNull(result);
     Ensure.instanceOf("", String.class);
 
@@ -59,8 +58,8 @@ public class EnsureTest {
 
   @Test
   public void testSame() {
-    Object a = new Object();
-    Object b = new Object();
+    var a = new Object();
+    var b = new Object();
     Ensure.same(a, a);
     assertEquals("a22b", assertThrows(IllegalArgumentException.class, () -> Ensure.same(a, b, "a{}b", 22)).getMessage());
   }
@@ -79,7 +78,7 @@ public class EnsureTest {
 
   @Test
   public void testIsFile() throws IOException {
-    Path tempFile = Files.createTempFile("a", "b");
+    var tempFile = Files.createTempFile("a", "b");
     try {
       Ensure.isFile(tempFile);
     }
@@ -93,7 +92,7 @@ public class EnsureTest {
 
   @Test
   public void testIsDirectory() throws IOException {
-    Path tempFile = Files.createTempFile("a", "b");
+    var tempFile = Files.createTempFile("a", "b");
     try {
       Ensure.isDirectory(tempFile.getParent());
     }

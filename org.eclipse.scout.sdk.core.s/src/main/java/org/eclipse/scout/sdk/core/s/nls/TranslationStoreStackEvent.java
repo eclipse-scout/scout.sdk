@@ -195,7 +195,7 @@ public final class TranslationStoreStackEvent {
 
   @Override
   public String toString() {
-    StringJoiner joiner = new StringJoiner(", ", TranslationStoreStackEvent.class.getSimpleName() + " [", "]")
+    var joiner = new StringJoiner(", ", TranslationStoreStackEvent.class.getSimpleName() + " [", "]")
         .add("type=" + typeName(m_type));
     if (Strings.hasText(m_key)) {
       joiner.add("key=" + m_key);
@@ -211,8 +211,8 @@ public final class TranslationStoreStackEvent {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + ((m_entry == null) ? 0 : m_entry.hashCode());
     result = prime * result + ((m_key == null) ? 0 : m_key.hashCode());
     result = prime * result + ((m_language == null) ? 0 : m_language.hashCode());
@@ -230,7 +230,7 @@ public final class TranslationStoreStackEvent {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    TranslationStoreStackEvent other = (TranslationStoreStackEvent) obj;
+    var other = (TranslationStoreStackEvent) obj;
     return m_type == other.m_type
         && Objects.equals(m_key, other.m_key)
         && Objects.equals(m_entry, other.m_entry)

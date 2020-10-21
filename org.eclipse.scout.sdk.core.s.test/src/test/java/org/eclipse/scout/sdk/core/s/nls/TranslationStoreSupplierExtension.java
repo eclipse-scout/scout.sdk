@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -126,30 +125,30 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
   }
 
   protected static PropertiesTranslationStore createTestingStore(IEnvironment env, boolean readOnly, String svcFqn, Path dir) {
-    IType txtSvcType = ((TestingEnvironment) env).primaryEnvironment().requireType(svcFqn);
+    var txtSvcType = ((TestingEnvironment) env).primaryEnvironment().requireType(svcFqn);
     return createTestingStore(txtSvcType, readOnly, dir);
   }
 
   protected static PropertiesTranslationStore createTestingStore(IType textService, boolean readOnly, Path directory) {
-    PropertiesTextProviderService originalSvc = PropertiesTextProviderService.create(textService).get();
-    PropertiesTextProviderService txtSvc = spy(originalSvc);
-    PropertiesTranslationStore store = new PropertiesTranslationStore(txtSvc);
+    var originalSvc = PropertiesTextProviderService.create(textService).get();
+    var txtSvc = spy(originalSvc);
+    var store = new PropertiesTranslationStore(txtSvc);
 
-    Properties def = new Properties();
+    var def = new Properties();
     def.setProperty(TRANSLATION_KEY_1, KEY_1_VAL_DEFAULT);
     def.setProperty(TRANSLATION_KEY_2, KEY_2_VAL_DEFAULT);
     def.setProperty(TRANSLATION_KEY_3, KEY_3_VAL_DEFAULT);
 
-    Properties en = new Properties();
+    var en = new Properties();
     en.setProperty(TRANSLATION_KEY_1, KEY_1_VAL_EN);
     en.setProperty(TRANSLATION_KEY_3, KEY_3_VAL_EN);
 
     Collection<ITranslationPropertiesFile> translationFiles = new ArrayList<>();
     try {
       if (readOnly) {
-        Properties readOnlyProps = new Properties();
+        var readOnlyProps = new Properties();
         readOnlyProps.setProperty(TRANSLATION_KEY_1, KEY_1_VAL_OVERRIDDEN);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        var out = new ByteArrayOutputStream();
         readOnlyProps.store(out, "");
         //noinspection resource
         translationFiles.add(new ReadOnlyTranslationFile(() -> new ByteArrayInputStream(out.toByteArray()), Language.LANGUAGE_DEFAULT));
@@ -171,13 +170,13 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
 
   protected static EditableTranslationFile createTranslationFile(Path file, Properties content) throws IOException {
     if (content != null) {
-      try (OutputStream out = Files.newOutputStream(file, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
+      try (var out = Files.newOutputStream(file, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
         content.store(out, null);
       }
     }
 
-    Language language = parseLanguageFromFileName(file.getFileName().toString(), PROPERTIES_FILE_NAME_PREFIX).get();
-    EditableTranslationFile props = new EditableTranslationFile(file, language);
+    var language = parseLanguageFromFileName(file.getFileName().toString(), PROPERTIES_FILE_NAME_PREFIX).get();
+    var props = new EditableTranslationFile(file, language);
     assertTrue(props.load(new NullProgress()));
     return props;
   }

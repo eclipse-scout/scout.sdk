@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.query.HierarchyInnerTypeQuery;
 import org.eclipse.scout.sdk.core.model.api.query.SuperTypeQuery;
@@ -46,12 +45,12 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
         .flatMap(Optional::stream)
         .collect(toSet());
 
-    IJavaEnvironment env = getJavaEnvironment();
+    var env = getJavaEnvironment();
     if (env == null) {
       return;
     }
 
-    Stream<String> superTypeSignatures = Stream.concat(
+    var superTypeSignatures = Stream.concat(
         enclosingTypeGenerator.superClass()
             .flatMap(af -> af.apply(env))
             .stream(),

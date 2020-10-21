@@ -27,12 +27,12 @@ import org.junit.jupiter.api.Test;
 public class HierarchicalSpliteratorTest {
   @Test
   public void testCharacteristicsAndSize() {
-    IType t = mock(IType.class);
+    var t = mock(IType.class);
     when(t.superClass()).thenReturn(Optional.empty());
     when(t.superInterfaces()).thenReturn(Stream.empty());
 
-    int levelCharacteristics = 100; // whatever
-    int numElements = 4;
+    var levelCharacteristics = 100; // whatever
+    var numElements = 4;
     Spliterator<Object> mock = mock(Spliterator.class);
     when(mock.characteristics()).thenReturn(levelCharacteristics);
     when(mock.estimateSize()).thenReturn((long) numElements);

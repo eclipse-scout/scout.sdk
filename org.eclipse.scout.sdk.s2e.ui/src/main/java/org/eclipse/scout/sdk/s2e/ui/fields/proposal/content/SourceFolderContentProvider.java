@@ -21,7 +21,6 @@ import java.util.function.Predicate;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -46,9 +45,9 @@ public class SourceFolderContentProvider extends AbstractContentProviderAdapter 
   @Override
   protected Collection<?> loadProposals(IProgressMonitor monitor) {
     try {
-      IJavaProject[] javaProjects = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
+      var javaProjects = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
       Collection<IPackageFragmentRoot> result = new ArrayList<>();
-      for (IJavaProject jp : javaProjects) {
+      for (var jp : javaProjects) {
         if (monitor.isCanceled()) {
           return emptyList();
         }
@@ -57,7 +56,7 @@ public class SourceFolderContentProvider extends AbstractContentProviderAdapter 
           S2eUtils.sourceFoldersOrdered(jp)
               .filter(root -> {
                 // filter generated source folders (except the form-data-generated source folder)
-                String srcFolderName = root.getPath().removeFirstSegments(1).toString().toLowerCase(Locale.ENGLISH);
+                var srcFolderName = root.getPath().removeFirstSegments(1).toString().toLowerCase(Locale.ENGLISH);
                 return IScoutSourceFolders.GENERATED_SOURCE_FOLDER.equals(srcFolderName)
                     || !srcFolderName.contains("generated");
               })
@@ -74,7 +73,7 @@ public class SourceFolderContentProvider extends AbstractContentProviderAdapter 
 
   @Override
   public String getText(Object element) {
-    IJavaElement root = (IJavaElement) element;
+    var root = (IJavaElement) element;
     return root.getJavaProject().getElementName() + '/' + root.getPath().removeFirstSegments(1);
   }
 }

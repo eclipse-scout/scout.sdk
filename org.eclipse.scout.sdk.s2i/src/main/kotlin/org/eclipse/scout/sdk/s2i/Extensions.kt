@@ -36,13 +36,13 @@ import com.intellij.structuralsearch.plugin.util.CollectingMatchResultSink
 import com.intellij.util.CollectionQuery
 import com.intellij.util.Query
 import com.intellij.util.containers.stream
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.util.JavaTypes
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult

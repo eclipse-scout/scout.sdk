@@ -37,7 +37,7 @@ public class TranslationImportAction extends Action {
 
   @Override
   public void run() {
-    TranslationImportExportWizard wizard = new TranslationImportExportWizard("Import Translations", "Please choose an importer.",
+    var wizard = new TranslationImportExportWizard("Import Translations", "Please choose an importer.",
         m_nlsProject, TranslationImportExportExtensionPoint.getImporters());
     Window dialog = new WizardDialog(m_parentShell, wizard);
     dialog.setBlockOnOpen(true);

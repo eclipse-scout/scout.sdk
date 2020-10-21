@@ -24,7 +24,6 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -44,24 +43,24 @@ public class ScoutTemplateCompletionProposalComputer implements IJavaCompletionP
   @SuppressWarnings("pmd:NPathComplexity")
   public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     try {
-      ContentAssistContextInfo info = ContentAssistContextInfo.build(context, S2ESdkUiActivator.PLUGIN_ID, monitor);
+      var info = ContentAssistContextInfo.build(context, S2ESdkUiActivator.PLUGIN_ID, monitor);
       if (info == null) {
         return emptyList();
       }
 
-      ICompilationUnit compilationUnit = info.getCompilationUnit();
-      int offset = info.getOffset();
+      var compilationUnit = info.getCompilationUnit();
+      var offset = info.getOffset();
 
       // check if we are in the middle of a statement. This may happen e.g. on annotations. The enclosing element is even though the IType holding the annotation
       IDocument d = new Document(compilationUnit.getSource());
-      IRegion lineInformationOfOffset = d.getLineInformationOfOffset(offset);
-      String lineSource = d.get(lineInformationOfOffset.getOffset(), lineInformationOfOffset.getLength());
+      var lineInformationOfOffset = d.getLineInformationOfOffset(offset);
+      var lineSource = d.get(lineInformationOfOffset.getOffset(), lineInformationOfOffset.getLength());
       if (lineSource.indexOf('@') >= 0 || lineSource.indexOf(JavaTypes.C_DOT) >= 0 || lineSource.indexOf('(') >= 0 || lineSource.indexOf(')') >= 0) {
         return emptyList();
       }
 
       compilationUnit.reconcile(ICompilationUnit.NO_AST, false, false, null, null); // reconcile in case it was a very fast edit and CTRL+space afterwards.
-      IJavaElement element = info.computeEnclosingElement();
+      var element = info.computeEnclosingElement();
       if (!JdtUtils.exists(element) || element.getElementType() != IJavaElement.TYPE) {
         return emptyList();
       }

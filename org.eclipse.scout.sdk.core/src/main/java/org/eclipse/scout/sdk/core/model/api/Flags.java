@@ -458,7 +458,7 @@ public final class Flags {
    */
   @SuppressWarnings("pmd:NPathComplexity")
   public static String toString(int flags, boolean includeTrailingSpace) {
-    StringBuilder sb = new StringBuilder(32);
+    var sb = new StringBuilder(32);
 
     if (isPublic(flags)) {
       sb.append("public ");
@@ -496,7 +496,7 @@ public final class Flags {
     if (isVolatile(flags)) {
       sb.append("volatile ");
     }
-    int len = sb.length();
+    var len = sb.length();
     if (len == 0) {
       return "";
     }

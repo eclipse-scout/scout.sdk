@@ -31,13 +31,13 @@ public class SimpleLoggerFactory implements ILoggerFactory {
 
   @Override
   public Logger getLogger(String name) {
-    Logger simpleLogger = m_loggerMap.get(name);
+    var simpleLogger = m_loggerMap.get(name);
     if (simpleLogger != null) {
       return simpleLogger;
     }
 
     Logger newInstance = new SimpleLogger(name);
-    Logger oldInstance = m_loggerMap.putIfAbsent(name, newInstance);
+    var oldInstance = m_loggerMap.putIfAbsent(name, newInstance);
     if (oldInstance == null) {
       return newInstance;
     }

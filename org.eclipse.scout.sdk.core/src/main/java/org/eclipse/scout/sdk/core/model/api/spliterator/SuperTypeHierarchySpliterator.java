@@ -45,7 +45,7 @@ public class SuperTypeHierarchySpliterator implements Spliterator<IType> {
     m_includeSuperClasses = includeSuperClasses;
     m_includeSuperInterfaces = includeSuperInterfaces;
 
-    boolean isSizeKnown = !includeSuperClasses && !includeSuperInterfaces;
+    var isSizeKnown = !includeSuperClasses && !includeSuperInterfaces;
     m_characteristics = getCharacteristics(isSizeKnown);
     if (isSizeKnown) {
       m_dek = new ArrayDeque<>(1);
@@ -69,7 +69,7 @@ public class SuperTypeHierarchySpliterator implements Spliterator<IType> {
   }
 
   protected static int getCharacteristics(boolean isSizeKnown) {
-    int characteristics = DEFAULT_CHARACTERISTICS;
+    var characteristics = DEFAULT_CHARACTERISTICS;
     if (isSizeKnown) {
       characteristics |= (Spliterator.SIZED | Spliterator.SUBSIZED);
     }
@@ -93,10 +93,10 @@ public class SuperTypeHierarchySpliterator implements Spliterator<IType> {
   @SuppressWarnings("ConstantConditions")
   protected void moveToNextValidElement() {
     while (isDataAvailable()) {
-      IType next = m_dek.peekFirst();
-      boolean ifcAccepted = isIncludeSuperInterfaces() && next.isInterface();
-      boolean superClassAccepted = isIncludeSuperClasses() && !next.isInterface();
-      boolean selfAccepted = isIncludeStartType() && next == m_startType;
+      var next = m_dek.peekFirst();
+      var ifcAccepted = isIncludeSuperInterfaces() && next.isInterface();
+      var superClassAccepted = isIncludeSuperClasses() && !next.isInterface();
+      var selfAccepted = isIncludeStartType() && next == m_startType;
       if (ifcAccepted || superClassAccepted || selfAccepted) {
         return;
       }
@@ -109,7 +109,7 @@ public class SuperTypeHierarchySpliterator implements Spliterator<IType> {
   }
 
   protected IType moveToNext() {
-    IType curElement = m_dek.removeFirst();
+    var curElement = m_dek.removeFirst();
     enqueueSuperLevelsOf(curElement);
     return curElement;
   }

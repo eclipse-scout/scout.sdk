@@ -20,9 +20,9 @@ public class CoreScoutTestingUtilsTest {
   @Test
   @SuppressWarnings("AccessOfSystemProperties")
   public void testScoutVersionWithProperty() {
-    String oldValue = System.getProperty(CoreScoutTestingUtils.SCOUT_VERSION_KEY);
+    var oldValue = System.getProperty(CoreScoutTestingUtils.SCOUT_VERSION_KEY);
     try {
-      String expected = "3.4.5";
+      var expected = "3.4.5";
       System.setProperty(CoreScoutTestingUtils.SCOUT_VERSION_KEY, expected);
       assertEquals(expected, CoreScoutTestingUtils.currentScoutVersion());
     }
@@ -38,7 +38,7 @@ public class CoreScoutTestingUtilsTest {
 
   @Test
   public void testScoutVersionRunningClasspath() {
-    String scoutVersion = CoreScoutTestingUtils.currentScoutVersion();
+    var scoutVersion = CoreScoutTestingUtils.currentScoutVersion();
     assertTrue(scoutVersion.endsWith("-SNAPSHOT"));
   }
 }

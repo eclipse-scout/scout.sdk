@@ -76,7 +76,7 @@ public final class MetaValueFactory {
 
       @Override
       public String toString() {
-        StringBuilder b = new StringBuilder(type().toString());
+        var b = new StringBuilder(type().toString());
         b.append('(');
         b.append(o);
         b.append(')');

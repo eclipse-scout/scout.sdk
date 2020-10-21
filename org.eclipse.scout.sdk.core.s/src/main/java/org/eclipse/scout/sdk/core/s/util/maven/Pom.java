@@ -86,8 +86,8 @@ public final class Pom {
     if (pom == null) {
       return Optional.empty();
     }
-    Element documentElement = pom.getDocumentElement();
-    Optional<String> directlySpecified = Xml.firstChildElement(documentElement, tagName)
+    var documentElement = pom.getDocumentElement();
+    var directlySpecified = Xml.firstChildElement(documentElement, tagName)
         .map(Element::getTextContent)
         .filter(Strings::hasText);
     if (directlySpecified.isPresent()) {

@@ -15,7 +15,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
-import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizardPage;
 import org.eclipse.swt.widgets.Shell;
 
@@ -33,7 +32,7 @@ public class TranslationModifyDialog extends AbstractTranslationDialog {
   protected void postCreate() {
     getKeyField().setEnabled(false);
 
-    TextField defaultField = getDefaultTranslationField();
+    var defaultField = getDefaultTranslationField();
     if (defaultField != null) {
       defaultField.addModifyListener(e -> revalidate());
     }
@@ -43,12 +42,12 @@ public class TranslationModifyDialog extends AbstractTranslationDialog {
 
   @Override
   protected void revalidate() {
-    TextField defaultLangField = getTranslationField(Language.LANGUAGE_DEFAULT);
+    var defaultLangField = getTranslationField(Language.LANGUAGE_DEFAULT);
     if (defaultLangField == null) {
       return;
     }
 
-    IStatus status = TranslationInputValidator.validateDefaultTranslation(defaultLangField.getText());
+    var status = TranslationInputValidator.validateDefaultTranslation(defaultLangField.getText());
     if (status.isOK()) {
       setMessage("Create a new translation entry.");
     }

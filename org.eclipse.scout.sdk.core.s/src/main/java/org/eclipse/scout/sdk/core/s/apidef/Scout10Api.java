@@ -10,12 +10,12 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.util.apidef.ApiLevel;
+import org.eclipse.scout.sdk.core.apidef.ApiLevel;
 
 @ApiLevel(10)
 public interface Scout10Api extends IScoutApi {
 
-  ApplicationScoped APPLICATION_SCOPED_ANNOTATION = new ApplicationScoped();
+  IScoutAnnotationApi.ApplicationScoped APPLICATION_SCOPED_ANNOTATION = new ApplicationScoped();
 
   @Override
   default IScoutAnnotationApi.ApplicationScoped ApplicationScoped() {
@@ -29,7 +29,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Authentication AUTHENTICATION_ANNOTATION = new Authentication();
+  IScoutAnnotationApi.Authentication AUTHENTICATION_ANNOTATION = new Authentication();
 
   @Override
   default IScoutAnnotationApi.Authentication Authentication() {
@@ -53,7 +53,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  BeanMock BEAN_MOCK_ANNOTATION = new BeanMock();
+  IScoutAnnotationApi.BeanMock BEAN_MOCK_ANNOTATION = new BeanMock();
 
   @Override
   default IScoutAnnotationApi.BeanMock BeanMock() {
@@ -67,7 +67,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Before BEFORE_ANNOTATION = new Before();
+  IScoutAnnotationApi.Before BEFORE_ANNOTATION = new Before();
 
   @Override
   default IScoutAnnotationApi.Before Before() {
@@ -81,7 +81,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ClassId CLASS_ID_ANNOTATION = new ClassId();
+  IScoutAnnotationApi.ClassId CLASS_ID_ANNOTATION = new ClassId();
 
   @Override
   default IScoutAnnotationApi.ClassId ClassId() {
@@ -100,7 +100,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Clazz CLAZZ_ANNOTATION = new Clazz();
+  IScoutAnnotationApi.Clazz CLAZZ_ANNOTATION = new Clazz();
 
   @Override
   default IScoutAnnotationApi.Clazz Clazz() {
@@ -124,7 +124,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ColumnData COLUMN_DATA_ANNOTATION = new ColumnData();
+  IScoutAnnotationApi.ColumnData COLUMN_DATA_ANNOTATION = new ColumnData();
 
   @Override
   default IScoutAnnotationApi.ColumnData ColumnData() {
@@ -162,7 +162,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  DtoRelevant DTORELEVANT_ANNOTATION = new DtoRelevant();
+  IScoutAnnotationApi.DtoRelevant DTORELEVANT_ANNOTATION = new DtoRelevant();
 
   @Override
   default IScoutAnnotationApi.DtoRelevant DtoRelevant() {
@@ -176,7 +176,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Extends EXTENDS_ANNOTATION = new Extends();
+  IScoutAnnotationApi.Extends EXTENDS_ANNOTATION = new Extends();
 
   @Override
   default IScoutAnnotationApi.Extends Extends() {
@@ -200,7 +200,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  FormData FORMDATA_ANNOTATION = new FormData();
+  IScoutAnnotationApi.FormData FORMDATA_ANNOTATION = new FormData();
 
   @Override
   default IScoutAnnotationApi.FormData FormData() {
@@ -239,7 +239,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Handler HANDLER_ANNOTATION = new Handler();
+  IScoutAnnotationApi.Handler HANDLER_ANNOTATION = new Handler();
 
   @Override
   default IScoutAnnotationApi.Handler Handler() {
@@ -258,7 +258,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Order ORDER_ANNOTATION = new Order();
+  IScoutAnnotationApi.Order ORDER_ANNOTATION = new Order();
 
   @Override
   default IScoutAnnotationApi.Order Order() {
@@ -277,7 +277,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  PageData PAGEDATA_ANNOTATION = new PageData();
+  IScoutAnnotationApi.PageData PAGEDATA_ANNOTATION = new PageData();
 
   @Override
   default IScoutAnnotationApi.PageData PageData() {
@@ -296,7 +296,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Replace REPLACE_ANNOTATION = new Replace();
+  IScoutAnnotationApi.Replace REPLACE_ANNOTATION = new Replace();
 
   @Override
   default IScoutAnnotationApi.Replace Replace() {
@@ -310,7 +310,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  RunWith RUNWITH_ANNOTATION = new RunWith();
+  IScoutAnnotationApi.RunWith RUNWITH_ANNOTATION = new RunWith();
 
   @Override
   default IScoutAnnotationApi.RunWith RunWith() {
@@ -329,7 +329,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  RunWithClientSession RUNWITHCLIENTSESSION_ANNOTATION = new RunWithClientSession();
+  IScoutAnnotationApi.RunWithClientSession RUNWITHCLIENTSESSION_ANNOTATION = new RunWithClientSession();
 
   @Override
   default IScoutAnnotationApi.RunWithClientSession RunWithClientSession() {
@@ -348,7 +348,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  RunWithServerSession RUNWITHSERVERSESSION_ANNOTATION = new RunWithServerSession();
+  IScoutAnnotationApi.RunWithServerSession RUNWITHSERVERSESSION_ANNOTATION = new RunWithServerSession();
 
   @Override
   default IScoutAnnotationApi.RunWithServerSession RunWithServerSession() {
@@ -367,7 +367,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  RunWithSubject RUNWITHSUBJECT_ANNOTATION = new RunWithSubject();
+  IScoutAnnotationApi.RunWithSubject RUNWITHSUBJECT_ANNOTATION = new RunWithSubject();
 
   @Override
   default IScoutAnnotationApi.RunWithSubject RunWithSubject() {
@@ -386,7 +386,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Test TEST_ANNOTATION = new Test();
+  IScoutAnnotationApi.Test TEST_ANNOTATION = new Test();
 
   @Override
   default IScoutAnnotationApi.Test Test() {
@@ -400,7 +400,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  TunnelToServer TUNNELTOSERVER_ANNOTATION = new TunnelToServer();
+  IScoutAnnotationApi.TunnelToServer TUNNELTOSERVER_ANNOTATION = new TunnelToServer();
 
   @Override
   default IScoutAnnotationApi.TunnelToServer TunnelToServer() {
@@ -414,7 +414,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  WebServiceEntryPoint WEBSERVICEENTRYPOINT_ANNOTATION = new WebServiceEntryPoint();
+  IScoutAnnotationApi.WebServiceEntryPoint WEBSERVICEENTRYPOINT_ANNOTATION = new WebServiceEntryPoint();
 
   @Override
   default IScoutAnnotationApi.WebServiceEntryPoint WebServiceEntryPoint() {
@@ -463,7 +463,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IAccordion I_ACCORDION = new IAccordion();
+  IScoutInterfaceApi.IAccordion I_ACCORDION = new IAccordion();
 
   @Override
   default IScoutInterfaceApi.IAccordion IAccordion() {
@@ -477,7 +477,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IAccordionField I_ACCORDION_FIELD = new IAccordionField();
+  IScoutInterfaceApi.IAccordionField I_ACCORDION_FIELD = new IAccordionField();
 
   @Override
   default IScoutInterfaceApi.IAccordionField IAccordionField() {
@@ -491,7 +491,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IAction I_ACTION = new IAction();
+  IScoutInterfaceApi.IAction I_ACTION = new IAction();
 
   @Override
   default IScoutInterfaceApi.IAction IAction() {
@@ -505,7 +505,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IActionNode I_ACTION_NODE = new IActionNode();
+  IScoutInterfaceApi.IActionNode I_ACTION_NODE = new IActionNode();
 
   @Override
   default IScoutInterfaceApi.IActionNode IActionNode() {
@@ -519,7 +519,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IBigDecimalField I_BIG_DECIMAL_FIELD = new IBigDecimalField();
+  IScoutInterfaceApi.IBigDecimalField I_BIG_DECIMAL_FIELD = new IBigDecimalField();
 
   @Override
   default IScoutInterfaceApi.IBigDecimalField IBigDecimalField() {
@@ -533,7 +533,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IBooleanField I_BOOLEAN_FIELD = new IBooleanField();
+  IScoutInterfaceApi.IBooleanField I_BOOLEAN_FIELD = new IBooleanField();
 
   @Override
   default IScoutInterfaceApi.IBooleanField IBooleanField() {
@@ -547,7 +547,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IBrowserField I_BROWSER_FIELD = new IBrowserField();
+  IScoutInterfaceApi.IBrowserField I_BROWSER_FIELD = new IBrowserField();
 
   @Override
   default IScoutInterfaceApi.IBrowserField IBrowserField() {
@@ -561,7 +561,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IButton I_BUTTON = new IButton();
+  IScoutInterfaceApi.IButton I_BUTTON = new IButton();
 
   @Override
   default IScoutInterfaceApi.IButton IButton() {
@@ -575,7 +575,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ICalendar I_CALENDAR = new ICalendar();
+  IScoutInterfaceApi.ICalendar I_CALENDAR = new ICalendar();
 
   @Override
   default IScoutInterfaceApi.ICalendar ICalendar() {
@@ -589,7 +589,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ICalendarField I_CALENDAR_FIELD = new ICalendarField();
+  IScoutInterfaceApi.ICalendarField I_CALENDAR_FIELD = new ICalendarField();
 
   @Override
   default IScoutInterfaceApi.ICalendarField ICalendarField() {
@@ -603,7 +603,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ICalendarItemProvider I_CALENDAR_ITEM_PROVIDER = new ICalendarItemProvider();
+  IScoutInterfaceApi.ICalendarItemProvider I_CALENDAR_ITEM_PROVIDER = new ICalendarItemProvider();
 
   @Override
   default IScoutInterfaceApi.ICalendarItemProvider ICalendarItemProvider() {
@@ -617,7 +617,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IClientSession I_CLIENT_SESSION = new IClientSession();
+  IScoutInterfaceApi.IClientSession I_CLIENT_SESSION = new IClientSession();
 
   @Override
   default IScoutInterfaceApi.IClientSession IClientSession() {
@@ -631,7 +631,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ICode I_CODE = new ICode();
+  IScoutInterfaceApi.ICode I_CODE = new ICode();
 
   @Override
   default IScoutInterfaceApi.ICode ICode() {
@@ -650,7 +650,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ICodeType I_CODE_TYPE = new ICodeType();
+  IScoutInterfaceApi.ICodeType I_CODE_TYPE = new ICodeType();
 
   @Override
   default IScoutInterfaceApi.ICodeType ICodeType() {
@@ -679,7 +679,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITableBeanHolder I_TABLE_BEAN_HOLDER = new ITableBeanHolder();
+  IScoutInterfaceApi.ITableBeanHolder I_TABLE_BEAN_HOLDER = new ITableBeanHolder();
 
   @Override
   default IScoutInterfaceApi.ITableBeanHolder ITableBeanHolder() {
@@ -708,7 +708,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IColumn I_COLUMN = new IColumn();
+  IScoutInterfaceApi.IColumn I_COLUMN = new IColumn();
 
   @Override
   default IScoutInterfaceApi.IColumn IColumn() {
@@ -727,7 +727,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ICompositeField I_COMPOSITE_FIELD = new ICompositeField();
+  IScoutInterfaceApi.ICompositeField I_COMPOSITE_FIELD = new ICompositeField();
 
   @Override
   default IScoutInterfaceApi.ICompositeField ICompositeField() {
@@ -746,7 +746,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IPropertyHolder I_PROPERTY_HOLDER = new IPropertyHolder();
+  IScoutInterfaceApi.IPropertyHolder I_PROPERTY_HOLDER = new IPropertyHolder();
 
   @Override
   default IScoutInterfaceApi.IPropertyHolder IPropertyHolder() {
@@ -765,7 +765,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ICompositeFieldExtension I_COMPOSITE_FIELD_EXTENSION = new ICompositeFieldExtension();
+  IScoutInterfaceApi.ICompositeFieldExtension I_COMPOSITE_FIELD_EXTENSION = new ICompositeFieldExtension();
 
   @Override
   default IScoutInterfaceApi.ICompositeFieldExtension ICompositeFieldExtension() {
@@ -779,7 +779,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IContextMenuOwner I_CONTEXT_MENU_OWNER = new IContextMenuOwner();
+  IScoutInterfaceApi.IContextMenuOwner I_CONTEXT_MENU_OWNER = new IContextMenuOwner();
 
   @Override
   default IScoutInterfaceApi.IContextMenuOwner IContextMenuOwner() {
@@ -793,7 +793,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IDataModelAttribute I_DATA_MODEL_ATTRIBUTE = new IDataModelAttribute();
+  IScoutInterfaceApi.IDataModelAttribute I_DATA_MODEL_ATTRIBUTE = new IDataModelAttribute();
 
   @Override
   default IScoutInterfaceApi.IDataModelAttribute IDataModelAttribute() {
@@ -807,7 +807,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IDataModelEntity I_DATA_MODEL_ENTITY = new IDataModelEntity();
+  IScoutInterfaceApi.IDataModelEntity I_DATA_MODEL_ENTITY = new IDataModelEntity();
 
   @Override
   default IScoutInterfaceApi.IDataModelEntity IDataModelEntity() {
@@ -821,7 +821,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IDataObject I_DATA_OBJECT = new IDataObject();
+  IScoutInterfaceApi.IDataObject I_DATA_OBJECT = new IDataObject();
 
   @Override
   default IScoutInterfaceApi.IDataObject IDataObject() {
@@ -835,7 +835,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IDateField I_DATE_FIELD = new IDateField();
+  IScoutInterfaceApi.IDateField I_DATE_FIELD = new IDateField();
 
   @Override
   default IScoutInterfaceApi.IDateField IDateField() {
@@ -849,7 +849,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IDesktop I_DESKTOP = new IDesktop();
+  IScoutInterfaceApi.IDesktop I_DESKTOP = new IDesktop();
 
   @Override
   default IScoutInterfaceApi.IDesktop IDesktop() {
@@ -863,7 +863,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IDesktopExtension I_DESKTOP_EXTENSION = new IDesktopExtension();
+  IScoutInterfaceApi.IDesktopExtension I_DESKTOP_EXTENSION = new IDesktopExtension();
 
   @Override
   default IScoutInterfaceApi.IDesktopExtension IDesktopExtension() {
@@ -877,7 +877,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IExtension I_EXTENSION = new IExtension();
+  IScoutInterfaceApi.IExtension I_EXTENSION = new IExtension();
 
   @Override
   default IScoutInterfaceApi.IExtension IExtension() {
@@ -901,7 +901,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IFileChooserButton I_FILE_CHOOSER_BUTTON = new IFileChooserButton();
+  IScoutInterfaceApi.IFileChooserButton I_FILE_CHOOSER_BUTTON = new IFileChooserButton();
 
   @Override
   default IScoutInterfaceApi.IFileChooserButton IFileChooserButton() {
@@ -915,7 +915,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IFileChooserField I_FILE_CHOOSER_FIELD = new IFileChooserField();
+  IScoutInterfaceApi.IFileChooserField I_FILE_CHOOSER_FIELD = new IFileChooserField();
 
   @Override
   default IScoutInterfaceApi.IFileChooserField IFileChooserField() {
@@ -929,7 +929,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IForm I_FORM = new IForm();
+  IScoutInterfaceApi.IForm I_FORM = new IForm();
 
   @Override
   default IScoutInterfaceApi.IForm IForm() {
@@ -958,7 +958,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IFormExtension I_FORM_EXTENSION = new IFormExtension();
+  IScoutInterfaceApi.IFormExtension I_FORM_EXTENSION = new IFormExtension();
 
   @Override
   default IScoutInterfaceApi.IFormExtension IFormExtension() {
@@ -972,7 +972,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IFormField I_FORM_FIELD = new IFormField();
+  IScoutInterfaceApi.IFormField I_FORM_FIELD = new IFormField();
 
   @Override
   default IScoutInterfaceApi.IFormField IFormField() {
@@ -986,7 +986,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IFormFieldExtension I_FORM_FIELD_EXTENSION = new IFormFieldExtension();
+  IScoutInterfaceApi.IFormFieldExtension I_FORM_FIELD_EXTENSION = new IFormFieldExtension();
 
   @Override
   default IScoutInterfaceApi.IFormFieldExtension IFormFieldExtension() {
@@ -1000,7 +1000,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IFormFieldMenu I_FORM_FIELD_MENU = new IFormFieldMenu();
+  IScoutInterfaceApi.IFormFieldMenu I_FORM_FIELD_MENU = new IFormFieldMenu();
 
   @Override
   default IScoutInterfaceApi.IFormFieldMenu IFormFieldMenu() {
@@ -1014,7 +1014,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IFormHandler I_FORM_HANDLER = new IFormHandler();
+  IScoutInterfaceApi.IFormHandler I_FORM_HANDLER = new IFormHandler();
 
   @Override
   default IScoutInterfaceApi.IFormHandler IFormHandler() {
@@ -1028,7 +1028,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IGroup I_GROUP = new IGroup();
+  IScoutInterfaceApi.IGroup I_GROUP = new IGroup();
 
   @Override
   default IScoutInterfaceApi.IGroup IGroup() {
@@ -1042,7 +1042,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IGroupBox I_GROUP_BOX = new IGroupBox();
+  IScoutInterfaceApi.IGroupBox I_GROUP_BOX = new IGroupBox();
 
   @Override
   default IScoutInterfaceApi.IGroupBox IGroupBox() {
@@ -1056,7 +1056,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IHtmlField I_HTML_FIELD = new IHtmlField();
+  IScoutInterfaceApi.IHtmlField I_HTML_FIELD = new IHtmlField();
 
   @Override
   default IScoutInterfaceApi.IHtmlField IHtmlField() {
@@ -1070,7 +1070,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IImageField I_IMAGE_FIELD = new IImageField();
+  IScoutInterfaceApi.IImageField I_IMAGE_FIELD = new IImageField();
 
   @Override
   default IScoutInterfaceApi.IImageField IImageField() {
@@ -1084,7 +1084,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IKeyStroke I_KEY_STROKE = new IKeyStroke();
+  IScoutInterfaceApi.IKeyStroke I_KEY_STROKE = new IKeyStroke();
 
   @Override
   default IScoutInterfaceApi.IKeyStroke IKeyStroke() {
@@ -1098,7 +1098,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ILabelField I_LABEL_FIELD = new ILabelField();
+  IScoutInterfaceApi.ILabelField I_LABEL_FIELD = new ILabelField();
 
   @Override
   default IScoutInterfaceApi.ILabelField ILabelField() {
@@ -1112,7 +1112,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IListBox I_LIST_BOX = new IListBox();
+  IScoutInterfaceApi.IListBox I_LIST_BOX = new IListBox();
 
   @Override
   default IScoutInterfaceApi.IListBox IListBox() {
@@ -1126,7 +1126,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ILongField I_LONG_FIELD = new ILongField();
+  IScoutInterfaceApi.ILongField I_LONG_FIELD = new ILongField();
 
   @Override
   default IScoutInterfaceApi.ILongField ILongField() {
@@ -1140,7 +1140,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ILookupCall I_LOOKUP_CALL = new ILookupCall();
+  IScoutInterfaceApi.ILookupCall I_LOOKUP_CALL = new ILookupCall();
 
   @Override
   default IScoutInterfaceApi.ILookupCall ILookupCall() {
@@ -1154,7 +1154,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ILookupRow I_LOOKUP_ROW = new ILookupRow();
+  IScoutInterfaceApi.ILookupRow I_LOOKUP_ROW = new ILookupRow();
 
   @Override
   default IScoutInterfaceApi.ILookupRow ILookupRow() {
@@ -1168,7 +1168,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ILookupService I_LOOKUP_SERVICE = new ILookupService();
+  IScoutInterfaceApi.ILookupService I_LOOKUP_SERVICE = new ILookupService();
 
   @Override
   default IScoutInterfaceApi.ILookupService ILookupService() {
@@ -1187,7 +1187,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IMenu I_MENU = new IMenu();
+  IScoutInterfaceApi.IMenu I_MENU = new IMenu();
 
   @Override
   default IScoutInterfaceApi.IMenu IMenu() {
@@ -1201,7 +1201,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IMenuType I_MENU_TYPE = new IMenuType();
+  IScoutInterfaceApi.IMenuType I_MENU_TYPE = new IMenuType();
 
   @Override
   default IScoutInterfaceApi.IMenuType IMenuType() {
@@ -1215,7 +1215,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IMode I_MODE = new IMode();
+  IScoutInterfaceApi.IMode I_MODE = new IMode();
 
   @Override
   default IScoutInterfaceApi.IMode IMode() {
@@ -1229,7 +1229,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IModeSelectorField I_MODE_SELECTOR_FIELD = new IModeSelectorField();
+  IScoutInterfaceApi.IModeSelectorField I_MODE_SELECTOR_FIELD = new IModeSelectorField();
 
   @Override
   default IScoutInterfaceApi.IModeSelectorField IModeSelectorField() {
@@ -1243,7 +1243,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IOrdered I_ORDERED = new IOrdered();
+  IScoutInterfaceApi.IOrdered I_ORDERED = new IOrdered();
 
   @Override
   default IScoutInterfaceApi.IOrdered IOrdered() {
@@ -1257,7 +1257,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IOutline I_OUTLINE = new IOutline();
+  IScoutInterfaceApi.IOutline I_OUTLINE = new IOutline();
 
   @Override
   default IScoutInterfaceApi.IOutline IOutline() {
@@ -1271,7 +1271,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IPage I_PAGE = new IPage();
+  IScoutInterfaceApi.IPage I_PAGE = new IPage();
 
   @Override
   default IScoutInterfaceApi.IPage IPage() {
@@ -1285,7 +1285,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IPageWithNodes I_PAGE_WITH_NODES = new IPageWithNodes();
+  IScoutInterfaceApi.IPageWithNodes I_PAGE_WITH_NODES = new IPageWithNodes();
 
   @Override
   default IScoutInterfaceApi.IPageWithNodes IPageWithNodes() {
@@ -1299,7 +1299,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IPageWithTable I_PAGE_WITH_TABLE = new IPageWithTable();
+  IScoutInterfaceApi.IPageWithTable I_PAGE_WITH_TABLE = new IPageWithTable();
 
   @Override
   default IScoutInterfaceApi.IPageWithTable IPageWithTable() {
@@ -1313,7 +1313,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IPageWithTableExtension I_PAGE_WITH_TABLE_EXTENSION = new IPageWithTableExtension();
+  IScoutInterfaceApi.IPageWithTableExtension I_PAGE_WITH_TABLE_EXTENSION = new IPageWithTableExtension();
 
   @Override
   default IScoutInterfaceApi.IPageWithTableExtension IPageWithTableExtension() {
@@ -1327,7 +1327,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IPrettyPrintDataObjectMapper I_PRETTY_PRINT_DATA_OBJECT_MAPPER = new IPrettyPrintDataObjectMapper();
+  IScoutInterfaceApi.IPrettyPrintDataObjectMapper I_PRETTY_PRINT_DATA_OBJECT_MAPPER = new IPrettyPrintDataObjectMapper();
 
   @Override
   default IScoutInterfaceApi.IPrettyPrintDataObjectMapper IPrettyPrintDataObjectMapper() {
@@ -1341,7 +1341,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IProposalField I_PROPOSAL_FIELD = new IProposalField();
+  IScoutInterfaceApi.IProposalField I_PROPOSAL_FIELD = new IProposalField();
 
   @Override
   default IScoutInterfaceApi.IProposalField IProposalField() {
@@ -1355,7 +1355,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IRadioButton I_RADIO_BUTTON = new IRadioButton();
+  IScoutInterfaceApi.IRadioButton I_RADIO_BUTTON = new IRadioButton();
 
   @Override
   default IScoutInterfaceApi.IRadioButton IRadioButton() {
@@ -1369,7 +1369,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IRadioButtonGroup I_RADIO_BUTTON_GROUP = new IRadioButtonGroup();
+  IScoutInterfaceApi.IRadioButtonGroup I_RADIO_BUTTON_GROUP = new IRadioButtonGroup();
 
   @Override
   default IScoutInterfaceApi.IRadioButtonGroup IRadioButtonGroup() {
@@ -1383,7 +1383,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ISequenceBox I_SEQUENCE_BOX = new ISequenceBox();
+  IScoutInterfaceApi.ISequenceBox I_SEQUENCE_BOX = new ISequenceBox();
 
   @Override
   default IScoutInterfaceApi.ISequenceBox ISequenceBox() {
@@ -1397,7 +1397,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IServerSession I_SERVER_SESSION = new IServerSession();
+  IScoutInterfaceApi.IServerSession I_SERVER_SESSION = new IServerSession();
 
   @Override
   default IScoutInterfaceApi.IServerSession IServerSession() {
@@ -1411,7 +1411,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IService I_SERVICE = new IService();
+  IScoutInterfaceApi.IService I_SERVICE = new IService();
 
   @Override
   default IScoutInterfaceApi.IService IService() {
@@ -1425,7 +1425,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ISession I_SESSION = new ISession();
+  IScoutInterfaceApi.ISession I_SESSION = new ISession();
 
   @Override
   default IScoutInterfaceApi.ISession ISession() {
@@ -1439,7 +1439,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ISmartField I_SMART_FIELD = new ISmartField();
+  IScoutInterfaceApi.ISmartField I_SMART_FIELD = new ISmartField();
 
   @Override
   default IScoutInterfaceApi.ISmartField ISmartField() {
@@ -1453,7 +1453,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IStringField I_STRING_FIELD = new IStringField();
+  IScoutInterfaceApi.IStringField I_STRING_FIELD = new IStringField();
 
   @Override
   default IScoutInterfaceApi.IStringField IStringField() {
@@ -1467,7 +1467,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITabBox I_TAB_BOX = new ITabBox();
+  IScoutInterfaceApi.ITabBox I_TAB_BOX = new ITabBox();
 
   @Override
   default IScoutInterfaceApi.ITabBox ITabBox() {
@@ -1481,7 +1481,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITable I_TABLE = new ITable();
+  IScoutInterfaceApi.ITable I_TABLE = new ITable();
 
   @Override
   default IScoutInterfaceApi.ITable ITable() {
@@ -1500,7 +1500,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITableControl I_TABLE_CONTROL = new ITableControl();
+  IScoutInterfaceApi.ITableControl I_TABLE_CONTROL = new ITableControl();
 
   @Override
   default IScoutInterfaceApi.ITableControl ITableControl() {
@@ -1514,7 +1514,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITableExtension I_TABLE_EXTENSION = new ITableExtension();
+  IScoutInterfaceApi.ITableExtension I_TABLE_EXTENSION = new ITableExtension();
 
   @Override
   default IScoutInterfaceApi.ITableExtension ITableExtension() {
@@ -1528,7 +1528,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITableField I_TABLE_FIELD = new ITableField();
+  IScoutInterfaceApi.ITableField I_TABLE_FIELD = new ITableField();
 
   @Override
   default IScoutInterfaceApi.ITableField ITableField() {
@@ -1542,7 +1542,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITagField I_TAG_FIELD = new ITagField();
+  IScoutInterfaceApi.ITagField I_TAG_FIELD = new ITagField();
 
   @Override
   default IScoutInterfaceApi.ITagField ITagField() {
@@ -1556,7 +1556,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITextProviderService I_TEXT_PROVIDER_SERVICE = new ITextProviderService();
+  IScoutInterfaceApi.ITextProviderService I_TEXT_PROVIDER_SERVICE = new ITextProviderService();
 
   @Override
   default IScoutInterfaceApi.ITextProviderService ITextProviderService() {
@@ -1570,7 +1570,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITile I_TILE = new ITile();
+  IScoutInterfaceApi.ITile I_TILE = new ITile();
 
   @Override
   default IScoutInterfaceApi.ITile ITile() {
@@ -1584,7 +1584,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITileField I_TILE_FIELD = new ITileField();
+  IScoutInterfaceApi.ITileField I_TILE_FIELD = new ITileField();
 
   @Override
   default IScoutInterfaceApi.ITileField ITileField() {
@@ -1598,7 +1598,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITileGrid I_TILE_GRID = new ITileGrid();
+  IScoutInterfaceApi.ITileGrid I_TILE_GRID = new ITileGrid();
 
   @Override
   default IScoutInterfaceApi.ITileGrid ITileGrid() {
@@ -1612,7 +1612,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITree I_TREE = new ITree();
+  IScoutInterfaceApi.ITree I_TREE = new ITree();
 
   @Override
   default IScoutInterfaceApi.ITree ITree() {
@@ -1626,7 +1626,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITreeField I_TREE_FIELD = new ITreeField();
+  IScoutInterfaceApi.ITreeField I_TREE_FIELD = new ITreeField();
 
   @Override
   default IScoutInterfaceApi.ITreeField ITreeField() {
@@ -1640,7 +1640,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITreeNode I_TREE_NODE = new ITreeNode();
+  IScoutInterfaceApi.ITreeNode I_TREE_NODE = new ITreeNode();
 
   @Override
   default IScoutInterfaceApi.ITreeNode ITreeNode() {
@@ -1654,7 +1654,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ITypeWithClassId I_TYPE_WITH_CLASS_ID = new ITypeWithClassId();
+  IScoutInterfaceApi.ITypeWithClassId I_TYPE_WITH_CLASS_ID = new ITypeWithClassId();
 
   @Override
   default IScoutInterfaceApi.ITypeWithClassId ITypeWithClassId() {
@@ -1668,7 +1668,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IUuId I_UU_ID = new IUuId();
+  IScoutInterfaceApi.IUuId I_UU_ID = new IUuId();
 
   @Override
   default IScoutInterfaceApi.IUuId IUuId() {
@@ -1682,7 +1682,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IValueField I_VALUE_FIELD = new IValueField();
+  IScoutInterfaceApi.IValueField I_VALUE_FIELD = new IValueField();
 
   @Override
   default IScoutInterfaceApi.IValueField IValueField() {
@@ -1701,7 +1701,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IViewButton I_VIEW_BUTTON = new IViewButton();
+  IScoutInterfaceApi.IViewButton I_VIEW_BUTTON = new IViewButton();
 
   @Override
   default IScoutInterfaceApi.IViewButton IViewButton() {
@@ -1715,7 +1715,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IWidget I_WIDGET = new IWidget();
+  IScoutInterfaceApi.IWidget I_WIDGET = new IWidget();
 
   @Override
   default IScoutInterfaceApi.IWidget IWidget() {
@@ -1734,7 +1734,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IWizard I_WIZARD = new IWizard();
+  IScoutInterfaceApi.IWizard I_WIZARD = new IWizard();
 
   @Override
   default IScoutInterfaceApi.IWizard IWizard() {
@@ -1748,7 +1748,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IWizardStep I_WIZARD_STEP = new IWizardStep();
+  IScoutInterfaceApi.IWizardStep I_WIZARD_STEP = new IWizardStep();
 
   @Override
   default IScoutInterfaceApi.IWizardStep IWizardStep() {
@@ -1762,7 +1762,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IConfigProperty I_CONFIG_PROPERTY = new IConfigProperty();
+  IScoutInterfaceApi.IConfigProperty I_CONFIG_PROPERTY = new IConfigProperty();
 
   @Override
   default IScoutInterfaceApi.IConfigProperty IConfigProperty() {
@@ -1786,7 +1786,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractAccordion ABSTRACT_ACCORDION = new AbstractAccordion();
+  IScoutAbstractApi.AbstractAccordion ABSTRACT_ACCORDION = new AbstractAccordion();
 
   @Override
   default IScoutAbstractApi.AbstractAccordion AbstractAccordion() {
@@ -1800,7 +1800,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractAccordionField ABSTRACT_ACCORDION_FIELD = new AbstractAccordionField();
+  IScoutAbstractApi.AbstractAccordionField ABSTRACT_ACCORDION_FIELD = new AbstractAccordionField();
 
   @Override
   default IScoutAbstractApi.AbstractAccordionField AbstractAccordionField() {
@@ -1814,7 +1814,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractActionNode ABSTRACT_ACTION_NODE = new AbstractActionNode();
+  IScoutAbstractApi.AbstractActionNode ABSTRACT_ACTION_NODE = new AbstractActionNode();
 
   @Override
   default IScoutAbstractApi.AbstractActionNode AbstractActionNode() {
@@ -1828,7 +1828,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractBigDecimalField ABSTRACT_BIG_DECIMAL_FIELD = new AbstractBigDecimalField();
+  IScoutAbstractApi.AbstractBigDecimalField ABSTRACT_BIG_DECIMAL_FIELD = new AbstractBigDecimalField();
 
   @Override
   default IScoutAbstractApi.AbstractBigDecimalField AbstractBigDecimalField() {
@@ -1842,7 +1842,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractBooleanField ABSTRACT_BOOLEAN_FIELD = new AbstractBooleanField();
+  IScoutAbstractApi.AbstractBooleanField ABSTRACT_BOOLEAN_FIELD = new AbstractBooleanField();
 
   @Override
   default IScoutAbstractApi.AbstractBooleanField AbstractBooleanField() {
@@ -1856,7 +1856,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractBrowserField ABSTRACT_BROWSER_FIELD = new AbstractBrowserField();
+  IScoutAbstractApi.AbstractBrowserField ABSTRACT_BROWSER_FIELD = new AbstractBrowserField();
 
   @Override
   default IScoutAbstractApi.AbstractBrowserField AbstractBrowserField() {
@@ -1870,7 +1870,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractButton ABSTRACT_BUTTON = new AbstractButton();
+  IScoutAbstractApi.AbstractButton ABSTRACT_BUTTON = new AbstractButton();
 
   @Override
   default IScoutAbstractApi.AbstractButton AbstractButton() {
@@ -1889,7 +1889,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCalendar ABSTRACT_CALENDAR = new AbstractCalendar();
+  IScoutAbstractApi.AbstractCalendar ABSTRACT_CALENDAR = new AbstractCalendar();
 
   @Override
   default IScoutAbstractApi.AbstractCalendar AbstractCalendar() {
@@ -1903,7 +1903,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCalendarField ABSTRACT_CALENDAR_FIELD = new AbstractCalendarField();
+  IScoutAbstractApi.AbstractCalendarField ABSTRACT_CALENDAR_FIELD = new AbstractCalendarField();
 
   @Override
   default IScoutAbstractApi.AbstractCalendarField AbstractCalendarField() {
@@ -1917,7 +1917,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCalendarItemProvider ABSTRACT_CALENDAR_ITEM_PROVIDER = new AbstractCalendarItemProvider();
+  IScoutAbstractApi.AbstractCalendarItemProvider ABSTRACT_CALENDAR_ITEM_PROVIDER = new AbstractCalendarItemProvider();
 
   @Override
   default IScoutAbstractApi.AbstractCalendarItemProvider AbstractCalendarItemProvider() {
@@ -1931,7 +1931,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCancelButton ABSTRACT_CANCEL_BUTTON = new AbstractCancelButton();
+  IScoutAbstractApi.AbstractCancelButton ABSTRACT_CANCEL_BUTTON = new AbstractCancelButton();
 
   @Override
   default IScoutAbstractApi.AbstractCancelButton AbstractCancelButton() {
@@ -1945,7 +1945,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCode ABSTRACT_CODE = new AbstractCode();
+  IScoutAbstractApi.AbstractCode ABSTRACT_CODE = new AbstractCode();
 
   @Override
   default IScoutAbstractApi.AbstractCode AbstractCode() {
@@ -1964,7 +1964,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCodeType ABSTRACT_CODE_TYPE = new AbstractCodeType();
+  IScoutAbstractApi.AbstractCodeType ABSTRACT_CODE_TYPE = new AbstractCodeType();
 
   @Override
   default IScoutAbstractApi.AbstractCodeType AbstractCodeType() {
@@ -1978,7 +1978,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCodeTypeWithGeneric ABSTRACT_CODE_TYPE_WITH_GENERIC = new AbstractCodeTypeWithGeneric();
+  IScoutAbstractApi.AbstractCodeTypeWithGeneric ABSTRACT_CODE_TYPE_WITH_GENERIC = new AbstractCodeTypeWithGeneric();
 
   @Override
   default IScoutAbstractApi.AbstractCodeTypeWithGeneric AbstractCodeTypeWithGeneric() {
@@ -1992,7 +1992,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractComposerField ABSTRACT_COMPOSER_FIELD = new AbstractComposerField();
+  IScoutAbstractApi.AbstractComposerField ABSTRACT_COMPOSER_FIELD = new AbstractComposerField();
 
   @Override
   default IScoutAbstractApi.AbstractComposerField AbstractComposerField() {
@@ -2006,7 +2006,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCompositeField ABSTRACT_COMPOSITE_FIELD = new AbstractCompositeField();
+  IScoutAbstractApi.AbstractCompositeField ABSTRACT_COMPOSITE_FIELD = new AbstractCompositeField();
 
   @Override
   default IScoutAbstractApi.AbstractCompositeField AbstractCompositeField() {
@@ -2020,7 +2020,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractDataModel ABSTRACT_DATA_MODEL = new AbstractDataModel();
+  IScoutAbstractApi.AbstractDataModel ABSTRACT_DATA_MODEL = new AbstractDataModel();
 
   @Override
   default IScoutAbstractApi.AbstractDataModel AbstractDataModel() {
@@ -2034,7 +2034,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractDataModelEntity ABSTRACT_DATA_MODEL_ENTITY = new AbstractDataModelEntity();
+  IScoutAbstractApi.AbstractDataModelEntity ABSTRACT_DATA_MODEL_ENTITY = new AbstractDataModelEntity();
 
   @Override
   default IScoutAbstractApi.AbstractDataModelEntity AbstractDataModelEntity() {
@@ -2048,7 +2048,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractDateField ABSTRACT_DATE_FIELD = new AbstractDateField();
+  IScoutAbstractApi.AbstractDateField ABSTRACT_DATE_FIELD = new AbstractDateField();
 
   @Override
   default IScoutAbstractApi.AbstractDateField AbstractDateField() {
@@ -2062,7 +2062,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractDesktop ABSTRACT_DESKTOP = new AbstractDesktop();
+  IScoutAbstractApi.AbstractDesktop ABSTRACT_DESKTOP = new AbstractDesktop();
 
   @Override
   default IScoutAbstractApi.AbstractDesktop AbstractDesktop() {
@@ -2076,7 +2076,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractDesktopExtension ABSTRACT_DESKTOP_EXTENSION = new AbstractDesktopExtension();
+  IScoutAbstractApi.AbstractDesktopExtension ABSTRACT_DESKTOP_EXTENSION = new AbstractDesktopExtension();
 
   @Override
   default IScoutAbstractApi.AbstractDesktopExtension AbstractDesktopExtension() {
@@ -2090,7 +2090,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractDynamicNlsTextProviderService ABSTRACT_DYNAMIC_NLS_TEXT_PROVIDER_SERVICE = new AbstractDynamicNlsTextProviderService();
+  IScoutAbstractApi.AbstractDynamicNlsTextProviderService ABSTRACT_DYNAMIC_NLS_TEXT_PROVIDER_SERVICE = new AbstractDynamicNlsTextProviderService();
 
   @Override
   default IScoutAbstractApi.AbstractDynamicNlsTextProviderService AbstractDynamicNlsTextProviderService() {
@@ -2109,7 +2109,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractExtension ABSTRACT_EXTENSION = new AbstractExtension();
+  IScoutAbstractApi.AbstractExtension ABSTRACT_EXTENSION = new AbstractExtension();
 
   @Override
   default IScoutAbstractApi.AbstractExtension AbstractExtension() {
@@ -2123,7 +2123,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractFileChooserButton ABSTRACT_FILE_CHOOSER_BUTTON = new AbstractFileChooserButton();
+  IScoutAbstractApi.AbstractFileChooserButton ABSTRACT_FILE_CHOOSER_BUTTON = new AbstractFileChooserButton();
 
   @Override
   default IScoutAbstractApi.AbstractFileChooserButton AbstractFileChooserButton() {
@@ -2137,7 +2137,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractFileChooserField ABSTRACT_FILE_CHOOSER_FIELD = new AbstractFileChooserField();
+  IScoutAbstractApi.AbstractFileChooserField ABSTRACT_FILE_CHOOSER_FIELD = new AbstractFileChooserField();
 
   @Override
   default IScoutAbstractApi.AbstractFileChooserField AbstractFileChooserField() {
@@ -2151,7 +2151,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractForm ABSTRACT_FORM = new AbstractForm();
+  IScoutAbstractApi.AbstractForm ABSTRACT_FORM = new AbstractForm();
 
   @Override
   default IScoutAbstractApi.AbstractForm AbstractForm() {
@@ -2180,7 +2180,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractFormData ABSTRACT_FORM_DATA = new AbstractFormData();
+  IScoutAbstractApi.AbstractFormData ABSTRACT_FORM_DATA = new AbstractFormData();
 
   @Override
   default IScoutAbstractApi.AbstractFormData AbstractFormData() {
@@ -2194,7 +2194,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractFormField ABSTRACT_FORM_FIELD = new AbstractFormField();
+  IScoutAbstractApi.AbstractFormField ABSTRACT_FORM_FIELD = new AbstractFormField();
 
   @Override
   default IScoutAbstractApi.AbstractFormField AbstractFormField() {
@@ -2223,7 +2223,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractFormFieldData ABSTRACT_FORM_FIELD_DATA = new AbstractFormFieldData();
+  IScoutAbstractApi.AbstractFormFieldData ABSTRACT_FORM_FIELD_DATA = new AbstractFormFieldData();
 
   @Override
   default IScoutAbstractApi.AbstractFormFieldData AbstractFormFieldData() {
@@ -2237,7 +2237,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractFormHandler ABSTRACT_FORM_HANDLER = new AbstractFormHandler();
+  IScoutAbstractApi.AbstractFormHandler ABSTRACT_FORM_HANDLER = new AbstractFormHandler();
 
   @Override
   default IScoutAbstractApi.AbstractFormHandler AbstractFormHandler() {
@@ -2261,7 +2261,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractGroup ABSTRACT_GROUP = new AbstractGroup();
+  IScoutAbstractApi.AbstractGroup ABSTRACT_GROUP = new AbstractGroup();
 
   @Override
   default IScoutAbstractApi.AbstractGroup AbstractGroup() {
@@ -2275,7 +2275,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractGroupBox ABSTRACT_GROUP_BOX = new AbstractGroupBox();
+  IScoutAbstractApi.AbstractGroupBox ABSTRACT_GROUP_BOX = new AbstractGroupBox();
 
   @Override
   default IScoutAbstractApi.AbstractGroupBox AbstractGroupBox() {
@@ -2289,7 +2289,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractHtmlField ABSTRACT_HTML_FIELD = new AbstractHtmlField();
+  IScoutAbstractApi.AbstractHtmlField ABSTRACT_HTML_FIELD = new AbstractHtmlField();
 
   @Override
   default IScoutAbstractApi.AbstractHtmlField AbstractHtmlField() {
@@ -2303,7 +2303,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractImageField ABSTRACT_IMAGE_FIELD = new AbstractImageField();
+  IScoutAbstractApi.AbstractImageField ABSTRACT_IMAGE_FIELD = new AbstractImageField();
 
   @Override
   default IScoutAbstractApi.AbstractImageField AbstractImageField() {
@@ -2322,7 +2322,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractKeyStroke ABSTRACT_KEY_STROKE = new AbstractKeyStroke();
+  IScoutAbstractApi.AbstractKeyStroke ABSTRACT_KEY_STROKE = new AbstractKeyStroke();
 
   @Override
   default IScoutAbstractApi.AbstractKeyStroke AbstractKeyStroke() {
@@ -2336,7 +2336,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractLabelField ABSTRACT_LABEL_FIELD = new AbstractLabelField();
+  IScoutAbstractApi.AbstractLabelField ABSTRACT_LABEL_FIELD = new AbstractLabelField();
 
   @Override
   default IScoutAbstractApi.AbstractLabelField AbstractLabelField() {
@@ -2350,7 +2350,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractListBox ABSTRACT_LIST_BOX = new AbstractListBox();
+  IScoutAbstractApi.AbstractListBox ABSTRACT_LIST_BOX = new AbstractListBox();
 
   @Override
   default IScoutAbstractApi.AbstractListBox AbstractListBox() {
@@ -2364,7 +2364,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractLongField ABSTRACT_LONG_FIELD = new AbstractLongField();
+  IScoutAbstractApi.AbstractLongField ABSTRACT_LONG_FIELD = new AbstractLongField();
 
   @Override
   default IScoutAbstractApi.AbstractLongField AbstractLongField() {
@@ -2378,7 +2378,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractLookupService ABSTRACT_LOOKUP_SERVICE = new AbstractLookupService();
+  IScoutAbstractApi.AbstractLookupService ABSTRACT_LOOKUP_SERVICE = new AbstractLookupService();
 
   @Override
   default IScoutAbstractApi.AbstractLookupService AbstractLookupService() {
@@ -2392,7 +2392,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractMenu ABSTRACT_MENU = new AbstractMenu();
+  IScoutAbstractApi.AbstractMenu ABSTRACT_MENU = new AbstractMenu();
 
   @Override
   default IScoutAbstractApi.AbstractMenu AbstractMenu() {
@@ -2411,7 +2411,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractMode ABSTRACT_MODE = new AbstractMode();
+  IScoutAbstractApi.AbstractMode ABSTRACT_MODE = new AbstractMode();
 
   @Override
   default IScoutAbstractApi.AbstractMode AbstractMode() {
@@ -2425,7 +2425,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractModeSelectorField ABSTRACT_MODE_SELECTOR_FIELD = new AbstractModeSelectorField();
+  IScoutAbstractApi.AbstractModeSelectorField ABSTRACT_MODE_SELECTOR_FIELD = new AbstractModeSelectorField();
 
   @Override
   default IScoutAbstractApi.AbstractModeSelectorField AbstractModeSelectorField() {
@@ -2439,7 +2439,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractOkButton ABSTRACT_OK_BUTTON = new AbstractOkButton();
+  IScoutAbstractApi.AbstractOkButton ABSTRACT_OK_BUTTON = new AbstractOkButton();
 
   @Override
   default IScoutAbstractApi.AbstractOkButton AbstractOkButton() {
@@ -2453,7 +2453,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractPage ABSTRACT_PAGE = new AbstractPage();
+  IScoutAbstractApi.AbstractPage ABSTRACT_PAGE = new AbstractPage();
 
   @Override
   default IScoutAbstractApi.AbstractPage AbstractPage() {
@@ -2472,7 +2472,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractPageWithNodes ABSTRACT_PAGE_WITH_NODES = new AbstractPageWithNodes();
+  IScoutAbstractApi.AbstractPageWithNodes ABSTRACT_PAGE_WITH_NODES = new AbstractPageWithNodes();
 
   @Override
   default IScoutAbstractApi.AbstractPageWithNodes AbstractPageWithNodes() {
@@ -2491,7 +2491,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractPageWithTable ABSTRACT_PAGE_WITH_TABLE = new AbstractPageWithTable();
+  IScoutAbstractApi.AbstractPageWithTable ABSTRACT_PAGE_WITH_TABLE = new AbstractPageWithTable();
 
   @Override
   default IScoutAbstractApi.AbstractPageWithTable AbstractPageWithTable() {
@@ -2515,7 +2515,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractPermission ABSTRACT_PERMISSION = new AbstractPermission();
+  IScoutAbstractApi.AbstractPermission ABSTRACT_PERMISSION = new AbstractPermission();
 
   @Override
   default IScoutAbstractApi.AbstractPermission AbstractPermission() {
@@ -2529,7 +2529,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractPropertyData ABSTRACT_PROPERTY_DATA = new AbstractPropertyData();
+  IScoutAbstractApi.AbstractPropertyData ABSTRACT_PROPERTY_DATA = new AbstractPropertyData();
 
   @Override
   default IScoutAbstractApi.AbstractPropertyData AbstractPropertyData() {
@@ -2553,7 +2553,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractProposalField ABSTRACT_PROPOSAL_FIELD = new AbstractProposalField();
+  IScoutAbstractApi.AbstractProposalField ABSTRACT_PROPOSAL_FIELD = new AbstractProposalField();
 
   @Override
   default IScoutAbstractApi.AbstractProposalField AbstractProposalField() {
@@ -2567,7 +2567,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractRadioButton ABSTRACT_RADIO_BUTTON = new AbstractRadioButton();
+  IScoutAbstractApi.AbstractRadioButton ABSTRACT_RADIO_BUTTON = new AbstractRadioButton();
 
   @Override
   default IScoutAbstractApi.AbstractRadioButton AbstractRadioButton() {
@@ -2586,7 +2586,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractRadioButtonGroup ABSTRACT_RADIO_BUTTON_GROUP = new AbstractRadioButtonGroup();
+  IScoutAbstractApi.AbstractRadioButtonGroup ABSTRACT_RADIO_BUTTON_GROUP = new AbstractRadioButtonGroup();
 
   @Override
   default IScoutAbstractApi.AbstractRadioButtonGroup AbstractRadioButtonGroup() {
@@ -2600,7 +2600,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractSequenceBox ABSTRACT_SEQUENCE_BOX = new AbstractSequenceBox();
+  IScoutAbstractApi.AbstractSequenceBox ABSTRACT_SEQUENCE_BOX = new AbstractSequenceBox();
 
   @Override
   default IScoutAbstractApi.AbstractSequenceBox AbstractSequenceBox() {
@@ -2619,7 +2619,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractSmartField ABSTRACT_SMART_FIELD = new AbstractSmartField();
+  IScoutAbstractApi.AbstractSmartField ABSTRACT_SMART_FIELD = new AbstractSmartField();
 
   @Override
   default IScoutAbstractApi.AbstractSmartField AbstractSmartField() {
@@ -2633,7 +2633,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractColumn ABSTRACT_COLUMN = new AbstractColumn();
+  IScoutAbstractApi.AbstractColumn ABSTRACT_COLUMN = new AbstractColumn();
 
   @Override
   default IScoutAbstractApi.AbstractColumn AbstractColumn() {
@@ -2657,7 +2657,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractStringColumn ABSTRACT_STRING_COLUMN = new AbstractStringColumn();
+  IScoutAbstractApi.AbstractStringColumn ABSTRACT_STRING_COLUMN = new AbstractStringColumn();
 
   @Override
   default IScoutAbstractApi.AbstractStringColumn AbstractStringColumn() {
@@ -2671,7 +2671,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractStringConfigProperty ABSTRACT_STRING_CONFIG_PROPERTY = new AbstractStringConfigProperty();
+  IScoutAbstractApi.AbstractStringConfigProperty ABSTRACT_STRING_CONFIG_PROPERTY = new AbstractStringConfigProperty();
 
   @Override
   default IScoutAbstractApi.AbstractStringConfigProperty AbstractStringConfigProperty() {
@@ -2685,7 +2685,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractStringField ABSTRACT_STRING_FIELD = new AbstractStringField();
+  IScoutAbstractApi.AbstractStringField ABSTRACT_STRING_FIELD = new AbstractStringField();
 
   @Override
   default IScoutAbstractApi.AbstractStringField AbstractStringField() {
@@ -2704,7 +2704,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTabBox ABSTRACT_TAB_BOX = new AbstractTabBox();
+  IScoutAbstractApi.AbstractTabBox ABSTRACT_TAB_BOX = new AbstractTabBox();
 
   @Override
   default IScoutAbstractApi.AbstractTabBox AbstractTabBox() {
@@ -2718,7 +2718,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTable ABSTRACT_TABLE = new AbstractTable();
+  IScoutAbstractApi.AbstractTable ABSTRACT_TABLE = new AbstractTable();
 
   @Override
   default IScoutAbstractApi.AbstractTable AbstractTable() {
@@ -2732,7 +2732,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTableField ABSTRACT_TABLE_FIELD = new AbstractTableField();
+  IScoutAbstractApi.AbstractTableField ABSTRACT_TABLE_FIELD = new AbstractTableField();
 
   @Override
   default IScoutAbstractApi.AbstractTableField AbstractTableField() {
@@ -2746,7 +2746,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTableFieldBeanData ABSTRACT_TABLE_FIELD_BEAN_DATA = new AbstractTableFieldBeanData();
+  IScoutAbstractApi.AbstractTableFieldBeanData ABSTRACT_TABLE_FIELD_BEAN_DATA = new AbstractTableFieldBeanData();
 
   @Override
   default IScoutAbstractApi.AbstractTableFieldBeanData AbstractTableFieldBeanData() {
@@ -2775,7 +2775,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTablePageData ABSTRACT_TABLE_PAGE_DATA = new AbstractTablePageData();
+  IScoutAbstractApi.AbstractTablePageData ABSTRACT_TABLE_PAGE_DATA = new AbstractTablePageData();
 
   @Override
   default IScoutAbstractApi.AbstractTablePageData AbstractTablePageData() {
@@ -2789,7 +2789,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTableRowData ABSTRACT_TABLE_ROW_DATA = new AbstractTableRowData();
+  IScoutAbstractApi.AbstractTableRowData ABSTRACT_TABLE_ROW_DATA = new AbstractTableRowData();
 
   @Override
   default IScoutAbstractApi.AbstractTableRowData AbstractTableRowData() {
@@ -2803,7 +2803,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTagField ABSTRACT_TAG_FIELD = new AbstractTagField();
+  IScoutAbstractApi.AbstractTagField ABSTRACT_TAG_FIELD = new AbstractTagField();
 
   @Override
   default IScoutAbstractApi.AbstractTagField AbstractTagField() {
@@ -2817,7 +2817,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTile ABSTRACT_TILE = new AbstractTile();
+  IScoutAbstractApi.AbstractTile ABSTRACT_TILE = new AbstractTile();
 
   @Override
   default IScoutAbstractApi.AbstractTile AbstractTile() {
@@ -2831,7 +2831,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTileField ABSTRACT_TILE_FIELD = new AbstractTileField();
+  IScoutAbstractApi.AbstractTileField ABSTRACT_TILE_FIELD = new AbstractTileField();
 
   @Override
   default IScoutAbstractApi.AbstractTileField AbstractTileField() {
@@ -2845,7 +2845,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTileGrid ABSTRACT_TILE_GRID = new AbstractTileGrid();
+  IScoutAbstractApi.AbstractTileGrid ABSTRACT_TILE_GRID = new AbstractTileGrid();
 
   @Override
   default IScoutAbstractApi.AbstractTileGrid AbstractTileGrid() {
@@ -2859,7 +2859,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTree ABSTRACT_TREE = new AbstractTree();
+  IScoutAbstractApi.AbstractTree ABSTRACT_TREE = new AbstractTree();
 
   @Override
   default IScoutAbstractApi.AbstractTree AbstractTree() {
@@ -2873,7 +2873,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTreeBox ABSTRACT_TREE_BOX = new AbstractTreeBox();
+  IScoutAbstractApi.AbstractTreeBox ABSTRACT_TREE_BOX = new AbstractTreeBox();
 
   @Override
   default IScoutAbstractApi.AbstractTreeBox AbstractTreeBox() {
@@ -2887,7 +2887,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTreeField ABSTRACT_TREE_FIELD = new AbstractTreeField();
+  IScoutAbstractApi.AbstractTreeField ABSTRACT_TREE_FIELD = new AbstractTreeField();
 
   @Override
   default IScoutAbstractApi.AbstractTreeField AbstractTreeField() {
@@ -2901,7 +2901,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTreeNode ABSTRACT_TREE_NODE = new AbstractTreeNode();
+  IScoutAbstractApi.AbstractTreeNode ABSTRACT_TREE_NODE = new AbstractTreeNode();
 
   @Override
   default IScoutAbstractApi.AbstractTreeNode AbstractTreeNode() {
@@ -2915,7 +2915,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractValueField ABSTRACT_VALUE_FIELD = new AbstractValueField();
+  IScoutAbstractApi.AbstractValueField ABSTRACT_VALUE_FIELD = new AbstractValueField();
 
   @Override
   default IScoutAbstractApi.AbstractValueField AbstractValueField() {
@@ -2929,7 +2929,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractValueFieldData ABSTRACT_VALUE_FIELD_DATA = new AbstractValueFieldData();
+  IScoutAbstractApi.AbstractValueFieldData ABSTRACT_VALUE_FIELD_DATA = new AbstractValueFieldData();
 
   @Override
   default IScoutAbstractApi.AbstractValueFieldData AbstractValueFieldData() {
@@ -2943,7 +2943,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractWebServiceClient ABSTRACT_WEB_SERVICE_CLIENT = new AbstractWebServiceClient();
+  IScoutAbstractApi.AbstractWebServiceClient ABSTRACT_WEB_SERVICE_CLIENT = new AbstractWebServiceClient();
 
   @Override
   default IScoutAbstractApi.AbstractWebServiceClient AbstractWebServiceClient() {
@@ -2972,7 +2972,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractWizard ABSTRACT_WIZARD = new AbstractWizard();
+  IScoutAbstractApi.AbstractWizard ABSTRACT_WIZARD = new AbstractWizard();
 
   @Override
   default IScoutAbstractApi.AbstractWizard AbstractWizard() {
@@ -2986,7 +2986,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractNumberField ABSTRACT_NUMBER_FIELD = new AbstractNumberField();
+  IScoutAbstractApi.AbstractNumberField ABSTRACT_NUMBER_FIELD = new AbstractNumberField();
 
   @Override
   default IScoutAbstractApi.AbstractNumberField AbstractNumberField() {
@@ -3010,7 +3010,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractAction ABSTRACT_ACTION = new AbstractAction();
+  IScoutAbstractApi.AbstractAction ABSTRACT_ACTION = new AbstractAction();
 
   @Override
   default IScoutAbstractApi.AbstractAction AbstractAction() {
@@ -3044,7 +3044,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractAccordionFieldExtension ABSTRACT_ACCORDION_FIELD_EXTENSION = new AbstractAccordionFieldExtension();
+  IScoutExtensionApi.AbstractAccordionFieldExtension ABSTRACT_ACCORDION_FIELD_EXTENSION = new AbstractAccordionFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractAccordionFieldExtension AbstractAccordionFieldExtension() {
@@ -3058,7 +3058,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractActionExtension ABSTRACT_ACTION_EXTENSION = new AbstractActionExtension();
+  IScoutExtensionApi.AbstractActionExtension ABSTRACT_ACTION_EXTENSION = new AbstractActionExtension();
 
   @Override
   default IScoutExtensionApi.AbstractActionExtension AbstractActionExtension() {
@@ -3072,7 +3072,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractActionNodeExtension ABSTRACT_ACTION_NODE_EXTENSION = new AbstractActionNodeExtension();
+  IScoutExtensionApi.AbstractActionNodeExtension ABSTRACT_ACTION_NODE_EXTENSION = new AbstractActionNodeExtension();
 
   @Override
   default IScoutExtensionApi.AbstractActionNodeExtension AbstractActionNodeExtension() {
@@ -3086,7 +3086,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractButtonExtension ABSTRACT_BUTTON_EXTENSION = new AbstractButtonExtension();
+  IScoutExtensionApi.AbstractButtonExtension ABSTRACT_BUTTON_EXTENSION = new AbstractButtonExtension();
 
   @Override
   default IScoutExtensionApi.AbstractButtonExtension AbstractButtonExtension() {
@@ -3100,7 +3100,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCalendarExtension ABSTRACT_CALENDAR_EXTENSION = new AbstractCalendarExtension();
+  IScoutExtensionApi.AbstractCalendarExtension ABSTRACT_CALENDAR_EXTENSION = new AbstractCalendarExtension();
 
   @Override
   default IScoutExtensionApi.AbstractCalendarExtension AbstractCalendarExtension() {
@@ -3114,7 +3114,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCalendarFieldExtension ABSTRACT_CALENDAR_FIELD_EXTENSION = new AbstractCalendarFieldExtension();
+  IScoutExtensionApi.AbstractCalendarFieldExtension ABSTRACT_CALENDAR_FIELD_EXTENSION = new AbstractCalendarFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractCalendarFieldExtension AbstractCalendarFieldExtension() {
@@ -3128,7 +3128,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCalendarItemProviderExtension ABSTRACT_CALENDAR_ITEM_PROVIDER_EXTENSION = new AbstractCalendarItemProviderExtension();
+  IScoutExtensionApi.AbstractCalendarItemProviderExtension ABSTRACT_CALENDAR_ITEM_PROVIDER_EXTENSION = new AbstractCalendarItemProviderExtension();
 
   @Override
   default IScoutExtensionApi.AbstractCalendarItemProviderExtension AbstractCalendarItemProviderExtension() {
@@ -3142,7 +3142,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCodeExtension ABSTRACT_CODE_EXTENSION = new AbstractCodeExtension();
+  IScoutExtensionApi.AbstractCodeExtension ABSTRACT_CODE_EXTENSION = new AbstractCodeExtension();
 
   @Override
   default IScoutExtensionApi.AbstractCodeExtension AbstractCodeExtension() {
@@ -3156,7 +3156,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCodeTypeWithGenericExtension ABSTRACT_CODE_TYPE_WITH_GENERIC_EXTENSION = new AbstractCodeTypeWithGenericExtension();
+  IScoutExtensionApi.AbstractCodeTypeWithGenericExtension ABSTRACT_CODE_TYPE_WITH_GENERIC_EXTENSION = new AbstractCodeTypeWithGenericExtension();
 
   @Override
   default IScoutExtensionApi.AbstractCodeTypeWithGenericExtension AbstractCodeTypeWithGenericExtension() {
@@ -3170,7 +3170,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractComposerFieldExtension ABSTRACT_COMPOSER_FIELD_EXTENSION = new AbstractComposerFieldExtension();
+  IScoutExtensionApi.AbstractComposerFieldExtension ABSTRACT_COMPOSER_FIELD_EXTENSION = new AbstractComposerFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractComposerFieldExtension AbstractComposerFieldExtension() {
@@ -3184,7 +3184,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractCompositeFieldExtension ABSTRACT_COMPOSITE_FIELD_EXTENSION = new AbstractCompositeFieldExtension();
+  IScoutExtensionApi.AbstractCompositeFieldExtension ABSTRACT_COMPOSITE_FIELD_EXTENSION = new AbstractCompositeFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractCompositeFieldExtension AbstractCompositeFieldExtension() {
@@ -3198,7 +3198,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractDataModelEntityExtension ABSTRACT_DATA_MODEL_ENTITY_EXTENSION = new AbstractDataModelEntityExtension();
+  IScoutExtensionApi.AbstractDataModelEntityExtension ABSTRACT_DATA_MODEL_ENTITY_EXTENSION = new AbstractDataModelEntityExtension();
 
   @Override
   default IScoutExtensionApi.AbstractDataModelEntityExtension AbstractDataModelEntityExtension() {
@@ -3212,7 +3212,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractFormExtension ABSTRACT_FORM_EXTENSION = new AbstractFormExtension();
+  IScoutExtensionApi.AbstractFormExtension ABSTRACT_FORM_EXTENSION = new AbstractFormExtension();
 
   @Override
   default IScoutExtensionApi.AbstractFormExtension AbstractFormExtension() {
@@ -3226,7 +3226,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractFormFieldExtension ABSTRACT_FORM_FIELD_EXTENSION = new AbstractFormFieldExtension();
+  IScoutExtensionApi.AbstractFormFieldExtension ABSTRACT_FORM_FIELD_EXTENSION = new AbstractFormFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractFormFieldExtension AbstractFormFieldExtension() {
@@ -3240,7 +3240,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractGroupBoxExtension ABSTRACT_GROUP_BOX_EXTENSION = new AbstractGroupBoxExtension();
+  IScoutExtensionApi.AbstractGroupBoxExtension ABSTRACT_GROUP_BOX_EXTENSION = new AbstractGroupBoxExtension();
 
   @Override
   default IScoutExtensionApi.AbstractGroupBoxExtension AbstractGroupBoxExtension() {
@@ -3254,7 +3254,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractGroupExtension ABSTRACT_GROUP_EXTENSION = new AbstractGroupExtension();
+  IScoutExtensionApi.AbstractGroupExtension ABSTRACT_GROUP_EXTENSION = new AbstractGroupExtension();
 
   @Override
   default IScoutExtensionApi.AbstractGroupExtension AbstractGroupExtension() {
@@ -3268,7 +3268,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractImageFieldExtension ABSTRACT_IMAGE_FIELD_EXTENSION = new AbstractImageFieldExtension();
+  IScoutExtensionApi.AbstractImageFieldExtension ABSTRACT_IMAGE_FIELD_EXTENSION = new AbstractImageFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractImageFieldExtension AbstractImageFieldExtension() {
@@ -3282,7 +3282,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractListBoxExtension ABSTRACT_LIST_BOX_EXTENSION = new AbstractListBoxExtension();
+  IScoutExtensionApi.AbstractListBoxExtension ABSTRACT_LIST_BOX_EXTENSION = new AbstractListBoxExtension();
 
   @Override
   default IScoutExtensionApi.AbstractListBoxExtension AbstractListBoxExtension() {
@@ -3296,7 +3296,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractPageWithTableExtension ABSTRACT_PAGE_WITH_TABLE_EXTENSION = new AbstractPageWithTableExtension();
+  IScoutExtensionApi.AbstractPageWithTableExtension ABSTRACT_PAGE_WITH_TABLE_EXTENSION = new AbstractPageWithTableExtension();
 
   @Override
   default IScoutExtensionApi.AbstractPageWithTableExtension AbstractPageWithTableExtension() {
@@ -3310,7 +3310,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractRadioButtonGroupExtension ABSTRACT_RADIO_BUTTON_GROUP_EXTENSION = new AbstractRadioButtonGroupExtension();
+  IScoutExtensionApi.AbstractRadioButtonGroupExtension ABSTRACT_RADIO_BUTTON_GROUP_EXTENSION = new AbstractRadioButtonGroupExtension();
 
   @Override
   default IScoutExtensionApi.AbstractRadioButtonGroupExtension AbstractRadioButtonGroupExtension() {
@@ -3324,7 +3324,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTabBoxExtension ABSTRACT_TAB_BOX_EXTENSION = new AbstractTabBoxExtension();
+  IScoutExtensionApi.AbstractTabBoxExtension ABSTRACT_TAB_BOX_EXTENSION = new AbstractTabBoxExtension();
 
   @Override
   default IScoutExtensionApi.AbstractTabBoxExtension AbstractTabBoxExtension() {
@@ -3338,7 +3338,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTableExtension ABSTRACT_TABLE_EXTENSION = new AbstractTableExtension();
+  IScoutExtensionApi.AbstractTableExtension ABSTRACT_TABLE_EXTENSION = new AbstractTableExtension();
 
   @Override
   default IScoutExtensionApi.AbstractTableExtension AbstractTableExtension() {
@@ -3352,7 +3352,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTableFieldExtension ABSTRACT_TABLE_FIELD_EXTENSION = new AbstractTableFieldExtension();
+  IScoutExtensionApi.AbstractTableFieldExtension ABSTRACT_TABLE_FIELD_EXTENSION = new AbstractTableFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractTableFieldExtension AbstractTableFieldExtension() {
@@ -3366,7 +3366,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTileFieldExtension ABSTRACT_TILE_FIELD_EXTENSION = new AbstractTileFieldExtension();
+  IScoutExtensionApi.AbstractTileFieldExtension ABSTRACT_TILE_FIELD_EXTENSION = new AbstractTileFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractTileFieldExtension AbstractTileFieldExtension() {
@@ -3380,7 +3380,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTileGridExtension ABSTRACT_TILE_GRID_EXTENSION = new AbstractTileGridExtension();
+  IScoutExtensionApi.AbstractTileGridExtension ABSTRACT_TILE_GRID_EXTENSION = new AbstractTileGridExtension();
 
   @Override
   default IScoutExtensionApi.AbstractTileGridExtension AbstractTileGridExtension() {
@@ -3394,7 +3394,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTreeBoxExtension ABSTRACT_TREE_BOX_EXTENSION = new AbstractTreeBoxExtension();
+  IScoutExtensionApi.AbstractTreeBoxExtension ABSTRACT_TREE_BOX_EXTENSION = new AbstractTreeBoxExtension();
 
   @Override
   default IScoutExtensionApi.AbstractTreeBoxExtension AbstractTreeBoxExtension() {
@@ -3408,7 +3408,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTreeExtension ABSTRACT_TREE_EXTENSION = new AbstractTreeExtension();
+  IScoutExtensionApi.AbstractTreeExtension ABSTRACT_TREE_EXTENSION = new AbstractTreeExtension();
 
   @Override
   default IScoutExtensionApi.AbstractTreeExtension AbstractTreeExtension() {
@@ -3422,7 +3422,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTreeFieldExtension ABSTRACT_TREE_FIELD_EXTENSION = new AbstractTreeFieldExtension();
+  IScoutExtensionApi.AbstractTreeFieldExtension ABSTRACT_TREE_FIELD_EXTENSION = new AbstractTreeFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractTreeFieldExtension AbstractTreeFieldExtension() {
@@ -3436,7 +3436,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractTreeNodeExtension ABSTRACT_TREE_NODE_EXTENSION = new AbstractTreeNodeExtension();
+  IScoutExtensionApi.AbstractTreeNodeExtension ABSTRACT_TREE_NODE_EXTENSION = new AbstractTreeNodeExtension();
 
   @Override
   default IScoutExtensionApi.AbstractTreeNodeExtension AbstractTreeNodeExtension() {
@@ -3450,7 +3450,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractValueFieldExtension ABSTRACT_VALUE_FIELD_EXTENSION = new AbstractValueFieldExtension();
+  IScoutExtensionApi.AbstractValueFieldExtension ABSTRACT_VALUE_FIELD_EXTENSION = new AbstractValueFieldExtension();
 
   @Override
   default IScoutExtensionApi.AbstractValueFieldExtension AbstractValueFieldExtension() {
@@ -3464,7 +3464,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  AbstractWizardExtension ABSTRACT_WIZARD_EXTENSION = new AbstractWizardExtension();
+  IScoutExtensionApi.AbstractWizardExtension ABSTRACT_WIZARD_EXTENSION = new AbstractWizardExtension();
 
   @Override
   default IScoutExtensionApi.AbstractWizardExtension AbstractWizardExtension() {
@@ -3478,7 +3478,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  CalendarMenuType CALENDAR_MENU_TYPE = new CalendarMenuType();
+  IScoutVariousApi.CalendarMenuType CALENDAR_MENU_TYPE = new CalendarMenuType();
 
   @Override
   default IScoutVariousApi.CalendarMenuType CalendarMenuType() {
@@ -3502,7 +3502,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ImageFieldMenuType IMAGE_FIELD_MENU_TYPE = new ImageFieldMenuType();
+  IScoutVariousApi.ImageFieldMenuType IMAGE_FIELD_MENU_TYPE = new ImageFieldMenuType();
 
   @Override
   default IScoutVariousApi.ImageFieldMenuType ImageFieldMenuType() {
@@ -3536,7 +3536,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  TabBoxMenuType TAB_BOX_MENU_TYPE = new TabBoxMenuType();
+  IScoutVariousApi.TabBoxMenuType TAB_BOX_MENU_TYPE = new TabBoxMenuType();
 
   @Override
   default IScoutVariousApi.TabBoxMenuType TabBoxMenuType() {
@@ -3555,7 +3555,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  TableMenuType TABLE_MENU_TYPE = new TableMenuType();
+  IScoutVariousApi.TableMenuType TABLE_MENU_TYPE = new TableMenuType();
 
   @Override
   default IScoutVariousApi.TableMenuType TableMenuType() {
@@ -3589,7 +3589,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  TileGridMenuType TILE_GRID_MENU_TYPE = new TileGridMenuType();
+  IScoutVariousApi.TileGridMenuType TILE_GRID_MENU_TYPE = new TileGridMenuType();
 
   @Override
   default IScoutVariousApi.TileGridMenuType TileGridMenuType() {
@@ -3618,7 +3618,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  TreeMenuType TREE_MENU_TYPE = new TreeMenuType();
+  IScoutVariousApi.TreeMenuType TREE_MENU_TYPE = new TreeMenuType();
 
   @Override
   default IScoutVariousApi.TreeMenuType TreeMenuType() {
@@ -3652,7 +3652,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ValueFieldMenuType VALUE_FIELD_MENU_TYPE = new ValueFieldMenuType();
+  IScoutVariousApi.ValueFieldMenuType VALUE_FIELD_MENU_TYPE = new ValueFieldMenuType();
 
   @Override
   default IScoutVariousApi.ValueFieldMenuType ValueFieldMenuType() {
@@ -3676,7 +3676,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  WebService WEB_SERVICE = new WebService();
+  IScoutVariousApi.WebService WEB_SERVICE = new WebService();
 
   @Override
   default IScoutVariousApi.WebService WebService() {
@@ -3700,7 +3700,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  WebServiceClient WEB_SERVICE_CLIENT = new WebServiceClient();
+  IScoutVariousApi.WebServiceClient WEB_SERVICE_CLIENT = new WebServiceClient();
 
   @Override
   default IScoutVariousApi.WebServiceClient WebServiceClient() {
@@ -3724,7 +3724,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ACCESS ACCESS = new ACCESS();
+  IScoutVariousApi.ACCESS ACCESS = new ACCESS();
 
   @Override
   default IScoutVariousApi.ACCESS ACCESS() {
@@ -3748,7 +3748,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  BEANS BEANS = new BEANS();
+  IScoutVariousApi.BEANS BEANS = new BEANS();
 
   @Override
   default IScoutVariousApi.BEANS BEANS() {
@@ -3767,7 +3767,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  BasicAuthenticationMethod BASIC_AUTHENTICATION_METHOD = new BasicAuthenticationMethod();
+  IScoutVariousApi.BasicAuthenticationMethod BASIC_AUTHENTICATION_METHOD = new BasicAuthenticationMethod();
 
   @Override
   default IScoutVariousApi.BasicAuthenticationMethod BasicAuthenticationMethod() {
@@ -3781,7 +3781,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  BinaryResource BINARY_RESOURCE = new BinaryResource();
+  IScoutVariousApi.BinaryResource BINARY_RESOURCE = new BinaryResource();
 
   @Override
   default IScoutVariousApi.BinaryResource BinaryResource() {
@@ -3795,7 +3795,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  BooleanUtility BOOLEAN_UTILITY = new BooleanUtility();
+  IScoutVariousApi.BooleanUtility BOOLEAN_UTILITY = new BooleanUtility();
 
   @Override
   default IScoutVariousApi.BooleanUtility BooleanUtility() {
@@ -3809,7 +3809,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ClientTestRunner CLIENT_TEST_RUNNER = new ClientTestRunner();
+  IScoutVariousApi.ClientTestRunner CLIENT_TEST_RUNNER = new ClientTestRunner();
 
   @Override
   default IScoutVariousApi.ClientTestRunner ClientTestRunner() {
@@ -3823,7 +3823,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  CollectionUtility COLLECTION_UTILITY = new CollectionUtility();
+  IScoutVariousApi.CollectionUtility COLLECTION_UTILITY = new CollectionUtility();
 
   @Override
   default IScoutVariousApi.CollectionUtility CollectionUtility() {
@@ -3842,7 +3842,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ConfigFileCredentialVerifier CONFIG_FILE_CREDENTIAL_VERIFIER = new ConfigFileCredentialVerifier();
+  IScoutVariousApi.ConfigFileCredentialVerifier CONFIG_FILE_CREDENTIAL_VERIFIER = new ConfigFileCredentialVerifier();
 
   @Override
   default IScoutVariousApi.ConfigFileCredentialVerifier ConfigFileCredentialVerifier() {
@@ -3856,7 +3856,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  LogHandler LOG_HANDLER = new LogHandler();
+  IScoutVariousApi.LogHandler LOG_HANDLER = new LogHandler();
 
   @Override
   default IScoutVariousApi.LogHandler LogHandler() {
@@ -3870,7 +3870,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  LookupCall LOOKUP_CALL = new LookupCall();
+  IScoutVariousApi.LookupCall LOOKUP_CALL = new LookupCall();
 
   @Override
   default IScoutVariousApi.LookupCall LookupCall() {
@@ -3904,7 +3904,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  NullClazz NULL_CLAZZ = new NullClazz();
+  IScoutVariousApi.NullClazz NULL_CLAZZ = new NullClazz();
 
   @Override
   default IScoutVariousApi.NullClazz NullClazz() {
@@ -3918,7 +3918,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  SearchFilter SEARCH_FILTER = new SearchFilter();
+  IScoutVariousApi.SearchFilter SEARCH_FILTER = new SearchFilter();
 
   @Override
   default IScoutVariousApi.SearchFilter SearchFilter() {
@@ -3932,7 +3932,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ServerTestRunner SERVER_TEST_RUNNER = new ServerTestRunner();
+  IScoutVariousApi.ServerTestRunner SERVER_TEST_RUNNER = new ServerTestRunner();
 
   @Override
   default IScoutVariousApi.ServerTestRunner ServerTestRunner() {
@@ -3946,7 +3946,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  TEXTS TEXTS = new TEXTS();
+  IScoutVariousApi.TEXTS TEXTS = new TEXTS();
 
   @Override
   default IScoutVariousApi.TEXTS TEXTS() {
@@ -3970,7 +3970,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  TestEnvironmentClientSession TEST_ENVIRONMENT_CLIENT_SESSION = new TestEnvironmentClientSession();
+  IScoutVariousApi.TestEnvironmentClientSession TEST_ENVIRONMENT_CLIENT_SESSION = new TestEnvironmentClientSession();
 
   @Override
   default IScoutVariousApi.TestEnvironmentClientSession TestEnvironmentClientSession() {
@@ -3984,7 +3984,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  TriState TRI_STATE = new TriState();
+  IScoutVariousApi.TriState TRI_STATE = new TriState();
 
   @Override
   default IScoutVariousApi.TriState TriState() {
@@ -3998,7 +3998,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  UiServlet UI_SERVLET = new UiServlet();
+  IScoutVariousApi.UiServlet UI_SERVLET = new UiServlet();
 
   @Override
   default IScoutVariousApi.UiServlet UiServlet() {
@@ -4012,7 +4012,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  UiTextContributor UI_TEXT_CONTRIBUTOR = new UiTextContributor();
+  IScoutVariousApi.UiTextContributor UI_TEXT_CONTRIBUTOR = new UiTextContributor();
 
   @Override
   default IScoutVariousApi.UiTextContributor UiTextContributor() {
@@ -4031,7 +4031,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  VetoException VETO_EXCEPTION = new VetoException();
+  IScoutVariousApi.VetoException VETO_EXCEPTION = new VetoException();
 
   @Override
   default IScoutVariousApi.VetoException VetoException() {
@@ -4045,7 +4045,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  WsConsumerCorrelationIdHandler WS_CONSUMER_CORRELATION_ID_HANDLER = new WsConsumerCorrelationIdHandler();
+  IScoutVariousApi.WsConsumerCorrelationIdHandler WS_CONSUMER_CORRELATION_ID_HANDLER = new WsConsumerCorrelationIdHandler();
 
   @Override
   default IScoutVariousApi.WsConsumerCorrelationIdHandler WsConsumerCorrelationIdHandler() {
@@ -4059,7 +4059,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  WsProviderCorrelationIdHandler WS_PROVIDER_CORRELATION_ID_HANDLER = new WsProviderCorrelationIdHandler();
+  IScoutVariousApi.WsProviderCorrelationIdHandler WS_PROVIDER_CORRELATION_ID_HANDLER = new WsProviderCorrelationIdHandler();
 
   @Override
   default IScoutVariousApi.WsProviderCorrelationIdHandler WsProviderCorrelationIdHandler() {
@@ -4073,7 +4073,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Logger LOGGER = new Logger();
+  IScoutVariousApi.Logger LOGGER = new Logger();
 
   @Override
   default IScoutVariousApi.Logger Logger() {
@@ -4087,7 +4087,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Mockito MOCKITO = new Mockito();
+  IScoutVariousApi.Mockito MOCKITO = new Mockito();
 
   @Override
   default IScoutVariousApi.Mockito Mockito() {
@@ -4106,7 +4106,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ArgumentMatchers ARGUMENT_MATCHERS = new ArgumentMatchers();
+  IScoutVariousApi.ArgumentMatchers ARGUMENT_MATCHERS = new ArgumentMatchers();
 
   @Override
   default IScoutVariousApi.ArgumentMatchers ArgumentMatchers() {
@@ -4125,7 +4125,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  ColumnSet COLUMN_SET = new ColumnSet();
+  IScoutVariousApi.ColumnSet COLUMN_SET = new ColumnSet();
 
   @Override
   default IScoutVariousApi.ColumnSet ColumnSet() {

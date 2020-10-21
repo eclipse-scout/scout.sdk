@@ -30,13 +30,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class SourceRangeTest {
   @Test
   public void testSourceRange(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
-    IType childClassType = env.requireType(ChildClass.class.getName());
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var childClassType = env.requireType(ChildClass.class.getName());
 
     assertFalse(baseClassType.containingPackage().source().isPresent());
     assertTrue(baseClassType.source().isPresent());
 
-    ISourceRange source = childClassType.source().get();
+    var source = childClassType.source().get();
     assertTrue(source.start() > childClassType.requireCompilationUnit().source().get().start());
     assertTrue(source.end() < childClassType.requireCompilationUnit().source().get().end());
     assertTrue(source.end() < childClassType.requireCompilationUnit().source().get().end());

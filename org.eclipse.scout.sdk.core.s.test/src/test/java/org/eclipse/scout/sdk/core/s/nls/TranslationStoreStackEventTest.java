@@ -30,13 +30,13 @@ public class TranslationStoreStackEventTest {
   @Test
   @SuppressWarnings({"ConstantConditions", "SimplifiableJUnitAssertion", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testEqualsAndHashCode() {
-    TranslationStoreStack stack = mock(TranslationStoreStack.class);
-    ITranslationEntry translation = mock(ITranslationEntry.class);
+    var stack = mock(TranslationStoreStack.class);
+    var translation = mock(ITranslationEntry.class);
     when(translation.key()).thenReturn("key");
 
-    TranslationStoreStackEvent removeTranslationEvent = createRemoveTranslationEvent(stack, translation);
-    TranslationStoreStackEvent removeTranslationEvent2 = createRemoveTranslationEvent(stack, translation);
-    TranslationStoreStackEvent addTranslationEvent = createAddTranslationEvent(stack, translation);
+    var removeTranslationEvent = createRemoveTranslationEvent(stack, translation);
+    var removeTranslationEvent2 = createRemoveTranslationEvent(stack, translation);
+    var addTranslationEvent = createAddTranslationEvent(stack, translation);
 
     assertEquals(removeTranslationEvent.hashCode(), removeTranslationEvent2.hashCode());
     assertFalse(removeTranslationEvent.equals(null));
@@ -48,19 +48,19 @@ public class TranslationStoreStackEventTest {
 
   @Test
   public void testToString() {
-    String key = "key";
-    String oldKey = "oldKey";
-    TranslationStoreStack stack = mock(TranslationStoreStack.class);
-    ITranslationEntry translation = mock(ITranslationEntry.class);
+    var key = "key";
+    var oldKey = "oldKey";
+    var stack = mock(TranslationStoreStack.class);
+    var translation = mock(ITranslationEntry.class);
     when(translation.key()).thenReturn(key);
 
-    TranslationStoreStackEvent removeTranslationEvent = createRemoveTranslationEvent(stack, translation);
-    TranslationStoreStackEvent addTranslationEvent = createAddTranslationEvent(stack, translation);
-    TranslationStoreStackEvent addLanguageEvent = createAddLanguageEvent(stack, Language.LANGUAGE_DEFAULT);
-    TranslationStoreStackEvent changeKeyEvent = createChangeKeyEvent(stack, translation, oldKey);
-    TranslationStoreStackEvent flushEvent = createFlushEvent(stack);
-    TranslationStoreStackEvent reloadEvent = createReloadEvent(stack);
-    TranslationStoreStackEvent updateTranslationEvent = createUpdateTranslationEvent(stack, translation);
+    var removeTranslationEvent = createRemoveTranslationEvent(stack, translation);
+    var addTranslationEvent = createAddTranslationEvent(stack, translation);
+    var addLanguageEvent = createAddLanguageEvent(stack, Language.LANGUAGE_DEFAULT);
+    var changeKeyEvent = createChangeKeyEvent(stack, translation, oldKey);
+    var flushEvent = createFlushEvent(stack);
+    var reloadEvent = createReloadEvent(stack);
+    var updateTranslationEvent = createUpdateTranslationEvent(stack, translation);
 
     assertEquals(TranslationStoreStackEvent.class.getSimpleName() + " [type=RemoveTranslation, key=" + key + "]", removeTranslationEvent.toString());
     assertEquals(TranslationStoreStackEvent.class.getSimpleName() + " [type=NewTranslation, key=" + key + "]", addTranslationEvent.toString());

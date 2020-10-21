@@ -59,7 +59,7 @@ public final class TranslationInputValidator {
     if (validationResult == TranslationValidator.OK) {
       return Status.OK_STATUS;
     }
-    int severity = IStatus.ERROR;
+    var severity = IStatus.ERROR;
     if (!isForbidden(validationResult)) {
       severity = IStatus.WARNING;
     }

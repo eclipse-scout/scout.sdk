@@ -13,15 +13,13 @@ package org.eclipse.scout.sdk.s2e.ui.internal;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Matcher;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -33,7 +31,6 @@ import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables.User;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateBuffer;
@@ -41,6 +38,7 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
@@ -78,24 +76,24 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createCompilationUnitComment(ICompilationUnitGenerator<?> target) {
     return b -> {
-      PropertySupport builderCtx = b.context().properties();
+      var builderCtx = b.context().properties();
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      IJavaProject ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
-      Template template = getCodeTemplate(CodeTemplateContextType.FILECOMMENT_ID, ownerProject);
+      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+      var template = getCodeTemplate(CodeTemplateContextType.FILECOMMENT_ID, ownerProject);
       if (template != null) {
         TemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, b.context().lineDelimiter());
         context.setVariable(CodeTemplateContextType.FILENAME, target.fileName().orElse(null));
 
-        String packageName = target.packageName().orElse("");
+        var packageName = target.packageName().orElse("");
         context.setVariable(CodeTemplateContextType.PACKAGENAME, packageName);
 
         if (JdtUtils.exists(ownerProject)) {
           context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
         }
         context.setVariable(CodeTemplateContextType.TYPENAME, JavaCore.removeJavaLikeExtension(target.elementName().orElse(null)));
-        String comment = evaluateTemplate(context, template);
+        var comment = evaluateTemplate(context, template);
         if (comment != null) {
           b.append(comment);
           ensureEndsWithNewline(b, comment);
@@ -107,12 +105,12 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createTypeComment(ITypeGenerator<?> target) {
     return b -> {
-      PropertySupport builderCtx = b.context().properties();
+      var builderCtx = b.context().properties();
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      IJavaProject ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
-      Template template = getCodeTemplate(CodeTemplateContextType.TYPECOMMENT_ID, ownerProject);
+      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+      var template = getCodeTemplate(CodeTemplateContextType.TYPECOMMENT_ID, ownerProject);
       if (template == null) {
         return;
       }
@@ -153,24 +151,24 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
 
   private static ISourceGenerator<ICommentBuilder<?>> createMethodCommentInternal(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target, int type) {
     return b -> {
-      PropertySupport builderCtx = b.context().properties();
+      var builderCtx = b.context().properties();
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      IJavaProject ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
-      IJavaBuilderContext builderContext = (IJavaBuilderContext) b.context();
-      List<String> paramNames = target.parameters()
+      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+      var builderContext = (IJavaBuilderContext) b.context();
+      var paramNames = target.parameters()
           .map(IMethodParameterGenerator::elementName)
           .flatMap(Optional::stream)
           .collect(toList());
-      List<String> exceptionNames = target.exceptions()
+      var exceptionNames = target.throwables()
           .map(func -> func.apply(builderContext))
-          .filter(Optional::isPresent)
-          .map(Optional::get)
+          .flatMap(Optional::stream)
+          .map(IClassNameSupplier::fqn)
           .collect(toList());
-      Optional<String> returnTypeName = target.returnType().flatMap(af -> af.apply(builderContext));
+      var returnTypeName = target.returnType().flatMap(af -> af.apply(builderContext));
 
-      String fieldTypeSimpleName = UNDEFINED_VAR_VALUE;
+      var fieldTypeSimpleName = UNDEFINED_VAR_VALUE;
       String templateName;
       switch (type) {
         case METHOD_TYPE_GETTER:
@@ -181,7 +179,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
           break;
         case METHOD_TYPE_SETTER:
           templateName = CodeTemplateContextType.SETTERCOMMENT_ID;
-          Optional<String> firstParam = target.parameters().findAny()
+          var firstParam = target.parameters().findAny()
               .flatMap(IMethodParameterGenerator::dataType)
               .flatMap(af -> af.apply(builderContext));
           if (firstParam.isPresent()) {
@@ -195,13 +193,13 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
           break;
       }
 
-      Template template = getCodeTemplate(templateName, ownerProject);
+      var template = getCodeTemplate(templateName, ownerProject);
       if (template == null) {
         return;
       }
       TemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, b.context().lineDelimiter());
-      String getterSetterName = UNDEFINED_VAR_VALUE;
-      Matcher matcher = PropertyBean.BEAN_METHOD_NAME.matcher(target.elementName().orElse(""));
+      var getterSetterName = UNDEFINED_VAR_VALUE;
+      var matcher = PropertyBean.BEAN_METHOD_NAME.matcher(target.elementName().orElse(""));
       if (matcher.find()) {
         getterSetterName = matcher.group(2);
       }
@@ -229,16 +227,16 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
 
   private static void evaluateTemplate(TemplateContext context, Template template, ICommentBuilder<?> b, Iterable<String> paramNames, Iterable<String> exceptionNames, String returnType) {
     try {
-      TemplateBuffer buffer = context.evaluate(template);
+      var buffer = context.evaluate(template);
       if (buffer == null) {
         return;
       }
 
-      String str = buffer.getString();
+      var str = buffer.getString();
       if (Strings.isBlank(str)) {
         return;
       }
-      TemplateVariable position = findVariable(buffer, CodeTemplateContextType.TAGS); // look if Javadoc tags have to be added
+      var position = findVariable(buffer, CodeTemplateContextType.TAGS); // look if Javadoc tags have to be added
       if (position == null) {
         b.append(str);
         ensureEndsWithNewline(b, str);
@@ -246,11 +244,11 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       }
 
       IDocument document = new Document(str);
-      int[] tagOffsets = position.getOffsets();
-      for (int i = tagOffsets.length - 1; i >= 0; i--) { // from last to first
+      var tagOffsets = position.getOffsets();
+      for (var i = tagOffsets.length - 1; i >= 0; i--) { // from last to first
         insertTag(document, tagOffsets[i], position.getLength(), paramNames, exceptionNames, returnType, emptyList(), false, b.context().lineDelimiter());
       }
-      String comment = document.get();
+      var comment = document.get();
       if (comment != null) {
         b.append(comment);
         ensureEndsWithNewline(b, comment);
@@ -264,16 +262,16 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createFieldComment(IFieldGenerator<?> target) {
     return b -> {
-      IJavaBuilderContext builderContext = (IJavaBuilderContext) b.context();
-      PropertySupport builderCtx = builderContext.properties();
+      var builderContext = (IJavaBuilderContext) b.context();
+      var builderCtx = builderContext.properties();
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      IJavaProject ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
-      Template template = getCodeTemplate(CodeTemplateContextType.FIELDCOMMENT_ID, ownerProject);
+      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+      var template = getCodeTemplate(CodeTemplateContextType.FIELDCOMMENT_ID, ownerProject);
       if (template != null) {
         TemplateContext templateContext = new CodeTemplateContext(template.getContextTypeId(), ownerProject, builderContext.lineDelimiter());
-        String dataType = target.dataType()
+        var dataType = target.dataType()
             .flatMap(af -> af.apply(builderContext))
             .map(JavaTypes::simpleName)
             .orElse(null);
@@ -284,7 +282,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
         }
         templateContext.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
         templateContext.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
-        String comment = evaluateTemplate(templateContext, template);
+        var comment = evaluateTemplate(templateContext, template);
         if (comment != null) {
           b.append(comment);
           ensureEndsWithNewline(b, comment);
@@ -297,27 +295,25 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
     if (map == null) {
       return false;
     }
-    IJavaProject jp = map.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+    var jp = map.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
     if (jp == null) {
       return false;
     }
 
-    IScopeContext[] contexts = {new ProjectScope(jp.getProject()), InstanceScope.INSTANCE, DefaultScope.INSTANCE};
-    for (IScopeContext context : contexts) {
-      IEclipsePreferences node = context.getNode(JavaUI.ID_PLUGIN);
-      if (node != null) {
-        String val = node.get(PreferenceConstants.CODEGEN_ADD_COMMENTS, null);
-        return "true".equals(val);
-      }
-    }
-    return true;
+    return Stream.of(new ProjectScope(jp.getProject()), InstanceScope.INSTANCE, DefaultScope.INSTANCE)
+        .map(context -> context.getNode(JavaUI.ID_PLUGIN))
+        .filter(Objects::nonNull)
+        .map(node -> node.get(PreferenceConstants.CODEGEN_ADD_COMMENTS, null))
+        .findFirst()
+        .map("true"::equals)
+        .orElse(true);
   }
 
   private static String evaluateTemplate(TemplateContext context, Template template) {
     // replace the user name resolver with our own to ensure we can respect the scout specific user names.
-    Iterator<TemplateVariableResolver> resolvers = context.getContextType().resolvers();
+    var resolvers = context.getContextType().resolvers();
     while (resolvers.hasNext()) {
-      TemplateVariableResolver resolver = resolvers.next();
+      var resolver = resolvers.next();
       if (resolver instanceof User) {
         context.getContextType().removeResolver(resolver); // remove the JDT resolver
         context.getContextType().addResolver(USERNAME_RESOLVER); // add our own
@@ -335,7 +331,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
     if (buffer == null) {
       return null;
     }
-    String str = buffer.getString();
+    var str = buffer.getString();
 
     if (Strings.isBlank(str)) {
       return null;
@@ -348,32 +344,30 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
   }
 
   private static TemplateVariable findVariable(TemplateBuffer buffer, String variable) {
-    TemplateVariable[] positions = buffer.getVariables();
-    for (TemplateVariable curr : positions) {
-      if (variable.equals(curr.getType())) {
-        return curr;
-      }
-    }
-    return null;
+    var positions = buffer.getVariables();
+    return Arrays.stream(positions)
+        .filter(curr -> variable.equals(curr.getType()))
+        .findFirst()
+        .orElse(null);
   }
 
   @SuppressWarnings({"squid:S00107", "pmd:NPathComplexity"})
   private static void insertTag(IDocument textBuffer, int offset, int length, Iterable<String> paramNames, Iterable<String> exceptionNames,
       String returnType, Iterable<String> typeParameterNames, boolean isDeprecated, String lineDelimiter) throws BadLocationException {
-    IRegion region = textBuffer.getLineInformationOfOffset(offset);
+    var region = textBuffer.getLineInformationOfOffset(offset);
     if (region == null) {
       return;
     }
-    String lineStart = textBuffer.get(region.getOffset(), offset - region.getOffset());
+    var lineStart = textBuffer.get(region.getOffset(), offset - region.getOffset());
 
-    StringBuilder buf = new StringBuilder();
-    for (String typeParameterName : typeParameterNames) {
+    var buf = new StringBuilder();
+    for (var typeParameterName : typeParameterNames) {
       if (buf.length() > 0) {
         buf.append(lineDelimiter).append(lineStart);
       }
       buf.append("@param ").append(JavaTypes.C_GENERIC_START).append(typeParameterName).append(JavaTypes.C_GENERIC_END);
     }
-    for (String paramName : paramNames) {
+    for (var paramName : paramNames) {
       if (buf.length() > 0) {
         buf.append(lineDelimiter).append(lineStart);
       }
@@ -386,7 +380,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       buf.append("@return");
     }
     if (exceptionNames != null) {
-      for (String exceptionName : exceptionNames) {
+      for (var exceptionName : exceptionNames) {
         if (buf.length() > 0) {
           buf.append(lineDelimiter).append(lineStart);
         }
@@ -400,10 +394,10 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       buf.append("@deprecated");
     }
     if (buf.length() == 0 && isAllCommentWhitespace(lineStart)) {
-      int prevLine = textBuffer.getLineOfOffset(offset) - 1;
+      var prevLine = textBuffer.getLineOfOffset(offset) - 1;
       if (prevLine > 0) {
-        IRegion prevRegion = textBuffer.getLineInformation(prevLine);
-        int prevLineEnd = prevRegion.getOffset() + prevRegion.getLength();
+        var prevRegion = textBuffer.getLineInformation(prevLine);
+        var prevLineEnd = prevRegion.getOffset() + prevRegion.getLength();
         // clear full line
         textBuffer.replace(prevLineEnd, offset + length - prevLineEnd, "");
         return;
@@ -413,8 +407,8 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
   }
 
   private static boolean isAllCommentWhitespace(CharSequence lineStart) {
-    for (int i = 0; i < lineStart.length(); i++) {
-      char ch = lineStart.charAt(i);
+    for (var i = 0; i < lineStart.length(); i++) {
+      var ch = lineStart.charAt(i);
       if (!Character.isWhitespace(ch) && ch != '*') {
         return false;
       }

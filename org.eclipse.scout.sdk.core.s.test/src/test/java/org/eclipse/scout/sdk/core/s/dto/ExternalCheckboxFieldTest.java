@@ -17,7 +17,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +39,7 @@ public class ExternalCheckboxFieldTest {
 
     // fields of AbstractTestCheckboxFieldData
     assertEquals(1, abstractTestCheckboxFieldData.fields().stream().count(), "field count of 'AbstractTestCheckboxFieldData'");
-    IField serialVersionUID = assertFieldExist(abstractTestCheckboxFieldData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(abstractTestCheckboxFieldData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 

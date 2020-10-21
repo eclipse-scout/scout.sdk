@@ -8,17 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.util.apidef;
+package org.eclipse.scout.sdk.core.fixture.apidef;
 
-import java.util.Optional;
+import org.eclipse.scout.sdk.core.apidef.ApiLevel;
 
-public interface IApiSpecification {
+@ApiLevel(13)
+public interface Java13Api extends IJavaApi, ICustomApi {
+  int INT = 11;
 
-  ApiVersion level();
-
-  Optional<ApiVersion> version();
-
-  <A extends IApiSpecification> Optional<A> optApi(Class<A> apiDefinition);
-
-  <A extends IApiSpecification> A api(Class<A> apiDefinition);
+  @Override
+  default int customMethod() {
+    return INT;
+  }
 }

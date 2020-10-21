@@ -33,7 +33,7 @@ public class ExtensionProposal extends AbstractTypeProposal {
   @Override
   @SuppressWarnings("unchecked")
   protected void fillRewrite(AstNodeFactory factory, Type superType) throws CoreException {
-    TypeDeclaration createdExtension = createExtensionType(superType);
+    var createdExtension = createExtensionType(superType);
 
     List<BodyDeclaration> bodyDeclarations = createdExtension.bodyDeclarations();
     setEndPosition(getRewrite().track(bodyDeclarations.get(bodyDeclarations.size() - 1)));

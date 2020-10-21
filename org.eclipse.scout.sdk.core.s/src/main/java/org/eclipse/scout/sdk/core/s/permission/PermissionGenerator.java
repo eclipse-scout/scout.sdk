@@ -37,7 +37,7 @@ public class PermissionGenerator<TYPE extends PermissionGenerator<TYPE>> extends
   }
 
   protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createConstructor(IJavaElementGenerator<?> constructorOwner) {
-    String permissionName = constructorOwner.elementName().orElseThrow(() -> newFail("Permission name is missing"));
+    var permissionName = constructorOwner.elementName().orElseThrow(() -> newFail("Permission name is missing"));
     return MethodGenerator.create()
         .asPublic()
         .withElementName(permissionName)

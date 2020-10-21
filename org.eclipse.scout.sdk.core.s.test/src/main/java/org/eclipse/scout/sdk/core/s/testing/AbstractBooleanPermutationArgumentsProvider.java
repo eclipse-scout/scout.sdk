@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.core.s.testing;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -40,20 +40,15 @@ public abstract class AbstractBooleanPermutationArgumentsProvider implements Arg
   }
 
   protected static Object[] toBoolArray(int numBits, long mask) {
-    Object[] result = new Object[numBits];
-    for (int pos = 0; pos < result.length; pos++) {
-      result[pos] = (mask & (1L << pos)) != 0;
-    }
-    return result;
+    return IntStream.range(0, numBits)
+        .mapToObj(pos -> (mask & (1L << pos)) != 0)
+        .toArray();
   }
 
   protected static Stream<Object[]> permutations(int numBits) {
-    int numCombinations = BigInteger.valueOf(2).pow(numBits).intValue();
-    Collection<Object[]> result = new ArrayList<>(numCombinations);
-    for (int cur = 0; cur < numCombinations; cur++) {
-      result.add(toBoolArray(numBits, cur));
-    }
-    return result.stream();
+    var numCombinations = BigInteger.valueOf(2).pow(numBits).longValue();
+    return LongStream.range(0, numCombinations)
+        .mapToObj(cur -> toBoolArray(numBits, cur));
   }
 
   @Override

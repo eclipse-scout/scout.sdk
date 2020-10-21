@@ -15,10 +15,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.Api;
+import org.eclipse.scout.sdk.core.apidef.IApiProvider;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link IJavaEnvironment}</h3> Represents a lookup environment (classpath) capable to resolve {@link IType}s by
@@ -55,8 +57,37 @@ public interface IJavaEnvironment {
    */
   Optional<IType> findType(String fqn);
 
+  /**
+   * Tries to find the {@link IType} with the given name.<br>
+   * For more details see {@link #findType(String)}.
+   * 
+   * @param fqn
+   *          The {@link IClassNameSupplier} of the type to find. Must not be {@code null}.
+   * @return An {@link Optional} holding the {@link IType} matching the given {@link IClassNameSupplier} or an empty
+   *         {@link Optional} if it could not be found.
+   * @see #findType(String)
+   * @see #requireType(String)
+   * @see JavaTypes
+   */
   Optional<IType> findType(IClassNameSupplier fqn);
 
+  /**
+   * Tries to find the {@link IType} with the name as returned by the given nameSupplier.<br>
+   * For more details see {@link #findType(String)}.
+   * 
+   * @param apiDefinition
+   *          The api type that defines the type name to find. An instance of this API is passed to the nameSupplier.
+   *          May be {@code null} in case the given nameSupplier can handle a {@code null} input.
+   * @param nameSupplier
+   *          A {@link Function} to be called to obtain the type name to find.
+   * @param <A>
+   *          The API type that contains the class name
+   * @return An {@link Optional} holding the {@link IType} matching the given {@link IClassNameSupplier} or an empty
+   *         {@link Optional} if it could not be found.
+   * @see #findType(String)
+   * @see #requireType(String)
+   * @see JavaTypes
+   */
   <A extends IApiSpecification> Optional<IType> findTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier);
 
   /**
@@ -72,8 +103,36 @@ public interface IJavaEnvironment {
    */
   IType requireType(String fqn);
 
+  /**
+   * Same as {@link #findType(IClassNameSupplier)} but throws an {@link IllegalArgumentException} if the type could not
+   * be found.
+   * 
+   * @param nameSupplier
+   *          The {@link IClassNameSupplier} of the type to find. Must not be {@code null}.
+   * @return The {@link IType} for the specified fully qualified name. Never returns {@code null}.
+   * @see #findType(String)
+   * @see #requireType(String)
+   * @see JavaTypes
+   */
   IType requireType(IClassNameSupplier nameSupplier);
 
+  /**
+   * Same as {@link #findTypeFrom(Class, Function)} but throws an {@link IllegalArgumentException} if the type could not
+   * be found.
+   *
+   * @param apiDefinition
+   *          The api type that defines the type name to find. An instance of this API is passed to the nameSupplier.
+   *          May be {@code null} in case the given nameSupplier can handle a {@code null} input.
+   * @param nameSupplier
+   *          A {@link Function} to be called to obtain the type name to find.
+   * @param <A>
+   *          The API type that contains the class name
+   * @return The {@link IType} for the {@link IClassNameSupplier} returned by the given nameSupplier. Never returns
+   *         {@code null}.
+   * @see #findType(String)
+   * @see #requireType(String)
+   * @see JavaTypes
+   */
   <A extends IApiSpecification> IType requireTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier);
 
   /**
@@ -207,7 +266,43 @@ public interface IJavaEnvironment {
    */
   Stream<IClasspathEntry> sourceFolders();
 
+  /**
+   * Tries to find the given API in this {@link IJavaEnvironment}.
+   * 
+   * @param apiDefinition
+   *          The API to find. May be {@code null} but then the resulting {@link Optional} is always empty.
+   * @param <A>
+   *          The API type to find.
+   * @return An {@link Optional} holding the API if it could be found. The {@link Optional} is empty if the given class
+   *         is {@code null} or the given API could not be found in this {@link IJavaEnvironment}.
+   * @throws IllegalArgumentException
+   *           if one of the following conditions is true:
+   *           <ol>
+   *           <li>the API version found in this {@link IJavaEnvironment} is not supported (version found in this
+   *           {@link IJavaEnvironment} is too old).</li>
+   *           <li>the given API class is not registered (see {@link Api#registerProvider(Class, IApiProvider)}</li>
+   *           </ol>
+   */
   <A extends IApiSpecification> Optional<A> api(Class<A> apiDefinition);
 
+  /**
+   * Gets the given API from this {@link IJavaEnvironment}.
+   * 
+   * @param apiDefinition
+   *          The API to find. Must not be {@code null}.
+   * @param <A>
+   *          The API type to find.
+   * @return The API instance
+   * @throws IllegalArgumentException
+   *           if one of the following conditions is true:
+   *           <ol>
+   *           <li>the given API class is {@code null}</li>
+   *           <li>the given API cannot be found in this {@link IJavaEnvironment}</li>
+   *           <li>the API version found in this {@link IJavaEnvironment} is not supported (version found in this
+   *           {@link IJavaEnvironment} is too old).</li>
+   *           <li>the given API class is not registered (see {@link Api#registerProvider(Class, IApiProvider)}</li>
+   *           </ol>
+   * @see #api(Class)
+   */
   <A extends IApiSpecification> A requireApi(Class<A> apiDefinition);
 }

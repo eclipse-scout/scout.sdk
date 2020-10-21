@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.util.CharSequenceInputStream;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -66,14 +65,14 @@ public class ResourceWriteOperation implements IResourceWriteOperation {
   }
 
   protected void writeFile(@SuppressWarnings("TypeMayBeWeakened") EclipseProgress progress) throws IOException, CoreException {
-    String charsetName = m_file.getCharset();
+    var charsetName = m_file.getCharset();
     try (InputStream stream = new CharSequenceInputStream(m_content, charsetName)) {
       if (!m_file.exists()) {
         mkdirs(m_file.getParent(), progress.newChild(1).monitor());
         m_file.create(stream, true, progress.newChild(1).monitor());
       }
       else {
-        IStatus result = S2eUtils.makeCommittable(singletonList(m_file));
+        var result = S2eUtils.makeCommittable(singletonList(m_file));
         if (result.isOK()) {
           m_file.setContents(stream, true, true, progress.newChild(2).monitor());
         }
@@ -88,8 +87,8 @@ public class ResourceWriteOperation implements IResourceWriteOperation {
     if (file == null || !file.exists()) {
       return false;
     }
-    try (InputStream in = file.getContents()) {
-      StringBuilder fileContent = Strings.fromInputStream(in, file.getCharset());
+    try (var in = file.getContents()) {
+      var fileContent = Strings.fromInputStream(in, file.getCharset());
       return Strings.equals(fileContent, newContent);
     }
     catch (IOException | CoreException e) {

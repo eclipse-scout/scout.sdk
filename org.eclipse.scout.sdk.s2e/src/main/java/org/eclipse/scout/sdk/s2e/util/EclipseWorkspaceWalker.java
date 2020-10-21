@@ -34,10 +34,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
-import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -138,8 +136,8 @@ public class EclipseWorkspaceWalker {
       SdkLog.warning("File '{}' could not be found in the current Eclipse Workspace.", file.path());
       return;
     }
-    Path modulePath = iFile.get().getProject().getLocation().toFile().toPath();
-    FileQueryInput candidate = new FileQueryInput(file.path(), modulePath, file::content);
+    var modulePath = iFile.get().getProject().getLocation().toFile().toPath();
+    var candidate = new FileQueryInput(file.path(), modulePath, file::content);
     query.searchIn(candidate, env, progress);
   }
 
@@ -154,17 +152,17 @@ public class EclipseWorkspaceWalker {
    */
   public void walk(BiConsumer<WorkspaceFile, IProgress> visitor, IProgressMonitor monitor) throws CoreException {
     Ensure.notNull(visitor);
-    IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-    SubMonitor subMonitor = SubMonitor.convert(monitor, taskName(), projects.length * 2);
-    for (IProject root : projects) {
+    var projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+    var subMonitor = SubMonitor.convert(monitor, taskName(), projects.length * 2);
+    for (var root : projects) {
       Set<Path> outputLocations = emptySet();
       subMonitor.subTask(root.getName());
       if (isSkipOutputLocation()) {
-        IJavaProject jp = JavaCore.create(root);
+        var jp = JavaCore.create(root);
         outputLocations = getOutputLocations(jp);
       }
 
-      Path projectPath = root.getLocation().toFile().toPath();
+      var projectPath = root.getLocation().toFile().toPath();
       if (Files.exists(projectPath)) {
         searchInFolder(visitor, projectPath, Charset.forName(root.getDefaultCharset()), outputLocations, subMonitor.newChild(1));
       }
@@ -180,9 +178,9 @@ public class EclipseWorkspaceWalker {
     if (!JdtUtils.exists(jp)) {
       return emptySet();
     }
-    String projectDir = jp.getProject().getLocation().toOSString();
-    IClasspathEntry[] rawClasspath = jp.getRawClasspath();
-    return Stream.of(rawClasspath)
+    var projectDir = jp.getProject().getLocation().toOSString();
+    var rawClasspath = jp.getRawClasspath();
+    return Arrays.stream(rawClasspath)
         .map(IClasspathEntry::getOutputLocation)
         .filter(Objects::nonNull)
         .map(location -> location.removeFirstSegments(1).toOSString())
@@ -230,7 +228,7 @@ public class EclipseWorkspaceWalker {
       return false;
     }
 
-    Path fileName = file.getFileName();
+    var fileName = file.getFileName();
     if (isSkipNodeModules() && fileName != null && "node_modules".equals(fileName.toString())) {
       return false;
     }
@@ -251,21 +249,16 @@ public class EclipseWorkspaceWalker {
     if (extensionsAccepted().isEmpty()) {
       return true; // no filter
     }
-    Path path = file.getFileName();
+    var path = file.getFileName();
     if (path == null) {
       return false;
     }
-    String fileName = path.toString().toLowerCase(Locale.ENGLISH);
-    for (String extension : extensionsAccepted()) {
-      if (fileName.endsWith(extension)) {
-        return true;
-      }
-    }
-    return false;
+    var fileName = path.toString().toLowerCase(Locale.ENGLISH);
+    return extensionsAccepted().stream().anyMatch(fileName::endsWith);
   }
 
   protected static boolean isHidden(Path path) {
-    Path fileName = path.getFileName();
+    var fileName = path.getFileName();
     return fileName != null && fileName.toString().startsWith(".");
   }
 
@@ -372,7 +365,7 @@ public class EclipseWorkspaceWalker {
   public EclipseWorkspaceWalker withExtensionsAccepted(Collection<String> extensions) {
     m_fileExtensions.clear();
     if (extensions != null && !extensions.isEmpty()) {
-      for (String e : extensions) {
+      for (var e : extensions) {
         if (Strings.hasText(e)) {
           m_fileExtensions.add(e);
         }
@@ -419,11 +412,11 @@ public class EclipseWorkspaceWalker {
     }
 
     protected static IFile resolveInWorkspace(Path file) {
-      IFile[] workspaceFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toUri());
+      var workspaceFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toUri());
       if (workspaceFiles.length < 1) {
         return null;
       }
-      IFile workspaceFile = workspaceFiles[0];
+      var workspaceFile = workspaceFiles[0];
       if (!workspaceFile.exists()) {
         return null;
       }
@@ -464,7 +457,7 @@ public class EclipseWorkspaceWalker {
         return false;
       }
 
-      WorkspaceFile other = (WorkspaceFile) obj;
+      var other = (WorkspaceFile) obj;
       return m_file.equals(other.m_file);
     }
   }

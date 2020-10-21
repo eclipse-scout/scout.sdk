@@ -17,23 +17,18 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsModuleNewHelper;
@@ -67,20 +62,20 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
 
     try {
       // get pom from target project
-      IFile pomFile = getServerModule().getProject().getFile(IMavenConstants.POM);
+      var pomFile = getServerModule().getProject().getFile(IMavenConstants.POM);
       if (!pomFile.isAccessible()) {
         throw new SdkException("{} could not be found in module '{}'.", IMavenConstants.POM, getServerModule().getElementName());
       }
       progress.worked(5);
 
       // create project on disk (using archetype)
-      Path createdProjectDir = JaxWsModuleNewHelper.createModule(pomFile.getLocation().toFile().toPath(), getArtifactId(), env, progress.newChild(10));
+      var createdProjectDir = JaxWsModuleNewHelper.createModule(pomFile.getLocation().toFile().toPath(), getArtifactId(), env, progress.newChild(10));
 
       // import into workspace
       setCreatedProject(importIntoWorkspace(createdProjectDir, progress.newChild(70)));
 
       // refresh modified resources
-      Set<IProject> modifiedProjects = getAffectedProjects(createdProjectDir);
+      var modifiedProjects = getAffectedProjects(createdProjectDir);
       modifiedProjects.add(getCreatedProject()); // ensure the created project is in the set
       modifiedProjects.add(getServerModule().getProject()); // ensure the modified server project is in the set
 
@@ -94,23 +89,23 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
 
   @SuppressWarnings("MethodMayBeStatic")
   protected Set<IProject> getAffectedProjects(Path createdProjectDir) throws IOException {
-    Path parentPom = JaxWsModuleNewHelper.getParentPomOf(createdProjectDir.resolve(IMavenConstants.POM));
+    var parentPom = JaxWsModuleNewHelper.getParentPomOf(createdProjectDir.resolve(IMavenConstants.POM));
     if (parentPom == null) {
       return emptySet();
     }
 
-    Path parentReference = parentPom.normalize();
+    var parentReference = parentPom.normalize();
     Collection<Path> modulesWithModifiedParent = new HashSet<>();
-    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-    for (IProject candidate : root.getProjects()) {
-      IFile pom = candidate.getFile(IMavenConstants.POM);
+    var root = ResourcesPlugin.getWorkspace().getRoot();
+    for (var candidate : root.getProjects()) {
+      var pom = candidate.getFile(IMavenConstants.POM);
       if (pom != null && pom.exists()) {
-        IPath location = pom.getLocation();
+        var location = pom.getLocation();
         if (location != null) {
-          Path moduleLocation = location.toFile().toPath();
-          Path parent = JaxWsModuleNewHelper.getParentPomOf(moduleLocation);
+          var moduleLocation = location.toFile().toPath();
+          var parent = JaxWsModuleNewHelper.getParentPomOf(moduleLocation);
           if (parent != null) {
-            Path canonicalFile = parent.normalize();
+            var canonicalFile = parent.normalize();
             if (parentReference.equals(canonicalFile)) {
               modulesWithModifiedParent.add(moduleLocation.resolve(IMavenConstants.POM));
             }
@@ -122,15 +117,15 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
 
     return modulesWithModifiedParent.stream()
         .map(Path::toUri)
-        .flatMap(uri -> Stream.of(root.findFilesForLocationURI(uri)))
+        .flatMap(uri -> Arrays.stream(root.findFilesForLocationURI(uri)))
         .map(IResource::getProject)
         .collect(toSet());
   }
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected static IProject importIntoWorkspace(Path createdProjectDir, EclipseProgress progress) throws CoreException {
-    Set<MavenProjectInfo> projects = singleton(new MavenProjectInfo(createdProjectDir.getFileName().toString(), createdProjectDir.resolve(IMavenConstants.POM).toFile(), null, null));
-    List<IMavenProjectImportResult> importedProjects = MavenPlugin.getProjectConfigurationManager().importProjects(projects, new ProjectImportConfiguration(), progress.monitor());
+    var projects = singleton(new MavenProjectInfo(createdProjectDir.getFileName().toString(), createdProjectDir.resolve(IMavenConstants.POM).toFile(), null, null));
+    var importedProjects = MavenPlugin.getProjectConfigurationManager().importProjects(projects, new ProjectImportConfiguration(), progress.monitor());
     if (importedProjects == null || importedProjects.isEmpty()) {
       throw newFail("Unable to import newly created project into workspace.");
     }

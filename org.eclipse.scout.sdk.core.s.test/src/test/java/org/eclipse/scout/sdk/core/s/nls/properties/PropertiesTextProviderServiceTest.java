@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.nls.TextProviderService;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
@@ -41,8 +40,8 @@ public class PropertiesTextProviderServiceTest {
 
   @Test
   public void testTextProviderService(IJavaEnvironment env) {
-    IType txtSvcType = env.requireType(TestTextProviderService.class.getName());
-    PropertiesTextProviderService txtSvc = PropertiesTextProviderService.create(txtSvcType).get();
+    var txtSvcType = env.requireType(TestTextProviderService.class.getName());
+    var txtSvc = PropertiesTextProviderService.create(txtSvcType).get();
 
     assertEquals("Prefix", txtSvc.filePrefix());
     assertEquals("formdata/shared/texts", txtSvc.folder());
@@ -64,18 +63,18 @@ public class PropertiesTextProviderServiceTest {
   @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "EqualsWithItself", "ConstantConditions", "EqualsBetweenInconvertibleTypes"})
   private static void testFromSegments(IJavaEnvironment first, IJavaEnvironment second) {
 
-    IType txtSvcType = first.requireType(TestTextProviderService.class.getName());
-    IType txtSvcType2 = second.requireType(SecondTestTextProviderService.class.getName());
+    var txtSvcType = first.requireType(TestTextProviderService.class.getName());
+    var txtSvcType2 = second.requireType(SecondTestTextProviderService.class.getName());
 
     assertFalse(PropertiesTextProviderService.fromSegments(new String[]{}, txtSvcType).isPresent());
 
-    PropertiesTextProviderService a = PropertiesTextProviderService.fromSegments(new String[]{"Prefix"}, txtSvcType).get();
-    PropertiesTextProviderService b = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "Prefix"}, txtSvcType).get();
-    PropertiesTextProviderService c = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "OtherPrefix"}, txtSvcType).get();
-    PropertiesTextProviderService d = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "OtherPrefix"}, txtSvcType).get();
+    var a = PropertiesTextProviderService.fromSegments(new String[]{"Prefix"}, txtSvcType).get();
+    var b = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "Prefix"}, txtSvcType).get();
+    var c = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "OtherPrefix"}, txtSvcType).get();
+    var d = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "OtherPrefix"}, txtSvcType).get();
 
-    TextProviderService nonPropService1 = new TextProviderService(txtSvcType);
-    TextProviderService nonPropService2 = new TextProviderService(txtSvcType2);
+    var nonPropService1 = new TextProviderService(txtSvcType);
+    var nonPropService2 = new TextProviderService(txtSvcType2);
 
     assertFalse(nonPropService1.equals(nonPropService2));
     assertFalse(a.equals(nonPropService1));

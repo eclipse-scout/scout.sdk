@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,7 +99,7 @@ public class TranslationKeysQuery implements IFileQuery {
   }
 
   protected boolean acceptCandidate(FileQueryInput candidate) {
-    String actualExtension = candidate.fileExtension();
+    var actualExtension = candidate.fileExtension();
     return hasText(actualExtension) && m_acceptedFileExtensions.contains(actualExtension);
   }
 
@@ -111,15 +110,15 @@ public class TranslationKeysQuery implements IFileQuery {
     }
 
     progress.init(m_suffixAndPrefix.size(), name());
-    char[] fileContent = candidate.fileContent();
-    for (Entry<char[], char[]> suffixAndPrefix : m_suffixAndPrefix.entrySet()) {
-      for (String key : m_searchKeys) {
-        char[] suffix = suffixAndPrefix.getKey();
-        char[] search = buildSearchPattern(suffix, key, suffixAndPrefix.getValue());
-        int pos = 0;
+    var fileContent = candidate.fileContent();
+    for (var suffixAndPrefix : m_suffixAndPrefix.entrySet()) {
+      for (var key : m_searchKeys) {
+        var suffix = suffixAndPrefix.getKey();
+        var search = buildSearchPattern(suffix, key, suffixAndPrefix.getValue());
+        var pos = 0;
         int index;
         while ((index = indexOf(search, fileContent, pos)) >= 0) {
-          FileRange match = new FileRange(candidate.file(), key, index + suffix.length, index + suffix.length + key.length());
+          var match = new FileRange(candidate.file(), key, index + suffix.length, index + suffix.length + key.length());
           acceptNlsKeyMatch(key, match);
           pos = index + search.length;
         }
@@ -129,7 +128,7 @@ public class TranslationKeysQuery implements IFileQuery {
   }
 
   private static char[] buildSearchPattern(char[] prefix, String key, char[] suffix) {
-    char[] pat = new char[prefix.length + key.length() + suffix.length];
+    var pat = new char[prefix.length + key.length() + suffix.length];
     System.arraycopy(prefix, 0, pat, 0, prefix.length);
     System.arraycopy(key.toCharArray(), 0, pat, prefix.length, key.length());
     System.arraycopy(suffix, 0, pat, prefix.length + key.length(), suffix.length);
@@ -145,7 +144,7 @@ public class TranslationKeysQuery implements IFileQuery {
 
   @Override
   public Set<FileQueryMatch> result(Path file) {
-    Map<String, Set<FileQueryMatch>> result = m_result.get(file);
+    var result = m_result.get(file);
     if (result == null) {
       return emptySet();
     }
@@ -169,8 +168,8 @@ public class TranslationKeysQuery implements IFileQuery {
    */
   public Map<String, Set<FileQueryMatch>> resultByKey() {
     Map<String, Set<FileQueryMatch>> resultByKey = new HashMap<>();
-    for (Map<String, Set<FileQueryMatch>> l : m_result.values()) {
-      for (Entry<String, Set<FileQueryMatch>> e : l.entrySet()) {
+    for (var l : m_result.values()) {
+      for (var e : l.entrySet()) {
         resultByKey.computeIfAbsent(e.getKey(), k -> new HashSet<>()).addAll(e.getValue());
       }
     }

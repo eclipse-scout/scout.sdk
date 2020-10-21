@@ -16,13 +16,9 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 /**
  * <h3>{@link ErrorFormPage}</h3>
@@ -47,11 +43,11 @@ public class ErrorFormPage extends FormPage {
 
   @Override
   protected void createFormContent(IManagedForm managedForm) {
-    ScrolledForm form = managedForm.getForm();
-    FormToolkit toolkit = managedForm.getToolkit();
-    Composite parent = form.getBody();
+    var form = managedForm.getForm();
+    var toolkit = managedForm.getToolkit();
+    var parent = form.getBody();
 
-    StringBuilder msgBuilder = new StringBuilder();
+    var msgBuilder = new StringBuilder();
     if (Strings.hasText(m_message)) {
       msgBuilder.append(m_message).append(lineSeparator());
     }
@@ -59,7 +55,7 @@ public class ErrorFormPage extends FormPage {
       msgBuilder.append(Strings.fromThrowable(m_throwable));
     }
 
-    Text text = toolkit.createText(parent, msgBuilder.toString(), SWT.MULTI);
+    var text = toolkit.createText(parent, msgBuilder.toString(), SWT.MULTI);
     text.setEditable(false);
 
     // layout

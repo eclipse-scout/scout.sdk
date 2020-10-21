@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.s2e.environment.model;
 
-import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -24,13 +23,10 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -38,7 +34,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.ecj.ClasspathEntry;
@@ -87,11 +82,11 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
 
   protected static Path javaHomeOf(IJavaProject javaProject) {
     try {
-      IVMInstall vmInstall = JavaRuntime.getVMInstall(javaProject);
+      var vmInstall = JavaRuntime.getVMInstall(javaProject);
       if (vmInstall != null) {
-        File javaInstallLocation = vmInstall.getInstallLocation();
+        var javaInstallLocation = vmInstall.getInstallLocation();
         if (javaInstallLocation != null) {
-          Path javaInstallPath = javaInstallLocation.toPath();
+          var javaInstallPath = javaInstallLocation.toPath();
           if (Files.isDirectory(javaInstallPath.resolve("jre/lib"))) {
             // the install location points to a JDK that contains a JRE! Use the JRE as Java home
             return javaInstallPath.resolve("jre");
@@ -109,20 +104,20 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
 
   protected static List<ClasspathEntryWithJdt> toClasspathEntries(IJavaProject javaProject, boolean excludeTestCode) {
     try {
-      IPackageFragmentRoot[] allPackageFragmentRoots = javaProject.getAllPackageFragmentRoots();
+      var allPackageFragmentRoots = javaProject.getAllPackageFragmentRoots();
       List<ClasspathEntryWithJdt> result = new ArrayList<>(allPackageFragmentRoots.length * 2);
-      for (IPackageFragmentRoot cpRoot : allPackageFragmentRoots) {
+      for (var cpRoot : allPackageFragmentRoots) {
         if (excludeTestCode && cpRoot.getRawClasspathEntry().isTest()) {
           continue;
         }
 
-        String encoding = getEncoding(cpRoot);
+        var encoding = getEncoding(cpRoot);
         if (cpRoot.getKind() == IPackageFragmentRoot.K_SOURCE) {
           result.add(new ClasspathEntryWithJdt(cpRoot, cpRoot.getResource().getLocation().toFile().toPath(), ClasspathSpi.MODE_SOURCE, encoding));
         }
         else if (!isJreContainerElement(cpRoot)) {
-          Path cpLocation = cpRoot.getPath().toFile().toPath();
-          IPath cpSourceLocation = cpRoot.getSourceAttachmentPath();
+          var cpLocation = cpRoot.getPath().toFile().toPath();
+          var cpSourceLocation = cpRoot.getSourceAttachmentPath();
           if (cpSourceLocation != null) {
             result.add(new ClasspathEntryWithJdt(cpRoot, cpSourceLocation.toFile().toPath(), ClasspathSpi.MODE_SOURCE, encoding));
             result.add(new ClasspathEntryWithJdt(cpRoot, cpLocation, ClasspathSpi.MODE_BINARY, null));
@@ -140,29 +135,29 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
   }
 
   protected static boolean isJreContainerElement(IPackageFragmentRoot root) throws JavaModelException {
-    IClasspathEntry entry = root.getRawClasspathEntry();
+    var entry = root.getRawClasspathEntry();
     if (entry.getEntryKind() != IClasspathEntry.CPE_CONTAINER) {
       return false;
     }
-    String type = entry.getPath().segment(0);
+    var type = entry.getPath().segment(0);
     return JavaRuntime.JRE_CONTAINER.equals(type);
   }
 
   protected static String getEncoding(IJavaElement root) throws CoreException {
-    IResource resource = root.getResource();
+    var resource = root.getResource();
     if (resource != null && resource.exists()) {
       // check file
       if (resource instanceof IFile) {
-        IFile f = (IFile) resource;
-        String charset = f.getCharset(true);
+        var f = (IFile) resource;
+        var charset = f.getCharset(true);
         if (isValidEncoding(charset, root)) {
           return charset;
         }
       }
       else if (resource instanceof IContainer) {
         // check folder
-        IContainer c = (IContainer) resource;
-        String charset = c.getDefaultCharset(true);
+        var c = (IContainer) resource;
+        var charset = c.getDefaultCharset(true);
         if (isValidEncoding(charset, root)) {
           return charset;
         }
@@ -170,10 +165,10 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
     }
 
     // check project settings
-    IPreferencesService preferencesService = Platform.getPreferencesService();
+    var preferencesService = Platform.getPreferencesService();
     if (preferencesService != null) {
       IScopeContext[] scopeContext = {new ProjectScope(root.getJavaProject().getProject())};
-      String encoding = preferencesService.getString(ResourcesPlugin.PI_RESOURCES, ResourcesPlugin.PREF_ENCODING, null, scopeContext);
+      var encoding = preferencesService.getString(ResourcesPlugin.PI_RESOURCES, ResourcesPlugin.PREF_ENCODING, null, scopeContext);
       if (isValidEncoding(encoding, root)) {
         return encoding;
       }
@@ -187,7 +182,7 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
     }
 
     //noinspection AccessOfSystemProperties
-    String systemEncoding = System.getProperty("file.encoding");
+    var systemEncoding = System.getProperty("file.encoding");
     if (systemEncoding != null) {
       return systemEncoding;
     }
@@ -210,10 +205,10 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
 
   protected Map<IPackageFragmentRoot, ClasspathSpi> getClasspathMap() {
     return m_classpath.computeIfAbsentAndGet(() -> {
-      List<ClasspathSpi> classpath = getClasspath();
+      var classpath = getClasspath();
       Map<IPackageFragmentRoot, ClasspathSpi> result = new HashMap<>(classpath.size());
-      for (ClasspathSpi cp : classpath) {
-        ClasspathWithJdt jdtCp = (ClasspathWithJdt) cp;
+      for (var cp : classpath) {
+        var jdtCp = (ClasspathWithJdt) cp;
         result.put(jdtCp.getRoot(), cp);
       }
       return result;
@@ -229,8 +224,8 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
   @Override
   protected JavaEnvironmentWithJdt emptyCopy() {
     @SuppressWarnings("unchecked")
-    Set<ClasspathEntryWithJdt> classpath = (Set<ClasspathEntryWithJdt>) getNameEnvironment().classpath();
-    JavaEnvironmentWithJdt newEnv = new JavaEnvironmentWithJdt(javaProject(), javaHome(), classpath);
+    var classpath = (Set<ClasspathEntryWithJdt>) getNameEnvironment().classpath();
+    var newEnv = new JavaEnvironmentWithJdt(javaProject(), javaHome(), classpath);
     runPreservingOverrides(this, newEnv, null);
     return newEnv;
   }

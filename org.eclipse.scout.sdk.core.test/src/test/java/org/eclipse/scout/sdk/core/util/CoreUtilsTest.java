@@ -28,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
@@ -51,11 +50,11 @@ public class CoreUtilsTest {
     assertEquals("", relativizeURI(URI.create("http://user:pw@host:port/g/h/i/j/k"), URI.create("http://user:pw@host:port/g/h/i/j")).toString());
 
     // dif scheme or authority
-    String child1 = "http://user:pw@host2:port/a/b/e/f/another.test";
+    var child1 = "http://user:pw@host2:port/a/b/e/f/another.test";
     assertEquals(child1, relativizeURI(URI.create("http://user:pw@host:port/a/b/c/d/test.txt"), URI.create(child1)).toString());
-    String child2 = "http://user:pw@host2:port/a/b/c/d/sub/sub2";
+    var child2 = "http://user:pw@host2:port/a/b/c/d/sub/sub2";
     assertEquals(child2, relativizeURI(URI.create("http://user:pw@host:port/a/b/c/d/"), URI.create(child2)).toString());
-    String child3 = "file://user:pw@host:port/a/b/c/d/sub/sub2";
+    var child3 = "file://user:pw@host:port/a/b/c/d/sub/sub2";
     assertEquals(child3, relativizeURI(URI.create("http://user:pw@host:port/a/b/c/d/"), URI.create(child3)).toString());
   }
 
@@ -155,14 +154,14 @@ public class CoreUtilsTest {
 
   @Test
   public void testDirectoryMoveAndDeleteSameFileSystem() throws IOException {
-    Path folderToMove = Files.createTempDirectory("folderToMove");
-    Path targetDirectory = Files.createTempDirectory("targetDir");
+    var folderToMove = Files.createTempDirectory("folderToMove");
+    var targetDirectory = Files.createTempDirectory("targetDir");
 
     try {
-      String subDirs = "dir/anotherdir/whateverdir/";
-      Path subFolder = folderToMove.resolve(subDirs);
+      var subDirs = "dir/anotherdir/whateverdir/";
+      var subFolder = folderToMove.resolve(subDirs);
       Files.createDirectories(subFolder);
-      String fileName = "content.txt";
+      var fileName = "content.txt";
       Files.createFile(subFolder.resolve(fileName));
       assertTrue(Files.isDirectory(folderToMove));
 
@@ -170,10 +169,10 @@ public class CoreUtilsTest {
 
       assertFalse(Files.isDirectory(folderToMove));
       //noinspection NestedTryStatement
-      try (Stream<Path> files = Files.list(targetDirectory)) {
-        Path[] newContent = files.toArray(Path[]::new);
+      try (var files = Files.list(targetDirectory)) {
+        var newContent = files.toArray(Path[]::new);
         assertEquals(1, newContent.length);
-        Path movedDir = newContent[0];
+        var movedDir = newContent[0];
         assertEquals(folderToMove.getFileName().toString(), movedDir.getFileName().toString());
         assertTrue(Files.isReadable(movedDir.resolve(subDirs + fileName)));
       }

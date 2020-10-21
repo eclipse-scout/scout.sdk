@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -92,8 +93,11 @@ class ProposalPopup extends Window {
   private final Object m_lazyLoaderJobLock;
   private final Object m_descLoaderJobLock;
 
+  @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized")
   private TableViewer m_tableViewer;
+  @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized")
   private Label m_itemCountLabel;
+  @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized")
   private ScrolledComposite m_proposalDescriptionArea;
 
   private Object m_selectedProposal;
@@ -144,7 +148,7 @@ class ProposalPopup extends Window {
   }
 
   protected void fireProposalAccepted(IStructuredSelection selection, boolean moveFocus) {
-    ProposalPopupEvent delegateEvent = new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_ACCEPTED);
+    var delegateEvent = new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_ACCEPTED);
     delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, selection.getFirstElement());
     delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_MOVE_FOCUS, moveFocus);
     firePopupEvent(delegateEvent);
@@ -153,9 +157,9 @@ class ProposalPopup extends Window {
   @Override
   @SuppressWarnings("findbugs:IS2_INCONSISTENT_SYNC")
   protected Control createContents(Composite parent) {
-    Composite proposalArea = new Composite(parent, SWT.INHERIT_FORCE);
+    var proposalArea = new Composite(parent, SWT.INHERIT_FORCE);
     proposalArea.setBackground(proposalArea.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-    Table table = new Table(proposalArea, SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+    var table = new Table(proposalArea, SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
     m_tableViewer = new TableViewer(table);
     m_tableViewer.setContentProvider(m_contentProvider);
     m_tableViewer.setLabelProvider(m_labelProvider);
@@ -172,7 +176,7 @@ class ProposalPopup extends Window {
     });
 
     m_tableViewer.addDoubleClickListener(event -> {
-      IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+      var selection = (IStructuredSelection) event.getSelection();
       if (!selection.isEmpty()) {
         if (selection.size() == 1 && selection.getFirstElement() instanceof ISeparatorProposal) {
           return;
@@ -184,7 +188,7 @@ class ProposalPopup extends Window {
       @Override
       public void keyReleased(KeyEvent e) {
         if (' ' == e.keyCode) {
-          IStructuredSelection selection = m_tableViewer.getStructuredSelection();
+          var selection = m_tableViewer.getStructuredSelection();
           if (!selection.isEmpty()) {
             fireProposalAccepted(selection, true);
           }
@@ -198,7 +202,7 @@ class ProposalPopup extends Window {
     m_proposalDescriptionArea.setExpandHorizontal(true);
     m_proposalDescriptionArea.setExpandVertical(true);
 
-    Composite footer = new Composite(proposalArea, SWT.BORDER);
+    var footer = new Composite(proposalArea, SWT.BORDER);
     footer.setBackground(footer.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     m_itemCountLabel = new Label(footer, SWT.NONE);
     m_itemCountLabel.setBackground(m_itemCountLabel.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -228,7 +232,7 @@ class ProposalPopup extends Window {
         .applyTo(m_proposalDescriptionArea);
 
     proposalArea.setLayout(new FormLayout());
-    FormData data = new FormData();
+    var data = new FormData();
     data.top = new FormAttachment(0, 0);
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(100, 0);
@@ -259,7 +263,7 @@ class ProposalPopup extends Window {
     }
 
     // refresh selected label
-    Object old = m_selectedProposal;
+    var old = m_selectedProposal;
     m_selectedProposal = null;
     if (old != null) {
       m_tableViewer.update(old, new String[]{"label"});
@@ -276,7 +280,7 @@ class ProposalPopup extends Window {
     try {
       if (m_uiLock.acquire()) {
         // handleSelection
-        ProposalPopupEvent delegateEvent = new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_SELECTED);
+        var delegateEvent = new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_SELECTED);
         delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, m_selectedProposal);
         firePopupEvent(delegateEvent);
       }
@@ -314,9 +318,9 @@ class ProposalPopup extends Window {
       m_tableViewer.getTable().setRedraw(false);
 
       m_tableViewer.setInput(m_input);
-      IStructuredSelection selection = m_tableViewer.getStructuredSelection();
+      var selection = m_tableViewer.getStructuredSelection();
       if (selection.isEmpty()) {
-        Object proposal = input.getInput();
+        var proposal = input.getInput();
         if (proposal == null && m_proposalField.getText() != null) {
           proposal = getProposalByText(m_proposalField.getText(), input.m_proposals);
           if (proposal != null) {
@@ -333,9 +337,9 @@ class ProposalPopup extends Window {
       // reveal selection
       if (!selection.isEmpty()) {
         // try to scroll to items after the selected one to show the selected in the "middle" of the viewer
-        int selectedRowIndex = m_tableViewer.getTable().getSelectionIndex();
-        int lastRowIndex = m_tableViewer.getTable().getItemCount() - 1;
-        int numOffsetRows = 3;
+        var selectedRowIndex = m_tableViewer.getTable().getSelectionIndex();
+        var lastRowIndex = m_tableViewer.getTable().getItemCount() - 1;
+        var numOffsetRows = 3;
         int revealRowIndex;
         if (selectedRowIndex < lastRowIndex - numOffsetRows) {
           revealRowIndex = selectedRowIndex + numOffsetRows;
@@ -350,11 +354,12 @@ class ProposalPopup extends Window {
 
       // items found label
       if (m_itemCountLabel != null) {
-        int itemCount = m_tableViewer.getTable().getItemCount();
+        var itemCount = m_tableViewer.getTable().getItemCount();
         if (itemCount < 1) {
           m_itemCountLabel.setText("No items found.");
         }
         else if (itemCount == 1) {
+          //noinspection AccessToStaticFieldLockedOnInstance
           if (m_tableViewer.getTable().getItem(0).getData() == LOADING_PROPOSAL) {
             m_itemCountLabel.setText("Still loading. Please wait...");
           }
@@ -378,12 +383,10 @@ class ProposalPopup extends Window {
     if (proposals == null || proposals.isEmpty()) {
       return null;
     }
-    for (Object o : proposals) {
-      if (text.equals(getText(o))) {
-        return o;
-      }
-    }
-    return null;
+    return proposals.stream()
+        .filter(o -> text.equals(getText(o)))
+        .findFirst()
+        .orElse(null);
   }
 
   public void setContentProvider(IProposalContentProvider contentProvider) {
@@ -438,7 +441,7 @@ class ProposalPopup extends Window {
 
   @Override
   public int open() {
-    Shell shell = getShell();
+    var shell = getShell();
     if (shell == null || shell.isDisposed()) {
       // create the window
       create();
@@ -454,19 +457,19 @@ class ProposalPopup extends Window {
   @Override
   @SuppressWarnings("pmd:NPathComplexity")
   protected void constrainShellSize() {
-    Shell shell = getShell();
+    var shell = getShell();
     try {
       shell.setRedraw(false);
-      Rectangle ownerBounds = getOwnerControl().getDisplay().map(getOwnerControl().getParent(), null, getOwnerControl().getBounds());
-      Rectangle displayBounds = shell.getDisplay().getBounds();
-      Rectangle shellBounds = new Rectangle(ownerBounds.x + POPUP_OFFSET, ownerBounds.y + ownerBounds.height + POPUP_OFFSET, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+      var ownerBounds = getOwnerControl().getDisplay().map(getOwnerControl().getParent(), null, getOwnerControl().getBounds());
+      var displayBounds = shell.getDisplay().getBounds();
+      var shellBounds = new Rectangle(ownerBounds.x + POPUP_OFFSET, ownerBounds.y + ownerBounds.height + POPUP_OFFSET, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
       if (getDialogSettings() != null) {
-        String widthString = getDialogSettings().get(DIALOG_SETTINGS_WIDTH);
+        var widthString = getDialogSettings().get(DIALOG_SETTINGS_WIDTH);
         if (Strings.hasText(widthString)) {
           shellBounds.width = Integer.parseInt(widthString);
         }
-        String heightString = getDialogSettings().get(DIALOG_SETTINGS_HEIGHT);
+        var heightString = getDialogSettings().get(DIALOG_SETTINGS_HEIGHT);
         if (Strings.hasText(heightString)) {
           shellBounds.height = Integer.parseInt(heightString);
         }
@@ -482,7 +485,7 @@ class ProposalPopup extends Window {
       shellBounds.width = Math.min(displayBounds.width / 2, shellBounds.width);
 
       // check fit y axis
-      int yDiff = (displayBounds.y + displayBounds.height) - (shellBounds.y + shellBounds.height);
+      var yDiff = (displayBounds.y + displayBounds.height) - (shellBounds.y + shellBounds.height);
       if (yDiff < 0) {
         if (Math.abs(yDiff) <= MINIMUM_HEIGHT) {
           // reduce to max allowed height
@@ -495,7 +498,7 @@ class ProposalPopup extends Window {
       }
 
       // check x axis
-      int xDiff = (displayBounds.x + displayBounds.width) - (shellBounds.x + shellBounds.width);
+      var xDiff = (displayBounds.x + displayBounds.width) - (shellBounds.x + shellBounds.width);
       if (xDiff < 0) {
         // move left
         shellBounds.x += xDiff;
@@ -515,9 +518,9 @@ class ProposalPopup extends Window {
       // workaround: on some operating systems (e.g. ubuntu) the shell does not have the size we just applied in setBounds(). It actually is slightly smaller.
       // therefore we remember the difference to correct it afterwards in close() where we save the last popup size.
       // this prevents the popup from getting smaller and smaller. See bugzilla 453515 for details.
-      Point sizeAfterSetBounds = shell.getSize();
-      int deltaX = shellBounds.width - sizeAfterSetBounds.x;
-      int deltaY = shellBounds.height - sizeAfterSetBounds.y;
+      var sizeAfterSetBounds = shell.getSize();
+      var deltaX = shellBounds.width - sizeAfterSetBounds.x;
+      var deltaY = shellBounds.height - sizeAfterSetBounds.y;
       if (deltaX != 0 || deltaY != 0) {
         m_shellSizeDif = new Point(deltaX / 2, deltaY);
       }
@@ -528,12 +531,12 @@ class ProposalPopup extends Window {
   }
 
   private void disposeDescriptions() {
-    for (Control c : m_proposalDescriptionArea.getChildren()) {
+    for (var c : m_proposalDescriptionArea.getChildren()) {
       if (!c.isDisposed()) {
         c.dispose();
       }
     }
-    Control content = m_proposalDescriptionArea.getContent();
+    var content = m_proposalDescriptionArea.getContent();
     if (content != null && !content.isDisposed()) {
       content.dispose();
     }
@@ -549,7 +552,7 @@ class ProposalPopup extends Window {
         return;
       }
 
-      IProposalDescriptionProvider proposalDescriptionProvider = getProposalDescriptionProvider();
+      var proposalDescriptionProvider = getProposalDescriptionProvider();
       if (proposalDescriptionProvider != null) {
         if (m_descLoaderJob != null) {
           m_descLoaderJob.cancel();
@@ -561,7 +564,7 @@ class ProposalPopup extends Window {
   }
 
   protected void layoutDescriptionArea() {
-    Control content = m_proposalDescriptionArea.getContent();
+    var content = m_proposalDescriptionArea.getContent();
     if (content != null && !content.isDisposed()) {
       ((GridLayout) m_proposalDescriptionArea.getParent().getLayout()).numColumns = 2;
       m_proposalDescriptionArea.setMinSize(content.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -604,7 +607,7 @@ class ProposalPopup extends Window {
     }
     firePopupEvent(new ProposalPopupEvent(ProposalPopupEvent.TYPE_POPUP_CLOSED));
     if (getDialogSettings() != null) {
-      Point size = getShell().getSize();
+      var size = getShell().getSize();
       // double width if description area is visible
       if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
         size.x /= 2;
@@ -632,7 +635,7 @@ class ProposalPopup extends Window {
     if (getShell() == null || getShell().isDisposed()) {
       return false;
     }
-    Control focusControl = getShell().getDisplay().getFocusControl();
+    var focusControl = getShell().getDisplay().getFocusControl();
     return (focusControl != null && focusControl.getShell() == getShell());
   }
 
@@ -649,15 +652,15 @@ class ProposalPopup extends Window {
   }
 
   private void firePopupEvent(ProposalPopupEvent event) {
-    for (IProposalPopupListener listener : m_selectionListeners.getListeners(IProposalPopupListener.class)) {
+    for (var listener : m_selectionListeners.getListeners(IProposalPopupListener.class)) {
       listener.popupChanged(event);
     }
   }
 
   boolean setFocus() {
-    Table table = m_tableViewer.getTable();
+    var table = m_tableViewer.getTable();
     if (m_tableViewer.getSelection().isEmpty() && table.getItemCount() > 0) {
-      Object first = m_tableViewer.getElementAt(0);
+      var first = m_tableViewer.getElementAt(0);
       m_tableViewer.setSelection(new StructuredSelection(first), true);
     }
     return table.setFocus();
@@ -691,8 +694,8 @@ class ProposalPopup extends Window {
 
     @Override
     public Object[] getElements(Object inputElement) {
-      SearchPatternInput input = (SearchPatternInput) inputElement;
-      Collection<Object> proposals = input.getProposals();
+      var input = (SearchPatternInput) inputElement;
+      var proposals = input.getProposals();
       if (proposals == null) {
         synchronized (m_lazyLoaderJobLock) {
           if (m_lazyLoaderJob != null) {
@@ -722,7 +725,7 @@ class ProposalPopup extends Window {
 
     @Override
     protected void execute(IProgressMonitor monitor) {
-      IProposalDescriptionProvider proposalDescriptionProvider = getProposalDescriptionProvider();
+      var proposalDescriptionProvider = getProposalDescriptionProvider();
       if (proposalDescriptionProvider == null) {
         return;
       }
@@ -733,14 +736,14 @@ class ProposalPopup extends Window {
         return;
       }
 
-      Object contentData = proposalDescriptionProvider.createDescriptionContent(m_proposal, monitor);
+      var contentData = proposalDescriptionProvider.createDescriptionContent(m_proposal, monitor);
       m_proposalDescriptionArea.getDisplay().asyncExec(() -> {
         synchronized (m_descLoaderJobLock) {
           if (m_proposalDescriptionArea.isDisposed()) {
             return;
           }
           if (contentData != null) {
-            Control content = proposalDescriptionProvider.createDescriptionControl(m_proposalDescriptionArea, contentData);
+            var content = proposalDescriptionProvider.createDescriptionControl(m_proposalDescriptionArea, contentData);
             if (content != null && !monitor.isCanceled()) {
               m_proposalDescriptionArea.setContent(content);
             }
@@ -771,7 +774,7 @@ class ProposalPopup extends Window {
     }
 
     private void setInputAsync(SearchPatternInput input, IProgressMonitor monitor) {
-      Control control = m_tableViewer.getControl();
+      var control = m_tableViewer.getControl();
       if (!control.isDisposed()) {
         control.getDisplay().asyncExec(() -> {
           if (monitor.isCanceled()) {
@@ -816,12 +819,11 @@ class ProposalPopup extends Window {
     @Override
     public void initialize(ColumnViewer viewer, ViewerColumn column) {
       super.initialize(viewer, column);
-      Font defaultFont = viewer.getControl().getFont();
-      FontData[] defaultFontData = defaultFont.getFontData();
-      FontData[] boldFontData = new FontData[defaultFontData.length];
-      for (int i = 0; i < defaultFontData.length; i++) {
-        boldFontData[i] = new FontData(defaultFontData[i].getName(), defaultFontData[i].getHeight(), defaultFontData[i].getStyle() | SWT.BOLD);
-      }
+      var defaultFont = viewer.getControl().getFont();
+      var defaultFontData = defaultFont.getFontData();
+      var boldFontData = Arrays.stream(defaultFontData)
+          .map(defaultFontDatum -> new FontData(defaultFontDatum.getName(), defaultFontDatum.getHeight(), defaultFontDatum.getStyle() | SWT.BOLD))
+          .toArray(FontData[]::new);
       m_boldFont = new Font(viewer.getControl().getDisplay(), boldFontData);
       m_boldStyler = new Styler() {
         @Override
@@ -841,15 +843,15 @@ class ProposalPopup extends Window {
 
     @Override
     public void update(ViewerCell cell) {
-      Object element = cell.getElement();
-      StyledString text = new StyledString(getText(element, Objects.equals(m_selectedProposal, element)));
+      var element = cell.getElement();
+      var text = new StyledString(getText(element, Objects.equals(m_selectedProposal, element)));
       if (cell.getColumnIndex() == 0 && m_wrappedLabelProvider instanceof ISearchRangeConsumer) {
-        ISearchRangeConsumer labelProvider = (ISearchRangeConsumer) m_wrappedLabelProvider;
-        int[] matchingRegions = labelProvider.getMatchRanges(element);
+        var labelProvider = (ISearchRangeConsumer) m_wrappedLabelProvider;
+        var matchingRegions = labelProvider.getMatchRanges(element);
         if (matchingRegions != null && matchingRegions.length > 0) {
-          for (int i = 0; i < matchingRegions.length - 1; i += 2) {
-            int offset = matchingRegions[i];
-            int length = matchingRegions[i + 1];
+          for (var i = 0; i < matchingRegions.length - 1; i += 2) {
+            var offset = matchingRegions[i];
+            var length = matchingRegions[i + 1];
             if (offset >= 0 && (offset + length) <= text.length()) {
               text.setStyle(offset, length, m_boldStyler);
             }
@@ -919,11 +921,11 @@ class ProposalPopup extends Window {
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder();
+      var builder = new StringBuilder();
       builder.append("input[").append(getInput()).append("] ");
       builder.append("pattern[").append(getPattern()).append("] ");
       builder.append("proposals[");
-      Collection<Object> proposals = getProposals();
+      var proposals = getProposals();
       if (proposals == null) {
         builder.append("null");
       }
@@ -943,20 +945,22 @@ class ProposalPopup extends Window {
         return false;
       }
 
-      SearchPatternInput other = (SearchPatternInput) o;
+      var other = (SearchPatternInput) o;
       if (!Objects.equals(m_pattern, other.m_pattern)) {
         return false;
       }
       if (!Objects.equals(m_input, other.m_input)) {
         return false;
       }
+      //noinspection NonFinalFieldReferenceInEquals
       return Objects.equals(m_proposals, other.m_proposals);
     }
 
     @Override
     public int hashCode() {
-      int result = m_pattern != null ? m_pattern.hashCode() : 0;
+      var result = m_pattern != null ? m_pattern.hashCode() : 0;
       result = 31 * result + (m_input != null ? m_input.hashCode() : 0);
+      //noinspection NonFinalFieldReferencedInHashCode
       result = 31 * result + (m_proposals != null ? m_proposals.hashCode() : 0);
       return result;
     }

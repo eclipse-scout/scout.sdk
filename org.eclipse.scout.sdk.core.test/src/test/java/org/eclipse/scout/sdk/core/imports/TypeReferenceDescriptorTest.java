@@ -23,15 +23,15 @@ import org.junit.jupiter.api.Test;
  */
 public class TypeReferenceDescriptorTest {
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "SimplifiableJUnitAssertion"})
   public void testEquals() {
-    String ref = "a.b.TestClass$Inner";
+    var ref = "a.b.TestClass$Inner";
     assertEquals(new TypeReferenceDescriptor(ref), new TypeReferenceDescriptor(ref));
     assertNotEquals(new TypeReferenceDescriptor(ref), new TypeReferenceDescriptor("a.b.TestClass.Inner"));
     assertNotEquals(new TypeReferenceDescriptor(ref), new TypeReferenceDescriptor("boolean"));
     assertNotEquals(new TypeReferenceDescriptor(ref), new TypeReferenceDescriptor("a.c.TestClass$Inner"));
 
-    TypeReferenceDescriptor d = new TypeReferenceDescriptor(ref);
+    var d = new TypeReferenceDescriptor(ref);
     assertEquals(d, d);
     assertFalse(d.equals(null));
     assertFalse(d.equals(ref));
@@ -39,7 +39,7 @@ public class TypeReferenceDescriptorTest {
 
   @Test
   public void testHashCode() {
-    String ref = "a.b.TestClass$Inner";
+    var ref = "a.b.TestClass$Inner";
     assertEquals(new TypeReferenceDescriptor(ref).hashCode(), new TypeReferenceDescriptor(ref).hashCode());
     assertNotEquals(new TypeReferenceDescriptor(ref).hashCode(), new TypeReferenceDescriptor("a.b.TestClass.Inner").hashCode());
     assertNotEquals(new TypeReferenceDescriptor(ref).hashCode(), new TypeReferenceDescriptor("boolean").hashCode());

@@ -12,12 +12,12 @@ package org.eclipse.scout.sdk.core.s.annotation;
 
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link ColumnDataAnnotation}</h3>
@@ -80,17 +80,17 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
       return Optional.empty();
     }
 
-    Optional<SdkColumnCommand> sdkColumnCommand = valueOf(type);
-    String replaceAnnotationFqn = type.javaEnvironment().requireApi(IScoutApi.class).Replace().fqn();
+    var sdkColumnCommand = valueOf(type);
+    var replaceAnnotationFqn = type.javaEnvironment().requireApi(IScoutApi.class).Replace().fqn();
     if (sdkColumnCommand.orElse(DEFAULT_VALUE) == SdkColumnCommand.IGNORE || !type.annotations().withName(replaceAnnotationFqn).existsAny()) {
       return sdkColumnCommand;
     }
 
     // we are replacing. Only if the parent is set to IGNORE and we are set to CREATE we have to create anything.
     // otherwise the column data is already available and nothing has to be done (IGNORE).
-    Optional<IType> replacedType = type.superClass();
+    var replacedType = type.superClass();
     if (replacedType.isPresent()) {
-      Optional<SdkColumnCommand> sdkColumnCommandOfReplaced = sdkColumnCommandOf(replacedType.get());
+      var sdkColumnCommandOfReplaced = sdkColumnCommandOf(replacedType.get());
       if (sdkColumnCommand.orElse(SdkColumnCommand.IGNORE) == SdkColumnCommand.CREATE
           && sdkColumnCommandOfReplaced.orElse(SdkColumnCommand.CREATE) == SdkColumnCommand.IGNORE) {
         return Optional.of(SdkColumnCommand.CREATE);

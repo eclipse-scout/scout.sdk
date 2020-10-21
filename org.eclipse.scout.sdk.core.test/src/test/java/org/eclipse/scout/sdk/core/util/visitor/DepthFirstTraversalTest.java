@@ -34,7 +34,7 @@ public class DepthFirstTraversalTest {
         return element == m_root;
       }
     };
-    TreeVisitResult result = TreeTraversals.create(visitor, this::children).traverse(m_root);
+    var result = TreeTraversals.create(visitor, this::children).traverse(m_root);
     assertEquals(TreeVisitResult.TERMINATE, result);
   }
 

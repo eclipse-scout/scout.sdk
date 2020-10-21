@@ -48,9 +48,9 @@ class TypeReferenceDescriptor {
       m_qualifiedName = m_simpleName;
     }
     else {
-      CharSequence nameWithoutDollar = replace(fqn, JavaTypes.C_DOLLAR, JavaTypes.C_DOT);
-      String qualifier = qualifier(fqn);
-      String qualifierFromNameWithoutDollar = qualifier(nameWithoutDollar);
+      var nameWithoutDollar = replace(fqn, JavaTypes.C_DOLLAR, JavaTypes.C_DOT);
+      var qualifier = qualifier(fqn);
+      var qualifierFromNameWithoutDollar = qualifier(nameWithoutDollar);
       m_qualifier = isBlank(qualifierFromNameWithoutDollar) ? null : qualifierFromNameWithoutDollar;
       m_packageName = isBlank(qualifier) ? null : qualifier;
       m_simpleName = simpleName(nameWithoutDollar);
@@ -101,7 +101,7 @@ class TypeReferenceDescriptor {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append("TypeReferenceDescriptor [");
     if (getPackageName() != null) {
       builder.append("packageName=").append(getPackageName()).append(", ");
@@ -117,8 +117,8 @@ class TypeReferenceDescriptor {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + (m_isTypeArg ? 1231 : 1237);
     result = prime * result + ((m_qualifier == null) ? 0 : m_qualifier.hashCode());
     result = prime * result + m_simpleName.hashCode();
@@ -135,7 +135,7 @@ class TypeReferenceDescriptor {
       return false;
     }
 
-    TypeReferenceDescriptor other = (TypeReferenceDescriptor) obj;
+    var other = (TypeReferenceDescriptor) obj;
     return m_isTypeArg == other.m_isTypeArg
         && Objects.equals(m_qualifier, other.m_qualifier)
         && Objects.equals(m_simpleName, other.m_simpleName)

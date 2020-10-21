@@ -37,7 +37,7 @@ public final class OptimisticLock {
    * @return true if lock was acquired as first monitor
    */
   public synchronized boolean acquire() {
-    int count = m_lockCount.incrementAndGet();
+    var count = m_lockCount.incrementAndGet();
     if (count == 1) {
       // this is the first
       return true;

@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.s2e.util.ast;
 import static java.util.stream.Collectors.toList;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,8 +33,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
@@ -61,7 +59,7 @@ public final class AstUtils {
    * @return A {@link Deque} holding the children.
    */
   public static Deque<ASTNode> getChildren(ASTNode node) {
-    P_ChildrenCollector visitor = new P_ChildrenCollector();
+    var visitor = new P_ChildrenCollector();
     node.accept(visitor);
     return visitor.m_result;
   }
@@ -74,11 +72,11 @@ public final class AstUtils {
    * @return The {@link IType} or {@code null} if no {@link IType} could be resolved.
    */
   public static IType getTypeBinding(AbstractTypeDeclaration td) {
-    ITypeBinding binding = td.resolveBinding();
+    var binding = td.resolveBinding();
     if (binding == null) {
       return null;
     }
-    IJavaElement javaElement = binding.getJavaElement();
+    var javaElement = binding.getJavaElement();
     if (!JdtUtils.exists(javaElement) || javaElement.getElementType() != IJavaElement.TYPE) {
       return null;
     }
@@ -99,13 +97,13 @@ public final class AstUtils {
    * @return A {@link Type} to be used as return type for a getter method returning the given type.
    */
   public static Type getInnerTypeReturnType(SimpleName innerTypeSimpleName, TypeDeclaration innerTypeDeclaringType) {
-    AST ast = innerTypeSimpleName.getAST();
-    Deque<TypeDeclaration> declaringTypes = getDeclaringTypes(innerTypeDeclaringType);
+    var ast = innerTypeSimpleName.getAST();
+    var declaringTypes = getDeclaringTypes(innerTypeDeclaringType);
 
     if (hasTypeParametersInDeclaringTypes(declaringTypes)) {
       // return type with type-parameters in the declaring types
       Type type = null;
-      Iterator<TypeDeclaration> topDownIterator = declaringTypes.descendingIterator();
+      var topDownIterator = declaringTypes.descendingIterator();
       while (topDownIterator.hasNext()) {
         type = wrapParameterizedIfRequired(topDownIterator.next(), type);
       }
@@ -120,8 +118,8 @@ public final class AstUtils {
 
   @SuppressWarnings("unchecked")
   private static Type wrapParameterizedIfRequired(TypeDeclaration template, Type type) {
-    AST ast = template.getAST();
-    SimpleName sn = ast.newSimpleName(template.getName().getIdentifier());
+    var ast = template.getAST();
+    var sn = ast.newSimpleName(template.getName().getIdentifier());
     if (type == null) {
       type = ast.newSimpleType(sn);
     }
@@ -133,15 +131,15 @@ public final class AstUtils {
       return type;
     }
 
-    ParameterizedType parameterizedType = ast.newParameterizedType(type);
-    for (int i = 0; i < template.typeParameters().size(); i++) {
+    var parameterizedType = ast.newParameterizedType(type);
+    for (var i = 0; i < template.typeParameters().size(); i++) {
       parameterizedType.typeArguments().add(ast.newWildcardType());
     }
     return parameterizedType;
   }
 
   private static boolean hasTypeParametersInDeclaringTypes(Iterable<TypeDeclaration> declaringTypes) {
-    for (TypeDeclaration td : declaringTypes) {
+    for (var td : declaringTypes) {
       if (!td.typeParameters().isEmpty()) {
         return true;
       }
@@ -160,7 +158,7 @@ public final class AstUtils {
    */
   public static Object getBindingResolver(AST ast) {
     try {
-      Method getBindingResolver = AST.class.getDeclaredMethod("getBindingResolver");
+      var getBindingResolver = AST.class.getDeclaredMethod("getBindingResolver");
       getBindingResolver.setAccessible(true);
       return getBindingResolver.invoke(ast);
     }
@@ -181,7 +179,7 @@ public final class AstUtils {
    */
   public static CompilationUnitScope getCompilationUnitScope(Object resolver) {
     try {
-      Method scope = resolver.getClass().getDeclaredMethod("scope");
+      var scope = resolver.getClass().getDeclaredMethod("scope");
       scope.setAccessible(true);
       return (CompilationUnitScope) scope.invoke(resolver);
     }
@@ -200,9 +198,9 @@ public final class AstUtils {
    */
   @SuppressWarnings("unchecked")
   public static void addAnnotationTo(Annotation a, BodyDeclaration owner) {
-    ASTNode sibling = getAnnotationSibling(owner, a);
+    var sibling = getAnnotationSibling(owner, a);
     if (sibling != null) {
-      int insertPos = owner.modifiers().indexOf(sibling);
+      var insertPos = owner.modifiers().indexOf(sibling);
       owner.modifiers().add(insertPos, a);
     }
     else {
@@ -225,7 +223,7 @@ public final class AstUtils {
       return result;
     }
     result.add(start);
-    TypeDeclaration parent = start;
+    var parent = start;
     while ((parent = (TypeDeclaration) getParent(parent, ASTNode.TYPE_DECLARATION)) != null) {
       result.add(parent);
     }
@@ -241,7 +239,7 @@ public final class AstUtils {
    */
   public static Deque<Annotation> getAnnotations(BodyDeclaration owner) {
     Deque<Annotation> annotations = new ArrayDeque<>();
-    for (Object o : owner.modifiers()) {
+    for (var o : owner.modifiers()) {
       if (o instanceof Annotation) {
         annotations.add((Annotation) o);
       }
@@ -258,7 +256,7 @@ public final class AstUtils {
    */
   @SuppressWarnings("unchecked")
   public static String createMethodIdentifier(MethodDeclaration md) {
-    List<String> parameters = ((List<SingleVariableDeclaration>) md.parameters()).stream()
+    var parameters = ((List<SingleVariableDeclaration>) md.parameters()).stream()
         .map(SingleVariableDeclaration::getType)
         .map(ASTNode::toString)
         .collect(toList());
@@ -276,19 +274,19 @@ public final class AstUtils {
    * @return The
    */
   public static ASTNode getAnnotationSibling(BodyDeclaration owner, Annotation newAnnotation) {
-    Deque<Annotation> annotations = getAnnotations(owner);
+    var annotations = getAnnotations(owner);
     if (!annotations.isEmpty()) {
-      int newAnnotLen = newAnnotation.toString().length();
-      Iterator<Annotation> iterator = annotations.descendingIterator();
+      var newAnnotLen = newAnnotation.toString().length();
+      var iterator = annotations.descendingIterator();
       while (iterator.hasNext()) {
-        Annotation existingAnnotation = iterator.next();
-        int len = existingAnnotation.getLength();
+        var existingAnnotation = iterator.next();
+        var len = existingAnnotation.getLength();
         if (len > 0 && len >= newAnnotLen) {
           return existingAnnotation;
         }
       }
     }
-    for (Object o : owner.modifiers()) {
+    for (var o : owner.modifiers()) {
       if (o instanceof Modifier) {
         return (ASTNode) o;
       }
@@ -312,7 +310,7 @@ public final class AstUtils {
     if (fqn == null) {
       return false;
     }
-    P_InstanceOfBindingVisitor visitor = new P_InstanceOfBindingVisitor(fqn);
+    var visitor = new P_InstanceOfBindingVisitor(fqn);
     visitHierarchy(hierarchyType, visitor);
 
     return visitor.m_isFound;
@@ -334,7 +332,7 @@ public final class AstUtils {
   }
 
   private static boolean visitBindingRec(ITypeBinding type, ITypeBindingVisitor visitor, Set<ITypeBinding> visited) {
-    boolean unvisited = visited.add(type);
+    var unvisited = visited.add(type);
     if (!unvisited) {
       return true;
     }
@@ -343,18 +341,13 @@ public final class AstUtils {
       return false;
     }
 
-    ITypeBinding superclass = type.getSuperclass();
+    var superclass = type.getSuperclass();
     if (superclass != null && !visitBindingRec(superclass, visitor, visited)) {
       return false;
     }
 
-    for (ITypeBinding ifc : type.getInterfaces()) {
-      if (!visitBindingRec(ifc, visitor, visited)) {
-        return false;
-      }
-    }
-
-    return true;
+    return Arrays.stream(type.getInterfaces())
+        .allMatch(ifc -> visitBindingRec(ifc, visitor, visited));
   }
 
   /**
@@ -410,7 +403,7 @@ public final class AstUtils {
   }
 
   private static ASTNode getSiblingNode(ASTNode n, int pos, Predicate<ASTNode> filter, boolean prev) {
-    Deque<ASTNode> children = getChildren(n);
+    var children = getChildren(n);
     Iterator<ASTNode> iterator;
     if (prev) {
       iterator = children.descendingIterator();
@@ -420,9 +413,9 @@ public final class AstUtils {
     }
 
     while (iterator.hasNext()) {
-      ASTNode currentNode = iterator.next();
-      int endOfCurrentNode = currentNode.getStartPosition() + currentNode.getLength();
-      boolean isRangeOk = prev ? endOfCurrentNode < pos : pos < endOfCurrentNode;
+      var currentNode = iterator.next();
+      var endOfCurrentNode = currentNode.getStartPosition() + currentNode.getLength();
+      var isRangeOk = prev ? endOfCurrentNode < pos : pos < endOfCurrentNode;
       if (isRangeOk && (filter == null || filter.test(currentNode))) {
         return currentNode;
       }
@@ -479,19 +472,19 @@ public final class AstUtils {
    * @return The fully qualified name of the given type.
    */
   public static String getFullyQualifiedName(TypeDeclaration type, TypeDeclaration declaringType, char innerTypeSeparator) {
-    ASTNode root = type.getRoot();
+    var root = type.getRoot();
     if (root instanceof CompilationUnit) {
-      Deque<TypeDeclaration> parentTypes = getDeclaringTypes(type);
+      var parentTypes = getDeclaringTypes(type);
       return getFullyQualifiedName(parentTypes, (CompilationUnit) root, innerTypeSeparator);
     }
 
-    StringBuilder sb = new StringBuilder();
+    var sb = new StringBuilder();
     if (declaringType != null) {
       sb.append(getFullyQualifiedName(declaringType, null, innerTypeSeparator));
     }
 
-    Deque<TypeDeclaration> declaringTypes = getDeclaringTypes(type);
-    for (TypeDeclaration td : declaringTypes) {
+    var declaringTypes = getDeclaringTypes(type);
+    for (var td : declaringTypes) {
       sb.append(innerTypeSeparator).append(td.getName().getIdentifier());
     }
     return sb.toString();
@@ -523,15 +516,15 @@ public final class AstUtils {
    * @return The fully qualified name of the given declaring types in the given {@link CompilationUnit}.
    */
   public static String getFullyQualifiedName(Deque<TypeDeclaration> parentTypes, CompilationUnit cu, char innerTypeSeparator) {
-    StringBuilder fqnBuilder = new StringBuilder();
+    var fqnBuilder = new StringBuilder();
 
     // package
-    PackageDeclaration pck = cu.getPackage();
+    var pck = cu.getPackage();
     if (pck != null) {
       fqnBuilder.append(pck.getName()).append(JavaTypes.C_DOT);
     }
 
-    Iterator<TypeDeclaration> descendingIterator = parentTypes.descendingIterator();
+    var descendingIterator = parentTypes.descendingIterator();
     if (descendingIterator.hasNext()) {
       fqnBuilder.append(descendingIterator.next().getName());
       while (descendingIterator.hasNext()) {

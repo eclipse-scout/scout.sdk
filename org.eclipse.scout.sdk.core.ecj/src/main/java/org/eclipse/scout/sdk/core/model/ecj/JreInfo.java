@@ -59,7 +59,7 @@ public class JreInfo {
     m_jreHome = Ensure.notNull(jreHome);
     m_rtSrcZip = resolveRtSourceZip(jreHome);
 
-    Path jrt = jreHome.resolve("lib").resolve(JRTUtil.JRT_FS_JAR);
+    var jrt = jreHome.resolve("lib").resolve(JRTUtil.JRT_FS_JAR);
     m_supportsJrtModules = Files.isReadable(jrt) && Files.isRegularFile(jrt); // supports module system (Java 9 and newer)
     m_version = computeVersion(jreHome);
     m_bootClasspath = new FinalValue<>();
@@ -112,10 +112,10 @@ public class JreInfo {
 
   protected List<Path> resolvePlatformLibrariesLegacy() {
     // fall back to try to retrieve them out of the lib directory
-    Path jreHome = jreHome();
-    Stream<Path> libDirs = Stream.of(jreHome.resolve("lib"), jreHome.resolve("lib/ext"));
+    var jreHome = jreHome();
+    var libDirs = Stream.of(jreHome.resolve("lib"), jreHome.resolve("lib/ext"));
 
-    List<Path> result = libDirs
+    var result = libDirs
         .flatMap(JreInfo::listFiles)
         .filter(JreInfo::isArchive)
         .collect(toList());
@@ -129,7 +129,7 @@ public class JreInfo {
   }
 
   protected static String computeVersion(Path jreHome) {
-    Path release = jreHome.resolve("release");
+    var release = jreHome.resolve("release");
     if (!Files.isReadable(release) || !Files.isRegularFile(release)) {
       return VERSION_1_8;
     }
@@ -143,13 +143,13 @@ public class JreInfo {
   }
 
   protected static String parseVersion(Iterable<String> lines) {
-    String prefix = "JAVA_VERSION=";
-    for (String line : lines) {
+    var prefix = "JAVA_VERSION=";
+    for (var line : lines) {
       if (Strings.isBlank(line)) {
         continue;
       }
       if (line.toUpperCase(Locale.ENGLISH).startsWith(prefix)) {
-        String value = withoutQuotes(line.substring(prefix.length()).trim()).toString();
+        var value = withoutQuotes(line.substring(prefix.length()).trim()).toString();
         if (value.length() > 0) {
           return parseVersion(value);
         }
@@ -159,15 +159,15 @@ public class JreInfo {
   }
 
   protected static String parseVersion(String versionString) {
-    char dot = '.';
-    int firstDot = versionString.indexOf(dot);
+    var dot = '.';
+    var firstDot = versionString.indexOf(dot);
     if (firstDot < 1) {
       return versionString;
     }
-    StringBuilder majorAndMinor = new StringBuilder(5);
+    var majorAndMinor = new StringBuilder(5);
     majorAndMinor.append(versionString.subSequence(0, firstDot));
 
-    int secondDot = versionString.indexOf(dot, firstDot + 1);
+    var secondDot = versionString.indexOf(dot, firstDot + 1);
     if (secondDot > firstDot + 1) {
       majorAndMinor.append(dot).append(versionString.subSequence(firstDot + 1, secondDot));
     }
@@ -193,11 +193,11 @@ public class JreInfo {
   }
 
   protected static boolean isArchive(Path candidate) {
-    Path fileName = candidate.getFileName();
+    var fileName = candidate.getFileName();
     if (fileName == null) {
       return false;
     }
-    String name = fileName.toString().toLowerCase(Locale.ENGLISH);
+    var name = fileName.toString().toLowerCase(Locale.ENGLISH);
     return name.endsWith(".jar") || name.endsWith(".zip");
   }
 
@@ -214,13 +214,13 @@ public class JreInfo {
     }
 
     // in Java9 the src.zip is in the lib folder inside java-home.
-    Path innerSrcZip = jreHome.resolve("lib/src.zip");
+    var innerSrcZip = jreHome.resolve("lib/src.zip");
     if (Files.isReadable(innerSrcZip) && Files.isRegularFile(innerSrcZip)) {
       return innerSrcZip;
     }
 
     // before Java9 it was in the jdk above the java-home.
-    Path parent = jreHome.getParent();
+    var parent = jreHome.getParent();
     if (parent == null) {
       return null;
     }
@@ -254,12 +254,12 @@ public class JreInfo {
    */
   public static Stream<Path> runningUserClassPath(Path javaHome) {
     //noinspection AccessOfSystemProperties
-    String javaClassPathRaw = System.getProperty("java.class.path");
+    var javaClassPathRaw = System.getProperty("java.class.path");
     if (Strings.isBlank(javaClassPathRaw)) {
       return Stream.empty();
     }
 
-    Path jreHome = Optional.ofNullable(javaHome).orElseGet(JreInfo::runningJavaHome);
+    var jreHome = Optional.ofNullable(javaHome).orElseGet(JreInfo::runningJavaHome);
     return StreamUtils.toStream(new StringTokenizer(javaClassPathRaw, File.pathSeparator))
         .map(Object::toString)
         .map(Paths::get)
@@ -289,7 +289,7 @@ public class JreInfo {
       return false;
     }
 
-    JreInfo other = (JreInfo) obj;
+    var other = (JreInfo) obj;
     return m_jreHome.equals(other.m_jreHome);
   }
 }

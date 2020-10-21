@@ -17,7 +17,6 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -29,7 +28,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler;
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler;
@@ -55,14 +53,14 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
   }
 
   protected static void findResourceCandidates(Iterable<IResource> resources, Collection<IType> collector) throws JavaModelException {
-    for (IResource r : resources) {
-      IJavaElement javaElement = JavaCore.create(r);
+    for (var r : resources) {
+      var javaElement = JavaCore.create(r);
       if (JdtUtils.exists(javaElement) && javaElement.getElementType() == IJavaElement.COMPILATION_UNIT) {
-        ICompilationUnit icu = (ICompilationUnit) javaElement;
-        Optional<IScoutApi> api = ApiHelper.scoutApiFor(icu.getJavaProject());
+        var icu = (ICompilationUnit) javaElement;
+        var api = ApiHelper.scoutApiFor(icu.getJavaProject());
         if (api.isPresent()) {
-          String[] dtoNames = dtoMarkerAnnotationNames(api.get());
-          for (IType candidate : icu.getTypes()) {
+          var dtoNames = dtoMarkerAnnotationNames(api.get());
+          for (var candidate : icu.getTypes()) {
             if (acceptType(candidate) && JdtUtils.exists(JdtUtils.getFirstAnnotationInSupertypeHierarchy(candidate, dtoNames))) {
               collector.add(candidate);
             }

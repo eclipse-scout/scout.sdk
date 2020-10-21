@@ -71,8 +71,8 @@ public class CommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends SourceBu
 
   @Override
   public TYPE appendTodo(CharSequence toDoMessage) {
-    StringBuilder msg = new StringBuilder("TODO ");
-    String username = CoreUtils.getUsername();
+    var msg = new StringBuilder("TODO ");
+    var username = CoreUtils.getUsername();
     if (Strings.hasText(username)) {
       msg.append('[').append(username).append("] ");
     }
@@ -114,8 +114,8 @@ public class CommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends SourceBu
     }
     nl();
 
-    try (BufferedReader inputReader = new BufferedReader(new StringReader(comment))) {
-      String line = inputReader.readLine();
+    try (var inputReader = new BufferedReader(new StringReader(comment))) {
+      var line = inputReader.readLine();
       while (line != null) {
         if (REGEX_COMMENT_PATTERN1.matcher(line).matches() || REGEX_COMMENT_PATTERN2.matcher(line).matches()) {
           line = inputReader.readLine();

@@ -10,18 +10,15 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
-import java.lang.reflect.Method;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalModel;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
-import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroupCore.PositionInformation;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorHighlightingSynchronizer;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.LinkedModeModel;
@@ -45,30 +42,30 @@ public final class LinkedAsyncProposalModelPresenter {
   }
 
   public static void enterLinkedMode(ITextViewer viewer, IEditorPart editor, boolean switchedEditor, LinkedProposalModel linkedProposalModel) throws BadLocationException {
-    IDocument document = viewer.getDocument();
-    AtomicReference<LinkedModeUI> linkedModeUiRef = new AtomicReference<>();
+    var document = viewer.getDocument();
+    var linkedModeUiRef = new AtomicReference<LinkedModeUI>();
 
     // setup linked-mode model
-    LinkedModeModel model = createLinkedModeModel(linkedProposalModel, document, linkedModeUiRef);
+    var model = createLinkedModeModel(linkedProposalModel, document, linkedModeUiRef);
     model.forceInstall();
     if (editor instanceof JavaEditor) {
       model.addLinkingListener(new EditorHighlightingSynchronizer((JavaEditor) editor));
     }
 
     // setup linked-mode UI
-    LinkedModeUI ui = createLinkedModeUi(viewer, switchedEditor, model, linkedProposalModel);
+    var ui = createLinkedModeUi(viewer, switchedEditor, model, linkedProposalModel);
     linkedModeUiRef.compareAndSet(null, ui);
     ui.enter();
 
-    IRegion region = ui.getSelectedRegion();
+    var region = ui.getSelectedRegion();
     viewer.setSelectedRange(region.getOffset(), region.getLength());
     viewer.revealRange(region.getOffset(), region.getLength());
   }
 
   static LinkedModeUI createLinkedModeUi(ITextViewer viewer, boolean switchedEditor, LinkedModeModel model, LinkedProposalModel linkedProposalModel) throws BadLocationException {
     LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
-    PositionInformation endPosition = linkedProposalModel.getEndPosition();
-    int offset = -1;
+    var endPosition = linkedProposalModel.getEndPosition();
+    var offset = -1;
     if (endPosition != null) {
       offset = endPosition.getOffset();
     }
@@ -77,7 +74,7 @@ public final class LinkedAsyncProposalModelPresenter {
       ui.setExitPosition(viewer, offset + endPosition.getLength(), 0, Integer.MAX_VALUE);
     }
     else if (!switchedEditor) {
-      int cursorPosition = viewer.getSelectedRange().x;
+      var cursorPosition = viewer.getSelectedRange().x;
       if (cursorPosition != 0) {
         ui.setExitPosition(viewer, cursorPosition, 0, Integer.MAX_VALUE);
       }
@@ -87,13 +84,13 @@ public final class LinkedAsyncProposalModelPresenter {
   }
 
   static LinkedModeModel createLinkedModeModel(LinkedProposalModel linkedProposalModel, IDocument document, AtomicReference<LinkedModeUI> linkedModeUiRef) throws BadLocationException {
-    Iterator<LinkedProposalPositionGroup> iterator = linkedProposalModel.getPositionGroupIterator();
-    LinkedModeModel model = new LinkedModeModel();
+    var iterator = linkedProposalModel.getPositionGroupIterator();
+    var model = new LinkedModeModel();
     while (iterator.hasNext()) {
-      LinkedProposalPositionGroup curr = iterator.next();
-      PositionInformation[] positions = curr.getPositions();
+      var curr = iterator.next();
+      var positions = curr.getPositions();
       if (positions.length > 0) {
-        LinkedPositionGroup group = createGroup(document, model, curr, linkedModeUiRef);
+        var group = createGroup(document, model, curr, linkedModeUiRef);
         model.addGroup(group);
       }
     }
@@ -106,23 +103,21 @@ public final class LinkedAsyncProposalModelPresenter {
       return createAsyncGroup(document, model, (ICompletionProposalProvider) propPositionGroup, linkedModeUiRef);
     }
 
-    LinkedPositionGroup group = new LinkedPositionGroup();
-    PositionInformation[] positions = propPositionGroup.getPositions();
-    LinkedProposalPositionGroup.Proposal[] linkedModeProposals = propPositionGroup.getProposals();
+    var group = new LinkedPositionGroup();
+    var positions = propPositionGroup.getPositions();
+    var linkedModeProposals = propPositionGroup.getProposals();
     if (linkedModeProposals.length <= 1) {
-      for (PositionInformation pos : positions) {
+      for (var pos : positions) {
         if (pos.getOffset() != -1) {
           group.addPosition(new LinkedPosition(document, pos.getOffset(), pos.getLength(), pos.getSequenceRank()));
         }
       }
     }
     else {
-      LinkedPositionProposalImpl[] proposalImpls = new LinkedPositionProposalImpl[linkedModeProposals.length];
-      for (int i = 0; i < linkedModeProposals.length; i++) {
-        proposalImpls[i] = new LinkedPositionProposalImpl(linkedModeProposals[i], model);
-      }
-
-      for (PositionInformation pos : positions) {
+      var proposalImpls = Arrays.stream(linkedModeProposals)
+          .map(linkedModeProposal -> new LinkedPositionProposalImpl(linkedModeProposal, model))
+          .toArray(LinkedPositionProposalImpl[]::new);
+      for (var pos : positions) {
         if (pos.getOffset() != -1) {
           group.addPosition(new ProposalPosition(document, pos.getOffset(), pos.getLength(), pos.getSequenceRank(), proposalImpls));
         }
@@ -133,12 +128,12 @@ public final class LinkedAsyncProposalModelPresenter {
 
   static LinkedPositionGroup createAsyncGroup(IDocument document, LinkedModeModel model, ICompletionProposalProvider proposalProvider, AtomicReference<LinkedModeUI> linkedModeUiRef) throws BadLocationException {
     // lazy (async) provider
-    PositionInformation[] positions = proposalProvider.getPositions();
-    LinkedPositionGroup group = new LinkedPositionGroup();
-    Display display = Display.getCurrent();
+    var positions = proposalProvider.getPositions();
+    var group = new LinkedPositionGroup();
+    var display = Display.getCurrent();
     ILinkedAsyncProposalListener listener = new P_ProposalListener(display, linkedModeUiRef);
 
-    for (PositionInformation pos : positions) {
+    for (var pos : positions) {
       if (pos.getOffset() != -1) {
         if (display != null) {
           proposalProvider.addListener(listener);
@@ -165,13 +160,13 @@ public final class LinkedAsyncProposalModelPresenter {
     }
 
     private void triggerContentAssist() {
-      LinkedModeUI linkedModeUi = m_linkedModeUiRef.get();
+      var linkedModeUi = m_linkedModeUiRef.get();
       if (linkedModeUi == null) {
         return;
       }
 
       try {
-        Method m = LinkedModeUI.class.getDeclaredMethod("triggerContentAssist");
+        var m = LinkedModeUI.class.getDeclaredMethod("triggerContentAssist");
         m.setAccessible(true);
         m.invoke(linkedModeUi);
       }

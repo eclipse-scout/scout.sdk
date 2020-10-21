@@ -16,16 +16,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
@@ -40,7 +38,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -91,7 +88,7 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
     createOptionsGroup(parent);
 
     // remove AbstractPage from the proposal list
-    StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
+    var superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
     superTypeContentProvider.setTypeProposalFilter(superTypeContentProvider.getTypeProposalFilter()
         .and(element -> !scoutApi().get().AbstractPage().fqn().equals(element.getFullyQualifiedName())));
 
@@ -99,7 +96,7 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   }
 
   protected void createOptionsGroup(Composite p) {
-    Group optionsGroup = FieldToolkit.createGroupBox(p, "Options");
+    var optionsGroup = FieldToolkit.createGroupBox(p, "Options");
     GridLayoutFactory
         .swtDefaults()
         .applyTo(optionsGroup);
@@ -131,14 +128,14 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   @Override
   protected void handleSuperTypeChanged() {
     super.handleSuperTypeChanged();
-    IType superType = getSuperType();
+    var superType = getSuperType();
     if (!JdtUtils.exists(superType)) {
       setIsPageWithTable(false);
       return;
     }
 
     try {
-      ITypeHierarchy supertypeHierarchy = superType.newSupertypeHierarchy(null);
+      var supertypeHierarchy = superType.newSupertypeHierarchy(null);
       setIsPageWithTable(JdtUtils.hierarchyContains(supertypeHierarchy, scoutApi().get().IPageWithTable().fqn()));
       if (isPageWithTable()) {
         setReadOnlySuffix(ISdkConstants.SUFFIX_PAGE_WITH_TABLE);
@@ -169,7 +166,7 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   }
 
   protected void guessSharedAndServerFolders() {
-    IPackageFragmentRoot clientSourceFolder = getSourceFolder();
+    var clientSourceFolder = getSourceFolder();
     if (!JdtUtils.exists(clientSourceFolder)) {
       return;
     }
@@ -184,7 +181,7 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   }
 
   protected void createPageServiceGroup(Composite p) {
-    Group parent = FieldToolkit.createGroupBox(p, "PageData and Service Source Folders");
+    var parent = FieldToolkit.createGroupBox(p, "PageData and Service Source Folders");
 
     // shared source folder
     m_sharedSourceFolder = FieldToolkit.createSourceFolderField(parent, "Shared Source Folder", ScoutTier.Shared, getLabelWidth());
@@ -273,7 +270,7 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   }
 
   public boolean isCreateAbstractPage() {
-    Boolean val = getProperty(PROP_CREATE_ABSTRACT_PAGE, Boolean.class);
+    var val = getProperty(PROP_CREATE_ABSTRACT_PAGE, Boolean.class);
     return val != null && val;
   }
 

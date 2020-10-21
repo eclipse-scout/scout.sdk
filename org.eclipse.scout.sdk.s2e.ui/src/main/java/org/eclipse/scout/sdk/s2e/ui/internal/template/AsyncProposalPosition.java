@@ -10,7 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
-import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.Proposal;
+import java.util.Arrays;
+
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.link.LinkedModeModel;
@@ -35,18 +36,16 @@ public class AsyncProposalPosition extends ProposalPosition {
 
   @Override
   public ICompletionProposal[] getChoices() {
-    Proposal[] proposals = m_provider.getProposals();
-    LinkedPositionProposalImpl[] proposalImpls = new LinkedPositionProposalImpl[proposals.length];
-    for (int i = 0; i < proposals.length; i++) {
-      proposalImpls[i] = new LinkedPositionProposalImpl(proposals[i], m_model);
-    }
-    return proposalImpls;
+    var proposals = m_provider.getProposals();
+    return Arrays.stream(proposals)
+        .map(proposal -> new LinkedPositionProposalImpl(proposal, m_model))
+        .toArray(LinkedPositionProposalImpl[]::new);
   }
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = super.hashCode();
+    var prime = 31;
+    var result = super.hashCode();
     result = prime * result + m_model.hashCode();
     result = prime * result + m_provider.hashCode();
     return result;
@@ -63,7 +62,7 @@ public class AsyncProposalPosition extends ProposalPosition {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    AsyncProposalPosition other = (AsyncProposalPosition) obj;
+    var other = (AsyncProposalPosition) obj;
     return m_model.equals(other.m_model)
         && m_provider.equals(other.m_provider);
   }

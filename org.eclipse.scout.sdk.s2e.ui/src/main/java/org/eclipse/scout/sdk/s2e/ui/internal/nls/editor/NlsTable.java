@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -79,13 +78,13 @@ public class NlsTable extends Composite {
 
     // layout
     setLayout(new FormLayout());
-    FormData filterData = new FormData();
+    var filterData = new FormData();
     filterData.top = new FormAttachment(0, 0);
     filterData.left = new FormAttachment(0, 0);
     filterData.right = new FormAttachment(100, 0);
     m_filterComp.setLayoutData(filterData);
 
-    FormData tableData = new FormData();
+    var tableData = new FormData();
     tableData.top = new FormAttachment(m_filterComp, 0);
     tableData.left = new FormAttachment(0, 0);
     tableData.right = new FormAttachment(100, 0);
@@ -108,11 +107,11 @@ public class NlsTable extends Composite {
     }
     else {
       // update translation
-      TranslationStoreStack stack = m_controller.stack();
+      var stack = m_controller.stack();
       stack.setChanging(true);
       try {
-        Translation updatedTranslation = new Translation(cell.entry());
-        Language language = cell.language().get();
+        var updatedTranslation = new Translation(cell.entry());
+        var language = cell.language().get();
         if (cell.store().languages().noneMatch(isEqual(language))) {
           // language does not yet exist for that store: create it
           stack.addNewLanguage(language, cell.entry().store());
@@ -128,20 +127,20 @@ public class NlsTable extends Composite {
 
   protected void createColumns() {
     // clear old columns
-    TableColumn[] cols = m_table.getColumns();
-    for (TableColumn col : cols) {
+    var cols = m_table.getColumns();
+    for (var col : cols) {
       col.dispose();
     }
 
     // ref count column
-    TableColumn colRefs = new TableColumn(m_table, SWT.LEFT);
+    var colRefs = new TableColumn(m_table, SWT.LEFT);
     colRefs.setResizable(false);
     colRefs.setMoveable(false);
     colRefs.setWidth(45);
     colRefs.addSelectionListener(new P_SortSelectionAdapter(0));
 
     // key column
-    TableColumn keyColumn = new TableColumn(m_table, SWT.LEFT);
+    var keyColumn = new TableColumn(m_table, SWT.LEFT);
     keyColumn.setText("Key");
     keyColumn.setMoveable(false);
     keyColumn.setWidth(200);
@@ -156,7 +155,7 @@ public class NlsTable extends Composite {
   }
 
   private void createColumnForLanguage(Language language) {
-    TableColumn c = new TableColumn(m_table, SWT.LEFT);
+    var c = new TableColumn(m_table, SWT.LEFT);
     c.setText(language.displayName());
     c.setMoveable(false);
     c.addSelectionListener(new P_SortSelectionAdapter(m_table.indexOf(c)));
@@ -164,13 +163,13 @@ public class NlsTable extends Composite {
   }
 
   private void updateSortIcon() {
-    TableColumn col = m_table.getColumn(m_controller.getSortIndex());
+    var col = m_table.getColumn(m_controller.getSortIndex());
     if (col == null) {
       return;
     }
 
     if (col.equals(m_sortColumn)) {
-      int sortDir = SWT.UP;
+      var sortDir = SWT.UP;
       if (m_table.getSortDirection() == SWT.UP) {
         sortDir = SWT.DOWN;
       }

@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
@@ -45,7 +44,7 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
     super(inner);
     m_defaultElementCommentGenerator = new FinalValue<>();
     m_defaultCommentGeneratorSupplier = Ensure.notNull(defaultCommentGeneratorSupplier);
-    IBuilderContext context = inner.context();
+    var context = inner.context();
     if (context instanceof IJavaBuilderContext) {
       m_context = (IJavaBuilderContext) context;
     }

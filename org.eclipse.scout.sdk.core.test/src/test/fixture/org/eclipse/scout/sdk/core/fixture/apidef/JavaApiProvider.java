@@ -10,26 +10,26 @@
  */
 package org.eclipse.scout.sdk.core.fixture.apidef;
 
-import static org.eclipse.scout.sdk.core.util.apidef.ApiVersion.requireApiLevelOf;
+import static org.eclipse.scout.sdk.core.apidef.ApiVersion.requireApiLevelOf;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.apidef.ApiVersion;
+import org.eclipse.scout.sdk.core.apidef.IApiProvider;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.util.apidef.IApiProvider;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 public class JavaApiProvider implements IApiProvider {
   @Override
   public Collection<Class<? extends IApiSpecification>> knownApis() {
-    return Arrays.asList(JavaApi8.class, JavaApi11.class, JavaApi13.class);
+    return Arrays.asList(Java8Api.class, Java11Api.class, Java13Api.class);
   }
 
   @Override
   public Optional<ApiVersion> version(IJavaEnvironment context) {
     // for testing: always return version 11
-    return Optional.of(requireApiLevelOf(JavaApi11.class));
+    return Optional.of(requireApiLevelOf(Java11Api.class));
   }
 }

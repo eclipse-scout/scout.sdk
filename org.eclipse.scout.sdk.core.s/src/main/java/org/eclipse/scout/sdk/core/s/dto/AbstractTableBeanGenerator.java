@@ -15,14 +15,10 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi.AbstractTableFieldBeanData;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.ITableBeanHolder;
 import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
@@ -57,18 +53,18 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
   }
 
   protected TYPE withTableBeanContent(IType table) {
-    String rowDataName = getRowDataName(removeFieldSuffix(modelType().elementName()));
-    String tableRowArray = rowDataName + "[]";
-    AbstractTableFieldBeanData abstractTableFieldBeanDataApi = scoutApi().AbstractTableFieldBeanData();
-    String rowAtMethodName = abstractTableFieldBeanDataApi.rowAtMethodName();
-    String setRowsMethodName = abstractTableFieldBeanDataApi.setRowsMethodName();
-    String createRowMethodName = abstractTableFieldBeanDataApi.createRowMethodName();
-    ITableBeanHolder iTableBeanHolderApi = scoutApi().ITableBeanHolder();
-    String addRowMethodName = iTableBeanHolderApi.addRowMethodName();
-    String getRowTypeMethodName = iTableBeanHolderApi.getRowTypeMethodName();
-    String getRowsMethodName = iTableBeanHolderApi.getRowsMethodName();
+    var rowDataName = getRowDataName(removeFieldSuffix(modelType().elementName()));
+    var tableRowArray = rowDataName + "[]";
+    var abstractTableFieldBeanDataApi = scoutApi().AbstractTableFieldBeanData();
+    var rowAtMethodName = abstractTableFieldBeanDataApi.rowAtMethodName();
+    var setRowsMethodName = abstractTableFieldBeanDataApi.setRowsMethodName();
+    var createRowMethodName = abstractTableFieldBeanDataApi.createRowMethodName();
+    var iTableBeanHolderApi = scoutApi().ITableBeanHolder();
+    var addRowMethodName = iTableBeanHolderApi.addRowMethodName();
+    var getRowTypeMethodName = iTableBeanHolderApi.getRowTypeMethodName();
+    var getRowsMethodName = iTableBeanHolderApi.getRowsMethodName();
 
-    IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createRow = MethodGenerator.create()
+    var createRow = MethodGenerator.create()
         .asPublic()
         .withReturnType(rowDataName)
         .withAnnotation(AnnotationGenerator.createOverride())
@@ -144,10 +140,10 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
   }
 
   protected TYPE withAbstractMethodImplementations() {
-    IScoutApi scoutApi = scoutApi();
-    String getRowTypeMethodName = scoutApi.ITableBeanHolder().getRowTypeMethodName();
-    String createRowMethodName = scoutApi.AbstractTableFieldBeanData().createRowMethodName();
-    String abstractTableRowDataFqn = scoutApi.AbstractTableRowData().fqn();
+    var scoutApi = scoutApi();
+    var getRowTypeMethodName = scoutApi.ITableBeanHolder().getRowTypeMethodName();
+    var createRowMethodName = scoutApi.AbstractTableFieldBeanData().createRowMethodName();
+    var abstractTableRowDataFqn = scoutApi.AbstractTableRowData().fqn();
     return this
         .withMethod(MethodGenerator.create()
             .withAnnotation(AnnotationGenerator.createOverride())

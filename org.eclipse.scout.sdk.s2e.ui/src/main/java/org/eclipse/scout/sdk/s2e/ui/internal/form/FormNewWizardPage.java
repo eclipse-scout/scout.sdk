@@ -16,14 +16,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
@@ -37,7 +36,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -92,15 +90,15 @@ public class FormNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   }
 
   protected void initDefaults() {
-    IDialogSettings settings = getDialogSettings();
+    var settings = getDialogSettings();
 
-    String prefCreateFormData = settings.get(PREF_CREATE_FORM_DATA);
+    var prefCreateFormData = settings.get(PREF_CREATE_FORM_DATA);
     setIsCreateFormDataInternal(Strings.isBlank(prefCreateFormData) || Boolean.parseBoolean(prefCreateFormData));
 
-    String prefCreateService = settings.get(PREF_CREATE_SERVICE);
+    var prefCreateService = settings.get(PREF_CREATE_SERVICE);
     setIsCreateServiceInternal(Strings.isBlank(prefCreateService) || Boolean.parseBoolean(prefCreateService));
 
-    String prefCreatePermissions = settings.get(PREF_CREATE_PERMISSIONS);
+    var prefCreatePermissions = settings.get(PREF_CREATE_PERMISSIONS);
     setIsCreatePermissionsInternal(Strings.isBlank(prefCreatePermissions) || Boolean.parseBoolean(prefCreatePermissions));
 
     guessSharedAndServerFolders();
@@ -125,7 +123,7 @@ public class FormNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   }
 
   protected void guessSharedAndServerFolders() {
-    IPackageFragmentRoot clientSourceFolder = getSourceFolder();
+    var clientSourceFolder = getSourceFolder();
     if (!JdtUtils.exists(clientSourceFolder)) {
       return;
     }
@@ -180,7 +178,7 @@ public class FormNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   }
 
   protected void createFormPropertiesGroup(Composite p) {
-    Group parent = FieldToolkit.createGroupBox(p, "Additional Components");
+    var parent = FieldToolkit.createGroupBox(p, "Additional Components");
 
     // create FormData
     m_createFormDataButton = FieldToolkit.createCheckBox(parent, "Create FormData", isCreateFormData());
@@ -243,7 +241,7 @@ public class FormNewWizardPage extends AbstractCompilationUnitNewWizardPage {
         .numColumns(3)
         .equalWidth(true)
         .applyTo(parent);
-    GridDataFactory optionsButtonGridDataFactory = GridDataFactory
+    var optionsButtonGridDataFactory = GridDataFactory
         .defaultsFor(parent)
         .indent(10, 8);
     GridDataFactory

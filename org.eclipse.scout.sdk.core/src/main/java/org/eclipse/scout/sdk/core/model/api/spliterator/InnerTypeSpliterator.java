@@ -53,7 +53,7 @@ public class InnerTypeSpliterator implements Spliterator<IType> {
 
   @Override
   public boolean tryAdvance(Consumer<? super IType> action) {
-    boolean consumed = consume(action);
+    var consumed = consume(action);
     if (isIncludeInnerTypesRecursive()) {
       while (!consumed && tryMoveToNextInnerType()) {
         consumed = consume(action);

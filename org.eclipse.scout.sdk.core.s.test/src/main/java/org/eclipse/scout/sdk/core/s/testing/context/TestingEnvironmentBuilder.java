@@ -65,7 +65,7 @@ public class TestingEnvironmentBuilder {
 
   public <T> T call(Function<TestingEnvironment, T> task) {
     Ensure.notNull(task);
-    AtomicReference<T> ret = new AtomicReference<>();
+    var ret = new AtomicReference<T>();
     getPrimaryEnvironment().orElse(nullEnvironment())
         .accept(first -> getDtoEnvironment().orElse(nullEnvironment())
             .accept(second -> ret.set(runInTestingEnvironment(task, first, isFlushResourcesToDisk(), second))));
@@ -73,7 +73,7 @@ public class TestingEnvironmentBuilder {
   }
 
   private static <T> T runInTestingEnvironment(Function<TestingEnvironment, T> task, IJavaEnvironment first, boolean isFlushResourcesToDisk, IJavaEnvironment second) {
-    try (TestingEnvironment env = new TestingEnvironment(first, isFlushResourcesToDisk, second)) {
+    try (var env = new TestingEnvironment(first, isFlushResourcesToDisk, second)) {
       return task.apply(env);
     }
   }

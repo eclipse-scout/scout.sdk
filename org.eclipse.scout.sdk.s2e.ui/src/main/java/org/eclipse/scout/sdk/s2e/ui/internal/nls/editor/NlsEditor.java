@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStoreStackListener;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
-import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -49,7 +48,7 @@ public class NlsEditor extends EditorPart {
     setInput(input);
     setSite(site);
 
-    IResource resource = input.getAdapter(IResource.class);
+    var resource = input.getAdapter(IResource.class);
     if (resource != null && resource.exists()) {
       m_path = resource.getProject().getLocation().toFile().toPath();
     }
@@ -93,7 +92,7 @@ public class NlsEditor extends EditorPart {
 
   private void loadAndCreateContentAsync(Composite parent, Path modulePath, IProgressMonitor monitor) {
     runInEclipseEnvironment((e, p /* do not use this monitor in here. instead use the monitor from the ProgressMonitorDialog */) -> {
-      EclipseProgress progress = toScoutProgress(monitor);
+      var progress = toScoutProgress(monitor);
       progress.init(1000, "Loading translation editor...");
 
       try {

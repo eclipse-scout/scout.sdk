@@ -19,7 +19,6 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.sdk.core.log.FormattingTuple;
 import org.eclipse.scout.sdk.core.log.MessageFormatter;
 
 /**
@@ -385,7 +384,7 @@ public final class Ensure {
    * @return A new {@link IllegalArgumentException} with given message.
    */
   public static IllegalArgumentException newFail(CharSequence msg, Object... msgArgs) {
-    FormattingTuple tuple = MessageFormatter.arrayFormat(msg, msgArgs);
+    var tuple = MessageFormatter.arrayFormat(msg, msgArgs);
     return new IllegalArgumentException(tuple.message(), tuple.firstThrowable().orElse(null));
   }
 

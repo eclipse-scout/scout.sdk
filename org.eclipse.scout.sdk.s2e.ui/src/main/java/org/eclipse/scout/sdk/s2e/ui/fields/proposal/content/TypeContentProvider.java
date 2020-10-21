@@ -30,7 +30,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
@@ -115,7 +114,7 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
     Set<IType> result = new TreeSet<>(new ElementNameComparator());
     addMostlyUsedCandidates(result, monitor);
 
-    int remainingSpace = getMaxProposalCount() - result.size();
+    var remainingSpace = getMaxProposalCount() - result.size();
     if (remainingSpace > 0) {
       addOtherCandidates(result, monitor);
     }
@@ -123,20 +122,20 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
   }
 
   protected void addMostlyUsedCandidates(Collection<IType> candidates, IProgressMonitor monitor) {
-    IJavaProject javaProject = getJavaProject();
+    var javaProject = getJavaProject();
     if (!JdtUtils.exists(javaProject)) {
       return;
     }
 
-    Predicate<IType> filter = getTypeProposalFilter();
-    for (String fqn : m_mostlyUsedTypes) {
+    var filter = getTypeProposalFilter();
+    for (var fqn : m_mostlyUsedTypes) {
       if (monitor.isCanceled()) {
         return;
       }
-      boolean matches = m_lastPattern.getMatchingRegions(JavaTypes.simpleName(fqn)) != null;
+      var matches = m_lastPattern.getMatchingRegions(JavaTypes.simpleName(fqn)) != null;
       if (matches) {
         try {
-          IType type = javaProject.findType(fqn);
+          var type = javaProject.findType(fqn);
           if ((filter == null || filter.test(type)) && !addProposalCandidate(type, candidates)) {
             return;
           }
@@ -153,14 +152,14 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
       // do not allow empty search
       return;
     }
-    IJavaProject javaProject = getJavaProject();
+    var javaProject = getJavaProject();
     if (!JdtUtils.exists(javaProject)) {
       return;
     }
 
     SearchRequestor requestor = new P_SearchRequestor(candidates, monitor);
-    SearchPattern pat = SearchPattern.createPattern(m_lastPattern.getPattern(), IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, m_lastPattern.getMatchRule());
-    IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{javaProject});
+    var pat = SearchPattern.createPattern(m_lastPattern.getPattern(), IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, m_lastPattern.getMatchRule());
+    var searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{javaProject});
     try {
       new SearchEngine().search(pat, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, searchScope, requestor, monitor);
     }
@@ -221,8 +220,8 @@ public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
         return;
       }
 
-      TypeDeclarationMatch match = (TypeDeclarationMatch) m;
-      IType type = (IType) match.getElement();
+      var match = (TypeDeclarationMatch) m;
+      var type = (IType) match.getElement();
       if (!JdtUtils.exists(type)) {
         return;
       }

@@ -17,8 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.MarkerAnnotation;
 import org.eclipse.scout.sdk.core.fixture.TestAnnotation;
@@ -35,15 +33,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class AnnotationTest {
   @Test
   public void testChildClassAnnotations(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
+    var childClassType = env.requireType(ChildClass.class.getName());
 
     // type annotation
-    List<IAnnotation> annotations = childClassType.annotations().stream().collect(toList());
+    var annotations = childClassType.annotations().stream().collect(toList());
     assertEquals(1, annotations.size());
-    IAnnotation annotation = annotations.get(0);
-    int nreal = 0;
-    int nsynth = 0;
-    for (IAnnotationElement v : annotation.elements().values()) {
+    var annotation = annotations.get(0);
+    var nreal = 0;
+    var nsynth = 0;
+    for (var v : annotation.elements().values()) {
       nreal += (v.isDefault() ? 0 : 1);
       nsynth += (v.isDefault() ? 1 : 0);
     }
@@ -54,12 +52,12 @@ public class AnnotationTest {
     assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
     // methodInChildClass annotation
-    IMethod methodInChildClass = childClassType.methods().item(1).get();
+    var methodInChildClass = childClassType.methods().item(1).get();
     assertEquals(1, methodInChildClass.annotations().stream().count());
     annotation = methodInChildClass.annotations().first().get();
     nreal = 0;
     nsynth = 0;
-    for (IAnnotationElement v : annotation.elements().values()) {
+    for (var v : annotation.elements().values()) {
       nreal += (v.isDefault() ? 0 : 1);
       nsynth += (v.isDefault() ? 1 : 0);
     }
@@ -72,7 +70,7 @@ public class AnnotationTest {
     assertEquals("@TestAnnotation(values = Long.class, en = TestEnum.A)", annotation.toWorkingCopy().toJavaSource().toString());
 
     // firstCase annotation
-    IMethod firstCase = childClassType.methods().item(2).get();
+    var firstCase = childClassType.methods().item(2).get();
     assertEquals(1, firstCase.annotations().stream().count());
     annotation = firstCase.annotations().first().get();
     assertEquals(1, annotation.elements().size());
@@ -83,21 +81,21 @@ public class AnnotationTest {
 
   @Test
   public void testAnnotationsWithAnnotationValues(IJavaEnvironment env) {
-    IType wildcardBaseClass = env.requireType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass");
-    IAnnotation testAnnot = wildcardBaseClass.annotations().first().get();
-    IAnnotationElement value = testAnnot.element("inner").get();
+    var wildcardBaseClass = env.requireType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass");
+    var testAnnot = wildcardBaseClass.annotations().first().get();
+    var value = testAnnot.element("inner").get();
     assertNotNull(value);
     assertSame(value.value().type(), MetaValueType.Array);
 
-    IMetaValue[] arr = ((IArrayMetaValue) value.value()).metaValueArray();
+    var arr = ((IArrayMetaValue) value.value()).metaValueArray();
     assertEquals(2, arr.length);
 
-    IAnnotation annot0 = arr[0].as(IAnnotation.class);
+    var annot0 = arr[0].as(IAnnotation.class);
     assertEquals(wildcardBaseClass, annot0.owner());
     assertEquals(ValueAnnot.class.getName(), annot0.type().name());
     assertEquals("a", annot0.element("value").get().value().as(String.class));
 
-    IAnnotation annot1 = arr[1].as(IAnnotation.class);
+    var annot1 = arr[1].as(IAnnotation.class);
     assertEquals(wildcardBaseClass, annot1.owner());
     assertEquals(ValueAnnot.class.getName(), annot1.type().name());
     assertEquals("b", annot1.element("value").get().value().as(String.class));
@@ -105,7 +103,7 @@ public class AnnotationTest {
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    IAnnotation annotation = env.requireType(ChildClass.class.getName()).methods().item(2).get().annotations().first().get();
+    var annotation = env.requireType(ChildClass.class.getName()).methods().item(2).get().annotations().first().get();
     assertFalse(Strings.isBlank(annotation.toString()));
 
     annotation = env.requireType(ChildClass.class.getName()).requireSuperClass().annotations().first().get();
@@ -114,15 +112,15 @@ public class AnnotationTest {
 
   @Test
   public void testBaseClassAnnotations(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
 
     // type annotation
-    List<IAnnotation> annotations = baseClassType.annotations().stream().collect(toList());
+    var annotations = baseClassType.annotations().stream().collect(toList());
     assertEquals(1, annotations.size());
-    IAnnotation annotation = annotations.get(0);
-    int nreal = 0;
-    int nsynth = 0;
-    for (IAnnotationElement v : annotation.elements().values()) {
+    var annotation = annotations.get(0);
+    var nreal = 0;
+    var nsynth = 0;
+    for (var v : annotation.elements().values()) {
       nreal += (v.isDefault() ? 0 : 1);
       nsynth += (v.isDefault() ? 1 : 0);
     }
@@ -133,13 +131,13 @@ public class AnnotationTest {
     assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
     // methodInBaseClass annotation
-    IMethod methodInBaseClass = baseClassType.methods().first().get();
+    var methodInBaseClass = baseClassType.methods().first().get();
     assertEquals(2, methodInBaseClass.annotations().stream().count());
 
     annotation = methodInBaseClass.annotations().first().get();
     nreal = 0;
     nsynth = 0;
-    for (IAnnotationElement v : annotation.elements().values()) {
+    for (var v : annotation.elements().values()) {
       nreal += (v.isDefault() ? 0 : 1);
       nsynth += (v.isDefault() ? 1 : 0);
     }
@@ -159,8 +157,8 @@ public class AnnotationTest {
   @Test
   @SuppressWarnings("deprecation")
   public void testDeprecatedAnnotations(IJavaEnvironment env) {
-    IType deprChildType = env.requireType(org.eclipse.scout.sdk.core.fixture.DeprecatedChildClass.class.getName());
-    IType deprBaseType = deprChildType.requireSuperClass();
+    var deprChildType = env.requireType(org.eclipse.scout.sdk.core.fixture.DeprecatedChildClass.class.getName());
+    var deprBaseType = deprChildType.requireSuperClass();
 
     assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.flags());
     assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.flags());

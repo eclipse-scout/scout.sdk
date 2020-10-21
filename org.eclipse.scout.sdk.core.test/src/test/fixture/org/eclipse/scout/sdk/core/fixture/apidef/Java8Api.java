@@ -10,10 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.fixture.apidef;
 
-import org.eclipse.scout.sdk.core.util.apidef.ApiLevel;
+import org.eclipse.scout.sdk.core.apidef.ApiLevel;
 
 @ApiLevel(8)
-public interface JavaApi8 extends IJavaApi {
+public interface Java8Api extends IJavaApi {
 
   String VALUE = "8";
 

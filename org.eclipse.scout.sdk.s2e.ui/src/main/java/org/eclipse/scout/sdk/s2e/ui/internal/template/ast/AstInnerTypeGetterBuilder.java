@@ -10,30 +10,21 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
+import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.QualifiedType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
-import org.eclipse.scout.sdk.core.s.structured.IStructuredType;
 import org.eclipse.scout.sdk.core.s.structured.StructuredType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
@@ -99,22 +90,22 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
   }
 
   protected Block getInnerTypeGetterBody() {
-    AST ast = getFactory().getAst();
-    TypeLiteral fieldClass = ast.newTypeLiteral();
+    var ast = getFactory().getAst();
+    var fieldClass = ast.newTypeLiteral();
     m_typeLiteralName = ast.newSimpleName(super.getMethodName() + getReadOnlySuffix());
     fieldClass.setType(ast.newSimpleType(m_typeLiteralName));
 
-    MethodInvocation get = ast.newMethodInvocation();
+    var get = ast.newMethodInvocation();
     get.setName(ast.newSimpleName(m_innerTypeFindMethodName));
     get.arguments().add(fieldClass);
     if (m_leftHandSideExpression != null) {
       get.setExpression(m_leftHandSideExpression);
     }
 
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(get);
 
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
     return body;
@@ -139,12 +130,12 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
     super.insert();
 
     // linked positions
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       ITrackedNodePosition methodPos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(get().getName()), getReadOnlyPrefix().length(), -getReadOnlyPrefix().length() - getReadOnlySuffix().length());
       ASTNode returnTypeNode = getReturnType();
       if (returnTypeNode instanceof QualifiedType) {
-        QualifiedType t = (QualifiedType) returnTypeNode;
+        var t = (QualifiedType) returnTypeNode;
         returnTypeNode = t.getName();
       }
       ITrackedNodePosition returnNamePos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(returnTypeNode), 0, -getReadOnlySuffix().length());
@@ -160,8 +151,8 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
 
   @Override
   protected void insertMethod() {
-    ASTNode methodSibling = getSiblingForGetter(get().getName().getIdentifier(), getDeclaringType(), getFactory().getScoutElementProvider());
-    ListRewrite rewrite = getFactory().getRewrite().getListRewrite(getDeclaringType(), getDeclaringType().getBodyDeclarationsProperty());
+    var methodSibling = getSiblingForGetter(get().getName().getIdentifier(), getDeclaringType(), getFactory().getScoutElementProvider());
+    var rewrite = getFactory().getRewrite().getListRewrite(getDeclaringType(), getDeclaringType().getBodyDeclarationsProperty());
     if (methodSibling == null) {
       List<?> originalList = rewrite.getOriginalList();
       if (originalList.isEmpty()) {
@@ -177,28 +168,27 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
   }
 
   protected static ASTNode getSiblingForGetter(String getterName, TypeDeclaration declaringType, EclipseEnvironment scoutElementProvider) {
-    IType t = Ensure.notNull(AstUtils.getTypeBinding(declaringType));
+    var t = Ensure.notNull(AstUtils.getTypeBinding(declaringType));
 
-    org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType = scoutElementProvider.toScoutType(t);
-    IStructuredType structuredForm = StructuredType.of(jdtTypeToScoutType);
-    IJavaElement methodSibling = structuredForm.getSiblingMethodFieldGetter(getterName);
+    var jdtTypeToScoutType = scoutElementProvider.toScoutType(t);
+    var structuredForm = StructuredType.of(jdtTypeToScoutType);
+    var methodSibling = structuredForm.getSiblingMethodFieldGetter(getterName);
     if (methodSibling == null) {
       return null;
     }
 
     if (methodSibling instanceof IMethod) {
-      String sigOfSiblingMethod = ((IMethod) methodSibling).identifier();
-      for (MethodDeclaration methodDeclaration : declaringType.getMethods()) {
-        if (sigOfSiblingMethod.equals(AstUtils.createMethodIdentifier(methodDeclaration))) {
-          return methodDeclaration;
-        }
-      }
+      var sigOfSiblingMethod = ((IMethod) methodSibling).identifier();
+      return Arrays.stream(declaringType.getMethods())
+          .filter(methodDeclaration -> sigOfSiblingMethod.equals(AstUtils.createMethodIdentifier(methodDeclaration)))
+          .findFirst()
+          .orElse(null);
     }
     else if (methodSibling instanceof IField) {
-      String elemName = methodSibling.elementName();
-      for (FieldDeclaration field : declaringType.getFields()) {
+      var elemName = methodSibling.elementName();
+      for (var field : declaringType.getFields()) {
         List<VariableDeclarationFragment> fragments = field.fragments();
-        for (VariableDeclarationFragment fragment : fragments) {
+        for (var fragment : fragments) {
           if (elemName.equals(fragment.getName().getIdentifier())) {
             return field;
           }
@@ -206,12 +196,11 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
       }
     }
     else if (methodSibling instanceof org.eclipse.scout.sdk.core.model.api.IType) {
-      String elemName = methodSibling.elementName();
-      for (TypeDeclaration innerType : declaringType.getTypes()) {
-        if (elemName.equals(innerType.getName().getIdentifier())) {
-          return innerType;
-        }
-      }
+      var elemName = methodSibling.elementName();
+      return Arrays.stream(declaringType.getTypes())
+          .filter(innerType -> elemName.equals(innerType.getName().getIdentifier()))
+          .findFirst()
+          .orElse(null);
     }
     return null;
   }

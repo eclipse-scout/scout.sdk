@@ -16,6 +16,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * <h3>{@link MessageFormatter}</h3><br>
@@ -46,19 +47,19 @@ public final class MessageFormatter {
    *         with the corresponding values.
    */
   public static FormattingTuple arrayFormat(CharSequence msg, Object... args) {
-    CharSequence rawMessage = msg;
+    var rawMessage = msg;
     if (rawMessage == null) {
       rawMessage = "";
     }
 
-    int nextIndex = 0;
-    StringBuilder messageBuilder = new StringBuilder(rawMessage);
+    var nextIndex = 0;
+    var messageBuilder = new StringBuilder(rawMessage);
     if (args != null) {
       int curIndex;
-      int lastPos = 0;
+      var lastPos = 0;
       while ((curIndex = messageBuilder.indexOf(ARG_REPLACE_PATTERN, lastPos)) >= 0 && nextIndex < args.length) {
-        int endPos = curIndex + ARG_REPLACE_PATTERN.length();
-        String replacement = toString(args[nextIndex]);
+        var endPos = curIndex + ARG_REPLACE_PATTERN.length();
+        var replacement = toString(args[nextIndex]);
         messageBuilder.replace(curIndex, endPos, replacement);
         nextIndex++;
         lastPos = curIndex + replacement.length();
@@ -73,8 +74,8 @@ public final class MessageFormatter {
     }
 
     List<Throwable> result = new ArrayList<>(args.length - startIndex);
-    for (int i = startIndex; i < args.length; i++) {
-      Object cur = args[i];
+    for (var i = startIndex; i < args.length; i++) {
+      var cur = args[i];
       searchForThrowables(cur, result);
     }
     if (result.isEmpty()) {
@@ -91,13 +92,13 @@ public final class MessageFormatter {
       collector.add((Throwable) o);
     }
     else if (o.getClass().isArray()) {
-      Object[] elements = (Object[]) o;
-      for (Object element : elements) {
+      var elements = (Object[]) o;
+      for (var element : elements) {
         searchForThrowables(element, collector);
       }
     }
     else if (o instanceof Iterable<?>) {
-      Iterable<?> it = (Iterable<?>) o;
+      var it = (Iterable<?>) o;
       for (Object element : it) {
         searchForThrowables(element, collector);
       }
@@ -109,17 +110,17 @@ public final class MessageFormatter {
       return safeObjectToString(o);
     }
 
-    Object[] arr = toObjectArray(o);
+    var arr = toObjectArray(o);
     if (arr.length < 1) {
       return "[]";
     }
 
-    int maxSize = 100;
-    int printSize = Math.min(arr.length, maxSize);
-    StringBuilder b = new StringBuilder();
+    var maxSize = 100;
+    var printSize = Math.min(arr.length, maxSize);
+    var b = new StringBuilder();
     b.append('[');
     b.append(toString(arr[0]));
-    for (int i = 1; i < printSize; i++) {
+    for (var i = 1; i < printSize; i++) {
       b.append(", ");
       b.append(toString(arr[i]));
     }
@@ -136,12 +137,8 @@ public final class MessageFormatter {
     }
 
     // must be a primitive array
-    int len = Array.getLength(arr);
-    Object[] result = new Object[len];
-    for (int i = 0; i < len; i++) {
-      result[i] = Array.get(arr, i);
-    }
-    return result;
+    var len = Array.getLength(arr);
+    return IntStream.range(0, len).mapToObj(i -> Array.get(arr, i)).toArray();
   }
 
   @SuppressWarnings({"squid:S1181", "squid:S1166", "squid:S1148"})

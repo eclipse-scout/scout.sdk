@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
+import static java.util.stream.Collectors.joining;
+
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -80,16 +83,14 @@ public class PropertiesTextProviderService extends TextProviderService {
     if (segments.length < 1) {
       return Optional.empty();
     }
-    String filePrefix = segments[segments.length - 1]; // last segment
+    var filePrefix = segments[segments.length - 1]; // last segment
 
-    StringBuilder folderName = new StringBuilder();
+    var folderName = "";
     if (segments.length > 1) {
-      folderName.append(segments[0]);
-      for (int i = 1; i < segments.length - 1; i++) {
-        folderName.append(FOLDER_SEGMENT_DELIMITER).append(segments[i]);
-      }
+      folderName = Arrays.stream(segments, 0, segments.length - 1)
+          .collect(joining(String.valueOf(FOLDER_SEGMENT_DELIMITER)));
     }
-    return Optional.of(new PropertiesTextProviderService(txtSvc, folderName.toString(), filePrefix));
+    return Optional.of(new PropertiesTextProviderService(txtSvc, folderName, filePrefix));
   }
 
   /**
@@ -122,7 +123,7 @@ public class PropertiesTextProviderService extends TextProviderService {
     if (!super.equals(o)) {
       return false;
     }
-    PropertiesTextProviderService that = (PropertiesTextProviderService) o;
+    var that = (PropertiesTextProviderService) o;
     return m_folder.equals(that.m_folder) &&
         m_filePrefix.equals(that.m_filePrefix);
   }

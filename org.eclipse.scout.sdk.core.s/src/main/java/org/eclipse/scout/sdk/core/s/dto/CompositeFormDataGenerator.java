@@ -18,7 +18,6 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.dto.form.FormDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableFieldDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
@@ -43,7 +42,7 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
   }
 
   protected void processInnerTypes(IType compositeType) {
-    IScoutApi scoutApi = scoutApi();
+    var scoutApi = scoutApi();
     // step into inner form field
     compositeType.innerTypes()
         .withFlags(Flags.AccPublic)
@@ -69,16 +68,16 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
   }
 
   protected void processFormField(IType formField) {
-    IScoutApi scoutApi = scoutApi();
-    FormDataAnnotationDescriptor fieldAnnotation = FormDataAnnotationDescriptor.of(formField);
+    var scoutApi = scoutApi();
+    var fieldAnnotation = FormDataAnnotationDescriptor.of(formField);
     if (FormDataAnnotationDescriptor.isIgnore(fieldAnnotation)) {
       return;
     }
 
-    boolean fieldExtendsTemplateField = false;
-    boolean isCompositeField = formField.isInstanceOf(scoutApi.ICompositeField());
+    var fieldExtendsTemplateField = false;
+    var isCompositeField = formField.isInstanceOf(scoutApi.ICompositeField());
     if (FormDataAnnotationDescriptor.isCreate(fieldAnnotation)) {
-      IType formDataType = fieldAnnotation.getFormDataType();
+      var formDataType = fieldAnnotation.getFormDataType();
       String formDataTypeName;
       if (formDataType == null) {
         formDataTypeName = removeFieldSuffix(formField.elementName());
@@ -110,7 +109,7 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
 
       // Scout RT requires the first char to be upper-case for a getter.
       // See org.eclipse.scout.rt.platform.reflect.FastBeanUtility.BEAN_METHOD_PAT.
-      String methodName = Strings.ensureStartWithUpperCase(formDataTypeName).toString();
+      var methodName = Strings.ensureStartWithUpperCase(formDataTypeName).toString();
       this
           .withType(dtoGenerator.withElementName(formDataTypeName), DtoMemberSortObjectFactory.forTypeFormDataFormField(formDataTypeName))
           .withMethod(ScoutMethodGenerator.create()
@@ -131,10 +130,10 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
    *         formDataTypeName would have.
    */
   protected boolean hasSimilarNameAs(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb, String formDataTypeName) {
-    String dataType = msb.returnType()
+    var dataType = msb.returnType()
         .flatMap(af -> af.apply(this.targetEnvironment()))
         .get();
-    String name = PropertyBean.getterPrefixFor(dataType) + formDataTypeName;
+    var name = PropertyBean.getterPrefixFor(dataType) + formDataTypeName;
     return name.equals(msb.elementName().get());
   }
 

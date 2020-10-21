@@ -60,6 +60,7 @@
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaMavenRunner"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdStartup"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerStartup"/>
+    <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager"
                     serviceImplementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.classid.ClassIdCache"

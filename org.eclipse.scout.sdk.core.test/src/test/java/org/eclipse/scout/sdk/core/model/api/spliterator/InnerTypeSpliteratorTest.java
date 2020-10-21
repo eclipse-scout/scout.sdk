@@ -34,34 +34,35 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class InnerTypeSpliteratorTest {
   @Test
   public void testInnerTypes(IJavaEnvironment env) {
-    IType abc = env.requireType(AbstractBaseClass.class.getName());
+    var abc = env.requireType(AbstractBaseClass.class.getName());
     Spliterator<IType> ts = new InnerTypeSpliterator(abc, false);
     assertEquals("InnerOne,Leaf", traverse(ts));
   }
 
   @Test
   public void testInnerTypesRecursive(IJavaEnvironment env) {
-    IType abc = env.requireType(AbstractBaseClass.class.getName());
+    var abc = env.requireType(AbstractBaseClass.class.getName());
     Spliterator<IType> ts = new InnerTypeSpliterator(abc, true);
     assertEquals("InnerOne,Leaf,Leaf2,InnerTwo,Leaf3,Leaf4", traverse(ts));
   }
 
   @Test
   public void testInnerTypesFromList(IJavaEnvironment env) {
-    IType owner = env.requireType(AbstractBaseClass.class.getName());
+    var owner = env.requireType(AbstractBaseClass.class.getName());
     Spliterator<IType> ts = new InnerTypeSpliterator(InnerTypeSpliterator.innerTypesOf(owner), false);
     assertEquals("InnerOne,Leaf", traverse(ts));
   }
 
   @Test
   public void testInnerTypesFromListRecursive(IJavaEnvironment env) {
-    IType owner = env.requireType(AbstractBaseClass.class.getName());
+    var owner = env.requireType(AbstractBaseClass.class.getName());
     Spliterator<IType> ts = new InnerTypeSpliterator(InnerTypeSpliterator.innerTypesOf(owner), true);
     assertEquals("InnerOne,Leaf,Leaf2,InnerTwo,Leaf3,Leaf4", traverse(ts));
   }
 
   static String traverse(Spliterator<IType> ts) {
-    StringBuilder b = new StringBuilder();
+    var b = new StringBuilder();
+    //noinspection StatementWithEmptyBody
     while (ts.tryAdvance(a -> b.append(a.elementName()).append(JavaTypes.C_COMMA))) {
     }
     if (b.length() > 0) {

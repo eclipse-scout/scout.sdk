@@ -45,10 +45,10 @@ public class LanguageTest {
 
   @Test
   public void testLanguageOrder() {
-    Language a = Language.parseThrowingOnError("a");
-    Language b = Language.parseThrowingOnError("z");
-    Language c = Language.LANGUAGE_DEFAULT;
-    Language d = Language.parseThrowingOnError("de_CH_xx");
+    var a = Language.parseThrowingOnError("a");
+    var b = Language.parseThrowingOnError("z");
+    var c = Language.LANGUAGE_DEFAULT;
+    var d = Language.parseThrowingOnError("de_CH_xx");
     Language[] langs = {a, b, c, d};
     Arrays.sort(langs);
 
@@ -61,8 +61,8 @@ public class LanguageTest {
   @Test
   @SuppressWarnings({"unlikely-arg-type", "EqualsBetweenInconvertibleTypes", "ConstantConditions", "SimplifiableJUnitAssertion", "EqualsWithItself"})
   public void testLanguage() {
-    Locale locale = new Locale("test");
-    Language lang = new Language(locale);
+    var locale = new Locale("test");
+    var lang = new Language(locale);
     assertSame(locale, lang.locale());
     assertEquals("test", lang.displayName());
     assertEquals("default", Language.LANGUAGE_DEFAULT.displayName());

@@ -21,8 +21,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -45,54 +43,54 @@ public class ExternalTableFieldTest {
 
     // fields of AbstractCompanyTableFieldData
     assertEquals(1, abstractCompanyTableFieldData.fields().stream().count(), "field count of 'formdata.shared.services.process.AbstractCompanyTableFieldData'");
-    IField serialVersionUID = assertFieldExist(abstractCompanyTableFieldData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(abstractCompanyTableFieldData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(7, abstractCompanyTableFieldData.methods().stream().count(), "method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData'");
-    IMethod addRow = assertMethodExist(abstractCompanyTableFieldData, "addRow", new String[]{});
+    var addRow = assertMethodExist(abstractCompanyTableFieldData, "addRow", new String[]{});
     assertMethodReturnType(addRow, "formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
-    IMethod addRow1 = assertMethodExist(abstractCompanyTableFieldData, "addRow", new String[]{"int"});
+    var addRow1 = assertMethodExist(abstractCompanyTableFieldData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    IMethod createRow = assertMethodExist(abstractCompanyTableFieldData, "createRow", new String[]{});
+    var createRow = assertMethodExist(abstractCompanyTableFieldData, "createRow", new String[]{});
     assertMethodReturnType(createRow, "formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    IMethod getRowType = assertMethodExist(abstractCompanyTableFieldData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(abstractCompanyTableFieldData, "getRowType", new String[]{});
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    IMethod getRows = assertMethodExist(abstractCompanyTableFieldData, "getRows", new String[]{});
+    var getRows = assertMethodExist(abstractCompanyTableFieldData, "getRows", new String[]{});
     assertMethodReturnType(getRows, "formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
-    IMethod rowAt = assertMethodExist(abstractCompanyTableFieldData, "rowAt", new String[]{"int"});
+    var rowAt = assertMethodExist(abstractCompanyTableFieldData, "rowAt", new String[]{"int"});
     assertMethodReturnType(rowAt, "formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData");
     assertAnnotation(rowAt, "java.lang.Override");
-    IMethod setRows = assertMethodExist(abstractCompanyTableFieldData, "setRows", new String[]{"formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData[]"});
+    var setRows = assertMethodExist(abstractCompanyTableFieldData, "setRows", new String[]{"formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData[]"});
     assertMethodReturnType(setRows, "void");
 
     assertEquals(1, abstractCompanyTableFieldData.innerTypes().stream().count(), "inner types count of 'AbstractCompanyTableFieldData'");
     // type AbstractCompanyTableRowData
-    IType abstractCompanyTableRowData = assertTypeExists(abstractCompanyTableFieldData, "AbstractCompanyTableRowData");
+    var abstractCompanyTableRowData = assertTypeExists(abstractCompanyTableFieldData, "AbstractCompanyTableRowData");
     assertHasFlags(abstractCompanyTableRowData, 1033);
     assertHasSuperClass(abstractCompanyTableRowData, "org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData");
 
     // fields of AbstractCompanyTableRowData
     assertEquals(3, abstractCompanyTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData'");
-    IField serialVersionUID1 = assertFieldExist(abstractCompanyTableRowData, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(abstractCompanyTableRowData, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
-    IField name = assertFieldExist(abstractCompanyTableRowData, "name");
+    var name = assertFieldExist(abstractCompanyTableRowData, "name");
     assertHasFlags(name, 25);
     assertFieldType(name, "java.lang.String");
-    IField m_name = assertFieldExist(abstractCompanyTableRowData, "m_name");
+    var m_name = assertFieldExist(abstractCompanyTableRowData, "m_name");
     assertHasFlags(m_name, 2);
     assertFieldType(m_name, "java.lang.String");
 
     assertEquals(2, abstractCompanyTableRowData.methods().stream().count(), "method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData'");
-    IMethod getName = assertMethodExist(abstractCompanyTableRowData, "getName", new String[]{});
+    var getName = assertMethodExist(abstractCompanyTableRowData, "getName", new String[]{});
     assertMethodReturnType(getName, "java.lang.String");
-    IMethod setName = assertMethodExist(abstractCompanyTableRowData, "setName", new String[]{"java.lang.String"});
+    var setName = assertMethodExist(abstractCompanyTableRowData, "setName", new String[]{"java.lang.String"});
     assertMethodReturnType(setName, "void");
 
     assertEquals(0, abstractCompanyTableRowData.innerTypes().stream().count(), "inner types count of 'AbstractCompanyTableRowData'");

@@ -45,8 +45,8 @@ public class SourceCollector<T extends ISourceGenerator<ISourceBuilder<?>>> impl
   public SourceCollector(ISourceBuilder<?> target, CharSequence prefix, CharSequence delim, CharSequence suffix) {
     m_target = Ensure.notNull(target);
 
-    boolean hasSuffix = !Strings.isEmpty(suffix);
-    boolean hasDelimiter = !Strings.isEmpty(delim);
+    var hasSuffix = !Strings.isEmpty(suffix);
+    var hasDelimiter = !Strings.isEmpty(delim);
     if (hasDelimiter) {
       m_appender = (a, b) -> target.append(delim).append(b);
     }

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.environment;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.unmodifiableCollection;
+import static java.util.stream.Collectors.joining;
 import static org.eclipse.scout.sdk.core.log.SdkLog.onTrace;
 
 import java.util.ArrayList;
@@ -151,12 +152,9 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder("Nested Exception: [").append(lineSeparator());
-      for (Throwable throwable : m_throwables) {
-        builder.append(throwable.toString()).append(Strings.fromThrowable(throwable)).append(lineSeparator());
-      }
-      builder.append(']').append(lineSeparator()).append(super.toString());
-      return builder.toString();
+      return m_throwables.stream()
+          .map(throwable -> throwable.toString() + Strings.fromThrowable(throwable) + lineSeparator())
+          .collect(joining("", "Nested Exception: [" + lineSeparator(), ']' + lineSeparator() + super.toString()));
     }
   }
 
@@ -187,7 +185,7 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
           complete(() -> null); // the supplier should never be null. only the result provided by the supplier may be null
         }
         else {
-          FinalValue<V> cachedResult = new FinalValue<>(); // use a final value so that the extractor is only executed once
+          var cachedResult = new FinalValue<V>(); // use a final value so that the extractor is only executed once
           complete(() -> cachedResult.computeIfAbsentAndGet(resultExtractor));
         }
       }
@@ -206,7 +204,7 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
     }
     catch (CompletionException e) {
       SdkLog.debug("Future completed exceptionally.", e);
-      Throwable cause = e.getCause();
+      var cause = e.getCause();
       if (cause instanceof RuntimeException) {
         throw (RuntimeException) cause;
       }

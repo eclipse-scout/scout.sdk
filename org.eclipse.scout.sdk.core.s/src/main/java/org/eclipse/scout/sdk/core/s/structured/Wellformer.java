@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.structured.IStructuredType.Categories;
 
@@ -44,9 +43,9 @@ public class Wellformer {
   }
 
   protected static List<IJavaElement> getChildren(IType t) {
-    List<IField> fields = t.fields().stream().collect(toList());
-    List<IType> innerTypes = t.innerTypes().stream().collect(toList());
-    List<IMethod> methods = t.methods().stream().collect(toList());
+    var fields = t.fields().stream().collect(toList());
+    var innerTypes = t.innerTypes().stream().collect(toList());
+    var methods = t.methods().stream().collect(toList());
     List<IJavaElement> result = new ArrayList<>(fields.size() + innerTypes.size() + methods.size());
     result.addAll(fields);
     result.addAll(methods);
@@ -55,7 +54,7 @@ public class Wellformer {
   }
 
   protected void appendFields(Iterable<IField> fields, StringBuilder builder) {
-    for (IField f : fields) {
+    for (var f : fields) {
       builder.append(m_lineDelimiter);
       appendMemberSource(f, builder);
     }
@@ -66,12 +65,12 @@ public class Wellformer {
       return;
     }
 
-    CharSequence source = m.source().get().asCharSequence();
+    var source = m.source().get().asCharSequence();
     if (m.javaDoc().isPresent()) {
-      ISourceRange javaDoc = m.javaDoc().get();
+      var javaDoc = m.javaDoc().get();
       if (EMPTY_COMMENT_REGEX.matcher(javaDoc.asCharSequence()).matches()) {
         // workaround for a bug in the javadoc formatter. See bug 491387 for details.
-        int javaDocEndRel = javaDoc.length() + 1 + m_lineDelimiter.length();
+        var javaDocEndRel = javaDoc.length() + 1 + m_lineDelimiter.length();
         builder.append("/**").append(m_lineDelimiter).append(" *").append(m_lineDelimiter).append(" */"); // default empty comment
         builder.append(source.subSequence(javaDocEndRel, source.length()));
         return;
@@ -81,14 +80,14 @@ public class Wellformer {
   }
 
   protected void appendMethods(Iterable<IMethod> methods, StringBuilder builder) {
-    for (IMethod m : methods) {
+    for (var m : methods) {
       builder.append(m_lineDelimiter);
       appendMemberSource(m, builder);
     }
   }
 
   protected void appendTypes(Iterable<IType> types, StringBuilder builder, boolean recursive) {
-    for (IType t : types) {
+    for (var t : types) {
       if (recursive) {
         builder.append(m_lineDelimiter).append(m_lineDelimiter);
         buildSource(t, builder);
@@ -105,18 +104,18 @@ public class Wellformer {
       return false;
     }
 
-    ISourceRange typeSource = type.source().get();
-    CharSequence src = typeSource.asCharSequence();
-    List<IJavaElement> children = getChildren(type);
+    var typeSource = type.source().get();
+    var src = typeSource.asCharSequence();
+    var children = getChildren(type);
     if (children.isEmpty()) {
       builder.append(src);
     }
     else {
-      int start = Integer.MAX_VALUE;
-      int end = -1;
-      for (IJavaElement e : children) {
+      var start = Integer.MAX_VALUE;
+      var end = -1;
+      for (var e : children) {
         if (e.source().isPresent()) {
-          ISourceRange eRange = e.source().get();
+          var eRange = e.source().get();
           start = Math.min(start, (eRange.start() - typeSource.start()));
           end = Math.max(end, (eRange.start() + eRange.length() - typeSource.start()));
         }
@@ -125,12 +124,12 @@ public class Wellformer {
         builder.append(src);
       }
       else {
-        CharSequence classHeader = src.subSequence(0, start);
+        var classHeader = src.subSequence(0, start);
         // remove leading spaces
         classHeader = LEADING_SPACES_REGEX.matcher(classHeader).replaceAll("");
         builder.append(classHeader).append(m_lineDelimiter);
 
-        IStructuredType structureHelper = StructuredType.of(type);
+        var structureHelper = StructuredType.of(type);
         appendFields(structureHelper.getElements(Categories.FIELD_LOGGER, IField.class), builder);
         appendFields(structureHelper.getElements(Categories.FIELD_STATIC, IField.class), builder);
         appendFields(structureHelper.getElements(Categories.FIELD_MEMBER, IField.class), builder);
@@ -163,7 +162,7 @@ public class Wellformer {
         appendTypes(structureHelper.getElements(Categories.TYPE_FORM_HANDLER, IType.class), builder, m_recursive);
         appendTypes(structureHelper.getElements(Categories.TYPE_UNCATEGORIZED, IType.class), builder, false);
 
-        CharSequence classTail = src.subSequence(end, src.length());
+        var classTail = src.subSequence(end, src.length());
         // remove trailing spaces
         classTail = TRAILING_SPACES_REGEX.matcher(classTail).replaceAll("");
         builder.append(m_lineDelimiter);

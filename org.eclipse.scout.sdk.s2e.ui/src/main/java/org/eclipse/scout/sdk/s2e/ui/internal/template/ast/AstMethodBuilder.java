@@ -11,13 +11,11 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.manipulation.CodeGeneration;
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -108,21 +106,21 @@ public class AstMethodBuilder<INSTANCE extends AstMethodBuilder<INSTANCE>> exten
   @Override
   public INSTANCE insert() {
     Ensure.notNull(getMethodName());
-    AST ast = getFactory().getAst();
-    Block body = getBody();
+    var ast = getFactory().getAst();
+    var body = getBody();
     if (body == null) {
       body = ast.newBlock();
     }
 
     m_resultMethod = ast.newMethodDeclaration();
     m_resultMethod.setConstructor(false);
-    for (ModifierKeyword mod : getModifiers()) {
+    for (var mod : getModifiers()) {
       m_resultMethod.modifiers().add(ast.newModifier(mod));
     }
 
-    SimpleName methodName = ast.newSimpleName(getMethodName());
+    var methodName = ast.newSimpleName(getMethodName());
     m_resultMethod.setName(methodName);
-    Type returnType = getReturnType();
+    var returnType = getReturnType();
     if (returnType != null) {
       m_resultMethod.setReturnType2(returnType);
     }
@@ -131,10 +129,10 @@ public class AstMethodBuilder<INSTANCE extends AstMethodBuilder<INSTANCE>> exten
 
     if (isCreateJavaDoc() && getFactory().isCreateCommentsSetting() && getModifiers().contains(ModifierKeyword.PUBLIC_KEYWORD)) {
       try {
-        String declaringTypeFqn = AstUtils.getFullyQualifiedName(getDeclaringType(), getFactory().getType(), JavaTypes.C_DOT);
-        String javadocText = CodeGeneration.getMethodComment(getFactory().getIcu(), declaringTypeFqn, m_resultMethod, null, getFactory().getIcu().findRecommendedLineSeparator());
+        var declaringTypeFqn = AstUtils.getFullyQualifiedName(getDeclaringType(), getFactory().getType(), JavaTypes.C_DOT);
+        var javadocText = CodeGeneration.getMethodComment(getFactory().getIcu(), declaringTypeFqn, m_resultMethod, null, getFactory().getIcu().findRecommendedLineSeparator());
         if (Strings.hasText(javadocText)) {
-          Javadoc javadoc = (Javadoc) getFactory().getRewrite().createStringPlaceholder(javadocText, ASTNode.JAVADOC);
+          var javadoc = (Javadoc) getFactory().getRewrite().createStringPlaceholder(javadocText, ASTNode.JAVADOC);
           m_resultMethod.setJavadoc(javadoc);
         }
       }

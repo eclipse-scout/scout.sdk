@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -36,52 +35,52 @@ public class FinalValueTest {
 
   @Test
   public void testUnset() {
-    FinalValue<String> s = new FinalValue<>();
+    var s = new FinalValue<String>();
     assertFalse(s.isSet());
     assertNull(s.get());
   }
 
   @Test
   public void testSuccessfulSet() {
-    FinalValue<String> s = new FinalValue<>();
+    var s = new FinalValue<String>();
     s.set(TEST_VALUE);
     assertTestValue(s);
   }
 
   @Test
   public void testDuplicateSet() {
-    FinalValue<String> s = new FinalValue<>();
+    var s = new FinalValue<String>();
     s.set(TEST_VALUE);
     assertThrows(IllegalArgumentException.class, () -> s.set(TEST_VALUE));
   }
 
   @Test
   public void testToString() {
-    FinalValue<String> a = new FinalValue<>();
+    var a = new FinalValue<String>();
     assertEquals("FinalValue[<not set>]", a.toString());
 
-    FinalValue<String> b = new FinalValue<>();
+    var b = new FinalValue<String>();
     b.set(null);
     assertEquals("FinalValue[null]", b.toString());
 
-    FinalValue<String> c = new FinalValue<>();
+    var c = new FinalValue<String>();
     c.set("");
     assertEquals("FinalValue[]", c.toString());
 
-    FinalValue<String> d = new FinalValue<>();
+    var d = new FinalValue<String>();
     d.set("abc");
     assertEquals("FinalValue[abc]", d.toString());
   }
 
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "EqualsWithItself", "ConstantConditions", "EqualsBetweenInconvertibleTypes"})
   public void testEquals() {
-    FinalValue<String> a = new FinalValue<>();
-    FinalValue<String> b = new FinalValue<>();
+    var a = new FinalValue<String>();
+    var b = new FinalValue<String>();
     b.set(null);
-    FinalValue<String> c = new FinalValue<>();
+    var c = new FinalValue<String>();
     c.set("abc");
-    FinalValue<String> d = new FinalValue<>();
+    var d = new FinalValue<String>();
     d.set("abc");
 
     assertTrue(a.equals(a));
@@ -95,16 +94,17 @@ public class FinalValueTest {
 
   @Test
   public void testHashCode() {
-    FinalValue<String> a = new FinalValue<>();
-    FinalValue<String> b = new FinalValue<>();
+    var a = new FinalValue<String>();
+    var b = new FinalValue<String>();
     b.set(null);
-    FinalValue<String> c = new FinalValue<>();
+    var c = new FinalValue<String>();
     c.set("abc");
-    FinalValue<String> d = new FinalValue<>();
+    var d = new FinalValue<String>();
     d.set("abc");
 
     assertEquals(a.hashCode(), b.hashCode());
     assertEquals(c.hashCode(), d.hashCode());
+    //noinspection ConstantConditions
     assertEquals(c.hashCode(), c.get().hashCode());
 
     assertNotEquals(a.hashCode(), d.hashCode());
@@ -112,7 +112,7 @@ public class FinalValueTest {
 
   @Test
   public void testOpt() {
-    FinalValue<String> s = new FinalValue<>();
+    var s = new FinalValue<String>();
     assertFalse(s.opt().isPresent());
     assertFalse(s.isSet());
     s.set(null);
@@ -127,15 +127,15 @@ public class FinalValueTest {
 
   @Test
   public void testLazySet() {
-    FinalValue<String> s = new FinalValue<>();
-    String value = s.setIfAbsentAndGet(TEST_VALUE);
+    var s = new FinalValue<String>();
+    var value = s.setIfAbsentAndGet(TEST_VALUE);
     assertTestValue(s);
     assertEquals(TEST_VALUE, value);
   }
 
   @Test
   public void testLazySetWithException() {
-    FinalValue<String> s = new FinalValue<>();
+    var s = new FinalValue<String>();
 
     assertThrows(RuntimeException.class,
         () -> s.computeIfAbsent(() -> {
@@ -145,7 +145,7 @@ public class FinalValueTest {
 
   @Test
   public void testLazySetWithCustomException() {
-    FinalValue<String> s = new FinalValue<>();
+    var s = new FinalValue<String>();
     assertThrows(RuntimeException.class,
         () -> s.computeIfAbsent(() -> {
           throw new MyRuntimeException();
@@ -154,16 +154,16 @@ public class FinalValueTest {
 
   @Test
   public void testLazyDuplicateSet() {
-    FinalValue<String> s = new FinalValue<>();
+    var s = new FinalValue<String>();
     s.setIfAbsentAndGet(TEST_VALUE);
-    String value2 = s.setIfAbsentAndGet("other");
+    var value2 = s.setIfAbsentAndGet("other");
     assertTestValue(s);
     assertEquals(TEST_VALUE, value2);
   }
 
   @Test
   public void testNoDoubleInitializationTry() {
-    FinalValue<String> s = new FinalValue<>();
+    var s = new FinalValue<String>();
     s.setIfAbsentAndGet(null);
     assertNull(s.setIfAbsentAndGet("should not matter"));
     assertTrue(s.isSet());
@@ -171,13 +171,13 @@ public class FinalValueTest {
 
   @Test
   public void testBlockingCalls() {
-    FinalValue<String> s = new FinalValue<>();
+    var s = new FinalValue<String>();
 
-    CountDownLatch setup = new CountDownLatch(1);
-    CountDownLatch latch = new CountDownLatch(1);
-    String schedThreadMsg = "scheduled thread";
-    String testThreadMsg = "test thread";
-    ExecutorService executor = Executors.newSingleThreadExecutor();
+    var setup = new CountDownLatch(1);
+    var latch = new CountDownLatch(1);
+    var schedThreadMsg = "scheduled thread";
+    var testThreadMsg = "test thread";
+    var executor = Executors.newSingleThreadExecutor();
 
     assertTimeout(Duration.ofSeconds(2), () -> {
       executor.submit(() -> {
@@ -195,7 +195,7 @@ public class FinalValueTest {
         }
       });
 
-      String value = s.computeIfAbsentAndGet(() -> {
+      var value = s.computeIfAbsentAndGet(() -> {
         setup.countDown();
         try {
           latch.await(5, TimeUnit.SECONDS);

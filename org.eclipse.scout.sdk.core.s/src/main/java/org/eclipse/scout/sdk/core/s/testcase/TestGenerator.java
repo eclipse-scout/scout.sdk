@@ -13,6 +13,9 @@ package org.eclipse.scout.sdk.core.s.testcase;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.CommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
@@ -22,9 +25,6 @@ import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link TestGenerator}</h3>

@@ -21,7 +21,7 @@ public class ArrayMetaValueTest {
 
   @Test
   public void testWithoutNullElements() {
-    IMetaValue mock = mock(IMetaValue.class);
+    var mock = mock(IMetaValue.class);
     IMetaValue[] noNullsSmall = {mock};
     IMetaValue[] noNulls = {mock, mock, mock, mock};
     IMetaValue[] withNulls = {null, null, mock, mock, mock, null, mock, null, mock, mock, null, null, null};

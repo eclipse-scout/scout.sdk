@@ -10,24 +10,17 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
-import java.util.Map.Entry;
-
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
-
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.scout.sdk.core.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl.WebServiceNames;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
 import org.eclipse.scout.sdk.s2e.operation.jaxws.WebServiceNewOperation;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
@@ -70,7 +63,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
   }
 
   protected String getScoutJaxWsDocumentationUrl() {
-    String majorAndMinor = ApiHelper.scoutVersionOf(m_jaxWsProject, null)
+    var majorAndMinor = ApiHelper.scoutVersionOf(m_jaxWsProject, null)
         .map(ApiVersion::segments)
         .filter(s -> s.length >= 2)
         .map(s -> s[0] + "." + s[1])
@@ -78,15 +71,15 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
           SdkLog.warning("Cannot detect used Scout version. Fallback to latest version.");
           return ScoutApi.latestMajorVersion() + ".0";
         });
-    String base = "http://eclipsescout.github.io/";
+    var base = "http://eclipsescout.github.io/";
     return base + majorAndMinor + "/technical-guide.html#webservices-with-jax-ws";
   }
 
   public static void open(WebServiceNewOperation op, Display d) {
     d.asyncExec(() -> {
-      Shell shell = d.getActiveShell();
+      var shell = d.getActiveShell();
       if (shell == null) {
-        Shell[] shells = d.getShells();
+        var shells = d.getShells();
         if (shells.length > 0) {
           shell = shells[0];
         }
@@ -113,22 +106,22 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
       prefKey = HIDE_PROVIDER_MSG;
     }
 
-    IPreferenceStore store = S2ESdkUiActivator.getDefault().getPreferenceStore();
-    String doNotShowAgainString = store.getString(prefKey);
-    boolean showBox = !ALWAYS.equals(doNotShowAgainString);
+    var store = S2ESdkUiActivator.getDefault().getPreferenceStore();
+    var doNotShowAgainString = store.getString(prefKey);
+    var showBox = !ALWAYS.equals(doNotShowAgainString);
     if (!showBox) {
       return null;
     }
 
-    WebServiceMessageDialog dialog = new WebServiceMessageDialog(shell, dialogTitle, null, message, INFORMATION, new String[]{IDialogConstants.OK_LABEL}, 0,
+    var dialog = new WebServiceMessageDialog(shell, dialogTitle, null, message, INFORMATION, new String[]{IDialogConstants.OK_LABEL}, 0,
         "Do not show this dialog again.", false, op.getJaxWsProject());
-    int style = SWT.SHEET;
+    var style = SWT.SHEET;
     dialog.setShellStyle(dialog.getShellStyle() | style);
     dialog.setPrefStore(store);
     dialog.setPrefKey(prefKey);
     dialog.open();
     if (dialog.isCopyToClipboard()) {
-      Clipboard clipboard = new Clipboard(shell.getDisplay());
+      var clipboard = new Clipboard(shell.getDisplay());
       clipboard.setContents(new Object[]{message + "\n\nJAX-WS Documentation: " + dialog.getScoutJaxWsDocumentationUrl()}, new Transfer[]{TextTransfer.getInstance()});
       clipboard.dispose();
     }
@@ -137,14 +130,14 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
 
   @Override
   protected Control createMessageArea(Composite composite) {
-    Control messageArea = super.createMessageArea(composite);
+    var messageArea = super.createMessageArea(composite);
     createDocumentationHyperlink(composite);
     return messageArea;
   }
 
   @Override
   protected Control createCustomArea(Composite parent) {
-    Composite composite = new Composite(parent, SWT.NONE);
+    var composite = new Composite(parent, SWT.NONE);
     GridLayoutFactory
         .swtDefaults()
         .margins(0, 0)
@@ -164,7 +157,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
         .grab(false, false)
         .applyTo(label);
 
-    Hyperlink h = new Hyperlink(parent, SWT.WRAP);
+    var h = new Hyperlink(parent, SWT.WRAP);
     h.setText("See the JAX-WS Scout Documentation for details.");
     h.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_BLUE));
     h.setUnderlined(true);
@@ -183,7 +176,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
   }
 
   protected void createCopyToClipboard(Composite parent) {
-    Button copyToClipboard = new Button(parent, SWT.CHECK | SWT.LEAD);
+    var copyToClipboard = new Button(parent, SWT.CHECK | SWT.LEAD);
     copyToClipboard.setSelection(false);
     copyToClipboard.setText("Copy this message to the Clipboard.");
     copyToClipboard.setFont(parent.getFont());
@@ -204,19 +197,19 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
   }
 
   protected static String getConsumerMessage(AbstractWebServiceNewOperation op) {
-    StringBuilder msgBuilder = new StringBuilder("The new Web Service consumer has been created.\n\nUsage example:\n");
-    for (Entry<Service, WebServiceNames> entry : op.getParsedWsdl().getServiceNames().entrySet()) {
-      for (PortType pt : op.getParsedWsdl().getPortTypes(entry.getKey())) {
+    var msgBuilder = new StringBuilder("The new Web Service consumer has been created.\n\nUsage example:\n");
+    for (var entry : op.getParsedWsdl().getServiceNames().entrySet()) {
+      for (var pt : op.getParsedWsdl().getPortTypes(entry.getKey())) {
         msgBuilder.append("- BEANS.get(").append(WebServiceNames.getPortTypeClassName(pt.getQName().getLocalPart())).append(JavaTypes.CLASS_FILE_SUFFIX).append(");\n");
       }
     }
     msgBuilder.append("\nThe URL of the Web Service end point usually differs for several deployments. Therefore the following properties have been generated to configure the end point URLs:\n");
-    for (String urlProperty : op.getCreatedUrlProperties()) {
+    for (var urlProperty : op.getCreatedUrlProperties()) {
       msgBuilder.append("- ").append(urlProperty).append('\n');
     }
     msgBuilder.append("Add these properties to your config.properties files.\n");
     msgBuilder.append("\nIf the Web Service requires authentication, modify the Handlers of the created Web Service Clients:\n");
-    for (IType client : op.getCreatedWebServiceClients()) {
+    for (var client : op.getCreatedWebServiceClients()) {
       msgBuilder.append("- ").append(client.elementName()).append('\n');
     }
     addImplementorMsg(msgBuilder);
@@ -224,12 +217,12 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
   }
 
   protected static String getProviderMessage(AbstractWebServiceNewOperation op) {
-    StringBuilder msgBuilder = new StringBuilder("The new Web Service provider has been created. The business logic can be implemented in the following classes:\n");
-    for (IType providerImpl : op.getCreatedProviderServiceImpls()) {
+    var msgBuilder = new StringBuilder("The new Web Service provider has been created. The business logic can be implemented in the following classes:\n");
+    for (var providerImpl : op.getCreatedProviderServiceImpls()) {
       msgBuilder.append("- ").append(providerImpl.elementName()).append('\n');
     }
     msgBuilder.append("\nBy default this Web Service is configured to use Basic Authentication against credentials stored in the config.properties file. This may be changed by modifying the corresponding Entry Point Defintions:\n");
-    for (IType entryPointDef : op.getCreatedEntryPointDefinitions()) {
+    for (var entryPointDef : op.getCreatedEntryPointDefinitions()) {
       msgBuilder.append("- ").append(entryPointDef.elementName()).append('\n');
     }
     addImplementorMsg(msgBuilder);

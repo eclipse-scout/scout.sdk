@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.internal.debug.ui.DetailFormatter;
 import org.eclipse.jdt.internal.debug.ui.JavaDetailFormattersManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -64,8 +63,8 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     // init Sdk log level
     getPreferenceStore().setDefault(SdkLog.LOG_LEVEL_PROPERTY_NAME, SdkLog.DEFAULT_LOG_LEVEL.getName());
     @SuppressWarnings("AccessOfSystemProperties")
-    boolean isLoggingConfiguredInSystem = Strings.hasText(System.getProperty(SdkLog.LOG_LEVEL_PROPERTY_NAME));
-    boolean isLoggingConfiguredInWorkspace = !getPreferenceStore().isDefault(SdkLog.LOG_LEVEL_PROPERTY_NAME);
+    var isLoggingConfiguredInSystem = Strings.hasText(System.getProperty(SdkLog.LOG_LEVEL_PROPERTY_NAME));
+    var isLoggingConfiguredInWorkspace = !getPreferenceStore().isDefault(SdkLog.LOG_LEVEL_PROPERTY_NAME);
     if (!isLoggingConfiguredInWorkspace && !isLoggingConfiguredInSystem && (Platform.inDebugMode() || Platform.inDevelopmentMode())) {
       // nothing is specified in the workspace and in the system: use full logging in debug mode by default
       // note: This value is not stored in the workspace preferences! Therefore not shown in the preference page.
@@ -96,7 +95,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
 
     // start DTO auto-update manager if required
     getPreferenceStore().setDefault(IDerivedResourceManager.PROP_AUTO_UPDATE, true);
-    IDerivedResourceManager mgr = S2ESdkActivator.getDefault().getDerivedResourceManager();
+    var mgr = S2ESdkActivator.getDefault().getDerivedResourceManager();
     if (mgr != null) {
       mgr.setEnabled(getPreferenceStore().getBoolean(IDerivedResourceManager.PROP_AUTO_UPDATE));
     }
@@ -120,10 +119,10 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     if (fqn.size() > 1) {
       SdkLog.warning("Ambiguous formatter specifications for object '{}'. Using the first.", iDataObjectFqn);
     }
-    SimpleEntry<String, String> entry = fqn.iterator().next();
-    String beans = entry.getKey();
-    String iPrettyPrintDataObjectMapper = entry.getValue();
-    String src = "return " + beans + ".get(" + iPrettyPrintDataObjectMapper + ".class).writeValue(this);";
+    var entry = fqn.iterator().next();
+    var beans = entry.getKey();
+    var iPrettyPrintDataObjectMapper = entry.getValue();
+    var src = "return " + beans + ".get(" + iPrettyPrintDataObjectMapper + ".class).writeValue(this);";
     m_iDataObjectDetailFormatter = new DetailFormatter(iDataObjectFqn, src, true);
     JavaDetailFormattersManager.getDefault().setAssociatedDetailFormatter(m_iDataObjectDetailFormatter);
   }
@@ -156,12 +155,12 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
 
   private static void setDefaultMavenSettings() {
     try {
-      M2EUIPluginActivator m2eUiActivator = M2EUIPluginActivator.getDefault();
+      var m2eUiActivator = M2EUIPluginActivator.getDefault();
       if (m2eUiActivator == null) {
         return;
       }
 
-      IPreferenceStore m2eUiPrefs = m2eUiActivator.getPreferenceStore();
+      var m2eUiPrefs = m2eUiActivator.getPreferenceStore();
       if (m2eUiPrefs == null) {
         return;
       }
@@ -188,9 +187,9 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   }
 
   private Image getImageImpl(String name) {
-    Image image = getImageRegistry().get(name);
+    var image = getImageRegistry().get(name);
     if (image == null) {
-      ImageDescriptor desc = getImageDescriptor(name);
+      var desc = getImageDescriptor(name);
       getImageRegistry().put(name, desc);
       image = getImageRegistry().get(name);
     }
@@ -209,8 +208,8 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   }
 
   public IDialogSettings getDialogSettingsSection(String name) {
-    IDialogSettings dialogSettings = getDialogSettings();
-    IDialogSettings section = dialogSettings.getSection(name);
+    var dialogSettings = getDialogSettings();
+    var section = dialogSettings.getSection(name);
     if (section == null) {
       section = dialogSettings.addNewSection(name);
     }
@@ -220,17 +219,17 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   private static final class P_PreferenceStorePropertyListener implements IPropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-      Object newValue = event.getNewValue();
+      var newValue = event.getNewValue();
 
       if (IDerivedResourceManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
-        boolean autoUpdate = newValue == null || Boolean.parseBoolean(newValue.toString());
-        IDerivedResourceManager mgr = S2ESdkActivator.getDefault().getDerivedResourceManager();
+        var autoUpdate = newValue == null || Boolean.parseBoolean(newValue.toString());
+        var mgr = S2ESdkActivator.getDefault().getDerivedResourceManager();
         if (mgr != null) {
           mgr.setEnabled(autoUpdate);
         }
       }
       else if (PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION.equals(event.getProperty())) {
-        boolean automaticallyCreate = newValue != null && Boolean.parseBoolean(newValue.toString());
+        var automaticallyCreate = newValue != null && Boolean.parseBoolean(newValue.toString());
         ClassIds.setAutomaticallyCreateClassIdAnnotation(automaticallyCreate);
       }
       else if (SdkLog.LOG_LEVEL_PROPERTY_NAME.equals(event.getProperty())) {

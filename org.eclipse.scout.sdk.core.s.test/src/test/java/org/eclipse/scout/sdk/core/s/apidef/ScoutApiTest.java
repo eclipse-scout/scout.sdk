@@ -43,7 +43,7 @@ public class ScoutApiTest {
 
   @Test
   public void testCreationUsingContext(IJavaEnvironment env) {
-    PrimaryTypeGenerator<?> generator = PrimaryTypeGenerator.create()
+    var generator = PrimaryTypeGenerator.create()
         .withPackageName("org.test")
         .withElementName("MyClass")
         .withAnnotation(ScoutAnnotationGenerator.createAuthentication());

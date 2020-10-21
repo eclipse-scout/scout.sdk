@@ -40,14 +40,14 @@ public class CreateAndOverrideNewCompilationUnitTest {
   @ExtendWithJavaEnvironmentFactory(EmptyJavaEnvironmentFactory.class)
   public void testCreateNewTypeWithErrors(IJavaEnvironment env) {
     // add an unresolved type error
-    ICompilationUnitGenerator<?> cuSrc = createBaseClass();
+    var cuSrc = createBaseClass();
     cuSrc.mainType().get().methods().findAny().get().withReturnType("FooBar");
 
-    StringBuilder buf = cuSrc.toJavaSource(env);
+    var buf = cuSrc.toJavaSource(env);
     env.registerCompilationUnitOverride(cuSrc.packageName().get(), cuSrc.fileName().get(), buf);
 
-    ICompilationUnit cu = env.requireType("a.b.c.BaseClass").requireCompilationUnit();
-    String expected =
+    var cu = env.requireType("a.b.c.BaseClass").requireCompilationUnit();
+    var expected =
         "package a.b.c;\n" +
             "public class BaseClass {\n" +
             "  public FooBar run() {\n" +
@@ -70,12 +70,12 @@ public class CreateAndOverrideNewCompilationUnitTest {
   @Test
   @ExtendWithJavaEnvironmentFactory(EmptyJavaEnvironmentFactory.class)
   public void testCreateNewType(IJavaEnvironment env) {
-    ICompilationUnitGenerator<?> cuSrc = createBaseClass();
-    StringBuilder buf = cuSrc.toJavaSource(env);
+    var cuSrc = createBaseClass();
+    var buf = cuSrc.toJavaSource(env);
     env.registerCompilationUnitOverride(cuSrc.packageName().get(), cuSrc.fileName().get(), buf);
-    ICompilationUnit cu = env.requireType("a.b.c.BaseClass").requireCompilationUnit();
+    var cu = env.requireType("a.b.c.BaseClass").requireCompilationUnit();
 
-    String expected =
+    var expected =
         "package a.b.c;\n" +
             "public class BaseClass {\n" +
             "  public void run() {\n" +
@@ -85,17 +85,17 @@ public class CreateAndOverrideNewCompilationUnitTest {
     assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().get().asCharSequence()));
 
     //now read the type from the env
-    IType t2 = env.requireType("a.b.c.BaseClass");
+    var t2 = env.requireType("a.b.c.BaseClass");
     assertEquals(cu.requireMainType().methods().withName("run").first().get().source().get().asCharSequence(), t2.methods().withName("run").first().get().source().get().asCharSequence());
   }
 
   @Test
   @ExtendWithJavaEnvironmentFactory(EmptyJavaEnvironmentFactory.class)
   public void testCreateNewSubType(IJavaEnvironment env) {
-    ICompilationUnitGenerator<?> cuSrc = createBaseClass();
-    StringBuilder buf = cuSrc.toJavaSource(env);
+    var cuSrc = createBaseClass();
+    var buf = cuSrc.toJavaSource(env);
     env.registerCompilationUnitOverride(cuSrc.packageName().get(), cuSrc.fileName().get(), buf);
-    ICompilationUnit cu = env.requireType("a.b.c.BaseClass").requireCompilationUnit();
+    var cu = env.requireType("a.b.c.BaseClass").requireCompilationUnit();
 
     //and now add a subclass
     cuSrc = createSubClass();
@@ -103,7 +103,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
     env.registerCompilationUnitOverride(cuSrc.packageName().get(), cuSrc.fileName().get(), buf);
     cu = env.requireType("a.b.c.d.SubClass").requireCompilationUnit();
 
-    String expected =
+    var expected =
         "package a.b.c.d;\n" +
             "import a.b.c.BaseClass;\n" +
             "public class SubClass extends BaseClass {\n" +
@@ -120,11 +120,11 @@ public class CreateAndOverrideNewCompilationUnitTest {
   @ExtendWithJavaEnvironmentFactory(EmptyJavaEnvironmentFactory.class)
   public void testCreateExistingTypes(IJavaEnvironment env) {
     //create base type
-    ICompilationUnitGenerator<?> cuSrc = createBaseClass();
-    StringBuilder buf = cuSrc.toJavaSource(env);
+    var cuSrc = createBaseClass();
+    var buf = cuSrc.toJavaSource(env);
 
     env.registerCompilationUnitOverride(cuSrc.packageName().get(), cuSrc.fileName().get(), buf);
-    ICompilationUnit cu = env.requireType("a.b.c.BaseClass").requireCompilationUnit();
+    var cu = env.requireType("a.b.c.BaseClass").requireCompilationUnit();
 
     //create sub type
     cuSrc = createSubClass();
@@ -141,7 +141,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
     env.reload();
     cu = env.requireType("a.b.c.BaseClass").requireCompilationUnit();
 
-    String expected = "" +
+    var expected = "" +
         "package a.b.c;\n" +
         "public class BaseClass {\n" +
         "  public void run() {\n" +
@@ -151,7 +151,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
     assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().get().asCharSequence()));
 
     //now read the type from the env
-    IType t2 = env.requireType("a.b.c.BaseClass");
+    var t2 = env.requireType("a.b.c.BaseClass");
     assertEquals(cu.requireMainType().methods().withName("run").first().get().source().get().asCharSequence(), t2.methods().withName("run").first().get().source().get().asCharSequence());
 
     //and again re-create modified base type

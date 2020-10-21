@@ -13,16 +13,14 @@ package org.eclipse.scout.sdk.core.generator;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.empty;
 import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.raw;
-import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformAnnotation;
 import static org.eclipse.scout.sdk.core.imports.ImportCollector.createImportDeclaration;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transformAnnotation;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -34,6 +32,7 @@ import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.IUnresolvedType;
 import org.eclipse.scout.sdk.core.model.api.MetaValueType;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 public final class SimpleGenerators {
@@ -74,7 +73,7 @@ public final class SimpleGenerators {
       case Type:
         return b -> b.classLiteral(mv.as(IType.class).reference(true));
       case Enum:
-        IField field = mv.as(IField.class);
+        var field = mv.as(IField.class);
         return b -> b.enumValue(field.requireDeclaringType().name(), field.elementName());
       case Annotation:
         return transformAnnotation(mv.as(IAnnotation.class), transformer)
@@ -88,16 +87,16 @@ public final class SimpleGenerators {
   }
 
   public static ISourceGenerator<IExpressionBuilder<?>> createArrayMetaValueGenerator(IArrayMetaValue mv, IWorkingCopyTransformer transformer) {
-    IMetaValue[] metaArray = mv.metaValueArray();
+    var metaArray = mv.metaValueArray();
 
     // do not inline this into the generator! the transformation must be executed before the generator is used!
-    List<ISourceGenerator<ISourceBuilder<?>>> generators = Arrays.stream(metaArray)
+    var generators = Arrays.stream(metaArray)
         .map(m -> createMetaValueGenerator(m, transformer))
         .map(g -> g.generalize(ExpressionBuilder::create))
         .collect(toList());
 
     // use newlines on multi-dimensional arrays and annotation arrays only
-    boolean useNewlines = metaArray.length > 0 && (metaArray[0].type() == MetaValueType.Array || metaArray[0].type() == MetaValueType.Annotation);
+    var useNewlines = metaArray.length > 0 && (metaArray[0].type() == MetaValueType.Array || metaArray[0].type() == MetaValueType.Annotation);
     return b -> b.array(generators.stream(), useNewlines);
   }
 

@@ -53,7 +53,7 @@ public class UpdateReferenceCountAction extends Action {
 
   private void handleEndSearchInUi(Supplier<IFileQueryResult> supplier, Throwable error) {
     if (error == null) {
-      TranslationKeysQuery query = (TranslationKeysQuery) supplier.get();
+      var query = (TranslationKeysQuery) supplier.get();
       m_controller.setReferenceProvider(new NlsReferenceProvider(query.resultByKey()));
     }
     else {

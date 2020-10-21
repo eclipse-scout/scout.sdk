@@ -77,7 +77,7 @@ public class DerivedResourceInputWithJdt implements IDerivedResourceInput {
       return false;
     }
 
-    DerivedResourceInputWithJdt other = (DerivedResourceInputWithJdt) obj;
+    var other = (DerivedResourceInputWithJdt) obj;
     return m_jdtType.equals(other.m_jdtType);
   }
 }

@@ -29,7 +29,6 @@ import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -73,8 +72,8 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
 
   private static <T> Map<T, Integer> buildPositionsMap(Collection<T> collection) {
     Map<T, Integer> elementPositionMap = new HashMap<>(collection.size());
-    int pos = 0;
-    for (T name : collection) {
+    var pos = 0;
+    for (var name : collection) {
       elementPositionMap.put(name, pos);
       pos++;
     }
@@ -83,26 +82,26 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
 
   private static Map<String, AnnotationElementSpi> buildAnnotationElementMap(Map<String, ?> defaultsMap, Object[] declaredPairs, AnnotationSpi owner, JavaEnvironmentWithEcj env) {
     // remember the position of each element by name
-    Map<String, Integer> elementPositionMap = buildPositionsMap(defaultsMap.keySet());
+    var elementPositionMap = buildPositionsMap(defaultsMap.keySet());
 
     // fill declared values
-    AnnotationElementSpi[] resultArr = new AnnotationElementSpi[defaultsMap.size()];
+    var resultArr = new AnnotationElementSpi[defaultsMap.size()];
     if (declaredPairs != null && declaredPairs.length > 0) {
-      for (Object declaredPair : declaredPairs) {
-        AnnotationElementSpi v = createAnnotationElementSpi(declaredPair, false, owner, env);
-        Integer idx = elementPositionMap.get(v.getElementName());
+      for (var declaredPair : declaredPairs) {
+        var v = createAnnotationElementSpi(declaredPair, false, owner, env);
+        var idx = elementPositionMap.get(v.getElementName());
         resultArr[idx] = v;
       }
     }
 
-    int pos = 0;
+    var pos = 0;
     Map<String, AnnotationElementSpi> result = new LinkedHashMap<>(defaultsMap.size());
     for (Entry<String, ?> e : defaultsMap.entrySet()) {
-      AnnotationElementSpi declaredElement = resultArr[pos];
+      var declaredElement = resultArr[pos];
       if (declaredElement == null) {
         // add default value
-        Object defaultValue = e.getValue();
-        String name = e.getKey();
+        var defaultValue = e.getValue();
+        var name = e.getKey();
         if (defaultValue == null) {
           // the annotation has no default value for this element and the element is not defined. this is a compile error but still might be possible in the source.
           result.put(name, env.createNullAnnotationValue(owner, name, true));
@@ -151,12 +150,12 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
     TypeBinding annotationType;
     Object[] explicitValues;
     if (annotation instanceof Annotation) {
-      Annotation binding = (Annotation) annotation;
+      var binding = (Annotation) annotation;
       explicitValues = binding.memberValuePairs();
       annotationType = binding.type.resolvedType;
     }
     else if (annotation instanceof AnnotationBinding) {
-      AnnotationBinding binding = (AnnotationBinding) annotation;
+      var binding = (AnnotationBinding) annotation;
       explicitValues = binding.getElementValuePairs();
       annotationType = binding.getAnnotationType();
     }
@@ -164,7 +163,7 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
       throw Ensure.newFail("Unsupported annotation type: '{}'.", annotation);
     }
 
-    Map<String, ?> defaultValues = getAnnotationDefaultValues(annotationType, env);
+    var defaultValues = getAnnotationDefaultValues(annotationType, env);
     return buildAnnotationElementMap(defaultValues, explicitValues, owner, env);
   }
 
@@ -186,9 +185,9 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      Annotation decl = SpiWithEcjUtils.findAnnotationDeclaration(this);
+      var decl = SpiWithEcjUtils.findAnnotationDeclaration(this);
       if (decl != null) {
-        CompilationUnitSpi cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
+        var cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
         return javaEnvWithEcj().getSource(cu, decl.sourceStart, decl.declarationSourceEnd);
       }
       return null;

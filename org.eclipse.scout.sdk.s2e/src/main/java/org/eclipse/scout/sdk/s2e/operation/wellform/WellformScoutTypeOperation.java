@@ -16,10 +16,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jdt.core.IBuffer;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
@@ -45,9 +41,9 @@ public class WellformScoutTypeOperation implements BiConsumer<EclipseEnvironment
 
   @Override
   public void accept(EclipseEnvironment env, EclipseProgress progress) {
-    SubMonitor monitor = progress.monitor();
+    var monitor = progress.monitor();
     monitor.beginTask("Wellform classes...", m_types.size());
-    for (IType t : m_types) {
+    for (var t : m_types) {
       if (monitor.isCanceled()) {
         return;
       }
@@ -64,30 +60,30 @@ public class WellformScoutTypeOperation implements BiConsumer<EclipseEnvironment
   }
 
   protected void wellformType(IType type, EclipseEnvironment env) throws JavaModelException {
-    ISourceRange typeRange = type.getSourceRange();
+    var typeRange = type.getSourceRange();
     if (!SourceRange.isAvailable(typeRange)) {
       return;
     }
 
-    ICompilationUnit icu = type.getCompilationUnit();
-    String lineSeparator = icu.findRecommendedLineSeparator();
-    Wellformer w = new Wellformer(lineSeparator, isRecursive());
+    var icu = type.getCompilationUnit();
+    var lineSeparator = icu.findRecommendedLineSeparator();
+    var w = new Wellformer(lineSeparator, isRecursive());
 
-    StringBuilder sourceBuilder = new StringBuilder(typeRange.getLength() * 2);
-    org.eclipse.scout.sdk.core.model.api.IType scoutType = env.toScoutType(type);
+    var sourceBuilder = new StringBuilder(typeRange.getLength() * 2);
+    var scoutType = env.toScoutType(type);
     if (scoutType == null) {
       SdkLog.warning("Type '{}' could not be found. Wellforming skipped.", type);
       return;
     }
-    boolean success = w.buildSource(scoutType, sourceBuilder);
+    var success = w.buildSource(scoutType, sourceBuilder);
     if (success) {
       try {
         currentWorkingCopyManager().register(icu, null);
 
         // apply changes
         TextEdit edit = new ReplaceEdit(typeRange.getOffset(), typeRange.getLength(), sourceBuilder.toString());
-        IBuffer icuBuffer = icu.getBuffer();
-        Document sourceDoc = new Document(icuBuffer.getContents());
+        var icuBuffer = icu.getBuffer();
+        var sourceDoc = new Document(icuBuffer.getContents());
         edit.apply(sourceDoc);
 
         // format

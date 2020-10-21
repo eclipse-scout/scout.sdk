@@ -94,7 +94,7 @@ public class FileQueryMatch extends FileRange {
     if (!super.equals(o)) {
       return false;
     }
-    FileQueryMatch that = (FileQueryMatch) o;
+    var that = (FileQueryMatch) o;
     return m_severity == that.m_severity;
   }
 

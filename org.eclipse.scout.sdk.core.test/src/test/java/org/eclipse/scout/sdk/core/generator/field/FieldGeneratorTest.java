@@ -39,7 +39,7 @@ public class FieldGeneratorTest {
 
   @Test
   public void testField(IJavaEnvironment env) {
-    IFieldGenerator<?> generator = FieldGenerator.create()
+    var generator = FieldGenerator.create()
         .asVolatile()
         .asPrivate()
         .asTransient()
@@ -54,7 +54,7 @@ public class FieldGeneratorTest {
 
   @Test
   public void testFieldWithoutValue() {
-    String src = FieldGenerator.create()
+    var src = FieldGenerator.create()
         .asFinal()
         .asProtected()
         .asStatic()
@@ -68,8 +68,8 @@ public class FieldGeneratorTest {
 
   @Test
   public void testStaticConstructor() {
-    String constrSrc = "static {\nint a = 4;\n}";
-    String src = FieldGenerator.create()
+    var constrSrc = "static {\nint a = 4;\n}";
+    var src = FieldGenerator.create()
         .withValue(b -> b.append(constrSrc))
         .toJavaSource()
         .toString();

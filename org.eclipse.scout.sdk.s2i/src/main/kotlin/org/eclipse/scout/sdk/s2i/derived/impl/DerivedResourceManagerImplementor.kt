@@ -17,7 +17,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.GlobalSearchScope.fileScope
@@ -55,10 +54,6 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         scheduleUpdate(union(events))
     }
     private var m_busConnection: MessageBusConnection? = null
-
-    init {
-        Disposer.register(project, this) // ensure it is disposed when the project closes
-    }
 
     override fun start() {
         addDerivedResourceHandlerFactory(DtoUpdateHandlerFactory())

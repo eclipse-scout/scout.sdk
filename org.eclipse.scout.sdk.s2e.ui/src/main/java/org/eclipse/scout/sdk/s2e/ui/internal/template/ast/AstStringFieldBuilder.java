@@ -10,12 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
 
 /**
  * <h3>{@link AstStringFieldBuilder}</h3>
@@ -39,13 +35,13 @@ public class AstStringFieldBuilder extends AstTypeBuilder<AstStringFieldBuilder>
 
   @SuppressWarnings("unchecked")
   protected void addGetConfiguredMaxLength() {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
 
-    NumberLiteral literal = ast.newNumberLiteral("128");
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var literal = ast.newNumberLiteral("128");
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(literal);
 
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
     getFactory().newMethod(getFactory().getScoutApi().AbstractStringField().getConfiguredMaxLengthMethodName())
@@ -57,7 +53,7 @@ public class AstStringFieldBuilder extends AstTypeBuilder<AstStringFieldBuilder>
         .insert();
 
     // linked positions
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPosition(getFactory().getRewrite().track(literal), true, AstNodeFactory.MAX_LEN_GROUP);
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IStringField().fqn());

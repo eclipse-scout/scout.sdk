@@ -39,9 +39,9 @@ public class LookupCallNewOperationTest {
   @ParameterizedTest(name = "withLookupService={0}, withServer={1}, withTest={2}")
   @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutServerJavaEnvironmentFactory.class))
   public void testLookupCallCreation(boolean lookupServiceSuperTypeFqn, boolean serverSourceFolder, boolean testSourceFolder, TestingEnvironment env) {
-    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
+    var scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
 
-    LookupCallNewOperation op = new LookupCallNewOperation();
+    var op = new LookupCallNewOperation();
     op.setKeyType(JavaTypes.Double);
     op.setLookupCallName("My" + ISdkConstants.SUFFIX_LOOKUP_CALL);
     if (lookupServiceSuperTypeFqn) {

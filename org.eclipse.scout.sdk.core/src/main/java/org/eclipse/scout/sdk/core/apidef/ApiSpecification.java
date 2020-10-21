@@ -8,26 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.util.apidef;
+package org.eclipse.scout.sdk.core.apidef;
 
 import static org.eclipse.scout.sdk.core.util.CoreUtils.invokeDefaultMethod;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.core.util.apidef.ApiVersion.requireApiLevelOf;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.log.MessageFormatter;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -36,7 +34,6 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 public class ApiSpecification implements InvocationHandler, IApiSpecification {
 
-  private final ApiVersion m_version;
   private final FinalValue<ApiVersion> m_level;
   private final Map<Class<? extends IApiSpecification>, Optional<?>> m_apiCache;
   private final Map<String, Entry<Method, ApiSpecification>> m_methods; // flattened over the full chain of api specs (for performance reasons)
@@ -46,10 +43,9 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
 
   private final ApiSpecification m_nestedApi;
 
-  protected ApiSpecification(ApiSpecification nestedApi, Class<? extends IApiSpecification> ifc, ApiVersion version) {
+  protected ApiSpecification(ApiSpecification nestedApi, Class<? extends IApiSpecification> ifc) {
     m_interface = Ensure.notNull(ifc);
     m_nestedApi = nestedApi; // may be null
-    m_version = version; // may be null indicating the "latest and greatest" version
     m_implementation = new FinalValue<>();
     m_level = new FinalValue<>();
     m_apiCache = new ConcurrentHashMap<>();
@@ -58,13 +54,12 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
 
   static IApiSpecification create(Collection<Class<? extends IApiSpecification>> apiClasses, ApiVersion version) {
     Predicate<ApiVersion> versionFilter = version == null || version == ApiVersion.LATEST ? v -> true : v -> v.compareTo(version) <= 0;
-    BiFunction<ApiSpecification, Class<? extends IApiSpecification>, ApiSpecification> wrapWith = (a, c) -> wrapWith(a, c, version);
-    ApiSpecification root = apiClasses.stream()
+    var root = apiClasses.stream()
         .map(ApiSpecification::associateWithLevel)
         .filter(e -> versionFilter.test(e.getKey()))
         .sorted(Entry.comparingByKey())
         .map(Entry::getValue)
-        .reduce(null, wrapWith, Ensure::failOnDuplicates);
+        .reduce(null, ApiSpecification::wrapWith, Ensure::failOnDuplicates);
     if (root == null) {
       return null;
     }
@@ -73,11 +68,11 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
   }
 
   static Entry<ApiVersion, Class<? extends IApiSpecification>> associateWithLevel(Class<? extends IApiSpecification> definition) {
-    return new SimpleEntry<>(requireApiLevelOf(definition), definition);
+    return new SimpleEntry<>(ApiVersion.requireApiLevelOf(definition), definition);
   }
 
-  static ApiSpecification wrapWith(ApiSpecification nested, Class<? extends IApiSpecification> wrapperInterface, ApiVersion version) {
-    return new ApiSpecification(nested, wrapperInterface, version);
+  static ApiSpecification wrapWith(ApiSpecification nested, Class<? extends IApiSpecification> wrapperInterface) {
+    return new ApiSpecification(nested, wrapperInterface);
   }
 
   public IApiSpecification nestedApiImplementation() {
@@ -94,19 +89,14 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
 
   @Override
   public ApiVersion level() {
-    return m_level.computeIfAbsentAndGet(() -> requireApiLevelOf(apiInterface()));
-  }
-
-  @Override
-  public Optional<ApiVersion> version() {
-    return Optional.ofNullable(m_version);
+    return m_level.computeIfAbsentAndGet(() -> ApiVersion.requireApiLevelOf(apiInterface()));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public Object invoke(Object proxy, Method method, Object[] args) {
     if (method.getDeclaringClass() == Object.class) {
-      String methodName = method.getName();
+      var methodName = method.getName();
       switch (methodName) {
         case "hashCode":
           return System.identityHashCode(proxy);
@@ -117,48 +107,45 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
       }
     }
     if (method.getDeclaringClass() == IApiSpecification.class) {
-      String methodName = method.getName();
+      var methodName = method.getName();
       switch (methodName) {
-        case "version":
-          return version();
         case "level":
           return level();
-        case "optApi":
-          return optApi((Class<? extends IApiSpecification>) args[0]);
         case "api":
           return api((Class<? extends IApiSpecification>) args[0]);
+        case "requireApi":
+          return requireApi((Class<? extends IApiSpecification>) args[0]);
       }
     }
     return invokeIfcMethod(method, args);
   }
 
   protected Object invokeIfcMethod(Method methodTemplate, Object[] args) {
-    String methodIdToFind = JavaTypes.createMethodIdentifier(methodTemplate);
-    Entry<Method, ApiSpecification> methodSpec = m_methods.get(methodIdToFind);
+    var methodIdToFind = JavaTypes.createMethodIdentifier(methodTemplate);
+    var methodSpec = m_methods.get(methodIdToFind);
     if (methodSpec == null) {
       throw newFail("Pure virtual function call: {}", methodTemplate);
     }
-    ApiSpecification spec = methodSpec.getValue();
-    return invokeDefaultMethod(spec.apiInterface(), spec.apiImplementation(), methodSpec.getKey(), args);
+    var spec = methodSpec.getValue();
+    return invokeDefaultMethod(spec.apiImplementation(), methodSpec.getKey(), args);
   }
 
   protected boolean mergeMethodsIntoCache(ApiSpecification spec) {
-    Stream.of(spec.apiInterface().getMethods())
+    Arrays.stream(spec.apiInterface().getMethods())
         .filter(Method::isDefault)
         .forEach(m -> m_methods.putIfAbsent(JavaTypes.createMethodIdentifier(m), new SimpleImmutableEntry<>(m, spec)));
     return true; // continue with the next spec
   }
 
   @Override
-  public <A extends IApiSpecification> A api(Class<A> apiDefinition) {
-    return optApi(apiDefinition).orElseThrow(() -> newFail("API {} is not supported.", apiDefinition.getSimpleName()));
+  public <A extends IApiSpecification> A requireApi(Class<A> apiDefinition) {
+    return api(apiDefinition).orElseThrow(() -> newFail("API {} is not supported.", apiDefinition.getSimpleName()));
   }
 
   @Override
-
   @SuppressWarnings("unchecked")
-  public <A extends IApiSpecification> Optional<A> optApi(Class<A> apiDefinition) {
-    Class<A> key = apiDefinition == null ? (Class<A>) IApiSpecification.class : apiDefinition;
+  public <A extends IApiSpecification> Optional<A> api(Class<A> apiDefinition) {
+    var key = apiDefinition == null ? (Class<A>) IApiSpecification.class : apiDefinition;
     return (Optional<A>) m_apiCache.computeIfAbsent(key, this::computeApi);
   }
 
@@ -168,9 +155,9 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
       return Optional.empty();
     }
 
-    FinalValue<A> result = new FinalValue<>();
+    var result = new FinalValue<A>();
     doInChain(invocationHandler -> {
-      IApiSpecification candidate = invocationHandler.apiImplementation();
+      var candidate = invocationHandler.apiImplementation();
       if (apiDefinition.isInstance(candidate)) {
         result.set((A) candidate);
         return false;
@@ -181,7 +168,7 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
   }
 
   protected void doInChain(Predicate<ApiSpecification> chainFunction) {
-    ApiSpecification invocationHandler = this;
+    var invocationHandler = this;
     do {
       if (!chainFunction.test(invocationHandler)) {
         return;

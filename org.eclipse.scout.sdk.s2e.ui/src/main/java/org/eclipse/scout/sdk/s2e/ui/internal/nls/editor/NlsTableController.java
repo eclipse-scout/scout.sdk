@@ -32,10 +32,8 @@ import org.eclipse.core.databinding.property.Properties;
 import org.eclipse.core.databinding.property.value.SimpleValueProperty;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
-import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableColorProvider;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -53,7 +51,6 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
 
@@ -98,7 +95,7 @@ public class NlsTableController extends ViewerComparator {
     m_stackListener = events -> m_view.getDisplay().asyncExec(() -> handleTranslationStoreStackEvents(events));
     m_disposeListener = e -> unbind();
 
-    ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+    var colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
     if (!colorRegistry.hasValueFor(COLOR_INACTIVE_FOREGROUND)) {
       colorRegistry.put(COLOR_INACTIVE_FOREGROUND, new RGB(166, 166, 166));
     }
@@ -158,8 +155,8 @@ public class NlsTableController extends ViewerComparator {
         m_observedColumns[INDEX_COLUMN_KEYS].fireChange(event.entry().get());
         return m_sortIndex == INDEX_COLUMN_KEYS;
       case TranslationStoreStackEvent.TYPE_UPDATE_TRANSLATION:
-        ITranslationEntry changedTranslation = event.entry().get();
-        for (int i = NUM_NON_LANGUAGE_COLS; i < m_observedColumns.length; i++) {
+        var changedTranslation = event.entry().get();
+        for (var i = NUM_NON_LANGUAGE_COLS; i < m_observedColumns.length; i++) {
           m_observedColumns[i].fireChange(changedTranslation);
         }
         return m_sortIndex > INDEX_COLUMN_KEYS;
@@ -181,7 +178,7 @@ public class NlsTableController extends ViewerComparator {
     m_observedColumns = new ObservedColumn[NUM_NON_LANGUAGE_COLS + allLanguages().size()];
     m_observedColumns[INDEX_COLUMN_REF_COUNT] = new ObservedColumn(INDEX_COLUMN_REF_COUNT);
     m_observedColumns[INDEX_COLUMN_KEYS] = new ObservedColumn(INDEX_COLUMN_KEYS);
-    for (int i = NUM_NON_LANGUAGE_COLS; i < m_observedColumns.length; i++) {
+    for (var i = NUM_NON_LANGUAGE_COLS; i < m_observedColumns.length; i++) {
       m_observedColumns[i] = new ObservedColumn(i);
     }
 
@@ -191,8 +188,8 @@ public class NlsTableController extends ViewerComparator {
         .collect(toList());
     m_translationList = new WritableList<>(m_translations, TranslationTableEntry.class);
 
-    TableViewer viewer = m_view.tableViewer();
-    ObservableListContentProvider<TranslationTableEntry> contentProvider = new ObservableListContentProvider<>();
+    var viewer = m_view.tableViewer();
+    var contentProvider = new ObservableListContentProvider<TranslationTableEntry>();
     viewer.setComparator(this);
     viewer.setLabelProvider(new NlsTableLabelProvider(contentProvider, m_observedColumns));
     viewer.setContentProvider(contentProvider);
@@ -202,10 +199,10 @@ public class NlsTableController extends ViewerComparator {
   }
 
   public void preservingSelectionDo(Runnable task) {
-    Table table = m_view.tableViewer().getTable();
+    var table = m_view.tableViewer().getTable();
     table.setRedraw(false);
     try {
-      Optional<NlsTableCell> selection = m_view.getCursorSelection();
+      var selection = m_view.getCursorSelection();
       task.run();
       selection.ifPresent(cell -> reveal(cell.entry().key(), cell.column()));
     }
@@ -219,7 +216,7 @@ public class NlsTableController extends ViewerComparator {
   }
 
   public void reveal(String keyToSelect, int columnToSelect) {
-    for (TableItem row : m_view.tableViewer().getTable().getItems()) {
+    for (var row : m_view.tableViewer().getTable().getItems()) {
       ITranslation e = entryOfRow(row);
       if (e.key().equals(keyToSelect)) {
         m_view.tableViewer().reveal(row.getData());
@@ -241,7 +238,7 @@ public class NlsTableController extends ViewerComparator {
   }
 
   protected Optional<TranslationTableEntry> translationToTableEntry(ITranslationEntry toSearch) {
-    for (TranslationTableEntry candidate : m_translations) {
+    for (var candidate : m_translations) {
       if (candidate.unwrap() == toSearch) {
         return Optional.of(candidate);
       }
@@ -250,9 +247,9 @@ public class NlsTableController extends ViewerComparator {
   }
 
   public List<ITranslationEntry> getSelectedEntries() {
-    IStructuredSelection selection = (IStructuredSelection) m_view.tableViewer().getSelection();
+    var selection = (IStructuredSelection) m_view.tableViewer().getSelection();
     List<ITranslationEntry> result = new ArrayList<>(selection.size());
-    for (Object o : selection) {
+    for (var o : selection) {
       result.add(entryOfRow(o));
     }
     return result;
@@ -261,7 +258,7 @@ public class NlsTableController extends ViewerComparator {
   protected String getColumnText(ITranslation element, int columnIndex) {
     switch (columnIndex) {
       case INDEX_COLUMN_REF_COUNT:
-        NlsReferenceProvider refProvider = getReferenceProvider();
+        var refProvider = getReferenceProvider();
         if (refProvider == null) {
           return "";
         }
@@ -269,8 +266,8 @@ public class NlsTableController extends ViewerComparator {
       case INDEX_COLUMN_KEYS:
         return element.key();
       default:
-        Language lang = languageOfColumn(columnIndex);
-        String text = element.text(lang).orElse("");
+        var lang = languageOfColumn(columnIndex);
+        var text = element.text(lang).orElse("");
         //noinspection HardcodedLineSeparator
         return Strings.replaceEach(text, new String[]{"\n", "\r"}, new String[]{" ", ""}).toString();
     }
@@ -278,7 +275,7 @@ public class NlsTableController extends ViewerComparator {
 
   @Override
   public int compare(Viewer viewer, Object e1, Object e2) {
-    int index = m_sortIndex;
+    var index = m_sortIndex;
     Object first;
     Object second;
     if (m_ascSorting) {
@@ -290,8 +287,8 @@ public class NlsTableController extends ViewerComparator {
       second = e2;
     }
 
-    String a = getColumnText(entryOfRow(first), index);
-    String b = getColumnText(entryOfRow(second), index);
+    var a = getColumnText(entryOfRow(first), index);
+    var b = getColumnText(entryOfRow(second), index);
 
     if (Objects.equals(a, b)) {
       return 0;
@@ -306,8 +303,8 @@ public class NlsTableController extends ViewerComparator {
     if (index == 0 && !a.isEmpty() && !b.isEmpty()) {
       // sort by NLS entry usage (numeric)
       try {
-        int numA = Integer.parseInt(a);
-        int numB = Integer.parseInt(b);
+        var numA = Integer.parseInt(a);
+        var numB = Integer.parseInt(b);
         return Integer.compare(numA, numB);
       }
       catch (NumberFormatException e) {
@@ -366,12 +363,12 @@ public class NlsTableController extends ViewerComparator {
   }
 
   protected void updateReferenceCountInTable() {
-    NlsReferenceProvider referenceProvider = getReferenceProvider();
+    var referenceProvider = getReferenceProvider();
     if (referenceProvider == null) {
       return; // no need to update ref count as there is no reference provider and therefore no count
     }
 
-    ObservedColumn refCountProperty = m_observedColumns[INDEX_COLUMN_REF_COUNT];
+    var refCountProperty = m_observedColumns[INDEX_COLUMN_REF_COUNT];
     if (refCountProperty != null) {
       m_stack.allEntries().forEach(refCountProperty::fireChange);
     }
@@ -414,13 +411,13 @@ public class NlsTableController extends ViewerComparator {
       if (INDEX_COLUMN_REF_COUNT == columnIndex) {
         return null;
       }
-      ITranslationEntry entry = entryOfRow(element);
+      var entry = entryOfRow(element);
       if (!entry.store().isEditable()) {
         return m_colorDisabledForeground;
       }
       if (columnIndex > INDEX_COLUMN_KEYS) {
-        Language lang = languageOfColumn(columnIndex);
-        boolean langExists = entry.store().languages().anyMatch(isEqual(lang));
+        var lang = languageOfColumn(columnIndex);
+        var langExists = entry.store().languages().anyMatch(isEqual(lang));
         if (!langExists) {
           return m_colorDisabledForeground;
         }
@@ -524,7 +521,7 @@ public class NlsTableController extends ViewerComparator {
         return false;
       }
 
-      TranslationTableEntry other = (TranslationTableEntry) obj;
+      var other = (TranslationTableEntry) obj;
       return m_id == other.m_id;
     }
   }

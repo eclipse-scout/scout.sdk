@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.MetaValueType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
@@ -45,23 +44,23 @@ public class CodeTypeNewOperationTest {
 
   @Test
   public void testCodeTypeLongInteger(TestingEnvironment env) {
-    IType codeType = testCodeTypeCreation(JavaTypes.Long, JavaTypes.Integer, env);
-    IField id = assertFieldExist(codeType, CodeTypeGenerator.ID_CONSTANT_NAME);
+    var codeType = testCodeTypeCreation(JavaTypes.Long, JavaTypes.Integer, env);
+    var id = assertFieldExist(codeType, CodeTypeGenerator.ID_CONSTANT_NAME);
     assertEquals(MetaValueType.Long, id.constantValue().get().type());
     assertEquals(UniqueIdExtension.UNIQUE_ID, id.constantValue().get().as(Long.class).longValue());
   }
 
   @Test
   public void testCodeTypeComplex(TestingEnvironment env) {
-    String codeTypeIdFqn = List.class.getName() + JavaTypes.C_GENERIC_START + BigDecimal.class.getName() + JavaTypes.C_GENERIC_END;
-    String codeIdFqn = Map.class.getName() + JavaTypes.C_GENERIC_START + BigDecimal.class.getName() + ", " + CharSequence.class.getName() + JavaTypes.C_GENERIC_END;
+    var codeTypeIdFqn = List.class.getName() + JavaTypes.C_GENERIC_START + BigDecimal.class.getName() + JavaTypes.C_GENERIC_END;
+    var codeIdFqn = Map.class.getName() + JavaTypes.C_GENERIC_START + BigDecimal.class.getName() + ", " + CharSequence.class.getName() + JavaTypes.C_GENERIC_END;
     testCodeTypeCreation(codeTypeIdFqn, codeIdFqn, env);
   }
 
   protected static IType testCodeTypeCreation(String codeTypeIdFqn, String codeIdFqn, TestingEnvironment env) {
-    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
-    String superTypeFqn = scoutApi.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + codeTypeIdFqn + ", " + codeIdFqn + JavaTypes.C_GENERIC_END;
-    CodeTypeNewOperation op = new CodeTypeNewOperation();
+    var scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
+    var superTypeFqn = scoutApi.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + codeTypeIdFqn + ", " + codeIdFqn + JavaTypes.C_GENERIC_END;
+    var op = new CodeTypeNewOperation();
     op.setCodeTypeIdDataType(codeTypeIdFqn);
     op.setCodeTypeName("My" + ISdkConstants.SUFFIX_CODE_TYPE);
     op.setPackage("org.eclipse.scout.sdk.s2e.shared.test");

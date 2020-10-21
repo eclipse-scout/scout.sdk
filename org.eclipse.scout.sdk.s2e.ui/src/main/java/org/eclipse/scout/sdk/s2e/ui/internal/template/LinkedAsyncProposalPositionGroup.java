@@ -73,7 +73,7 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
       @Override
       public void done(IJobChangeEvent event) {
         job.removeJobChangeListener(this);
-        IStatus result = event.getResult();
+        var result = event.getResult();
         if (result.isOK()) {
           fireLoaded();
         }
@@ -87,7 +87,7 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
         synchronized (this) {
           listeners = m_listeners.toArray(new ILinkedAsyncProposalListener[0]);
         }
-        for (ILinkedAsyncProposalListener listener : listeners) {
+        for (var listener : listeners) {
           listener.loaded();
         }
       }

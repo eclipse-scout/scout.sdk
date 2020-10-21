@@ -8,21 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.util.apidef;
+package org.eclipse.scout.sdk.core.apidef;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.Map;
-
 import org.eclipse.scout.sdk.core.fixture.apidef.IJavaApi;
-import org.eclipse.scout.sdk.core.fixture.apidef.JavaApi8.TestClass;
+import org.eclipse.scout.sdk.core.fixture.apidef.Java8Api.TestClass;
 import org.eclipse.scout.sdk.core.fixture.apidef.JavaApiProvider;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
-import org.eclipse.scout.sdk.core.util.apidef.Api.ChildElementType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -53,7 +50,7 @@ public class ApiTest {
 
   @Test
   public void testDump() {
-    Map<String, Map<ChildElementType, Map<String, String>>> dump = Api.dump(Api.create(IJavaApi.class, new ApiVersion(11)));
+    var dump = Api.dump(Api.create(IJavaApi.class, new ApiVersion(11)));
     assertNotNull(dump.get(TestClass.TEST_CLASS_FQN));
   }
 

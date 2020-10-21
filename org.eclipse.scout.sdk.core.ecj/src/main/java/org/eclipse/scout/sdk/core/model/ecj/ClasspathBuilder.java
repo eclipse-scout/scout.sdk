@@ -52,10 +52,10 @@ public class ClasspathBuilder {
    *          The runtime classpath entries.
    */
   protected ClasspathBuilder(Path jreHome, Collection<? extends ClasspathEntry> paths) {
-    Path javaHome = Optional.ofNullable(jreHome).orElseGet(JreInfo::runningJavaHome).normalize();
+    var javaHome = Optional.ofNullable(jreHome).orElseGet(JreInfo::runningJavaHome).normalize();
     m_jreInfo = JRE_INFOS.computeIfAbsent(javaHome, JreInfo::new);
 
-    Map<ClasspathEntry, Classpath> classpath = toClasspath(paths);
+    var classpath = toClasspath(paths);
     m_entries = classpath.keySet();
     m_classpath = classpath.values();
 
@@ -104,8 +104,8 @@ public class ClasspathBuilder {
 
   private static List<Classpath> createBootClasspathFor(JreInfo jre) {
     List<Classpath> result = new ArrayList<>();
-    Path jreHome = jre.jreHome();
-    Path rtSrcZip = jre.rtSrcZip();
+    var jreHome = jre.jreHome();
+    var rtSrcZip = jre.rtSrcZip();
     if (jre.supportsJrtModules()) {
       SdkLog.debug("Boot Classpath uses binary JRT modules of Java home: {}.", jreHome);
       result.add(FileSystem.getJrtClasspath(jreHome.toString(), null, null, null));
@@ -115,7 +115,7 @@ public class ClasspathBuilder {
       // append RT src.zip first
       appendSrcClasspathToEnd(result, rtSrcZip, null /* use default encoding */);
 
-      for (Path cpEntry : jre.bootClasspath()) {
+      for (var cpEntry : jre.bootClasspath()) {
         appendBinClasspathToEnd(result, cpEntry);
       }
     }
@@ -125,7 +125,7 @@ public class ClasspathBuilder {
 
   private Map<ClasspathEntry, Classpath> toClasspath(Collection<? extends ClasspathEntry> paths) {
     Map<ClasspathEntry, Classpath> result = new LinkedHashMap<>(paths.size());
-    String version = jreInfo().version();
+    var version = jreInfo().version();
     if (JreInfo.VERSION_1_8.equals(version)) {
       version = null; // multi release JARs are not supported before Java 9.
     }
@@ -135,7 +135,7 @@ public class ClasspathBuilder {
         continue; // skip duplicates. using the first of all duplicates on the cp
       }
 
-      Classpath classpath = toClasspath(cpe.path(), cpe.mode() == ClasspathSpi.MODE_SOURCE, cpe.encoding(), version);
+      var classpath = toClasspath(cpe.path(), cpe.mode() == ClasspathSpi.MODE_SOURCE, cpe.encoding(), version);
       if (classpath != null) {
         result.put(cpe, classpath);
       }
@@ -152,7 +152,7 @@ public class ClasspathBuilder {
   }
 
   private static void appendClasspathToEnd(Collection<Classpath> collector, Path f, boolean isSourceOnly, String encoding) {
-    Classpath cp = toClasspath(f, isSourceOnly, encoding, null);
+    var cp = toClasspath(f, isSourceOnly, encoding, null);
     if (cp == null) {
       return;
     }

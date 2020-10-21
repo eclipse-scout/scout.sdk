@@ -39,19 +39,19 @@ public class DepthFirstTraversal<T> implements ITreeTraversal<T> {
   }
 
   protected TreeVisitResult doVisitInternal(T toVisit, int level, int index) {
-    TreeVisitResult nextAction = m_visitor.preVisit(toVisit, level, index);
+    var nextAction = m_visitor.preVisit(toVisit, level, index);
     if (nextAction == TreeVisitResult.TERMINATE) {
       return TreeVisitResult.TERMINATE;
     }
 
     if (nextAction != TreeVisitResult.SKIP_SUBTREE) {
-      TreeVisitResult childResult = visitChildren(toVisit, level + 1);
+      var childResult = visitChildren(toVisit, level + 1);
       if (childResult == TreeVisitResult.TERMINATE) {
         return TreeVisitResult.TERMINATE;
       }
     }
 
-    boolean continueVisit = m_visitor.postVisit(toVisit, level, index);
+    var continueVisit = m_visitor.postVisit(toVisit, level, index);
     if (!continueVisit) {
       return TreeVisitResult.TERMINATE;
     }
@@ -60,12 +60,12 @@ public class DepthFirstTraversal<T> implements ITreeTraversal<T> {
   }
 
   protected TreeVisitResult visitChildren(T parent, int level) {
-    Stream<? extends T> children = m_childrenSupplier.apply(parent);
+    var children = m_childrenSupplier.apply(parent);
     if (children == null) {
       return TreeVisitResult.CONTINUE;
     }
 
-    AtomicInteger index = new AtomicInteger();
+    var index = new AtomicInteger();
     return children
         .map(child -> visitChild(child, level, index.getAndIncrement()))
         .filter(DepthFirstTraversal::isAbortResult)

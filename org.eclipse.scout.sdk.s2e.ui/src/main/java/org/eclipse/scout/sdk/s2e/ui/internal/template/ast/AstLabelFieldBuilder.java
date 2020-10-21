@@ -31,7 +31,7 @@ public class AstLabelFieldBuilder extends AstTypeBuilder<AstLabelFieldBuilder> {
     Annotation annotation = getFactory().newFormDataIgnoreAnnotation();
     AstUtils.addAnnotationTo(annotation, get());
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ILabelField().fqn());
     }

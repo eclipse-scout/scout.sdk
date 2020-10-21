@@ -14,6 +14,7 @@ import static java.lang.System.lineSeparator;
 import static java.time.Instant.ofEpochSecond;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.joining;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -23,6 +24,7 @@ import java.time.Clock;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -68,42 +70,35 @@ public class SdkLogTest {
     assertPlaceholders("a [[[11, 12]], [[13], [14, 15, 16]]] b", "a {} b", new Object[]{new int[][][]{{{11, 12}}, {{13}, {14, 15, 16}}}});
     assertPlaceholders("a false b", "a {} b", false, new Exception(), new Exception());
 
-    Object[] longArgs = new Object[101];
-    for (int i = 0; i < longArgs.length; i++) {
-      longArgs[i] = i + 1;
-    }
-    StringBuilder expected = new StringBuilder("1");
-    for (int i = 2; i <= 100; i++) {
-      expected.append(", ");
-      expected.append(i);
-    }
+    var longArgs = IntStream.range(1, 102).toArray();
+    var expected = IntStream.rangeClosed(1, 100)
+        .mapToObj(Integer::toString)
+        .collect(joining(", "));
 
     assertPlaceholders("a [" + expected + ",...] b", "a {} b", new Object[]{longArgs});
   }
 
   private static void assertPlaceholders(String expected, String input, Object... args) {
-    FormattingTuple tuple = MessageFormatter.arrayFormat(input, args);
-    String replaced = tuple.message();
+    var tuple = MessageFormatter.arrayFormat(input, args);
+    var replaced = tuple.message();
     assertEquals(expected, replaced);
 
-    int expectedNumThrowables = 0;
+    var expectedNumThrowables = 0L;
     if (args != null) {
-      int numReplaced = Math.min(Strings.countMatches(input, MessageFormatter.ARG_REPLACE_PATTERN), args.length);
-      for (int i = numReplaced; i < args.length; i++) {
-        if (args[i] instanceof Throwable) {
-          expectedNumThrowables++;
-        }
-      }
+      var numReplaced = Math.min(Strings.countMatches(input, MessageFormatter.ARG_REPLACE_PATTERN), args.length);
+      expectedNumThrowables = IntStream.range(numReplaced, args.length)
+          .filter(i -> args[i] instanceof Throwable)
+          .count();
     }
     assertEquals(expectedNumThrowables, tuple.throwables().size());
   }
 
   @Test
   public void testFormattingTuple() {
-    Exception e = new Exception("err");
-    FormattingTuple a = new FormattingTuple("msg", singletonList(e));
-    FormattingTuple b = new FormattingTuple("msg", singletonList(e));
-    FormattingTuple c = new FormattingTuple("msg", emptyList());
+    var e = new Exception("err");
+    var a = new FormattingTuple("msg", singletonList(e));
+    var b = new FormattingTuple("msg", singletonList(e));
+    var c = new FormattingTuple("msg", emptyList());
 
     assertEquals(a.hashCode(), b.hashCode());
     assertEquals(a.toString(), b.toString());
@@ -154,7 +149,7 @@ public class SdkLogTest {
       assertTrue(SdkLog.isWarningEnabled());
       SdkConsole.clear();
 
-      Exception exception = new Exception();
+      var exception = new Exception();
       SdkLog.warning("hello {} there", "test", exception);
       assertEqualsWithTime("[WARNING] hello test there" + lineSeparator() + Strings.fromThrowable(exception), logContent.toString());
       SdkConsole.clear();
@@ -205,10 +200,10 @@ public class SdkLogTest {
     // lock on console to ensure no other thread writes to the console while we are testing (in case tests are running in parallel)
     //noinspection SynchronizeOnThis
     synchronized (SdkConsole.class) {
-      ISdkConsoleSpi backup = SdkConsole.getConsoleSpi();
-      Level oldLevel = SdkLog.getLogLevel();
+      var backup = SdkConsole.getConsoleSpi();
+      var oldLevel = SdkLog.getLogLevel();
       try {
-        StringBuilder logContent = new StringBuilder();
+        var logContent = new StringBuilder();
         SdkLog.setLogLevel(initialLevel);
         SdkConsole.setConsoleSpi(new ISdkConsoleSpi() {
 

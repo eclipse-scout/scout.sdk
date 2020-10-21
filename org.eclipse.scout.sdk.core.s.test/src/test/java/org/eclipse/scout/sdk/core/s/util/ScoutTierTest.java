@@ -74,10 +74,10 @@ public class ScoutTierTest {
 
   @Test
   public void testFilterJavaElement() {
-    IScoutApi scoutApi = ScoutApi.latest();
-    IJavaEnvironment p = mock(IJavaEnvironment.class);
+    var scoutApi = ScoutApi.latest();
+    var p = mock(IJavaEnvironment.class);
     when(p.api(IScoutApi.class)).thenReturn(Optional.of(scoutApi));
-    IType mock = mock(IType.class);
+    var mock = mock(IType.class);
     when(mock.javaEnvironment()).thenReturn(p);
 
     assertFalse(ScoutTier.Shared.test(null));

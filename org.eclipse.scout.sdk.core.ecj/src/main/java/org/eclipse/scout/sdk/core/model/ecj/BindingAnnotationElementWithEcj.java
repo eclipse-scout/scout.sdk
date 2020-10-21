@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import org.eclipse.jdt.internal.compiler.ast.Expression;
-import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.jdt.internal.compiler.lookup.ElementValuePair;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
@@ -72,8 +71,8 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   @Override
   public IMetaValue getMetaValue() {
     return m_value.computeIfAbsentAndGet(() -> {
-      Object value = m_binding.getValue();
-      IMetaValue metaVal = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), value);
+      var value = m_binding.getValue();
+      var metaVal = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), value);
       if (metaVal != null) {
         return metaVal;
       }
@@ -95,7 +94,7 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      MemberValuePair pairDecl = SpiWithEcjUtils.findAnnotationValueDeclaration(this);
+      var pairDecl = SpiWithEcjUtils.findAnnotationValueDeclaration(this);
       if (pairDecl != null) {
         return new SourceRange(pairDecl.toString(), pairDecl.sourceStart, pairDecl.sourceEnd);
       }
@@ -104,7 +103,7 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   }
 
   protected Expression getSourceExpression() {
-    MemberValuePair pairDecl = SpiWithEcjUtils.findAnnotationValueDeclaration(this);
+    var pairDecl = SpiWithEcjUtils.findAnnotationValueDeclaration(this);
     if (pairDecl != null) {
       return pairDecl.value;
     }
@@ -114,7 +113,7 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   @Override
   public ISourceRange getSourceOfExpression() {
     return m_expressionSource.computeIfAbsentAndGet(() -> {
-      Expression expr = getSourceExpression();
+      var expr = getSourceExpression();
       if (expr != null) {
         return new SourceRange(expr.toString(), expr.sourceStart, expr.sourceEnd);
       }

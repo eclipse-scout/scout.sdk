@@ -84,13 +84,8 @@ public class TemplateProposalDescriptor {
     if (possibleChildren == null || possibleChildren.isEmpty()) {
       return false;
     }
-
-    for (String possibleChild : possibleChildren) {
-      if (hierarchy.isSubtypeOf(m_proposalIfcTypeFqn, possibleChild) && acceptSearchString(searchString)) {
-        return true;
-      }
-    }
-    return false;
+    return possibleChildren.stream()
+        .anyMatch(possibleChild -> hierarchy.isSubtypeOf(m_proposalIfcTypeFqn, possibleChild) && acceptSearchString(searchString));
   }
 
   protected boolean acceptSearchString(String searchString) {
@@ -107,8 +102,8 @@ public class TemplateProposalDescriptor {
       return true;
     }
 
-    for (String defaultSuperType : m_defaultSuperTypeFqns) {
-      String simpleName = JavaTypes.simpleName(defaultSuperType);
+    for (var defaultSuperType : m_defaultSuperTypeFqns) {
+      var simpleName = JavaTypes.simpleName(defaultSuperType);
       if (simpleName.startsWith(ISdkConstants.PREFIX_ABSTRACT)) {
         simpleName = simpleName.substring(ISdkConstants.PREFIX_ABSTRACT.length());
       }
@@ -117,7 +112,7 @@ public class TemplateProposalDescriptor {
       }
     }
 
-    for (String alias : m_aliasNames) {
+    for (var alias : m_aliasNames) {
       if (alias.toLowerCase(Locale.ENGLISH).contains(searchString)) {
         return true;
       }
@@ -127,7 +122,7 @@ public class TemplateProposalDescriptor {
 
   public ICompletionProposal createProposal(ICompilationUnit icu, int pos, ScoutModelHierarchy hierarchy, ISourceRange surroundingTypeNameRange, Future<EclipseEnvironment> provider, String searchString) {
     try {
-      TypeProposalContext context = new TypeProposalContext();
+      var context = new TypeProposalContext();
       context.setScoutModelHierarchy(hierarchy);
       context.setProvider(provider);
       context.setDefaultName(getDefaultNameOfNewType());
@@ -147,7 +142,7 @@ public class TemplateProposalDescriptor {
   }
 
   protected static String createDisplayNameFromIfc(CharSequence ifcFqn) {
-    String simpleName = JavaTypes.simpleName(ifcFqn);
+    var simpleName = JavaTypes.simpleName(ifcFqn);
     if (!simpleName.isEmpty() && simpleName.charAt(0) == 'I') {
       simpleName = simpleName.substring(1);
     }

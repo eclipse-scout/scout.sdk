@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 
 public interface IScoutInterfaceApi {
   IAccordion IAccordion();

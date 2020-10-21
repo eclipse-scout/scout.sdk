@@ -10,10 +10,10 @@
  */
 package org.eclipse.scout.sdk.s2e.environment;
 
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.callInContext;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -23,8 +23,8 @@ import java.util.function.Supplier;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -66,8 +66,8 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
     Ensure.notNull(r);
     Ensure.notNull(monitorSupplier);
 
-    WorkingCopyManager wcm = new WorkingCopyManager();
-    boolean save = false;
+    var wcm = new WorkingCopyManager();
+    var save = false;
     try {
       runWithWorkingCopyManager(r, wcm);
       save = true;
@@ -118,16 +118,13 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
   private boolean unregisterAllImpl(boolean save, IProgressMonitor monitor) {
     ensureOpen();
     try {
-      boolean tryToSave = save && (monitor == null || !monitor.isCanceled()); // only save if asked for save and not canceled yet.
+      var tryToSave = save && (monitor == null || !monitor.isCanceled()); // only save if asked for save and not canceled yet.
       if (tryToSave) {
-        Collection<IResource> resourcesToSave = new ArrayList<>(m_workingCopies.size());
-        for (ICompilationUnit icu : m_workingCopies) {
-          IResource resource = icu.getResource();
-          resourcesToSave.add(resource);
-        }
-
+        Collection<IResource> resourcesToSave = m_workingCopies.stream()
+            .map(IJavaElement::getResource)
+            .collect(toList());
         if (!resourcesToSave.isEmpty()) {
-          IStatus result = S2eUtils.makeCommittable(resourcesToSave);
+          var result = S2eUtils.makeCommittable(resourcesToSave);
           if (!result.isOK()) {
             tryToSave = false;
             SdkLog.info("Unable to make all resources committable. Save will be skipped.", new CoreException(result));
@@ -135,7 +132,7 @@ public final class WorkingCopyManager implements IWorkingCopyManager {
         }
       }
 
-      for (ICompilationUnit icu : m_workingCopies) {
+      for (var icu : m_workingCopies) {
         releaseCompilationUnit(icu, monitor, tryToSave);
       }
       return tryToSave;

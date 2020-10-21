@@ -22,8 +22,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper;
 import org.junit.jupiter.api.Test;
@@ -52,10 +50,10 @@ public class NestedMultiLevelFormFieldTest {
 
   private static void checkAbstractTemplateFieldData() {
     ScoutFixtureHelper.runWithSharedAndClientEnv((shared, client) -> {
-      IType modelType = client.requireType(AbstractTemplateField.class.getName());
+      var modelType = client.requireType(AbstractTemplateField.class.getName());
       assertFalse(DtoGeneratorFactory.createFormDataGenerator(modelType, shared).isPresent()); // must be empty because it is SdkCommand.USE
 
-      IType dto = client.requireType(AbstractTemplateFieldData.class.getName());
+      var dto = client.requireType(AbstractTemplateFieldData.class.getName());
       testApiOfAbstractTemplateFieldData(dto);
       return null;
     });
@@ -84,23 +82,23 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of AbstractMainBoxData
     assertEquals(1, abstractMainBoxData.fields().stream().count(), "field count of 'AbstractMainBoxData'");
-    IField serialVersionUID = assertFieldExist(abstractMainBoxData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(abstractMainBoxData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, abstractMainBoxData.methods().stream().count(), "method count of 'AbstractMainBoxData'");
-    IMethod getFirstLevel = assertMethodExist(abstractMainBoxData, "getFirstLevel", new String[]{});
+    var getFirstLevel = assertMethodExist(abstractMainBoxData, "getFirstLevel", new String[]{});
     assertMethodReturnType(getFirstLevel, "formdata.shared.ui.template.formfield.replace.levels.AbstractMainBoxData$FirstLevel");
 
     assertEquals(1, abstractMainBoxData.innerTypes().stream().count(), "inner types count of 'AbstractMainBoxData'");
     // type FirstLevel
-    IType firstLevel = assertTypeExists(abstractMainBoxData, "FirstLevel");
+    var firstLevel = assertTypeExists(abstractMainBoxData, "FirstLevel");
     assertHasFlags(firstLevel, 9);
     assertHasSuperClass(firstLevel, "formdata.shared.ui.template.formfield.replace.levels.AbstractTemplateFieldData<java.lang.Number>");
 
     // fields of FirstLevel
     assertEquals(1, firstLevel.fields().stream().count(), "field count of 'FirstLevel'");
-    IField serialVersionUID1 = assertFieldExist(firstLevel, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(firstLevel, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 
@@ -117,7 +115,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of AbstractTemplateFieldData
     assertEquals(1, abstractTemplateFieldData.fields().stream().count(), "field count of 'AbstractTemplateFieldData'");
-    IField serialVersionUID = assertFieldExist(abstractTemplateFieldData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(abstractTemplateFieldData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
@@ -134,23 +132,23 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of FirstLevelFormData
     assertEquals(1, firstLevelFormData.fields().stream().count(), "field count of 'FirstLevelFormData'");
-    IField serialVersionUID = assertFieldExist(firstLevelFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(firstLevelFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, firstLevelFormData.methods().stream().count(), "method count of 'FirstLevelFormData'");
-    IMethod getFirstInnerBox = assertMethodExist(firstLevelFormData, "getFirstInnerBox", new String[]{});
+    var getFirstInnerBox = assertMethodExist(firstLevelFormData, "getFirstInnerBox", new String[]{});
     assertMethodReturnType(getFirstInnerBox, "formdata.shared.ui.template.formfield.replace.levels.FirstLevelFormData$FirstInnerBox");
 
     assertEquals(1, firstLevelFormData.innerTypes().stream().count(), "inner types count of 'FirstLevelFormData'");
     // type FirstInnerBox
-    IType firstInnerBox = assertTypeExists(firstLevelFormData, "FirstInnerBox");
+    var firstInnerBox = assertTypeExists(firstLevelFormData, "FirstInnerBox");
     assertHasFlags(firstInnerBox, 9);
     assertHasSuperClass(firstInnerBox, "formdata.shared.ui.template.formfield.replace.levels.AbstractMainBoxData");
 
     // fields of FirstInnerBox
     assertEquals(1, firstInnerBox.fields().stream().count(), "field count of 'FirstInnerBox'");
-    IField serialVersionUID1 = assertFieldExist(firstInnerBox, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(firstInnerBox, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 
@@ -167,41 +165,41 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of SecondLevelFormData
     assertEquals(1, secondLevelFormData.fields().stream().count(), "field count of 'SecondLevelFormData'");
-    IField serialVersionUID = assertFieldExist(secondLevelFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(secondLevelFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, secondLevelFormData.methods().stream().count(), "method count of 'SecondLevelFormData'");
-    IMethod getSecondInnerBox = assertMethodExist(secondLevelFormData, "getSecondInnerBox", new String[]{});
+    var getSecondInnerBox = assertMethodExist(secondLevelFormData, "getSecondInnerBox", new String[]{});
     assertMethodReturnType(getSecondInnerBox, "formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox");
 
     assertEquals(1, secondLevelFormData.innerTypes().stream().count(), "inner types count of 'SecondLevelFormData'");
     // type SecondInnerBox
-    IType secondInnerBox = assertTypeExists(secondLevelFormData, "SecondInnerBox");
+    var secondInnerBox = assertTypeExists(secondLevelFormData, "SecondInnerBox");
     assertHasFlags(secondInnerBox, 9);
     assertHasSuperClass(secondInnerBox, "formdata.shared.ui.template.formfield.replace.levels.FirstLevelFormData$FirstInnerBox");
     assertAnnotation(secondInnerBox, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SecondInnerBox
     assertEquals(1, secondInnerBox.fields().stream().count(), "field count of 'SecondInnerBox'");
-    IField serialVersionUID1 = assertFieldExist(secondInnerBox, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(secondInnerBox, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(1, secondInnerBox.methods().stream().count(), "method count of 'SecondInnerBox'");
-    IMethod getSecondLevel = assertMethodExist(secondInnerBox, "getSecondLevel", new String[]{});
+    var getSecondLevel = assertMethodExist(secondInnerBox, "getSecondLevel", new String[]{});
     assertMethodReturnType(getSecondLevel, "formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox$SecondLevel");
 
     assertEquals(1, secondInnerBox.innerTypes().stream().count(), "inner types count of 'SecondInnerBox'");
     // type SecondLevel
-    IType secondLevel = assertTypeExists(secondInnerBox, "SecondLevel");
+    var secondLevel = assertTypeExists(secondInnerBox, "SecondLevel");
     assertHasFlags(secondLevel, 9);
     assertHasSuperClass(secondLevel, "formdata.shared.ui.template.formfield.replace.levels.AbstractMainBoxData$FirstLevel");
     assertAnnotation(secondLevel, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of SecondLevel
     assertEquals(1, secondLevel.fields().stream().count(), "field count of 'SecondLevel'");
-    IField serialVersionUID2 = assertFieldExist(secondLevel, "serialVersionUID");
+    var serialVersionUID2 = assertFieldExist(secondLevel, "serialVersionUID");
     assertHasFlags(serialVersionUID2, 26);
     assertFieldType(serialVersionUID2, "long");
 
@@ -218,41 +216,41 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of ThirdLevelFormData
     assertEquals(1, thirdLevelFormData.fields().stream().count(), "field count of 'ThirdLevelFormData'");
-    IField serialVersionUID = assertFieldExist(thirdLevelFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(thirdLevelFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, thirdLevelFormData.methods().stream().count(), "method count of 'ThirdLevelFormData'");
-    IMethod getThirdInnerBox = assertMethodExist(thirdLevelFormData, "getThirdInnerBox", new String[]{});
+    var getThirdInnerBox = assertMethodExist(thirdLevelFormData, "getThirdInnerBox", new String[]{});
     assertMethodReturnType(getThirdInnerBox, "formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData$ThirdInnerBox");
 
     assertEquals(1, thirdLevelFormData.innerTypes().stream().count(), "inner types count of 'ThirdLevelFormData'");
     // type ThirdInnerBox
-    IType thirdInnerBox = assertTypeExists(thirdLevelFormData, "ThirdInnerBox");
+    var thirdInnerBox = assertTypeExists(thirdLevelFormData, "ThirdInnerBox");
     assertHasFlags(thirdInnerBox, 9);
     assertHasSuperClass(thirdInnerBox, "formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox");
     assertAnnotation(thirdInnerBox, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of ThirdInnerBox
     assertEquals(1, thirdInnerBox.fields().stream().count(), "field count of 'ThirdInnerBox'");
-    IField serialVersionUID1 = assertFieldExist(thirdInnerBox, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(thirdInnerBox, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(1, thirdInnerBox.methods().stream().count(), "method count of 'ThirdInnerBox'");
-    IMethod getThirdLevel = assertMethodExist(thirdInnerBox, "getThirdLevel", new String[]{});
+    var getThirdLevel = assertMethodExist(thirdInnerBox, "getThirdLevel", new String[]{});
     assertMethodReturnType(getThirdLevel, "formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData$ThirdInnerBox$ThirdLevel");
 
     assertEquals(1, thirdInnerBox.innerTypes().stream().count(), "inner types count of 'ThirdInnerBox'");
     // type ThirdLevel
-    IType thirdLevel = assertTypeExists(thirdInnerBox, "ThirdLevel");
+    var thirdLevel = assertTypeExists(thirdInnerBox, "ThirdLevel");
     assertHasFlags(thirdLevel, 9);
     assertHasSuperClass(thirdLevel, "formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox$SecondLevel");
     assertAnnotation(thirdLevel, "org.eclipse.scout.rt.platform.Replace");
 
     // fields of ThirdLevel
     assertEquals(1, thirdLevel.fields().stream().count(), "field count of 'ThirdLevel'");
-    IField serialVersionUID2 = assertFieldExist(thirdLevel, "serialVersionUID");
+    var serialVersionUID2 = assertFieldExist(thirdLevel, "serialVersionUID");
     assertHasFlags(serialVersionUID2, 26);
     assertFieldType(serialVersionUID2, "long");
 

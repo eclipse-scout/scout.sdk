@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -25,11 +24,9 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Base64.Encoder;
-import java.util.Collection;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import javax.xml.transform.TransformerException;
 
@@ -44,10 +41,8 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * <h3>{@link ScoutProjectNewHelper}</h3>
@@ -82,15 +77,15 @@ public final class ScoutProjectNewHelper {
 
     // validate input
     Ensure.notNull(workingDir);
-    String groupIdMsg = getMavenGroupIdErrorMessage(groupId);
+    var groupIdMsg = getMavenGroupIdErrorMessage(groupId);
     if (groupIdMsg != null) {
       throw new IllegalArgumentException(groupIdMsg);
     }
-    String artifactIdMsg = getMavenArtifactIdErrorMessage(artifactId);
+    var artifactIdMsg = getMavenArtifactIdErrorMessage(artifactId);
     if (artifactIdMsg != null) {
       throw new IllegalArgumentException(artifactIdMsg);
     }
-    String displayNameMsg = getDisplayNameErrorMessage(displayName);
+    var displayNameMsg = getDisplayNameErrorMessage(displayName);
     if (displayNameMsg != null) {
       throw new IllegalArgumentException(displayNameMsg);
     }
@@ -107,13 +102,13 @@ public final class ScoutProjectNewHelper {
       archetypeVersion = IMavenConstants.LATEST;
     }
 
-    String pck = getPackage(groupId, artifactId);
-    String artifactName = getArtifactName(artifactId);
+    var pck = getPackage(groupId, artifactId);
+    var artifactName = getArtifactName(artifactId);
 
     // create command
-    String[] authKeysForWar = generateKeyPairSafe();
-    String[] authKeysForDev = generateKeyPairSafe();
-    MavenBuild archetypeBuild = new MavenBuild()
+    var authKeysForWar = generateKeyPairSafe();
+    var authKeysForDev = generateKeyPairSafe();
+    var archetypeBuild = new MavenBuild()
         .withWorkingDirectory(workingDir)
         .withGoal("archetype:generate")
         .withOption(MavenBuild.OPTION_BATCH_MODE)
@@ -140,7 +135,7 @@ public final class ScoutProjectNewHelper {
   }
 
   static String getArtifactName(String artifactId) {
-    int pos = artifactId.lastIndexOf('.');
+    var pos = artifactId.lastIndexOf('.');
     if (pos < 0 || pos >= artifactId.length() - 1) {
       return artifactId;
     }
@@ -160,7 +155,7 @@ public final class ScoutProjectNewHelper {
     }
     catch (GeneralSecurityException e) {
       SdkLog.warning("Could not generate a new key pair.", e);
-      String keyPlaceholder = "TODO_use_org.eclipse.scout.rt.platform.security.SecurityUtility.main(String[]))";
+      var keyPlaceholder = "TODO_use_org.eclipse.scout.rt.platform.security.SecurityUtility.main(String[]))";
       return new String[]{keyPlaceholder, keyPlaceholder};
     }
   }
@@ -174,15 +169,15 @@ public final class ScoutProjectNewHelper {
    *         encoded public key at index 1.
    */
   static String[] generateKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC", "SunEC");
+    var keyGen = KeyPairGenerator.getInstance("EC", "SunEC");
     AlgorithmParameterSpec spec = new ECGenParameterSpec("secp256k1");
     keyGen.initialize(spec, new SecureRandom());
-    KeyPair keyPair = keyGen.generateKeyPair();
+    var keyPair = keyGen.generateKeyPair();
 
     EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded());
     EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded());
 
-    Encoder base64Encoder = Base64.getEncoder();
+    var base64Encoder = Base64.getEncoder();
 
     return new String[]{base64Encoder.encodeToString(pkcs8EncodedKeySpec.getEncoded()) /*private key*/, base64Encoder.encodeToString(x509EncodedKeySpec.getEncoded()) /* public key*/};
   }
@@ -193,28 +188,19 @@ public final class ScoutProjectNewHelper {
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   static void postProcessRootPom(Path targetDirectory) throws IOException {
     try {
-      Path pom = targetDirectory.resolve(IMavenConstants.POM);
+      var pom = targetDirectory.resolve(IMavenConstants.POM);
       if (!Files.isReadable(pom) || !Files.isRegularFile(pom)) {
         return;
       }
 
-      Document doc = Xml.get(pom);
-      Element modules = Xml.firstChildElement(doc.getDocumentElement(), IMavenConstants.MODULES).get();
-      NodeList childNodes = modules.getChildNodes();
-      Collection<Node> nodesToRemove = new ArrayList<>();
-      String targetDirectoryName = targetDirectory.getFileName().toString();
-      for (int i = 0; i < childNodes.getLength(); i++) {
-        Node n = childNodes.item(i);
-        if (n.getNodeType() == Node.TEXT_NODE
-            || (n.getNodeType() == Node.ELEMENT_NODE
-                && IMavenConstants.MODULE.equals(((Element) n).getTagName())
-                && !targetDirectoryName.equals(n.getTextContent().trim()))) {
-          nodesToRemove.add(n);
-        }
-      }
-      for (Node n : nodesToRemove) {
-        modules.removeChild(n);
-      }
+      var doc = Xml.get(pom);
+      var modules = Xml.firstChildElement(doc.getDocumentElement(), IMavenConstants.MODULES).get();
+      var childNodes = modules.getChildNodes();
+      var targetDirectoryName = targetDirectory.getFileName().toString();
+      IntStream.range(0, childNodes.getLength())
+          .mapToObj(childNodes::item)
+          .filter(n -> isNodeToRemove(n, targetDirectoryName))
+          .forEach(modules::removeChild);
 
       Ensure.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");
       Xml.writeDocument(doc, false, pom);
@@ -222,6 +208,11 @@ public final class ScoutProjectNewHelper {
     catch (TransformerException e) {
       throw new IOException(e);
     }
+  }
+
+  static boolean isNodeToRemove(Node n, String targetDirectoryName) {
+    return n.getNodeType() == Node.TEXT_NODE
+        || (n.getNodeType() == Node.ELEMENT_NODE && IMavenConstants.MODULE.equals(((Element) n).getTagName()) && !targetDirectoryName.equals(n.getTextContent().trim()));
   }
 
   public static String getDisplayNameErrorMessage(CharSequence displayNameCandidate) {
@@ -251,7 +242,7 @@ public final class ScoutProjectNewHelper {
       return "The " + attributeName + " value is not valid.";
     }
     // reserved java keywords
-    String jkw = getContainingJavaKeyWord(nameCandidate);
+    var jkw = getContainingJavaKeyWord(nameCandidate);
     if (jkw != null) {
       return "The " + attributeName + " must not contain the Java keyword '" + jkw + "'.";
     }
@@ -259,11 +250,9 @@ public final class ScoutProjectNewHelper {
   }
 
   private static String getContainingJavaKeyWord(String s) {
-    for (String keyWord : JavaTypes.getJavaKeyWords()) {
-      if (s.startsWith(keyWord + JavaTypes.C_DOT) || s.endsWith(JavaTypes.C_DOT + keyWord) || s.contains(JavaTypes.C_DOT + keyWord + JavaTypes.C_DOT)) {
-        return keyWord;
-      }
-    }
-    return null;
+    return JavaTypes.getJavaKeyWords().stream()
+        .filter(keyWord -> s.startsWith(keyWord + JavaTypes.C_DOT) || s.endsWith(JavaTypes.C_DOT + keyWord) || s.contains(JavaTypes.C_DOT + keyWord + JavaTypes.C_DOT))
+        .findFirst()
+        .orElse(null);
   }
 }

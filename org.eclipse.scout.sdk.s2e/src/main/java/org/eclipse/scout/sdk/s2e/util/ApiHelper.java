@@ -18,10 +18,10 @@ import java.util.function.Function;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.scout.sdk.core.apidef.ApiVersion;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
-import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 
 public final class ApiHelper {
@@ -34,12 +34,12 @@ public final class ApiHelper {
   }
 
   public static IScoutApi requireScoutApiFor(IJavaElement context, EclipseEnvironment environment) {
-    IJavaProject project = context.getJavaProject();
+    var project = context.getJavaProject();
     return applyWithEclipseEnvironment(e -> requireApiFor(project, IScoutApi.class, e), environment);
   }
 
   public static Optional<ApiVersion> scoutVersionOf(IJavaElement context, EclipseEnvironment environment) {
-    IJavaProject project = context.getJavaProject();
+    var project = context.getJavaProject();
     return applyWithEclipseEnvironment(e -> ScoutApi.version(e.toScoutJavaEnvironment(project)), environment);
   }
 

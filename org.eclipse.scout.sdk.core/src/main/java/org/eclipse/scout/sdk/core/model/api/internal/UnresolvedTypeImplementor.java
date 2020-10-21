@@ -15,7 +15,6 @@ import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createUnreso
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
@@ -29,6 +28,7 @@ import org.eclipse.scout.sdk.core.model.api.internal.UnresolvedTypeImplementor.U
 import org.eclipse.scout.sdk.core.model.spi.AbstractSpiElement;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
@@ -105,7 +105,7 @@ public class UnresolvedTypeImplementor extends AbstractJavaElementImplementor<Un
 
       m_type = null;
       m_name = name;
-      int dot = name.lastIndexOf(JavaTypes.C_DOT);
+      var dot = name.lastIndexOf(JavaTypes.C_DOT);
       if (dot > 0) {
         m_package = env.getPackage(name.substring(0, dot)).wrap();
         m_simpleName = name.substring(dot + 1);

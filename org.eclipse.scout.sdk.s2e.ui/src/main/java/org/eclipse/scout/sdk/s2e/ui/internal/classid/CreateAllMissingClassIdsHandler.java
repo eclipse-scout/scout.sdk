@@ -28,10 +28,10 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class CreateAllMissingClassIdsHandler extends AbstractHandler {
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
-    MessageBox messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+    var messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
     messageBox.setMessage("This will create all missing @ClassId annotations in the workspace.\nDepending on the size of your workspace this can take several minutes.\nDo you really want to continue?");
     messageBox.setText("Do you really want to create all missing @ClassId annotations?");
-    int answer = messageBox.open();
+    var answer = messageBox.open();
     if (answer == SWT.YES) {
       runInEclipseEnvironment(new MissingClassIdsNewOperation());
     }

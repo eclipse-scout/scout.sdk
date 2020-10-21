@@ -125,7 +125,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    * @return this
    */
   public T exclude(String regex) {
-    Pattern pat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+    var pat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
     m_sourceExcludes.put(regex, pat);
     m_binaryExcludes.put(regex, pat);
     return thisInstance();
@@ -341,12 +341,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     }
 
     CharSequence s = f.toString().replace(File.separatorChar, '/');
-    for (Pattern p : exclusions) {
-      if (p.matcher(s).matches()) {
-        return true;
-      }
-    }
-    return false;
+    return exclusions.stream().anyMatch(p -> p.matcher(s).matches());
   }
 
   /**
@@ -367,7 +362,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     if (f == null || !Files.isReadable(f)) {
       return;
     }
-    String charsetName = Optional.ofNullable(encoding).map(Charset::name).orElse(null);
+    var charsetName = Optional.ofNullable(encoding).map(Charset::name).orElse(null);
     collector.add(new ClasspathEntry(f, isSource ? ClasspathSpi.MODE_SOURCE : ClasspathSpi.MODE_BINARY, charsetName));
   }
 
@@ -377,7 +372,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
       return;
     }
 
-    for (Path path : sourceAttachmentsFor) {
+    for (var path : sourceAttachmentsFor) {
       if (path.endsWith("target/classes")) {
         filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.MAIN_JAVA_SOURCE_FOLDER), collector);
         filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER), collector);
@@ -387,9 +382,9 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
         filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.TEST_JAVA_SOURCE_FOLDER), collector);
       }
       else {
-        String extension = CoreUtils.extensionOf(path);
+        var extension = CoreUtils.extensionOf(path);
         if ("jar".equals(extension) || "zip".equals(extension)) {
-          String fileName = path.getFileName().toString(); // no lower case here! Otherwise case sensitive filesystem may not find the file anymore!
+          var fileName = path.getFileName().toString(); // no lower case here! Otherwise case sensitive filesystem may not find the file anymore!
           fileName = fileName.substring(0, fileName.length() - 4) + "-sources" + fileName.substring(fileName.length() - 4);
           filterAndAppendSourcePath(path.getParent().resolve(fileName), collector);
         }
@@ -398,20 +393,20 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   }
 
   protected static Collection<ClasspathEntry> sort(Collection<ClasspathEntry> allEntries) {
-    int numBuckets = 4;
+    var numBuckets = 4;
     Map<Integer, List<ClasspathEntry>> buckets = new HashMap<>(numBuckets);
-    for (ClasspathEntry entry : allEntries) {
+    for (var entry : allEntries) {
       buckets.computeIfAbsent(bucketOf(entry), ArrayList::new).add(entry);
     }
     Collection<ClasspathEntry> grouped = new ArrayList<>(allEntries.size());
-    for (int i = 0; i < numBuckets; i++) {
+    for (var i = 0; i < numBuckets; i++) {
       addBucket(i, grouped, buckets);
     }
     return grouped;
   }
 
   protected static void addBucket(int index, Collection<ClasspathEntry> grouped, Map<Integer, List<ClasspathEntry>> buckets) {
-    List<ClasspathEntry> bucketContent = buckets.get(index);
+    var bucketContent = buckets.get(index);
     if (bucketContent == null) {
       return;
     }
@@ -419,7 +414,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   }
 
   protected static Integer bucketOf(ClasspathEntry entry) {
-    int result = 0;
+    var result = 0;
     if (!Files.isDirectory(entry.path())) {
       result++;
     }
@@ -437,7 +432,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
       appendSourceAttachments(sourceAttachmentFor, allEntries); // find source attachments for the running classpath entries
     }
 
-    CompilerOptions opts = EcjAstCompiler.createDefaultOptions();
+    var opts = EcjAstCompiler.createDefaultOptions();
     opts.ignoreMethodBodies = !isParseMethodBodies();
     return build(javaHome(), sort(allEntries), opts);
   }
@@ -456,7 +451,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    * @return The return value of the specified {@link Function}.
    */
   public <R> R call(Function<IJavaEnvironment, R> task) {
-    try (JavaEnvironmentWithEcj env = build()) {
+    try (var env = build()) {
       return Ensure.notNull(task).apply(env.wrap());
     }
   }

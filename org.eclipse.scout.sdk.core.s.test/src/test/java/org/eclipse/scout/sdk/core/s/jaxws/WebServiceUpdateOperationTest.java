@@ -18,9 +18,6 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.jaxws.WebServiceUpdateOperation.BindingClassUpdate;
@@ -50,7 +47,7 @@ public class WebServiceUpdateOperationTest {
 
   @Test
   public void testUpdateWebServiceConsumer() throws IOException {
-    Path root = CoreScoutTestingUtils.createClassicTestProject();
+    var root = CoreScoutTestingUtils.createClassicTestProject();
     try {
       WebServiceNewOperationTest.runCreateJaxWsModule(testUpdateConsumer(root));
     }
@@ -63,7 +60,7 @@ public class WebServiceUpdateOperationTest {
 
   @Test
   public void testUpdateWebServiceProvider() throws IOException {
-    Path root = CoreScoutTestingUtils.createClassicTestProject();
+    var root = CoreScoutTestingUtils.createClassicTestProject();
     try {
       WebServiceNewOperationTest.runCreateJaxWsModule(testUpdateProvider(root));
     }
@@ -77,19 +74,19 @@ public class WebServiceUpdateOperationTest {
   protected static Consumer<TestingEnvironment> testUpdateConsumer(Path root) {
     return env -> {
       // create project with web service
-      String origPackage = "test.consumer.multifile";
-      AbstractWebServiceNewOperation wsCreateOp = WebServiceNewOperationTest.createWebServiceConsumer(root, true, WebServiceNewOperationTest.MULTI_FILE_WSDL, origPackage, env);
-      Path jaxwsProjectDirectory = wsCreateOp.getProjectRoot();
-      IClasspathEntry sourceFolder = wsCreateOp.getSourceFolder();
-      IJavaEnvironment javaEnvironment = sourceFolder.javaEnvironment();
-      IType wsClient = javaEnvironment.requireType(origPackage + JavaTypes.C_DOT + "ScoutQueryInterface2WebServiceClient");
+      var origPackage = "test.consumer.multifile";
+      var wsCreateOp = WebServiceNewOperationTest.createWebServiceConsumer(root, true, WebServiceNewOperationTest.MULTI_FILE_WSDL, origPackage, env);
+      var jaxwsProjectDirectory = wsCreateOp.getProjectRoot();
+      var sourceFolder = wsCreateOp.getSourceFolder();
+      var javaEnvironment = sourceFolder.javaEnvironment();
+      var wsClient = javaEnvironment.requireType(origPackage + JavaTypes.C_DOT + "ScoutQueryInterface2WebServiceClient");
 
       // start update
-      String newPortTypePackage = "test.consumer.newMultiFile";
-      String newPortTypeName = "IChangedPortType";
-      String newServiceName = "ChangedNameService";
+      var newPortTypePackage = "test.consumer.newMultiFile";
+      var newPortTypeName = "IChangedPortType";
+      var newServiceName = "ChangedNameService";
 
-      WebServiceUpdateOperation wsUpdateOp = createWsUpdateOp(wsCreateOp);
+      var wsUpdateOp = createWsUpdateOp(wsCreateOp);
       wsUpdateOp.setPackage(newPortTypePackage);
       wsUpdateOp.addBindingClassUpdate(new BindingClassUpdate(JaxWsUtils.getWebServiceXPath(WEB_SERVICE_NAME_IN_WSDL), newServiceName));
       wsUpdateOp.addBindingClassUpdate(new BindingClassUpdate(JaxWsUtils.getPortTypeXPath(PORT_TYPE_NAME_IN_WSDL), newPortTypeName));
@@ -109,7 +106,7 @@ public class WebServiceUpdateOperationTest {
   }
 
   protected static WebServiceUpdateOperation createWsUpdateOp(AbstractWebServiceNewOperation wsCreateOp) {
-    WebServiceUpdateOperation wsUpdateOp = new WebServiceUpdateOperation() {
+    var wsUpdateOp = new WebServiceUpdateOperation() {
       @Override
       protected void updateJaxWsBinding(IEnvironment e, IProgress p) {
         super.updateJaxWsBinding(e, p);
@@ -124,24 +121,24 @@ public class WebServiceUpdateOperationTest {
   protected static Consumer<TestingEnvironment> testUpdateProvider(Path root) {
     return env -> {
       // create project with web service
-      String origPackage = "test.provider.multifile";
-      AbstractWebServiceNewOperation wsCreateOp = WebServiceNewOperationTest.createWebServiceProvider(root, true, WebServiceNewOperationTest.MULTI_FILE_WSDL, origPackage, env);
-      Path jaxwsProjectDirectory = wsCreateOp.getProjectRoot();
-      IClasspathEntry sourceFolder = wsCreateOp.getSourceFolder();
-      IJavaEnvironment javaEnvironment = sourceFolder.javaEnvironment();
-      IType entryPointDef = javaEnvironment.requireType(origPackage + JavaTypes.C_DOT + "IScoutQueryInterface2WebServiceEntryPointDefinition");
-      IType serviceImpl = javaEnvironment.requireType(origPackage + JavaTypes.C_DOT + "ScoutQueryInterface2WebService");
+      var origPackage = "test.provider.multifile";
+      var wsCreateOp = WebServiceNewOperationTest.createWebServiceProvider(root, true, WebServiceNewOperationTest.MULTI_FILE_WSDL, origPackage, env);
+      var jaxwsProjectDirectory = wsCreateOp.getProjectRoot();
+      var sourceFolder = wsCreateOp.getSourceFolder();
+      var javaEnvironment = sourceFolder.javaEnvironment();
+      var entryPointDef = javaEnvironment.requireType(origPackage + JavaTypes.C_DOT + "IScoutQueryInterface2WebServiceEntryPointDefinition");
+      var serviceImpl = javaEnvironment.requireType(origPackage + JavaTypes.C_DOT + "ScoutQueryInterface2WebService");
 
       assertTrue(javaEnvironment.findType(origPackage + JavaTypes.C_DOT + ORIGINAL_PORT_TYPE_NAME).isPresent());
 
       // start update
-      String newPortTypePackage = "test.provider.newMultiFile";
-      String newPortTypeName = "IChangedPortType";
-      String newEntryPointPackage = "entry.point.changedpackage";
-      String newEntryPointName = "ChangedEntryPointName";
-      String newServiceName = "ChangedNameService";
+      var newPortTypePackage = "test.provider.newMultiFile";
+      var newPortTypeName = "IChangedPortType";
+      var newEntryPointPackage = "entry.point.changedpackage";
+      var newEntryPointName = "ChangedEntryPointName";
+      var newServiceName = "ChangedNameService";
 
-      WebServiceUpdateOperation wsUpdateOp = createWsUpdateOp(wsCreateOp);
+      var wsUpdateOp = createWsUpdateOp(wsCreateOp);
       wsUpdateOp.setPackage(newPortTypePackage);
       wsUpdateOp.addBindingClassUpdate(new BindingClassUpdate(JaxWsUtils.getWebServiceXPath(WEB_SERVICE_NAME_IN_WSDL), newServiceName));
       wsUpdateOp.addBindingClassUpdate(new BindingClassUpdate(JaxWsUtils.getPortTypeXPath(PORT_TYPE_NAME_IN_WSDL), newPortTypeName));
@@ -172,7 +169,7 @@ public class WebServiceUpdateOperationTest {
       SdkLog.warning("Unable to delete directory '{}'.", jaxwsProjectDirectory, e);
     }
 
-    Path parentDir = jaxwsProjectDirectory.getParent().resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID);
+    var parentDir = jaxwsProjectDirectory.getParent().resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID);
     CoreScoutTestingUtils.runMavenCleanTest(parentDir);
   }
 }

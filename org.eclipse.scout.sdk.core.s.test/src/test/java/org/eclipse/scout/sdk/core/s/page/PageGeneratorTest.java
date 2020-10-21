@@ -17,7 +17,6 @@ import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.service.ServiceInterfaceGenerator;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
@@ -43,9 +42,9 @@ public class PageGeneratorTest {
 
   @Test
   public void testPageWithTable(IJavaEnvironment env) {
-    for (int i = 0; i < 2; i++) {
+    for (var i = 0; i < 2; i++) {
       // page service
-      String dataFetchMethodName = "getTestTableData";
+      var dataFetchMethodName = "getTestTableData";
       ServiceInterfaceGenerator<?> svcIfcGenerator = new ServiceInterfaceGenerator<>()
           .withPackageName("org.eclipse.scout.sdk.core.s.test")
           .withElementName("IMyPageService" + i)
@@ -57,7 +56,7 @@ public class PageGeneratorTest {
                   .withDataTypeFrom(IScoutApi.class, api -> api.SearchFilter().fqn())));
 
       assertEqualsRefFile(env, REF_FILE_FOLDER + "ServiceTest" + (i + 1) + ".txt", svcIfcGenerator);
-      IType createdSvcIfc = assertNoCompileErrors(env, svcIfcGenerator);
+      var createdSvcIfc = assertNoCompileErrors(env, svcIfcGenerator);
 
       // page
       PageGenerator<?> pageGenerator = new PageGenerator<>()
@@ -79,7 +78,7 @@ public class PageGeneratorTest {
 
   @Test
   public void testPageWithNodes(IJavaEnvironment env) {
-    for (int i = 0; i < 2; i++) {
+    for (var i = 0; i < 2; i++) {
       // page
       PageGenerator<?> pageGenerator = new PageGenerator<>()
           .withElementName("MyNodePage" + i)

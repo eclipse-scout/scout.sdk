@@ -55,7 +55,7 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
 
   @Override
   public TypeSpi findType(String fqn) {
-    Object elem = m_typeCache.get(fqn); // fast check without synchronizing
+    var elem = m_typeCache.get(fqn); // fast check without synchronizing
     if (elem == null) {
       synchronized (lock()) { // do not use computeIfAbsent outside the instance lock because the map uses its own lock which might lead to deadlocks
         elem = m_typeCache.computeIfAbsent(fqn, this::doFindTypeInternal);
@@ -68,7 +68,7 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
   }
 
   private Object doFindTypeInternal(String fqn) {
-    TypeSpi result = doFindType(fqn);
+    var result = doFindType(fqn);
     if (result == null) {
       return NULL_OBJECT;
     }
@@ -123,10 +123,10 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
       onReloadStart();
       try {
         // reconnect all new SPI/API mappings
-        for (JavaElementSpi old : detachedSpiElements) {
-          AbstractSpiElement<? extends IJavaElement> oldSpiElement = (AbstractSpiElement<? extends IJavaElement>) old;
-          AbstractJavaElementImplementor<JavaElementSpi> apiElement = (AbstractJavaElementImplementor<JavaElementSpi>) oldSpiElement.wrap();
-          JavaElementSpi newSpiElement = oldSpiElement.internalFindNewElement();
+        for (var old : detachedSpiElements) {
+          var oldSpiElement = (AbstractSpiElement<? extends IJavaElement>) old;
+          var apiElement = (AbstractJavaElementImplementor<JavaElementSpi>) oldSpiElement.wrap();
+          var newSpiElement = oldSpiElement.internalFindNewElement();
 
           apiElement.internalSetSpi(newSpiElement);
           if (newSpiElement != null) {

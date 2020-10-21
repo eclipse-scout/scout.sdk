@@ -47,11 +47,11 @@ public class ClasspathEntry {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append("ClasspathEntry [");
     builder.append("path=").append(m_classpath).append(", ");
     builder.append("mode=");
-    boolean sourceAttached = false;
+    var sourceAttached = false;
     if ((m_mode & ClasspathSpi.MODE_SOURCE) != 0) {
       builder.append("source");
       sourceAttached = true;
@@ -69,8 +69,8 @@ public class ClasspathEntry {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = prime + m_classpath.hashCode();
+    var prime = 31;
+    var result = prime + m_classpath.hashCode();
     return prime * result + m_mode;
   }
 
@@ -82,7 +82,7 @@ public class ClasspathEntry {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    ClasspathEntry other = (ClasspathEntry) obj;
+    var other = (ClasspathEntry) obj;
     return m_mode == other.m_mode && m_classpath.equals(other.m_classpath);
   }
 }

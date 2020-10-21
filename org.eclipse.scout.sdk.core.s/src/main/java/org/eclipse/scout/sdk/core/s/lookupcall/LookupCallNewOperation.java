@@ -69,8 +69,8 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
 
     progress.init(4, toString());
 
-    String svcName = getLookupCallName();
-    String suffix = "Call";
+    var svcName = getLookupCallName();
+    var suffix = "Call";
     if (svcName.endsWith(suffix)) {
       svcName = svcName.substring(0, svcName.length() - suffix.length());
     }
@@ -79,7 +79,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     setCreatedLookupServiceIfc(createLookupServiceIfc(svcName, env, progress.newChild(1)));
 
     if (getServerSourceFolder() != null && getLookupServiceSuperType() != null) {
-      String serverPackage = ScoutTier.Shared.convert(ScoutTier.Server, getPackage());
+      var serverPackage = ScoutTier.Shared.convert(ScoutTier.Server, getPackage());
       setCreatedLookupServiceImpl(createLookupServiceImpl(svcName, serverPackage, env, progress.newChild(1)));
     }
     progress.setWorkRemaining(2);
@@ -89,16 +89,16 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
   }
 
   protected IType createLookupCallTest(IEnvironment env, IProgress progress) {
-    IClasspathEntry testSourceFolder = getTestSourceFolder();
+    var testSourceFolder = getTestSourceFolder();
     if (testSourceFolder == null) {
       return null;
     }
 
-    IScoutApi scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
-    ScoutTier targetTier = ScoutTier.valueOf(testSourceFolder.javaEnvironment())
+    var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
+    var targetTier = ScoutTier.valueOf(testSourceFolder.javaEnvironment())
         .orElseThrow(() -> newFail("Test-source-folder {} has no access to Scout classes", testSourceFolder));
-    String testPackage = ScoutTier.Shared.convert(targetTier, getPackage());
-    boolean isClient = ScoutTier.Client.isIncludedIn(targetTier);
+    var testPackage = ScoutTier.Shared.convert(targetTier, getPackage());
+    var isClient = ScoutTier.Client.isIncludedIn(targetTier);
     String runnerFqn;
     if (isClient) {
       runnerFqn = scoutApi.ClientTestRunner().fqn();
@@ -114,7 +114,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
       return null;
     }
 
-    String createLookupCallMethodName = "createLookupCall";
+    var createLookupCallMethodName = "createLookupCall";
     TestGenerator<?> lookupCallTestBuilder = new TestGenerator<>()
         .withElementName(getLookupCallName() + ISdkConstants.SUFFIX_TEST)
         .withPackageName(testPackage)
@@ -142,9 +142,9 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
         .withReturnType(JavaTypes._void)
         .withElementName("test" + Strings.ensureStartWithUpperCase(getDataByMethodName))
         .withBody(b -> {
-          String callVarName = "call";
-          IScoutApi scoutApi = b.context().requireApi(IScoutApi.class);
-          String dataType = new StringBuilder(List.class.getName()).append(JavaTypes.C_GENERIC_START)
+          var callVarName = "call";
+          var scoutApi = b.context().requireApi(IScoutApi.class);
+          var dataType = new StringBuilder(List.class.getName()).append(JavaTypes.C_GENERIC_START)
               .append("? extends ").append(scoutApi.ILookupRow().fqn()).append(JavaTypes.C_GENERIC_START).append(getKeyType())
               .append(JavaTypes.C_GENERIC_END).append(JavaTypes.C_GENERIC_END).toString();
 
@@ -156,14 +156,14 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
   }
 
   protected IType createLookupServiceIfc(String svcName, IEnvironment env, IProgress progress) {
-    String ifcName = 'I' + svcName;
-    IScoutApi scoutApi = getSharedSourceFolder().javaEnvironment().requireApi(IScoutApi.class);
-    StringBuilder superTypeBuilder = new StringBuilder(scoutApi.ILookupService().fqn());
+    var ifcName = 'I' + svcName;
+    var scoutApi = getSharedSourceFolder().javaEnvironment().requireApi(IScoutApi.class);
+    var superTypeBuilder = new StringBuilder(scoutApi.ILookupService().fqn());
     superTypeBuilder.append(JavaTypes.C_GENERIC_START);
     superTypeBuilder.append(getKeyType());
     superTypeBuilder.append(JavaTypes.C_GENERIC_END);
 
-    PrimaryTypeGenerator<?> ifc = PrimaryTypeGenerator.create()
+    var ifc = PrimaryTypeGenerator.create()
         .withAnnotation(ScoutAnnotationGenerator.createTunnelToServer())
         .withElementName(ifcName)
         .withPackageName(getPackage())
@@ -176,12 +176,12 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
   }
 
   protected IType createLookupServiceImpl(String svcName, String serverPackage, IEnvironment env, IProgress progress) {
-    StringBuilder superTypeBuilder = new StringBuilder(getLookupServiceSuperType());
+    var superTypeBuilder = new StringBuilder(getLookupServiceSuperType());
     superTypeBuilder.append(JavaTypes.C_GENERIC_START);
     superTypeBuilder.append(getKeyType());
     superTypeBuilder.append(JavaTypes.C_GENERIC_END);
 
-    PrimaryTypeGenerator<?> impl = PrimaryTypeGenerator.create()
+    var impl = PrimaryTypeGenerator.create()
         .withElementName(svcName)
         .withPackageName(serverPackage)
         .asPublic()
@@ -194,7 +194,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
 
   protected IType createLookupCall(IEnvironment env, IProgress progress) {
 
-    StringBuilder superTypeBuilder = new StringBuilder(getSuperType());
+    var superTypeBuilder = new StringBuilder(getSuperType());
     superTypeBuilder.append(JavaTypes.C_GENERIC_START);
     superTypeBuilder.append(getKeyType());
     superTypeBuilder.append(JavaTypes.C_GENERIC_END);

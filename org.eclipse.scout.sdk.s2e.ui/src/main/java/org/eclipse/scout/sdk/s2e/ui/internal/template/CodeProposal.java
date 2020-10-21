@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
 
 /**
@@ -34,7 +33,7 @@ public class CodeProposal extends AbstractTypeProposal {
   @SuppressWarnings("unchecked")
   protected void fillRewrite(AstNodeFactory factory, Type superType) throws CoreException {
     // code
-    TypeDeclaration createdCode = factory.newCode(getProposalContext().getDefaultName())
+    var createdCode = factory.newCode(getProposalContext().getDefaultName())
         .withSuperType(superType) // type parameter is calculated and added in the factory
         .withReadOnlyNameSuffix(getProposalContext().getSuffix())
         .in(getProposalContext().getDeclaringType())

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2i
 import com.intellij.AbstractBundle
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
+import org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener
 import org.eclipse.scout.sdk.s2i.classid.ClassIdCache
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.jetbrains.annotations.Nls
@@ -30,6 +31,9 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
     fun derivedResourceManager(project: Project): DerivedResourceManager =
             ServiceManager.getService(project, DerivedResourceManager::class.java)
+
+    fun autoCreateClassIdListener(project: Project): AutoCreateClassIdListener =
+            ServiceManager.getService(project, AutoCreateClassIdListener::class.java)
 
     fun classIdCache(project: Project): ClassIdCache = ServiceManager.getService(project, ClassIdCache::class.java)
 }

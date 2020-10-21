@@ -73,7 +73,7 @@ public final class SdkConsole {
 
     @Override
     public void clear() {
-      char[] line = new char[50];
+      var line = new char[50];
       Arrays.fill(line, '_');
       OUT.println(line);
     }

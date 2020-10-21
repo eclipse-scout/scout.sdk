@@ -14,10 +14,7 @@ import static org.eclipse.scout.sdk.core.util.Strings.isBlank;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
@@ -41,15 +38,15 @@ import formdata.shared.services.process.replace.HugeCodeType;
 public class HugeCodeTypeTest {
   @Test
   public void testHugeCodeType(IJavaEnvironment env) {
-    ICompilationUnit codeType = env.requireType(HugeCodeType.class.getName()).requireCompilationUnit();
-    ICompilationUnitGenerator<?> workingCopy = codeType.toWorkingCopy();
-    StringBuilder javaSource = workingCopy.toJavaSource(codeType.javaEnvironment());
+    var codeType = env.requireType(HugeCodeType.class.getName()).requireCompilationUnit();
+    var workingCopy = codeType.toWorkingCopy();
+    var javaSource = workingCopy.toJavaSource(codeType.javaEnvironment());
 
     assertFalse(isBlank(javaSource));
 
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
-    String superType = scoutApi.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_COMMA + JavaTypes.Long + JavaTypes.C_GENERIC_END;
-    String packageName = HugeCodeType.class.getPackage().getName();
+    var scoutApi = env.requireApi(IScoutApi.class);
+    var superType = scoutApi.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_COMMA + JavaTypes.Long + JavaTypes.C_GENERIC_END;
+    var packageName = HugeCodeType.class.getPackage().getName();
     CodeTypeGenerator<?> ctg = new CodeTypeGenerator<>()
         .withPackageName(packageName)
         .withElementName(HugeCodeType.class.getSimpleName())
@@ -57,7 +54,7 @@ public class HugeCodeTypeTest {
         .withCodeTypeIdDataType(String.class.getName())
         .withIdValueBuilder(b -> b.stringLiteral("id_value"))
         .withSuperClass(superType);
-    IType newType = CoreTestingUtils.registerCompilationUnit(codeType.javaEnvironment(), ctg);
+    var newType = CoreTestingUtils.registerCompilationUnit(codeType.javaEnvironment(), ctg);
 
     assertTrue(newType.source().get().asCharSequence().length() < 400); // assert the huge one has been replaced with an empty code type
   }

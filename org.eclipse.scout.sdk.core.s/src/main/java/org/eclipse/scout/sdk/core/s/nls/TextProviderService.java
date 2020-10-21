@@ -54,7 +54,7 @@ public class TextProviderService {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append(TextProviderService.class.getSimpleName()).append(" [")
         .append(m_txtSvc.name()).append(", ");
     builder.append("order=").append(m_order).append(']');
@@ -75,7 +75,7 @@ public class TextProviderService {
       return false;
     }
 
-    TextProviderService other = (TextProviderService) obj;
+    var other = (TextProviderService) obj;
     return m_txtSvc.equals(other.m_txtSvc);
   }
 }

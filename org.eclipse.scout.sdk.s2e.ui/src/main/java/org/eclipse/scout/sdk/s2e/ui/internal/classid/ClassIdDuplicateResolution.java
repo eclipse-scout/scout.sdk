@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.ui.internal.classid;
 import java.util.function.BiConsumer;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
@@ -48,9 +47,9 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
 
   @Override
   public void run(IMarker marker) {
-    IType parent = (IType) m_annotation.getAncestor(IJavaElement.TYPE);
+    var parent = (IType) m_annotation.getAncestor(IJavaElement.TYPE);
     if (JdtUtils.exists(parent)) {
-      String newId = ClassIds.next(parent.getFullyQualifiedName());
+      var newId = ClassIds.next(parent.getFullyQualifiedName());
       if (Strings.hasText(newId)) {
         EclipseEnvironment
             .runInEclipseEnvironment(createUpdateAnnotationInJavaSourceOperation(parent, newId))
@@ -64,7 +63,7 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
       marker.delete();
     }
     catch (CoreException e) {
-      IResource resource = marker.getResource();
+      var resource = marker.getResource();
       if (resource == null) {
         SdkLog.debug("Unable to delete marker", e);
       }

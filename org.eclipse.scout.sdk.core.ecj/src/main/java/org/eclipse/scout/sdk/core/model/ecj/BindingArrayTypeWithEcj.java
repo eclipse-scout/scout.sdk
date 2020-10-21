@@ -107,8 +107,8 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public String getName() {
     return m_name.computeIfAbsentAndGet(() -> {
-      String componentTypeName = getLeafComponentType().getName();
-      StringBuilder b = new StringBuilder(componentTypeName.length() + (2 * m_arrayDimension));
+      var componentTypeName = getLeafComponentType().getName();
+      var b = new StringBuilder(componentTypeName.length() + (2 * m_arrayDimension));
       b.append(componentTypeName);
       b.append(repeat("[]", m_arrayDimension));
       return b.toString();

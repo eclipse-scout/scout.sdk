@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.generator;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -35,11 +36,13 @@ public interface IAnnotatableGenerator<TYPE extends IAnnotatableGenerator<TYPE>>
   TYPE withAnnotation(IAnnotationGenerator<?> generator);
 
   /**
-   * Removes all {@link IAnnotationGenerator}s having the specified name from this generator.
-   *
-   * @param annotationFqn
-   *          The fully qualified name of the {@link IAnnotationGenerator}s to remove.
-   * @return This generator
+   * Removes all {@link IAnnotationGenerator IAnnotationGenerators} for which the given {@link Predicate} returns
+   * {@code true}.
+   * 
+   * @param removalFilter
+   *          A {@link Predicate} that decides if a {@link IAnnotationGenerator} should be removed. May be {@code null}.
+   *          In that case all {@link IAnnotationGenerator} are removed.
+   * @return This generator.
    */
   TYPE withoutAnnotation(Predicate<IAnnotationGenerator<?>> removalFilter);
 
@@ -48,6 +51,18 @@ public interface IAnnotatableGenerator<TYPE extends IAnnotatableGenerator<TYPE>>
    */
   Stream<IAnnotationGenerator<?>> annotations();
 
+  /**
+   * Gets the first {@link IAnnotationGenerator} having the given annotation name.<br>
+   * <br>
+   * <b>Note</b>: If the name of a {@link IAnnotationGenerator} is specified using
+   * {@link IAnnotationGenerator#withElementNameFrom(Class, Function)} the name is API dependant and may therefore not
+   * be found by this method.
+   * 
+   * @param annotationFqn
+   *          The fully qualified annotation name to search. Must not be {@code null}.
+   * @return An {@link Optional} containing the {@link IAnnotationGenerator} with given name or an empty
+   *         {@link Optional}.
+   */
   Optional<IAnnotationGenerator<?>> annotation(String annotationFqn);
 
   /**

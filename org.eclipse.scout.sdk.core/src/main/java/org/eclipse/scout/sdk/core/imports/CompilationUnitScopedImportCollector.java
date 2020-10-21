@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -70,7 +69,7 @@ public class CompilationUnitScopedImportCollector extends WrappedImportCollector
       return cand.getSimpleName();
     }
 
-    IJavaEnvironment env = getJavaEnvironment();
+    var env = getJavaEnvironment();
     if (env == null) {
       return super.checkCurrentScope(cand);
     }

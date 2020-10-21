@@ -42,7 +42,7 @@ public class HierarchicalSpliterator<ELEMENT> implements Spliterator<ELEMENT> {
     do {
       dataAvailable = m_levelSpliterator != null && m_levelSpliterator.tryAdvance(action);
       if (!dataAvailable) {
-        boolean classFound = moveToNextType();
+        var classFound = moveToNextType();
         if (!classFound) {
           return false;
         }

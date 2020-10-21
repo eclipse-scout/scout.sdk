@@ -10,8 +10,6 @@
  */
 package org.eclipse.scout.sdk.s2e.environment.model;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -56,7 +54,7 @@ public class ClasspathWithJdt extends ClasspathWithEcj {
       if (root.getKind() != IPackageFragmentRoot.K_SOURCE || root.isArchive() || root.isExternal()) {
         return false;
       }
-      IResource resource = root.getResource();
+      var resource = root.getResource();
       if (resource == null || !resource.exists() || resource.isDerived()) {
         return false;
       }
@@ -71,12 +69,12 @@ public class ClasspathWithJdt extends ClasspathWithEcj {
     if (rawClasspathEntry == null) {
       return true;
     }
-    IPath[] exclusionPatterns = rawClasspathEntry.getExclusionPatterns();
+    var exclusionPatterns = rawClasspathEntry.getExclusionPatterns();
     if (exclusionPatterns != null && exclusionPatterns.length > 0) {
-      char[] javaSample = ("Whatever" + JavaTypes.JAVA_FILE_SUFFIX).toCharArray();
-      for (IPath excludedPath : exclusionPatterns) {
-        char[] pattern = excludedPath.toString().toCharArray();
-        boolean javaFilesExcluded = CharOperation.pathMatch(pattern, javaSample, true, '/');
+      var javaSample = ("Whatever" + JavaTypes.JAVA_FILE_SUFFIX).toCharArray();
+      for (var excludedPath : exclusionPatterns) {
+        var pattern = excludedPath.toString().toCharArray();
+        var javaFilesExcluded = CharOperation.pathMatch(pattern, javaSample, true, '/');
         if (javaFilesExcluded) {
           return false;
         }

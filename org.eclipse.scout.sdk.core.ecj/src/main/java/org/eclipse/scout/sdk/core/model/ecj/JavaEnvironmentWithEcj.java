@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.eclipse.scout.sdk.core.log.SdkLog.onTrace;
 import static org.eclipse.scout.sdk.core.util.Ensure.fail;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
@@ -25,11 +25,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -51,10 +51,8 @@ import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
 import org.eclipse.jdt.internal.compiler.lookup.BaseTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.ElementValuePair;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
-import org.eclipse.jdt.internal.compiler.lookup.LookupEnvironment;
 import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
 import org.eclipse.jdt.internal.compiler.lookup.MissingTypeBinding;
-import org.eclipse.jdt.internal.compiler.lookup.ModuleBinding;
 import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
@@ -123,20 +121,16 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     if (list == null || list.isEmpty()) {
       return emptyList();
     }
-    List<T> result = new ArrayList<>(list.size());
-    for (T t : list) {
-      if (t != null) {
-        result.add(t);
-      }
-    }
-    return result;
+    return list.stream()
+        .filter(Objects::nonNull)
+        .collect(toList());
   }
 
   @Override
   protected TypeSpi doFindType(String fqn) {
     assertInitialized();
-    TypeNameDescriptor desc = TypeNameDescriptor.of(fqn);
-    TypeBinding binding = lookupTypeBinding(desc.getPrimaryTypeName());
+    var desc = TypeNameDescriptor.of(fqn);
+    var binding = lookupTypeBinding(desc.getPrimaryTypeName());
     if (binding == null) {
       return null;
     }
@@ -151,7 +145,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     }
 
     if (desc.getArrayDimension() > 0) {
-      TypeBinding b = Ensure.notNull(((AbstractTypeWithEcj) result).getInternalBinding(), "Cannot find internal binding to create array type.");
+      var b = Ensure.notNull(((AbstractTypeWithEcj) result).getInternalBinding(), "Cannot find internal binding to create array type.");
       ArrayBinding arrayType;
       arrayType = getCompiler().lookupEnvironment.createArrayType(b, desc.getArrayDimension());
       return SpiWithEcjUtils.bindingToType(this, arrayType);
@@ -185,7 +179,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
           break;
       }
     }
-    char[][] lookupName = CharOperation.splitOn(JavaTypes.C_DOT, fqn.toCharArray());
+    var lookupName = CharOperation.splitOn(JavaTypes.C_DOT, fqn.toCharArray());
     ReferenceBinding binding;
     synchronized (lock()) {
       binding = getCompiler().lookupEnvironment.getType(lookupName);
@@ -249,7 +243,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     m_mvpCache.clear();
     m_sourceCache.clear();
 
-    FileSystemWithOverride oldFs = m_fs.get();
+    var oldFs = m_fs.get();
     m_fs = new FinalValue<>(); // remove the current file system before closing it
     if (closeFs && oldFs != null) {
       oldFs.cleanup();
@@ -261,7 +255,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   @Override
   protected void onReloadEnd() {
     super.onReloadEnd();
-    FileSystemWithOverride oldFs = m_oldFsDuringReload;
+    var oldFs = m_oldFsDuringReload;
     if (oldFs != null) {
       oldFs.cleanup();
       m_oldFsDuringReload = null;
@@ -270,13 +264,13 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
 
   @Override
   public <T> T callInEmptyCopy(Function<JavaEnvironmentSpi, T> function) {
-    try (JavaEnvironmentWithEcj copy = emptyCopy()) {
+    try (var copy = emptyCopy()) {
       return Ensure.notNull(function).apply(copy);
     }
   }
 
   protected JavaEnvironmentWithEcj emptyCopy() {
-    JavaEnvironmentWithEcj newEnv = new JavaEnvironmentWithEcj(javaHome(), getNameEnvironment().classpath(), getCompiler().options);
+    var newEnv = new JavaEnvironmentWithEcj(javaHome(), getNameEnvironment().classpath(), getCompiler().options);
     runPreservingOverrides(this, newEnv, null); // copy overrides
     return newEnv;
   }
@@ -299,7 +293,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
       if (task != null) {
         task.run();
       }
-      for (ICompilationUnit cu : units) {
+      for (var cu : units) {
         dest.getNameEnvironment().overrideSupport().addCompilationUnit(cu);
       }
     }
@@ -307,11 +301,11 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
 
   @Override
   public List<String> getCompileErrors(TypeSpi typeSpi) {
-    CompilationUnitSpi cuSpi = Ensure.notNull(typeSpi).getCompilationUnit();
+    var cuSpi = Ensure.notNull(typeSpi).getCompilationUnit();
     if (!(cuSpi instanceof DeclarationCompilationUnitWithEcj)) {
       throw newFail("Type '{}' is not a source type.", typeSpi.getName());
     }
-    CompilationUnitDeclaration decl = ((DeclarationCompilationUnitWithEcj) cuSpi).getInternalCompilationUnitDeclaration();
+    var decl = ((DeclarationCompilationUnitWithEcj) cuSpi).getInternalCompilationUnitDeclaration();
     synchronized (lock()) {
       return getCompiler().getCompileErrors(decl);
     }
@@ -327,11 +321,11 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     Ensure.notNull(fileName);
     Ensure.notNull(src);
 
-    StringBasedCompilationUnitWithEcj cu = new StringBasedCompilationUnitWithEcj(packageName, fileName, src, ""/*ModuleBinding.UNNAMED*/, fileName);
+    var cu = new StringBasedCompilationUnitWithEcj(packageName, fileName, src, ""/*ModuleBinding.UNNAMED*/, fileName);
     synchronized (lock()) {
-      boolean reloadRequired = getNameEnvironment().overrideSupport().addCompilationUnit(cu);
+      var reloadRequired = getNameEnvironment().overrideSupport().addCompilationUnit(cu);
 
-      String fqn = cu.getFullyQualifiedName();
+      var fqn = cu.getFullyQualifiedName();
       removeTypeFromCache(fqn);// clear cache info for this element
       if (!reloadRequired && isInitialized()) {
         // if not used in name-env: also check in compiler
@@ -352,37 +346,33 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   private boolean isLoadedInCompiler(String fqn, char[] src) {
-    ReferenceBinding cachedType = findExistingBindingFor(fqn);
+    var cachedType = findExistingBindingFor(fqn);
     if (cachedType == null) {
       return false; // has not yet been used. no reload required.
     }
 
     if (cachedType instanceof SourceTypeBinding) {
-      CompilationUnitDeclaration decl = ((SourceTypeBinding) cachedType).scope.compilationUnitScope().referenceContext;
-      char[] existing = getSource(decl);
+      var decl = ((SourceTypeBinding) cachedType).scope.compilationUnitScope().referenceContext;
+      var existing = getSource(decl);
       return !Arrays.equals(existing, src); // only reload if source is different
     }
     return true;
   }
 
   private ReferenceBinding findExistingBindingFor(String fqn) {
-    LookupEnvironment lookupEnvironment = getCompiler().lookupEnvironment;
-    char[][] compoundName = CharOperation.splitOn(JavaTypes.C_DOT, fqn.toCharArray());
-    ReferenceBinding cachedType = lookupEnvironment.getCachedType(compoundName);
+    var lookupEnvironment = getCompiler().lookupEnvironment;
+    var compoundName = CharOperation.splitOn(JavaTypes.C_DOT, fqn.toCharArray());
+    var cachedType = lookupEnvironment.getCachedType(compoundName);
     if (cachedType != null) {
       return cachedType;
     }
 
-    for (ModuleBinding module : lookupEnvironment.knownModules.valueTable) {
-      if (module == null) {
-        continue;
-      }
-      ReferenceBinding referenceBinding = module.environment.getCachedType(compoundName);
-      if (referenceBinding != null) {
-        return referenceBinding;
-      }
-    }
-    return null;
+    return Arrays.stream(lookupEnvironment.knownModules.valueTable)
+        .filter(Objects::nonNull)
+        .map(module -> module.environment.getCachedType(compoundName))
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(null);
   }
 
   /**
@@ -402,7 +392,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     }
     assertInitialized();
 
-    char[] src = getSource(((DeclarationCompilationUnitWithEcj) cu).getInternalCompilationUnitDeclaration());
+    var src = getSource(((DeclarationCompilationUnitWithEcj) cu).getInternalCompilationUnitDeclaration());
     if (src == null) {
       return null;
     }
@@ -413,7 +403,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   @SuppressWarnings("squid:S1168")
   protected char[] getSource(CompilationUnitDeclaration decl) {
     synchronized (lock()) {
-      ICompilationUnit sourceUnit = getCompiler().getSource(decl);
+      var sourceUnit = getCompiler().getSource(decl);
       if (sourceUnit == null) {
         return null;
       }
@@ -429,7 +419,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   private FileSystemWithOverride buildNameEnvironment() {
     // classpath registers a system wide file system but does not handle the fact that it might already have been created.
     // see org.eclipse.jdt.internal.compiler.batch.ClasspathMultiReleaseJar.initialize
-    ClasspathBuilder cp = new ClasspathBuilder(javaHome(), m_rawClassPath);
+    var cp = new ClasspathBuilder(javaHome(), m_rawClassPath);
     while (true) {
       try {
         // optimistic creation without locking
@@ -452,7 +442,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public List<ClasspathSpi> getClasspath() {
     return m_classpath.computeIfAbsentAndGet(() -> m_rawClassPath.stream()
         .map(this::classpathEntryToSpi)
-        .collect(collectingAndThen(toList(), Collections::unmodifiableList)));
+        .collect(toUnmodifiableList()));
   }
 
   public VoidTypeWithEcj createVoidType() {
@@ -472,7 +462,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingAnnotationWithEcj createBindingAnnotation(AnnotatableSpi owner, AnnotationBinding binding) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(binding);
+      var key = new SameCompositeObject(binding);
       return (BindingAnnotationWithEcj) m_elements.computeIfAbsent(key, k -> new BindingAnnotationWithEcj(this, owner, binding));
     }
   }
@@ -480,7 +470,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingAnnotationElementWithEcj createBindingAnnotationValue(AnnotationSpi owner, ElementValuePair bindingPair, boolean syntheticDefaultValue) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(owner, bindingPair);
+      var key = new SameCompositeObject(owner, bindingPair);
       return (BindingAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new BindingAnnotationElementWithEcj(this, owner, bindingPair, syntheticDefaultValue));
     }
   }
@@ -488,7 +478,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public NullAnnotationElementWithEcj createNullAnnotationValue(AnnotationSpi owner, String name, boolean syntheticDefaultValue) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(NullAnnotationElementWithEcj.class, owner, name);
+      var key = new SameCompositeObject(NullAnnotationElementWithEcj.class, owner, name);
       return (NullAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new NullAnnotationElementWithEcj(this, owner, name, syntheticDefaultValue));
     }
   }
@@ -496,7 +486,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingArrayTypeWithEcj createBindingArrayType(ArrayBinding binding, boolean isWildcard) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(binding, isWildcard);
+      var key = new SameCompositeObject(binding, isWildcard);
       return (BindingArrayTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingArrayTypeWithEcj(this, binding, isWildcard));
     }
   }
@@ -504,7 +494,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingBaseTypeWithEcj createBindingBaseType(BaseTypeBinding binding) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(binding);
+      var key = new SameCompositeObject(binding);
       return (BindingBaseTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingBaseTypeWithEcj(this, binding));
     }
   }
@@ -512,7 +502,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingFieldWithEcj createBindingField(AbstractTypeWithEcj declaringType, FieldBinding binding) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(binding);
+      var key = new SameCompositeObject(binding);
       return (BindingFieldWithEcj) m_elements.computeIfAbsent(key, k -> new BindingFieldWithEcj(this, declaringType, binding));
     }
   }
@@ -520,7 +510,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingMethodWithEcj createBindingMethod(BindingTypeWithEcj declaringType, MethodBinding binding) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(binding);
+      var key = new SameCompositeObject(binding);
       return (BindingMethodWithEcj) m_elements.computeIfAbsent(key, k -> new BindingMethodWithEcj(this, declaringType, binding));
     }
   }
@@ -528,7 +518,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingMethodParameterWithEcj createBindingMethodParameter(BindingMethodWithEcj declaringMethod, TypeBinding binding, char[] name, int flags, int index) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(BindingMethodParameterWithEcj.class, declaringMethod, binding, index);
+      var key = new SameCompositeObject(BindingMethodParameterWithEcj.class, declaringMethod, binding, index);
       return (BindingMethodParameterWithEcj) m_elements.computeIfAbsent(key, k -> new BindingMethodParameterWithEcj(this, declaringMethod, binding, name, flags, index));
     }
   }
@@ -536,7 +526,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingTypeWithEcj createBindingType(ReferenceBinding binding, BindingTypeWithEcj declaringType, boolean isWildcard) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(binding, isWildcard);
+      var key = new SameCompositeObject(binding, isWildcard);
       return (BindingTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingTypeWithEcj(this, binding, declaringType, isWildcard));
     }
   }
@@ -544,7 +534,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingTypeParameterWithEcj createBindingTypeParameter(AbstractMemberWithEcj<?> declaringMember, TypeVariableBinding binding, int index) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(declaringMember, binding, index);
+      var key = new SameCompositeObject(declaringMember, binding, index);
       return (BindingTypeParameterWithEcj) m_elements.computeIfAbsent(key, k -> new BindingTypeParameterWithEcj(this, declaringMember, binding, index));
     }
   }
@@ -552,7 +542,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public DeclarationAnnotationWithEcj createDeclarationAnnotation(AnnotatableSpi owner, Annotation astNode) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(astNode);
+      var key = new SameCompositeObject(astNode);
       return (DeclarationAnnotationWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationAnnotationWithEcj(this, owner, astNode));
     }
   }
@@ -560,7 +550,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public DeclarationAnnotationElementWithEcj createDeclarationAnnotationValue(AnnotationSpi declaringAnnotation, MemberValuePair astNode, boolean syntheticDefaultValue) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(astNode);
+      var key = new SameCompositeObject(astNode);
       return (DeclarationAnnotationElementWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationAnnotationElementWithEcj(this, declaringAnnotation, astNode, syntheticDefaultValue));
     }
   }
@@ -568,7 +558,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public DeclarationCompilationUnitWithEcj createDeclarationCompilationUnit(CompilationUnitDeclaration astNode) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(astNode);
+      var key = new SameCompositeObject(astNode);
       return (DeclarationCompilationUnitWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationCompilationUnitWithEcj(this, astNode));
     }
   }
@@ -576,7 +566,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public DeclarationFieldWithEcj createDeclarationField(DeclarationTypeWithEcj declaringType, FieldDeclaration astNode) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(astNode);
+      var key = new SameCompositeObject(astNode);
       return (DeclarationFieldWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationFieldWithEcj(this, declaringType, astNode));
     }
   }
@@ -584,7 +574,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public DeclarationImportWithEcj createDeclarationImport(DeclarationCompilationUnitWithEcj owner, ImportReference astNode) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(astNode);
+      var key = new SameCompositeObject(astNode);
       return (DeclarationImportWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationImportWithEcj(this, owner, astNode));
     }
   }
@@ -592,7 +582,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public DeclarationMethodWithEcj createDeclarationMethod(DeclarationTypeWithEcj declaringType, AbstractMethodDeclaration astNode) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(astNode);
+      var key = new SameCompositeObject(astNode);
       return (DeclarationMethodWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationMethodWithEcj(this, declaringType, astNode));
     }
   }
@@ -600,7 +590,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public DeclarationMethodParameterWithEcj createDeclarationMethodParameter(DeclarationMethodWithEcj declaringMethod, Argument astNode, int index) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(astNode);
+      var key = new SameCompositeObject(astNode);
       return (DeclarationMethodParameterWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationMethodParameterWithEcj(this, declaringMethod, astNode, index));
     }
   }
@@ -608,7 +598,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public DeclarationTypeWithEcj createDeclarationType(CompilationUnitSpi cu, DeclarationTypeWithEcj declaringType, TypeDeclaration astNode) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(astNode);
+      var key = new SameCompositeObject(astNode);
       return (DeclarationTypeWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationTypeWithEcj(this, cu, declaringType, astNode));
     }
   }
@@ -616,7 +606,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public DeclarationTypeParameterWithEcj createDeclarationTypeParameter(AbstractMemberWithEcj<?> declaringMember, TypeParameter astNode, int index) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(astNode);
+      var key = new SameCompositeObject(astNode);
       return (DeclarationTypeParameterWithEcj) m_elements.computeIfAbsent(key, k -> new DeclarationTypeParameterWithEcj(this, declaringMember, astNode, index));
     }
   }
@@ -624,7 +614,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public PackageWithEcj createPackage(String name) {
     assertInitialized();
     synchronized (lock()) {
-      CompositeObject key = new CompositeObject(PackageWithEcj.class, name);
+      var key = new CompositeObject(PackageWithEcj.class, name);
       return (PackageWithEcj) m_elements.computeIfAbsent(key, k -> new PackageWithEcj(this, name));
     }
   }
@@ -641,7 +631,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public SyntheticCompilationUnitWithEcj createSyntheticCompilationUnit(BindingTypeWithEcj mainType) {
     assertInitialized();
     synchronized (lock()) {
-      SameCompositeObject key = new SameCompositeObject(SyntheticCompilationUnitWithEcj.class, mainType);
+      var key = new SameCompositeObject(SyntheticCompilationUnitWithEcj.class, mainType);
       return (SyntheticCompilationUnitWithEcj) m_elements.computeIfAbsent(key, k -> new SyntheticCompilationUnitWithEcj(this, mainType));
     }
   }
@@ -658,7 +648,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   protected static Map<String, ElementValuePair> computeBindingAnnotationSyntheticDefaultValues(ReferenceBinding annotationType) {
-    MethodBinding[] valueMethods = annotationType.methods();
+    var valueMethods = annotationType.methods();
     if (valueMethods == null || valueMethods.length < 1) {
       return emptyMap();
     }
@@ -667,9 +657,9 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     Arrays.sort(valueMethods, MethodBindingComparator.INSTANCE);
 
     Map<String, ElementValuePair> defaultValues = new LinkedHashMap<>(valueMethods.length);
-    for (MethodBinding mb : valueMethods) {
-      String name = new String(mb.selector);
-      Object value = mb.getDefaultValue();
+    for (var mb : valueMethods) {
+      var name = new String(mb.selector);
+      var value = mb.getDefaultValue();
       if (value != null) {
         defaultValues.put(name, new ElementValuePair(mb.selector, value, mb));
       }
@@ -688,7 +678,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   protected static Map<String, MemberValuePair> computeDeclarationAnnotationSyntheticDefaultValues(TypeBinding typeBinding) {
-    MethodBinding[] valueMethods = ((ReferenceBinding) typeBinding).methods();
+    var valueMethods = ((ReferenceBinding) typeBinding).methods();
     if (valueMethods == null || valueMethods.length < 1) {
       return emptyMap();
     }
@@ -697,11 +687,11 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     Arrays.sort(valueMethods, MethodBindingComparator.INSTANCE);
 
     Map<String, MemberValuePair> defaultValues = new LinkedHashMap<>(valueMethods.length);
-    for (MethodBinding mb : valueMethods) {
-      String name = new String(mb.selector);
-      AbstractMethodDeclaration md0 = Ensure.notNull(SpiWithEcjUtils.sourceMethodOf(mb), "binding is binary. Source method could not be found.");
+    for (var mb : valueMethods) {
+      var name = new String(mb.selector);
+      var md0 = Ensure.notNull(SpiWithEcjUtils.sourceMethodOf(mb), "binding is binary. Source method could not be found.");
       if (md0 instanceof AnnotationMethodDeclaration) {
-        AnnotationMethodDeclaration md = (AnnotationMethodDeclaration) md0;
+        var md = (AnnotationMethodDeclaration) md0;
         if (md.defaultValue != null) {
           defaultValues.put(name, new MemberValuePair(mb.selector, md.defaultValue.sourceStart, md.defaultValue.sourceEnd, md.defaultValue));
         }

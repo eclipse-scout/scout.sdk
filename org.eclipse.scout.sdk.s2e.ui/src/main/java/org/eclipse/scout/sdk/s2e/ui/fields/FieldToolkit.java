@@ -47,7 +47,7 @@ public final class FieldToolkit {
   }
 
   public static StyledTextField createStyledTextField(Composite parent, String label, int type, int labelWidth) {
-    StyledTextField styledTextField = new StyledTextField(parent, type, labelWidth);
+    var styledTextField = new StyledTextField(parent, type, labelWidth);
     styledTextField.setLabelText(label);
     return styledTextField;
   }
@@ -57,7 +57,7 @@ public final class FieldToolkit {
   }
 
   public static ResourceTextField createResourceField(Composite parent, String label, int type, int labelWidth) {
-    ResourceTextField field = new ResourceTextField(parent, type, labelWidth);
+    var field = new ResourceTextField(parent, type, labelWidth);
     field.setLabelText(label);
     return field;
   }
@@ -71,19 +71,19 @@ public final class FieldToolkit {
   }
 
   public static ProposalTextField createProposalField(Composite parent, String label, int type, int labelWidth) {
-    ProposalTextField field = new ProposalTextField(parent, type, labelWidth);
+    var field = new ProposalTextField(parent, type, labelWidth);
     field.setLabelText(label);
     return field;
   }
 
   public static Group createGroupBox(Composite parent, String label) {
-    Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
+    var group = new Group(parent, SWT.SHADOW_ETCHED_IN);
     group.setText(label);
     return group;
   }
 
   public static Button createCheckBox(Composite parent, String label, boolean checkedByDefault) {
-    Button btn = new Button(parent, SWT.CHECK);
+    var btn = new Button(parent, SWT.CHECK);
     btn.setText(label);
     btn.setSelection(checkedByDefault);
     return btn;
@@ -100,8 +100,8 @@ public final class FieldToolkit {
   }
 
   public static ProposalTextField createPackageField(Composite parent, String label, IJavaProject project, int labelWidth, int type) {
-    ProposalTextField proposalField = createProposalField(parent, label, type, labelWidth);
-    PackageContentProvider provider = new PackageContentProvider(project);
+    var proposalField = createProposalField(parent, label, type, labelWidth);
+    var provider = new PackageContentProvider(project);
     proposalField.setContentProvider(provider);
     proposalField.setLabelProvider(provider);
     proposalField.setProposalDescriptionProvider(provider);
@@ -113,8 +113,8 @@ public final class FieldToolkit {
   }
 
   public static ProposalTextField createSourceFolderField(Composite parent, String label, ScoutTier tier, int labelWidth) {
-    ProposalTextField proposalField = createProposalField(parent, label, TextField.TYPE_LABEL, labelWidth);
-    SourceFolderContentProvider provider = new SourceFolderContentProvider(S2eScoutTier.wrap(tier));
+    var proposalField = createProposalField(parent, label, TextField.TYPE_LABEL, labelWidth);
+    var provider = new SourceFolderContentProvider(S2eScoutTier.wrap(tier));
     proposalField.setContentProvider(provider);
     proposalField.setLabelProvider(provider);
     return proposalField;
@@ -125,8 +125,8 @@ public final class FieldToolkit {
   }
 
   public static ProposalTextField createAbstractTypeProposalField(Composite parent, String label, IJavaProject jp, String baseClassFqn, int labelWidth) {
-    ProposalTextField proposalField = createProposalField(parent, label, TextField.TYPE_HYPERLINK, labelWidth);
-    StrictHierarchyTypeContentProvider provider = new StrictHierarchyTypeContentProvider(jp, baseClassFqn);
+    var proposalField = createProposalField(parent, label, TextField.TYPE_HYPERLINK, labelWidth);
+    var provider = new StrictHierarchyTypeContentProvider(jp, baseClassFqn);
     provider.setTypeProposalFilter(new PublicAbstractPrimaryTypeFilter());
     proposalField.setContentProvider(provider);
     proposalField.setLabelProvider(provider);
@@ -144,8 +144,8 @@ public final class FieldToolkit {
   }
 
   public static ProposalTextField createProjectProposalField(Composite parent, String label, Predicate<IJavaProject> filter, int labelWidth) {
-    ProposalTextField proposalField = createProposalField(parent, label, TextField.TYPE_LABEL, labelWidth);
-    JavaProjectContentProvider provider = new JavaProjectContentProvider();
+    var proposalField = createProposalField(parent, label, TextField.TYPE_LABEL, labelWidth);
+    var provider = new JavaProjectContentProvider();
     provider.setFilter(filter);
     proposalField.setContentProvider(provider);
     proposalField.setLabelProvider(provider);
@@ -157,8 +157,8 @@ public final class FieldToolkit {
   }
 
   public static ProposalTextField createTranslationStoreProposalField(Composite parent, String label, TranslationStoreStack stack, int labelWidth) {
-    ProposalTextField proposalField = createProposalField(parent, label, TextField.TYPE_LABEL, labelWidth);
-    TranslationStoreContentProvider provider = new TranslationStoreContentProvider(stack);
+    var proposalField = createProposalField(parent, label, TextField.TYPE_LABEL, labelWidth);
+    var provider = new TranslationStoreContentProvider(stack);
     proposalField.setContentProvider(provider);
     proposalField.setLabelProvider(provider);
     proposalField.setProposalDescriptionProvider(provider);
@@ -170,7 +170,7 @@ public final class FieldToolkit {
   }
 
   public static ProposalTextField createTypeProposalField(Composite parent, String label, IJavaProject jp, int labelWidth) {
-    ProposalTextField proposalField = createProposalField(parent, label, TextField.TYPE_HYPERLINK, labelWidth);
+    var proposalField = createProposalField(parent, label, TextField.TYPE_HYPERLINK, labelWidth);
     StrictHierarchyTypeContentProvider provider = new TypeContentProvider(jp);
     provider.setTypeProposalFilter(new PublicPrimaryTypeFilter());
 
@@ -192,7 +192,7 @@ public final class FieldToolkit {
 
     @Override
     public void linkActivated(HyperlinkEvent e) {
-      Object proposal = m_owner.getSelectedProposal();
+      var proposal = m_owner.getSelectedProposal();
       if (proposal instanceof IJavaElement) {
         S2eUiUtils.openInEditor((IJavaElement) proposal, false);
       }

@@ -45,7 +45,7 @@ public class EclipseProgress implements IProgress {
 
   @Override
   public EclipseProgress init(int totalWork, CharSequence name, Object... args) {
-    String message = arrayFormat(name, args).message();
+    var message = arrayFormat(name, args).message();
     SdkLog.debug(message);
     m_monitor.beginTask(message, totalWork);
     return this;

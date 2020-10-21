@@ -14,7 +14,6 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi.PageData;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 
 /**
@@ -41,13 +40,13 @@ public class DataAnnotationDescriptor {
       return Optional.empty();
     }
 
-    Optional<IType> dtoType = getDataAnnotationValue(type);
+    var dtoType = getDataAnnotationValue(type);
     if (dtoType.isEmpty()) {
       return Optional.empty();
     }
 
     Optional<IType> superType = Optional.empty();
-    Optional<IType> curType = type.superClass();
+    var curType = type.superClass();
     while (curType.isPresent()) {
       superType = getDataAnnotationValue(curType.get());
       if (superType.isPresent()) {
@@ -64,13 +63,13 @@ public class DataAnnotationDescriptor {
    * {@code value()} as {@link IType}.
    */
   private static Optional<IType> getDataAnnotationValue(IAnnotatable owner) {
-    Optional<IType> dataType = DataAnnotation.valueOf(owner);
+    var dataType = DataAnnotation.valueOf(owner);
     if (dataType.isPresent()) {
       return dataType;
     }
 
     // fall back to legacy name:
-    PageData pageDataApi = owner.javaEnvironment().requireApi(IScoutApi.class).PageData();
+    var pageDataApi = owner.javaEnvironment().requireApi(IScoutApi.class).PageData();
     return owner.annotations()
         .withName(pageDataApi.fqn())
         .first()

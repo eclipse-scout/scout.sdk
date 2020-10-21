@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.eclipse.jdt.internal.compiler.ast.TypeParameter;
-import org.eclipse.jdt.internal.compiler.ast.TypeReference;
 import org.eclipse.jdt.internal.compiler.lookup.BlockScope;
 import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
 import org.eclipse.jdt.internal.compiler.lookup.Scope;
@@ -24,7 +23,6 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeParameterImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
@@ -56,7 +54,7 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
   }
 
   protected TypeBinding ensureResolvedType(Scope scope, Expression r) {
-    TypeBinding resolvedType = r.resolvedType;
+    var resolvedType = r.resolvedType;
     if (resolvedType != null) {
       return resolvedType;
     }
@@ -74,7 +72,7 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
 
   @Override
   public JavaElementSpi internalFindNewElement() {
-    MemberSpi newMember = (MemberSpi) getDeclaringMember().internalFindNewElement();
+    var newMember = (MemberSpi) getDeclaringMember().internalFindNewElement();
     if (newMember != null && newMember.getTypeParameters().size() > m_index) {
       return newMember.getTypeParameters().get(m_index);
     }
@@ -93,9 +91,9 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
   @Override
   public List<TypeSpi> getBounds() {
     return m_bounds.computeIfAbsentAndGet(() -> {
-      boolean hasType = m_astNode.type != null;
-      boolean hasBounds = m_astNode.bounds != null && m_astNode.bounds.length > 0;
-      int size = 0;
+      var hasType = m_astNode.type != null;
+      var hasBounds = m_astNode.bounds != null && m_astNode.bounds.length > 0;
+      var size = 0;
       if (hasType) {
         size++;
       }
@@ -103,16 +101,16 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
         size += m_astNode.bounds.length;
       }
       List<TypeSpi> result = new ArrayList<>(size);
-      Scope scope = SpiWithEcjUtils.memberScopeOf(this);
+      var scope = SpiWithEcjUtils.memberScopeOf(this);
       if (hasType) {
-        TypeSpi t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), ensureResolvedType(scope, m_astNode.type));
+        var t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), ensureResolvedType(scope, m_astNode.type));
         if (t != null) {
           result.add(t);
         }
       }
       if (hasBounds) {
-        for (TypeReference r : m_astNode.bounds) {
-          TypeSpi t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), ensureResolvedType(scope, r));
+        for (var r : m_astNode.bounds) {
+          var t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), ensureResolvedType(scope, r));
           if (t != null) {
             result.add(t);
           }
@@ -135,8 +133,8 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      CompilationUnitSpi cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
-      TypeParameter decl = m_astNode;
+      var cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
+      var decl = m_astNode;
       return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
     });
   }

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJs.Co
 class NlsDocumentationProviderForJs : AbstractNlsDocumentationProvider() {
     override fun accept(element: PsiElement?) = allNlsPatternsInJs().accepts(element)
 
-    override fun psiElementToKey(element: PsiElement): String? {
+    override fun psiElementToKey(element: PsiElement): String {
         var text = withoutQuotes(element.text).toString()
         val jsonPrefix = TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX
         val jsonSuffix = TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX

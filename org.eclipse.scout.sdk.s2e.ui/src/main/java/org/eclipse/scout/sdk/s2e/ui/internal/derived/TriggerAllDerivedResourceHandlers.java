@@ -20,7 +20,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
-import org.eclipse.scout.sdk.s2e.derived.IDerivedResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -34,13 +33,13 @@ public class TriggerAllDerivedResourceHandlers extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
-    MessageBox messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+    var messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
     messageBox.setMessage("This will update all derived resources.\nDepending on the size of your workspace this can take several minutes.\nDo you really want to continue?");
     messageBox.setText("Do you really want to update all derived resources?");
-    int answer = messageBox.open();
+    var answer = messageBox.open();
     if (answer == SWT.YES) {
       Set<IResource> workspaceroot = singleton(ResourcesPlugin.getWorkspace().getRoot());
-      IDerivedResourceManager mgr = S2ESdkActivator.getDefault().getDerivedResourceManager();
+      var mgr = S2ESdkActivator.getDefault().getDerivedResourceManager();
       if (mgr != null) {
         mgr.trigger(workspaceroot);
       }

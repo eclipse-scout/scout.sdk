@@ -14,15 +14,12 @@ import static java.util.Collections.emptyList;
 
 import java.util.List;
 
-import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.Argument;
 import org.eclipse.jdt.internal.compiler.lookup.AnnotationBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.MethodParameterImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
@@ -59,7 +56,7 @@ public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IM
 
   @Override
   public JavaElementSpi internalFindNewElement() {
-    MethodSpi newMethod = (MethodSpi) getDeclaringMethod().internalFindNewElement();
+    var newMethod = (MethodSpi) getDeclaringMethod().internalFindNewElement();
     if (newMethod != null && newMethod.getParameters().size() > m_index) {
       return newMethod.getParameters().get(m_index);
     }
@@ -119,10 +116,10 @@ public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IM
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      AbstractMethodDeclaration declMethod = SpiWithEcjUtils.sourceMethodOf(m_declaringMethod);
+      var declMethod = SpiWithEcjUtils.sourceMethodOf(m_declaringMethod);
       if (declMethod != null) {
-        CompilationUnitSpi cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
-        Argument decl = declMethod.arguments[m_index];
+        var cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
+        var decl = declMethod.arguments[m_index];
         return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
       }
       return null;

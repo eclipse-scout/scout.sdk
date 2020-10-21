@@ -14,10 +14,6 @@ import java.math.BigDecimal;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
@@ -44,24 +40,24 @@ public class AstValueFieldBuilder<INSTANCE extends AstValueFieldBuilder<INSTANCE
   @Override
   public INSTANCE insert() {
     // calc super type
-    ParameterizedType parameterizedType = getFactory().getAst().newParameterizedType(getSuperType());
-    Type typeArg = getFactory().newTypeReference(JavaTypes.Long);
+    var parameterizedType = getFactory().getAst().newParameterizedType(getSuperType());
+    var typeArg = getFactory().newTypeReference(JavaTypes.Long);
     parameterizedType.typeArguments().add(typeArg);
     withSuperType(parameterizedType);
 
     super.insert();
 
     // linked positions
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       if (typeArg != null) {
-        ITrackedNodePosition dataTypeTracker = getFactory().getRewrite().track(typeArg);
+        var dataTypeTracker = getFactory().getRewrite().track(typeArg);
         links.addLinkedPosition(dataTypeTracker, true, AstNodeFactory.VALUE_TYPE_GROUP);
       }
 
-      String[] proposalTypes = PROPOSAL_VALUE_DATA_TYPES.toArray(new String[0]);
-      for (String fqn : proposalTypes) {
-        ITypeBinding typeBinding = getFactory().resolveTypeBinding(fqn);
+      var proposalTypes = PROPOSAL_VALUE_DATA_TYPES.toArray(new String[0]);
+      for (var fqn : proposalTypes) {
+        var typeBinding = getFactory().resolveTypeBinding(fqn);
         if (typeBinding != null) {
           links.addLinkedPositionProposal(AstNodeFactory.VALUE_TYPE_GROUP, typeBinding);
         }

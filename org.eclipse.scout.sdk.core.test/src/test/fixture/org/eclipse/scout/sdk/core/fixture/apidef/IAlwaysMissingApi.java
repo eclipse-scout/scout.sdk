@@ -10,8 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.fixture.apidef;
 
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 
 public interface IAlwaysMissingApi extends IApiSpecification {
   default IClassNameSupplier alwaysMissing() {

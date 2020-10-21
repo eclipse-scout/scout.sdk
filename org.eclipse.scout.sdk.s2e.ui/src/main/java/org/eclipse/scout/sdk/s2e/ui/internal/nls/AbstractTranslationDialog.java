@@ -109,13 +109,13 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
 
   @Override
   protected Control createContents(Composite parent) {
-    Control contents = super.createContents(parent);
+    var contents = super.createContents(parent);
     setTitle(m_title);
 
     postCreate();
 
     getButton(IDialogConstants.OK_ID).setText("&Ok");
-    TextField defaultTranslationField = getDefaultTranslationField();
+    var defaultTranslationField = getDefaultTranslationField();
     if (defaultTranslationField != null) {
       defaultTranslationField.setFocus();
     }
@@ -128,7 +128,7 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
   }
 
   protected void reCreateDialogArea() {
-    for (Control c : m_fixDialogArea.getChildren()) {
+    for (var c : m_fixDialogArea.getChildren()) {
       c.dispose();
     }
     createDialogArea(null);
@@ -150,8 +150,8 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
           .grab(true, true)
           .applyTo(m_fixDialogArea);
     }
-    Composite rootArea = new Composite(m_fixDialogArea, SWT.NONE);
-    Composite inputComp = new Composite(rootArea, SWT.NONE);
+    var rootArea = new Composite(m_fixDialogArea, SWT.NONE);
+    var inputComp = new Composite(rootArea, SWT.NONE);
 
     // store selection proposal field
     m_projectProposalField = FieldToolkit.createTranslationStoreProposalField(inputComp, "Create in", getNlsProject(), 60);
@@ -172,7 +172,7 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
     m_keyField.addModifyListener(input -> m_nlsEntry.setKey(m_keyField.getText()));
 
     // Tabs
-    TabFolder translationGroup = new TabFolder(rootArea, SWT.NULL);
+    var translationGroup = new TabFolder(rootArea, SWT.NULL);
     translationGroup.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
@@ -185,9 +185,9 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
         .orElseGet(Stream::empty)
         .collect(toCollection(TreeSet::new));
     m_translationFields.clear();
-    for (Language l : languages) {
-      Composite txtFieldContainer = new Composite(translationGroup, SWT.NONE);
-      TabItem tabItem = new TabItem(translationGroup, SWT.NULL);
+    for (var l : languages) {
+      var txtFieldContainer = new Composite(translationGroup, SWT.NONE);
+      var tabItem = new TabItem(translationGroup, SWT.NULL);
       tabItem.setText(l.displayName());
       tabItem.setControl(txtFieldContainer);
 
@@ -203,7 +203,7 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
           .applyTo(txtFieldContainer);
 
       // translation text field for a language
-      TextField field = createTranslationField(txtFieldContainer, l);
+      var field = createTranslationField(txtFieldContainer, l);
       field.setText(m_nlsEntry.text(l).orElse(""));
       field.setSelection(field.getText().length());
       GridDataFactory
@@ -269,9 +269,9 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
   }
 
   protected TextField createTranslationField(Composite parent, Language l) {
-    TextField translationField = new TextField(parent, TextField.TYPE_MULTI_LINE);
+    var translationField = new TextField(parent, TextField.TYPE_MULTI_LINE);
     translationField.addModifyListener(event -> {
-      String newText = translationField.getText();
+      var newText = translationField.getText();
       if (Strings.isEmpty(newText)) {
         m_nlsEntry.putText(l, null);
       }
@@ -285,10 +285,10 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
 
       @Override
       public void modifyText(ModifyEvent event) {
-        String newText = translationField.getText();
+        var newText = translationField.getText();
         if (getKeyField().isEnabled() && !Strings.isEmpty(newText)) {
-          String oldKey = getNlsProject().generateNewKey(m_oldInput);
-          String curVal = getKeyField().getText();
+          var oldKey = getNlsProject().generateNewKey(m_oldInput);
+          var curVal = getKeyField().getText();
           if (Strings.isBlank(curVal)) {
             curVal = null;
           }
@@ -321,11 +321,11 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
   }
 
   private void copyKeyToClipboard() {
-    ITranslation entry = getNlsEntry();
+    var entry = getNlsEntry();
     if (entry == null) {
       return;
     }
-    String key = entry.key();
+    var key = entry.key();
     if (Strings.isBlank(key)) {
       return;
     }

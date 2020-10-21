@@ -12,11 +12,8 @@ package org.eclipse.scout.sdk.s2e;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.lang.reflect.Method;
-
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
@@ -30,20 +27,20 @@ import org.junit.jupiter.api.Test;
 public class ApiTest {
   @Test
   public void testAstUtilsApi() throws NoSuchMethodException {
-    ASTParser parser = ASTParser.newParser(AST.JLS14);
+    var parser = ASTParser.newParser(AST.JLS14);
     parser.setBindingsRecovery(false);
     parser.setIgnoreMethodBodies(true);
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setResolveBindings(false);
     parser.setSource("public class Test {}".toCharArray());
-    ASTNode node = parser.createAST(new NullProgressMonitor());
-    AST ast = node.getAST();
-    Object resolver = AstUtils.getBindingResolver(ast);
+    var node = parser.createAST(new NullProgressMonitor());
+    var ast = node.getAST();
+    var resolver = AstUtils.getBindingResolver(ast);
     assertNotNull(resolver);
     AstUtils.getCompilationUnitScope(resolver);
 
     // test for org.eclipse.scout.sdk.s2e.ui.internal.util.ast.AstNodeFactory.resolveTypeBinding(String)
-    Method m = resolver.getClass().getDeclaredMethod("getTypeBinding", TypeBinding.class);
+    var m = resolver.getClass().getDeclaredMethod("getTypeBinding", TypeBinding.class);
     assertNotNull(m);
   }
 }

@@ -48,7 +48,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class MetaValueFactoryTest {
   @Test
   public void testCreateNull() {
-    IMetaValue createNull = MetaValueFactory.createNull();
+    var createNull = MetaValueFactory.createNull();
     assertNull(createNull.as(Object.class));
     assertEquals("null", createNull.toString());
     assertEquals(MetaValueType.Null, createNull.type());
@@ -63,7 +63,7 @@ public class MetaValueFactoryTest {
   @Test
   public void testCreateUnknown() {
     Object val = "test";
-    IMetaValue metaValue = MetaValueFactory.createUnknown(val);
+    var metaValue = MetaValueFactory.createUnknown(val);
     assertSame(val, metaValue.as(Object.class));
     assertEquals("Unknown(" + val + ')', metaValue.toString());
     assertEquals(MetaValueType.Unknown, metaValue.type());
@@ -71,8 +71,8 @@ public class MetaValueFactoryTest {
 
   @Test
   public void testCreateFromType(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
-    IMetaValue metaValue = MetaValueFactory.createFromType(childClassType.unwrap());
+    var childClassType = env.requireType(ChildClass.class.getName());
+    var metaValue = MetaValueFactory.createFromType(childClassType.unwrap());
     assertSame(childClassType, metaValue.as(Object.class));
     assertSame(childClassType, metaValue.as(IType.class));
     assertSame(childClassType.unwrap(), metaValue.as(List.class));
@@ -83,10 +83,10 @@ public class MetaValueFactoryTest {
 
   @Test
   public void testCreateFromEnum(IJavaEnvironment env) {
-    IType type = env.requireType(TestEnum.class.getName());
-    IField field = type.fields().first().get();
+    var type = env.requireType(TestEnum.class.getName());
+    var field = type.fields().first().get();
 
-    IMetaValue metaValue = MetaValueFactory.createFromEnum(field.unwrap());
+    var metaValue = MetaValueFactory.createFromEnum(field.unwrap());
     assertSame(field, metaValue.as(Object.class));
     assertSame(field, metaValue.as(IField.class));
     assertSame(field.unwrap(), metaValue.as(List.class));
@@ -97,8 +97,8 @@ public class MetaValueFactoryTest {
 
   @Test
   public void testCreateFromAnnotation(IJavaEnvironment env) {
-    IAnnotation annot = env.requireType(ChildClass.class.getName()).annotations().first().get();
-    IMetaValue metaValue = MetaValueFactory.createFromAnnotation(annot.unwrap());
+    var annot = env.requireType(ChildClass.class.getName()).annotations().first().get();
+    var metaValue = MetaValueFactory.createFromAnnotation(annot.unwrap());
     assertSame(annot, metaValue.as(Object.class));
     assertSame(annot, metaValue.as(IAnnotation.class));
     assertEquals(annot.unwrap(), metaValue.as(String.class));
@@ -107,9 +107,10 @@ public class MetaValueFactoryTest {
   }
 
   @Test
+  @SuppressWarnings("ConstantConditions")
   public void testCreateFromConstantBoolean() {
-    boolean val = true;
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(BooleanConstant.fromValue(val));
+    var val = true;
+    var metaValue = MetaValueFactory.createFromConstant(BooleanConstant.fromValue(val));
     assertEquals(MetaValueType.Bool, metaValue.type());
     assertEquals(val, metaValue.as(Object.class));
     assertEquals(val, metaValue.as(Boolean.class));
@@ -121,7 +122,7 @@ public class MetaValueFactoryTest {
   @Test
   public void testCreateFromConstantByte() {
     byte val = 55;
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(ByteConstant.fromValue(val));
+    var metaValue = MetaValueFactory.createFromConstant(ByteConstant.fromValue(val));
     assertEquals(MetaValueType.Byte, metaValue.type());
     assertEquals(val, metaValue.as(Object.class));
     assertEquals(Byte.toString(val), metaValue.toString());
@@ -145,8 +146,8 @@ public class MetaValueFactoryTest {
 
   @Test
   public void testCreateFromConstantInt() {
-    int val = 55;
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(IntConstant.fromValue(val));
+    var val = 55;
+    var metaValue = MetaValueFactory.createFromConstant(IntConstant.fromValue(val));
     assertEquals(MetaValueType.Int, metaValue.type());
     assertEquals(val, metaValue.as(Object.class));
     assertEquals(Integer.toString(val), metaValue.toString());
@@ -171,7 +172,7 @@ public class MetaValueFactoryTest {
   @Test
   public void testCreateFromConstantChar() {
     char val = 55;
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(CharConstant.fromValue(val));
+    var metaValue = MetaValueFactory.createFromConstant(CharConstant.fromValue(val));
     assertEquals(MetaValueType.Char, metaValue.type());
     assertEquals(val, metaValue.as(Object.class));
     assertEquals(Character.toString(val), metaValue.toString());
@@ -196,7 +197,7 @@ public class MetaValueFactoryTest {
   @Test
   public void testCreateFromConstantLong() {
     long val = 55;
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(LongConstant.fromValue(val));
+    var metaValue = MetaValueFactory.createFromConstant(LongConstant.fromValue(val));
     assertEquals(MetaValueType.Long, metaValue.type());
     assertEquals(val, metaValue.as(Object.class));
     assertEquals(Long.toString(val), metaValue.toString());
@@ -221,7 +222,7 @@ public class MetaValueFactoryTest {
   @Test
   public void testCreateFromConstantShort() {
     short val = 55;
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(ShortConstant.fromValue(val));
+    var metaValue = MetaValueFactory.createFromConstant(ShortConstant.fromValue(val));
     assertEquals(MetaValueType.Short, metaValue.type());
     assertEquals(val, metaValue.as(Object.class));
     assertEquals(Short.toString(val), metaValue.toString());
@@ -244,9 +245,10 @@ public class MetaValueFactoryTest {
   }
 
   @Test
+  @SuppressWarnings("NumericCastThatLosesPrecision")
   public void testCreateFromConstantDouble() {
-    double val = 55.3;
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(DoubleConstant.fromValue(val));
+    var val = 55.3;
+    var metaValue = MetaValueFactory.createFromConstant(DoubleConstant.fromValue(val));
     assertEquals(MetaValueType.Double, metaValue.type());
     assertEquals(val, metaValue.as(Object.class));
     assertEquals(Double.toString(val), metaValue.toString());
@@ -269,9 +271,10 @@ public class MetaValueFactoryTest {
   }
 
   @Test
+  @SuppressWarnings("NumericCastThatLosesPrecision")
   public void testCreateFromConstantFloat() {
-    float val = 55.3f;
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(FloatConstant.fromValue(val));
+    var val = 55.3f;
+    var metaValue = MetaValueFactory.createFromConstant(FloatConstant.fromValue(val));
     assertEquals(MetaValueType.Float, metaValue.type());
     assertEquals(val, metaValue.as(Object.class));
     assertEquals(Float.toString(val), metaValue.toString());
@@ -295,8 +298,8 @@ public class MetaValueFactoryTest {
 
   @Test
   public void testCreateFromConstantString() {
-    String val = "teststring";
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(val));
+    var val = "teststring";
+    var metaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(val));
     assertEquals(MetaValueType.String, metaValue.type());
     assertEquals(val, metaValue.as(Object.class));
     assertEquals(val, metaValue.as(String.class));
@@ -306,7 +309,7 @@ public class MetaValueFactoryTest {
 
   @Test
   public void testCreateFromConstantNullString() {
-    IMetaValue metaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(null));
+    var metaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(null));
     assertEquals(MetaValueType.String, metaValue.type());
     assertNull(metaValue.as(Object.class));
     assertNull(metaValue.as(String.class));
@@ -315,28 +318,28 @@ public class MetaValueFactoryTest {
 
   @Test
   public void testCreateArray() {
-    String first = "first";
-    String second = "second";
-    IMetaValue firstMetaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(first));
-    IMetaValue secondMetaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(second));
+    var first = "first";
+    var second = "second";
+    var firstMetaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(first));
+    var secondMetaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(second));
     IMetaValue[] metaArray = {firstMetaValue, secondMetaValue};
-    IMetaValue metaValue = MetaValueFactory.createArray(metaArray);
+    var metaValue = MetaValueFactory.createArray(metaArray);
 
     assertEquals(MetaValueType.Array, metaValue.type());
     assertArrayEquals(new Object[]{first, second}, (Object[]) metaValue.as(Object.class));
     assertArrayEquals(new Object[]{first, second}, metaValue.as(Object[].class));
     assertArrayEquals(new Object[]{first, second}, metaValue.as(String[].class));
 
-    IArrayMetaValue array = (IArrayMetaValue) metaValue;
+    var array = (IArrayMetaValue) metaValue;
     assertSame(metaArray, array.metaValueArray());
   }
 
   @Test
   public void testCreateArrayOneElement() {
-    String first = "first";
-    IMetaValue firstMetaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(first));
+    var first = "first";
+    var firstMetaValue = MetaValueFactory.createFromConstant(StringConstant.fromValue(first));
     IMetaValue[] metaArray = {firstMetaValue};
-    IMetaValue metaValue = MetaValueFactory.createArray(metaArray);
+    var metaValue = MetaValueFactory.createArray(metaArray);
 
     assertEquals(MetaValueType.Array, metaValue.type());
     assertArrayEquals(new Object[]{first}, (Object[]) metaValue.as(Object.class));
@@ -344,7 +347,7 @@ public class MetaValueFactoryTest {
     assertArrayEquals(new Object[]{first}, metaValue.as(String[].class));
     assertEquals(first, metaValue.as(String.class));
 
-    IArrayMetaValue array = (IArrayMetaValue) metaValue;
+    var array = (IArrayMetaValue) metaValue;
     assertSame(metaArray, array.metaValueArray());
   }
 }

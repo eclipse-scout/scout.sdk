@@ -42,7 +42,7 @@ final class SameCompositeObject {
       return false;
     }
 
-    SameCompositeObject other = (SameCompositeObject) obj;
+    var other = (SameCompositeObject) obj;
     return sameElements(m_value, other.m_value);
   }
 
@@ -53,14 +53,14 @@ final class SameCompositeObject {
     if (a1 == null || a2 == null) {
       return false;
     }
-    int length = a1.length;
+    var length = a1.length;
     if (a2.length != length) {
       return false;
     }
 
-    for (int i = 0; i < length; i++) {
-      Object e1 = a1[i];
-      Object e2 = a2[i];
+    for (var i = 0; i < length; i++) {
+      var e1 = a1[i];
+      var e2 = a2[i];
 
       if (e1 != e2) {
         return false;

@@ -25,15 +25,15 @@ import org.junit.jupiter.api.Test;
 public class TypeNameDescriptorTest {
 
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "ConstantConditions", "SimplifiableJUnitAssertion", "EqualsBetweenInconvertibleTypes"})
   public void testEquals() {
-    String ref = "a.b.TestClass$Inner[][]";
+    var ref = "a.b.TestClass$Inner[][]";
     assertEquals(TypeNameDescriptor.of(ref), TypeNameDescriptor.of(ref));
     assertNotEquals(TypeNameDescriptor.of(ref), TypeNameDescriptor.of("a.b.TestClass$Inner[]"));
     assertNotEquals(TypeNameDescriptor.of(ref), TypeNameDescriptor.of("a.b.TestClass.Inner[][]"));
     assertNotEquals(TypeNameDescriptor.of(ref), TypeNameDescriptor.of("a.c.TestClass$Inner[][]"));
 
-    TypeNameDescriptor d = TypeNameDescriptor.of(ref);
+    var d = TypeNameDescriptor.of(ref);
     assertEquals(d, d);
     assertFalse(d.equals(null));
     assertFalse(d.equals(ref));

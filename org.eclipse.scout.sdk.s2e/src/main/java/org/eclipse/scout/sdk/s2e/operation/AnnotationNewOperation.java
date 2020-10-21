@@ -13,16 +13,12 @@ package org.eclipse.scout.sdk.s2e.operation;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
 
-import java.nio.file.Path;
 import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IBuffer;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
@@ -30,7 +26,6 @@ import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
@@ -44,7 +39,6 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.PropertySupport;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
@@ -75,16 +69,16 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
     Ensure.isTrue(JdtUtils.exists(m_declaringMember));
 
     try {
-      ICompilationUnit icu = m_declaringMember.getCompilationUnit();
+      var icu = m_declaringMember.getCompilationUnit();
       currentWorkingCopyManager().register(icu, progress.monitor());
 
-      IJavaEnvironment javaEnv = env.toScoutJavaEnvironment(m_declaringMember.getJavaProject());
+      var javaEnv = env.toScoutJavaEnvironment(m_declaringMember.getJavaProject());
       IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(javaEnv), JdtUtils.getPackage(icu));
       IDocument doc = new Document(icu.getSource());
 
-      TextEdit edit = createEdit(new ImportValidator(collector), doc, icu.findRecommendedLineSeparator());
+      var edit = createEdit(new ImportValidator(collector), doc, icu.findRecommendedLineSeparator());
       edit.apply(doc);
-      IBuffer buffer = icu.getBuffer();
+      var buffer = icu.getBuffer();
       buffer.setContents(doc.get());
 
       // create imports
@@ -96,21 +90,21 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
   }
 
   protected ISourceRange getAnnotationReplaceRange(IDocument sourceDocument, CharSequence newLine, CharSequence newAnnotationSource, IJavaEnvironment env) throws JavaModelException, BadLocationException {
-    String annotationFqn = getSourceBuilder().elementName(env).orElseThrow(() -> newFail("Annotation generator is missing the name."));
-    String sn = JavaTypes.simpleName(annotationFqn);
-    String fqn = JavaTypes.qualifier(annotationFqn) + JavaTypes.C_DOT + sn;
-    int newLineLength = newLine.length();
+    var annotationFqn = getSourceBuilder().elementName(env).orElseThrow(() -> newFail("Annotation generator is missing the name."));
+    var sn = JavaTypes.simpleName(annotationFqn);
+    var fqn = JavaTypes.qualifier(annotationFqn) + JavaTypes.C_DOT + sn;
+    var newLineLength = newLine.length();
 
-    IRegion lineOfMemberName = sourceDocument.getLineInformationOfOffset(m_declaringMember.getNameRange().getOffset());
-    int lineBeforeMemberNameEndPos = lineOfMemberName.getOffset() - newLineLength;
-    int lastLineStart = sourceDocument.getLineInformationOfOffset(m_declaringMember.getSourceRange().getOffset()).getOffset();
-    int newAnnotationLen = newAnnotationSource.length();
-    IRegion lineInfo = sourceDocument.getLineInformationOfOffset(lineBeforeMemberNameEndPos);
-    IRegion result = lineOfMemberName;
-    boolean isReplaceExisting = false;
-    boolean isInBlockComment = false;
+    var lineOfMemberName = sourceDocument.getLineInformationOfOffset(m_declaringMember.getNameRange().getOffset());
+    var lineBeforeMemberNameEndPos = lineOfMemberName.getOffset() - newLineLength;
+    var lastLineStart = sourceDocument.getLineInformationOfOffset(m_declaringMember.getSourceRange().getOffset()).getOffset();
+    var newAnnotationLen = newAnnotationSource.length();
+    var lineInfo = sourceDocument.getLineInformationOfOffset(lineBeforeMemberNameEndPos);
+    var result = lineOfMemberName;
+    var isReplaceExisting = false;
+    var isInBlockComment = false;
     while (lineInfo.getOffset() >= lastLineStart) {
-      String lineSource = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
+      var lineSource = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
       if (lineSource != null) {
         lineSource = CoreUtils.removeComments(lineSource).trim();
         if (!lineSource.isEmpty()) {
@@ -143,8 +137,8 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
   }
 
   protected static String getIndent(IDocument sourceDocument, ISourceRange replaceRange) throws BadLocationException {
-    IRegion line = sourceDocument.getLineInformationOfOffset(replaceRange.getOffset());
-    Matcher matcher = REGEX_WHITE_SPACE_START.matcher(sourceDocument.get(line.getOffset(), line.getLength()));
+    var line = sourceDocument.getLineInformationOfOffset(replaceRange.getOffset());
+    var matcher = REGEX_WHITE_SPACE_START.matcher(sourceDocument.get(line.getOffset(), line.getLength()));
     if (matcher.find()) {
       return matcher.group(1);
     }
@@ -154,12 +148,12 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
   public TextEdit createEdit(IImportValidator validator, IDocument sourceDocument, String nl) throws CoreException {
     try {
       // create new source
-      Path targetPath = m_declaringMember.getCompilationUnit().getResource().getLocation().toFile().toPath();
-      PropertySupport properties = S2eUtils.propertyMap(m_declaringMember.getJavaProject(), targetPath);
-      StringBuilder src = getSourceBuilder().toJavaSource(new JavaBuilderContext(new BuilderContext(nl, properties), validator));
+      var targetPath = m_declaringMember.getCompilationUnit().getResource().getLocation().toFile().toPath();
+      var properties = S2eUtils.propertyMap(m_declaringMember.getJavaProject(), targetPath);
+      var src = getSourceBuilder().toJavaSource(new JavaBuilderContext(new BuilderContext(nl, properties), validator));
 
       // find insert/replace range
-      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, nl, src, validator.importCollector().getJavaEnvironment());
+      var replaceRange = getAnnotationReplaceRange(sourceDocument, nl, src, validator.importCollector().getJavaEnvironment());
 
       // insert indentation at the beginning
       src.insert(0, getIndent(sourceDocument, replaceRange));

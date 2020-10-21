@@ -14,22 +14,19 @@ import static java.util.Collections.unmodifiableMap;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
 @SuppressWarnings("squid:S2160")
@@ -59,9 +56,9 @@ public class AnnotationImplementor extends AbstractJavaElementImplementor<Annota
   @Override
   public Map<String, IAnnotationElement> elements() {
     return m_values.computeIfAbsentAndGet(() -> {
-      Set<Entry<String, AnnotationElementSpi>> entrySet = m_spi.getValues().entrySet();
+      var entrySet = m_spi.getValues().entrySet();
       Map<String, IAnnotationElement> values = new LinkedHashMap<>(entrySet.size());
-      for (Entry<String, AnnotationElementSpi> e : entrySet) {
+      for (var e : entrySet) {
         values.put(e.getKey(), e.getValue().wrap());
       }
       return unmodifiableMap(values);

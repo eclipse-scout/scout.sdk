@@ -8,10 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.util.apidef;
+package org.eclipse.scout.sdk.core.apidef;
 
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
+/**
+ * Represents an object having a fully qualified class name.
+ */
 @FunctionalInterface
 public interface IClassNameSupplier {
 
@@ -20,12 +23,22 @@ public interface IClassNameSupplier {
    */
   String fqn();
 
+  /**
+   * @return The simple name of this class.
+   */
   default String simpleName() {
     return JavaTypes.simpleName(fqn());
   }
 
+  /**
+   * Creates a {@link IClassNameSupplier} from a fully qualified {@link CharSequence}.
+   * 
+   * @param fqn
+   *          The fully qualified class name. May be {@code null}.
+   * @return A {@link IClassNameSupplier} using the fqn provided as fully qualified class name.
+   */
   static IClassNameSupplier raw(CharSequence fqn) {
-    String name = fqn == null ? null : fqn.toString();
+    var name = fqn == null ? null : fqn.toString();
     return () -> name;
   }
 }

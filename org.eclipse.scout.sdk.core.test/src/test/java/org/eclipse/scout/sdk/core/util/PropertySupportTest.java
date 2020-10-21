@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,9 +39,9 @@ public class PropertySupportTest {
   @Test
   @SuppressWarnings({"CallToSystemGC", "UnusedAssignment"})
   public void testEventListenerAllProperties() {
-    PropertySupport ps = new PropertySupport(this);
-    P_Listener l = new P_Listener();
-    P_WeakListener wl = new P_WeakListener();
+    var ps = new PropertySupport(this);
+    var l = new P_Listener();
+    var wl = new P_WeakListener();
     ps.addPropertyChangeListener(l);
     ps.addPropertyChangeListener(wl);
 
@@ -60,7 +59,7 @@ public class PropertySupportTest {
   @Test
   @SuppressWarnings({"CallToSystemGC", "UnusedAssignment"})
   public void testNoFireWeakListenerAfterReclaim() {
-    PropertySupport ps = new PropertySupport(this);
+    var ps = new PropertySupport(this);
     PropertyChangeListener wl = new P_WeakListener();
     ps.addPropertyChangeListener(wl);
     wl = null;
@@ -73,10 +72,10 @@ public class PropertySupportTest {
 
   @Test
   public void testEventListenerSingleProperty() {
-    PropertySupport ps = new PropertySupport(this);
-    P_Listener l1 = new P_Listener();
-    P_Listener l2 = new P_Listener();
-    P_WeakListener wl = new P_WeakListener();
+    var ps = new PropertySupport(this);
+    var l1 = new P_Listener();
+    var l2 = new P_Listener();
+    var wl = new P_WeakListener();
     ps.addPropertyChangeListener("whatever", l1);
     ps.addPropertyChangeListener(PROP_NAME, l2);
     ps.addPropertyChangeListener(PROP_NAME, wl);
@@ -109,8 +108,8 @@ public class PropertySupportTest {
 
   @Test
   public void testPropertyChangeListenerProxy() {
-    PropertySupport ps = new PropertySupport(this);
-    P_Listener listener = new P_Listener();
+    var ps = new PropertySupport(this);
+    var listener = new P_Listener();
     PropertyChangeListener p = new PropertyChangeListenerProxy(PROP_NAME, listener);
     ps.addPropertyChangeListener(p);
     ps.setProperty("other", "whatever");
@@ -127,8 +126,8 @@ public class PropertySupportTest {
 
   @Test
   public void testNullRemoves() {
-    PropertySupport ps = new PropertySupport();
-    P_Listener l1 = new P_Listener();
+    var ps = new PropertySupport();
+    var l1 = new P_Listener();
     ps.addPropertyChangeListener(PROP_NAME, l1);
     ps.setProperty(PROP_NAME, PROP_VALUE);
     ps.setProperty(PROP_NAME, null);
@@ -142,7 +141,7 @@ public class PropertySupportTest {
 
   @Test
   public void testDataTypes() {
-    PropertySupport ps = new PropertySupport(11);
+    var ps = new PropertySupport(11);
     ps.setPropertyBool("bool", true);
     ps.setPropertyDouble("double", 1.12);
     ps.setPropertyInt("int", 11);
@@ -167,12 +166,12 @@ public class PropertySupportTest {
   @Test
   @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testEqualsAndHashCode() {
-    PropertySupport a = new PropertySupport();
-    PropertySupport b = new PropertySupport("source");
-    PropertySupport c = new PropertySupport();
+    var a = new PropertySupport();
+    var b = new PropertySupport("source");
+    var c = new PropertySupport();
     c.setProperty(PROP_NAME, PROP_VALUE);
-    PropertySupport d = new PropertySupport();
-    PropertySupport e = new PropertySupport("other");
+    var d = new PropertySupport();
+    var e = new PropertySupport("other");
     assertFalse(a.equals(b));
     assertFalse(a.equals(null));
     assertFalse(a.equals(""));
@@ -186,13 +185,13 @@ public class PropertySupportTest {
 
   @Test
   public void testNoEventsEvent() {
-    PropertySupport p1 = new PropertySupport();
-    P_Listener l = new P_Listener();
+    var p1 = new PropertySupport();
+    var l = new P_Listener();
     p1.addPropertyChangeListener(PROP_NAME, l);
     p1.firePropertyChange(null);
     assertEquals(0, l.m_counter.get());
 
-    PropertySupport ps = new PropertySupport(this);
+    var ps = new PropertySupport(this);
     ps.addPropertyChangeListener("whatever", l);
     ps.setProperty(PROP_NAME, PROP_VALUE);
     assertEquals(0, l.m_counter.get());
@@ -202,7 +201,7 @@ public class PropertySupportTest {
   @SuppressWarnings("unchecked")
   private static Map<String, List<Object>> childListenerFieldOf(PropertySupport owner) {
     try {
-      Field f = PropertySupport.class.getDeclaredField("m_childListeners");
+      var f = PropertySupport.class.getDeclaredField("m_childListeners");
       f.setAccessible(true);
       return (Map<String, List<Object>>) f.get(owner);
     }
@@ -213,7 +212,7 @@ public class PropertySupportTest {
 
   private static EventListenerList listenerFieldOf(PropertySupport owner) {
     try {
-      Field f = PropertySupport.class.getDeclaredField("m_listeners");
+      var f = PropertySupport.class.getDeclaredField("m_listeners");
       f.setAccessible(true);
       return (EventListenerList) f.get(owner);
     }

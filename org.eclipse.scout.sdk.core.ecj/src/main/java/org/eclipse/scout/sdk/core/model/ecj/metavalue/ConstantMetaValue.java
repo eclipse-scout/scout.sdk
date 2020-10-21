@@ -99,7 +99,7 @@ class ConstantMetaValue extends AbstractMetaValue {
 
   @Override
   public String toString() {
-    Object internalObject = getInternalObject(Object.class);
+    var internalObject = getInternalObject(Object.class);
     if (internalObject == null) {
       return "null";
     }

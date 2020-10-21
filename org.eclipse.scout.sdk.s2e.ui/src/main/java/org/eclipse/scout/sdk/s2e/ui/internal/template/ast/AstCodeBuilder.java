@@ -11,27 +11,16 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import java.math.BigDecimal;
-import java.util.Deque;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Stream;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.ICodeType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
@@ -63,12 +52,12 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
   @Override
   public AstCodeBuilder insert() {
     // calc code_id type
-    String genericFromCodeTypeFqn = parseCodeIdTypeFromCodeType();
-    Type genericFromCodeType = getFactory().newTypeReference(genericFromCodeTypeFqn);
+    var genericFromCodeTypeFqn = parseCodeIdTypeFromCodeType();
+    var genericFromCodeType = getFactory().newTypeReference(genericFromCodeTypeFqn);
 
     applyTypeArgToSuperType(genericFromCodeType);
 
-    TypeDeclaration codeType = super.insert().get();
+    var codeType = super.insert().get();
 
     // serialVersionUID
     codeType.bodyDeclarations().add(0, getFactory().newSerialVersionUid());
@@ -77,23 +66,23 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
     codeType.bodyDeclarations().add(1, createId(genericFromCodeTypeFqn));
 
     // getId
-    MethodDeclaration getId = createGetId(genericFromCodeTypeFqn);
+    var getId = createGetId(genericFromCodeTypeFqn);
     codeType.bodyDeclarations().add(getId);
 
     // linked positions
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      ITrackedNodePosition dataTypeTracker = getFactory().getRewrite().track(genericFromCodeType);
+      var dataTypeTracker = getFactory().getRewrite().track(genericFromCodeType);
       links.addLinkedPosition(dataTypeTracker, true, AstNodeFactory.CODE_DATA_TYPE_GROUP);
 
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ICode().fqn());
 
-      ITypeBinding typeBinding = getFactory().resolveTypeBinding(genericFromCodeTypeFqn);
+      var typeBinding = getFactory().resolveTypeBinding(genericFromCodeTypeFqn);
       if (typeBinding != null) {
         links.addLinkedPositionProposal(AstNodeFactory.CODE_DATA_TYPE_GROUP, typeBinding);
       }
-      String[] proposalTypes = PROPOSAL_CODE_DATA_TYPES.toArray(new String[0]);
-      for (String fqn : proposalTypes) {
+      var proposalTypes = PROPOSAL_CODE_DATA_TYPES.toArray(new String[0]);
+      for (var fqn : proposalTypes) {
         typeBinding = getFactory().resolveTypeBinding(fqn);
         if (typeBinding != null) {
           links.addLinkedPositionProposal(AstNodeFactory.CODE_DATA_TYPE_GROUP, typeBinding);
@@ -105,22 +94,22 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
   }
 
   protected void applyTypeArgToSuperType(Type genericFromCodeType) {
-    ParameterizedType parameterizedType = getFactory().getAst().newParameterizedType(getSuperType());
+    var parameterizedType = getFactory().getAst().newParameterizedType(getSuperType());
     parameterizedType.typeArguments().add(genericFromCodeType);
     withSuperType(parameterizedType);
   }
 
   protected TypeDeclaration getDeclaringCodeType() {
-    Deque<TypeDeclaration> parentTypes = AstUtils.getDeclaringTypes(getDeclaringType());
+    var parentTypes = AstUtils.getDeclaringTypes(getDeclaringType());
     return parentTypes.getLast();
   }
 
   protected String parseCodeIdTypeFromCodeType() {
-    TypeDeclaration codeType = getDeclaringCodeType();
-    IType typeBinding = Ensure.notNull(AstUtils.getTypeBinding(codeType));
+    var codeType = getDeclaringCodeType();
+    var typeBinding = Ensure.notNull(AstUtils.getTypeBinding(codeType));
     //noinspection resource
-    org.eclipse.scout.sdk.core.model.api.IType scoutType = getFactory().getScoutElementProvider().toScoutType(typeBinding);
-    ICodeType iCodeType = getFactory().getScoutApi().ICodeType();
+    var scoutType = getFactory().getScoutElementProvider().toScoutType(typeBinding);
+    var iCodeType = getFactory().getScoutApi().ICodeType();
     return scoutType.resolveTypeParamValue(iCodeType.codeIdTypeParamIndex(), iCodeType.fqn())
         .flatMap(Stream::findFirst)
         .map(org.eclipse.scout.sdk.core.model.api.IType::name)
@@ -128,27 +117,27 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
   }
 
   protected FieldDeclaration createId(String codeIdTypeFqn) {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
 
-    Type dataType = calcIdDataType(codeIdTypeFqn);
+    var dataType = calcIdDataType(codeIdTypeFqn);
 
-    Expression initValue = getFactory().newDefaultValueExpression(dataType.toString(), true);
-    VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+    var initValue = getFactory().newDefaultValueExpression(dataType.toString(), true);
+    var fragment = ast.newVariableDeclarationFragment();
     fragment.setName(ast.newSimpleName(ID_FIELD_NAME));
     fragment.setInitializer(initValue);
 
-    FieldDeclaration declaration = ast.newFieldDeclaration(fragment);
+    var declaration = ast.newFieldDeclaration(fragment);
 
     declaration.setType(dataType);
     declaration.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
     declaration.modifiers().add(ast.newModifier(ModifierKeyword.STATIC_KEYWORD));
     declaration.modifiers().add(ast.newModifier(ModifierKeyword.FINAL_KEYWORD));
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      ITrackedNodePosition dataTypeTracker = getFactory().getRewrite().track(dataType);
+      var dataTypeTracker = getFactory().getRewrite().track(dataType);
       links.addLinkedPosition(dataTypeTracker, true, AstNodeFactory.ID_DATA_TYPE_GROUP);
-      ITrackedNodePosition valueTracker = getFactory().getRewrite().track(initValue);
+      var valueTracker = getFactory().getRewrite().track(initValue);
       links.addLinkedPosition(valueTracker, true, AstNodeFactory.ID_VALUE_GROUP);
     }
 
@@ -156,7 +145,7 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
   }
 
   protected Type calcIdDataType(String codeIdTypeFqn) {
-    String primitive = JavaTypes.unboxToPrimitive(codeIdTypeFqn);
+    var primitive = JavaTypes.unboxToPrimitive(codeIdTypeFqn);
     if (JavaTypes.isPrimitive(primitive)) {
       return getFactory().getAst().newPrimitiveType(PrimitiveType.toCode(primitive));
     }
@@ -164,28 +153,28 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
   }
 
   protected MethodDeclaration createGetId(String codeIdTypeFqn) {
-    AST ast = getFactory().getAst();
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var ast = getFactory().getAst();
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(ast.newSimpleName(ID_FIELD_NAME));
 
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
-    MethodDeclaration getId = ast.newMethodDeclaration();
+    var getId = ast.newMethodDeclaration();
     getId.setConstructor(false);
     getId.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
     getId.setName(ast.newSimpleName(getFactory().getScoutApi().ICode().getIdMethodName()));
 
-    Type simpleDataType = getFactory().newTypeReference(codeIdTypeFqn);
+    var simpleDataType = getFactory().newTypeReference(codeIdTypeFqn);
     getId.setReturnType2(simpleDataType);
 
     getId.setBody(body);
 
     AstUtils.addAnnotationTo(getFactory().newOverrideAnnotation(), getId);
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      ITrackedNodePosition dataTypeTracker = getFactory().getRewrite().track(simpleDataType);
+      var dataTypeTracker = getFactory().getRewrite().track(simpleDataType);
       links.addLinkedPosition(dataTypeTracker, false, AstNodeFactory.CODE_DATA_TYPE_GROUP);
     }
 

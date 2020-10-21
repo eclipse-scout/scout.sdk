@@ -14,20 +14,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.eclipse.scout.sdk.core.apidef.Api;
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.fixture.AnnotationQueryTestFixture;
 import org.eclipse.scout.sdk.core.fixture.AnnotationQueryTestFixture.TestChildClass;
 import org.eclipse.scout.sdk.core.fixture.apidef.AlwaysMissingApiProvider;
 import org.eclipse.scout.sdk.core.fixture.apidef.IAlwaysMissingApi;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.apidef.Api;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -42,25 +41,25 @@ public class AnnotationQueryTest {
 
   @Test
   public void testAllSuperTypes(IJavaEnvironment env) {
-    IType testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName() + JavaTypes.C_DOLLAR + TestChildClass.class.getSimpleName());
+    var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName() + JavaTypes.C_DOLLAR + TestChildClass.class.getSimpleName());
     assertEquals(4, testChildClass.methods().first().get().annotations().withSuperTypes(true).stream().count());
   }
 
   @Test
   public void testSuperClasses(IJavaEnvironment env) {
-    IType testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName() + JavaTypes.C_DOLLAR + TestChildClass.class.getSimpleName());
+    var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName() + JavaTypes.C_DOLLAR + TestChildClass.class.getSimpleName());
     assertEquals(3, testChildClass.methods().first().get().annotations().withSuperClasses(true).stream().count());
   }
 
   @Test
   public void testSuperInterfaces(IJavaEnvironment env) {
-    IType testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName() + JavaTypes.C_DOLLAR + TestChildClass.class.getSimpleName());
+    var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName() + JavaTypes.C_DOLLAR + TestChildClass.class.getSimpleName());
     assertEquals(3, testChildClass.methods().first().get().annotations().withSuperInterfaces(true).stream().count());
   }
 
   @Test
   public void testOnField(IJavaEnvironment env) {
-    IType testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName());
+    var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName());
     assertEquals(1, testChildClass.fields().first().get().annotations().stream().count());
   }
 
@@ -68,7 +67,7 @@ public class AnnotationQueryTest {
   public void testAnnotationQueryWithNonExistingApi(IJavaEnvironment env) {
     Api.registerProvider(IAlwaysMissingApi.class, new AlwaysMissingApiProvider());
     try {
-      IType testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName());
+      var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName());
       assertTrue(testChildClass.annotations().withNameFrom(IAlwaysMissingApi.class, IAlwaysMissingApi::alwaysMissing).first().isEmpty());
     }
     finally {
@@ -80,7 +79,7 @@ public class AnnotationQueryTest {
   public void testAnnotationQueryWithNonExistingApiUsingWrapper(IJavaEnvironment env) {
     Api.registerProvider(IAlwaysMissingApi.class, new AlwaysMissingApiProvider());
     try {
-      IType testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName());
+      var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName());
       assertNotNull(AlwaysMissingAnnotation.TYPE_NAME);
       assertTrue(testChildClass.annotations().withManagedWrapper(AlwaysMissingAnnotation.class).first().isEmpty());
     }

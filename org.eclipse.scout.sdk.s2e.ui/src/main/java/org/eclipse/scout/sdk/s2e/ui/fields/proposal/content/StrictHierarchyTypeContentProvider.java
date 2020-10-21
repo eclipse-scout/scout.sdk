@@ -42,7 +42,7 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
 
   @Override
   protected Collection<?> loadProposals(IProgressMonitor monitor) {
-    IJavaProject javaProject = getJavaProject();
+    var javaProject = getJavaProject();
     if (!JdtUtils.exists(javaProject)) {
       return emptyList();
     }
@@ -63,9 +63,9 @@ public class StrictHierarchyTypeContentProvider extends AbstractContentProviderA
 
   @Override
   public String getTextSelected(Object element) {
-    IType t = (IType) element;
-    StringBuilder sb = new StringBuilder(t.getElementName());
-    String elementName = t.getPackageFragment().getElementName();
+    var t = (IType) element;
+    var sb = new StringBuilder(t.getElementName());
+    var elementName = t.getPackageFragment().getElementName();
     if (Strings.hasText(elementName)) {
       sb.append(" - ").append(elementName);
     }

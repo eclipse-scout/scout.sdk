@@ -14,19 +14,15 @@ import static org.eclipse.scout.sdk.core.util.Strings.escapeHtml;
 import static org.eclipse.scout.sdk.core.util.Strings.replaceEach;
 
 import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
-import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 
 /**
  * <h4>NlsProposal</h4>
@@ -51,15 +47,15 @@ public class TranslationProposal extends AbstractTranslationProposal {
 
   @Override
   public String getAdditionalProposalInfo() {
-    Map<Language, String> allTranslations = m_translation.texts();
+    var allTranslations = m_translation.texts();
     if (allTranslations.isEmpty()) {
       return null;
     }
 
-    StringBuilder b = new StringBuilder();
-    for (Entry<Language, String> e : allTranslations.entrySet()) {
+    var b = new StringBuilder();
+    for (var e : allTranslations.entrySet()) {
       //noinspection HardcodedLineSeparator
-      CharSequence text = replaceEach(escapeHtml(e.getValue()), new String[]{"\n", "\r"}, new String[]{"<br>", ""});
+      var text = replaceEach(escapeHtml(e.getValue()), new String[]{"\n", "\r"}, new String[]{"<br>", ""});
       b.append("<b>").append(text).append("</b> [").append(escapeHtml(e.getKey().displayName())).append("]<br>");
     }
     return b.toString();
@@ -89,12 +85,12 @@ public class TranslationProposal extends AbstractTranslationProposal {
   public boolean validate(IDocument document, int offset, DocumentEvent event) {
     if (super.validate(document, offset, event)) {
       try {
-        Point keyRange = findKeyRange(document, offset);
+        var keyRange = findKeyRange(document, offset);
         if (keyRange == null) {
           return false;
         }
 
-        String prefix = document.get(keyRange.x, offset - keyRange.x);
+        var prefix = document.get(keyRange.x, offset - keyRange.x);
         return m_translation.key().toLowerCase(Locale.ENGLISH).startsWith(prefix.toLowerCase(Locale.ENGLISH));
       }
       catch (BadLocationException e) {

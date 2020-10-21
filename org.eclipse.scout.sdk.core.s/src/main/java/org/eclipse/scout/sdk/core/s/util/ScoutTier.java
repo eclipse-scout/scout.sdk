@@ -114,22 +114,22 @@ public enum ScoutTier implements Predicate<IJavaElement> {
       return Optional.empty();
     }
 
-    boolean uiAvailable = typeLookupStrategy.test(api.UiServlet().fqn());
+    var uiAvailable = typeLookupStrategy.test(api.UiServlet().fqn());
     if (uiAvailable) {
       return Optional.of(HtmlUi);
     }
 
-    boolean clientAvailable = typeLookupStrategy.test(api.IClientSession().fqn());
+    var clientAvailable = typeLookupStrategy.test(api.IClientSession().fqn());
     if (clientAvailable) {
       return Optional.of(Client);
     }
 
-    boolean serverAvailable = typeLookupStrategy.test(api.IServerSession().fqn());
+    var serverAvailable = typeLookupStrategy.test(api.IServerSession().fqn());
     if (serverAvailable) {
       return Optional.of(Server);
     }
 
-    boolean sharedAvailable = typeLookupStrategy.test(api.ISession().fqn());
+    var sharedAvailable = typeLookupStrategy.test(api.ISession().fqn());
     if (sharedAvailable) {
       return Optional.of(Shared);
     }

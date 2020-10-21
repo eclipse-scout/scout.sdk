@@ -15,19 +15,16 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -40,18 +37,13 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -120,7 +112,7 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
         // wait until the forked java process has ended
         waitForArtifactBuildCompleted();
 
-        for (Integer mavenReturnCode : m_mavenReturnCodes) {
+        for (var mavenReturnCode : m_mavenReturnCodes) {
           if (mavenReturnCode == null || mavenReturnCode != 0) {
             throw newFail("Maven build failed with error code {}. See Maven Console for details.", mavenReturnCode);
           }
@@ -133,73 +125,85 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
     }
   }
 
-  protected void scheduleMavenBuild(IProgress progress) throws CoreException {
-    DebugPlugin debugPlugin = DebugPlugin.getDefault();
-    ILaunchManager launchManager = debugPlugin.getLaunchManager();
-    Collection<IProcess> watchedProcesses = new HashSet<>(1);
-    ILaunchConfiguration launchConfiguration = createLaunchConfiguration(toScoutProgress(progress.newChild(1)).monitor());
-    IDebugEventSetListener eventSetListener = new IDebugEventSetListener() {
-      @Override
-      public void handleDebugEvents(DebugEvent[] events) {
-        synchronized (watchedProcesses) {
-          for (DebugEvent e : events) {
-            Object source = e.getSource();
-            //noinspection SuspiciousMethodCalls
-            if (source != null && watchedProcesses.contains(source)) {
-              IProcess changedProcess = (IProcess) source;
-              if (changedProcess.isTerminated()) {
-                int exitValue = -1;
-                try {
-                  exitValue = changedProcess.getExitValue();
-                }
-                catch (DebugException ex) {
-                  SdkLog.error("Error reading exit value.", ex);
-                }
-                m_mavenReturnCodes.add(exitValue);
-                watchedProcesses.remove(changedProcess);
+  private final class DebugEventSetListener implements IDebugEventSetListener {
+
+    private final Collection<IProcess> m_expectedProcesses;
+
+    private DebugEventSetListener(Collection<IProcess> expectedProcesses) {
+      m_expectedProcesses = expectedProcesses;
+    }
+
+    @Override
+    public void handleDebugEvents(DebugEvent[] events) {
+      synchronized (m_expectedProcesses) {
+        for (var e : events) {
+          var source = e.getSource();
+          //noinspection SuspiciousMethodCalls
+          if (source != null && m_expectedProcesses.contains(source)) {
+            var changedProcess = (IProcess) source;
+            if (changedProcess.isTerminated()) {
+              var exitValue = -1;
+              try {
+                exitValue = changedProcess.getExitValue();
               }
+              catch (DebugException ex) {
+                SdkLog.error("Error reading exit value.", ex);
+              }
+              m_mavenReturnCodes.add(exitValue);
+              m_expectedProcesses.remove(changedProcess);
             }
           }
-
-          if (watchedProcesses.isEmpty()) {
-            // last process has ended -> finish
-            debugPlugin.removeDebugEventListener(this);
-            m_artifactGenCompleted.countDown(); // signal that all processes ended and the build has finished
-          }
-        }
-      }
-    };
-
-    ILaunchListener launchListener = new ILaunchListener() {
-      @Override
-      public void launchRemoved(ILaunch launch) {
-        // not interesting
-      }
-
-      @Override
-      public void launchChanged(ILaunch launch) {
-        IProcess[] processes = launch.getProcesses();
-        if (processes == null || processes.length < 1) {
-          return;
         }
 
-        synchronized (watchedProcesses) {
-          debugPlugin.addDebugEventListener(eventSetListener);
-          addAll(watchedProcesses, processes);
-          launchManager.removeLaunchListener(this);
+        if (m_expectedProcesses.isEmpty()) {
+          // last process has ended -> finish
+          DebugPlugin.getDefault().removeDebugEventListener(this);
+          m_artifactGenCompleted.countDown(); // signal that all processes ended and the build has finished
         }
       }
+    }
+  }
 
-      @Override
-      public void launchAdded(ILaunch launch) {
-        // not interesting
+  private final class LaunchListener implements ILaunchListener {
+
+    private final Collection<IProcess> m_watchedProcesses;
+
+    private LaunchListener() {
+      m_watchedProcesses = new HashSet<>(1);
+    }
+
+    @Override
+    public void launchRemoved(ILaunch launch) {
+      // not interesting
+    }
+
+    @Override
+    public void launchAdded(ILaunch launch) {
+      // not interesting
+    }
+
+    @Override
+    public void launchChanged(ILaunch launch) {
+      var processes = launch.getProcesses();
+      if (processes == null || processes.length < 1) {
+        return;
       }
-    };
 
-    launchManager.addLaunchListener(launchListener);
+      var debugPlugin = DebugPlugin.getDefault();
+      synchronized (m_watchedProcesses) {
+        debugPlugin.addDebugEventListener(new DebugEventSetListener(m_watchedProcesses));
+        addAll(m_watchedProcesses, processes);
+        debugPlugin.getLaunchManager().removeLaunchListener(this);
+      }
+    }
+  }
 
+  protected void scheduleMavenBuild(IProgress progress) throws CoreException {
+    var launchConfiguration = createLaunchConfiguration(toScoutProgress(progress.newChild(1)).monitor());
     SdkLog.debug("Executing embedded {}", getBuild().toString());
-    launchConfiguration.launch("run", toScoutProgress(progress.newChild(5)).monitor(), false, true);
+
+    DebugPlugin.getDefault().getLaunchManager().addLaunchListener(new LaunchListener());
+    launchConfiguration.launch(ILaunchManager.RUN_MODE, toScoutProgress(progress.newChild(5)).monitor(), false, true);
   }
 
   protected void waitForArtifactBuildCompleted() {
@@ -212,7 +216,7 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
   }
 
   protected IContainer getWorkspaceContainer() {
-    IContainer[] containers = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(getBuild().getWorkingDirectory().toUri());
+    var containers = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(getBuild().getWorkingDirectory().toUri());
     if (containers.length < 1) {
       return null;
     }
@@ -220,11 +224,11 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
   }
 
   protected ILaunchConfiguration createLaunchConfiguration(IProgressMonitor monitor) throws CoreException {
-    ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-    ILaunchConfigurationType launchConfigurationType = launchManager.getLaunchConfigurationType(LAUNCH_CONFIGURATION_TYPE_ID);
-    ILaunchConfigurationWorkingCopy workingCopy = launchConfigurationType.newInstance(null, "-mavenBuild" + BUILD_NAME_NUM.getAndIncrement());
-    MavenBuild build = getBuild();
-    Map<String, String> properties = build.getProperties();
+    var launchManager = DebugPlugin.getDefault().getLaunchManager();
+    var launchConfigurationType = launchManager.getLaunchConfigurationType(LAUNCH_CONFIGURATION_TYPE_ID);
+    var workingCopy = launchConfigurationType.newInstance(null, "-mavenBuild" + BUILD_NAME_NUM.getAndIncrement());
+    var build = getBuild();
+    var properties = build.getProperties();
 
     workingCopy.setAttribute(WORKING_DIRECTORY, build.getWorkingDirectory().toAbsolutePath().toString());
     workingCopy.setAttribute(ILaunchManager.ATTR_PRIVATE, true);
@@ -240,7 +244,7 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
 
     setGoals(workingCopy, build.getGoals());
 
-    IContainer container = getWorkspaceContainer();
+    var container = getWorkspaceContainer();
     setProjectConfiguration(workingCopy, container, monitor);
     setJreContainerPath(workingCopy, container);
 
@@ -248,15 +252,15 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
   }
 
   protected static void setJreContainerPath(ILaunchConfigurationWorkingCopy workingCopy, IResource container) throws CoreException {
-    IPath path = getJreContainerPath(container);
+    var path = getJreContainerPath(container);
     if (path != null) {
       workingCopy.setAttribute(JRE_CONTAINER, path.toPortableString());
     }
   }
 
   protected static void setGoals(ILaunchConfigurationWorkingCopy workingCopy, Iterable<String> goals) {
-    StringBuilder goalBuilder = new StringBuilder();
-    Iterator<String> iterator = goals.iterator();
+    var goalBuilder = new StringBuilder();
+    var iterator = goals.iterator();
     goalBuilder.append(iterator.next());
     while (iterator.hasNext()) {
       goalBuilder.append(' ').append(iterator.next());
@@ -269,23 +273,23 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
       return;
     }
 
-    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+    var projectManager = MavenPlugin.getMavenProjectRegistry();
     if (projectManager == null) {
       return;
     }
 
-    IFile pomFile = basedir.getFile(new Path(IMavenConstants.POM));
-    IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, monitor);
+    var pomFile = basedir.getFile(new Path(IMavenConstants.POM));
+    var projectFacade = projectManager.create(pomFile, false, monitor);
     if (projectFacade == null) {
       return;
     }
 
-    ResolverConfiguration configuration = projectFacade.getResolverConfiguration();
+    var configuration = projectFacade.getResolverConfiguration();
     if (configuration == null) {
       return;
     }
 
-    String selectedProfiles = configuration.getSelectedProfiles();
+    var selectedProfiles = configuration.getSelectedProfiles();
     if (Strings.hasText(selectedProfiles)) {
       workingCopy.setAttribute(M2_PROFILES, selectedProfiles);
     }
@@ -296,23 +300,22 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
       return null;
     }
 
-    IProject project = basedir.getProject();
+    var project = basedir.getProject();
     if (project == null || !project.hasNature(JavaCore.NATURE_ID)) {
       return null;
     }
 
-    IJavaProject javaProject = JavaCore.create(project);
+    var javaProject = JavaCore.create(project);
     if (!JdtUtils.exists(javaProject)) {
       return null;
     }
 
-    IClasspathEntry[] entries = javaProject.getRawClasspath();
-    for (IClasspathEntry entry : entries) {
-      if (JRE_CONTAINER.equals(entry.getPath().segment(0))) {
-        return entry.getPath();
-      }
-    }
-    return null;
+    var entries = javaProject.getRawClasspath();
+    return Arrays.stream(entries)
+        .filter(entry -> JRE_CONTAINER.equals(entry.getPath().segment(0)))
+        .findFirst()
+        .map(IClasspathEntry::getPath)
+        .orElse(null);
   }
 
   public boolean isWaitUntilCompleted() {
@@ -334,7 +337,7 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
   public static final class M2eMavenRunner implements IMavenRunnerSpi {
     @Override
     public void execute(MavenBuild build, IEnvironment env, IProgress progress) {
-      MavenBuildOperation op = new MavenBuildOperation();
+      var op = new MavenBuildOperation();
       op.setBuild(build);
       op.accept(env, progress);
     }

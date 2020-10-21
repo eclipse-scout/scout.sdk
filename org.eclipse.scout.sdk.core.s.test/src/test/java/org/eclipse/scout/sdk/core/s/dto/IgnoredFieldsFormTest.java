@@ -20,8 +20,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -44,23 +42,23 @@ public class IgnoredFieldsFormTest {
 
     // fields of IgnoredFieldsFormData
     assertEquals(1, ignoredFieldsFormData.fields().stream().count(), "field count of 'IgnoredFieldsFormData'");
-    IField serialVersionUID = assertFieldExist(ignoredFieldsFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(ignoredFieldsFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, ignoredFieldsFormData.methods().stream().count(), "method count of 'IgnoredFieldsFormData'");
-    IMethod getNotIgnored = assertMethodExist(ignoredFieldsFormData, "getNotIgnored", new String[]{});
+    var getNotIgnored = assertMethodExist(ignoredFieldsFormData, "getNotIgnored", new String[]{});
     assertMethodReturnType(getNotIgnored, "formdata.shared.services.process.IgnoredFieldsFormData$NotIgnored");
 
     assertEquals(1, ignoredFieldsFormData.innerTypes().stream().count(), "inner types count of 'IgnoredFieldsFormData'");
     // type NotIgnored
-    IType notIgnored = assertTypeExists(ignoredFieldsFormData, "NotIgnored");
+    var notIgnored = assertTypeExists(ignoredFieldsFormData, "NotIgnored");
     assertHasFlags(notIgnored, 9);
     assertHasSuperClass(notIgnored, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.String>");
 
     // fields of NotIgnored
     assertEquals(1, notIgnored.fields().stream().count(), "field count of 'NotIgnored'");
-    IField serialVersionUID1 = assertFieldExist(notIgnored, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(notIgnored, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 

@@ -61,7 +61,7 @@ public class FormattingTuple {
       return false;
     }
 
-    FormattingTuple other = (FormattingTuple) o;
+    var other = (FormattingTuple) o;
     return m_message.equals(other.m_message) && m_throwables.equals(other.m_throwables);
   }
 
@@ -72,7 +72,7 @@ public class FormattingTuple {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("FormattingTuple{");
+    var sb = new StringBuilder("FormattingTuple{");
     sb.append("message='").append(m_message).append('\'');
     sb.append(", throwables=").append(m_throwables);
     sb.append('}');

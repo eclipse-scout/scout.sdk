@@ -11,14 +11,13 @@
 package org.eclipse.scout.sdk.core.util;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableCollection;
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -94,11 +93,11 @@ public final class EventListenerList {
       }
 
       candidates = new ArrayList<>(m_listeners.size());
-      Iterator<Object> iterator = m_listeners.iterator();
+      var iterator = m_listeners.iterator();
       while (iterator.hasNext()) {
-        Object entry = iterator.next();
-        if (entry instanceof Reference<?>) {
-          Object inner = ((Reference<?>) entry).get();
+        var listener = iterator.next();
+        if (listener instanceof Reference<?>) {
+          var inner = ((Reference<?>) listener).get();
           if (inner == null) {
             iterator.remove(); // housekeeping: remove weak-listener that was reclaimed
           }
@@ -107,18 +106,20 @@ public final class EventListenerList {
           }
         }
         else {
-          candidates.add(entry);
+          candidates.add(listener);
         }
       }
     }
 
-    Collection<T> result = new ArrayList<>(candidates.size());
-    for (Object candidate : candidates) {
-      if (type == null || type.isAssignableFrom(candidate.getClass())) {
-        result.add((T) candidate);
-      }
+    if (type == null) {
+      return candidates.stream()
+          .map(candidate -> (T) candidate)
+          .collect(toUnmodifiableList());
     }
-    return unmodifiableCollection(result);
+    return candidates.stream()
+        .filter(candidate -> type.isAssignableFrom(candidate.getClass()))
+        .map(candidate -> (T) candidate)
+        .collect(toUnmodifiableList());
   }
 
   /**
@@ -134,16 +135,16 @@ public final class EventListenerList {
         return false;
       }
 
-      boolean removed = false;
-      Iterator<Object> iterator = m_listeners.iterator();
+      var removed = false;
+      var iterator = m_listeners.iterator();
       while (iterator.hasNext()) {
-        Object entry = iterator.next();
+        var entry = iterator.next();
         if (entry == listenerToRemove) {
           iterator.remove();
           removed = true;
         }
         else if (entry instanceof Reference<?>) {
-          Object inner = ((Reference<?>) entry).get();
+          var inner = ((Reference<?>) entry).get();
           if (inner == null || inner == listenerToRemove) {
             iterator.remove(); // housekeeping: remove weak-listener that was reclaimed
             removed = true;

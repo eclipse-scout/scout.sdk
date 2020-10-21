@@ -79,22 +79,22 @@ public final class SdkLog {
       return;
     }
 
-    FormattingTuple tuple = MessageFormatter.arrayFormat(msg, args);
-    LogMessage message = new LogMessage(level, defaultPrefixFor(level), tuple.message(), tuple.throwables());
+    var tuple = MessageFormatter.arrayFormat(msg, args);
+    var message = new LogMessage(level, defaultPrefixFor(level), tuple.message(), tuple.throwables());
     SdkConsole.println(message);
   }
 
   static String defaultPrefixFor(Level level) {
-    int levelColWidth = 8;
-    String levelName = level.getName();
-    CharSequence spaces = repeat(" ", levelColWidth - levelName.length());
+    var levelColWidth = 8;
+    var levelName = level.getName();
+    var spaces = repeat(" ", levelColWidth - levelName.length());
     return new StringBuilder().append(logTime())
         .append(" [").append(levelName).append(']')
         .append(spaces).toString();
   }
 
   static String logTime() {
-    LocalDateTime now = LocalDateTime.now(clock);
+    var now = LocalDateTime.now(clock);
     return now.format(TIME_FORMATTER);
   }
 
@@ -317,13 +317,13 @@ public final class SdkLog {
     }
 
     try {
-      Level parsedLevel = Level.parse(lvl);
+      var parsedLevel = Level.parse(lvl);
       if (parsedLevel != null) {
         return parsedLevel;
       }
     }
     catch (Exception e) {
-      String msg = "Unable to parse log level '" + lvl + "'. Fallback to default: '" + DEFAULT_LOG_LEVEL.getName() + "'.";
+      var msg = "Unable to parse log level '" + lvl + "'. Fallback to default: '" + DEFAULT_LOG_LEVEL.getName() + "'.";
       SdkConsole.println(new LogMessage(Level.SEVERE, defaultPrefixFor(Level.SEVERE), msg, singletonList(e)));
     }
     return DEFAULT_LOG_LEVEL;
@@ -331,7 +331,7 @@ public final class SdkLog {
 
   static Level getInitialLogLevel() {
     //noinspection AccessOfSystemProperties
-    String lvl = System.getProperty(LOG_LEVEL_PROPERTY_NAME);
+    var lvl = System.getProperty(LOG_LEVEL_PROPERTY_NAME);
     if (Strings.isBlank(lvl)) {
       return DEFAULT_LOG_LEVEL;
     }

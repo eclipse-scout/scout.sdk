@@ -162,17 +162,17 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
    */
   @Override
   public boolean test(IType t) {
-    int flags = getFlags();
+    var flags = getFlags();
     if (flags >= 0 && (t.flags() & flags) != flags) {
       return false;
     }
 
-    String name = getName();
+    var name = getName();
     if (name != null && !name.equals(t.name())) {
       return false;
     }
 
-    String simpleName = getSimpleName();
+    var simpleName = getSimpleName();
     return simpleName == null || simpleName.equals(t.elementName());
   }
 

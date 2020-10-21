@@ -28,7 +28,7 @@ public class AnnotationGeneratorTest {
 
   @Test
   public void testMultiValueAnnotation() {
-    IAnnotationGenerator<?> generator = AnnotationGenerator.create()
+    var generator = AnnotationGenerator.create()
         .withElementName("scout.test.TestAnnotation")
         .withElement("value", "4")
         .withElement("second", b -> b.append(10.0f))
@@ -69,7 +69,7 @@ public class AnnotationGeneratorTest {
 
   @Test
   public void testNoValueAnnotation() {
-    String src = AnnotationGenerator.create()
+    var src = AnnotationGenerator.create()
         .withElementName("scout.test.TestAnnotation")
         .withoutElement(func -> "third".equals(func.apply().get()))
         .toJavaSource()
@@ -80,7 +80,7 @@ public class AnnotationGeneratorTest {
 
   @Test
   public void testSingleValueAnnotationSpecialName() {
-    String src = AnnotationGenerator.create()
+    var src = AnnotationGenerator.create()
         .withElementName("scout.test.TestAnnotation")
         .withElement("special", "4")
         .toJavaSource()
@@ -91,7 +91,7 @@ public class AnnotationGeneratorTest {
 
   @Test
   public void testSingleValueAnnotation() {
-    String src = AnnotationGenerator.create()
+    var src = AnnotationGenerator.create()
         .withElementName("scout.test.TestAnnotation")
         .withElement("value", "4")
         .toJavaSource()

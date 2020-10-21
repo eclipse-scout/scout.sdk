@@ -11,13 +11,11 @@
 package org.eclipse.scout.sdk.core.util;
 
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.file.FileVisitResult;
@@ -62,7 +60,7 @@ public final class CoreUtils {
    * @return The user name of the thread or the system if no user name is defined on the thread.
    */
   public static String getUsername() {
-    String name = CURRENT_USER_NAME.get();
+    var name = CURRENT_USER_NAME.get();
     if (name != null) {
       return name;
     }
@@ -94,7 +92,7 @@ public final class CoreUtils {
     if (Strings.isBlank(methodBody)) {
       return methodBody.toString();
     }
-    String retVal = REGEX_COMMENT_REMOVE_1.matcher(methodBody).replaceAll("");
+    var retVal = REGEX_COMMENT_REMOVE_1.matcher(methodBody).replaceAll("");
     retVal = REGEX_COMMENT_REMOVE_2.matcher(retVal).replaceAll("");
     retVal = REGEX_COMMENT_REMOVE_3.matcher(retVal).replaceAll("");
     return retVal;
@@ -162,8 +160,8 @@ public final class CoreUtils {
     Ensure.isDirectory(sourceDir);
     Ensure.isDirectory(targetDir);
 
-    Path fileName = Ensure.notNull(sourceDir.getFileName());
-    Path targetPath = targetDir.resolve(fileName.toString());
+    var fileName = Ensure.notNull(sourceDir.getFileName());
+    var targetPath = targetDir.resolve(fileName.toString());
     Files.createDirectories(targetPath); // ensure target exists
 
     if (Objects.equals(Files.getFileStore(sourceDir), Files.getFileStore(targetPath))) {
@@ -217,8 +215,8 @@ public final class CoreUtils {
     base = base.normalize();
     child = child.normalize();
 
-    String[] bParts = PATH_SEGMENT_SPLIT_PATTERN.split(base.getRawPath());
-    String[] cParts = PATH_SEGMENT_SPLIT_PATTERN.split(child.getRawPath());
+    var bParts = PATH_SEGMENT_SPLIT_PATTERN.split(base.getRawPath());
+    var cParts = PATH_SEGMENT_SPLIT_PATTERN.split(child.getRawPath());
 
     // Discard trailing segment of base path
     if (bParts.length > 0 && !base.getPath().endsWith("/")) {
@@ -226,7 +224,7 @@ public final class CoreUtils {
     }
 
     // Remove common prefix segments
-    int i = 0;
+    var i = 0;
     while (i < bParts.length
         && i < cParts.length
         && bParts[i].equals(cParts[i])) {
@@ -234,9 +232,9 @@ public final class CoreUtils {
     }
 
     // Construct the relative path
-    StringBuilder sb = new StringBuilder();
+    var sb = new StringBuilder();
     sb.append("../".repeat(Math.max(0, bParts.length - i)));
-    for (int j = i; j < cParts.length; j++) {
+    for (var j = i; j < cParts.length; j++) {
       if (j != i) {
         sb.append('/');
       }
@@ -305,7 +303,7 @@ public final class CoreUtils {
    *          The {@link Supplier} to execute. Must not be {@code null}.
    */
   public static <T, R> R callInContext(ThreadLocal<T> threadLocal, T context, Supplier<R> callable) {
-    T orig = threadLocal.get();
+    var orig = threadLocal.get();
     try {
       setThreadLocal(threadLocal, context);
       return callable.get();
@@ -336,7 +334,7 @@ public final class CoreUtils {
     if (Strings.isBlank(filePath)) {
       return "";
     }
-    int lastDot = filePath.lastIndexOf('.');
+    var lastDot = filePath.lastIndexOf('.');
     if (lastDot < 0) {
       return "";
     }
@@ -356,7 +354,7 @@ public final class CoreUtils {
     if (file == null) {
       return "";
     }
-    Path lastSegment = file.getFileName();
+    var lastSegment = file.getFileName();
     if (lastSegment == null) {
       return "";
     }
@@ -379,7 +377,7 @@ public final class CoreUtils {
     }
 
     try {
-      String declaringClassFqn = o.getClass().getMethod("toString").getDeclaringClass().getName();
+      var declaringClassFqn = o.getClass().getMethod("toString").getDeclaringClass().getName();
       if (Object.class.getName().equals(declaringClassFqn) || "kotlin.jvm.internal.Lambda".equals(declaringClassFqn)) {
         return Optional.empty();
       }
@@ -426,9 +424,9 @@ public final class CoreUtils {
     }
 
     try {
-      StringSelection stringSelection = new StringSelection(text);
-      ClipboardOwner owner = ownershipLostCallback == null ? stringSelection : ownershipLostCallback;
-      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      var stringSelection = new StringSelection(text);
+      var owner = ownershipLostCallback == null ? stringSelection : ownershipLostCallback;
+      var clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
       clipboard.setContents(stringSelection, owner);
       return true;
     }
@@ -438,26 +436,39 @@ public final class CoreUtils {
     }
   }
 
-  public static Object invokeDefaultMethod(Class<?> ifcClass, Object proxy, Method method, Object[] args) {
+  /**
+   * Invokes a default method of an interface.
+   * 
+   * @param instance
+   *          The instance on which the default method should be called.
+   * @param method
+   *          The method in the interface to call.
+   * @param args
+   *          The arguments to pass to the the method.
+   * @return The result of the method call
+   * @throws RuntimeException
+   *           if the called method threw a {@link RuntimeException}
+   * @throws SdkException
+   *           wrapping the original exception if it was a checked exception.
+   */
+  public static Object invokeDefaultMethod(Object instance, Method method, Object[] args) {
     try {
+      var ifcClass = method.getDeclaringClass();
       return MethodHandles.lookup()
           .findSpecial(ifcClass, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()), ifcClass)
-          .bindTo(proxy)
+          .bindTo(instance)
           .invokeWithArguments(args);
     }
     catch (RuntimeException | Error e) {
       throw e;
     }
-    catch (InvocationTargetException ite) {
-      SdkLog.debug("Exception calling default method '{}'.", method, ite);
-      Throwable cause = ite.getCause();
+    catch (Throwable e) {
+      SdkLog.debug("Exception calling default method '{}'.", method, e);
+      var cause = e.getCause();
       if (cause instanceof RuntimeException) {
         throw (RuntimeException) cause;
       }
       throw new SdkException(cause);
-    }
-    catch (Throwable e) {
-      throw new SdkException(e);
     }
   }
 }

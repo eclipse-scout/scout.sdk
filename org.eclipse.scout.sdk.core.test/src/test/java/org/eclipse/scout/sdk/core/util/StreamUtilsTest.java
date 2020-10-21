@@ -31,8 +31,8 @@ public class StreamUtilsTest {
 
   @Test
   public void testAllMatchResults() {
-    String input = "abcdefab";
-    Pattern pattern = Pattern.compile("ab");
+    var input = "abcdefab";
+    var pattern = Pattern.compile("ab");
     assertEquals(2, allMatchResults(pattern, input).count());
     assertTrue(allMatchResults(pattern, input).anyMatch(candidate -> candidate.group().length() == 2));
     assertFalse(allMatchResults(pattern, input).anyMatch(candidate -> candidate.group().length() == 6));
@@ -40,8 +40,8 @@ public class StreamUtilsTest {
 
   @Test
   public void testToStreamWithEnumeration() {
-    String elements = "asdfx.1234.hjkl.9876";
-    String delim = ".";
+    var elements = "asdfx.1234.hjkl.9876";
+    var delim = ".";
     assertEquals(4, toStream(new StringTokenizer(elements, delim)).count());
     assertTrue(toStream(new StringTokenizer(elements, delim)).anyMatch(candidate -> candidate.toString().length() == 4));
     assertFalse(toStream(new StringTokenizer(elements, delim)).anyMatch(candidate -> candidate.toString().length() == 6));

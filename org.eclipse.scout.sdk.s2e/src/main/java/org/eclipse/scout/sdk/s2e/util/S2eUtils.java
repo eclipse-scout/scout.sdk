@@ -12,40 +12,34 @@ package org.eclipse.scout.sdk.s2e.util;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
@@ -57,7 +51,6 @@ import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.model.api.internal.JavaEnvironmentImplementor;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.PropertySupport;
@@ -102,7 +95,7 @@ public final class S2eUtils {
    * @return The created {@link PropertySupport}. Never returns {@code null}.
    */
   public static PropertySupport propertyMap(IJavaProject p, Path targetPath) {
-    PropertySupport context = new PropertySupport(2);
+    var context = new PropertySupport(2);
     context.setProperty(IBuilderContext.PROPERTY_JAVA_MODULE, p);
     context.setProperty(IBuilderContext.PROPERTY_TARGET_PATH, targetPath);
     return context;
@@ -124,36 +117,37 @@ public final class S2eUtils {
       return Status.OK_STATUS;
     }
 
-    Set<IFile> existingReadOnlyFiles = new HashSet<>(resources.size());
-    for (IResource r : resources) {
-      if (r != null && r.exists() && r.getType() == IResource.FILE && isReadOnly(r)) {
-        existingReadOnlyFiles.add((IFile) r);
-      }
-    }
+    var existingReadOnlyFiles = resources.stream()
+        .filter(Objects::nonNull)
+        .filter(IResource::exists)
+        .filter(r -> r.getType() == IResource.FILE)
+        .filter(S2eUtils::isReadOnly)
+        .map(r -> (IFile) r)
+        .collect(toSet());
     if (existingReadOnlyFiles.isEmpty()) {
       return Status.OK_STATUS;
     }
 
-    Map<IFile, Long> oldTimeStamps = createModificationStampMap(existingReadOnlyFiles);
-    IStatus status = ResourcesPlugin.getWorkspace().validateEdit(existingReadOnlyFiles.toArray(new IFile[0]), IWorkspace.VALIDATE_PROMPT);
+    var oldTimeStamps = createModificationStampMap(existingReadOnlyFiles);
+    var status = ResourcesPlugin.getWorkspace().validateEdit(existingReadOnlyFiles.toArray(new IFile[0]), IWorkspace.VALIDATE_PROMPT);
     if (!status.isOK()) {
       return status;
     }
 
     IStatus modified = null;
     // check if the resources can be written now
-    for (IFile f : existingReadOnlyFiles) {
+    for (var f : existingReadOnlyFiles) {
       if (isReadOnly(f)) {
-        String message = "File '" + f.getFullPath() + "' is read only.";
+        var message = "File '" + f.getFullPath() + "' is read only.";
         modified = addStatus(modified, message);
       }
     }
     // check for in between modifications
-    Map<IFile, Long> newTimeStamps = createModificationStampMap(existingReadOnlyFiles);
-    for (Entry<IFile, Long> e : oldTimeStamps.entrySet()) {
-      IFile file = e.getKey();
+    var newTimeStamps = createModificationStampMap(existingReadOnlyFiles);
+    for (var e : oldTimeStamps.entrySet()) {
+      var file = e.getKey();
       if (!e.getValue().equals(newTimeStamps.get(file))) {
-        String message = "File '" + file.getFullPath() + "' has been modified since the beginning of the operation.";
+        var message = "File '" + file.getFullPath() + "' has been modified since the beginning of the operation.";
         modified = addStatus(modified, message);
       }
     }
@@ -173,7 +167,7 @@ public final class S2eUtils {
       return status;
     }
     else {
-      MultiStatus result = new MultiStatus(S2ESdkActivator.PLUGIN_ID, 0, msg, null);
+      var result = new MultiStatus(S2ESdkActivator.PLUGIN_ID, 0, msg, null);
       result.add(status);
       result.add(entry);
       return result;
@@ -182,7 +176,7 @@ public final class S2eUtils {
 
   private static Map<IFile, Long> createModificationStampMap(Collection<IFile> files) {
     Map<IFile, Long> map = new HashMap<>(files.size());
-    for (IFile f : files) {
+    for (var f : files) {
       map.put(f, f.getModificationStamp());
     }
     return map;
@@ -196,7 +190,7 @@ public final class S2eUtils {
    * @return {@code true} if the resource is marked as read-only. {@code false} otherwise.
    */
   private static boolean isReadOnly(IResource resource) {
-    ResourceAttributes resourceAttributes = resource.getResourceAttributes();
+    var resourceAttributes = resource.getResourceAttributes();
     return resourceAttributes != null && resourceAttributes.isReadOnly();
   }
 
@@ -213,7 +207,7 @@ public final class S2eUtils {
    *         source folder could be found.
    */
   public static IPackageFragmentRoot getTestSourceFolder(IJavaProject orig, String fqnOfRequiredType) {
-    IPackageFragmentRoot sourceFolder = getTestSourceFolderInProject(orig, fqnOfRequiredType);
+    var sourceFolder = getTestSourceFolderInProject(orig, fqnOfRequiredType);
     if (JdtUtils.exists(sourceFolder)) {
       return sourceFolder;
     }
@@ -221,9 +215,9 @@ public final class S2eUtils {
     // search for a test project
     String[] testProjectSuffixes = {".test", ".tests", ".testing"};
     @SuppressWarnings("squid:S2259") // NPE
-    IJavaModel javaModel = orig.getJavaModel();
-    for (String suffix : testProjectSuffixes) {
-      IJavaProject testProject = javaModel.getJavaProject(orig.getElementName() + suffix);
+    var javaModel = orig.getJavaModel();
+    for (var suffix : testProjectSuffixes) {
+      var testProject = javaModel.getJavaProject(orig.getElementName() + suffix);
       sourceFolder = getTestSourceFolderInProject(testProject, fqnOfRequiredType);
       if (JdtUtils.exists(sourceFolder)) {
         return sourceFolder;
@@ -258,8 +252,8 @@ public final class S2eUtils {
       return Optional.empty();
     }
 
-    IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-    IFile[] files = workspaceRoot.findFilesForLocationURI(uri);
+    var workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+    var files = workspaceRoot.findFilesForLocationURI(uri);
     if (files.length < 1) {
       return Optional.empty();
     }
@@ -297,15 +291,15 @@ public final class S2eUtils {
     if (!JdtUtils.exists(selectedSourceFolder)) {
       return selectedSourceFolder;
     }
-    IJavaProject targetProject = selectedSourceFolder.getJavaProject();
+    var targetProject = selectedSourceFolder.getJavaProject();
     if (!JdtUtils.exists(targetProject)) {
       return selectedSourceFolder;
     }
-    IFolder generatedFolder = targetProject.getProject().getFolder(IScoutSourceFolders.GENERATED_SOURCE_FOLDER);
+    var generatedFolder = targetProject.getProject().getFolder(IScoutSourceFolders.GENERATED_SOURCE_FOLDER);
     if (generatedFolder == null || !generatedFolder.exists()) {
       return selectedSourceFolder;
     }
-    IPackageFragmentRoot generatedSourceFolder = targetProject.getPackageFragmentRoot(generatedFolder);
+    var generatedSourceFolder = targetProject.getPackageFragmentRoot(generatedFolder);
     if (!JdtUtils.exists(generatedSourceFolder)) {
       return selectedSourceFolder;
     }
@@ -344,7 +338,7 @@ public final class S2eUtils {
     };
 
     String sessionToFind;
-    Optional<IScoutApi> scoutApi = ApiHelper.scoutApiFor(project);
+    var scoutApi = ApiHelper.scoutApiFor(project);
     if (scoutApi.isEmpty()) {
       return Optional.empty();
     }
@@ -361,7 +355,7 @@ public final class S2eUtils {
         sessionToFind = scoutApi.get().ISession().fqn();
         break;
     }
-    Set<IType> sessions = JdtUtils.findTypesInStrictHierarchy(project, sessionToFind, monitor, filter);
+    var sessions = JdtUtils.findTypesInStrictHierarchy(project, sessionToFind, monitor, filter);
 
     if (sessions.isEmpty()) {
       return Optional.empty();
@@ -376,7 +370,7 @@ public final class S2eUtils {
 
   private static IType findMostSpecific(Iterable<IType> candidates) {
     ITypeHierarchy superHierarchy = null;
-    for (IType t : candidates) {
+    for (var t : candidates) {
       if (superHierarchy == null || !superHierarchy.contains(t)) {
         try {
           superHierarchy = t.newSupertypeHierarchy(null);
@@ -400,7 +394,7 @@ public final class S2eUtils {
    * @return The {@link Document} holding the pom.xml contents.
    */
   public static Document getPomDocument(IProject p) {
-    IFile pom = p.getFile(IMavenConstants.POM);
+    var pom = p.getFile(IMavenConstants.POM);
     return readXmlDocument(pom);
   }
 
@@ -418,9 +412,9 @@ public final class S2eUtils {
     }
 
     try {
-      DocumentBuilder docBuilder = Xml.createDocumentBuilder();
+      var docBuilder = Xml.createDocumentBuilder();
       //noinspection NestedTryStatement
-      try (InputStream in = file.getContents()) {
+      try (var in = file.getContents()) {
         return docBuilder.parse(in);
       }
     }
@@ -451,15 +445,15 @@ public final class S2eUtils {
     if (projects == null || projects.isEmpty()) {
       return emptyMap();
     }
-    MavenPluginActivator mavenPlugin = MavenPluginActivator.getDefault();
+    var mavenPlugin = MavenPluginActivator.getDefault();
     if (mavenPlugin == null) {
       return emptyMap();
     }
-    ProjectConfigurationManager configurationManager = (ProjectConfigurationManager) mavenPlugin.getProjectConfigurationManager();
+    var configurationManager = (ProjectConfigurationManager) mavenPlugin.getProjectConfigurationManager();
     if (configurationManager == null) {
       return emptyMap();
     }
-    MavenUpdateRequest request = new MavenUpdateRequest(projects.toArray(new IProject[0]), false, updateSnapshots);
+    var request = new MavenUpdateRequest(projects.toArray(new IProject[0]), false, updateSnapshots);
     if (monitor != null && monitor.isCanceled()) {
       return emptyMap();
     }

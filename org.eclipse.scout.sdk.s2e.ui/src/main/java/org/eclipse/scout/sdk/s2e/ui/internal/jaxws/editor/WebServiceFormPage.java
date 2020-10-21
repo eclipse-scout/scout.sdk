@@ -20,14 +20,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -36,7 +33,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils;
 import org.eclipse.scout.sdk.core.s.jaxws.WebServiceUpdateOperation;
@@ -63,14 +59,12 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
@@ -79,9 +73,6 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ImageHyperlink;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
@@ -137,13 +128,13 @@ public class WebServiceFormPage extends FormPage {
   @Override
   protected void createFormContent(IManagedForm managedForm) {
     super.createFormContent(managedForm);
-    ScrolledForm scrolledForm = managedForm.getForm();
+    var scrolledForm = managedForm.getForm();
     getFormToolkit().decorateFormHeading(scrolledForm.getForm());
     createActionToolBar(scrolledForm.getToolBarManager());
     scrolledForm.setText(getInput().getDisplayName());
     scrolledForm.updateToolBar();
 
-    Composite body = scrolledForm.getBody();
+    var body = scrolledForm.getBody();
     createBody(body);
     setEnabled(true);
     scrolledForm.reflow(true);
@@ -155,12 +146,12 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected void createOverviewImage(Composite parent, String imgName, Iterable<P_ImageArea> areas, int horizontalSpan) {
-    Image overviewImage = S2ESdkUiActivator.getImage(imgName);
-    int imageWidth = overviewImage.getBounds().width;
-    Label label = getFormToolkit().createLabel(parent, "", SWT.CENTER);
+    var overviewImage = S2ESdkUiActivator.getImage(imgName);
+    var imageWidth = overviewImage.getBounds().width;
+    var label = getFormToolkit().createLabel(parent, "", SWT.CENTER);
     label.setImage(overviewImage);
     label.addMouseMoveListener(e -> {
-      for (P_ImageArea area : areas) {
+      for (var area : areas) {
         if (area.contains(e.x, e.y, imageWidth, label.getSize().x)) {
           parent.setCursor(parent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
           return;
@@ -174,9 +165,9 @@ public class WebServiceFormPage extends FormPage {
         if (e.button != 1) {
           return;
         }
-        for (P_ImageArea area : areas) {
+        for (var area : areas) {
           if (area.contains(e.x, e.y, imageWidth, label.getSize().x)) {
-            Object element = area.m_elementToShow;
+            var element = area.m_elementToShow;
             if (element instanceof IJavaElement) {
               S2eUiUtils.openInEditor((IJavaElement) element, true);
             }
@@ -201,9 +192,9 @@ public class WebServiceFormPage extends FormPage {
         .swtDefaults()
         .applyTo(parent);
 
-    Set<IType> allPortTypes = getInput().getAllPortTypes();
+    var allPortTypes = getInput().getAllPortTypes();
     if (!allPortTypes.isEmpty()) {
-      int labelColWidth = 180;
+      var labelColWidth = 180;
       if (getInput().hasProviderElements()) {
         createProviderGroup(parent, allPortTypes, labelColWidth);
       }
@@ -217,12 +208,12 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected void createConsumerGroup(Composite p, Collection<IType> allPortTypes, int labelColWidth) {
-    int numPortTypes = allPortTypes.size();
-    IType firstPortType = allPortTypes.iterator().next();
-    Set<IType> webServices = getInput().getWebServices();
-    IType firstWebService = webServices.iterator().next();
+    var numPortTypes = allPortTypes.size();
+    var firstPortType = allPortTypes.iterator().next();
+    var webServices = getInput().getWebServices();
+    var firstWebService = webServices.iterator().next();
 
-    Composite parent = createSection(getFormToolkit(), p, "Consumer");
+    var parent = createSection(getFormToolkit(), p, "Consumer");
     GridLayoutFactory
         .swtDefaults()
         .numColumns(numPortTypes)
@@ -237,19 +228,19 @@ public class WebServiceFormPage extends FormPage {
     createOverviewImage(parent, ISdkIcons.WsConsumerOverview, clickAreas, numPortTypes);
 
     createLabeledHyperlink(parent, "WSDL", getInput().getWsdl(), null, labelColWidth, 0);
-    for (int i = 0; i < numPortTypes - 1; i++) {
+    for (var i = 0; i < numPortTypes - 1; i++) {
       getFormToolkit().createLabel(parent, "");
     }
-    for (IType portType : allPortTypes) {
+    for (var portType : allPortTypes) {
       createLabeledHyperlink(parent, "Web Service Client", null, getInput().getWebServiceClient(portType), labelColWidth, 0);
     }
-    for (IType portType : allPortTypes) {
+    for (var portType : allPortTypes) {
       createPortTypeNameField(parent, portType, labelColWidth);
     }
 
-    for (IType webservice : webServices) {
-      int numPortTypesInThisService = getInput().getPortTypes(webservice).size();
-      StyledTextField webServiceNameField = FieldToolkit.createStyledTextField(parent, "Web Service", TextField.TYPE_HYPERLINK | TextField.TYPE_IMAGE, labelColWidth);
+    for (var webservice : webServices) {
+      var numPortTypesInThisService = getInput().getPortTypes(webservice).size();
+      var webServiceNameField = FieldToolkit.createStyledTextField(parent, "Web Service", TextField.TYPE_HYPERLINK | TextField.TYPE_IMAGE, labelColWidth);
       GridDataFactory
           .defaultsFor(webServiceNameField)
           .align(SWT.FILL, SWT.CENTER)
@@ -282,9 +273,9 @@ public class WebServiceFormPage extends FormPage {
 
   @SuppressWarnings("pmd:NPathComplexity")
   protected void createProviderGroup(Composite p, Collection<IType> allPortTypes, int labelColWidth) {
-    int numPortTypes = allPortTypes.size();
-    IType firstPortType = allPortTypes.iterator().next();
-    Composite parent = createSection(getFormToolkit(), p, "Provider");
+    var numPortTypes = allPortTypes.size();
+    var firstPortType = allPortTypes.iterator().next();
+    var parent = createSection(getFormToolkit(), p, "Provider");
     GridLayoutFactory
         .swtDefaults()
         .numColumns(numPortTypes)
@@ -301,36 +292,36 @@ public class WebServiceFormPage extends FormPage {
     createOverviewImage(parent, ISdkIcons.WsProviderOverview, clickAreas, numPortTypes);
 
     createLabeledHyperlink(parent, "WSDL", getInput().getWsdl(), null, labelColWidth, 0);
-    for (int i = 0; i < numPortTypes - 1; i++) {
+    for (var i = 0; i < numPortTypes - 1; i++) {
       getFormToolkit().createLabel(parent, "");
     }
 
-    for (IType portType : allPortTypes) {
+    for (var portType : allPortTypes) {
       createLabeledHyperlink(parent, "Web Service Implementation", null, getInput().getServiceImplementation(portType), labelColWidth, 0);
     }
-    for (IType portType : allPortTypes) {
+    for (var portType : allPortTypes) {
       createPortTypeNameField(parent, portType, labelColWidth);
     }
     createPackageField(parent, firstPortType, labelColWidth, numPortTypes);
 
-    for (IType portType : allPortTypes) {
+    for (var portType : allPortTypes) {
       createLabeledHyperlink(parent, "Entry Point Definition", null, getInput().getEntryPointDefinition(portType), labelColWidth, 20);
     }
 
     // entry point name
-    for (IType portType : allPortTypes) {
-      StyledTextField entryPointNameField = FieldToolkit.createStyledTextField(parent, "Entry Point", TextField.TYPE_HYPERLINK | TextField.TYPE_IMAGE, labelColWidth);
+    for (var portType : allPortTypes) {
+      var entryPointNameField = FieldToolkit.createStyledTextField(parent, "Entry Point", TextField.TYPE_HYPERLINK | TextField.TYPE_IMAGE, labelColWidth);
       GridDataFactory
           .defaultsFor(entryPointNameField)
           .align(SWT.FILL, SWT.CENTER)
           .grab(true, false)
           .applyTo(entryPointNameField);
-      String nameInDefinition = getInput().getEntryPointNameFromDefinition(portType);
+      var nameInDefinition = getInput().getEntryPointNameFromDefinition(portType);
       if (Strings.hasText(nameInDefinition)) {
         entryPointNameField.setReadOnlySuffix(ISdkConstants.SUFFIX_WS_ENTRY_POINT);
         entryPointNameField.setText(nameInDefinition);
       }
-      IType entryPoint = getInput().getEntryPoint(portType);
+      var entryPoint = getInput().getEntryPoint(portType);
       m_portTypes.put(entryPointNameField, portType);
       m_entryPointNames.put(entryPointNameField, entryPointNameField.getText());
       entryPointNameField.addModifyListener(e -> {
@@ -352,14 +343,14 @@ public class WebServiceFormPage extends FormPage {
     }
 
     // entry point package
-    for (IType portType : allPortTypes) {
-      ProposalTextField entryPointPackageField = FieldToolkit.createPackageField(parent, "Entry Point Package", getInput().getJavaProject(), labelColWidth, TextField.TYPE_LABEL | TextField.TYPE_IMAGE);
+    for (var portType : allPortTypes) {
+      var entryPointPackageField = FieldToolkit.createPackageField(parent, "Entry Point Package", getInput().getJavaProject(), labelColWidth, TextField.TYPE_LABEL | TextField.TYPE_IMAGE);
       GridDataFactory
           .defaultsFor(entryPointPackageField)
           .align(SWT.FILL, SWT.CENTER)
           .grab(true, false)
           .applyTo(entryPointPackageField);
-      String packageInDefinition = getInput().getEntryPointPackageFromDefinition(portType);
+      var packageInDefinition = getInput().getEntryPointPackageFromDefinition(portType);
       if (Strings.hasText(packageInDefinition)) {
         entryPointPackageField.setText(packageInDefinition);
       }
@@ -374,17 +365,17 @@ public class WebServiceFormPage extends FormPage {
       m_entryPointPackageFields.add(entryPointPackageField);
     }
 
-    for (IType portType : allPortTypes) {
+    for (var portType : allPortTypes) {
       createHandlersList(parent, portType, labelColWidth, numPortTypes);
     }
-    for (IType portType : allPortTypes) {
-      IType authMethodFromDefinition = getInput().getAuthMethodFromDefinition(portType);
+    for (var portType : allPortTypes) {
+      var authMethodFromDefinition = getInput().getAuthMethodFromDefinition(portType);
       if (JdtUtils.exists(authMethodFromDefinition)) {
         createLabeledHyperlink(parent, "Authentication Method", null, authMethodFromDefinition, labelColWidth, 0);
       }
     }
-    for (IType portType : allPortTypes) {
-      IType authVerifierFromDefinition = getInput().getAuthVerifierFromDefinition(portType);
+    for (var portType : allPortTypes) {
+      var authVerifierFromDefinition = getInput().getAuthVerifierFromDefinition(portType);
       if (JdtUtils.exists(authVerifierFromDefinition)) {
         createLabeledHyperlink(parent, "Authentication Verifier", null, authVerifierFromDefinition, labelColWidth, 0);
       }
@@ -392,11 +383,11 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected void createHandlersList(Composite p, IType portType, int labelColWidth, int numPortTypes) {
-    List<IType> handlers = getInput().getHandlers(portType);
+    var handlers = getInput().getHandlers(portType);
     if (handlers.isEmpty() && numPortTypes <= 1) {
       return; // don't draw anything if we have only one column and there are no handlers
     }
-    Composite parent = getFormToolkit().createComposite(p);
+    var parent = getFormToolkit().createComposite(p);
     GridDataFactory
         .defaultsFor(parent)
         .align(SWT.FILL, SWT.BEGINNING)
@@ -405,16 +396,16 @@ public class WebServiceFormPage extends FormPage {
         .applyTo(parent);
     parent.setLayout(new FormLayout());
     if (!handlers.isEmpty()) {
-      Label label = getFormToolkit().createLabel(parent, "Handlers", SWT.TRAIL);
+      var label = getFormToolkit().createLabel(parent, "Handlers", SWT.TRAIL);
 
-      Composite handlersComposite = getFormToolkit().createComposite(parent);
+      var handlersComposite = getFormToolkit().createComposite(parent);
       GridLayoutFactory
           .swtDefaults()
           .margins(0, 0)
           .applyTo(handlersComposite);
 
-      for (IType handler : handlers) {
-        ImageHyperlink link = getFormToolkit().createImageHyperlink(handlersComposite, SWT.NONE);
+      for (var handler : handlers) {
+        var link = getFormToolkit().createImageHyperlink(handlersComposite, SWT.NONE);
         link.setUnderlined(true);
         link.setImage(m_decoratingWorkbenchLabelProvider.getImage(handler));
         link.setToolTipText(handler.getFullyQualifiedName());
@@ -427,14 +418,14 @@ public class WebServiceFormPage extends FormPage {
         });
       }
 
-      FormData labelData = new FormData();
+      var labelData = new FormData();
       labelData.top = new FormAttachment(0, 2);
       labelData.left = new FormAttachment(0, 0);
       labelData.right = new FormAttachment(0, labelColWidth);
       labelData.bottom = new FormAttachment(100, 0);
       label.setLayoutData(labelData);
 
-      FormData textData = new FormData();
+      var textData = new FormData();
       textData.top = new FormAttachment(0, 0);
       textData.left = new FormAttachment(label, 5);
       textData.right = new FormAttachment(100, 0);
@@ -444,11 +435,11 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected void setEnabled(boolean enabled) {
-    IManagedForm managedForm = getManagedForm();
+    var managedForm = getManagedForm();
     if (managedForm == null) {
       return;
     }
-    ScrolledForm form = managedForm.getForm();
+    var form = managedForm.getForm();
     if (form.isDisposed()) {
       return;
     }
@@ -456,18 +447,18 @@ public class WebServiceFormPage extends FormPage {
     form.setEnabled(enabled);
     form.getBody().setEnabled(enabled);
 
-    boolean jaxwsBindingFileExists = !getInput().getJaxWsBindingFiles().isEmpty();
-    for (StyledTextField field : m_portTypeNameFields) {
+    var jaxwsBindingFileExists = !getInput().getJaxWsBindingFiles().isEmpty();
+    for (var field : m_portTypeNameFields) {
       field.setEnabled(enabled && jaxwsBindingFileExists);
     }
     m_packageField.setEnabled(enabled && jaxwsBindingFileExists);
-    for (StyledTextField field : m_webServiceNameFields) {
+    for (var field : m_webServiceNameFields) {
       field.setEnabled(enabled && jaxwsBindingFileExists);
     }
-    for (StyledTextField field : m_entryPointNameFields) {
+    for (var field : m_entryPointNameFields) {
       field.setEnabled(enabled && JdtUtils.exists(getInput().getEntryPointDefinition(getPortType(field))));
     }
-    for (ProposalTextField field : m_entryPointPackageFields) {
+    for (var field : m_entryPointPackageFields) {
       field.setEnabled(enabled && JdtUtils.exists(getInput().getEntryPointDefinition(getPortType(field))));
     }
   }
@@ -482,13 +473,13 @@ public class WebServiceFormPage extends FormPage {
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected void createBindingGroup(Composite p) {
-    Composite parent = createSection(getFormToolkit(), p, "Bindings");
+    var parent = createSection(getFormToolkit(), p, "Bindings");
     GridLayoutFactory
         .swtDefaults()
         .applyTo(parent);
 
-    for (Path f : getInput().getBindings()) {
-      ImageHyperlink field = getFormToolkit().createImageHyperlink(parent, SWT.NONE);
+    for (var f : getInput().getBindings()) {
+      var field = getFormToolkit().createImageHyperlink(parent, SWT.NONE);
       field.setUnderlined(true);
       field.setText(f.getFileName().toString());
       field.setImage(m_decoratingWorkbenchLabelProvider.getImage(f));
@@ -514,7 +505,7 @@ public class WebServiceFormPage extends FormPage {
         .grab(true, false)
         .span(horizontalSpan, 1)
         .applyTo(m_packageField);
-    String packageInBinding = JavaTypes.qualifier(portType.getFullyQualifiedName());
+    var packageInBinding = JavaTypes.qualifier(portType.getFullyQualifiedName());
     if (Strings.hasText(packageInBinding)) {
       m_packageField.setText(packageInBinding);
     }
@@ -529,13 +520,13 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected void createPortTypeNameField(Composite parent, IType portType, int labelColWidth) {
-    StyledTextField portTypeNameField = FieldToolkit.createStyledTextField(parent, "Port Type (EPI)", TextField.TYPE_HYPERLINK | TextField.TYPE_IMAGE, labelColWidth);
+    var portTypeNameField = FieldToolkit.createStyledTextField(parent, "Port Type (EPI)", TextField.TYPE_HYPERLINK | TextField.TYPE_IMAGE, labelColWidth);
     GridDataFactory
         .defaultsFor(portTypeNameField)
         .align(SWT.FILL, SWT.CENTER)
         .grab(true, false)
         .applyTo(portTypeNameField);
-    String nameInBinding = portType.getElementName();
+    var nameInBinding = portType.getElementName();
     if (Strings.hasText(nameInBinding)) {
       portTypeNameField.setReadOnlyPrefix("I");
       portTypeNameField.setReadOnlySuffix(ISdkConstants.SUFFIX_WS_PORT_TYPE);
@@ -560,12 +551,8 @@ public class WebServiceFormPage extends FormPage {
   }
 
   public boolean isPortTypeNameChanged() {
-    for (StyledTextField field : m_portTypeNameFields) {
-      if (!Objects.equals(m_portTypeNames.get(field), getPortType(field).getElementName())) {
-        return true;
-      }
-    }
-    return false;
+    return m_portTypeNameFields.stream()
+        .anyMatch(field -> !Objects.equals(m_portTypeNames.get(field), getPortType(field).getElementName()));
   }
 
   @Override
@@ -590,12 +577,7 @@ public class WebServiceFormPage extends FormPage {
   }
 
   public boolean isEntryPointPackageChanged() {
-    for (ProposalTextField field : m_entryPointPackageFields) {
-      if (isEntryPointPackageChanged(field)) {
-        return true;
-      }
-    }
-    return false;
+    return m_entryPointPackageFields.stream()        .anyMatch(this::isEntryPointPackageChanged);
   }
 
   protected boolean isEntryPointNameChanged(TextField field) {
@@ -603,16 +585,11 @@ public class WebServiceFormPage extends FormPage {
   }
 
   public boolean isEntryPointNameChanged() {
-    for (StyledTextField field : m_entryPointNameFields) {
-      if (isEntryPointNameChanged(field)) {
-        return true;
-      }
-    }
-    return false;
+    return m_entryPointNameFields.stream().anyMatch(this::isEntryPointNameChanged);
   }
 
   public boolean isWebServiceNameChanged() {
-    for (StyledTextField field : m_webServiceNameFields) {
+    for (var field : m_webServiceNameFields) {
       IJavaElement webService = getWebService(field);
       if (!Objects.equals(m_webServiceNames.get(field), webService.getElementName())) {
         return true;
@@ -626,43 +603,39 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected StyledTextField getWebServiceNameField(IType portType) {
-    IType webService = getInput().getWebService(portType);
-    for (StyledTextField field : m_webServiceNameFields) {
-      if (webService.equals(getWebService(field))) {
-        return field;
-      }
-    }
-    return null;
+    var webService = getInput().getWebService(portType);
+    return m_webServiceNameFields.stream()
+        .filter(field -> webService.equals(getWebService(field)))
+        .findFirst()
+        .orElse(null);
   }
 
   protected StyledTextField getPortTypeNameField(IType portType) {
-    for (StyledTextField field : m_portTypeNameFields) {
-      if (portType.equals(getPortType(field))) {
-        return field;
-      }
-    }
-    return null;
+    return m_portTypeNameFields.stream()
+        .filter(field -> portType.equals(getPortType(field)))
+        .findFirst()
+        .orElse(null);
   }
 
   protected void fillOperation(WebServiceUpdateOperation op, EclipseEnvironment adapter) {
-    List<Path> jaxWsBindingFiles = getInput().getJaxWsBindingFiles();
-    String newPackage = getPackage();
+    var jaxWsBindingFiles = getInput().getJaxWsBindingFiles();
+    var newPackage = getPackage();
     if (!jaxWsBindingFiles.isEmpty() && (isPortTypeNameChanged() || isWebServiceNameChanged() || isPackageChanged())) {
       op.setJaxwsBindingFiles(jaxWsBindingFiles);
       op.setPackage(newPackage);
-      for (StyledTextField webServiceField : m_webServiceNameFields) {
-        IType webService = getWebService(webServiceField);
+      for (var webServiceField : m_webServiceNameFields) {
+        var webService = getWebService(webServiceField);
         op.addBindingClassUpdate(new BindingClassUpdate(JaxWsUtils.getWebServiceXPath(getInput().getWebServiceNameInWsdl(webService).getLocalPart()), m_webServiceNames.get(webServiceField)));
       }
 
-      for (StyledTextField portTypeNameField : m_portTypeNameFields) {
-        IType portType = getPortType(portTypeNameField);
-        IType webServiceClient = getInput().getWebServiceClient(portType);
-        String newPortTypeName = m_portTypeNames.get(portTypeNameField);
+      for (var portTypeNameField : m_portTypeNameFields) {
+        var portType = getPortType(portTypeNameField);
+        var webServiceClient = getInput().getWebServiceClient(portType);
+        var newPortTypeName = m_portTypeNames.get(portTypeNameField);
 
         if (JdtUtils.exists(webServiceClient)) {
-          String newWebServiceName = m_webServiceNames.get(getWebServiceNameField(portType));
-          IClasspathEntry sourceFolder = adapter.toScoutSourceFolder(JdtUtils.getSourceFolder(webServiceClient));
+          var newWebServiceName = m_webServiceNames.get(getWebServiceNameField(portType));
+          var sourceFolder = adapter.toScoutSourceFolder(JdtUtils.getSourceFolder(webServiceClient));
           op.addWebServiceClientUpdate(new WebServiceClientUpdate(adapter.toScoutType(webServiceClient),
               newPackage,
               newPortTypeName,
@@ -670,9 +643,9 @@ public class WebServiceFormPage extends FormPage {
               sourceFolder));
         }
 
-        IType serviceImpl = getInput().getServiceImplementation(portType);
+        var serviceImpl = getInput().getServiceImplementation(portType);
         if (JdtUtils.exists(serviceImpl)) {
-          IClasspathEntry sourceFolder = adapter.toScoutSourceFolder(JdtUtils.getSourceFolder(serviceImpl));
+          var sourceFolder = adapter.toScoutSourceFolder(JdtUtils.getSourceFolder(serviceImpl));
           op.addWebServiceImplementationUpdate(new WebServiceImplementationUpdate(adapter.toScoutType(serviceImpl),
               newPackage,
               newPortTypeName,
@@ -683,15 +656,15 @@ public class WebServiceFormPage extends FormPage {
       }
     }
 
-    for (int i = 0; i < m_entryPointNameFields.size(); i++) {
-      StyledTextField entryPointNameField = m_entryPointNameFields.get(i);
-      ProposalTextField entryPointPckField = m_entryPointPackageFields.get(i);
-      IType portType = getPortType(entryPointNameField);
-      IType entryPointDefinition = getInput().getEntryPointDefinition(portType);
+    for (var i = 0; i < m_entryPointNameFields.size(); i++) {
+      var entryPointNameField = m_entryPointNameFields.get(i);
+      var entryPointPckField = m_entryPointPackageFields.get(i);
+      var portType = getPortType(entryPointNameField);
+      var entryPointDefinition = getInput().getEntryPointDefinition(portType);
       if (JdtUtils.exists(entryPointDefinition)) {
-        boolean isChanged = isPortTypeNameChanged() || isPackageChanged() || isEntryPointNameChanged(entryPointNameField) || isEntryPointPackageChanged(entryPointPckField);
+        var isChanged = isPortTypeNameChanged() || isPackageChanged() || isEntryPointNameChanged(entryPointNameField) || isEntryPointPackageChanged(entryPointPckField);
         if (isChanged) {
-          IClasspathEntry sourceFolder = adapter.toScoutSourceFolder(JdtUtils.getSourceFolder(entryPointDefinition));
+          var sourceFolder = adapter.toScoutSourceFolder(JdtUtils.getSourceFolder(entryPointDefinition));
           op.addEntryPointDefinitionUpdate(new EntryPointDefinitionUpdate(adapter.toScoutType(entryPointDefinition),
               m_entryPointPackageNames.get(entryPointPckField),
               m_entryPointNames.get(entryPointNameField),
@@ -727,23 +700,23 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected void validateAnnotationProcessingSettings() {
-    IJavaProject javaProject = getInput().getJavaProject();
-    String processAnnotations = javaProject.getOption(WebServiceNewOperation.PROCESS_ANNOTATIONS_KEY, false);
+    var javaProject = getInput().getJavaProject();
+    var processAnnotations = javaProject.getOption(WebServiceNewOperation.PROCESS_ANNOTATIONS_KEY, false);
     if (!WebServiceNewOperation.PROCESS_ANNOTATIONS_VALUE.equals(processAnnotations)) {
       setMessage(new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "Annotation processing is not correctly enabled. Open preference file 'org.eclipse.jdt.core.prefs' in '" + javaProject.getElementName()
           + "/.settings/' and set property '" + WebServiceNewOperation.PROCESS_ANNOTATIONS_KEY + "' to '" + WebServiceNewOperation.PROCESS_ANNOTATIONS_VALUE + "'."));
       return;
     }
 
-    IEclipsePreferences aptPluginPreferenceNode = new ProjectScope(javaProject.getProject()).getNode(WebServiceNewOperation.JDT_APT_SETTINGS_NODE);
-    boolean aptEnabled = aptPluginPreferenceNode.getBoolean(WebServiceNewOperation.APT_ENABLED_KEY, false);
+    var aptPluginPreferenceNode = new ProjectScope(javaProject.getProject()).getNode(WebServiceNewOperation.JDT_APT_SETTINGS_NODE);
+    var aptEnabled = aptPluginPreferenceNode.getBoolean(WebServiceNewOperation.APT_ENABLED_KEY, false);
     if (aptEnabled != WebServiceNewOperation.APT_ENABLED_VALUE) {
       setMessage(new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "Annotation processing is not correctly enabled. Open the properties of project '" + javaProject.getElementName()
           + "' -> 'Java Compiler' -> 'Annotation Processing' and check 'Enable annotation processing'."));
       return;
     }
 
-    boolean aptReconcileEnabled = aptPluginPreferenceNode.getBoolean(WebServiceNewOperation.APT_RECONCILE_ENABLED_KEY, false);
+    var aptReconcileEnabled = aptPluginPreferenceNode.getBoolean(WebServiceNewOperation.APT_RECONCILE_ENABLED_KEY, false);
     if (aptReconcileEnabled != WebServiceNewOperation.APT_RECONCILE_ENABLED_VALUE) {
       setMessage(new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "Annotation processing is not correctly enabled. Open the properties of project '" + javaProject.getElementName()
           + "' -> 'Java Compiler' -> 'Annotation Processing' and check 'Enable processing in editor'."));
@@ -756,9 +729,9 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected boolean isValidJavaName(Iterable<StyledTextField> fields) {
-    for (StyledTextField field : fields) {
+    for (var field : fields) {
       if (field.isEnabled()) {
-        IStatus status = AbstractCompilationUnitNewWizardPage.validateJavaName(field.getText(), field.getReadOnlySuffix());
+        var status = AbstractCompilationUnitNewWizardPage.validateJavaName(field.getText(), field.getReadOnlySuffix());
         if (!status.isOK()) {
           setMessage(status);
           return false;
@@ -771,7 +744,7 @@ public class WebServiceFormPage extends FormPage {
   protected boolean isValidPackage(Iterable<? extends TextField> fields) {
     for (TextField field : fields) {
       if (field.isEnabled()) {
-        IStatus status = AbstractCompilationUnitNewWizardPage.validatePackageName(field.getText());
+        var status = AbstractCompilationUnitNewWizardPage.validatePackageName(field.getText());
         if (!status.isOK()) {
           setMessage(status);
           return false;
@@ -799,7 +772,7 @@ public class WebServiceFormPage extends FormPage {
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected void createLabeledHyperlink(Composite p, String labelText, Path file, IType element, int labelWidth, int topOffset) {
-    Composite parent = getFormToolkit().createComposite(p);
+    var parent = getFormToolkit().createComposite(p);
     GridDataFactory
         .defaultsFor(parent)
         .align(SWT.FILL, SWT.CENTER)
@@ -807,13 +780,13 @@ public class WebServiceFormPage extends FormPage {
         .applyTo(parent);
     parent.setLayout(new FormLayout());
 
-    Label label = getFormToolkit().createLabel(parent, labelText, SWT.TRAIL);
-    int fieldTopOffset = topOffset;
-    int labelYOffset = 2;
+    var label = getFormToolkit().createLabel(parent, labelText, SWT.TRAIL);
+    var fieldTopOffset = topOffset;
+    var labelYOffset = 2;
 
     Control field;
     if ((file != null && Files.isReadable(file) && Files.isRegularFile(file)) || JdtUtils.exists(element)) {
-      ImageHyperlink link = getFormToolkit().createImageHyperlink(parent, SWT.NONE);
+      var link = getFormToolkit().createImageHyperlink(parent, SWT.NONE);
       field = link;
       link.setUnderlined(true);
 
@@ -844,20 +817,20 @@ public class WebServiceFormPage extends FormPage {
     }
     else {
       // error label
-      Label lbl = getFormToolkit().createLabel(parent, "Not found");
+      var lbl = getFormToolkit().createLabel(parent, "Not found");
       field = lbl;
       lbl.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_RED));
       fieldTopOffset += labelYOffset;
     }
 
     // layout
-    FormData labelData = new FormData();
+    var labelData = new FormData();
     labelData.top = new FormAttachment(0, labelYOffset + topOffset);
     labelData.left = new FormAttachment(0, 0);
     labelData.right = new FormAttachment(0, labelWidth);
     label.setLayoutData(labelData);
 
-    FormData textData = new FormData();
+    var textData = new FormData();
     textData.top = new FormAttachment(0, fieldTopOffset);
     textData.left = new FormAttachment(label, 5);
     field.setLayoutData(textData);
@@ -899,7 +872,7 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected static Composite createSection(FormToolkit toolkit, Composite parent, String sectionLabel) {
-    Section section = toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
+    var section = toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
     section.setText(sectionLabel);
     GridLayoutFactory
         .swtDefaults()
@@ -910,7 +883,7 @@ public class WebServiceFormPage extends FormPage {
         .grab(true, false)
         .applyTo(section);
 
-    Composite result = toolkit.createComposite(section);
+    var result = toolkit.createComposite(section);
     section.setClient(result);
     GridDataFactory
         .defaultsFor(result)
@@ -946,7 +919,7 @@ public class WebServiceFormPage extends FormPage {
     }
 
     private boolean contains(int x, int y, int imageWidth, int containerWidth) {
-      int leftOffset = (containerWidth - imageWidth) / 2;
+      var leftOffset = (containerWidth - imageWidth) / 2;
       return m_area.contains(x - leftOffset, y);
     }
   }

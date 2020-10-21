@@ -20,8 +20,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -44,23 +42,23 @@ public class ExternalGroupboxTest {
 
     // fields of AbstractExternalGroupBoxData
     assertEquals(1, abstractExternalGroupBoxData.fields().stream().count(), "field count of 'AbstractExternalGroupBoxData'");
-    IField serialVersionUID = assertFieldExist(abstractExternalGroupBoxData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(abstractExternalGroupBoxData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, abstractExternalGroupBoxData.methods().stream().count(), "method count of 'AbstractExternalGroupBoxData'");
-    IMethod getExternalString = assertMethodExist(abstractExternalGroupBoxData, "getExternalString", new String[]{});
+    var getExternalString = assertMethodExist(abstractExternalGroupBoxData, "getExternalString", new String[]{});
     assertMethodReturnType(getExternalString, "formdata.shared.services.process.AbstractExternalGroupBoxData$ExternalString");
 
     assertEquals(1, abstractExternalGroupBoxData.innerTypes().stream().count(), "inner types count of 'AbstractExternalGroupBoxData'");
     // type ExternalString
-    IType externalString = assertTypeExists(abstractExternalGroupBoxData, "ExternalString");
+    var externalString = assertTypeExists(abstractExternalGroupBoxData, "ExternalString");
     assertHasFlags(externalString, 9);
     assertHasSuperClass(externalString, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.String>");
 
     // fields of ExternalString
     assertEquals(1, externalString.fields().stream().count(), "field count of 'ExternalString'");
-    IField serialVersionUID1 = assertFieldExist(externalString, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(externalString, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 

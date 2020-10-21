@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -45,7 +44,7 @@ public final class JobFuture<V> extends SdkFuture<V> {
       @SuppressWarnings("squid:S1181") // Throwable and Error should not be caught
       public void done(IJobChangeEvent event) {
         try {
-          AbstractJob j = (AbstractJob) event.getJob();
+          var j = (AbstractJob) event.getJob();
           j.removeJobChangeListener(this);
           doCompletion(j.isCanceled(), exception().orElse(null), resultExtractor);
         }
@@ -74,11 +73,11 @@ public final class JobFuture<V> extends SdkFuture<V> {
    *         yet (and can therefore not have an exception) or the task completed successfully.
    */
   public Optional<Throwable> exception() {
-    IStatus result = m_job.getResult();
+    var result = m_job.getResult();
     if (result == null) {
       return Optional.empty(); // job is not finished
     }
-    Optional<Throwable> exception = Optional.ofNullable(result.getException());
+    var exception = Optional.ofNullable(result.getException());
     if (exception.isPresent()) {
       return exception;
     }
@@ -113,7 +112,7 @@ public final class JobFuture<V> extends SdkFuture<V> {
   public Supplier<V> get(long timeout, TimeUnit unit, IProgressMonitor monitor) throws InterruptedException, ExecutionException, TimeoutException {
     try {
       detectDeadLock();
-      boolean completed = m_job.join(unit.toMillis(timeout), monitor);
+      var completed = m_job.join(unit.toMillis(timeout), monitor);
       if (!completed) {
         throw new TimeoutException();
       }
@@ -134,12 +133,12 @@ public final class JobFuture<V> extends SdkFuture<V> {
   }
 
   boolean isCurrentContextConflictingWithJobRule() {
-    ISchedulingRule rule = m_job.getRule();
+    var rule = m_job.getRule();
     if (rule == null) {
       return false;
     }
 
-    ISchedulingRule currentRule = Job.getJobManager().currentRule();
+    var currentRule = Job.getJobManager().currentRule();
     if (currentRule == null) {
       return false;
     }

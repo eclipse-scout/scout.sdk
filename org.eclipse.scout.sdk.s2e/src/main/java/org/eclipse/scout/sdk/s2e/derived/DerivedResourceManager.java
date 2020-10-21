@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.derived;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toCollection;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -31,7 +33,6 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -77,7 +78,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     m_enabled = false;
     m_updateHandlerFactories = new ArrayList<>();
 
-    DefaultResourceChangeEventFilter filter = new DefaultResourceChangeEventFilter();
+    var filter = new DefaultResourceChangeEventFilter();
     filter.setIgnoreScoutSdkEvents(false);
     m_resourceChangeEventFilter = filter;
 
@@ -134,7 +135,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   }
 
   protected void triggerSync(Collection<IResource> resources) {
-    Set<IResource> cleanResources = cleanCopy(resources); // remove non-accessible, containing and null resources
+    var cleanResources = cleanCopy(resources); // remove non-accessible, containing and null resources
     if (enqueueFiles(cleanResources)) {
       m_runQueuedTriggerHandlersJob.abort();
       m_runQueuedTriggerHandlersJob.schedule(1000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
@@ -149,10 +150,10 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       return false;
     }
 
-    boolean added = false;
+    var added = false;
     try {
-      IJavaSearchScope searchScope = JdtUtils.createJavaSearchScope(resources);
-      for (IDerivedResourceHandler handler : createOperations(resources, searchScope)) {
+      var searchScope = JdtUtils.createJavaSearchScope(resources);
+      for (var handler : createOperations(resources, searchScope)) {
         if (!m_triggerHandlers.contains(handler)) {
           if (addElementToQueueSecure(m_triggerHandlers, handler, handler.toString(), -1, null)) {
             //ok, continue
@@ -174,19 +175,16 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     if (resources == null) {
       return emptySet();
     }
-
-    Set<IResource> cleanSet = new LinkedHashSet<>(resources.size());
-    for (IResource r : resources) {
-      if (r != null && r.isAccessible() && !existsParentIn(resources, r)) {
-        cleanSet.add(r);
-      }
-    }
-    return cleanSet;
+    return resources.stream()
+        .filter(Objects::nonNull)
+        .filter(IResource::isAccessible)
+        .filter(r -> !existsParentIn(resources, r))
+        .collect(toCollection(() -> new LinkedHashSet<>(resources.size())));
   }
 
   protected static boolean existsParentIn(Iterable<IResource> searchList, IResource resource) {
-    IPath path = resource.getFullPath();
-    for (IResource r : searchList) {
+    var path = resource.getFullPath();
+    for (var r : searchList) {
       if (r == null || !r.isAccessible()) {
         continue;
       }
@@ -199,9 +197,9 @@ public class DerivedResourceManager implements IDerivedResourceManager {
 
   protected Collection<IDerivedResourceHandler> createOperations(Set<IResource> resources, IJavaSearchScope searchScope) {
     List<IDerivedResourceHandler> all = null;
-    for (IDerivedResourceHandlerFactory factory : m_updateHandlerFactories) {
+    for (var factory : m_updateHandlerFactories) {
       try {
-        List<IDerivedResourceHandler> ops = factory.createHandlersFor(resources, searchScope);
+        var ops = factory.createHandlersFor(resources, searchScope);
         if (ops != null && !ops.isEmpty()) {
           if (all == null) {
             all = new ArrayList<>();
@@ -240,7 +238,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       }
 
       // cancel the job that checks the java deltas
-      Thread thread = m_javaDeltaCheckJob.getThread();
+      var thread = m_javaDeltaCheckJob.getThread();
       if (thread != null) {
         m_javaDeltaCheckJob.cancel();
         thread.interrupt();
@@ -281,7 +279,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
    */
   private static <T> boolean addElementToQueueSecure(BlockingQueue<T> queue, T element, String name, long timeout, TimeUnit unit) {
     boolean interrupted;
-    int numInterrupted = 0;
+    var numInterrupted = 0;
     do {
       try {
         //noinspection UnusedAssignment
@@ -323,7 +321,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     }
 
     private boolean isInterestingResourceChangeEvent(IResourceChangeEvent event) {
-      Predicate<IResourceChangeEvent> filter = getResourceChangeEventFilter();
+      var filter = getResourceChangeEventFilter();
       return filter == null || filter.test(event);
     }
 
@@ -373,7 +371,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         }
         if (event != null && event.getDelta() != null) {
           // collect all files that have been changed as part of this delta
-          Set<IResource> resources = collectFilesFromDelta(event.getDelta());
+          var resources = collectFilesFromDelta(event.getDelta());
           m_manager.triggerSync(resources);
         }
       }
@@ -383,7 +381,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       Set<IResource> scope = new LinkedHashSet<>();
       try {
         d.accept(delta -> {
-          IResource resource = delta.getResource();
+          var resource = delta.getResource();
           if (resource != null && resource.getType() == IResource.FILE && resource.exists()) {
             scope.add(resource);
             return false;
@@ -458,7 +456,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         return;
       }
 
-      int numOperations = m_queueToConsume.size();
+      var numOperations = m_queueToConsume.size();
       if (numOperations < 1) {
         return;
       }
@@ -467,21 +465,21 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     }
 
     private void execute(IEnvironment env, EclipseProgress progress, int numOperations) {
-      int workByHandler = 100;
+      var workByHandler = 100;
       progress.init(numOperations * workByHandler, "");
       Collection<IFuture<?>> executedFileWrites = new ArrayList<>(numOperations);
-      for (int i = 1; i <= numOperations; i++) {
+      for (var i = 1; i <= numOperations; i++) {
         if (isAborted()) {
           doAbort();
           return;
         }
 
         // already remove the operation here. if there is a problem with this operation we don't want to keep trying
-        IDerivedResourceHandler handler = m_queueToConsume.poll();
+        var handler = m_queueToConsume.poll();
         if (handler == null) {
           continue;
         }
-        String handlerName = handler.toString();
+        var handlerName = handler.toString();
         progress.monitor().setTaskName(handlerName + " [" + i + " of " + numOperations + ']');
         progress.monitor().subTask("");
 
@@ -507,7 +505,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     }
 
     private static Collection<? extends IFuture<?>> executeHandler(IDerivedResourceHandler handler, IEnvironment env, IProgress progress) {
-      long start = System.currentTimeMillis();
+      var start = System.currentTimeMillis();
       try {
         return handler.apply(env, progress);
       }

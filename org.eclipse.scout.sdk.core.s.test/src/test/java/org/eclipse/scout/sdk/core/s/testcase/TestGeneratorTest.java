@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.IClientSession;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -38,7 +37,7 @@ public class TestGeneratorTest {
 
   @Test
   public void testTestSourceBuilderWithDefaultValues(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+    var scoutApi = env.requireApi(IScoutApi.class);
 
     TestGenerator<?> generator = new TestGenerator<>()
         .asClientTest(true)
@@ -48,7 +47,7 @@ public class TestGeneratorTest {
         .withSession(null)
         .withRunWithSubjectValueBuilder(null);
 
-    StringBuilder source = generator.toJavaSource(env);
+    var source = generator.toJavaSource(env);
     assertTrue(source.indexOf('@' + scoutApi.RunWithSubject().simpleName() + "(\"anonymous") >= 0);
     assertTrue(source.indexOf('@' + scoutApi.RunWithClientSession().simpleName() + '(' + scoutApi.TestEnvironmentClientSession().simpleName()) >= 0);
     assertNoCompileErrors(env, generator);
@@ -57,9 +56,9 @@ public class TestGeneratorTest {
 
   @Test
   public void testTestSourceBuilderWithSpecificValues(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
-    String subjectValue = "myvalue";
-    IClientSession iClientSession = scoutApi.IClientSession();
+    var scoutApi = env.requireApi(IScoutApi.class);
+    var subjectValue = "myvalue";
+    var iClientSession = scoutApi.IClientSession();
     TestGenerator<?> generator = new TestGenerator<>()
         .asClientTest(true)
         .withElementName("MyTest")
@@ -68,7 +67,7 @@ public class TestGeneratorTest {
         .withSession(iClientSession.fqn())
         .withRunWithSubjectValueBuilder(b -> b.stringLiteral(subjectValue));
 
-    StringBuilder source = generator.toJavaSource(env);
+    var source = generator.toJavaSource(env);
     assertTrue(source.indexOf('@' + scoutApi.RunWithSubject().simpleName() + "(\"" + subjectValue) >= 0);
     assertTrue(source.indexOf('@' + scoutApi.RunWithClientSession().simpleName() + '(' + iClientSession.simpleName()) >= 0);
     assertNoCompileErrors(env, generator);

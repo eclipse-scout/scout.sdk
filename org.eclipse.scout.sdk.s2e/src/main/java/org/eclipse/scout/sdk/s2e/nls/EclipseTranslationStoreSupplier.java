@@ -18,10 +18,12 @@ import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPro
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -29,20 +31,17 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
@@ -69,8 +68,8 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
   @Override
   @SuppressWarnings("resource") // false positive
   public Stream<ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress) {
-    EclipseEnvironment e = EclipseEnvironment.narrow(env);
-    EclipseProgress p = EclipseEnvironment.toScoutProgress(progress);
+    var e = EclipseEnvironment.narrow(env);
+    var p = EclipseEnvironment.toScoutProgress(progress);
     return e.findJavaProject(modulePath)
         .map(jp -> visibleTranslationStores(jp, e, p))
         .orElseGet(Stream::empty);
@@ -85,7 +84,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
   private static Stream<ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, @SuppressWarnings("TypeMayBeWeakened") EclipseProgress progress) {
     progress.init(20, "Search properties text provider services.");
 
-    Optional<IScoutApi> scoutApi = ApiHelper.scoutApiFor(jp, env);
+    var scoutApi = ApiHelper.scoutApiFor(jp, env);
     if (scoutApi.isEmpty()) {
       return Stream.empty();
     }
@@ -105,9 +104,9 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
       }
     };
 
-    String abstractDynamicNlsTextProviderSvcFqn = scoutApi.get().AbstractDynamicNlsTextProviderService().fqn();
-    Set<IType> dynamicNlsTextProviderServices = JdtUtils.findTypesInStrictHierarchy(jp, abstractDynamicNlsTextProviderSvcFqn, progress.newChild(10).monitor(), filter);
-    EclipseProgress loopProgress = progress
+    var abstractDynamicNlsTextProviderSvcFqn = scoutApi.get().AbstractDynamicNlsTextProviderService().fqn();
+    var dynamicNlsTextProviderServices = JdtUtils.findTypesInStrictHierarchy(jp, abstractDynamicNlsTextProviderSvcFqn, progress.newChild(10).monitor(), filter);
+    var loopProgress = progress
         .newChild(10)
         .setWorkRemaining(dynamicNlsTextProviderServices.size());
 
@@ -121,11 +120,11 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     return PropertiesTextProviderService.create(textProviderServiceType)
         .map(PropertiesTranslationStore::new)
         .filter(s -> loadStore(s, progress.newChild(1)))
-        .map(s -> s);
+        .map(Function.identity());
   }
 
   private static boolean loadStore(PropertiesTranslationStore store, IProgress progress) {
-    IType jdtType = EclipseEnvironment.toJdtType(store.service().type());
+    var jdtType = EclipseEnvironment.toJdtType(store.service().type());
     if (!JdtUtils.exists(jdtType)) {
       SdkLog.warning("Type '{}' could not be found.", store.service().type().name());
       return false;
@@ -149,7 +148,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
   }
 
   private static boolean loadStoreFromPlatform(IType jdtType, PropertiesTranslationStore store, IProgress progress) {
-    IPackageFragmentRoot r = JdtUtils.getSourceFolder(jdtType);
+    var r = JdtUtils.getSourceFolder(jdtType);
     if (!JdtUtils.exists(r)) {
       SdkLog.warning("Could not find text resource for type '{}'.", jdtType.getFullyQualifiedName());
       return false;
@@ -189,21 +188,18 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     }
 
     // check runtime dir
-    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-    IClasspathEntry[] clEntries = project.getRawClasspath();
-    Collection<IFolder> folders = new ArrayList<>();
-    for (IClasspathEntry entry : clEntries) {
-      if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-        IPath toCheck = entry.getPath().append(path);
-        IFolder folder = root.getFolder(toCheck);
-        if (folder != null && folder.exists()) {
-          folders.add(folder);
-        }
-      }
-    }
+    var root = ResourcesPlugin.getWorkspace().getRoot();
+    var clEntries = project.getRawClasspath();
+    Collection<IFolder> folders = Arrays.stream(clEntries)
+        .filter(entry -> entry.getEntryKind() == IClasspathEntry.CPE_SOURCE)
+        .map(entry -> entry.getPath().append(path))
+        .map(root::getFolder)
+        .filter(Objects::nonNull)
+        .filter(IResource::exists)
+        .collect(toList());
 
     // check path relative to project
-    IFolder foundFolder = project.getProject().getFolder(path);
+    var foundFolder = project.getProject().getFolder(path);
     if (foundFolder != null && foundFolder.exists()) {
       folders.add(foundFolder);
     }
@@ -212,7 +208,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
 
   private static Stream<IFile> filesInFolder(IFolder folder) {
     try {
-      return Stream.of(folder.members(IResource.NONE))
+      return Arrays.stream(folder.members(IResource.NONE))
           .filter(member -> member instanceof IFile)
           .map(member -> (IFile) member);
     }
@@ -222,19 +218,19 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
   }
 
   private static Collection<ITranslationPropertiesFile> filesFromPlatform(IPackageFragmentRoot r, @SuppressWarnings("TypeMayBeWeakened") PropertiesTranslationStore store) throws JavaModelException {
-    char delim = '.';
-    String pckg = store.service().folder().replace(PropertiesTextProviderService.FOLDER_SEGMENT_DELIMITER, delim);
-    IPackageFragment textFolder = r.getPackageFragment(pckg);
+    var delim = '.';
+    var pckg = store.service().folder().replace(PropertiesTextProviderService.FOLDER_SEGMENT_DELIMITER, delim);
+    var textFolder = r.getPackageFragment(pckg);
     if (!JdtUtils.exists(textFolder)) {
       SdkLog.warning("Folder '{}' could not be found in '{}'. Will be ignored.", store.service().folder(), r.getElementName());
       return emptyList();
     }
 
     Collection<ITranslationPropertiesFile> translationFiles = new ArrayList<>();
-    String fileNamePrefix = store.service().filePrefix();
-    for (Object o : textFolder.getNonJavaResources()) {
+    var fileNamePrefix = store.service().filePrefix();
+    for (var o : textFolder.getNonJavaResources()) {
       if (o instanceof IStorage) {
-        IStorage f = (IStorage) o;
+        var f = (IStorage) o;
         parseLanguageFromFileName(f.getName(), fileNamePrefix)
             .map(lang -> new ReadOnlyTranslationFile(() -> contentsOf(f), lang, f))
             .ifPresent(translationFiles::add);

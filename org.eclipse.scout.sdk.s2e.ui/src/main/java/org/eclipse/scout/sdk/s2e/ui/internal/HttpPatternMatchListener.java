@@ -11,8 +11,6 @@
 package org.eclipse.scout.sdk.s2e.ui.internal;
 
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
 import org.eclipse.ui.console.IHyperlink;
@@ -68,13 +66,13 @@ public class HttpPatternMatchListener implements IPatternMatchListenerDelegate {
 
     @Override
     public void linkActivated() {
-      IRegion region = m_sourceConsole.getRegion(this);
+      var region = m_sourceConsole.getRegion(this);
       if (region == null) {
         return;
       }
-      IDocument document = m_sourceConsole.getDocument();
+      var document = m_sourceConsole.getDocument();
       try {
-        String link = document.get(region.getOffset(), region.getLength());
+        var link = document.get(region.getOffset(), region.getLength());
         S2eUiUtils.showUrlInBrowser(link);
       }
       catch (BadLocationException e) {

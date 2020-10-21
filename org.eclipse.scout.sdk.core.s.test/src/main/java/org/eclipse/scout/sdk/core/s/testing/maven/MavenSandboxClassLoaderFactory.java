@@ -12,18 +12,13 @@ package org.eclipse.scout.sdk.core.s.testing.maven;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.CodeSource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.zip.ZipFile;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -109,11 +104,9 @@ public final class MavenSandboxClassLoaderFactory {
    * @return the {@link URL}s of the jars that contain the given class names.
    */
   static URL[] getJarsUrls(Collection<String> baseClasses) {
-    List<URL> urls = new ArrayList<>(baseClasses.size());
-    for (String className : baseClasses) {
-      urls.add(getJarContaining(className));
-    }
-    return urls.toArray(new URL[0]);
+    return baseClasses.stream()
+        .map(MavenSandboxClassLoaderFactory::getJarContaining)
+        .toArray(URL[]::new);
   }
 
   /**
@@ -125,9 +118,9 @@ public final class MavenSandboxClassLoaderFactory {
    */
   static URL getJarContaining(String className) {
     try {
-      ClassLoader classLoader = MavenSandboxClassLoaderFactory.class.getClassLoader();
-      Class<?> clazz = classLoader.loadClass(className);
-      URL url = getJarContaining(clazz);
+      var classLoader = MavenSandboxClassLoaderFactory.class.getClassLoader();
+      var clazz = classLoader.loadClass(className);
+      var url = getJarContaining(clazz);
       if (url == null && classLoader instanceof URLClassLoader) {
         url = getJarContaining(className, (URLClassLoader) classLoader);
       }
@@ -142,29 +135,27 @@ public final class MavenSandboxClassLoaderFactory {
   }
 
   static URL getJarContaining(String className, URLClassLoader urlClassLoader) {
-    for (URL url : urlClassLoader.getURLs()) {
-      if (zipContainsEntry(url, className)) {
-        return url;
-      }
-    }
-    return null;
+    return Arrays.stream(urlClassLoader.getURLs())
+        .filter(url -> zipContainsEntry(url, className))
+        .findFirst()
+        .orElse(null);
   }
 
   @SuppressWarnings("squid:S1141") // nested try
   static boolean zipContainsEntry(URL zipUrl, String className) {
     try {
-      URI uri = zipUrl.toURI();
+      var uri = zipUrl.toURI();
       if (!"file".equals(uri.getScheme())) {
         return false;
       }
 
-      Path file = Paths.get(uri);
+      var file = Paths.get(uri);
       if (!Files.isRegularFile(file) || !Files.isReadable(file)) {
         return false;
       }
 
       //noinspection NestedTryStatement
-      try (ZipFile zip = new ZipFile(file.toFile())) {
+      try (var zip = new ZipFile(file.toFile())) {
         if (zipContainsEntry(zip, className)) {
           return true;
         }
@@ -191,11 +182,11 @@ public final class MavenSandboxClassLoaderFactory {
     if (clazz == null) {
       return null;
     }
-    CodeSource codeSource = clazz.getProtectionDomain().getCodeSource();
+    var codeSource = clazz.getProtectionDomain().getCodeSource();
     if (codeSource == null) {
       return null;
     }
-    URL url = codeSource.getLocation();
+    var url = codeSource.getLocation();
     if (url == null) {
       return null;
     }
@@ -204,8 +195,8 @@ public final class MavenSandboxClassLoaderFactory {
     }
 
     try {
-      URL fileUrl = new URL(url, "target/classes/");
-      Path f = Paths.get(fileUrl.toURI());
+      var fileUrl = new URL(url, "target/classes/");
+      var f = Paths.get(fileUrl.toURI());
       if (Files.isReadable(f) || Files.isDirectory(f)) {
         return fileUrl;
       }

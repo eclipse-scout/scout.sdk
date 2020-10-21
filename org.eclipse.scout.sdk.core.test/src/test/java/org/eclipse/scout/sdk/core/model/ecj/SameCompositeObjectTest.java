@@ -27,20 +27,20 @@ public class SameCompositeObjectTest {
   @Test
   @SuppressWarnings({"unlikely-arg-type", "UnnecessaryBoxing", "RedundantArrayCreation", "SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testSameness() {
-    Long a = Long.valueOf(300);
-    Long b = Long.valueOf(300);
+    var a = Long.valueOf(300);
+    var b = Long.valueOf(300);
     assertNotSame(a, b);
     assertEquals(a, b);
 
-    SameCompositeObject o1 = new SameCompositeObject(a, b);
-    SameCompositeObject o2 = new SameCompositeObject(a, a);
-    SameCompositeObject o3 = new SameCompositeObject(a, b);
-    SameCompositeObject o4 = new SameCompositeObject((Object[]) null);
+    var o1 = new SameCompositeObject(a, b);
+    var o2 = new SameCompositeObject(a, a);
+    var o3 = new SameCompositeObject(a, b);
+    var o4 = new SameCompositeObject((Object[]) null);
     Object[] arr = {a, null};
-    SameCompositeObject o5 = new SameCompositeObject(arr);
-    SameCompositeObject o6 = new SameCompositeObject(arr);
-    SameCompositeObject o7 = new SameCompositeObject(new Object[]{a, b, null});
-    SameCompositeObject o8 = new SameCompositeObject((Object[]) null);
+    var o5 = new SameCompositeObject(arr);
+    var o6 = new SameCompositeObject(arr);
+    var o7 = new SameCompositeObject(new Object[]{a, b, null});
+    var o8 = new SameCompositeObject((Object[]) null);
 
     assertFalse(o1.equals(o2));
     assertFalse(o1.equals(null));

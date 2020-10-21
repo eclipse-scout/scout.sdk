@@ -15,12 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -62,7 +58,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
     assertNotNull(build);
     assertNotNull(build.getWorkingDirectory());
 
-    try (URLClassLoader loader = MavenSandboxClassLoaderFactory.build()) {
+    try (var loader = MavenSandboxClassLoaderFactory.build()) {
       SdkLog.debug("Executing embedded {}", build.toString());
       execute(build.getWorkingDirectory(), build.getOptions(), build.getGoals(), build.getProperties(), loader);
     }
@@ -72,10 +68,10 @@ public class MavenCliRunner implements IMavenRunnerSpi {
   }
 
   protected static synchronized void execute(Path workingDirectory, Set<String> options, Collection<String> goals, Map<String, String> props, ClassLoader loader) throws IOException {
-    String oldMultiModuleProjectDir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
-    String oldHttpKeepAlive = System.getProperty(OKHTTP_KEEP_ALIVE);
-    ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader(); // backup context class loader because maven-cli changes it
-    InputStream origSystemIn = System.in; // backup system.in and provide a dummy because maven-cli closes the stream.
+    var oldMultiModuleProjectDir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
+    var oldHttpKeepAlive = System.getProperty(OKHTTP_KEEP_ALIVE);
+    var oldContextClassLoader = Thread.currentThread().getContextClassLoader(); // backup context class loader because maven-cli changes it
+    var origSystemIn = System.in; // backup system.in and provide a dummy because maven-cli closes the stream.
     try {
       System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, workingDirectory.toAbsolutePath().toString());
       System.setProperty(OKHTTP_KEEP_ALIVE, Boolean.toString(false)); // disable OkHttp keepAlive
@@ -83,7 +79,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       Thread.currentThread().setContextClassLoader(loader);
       //noinspection ResultOfMethodCallIgnored
       SdkConsole.getConsoleSpi(); // enforce init of logging SPI
-      String[] mavenArgs = getMavenArgs(new LinkedHashSet<>(options), goals, new LinkedHashMap<>(props));
+      var mavenArgs = getMavenArgs(new LinkedHashSet<>(options), goals, new LinkedHashMap<>(props));
       runMavenInSandbox(mavenArgs, workingDirectory, SdkLog.getLogLevel(), loader);
     }
     finally {
@@ -107,15 +103,15 @@ public class MavenCliRunner implements IMavenRunnerSpi {
   }
 
   protected static String[] getMavenArgs(Collection<String> options, Collection<String> goals, Map<String, String> props) {
-    String mavenExtClassPath = "maven.ext.class.path";
+    var mavenExtClassPath = "maven.ext.class.path";
     if (!props.containsKey(mavenExtClassPath)) {
       props.put(mavenExtClassPath, "");
     }
 
-    String testForkJvmMemoryConfigKey = "master_test_jvmMemory";
+    var testForkJvmMemoryConfigKey = "master_test_jvmMemory";
     if (!props.containsKey(testForkJvmMemoryConfigKey)) {
       // reduce default memory consumption in forked tests
-      String testForkJvmMemoryConfigValue = System.getProperty(testForkJvmMemoryConfigKey);
+      var testForkJvmMemoryConfigValue = System.getProperty(testForkJvmMemoryConfigKey);
       if (Strings.isBlank(testForkJvmMemoryConfigValue)) {
         testForkJvmMemoryConfigValue = "-Xms256m -Xmx768m";
       }
@@ -129,28 +125,28 @@ public class MavenCliRunner implements IMavenRunnerSpi {
 
     List<String> args = new ArrayList<>(goals.size() + options.size() + props.size());
     args.addAll(goals);
-    for (String option : options) {
+    for (var option : options) {
       args.add('-' + option);
     }
-    for (String prop : MavenBuild.getMapAsList(props)) {
+    for (var prop : MavenBuild.getMapAsList(props)) {
       args.add("-D" + prop);
     }
     return args.toArray(new String[0]);
   }
 
   protected static void runMavenInSandbox(String[] mavenArgs, Path workingDirectory, Level level, ClassLoader loader) throws IOException {
-    String charset = StandardCharsets.UTF_8.name();
-    try (ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-        PrintStream out = new PrintStream(bOut, true, charset);
-        ByteArrayOutputStream bErr = new ByteArrayOutputStream();
-        PrintStream err = new PrintStream(bErr, true, charset)) {
+    var charset = StandardCharsets.UTF_8.name();
+    try (var bOut = new ByteArrayOutputStream();
+         var out = new PrintStream(bOut, true, charset);
+         var bErr = new ByteArrayOutputStream();
+         var err = new PrintStream(bErr, true, charset)) {
       loader.loadClass(SdkConsole.class.getName()).getMethod("getConsoleSpi").invoke(null); // enforce init of out streams before they are changed by maven-cli
       loader.loadClass(SdkLog.class.getName()).getMethod("setLogLevel", Level.class).invoke(null, level); // copy log level to new classloader
 
       // start maven call
-      Class<?> mavenCli = loader.loadClass(MavenCli.class.getName());
-      Method doMain = mavenCli.getMethod("doMain", String[].class, String.class, PrintStream.class, PrintStream.class);
-      Object ret = doMain.invoke(mavenCli.getConstructor().newInstance(), mavenArgs, workingDirectory.toAbsolutePath().toString(), out, err);
+      var mavenCli = loader.loadClass(MavenCli.class.getName());
+      var doMain = mavenCli.getMethod("doMain", String[].class, String.class, PrintStream.class, PrintStream.class);
+      var ret = doMain.invoke(mavenCli.getConstructor().newInstance(), mavenArgs, workingDirectory.toAbsolutePath().toString(), out, err);
 
       logStream(Level.INFO, bOut, charset);
       int result = (Integer) ret;
@@ -170,15 +166,15 @@ public class MavenCliRunner implements IMavenRunnerSpi {
   @SuppressWarnings({"deprecation", "squid:S1181"}) // Throwable and Error should not be caught
   protected static void stopOkHttp(ClassLoader loader) {
     try {
-      Class<?> poolClass = loader.loadClass(RealConnectionPool.class.getName());
-      Field field = poolClass.getDeclaredField("executor");
+      var poolClass = loader.loadClass(RealConnectionPool.class.getName());
+      var field = poolClass.getDeclaredField("executor");
       field.setAccessible(true);
       //noinspection TypeMayBeWeakened
-      ThreadPoolExecutor executor = (ThreadPoolExecutor) field.get(null);
+      var executor = (ThreadPoolExecutor) field.get(null);
       executor.shutdownNow();
 
-      for (Thread candidate : Thread.getAllStackTraces().keySet()) {
-        String threadName = candidate.getName();
+      for (var candidate : Thread.getAllStackTraces().keySet()) {
+        var threadName = candidate.getName();
         if ("Okio Watchdog".equals(threadName) || "OkHttp ConnectionPool".equals(threadName)) {
           candidate.setUncaughtExceptionHandler((t, e) -> SdkLog.debug("Okio Thread terminated", e));
           //noinspection CallToThreadStopSuspendOrResumeManager
@@ -192,7 +188,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
   }
 
   protected static void logStream(Level level, ByteArrayOutputStream stream, String charset) throws UnsupportedEncodingException {
-    String outString = stream.toString(charset);
+    var outString = stream.toString(charset);
     if (Strings.hasText(outString)) {
       //noinspection HardcodedLineSeparator
       SdkLog.log(level, "Output of embedded Maven call:\nMVN-BEGIN\n{}\nMVN-END\n", outString);

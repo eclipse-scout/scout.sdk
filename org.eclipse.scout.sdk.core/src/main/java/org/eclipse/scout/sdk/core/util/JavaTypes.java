@@ -11,9 +11,8 @@
 package org.eclipse.scout.sdk.core.util;
 
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
 import static org.eclipse.scout.sdk.core.util.Strings.lastIndexOf;
 
@@ -22,9 +21,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -211,12 +208,11 @@ public final class JavaTypes {
    * @return An unmodifiable {@link Set} holding all reserved java keywords.
    */
   public static Set<String> getJavaKeyWords() {
-    return JAVA_KEYWORDS.computeIfAbsentAndGet(() -> {
-      String[] keyWords = {"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", EXTENDS, "final", "finally", "float", "for",
-          "goto", "if", IMPLEMENTS, "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", SUPER, "switch", "synchronized", "this",
-          "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true", "yield", "var", "_", "record", "sealed", "permits", "non-sealed"};
-      return Arrays.stream(keyWords).collect(collectingAndThen(toSet(), Collections::unmodifiableSet));
-    });
+    return JAVA_KEYWORDS.computeIfAbsentAndGet(() -> Stream
+        .of("abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", EXTENDS, "final", "finally", "float", "for",
+            "goto", "if", IMPLEMENTS, "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", SUPER, "switch", "synchronized", "this",
+            "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true", "yield", "var", "_", "record", "sealed", "permits", "non-sealed")
+        .collect(toUnmodifiableSet()));
   }
 
   /**
@@ -233,7 +229,7 @@ public final class JavaTypes {
     if (fqn == null) {
       return null;
     }
-    String fqnStr = fqn.toString();
+    var fqnStr = fqn.toString();
     switch (fqnStr) {
       case _boolean:
         return Boolean;
@@ -271,7 +267,7 @@ public final class JavaTypes {
     if (fqn == null) {
       return null;
     }
-    String fqnStr = fqn.toString();
+    var fqnStr = fqn.toString();
     switch (fqnStr) {
       case Boolean:
         return _boolean;
@@ -386,8 +382,8 @@ public final class JavaTypes {
    *           if name is null
    */
   public static String qualifier(CharSequence name) {
-    int firstGenericStart = indexOf(C_GENERIC_START, name);
-    int lastDot = lastIndexOf(C_DOT, name, 0, firstGenericStart == -1 ? name.length() - 1 : firstGenericStart);
+    var firstGenericStart = indexOf(C_GENERIC_START, name);
+    var lastDot = lastIndexOf(C_DOT, name, 0, firstGenericStart == -1 ? name.length() - 1 : firstGenericStart);
     if (lastDot == -1) {
       return "";
     }
@@ -414,9 +410,9 @@ public final class JavaTypes {
    *           If the specified fqn is {@code null}.
    */
   public static String simpleName(CharSequence fqn) {
-    int lastSegmentStart = 0;
+    var lastSegmentStart = 0;
     CharSequence erasure = erasure(fqn);
-    for (int i = erasure.length() - 1; i >= 0; i--) {
+    for (var i = erasure.length() - 1; i >= 0; i--) {
       if (erasure.charAt(i) == C_DOT || erasure.charAt(i) == C_DOLLAR) {
         lastSegmentStart = i + 1;
         break;
@@ -441,11 +437,11 @@ public final class JavaTypes {
    * @return The created identifier
    */
   public static String createMethodIdentifier(CharSequence methodName, Collection<? extends CharSequence> paramDataTypes) {
-    StringBuilder methodIdBuilder = new StringBuilder(256);
+    var methodIdBuilder = new StringBuilder(256);
     methodIdBuilder.append(methodName);
     methodIdBuilder.append('(');
     if (paramDataTypes != null && !paramDataTypes.isEmpty()) {
-      Iterator<? extends CharSequence> iterator = paramDataTypes.iterator();
+      var iterator = paramDataTypes.iterator();
       methodIdBuilder.append(iterator.next());
       while (iterator.hasNext()) {
         methodIdBuilder.append(C_COMMA);
@@ -456,8 +452,16 @@ public final class JavaTypes {
     return methodIdBuilder.toString();
   }
 
+  /**
+   * Returns an unique identifier for the given {@link Method}. The identifier looks like
+   * '{@code methodName(dataTypeOfParam1,dataTypeOfParam2)}'.
+   *
+   * @param method
+   *          The method for which the identifier should be computed. Must not be {@code null}.
+   * @return The created identifier
+   */
   public static String createMethodIdentifier(Method method) {
-    List<String> args = Stream.of(method.getParameterTypes())
+    var args = Arrays.stream(method.getParameterTypes())
         .map(Class::getName)
         .collect(toList());
     return createMethodIdentifier(method.getName(), args);
@@ -482,7 +486,7 @@ public final class JavaTypes {
    *           if the given type is syntactically incorrect
    */
   public static String erasure(CharSequence parameterizedType) {
-    int firstParamIndex = indexOf(C_GENERIC_START, parameterizedType);
+    var firstParamIndex = indexOf(C_GENERIC_START, parameterizedType);
     if (firstParamIndex < 0) {
       return parameterizedType.toString();
     }
@@ -490,11 +494,11 @@ public final class JavaTypes {
   }
 
   private static String erasure(CharSequence parameterizedType, int firstParamIndex) {
-    StringBuilder result = new StringBuilder(parameterizedType.length());
+    var result = new StringBuilder(parameterizedType.length());
     result.append(parameterizedType.subSequence(0, firstParamIndex));
-    int depth = 1;
-    for (int i = firstParamIndex + 1; i < parameterizedType.length(); i++) {
-      char c = parameterizedType.charAt(i);
+    var depth = 1;
+    for (var i = firstParamIndex + 1; i < parameterizedType.length(); i++) {
+      var c = parameterizedType.charAt(i);
       if (c == C_GENERIC_START) {
         depth++;
       }
@@ -527,7 +531,7 @@ public final class JavaTypes {
    *           if the type is syntactically incorrect
    */
   public static List<String> typeArguments(CharSequence parameterizedType) {
-    int length = parameterizedType.length();
+    var length = parameterizedType.length();
     if (length < 4) {
       // cannot have type arguments
       return emptyList();
@@ -537,14 +541,14 @@ public final class JavaTypes {
     }
 
     Deque<String> args = new ArrayDeque<>();
-    int depth = 1;
-    int end = length - 1;
-    for (int pos = end - 1; pos >= 0 && depth > 0; pos--) {
-      char curChar = parameterizedType.charAt(pos);
+    var depth = 1;
+    var end = length - 1;
+    for (var pos = end - 1; pos >= 0 && depth > 0; pos--) {
+      var curChar = parameterizedType.charAt(pos);
       if (curChar == C_GENERIC_START) {
         depth--;
         if (depth == 0) {
-          String arg = subElement(parameterizedType, pos + 1, end);
+          var arg = subElement(parameterizedType, pos + 1, end);
           args.addFirst(arg);
           end = pos;
         }
@@ -553,7 +557,7 @@ public final class JavaTypes {
         depth++;
       }
       else if (depth == 1 && curChar == C_COMMA) {
-        String arg = subElement(parameterizedType, pos + 1, end);
+        var arg = subElement(parameterizedType, pos + 1, end);
         args.addFirst(arg);
         end = pos;
       }
@@ -562,13 +566,13 @@ public final class JavaTypes {
   }
 
   static String subElement(CharSequence src, int start, int end) {
-    for (int i = start; i < end; i++) {
+    for (var i = start; i < end; i++) {
       start = i;
       if (src.charAt(i) != C_SPACE) {
         break;
       }
     }
-    for (int i = end; i >= start; i--) {
+    for (var i = end; i >= start; i--) {
       end = i;
       if (src.charAt(i - 1) != C_SPACE) {
         break;
@@ -587,19 +591,19 @@ public final class JavaTypes {
     }
 
     public String useReference(CharSequence fullyQualifiedName) {
-      StringBuilder result = new StringBuilder(fullyQualifiedName.length());
+      var result = new StringBuilder(fullyQualifiedName.length());
       useReferenceInternal(fullyQualifiedName, result);
       return result.toString();
     }
 
     protected void useReferenceInternal(CharSequence ref, StringBuilder result) {
-      boolean isFirst = true;
-      boolean inWildcard = false;
-      int depth = 0;
-      int lastTypeArgStart = -1;
+      var isFirst = true;
+      var inWildcard = false;
+      var depth = 0;
+      var lastTypeArgStart = -1;
 
-      for (int i = 0; i < ref.length(); i++) {
-        char c = ref.charAt(i);
+      for (var i = 0; i < ref.length(); i++) {
+        var c = ref.charAt(i);
         switch (c) {
           case C_GENERIC_START:
             if (isFirst) {
@@ -654,15 +658,15 @@ public final class JavaTypes {
         return end + 1;
       }
 
-      int fqnStart = consumeWildcard(start, src, result);
+      var fqnStart = consumeWildcard(start, src, result);
       if (fqnStart == end) {
         return end + 1;
       }
 
-      int arrayStart = indexOf(C_ARRAY, src, fqnStart, end);
-      boolean isArray = arrayStart > fqnStart;
+      var arrayStart = indexOf(C_ARRAY, src, fqnStart, end);
+      var isArray = arrayStart > fqnStart;
 
-      CharSequence fqn = src.subSequence(fqnStart, isArray ? arrayStart : end);
+      var fqn = src.subSequence(fqnStart, isArray ? arrayStart : end);
       result.append(handler().apply(fqn, depth > 0));
 
       if (isArray) {
@@ -676,7 +680,7 @@ public final class JavaTypes {
         return start;
       }
 
-      for (char[] wildcardMarker : WILDCARD_MARKERS) {
+      for (var wildcardMarker : WILDCARD_MARKERS) {
         if (fragmentEquals(wildcardMarker, src, start + 1)) {
           result.append(C_QUESTION_MARK);
           if (wildcardMarker[0] != C_SPACE) {
@@ -693,11 +697,11 @@ public final class JavaTypes {
 
     @SuppressWarnings("squid:S881")
     protected static boolean fragmentEquals(char[] fragment, CharSequence name, int startIndex) {
-      int max = fragment.length;
+      var max = fragment.length;
       if (name.length() < max + startIndex) {
         return false;
       }
-      for (int i = max; --i >= 0;) {
+      for (var i = max; --i >= 0;) {
         if (fragment[i] != name.charAt(i + startIndex)) {
           return false;
         }

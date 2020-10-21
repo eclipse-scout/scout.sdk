@@ -11,11 +11,10 @@
 package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper;
@@ -34,10 +33,10 @@ public class WebModuleTranslationStoresTest {
 
   @Test
   public void testLoadKeysForJsModule(TestingEnvironment env) {
-    Set<String> keysVisibleForJs = WebModuleTranslationStores
+    var keysVisibleForJs = WebModuleTranslationStores
         .allForModule(ScoutFixtureHelper.NLS_TEST_DIR, env, new NullProgress())
         .flatMap(ITranslationStore::keys)
-        .collect(Collectors.toSet());
+        .collect(toSet());
     assertEquals(new HashSet<>(asList(
         TranslationStoreSupplierExtension.TRANSLATION_KEY_1,
         TranslationStoreSupplierExtension.TRANSLATION_KEY_2,

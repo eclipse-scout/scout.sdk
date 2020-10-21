@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.s2i.template
 
 import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
+import org.eclipse.scout.sdk.core.apidef.Api
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.core.s.uniqueid.UniqueIds
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.core.util.apidef.Api
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.util.VelocityRunner
 import java.util.Collections.emptyList

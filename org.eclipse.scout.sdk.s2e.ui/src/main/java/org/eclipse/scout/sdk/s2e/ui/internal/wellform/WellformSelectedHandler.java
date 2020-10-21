@@ -27,7 +27,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.s2e.operation.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
@@ -43,25 +42,24 @@ public class WellformSelectedHandler extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) {
-    ISelection selection = HandlerUtil.getCurrentSelection(event);
-    Set<IResource> resourcesFromSelection = S2eUiUtils.getResourcesOfSelection(selection);
+    var selection = HandlerUtil.getCurrentSelection(event);
+    var resourcesFromSelection = S2eUiUtils.getResourcesOfSelection(selection);
     if (resourcesFromSelection.isEmpty()) {
       logNoSelection();
       return null;
     }
 
-    Set<IType> types = toTypes(resourcesFromSelection);
+    var types = toTypes(resourcesFromSelection);
     if (types.isEmpty()) {
       logNoSelection();
       return null;
     }
 
-    Set<IResource> resources = new HashSet<>(types.size());
-    for (IType t : types) {
-      resources.add(t.getResource());
-    }
-
-    ISchedulingRule rule = new MultiRule(resources.toArray(new ISchedulingRule[0]));
+    var rules = types.stream()
+        .map(IJavaElement::getResource)
+        .distinct()
+        .toArray(ISchedulingRule[]::new);
+    ISchedulingRule rule = new MultiRule(rules);
     runInEclipseEnvironment(new WellformScoutTypeOperation(types, true), rule);
     return null;
   }
@@ -72,15 +70,15 @@ public class WellformSelectedHandler extends AbstractHandler {
 
   private static Set<IType> toTypes(Collection<IResource> resources) {
     Set<IType> result = new HashSet<>(resources.size());
-    for (IResource r : resources) {
+    for (var r : resources) {
       if (r != null && r.isAccessible()) {
-        IJavaElement element = JavaCore.create(r);
+        var element = JavaCore.create(r);
         if (JdtUtils.exists(element)) {
           if (element.getElementType() == IJavaElement.TYPE) {
             result.add((IType) element);
           }
           else if (element.getElementType() == IJavaElement.COMPILATION_UNIT) {
-            ICompilationUnit icu = (ICompilationUnit) element;
+            var icu = (ICompilationUnit) element;
             try {
               addAll(result, icu.getTypes());
             }

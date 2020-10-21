@@ -52,7 +52,7 @@ public class ImportsCreateOperation implements BiConsumer<EclipseEnvironment, Ec
   public void accept(EclipseEnvironment env, EclipseProgress progress) {
     Ensure.isTrue(JdtUtils.exists(getCompilationUnit()));
     try {
-      for (String s : m_importsToCreate) {
+      for (var s : m_importsToCreate) {
         getCompilationUnit().createImport(s, null, progress.monitor());
       }
     }

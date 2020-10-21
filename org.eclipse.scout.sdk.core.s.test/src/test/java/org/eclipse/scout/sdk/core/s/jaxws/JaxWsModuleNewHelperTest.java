@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
@@ -44,12 +43,12 @@ public class JaxWsModuleNewHelperTest {
   }
 
   protected static void assertParentPomPath(String xml, String expectedPath) throws IOException {
-    Path dir = Files.createTempDirectory("parentPomTest");
+    var dir = Files.createTempDirectory("parentPomTest");
     try {
-      Path pom = dir.resolve(MODULE_FOLDER + '/' + IMavenConstants.POM);
+      var pom = dir.resolve(MODULE_FOLDER + '/' + IMavenConstants.POM);
       Files.createDirectories(pom.getParent());
       Files.write(pom, xml.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-      Path result = JaxWsModuleNewHelper.getParentPomOf(pom);
+      var result = JaxWsModuleNewHelper.getParentPomOf(pom);
       if (result == null) {
         if (expectedPath == null) {
           return; // ok
@@ -57,7 +56,7 @@ public class JaxWsModuleNewHelperTest {
         throw new SdkException("Parent Pom is null but expected '{}'.", expectedPath);
       }
 
-      Path relPath = dir.relativize(result);
+      var relPath = dir.relativize(result);
       assertEquals(expectedPath, relPath.toString().replace(File.separatorChar, '/'));
     }
     finally {

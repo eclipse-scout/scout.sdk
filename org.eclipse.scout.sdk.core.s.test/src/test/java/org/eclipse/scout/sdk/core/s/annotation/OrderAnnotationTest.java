@@ -15,7 +15,6 @@ import static org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.getOrderVa
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -38,17 +37,17 @@ public class OrderAnnotationTest {
 
   @Test
   public void testNewViewOrderValue(IJavaEnvironment env) {
-    IType type = env.requireType("formdata.client.ui.forms.IgnoredFieldsForm$MainBox$AGroupBox");
-    IType first = type.innerTypes().first().get();
-    IType second = type.innerTypes().item(1).get();
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+    var type = env.requireType("formdata.client.ui.forms.IgnoredFieldsForm$MainBox$AGroupBox");
+    var first = type.innerTypes().first().get();
+    var second = type.innerTypes().item(1).get();
+    var scoutApi = env.requireApi(IScoutApi.class);
     assertEquals(-1000.0, getNewViewOrderValue(type, scoutApi.IFormField(), first.source().get().start() - 1), DELTA);
     assertEquals(15.0, getNewViewOrderValue(type, scoutApi.IFormField(), first.source().get().end() + 1), DELTA);
     assertEquals(2000.0, getNewViewOrderValue(type, scoutApi.IFormField(), second.source().get().end() + 1), DELTA);
 
-    IType formWithHighOrders = env.requireType(FormWithHighOrders.class.getName());
-    IType mainBox = formWithHighOrders.innerTypes().first().get();
-    IType aGroupBox = mainBox.innerTypes().first().get();
+    var formWithHighOrders = env.requireType(FormWithHighOrders.class.getName());
+    var mainBox = formWithHighOrders.innerTypes().first().get();
+    var aGroupBox = mainBox.innerTypes().first().get();
     assertEquals(99382716061728384.0d, getNewViewOrderValue(mainBox, scoutApi.IFormField(), aGroupBox.source().get().end() + 1), DELTA);
     assertEquals(1000, getNewViewOrderValue(aGroupBox, scoutApi.IFormField(), aGroupBox.source().get().start() + 1), DELTA);
   }

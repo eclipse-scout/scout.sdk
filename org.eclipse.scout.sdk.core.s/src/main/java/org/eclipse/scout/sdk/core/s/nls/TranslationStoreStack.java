@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.function.Predicate.isEqual;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStackEvent.createAddLanguageEvent;
@@ -33,7 +34,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,7 +73,7 @@ public class TranslationStoreStack {
     m_eventBuffer = new ArrayList<>();
     m_listeners = new EventListenerList();
 
-    P_TranslationStoreComparator comparator = new P_TranslationStoreComparator();
+    var comparator = new P_TranslationStoreComparator();
     m_stores = stores
         .sorted(comparator)
         .collect(toCollection(ArrayDeque::new));
@@ -201,7 +201,7 @@ public class TranslationStoreStack {
    *           if one of the mentioned condition is not fulfilled.
    */
   public synchronized ITranslationEntry addNewTranslation(ITranslation newTranslation, ITranslationStore target) {
-    IEditableTranslationStore editableStore = toEditableStore(
+    var editableStore = toEditableStore(
         Optional.ofNullable(target)
             .orElseGet(() -> primaryEditableStore()
                 .orElseThrow(() -> newFail("Cannot create new entries. All translation stores are read-only."))));
@@ -215,8 +215,8 @@ public class TranslationStoreStack {
   }
 
   protected ITranslationEntry addNewTranslationInternal(ITranslation newTranslation, IEditableTranslationStore target) {
-    Optional<? extends ITranslationEntry> existingEntryWithSameKey = translation(newTranslation.key());
-    ITranslationEntry createdTranslation = editStoreObservingLanguages(target, s -> s.addNewTranslation(newTranslation));
+    var existingEntryWithSameKey = translation(newTranslation.key());
+    var createdTranslation = editStoreObservingLanguages(target, s -> s.addNewTranslation(newTranslation));
 
     setChanging(true);
     try {
@@ -261,7 +261,7 @@ public class TranslationStoreStack {
    * @see #updateTranslation(ITranslation)
    */
   public synchronized ITranslationEntry mergeTranslation(ITranslation newTranslation, ITranslationStore targetInCaseNew) {
-    ITranslation merged = translation(Ensure.notNull(newTranslation).key())
+    var merged = translation(Ensure.notNull(newTranslation).key())
         .map(t -> t.merged(newTranslation))
         .orElse(newTranslation);
     return updateTranslation(merged)
@@ -289,7 +289,7 @@ public class TranslationStoreStack {
    *         imported entries, ignored columns or rows.
    */
   public synchronized ITranslationImportInfo importTranslations(List<List<String>> rawTableData, String keyColumnName, ITranslationStore targetInCaseNew) {
-    TranslationImporter importer = new TranslationImporter(this, rawTableData, keyColumnName, targetInCaseNew);
+    var importer = new TranslationImporter(this, rawTableData, keyColumnName, targetInCaseNew);
     importer.tryImport();
     return importer;
   }
@@ -311,17 +311,17 @@ public class TranslationStoreStack {
       return;
     }
 
-    Optional<IEditableTranslationStore> targetStore = firstEditableStoreWithKey(oldKey);
+    var targetStore = firstEditableStoreWithKey(oldKey);
     if (targetStore.isEmpty()) {
       return;
     }
-    IEditableTranslationStore store = targetStore.get();
+    var store = targetStore.get();
     Ensure.isFalse(isForbidden(validateKey(this, store, newKey)), "Cannot change key '{}' to '{}' because the new key is not valid.", oldKey, newKey);
 
     setChanging(true);
     try {
-      Optional<? extends ITranslationEntry> existingEntryWithNewKey = translation(newKey);
-      ITranslationEntry changedEntry = store.changeKey(oldKey, newKey);
+      var existingEntryWithNewKey = translation(newKey);
+      var changedEntry = store.changeKey(oldKey, newKey);
 
       if (existingEntryWithNewKey.isPresent()) {
         // the new key already existed in another service before the update. so the changed entry was a normal and is now an overriding or overridden entry.
@@ -373,8 +373,8 @@ public class TranslationStoreStack {
   }
 
   protected ITranslationEntry removeTranslationInternal(IEditableTranslationStore store, String key) {
-    ITranslationEntry removedEntry = store.removeTranslation(key);
-    Optional<? extends ITranslationEntry> translationAfterRemoval = translation(key);
+    var removedEntry = store.removeTranslation(key);
+    var translationAfterRemoval = translation(key);
     // an overriding entry has been removed. The previously overridden entry becomes visible now
     translationAfterRemoval.ifPresent(previouslyOverridden -> fireStackChanged(createAddTranslationEvent(this, previouslyOverridden)));
     return removedEntry;
@@ -402,13 +402,13 @@ public class TranslationStoreStack {
   }
 
   protected ITranslationEntry updateTranslationInternal(ITranslation newEntry, IEditableTranslationStore storeToUpdate) {
-    ITranslationEntry updateTranslation = editStoreObservingLanguages(storeToUpdate, s -> s.updateTranslation(newEntry));
+    var updateTranslation = editStoreObservingLanguages(storeToUpdate, s -> s.updateTranslation(newEntry));
     fireStackChanged(createUpdateTranslationEvent(this, updateTranslation));
     return updateTranslation;
   }
 
   protected <T> T editStoreObservingLanguages(IEditableTranslationStore storeToObserve, Function<IEditableTranslationStore, T> task) {
-    Set<Language> oldLanguages = storeToObserve.languages().collect(toSet());
+    var oldLanguages = storeToObserve.languages().collect(toSet());
     try {
       return task.apply(storeToObserve);
     }
@@ -435,7 +435,7 @@ public class TranslationStoreStack {
    *           if one of the conditions is not fulfilled.
    */
   public synchronized void addNewLanguage(Language lang, ITranslationStore target) {
-    IEditableTranslationStore editableStore = toEditableStore(target);
+    var editableStore = toEditableStore(target);
 
     Ensure.notNull(lang, "Language cannot be null.");
     Ensure.isTrue(editableStore.languages().noneMatch(isEqual(lang)), "Store '{}' already contains language '{}'.", target.service().type().name(), lang);
@@ -455,9 +455,9 @@ public class TranslationStoreStack {
    */
   public synchronized Stream<ITranslationEntry> allEntries() {
     Map<String, ITranslationEntry> allEntries = new TreeMap<>();
-    Iterator<ITranslationStore> storesHighestOrderFirst = m_stores.descendingIterator();
+    var storesHighestOrderFirst = m_stores.descendingIterator();
     while (storesHighestOrderFirst.hasNext()) {
-      ITranslationStore store = storesHighestOrderFirst.next();
+      var store = storesHighestOrderFirst.next();
       store.entries().forEach(entry -> allEntries.put(entry.key(), entry));
     }
     return allEntries.values().stream();
@@ -538,16 +538,16 @@ public class TranslationStoreStack {
       return "";
     }
 
-    StringBuilder ret = new StringBuilder(baseText.length());
+    var ret = new StringBuilder(baseText.length());
 
     // remove not allowed characters
     baseText = Pattern.compile("[^a-zA-Z0-9_.\\- ]*").matcher(baseText).replaceAll("").trim();
 
     // camel case multiple words
-    String[] split = baseText.split(" ");
-    for (String splitValue : split) {
+    var split = baseText.split(" ");
+    for (var splitValue : split) {
       if (!splitValue.isEmpty()) {
-        char first = splitValue.charAt(0);
+        var first = splitValue.charAt(0);
         if (split.length > 1) {
           first = Character.toUpperCase(first);
         }
@@ -569,7 +569,7 @@ public class TranslationStoreStack {
     }
 
     // ensure max length
-    int maxLength = 190;
+    var maxLength = 190;
     String newKey;
     if (ret.length() > maxLength) {
       newKey = ret.substring(0, maxLength);
@@ -579,9 +579,9 @@ public class TranslationStoreStack {
     }
 
     // add unique ending number if requested
-    String result = newKey;
+    var result = newKey;
     if (appendFreeNumSuffix) {
-      int i = 0;
+      var i = 0;
       while (containsKey(result)) {
         result = newKey + i;
         i++;
@@ -658,9 +658,9 @@ public class TranslationStoreStack {
         return;
       }
 
-      Collection<ITranslationStoreStackListener> listeners = m_listeners.get(ITranslationStoreStackListener.class);
+      var listeners = m_listeners.get(ITranslationStoreStackListener.class);
       Collection<TranslationStoreStackEvent> events = new ArrayList<>(m_eventBuffer); // copy buffer so that async operating listeners do not work on the cleared version (see finally).
-      for (ITranslationStoreStackListener l : listeners) {
+      for (var l : listeners) {
         l.stackChanged(events.stream());
       }
     }
@@ -675,8 +675,8 @@ public class TranslationStoreStack {
       return;
     }
 
-    Collection<ITranslationStoreStackListener> listeners = m_listeners.get(ITranslationStoreStackListener.class);
-    for (ITranslationStoreStackListener l : listeners) {
+    var listeners = m_listeners.get(ITranslationStoreStackListener.class);
+    for (var l : listeners) {
       l.stackChanged(Stream.of(event));
     }
   }
@@ -696,13 +696,13 @@ public class TranslationStoreStack {
         return 0;
       }
 
-      int compare = Double.compare(o1.service().order(), o2.service().order());
+      var compare = Double.compare(o1.service().order(), o2.service().order());
       if (compare != 0) {
         return compare;
       }
 
-      String o1Fqn = o1.service().type().name();
-      String o2Fqn = o2.service().type().name();
+      var o1Fqn = o1.service().type().name();
+      var o2Fqn = o2.service().type().name();
       rememberDuplicateOrder(o1Fqn, o2Fqn);
 
       compare = Boolean.compare(o2.isEditable(), o1.isEditable());
@@ -727,12 +727,8 @@ public class TranslationStoreStack {
   @Override
   @SuppressWarnings("HardcodedLineSeparator")
   public String toString() {
-    StringBuilder builder = new StringBuilder(TranslationStoreStack.class.getSimpleName());
-    builder.append(" [\n");
-    for (ITranslationStore s : m_stores) {
-      builder.append(s).append('\n');
-    }
-    builder.append(']');
-    return builder.toString();
+    return m_stores.stream()
+        .map(s -> String.valueOf(s) + '\n')
+        .collect(joining("", TranslationStoreStack.class.getSimpleName() + " [\n", "]"));
   }
 }

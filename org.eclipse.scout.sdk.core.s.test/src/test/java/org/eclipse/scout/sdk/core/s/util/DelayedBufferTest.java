@@ -41,10 +41,10 @@ public class DelayedBufferTest {
 
   @Test
   public void testElementsAreBuffered() throws InterruptedException, ExecutionException, TimeoutException {
-    ProtocolConsumer protocolConsumer = new ProtocolConsumer();
-    DelayedBuffer<String> worker = new DelayedBuffer<>(DELAY, TimeUnit.MILLISECONDS, m_executor, true, protocolConsumer);
-    int numElementsToSubmit = 100;
-    for (int i = 0; i < numElementsToSubmit; i++) {
+    var protocolConsumer = new ProtocolConsumer();
+    var worker = new DelayedBuffer<>(DELAY, TimeUnit.MILLISECONDS, m_executor, true, protocolConsumer);
+    var numElementsToSubmit = 100;
+    for (var i = 0; i < numElementsToSubmit; i++) {
       worker.submit(Integer.toString(i));
     }
     worker.awaitAllProcessed(DELAY * 5, TimeUnit.MILLISECONDS);
@@ -54,8 +54,8 @@ public class DelayedBufferTest {
 
   @Test
   public void testMultipleSubmitsAfterDelay() throws InterruptedException, ExecutionException, TimeoutException {
-    ProtocolConsumer protocolConsumer = new ProtocolConsumer();
-    DelayedBuffer<String> worker = new DelayedBuffer<>(DELAY, TimeUnit.MILLISECONDS, m_executor, true, protocolConsumer);
+    var protocolConsumer = new ProtocolConsumer();
+    var worker = new DelayedBuffer<>(DELAY, TimeUnit.MILLISECONDS, m_executor, true, protocolConsumer);
     worker.submit("1");
     worker.awaitAllProcessed(DELAY * 2, TimeUnit.MILLISECONDS);
     worker.submit("2");
@@ -66,13 +66,13 @@ public class DelayedBufferTest {
 
   @Test
   public void testSubmittedWhileWorkerIsBeingExecuted() throws InterruptedException, TimeoutException, ExecutionException {
-    ProtocolConsumer protocolConsumer = new ProtocolConsumer();
-    CountDownLatch workerStarted = new CountDownLatch(1);
-    CountDownLatch secondElementSubmitted = new CountDownLatch(1);
-    DelayedBuffer<String> worker = new DelayedBuffer<>(DELAY, TimeUnit.MILLISECONDS, m_executor,  false, protocolConsumer) {
+    var protocolConsumer = new ProtocolConsumer();
+    var workerStarted = new CountDownLatch(1);
+    var secondElementSubmitted = new CountDownLatch(1);
+    var worker = new DelayedBuffer<>(DELAY, TimeUnit.MILLISECONDS, m_executor,  false, protocolConsumer) {
       @Override
       List<String> getMyWork() {
-        List<String> myWork = super.getMyWork();
+        var myWork = super.getMyWork();
         workerStarted.countDown();
         try {
           secondElementSubmitted.await(DELAY * 2, TimeUnit.MILLISECONDS);
@@ -94,10 +94,10 @@ public class DelayedBufferTest {
 
   @Test
   public void testSubmittedBeforeWorkerHasTakenItsItems() throws InterruptedException, TimeoutException, ExecutionException {
-    ProtocolConsumer protocolConsumer = new ProtocolConsumer();
-    CountDownLatch workerStarted = new CountDownLatch(1);
-    CountDownLatch secondElementSubmitted = new CountDownLatch(1);
-    DelayedBuffer<String> worker = new DelayedBuffer<>(DELAY, TimeUnit.MILLISECONDS, m_executor,  false, protocolConsumer) {
+    var protocolConsumer = new ProtocolConsumer();
+    var workerStarted = new CountDownLatch(1);
+    var secondElementSubmitted = new CountDownLatch(1);
+    var worker = new DelayedBuffer<>(DELAY, TimeUnit.MILLISECONDS, m_executor,  false, protocolConsumer) {
       @Override
       List<String> getMyWork() {
         workerStarted.countDown();

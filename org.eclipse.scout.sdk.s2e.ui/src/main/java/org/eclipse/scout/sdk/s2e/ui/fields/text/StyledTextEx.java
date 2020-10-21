@@ -50,15 +50,15 @@ public class StyledTextEx extends StyledText {
 
   @Override
   public void paste() {
-    TextTransfer plainTextTransfer = TextTransfer.getInstance();
-    String clipboardContent = (String) m_clipboard.getContents(plainTextTransfer, DND.CLIPBOARD);
+    var plainTextTransfer = TextTransfer.getInstance();
+    var clipboardContent = (String) m_clipboard.getContents(plainTextTransfer, DND.CLIPBOARD);
     if (Strings.hasText(clipboardContent)) {
-      Event e = new Event();
+      var e = new Event();
       e.doit = true;
       e.text = clipboardContent;
       e.widget = this;
       e.display = getDisplay();
-      for (Listener l : getListeners(PASTE)) {
+      for (var l : getListeners(PASTE)) {
         l.handleEvent(e);
         if (!e.doit) {
           break;

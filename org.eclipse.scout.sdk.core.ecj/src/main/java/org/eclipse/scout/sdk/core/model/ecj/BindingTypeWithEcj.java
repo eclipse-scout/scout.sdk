@@ -11,17 +11,16 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
-import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.Javadoc;
-import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
 import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
-import org.eclipse.jdt.internal.compiler.lookup.CompilationUnitScope;
 import org.eclipse.jdt.internal.compiler.lookup.ExtraCompilerModifiers;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
@@ -106,7 +105,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   }
 
   static PackageSpi packageOf(TypeBinding binding, JavaEnvironmentWithEcj env) {
-    char[] qualifiedPackageName = binding.qualifiedPackageName();
+    var qualifiedPackageName = binding.qualifiedPackageName();
     if (qualifiedPackageName == null || qualifiedPackageName.length < 1) {
       return env.createDefaultPackage();
     }
@@ -127,7 +126,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
    * if source is attached, this returns the SourceTypeBinding containing the {@link ClassScope}
    */
   public ClassScope getInternalClassScope() {
-    SourceTypeBinding stb = getSourceTypeBinding();
+    var stb = getSourceTypeBinding();
     return stb != null ? stb.scope : null;
   }
 
@@ -149,9 +148,9 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public CompilationUnitSpi getCompilationUnit() {
     return m_unit.computeIfAbsentAndGet(() -> {
-      ClassScope scope = getInternalClassScope();
+      var scope = getInternalClassScope();
       if (scope != null) {
-        CompilationUnitScope cuScope = scope.compilationUnitScope();
+        var cuScope = scope.compilationUnitScope();
         if (cuScope != null) {
           return javaEnvWithEcj().createDeclarationCompilationUnit(cuScope.referenceContext);
         }
@@ -207,7 +206,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
       fields = Arrays.copyOf(fields, fields.length);
       Arrays.sort(fields, FieldBindingComparator.INSTANCE);
       List<FieldSpi> result = new ArrayList<>(fields.length);
-      for (FieldBinding fd : fields) {
+      for (var fd : fields) {
         if (fd.isSynthetic()) {
           continue;
         }
@@ -233,7 +232,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
       methods = Arrays.copyOf(methods, methods.length);
       Arrays.sort(methods, MethodBindingComparator.INSTANCE);
       List<MethodSpi> result = new ArrayList<>(methods.length);
-      for (MethodBinding a : methods) {
+      for (var a : methods) {
         if ((a.modifiers & ExtraCompilerModifiers.AccIsDefaultConstructor) != 0) {
           continue;
         }
@@ -267,8 +266,8 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
       memberTypes = Arrays.copyOf(memberTypes, memberTypes.length);
       Arrays.sort(memberTypes, TypeBindingComparator.INSTANCE);
       List<TypeSpi> result = new ArrayList<>(memberTypes.length);
-      for (ReferenceBinding d : memberTypes) {
-        TypeSpi t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), d, this);
+      for (var d : memberTypes) {
+        var t = bindingToType(javaEnvWithEcj(), d, this);
         result.add(t);
       }
       return result;
@@ -279,7 +278,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public BindingTypeWithEcj getDeclaringType() {
     return m_declaringType.computeIfAbsentAndGet(() -> {
-      ReferenceBinding enclosingType = m_binding.enclosingType();
+      var enclosingType = m_binding.enclosingType();
       if (enclosingType == null) {
         return null;
       }
@@ -298,7 +297,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
       if (superclass == null) {
         return null;
       }
-      return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), superclass);
+      return bindingToType(javaEnvWithEcj(), superclass);
     });
   }
 
@@ -324,17 +323,14 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
     return m_typeArguments.computeIfAbsentAndGet(() -> {
       getSourceTypeBinding();
       if (m_binding instanceof ParameterizedTypeBinding) {
-        ParameterizedTypeBinding ptb = (ParameterizedTypeBinding) m_binding;
-        TypeBinding[] arguments = ptb.arguments;
+        var ptb = (ParameterizedTypeBinding) m_binding;
+        var arguments = ptb.arguments;
         if (arguments != null && arguments.length > 0) {
-          List<TypeSpi> result = new ArrayList<>(arguments.length);
-          for (TypeBinding b : arguments) {
-            TypeSpi type = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), b);
-            if (type != null) {
-              result.add(type);
-            }
-          }
-          return result;
+          var env = javaEnvWithEcj();
+          return Arrays.stream(arguments)
+              .map(b -> bindingToType(env, b))
+              .filter(Objects::nonNull)
+              .collect(toList());
         }
       }
       return emptyList();
@@ -343,7 +339,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
 
   protected TypeVariableBinding[] getTypeVariables() {
     //ask this or the actualType since we do not distinguish between the virtual parameterized type with arguments and the effective parameterized type with parameters
-    ReferenceBinding refType = m_binding;
+    var refType = m_binding;
     if (m_binding.actualType() != null) {
       refType = m_binding.actualType();
     }
@@ -353,7 +349,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public boolean hasTypeParameters() {
     getSourceTypeBinding();
-    TypeVariableBinding[] typeVariables = getTypeVariables();
+    var typeVariables = getTypeVariables();
     return typeVariables != null && typeVariables.length > 0;
   }
 
@@ -386,7 +382,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
    */
   protected SourceTypeBinding getSourceTypeBinding() {
     return m_sourceTypeBindingRef.computeIfAbsentAndGet(() -> {
-      TypeBinding b = SpiWithEcjUtils.nvl(m_binding.original(), m_binding);
+      var b = SpiWithEcjUtils.nvl(m_binding.original(), m_binding);
       if (b instanceof SourceTypeBinding) {
         return (SourceTypeBinding) b;
       }
@@ -402,9 +398,9 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      TypeBinding reference = SpiWithEcjUtils.nvl(m_binding.original(), m_binding);
+      var reference = SpiWithEcjUtils.nvl(m_binding.original(), m_binding);
       if (reference instanceof SourceTypeBinding) {
-        TypeDeclaration decl = ((SourceTypeBinding) reference).scope.referenceContext;
+        var decl = ((SourceTypeBinding) reference).scope.referenceContext;
         return javaEnvWithEcj().getSource(getCompilationUnit(), decl.declarationSourceStart, decl.declarationSourceEnd);
       }
       return null;
@@ -415,10 +411,10 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   public ISourceRange getSourceOfStaticInitializer() {
     return m_staticInitSource.computeIfAbsentAndGet(() -> {
       if (m_binding instanceof SourceTypeBinding) {
-        TypeDeclaration decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
-        for (FieldDeclaration fieldDecl : decl.fields) {
+        var decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
+        for (var fieldDecl : decl.fields) {
           if (fieldDecl.type == null && fieldDecl.name == null) {
-            CompilationUnitSpi cu = getCompilationUnit();
+            var cu = getCompilationUnit();
             return javaEnvWithEcj().getSource(cu, fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd);
           }
         }
@@ -431,10 +427,10 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   public ISourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
       if (m_binding instanceof SourceTypeBinding) {
-        TypeDeclaration decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
-        Javadoc doc = decl.javadoc;
+        var decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
+        var doc = decl.javadoc;
         if (doc != null) {
-          CompilationUnitSpi cu = getCompilationUnit();
+          var cu = getCompilationUnit();
           return javaEnvWithEcj().getSource(cu, doc.sourceStart, doc.sourceEnd);
         }
       }

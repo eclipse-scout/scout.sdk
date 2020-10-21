@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.structured;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isDeprecated;
@@ -23,7 +24,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,9 +32,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
@@ -48,7 +48,6 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTypeComparators;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 public class StructuredType implements IStructuredType {
 
@@ -60,7 +59,7 @@ public class StructuredType implements IStructuredType {
     if (Strings.isBlank(type.elementName())) {
       return false; // anonymous type
     }
-    int flags = type.flags();
+    var flags = type.flags();
     return !isAbstract(flags) && !isInterface(flags) && !isDeprecated(flags);
   };
 
@@ -78,10 +77,10 @@ public class StructuredType implements IStructuredType {
     m_elements = new EnumMap<>(Categories.class);
 
     // initially put all into unknown categories
-    List<IField> fields = type.fields().stream().collect(toList());
-    List<IType> enums = type.innerTypes().withFlags(Flags.AccEnum).stream().collect(toList());
-    List<IMethod> methods = type.methods().stream().collect(toList());
-    List<IType> types = type.innerTypes().stream().filter(element -> !isEnum(element.flags())).collect(toList());
+    var fields = type.fields().stream().collect(toList());
+    var enums = type.innerTypes().withFlags(Flags.AccEnum).stream().collect(toList());
+    var methods = type.methods().stream().collect(toList());
+    var types = type.innerTypes().stream().filter(element -> !isEnum(element.flags())).collect(toList());
 
     m_elements.put(Categories.FIELD_UNKNOWN, fields);
     m_elements.put(Categories.ENUM, enums);
@@ -94,7 +93,7 @@ public class StructuredType implements IStructuredType {
   }
 
   public static IStructuredType of(IType type) {
-    EnumSet<Categories> enabled = EnumSet.of(Categories.FIELD_LOGGER, Categories.FIELD_STATIC, Categories.FIELD_MEMBER, Categories.FIELD_UNKNOWN, Categories.METHOD_CONSTRUCTOR, Categories.METHOD_CONFIG_PROPERTY,
+    var enabled = EnumSet.of(Categories.FIELD_LOGGER, Categories.FIELD_STATIC, Categories.FIELD_MEMBER, Categories.FIELD_UNKNOWN, Categories.METHOD_CONSTRUCTOR, Categories.METHOD_CONFIG_PROPERTY,
         Categories.METHOD_CONFIG_EXEC, Categories.METHOD_FORM_DATA_BEAN, Categories.METHOD_OVERRIDDEN, Categories.METHOD_START_HANDLER, Categories.METHOD_INNER_TYPE_GETTER, Categories.METHOD_LOCAL_BEAN, Categories.METHOD_UNCATEGORIZED,
         Categories.TYPE_FORM_FIELD, Categories.TYPE_COLUMN, Categories.TYPE_CODE, Categories.TYPE_FORM, Categories.TYPE_TABLE, Categories.TYPE_TREE, Categories.TYPE_CALENDAR,
         Categories.TYPE_CALENDAR_ITEM_PROVIDER, Categories.TYPE_WIZARD, Categories.TYPE_WIZARD_STEP, Categories.TYPE_MENU, Categories.TYPE_VIEW_BUTTON, Categories.TYPE_KEYSTROKE,
@@ -104,9 +103,9 @@ public class StructuredType implements IStructuredType {
 
   private static CompositeObject createPropertyMethodKey(IMethod method) {
     if (method != null) {
-      Matcher matcher = PROPERTY_BEAN_REGEX.matcher(method.elementName());
+      var matcher = PROPERTY_BEAN_REGEX.matcher(method.elementName());
       if (matcher.find()) {
-        int getSetOrder = 20;
+        var getSetOrder = 20;
         if (PropertyBean.GETTER_PREFIX.equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 1;
         }
@@ -128,7 +127,7 @@ public class StructuredType implements IStructuredType {
         else if ("delete".equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 7;
         }
-        String propName = matcher.group(2);
+        var propName = matcher.group(2);
         return new CompositeObject(propName, getSetOrder, method.elementName(), method.parameters().stream().count(), method);
       }
     }
@@ -136,7 +135,7 @@ public class StructuredType implements IStructuredType {
   }
 
   private static IMethod getOverwrittenMethod(IMethod method) {
-    String refSig = method.identifier();
+    var refSig = method.identifier();
     return method.requireDeclaringType().methods()
         .withSuperClasses(true).stream()
         .filter(element -> !method.equals(element) && refSig.equals(element.identifier()))
@@ -148,12 +147,8 @@ public class StructuredType implements IStructuredType {
     if (list == null) {
       return new CompositeObject(0, "");
     }
-
-    StringBuilder b = new StringBuilder();
-    for (IMethodParameter p : list) {
-      b.append(p.dataType().name());
-    }
-    return new CompositeObject(list.size(), b.toString());
+    var b = list.stream().map(p -> p.dataType().name()).collect(joining());
+    return new CompositeObject(list.size(), b);
   }
 
   /**
@@ -185,16 +180,13 @@ public class StructuredType implements IStructuredType {
   @Override
   @SuppressWarnings("unchecked")
   public <T extends IJavaElement> List<T> getElements(Categories category, Class<T> clazz) {
-    List<? extends IJavaElement> elements = getElementsInternal(category);
+    var elements = getElementsInternal(category);
     if (elements == null) {
       return emptyList();
     }
-
-    List<T> result = new ArrayList<>(elements.size());
-    for (IJavaElement e : elements) {
-      result.add((T) e);
-    }
-    return result;
+    return elements.stream()
+        .map(e -> (T) e)
+        .collect(toList());
   }
 
   @Override
@@ -203,8 +195,8 @@ public class StructuredType implements IStructuredType {
   }
 
   protected IJavaElement getSibling(String siblingName, Categories... categories) {
-    for (Categories cat : categories) {
-      List<? extends IJavaElement> references = getElementsInternal(cat);
+    for (var cat : categories) {
+      var references = getElementsInternal(cat);
       if (references != null && !references.isEmpty()) {
         for (IJavaElement reference : references) {
           if (reference.elementName().compareTo(siblingName) > 0) {
@@ -213,7 +205,7 @@ public class StructuredType implements IStructuredType {
         }
         return references.get(references.size() - 1);
       }
-      IJavaElement sibling = getSibling(cat);
+      var sibling = getSibling(cat);
       if (sibling != null) {
         return sibling;
       }
@@ -224,12 +216,12 @@ public class StructuredType implements IStructuredType {
 
   @Override
   public IJavaElement getSibling(Categories category) {
-    boolean search = false;
-    Categories[] methodCategories = Categories.values();
-    for (Categories methodCategory : methodCategories) {
+    var search = false;
+    var methodCategories = Categories.values();
+    for (var methodCategory : methodCategories) {
       cache(methodCategory);
       if (search) {
-        List<? extends IJavaElement> elements = getElementsInternal(methodCategory);
+        var elements = getElementsInternal(methodCategory);
         if (elements != null && !elements.isEmpty()) {
           return elements.get(0);
         }
@@ -388,12 +380,12 @@ public class StructuredType implements IStructuredType {
     List<IJavaElement> statics = new ArrayList<>();
     List<IJavaElement> members = new ArrayList<>();
 
-    Optional<String> logger = scoutApi().map(IScoutApi::Logger).map(IClassNameSupplier::fqn);
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IField f = (IField) it.next();
+    var logger = scoutApi().map(IScoutApi::Logger).map(IClassNameSupplier::fqn);
+    for (var it = workingSet.iterator(); it.hasNext();) {
+      var f = (IField) it.next();
       // static
       if ((f.flags() & Flags.AccStatic) != 0) {
-        String fieldDataType = f.dataType().reference();
+        var fieldDataType = f.dataType().reference();
         if (logger.isPresent() && logger.get().equals(fieldDataType)) {
           loggers.add(f);
         }
@@ -414,10 +406,10 @@ public class StructuredType implements IStructuredType {
 
   protected void visitMethodConstructors(Iterable<IJavaElement> workingSet) {
     Map<CompositeObject, IJavaElement> constructors = new TreeMap<>();
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IMethod method = (IMethod) it.next();
+    for (var it = workingSet.iterator(); it.hasNext();) {
+      var method = (IMethod) it.next();
       if (method.isConstructor()) {
-        CompositeObject key = createConstructorKey(method.parameters().stream().collect(toList()));
+        var key = createConstructorKey(method.parameters().stream().collect(toList()));
         constructors.put(key, method);
         it.remove();
       }
@@ -435,13 +427,13 @@ public class StructuredType implements IStructuredType {
 
   protected void visitMethodWithPrefix(Iterable<IJavaElement> workingSet, String prefix, Categories category) {
     Map<CompositeObject, IJavaElement> methods = new TreeMap<>();
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IMethod method = (IMethod) it.next();
-      IMethod visitedMethod = method;
+    for (var it = workingSet.iterator(); it.hasNext();) {
+      var method = (IMethod) it.next();
+      var visitedMethod = method;
       while (visitedMethod != null) {
-        String methodName = visitedMethod.elementName();
+        var methodName = visitedMethod.elementName();
         if (methodName.length() > prefix.length() && methodName.startsWith(prefix)) {
-          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
+          var key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
           methods.put(key, method);
           it.remove();
           break;
@@ -454,14 +446,14 @@ public class StructuredType implements IStructuredType {
 
   protected void visitMethodFormDataBean(Iterable<IJavaElement> workingSet) {
     Map<CompositeObject, IJavaElement> methods = new TreeMap<>();
-    Optional<IScoutApi> scoutApi = scoutApi();
+    var scoutApi = scoutApi();
     if (scoutApi.isPresent()) {
-      IScoutApi api = scoutApi.get();
-      String formDataFqn = api.FormData().fqn();
-      for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-        IMethod method = (IMethod) it.next();
+      var api = scoutApi.get();
+      var formDataFqn = api.FormData().fqn();
+      for (var it = workingSet.iterator(); it.hasNext();) {
+        var method = (IMethod) it.next();
         if (method.annotations().withName(formDataFqn).existsAny()) {
-          CompositeObject methodKey = createPropertyMethodKey(method);
+          var methodKey = createPropertyMethodKey(method);
           if (methodKey != null) {
             methods.put(methodKey, method);
             it.remove();
@@ -477,10 +469,10 @@ public class StructuredType implements IStructuredType {
 
   protected void visitMethodOverridden(Iterable<IJavaElement> workingSet) {
     Map<CompositeObject, IJavaElement> overriddenMethods = new TreeMap<>();
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IMethod method = (IMethod) it.next();
+    for (var it = workingSet.iterator(); it.hasNext();) {
+      var method = (IMethod) it.next();
       if (getOverwrittenMethod(method) != null) {
-        CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
+        var key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
         overriddenMethods.put(key, method);
         it.remove();
       }
@@ -490,13 +482,13 @@ public class StructuredType implements IStructuredType {
 
   protected void visitMethodStartHandler(Iterable<IJavaElement> workingSet) {
     Map<CompositeObject, IJavaElement> startHandlerMethods = new TreeMap<>();
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IMethod method = (IMethod) it.next();
-      Matcher matcher = START_HANDLER_REGEX.matcher(method.elementName());
+    for (var it = workingSet.iterator(); it.hasNext();) {
+      var method = (IMethod) it.next();
+      var matcher = START_HANDLER_REGEX.matcher(method.elementName());
       if (matcher.find()) {
-        String fieldName = matcher.group(1);
+        var fieldName = matcher.group(1);
         if (getType().innerTypes().withRecursiveInnerTypes(true).withSimpleName(fieldName + ISdkConstants.SUFFIX_FORM_HANDLER).existsAny()) {
-          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
+          var key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
           startHandlerMethods.put(key, method);
           it.remove();
         }
@@ -507,13 +499,13 @@ public class StructuredType implements IStructuredType {
 
   protected void visitMethodInnerTypeGetter(Iterable<IJavaElement> workingSet) {
     Map<CompositeObject, IJavaElement> fieldGetterMethods = new TreeMap<>();
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IMethod method = (IMethod) it.next();
-      Matcher matcher = METHOD_INNER_TYPE_GETTER_REGEX.matcher(method.elementName());
+    for (var it = workingSet.iterator(); it.hasNext();) {
+      var method = (IMethod) it.next();
+      var matcher = METHOD_INNER_TYPE_GETTER_REGEX.matcher(method.elementName());
       if (matcher.find()) {
-        String fieldName = matcher.group(1);
+        var fieldName = matcher.group(1);
         if (getType().innerTypes().withRecursiveInnerTypes(true).withSimpleName(fieldName).existsAny()) {
-          CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
+          var key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
           fieldGetterMethods.put(key, method);
           it.remove();
         }
@@ -524,9 +516,9 @@ public class StructuredType implements IStructuredType {
 
   protected void visitMethodLocalBean(Iterable<IJavaElement> workingSet) {
     Map<CompositeObject, IJavaElement> localPropertyMethods = new TreeMap<>();
-    for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
-      IMethod method = (IMethod) it.next();
-      CompositeObject key = createPropertyMethodKey(method);
+    for (var it = workingSet.iterator(); it.hasNext();) {
+      var method = (IMethod) it.next();
+      var key = createPropertyMethodKey(method);
       if (key != null) {
         localPropertyMethods.put(key, method);
         it.remove();
@@ -537,9 +529,9 @@ public class StructuredType implements IStructuredType {
 
   protected void visitMethodUncategorized(Iterable<IMethod> workingSet) {
     Map<CompositeObject, IJavaElement> methods = new TreeMap<>();
-    for (Iterator<IMethod> it = workingSet.iterator(); it.hasNext();) {
-      IMethod method = it.next();
-      CompositeObject key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
+    for (var it = workingSet.iterator(); it.hasNext();) {
+      var method = it.next();
+      var key = new CompositeObject(method.elementName(), method.parameters().stream().count(), method);
       methods.put(key, method);
       it.remove();
     }
@@ -612,13 +604,13 @@ public class StructuredType implements IStructuredType {
 
   protected void consumeType(Iterable<IJavaElement> workingSet, Function<IScoutApi, IClassNameSupplier> typeInterface, Categories category, Comparator<IType> comparator) {
     Set<IType> types = new TreeSet<>(comparator);
-    IScoutApi scoutApi = scoutApi().orElse(null);
+    var scoutApi = scoutApi().orElse(null);
     if (scoutApi != null) {
-      String fqn = typeInterface.apply(scoutApi).fqn();
-      Predicate<IType> filter = CLASS_FILTER.and(instanceOf(fqn));
-      Iterator<IJavaElement> it = workingSet.iterator();
+      var fqn = typeInterface.apply(scoutApi).fqn();
+      var filter = CLASS_FILTER.and(instanceOf(fqn));
+      var it = workingSet.iterator();
       while (it.hasNext()) {
-        IType candidate = (IType) it.next();
+        var candidate = (IType) it.next();
         if (filter.test(candidate)) {
           types.add(candidate);
           it.remove();

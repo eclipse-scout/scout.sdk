@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
@@ -32,27 +33,27 @@ public class PropertiesGeneratorTest {
 
   @Test
   public void testCreateEmpty() {
-    PropertiesGenerator generator = PropertiesGenerator.create();
+    var generator = PropertiesGenerator.create();
     assertTrue(generator.headerLines().isEmpty());
     assertTrue(generator.properties().isEmpty());
   }
 
   @Test
   public void testPropertiesEncode() {
-    String key = "key";
-    String value = "ö\nä\r\nü";
-    Map<String, String> values = singletonMap(key, value);
-    PropertiesGenerator generator = PropertiesGenerator.create(values);
-    String generatedSource = generator.toSource(identity(), new BuilderContext()).toString();
+    var key = "key";
+    var value = "ö\nä\r\nü";
+    var values = singletonMap(key, value);
+    var generator = PropertiesGenerator.create(values);
+    var generatedSource = generator.toSource(identity(), new BuilderContext()).toString();
     assertEquals("key=\\u00F6\\n\\u00E4\\r\\n\\u00FC\n", generatedSource);
   }
 
   @Test
   @SuppressWarnings({"SimplifiableJUnitAssertion", "EqualsWithItself", "EqualsBetweenInconvertibleTypes"})
   public void testGenerator() throws IOException {
-    String[] prop1 = new String[]{"prop1", "1"};
-    String[] prop2 = new String[]{"a-prop2", "2"};
-    String[] lines = new String[]{
+    var prop1 = new String[]{"prop1", "1"};
+    var prop2 = new String[]{"a-prop2", "2"};
+    var lines = new String[]{
         "# comment line 1",
         "!comment line 2",
         "  ",
@@ -60,8 +61,8 @@ public class PropertiesGeneratorTest {
         prop2[0] + "=" + prop2[1]
     };
 
-    String origContent = Stream.of(lines).collect(joining(lineSeparator()));
-    PropertiesGenerator generator = PropertiesGenerator.create(new ByteArrayInputStream(origContent.getBytes(PropertiesGenerator.ENCODING)));
+    var origContent = Stream.of(lines).collect(joining(lineSeparator()));
+    var generator = PropertiesGenerator.create(new ByteArrayInputStream(origContent.getBytes(PropertiesGenerator.ENCODING)));
 
     // test content (parse)
     assertEquals(Arrays.asList(lines[0], lines[1], lines[2]), generator.headerLines());
@@ -71,16 +72,12 @@ public class PropertiesGeneratorTest {
     assertEquals(expected, generator.properties());
 
     // test write
-    String generatedSource = generator.toSource(identity(), new BuilderContext()).toString();
-    String expectedSource = lines[0] + "\n" +
-        lines[1] + "\n" +
-        lines[2] + "\n" +
-        lines[4] + "\n" +
-        lines[3] + "\n";
+    var generatedSource = generator.toSource(identity(), new BuilderContext()).toString();
+    var expectedSource = IntStream.of(0, 1, 2, 4, 3).mapToObj(i -> lines[i]).collect(joining("\n")) + "\n";
     assertEquals(expectedSource, generatedSource);
 
     // test compares
-    PropertiesGenerator generator2 = PropertiesGenerator.create(generator.properties(), generator.headerLines());
+    var generator2 = PropertiesGenerator.create(generator.properties(), generator.headerLines());
     assertEquals(generator, generator2);
     assertEquals(generator.hashCode(), generator2.hashCode());
     assertTrue(generator.equals(generator));

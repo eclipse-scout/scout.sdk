@@ -74,7 +74,7 @@ public interface ISourceGenerator<BUILDER extends ISourceBuilder<?>> {
    * @see ISourceGenerator#generalize(Function)
    */
   default StringBuilder toSource(Function<ISourceBuilder<?>, BUILDER> fromGenericToSpecificBuilder, IBuilderContext context) {
-    MemorySourceBuilder out = new MemorySourceBuilder(context);
+    var out = new MemorySourceBuilder(context);
     generalize(fromGenericToSpecificBuilder).generate(out);
     return out.source();
   }

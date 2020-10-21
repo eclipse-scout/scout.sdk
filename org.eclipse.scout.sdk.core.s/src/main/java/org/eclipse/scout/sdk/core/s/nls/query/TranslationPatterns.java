@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.query;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInCode;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInString;
@@ -24,11 +25,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi.TEXTS;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
@@ -101,31 +100,31 @@ public final class TranslationPatterns {
     public abstract Optional<FileRange> keyRangeIfAccept(MatchResult match, FileQueryInput fileQueryInput);
 
     protected static FileRange toFileRange(MatchResult match, FileQueryInput fileQueryInput, int keyGroup) {
-      int startIndex = match.start(keyGroup);
-      int endIndex = match.end(keyGroup);
+      var startIndex = match.start(keyGroup);
+      var endIndex = match.end(keyGroup);
       CharSequence key = CharBuffer.wrap(fileQueryInput.fileContent(), startIndex, endIndex - startIndex);
       return new FileRange(fileQueryInput.file(), key, startIndex, endIndex);
     }
 
     protected static boolean lineEndsWithIgnoreMarker(char[] content, int offset) {
-      int lineEnd = Strings.nextLineEnd(content, offset); // because of the regex patterns the full content cannot be shorter than the ignore marker -> no need to check for the bounds
-      CharBuffer end = CharBuffer.wrap(content, lineEnd - IGNORE_MARKER.length(), IGNORE_MARKER.length());
+      var lineEnd = Strings.nextLineEnd(content, offset); // because of the regex patterns the full content cannot be shorter than the ignore marker -> no need to check for the bounds
+      var end = CharBuffer.wrap(content, lineEnd - IGNORE_MARKER.length(), IGNORE_MARKER.length());
       return Strings.equals(IGNORE_MARKER, end, false);
     }
 
     protected static boolean isKeyInCode(char[] content, int offset) {
       /* the start index itself is inside of the string literal and therefore never in the code. subtract two (one to get to the string delimiter and one to get to the char before */
-      int posBeforeKeyMatch = offset - 2;
+      var posBeforeKeyMatch = offset - 2;
       return isInCode(content, posBeforeKeyMatch);
     }
 
     protected static boolean isAcceptedCodeMatch(MatchResult match, int keyGroup, char[] content) {
-      int endIndex = match.end(keyGroup);
+      var endIndex = match.end(keyGroup);
       if (lineEndsWithIgnoreMarker(content, endIndex)) {
         return false;
       }
 
-      int startIndex = match.start(keyGroup);
+      var startIndex = match.start(keyGroup);
       return isKeyInCode(content, startIndex);
     }
 
@@ -183,12 +182,12 @@ public final class TranslationPatterns {
 
     @Override
     public Optional<FileRange> keyRangeIfAccept(MatchResult match, FileQueryInput fileQueryInput) {
-      int keyGroup = 1;
+      var keyGroup = 1;
       if (lineEndsWithIgnoreMarker(fileQueryInput.fileContent(), match.end(keyGroup))) {
         return Optional.empty();
       }
 
-      int startIndex = match.start(1);
+      var startIndex = match.start(1);
       if (!isInString(fileQueryInput.fileContent(), startIndex)) {
         return Optional.empty();
       }
@@ -207,11 +206,11 @@ public final class TranslationPatterns {
       return ScoutApi.allKnown()
           .map(JavaTextsGetPattern::toTextsGetRegex)
           .distinct()
-          .collect(Collectors.joining("|"));
+          .collect(joining("|"));
     }
 
     private static String toTextsGetRegex(IScoutVariousApi api) {
-      TEXTS texts = api.TEXTS();
+      var texts = api.TEXTS();
       return texts.simpleName() + "\\." + texts.getMethodName() + "\\((?:[a-zA-Z0-9_]+,\\s*)?(\")?(" + NLS_KEY_PAT + ")(\")?\\s*[,)]";
     }
 
@@ -255,8 +254,8 @@ public final class TranslationPatterns {
 
     @Override
     public Optional<FileRange> keyRangeIfAccept(MatchResult match, FileQueryInput fileQueryInput) {
-      int keyGroup = 1;
-      boolean isIgnored = textToNextNewLine(fileQueryInput.fileContent(), match.end(keyGroup))
+      var keyGroup = 1;
+      var isIgnored = textToNextNewLine(fileQueryInput.fileContent(), match.end(keyGroup))
           .toUpperCase(Locale.ENGLISH)
           .endsWith(IGNORE_MARKER + " -->");
       if (isIgnored) {
@@ -266,7 +265,7 @@ public final class TranslationPatterns {
     }
 
     public static String textToNextNewLine(char[] searchIn, int offset) {
-      int lineEnd = nextLineEnd(searchIn, offset);
+      var lineEnd = nextLineEnd(searchIn, offset);
       return new String(searchIn, offset, lineEnd - offset);
     }
   }

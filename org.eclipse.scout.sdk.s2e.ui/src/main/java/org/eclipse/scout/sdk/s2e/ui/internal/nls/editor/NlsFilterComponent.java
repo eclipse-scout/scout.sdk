@@ -10,12 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor;
 
-import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
+
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.TableViewer;
@@ -29,11 +29,9 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
 public class NlsFilterComponent extends Composite {
@@ -59,7 +57,7 @@ public class NlsFilterComponent extends Composite {
     m_resetButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        for (Text t : m_filterFields.values()) {
+        for (var t : m_filterFields.values()) {
           t.setText("");
         }
       }
@@ -72,7 +70,7 @@ public class NlsFilterComponent extends Composite {
     Map<Language, String> oldContents = new HashMap<>(m_filterFields.size());
     if (!m_filterFields.isEmpty()) {
       // dispose old text fields and backup the filter text to restore it afterwards in the new fields
-      for (Entry<Language, Text> entry : m_filterFields.entrySet()) {
+      for (var entry : m_filterFields.entrySet()) {
         oldContents.put(entry.getKey(), entry.getValue().getText());
         entry.getValue().dispose();
       }
@@ -80,13 +78,13 @@ public class NlsFilterComponent extends Composite {
     }
 
     if (m_tableViewer != null && m_tableViewer.getTable().getColumnCount() >= NlsTableController.INDEX_COLUMN_KEYS) {
-      TableColumn[] columns = m_tableViewer.getTable().getColumns();
-      for (int i = NlsTableController.INDEX_COLUMN_KEYS; i < columns.length; i++) {
-        Language l = m_controller.languageOfColumn(i);
-        Text filterField = new Text(this, SWT.BORDER);
+      var columns = m_tableViewer.getTable().getColumns();
+      for (var i = NlsTableController.INDEX_COLUMN_KEYS; i < columns.length; i++) {
+        var l = m_controller.languageOfColumn(i);
+        var filterField = new Text(this, SWT.BORDER);
 
         // restore old filter text
-        String oldText = oldContents.get(l);
+        var oldText = oldContents.get(l);
         if (oldText != null) {
           filterField.setText(oldText);
         }
@@ -105,14 +103,11 @@ public class NlsFilterComponent extends Composite {
    */
   protected void handleFilterModified(ModifyEvent event) {
     // update filters
-    List<ViewerFilter> filters = new ArrayList<>();
+    var filters = Arrays.stream(m_tableViewer.getFilters())
+        .filter(filter -> !(filter instanceof P_ViewerFilter))
+        .collect(toList());
     // backup old filters
-    for (ViewerFilter filter : m_tableViewer.getFilters()) {
-      if (!(filter instanceof P_ViewerFilter)) {
-        filters.add(filter);
-      }
-    }
-    for (Entry<Language, Text> e : m_filterFields.entrySet()) {
+    for (var e : m_filterFields.entrySet()) {
       if (!e.getValue().getText().isEmpty()) {
         filters.add(new P_ViewerFilter(e.getKey(), e.getValue().getText()));
       }
@@ -160,8 +155,8 @@ public class NlsFilterComponent extends Composite {
     @Override
     protected Point computeSize(Composite composite, int hint, int hint2, boolean flushCache) {
       // height
-      int height = m_resetButton.computeSize(SWT.DEFAULT, hint2).y + 2;
-      for (Text t : m_filterFields.values()) {
+      var height = m_resetButton.computeSize(SWT.DEFAULT, hint2).y + 2;
+      for (var t : m_filterFields.values()) {
         height = Math.max(height, t.computeSize(SWT.DEFAULT, hint2).y + 2);
       }
       return new Point(hint, height);
@@ -169,20 +164,20 @@ public class NlsFilterComponent extends Composite {
 
     @Override
     protected void layout(Composite composite, boolean flushCache) {
-      Rectangle parentBounds = composite.getClientArea();
-      TableColumn[] columns = m_tableViewer.getTable().getColumns();
-      int[] colOrder = m_tableViewer.getTable().getColumnOrder();
-      int x = -m_tableViewer.getTable().getHorizontalBar().getSelection();
-      for (int i = 0; i < columns.length; i++) {
-        int colIndex = colOrder[i];
-        TableColumn column = columns[colIndex];
+      var parentBounds = composite.getClientArea();
+      var columns = m_tableViewer.getTable().getColumns();
+      var colOrder = m_tableViewer.getTable().getColumnOrder();
+      var x = -m_tableViewer.getTable().getHorizontalBar().getSelection();
+      for (var i = 0; i < columns.length; i++) {
+        var colIndex = colOrder[i];
+        var column = columns[colIndex];
         if (i == NlsTableController.INDEX_COLUMN_KEYS) {
           // layout button
           m_resetButton.setBounds(1, 1, x - 2, parentBounds.height - 2);
         }
         if (i >= NlsTableController.INDEX_COLUMN_KEYS) {
-          Language lang = m_controller.languageOfColumn(colIndex);
-          Text text = m_filterFields.get(lang);
+          var lang = m_controller.languageOfColumn(colIndex);
+          var text = m_filterFields.get(lang);
           if (text != null) {
             text.setBounds(x + 1, 1, column.getWidth() - 2, parentBounds.height - 2);
           }

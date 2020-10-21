@@ -15,7 +15,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstButtonBuilder;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.ZeroLenWrappedTrackedNodePosition;
 
@@ -40,7 +39,7 @@ public class ButtonProposal extends FormFieldProposal {
 
   @Override
   protected TypeDeclaration createFormFieldType(Type superType) {
-    AstButtonBuilder buttonBuilder = getFactory().newButton(getProposalContext().getDefaultName())
+    var buttonBuilder = getFactory().newButton(getProposalContext().getDefaultName())
         .withNlsMethod(getNlsMethodName())
         .withReadOnlyNameSuffix(getProposalContext().getSuffix())
         .withSuperType(superType)

@@ -34,8 +34,8 @@ public class JaxwsBindingGenerator implements ISourceGenerator<ISourceBuilder<?>
 
   @Override
   public void generate(ISourceBuilder<?> builder) {
-    URI wsdlLocation = wsdlLocation().get();
-    String wsPackage = wsPackage().get();
+    var wsdlLocation = wsdlLocation().get();
+    var wsPackage = wsPackage().get();
 
     builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").nl();
     builder.append("<!-- binding to customize webservice artifacts (jaxws-namespace: http://java.sun.com/xml/ns/jaxws) -->").nl();
@@ -49,7 +49,7 @@ public class JaxwsBindingGenerator implements ISourceGenerator<ISourceBuilder<?>
     builder.append("  <jaxws:bindings node=\"wsdl:definitions\">").nl();
     builder.append("    <jaxws:package name=\"").append(wsPackage).append("\"/>").nl();
     builder.append("  </jaxws:bindings>").nl();
-    for (JaxWsBindingMapping mapping : names()) {
+    for (var mapping : names()) {
       String nodeAttr;
       if (mapping.isPortType()) {
         nodeAttr = JaxWsUtils.getPortTypeXPath(mapping.getWsdlName());

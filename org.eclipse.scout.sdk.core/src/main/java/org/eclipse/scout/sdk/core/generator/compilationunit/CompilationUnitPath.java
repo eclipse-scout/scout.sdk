@@ -89,7 +89,7 @@ public class CompilationUnitPath {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CompilationUnitPath that = (CompilationUnitPath) o;
+    var that = (CompilationUnitPath) o;
     return m_fileName.equals(that.m_fileName) &&
         m_targetDirectory.equals(that.m_targetDirectory) &&
         m_targetFile.equals(that.m_targetFile);

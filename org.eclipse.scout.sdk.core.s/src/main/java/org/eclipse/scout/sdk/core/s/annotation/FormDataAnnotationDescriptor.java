@@ -14,7 +14,6 @@ import static java.util.Collections.addAll;
 import static java.util.Collections.unmodifiableSet;
 
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
@@ -43,15 +42,15 @@ public class FormDataAnnotationDescriptor {
   }
 
   public static FormDataAnnotationDescriptor of(IType type) {
-    FormDataAnnotationDescriptor anot = new FormDataAnnotationDescriptor();
+    var anot = new FormDataAnnotationDescriptor();
     if (type == null) {
       return anot;
     }
-    IScoutApi scoutApi = type.javaEnvironment().requireApi(IScoutApi.class);
+    var scoutApi = type.javaEnvironment().requireApi(IScoutApi.class);
     if (type.isInstanceOf(scoutApi.IFormExtension()) || type.isInstanceOf(scoutApi.IFormFieldExtension())) {
       // extensions are annotated with @Data but behave like normal form fields -> bridge from @Data to @FormData
 
-      Optional<DataAnnotationDescriptor> dataAnnotation = DataAnnotationDescriptor.of(type);
+      var dataAnnotation = DataAnnotationDescriptor.of(type);
       dataAnnotation.ifPresent(dataAnnotationDescriptor -> {
         anot.setAnnotationOwner(type);
         anot.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.CREATE);
@@ -73,9 +72,9 @@ public class FormDataAnnotationDescriptor {
       return;
     }
 
-    String replaceAnnotationFqn = type.javaEnvironment().requireApi(IScoutApi.class).Replace().fqn();
-    boolean replaceAnnotationPresent = type.annotations().withName(replaceAnnotationFqn).existsAny();
-    IType superType = type.superClass().orElse(null);
+    var replaceAnnotationFqn = type.javaEnvironment().requireApi(IScoutApi.class).Replace().fqn();
+    var replaceAnnotationPresent = type.annotations().withName(replaceAnnotationFqn).existsAny();
+    var superType = type.superClass().orElse(null);
 
     parseFormDataAnnotationRec(descriptorToFill, superType, api, replaceAnnotationPresent);
     type.superInterfaces()
@@ -84,9 +83,9 @@ public class FormDataAnnotationDescriptor {
     if (replaceAnnotationPresent && superType != null && !superType.annotations().withName(replaceAnnotationFqn).existsAny()) {
       // super type is the original field that is going to be replaced by the given type
       // check whether the super type is embedded into a form field that is annotated by @FormData with SdkCommand.IGNORE.
-      Optional<IType> declaringType = superType.declaringType();
+      var declaringType = superType.declaringType();
       while (declaringType.isPresent()) {
-        FormDataAnnotationDescriptor declaringTypeformDataAnnotation = of(declaringType.get());
+        var declaringTypeformDataAnnotation = of(declaringType.get());
         if (isIgnore(declaringTypeformDataAnnotation)) {
           // super type is embedded into a ignored form field. Hence this field is ignored as well. Adjust parsed annotation.
           descriptorToFill.setSdkCommand(SdkCommand.IGNORE);
@@ -101,19 +100,19 @@ public class FormDataAnnotationDescriptor {
     // A field that is once marked so that a DTO should be created, can never be set to ignore again. But an ignored field may be changed to create. Afterwards it can never be set to ignore again.
     // Therefore ignored fields may define all attributes and they are inherited from the first level that declares it to be created.
     // Forms are excluded from this rule: If a form has a @Replace annotation, it even though may define a different dto.
-    boolean cumulativeAttribsOnly = replaceAnnotationPresent && !isIgnore(descriptorToFill) && !type.isInstanceOf(api.IForm());
+    var cumulativeAttribsOnly = replaceAnnotationPresent && !isIgnore(descriptorToFill) && !type.isInstanceOf(api.IForm());
 
     fillFormDataAnnotation(type, descriptorToFill, isOwner, cumulativeAttribsOnly);
   }
 
   @SuppressWarnings("pmd:NPathComplexity")
   private static void fillFormDataAnnotation(IAnnotatable element, FormDataAnnotationDescriptor descriptorToFill, boolean isOwner, boolean cumulativeAttributesOnly) {
-    Optional<FormDataAnnotation> optFda = element.annotations().withManagedWrapper(FormDataAnnotation.class).first();
+    var optFda = element.annotations().withManagedWrapper(FormDataAnnotation.class).first();
     if (optFda.isEmpty()) {
       return;
     }
 
-    FormDataAnnotation formDataAnnotation = optFda.get();
+    var formDataAnnotation = optFda.get();
 
     // value
     IType dtoType = null;
@@ -134,10 +133,10 @@ public class FormDataAnnotationDescriptor {
     }
 
     // generic ordinal
-    int genericOrdinal = formDataAnnotation.genericOrdinal();
+    var genericOrdinal = formDataAnnotation.genericOrdinal();
 
     // interfaces
-    IType[] interfaces = formDataAnnotation.interfaces();
+    var interfaces = formDataAnnotation.interfaces();
 
     // default setup
     if (!cumulativeAttributesOnly) {
@@ -174,7 +173,7 @@ public class FormDataAnnotationDescriptor {
     }
 
     // correction
-    boolean isMemberType = element instanceof IMember && ((IMember) element).declaringType().isPresent();
+    var isMemberType = element instanceof IMember && ((IMember) element).declaringType().isPresent();
     if (isOwner && sdkCommand == SdkCommand.USE && dtoType != null && isMemberType) {
       descriptorToFill.setSuperType(dtoType);
       descriptorToFill.setFormDataType(null);

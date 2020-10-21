@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,10 +43,10 @@ public class JavaProjectContentProvider extends AbstractContentProviderAdapter {
   @Override
   protected Collection<?> loadProposals(IProgressMonitor monitor) {
     try {
-      IJavaProject[] allJavaProjectsInWorkspace = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
+      var allJavaProjectsInWorkspace = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
       Collection<IJavaProject> allMavenJavaProjects = new ArrayList<>(allJavaProjectsInWorkspace.length);
 
-      for (IJavaProject candidate : allJavaProjectsInWorkspace) {
+      for (var candidate : allJavaProjectsInWorkspace) {
         if (monitor.isCanceled()) {
           return emptyList();
         }
@@ -68,19 +66,19 @@ public class JavaProjectContentProvider extends AbstractContentProviderAdapter {
     if (!JdtUtils.exists(jp)) {
       return false;
     }
-    IProject project = jp.getProject();
+    var project = jp.getProject();
     if (!project.isAccessible()) {
       return false;
     }
     if (!project.hasNature(org.eclipse.m2e.core.internal.IMavenConstants.NATURE_ID)) {
       return false;
     }
-    IFile pom = project.getFile(IMavenConstants.POM);
+    var pom = project.getFile(IMavenConstants.POM);
     if (pom == null || !pom.isAccessible()) {
       return false;
     }
 
-    Predicate<IJavaProject> filter = getFilter();
+    var filter = getFilter();
     return filter == null || filter.test(jp);
   }
 

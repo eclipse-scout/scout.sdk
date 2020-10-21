@@ -15,7 +15,6 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
@@ -26,8 +25,6 @@ import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -69,19 +66,19 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
 
     progress.init(2, toString());
 
-    String serverPackage = ScoutTier.Shared.convert(ScoutTier.Server, getSharedPackage());
-    String svcName = getServiceName() + ISdkConstants.SUFFIX_SERVICE;
+    var serverPackage = ScoutTier.Shared.convert(ScoutTier.Server, getSharedPackage());
+    var svcName = getServiceName() + ISdkConstants.SUFFIX_SERVICE;
 
     setCreatedServiceInterface(createServiceIfc(svcName, getSharedPackage(), env, progress.newChild(1)));
     setCreatedServiceImpl(createServiceImpl(svcName, serverPackage, env, progress.newChild(1)));
   }
 
   protected ICompilationUnitGenerator<?> createServiceImplBuilder(String svcName, String serverPackage) {
-    IJavaEnvironment javaEnvironment = getServerSourceFolder().javaEnvironment();
-    Optional<IType> existingServiceImpl = javaEnvironment.findType(serverPackage + JavaTypes.C_DOT + svcName);
+    var javaEnvironment = getServerSourceFolder().javaEnvironment();
+    var existingServiceImpl = javaEnvironment.findType(serverPackage + JavaTypes.C_DOT + svcName);
     ICompilationUnitGenerator<?> implBuilder;
     if (existingServiceImpl.isPresent()) {
-      ICompilationUnit compilationUnit = existingServiceImpl.get().requireCompilationUnit();
+      var compilationUnit = existingServiceImpl.get().requireCompilationUnit();
       implBuilder = compilationUnit.toWorkingCopy();
       implBuilder.mainType().ifPresent(t -> t.withInterface(getServiceIfcBuilder().fullyQualifiedName()));
     }
@@ -92,13 +89,13 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
           .withInterface(getServiceIfcBuilder().fullyQualifiedName());
     }
 
-    for (IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb : getMethods()) {
-      String methodIdToSearch = msb.identifier(javaEnvironment, true);
-      Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> existingMethod = implBuilder
+    for (var msb : getMethods()) {
+      var methodIdToSearch = msb.identifier(javaEnvironment, true);
+      var existingMethod = implBuilder
           .mainType()
           .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, true));
       if (existingMethod.isEmpty()) {
-        boolean existsInInterface = isInterface(msb.flags()) || isPublic(msb.flags());
+        var existsInInterface = isInterface(msb.flags()) || isPublic(msb.flags());
         if (existsInInterface) {
           msb.withAnnotation(AnnotationGenerator.createOverride());
         }
@@ -113,14 +110,14 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
   }
 
   protected IType createServiceImpl(String svcName, String serverPackage, IEnvironment env, IProgress progress) {
-    ICompilationUnitGenerator<?> implBuilder = createServiceImplBuilder(svcName, serverPackage);
+    var implBuilder = createServiceImplBuilder(svcName, serverPackage);
     return env.writeCompilationUnit(implBuilder, getServerSourceFolder(), progress);
   }
 
   protected ICompilationUnitGenerator<?> createServiceIfcBuilder(String svcName, String sharedPackage) {
-    String ifcName = 'I' + svcName;
-    IJavaEnvironment javaEnvironment = getSharedSourceFolder().javaEnvironment();
-    Optional<IType> existingServiceIfc = javaEnvironment.findType(sharedPackage + JavaTypes.C_DOT + ifcName);
+    var ifcName = 'I' + svcName;
+    var javaEnvironment = getSharedSourceFolder().javaEnvironment();
+    var existingServiceIfc = javaEnvironment.findType(sharedPackage + JavaTypes.C_DOT + ifcName);
     ICompilationUnitGenerator<?> ifcBuilder;
     ifcBuilder = existingServiceIfc
         .<ICompilationUnitGenerator<?>> map(iType -> iType.requireCompilationUnit().toWorkingCopy())
@@ -128,10 +125,10 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
             .withElementName(ifcName)
             .withPackageName(sharedPackage));
 
-    for (IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb : getMethods()) {
+    for (var msb : getMethods()) {
       if (isPublic(msb.flags()) || isInterface(msb.flags())) {
-        String methodIdToSearch = msb.identifier(javaEnvironment, true);
-        Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> existingMethod = ifcBuilder.mainType()
+        var methodIdToSearch = msb.identifier(javaEnvironment, true);
+        var existingMethod = ifcBuilder.mainType()
             .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, true));
         if (existingMethod.isEmpty()) {
           ifcBuilder.mainType().ifPresent(t -> t
@@ -145,8 +142,8 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
   }
 
   protected IType createServiceIfc(String svcName, String sharedPackage, IEnvironment env, IProgress progress) {
-    ICompilationUnitGenerator<?> ifcBuilder = createServiceIfcBuilder(svcName, sharedPackage);
-    IType createdIfc = env.writeCompilationUnit(ifcBuilder, getSharedSourceFolder(), progress);
+    var ifcBuilder = createServiceIfcBuilder(svcName, sharedPackage);
+    var createdIfc = env.writeCompilationUnit(ifcBuilder, getSharedSourceFolder(), progress);
     setServiceIfcBuilder(ifcBuilder.mainType().orElse(null));
     return createdIfc;
   }

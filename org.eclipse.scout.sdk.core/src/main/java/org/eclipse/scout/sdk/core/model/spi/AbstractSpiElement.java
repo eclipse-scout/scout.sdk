@@ -32,7 +32,7 @@ public abstract class AbstractSpiElement<API> {
 
   public API wrap() {
     API api = null;
-    WeakReference<API> apiRef = m_apiRef;
+    var apiRef = m_apiRef;
     if (apiRef != null) {
       api = apiRef.get();
     }

@@ -21,8 +21,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -51,38 +49,38 @@ public class MixedValueFieldTest {
 
     // fields of MixedValueFieldFormData
     assertEquals(1, mixedValueFieldFormData.fields().stream().count(), "field count of 'formdata.shared.mixed.MixedValueFieldFormData'");
-    IField serialVersionUID = assertFieldExist(mixedValueFieldFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(mixedValueFieldFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, mixedValueFieldFormData.methods().stream().count(), "method count of 'formdata.shared.mixed.MixedValueFieldFormData'");
-    IMethod getFirst = assertMethodExist(mixedValueFieldFormData, "getFirst", new String[]{});
+    var getFirst = assertMethodExist(mixedValueFieldFormData, "getFirst", new String[]{});
     assertMethodReturnType(getFirst, "formdata.shared.mixed.MixedValueFieldFormData$First");
     assertEquals(0, getFirst.annotations().stream().count(), "annotation count");
 
     assertEquals(1, mixedValueFieldFormData.innerTypes().stream().count(), "inner types count of 'MixedValueFieldFormData'");
     // type First
-    IType first = assertTypeExists(mixedValueFieldFormData, "First");
+    var first = assertTypeExists(mixedValueFieldFormData, "First");
     assertHasFlags(first, 9);
     assertHasSuperClass(first, "formdata.shared.mixed.AbstractMixedValueFieldData<java.lang.Short>");
     assertEquals(0, first.annotations().stream().count(), "annotation count");
 
     // fields of First
     assertEquals(1, first.fields().stream().count(), "field count of 'formdata.shared.mixed.MixedValueFieldFormData$First'");
-    IField serialVersionUID1 = assertFieldExist(first, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(first, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
     assertEquals(1, first.methods().stream().count(), "method count of 'formdata.shared.mixed.MixedValueFieldFormData$First'");
-    IMethod getChangedAttributeNameFieldEx = assertMethodExist(first, "getChangedAttributeNameFieldEx", new String[]{});
+    var getChangedAttributeNameFieldEx = assertMethodExist(first, "getChangedAttributeNameFieldEx", new String[]{});
     assertMethodReturnType(getChangedAttributeNameFieldEx, "formdata.shared.mixed.MixedValueFieldFormData$First$ChangedAttributeNameFieldEx");
     assertEquals(0, getChangedAttributeNameFieldEx.annotations().stream().count(), "annotation count");
 
     assertEquals(1, first.innerTypes().stream().count(), "inner types count of 'First'");
     // type ChangedAttributeNameFieldEx
-    IType changedAttributeNameFieldEx = assertTypeExists(first, "ChangedAttributeNameFieldEx");
+    var changedAttributeNameFieldEx = assertTypeExists(first, "ChangedAttributeNameFieldEx");
     assertHasFlags(changedAttributeNameFieldEx, 9);
     assertHasSuperClass(changedAttributeNameFieldEx, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.String>");
     assertEquals(1, changedAttributeNameFieldEx.annotations().stream().count(), "annotation count");
@@ -90,7 +88,7 @@ public class MixedValueFieldTest {
 
     // fields of ChangedAttributeNameFieldEx
     assertEquals(1, changedAttributeNameFieldEx.fields().stream().count(), "field count of 'formdata.shared.mixed.MixedValueFieldFormData$First$ChangedAttributeNameFieldEx'");
-    IField serialVersionUID2 = assertFieldExist(changedAttributeNameFieldEx, "serialVersionUID");
+    var serialVersionUID2 = assertFieldExist(changedAttributeNameFieldEx, "serialVersionUID");
     assertHasFlags(serialVersionUID2, 26);
     assertFieldType(serialVersionUID2, "long");
     assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");

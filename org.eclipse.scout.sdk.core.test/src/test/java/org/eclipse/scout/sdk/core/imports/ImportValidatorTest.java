@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilder;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
@@ -47,7 +46,7 @@ public class ImportValidatorTest {
 
   @Test
   public void testImportGrouping() {
-    IImportCollector iv = createCompilationUnitImportCollector("com.orig.pck");
+    var iv = createCompilationUnitImportCollector("com.orig.pck");
     iv.addImport("org.test.bla.Clazz1");
     iv.addImport("org.test.bla.Clazz2");
     iv.addImport("net.application.whatever.Clazz4");
@@ -56,7 +55,7 @@ public class ImportValidatorTest {
     iv.addImport("javax.test.Clazz7");
     iv.addStaticImport("org.test.bla.Clazz1.myMethod");
 
-    List<String> importsToCreate = toStringList(iv.createImportDeclarations());
+    var importsToCreate = toStringList(iv.createImportDeclarations());
 
     assertEquals(Arrays.asList("import static org.test.bla.Clazz1.myMethod;", "",
         "import javax.test.Clazz7;", "",
@@ -66,12 +65,12 @@ public class ImportValidatorTest {
 
   @Test
   public void testComplexWithDollar() {
-    ImportCollector collector = new ImportCollector();
-    String result =
+    var collector = new ImportCollector();
+    var result =
         new ImportValidator(collector).useReference("d.e.f.TopLevelAnother$MyClassThree< java.lang.Long >$InnerClass<org.test.Boolean>$SecondInner<java.util.Map<java.lang.Long[][][], java.test.Whatever$Other[]>>$ThirdInner");
     assertEquals("MyClassThree<Long>$InnerClass<Boolean>$SecondInner<Map<Long[][][],Other[]>>$ThirdInner", result);
 
-    List<String> collectedImports = collector.getImports()
+    var collectedImports = collector.getImports()
         .map(StringBuilder::toString)
         .collect(toList());
 
@@ -85,17 +84,17 @@ public class ImportValidatorTest {
 
   @Test
   public void testJavaLangPackage() {
-    IImportCollector iv = createCompilationUnitImportCollector("test");
+    var iv = createCompilationUnitImportCollector("test");
     IImportValidator validator = new ImportValidator(iv);
 
-    String longName = validator.useReference(JavaTypes.Long);
+    var longName = validator.useReference(JavaTypes.Long);
     assertEquals(Long.class.getSimpleName(), longName);
 
-    String longName2 = validator.useReference(JavaTypes.Long);
+    var longName2 = validator.useReference(JavaTypes.Long);
     assertEquals(Long.class.getSimpleName(), longName2);
 
-    String ownClassFqn = "test.blub.MyClass";
-    String ownName = validator.useReference(ownClassFqn);
+    var ownClassFqn = "test.blub.MyClass";
+    var ownName = validator.useReference(ownClassFqn);
     assertEquals("MyClass", ownName);
 
     Collection<String> importsToCreate = toStringList(iv.createImportDeclarations());
@@ -104,14 +103,14 @@ public class ImportValidatorTest {
 
   @Test
   public void testTypeArgToTypeInSamePackage() {
-    ICompilationUnitGenerator<?> cu = CompilationUnitGenerator.create()
+    var cu = CompilationUnitGenerator.create()
         .withElementName("MyClass.java")
         .withPackageName("test")
         .withType(TypeGenerator.create()
             .withElementName("MyClass")
             .withSuperClass("a.b.SuperClass<test.External>"));
 
-    IJavaSourceBuilder<?> jsb = JavaSourceBuilder.create(new MemorySourceBuilder());
+    var jsb = JavaSourceBuilder.create(new MemorySourceBuilder());
     cu.generate(jsb);
 
     Collection<String> imports = toStringList(jsb.context().validator().importCollector().getImports());
@@ -122,14 +121,14 @@ public class ImportValidatorTest {
 
   @Test
   public void testTypeArgToInnerType() {
-    ICompilationUnitGenerator<?> cu = CompilationUnitGenerator.create()
+    var cu = CompilationUnitGenerator.create()
         .withElementName("MyClass.java")
         .withPackageName("test")
         .withType(TypeGenerator.create()
             .withElementName("MyClass")
             .withSuperClass("a.b.SuperClass<test.MyClass.Inner>"));
 
-    IJavaSourceBuilder<?> jsb = JavaSourceBuilder.create(new MemorySourceBuilder());
+    var jsb = JavaSourceBuilder.create(new MemorySourceBuilder());
     cu.generate(jsb);
 
     Collection<String> imports = toStringList(jsb.context().validator().importCollector().getImports());
@@ -141,18 +140,18 @@ public class ImportValidatorTest {
 
   @Test
   public void testOwnPackage() {
-    IImportCollector iv = createCompilationUnitImportCollector("test.own.pck");
+    var iv = createCompilationUnitImportCollector("test.own.pck");
     IImportValidator validator = new ImportValidator(iv);
 
-    String longName = validator.useReference(JavaTypes.Long);
+    var longName = validator.useReference(JavaTypes.Long);
     assertEquals(Long.class.getSimpleName(), longName);
 
-    String ownClassFqn = "test.blub.MyClass";
-    String ownName = validator.useReference(ownClassFqn);
+    var ownClassFqn = "test.blub.MyClass";
+    var ownName = validator.useReference(ownClassFqn);
     assertEquals("MyClass", ownName);
 
-    String ownClassFqn2 = "test.own.pck.MyClass2";
-    String ownName2 = validator.useReference(ownClassFqn2);
+    var ownClassFqn2 = "test.own.pck.MyClass2";
+    var ownName2 = validator.useReference(ownClassFqn2);
     assertEquals("MyClass2", ownName2);
 
     Collection<String> importsToCreate = toStringList(iv.createImportDeclarations());
@@ -161,10 +160,10 @@ public class ImportValidatorTest {
 
   @Test
   public void testPrimitives() {
-    IImportCollector iv = createCompilationUnitImportCollector("test");
+    var iv = createCompilationUnitImportCollector("test");
     IImportValidator validator = new ImportValidator(iv);
 
-    String intName = validator.useReference(JavaTypes._int);
+    var intName = validator.useReference(JavaTypes._int);
     assertEquals(JavaTypes._int, intName);
 
     Collection<String> importsToCreate = toStringList(iv.createImportDeclarations());
@@ -173,18 +172,18 @@ public class ImportValidatorTest {
 
   @Test
   public void testNullPackage() {
-    IImportCollector iv = createCompilationUnitImportCollector((String) null);
+    var iv = createCompilationUnitImportCollector((String) null);
     IImportValidator validator = new ImportValidator(iv);
 
-    String longName = validator.useReference(JavaTypes.Long);
+    var longName = validator.useReference(JavaTypes.Long);
     assertEquals(Long.class.getSimpleName(), longName);
 
-    String ownClassFqn = "test.blub.MyClass";
-    String ownName = validator.useReference(ownClassFqn);
+    var ownClassFqn = "test.blub.MyClass";
+    var ownName = validator.useReference(ownClassFqn);
     assertEquals("MyClass", ownName);
 
-    String ownClassFqn2 = "test.own.pck.MyClass2";
-    String ownName2 = validator.useReference(ownClassFqn2);
+    var ownClassFqn2 = "test.own.pck.MyClass2";
+    var ownName2 = validator.useReference(ownClassFqn2);
     assertEquals("MyClass2", ownName2);
 
     Collection<String> importsToCreate = toStringList(iv.createImportDeclarations());
@@ -193,18 +192,18 @@ public class ImportValidatorTest {
 
   @Test
   public void testQualifiedPackage() {
-    IImportCollector iv = createCompilationUnitImportCollector("test");
+    var iv = createCompilationUnitImportCollector("test");
     IImportValidator validator = new ImportValidator(iv);
 
-    String longName = validator.useReference(JavaTypes.Long);
+    var longName = validator.useReference(JavaTypes.Long);
     assertEquals(Long.class.getSimpleName(), longName);
 
-    String ownClassFqn = "test.blub.MyClass";
-    String ownName = validator.useReference(ownClassFqn);
+    var ownClassFqn = "test.blub.MyClass";
+    var ownName = validator.useReference(ownClassFqn);
     assertEquals("MyClass", ownName);
 
-    String ownClassFqn2 = "test.own.pck.MyClass";
-    String ownName2 = validator.useReference(ownClassFqn2);
+    var ownClassFqn2 = "test.own.pck.MyClass";
+    var ownName2 = validator.useReference(ownClassFqn2);
     assertEquals(ownClassFqn2, ownName2);
 
     Collection<String> importsToCreate = toStringList(iv.createImportDeclarations());
@@ -213,8 +212,8 @@ public class ImportValidatorTest {
 
   @Test
   public void testWithInnerClasses() {
-    String name = "a.b.c.MyClass$InnerClass$SecondInner";
-    IImportCollector iv = createCompilationUnitImportCollector("a.b.c");
+    var name = "a.b.c.MyClass$InnerClass$SecondInner";
+    var iv = createCompilationUnitImportCollector("a.b.c");
     IImportValidator validator = new ImportValidator(iv);
     assertEquals("SecondInner", validator.useReference(name));
     assertEquals("a.b.c.SecondInner", validator.useReference("a.b.c.SecondInner"));
@@ -223,8 +222,8 @@ public class ImportValidatorTest {
   @Test
   @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
   public void testIcuWithInnerClassesThatAlsoExistInOwnPackage(IJavaEnvironment env) {
-    IType importTest = env.requireType(ImportTestClass.class.getName());
-    IImportCollector iv = createEnclosingTypeImportCollector(importTest);
+    var importTest = env.requireType(ImportTestClass.class.getName());
+    var iv = createEnclosingTypeImportCollector(importTest);
     IImportValidator validator = new ImportValidator(iv);
 
     assertEquals(ImportTestClass.Long.class.getSimpleName(), validator.useReference(importTest.innerTypes().first().get().name()));
@@ -234,8 +233,8 @@ public class ImportValidatorTest {
   @Test
   @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
   public void testResolveSuperClassInnerNameWhileExistingInOwnClassToo(IJavaEnvironment env) {
-    IType importTest = env.requireType(ImportTestClass2.class.getName());
-    IImportCollector iv = createEnclosingTypeImportCollector(importTest);
+    var importTest = env.requireType(ImportTestClass2.class.getName());
+    var iv = createEnclosingTypeImportCollector(importTest);
     IImportValidator validator = new ImportValidator(iv);
 
     // must be qualified because the same name also exists in the sub class itself (and the parent class).
@@ -244,12 +243,12 @@ public class ImportValidatorTest {
 
   @Test
   public void testWildcardComplex() {
-    IImportCollector iv = createCompilationUnitImportCollector("a.b.c");
+    var iv = createCompilationUnitImportCollector("a.b.c");
     IImportValidator validator = new ImportValidator(iv);
-    String ref = validator.useReference("java.util.Map$Entry<? extends java.io.Serializable, java.util.Set<? extends org.eclipse.scout.Test$Inner>>");
+    var ref = validator.useReference("java.util.Map$Entry<? extends java.io.Serializable, java.util.Set<? extends org.eclipse.scout.Test$Inner>>");
     assertEquals("Entry<? extends Serializable,Set<? extends Inner>>", ref);
 
-    List<String> collectedImports = iv.getImports()
+    var collectedImports = iv.getImports()
         .map(StringBuilder::toString)
         .collect(toList());
 
@@ -262,16 +261,16 @@ public class ImportValidatorTest {
 
   @Test
   public void testWildcard() {
-    IImportCollector iv = createCompilationUnitImportCollector("a.b.c");
+    var iv = createCompilationUnitImportCollector("a.b.c");
     IImportValidator validator = new ImportValidator(iv);
-    String ref = validator.useReference("? extends java.lang.Long");
-    String ref2 = validator.useReference("? extends java.test.Long");
-    String ref3 = validator.useReference("?");
-    String ref4 = validator.useReference("java.util.Set<? extends java.util.List<java.lang.CharSequence[]>[]>[]");
-    String ref5 = validator.useReference("java.util.List<?extends java.lang.CharSequence>");
-    String ref6 = validator.useReference("java.util.List<?>");
-    String ref7 = validator.useReference("java.util.Set<? super java.util.List<java.lang.CharSequence[]>[]>[]");
-    String ref8 = validator.useReference("java.util.List<?super java.lang.CharSequence>");
+    var ref = validator.useReference("? extends java.lang.Long");
+    var ref2 = validator.useReference("? extends java.test.Long");
+    var ref3 = validator.useReference("?");
+    var ref4 = validator.useReference("java.util.Set<? extends java.util.List<java.lang.CharSequence[]>[]>[]");
+    var ref5 = validator.useReference("java.util.List<?extends java.lang.CharSequence>");
+    var ref6 = validator.useReference("java.util.List<?>");
+    var ref7 = validator.useReference("java.util.Set<? super java.util.List<java.lang.CharSequence[]>[]>[]");
+    var ref8 = validator.useReference("java.util.List<?super java.lang.CharSequence>");
 
     assertEquals("? extends Long", ref);
     assertEquals("? extends java.test.Long", ref2);
@@ -285,9 +284,9 @@ public class ImportValidatorTest {
 
   @Test
   public void testWithInnerClassOfPrimaryTypeHavingTypeArgs() {
-    IImportCollector iv = createCompilationUnitImportCollector("a.b.c");
+    var iv = createCompilationUnitImportCollector("a.b.c");
     IImportValidator validator = new ImportValidator(iv);
-    String ref = validator.useReference("d.e.f.MyClassOne<java.lang.Long>.InnerClass.SecondInner");
+    var ref = validator.useReference("d.e.f.MyClassOne<java.lang.Long>.InnerClass.SecondInner");
     assertEquals("MyClassOne<Long>.InnerClass.SecondInner", ref);
 
     ref = validator.useReference("d.e.f.MyClassTwo<java.lang.Long>.InnerClass<java.lang.Boolean>.SecondInner<java.util.Map<java.lang.Long, java.lang.String>>.ThirdInner");
@@ -315,11 +314,11 @@ public class ImportValidatorTest {
   @Test
   @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
   public void testWithDuplicateInOwnPackage(IJavaEnvironment env) {
-    IImportCollector iv = createCompilationUnitImportCollector(env.requireType(BaseClass.class.getName()).requireCompilationUnit());
+    var iv = createCompilationUnitImportCollector(env.requireType(BaseClass.class.getName()).requireCompilationUnit());
     IImportValidator validator = new ImportValidator(iv);
 
     // long on foreign package
-    String longName = validator.useReference(JavaTypes.Long);
+    var longName = validator.useReference(JavaTypes.Long);
     assertEquals(JavaTypes.Long, longName);
 
     longName = validator.useReference(JavaTypes.Long);
@@ -330,11 +329,11 @@ public class ImportValidatorTest {
     assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getSimpleName(), longName);
 
     // own class in own package
-    String baseClassName = validator.useReference(BaseClass.class.getName());
+    var baseClassName = validator.useReference(BaseClass.class.getName());
     assertEquals(BaseClass.class.getSimpleName(), baseClassName);
 
     // other class in own package
-    String childClassName = validator.useReference(ChildClass.class.getName());
+    var childClassName = validator.useReference(ChildClass.class.getName());
     assertEquals(ChildClass.class.getSimpleName(), childClassName);
   }
 
@@ -359,8 +358,8 @@ public class ImportValidatorTest {
   }
 
   protected static IImportCollector createEnclosingTypeImportCollector(IType t) {
-    ICompilationUnitGenerator<?> cuSrc = t.requireCompilationUnit().toWorkingCopy();
-    IImportCollector collector1 = createCompilationUnitImportCollector(cuSrc, t.javaEnvironment());
+    var cuSrc = t.requireCompilationUnit().toWorkingCopy();
+    var collector1 = createCompilationUnitImportCollector(cuSrc, t.javaEnvironment());
     return new EnclosingTypeScopedImportCollector(collector1, cuSrc.mainType().get());
   }
 }

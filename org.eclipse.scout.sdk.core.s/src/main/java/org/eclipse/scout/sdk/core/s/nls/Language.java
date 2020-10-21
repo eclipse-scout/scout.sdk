@@ -14,7 +14,6 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Locale;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -79,7 +78,7 @@ public final class Language implements Comparable<Language> {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    Language other = (Language) obj;
+    var other = (Language) obj;
     return displayName().equals(other.displayName());
   }
 
@@ -111,18 +110,18 @@ public final class Language implements Comparable<Language> {
    *         {@link #LANGUAGE_REGEX}.
    */
   public static Optional<Language> parse(CharSequence name) {
-    Matcher matcher = LANGUAGE_PATTERN.matcher(name);
+    var matcher = LANGUAGE_PATTERN.matcher(name);
     if (matcher.matches()) {
       if (matcher.group(2) == null && LANGUAGE_DEFAULT.locale().toString().equals(matcher.group(1))) {
         return Optional.of(LANGUAGE_DEFAULT);
       }
 
-      String languageIso = matcher.group(1);
-      String countryIso = matcher.group(2);
+      var languageIso = matcher.group(1);
+      var countryIso = matcher.group(2);
       if (countryIso == null) {
         countryIso = "";
       }
-      String variantIso = matcher.group(3);
+      var variantIso = matcher.group(3);
       if (variantIso == null) {
         variantIso = "";
       }

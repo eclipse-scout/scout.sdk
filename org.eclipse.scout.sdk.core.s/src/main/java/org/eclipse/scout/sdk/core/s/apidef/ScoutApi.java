@@ -16,14 +16,14 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.Api;
+import org.eclipse.scout.sdk.core.apidef.ApiVersion;
+import org.eclipse.scout.sdk.core.apidef.IApiProvider;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenModuleVersion;
-import org.eclipse.scout.sdk.core.util.apidef.Api;
-import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.util.apidef.IApiProvider;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 public final class ScoutApi {
 
@@ -32,30 +32,57 @@ public final class ScoutApi {
   private ScoutApi() {
   }
 
+  /**
+   * @see Api#latest(Class)
+   */
   public static IScoutApi latest() {
     return Api.latest(IScoutApi.class);
   }
 
+  /**
+   * @see Api#latestMajorVersion(Class)
+   */
   public static int latestMajorVersion() {
     return Api.latestMajorVersion(IScoutApi.class);
   }
 
+  /**
+   * @see Api#create(Class, IJavaElement)
+   */
   public static Optional<IScoutApi> create(IJavaElement context) {
     return Api.create(IScoutApi.class, context);
   }
 
+  /**
+   * @see Api#create(Class, IJavaEnvironment)
+   */
   public static Optional<IScoutApi> create(IJavaEnvironment context) {
     return Api.create(IScoutApi.class, context);
   }
 
+  /**
+   * @see Api#version(Class, IJavaEnvironment)
+   */
   public static Optional<ApiVersion> version(IJavaEnvironment context) {
     return Api.version(IScoutApi.class, context);
   }
 
+  /**
+   * Gets the Scout version used in the module at the given {@link Path}.
+   * 
+   * @param moduleDir
+   *          The root {@link Path} of the module. Must not be {@code null}.
+   * @param env
+   *          The {@link IEnvironment} to find the module with the given path. Must not be {@code null}.
+   * @return The Scout version or an empty {@link Optional} if the module could not be found or it is no Scout module.
+   */
   public static Optional<ApiVersion> version(Path moduleDir, IEnvironment env) {
     return env.findJavaEnvironment(moduleDir).flatMap(je -> Api.version(IScoutApi.class, je));
   }
 
+  /**
+   * @see Api#allKnown(Class)
+   */
   public static Stream<IScoutApi> allKnown() {
     return Api.allKnown(IScoutApi.class);
   }

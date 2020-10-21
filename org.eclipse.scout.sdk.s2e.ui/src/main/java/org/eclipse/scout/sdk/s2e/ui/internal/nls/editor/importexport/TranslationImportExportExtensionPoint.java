@@ -14,16 +14,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractImportExportWizard;
-import org.osgi.framework.Bundle;
 
 /**
  * <h4>ExportExtensionPojnts</h4>
@@ -42,7 +37,7 @@ public final class TranslationImportExportExtensionPoint {
   }
 
   public static List<TranslationImportExportWizardExtension> getImporters() {
-    List<TranslationImportExportWizardExtension> result = importers;
+    var result = importers;
     if (result != null) {
       return result;
     }
@@ -50,7 +45,7 @@ public final class TranslationImportExportExtensionPoint {
   }
 
   private static synchronized List<TranslationImportExportWizardExtension> loadImporters() {
-    List<TranslationImportExportWizardExtension> result = importers;
+    var result = importers;
     if (result != null) {
       return result;
     }
@@ -61,7 +56,7 @@ public final class TranslationImportExportExtensionPoint {
   }
 
   public static List<TranslationImportExportWizardExtension> getExporters() {
-    List<TranslationImportExportWizardExtension> result = exporters;
+    var result = exporters;
     if (result != null) {
       return result;
     }
@@ -69,7 +64,7 @@ public final class TranslationImportExportExtensionPoint {
   }
 
   private static synchronized List<TranslationImportExportWizardExtension> loadExporters() {
-    List<TranslationImportExportWizardExtension> result = exporters;
+    var result = exporters;
     if (result != null) {
       return result;
     }
@@ -81,23 +76,23 @@ public final class TranslationImportExportExtensionPoint {
 
   @SuppressWarnings("unchecked")
   private static List<TranslationImportExportWizardExtension> loadExtensionPoints(String id) {
-    IExtensionRegistry reg = Platform.getExtensionRegistry();
+    var reg = Platform.getExtensionRegistry();
     Collection<TranslationImportExportWizardExtension> wizardExtensions = new ArrayList<>();
-    IExtensionPoint xp = reg.getExtensionPoint(S2ESdkUiActivator.PLUGIN_ID, id);
-    IExtension[] exts = xp.getExtensions();
-    for (IExtension extension : exts) {
-      IConfigurationElement[] elements = extension.getConfigurationElements();
-      for (IConfigurationElement element : elements) {
+    var xp = reg.getExtensionPoint(S2ESdkUiActivator.PLUGIN_ID, id);
+    var exts = xp.getExtensions();
+    for (var extension : exts) {
+      var elements = extension.getConfigurationElements();
+      for (var element : elements) {
         try {
-          String attWizard = element.getAttribute("wizard");
-          String attName = element.getAttribute("name");
+          var attWizard = element.getAttribute("wizard");
+          var attName = element.getAttribute("name");
           if (Strings.isBlank(attWizard) || Strings.isBlank(attName)) {
             SdkLog.warning("Invalid import/export wizard extension: {}. Name or wizard missing.", extension.getExtensionPointUniqueIdentifier());
             continue;
           }
 
-          Bundle contributingBundle = Platform.getBundle(extension.getNamespaceIdentifier());
-          Class<?> wizard = contributingBundle.loadClass(attWizard);
+          var contributingBundle = Platform.getBundle(extension.getNamespaceIdentifier());
+          var wizard = contributingBundle.loadClass(attWizard);
           if (!AbstractImportExportWizard.class.isAssignableFrom(wizard)) {
             SdkLog.error("extension '{}' has a wizard not instance of '{}'. Ignoring extension.", extension.getExtensionPointUniqueIdentifier(), AbstractImportExportWizard.class.getName());
             continue;

@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
-import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
@@ -34,10 +33,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class FilteredTranslationStoreTest {
   @Test
   public void testFilter(TestingEnvironment env) {
-    String addedKey = "added";
-    String notExistingKey = "notexisting";
-    PropertiesTranslationStore inner = testingStore(env);
-    FilteredTranslationStore store = new FilteredTranslationStore(inner, asList(TranslationStoreSupplierExtension.TRANSLATION_KEY_1, TranslationStoreSupplierExtension.TRANSLATION_KEY_2, addedKey, notExistingKey));
+    var addedKey = "added";
+    var notExistingKey = "notexisting";
+    var inner = testingStore(env);
+    var store = new FilteredTranslationStore(inner, asList(TranslationStoreSupplierExtension.TRANSLATION_KEY_1, TranslationStoreSupplierExtension.TRANSLATION_KEY_2, addedKey, notExistingKey));
 
     assertEquals(2, store.keys().count());
     assertFalse(store.containsKey("whatever")); // does not exist in filter and store
@@ -47,14 +46,14 @@ public class FilteredTranslationStoreTest {
     assertEquals(2, store.entries().count());
     assertEquals(2, store.languages().count());
 
-    Translation toAdd = new Translation(addedKey);
+    var toAdd = new Translation(addedKey);
     toAdd.putText(Language.LANGUAGE_DEFAULT, "test");
     store.addNewTranslation(toAdd);
 
-    String newLangKey = "newLang";
-    Translation toAddDifferentLang = new Translation(newLangKey);
+    var newLangKey = "newLang";
+    var toAddDifferentLang = new Translation(newLangKey);
     toAddDifferentLang.putText(Language.LANGUAGE_DEFAULT, "test2");
-    Language langDe = Language.parseThrowingOnError("de");
+    var langDe = Language.parseThrowingOnError("de");
     toAddDifferentLang.putText(langDe, "test2");
     store.addNewTranslation(toAddDifferentLang);
 
@@ -85,7 +84,7 @@ public class FilteredTranslationStoreTest {
     assertTrue(store.isDirty());
     assertTrue(store.isEditable());
 
-    String changedKey = "changed";
+    var changedKey = "changed";
     store.changeKey(TranslationStoreSupplierExtension.TRANSLATION_KEY_1, changedKey);
     assertFalse(store.containsKey(changedKey)); // because not part of the filter
     store.changeKey(changedKey, notExistingKey);
@@ -100,11 +99,11 @@ public class FilteredTranslationStoreTest {
   @Test
   @SuppressWarnings({"ConstantConditions", "SimplifiableJUnitAssertion", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testEqualsAndToString(TestingEnvironment env) {
-    PropertiesTranslationStore inner = testingStore(env);
+    var inner = testingStore(env);
 
-    FilteredTranslationStore store1 = new FilteredTranslationStore(inner, asList(TranslationStoreSupplierExtension.TRANSLATION_KEY_1, TranslationStoreSupplierExtension.TRANSLATION_KEY_2));
-    FilteredTranslationStore store2 = new FilteredTranslationStore(inner, singletonList(TranslationStoreSupplierExtension.TRANSLATION_KEY_2));
-    FilteredTranslationStore store3 = new FilteredTranslationStore(inner, singletonList(TranslationStoreSupplierExtension.TRANSLATION_KEY_2));
+    var store1 = new FilteredTranslationStore(inner, asList(TranslationStoreSupplierExtension.TRANSLATION_KEY_1, TranslationStoreSupplierExtension.TRANSLATION_KEY_2));
+    var store2 = new FilteredTranslationStore(inner, singletonList(TranslationStoreSupplierExtension.TRANSLATION_KEY_2));
+    var store3 = new FilteredTranslationStore(inner, singletonList(TranslationStoreSupplierExtension.TRANSLATION_KEY_2));
 
     assertEquals(FilteredTranslationStore.class.getSimpleName() + " [" + store1.service().type().name() + ']', store1.toString());
     assertFalse(store1.equals(null));

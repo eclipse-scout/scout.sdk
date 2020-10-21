@@ -32,8 +32,8 @@ public class StringBasedCompilationUnitWithEcj implements ICompilationUnit {
 
   public StringBasedCompilationUnitWithEcj(String packageName, String fileName, char[] src, String moduleName, String destinationPath) {
     m_destinationPath = destinationPath;
-    int dot = fileName.indexOf(JavaTypes.C_DOT);
-    String mainTypeName = dot >= 0 ? fileName.substring(0, dot) : fileName;
+    var dot = fileName.indexOf(JavaTypes.C_DOT);
+    var mainTypeName = dot >= 0 ? fileName.substring(0, dot) : fileName;
     m_packageName = packageName != null ? CharOperation.splitOn(JavaTypes.C_DOT, packageName.toCharArray()) : null;
     m_fileName = fileName.toCharArray();
     m_mainTypeName = mainTypeName.toCharArray();
@@ -87,7 +87,7 @@ public class StringBasedCompilationUnitWithEcj implements ICompilationUnit {
   }
 
   protected static String calcFqn(String packageName, String mainTypeName) {
-    StringBuilder fqnBuilder = new StringBuilder();
+    var fqnBuilder = new StringBuilder();
     if (Strings.hasText(packageName)) {
       fqnBuilder.append(packageName);
       fqnBuilder.append(JavaTypes.C_DOT);

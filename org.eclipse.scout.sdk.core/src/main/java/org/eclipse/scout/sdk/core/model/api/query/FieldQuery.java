@@ -128,12 +128,12 @@ public class FieldQuery extends AbstractQuery<IField> implements Predicate<IFiel
    */
   @Override
   public boolean test(IField f) {
-    String name = getName();
+    var name = getName();
     if (name != null && !name.equals(f.elementName())) {
       return false;
     }
 
-    int flags = getFlags();
+    var flags = getFlags();
     return flags < 0 || (f.flags() & m_flags) == m_flags;
   }
 

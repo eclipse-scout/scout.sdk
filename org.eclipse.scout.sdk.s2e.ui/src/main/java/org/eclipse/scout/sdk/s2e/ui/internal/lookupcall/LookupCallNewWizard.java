@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.lookupcall;
 
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.core.s.lookupcall.LookupCallNewOperation;
@@ -59,7 +58,7 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
     op.setSharedSourceFolder(input.environment().toScoutSourceFolder(m_page1.getSourceFolder()));
     op.setSuperType(m_page1.getSuperType().getFullyQualifiedName());
     op.setKeyType(m_page1.getKeyType().getFullyQualifiedName());
-    IPackageFragmentRoot serverSourceFolder = m_page1.getServerSourceFolder();
+    var serverSourceFolder = m_page1.getServerSourceFolder();
     if (JdtUtils.exists(serverSourceFolder)) {
       op.setServerSourceFolder(input.environment().toScoutSourceFolder(serverSourceFolder));
     }
@@ -68,7 +67,7 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
     IJavaProject testProject;
     if (op.getTestSourceFolder() == null) {
       // calculate test source if not already set
-      IPackageFragmentRoot testSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getServerSourceFolder(), null /* validation is done in the operation */, "LookupCall test");
+      var testSourceFolder = S2eUiUtils.getTestSourceFolder(m_page1.getServerSourceFolder(), null /* validation is done in the operation */, "LookupCall test");
       if (testSourceFolder != null) {
         testProject = testSourceFolder.getJavaProject();
         op.setTestSourceFolder(input.environment().toScoutSourceFolder(testSourceFolder));

@@ -41,9 +41,9 @@ public final class ClassIds {
    * @return The new id or {@code null} if no provider returned an id.
    */
   public static String next(String ownerTypeFqn) {
-    for (Function<String, String> gen : STORE) {
+    for (var gen : STORE) {
       try {
-        String newId = gen.apply(ownerTypeFqn);
+        var newId = gen.apply(ownerTypeFqn);
         if (newId != null) {
           return newId;
         }

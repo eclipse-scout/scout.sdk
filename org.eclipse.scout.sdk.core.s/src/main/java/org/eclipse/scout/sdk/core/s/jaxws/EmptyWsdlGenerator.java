@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.s.jaxws;
 import static java.util.Collections.reverse;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
@@ -32,8 +31,8 @@ public class EmptyWsdlGenerator implements ISourceGenerator<ISourceBuilder<?>> {
 
   @Override
   public void generate(ISourceBuilder<?> builder) {
-    String name = name().get();
-    String nameSpace = packageToNamespace(name, packageName().get());
+    var name = name().get();
+    var nameSpace = packageToNamespace(name, packageName().get());
 
     builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").nl();
     builder.append("<wsdl:definitions name=\"").append(name).append('"').nl();
@@ -81,11 +80,11 @@ public class EmptyWsdlGenerator implements ISourceGenerator<ISourceBuilder<?>> {
   }
 
   protected static String packageToNamespace(String name, String packageName) {
-    String[] parts = packageName.split("\\.");
+    var parts = packageName.split("\\.");
     if (parts.length > 0 && name.equalsIgnoreCase(parts[parts.length - 1])) {
       parts = Arrays.copyOf(parts, parts.length - 1);
     }
-    List<String> partsInXmlOrder = Arrays.asList(parts);
+    var partsInXmlOrder = Arrays.asList(parts);
     reverse(partsInXmlOrder);
     return String.join(".", partsInXmlOrder);
   }

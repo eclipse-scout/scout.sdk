@@ -101,17 +101,17 @@ public class TextField extends Composite {
 
   @SuppressWarnings("pmd:NPathComplexity")
   protected void createContent(Composite parent) {
-    boolean hasLabel = hasLabel();
-    boolean isHyperLinkLabel = isHyperlinkLabel();
-    boolean hasImage = hasImage();
-    boolean isMultiLine = isMultiLine();
+    var hasLabel = hasLabel();
+    var isHyperLinkLabel = isHyperlinkLabel();
+    var hasImage = hasImage();
+    var isMultiLine = isMultiLine();
 
     // create controls
     if (isHyperLinkLabel) {
-      Hyperlink hyperlink = new Hyperlink(parent, SWT.NONE);
+      var hyperlink = new Hyperlink(parent, SWT.NONE);
       hyperlink.setUnderlined(true);
 
-      Color fg = JFaceColors.getHyperlinkText(parent.getDisplay());
+      var fg = JFaceColors.getHyperlinkText(parent.getDisplay());
       if (fg == null) {
         fg = parent.getDisplay().getSystemColor(SWT.COLOR_LINK_FOREGROUND);
       }
@@ -127,7 +127,7 @@ public class TextField extends Composite {
       m_imgLabel = new Label(parent, SWT.NONE);
       m_imgLabel.setImage(getImage());
     }
-    int textStyle = SWT.BORDER;
+    var textStyle = SWT.BORDER;
     if (isMultiLine) {
       textStyle |= SWT.MULTI;
     }
@@ -137,9 +137,9 @@ public class TextField extends Composite {
     m_text = new StyledTextEx(parent, textStyle);
 
     // calculate offsets
-    int textFieldMarginLeft = 0;
-    int imgOffset = 0;
-    int labelOffset = 0;
+    var textFieldMarginLeft = 0;
+    var imgOffset = 0;
+    var labelOffset = 0;
     if (hasLabel) {
       labelOffset = getLabelWidth();
     }
@@ -152,7 +152,7 @@ public class TextField extends Composite {
 
     // layout
     parent.setLayout(new FormLayout());
-    FormData labelData = new FormData();
+    var labelData = new FormData();
     if (isHyperLinkLabel) {
       labelData.top = new FormAttachment(0, 3);
     }
@@ -161,7 +161,7 @@ public class TextField extends Composite {
     }
     labelData.right = new FormAttachment(m_text, -textFieldMarginLeft - imgOffset);
     m_label.setLayoutData(labelData);
-    FormData textData = new FormData();
+    var textData = new FormData();
     textData.top = new FormAttachment(0, 0);
     textData.right = new FormAttachment(100, 0);
     textData.left = new FormAttachment(0, textFieldMarginLeft + labelOffset + imgOffset);
@@ -170,7 +170,7 @@ public class TextField extends Composite {
     }
     m_text.setLayoutData(textData);
     if (m_imgLabel != null) {
-      FormData imgData = new FormData();
+      var imgData = new FormData();
       imgData.top = new FormAttachment(0, 5);
       imgData.left = new FormAttachment(0, labelOffset + 6);
       m_imgLabel.setLayoutData(imgData);
@@ -409,7 +409,7 @@ public class TextField extends Composite {
    */
   @Override
   public boolean isEnabled() {
-    boolean enabled = super.isEnabled();
+    var enabled = super.isEnabled();
     if (m_text == null || m_text.isDisposed()) {
       return enabled;
     }

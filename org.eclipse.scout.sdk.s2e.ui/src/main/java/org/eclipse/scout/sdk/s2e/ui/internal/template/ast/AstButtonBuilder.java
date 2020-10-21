@@ -29,7 +29,7 @@ public class AstButtonBuilder extends AstTypeBuilder<AstButtonBuilder> {
   public AstButtonBuilder insert() {
     super.insert();
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IButton().fqn());
     }

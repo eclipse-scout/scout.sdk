@@ -17,14 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.fixture.AbstractClass;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
@@ -68,17 +65,17 @@ public class MethodGeneratorTest {
 
   @Test
   public void testMethod(IJavaEnvironment env) {
-    IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator = MethodGenerator.create()
+    var generator = MethodGenerator.create()
         .asPublic()
         .asAbstract()
         .withAnnotation(AnnotationGenerator.createOverride())
         .withAnnotation(AnnotationGenerator.createSuppressWarnings("checked"))
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withElementName("testMethod")
-        .withException(IOException.class.getName())
-        .withException(SecurityException.class.getName())
-        .withException(RuntimeException.class.getName())
-        .withoutException(filter -> RuntimeException.class.getName().equals(filter.apply().get()))
+        .withThrowable(IOException.class.getName())
+        .withThrowable(SecurityException.class.getName())
+        .withThrowable(RuntimeException.class.getName())
+        .withoutThrowable(filter -> RuntimeException.class.getName().equals(filter.apply().get().fqn()))
         .withReturnType(JavaTypes._byte)
         .withParameter(
             MethodParameterGenerator.create()
@@ -117,7 +114,7 @@ public class MethodGeneratorTest {
 
   @Test
   public void testSetter(IJavaEnvironment env) {
-    IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator = MethodGenerator.createSetter("m_testField", JavaTypes._int)
+    var generator = MethodGenerator.createSetter("m_testField", JavaTypes._int)
         .asSynchronized()
         .withoutParameter("notexisting")
         .withTypeParameter(
@@ -139,7 +136,7 @@ public class MethodGeneratorTest {
 
   @Test
   public void testCreateOverride(IJavaEnvironment env) {
-    ITypeGenerator<?> typeGenerator = TypeGenerator.create()
+    var typeGenerator = TypeGenerator.create()
         .setDeclaringFullyQualifiedName(TESTING_TARGET_PACKAGE)
         .withSuperClass(AbstractClass.class.getName());
 
@@ -185,7 +182,7 @@ public class MethodGeneratorTest {
 
   @Test
   public void testCreateUnimplemented(IJavaEnvironment env) {
-    PrimaryTypeGenerator<?> typeGenerator = PrimaryTypeGenerator.create()
+    var typeGenerator = PrimaryTypeGenerator.create()
         .withPackageName("a.b.c")
         .withElementName("TestClass")
         .withSuperClass(AbstractClass.class.getName())
@@ -196,7 +193,7 @@ public class MethodGeneratorTest {
 
   @Test
   public void testGetterFromFieldGenerator(IJavaEnvironment env) {
-    IFieldGenerator<?> generator = FieldGenerator.create()
+    var generator = FieldGenerator.create()
         .withElementName("m_testField")
         .withDataType(JavaTypes._long);
     assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest3.txt", MethodGenerator.createGetter(generator));
@@ -204,7 +201,7 @@ public class MethodGeneratorTest {
 
   @Test
   public void testSetterFromFieldGenerator(IJavaEnvironment env) {
-    IFieldGenerator<?> generator = FieldGenerator.create()
+    var generator = FieldGenerator.create()
         .withElementName("m_testField")
         .withDataType(JavaTypes._int);
     assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest2.txt", MethodGenerator.createSetter(generator).asSynchronized());
@@ -212,7 +209,7 @@ public class MethodGeneratorTest {
 
   @Test
   public void testVarargsInterfaceMethod() {
-    String src = MethodGenerator.create()
+    var src = MethodGenerator.create()
         .withFlags(Flags.AccVarargs)
         .withFlags(Flags.AccInterface)
         .withElementName("testMethod")

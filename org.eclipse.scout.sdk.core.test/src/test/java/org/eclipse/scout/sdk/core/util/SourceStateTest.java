@@ -65,11 +65,11 @@ public class SourceStateTest {
     assertFalse(isInCode("a //".toCharArray(), 2));
     assertFalse(isInCode("a /*".toCharArray(), 2));
     assertFalse(isInCode("a \"".toCharArray(), 2));
-    String simpleLineComment = "a //comment\ncode";
+    var simpleLineComment = "a //comment\ncode";
     assertFalse(isInCode(simpleLineComment.toCharArray(), 10)); // t
     assertTrue(isInCode(simpleLineComment.toCharArray(), 11)); // \n
 
-    String simpleBlockComment = "a/*comment*/code";
+    var simpleBlockComment = "a/*comment*/code";
     assertTrue(isInCode(simpleBlockComment.toCharArray(), 0));
     assertFalse(isInCode(simpleBlockComment.toCharArray(), 1));
     assertFalse(isInCode(simpleBlockComment.toCharArray(), 2));
@@ -112,14 +112,14 @@ public class SourceStateTest {
 
     assertFalse(isInComment("a/b".toCharArray(), 1));
 
-    String simpleLineComment = "a//c\n";
+    var simpleLineComment = "a//c\n";
     assertFalse(isInComment(simpleLineComment.toCharArray(), 0));
     assertTrue(isInComment(simpleLineComment.toCharArray(), 1));
     assertTrue(isInComment(simpleLineComment.toCharArray(), 2));
     assertTrue(isInComment(simpleLineComment.toCharArray(), 3));
     assertFalse(isInComment(simpleLineComment.toCharArray(), 4));
 
-    String simpleBlockComment = "a/*comment*/code";
+    var simpleBlockComment = "a/*comment*/code";
     assertTrue(isInComment(simpleBlockComment.toCharArray(), 1));
     assertTrue(isInComment(simpleBlockComment.toCharArray(), 2));
     assertTrue(isInComment(simpleBlockComment.toCharArray(), 10));
@@ -136,7 +136,7 @@ public class SourceStateTest {
 
   @Test
   public void testInStringWithLimitsJava() {
-    char[] src = "\"abc\"".toCharArray();
+    var src = "\"abc\"".toCharArray();
     assertTrue(isInString(src, 0));
     assertTrue(isInString(src, src.length - 1));
     assertFalse(isInString(new char[]{}, src.length - 1));
@@ -144,7 +144,7 @@ public class SourceStateTest {
 
   @Test
   public void testInStringWithLimitsJs() {
-    char[] src = "'abc'".toCharArray();
+    var src = "'abc'".toCharArray();
     assertTrue(isInString(src, 0));
     assertTrue(isInString(src, src.length - 1));
     assertFalse(isInString(new char[]{}, src.length - 1));
@@ -192,7 +192,7 @@ public class SourceStateTest {
 
   @Test
   public void testOutOfBounds() {
-    char[] src = "/*".toCharArray();
+    var src = "/*".toCharArray();
     assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 0));
     assertEquals(State.IN_BLOCK_COMMENT, parse(src, 1));
     assertEquals(State.IN_BLOCK_COMMENT, parse(src, 100));
@@ -201,7 +201,7 @@ public class SourceStateTest {
 
   @Test
   public void testJavaDoc() {
-    char[] src = ("/****\n" +
+    var src = ("/****\n" +
         " * multi block\n" +
         " ****/\n" +
         "code\n" +
@@ -242,7 +242,7 @@ public class SourceStateTest {
 
   @Test
   public void testLineCommentRemovingBlockComment() {
-    char[] src =
+    var src =
         ("// line comment\n" +
             "// /*\n" +
             "12343/12\n" +
@@ -262,7 +262,7 @@ public class SourceStateTest {
 
   @Test
   public void testWithBackTicksJs() {
-    String src = "a`b\\`c`d";
+    var src = "a`b\\`c`d";
     assertFalse(isInString(src, 0));
     assertTrue(isInString(src, 1));
     assertTrue(isInString(src, 2));
@@ -275,7 +275,7 @@ public class SourceStateTest {
 
   @Test
   public void testWithDifferentStringDelimiterInsideString1() {
-    String src = "a'inside\"still-inside'b";
+    var src = "a'inside\"still-inside'b";
     assertFalse(isInString(src, 0));
     assertTrue(isInString(src, 1));
     assertTrue(isInString(src, 8));
@@ -286,7 +286,7 @@ public class SourceStateTest {
 
   @Test
   public void testWithDifferentStringDelimiterInsideString2() {
-    String src = "a'inside`still-inside'b";
+    var src = "a'inside`still-inside'b";
     assertFalse(isInString(src, 0));
     assertTrue(isInString(src, 1));
     assertTrue(isInString(src, 8));

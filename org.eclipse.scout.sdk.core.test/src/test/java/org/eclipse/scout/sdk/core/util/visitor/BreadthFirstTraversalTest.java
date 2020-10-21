@@ -29,7 +29,7 @@ public class BreadthFirstTraversalTest {
   @Test
   public void testWithNullChildren() {
     IBreadthFirstVisitor<Object> visitor = (element, level, index) -> TreeVisitResult.CONTINUE;
-    TreeVisitResult result = TreeTraversals.create(visitor, this::children).traverse(m_root);
+    var result = TreeTraversals.create(visitor, this::children).traverse(m_root);
     assertEquals(TreeVisitResult.CONTINUE, result);
   }
 

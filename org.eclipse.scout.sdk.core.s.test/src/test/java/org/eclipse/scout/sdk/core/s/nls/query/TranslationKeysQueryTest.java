@@ -18,8 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
@@ -28,7 +26,6 @@ import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
-import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -42,18 +39,18 @@ public class TranslationKeysQueryTest {
   @Test
   @SuppressWarnings({"SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes"})
   public void testWithSingleKey(TestingEnvironment env) {
-    String keyToFind1 = "keyToFind1";
-    String fileName = "test.java";
-    String prefix = "abc";
-    String suffix = "abcd";
+    var keyToFind1 = "keyToFind1";
+    var fileName = "test.java";
+    var prefix = "abc";
+    var suffix = "abcd";
 
-    TranslationKeysQuery query = new TranslationKeysQuery(keyToFind1, "testquery");
-    searchIn(query, fileName, prefix + '"' + keyToFind1 + '"' + suffix, env);
+    var query = new TranslationKeysQuery(keyToFind1, "testquery");
+    searchIn(query, fileName, String.join("\"", prefix, keyToFind1, suffix), env);
     assertEquals(1, query.result().count());
 
-    int expectedStart = prefix.length() + 1; /* leading '"' */
-    int expectedEnd = expectedStart + keyToFind1.length();
-    FileQueryMatch finding = query.result(keyToFind1).findAny().get();
+    var expectedStart = prefix.length() + 1; /* leading '"' */
+    var expectedEnd = expectedStart + keyToFind1.length();
+    var finding = query.result(keyToFind1).findAny().get();
     assertEquals(fileName, finding.file().toString());
     assertEquals(keyToFind1.length(), finding.length());
     assertEquals(expectedStart, finding.start());
@@ -67,13 +64,13 @@ public class TranslationKeysQueryTest {
 
   @Test
   public void testWithMultipleKeys(TestingEnvironment env) {
-    String keyToFind1 = "keyToFind1";
-    String keyToFind2 = "keyToFind2";
-    String fileJava = "test.java";
-    String fileJs = "test.js";
-    String fileHtml = "test.html";
+    var keyToFind1 = "keyToFind1";
+    var keyToFind2 = "keyToFind2";
+    var fileJava = "test.java";
+    var fileJs = "test.js";
+    var fileHtml = "test.html";
 
-    TranslationKeysQuery query = new TranslationKeysQuery(Arrays.asList(keyToFind1, keyToFind2), "testquery");
+    var query = new TranslationKeysQuery(Arrays.asList(keyToFind1, keyToFind2), "testquery");
     searchIn(query, "test.txt", "", env);
     searchIn(query, "test", "", env);
     searchIn(query, fileJava, "public class Test { public void test() { return TEXTS.get(\"" + keyToFind1 + "\"); } }", env);
@@ -92,7 +89,7 @@ public class TranslationKeysQueryTest {
     assertEquals(0, query.result(Paths.get("notexisting")).size());
     assertEquals(2, query.result(Paths.get("test.js")).size());
 
-    Set<String> files = query.result(keyToFind1)
+    var files = query.result(keyToFind1)
         .map(FileRange::file)
         .map(Path::toString)
         .collect(toSet());
@@ -101,10 +98,10 @@ public class TranslationKeysQueryTest {
     assertTrue(files.contains(fileJs));
     assertTrue(files.contains(fileJava));
 
-    Map<String, Set<FileQueryMatch>> resultByKey = query.resultByKey();
+    var resultByKey = query.resultByKey();
     assertEquals(2, resultByKey.size());
 
-    Set<String> find2 = resultByKey.get(keyToFind2).stream().map(FileRange::file).map(Path::toString).collect(toSet());
+    var find2 = resultByKey.get(keyToFind2).stream().map(FileRange::file).map(Path::toString).collect(toSet());
     assertTrue(find2.contains(fileHtml));
   }
 

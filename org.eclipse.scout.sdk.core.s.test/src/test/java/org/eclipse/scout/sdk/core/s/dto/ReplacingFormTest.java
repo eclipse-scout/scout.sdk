@@ -18,7 +18,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +47,7 @@ public class ReplacingFormTest {
 
     // fields of ReplacingFormData
     assertEquals(1, replacingFormData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.ReplacingFormData'");
-    IField serialVersionUID = assertFieldExist(replacingFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(replacingFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");

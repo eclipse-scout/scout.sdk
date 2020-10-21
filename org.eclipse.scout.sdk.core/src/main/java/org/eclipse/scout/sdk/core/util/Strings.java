@@ -58,6 +58,7 @@ public final class Strings {
    *          The second array
    * @return {@code true} if both have equal content or both are {@code null}.
    */
+  @SuppressWarnings("Convert2streamapi")
   public static boolean equals(char[] first, char[] second) {
     //noinspection ArrayEquality
     if (first == second) {
@@ -69,7 +70,7 @@ public final class Strings {
     if (first.length != second.length) {
       return false;
     }
-    for (int i = first.length - 1; i >= 0; i--) {
+    for (var i = first.length - 1; i >= 0; i--) {
       if (first[i] != second[i]) {
         return false;
       }
@@ -90,6 +91,7 @@ public final class Strings {
    * @return {@code true} if the two arrays are identical character by character according to the value of
    *         isCaseSensitive or if both are {@code null}.
    */
+  @SuppressWarnings("Convert2streamapi")
   public static boolean equals(char[] first, char[] second, boolean isCaseSensitive) {
     if (isCaseSensitive) {
       return equals(first, second);
@@ -104,7 +106,7 @@ public final class Strings {
     if (first.length != second.length) {
       return false;
     }
-    for (int i = first.length - 1; i >= 0; i--) {
+    for (var i = first.length - 1; i >= 0; i--) {
       if (Character.toLowerCase(first[i]) != Character.toLowerCase(second[i])) {
         return false;
       }
@@ -128,6 +130,7 @@ public final class Strings {
    *          The second {@link CharSequence}
    * @return {@code true} if both have equal content or both are {@code null}.
    */
+  @SuppressWarnings("Convert2streamapi")
   public static boolean equals(CharSequence first, CharSequence second) {
     if (first == second) {
       return true;
@@ -138,7 +141,7 @@ public final class Strings {
     if (first.length() != second.length()) {
       return false;
     }
-    for (int i = first.length() - 1; i >= 0; i--) {
+    for (var i = first.length() - 1; i >= 0; i--) {
       if (first.charAt(i) != second.charAt(i)) {
         return false;
       }
@@ -159,6 +162,7 @@ public final class Strings {
    * @return {@code true} if the two sequences are identical character by character according to the value of
    *         isCaseSensitive or if both are {@code null}.
    */
+  @SuppressWarnings("Convert2streamapi")
   public static boolean equals(CharSequence first, CharSequence second, boolean isCaseSensitive) {
     if (isCaseSensitive) {
       return equals(first, second);
@@ -173,7 +177,7 @@ public final class Strings {
     if (first.length() != second.length()) {
       return false;
     }
-    for (int i = first.length() - 1; i >= 0; i--) {
+    for (var i = first.length() - 1; i >= 0; i--) {
       if (Character.toLowerCase(first.charAt(i)) != Character.toLowerCase(second.charAt(i))) {
         return false;
       }
@@ -230,9 +234,10 @@ public final class Strings {
    * @throws NullPointerException
    *           if the array is {@code null}.
    */
+  @SuppressWarnings("Convert2streamapi")
   public static int indexOf(char toBeFound, char[] searchIn, int start, int end) {
-    int limit = Math.min(end, searchIn.length);
-    for (int i = start; i < limit; ++i) {
+    var limit = Math.min(end, searchIn.length);
+    for (var i = start; i < limit; ++i) {
       if (toBeFound == searchIn[i]) {
         return i;
       }
@@ -289,9 +294,10 @@ public final class Strings {
    * @throws NullPointerException
    *           if the {@link CharSequence} is {@code null}.
    */
+  @SuppressWarnings("Convert2streamapi")
   public static int indexOf(char toBeFound, CharSequence searchIn, int start, int end) {
-    int limit = Math.max(Math.min(end, searchIn.length()), 0);
-    for (int i = start; i < limit; i++) {
+    var limit = Math.max(Math.min(end, searchIn.length()), 0);
+    for (var i = start; i < limit; i++) {
       if (toBeFound == searchIn.charAt(i)) {
         return i;
       }
@@ -317,7 +323,7 @@ public final class Strings {
    * Like {@link #indexOf(char[], char[], int, int)}.
    */
   public static int indexOf(CharSequence toBeFound, CharSequence searchIn, int start, int end) {
-    int toBeFoundLength = toBeFound.length();
+    var toBeFoundLength = toBeFound.length();
     if (toBeFoundLength > end || start < 0) {
       return INDEX_NOT_FOUND;
     }
@@ -326,7 +332,7 @@ public final class Strings {
     }
     arrayLoop: for (int i = start, max = end - toBeFoundLength + 1; i < max; i++) {
       if (searchIn.charAt(i) == toBeFound.charAt(0)) {
-        for (int j = 1; j < toBeFoundLength; j++) {
+        for (var j = 1; j < toBeFoundLength; j++) {
           if (searchIn.charAt(i + j) != toBeFound.charAt(j)) {
             continue arrayLoop;
           }
@@ -410,7 +416,7 @@ public final class Strings {
    */
   @SuppressWarnings("IfStatementWithIdenticalBranches")
   public static int indexOf(char[] toBeFound, char[] searchIn, int start, int end, boolean isCaseSensitive) {
-    int toBeFoundLength = toBeFound.length;
+    var toBeFoundLength = toBeFound.length;
     if (toBeFoundLength > end || start < 0) {
       return INDEX_NOT_FOUND;
     }
@@ -420,7 +426,7 @@ public final class Strings {
     if (isCaseSensitive) {
       arrayLoop: for (int i = start, max = end - toBeFoundLength + 1; i < max; i++) {
         if (searchIn[i] == toBeFound[0]) {
-          for (int j = 1; j < toBeFoundLength; j++) {
+          for (var j = 1; j < toBeFoundLength; j++) {
             if (searchIn[i + j] != toBeFound[j]) {
               continue arrayLoop;
             }
@@ -432,7 +438,7 @@ public final class Strings {
     else {
       arrayLoop: for (int i = start, max = end - toBeFoundLength + 1; i < max; i++) {
         if (Character.toLowerCase(searchIn[i]) == Character.toLowerCase(toBeFound[0])) {
-          for (int j = 1; j < toBeFoundLength; j++) {
+          for (var j = 1; j < toBeFoundLength; j++) {
             if (Character.toLowerCase(searchIn[i + j]) != Character.toLowerCase(toBeFound[j])) {
               continue arrayLoop;
             }
@@ -494,7 +500,7 @@ public final class Strings {
    */
   @SuppressWarnings("squid:S881")
   public static int lastIndexOf(char toBeFound, CharSequence searchIn, int startIndex, int endIndex) {
-    for (int i = endIndex; --i >= startIndex;) {
+    for (var i = endIndex; --i >= startIndex;) {
       if (toBeFound == searchIn.charAt(i)) {
         return i;
       }
@@ -514,7 +520,7 @@ public final class Strings {
    */
   @SuppressWarnings("HardcodedLineSeparator")
   public static int nextLineEnd(char[] searchIn, int offset) {
-    int nlPos = indexOf('\n', searchIn, offset);
+    var nlPos = indexOf('\n', searchIn, offset);
     if (nlPos < 0) {
       return searchIn.length; // no more newline found: search to the end of searchIn
     }
@@ -543,9 +549,9 @@ public final class Strings {
       return "";
     }
 
-    StringBuilder result = new StringBuilder(text.length());
-    for (int i = 0; i < text.length(); i++) {
-      char c = text.charAt(i);
+    var result = new StringBuilder(text.length());
+    for (var i = 0; i < text.length(); i++) {
+      var c = text.charAt(i);
       if (c == search) {
         result.append(replacement);
       }
@@ -567,7 +573,7 @@ public final class Strings {
    */
   public static char[] toCharArray(StringBuilder s) {
     Ensure.notNull(s);
-    char[] buf = new char[s.length()];
+    var buf = new char[s.length()];
     s.getChars(0, buf.length, buf, 0);
     return buf;
   }
@@ -636,16 +642,16 @@ public final class Strings {
     if (isEmpty(text) || isEmpty(searchString) || replacement == null || Objects.equals(searchString, replacement)) {
       return text;
     }
-    int start = 0;
-    int end = indexOf(searchString, text, start);
+    var start = 0;
+    var end = indexOf(searchString, text, start);
     if (end == INDEX_NOT_FOUND) {
       return text;
     }
-    int replLength = searchString.length();
-    int increase = replacement.length() - replLength;
+    var replLength = searchString.length();
+    var increase = replacement.length() - replLength;
     increase = Math.max(increase, 0);
     increase *= 16;
-    StringBuilder buf = new StringBuilder(text.length() + increase);
+    var buf = new StringBuilder(text.length() + increase);
     while (end != INDEX_NOT_FOUND) {
       buf.append(text, start, end).append(replacement);
       start = end + replLength;
@@ -686,8 +692,8 @@ public final class Strings {
     if (isEmpty(str) || isEmpty(sub)) {
       return 0;
     }
-    int count = 0;
-    int idx = 0;
+    var count = 0;
+    var idx = 0;
     while ((idx = indexOf(sub, str, idx)) != INDEX_NOT_FOUND) {
       count++;
       idx += sub.length();
@@ -811,8 +817,8 @@ public final class Strings {
    *           While reading data from the stream.
    */
   public static StringBuilder fromInputStream(InputStream is, Charset charset) throws IOException {
-    char[] buffer = new char[8192];
-    StringBuilder out = new StringBuilder(buffer.length);
+    var buffer = new char[8192];
+    var out = new StringBuilder(buffer.length);
     int length;
     //noinspection resource,IOResourceOpenedButNotSafelyClosed
     Reader in = new InputStreamReader(is, charset);
@@ -833,9 +839,9 @@ public final class Strings {
    */
   @SuppressWarnings({"squid:S1148", "squid:S1166"})
   public static String fromThrowable(Throwable t) {
-    try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
+    try (var w = new StringWriter(); var p = new PrintWriter(w)) {
       t.printStackTrace(p);
-      StringBuffer buffer = w.getBuffer();
+      var buffer = w.getBuffer();
       buffer.delete(buffer.length() - lineSeparator().length(), buffer.length());
       return w.toString();
     }
@@ -885,7 +891,7 @@ public final class Strings {
       return null;
     }
 
-    StringBuilder b = new StringBuilder(s.length() * 2);
+    var b = new StringBuilder(s.length() * 2);
     b.append('"'); // opening delimiter
     b.append(replaceLiterals(s, false));
     b.append('"'); // closing delimiter
@@ -918,14 +924,14 @@ public final class Strings {
    * @return The input with removed leading and trailing quotes respecting the enabled quote types.
    */
   public static CharSequence withoutQuotes(CharSequence literal, boolean removeDouble, boolean removeSingle, boolean removeBackTick) {
-    boolean needsProcessing = removeDouble || removeSingle || removeBackTick;
+    var needsProcessing = removeDouble || removeSingle || removeBackTick;
     if (literal == null || literal.length() < 2 || !needsProcessing) {
       return literal;
     }
 
-    boolean[] enabled = new boolean[]{removeDouble, removeSingle, removeBackTick};
-    char[] toRemove = new char[]{'"', '\'', '`'};
-    for (int i = 0; i < toRemove.length; i++) {
+    var enabled = new boolean[]{removeDouble, removeSingle, removeBackTick};
+    var toRemove = new char[]{'"', '\'', '`'};
+    for (var i = 0; i < toRemove.length; i++) {
       if (enabled[i] && literal.charAt(0) == toRemove[i] && literal.charAt(literal.length() - 1) == toRemove[i]) {
         return literal.subSequence(1, literal.length() - 1);
       }
@@ -1012,22 +1018,22 @@ public final class Strings {
       return text;
     }
 
-    int searchLength = searchList.length;
-    int replacementLength = replacementList.length;
+    var searchLength = searchList.length;
+    var replacementLength = replacementList.length;
     if (searchLength != replacementLength) { // make sure lengths are ok, these need to be equal
       throw newFail("Search and Replace array lengths don't match: {} vs {}", searchLength, replacementLength);
     }
 
     // keep track of which still have matches
-    boolean[] noMoreMatchesForReplIndex = new boolean[searchLength];
+    var noMoreMatchesForReplIndex = new boolean[searchLength];
 
     // index on index that the match was found
-    int textIndex = INDEX_NOT_FOUND;
-    int replaceIndex = INDEX_NOT_FOUND;
+    var textIndex = INDEX_NOT_FOUND;
+    var replaceIndex = INDEX_NOT_FOUND;
     int tempIndex;
 
     // index of replace array that will replace the search string found
-    for (int i = 0; i < searchLength; i++) {
+    for (var i = 0; i < searchLength; i++) {
       if (noMoreMatchesForReplIndex[i] || searchList[i] == null || searchList[i].length() == 0 || replacementList[i] == null) {
         continue;
       }
@@ -1050,14 +1056,14 @@ public final class Strings {
       return text;
     }
 
-    int start = 0;
+    var start = 0;
 
     // get a good guess on the size of the result buffer so it doesn't have to double if it goes over a bit
-    int increase = getLengthIncreaseGuess(text, searchList, replacementList);
-    StringBuilder result = new StringBuilder(text.length() + increase);
+    var increase = getLengthIncreaseGuess(text, searchList, replacementList);
+    var result = new StringBuilder(text.length() + increase);
     while (textIndex != INDEX_NOT_FOUND) {
 
-      for (int i = start; i < textIndex; i++) {
+      for (var i = start; i < textIndex; i++) {
         result.append(text.charAt(i));
       }
       result.append(replacementList[replaceIndex]);
@@ -1067,7 +1073,7 @@ public final class Strings {
       textIndex = INDEX_NOT_FOUND;
       replaceIndex = INDEX_NOT_FOUND;
       // find the next earliest match
-      for (int i = 0; i < searchLength; i++) {
+      for (var i = 0; i < searchLength; i++) {
         if (noMoreMatchesForReplIndex[i] || searchList[i] == null || searchList[i].length() == 0 || replacementList[i] == null) {
           continue;
         }
@@ -1085,21 +1091,22 @@ public final class Strings {
         }
       }
     }
-    int textLength = text.length();
-    for (int i = start; i < textLength; i++) {
+    var textLength = text.length();
+    for (var i = start; i < textLength; i++) {
       result.append(text.charAt(i));
     }
     return result;
   }
 
+  @SuppressWarnings("Convert2streamapi")
   private static int getLengthIncreaseGuess(CharSequence text, CharSequence[] searchList, CharSequence[] replacementList) {
-    int increase = 0;
+    var increase = 0;
     // count the replacement text elements that are larger than their corresponding text being replaced
-    for (int i = 0; i < searchList.length; i++) {
+    for (var i = 0; i < searchList.length; i++) {
       if (searchList[i] == null || replacementList[i] == null) {
         continue;
       }
-      int longer = replacementList[i].length() - searchList[i].length();
+      var longer = replacementList[i].length() - searchList[i].length();
       if (longer > 0) {
         increase += 3 * longer; // assume 3 matches
       }
@@ -1125,12 +1132,13 @@ public final class Strings {
    * @return {@code true} if the CharSequence is null, empty or whitespace
    * @see #hasText(CharSequence)
    */
+  @SuppressWarnings("Convert2streamapi")
   public static boolean isBlank(CharSequence cs) {
     int strLen;
     if (cs == null || (strLen = cs.length()) == 0) {
       return true;
     }
-    for (int i = 0; i < strLen; i++) {
+    for (var i = 0; i < strLen; i++) {
       if (!Character.isWhitespace(cs.charAt(i))) {
         return false;
       }
@@ -1241,12 +1249,12 @@ public final class Strings {
     if (b == null) {
       return 1;
     }
-    int limit = Math.min(a.length(), b.length());
-    for (int i = 0; i < limit; i++) {
-      char x = a.charAt(i);
-      char y = b.charAt(i);
+    var limit = Math.min(a.length(), b.length());
+    for (var i = 0; i < limit; i++) {
+      var x = a.charAt(i);
+      var y = b.charAt(i);
       //noinspection CharUsedInArithmeticContext
-      int diff = x - y;
+      var diff = x - y;
       if (diff != 0) {
         return diff;
       }

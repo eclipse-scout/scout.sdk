@@ -26,7 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -75,7 +74,7 @@ public class TranslationImporter implements ITranslationImportInfo {
   }
 
   protected int doImport() {
-    List<List<String>> rawData = rawTableData();
+    var rawData = rawTableData();
     if (rawData.size() < 2) {
       return NO_DATA; // no data to import
     }
@@ -96,8 +95,8 @@ public class TranslationImporter implements ITranslationImportInfo {
       return NO_DATA;
     }
 
-    TranslationStoreStack stack = stack();
-    ITranslationStore targetForNewTranslations = storeForNewTranslations();
+    var stack = stack();
+    var targetForNewTranslations = storeForNewTranslations();
     stack.setChanging(true);
     try {
       m_importedTranslations.putAll(toImport.values().stream()
@@ -127,7 +126,7 @@ public class TranslationImporter implements ITranslationImportInfo {
       m_invalidRows.add(rowIndex);
       return null;
     }
-    String key = row.get(keyColumnIndex());
+    var key = row.get(keyColumnIndex());
     if (validateKey(key) != TranslationValidator.OK) {
       m_invalidRows.add(rowIndex);
       return null;
@@ -138,14 +137,14 @@ public class TranslationImporter implements ITranslationImportInfo {
       m_invalidRows.add(rowIndex);
       return null;
     }
-    String defaultLangText = row.get(defaultLanguageColumnIndex());
+    var defaultLangText = row.get(defaultLanguageColumnIndex());
     if (validateDefaultText(defaultLangText) != TranslationValidator.OK) {
       m_invalidRows.add(rowIndex);
       return null;
     }
 
     // create translation for row
-    Translation t = new Translation(key);
+    var t = new Translation(key);
     t.putText(Language.LANGUAGE_DEFAULT, defaultLangText);
     m_columnMapping.forEach((index, language) -> appendText(t, language, row, index));
     return t;
@@ -159,7 +158,7 @@ public class TranslationImporter implements ITranslationImportInfo {
     if (row.size() <= index) {
       return;
     }
-    String text = row.get(index);
+    var text = row.get(index);
     if (Strings.isEmpty(text)) {
       return;
     }
@@ -178,11 +177,11 @@ public class TranslationImporter implements ITranslationImportInfo {
   protected void parseHeader(List<String> headerRow) {
     Map<Integer, Language> columnMapping = new HashMap<>(headerRow.size() - 1);
     Map<Integer, String> unmappedColumns = new LinkedHashMap<>();
-    int keyColumnIndex = -1;
-    int defaultLanguageColumnIndex = -1;
+    var keyColumnIndex = -1;
+    var defaultLanguageColumnIndex = -1;
 
-    for (int i = 0; i < headerRow.size(); i++) {
-      String cell = headerRow.get(i);
+    for (var i = 0; i < headerRow.size(); i++) {
+      var cell = headerRow.get(i);
       if (Strings.isBlank(cell)) {
         if (!isEmptyColumn(i)) {
           unmappedColumns.put(i, cell);
@@ -197,7 +196,7 @@ public class TranslationImporter implements ITranslationImportInfo {
         defaultLanguageColumnIndex = i;
       }
       else {
-        Optional<Language> language = Language.parse(cell);
+        var language = Language.parse(cell);
         if (language.isPresent()) {
           columnMapping.put(i, language.get());
         }

@@ -10,15 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 
 /**
@@ -35,33 +27,33 @@ public class AstExtensionBuilder extends AstTypeBuilder<AstExtensionBuilder> {
   @Override
   @SuppressWarnings("unchecked")
   public AstExtensionBuilder insert() {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
 
-    String typeArgName = "OWNER";
-    ParameterizedType parameterizedType = ast.newParameterizedType(getSuperType());
-    SimpleType typeArg = ast.newSimpleType(ast.newName(typeArgName));
+    var typeArgName = "OWNER";
+    var parameterizedType = ast.newParameterizedType(getSuperType());
+    var typeArg = ast.newSimpleType(ast.newName(typeArgName));
     parameterizedType.typeArguments().add(typeArg);
     withSuperType(parameterizedType);
 
     super.insert();
 
     // add constructor
-    String argName = "owner";
-    MethodDeclaration constructor = ast.newMethodDeclaration();
+    var argName = "owner";
+    var constructor = ast.newMethodDeclaration();
     constructor.setConstructor(true);
-    SimpleName constrName = ast.newSimpleName(getTypeName() + getReadOnlySuffix());
+    var constrName = ast.newSimpleName(getTypeName() + getReadOnlySuffix());
     constructor.setName(constrName);
     constructor.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
-    SingleVariableDeclaration ownerArg = ast.newSingleVariableDeclaration();
-    SimpleType constrArg = ast.newSimpleType(ast.newName(typeArgName));
+    var ownerArg = ast.newSingleVariableDeclaration();
+    var constrArg = ast.newSimpleType(ast.newName(typeArgName));
     ownerArg.setType(constrArg);
     ownerArg.setName(ast.newSimpleName(argName));
     constructor.parameters().add(ownerArg);
 
-    SuperConstructorInvocation superConstructorInvocation = ast.newSuperConstructorInvocation();
+    var superConstructorInvocation = ast.newSuperConstructorInvocation();
     superConstructorInvocation.arguments().add(ast.newSimpleName(argName));
 
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(superConstructorInvocation);
 
     constructor.setBody(body);
@@ -69,7 +61,7 @@ public class AstExtensionBuilder extends AstTypeBuilder<AstExtensionBuilder> {
     get().bodyDeclarations().add(constructor);
 
     // linked positions
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
 
       ITrackedNodePosition typeNamePos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(constrName), 0, -getReadOnlySuffix().length());

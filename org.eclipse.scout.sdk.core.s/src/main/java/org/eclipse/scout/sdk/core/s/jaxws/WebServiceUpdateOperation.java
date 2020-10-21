@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import javax.xml.transform.TransformerException;
@@ -30,7 +28,6 @@ import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGene
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
@@ -38,14 +35,11 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Xml;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * <h3>{@link WebServiceUpdateOperation}</h3>
@@ -83,24 +77,22 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
       return;
     }
 
-    for (WebServiceImplementationUpdate up : m_webServiceImplUpdates) {
-      ICompilationUnit wsImpl = up.getWebServiceImpl().requireCompilationUnit();
-      ICompilationUnitGenerator<?> builder = wsImpl.toWorkingCopy();
-      IJavaEnvironment javaEnvironment = wsImpl.javaEnvironment();
+    for (var up : m_webServiceImplUpdates) {
+      var wsImpl = up.getWebServiceImpl().requireCompilationUnit();
+      var builder = wsImpl.toWorkingCopy();
+      var javaEnvironment = wsImpl.javaEnvironment();
 
       builder.mainType().ifPresent(mainType -> {
         // remove the old import to port type
         mainType.interfaces()
-            .map(af -> af.apply(javaEnvironment))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(af -> af.apply(javaEnvironment).stream())
             .forEach(builder::withoutImport);
 
         // remove old port type super interface
         removePortTypeSuperInterfaces(mainType, javaEnvironment);
 
         // new super interface
-        String newPortTypeFqn = up.getPackage() + JavaTypes.C_DOT + up.getPortTypeName();
+        var newPortTypeFqn = up.getPackage() + JavaTypes.C_DOT + up.getPortTypeName();
         mainType.withInterface(newPortTypeFqn);
       });
 
@@ -115,15 +107,13 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
     icuBuilder
         .mainType()
         .ifPresent(t -> t.methods().forEach(methodBuilder -> {
-          List<String> exceptions = methodBuilder.exceptions()
-              .map(func -> func.apply(javaEnvironment))
-              .filter(Optional::isPresent)
-              .map(Optional::get)
+          var exceptions = methodBuilder.throwables()
+              .flatMap(func -> func.apply(javaEnvironment).stream())
               .collect(toList());
-          methodBuilder.withoutException(element -> true); // remove all existing exceptions
-          for (String exc : exceptions) {
-            methodBuilder.withException(newPackage + JavaTypes.C_DOT + JavaTypes.simpleName(exc));
-            icuBuilder.withoutImport(exc);
+          methodBuilder.withoutThrowable(element -> true); // remove all existing exceptions
+          for (var exc : exceptions) {
+            methodBuilder.withThrowable(newPackage + JavaTypes.C_DOT + exc.simpleName());
+            icuBuilder.withoutImport(exc.fqn());
           }
         }));
   }
@@ -133,16 +123,16 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
       return;
     }
 
-    for (WebServiceClientUpdate up : m_webServiceClientUpdates) {
-      ICompilationUnit wsClient = up.getWebServiceClient().requireCompilationUnit();
-      IJavaEnvironment javaEnvironment = wsClient.javaEnvironment();
-      IScoutApi scoutApi = javaEnvironment.requireApi(IScoutApi.class);
-      ICompilationUnitGenerator<?> builder = wsClient.toWorkingCopy();
+    for (var up : m_webServiceClientUpdates) {
+      var wsClient = up.getWebServiceClient().requireCompilationUnit();
+      var javaEnvironment = wsClient.javaEnvironment();
+      var scoutApi = javaEnvironment.requireApi(IScoutApi.class);
+      var builder = wsClient.toWorkingCopy();
 
       builder.mainType()
           .ifPresent(mainType -> {
             // remove the old imports
-            for (String oldImport : JavaTypes.typeArguments(mainType.superClass().flatMap(af -> af.apply(javaEnvironment)).get())) {
+            for (var oldImport : JavaTypes.typeArguments(mainType.superClass().flatMap(af -> af.apply(javaEnvironment)).get())) {
               builder.withoutImport(oldImport);
             }
 
@@ -150,9 +140,9 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
             removePortTypeSuperInterfaces(mainType, javaEnvironment);
 
             // set new super class and super interface
-            String newPortTypeFqn = up.getPackage() + JavaTypes.C_DOT + up.getPortTypeName();
-            String newWebServiceFqn = up.getPackage() + JavaTypes.C_DOT + up.getWebServiceName();
-            StringBuilder superTypeFqnBuilder = new StringBuilder(scoutApi.AbstractWebServiceClient().fqn());
+            var newPortTypeFqn = up.getPackage() + JavaTypes.C_DOT + up.getPortTypeName();
+            var newWebServiceFqn = up.getPackage() + JavaTypes.C_DOT + up.getWebServiceName();
+            var superTypeFqnBuilder = new StringBuilder(scoutApi.AbstractWebServiceClient().fqn());
             superTypeFqnBuilder.append(JavaTypes.C_GENERIC_START).append(newWebServiceFqn).append(", ").append(newPortTypeFqn).append(JavaTypes.C_GENERIC_END);
             mainType
                 .withInterface(newPortTypeFqn)
@@ -173,32 +163,32 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
   }
 
   protected void updateJaxWsBinding(IEnvironment env, IProgress progress) {
-    Collection<Path> jaxwsBindingFiles = getJaxwsBindingFiles();
+    var jaxwsBindingFiles = getJaxwsBindingFiles();
     if (jaxwsBindingFiles.isEmpty()) {
       return;
     }
 
     progress.init(jaxwsBindingFiles.size() * 2, "Update Jax-Ws Bindings");
     try {
-      for (Path jaxwsBindingFile : jaxwsBindingFiles) {
-        Document document = Xml.get(jaxwsBindingFile);
-        String prefix = document.lookupPrefix(JaxWsUtils.JAX_WS_NAMESPACE);
-        for (BindingClassUpdate up : m_bindingClassUpdates) {
-          Element nodeElement = JaxWsUtils.getJaxWsBindingElement(up.getNodeValue(), document);
+      for (var jaxwsBindingFile : jaxwsBindingFiles) {
+        var document = Xml.get(jaxwsBindingFile);
+        var prefix = document.lookupPrefix(JaxWsUtils.JAX_WS_NAMESPACE);
+        for (var up : m_bindingClassUpdates) {
+          var nodeElement = JaxWsUtils.getJaxWsBindingElement(up.getNodeValue(), document);
           Xml.firstChildElement(nodeElement, JaxWsUtils.BINDINGS_CLASS_ELEMENT_NAME)
               .ifPresent(e -> e.setAttribute(JaxWsUtils.BINDINGS_NAME_ATTRIBUTE, up.getClassName()));
         }
 
         // package
-        Element packageElement = JaxWsUtils.getJaxWsBindingElement(JaxWsUtils.PACKAGE_XPATH, document);
+        var packageElement = JaxWsUtils.getJaxWsBindingElement(JaxWsUtils.PACKAGE_XPATH, document);
         if (packageElement == null) {
           packageElement = document.createElement(prefix + ':' + JaxWsUtils.BINDINGS_ELEMENT_NAME);
           packageElement.setAttribute(JaxWsUtils.BINDINGS_NODE_ATTRIBUTE_NAME, JaxWsUtils.PACKAGE_XPATH);
           document.getDocumentElement().appendChild(packageElement);
         }
-        Element packageNameElement = Xml.firstChildElement(packageElement, JaxWsUtils.BINDING_PACKAGE_ELEMENT_NAME)
+        var packageNameElement = Xml.firstChildElement(packageElement, JaxWsUtils.BINDING_PACKAGE_ELEMENT_NAME)
             .orElseGet(() -> {
-              Element e = document.createElement(prefix + ':' + JaxWsUtils.BINDING_PACKAGE_ELEMENT_NAME);
+              var e = document.createElement(prefix + ':' + JaxWsUtils.BINDING_PACKAGE_ELEMENT_NAME);
               e.appendChild(e);
               return e;
             });
@@ -214,18 +204,18 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
   }
 
   protected void updateEntryPointDefinitions(IEnvironment env, IProgress progress) {
-    for (EntryPointDefinitionUpdate up : m_entryPointDefinitionUpdates) {
-      IType entryPointDefinition = up.getEntryPointDefinition();
+    for (var up : m_entryPointDefinitionUpdates) {
+      var entryPointDefinition = up.getEntryPointDefinition();
       if (entryPointDefinition == null) {
         continue;
       }
 
-      IScoutApi scoutApi = entryPointDefinition.javaEnvironment().requireApi(IScoutApi.class);
-      ICompilationUnit definition = entryPointDefinition.requireCompilationUnit();
-      IWorkingCopyTransformer transformer = new SimpleWorkingCopyTransformerBuilder()
+      var scoutApi = entryPointDefinition.javaEnvironment().requireApi(IScoutApi.class);
+      var definition = entryPointDefinition.requireCompilationUnit();
+      var transformer = new SimpleWorkingCopyTransformerBuilder()
           .withAnnotationElementMapper(input -> rewriteEntryPointDefAnnotationElements(input, scoutApi, up))
           .build();
-      ICompilationUnitGenerator<?> builder = definition.toWorkingCopy(transformer);
+      var builder = definition.toWorkingCopy(transformer);
       env.writeCompilationUnit(builder, up.getSourceFolder(), progress);
     }
   }
@@ -234,7 +224,7 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
       IScoutAnnotationApi scoutApi, EntryPointDefinitionUpdate up) {
     if (scoutApi.WebServiceEntryPoint().fqn().equals(input.model().declaringAnnotation().name())) {
       if (scoutApi.WebServiceEntryPoint().endpointInterfaceElementName().equals(input.model().elementName())) {
-        String newPortTypeFqn = up.getPortTypePackage() + JavaTypes.C_DOT + up.getPortTypeName();
+        var newPortTypeFqn = up.getPortTypePackage() + JavaTypes.C_DOT + up.getPortTypeName();
         return b -> b.classLiteral(newPortTypeFqn);
       }
       if (scoutApi.WebServiceEntryPoint().entryPointNameElementName().equals(input.model().elementName())) {

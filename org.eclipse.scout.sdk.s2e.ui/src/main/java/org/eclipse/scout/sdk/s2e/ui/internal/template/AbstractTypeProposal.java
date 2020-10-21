@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
@@ -22,18 +22,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.core.manipulation.SharedASTProviderCore;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalModel;
-import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup;
 import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroup.Proposal;
-import org.eclipse.jdt.internal.corext.fix.LinkedProposalPositionGroupCore.PositionInformation;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.JavaUIStatus;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
@@ -41,14 +37,12 @@ import org.eclipse.jdt.internal.ui.viewsupport.BindingLabelProvider;
 import org.eclipse.jdt.ui.CodeStyleConfiguration;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.eclipse.jdt.ui.text.java.correction.CUCorrectionProposal;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.s2e.environment.RunnableJob;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
@@ -94,7 +88,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   }
 
   private static volatile IAstNodeFactoryProvider astNodeFactoryProvider = proposal -> {
-    TypeProposalContext ctx = proposal.getProposalContext();
+    var ctx = proposal.getProposalContext();
     return new AstNodeFactory(ctx.getDeclaringType(), ctx.getIcu(), ctx.getProvider(), ctx.getScoutModelHierarchy().api(), ctx.getDeclaringTypeBinding(), proposal);
   };
 
@@ -127,8 +121,8 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
   protected ASTRewrite getRewrite() throws CoreException {
     if (m_rewrite == null) {
-      AstNodeFactory factory = getFactory();
-      Type superType = getBestMatchingSuperType(m_context.getDefaultSuperClasses());
+      var factory = getFactory();
+      var superType = getBestMatchingSuperType(m_context.getDefaultSuperClasses());
       m_rewrite = factory.getRewrite();
 
       fillRewrite(factory, superType);
@@ -138,8 +132,8 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
   protected Type getBestMatchingSuperType(Iterable<String> candidates) {
     //noinspection resource
-    IJavaEnvironment env = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
-    for (String superTypeCandidate : candidates) {
+    var env = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
+    for (var superTypeCandidate : candidates) {
       if (env.exists(superTypeCandidate)) {
         // found! return as best candidate
         return getFactory().newTypeReference(superTypeCandidate);
@@ -163,12 +157,12 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   @Override
   protected void addEdits(IDocument document, TextEdit editRoot) throws CoreException {
     try {
-      ASTRewrite rewrite = getRewrite();
-      TextEdit edit = rewrite.rewriteAST();
-      String searchString = m_context.getSearchString();
+      var rewrite = getRewrite();
+      var edit = rewrite.rewriteAST();
+      var searchString = m_context.getSearchString();
       if (searchString != null) {
         // remove the search prefix
-        int len = searchString.length();
+        var len = searchString.length();
         edit.addChild(new DeleteEdit(m_context.getInsertPosition() - len, len + String.valueOf(SEARCH_STRING_END_FIX).length()));
       }
       editRoot.addChild(edit);
@@ -189,7 +183,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
       getRewrite(); // trigger rewrite creation
 
       // start proposal calculation
-      for (ICompletionProposalProvider a : m_asyncProposalProviders) {
+      for (var a : m_asyncProposalProviders) {
         a.load();
       }
 
@@ -208,8 +202,8 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
     }
 
     try {
-      InsertEdit insertFixEdit = new InsertEdit(m_context.getInsertPosition(), String.valueOf(SEARCH_STRING_END_FIX));
-      TextEditProcessor proc = new TextEditProcessor(document, insertFixEdit, TextEdit.UPDATE_REGIONS);
+      var insertFixEdit = new InsertEdit(m_context.getInsertPosition(), String.valueOf(SEARCH_STRING_END_FIX));
+      var proc = new TextEditProcessor(document, insertFixEdit, TextEdit.UPDATE_REGIONS);
       proc.performEdits();
     }
     catch (MalformedTreeException | BadLocationException e) {
@@ -234,10 +228,10 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
       LinkedAsyncProposalModelPresenter.enterLinkedMode(viewer, part, didOpenEditor(), m_linkedProposalModel);
     }
     else if (part instanceof ITextEditor) {
-      PositionInformation endPosition = m_linkedProposalModel.getEndPosition();
+      var endPosition = m_linkedProposalModel.getEndPosition();
       if (endPosition != null) {
         // select a result
-        int pos = endPosition.getOffset() + endPosition.getLength();
+        var pos = endPosition.getOffset() + endPosition.getLength();
         ((ITextEditor) part).selectAndReveal(pos, 0);
       }
     }
@@ -256,14 +250,14 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   }
 
   private void addLinkedPositionProposalProvider(String groupId, Callable<Proposal[]> callable) {
-    FutureTask<Proposal[]> future = new FutureTask<>(callable);
-    LinkedProposalPositionGroup group = m_linkedProposalModel.getPositionGroup(groupId, false);
+    var future = new FutureTask<>(callable);
+    var group = m_linkedProposalModel.getPositionGroup(groupId, false);
     if (!(group instanceof ICompletionProposalProvider)) {
-      LinkedAsyncProposalPositionGroup newGroup = new LinkedAsyncProposalPositionGroup(groupId, future);
+      var newGroup = new LinkedAsyncProposalPositionGroup(groupId, future);
       m_asyncProposalProviders.add(newGroup);
       if (group != null) {
         // already added positions. copy over
-        for (PositionInformation info : group.getPositions()) {
+        for (var info : group.getPositions()) {
           newGroup.addPosition(info);
         }
       }
@@ -321,15 +315,12 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
     @Override
     public Proposal[] call() {
-      Set<IType> abstractClassesInHierarchy = JdtUtils.findAbstractClassesInHierarchy(getFactory().getJavaProject(), m_hierarchyBaseTypeFqn, null);
-      List<Proposal> result = new ArrayList<>(abstractClassesInHierarchy.size());
-      for (IType type : abstractClassesInHierarchy) {
-        ITypeBinding binding = getFactory().resolveTypeBinding(type.getFullyQualifiedName());
-        if (binding != null) {
-          result.add(new P_JavaLinkedModeProposal(getFactory().getIcu(), binding, 10));
-        }
-      }
-      return result.toArray(new Proposal[0]);
+      var abstractClassesInHierarchy = JdtUtils.findAbstractClassesInHierarchy(getFactory().getJavaProject(), m_hierarchyBaseTypeFqn, null);
+      return abstractClassesInHierarchy.stream()
+          .map(type -> getFactory().resolveTypeBinding(type.getFullyQualifiedName()))
+          .filter(Objects::nonNull)
+          .map(binding -> new P_JavaLinkedModeProposal(getFactory().getIcu(), binding, 10))
+          .toArray(Proposal[]::new);
     }
   }
 
@@ -341,7 +332,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
       super(BindingLabelProvider.getBindingLabel(typeProposal, JavaElementLabels.ALL_DEFAULT | JavaElementLabels.ALL_POST_QUALIFIED), null, relevance);
       m_typeProposal = typeProposal;
       m_compilationUnit = unit;
-      ImageDescriptor desc = BindingLabelProvider.getBindingImageDescriptor(m_typeProposal, BindingLabelProvider.DEFAULT_IMAGEFLAGS);
+      var desc = BindingLabelProvider.getBindingImageDescriptor(m_typeProposal, BindingLabelProvider.DEFAULT_IMAGEFLAGS);
       if (desc != null) {
         setImage(JavaPlugin.getImageDescriptorRegistry().get(desc));
       }
@@ -349,8 +340,8 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
     @Override
     public TextEdit computeEdits(int offset, LinkedPosition position, char trigger, int stateMask, LinkedModeModel model) throws CoreException {
-      ImportRewrite impRewrite = CodeStyleConfiguration.createImportRewrite(m_compilationUnit, true);
-      String replaceString = impRewrite.addImport(m_typeProposal);
+      var impRewrite = CodeStyleConfiguration.createImportRewrite(m_compilationUnit, true);
+      var replaceString = impRewrite.addImport(m_typeProposal);
 
       TextEdit composedEdit = new MultiTextEdit();
       composedEdit.addChild(new ReplaceEdit(position.getOffset(), position.getLength(), replaceString));

@@ -44,8 +44,8 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
   }
 
   protected Optional<IFuture<IType>> writeDerivedTypeOf(IType modelType, IEnvironment env, IProgress progress) {
-    IScoutApi scoutApi = modelType.javaEnvironment().requireApi(IScoutApi.class);
-    Optional<FormDataAnnotationDescriptor> formDataAnnotation = findDataAnnotationForFormData(modelType);
+    var scoutApi = modelType.javaEnvironment().requireApi(IScoutApi.class);
+    var formDataAnnotation = findDataAnnotationForFormData(modelType);
     if (formDataAnnotation.isPresent()) {
       return getInput()
           .getSourceFolderOf(formDataAnnotation.get().getFormDataType(), env)
@@ -54,7 +54,7 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
               .map(g -> env.writeCompilationUnitAsync(g, derivedSourceFolder, progress)));
     }
 
-    Optional<DataAnnotationDescriptor> pageDataAnnotation = findDataAnnotationForPageData(modelType, scoutApi);
+    var pageDataAnnotation = findDataAnnotationForPageData(modelType, scoutApi);
     if (pageDataAnnotation.isPresent()) {
       return getInput()
           .getSourceFolderOf(pageDataAnnotation.get().getDataType(), env)
@@ -63,7 +63,7 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
               .map(g -> env.writeCompilationUnitAsync(g, derivedSourceFolder, progress)));
     }
 
-    Optional<DataAnnotationDescriptor> dataAnnotation = findDataAnnotationForRowData(modelType, scoutApi);
+    var dataAnnotation = findDataAnnotationForRowData(modelType, scoutApi);
     return dataAnnotation.flatMap(dataAnnotationDescriptor -> getInput()
         .getSourceFolderOf(dataAnnotationDescriptor.getDataType(), env)
         .flatMap(derivedSourceFolder -> DtoGeneratorFactory

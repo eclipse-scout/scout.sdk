@@ -21,9 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Locale;
-import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.nls.Language;
@@ -49,11 +48,11 @@ public class TranslationPropertiesFileTest {
 
   @Test
   public void testTranslationPropertiesFile(TestingEnvironment env) {
-    PropertiesTranslationStore store = testingStore(env);
-    ITranslationPropertiesFile props0 = store.translationFiles().get(Language.LANGUAGE_DEFAULT);
-    ITranslationPropertiesFile props1 = store.translationFiles().get(TranslationStoreSupplierExtension.EN);
-    ITranslationPropertiesFile props2 = store.translationFiles().get(TranslationStoreSupplierExtension.ES);
-    ITranslationPropertiesFile readOnly = TranslationStoreSupplierExtension.createReadOnlyStore(env).translationFiles().get(Language.LANGUAGE_DEFAULT);
+    var store = testingStore(env);
+    var props0 = store.translationFiles().get(Language.LANGUAGE_DEFAULT);
+    var props1 = store.translationFiles().get(TranslationStoreSupplierExtension.EN);
+    var props2 = store.translationFiles().get(TranslationStoreSupplierExtension.ES);
+    var readOnly = TranslationStoreSupplierExtension.createReadOnlyStore(env).translationFiles().get(Language.LANGUAGE_DEFAULT);
 
     // test editable files
     assertFalse(props1.load(new NullProgress())); // load a second time
@@ -78,20 +77,20 @@ public class TranslationPropertiesFileTest {
 
   @Test
   public void testParseWithAllLocales() {
-    String prefix = "prefix";
-    String[] availableLocaleNames = Stream.of(Locale.getAvailableLocales())
+    var prefix = "prefix";
+    var availableLocaleNames = Arrays.stream(Locale.getAvailableLocales())
         .map(Locale::toString)
         .toArray(String[]::new);
-    List<Language> languages = Stream.of(availableLocaleNames)
+    var languages = Arrays.stream(availableLocaleNames)
         .map(locale -> Strings.notBlank(locale).orElseGet(() -> Language.LANGUAGE_DEFAULT.locale().toString()))
         .map(Language::parseThrowingOnError)
         .collect(toList());
 
-    List<Language> parsedLanguages = languages.stream()
+    var parsedLanguages = languages.stream()
         .map(lang -> getPropertiesFileName(prefix, lang))
         .map(fileName -> parseLanguageFromFileName(fileName, prefix).get())
         .collect(toList());
-    String[] parsedLocaleNames = parsedLanguages.stream()
+    var parsedLocaleNames = parsedLanguages.stream()
         .map(lang -> lang == Language.LANGUAGE_DEFAULT ? Locale.ROOT : lang.locale())
         .map(Locale::toString)
         .toArray(String[]::new);

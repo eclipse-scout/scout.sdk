@@ -36,7 +36,7 @@ public class NlsReferenceProvider {
   }
 
   public Collection<FileQueryMatch> getReferencesFor(String key) {
-    Collection<FileQueryMatch> references = m_matches.get(key);
+    var references = m_matches.get(key);
     if (references == null) {
       return emptySet();
     }

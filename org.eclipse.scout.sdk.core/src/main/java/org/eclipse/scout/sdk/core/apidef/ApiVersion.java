@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.util.apidef;
+package org.eclipse.scout.sdk.core.apidef;
 
 import static java.util.stream.Collectors.joining;
 
@@ -16,18 +16,27 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 
+/**
+ * Represents an API version consisting of a list of integers followed by an optional {@link String} suffix.
+ */
 public class ApiVersion implements Comparable<ApiVersion> {
 
+  /**
+   * {@link ApiVersion} indicating the latest (newest) version of an API.
+   */
   public static final ApiVersion LATEST = new ApiVersion(Integer.MAX_VALUE);
+
+  /**
+   * Regex of a valid API pattern.
+   */
   public static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)(\\.(\\d*))?(\\.(\\d*))?(-.*)?");
+
   private final int[] m_segments;
   private final String m_suffix;
 
@@ -45,50 +54,86 @@ public class ApiVersion implements Comparable<ApiVersion> {
     m_suffix = suffix;
   }
 
-  public static Optional<ApiVersion> apiLevelOf(Class<? extends IApiSpecification> definition) {
-    return Optional.ofNullable(definition)
+  /**
+   * Parses the value of an {@link ApiLevel} annotation on the given class.
+   * 
+   * @param clazz
+   *          The class whose {@link ApiLevel} annotation should be parsed.
+   * @return An {@link Optional} with the {@link ApiVersion} of the given class or an empty {@link Optional} if the
+   *         given class is {@code null} or the annotation does not exist.
+   * @see #requireApiLevelOf(Class)
+   */
+  public static Optional<ApiVersion> apiLevelOf(Class<?> clazz) {
+    return Optional.ofNullable(clazz)
         .map(c -> c.getAnnotation(ApiLevel.class))
         .map(ApiLevel::value)
         .map(ApiVersion::new);
   }
 
-  public static ApiVersion requireApiLevelOf(Class<? extends IApiSpecification> definition) {
-    return apiLevelOf(definition)
-        .orElseThrow(() -> Ensure.newFail("{} is missing required annotation '{}'.", definition, ApiLevel.class.getName()));
+  /**
+   * Parses the value of an {@link ApiLevel} annotation on the given class. This method fails if the given class does
+   * not have an {@link ApiLevel} annotation.
+   *
+   * @param clazz
+   *          The class whose {@link ApiLevel} annotation should be parsed.
+   * @return The {@link ApiVersion} value of the annotation.
+   * @throws IllegalArgumentException
+   *           if the clazz is {@code null} or the clazz does not have the {@link ApiLevel} annotation.
+   * @see #apiLevelOf(Class)
+   */
+  public static ApiVersion requireApiLevelOf(Class<?> clazz) {
+    return apiLevelOf(clazz)
+        .orElseThrow(() -> Ensure.newFail("{} is missing required annotation '{}'.", clazz, ApiLevel.class.getName()));
   }
 
+  /**
+   * Parses the given {@link CharSequence} into an {@link ApiVersion}.
+   * 
+   * @param version
+   *          The {@link CharSequence} to parse. It must fulfill {@link #VERSION_PATTERN} to be successfully parsed.
+   * @return The {@link ApiVersion} or an empty {@link Optional} if the given {@link CharSequence} cannot be parsed.
+   */
   public static Optional<ApiVersion> parse(CharSequence version) {
     if (Strings.isBlank(version)) {
       return Optional.empty();
     }
 
-    Matcher matcher = VERSION_PATTERN.matcher(version);
+    var matcher = VERSION_PATTERN.matcher(version);
     if (!matcher.find()) {
       return Optional.empty();
     }
 
-    int[] segments = Stream.of(1, 3, 5)
+    var segments = Stream.of(1, 3, 5)
         .map(matcher::group)
         .filter(Strings::hasText)
         .mapToInt(Integer::parseInt)
         .toArray();
-    String suffix = matcher.group(6);
+    var suffix = matcher.group(6);
     return Optional.of(new ApiVersion(segments, suffix));
   }
 
+  /**
+   * @return The suffix {@link String} or {@code null} if this {@link ApiVersion} has no suffix.
+   */
   public String suffix() {
     return m_suffix;
   }
 
+  /**
+   * @return A copy of all number segments of the version. Never returns {@code null}.
+   */
   public int[] segments() {
     return Arrays.copyOf(m_segments, m_segments.length);
   }
 
+  /**
+   * @return A {@link String} representation of the version. Never returns {@code null}.
+   */
   public String asString() {
-    String numberPart = IntStream.of(m_segments)
+    var numberPart = Arrays.stream(m_segments)
         .mapToObj(Integer::toString)
         .collect(joining("."));
-    String suffix = suffix();
+    var suffix = suffix();
     if (Strings.isEmpty(suffix)) {
       return numberPart;
     }
@@ -109,7 +154,7 @@ public class ApiVersion implements Comparable<ApiVersion> {
       return false;
     }
 
-    ApiVersion that = (ApiVersion) o;
+    var that = (ApiVersion) o;
     return Arrays.equals(m_segments, that.m_segments)
         && Objects.equals(m_suffix, that.m_suffix);
   }
@@ -130,11 +175,11 @@ public class ApiVersion implements Comparable<ApiVersion> {
     }
 
     // also compare missing segments. missing segments are treated as zero
-    int numSegments = Math.max(o.m_segments.length, m_segments.length);
-    for (int i = 0; i < numSegments; i++) {
-      int me = positionValue(m_segments, i);
-      int other = positionValue(o.m_segments, i);
-      int dif = Integer.compare(me, other);
+    var numSegments = Math.max(o.m_segments.length, m_segments.length);
+    for (var i = 0; i < numSegments; i++) {
+      var me = positionValue(m_segments, i);
+      var other = positionValue(o.m_segments, i);
+      var dif = Integer.compare(me, other);
       if (dif != 0) {
         return dif;
       }

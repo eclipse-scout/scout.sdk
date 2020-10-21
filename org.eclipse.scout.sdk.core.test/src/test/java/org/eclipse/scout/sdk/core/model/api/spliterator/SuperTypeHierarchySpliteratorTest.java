@@ -64,14 +64,14 @@ public class SuperTypeHierarchySpliteratorTest {
 
   @Test
   public void testMultiSuperInterfaces(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithMultipleIfc.class.getName());
+    var t = env.requireType(ClassWithMultipleIfc.class.getName());
     Spliterator<IType> s = new SuperTypeHierarchySpliterator(t, false, true, false);
     assertEquals("InterfaceLevel0,InterfaceLevel1,InterfaceLevel2", InnerTypeSpliteratorTest.traverse(s));
   }
 
   @Test
   public void testAllSuperTypesMultiSuperInterfaces(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithMultipleIfc.class.getName());
+    var t = env.requireType(ClassWithMultipleIfc.class.getName());
     Spliterator<IType> s = new SuperTypeHierarchySpliterator(t, true, true, false);
     assertEquals("BaseClassWithMultipleIfc,InterfaceLevel0,InterfaceLevel1,Object,InterfaceLevel2", InnerTypeSpliteratorTest.traverse(s));
   }

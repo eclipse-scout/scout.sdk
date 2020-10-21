@@ -28,7 +28,7 @@ public class OperationJobTest {
 
   @Test
   public void testExecuteOperations() {
-    OperationJob j = new OperationJob(createEmptyOperationWithName("a"), "name");
+    var j = new OperationJob(createEmptyOperationWithName("a"), "name");
     j.scheduleWithFuture().awaitDoneThrowingOnErrorOrCancel();
   }
 

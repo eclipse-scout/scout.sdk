@@ -47,7 +47,7 @@ public final class TranslationValidator {
    */
   public static int validateTranslation(ITranslation toValidate) {
     Ensure.notNull(toValidate, "A translation must be specified.");
-    int result = validateKey(toValidate.key());
+    var result = validateKey(toValidate.key());
     if (result != OK) {
       return result;
     }
@@ -151,13 +151,13 @@ public final class TranslationValidator {
       }
 
       // the stores that are overridden by me
-      long numStoresWithKeyOverridden = stack.allStores()
+      var numStoresWithKeyOverridden = stack.allStores()
           .filter(store -> store.containsKey(keyToValidate))
           .filter(store -> store.service().order() > target.service().order())
           .count();
 
       // the stores that override me
-      long numStoresOverridingKey = stack.allStores()
+      var numStoresOverridingKey = stack.allStores()
           .filter(store -> store.containsKey(keyToValidate))
           .filter(store -> store.service().order() < target.service().order())
           .count();

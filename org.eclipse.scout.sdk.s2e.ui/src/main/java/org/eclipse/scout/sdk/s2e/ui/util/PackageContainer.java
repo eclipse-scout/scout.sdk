@@ -54,8 +54,8 @@ public class PackageContainer {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + ((m_package == null) ? 0 : m_package.hashCode());
     result = prime * result + ((m_project == null) ? 0 : m_project.hashCode());
     result = prime * result + ((m_srcFolder == null) ? 0 : m_srcFolder.hashCode());
@@ -74,7 +74,7 @@ public class PackageContainer {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    PackageContainer other = (PackageContainer) obj;
+    var other = (PackageContainer) obj;
     return Objects.equals(m_package, other.m_package)
         && Objects.equals(m_project, other.m_project)
         && Objects.equals(m_srcFolder, other.m_srcFolder);
@@ -82,7 +82,7 @@ public class PackageContainer {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append("PackageContainer [src_folder=").append(toStringElement(m_srcFolder))
         .append(", package=").append(toStringElement(m_package))
         .append(", project=").append(toStringElement(m_project)).append(']');

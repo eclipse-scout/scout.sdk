@@ -40,9 +40,9 @@ public class LanguageNewAction extends Action {
 
   @Override
   public void run() {
-    LanguageNewDialog dialog = new LanguageNewDialog(m_shell, m_project);
+    var dialog = new LanguageNewDialog(m_shell, m_project);
     if (dialog.open() == Window.OK) {
-      Language newLanguage = new Language(new Locale(dialog.getLanguageIso(), Optional.ofNullable(dialog.getCountryIso()).orElse("")));
+      var newLanguage = new Language(new Locale(dialog.getLanguageIso(), Optional.ofNullable(dialog.getCountryIso()).orElse("")));
       m_project.addNewLanguage(newLanguage, dialog.getStore());
     }
   }

@@ -223,7 +223,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
                 return false
             }
             // the boolean result might be null in case the callable was not executed because the project is closing
-            val result: Boolean? = computeInWriteAction(project, transactionName) { commitAllInUiThread(progress) }
+            @Suppress("RedundantNullableReturnType") val result: Boolean? = computeInWriteAction(project, transactionName) { commitAllInUiThread(progress) }
             return result ?: return false
         } finally {
             m_members.clear()

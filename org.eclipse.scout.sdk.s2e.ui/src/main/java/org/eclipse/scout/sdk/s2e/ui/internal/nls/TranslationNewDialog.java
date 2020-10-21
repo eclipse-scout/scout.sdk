@@ -15,14 +15,12 @@ import static org.eclipse.scout.sdk.s2e.ui.internal.nls.TranslationInputValidato
 import static org.eclipse.scout.sdk.s2e.ui.internal.nls.TranslationInputValidator.validateNlsKey;
 import static org.eclipse.scout.sdk.s2e.ui.internal.nls.TranslationInputValidator.validateTranslationStore;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator;
-import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizardPage;
 import org.eclipse.swt.widgets.Shell;
@@ -36,7 +34,7 @@ public class TranslationNewDialog extends AbstractTranslationDialog {
   @Override
   protected void postCreate() {
     getKeyField().addModifyListener(e -> revalidate());
-    TextField defaultField = getDefaultTranslationField();
+    var defaultField = getDefaultTranslationField();
     if (defaultField != null) {
       defaultField.addModifyListener(e -> revalidate());
     }
@@ -45,17 +43,17 @@ public class TranslationNewDialog extends AbstractTranslationDialog {
 
   @Override
   protected void revalidate() {
-    MultiStatus status = new MultiStatus(S2ESdkUiActivator.PLUGIN_ID, TranslationValidator.OK, "multi status", null);
+    var status = new MultiStatus(S2ESdkUiActivator.PLUGIN_ID, TranslationValidator.OK, "multi status", null);
 
     status.add(validateTranslationStore(getSelectedStore().orElse(null)));
     getSelectedStore().ifPresent(store -> status.add(validateNlsKey(getNlsProject(), store, getKeyField().getText())));
 
-    TextField defaultLanguageField = getTranslationField(Language.LANGUAGE_DEFAULT);
+    var defaultLanguageField = getTranslationField(Language.LANGUAGE_DEFAULT);
     if (defaultLanguageField != null) {
       status.add(validateDefaultTranslation(defaultLanguageField.getText()));
     }
 
-    IStatus worst = AbstractWizardPage.getHighestSeverityStatus(status);
+    var worst = AbstractWizardPage.getHighestSeverityStatus(status);
     if (status.isOK()) {
       setMessage("Create a new translation.");
     }

@@ -43,7 +43,7 @@ public class JaxWsUtilsTest {
   @Test
   @SuppressWarnings({"unlikely-arg-type", "ConstantConditions", "SimplifiableJUnitAssertion", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testJaxWsBindingMapping() {
-    JaxWsBindingMapping m = new JaxWsBindingMapping(true, "wsdlName", "className");
+    var m = new JaxWsBindingMapping(true, "wsdlName", "className");
     assertFalse(m.equals(null));
     assertFalse(m.equals(""));
     assertFalse(m.equals(new JaxWsBindingMapping(true, "wsdlName", "className2")));
@@ -54,7 +54,7 @@ public class JaxWsUtilsTest {
     assertTrue(m.equals(new JaxWsBindingMapping(true, "wsdlName", "className")));
     assertTrue(m.equals(m));
 
-    JaxWsBindingMapping m2 = new JaxWsBindingMapping(true, null, null);
+    var m2 = new JaxWsBindingMapping(true, null, null);
     assertFalse(m2.equals(new JaxWsBindingMapping(true, null, "className")));
     assertFalse(m2.equals(new JaxWsBindingMapping(true, "wsdlName", null)));
     assertTrue(m2.equals(new JaxWsBindingMapping(true, null, null)));
@@ -78,7 +78,7 @@ public class JaxWsUtilsTest {
   public void testGetBindingPathsFromPom() throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
     assertBindingPathsIn("<?xml version=\"1.0\" encoding=\"UTF-8\"?><project></project>", "myTest/myTest.wsdl", emptyList());
 
-    String correct = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
+    var correct = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
         "        <groupId>com.sun.xml.ws</groupId>" +
@@ -123,7 +123,7 @@ public class JaxWsUtilsTest {
         "  </build></project>";
     assertBindingPathsIn(correct, "myTest/myTest.wsdl", Arrays.asList("global-binding.xml", "myTest/jaxws-binding-a.xml", "myTest/jaxws-binding-b.xml", "myTest/jaxb-binding.xml"));
 
-    String correctWithEmptyBinding = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
+    var correctWithEmptyBinding = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
         "        <groupId>com.sun.xml.ws</groupId>" +
@@ -152,7 +152,7 @@ public class JaxWsUtilsTest {
         "  </build></project>";
     assertBindingPathsIn(correctWithEmptyBinding, "myTest/myTest.wsdl", Arrays.asList("global-binding.xml", "myTest/jaxws-binding.xml", "myTest/jaxb-binding.xml"));
 
-    String correctCaseMismatch = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
+    var correctCaseMismatch = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
         "        <groupId>com.sun.xml.ws</groupId>" +
@@ -197,7 +197,7 @@ public class JaxWsUtilsTest {
         "  </build></project>";
     assertBindingPathsIn(correctCaseMismatch, "myTest/myTest.wsdl", Arrays.asList("global-binding.xml", "myTest/jaxws-binding-A.xml", "myTest/jaxws-binding-B.xml", "myTest/jaxb-binding.xml"));
 
-    String wrong = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
+    var wrong = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/4.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
         "        <groupId>wrong</groupId>" +
@@ -226,7 +226,7 @@ public class JaxWsUtilsTest {
         "  </build></project>";
     assertBindingPathsIn(wrong, "myTest/myTest.wsdl", emptyList());
 
-    String wrongNamespace = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/5.0.0\"><build>" +
+    var wrongNamespace = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><project xmlns=\"http://maven.apache.org/POM/5.0.0\"><build>" +
         "    <plugins>" +
         "      <plugin>" +
         "        <groupId>com.sun.xml.ws</groupId>" +
@@ -261,7 +261,7 @@ public class JaxWsUtilsTest {
     try (Reader r = new StringReader(xml)) {
       d = Xml.createDocumentBuilder().parse(new InputSource(r));
     }
-    List<String> bindingPathsFromPom = JaxWsUtils.getBindingPathsFromPom(d, wsdlName);
+    var bindingPathsFromPom = JaxWsUtils.getBindingPathsFromPom(d, wsdlName);
     assertEquals(expectedPaths, bindingPathsFromPom);
   }
 }

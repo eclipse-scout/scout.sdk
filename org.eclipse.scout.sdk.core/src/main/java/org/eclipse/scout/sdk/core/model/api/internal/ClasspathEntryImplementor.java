@@ -84,7 +84,7 @@ public class ClasspathEntryImplementor implements IClasspathEntry {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append("Classpath [path=");
     builder.append(path());
     builder.append(']');

@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.scout.sdk.core.fixture.AbstractBaseClass;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
@@ -53,7 +52,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class TypeTest {
   @Test
   public void testPrimaryType(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
+    var childClassType = env.requireType(ChildClass.class.getName());
 
     assertEquals(0, childClassType.arrayDimension());
     assertEquals(Flags.AccPublic, childClassType.flags());
@@ -75,7 +74,7 @@ public class TypeTest {
 
     // type parameters
     assertEquals(1, childClassType.typeParameters().count());
-    ITypeParameter firstTypeParam = childClassType.typeParameters().findAny().get();
+    var firstTypeParam = childClassType.typeParameters().findAny().get();
     assertNotNull(firstTypeParam);
     assertEquals(childClassType, firstTypeParam.declaringMember());
     assertEquals("X", firstTypeParam.elementName());
@@ -95,9 +94,9 @@ public class TypeTest {
   @SuppressWarnings("unlikely-arg-type")
   public void testUnresolvedType(IJavaEnvironment env) {
     Class<?> existingClass = AbstractBaseClass.class;
-    String notExistingFqn = "a.b.c.NotExisting";
-    IUnresolvedType notExisting = env.findUnresolvedType(notExistingFqn);
-    IUnresolvedType existing = env.findUnresolvedType(existingClass.getName());
+    var notExistingFqn = "a.b.c.NotExisting";
+    var notExisting = env.findUnresolvedType(notExistingFqn);
+    var existing = env.findUnresolvedType(existingClass.getName());
 
     assertNotNull(existing);
     assertTrue(existing.exists());
@@ -137,13 +136,13 @@ public class TypeTest {
 
   @Test
   public void testSourceOfStaticInitializer(IJavaEnvironment env) {
-    IType classWithMembers = env.requireType(ClassWithMembers.class.getName());
+    var classWithMembers = env.requireType(ClassWithMembers.class.getName());
     assertEquals("static{System.out.println(\"staticsection\");}", CoreTestingUtils.removeWhitespace(classWithMembers.sourceOfStaticInitializer().get().asCharSequence().toString()));
   }
 
   @Test
   public void testResolveTypeParamValue(IJavaEnvironment env) {
-    List<IType> resolvedTypeParamValueSignature = env.requireType(ChildClass.class.getName()).resolveTypeParamValue(0, InterfaceLevel1.class.getName()).get().collect(toList());
+    var resolvedTypeParamValueSignature = env.requireType(ChildClass.class.getName()).resolveTypeParamValue(0, InterfaceLevel1.class.getName()).get().collect(toList());
     assertEquals(1, resolvedTypeParamValueSignature.size());
     assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), resolvedTypeParamValueSignature.get(0).name());
 
@@ -157,15 +156,15 @@ public class TypeTest {
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
+    var childClassType = env.requireType(ChildClass.class.getName());
     assertEquals(childClassType.name(), childClassType.toString());
   }
 
   @Test
   public void testWildcard(IJavaEnvironment env) {
-    IType wildcardType = env.requireType(WildcardChildClass.class.getName());
-    IType returnType = wildcardType.methods().first().get().requireReturnType();
-    IType firstArg = returnType.typeArguments().findAny().get();
+    var wildcardType = env.requireType(WildcardChildClass.class.getName());
+    var returnType = wildcardType.methods().first().get().requireReturnType();
+    var firstArg = returnType.typeArguments().findAny().get();
     assertTrue(firstArg.isWildcardType());
     assertEquals(BaseClass.class.getName(), firstArg.name());
     assertEquals(2, firstArg.typeArguments().count());
@@ -174,7 +173,7 @@ public class TypeTest {
 
   @Test
   public void testPrimaryTypeSuper(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
 
     assertEquals(0, baseClassType.arrayDimension());
     assertEquals(Flags.AccPublic, baseClassType.flags());
@@ -196,13 +195,13 @@ public class TypeTest {
 
     // type parameters
     assertEquals(2, baseClassType.typeParameters().count());
-    ITypeParameter firstTypeParam = baseClassType.typeParameters().findAny().get();
+    var firstTypeParam = baseClassType.typeParameters().findAny().get();
     assertNotNull(firstTypeParam);
     assertEquals(baseClassType, firstTypeParam.declaringMember());
     assertEquals("T", firstTypeParam.elementName());
     assertEquals(0, firstTypeParam.bounds().count());
 
-    ITypeParameter secondTypeParam = baseClassType.typeParameters().skip(1).findAny().get();
+    var secondTypeParam = baseClassType.typeParameters().skip(1).findAny().get();
     assertNotNull(secondTypeParam);
     assertEquals(baseClassType, secondTypeParam.declaringMember());
     assertEquals("Z", secondTypeParam.elementName());
@@ -216,16 +215,16 @@ public class TypeTest {
     assertEquals(baseClassType, baseClassType.innerTypes().item(1).get().declaringType().get());
 
     // type arguments
-    List<IType> typeArguments = baseClassType.typeArguments().collect(toList());
+    var typeArguments = baseClassType.typeArguments().collect(toList());
     assertEquals(2, typeArguments.size());
-    IType firstTypeArg = typeArguments.get(0);
+    var firstTypeArg = typeArguments.get(0);
     assertTrue(firstTypeArg.isParameterType());
     assertEquals(AbstractList.class.getName(), firstTypeArg.requireSuperClass().name());
     assertEquals(2, firstTypeArg.superInterfaces().count());
     assertEquals(Runnable.class.getName(), firstTypeArg.superInterfaces().findAny().get().name());
     assertEquals(Serializable.class.getName(), firstTypeArg.superInterfaces().skip(1).findAny().get().name());
 
-    IType secondTypeArg = typeArguments.get(1);
+    var secondTypeArg = typeArguments.get(1);
     assertFalse(secondTypeArg.isParameterType());
     assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), secondTypeArg.name());
   }
@@ -233,13 +232,13 @@ public class TypeTest {
   @Test
   @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentBinaryOnlyFactory.class)
   public void testInnerTypeDirectly(IJavaEnvironment env) {
-    IType innerClass2 = env.requireType("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2");
+    var innerClass2 = env.requireType("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2");
     testInnerType(innerClass2);
   }
 
   @Test
   public void testGetPrimaryType(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
     assertSame(baseClassType, baseClassType.primary());
     assertSame(baseClassType, baseClassType.innerTypes().first().get().primary());
   }
@@ -267,7 +266,7 @@ public class TypeTest {
   @Test
   public void testResolveSimpleName(IJavaEnvironment env) {
     // wildcard package
-    IType type = env.requireType(ClassWithWildcardImport.class.getName());
+    var type = env.requireType(ClassWithWildcardImport.class.getName());
 
     // if this test fails the IDE might have adapted the import in this file. It must be a wildcard package import!
     assertEquals(1, type.requireCompilationUnit().imports().filter(imp -> imp.name().endsWith(".*")).count());
@@ -301,8 +300,8 @@ public class TypeTest {
 
   @Test
   public void testInnerTypeFromDeclaringType(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
-    IType innerClass2 = baseClassType.innerTypes().item(1).get();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var innerClass2 = baseClassType.innerTypes().item(1).get();
     testInnerType(innerClass2);
   }
 
@@ -312,7 +311,7 @@ public class TypeTest {
     assertEquals(0, innerClass2.arrayDimension());
     assertEquals(Flags.AccProtected, innerClass2.flags());
     assertEquals(0, innerClass2.annotations().stream().count());
-    IType baseClass = innerClass2.javaEnvironment().requireType(ChildClass.class.getName()).requireSuperClass();
+    var baseClass = innerClass2.javaEnvironment().requireType(ChildClass.class.getName()).requireSuperClass();
     assertEquals(baseClass.name(), innerClass2.declaringType().get().name());
     assertEquals(1, innerClass2.fields().stream().count());
     assertEquals(1, innerClass2.methods().stream().count());
@@ -333,13 +332,13 @@ public class TypeTest {
     assertEquals(0, innerClass2.innerTypes().stream().count());
 
     // type arguments
-    List<IType> typeArguments = innerClass2.typeArguments().collect(toList());
+    var typeArguments = innerClass2.typeArguments().collect(toList());
     assertEquals(0, typeArguments.size());
 
     // super type arguments
-    List<IType> superTypeArguments = innerClass2.requireSuperClass().typeArguments().collect(toList());
+    var superTypeArguments = innerClass2.requireSuperClass().typeArguments().collect(toList());
     assertEquals(1, superTypeArguments.size());
-    IType firstTypeArg = superTypeArguments.get(0);
+    var firstTypeArg = superTypeArguments.get(0);
     assertFalse(firstTypeArg.isParameterType());
     assertTrue(firstTypeArg.isArray());
     assertEquals(1, firstTypeArg.arrayDimension());
@@ -348,8 +347,8 @@ public class TypeTest {
 
   @Test
   public void testIsOnClasspath(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
-    IJavaEnvironment environment = baseClassType.javaEnvironment();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var environment = baseClassType.javaEnvironment();
     assertTrue(environment.exists(baseClassType));
     assertFalse(environment.exists((IType) null));
 
@@ -361,7 +360,7 @@ public class TypeTest {
 
   @Test
   public void testWithParameterizedSuperType(IJavaEnvironment env) {
-    IType t = env.requireType(TypeWithParameterizedSuperType.class.getName());
+    var t = env.requireType(TypeWithParameterizedSuperType.class.getName());
     assertEquals("AbstractList", t.requireSuperClass().elementName());
   }
 

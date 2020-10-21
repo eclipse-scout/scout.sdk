@@ -20,10 +20,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
-import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
-import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.util.EventListenerList;
 import org.eclipse.scout.sdk.s2e.ui.internal.nls.TranslationInputValidator;
 import org.eclipse.swt.SWT;
@@ -114,8 +110,8 @@ public class NlsTableCursor {
     m_cursor.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        TableItem row = ((TableCursor) e.getSource()).getRow();
-        ITranslationEntry entry = NlsTableController.entryOfRow(row);
+        var row = ((TableCursor) e.getSource()).getRow();
+        var entry = NlsTableController.entryOfRow(row);
         if (entry == null) {
           return;
         }
@@ -139,13 +135,13 @@ public class NlsTableCursor {
   }
 
   public Optional<NlsTableCell> getSelection() {
-    TableItem row = getCursor().getRow();
+    var row = getCursor().getRow();
     if (row == null) {
       return Optional.empty();
     }
 
-    int column = getCursor().getColumn();
-    Language lang = m_controller.languageOfColumn(column);
+    var column = getCursor().getColumn();
+    var lang = m_controller.languageOfColumn(column);
     return Optional.of(new NlsTableCell(column, NlsTableController.entryOfRow(row), lang));
   }
 
@@ -186,9 +182,9 @@ public class NlsTableCursor {
   }
 
   private Color getColor(String id) {
-    ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+    var colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
     if (!colorRegistry.hasValueFor(id)) {
-      RGB rgb = m_colors.get(id);
+      var rgb = m_colors.get(id);
       if (rgb != null) {
         colorRegistry.put(id, rgb);
       }
@@ -201,12 +197,12 @@ public class NlsTableCursor {
   }
 
   private void createEditableText(String input) {
-    Optional<NlsTableCell> selection = getSelection();
+    var selection = getSelection();
     if (selection.isEmpty()) {
       return;
     }
 
-    NlsTableCell cell = selection.get();
+    var cell = selection.get();
     if (!cell.store().isEditable()) {
       return;
     }
@@ -218,9 +214,9 @@ public class NlsTableCursor {
   }
 
   private IStatus validateEditingText() {
-    int selectedColumn = getCursor().getColumn();
+    var selectedColumn = getCursor().getColumn();
     if (selectedColumn == NlsTableController.INDEX_COLUMN_KEYS) {
-      ITranslationStore storeOfSelectedRow = getSelection().get().store();
+      var storeOfSelectedRow = getSelection().get().store();
       return TranslationInputValidator.validateNlsKey(m_controller.stack(), storeOfSelectedRow, m_editingText.getText());
     }
     return Status.OK_STATUS;
@@ -231,7 +227,7 @@ public class NlsTableCursor {
       if (isKeyColumn) {
         return NlsTableController.entryOfRow(getCursor().getRow()).key();
       }
-      Language lang = m_controller.languageOfColumn(getCursor().getColumn());
+      var lang = m_controller.languageOfColumn(getCursor().getColumn());
       return NlsTableController.entryOfRow(getCursor().getRow()).text(lang).orElse("");
     }
     return inputText;
@@ -243,8 +239,8 @@ public class NlsTableCursor {
       m_editingText.dispose();
     }
 
-    boolean isKeyColumn = getCursor().getColumn() == NlsTableController.INDEX_COLUMN_KEYS;
-    String input = getEditableTextContent(defaultText, isKeyColumn);
+    var isKeyColumn = getCursor().getColumn() == NlsTableController.INDEX_COLUMN_KEYS;
+    var input = getEditableTextContent(defaultText, isKeyColumn);
     m_editingText = new TableTextEditor(getCursor(), isKeyColumn ? SWT.NONE : SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
     m_editingText.setText(input);
     m_editingText.addModifyListener(e -> {
@@ -332,9 +328,9 @@ public class NlsTableCursor {
 
     m_renaming = true;
     try {
-      String text = m_editingText.getText();
-      NlsTableCell selection = getSelection().get();
-      for (INlsTableCursorListener listener : m_listeners.get(INlsTableCursorListener.class)) {
+      var text = m_editingText.getText();
+      var selection = getSelection().get();
+      for (var listener : m_listeners.get(INlsTableCursorListener.class)) {
         listener.textStored(selection, text);
       }
     }

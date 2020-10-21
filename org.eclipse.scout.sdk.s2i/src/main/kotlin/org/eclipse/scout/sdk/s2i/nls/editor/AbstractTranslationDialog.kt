@@ -167,7 +167,7 @@ abstract class AbstractTranslationDialog(val project: Project, val store: ITrans
         return "<font color=\"${color}\">$message</font>"
     }
 
-    fun htmlColorString(color: Color): String? {
+    fun htmlColorString(color: Color): String {
         val red = Integer.toHexString(color.red)
         val green = Integer.toHexString(color.green)
         val blue = Integer.toHexString(color.blue)

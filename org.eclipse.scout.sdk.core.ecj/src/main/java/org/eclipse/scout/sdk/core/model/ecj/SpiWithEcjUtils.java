@@ -11,12 +11,16 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
+import java.util.stream.IntStream;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ASTVisitor;
@@ -42,7 +46,6 @@ import org.eclipse.jdt.internal.compiler.ast.QualifiedNameReference;
 import org.eclipse.jdt.internal.compiler.ast.Reference;
 import org.eclipse.jdt.internal.compiler.ast.SingleMemberAnnotation;
 import org.eclipse.jdt.internal.compiler.ast.TypeParameter;
-import org.eclipse.jdt.internal.compiler.ast.TypeReference;
 import org.eclipse.jdt.internal.compiler.ast.UnaryExpression;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
 import org.eclipse.jdt.internal.compiler.impl.Constant;
@@ -75,8 +78,6 @@ import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
-import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
@@ -98,9 +99,9 @@ public final class SpiWithEcjUtils {
     }
 
     List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
-    int index = 0;
-    JavaEnvironmentWithEcj env = (JavaEnvironmentWithEcj) owner.getJavaEnvironment();
-    for (TypeVariableBinding param : typeParams) {
+    var index = 0;
+    var env = (JavaEnvironmentWithEcj) owner.getJavaEnvironment();
+    for (var param : typeParams) {
       result.add(env.createBindingTypeParameter(owner, param, index));
       index++;
     }
@@ -112,20 +113,17 @@ public final class SpiWithEcjUtils {
       return null;
     }
 
-    TypeSpi result = bindingToType(env, primaryTypeBinding);
+    var result = bindingToType(env, primaryTypeBinding);
 
     // it is an inner type: step into
-    StringTokenizer st = new StringTokenizer(innerTypes, "$", false);
+    var st = new StringTokenizer(innerTypes, "$", false);
     while (st.hasMoreTokens()) {
-      String name = st.nextToken();
+      var name = st.nextToken();
 
-      TypeSpi innerType = null;
-      for (TypeSpi t : result.getTypes()) {
-        if (t.getElementName().equals(name)) {
-          innerType = t;
-          break;
-        }
-      }
+      var innerType = result.getTypes().stream()
+          .filter(t -> t.getElementName().equals(name))
+          .findFirst()
+          .orElse(null);
       if (innerType == null) {
         return null;
       }
@@ -138,15 +136,10 @@ public final class SpiWithEcjUtils {
     if (exceptions == null || exceptions.length < 1) {
       return emptyList();
     }
-
-    List<TypeSpi> result = new ArrayList<>(exceptions.length);
-    for (ReferenceBinding r : exceptions) {
-      TypeSpi t = bindingToType(env, r);
-      if (t != null) {
-        result.add(t);
-      }
-    }
-    return result;
+    return Arrays.stream(exceptions)
+        .map(r -> bindingToType(env, r))
+        .filter(Objects::nonNull)
+        .collect(toList());
   }
 
   //public only for junit testing purposes
@@ -162,31 +155,28 @@ public final class SpiWithEcjUtils {
     if (typeParams == null || typeParams.length < 1) {
       return emptyList();
     }
-    List<TypeParameterSpi> result = new ArrayList<>(typeParams.length);
-    for (int i = 0; i < typeParams.length; i++) {
-      result.add(env.createDeclarationTypeParameter(method, typeParams[i], i));
-    }
-    return result;
+    return IntStream.range(0, typeParams.length)
+        .mapToObj(i -> env.createDeclarationTypeParameter(method, typeParams[i], i))
+        .collect(toList());
   }
 
   static ISourceRange getJavaDocSource(ASTNode doc, TypeSpi declaringType, JavaEnvironmentWithEcj env) {
     if (doc == null) {
       return null;
     }
-    CompilationUnitSpi cu = declaringType.getCompilationUnit();
+    var cu = declaringType.getCompilationUnit();
     return env.getSource(cu, doc.sourceStart, doc.sourceEnd);
   }
 
   static MethodSpi findNewMethodIn(MethodSpi m) {
-    AbstractJavaElementWithEcj<?> declaringType = (AbstractJavaElementWithEcj<?>) m.getDeclaringType();
-    TypeSpi newType = (TypeSpi) declaringType.internalFindNewElement();
+    var declaringType = (AbstractJavaElementWithEcj<?>) m.getDeclaringType();
+    var newType = (TypeSpi) declaringType.internalFindNewElement();
     if (newType != null) {
-      String oldSig = m.wrap().identifier();
-      for (MethodSpi newM : newType.getMethods()) {
-        if (oldSig.equals(newM.wrap().identifier())) {
-          return newM;
-        }
-      }
+      var oldSig = m.wrap().identifier();
+      return newType.getMethods().stream()
+          .filter(newM -> oldSig.equals(newM.wrap().identifier()))
+          .findFirst()
+          .orElse(null);
     }
     return null;
   }
@@ -196,8 +186,8 @@ public final class SpiWithEcjUtils {
       return env.createVoidType();
     }
     if (b instanceof WildcardBinding) {
-      WildcardBinding wb = (WildcardBinding) b;
-      TypeBinding allBounds = wb.allBounds();
+      var wb = (WildcardBinding) b;
+      var allBounds = wb.allBounds();
       if (allBounds == null) {
         // wildcard only binding: <?>
         return env.createWildcardOnlyType();
@@ -223,13 +213,13 @@ public final class SpiWithEcjUtils {
 
   @SuppressWarnings("squid:AssignmentInSubExpressionCheck")
   static int getTypeFlags(int modifiers, AllocationExpression allocation, boolean hasDeprecatedAnnotation) {
-    int currentModifiers = modifiers;
-    boolean isEnumInit = allocation != null && allocation.enumConstant != null;
+    var currentModifiers = modifiers;
+    var isEnumInit = allocation != null && allocation.enumConstant != null;
     if (isEnumInit) {
       currentModifiers |= ClassFileConstants.AccEnum;
     }
 
-    boolean deprecated = hasDeprecatedAnnotation || (currentModifiers & ClassFileConstants.AccDeprecated) != 0;
+    var deprecated = hasDeprecatedAnnotation || (currentModifiers & ClassFileConstants.AccDeprecated) != 0;
     currentModifiers &= ExtraCompilerModifiers.AccJustFlag;
 
     if (deprecated) {
@@ -239,7 +229,7 @@ public final class SpiWithEcjUtils {
   }
 
   static int getMethodFlags(int modifiers, boolean isVarargs, boolean isDeprecated) {
-    int currentModifiers = modifiers & (ExtraCompilerModifiers.AccJustFlag | ClassFileConstants.AccDeprecated | ExtraCompilerModifiers.AccDefaultMethod);
+    var currentModifiers = modifiers & (ExtraCompilerModifiers.AccJustFlag | ClassFileConstants.AccDeprecated | ExtraCompilerModifiers.AccDefaultMethod);
     if (isVarargs) {
       currentModifiers |= ClassFileConstants.AccVarargs;
     }
@@ -297,7 +287,7 @@ public final class SpiWithEcjUtils {
   }
 
   static ClassScope classScopeOf(JavaElementSpi owner) {
-    TypeSpi t = declaringTypeOf(owner);
+    var t = declaringTypeOf(owner);
 
     if (t instanceof DeclarationTypeWithEcj) {
       return ((DeclarationTypeWithEcj) t).getInternalTypeDeclaration().scope;
@@ -313,7 +303,7 @@ public final class SpiWithEcjUtils {
 
   static MethodScope methodScopeOf(JavaElementSpi owner) {
     if (owner instanceof BindingMethodWithEcj) {
-      AbstractMethodDeclaration d = sourceMethodOf((BindingMethodWithEcj) owner);
+      var d = sourceMethodOf((BindingMethodWithEcj) owner);
       if (d != null) {
         return d.scope;
       }
@@ -350,48 +340,48 @@ public final class SpiWithEcjUtils {
 
   static Annotation findAnnotationDeclaration(AnnotationSpi annotationSpi) {
     Annotation[] declaredAnnotations = null;
-    AnnotatableSpi owner = annotationSpi.getOwner();
-    if (owner instanceof BindingTypeWithEcj) {
-      ReferenceBinding b = ((BindingTypeWithEcj) owner).getInternalBinding();
+    var owner = annotationSpi.getOwner();
+    if (owner instanceof AbstractTypeWithEcj) {
+      var b = ((AbstractTypeWithEcj) owner).getInternalBinding();
       b = nvl(b.actualType(), b);
       if (b instanceof SourceTypeBinding) {
         declaredAnnotations = ((SourceTypeBinding) b).scope.referenceContext.annotations;
       }
     }
     else if (owner instanceof BindingMethodWithEcj) {
-      MethodBinding b = ((BindingMethodWithEcj) owner).getInternalBinding();
-      AbstractMethodDeclaration sourceMethod = sourceMethodOf(b);
+      var b = ((BindingMethodWithEcj) owner).getInternalBinding();
+      var sourceMethod = sourceMethodOf(b);
       if (sourceMethod != null) {
         declaredAnnotations = sourceMethod.annotations;
       }
     }
     else if (owner instanceof BindingFieldWithEcj) {
-      FieldBinding b = ((BindingFieldWithEcj) owner).getInternalBinding();
+      var b = ((BindingFieldWithEcj) owner).getInternalBinding();
       b = nvl(b.original(), b);
       if (b.sourceField() != null) {
         declaredAnnotations = b.sourceField().annotations;
       }
     }
     else if (owner instanceof BindingTypeParameterWithEcj) {
-      TypeVariableBinding b = ((BindingTypeParameterWithEcj) owner).getInternalBinding();
+      var b = ((BindingTypeParameterWithEcj) owner).getInternalBinding();
       b = (TypeVariableBinding) nvl(b.original(), b);
       if (b.declaringElement instanceof SourceTypeBinding) {
         declaredAnnotations = ((SourceTypeBinding) b.declaringElement).scope.referenceContext.annotations;
       }
     }
     if (declaredAnnotations != null && annotationSpi instanceof BindingAnnotationWithEcj) {
-      AnnotationBinding binding = ((BindingAnnotationWithEcj) annotationSpi).getInternalBinding();
+      var binding = ((BindingAnnotationWithEcj) annotationSpi).getInternalBinding();
 
       //fast visit
-      for (Annotation decl : declaredAnnotations) {
+      for (var decl : declaredAnnotations) {
         if (decl.getCompilerAnnotation() == binding) {
           return decl;
         }
       }
 
       //full visit
-      FindAnnotationVisitor v = new FindAnnotationVisitor(binding);
-      for (Annotation decl : declaredAnnotations) {
+      var v = new FindAnnotationVisitor(binding);
+      for (var decl : declaredAnnotations) {
         decl.traverse(v, (BlockScope) null);
         if (v.getResult() != null) {
           break;
@@ -403,17 +393,17 @@ public final class SpiWithEcjUtils {
   }
 
   static MemberValuePair findAnnotationValueDeclaration(BindingAnnotationElementWithEcj a) {
-    Annotation annotationDeclaration = findAnnotationDeclaration(a.getDeclaringAnnotation());
+    var annotationDeclaration = findAnnotationDeclaration(a.getDeclaringAnnotation());
     if (annotationDeclaration == null) {
       return null;
     }
-    FindMemberValuePairVisitor v = new FindMemberValuePairVisitor(a.getInternalBinding());
+    var v = new FindMemberValuePairVisitor(a.getInternalBinding());
     annotationDeclaration.traverse(v, (BlockScope) null);
     return v.getResult();
   }
 
   static List<BindingAnnotationWithEcj> createBindingAnnotations(AnnotatableSpi owner, Binding binding) {
-    Object lock = ((AbstractJavaEnvironment) owner.getJavaEnvironment()).lock();
+    var lock = ((AbstractJavaEnvironment) owner.getJavaEnvironment()).lock();
 
     AnnotationBinding[] annotations;
     //noinspection SynchronizationOnLocalVariableOrMethodParameter
@@ -427,25 +417,20 @@ public final class SpiWithEcjUtils {
     if (annotationBindings == null || annotationBindings.length < 1) {
       return emptyList();
     }
-    List<BindingAnnotationWithEcj> result = new ArrayList<>(annotationBindings.length);
-    JavaEnvironmentWithEcj env = (JavaEnvironmentWithEcj) owner.getJavaEnvironment();
-    for (AnnotationBinding annotation : annotationBindings) {
-      if (annotation != null) {
-        result.add(env.createBindingAnnotation(owner, annotation));
-      }
-    }
-    return result;
+    var env = (JavaEnvironmentWithEcj) owner.getJavaEnvironment();
+    return Arrays.stream(annotationBindings)
+        .filter(Objects::nonNull)
+        .map(annotation -> env.createBindingAnnotation(owner, annotation))
+        .collect(toList());
   }
 
   static List<DeclarationAnnotationWithEcj> createDeclarationAnnotations(JavaEnvironmentWithEcj env, AnnotatableSpi owner, Annotation[] annotations) {
     if (annotations == null || annotations.length < 1) {
       return emptyList();
     }
-    List<DeclarationAnnotationWithEcj> result = new ArrayList<>(annotations.length);
-    for (Annotation annotation : annotations) {
-      result.add(env.createDeclarationAnnotation(owner, annotation));
-    }
-    return result;
+    return Arrays.stream(annotations)
+        .map(annotation -> env.createDeclarationAnnotation(owner, annotation))
+        .collect(toList());
   }
 
   /**
@@ -467,24 +452,21 @@ public final class SpiWithEcjUtils {
       return expression.constant;
     }
     if (expression instanceof ArrayInitializer) {
-      Expression[] array = ((ArrayInitializer) expression).expressions;
+      var array = ((ArrayInitializer) expression).expressions;
       if (array != null) {
-        int n = array.length;
-        Object[] values = new Object[n];
-        for (int i = 0; i < n; i++) {
-          values[i] = compileExpression(array[i], scopeForTypeLookup, env);
-        }
-        return values;
+        return Arrays.stream(array)
+            .map(item -> compileExpression(item, scopeForTypeLookup, env))
+            .toArray();
       }
       return DefaultProblem.EMPTY_VALUES;
     }
     if (expression instanceof UnaryExpression) {
-      UnaryExpression ue = (UnaryExpression) expression;
-      Expression inner = ue.expression;
+      var ue = (UnaryExpression) expression;
+      var inner = ue.expression;
       if (inner instanceof Literal) {
-        int id = getTypeIdForLiteral((Literal) inner);
+        var id = getTypeIdForLiteral((Literal) inner);
         if (id > 0) {
-          Object candidate = compileExpression(inner, scopeForTypeLookup, env);
+          var candidate = compileExpression(inner, scopeForTypeLookup, env);
           if (candidate instanceof Constant) {
             return Constant.computeConstantOperation((Constant) candidate, id, ((expression.bits & ASTNode.OperatorMASK) >> ASTNode.OperatorSHIFT));
           }
@@ -492,9 +474,9 @@ public final class SpiWithEcjUtils {
       }
     }
     else if (expression instanceof ClassLiteralAccess) {
-      TypeBinding val = ((ClassLiteralAccess) expression).targetType;
+      var val = ((ClassLiteralAccess) expression).targetType;
       if (val == null) {
-        TypeReference type = ((ClassLiteralAccess) expression).type;
+        var type = ((ClassLiteralAccess) expression).type;
         if (type != null) {
           if (type.resolvedType == null && scopeForTypeLookup != null) {
             synchronized (env.lock()) {
@@ -507,8 +489,8 @@ public final class SpiWithEcjUtils {
       return val;
     }
     if (expression instanceof Annotation) {
-      Annotation annotation = (Annotation) expression;
-      AnnotationBinding compilerAnnotation = annotation.getCompilerAnnotation();
+      var annotation = (Annotation) expression;
+      var compilerAnnotation = annotation.getCompilerAnnotation();
       if (compilerAnnotation == null) {
         synchronized (env.lock()) {
           annotation.resolveType(scopeForTypeLookup.referenceContext.staticInitializerScope);
@@ -519,21 +501,21 @@ public final class SpiWithEcjUtils {
     if (expression instanceof Reference) {
       FieldBinding fieldBinding = null;
       if (expression instanceof NameReference) {
-        Binding binding = ((NameReference) expression).binding;
+        var binding = ((NameReference) expression).binding;
         if (binding != null && binding.kind() == Binding.FIELD) {
           fieldBinding = (FieldBinding) binding;
         }
         else if (expression instanceof QualifiedNameReference) {
-          char[][] tokens = ((QualifiedNameReference) expression).tokens;
-          TypeBinding baseType = scopeForTypeLookup.getType(tokens, tokens.length - 1);
+          var tokens = ((QualifiedNameReference) expression).tokens;
+          var baseType = scopeForTypeLookup.getType(tokens, tokens.length - 1);
           if (baseType instanceof ReferenceBinding) {
-            ReferenceBinding ref = (ReferenceBinding) baseType;
-            FieldBinding field = ref.getField(tokens[tokens.length - 1], true);
+            var ref = (ReferenceBinding) baseType;
+            var field = ref.getField(tokens[tokens.length - 1], true);
             if (field != null) {
               return field;
             }
           }
-          String str = CharOperation.toString(tokens);
+          var str = CharOperation.toString(tokens);
           return StringConstant.fromValue(str);
         }
       }
@@ -571,10 +553,10 @@ public final class SpiWithEcjUtils {
     }
     if (compiledValue instanceof FieldBinding) {
       // enum constants
-      FieldBinding fb = (FieldBinding) compiledValue;
-      TypeSpi type = bindingToType(env, fb.declaringClass);
-      String name = new String(fb.name);
-      for (FieldSpi f : type.getFields()) {
+      var fb = (FieldBinding) compiledValue;
+      var type = bindingToType(env, fb.declaringClass);
+      var name = new String(fb.name);
+      for (var f : type.getFields()) {
         if (f.getElementName().equals(name)) {
           return MetaValueFactory.createFromEnum(f);
         }
@@ -583,17 +565,17 @@ public final class SpiWithEcjUtils {
     }
     if (compiledValue instanceof AnnotationBinding) {
       // annotation binding
-      AnnotationBinding a = (AnnotationBinding) compiledValue;
+      var a = (AnnotationBinding) compiledValue;
       return MetaValueFactory.createFromAnnotation(env.createBindingAnnotation(owner, a));
     }
     if (compiledValue.getClass().isArray()) {
       // arrays
-      int n = Array.getLength(compiledValue);
-      IMetaValue[] metaArray = new IMetaValue[n];
+      var n = Array.getLength(compiledValue);
+      var metaArray = new IMetaValue[n];
       if (n > 0) {
-        for (int i = 0; i < n; i++) {
-          metaArray[i] = resolveCompiledValue(env, owner, Array.get(compiledValue, i));
-        }
+        metaArray = IntStream.range(0, n)
+            .mapToObj(i -> resolveCompiledValue(env, owner, Array.get(compiledValue, i)))
+            .toArray(IMetaValue[]::new);
       }
       return MetaValueFactory.createArray(metaArray);
     }
@@ -623,13 +605,9 @@ public final class SpiWithEcjUtils {
     if (annotations == null || annotations.isEmpty()) {
       return false;
     }
-
-    for (AnnotationSpi annotation : annotations) {
-      if (annotation != null && DEPRECATED_ANNOTATION_FQN.equals(annotation.getType().getName())) {
-        return true;
-      }
-    }
-    return false;
+    return annotations.stream()
+        .filter(Objects::nonNull)
+        .anyMatch(annotation -> DEPRECATED_ANNOTATION_FQN.equals(annotation.getType().getName()));
   }
 
   private static final class FindAnnotationVisitor extends ASTVisitor {

@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.ecj.ClasspathEntry;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
@@ -39,10 +38,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class ClasspathEntryTest {
   @Test
   public void testApiAndSpi(IJavaEnvironment env) {
-    List<IClasspathEntry> path = env.classpath().collect(toList());
-    IClasspathEntry first = path.get(0);
-    IClasspathEntry second = path.get(1);
-    IClasspathEntry last = path.get(path.size() - 1);
+    var path = env.classpath().collect(toList());
+    var first = path.get(0);
+    var second = path.get(1);
+    var last = path.get(path.size() - 1);
     assertEquals(StandardCharsets.UTF_8.name(), first.encoding());
     assertTrue(first.isDirectory());
     assertTrue(first.isSourceFolder());
@@ -66,13 +65,13 @@ public class ClasspathEntryTest {
   }
 
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testEntry() {
-    ClasspathEntry a = new ClasspathEntry(Paths.get("a", "a.jar"), ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());
-    ClasspathEntry b = new ClasspathEntry(Paths.get("b", "b.jar"), ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());
-    ClasspathEntry aa = new ClasspathEntry(Paths.get("a", "a.jar"), ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());
-    ClasspathEntry bb = new ClasspathEntry(Paths.get("b", "b.jar"), ClasspathSpi.MODE_SOURCE, StandardCharsets.UTF_8.name());
-    ClasspathEntry cc = new ClasspathEntry(Paths.get("b", "b.jar"), ClasspathSpi.MODE_SOURCE | ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());
+    var a = new ClasspathEntry(Paths.get("a", "a.jar"), ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());
+    var b = new ClasspathEntry(Paths.get("b", "b.jar"), ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());
+    var aa = new ClasspathEntry(Paths.get("a", "a.jar"), ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());
+    var bb = new ClasspathEntry(Paths.get("b", "b.jar"), ClasspathSpi.MODE_SOURCE, StandardCharsets.UTF_8.name());
+    var cc = new ClasspathEntry(Paths.get("b", "b.jar"), ClasspathSpi.MODE_SOURCE | ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());
     assertNotEquals(a, b);
     assertNotEquals(bb, b);
     assertEquals(a, aa);

@@ -31,11 +31,9 @@ import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -62,8 +60,8 @@ public class TypeGeneratorTest {
 
   @Test
   public void testTypeWithSingleFieldAndAllImplementedMethods(IJavaEnvironment env) {
-    String superIfc = InterfaceWithTypeParam.class.getName() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END;
-    ITypeGenerator<?> generator = TypeGenerator.create()
+    var superIfc = InterfaceWithTypeParam.class.getName() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END;
+    var generator = TypeGenerator.create()
         .asPublic()
         .withElementName("TestConsumer")
         .withInterface(superIfc)
@@ -83,9 +81,9 @@ public class TypeGeneratorTest {
 
   @Test
   public void testTypeGenerator(IJavaEnvironment env) {
-    Stream<String> interfaces = Stream.of(CharSequence.class.getName(), Comparable.class.getName());
+    var interfaces = Stream.of(CharSequence.class.getName(), Comparable.class.getName());
 
-    ITypeGenerator<?> generator = TypeGenerator.create()
+    var generator = TypeGenerator.create()
         .asPublic()
         .asFinal()
         .withAnnotation(AnnotationGenerator.createGenerated("GeneratorType", "Comments"))
@@ -146,13 +144,13 @@ public class TypeGeneratorTest {
 
   @Test
   public void testTypeParameterWithoutName() {
-    ITypeParameterGenerator<?> typeParamGenerator = TypeParameterGenerator.create()
+    var typeParamGenerator = TypeParameterGenerator.create()
         .withBinding(CharSequence.class.getName())
         .withBinding(Iterable.class.getName())
         .withBinding(Comparable.class.getName());
     assertEquals(3, typeParamGenerator.bounds().count());
 
-    String src = TypeGenerator.create()
+    var src = TypeGenerator.create()
         .asPublic()
         .asInterface()
         .withElementName("GenericIfc")
@@ -166,7 +164,7 @@ public class TypeGeneratorTest {
 
   @Test
   public void testEnum(IJavaEnvironment env) {
-    ITypeGenerator<?> generator = TypeGenerator.create()
+    var generator = TypeGenerator.create()
         .asPublic()
         .asEnum()
         .withElementName("TestEnum")
@@ -177,7 +175,7 @@ public class TypeGeneratorTest {
 
   @Test
   public void testAnnotationType(IJavaEnvironment env) {
-    ITypeGenerator<?> generator = TypeGenerator.create()
+    var generator = TypeGenerator.create()
         .asPublic()
         .asAnnotationType()
         .withElementName("TestAnnotation")
@@ -188,7 +186,7 @@ public class TypeGeneratorTest {
 
   @Test
   public void testInterface(IJavaEnvironment env) {
-    ITypeGenerator<?> generator = TypeGenerator.create()
+    var generator = TypeGenerator.create()
         .asPublic()
         .asInterface()
         .withElementName("ITest")
@@ -201,7 +199,7 @@ public class TypeGeneratorTest {
 
   @Test
   public void testClassWithObjectSuperClass(IJavaEnvironment env) {
-    ITypeGenerator<?> generator = TypeGenerator.create()
+    var generator = TypeGenerator.create()
         .asPublic()
         .withElementName("ClassWithObjectSuperClass")
         .withSuperClass(Object.class.getName())
@@ -234,18 +232,18 @@ public class TypeGeneratorTest {
 
   @Test
   public void testUnableToAddPrimaryTypeToType() {
-    PrimaryTypeGenerator<?> primary = PrimaryTypeGenerator.create();
-    PrimaryTypeGenerator<?> nested = PrimaryTypeGenerator.create();
+    var primary = PrimaryTypeGenerator.create();
+    var nested = PrimaryTypeGenerator.create();
     assertEquals("A PrimaryTypeGenerator cannot be added as nested type. Use a TypeGenerator instead.", assertThrows(IllegalArgumentException.class, () -> primary.withType(nested)).getMessage());
   }
 
   @Test
   public void testAnnotationReferringNestedType(IJavaEnvironment env) {
-    String idFieldName = "ID";
-    PrimaryTypeGenerator<?> primary = PrimaryTypeGenerator.create()
+    var idFieldName = "ID";
+    var primary = PrimaryTypeGenerator.create()
         .withElementName("Outer")
         .withPackageName("a.b.c");
-    ITypeGenerator<?> inner = TypeGenerator.create()
+    var inner = TypeGenerator.create()
         .withElementName("Inner")
         .withField(FieldGenerator.create()
             .asPublic()
@@ -263,24 +261,24 @@ public class TypeGeneratorTest {
             .withParameter(MethodParameterGenerator.create()
                 .withDataType(inner.fullyQualifiedName())
                 .withElementName("param")));
-    IType result = assertNoCompileErrors(env, primary);
+    var result = assertNoCompileErrors(env, primary);
 
     // import to the nested type must be present for the annotation
     assertEquals(2, result.requireCompilationUnit().imports().count());
   }
 
   protected static void assertMethodOrder(int expectedOrder, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator) {
-    long insertionOrder = INSERTION_ORDER.getAndIncrement();
+    var insertionOrder = INSERTION_ORDER.getAndIncrement();
     assertMemberOrder(expectedOrder, SortedMemberEntry.METHOD_ORDER, insertionOrder, SortedMemberEntry.defaultMethodOrder(generator, insertionOrder));
   }
 
   protected static void assertTypeOrder(int expectedOrder, ITypeGenerator<?> generator) {
-    long insertionOrder = INSERTION_ORDER.getAndIncrement();
+    var insertionOrder = INSERTION_ORDER.getAndIncrement();
     assertMemberOrder(expectedOrder, SortedMemberEntry.TYPE_ORDER, insertionOrder, SortedMemberEntry.defaultTypeOrder(generator, insertionOrder));
   }
 
   protected static void assertFieldOrder(int expectedOrder, IFieldGenerator<?> generator) {
-    long insertionOrder = INSERTION_ORDER.getAndIncrement();
+    var insertionOrder = INSERTION_ORDER.getAndIncrement();
     assertMemberOrder(expectedOrder, SortedMemberEntry.FIELD_ORDER, insertionOrder, SortedMemberEntry.defaultFieldOrder(generator, insertionOrder));
   }
 

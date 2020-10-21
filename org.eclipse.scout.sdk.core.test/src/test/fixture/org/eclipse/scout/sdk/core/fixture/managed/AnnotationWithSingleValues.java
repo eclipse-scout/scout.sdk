@@ -10,17 +10,17 @@
  */
 package org.eclipse.scout.sdk.core.fixture.managed;
 
-import static org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier.raw;
+import static org.eclipse.scout.sdk.core.apidef.IClassNameSupplier.raw;
 
 import java.util.function.Supplier;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link AnnotationWithSingleValues}</h3> managed wrapper for {@link AnnotationWithSingleValues}

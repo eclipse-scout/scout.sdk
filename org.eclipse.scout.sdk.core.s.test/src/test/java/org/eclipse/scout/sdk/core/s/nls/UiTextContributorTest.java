@@ -11,13 +11,12 @@
 package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
@@ -36,10 +35,10 @@ import nls.TestUiTextContributor;
 public class UiTextContributorTest {
   @Test
   public void testContributorKeys(TestingEnvironment env) {
-    UiTextContributor contributor = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().get());
+    var contributor = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().get());
     contributor.load(new NullProgress());
 
-    Set<String> keys = contributor.keys().collect(Collectors.toSet());
+    var keys = contributor.keys().collect(toSet());
     assertEquals(new HashSet<>(asList(
         TranslationStoreSupplierExtension.TRANSLATION_KEY_1,
         TranslationStoreSupplierExtension.TRANSLATION_KEY_2,
@@ -53,11 +52,11 @@ public class UiTextContributorTest {
   @Test
   @SuppressWarnings({"SimplifiableJUnitAssertion", "ConstantConditions", "EqualsWithItself", "EqualsBetweenInconvertibleTypes"})
   public void testToStringEquals(TestingEnvironment env) {
-    UiTextContributor contributor1 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().get());
+    var contributor1 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().get());
     contributor1.load(new NullProgress());
-    UiTextContributor contributor2 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().get());
+    var contributor2 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().get());
     contributor1.load(new NullProgress());
-    UiTextContributor contributor3 = new UiTextContributor(env.findType(Long.class.getName()).findAny().get());
+    var contributor3 = new UiTextContributor(env.findType(Long.class.getName()).findAny().get());
     contributor1.load(new NullProgress());
 
     assertEquals(UiTextContributor.class.getSimpleName() + " [" + TestUiTextContributor.class.getName() + "]", contributor1.toString());

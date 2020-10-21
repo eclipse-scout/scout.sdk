@@ -11,23 +11,19 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import javax.wsdl.WSDLException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -35,14 +31,12 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils;
 import org.eclipse.scout.sdk.core.s.jaxws.ParsedWsdl;
@@ -62,8 +56,8 @@ import org.eclipse.scout.sdk.s2e.ui.fields.resource.ResourceTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.StyledTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
-import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizardPage;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
+import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizardPage;
 import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
@@ -72,10 +66,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * <h3>{@link WebServiceNewWizardPage}</h3>
@@ -137,7 +129,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
         .swtDefaults()
         .applyTo(parent);
 
-    int labelWidth = 130;
+    var labelWidth = 130;
     createTypeGroup(parent, labelWidth);
     createProjectGroup(parent, labelWidth);
     createAttributesGroup(parent, labelWidth);
@@ -149,7 +141,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
   }
 
   protected void createTypeGroup(Composite parent, int labelWidth) {
-    Group typeGroupBox = FieldToolkit.createGroupBox(parent, "Type of Web Service");
+    var typeGroupBox = FieldToolkit.createGroupBox(parent, "Type of Web Service");
 
     // radio button "new consumer"
     m_createConsumer = new Button(typeGroupBox, SWT.RADIO);
@@ -266,7 +258,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
 
   protected void createProjectGroup(Composite parent, int labelWidth) {
     // project group box
-    Group projectGroupBox = FieldToolkit.createGroupBox(parent, "Target Project");
+    var projectGroupBox = FieldToolkit.createGroupBox(parent, "Target Project");
 
     // radio button "create new project"
     m_createNewProjectButton = new Button(projectGroupBox, SWT.RADIO);
@@ -286,7 +278,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     m_serverProjectField = FieldToolkit.createProjectProposalField(projectGroupBox, "Add new Project to", serverProjectsFilter, labelWidth);
     m_serverProjectField.acceptProposal(getServerProject());
     m_serverProjectField.addProposalListener(proposal -> {
-      IJavaProject jp = (IJavaProject) proposal;
+      var jp = (IJavaProject) proposal;
       setServerProjectInternal(jp);
       pingStateChanging();
     });
@@ -317,7 +309,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     m_existingJaxWsProjectField = FieldToolkit.createProjectProposalField(projectGroupBox, "Web Service Project", jaxwsProjectsFilter, labelWidth);
     m_existingJaxWsProjectField.acceptProposal(getExistingJaxWsProject());
     m_existingJaxWsProjectField.addProposalListener(proposal -> {
-      IJavaProject javaProject = (IJavaProject) proposal;
+      var javaProject = (IJavaProject) proposal;
       setExistingJaxWsProjectInternal(javaProject);
       pingStateChanging();
     });
@@ -360,7 +352,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
 
   protected void createAttributesGroup(Composite parent, int labelWidth) {
     // project group box
-    Group attributesGroupBox = FieldToolkit.createGroupBox(parent, "Web Service Artifacts Package");
+    var attributesGroupBox = FieldToolkit.createGroupBox(parent, "Web Service Artifacts Package");
 
     // package field
     m_packageField = FieldToolkit.createPackageField(attributesGroupBox, "Target Package", getExistingJaxWsProject(), labelWidth);
@@ -411,13 +403,13 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     Optional<String> artifactId = Optional.empty();
     if (isCreateNewProject()) {
       if (Strings.hasText(getArtifactId()) && JdtUtils.exists(getServerProject())) {
-        Document pom = getPomDocument(getServerProject());
+        var pom = getPomDocument(getServerProject());
         groupId = Pom.groupId(pom);
         artifactId = Optional.ofNullable(getArtifactId());
       }
     }
     else if (JdtUtils.exists(getExistingJaxWsProject())) {
-      Document pom = getPomDocument(getExistingJaxWsProject());
+      var pom = getPomDocument(getExistingJaxWsProject());
       groupId = Pom.groupId(pom);
       artifactId = Pom.artifactId(pom);
     }
@@ -444,7 +436,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       return;
     }
 
-    StringBuilder pckBuilder = new StringBuilder();
+    var pckBuilder = new StringBuilder();
     if (groupId.isPresent() && !artifactId.get().startsWith(groupId.get())) {
       pckBuilder.append(groupId.get());
       pckBuilder.append(JavaTypes.C_DOT);
@@ -460,15 +452,15 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       return null;
     }
     try {
-      String path = new URL(url).getPath();
+      var path = new URL(url).getPath();
       if (Strings.hasText(path)) {
-        int lastSlashPos = path.lastIndexOf('/');
+        var lastSlashPos = path.lastIndexOf('/');
         if (lastSlashPos >= 0) {
           path = path.substring(lastSlashPos + 1);
         }
         path = path.toLowerCase(Locale.ENGLISH);
 
-        int lastDotPos = path.lastIndexOf('.');
+        var lastDotPos = path.lastIndexOf('.');
         if (lastDotPos > 0) {
           path = path.substring(0, lastDotPos);
         }
@@ -493,7 +485,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
 
   protected static boolean isServerProject(IJavaProject jp) {
     try {
-      Optional<IScoutApi> scoutApi = ApiHelper.scoutApiFor(jp);
+      var scoutApi = ApiHelper.scoutApiFor(jp);
       return scoutApi.isPresent()
           && JdtUtils.exists(jp.findType(scoutApi.get().IServerSession().fqn()))
           && !jp.getProject().getFolder(IScoutSourceFolders.WEBAPP_RESOURCE_FOLDER + "/WEB-INF").exists()
@@ -507,27 +499,27 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
 
   protected static boolean isJaxWsProject(IJavaProject jp) {
     try {
-      IProject project = jp.getProject();
-      Path projectPath = project.getLocation().toFile().toPath();
-      Path wsdlFolder = AbstractWebServiceNewOperation.getWsdlRootFolder(projectPath);
+      var project = jp.getProject();
+      var projectPath = project.getLocation().toFile().toPath();
+      var wsdlFolder = AbstractWebServiceNewOperation.getWsdlRootFolder(projectPath);
       if (!Files.isDirectory(wsdlFolder)) {
         return false;
       }
-      Path bindingFolder = AbstractWebServiceNewOperation.getBindingRootFolder(projectPath);
+      var bindingFolder = AbstractWebServiceNewOperation.getBindingRootFolder(projectPath);
       if (!Files.isDirectory(bindingFolder)) {
         return false;
       }
 
-      Optional<IPackageFragmentRoot> primarySourceFolderOpt = S2eUtils.primarySourceFolder(jp);
+      var primarySourceFolderOpt = S2eUtils.primarySourceFolder(jp);
       if (primarySourceFolderOpt.isEmpty()) {
         return false;
       }
 
-      IPackageFragmentRoot primarySourceFolder = primarySourceFolderOpt.get();
+      var primarySourceFolder = primarySourceFolderOpt.get();
       if (!JdtUtils.exists(primarySourceFolder) || !primarySourceFolder.getResource().getProjectRelativePath().toString().toLowerCase(Locale.ENGLISH).contains("java")) {
         return false;
       }
-      Optional<IScoutApi> scoutApi = ApiHelper.scoutApiFor(jp);
+      var scoutApi = ApiHelper.scoutApiFor(jp);
       if (scoutApi.isEmpty()) {
         return false;
       }
@@ -535,13 +527,13 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
         return false;
       }
 
-      String prefix = "p";
-      String p = prefix + ':';
-      StringBuilder bindingFilesXpathBuilder = new StringBuilder();
+      var prefix = "p";
+      var p = prefix + ':';
+      var bindingFilesXpathBuilder = new StringBuilder();
       bindingFilesXpathBuilder.append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.BUILD).append('/').append(p).append(IMavenConstants.PLUGINS).append('/').append(p).append(IMavenConstants.PLUGIN)
           .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(JaxWsUtils.JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='")
           .append(JaxWsUtils.JAXWS_MAVEN_PLUGIN_ARTIFACT_ID).append("']");
-      List<Element> elements = Xml.evaluateXPath(bindingFilesXpathBuilder.toString(), S2eUtils.getPomDocument(project), prefix, IMavenConstants.POM_XML_NAMESPACE);
+      var elements = Xml.evaluateXPath(bindingFilesXpathBuilder.toString(), S2eUtils.getPomDocument(project), prefix, IMavenConstants.POM_XML_NAMESPACE);
       //noinspection RedundantIfStatement
       if (elements.isEmpty() && containsWsdls(wsdlFolder)) {
         // these are jaxws project that contain wsdls but they are not listed in the pom (auto discovery).
@@ -557,7 +549,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
   }
 
   protected static boolean containsWsdls(Path wsdlFolder) {
-    try (Stream<Path> paths = Files.walk(wsdlFolder)) {
+    try (var paths = Files.walk(wsdlFolder)) {
       return paths
           .filter(p -> p.getFileName().toString().endsWith(JaxWsUtils.WSDL_FILE_EXTENSION))
           .filter(Files::isRegularFile)
@@ -628,13 +620,13 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     }
 
     // check name pattern
-    String msg = ScoutProjectNewHelper.getMavenArtifactIdErrorMessage(getArtifactId());
+    var msg = ScoutProjectNewHelper.getMavenArtifactIdErrorMessage(getArtifactId());
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }
 
     // check project existence in workspace
-    for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+    for (var p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
       if (p.getName().equalsIgnoreCase(getArtifactId())) {
         return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Artifact Id already exists in the workspace.");
       }
@@ -642,8 +634,8 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
 
     // check for existence on the file system
     if (JdtUtils.exists(getServerProject())) {
-      Path serverProjectFolder = getServerProject().getProject().getLocation().makeAbsolute().toFile().toPath();
-      Path targetDir = serverProjectFolder.getParent();
+      var serverProjectFolder = getServerProject().getProject().getLocation().makeAbsolute().toFile().toPath();
+      var targetDir = serverProjectFolder.getParent();
       if (targetDir != null) {
         if (Files.isDirectory(targetDir.resolve(getArtifactId()))) {
           return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Artifact Id already exists in this target directory.");
@@ -677,7 +669,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     }
 
     try {
-      URL url = new URL(wsdlUrl);
+      var url = new URL(wsdlUrl);
       if (Objects.equals(m_lastParsedWsdlUrl, url)) {
         return m_lastParsedWsdlUrlStatus;
       }
@@ -687,7 +679,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
         @Override
         protected void execute(IProgressMonitor monitor) {
           try {
-            String msg = validateWsdl(url);
+            var msg = validateWsdl(url);
             m_lastParsedWsdlUrl = url;
             if (msg == null) {
               m_lastParsedWsdlUrlStatus = Status.OK_STATUS;
@@ -720,8 +712,8 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
   }
 
   protected static String validateWsdl(URL url) {
-    try (InputStream in = url.openStream()) {
-      ParsedWsdl info = ParsedWsdl.create(url.toURI(), in, false);
+    try (var in = url.openStream()) {
+      var info = ParsedWsdl.create(url.toURI(), in, false);
       if (info.isEmpty()) {
         return "Either this Web Service uses SOAP encoding (use=encoded) or contains no operations. Ensure the Web Service uses literal encoding.";
       }

@@ -10,7 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
+import static java.util.stream.Collectors.joining;
+
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * <h3>{@link CompositeObject}</h3> Composite object used to sort and compare compositions of objects.
@@ -40,11 +43,11 @@ public final class CompositeObject implements Comparable<CompositeObject> {
       return new CompositeObject();
     }
 
-    Object[] a = new Object[getCombinedSize(objects)];
-    int pos = 0;
-    for (CompositeObject o : objects) {
+    var a = new Object[getCombinedSize(objects)];
+    var pos = 0;
+    for (var o : objects) {
       if (o != null && o.m_value != null) {
-        int num = o.m_value.length;
+        var num = o.m_value.length;
         if (num > 0) {
           System.arraycopy(o.m_value, 0, a, pos, num);
           pos += num;
@@ -55,13 +58,12 @@ public final class CompositeObject implements Comparable<CompositeObject> {
   }
 
   private static int getCombinedSize(CompositeObject... objects) {
-    int size = 0;
-    for (CompositeObject o : objects) {
-      if (o != null && o.m_value != null) {
-        size += o.m_value.length;
-      }
-    }
-    return size;
+    return Arrays.stream(objects)
+        .filter(Objects::nonNull)
+        .map(o -> o.m_value)
+        .filter(Objects::nonNull)
+        .mapToInt(o -> o.length)
+        .sum();
   }
 
   @SuppressWarnings("unchecked")
@@ -82,6 +84,7 @@ public final class CompositeObject implements Comparable<CompositeObject> {
   }
 
   @Override
+  @SuppressWarnings("NonFinalFieldReferencedInHashCode")
   public int hashCode() {
     if (m_hash == null) {
       m_hash = Arrays.hashCode(m_value);
@@ -98,14 +101,15 @@ public final class CompositeObject implements Comparable<CompositeObject> {
       return false;
     }
 
-    CompositeObject other = (CompositeObject) obj;
+    var other = (CompositeObject) obj;
     return Arrays.equals(m_value, other.m_value);
   }
 
   @Override
   public int compareTo(CompositeObject o) {
-    Object[] me = m_value;
-    Object[] other = o.m_value;
+    var me = m_value;
+    var other = o.m_value;
+    //noinspection ArrayEquality
     if (me == other) {
       return 0;
     }
@@ -116,9 +120,9 @@ public final class CompositeObject implements Comparable<CompositeObject> {
       return 1;
     }
 
-    int minSize = Math.min(me.length, other.length);
-    for (int i = 0; i < minSize; i++) {
-      int c = compareImpl(me[i], other[i]);
+    var minSize = Math.min(me.length, other.length);
+    for (var i = 0; i < minSize; i++) {
+      var c = compareImpl(me[i], other[i]);
       if (c != 0) {
         return c;
       }
@@ -126,23 +130,19 @@ public final class CompositeObject implements Comparable<CompositeObject> {
     return Integer.compare(me.length, other.length);
   }
 
-  public String toString(String delim) {
+  public String toString(CharSequence delimiter) {
     if (m_value == null || m_value.length < 1) {
       return "";
     }
 
-    StringBuilder b = new StringBuilder();
-    b.append(m_value[0]);
-    for (int i = 1; i < m_value.length; i++) {
-      b.append(delim);
-      b.append(m_value[i]);
-    }
-    return b.toString();
+    return Arrays.stream(m_value)
+        .map(String::valueOf)
+        .collect(joining(delimiter));
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    var sb = new StringBuilder();
     sb.append('[');
     sb.append(toString(", "));
     sb.append(']');

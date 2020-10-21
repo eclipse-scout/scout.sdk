@@ -65,7 +65,7 @@ public class SourceCollectorTest {
   }
 
   protected static String collectWithData(Stream<ISourceGenerator<ISourceBuilder<?>>> generators, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
-    MemorySourceBuilder out = new MemorySourceBuilder();
+    var out = new MemorySourceBuilder();
     out.append(generators, prefix, delimiter, suffix);
     return out.source().toString();
   }

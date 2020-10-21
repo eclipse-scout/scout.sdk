@@ -15,7 +15,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileEr
 
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -37,10 +36,10 @@ public class LookupCallGeneratorTest {
 
   @Test
   public void testLookupCallAllParams(IJavaEnvironment env) {
-    IScoutApi scoutApi = env.requireApi(IScoutApi.class);
+    var scoutApi = env.requireApi(IScoutApi.class);
 
     // lookup service interface
-    PrimaryTypeGenerator<?> lookupSvcIfc = PrimaryTypeGenerator.create()
+    var lookupSvcIfc = PrimaryTypeGenerator.create()
         .withPackageName("org.eclipse.scout.sdk.core.s.test")
         .asPublic()
         .asInterface()
@@ -48,7 +47,7 @@ public class LookupCallGeneratorTest {
         .withInterface(scoutApi.ILookupService().fqn() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END);
 
     assertEqualsRefFile(env, REF_FILE_FOLDER + "LookupCall1.txt", lookupSvcIfc);
-    IType createdLookupSvcIfc = assertNoCompileErrors(env, lookupSvcIfc);
+    var createdLookupSvcIfc = assertNoCompileErrors(env, lookupSvcIfc);
 
     // lookup call
     LookupCallGenerator<?> lookupCallGenerator = new LookupCallGenerator<>()

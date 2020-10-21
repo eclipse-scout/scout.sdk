@@ -45,18 +45,18 @@ public class CompilationUnitOverrideSupport {
    *         is the first override for this compilation unit or there was no change.
    */
   public boolean addCompilationUnit(ICompilationUnit cu) {
-    char[][] packageName0 = cu.getPackageName();
-    CharBuffer key = CharBuffer.wrap(CharOperation.concatWith(packageName0, cu.getMainTypeName(), SEPARATOR));
+    var packageName0 = cu.getPackageName();
+    var key = CharBuffer.wrap(CharOperation.concatWith(packageName0, cu.getMainTypeName(), SEPARATOR));
 
-    boolean updatedExistingEntry = false;
-    ICompilationUnit existingIcu = m_overrideCompilationUnits.put(key, cu);
+    var updatedExistingEntry = false;
+    var existingIcu = m_overrideCompilationUnits.put(key, cu);
     if (existingIcu != null) {
       updatedExistingEntry = !Arrays.equals(existingIcu.getContents(), cu.getContents());
     }
 
     //register additional packages
     if (packageName0 != null && packageName0.length > 0) {
-      for (int i = 1; i <= packageName0.length; i++) {
+      for (var i = 1; i <= packageName0.length; i++) {
         m_additionalPackages.add(CharBuffer.wrap(CharOperation.concatWith(CharOperation.subarray(packageName0, 0, i), SEPARATOR)));
       }
     }

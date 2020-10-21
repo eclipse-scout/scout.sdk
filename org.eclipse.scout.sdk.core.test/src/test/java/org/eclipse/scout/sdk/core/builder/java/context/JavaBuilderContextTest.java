@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 public class JavaBuilderContextTest {
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "EqualsWithItself", "ConstantConditions", "EqualsBetweenInconvertibleTypes"})
   public void testValues() {
     assertNotNull(new JavaBuilderContext().properties());
     assertNotNull(new JavaBuilderContext().lineDelimiter());
@@ -37,7 +37,7 @@ public class JavaBuilderContextTest {
     assertNotNull(new JavaBuilderContext().validator());
     assertFalse(new JavaBuilderContext().environment().isPresent());
 
-    JavaBuilderContext c = new JavaBuilderContext();
+    var c = new JavaBuilderContext();
     assertTrue(c.equals(c));
     assertTrue(new JavaBuilderContext().equals(new JavaBuilderContext()));
     assertFalse(new JavaBuilderContext().equals(null));
@@ -47,13 +47,13 @@ public class JavaBuilderContextTest {
     assertEquals(new JavaBuilderContext().hashCode(), new JavaBuilderContext().hashCode());
     new CoreJavaEnvironmentWithSourceFactory().accept(env -> assertNotEquals(new JavaBuilderContext().hashCode(), new JavaBuilderContext(env).hashCode()));
 
-    JavaBuilderContext c2 = new JavaBuilderContext(new BuilderContext("a"));
+    var c2 = new JavaBuilderContext(new BuilderContext("a"));
     assertNotEquals(c2, c);
 
-    BuilderContext a = new BuilderContext();
-    BuilderContext b = new BuilderContext("c");
-    BuilderContext d = new BuilderContext("nl", new PropertySupport());
-    BuilderContext e = new BuilderContext("nl", new PropertySupport());
+    var a = new BuilderContext();
+    var b = new BuilderContext("c");
+    var d = new BuilderContext("nl", new PropertySupport());
+    var e = new BuilderContext("nl", new PropertySupport());
     assertFalse(a.equals(b));
     assertTrue(a.equals(a));
     assertFalse(a.equals(null));

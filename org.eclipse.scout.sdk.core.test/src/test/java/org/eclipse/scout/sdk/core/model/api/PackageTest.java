@@ -37,42 +37,42 @@ public class PackageTest {
 
   @Test
   public void testPackageName(IJavaEnvironment env) {
-    ICompilationUnit childClassIcu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
-    IPackage pck = childClassIcu.containingPackage();
+    var childClassIcu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
+    var pck = childClassIcu.containingPackage();
     assertEquals(FIXTURE_PACKAGE, pck.elementName());
     assertEquals("package " + FIXTURE_PACKAGE + ';', pck.toString());
   }
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    ICompilationUnit childClassIcu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
-    IPackage pck = childClassIcu.containingPackage();
+    var childClassIcu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
+    var pck = childClassIcu.containingPackage();
     assertFalse(Strings.isBlank(pck.toString()));
   }
 
   @Test
   public void testPackageNameFromType(IJavaEnvironment env) {
-    IType childClass = env.requireType(ChildClass.class.getName());
-    IPackage pck = childClass.containingPackage();
+    var childClass = env.requireType(ChildClass.class.getName());
+    var pck = childClass.containingPackage();
     assertEquals(FIXTURE_PACKAGE, pck.elementName());
     assertEquals("package " + FIXTURE_PACKAGE + ';', pck.toString());
   }
 
   @Test
   public void testPackageAnnotationNotExisting(IJavaEnvironment env) {
-    IType testClass = env.requireType(AbstractBaseClass.class.getName());
-    IPackage pck = testClass.containingPackage();
+    var testClass = env.requireType(AbstractBaseClass.class.getName());
+    var pck = testClass.containingPackage();
     assertEquals(0, pck.annotations().stream().count());
   }
 
   @Test
   public void testPackageAnnotation(IJavaEnvironment env) {
-    IType testClass = env.requireType(ImportTestClass2.class.getName());
-    IPackage pck = testClass.containingPackage();
-    String expectedPackageName = ImportTestClass2.class.getPackage().getName();
+    var testClass = env.requireType(ImportTestClass2.class.getName());
+    var pck = testClass.containingPackage();
+    var expectedPackageName = ImportTestClass2.class.getPackage().getName();
     assertEquals(expectedPackageName, pck.elementName());
     assertNotNull(pck.packageInfo().orElse(null));
-    IPackage org = pck.parent()
+    var org = pck.parent()
         .flatMap(IPackage::parent)
         .flatMap(IPackage::parent)
         .flatMap(IPackage::parent)
@@ -84,14 +84,14 @@ public class PackageTest {
     assertFalse(org.parent().get().parent().isPresent());
     assertEquals(1, pck.children().count());
     assertEquals(Paths.get(expectedPackageName.replace(JavaTypes.C_DOT, '/')), pck.asPath());
-    IAnnotation pckAnnotation = pck.annotations().withName(PackageAnnotation.class.getName()).first().get();
+    var pckAnnotation = pck.annotations().withName(PackageAnnotation.class.getName()).first().get();
     assertEquals("testValue", pckAnnotation.element("testAttrib").get().value().as(String.class));
   }
 
   @Test
   public void testPackageNameFromSuperType(IJavaEnvironment env) {
-    IType childClass = env.requireType(ChildClass.class.getName()).requireSuperClass();
-    IPackage pck = childClass.containingPackage();
+    var childClass = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var pck = childClass.containingPackage();
     assertEquals(FIXTURE_PACKAGE, pck.elementName());
     assertEquals("package " + FIXTURE_PACKAGE + ';', pck.toString());
   }

@@ -14,7 +14,6 @@ import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEcli
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.jdt.internal.ui.JavaPluginImages;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -46,15 +45,10 @@ public abstract class AbstractWizard extends Wizard {
   public abstract WizardFinishTask<?> getFinishTask();
 
   protected boolean allPagesCanFinish() {
-    for (IWizardPage page : getPages()) {
-      if (page instanceof AbstractWizardPage) {
-        AbstractWizardPage wizPage = (AbstractWizardPage) page;
-        if (!wizPage.performFinish()) {
-          return false;
-        }
-      }
-    }
-    return true;
+    return Arrays.stream(getPages())
+        .filter(page -> page instanceof AbstractWizardPage)
+        .map(page -> (AbstractWizardPage) page)
+        .allMatch(AbstractWizardPage::performFinish);
   }
 
   /**
@@ -98,7 +92,7 @@ public abstract class AbstractWizard extends Wizard {
    * @return The created page.
    */
   protected <T extends AbstractWizardPage> T initNewClassWizardWithPage(Class<T> pageClass, PackageContainer packageContainer) {
-    T page = createWizardPage(pageClass, packageContainer);
+    var page = createWizardPage(pageClass, packageContainer);
     addPage(page);
     setWindowTitle(page.getTitle());
     setHelpAvailable(true);
@@ -123,7 +117,7 @@ public abstract class AbstractWizard extends Wizard {
 
   @Override
   public IWizardPage getStartingPage() {
-    AbstractWizardPage startingPage = (AbstractWizardPage) super.getStartingPage();
+    var startingPage = (AbstractWizardPage) super.getStartingPage();
     if (startingPage != null && startingPage.isExcludePage()) {
       return getNextPage(startingPage);
     }
@@ -132,12 +126,12 @@ public abstract class AbstractWizard extends Wizard {
 
   @Override
   public IWizardPage getNextPage(IWizardPage page) {
-    List<IWizardPage> pages = Arrays.asList(getPages());
-    int index = pages.indexOf(page);
+    var pages = Arrays.asList(getPages());
+    var index = pages.indexOf(page);
     if (index == pages.size() - 1 || index == -1) {
       return null;
     }
-    AbstractWizardPage nextPage = (AbstractWizardPage) pages.get(index + 1);
+    var nextPage = (AbstractWizardPage) pages.get(index + 1);
     if (nextPage.isExcludePage()) {
       return getNextPage(nextPage);
     }
@@ -146,7 +140,7 @@ public abstract class AbstractWizard extends Wizard {
 
   @Override
   public IWizardPage getPreviousPage(IWizardPage page) {
-    AbstractWizardPage prevPage = (AbstractWizardPage) super.getPreviousPage(page);
+    var prevPage = (AbstractWizardPage) super.getPreviousPage(page);
     if (prevPage != null && prevPage.isExcludePage()) {
       return getPreviousPage(prevPage);
     }
@@ -155,12 +149,8 @@ public abstract class AbstractWizard extends Wizard {
 
   @Override
   public boolean canFinish() {
-    for (IWizardPage page : getPages()) {
-      AbstractWizardPage bcPage = (AbstractWizardPage) page;
-      if (!bcPage.isExcludePage() && !bcPage.isPageComplete()) {
-        return false;
-      }
-    }
-    return true;
+    return Arrays.stream(getPages())
+        .map(page -> (AbstractWizardPage) page)
+        .noneMatch(bcPage -> !bcPage.isExcludePage() && !bcPage.isPageComplete());
   }
 }

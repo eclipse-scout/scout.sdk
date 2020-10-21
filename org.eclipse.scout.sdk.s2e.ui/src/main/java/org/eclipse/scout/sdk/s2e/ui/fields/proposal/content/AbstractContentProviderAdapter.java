@@ -35,7 +35,6 @@ import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.util.NormalizedPattern;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -108,7 +107,7 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
 
   @Override
   public Control createDescriptionControl(Composite parent, Object content) {
-    Browser browser = JavaDocBrowser.create(parent, content.toString());
+    var browser = JavaDocBrowser.create(parent, content.toString());
     if (browser == null) {
       return null;
     }
@@ -129,7 +128,7 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
         return emptyList();
       }
 
-      Collection<?> proposals = doLoadProposals();
+      var proposals = doLoadProposals();
       if (proposals == null || proposals.isEmpty()) {
         return emptyList();
       }
@@ -139,7 +138,7 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
         if (monitor != null && monitor.isCanceled()) {
           break;
         }
-        int[] matchRegions = searchPattern.getMatchingRegions(getText(o));
+        var matchRegions = searchPattern.getMatchingRegions(getText(o));
         if (matchRegions != null) {
           result.add(o);
         }
@@ -172,7 +171,7 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
   }
 
   protected Collection<?> doLoadProposals() {
-    Collection<?> loadedProposals = m_allProposals;
+    var loadedProposals = m_allProposals;
     if (loadedProposals != null) {
       return loadedProposals;
     }

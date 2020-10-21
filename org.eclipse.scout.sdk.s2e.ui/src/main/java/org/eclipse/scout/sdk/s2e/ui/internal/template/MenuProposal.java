@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstMenuBuilder;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.ZeroLenWrappedTrackedNodePosition;
 
@@ -30,7 +29,7 @@ public class MenuProposal extends AbstractTypeProposal {
 
   @Override
   protected void fillRewrite(AstNodeFactory factory, Type superType) throws CoreException {
-    AstMenuBuilder menuBuilder = factory.newMenu(getProposalContext().getDefaultName())
+    var menuBuilder = factory.newMenu(getProposalContext().getDefaultName())
         .withSuperType(superType)
         .withReadOnlyNameSuffix(getProposalContext().getSuffix())
         .in(getProposalContext().getDeclaringType())

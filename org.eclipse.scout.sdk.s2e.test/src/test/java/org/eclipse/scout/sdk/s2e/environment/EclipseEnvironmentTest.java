@@ -43,13 +43,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.CharSequenceInputStream;
@@ -68,11 +65,11 @@ public class EclipseEnvironmentTest {
   @Test
   public void testWriteResourceWithGeneratorSync() {
     runInEnvironment((env, fs) -> {
-      Path a = Paths.get("a");
-      String content = "examplecontent";
-      String content2 = "otherfileContent";
+      var a = Paths.get("a");
+      var content = "examplecontent";
+      var content2 = "otherfileContent";
 
-      AbstractJob j = new AbstractJob("") {
+      var j = new AbstractJob("") {
         @Override
         protected void execute(IProgressMonitor monitor) {
           env.writeResource(b -> b.append(content), a, null);
@@ -80,7 +77,7 @@ public class EclipseEnvironmentTest {
           env.writeResource(content2, a, null);
         }
       };
-      ISchedulingRule rule = mock(ISchedulingRule.class);
+      var rule = mock(ISchedulingRule.class);
       doAnswer(invocation -> mockingDetails(invocation.getArgument(0)).isMock()).when(rule).contains(any());
       doAnswer(invocation -> mockingDetails(invocation.getArgument(0)).isMock()).when(rule).isConflicting(any());
       j.setRule(rule);
@@ -95,9 +92,9 @@ public class EclipseEnvironmentTest {
   @Test
   public void testWriteCompilationUnitAsync() {
     runInEnvironment((env, fs) -> {
-      IJavaEnvironment je = env.findJavaEnvironment(null).get();
-      String className = "TestClass";
-      IType result = env.writeCompilationUnit(PrimaryTypeGenerator.create().withElementName(className), je.primarySourceFolder().get());
+      var je = env.findJavaEnvironment(null).get();
+      var className = "TestClass";
+      var result = env.writeCompilationUnit(PrimaryTypeGenerator.create().withElementName(className), je.primarySourceFolder().get());
       assertEquals(className, result.elementName());
 
       env.createResource(PrimaryTypeGenerator.create()
@@ -120,8 +117,8 @@ public class EclipseEnvironmentTest {
   @Test
   public void testCreateCompilationUnitWithReload() {
     runInEnvironment((env, fs) -> {
-      IJavaEnvironment je = env.findJavaEnvironment(null).get();
-      IType result = env.writeCompilationUnit(
+      var je = env.findJavaEnvironment(null).get();
+      var result = env.writeCompilationUnit(
           PrimaryTypeGenerator.create()
               .withElementName("Test")
               .withField(FieldGenerator.create()
@@ -139,8 +136,8 @@ public class EclipseEnvironmentTest {
   @Test
   public void testWriteResourceAsync() {
     runInEnvironment((env, fs) -> {
-      Path a = Paths.get("a");
-      String content = "examplecontent";
+      var a = Paths.get("a");
+      var content = "examplecontent";
       env.writeResourceAsync(content, a, null).awaitDoneThrowingOnErrorOrCancel();
       assertEquals(content, fs.get(a).toString());
     });
@@ -148,11 +145,11 @@ public class EclipseEnvironmentTest {
 
   @Test
   public void testEnvironment() {
-    try (EclipseEnvironment jdtEnv = mock(EclipseEnvironment.class)) {
+    try (var jdtEnv = mock(EclipseEnvironment.class)) {
       assertNotNull(EclipseEnvironment.narrow(jdtEnv));
     }
 
-    IEnvironment env = mock(IEnvironment.class);
+    var env = mock(IEnvironment.class);
     assertFalse(env instanceof EclipseEnvironment);
     assertThrows(IllegalArgumentException.class, () -> EclipseEnvironment.narrow(env));
   }
@@ -165,17 +162,17 @@ public class EclipseEnvironmentTest {
     assertNotNull(EclipseEnvironment.toScoutProgress((IProgress) null));
     assertNotNull(EclipseEnvironment.toScoutProgress((IProgressMonitor) null));
 
-    IProgress p = mock(IProgress.class);
+    var p = mock(IProgress.class);
     assertFalse(p instanceof EclipseProgress);
     assertThrows(IllegalArgumentException.class, () -> EclipseEnvironment.toScoutProgress(p));
   }
 
   @Test
   public void testJavaEnvironmentWithJdt() throws JavaModelException {
-    try (EclipseEnvironment e = new EclipseEnvironment(); EclipseEnvironment adapter = spy(e)) {
+    try (var e = new EclipseEnvironment(); var adapter = spy(e)) {
       doAnswer(invocation -> new JavaEnvironmentWithJdt(invocation.getArgument(0), null)).when(adapter).createNewJavaEnvironmentFor(any());
-      IJavaProject javaProject = MockFactory.createJavaProjectMock();
-      try (JavaEnvironmentWithJdt env = (JavaEnvironmentWithJdt) adapter.toScoutJavaEnvironment(javaProject).unwrap()) {
+      var javaProject = MockFactory.createJavaProjectMock();
+      try (var env = (JavaEnvironmentWithJdt) adapter.toScoutJavaEnvironment(javaProject).unwrap()) {
         assertNotNull(env);
         assertSame(javaProject, env.javaProject());
         assertNotNull(adapter.toScoutType(MockFactory.createJdtTypeMock(Long.class.getName(), javaProject)));
@@ -183,7 +180,7 @@ public class EclipseEnvironmentTest {
         assertNull(adapter.toScoutType(MockFactory.createJdtTypeMock("not.existing", javaProject)));
         assertNotNull(adapter.toScoutSourceFolder(javaProject.getAllPackageFragmentRoots()[0]));
         assertNull(adapter.toScoutSourceFolder(null));
-        IPackageFragmentRoot notExistingPackageRoot = mock(IPackageFragmentRoot.class);
+        var notExistingPackageRoot = mock(IPackageFragmentRoot.class);
         when(notExistingPackageRoot.getJavaProject()).thenReturn(javaProject);
         assertNull(adapter.toScoutSourceFolder(notExistingPackageRoot));
       }
@@ -193,8 +190,8 @@ public class EclipseEnvironmentTest {
   @Test
   public void testWriteResource() {
     runInEnvironment((env, fs) -> {
-      Path a = Paths.get("a");
-      String content = "examplecontent";
+      var a = Paths.get("a");
+      var content = "examplecontent";
       env.writeResource(content, a, null);
       assertEquals(content, fs.get(a).toString());
     });
@@ -203,20 +200,20 @@ public class EclipseEnvironmentTest {
   protected static void runInEnvironment(BiConsumer<EclipseEnvironment, Map<Path, StringBuilder>> task) {
     runInEclipseEnvironment((e, progress) -> {
       Map<Path, StringBuilder> memoryFileSystem = new HashMap<>();
-      try (EclipseEnvironment env = spy(e)) {
-        IJavaProject javaProject = MockFactory.createJavaProjectMock();
+      try (var env = spy(e)) {
+        var javaProject = MockFactory.createJavaProjectMock();
         doAnswer(invocation -> Optional.of(javaProject)).when(env).findJavaProject(any());
 
         doAnswer(invocation -> {
           Path pathOfFile = invocation.getArgument(0);
 
-          IContainer folder = mock(IContainer.class);
+          var folder = mock(IContainer.class);
           when(folder.exists()).thenReturn(true);
           when(folder.contains(folder)).thenReturn(true);
           when(folder.isConflicting(folder)).thenReturn(true);
 
-          StringBuilder fileContent = memoryFileSystem.computeIfAbsent(pathOfFile, k -> new StringBuilder());
-          IFile file = mock(IFile.class);
+          var fileContent = memoryFileSystem.computeIfAbsent(pathOfFile, k -> new StringBuilder());
+          var file = mock(IFile.class);
           try {
             when(file.exists()).thenAnswer(i -> memoryFileSystem.get(pathOfFile).length() > 0);
             when(file.getContents()).thenAnswer(i -> new CharSequenceInputStream(memoryFileSystem.get(pathOfFile), StandardCharsets.UTF_8));
@@ -225,7 +222,7 @@ public class EclipseEnvironmentTest {
             when(file.getCharset()).thenReturn(StandardCharsets.UTF_8.name());
             doAnswer(i2 -> {
               fileContent.delete(0, fileContent.length());
-              StringBuilder newContent = Strings.fromInputStream(i2.getArgument(0), StandardCharsets.UTF_8);
+              var newContent = Strings.fromInputStream(i2.getArgument(0), StandardCharsets.UTF_8);
               fileContent.append(newContent);
               return null;
             }).when(file).create(any(), anyBoolean(), any());

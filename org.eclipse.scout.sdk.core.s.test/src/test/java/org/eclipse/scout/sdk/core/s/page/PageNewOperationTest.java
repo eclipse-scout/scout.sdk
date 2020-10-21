@@ -42,9 +42,9 @@ public class PageNewOperationTest {
   @ParameterizedTest(name = "withDTO={0}, withServer={1}, withShared={2}, withTest={3}, isPageWithTable={4}, withAbstractPage={5}")
   public void testPageCreation(boolean dtoSourceFolder, boolean serverSourceFolder, boolean sharedSourceFolder,
       boolean testSourceFolder, boolean isPageWithTable, boolean isCreateAbstractPage, TestingEnvironment env) {
-    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
+    var scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
 
-    PageNewOperation pno = new PageNewOperation();
+    var pno = new PageNewOperation();
     pno.setClientSourceFolder(env.getTestingSourceFolder());
     pno.setPackage("org.eclipse.scout.sdk.s2e.client.test");
     String suffix;

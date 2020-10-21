@@ -14,13 +14,12 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -28,7 +27,6 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IImport;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -40,9 +38,9 @@ import org.eclipse.scout.sdk.core.model.api.query.SuperTypeQuery;
 import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 @SuppressWarnings("squid:S2160")
 public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implements IType {
@@ -200,7 +198,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   protected static String buildReference(IType type, boolean erasureOnly) {
-    StringBuilder builder = new StringBuilder(128);
+    var builder = new StringBuilder(128);
     buildReferenceRec(type, erasureOnly, builder);
     return builder.toString();
   }
@@ -212,8 +210,8 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
       return;
     }
 
-    String name = type.name();
-    boolean isWildCardOnly = name == null; // name may be null for wildcard only types (<?>)
+    var name = type.name();
+    var isWildCardOnly = name == null; // name may be null for wildcard only types (<?>)
     if (type.isWildcardType()) {
       builder.append(JavaTypes.C_QUESTION_MARK);
       if (isWildCardOnly) {
@@ -230,11 +228,11 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     }
 
     // type arguments
-    List<IType> typeArgs = type.typeArguments().collect(toList());
+    var typeArgs = type.typeArguments().collect(toList());
     if (!typeArgs.isEmpty()) {
       builder.append(JavaTypes.C_GENERIC_START);
       buildReferenceRec(typeArgs.get(0), false, builder);
-      for (int i = 1; i < typeArgs.size(); i++) {
+      for (var i = 1; i < typeArgs.size(); i++) {
         builder.append(JavaTypes.C_COMMA);
         buildReferenceRec(typeArgs.get(i), false, builder);
       }
@@ -289,30 +287,30 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     if (Strings.isBlank(simpleName)) {
       return Optional.empty();
     }
-    Optional<ICompilationUnit> optCu = compilationUnit();
+    var optCu = compilationUnit();
     if (optCu.isEmpty()) {
       return Optional.empty(); // simple types cannot resolve anything
     }
-    IJavaEnvironment env = javaEnvironment();
-    ICompilationUnit compilationUnit = optCu.get();
+    var env = javaEnvironment();
+    var compilationUnit = optCu.get();
 
     // 1. step: try to resolve the name using the declared imports
-    Optional<IType> fromImports = resolveNameUsingImports(compilationUnit, simpleName);
+    var fromImports = resolveNameUsingImports(compilationUnit, simpleName);
     if (fromImports.isPresent()) {
       return fromImports;
     }
 
     // 2. step: search in own package
-    String pck = Strings.notBlank(compilationUnit.containingPackage().elementName())
+    var pck = Strings.notBlank(compilationUnit.containingPackage().elementName())
         .map(p -> p + JavaTypes.C_DOT)
         .orElse("");
-    Optional<IType> fromPackage = env.findType(pck + simpleName);
+    var fromPackage = env.findType(pck + simpleName);
     if (fromPackage.isPresent()) {
       return fromPackage;
     }
 
     // 3. step: name is already fully qualified
-    Optional<IType> fromFqn = env.findType(simpleName);
+    var fromFqn = env.findType(simpleName);
     if (fromFqn.isPresent()) {
       return fromFqn;
     }
@@ -322,7 +320,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   protected Optional<IType> resolveNameUsingImports(ICompilationUnit compilationUnit, String simpleName) {
-    IJavaEnvironment env = javaEnvironment();
+    var env = javaEnvironment();
     return compilationUnit
         .imports() // imports are empty on synthetic type. Can only be parsed if source is available
         .map(imp -> toImportName(imp, simpleName))
@@ -333,12 +331,12 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   private static String toImportName(IImport imp, String simpleNameToResolve) {
-    String impName = imp.name();
+    var impName = imp.name();
     if (impName.endsWith(JavaTypes.C_DOT + simpleNameToResolve)) {
       // explicit import
       return impName;
     }
-    String wildcardSuffix = ".*";
+    var wildcardSuffix = ".*";
     if (impName.endsWith(wildcardSuffix)) {
       // wildcard import
       return impName.substring(0, impName.length() - 1 /* only remove the star, keep the dot */) + simpleNameToResolve;
@@ -372,7 +370,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     if (!isPrimitive()) {
       return this;
     }
-    String boxedFqn = JavaTypes.boxPrimitive(name());
+    var boxedFqn = JavaTypes.boxPrimitive(name());
     if (boxedFqn == null) {
       return this;
     }
@@ -384,8 +382,8 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     if (isPrimitive()) {
       return this;
     }
-    String myName = name();
-    String unboxed = JavaTypes.unboxToPrimitive(myName);
+    var myName = name();
+    var unboxed = JavaTypes.unboxToPrimitive(myName);
     //noinspection StringEquality
     if (unboxed == myName) {
       return this; // there is no primitive type for this type

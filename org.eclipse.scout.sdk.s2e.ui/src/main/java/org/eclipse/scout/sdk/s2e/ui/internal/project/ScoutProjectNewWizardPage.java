@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -38,7 +37,6 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
@@ -80,7 +78,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         .swtDefaults()
         .applyTo(parent);
 
-    int labelWidth = 100;
+    var labelWidth = 100;
     createProjectNameGroup(parent, labelWidth);
     createClientLanguageGroup(parent);
     createProjectLocationGroup(parent, labelWidth);
@@ -89,7 +87,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   }
 
   protected void createProjectNameGroup(Composite parent, int labelWidth) {
-    Group nameGroup = FieldToolkit.createGroupBox(parent, "Project Name");
+    var nameGroup = FieldToolkit.createGroupBox(parent, "Project Name");
 
     // group id
     m_groupIdField = FieldToolkit.createStyledTextField(nameGroup, "Group Id", TextField.TYPE_LABEL, labelWidth);
@@ -145,7 +143,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected void createClientLanguageGroup(Composite parent) {
 
-    Group uiLangBox = FieldToolkit.createGroupBox(parent, "Programming language of the user interface");
+    var uiLangBox = FieldToolkit.createGroupBox(parent, "Programming language of the user interface");
 
     m_javaButton = new Button(uiLangBox, SWT.RADIO);
     m_javaButton.setText("Java");
@@ -190,7 +188,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   }
 
   protected void createProjectLocationGroup(Composite parent, int labelWidth) {
-    Group locationGroup = FieldToolkit.createGroupBox(parent, "Project Location");
+    var locationGroup = FieldToolkit.createGroupBox(parent, "Project Location");
 
     // location checkbox
     createLocationCheckbox(locationGroup);
@@ -223,8 +221,8 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   }
 
   protected Composite createLocationCheckbox(Composite p) {
-    Composite parent = new Composite(p, SWT.NONE);
-    Label lbl = new Label(parent, SWT.NONE);
+    var parent = new Composite(p, SWT.NONE);
+    var lbl = new Label(parent, SWT.NONE);
 
     m_useWsLoc = FieldToolkit.createCheckBox(parent, "Use default Workspace location", isUseWorkspaceLocation());
     m_useWsLoc.addSelectionListener(new SelectionAdapter() {
@@ -244,14 +242,14 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         .grab(true, false)
         .applyTo(parent);
 
-    FormData labelData = new FormData();
+    var labelData = new FormData();
     labelData.top = new FormAttachment(0, 4);
     labelData.left = new FormAttachment(0, 0);
     labelData.right = new FormAttachment(0, 10);
     labelData.bottom = new FormAttachment(100, 0);
     lbl.setLayoutData(labelData);
 
-    FormData textData = new FormData();
+    var textData = new FormData();
     textData.top = new FormAttachment(0, 0);
     textData.left = new FormAttachment(lbl, 5);
     textData.right = new FormAttachment(100, 0);
@@ -291,9 +289,9 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       file = getWorkspaceLocation();
     }
     else {
-      Path wsLoc = getWorkspaceLocation();
+      var wsLoc = getWorkspaceLocation();
       if (getTargetDirectory() == null || wsLoc.equals(getTargetDirectory())) {
-        String recentTargetDir = getDialogSettings().get(SETTINGS_TARGET_DIR);
+        var recentTargetDir = getDialogSettings().get(SETTINGS_TARGET_DIR);
         if (recentTargetDir != null) {
           file = Paths.get(recentTargetDir);
         }
@@ -322,7 +320,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected IStatus getStatusGroupId() {
     // check name pattern
-    String msg = ScoutProjectNewHelper.getMavenGroupIdErrorMessage(getGroupId());
+    var msg = ScoutProjectNewHelper.getMavenGroupIdErrorMessage(getGroupId());
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }
@@ -331,8 +329,8 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected IStatus getStatusArtifactId() {
     // check name pattern
-    String artifactId = getArtifactId();
-    String msg = ScoutProjectNewHelper.getMavenArtifactIdErrorMessage(artifactId);
+    var artifactId = getArtifactId();
+    var msg = ScoutProjectNewHelper.getMavenArtifactIdErrorMessage(artifactId);
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }
@@ -350,7 +348,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     }
 
     // check project existence in workspace
-    for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+    for (var p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
       if (p.getName().startsWith(artifactId + '.')) {
         return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Artifact Id already exists in the workspace.");
       }
@@ -359,7 +357,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   }
 
   protected IStatus getStatusDisplayName() {
-    String msg = ScoutProjectNewHelper.getDisplayNameErrorMessage(getDisplayName());
+    var msg = ScoutProjectNewHelper.getDisplayNameErrorMessage(getDisplayName());
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }

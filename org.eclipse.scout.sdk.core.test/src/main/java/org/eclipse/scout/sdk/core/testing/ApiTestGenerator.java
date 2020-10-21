@@ -18,7 +18,6 @@ import java.beans.Introspector;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.sdk.core.imports.IImportCollector;
@@ -27,10 +26,8 @@ import org.eclipse.scout.sdk.core.imports.ImportCollector;
 import org.eclipse.scout.sdk.core.imports.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -55,9 +52,9 @@ public class ApiTestGenerator {
   }
 
   protected static void buildMethod(IMethod method, String methodVarName, StringBuilder source) {
-    List<IMethodParameter> parameterTypes = method.parameters().stream().collect(toList());
+    var parameterTypes = method.parameters().stream().collect(toList());
     if (!parameterTypes.isEmpty()) {
-      for (int i = 0; i < parameterTypes.size(); i++) {
+      for (var i = 0; i < parameterTypes.size(); i++) {
         source.append(toStringLiteral(parameterTypes.get(i).dataType().reference()));
         if (i < parameterTypes.size() - 1) {
           source.append(", ");
@@ -88,7 +85,7 @@ public class ApiTestGenerator {
   }
 
   protected static String getFlagsSource(int flags, String flagsRef) {
-    String flagSrc = Arrays.stream(Flags.class.getDeclaredFields())
+    var flagSrc = Arrays.stream(Flags.class.getDeclaredFields())
         .filter(f -> f.getType() == int.class)
         .filter(f -> (intValueOf(f) & flags) != 0)
         .map(f -> flagsRef + JavaTypes.C_DOT + f.getName())
@@ -109,20 +106,20 @@ public class ApiTestGenerator {
   }
 
   public static void createAnnotationsAsserts(IAnnotatable annotatable, StringBuilder source, String annotatableRef) {
-    List<IAnnotation> annotations = annotatable.annotations().stream().collect(toList());
-    source.append("assertEquals(").append(annotations.size()).append(", ").append(annotatableRef).append(".annotations().stream().count(), \"annotation count\");").append(NL);
-    for (IAnnotation a : annotations) {
-      String annotationRef = a.type().reference();
-      source.append("assertAnnotation(").append(annotatableRef).append(", \"").append(annotationRef).append("\");").append(NL);
-    }
+    var annotations = annotatable.annotations().stream().collect(toList());
+    var string = annotations.stream()
+        .map(a -> a.type().reference())
+        .map(annotationRef -> "assertAnnotation(" + annotatableRef + ", \"" + annotationRef + "\");" + NL)
+        .collect(joining("", "assertEquals(" + annotations.size() + ", " + annotatableRef + ".annotations().stream().count(), \"annotation count\");" + NL, ""));
+    source.append(string);
   }
 
   public String buildSource() {
     IImportCollector collector = new ImportCollector();
     IImportValidator validator = new ImportValidator(collector);
-    StringBuilder sourceBuilder = new StringBuilder();
-    String typeVarName = getMemberName(m_element.elementName());
-    String iTypeRef = validator.useReference(IType.class.getName());
+    var sourceBuilder = new StringBuilder();
+    var typeVarName = getMemberName(m_element.elementName());
+    var iTypeRef = validator.useReference(IType.class.getName());
 
     sourceBuilder.append("/**").append(NL);
     sourceBuilder.append("* @Generated with ").append(getClass().getName()).append(NL);
@@ -146,7 +143,7 @@ public class ApiTestGenerator {
     collector.addStaticImport(Assertions.class.getName() + ".assertEquals");
     collector.addStaticImport(Assertions.class.getName() + ".assertTrue");
 
-    StringBuilder result = new StringBuilder();
+    var result = new StringBuilder();
     collector.createImportDeclarations()
         .forEach(i -> result.append(i).append(NL));
     result.append(NL);
@@ -155,7 +152,7 @@ public class ApiTestGenerator {
   }
 
   protected void buildType(IType type, String typeVarName, StringBuilder source, IImportValidator validator, String iTypeRef) {
-    String flagsRef = validator.useReference(Flags.class.getName());
+    var flagsRef = validator.useReference(Flags.class.getName());
 
     source.append("assertHasFlags(").append(typeVarName).append(", ").append(getFlagsSource(type.flags(), flagsRef)).append(");").append(NL);
 
@@ -170,10 +167,10 @@ public class ApiTestGenerator {
             .append(NL));
 
     // interfaces
-    List<IType> interfaces = type.superInterfaces().collect(toList());
+    var interfaces = type.superInterfaces().collect(toList());
     if (!interfaces.isEmpty()) {
       source.append("assertHasSuperInterfaces(").append(typeVarName).append(", new String[]{");
-      for (int i = 0; i < interfaces.size(); i++) {
+      for (var i = 0; i < interfaces.size(); i++) {
         source.append(toStringLiteral(interfaces.get(i).reference()));
         if (i < interfaces.size() - 1) {
           source.append(", ");
@@ -186,45 +183,43 @@ public class ApiTestGenerator {
 
     // fields
     source.append("// fields of ").append(type.elementName()).append(NL);
-    String iFieldRef = validator.useReference(IField.class.getName());
-    List<IField> fields = type.fields().stream().collect(toList());
+    var fields = type.fields().stream().collect(toList());
     source.append("assertEquals(").append(fields.size()).append(", ").append(typeVarName).append(".fields().stream().count(), \"field count of '").append(type.name()).append("'\");").append(NL);
-    for (IField f : fields) {
-      String fieldVarName = getMemberName(f.elementName());
-      source.append(iFieldRef).append(JavaTypes.C_SPACE).append(fieldVarName).append(" = ").append("assertFieldExist(").append(typeVarName).append(", \"").append(f.elementName()).append("\");").append(NL);
+    for (var f : fields) {
+      var fieldVarName = getMemberName(f.elementName());
+      source.append("var ").append(fieldVarName).append(" = ").append("assertFieldExist(").append(typeVarName).append(", \"").append(f.elementName()).append("\");").append(NL);
       buildField(f, fieldVarName, source, flagsRef);
     }
     source.append(NL);
 
     // methods
-    String iMethodRef = validator.useReference(IMethod.class.getName());
-    List<IMethod> methods = type.methods().stream().collect(toList());
+    var methods = type.methods().stream().collect(toList());
     source.append("assertEquals(").append(methods.size()).append(", ").append(typeVarName).append(".methods().stream().count(), \"method count of '").append(type.name()).append("'\");").append(NL);
-    for (IMethod method : methods) {
-      String methodVarName = getMemberName(method.elementName());
-      source.append(iMethodRef).append(JavaTypes.C_SPACE).append(methodVarName).append(" = ").append("assertMethodExist(").append(typeVarName).append(", \"").append(method.elementName()).append("\", new String[]{");
+    for (var method : methods) {
+      var methodVarName = getMemberName(method.elementName());
+      source.append("var ").append(methodVarName).append(" = ").append("assertMethodExist(").append(typeVarName).append(", \"").append(method.elementName()).append("\", new String[]{");
       buildMethod(method, methodVarName, source);
     }
     source.append(NL);
 
     // inner types
-    List<IType> innerTypes = type.innerTypes().stream().collect(toList());
+    var innerTypes = type.innerTypes().stream().collect(toList());
     source.append("assertEquals(").append(innerTypes.size()).append(", ")
         .append(typeVarName).append(".innerTypes().stream().count(), \"inner types count of '").append(type.elementName()).append("'\");").append(NL);
-    for (IType innerType : innerTypes) {
-      String innerTypeVarName = getMemberName(innerType.elementName());
+    for (var innerType : innerTypes) {
+      var innerTypeVarName = getMemberName(innerType.elementName());
       source.append("// type ").append(innerType.elementName()).append(NL);
-      source.append(iTypeRef).append(JavaTypes.C_SPACE).append(innerTypeVarName).append(" = ");
+      source.append("var ").append(innerTypeVarName).append(" = ");
       source.append("assertTypeExists(").append(typeVarName).append(", \"").append(innerType.elementName()).append("\");").append(NL);
       buildType(innerType, innerTypeVarName, source, validator, iTypeRef);
     }
   }
 
   private String getMemberName(String e) {
-    String memberName = Introspector.decapitalize(e);
+    var memberName = Introspector.decapitalize(e);
     if (m_usedMemberNames.contains(memberName)) {
-      int counter = 1;
-      String workingName = memberName + counter;
+      var counter = 1;
+      var workingName = memberName + counter;
       while (m_usedMemberNames.contains(workingName)) {
         counter++;
         workingName = memberName + counter;

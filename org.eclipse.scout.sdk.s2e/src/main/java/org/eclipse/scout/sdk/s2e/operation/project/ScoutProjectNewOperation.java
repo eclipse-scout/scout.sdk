@@ -19,21 +19,17 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
-import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
@@ -48,7 +44,6 @@ import org.eclipse.scout.sdk.s2e.environment.CompilationUnitWriteOperation;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 
 /**
@@ -73,8 +68,8 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
   public void accept(EclipseEnvironment env, EclipseProgress progress) {
     try {
       // get archetype settings
-      BundleContext bundleContext = S2ESdkActivator.getDefault().getBundle().getBundleContext();
-      String version = bundleContext.getProperty(TEMPLATE_VERSION);
+      var bundleContext = S2ESdkActivator.getDefault().getBundle().getBundleContext();
+      var version = bundleContext.getProperty(TEMPLATE_VERSION);
       if (Strings.isBlank(version)) {
         version = null; // will use the latest
       }
@@ -116,7 +111,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
    * @return E.g. "1.8" or "9".
    */
   protected static String versionToString(Version version) {
-    StringBuilder b = new StringBuilder(4);
+    var b = new StringBuilder(4);
     b.append(version.getMajor());
     if (version.getMinor() != 0) {
       b.append('.').append(version.getMinor());
@@ -130,15 +125,15 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
    * @return A {@link Version} like "1.8.0" or "9.0.0" with the latest version supported in the current default JVM.
    */
   protected static Version computeDefaultWorkspaceJavaVersion() {
-    Version result = Version.parseVersion(MIN_JVM_VERSION);
-    IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
+    var result = Version.parseVersion(MIN_JVM_VERSION);
+    var defaultVm = JavaRuntime.getDefaultVMInstall();
     if (defaultVm == null) {
       return result;
     }
 
-    for (IExecutionEnvironment env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
+    for (var env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
       if (env.isStrictlyCompatible(defaultVm)) {
-        Version cur = execEnvironmentToVersion(env.getId());
+        var cur = execEnvironmentToVersion(env.getId());
         if (cur.compareTo(result) > 0) {
           result = cur; // take the newest
         }
@@ -157,7 +152,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
    */
   protected static Version execEnvironmentToVersion(String executionEnvId) {
     if (executionEnvId != null && executionEnvId.startsWith(EXEC_ENV_PREFIX)) {
-      String numPart = executionEnvId.substring(EXEC_ENV_PREFIX.length());
+      var numPart = executionEnvId.substring(EXEC_ENV_PREFIX.length());
       if (Strings.hasText(numPart)) {
         try {
           return Version.parseVersion(numPart);
@@ -172,9 +167,9 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
 
   protected void formatCreatedProjects(EclipseProgress progress) throws CoreException {
     progress.init(m_createdProjects.size(), "Format created projects");
-    for (IProject createdProject : m_createdProjects) {
+    for (var createdProject : m_createdProjects) {
       if (createdProject.isAccessible() && createdProject.hasNature(JavaCore.NATURE_ID)) {
-        IJavaProject jp = JavaCore.create(createdProject);
+        var jp = JavaCore.create(createdProject);
         if (JdtUtils.exists(jp)) {
           formatProject(progress.newChild(1), jp);
         }
@@ -183,8 +178,8 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
   }
 
   protected static void formatProject(EclipseProgress progress, IJavaProject p) throws JavaModelException {
-    for (IPackageFragment pck : p.getPackageFragments()) {
-      for (ICompilationUnit u : pck.getCompilationUnits()) {
+    for (var pck : p.getPackageFragments()) {
+      for (var u : pck.getCompilationUnits()) {
         // the cu write operation also formats the unit. just overwrite with itself.
         new CompilationUnitWriteOperation(u, u.getSource()).accept(progress);
       }
@@ -197,7 +192,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
   @SuppressWarnings({"findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", "TypeMayBeWeakened"})
   protected List<IProject> importIntoWorkspace(EclipseProgress progress) throws CoreException {
     List<Path> subFolders;
-    try (Stream<Path> files = Files.list(getTargetDirectory().resolve(getArtifactId()))) {
+    try (var files = Files.list(getTargetDirectory().resolve(getArtifactId()))) {
       subFolders = files.collect(toList());
     }
     catch (IOException e) {
@@ -205,22 +200,20 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
     }
 
     Collection<MavenProjectInfo> projects = new ArrayList<>(subFolders.size());
-    for (Path subFolder : subFolders) {
-      Path pom = subFolder.resolve(IMavenConstants.POM);
+    for (var subFolder : subFolders) {
+      var pom = subFolder.resolve(IMavenConstants.POM);
       if (Files.isReadable(pom) && Files.isRegularFile(pom)) {
         projects.add(new MavenProjectInfo(subFolder.getFileName().toString(), pom.toFile(), null, null));
       }
     }
 
-    List<IMavenProjectImportResult> importedProjects = MavenPlugin.getProjectConfigurationManager().importProjects(projects, new ProjectImportConfiguration(), progress.newChild(projects.size()).monitor());
-
-    List<IProject> result = new ArrayList<>(importedProjects.size());
-    for (IMavenProjectImportResult mavenProject : importedProjects) {
-      if (mavenProject.getProject() != null) {
-        result.add(mavenProject.getProject());
-      }
-    }
-    return result;
+    return MavenPlugin.getProjectConfigurationManager()
+        .importProjects(projects, new ProjectImportConfiguration(), progress.newChild(projects.size()).monitor())
+        .stream()
+        .filter(Objects::nonNull)
+        .map(IMavenProjectImportResult::getProject)
+        .filter(Objects::nonNull)
+        .collect(toList());
   }
 
   public String getDisplayName() {

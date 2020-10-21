@@ -24,19 +24,19 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenBuildTest {
   @Test
-  @SuppressWarnings("unlikely-arg-type")
+  @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "EqualsWithItself", "ConstantConditions", "EqualsBetweenInconvertibleTypes"})
   public void testMavenBuild() {
-    MavenBuild a = new MavenBuild()
+    var a = new MavenBuild()
         .withGoal("goal1")
         .withOption("option1")
         .withProperty('x');
 
-    MavenBuild b = new MavenBuild()
+    var b = new MavenBuild()
         .withGoal("goal2")
         .withOption("option2")
         .withProperty("prop2");
 
-    MavenBuild bb = new MavenBuild()
+    var bb = new MavenBuild()
         .withGoal("goal2")
         .withOption("option2")
         .withProperty("prop2");

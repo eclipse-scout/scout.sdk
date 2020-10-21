@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.core.s.builder.java.body;
 
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.MethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link ScoutMethodBodyBuilder}</h3>
@@ -40,8 +40,8 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
   }
 
   @Override
-  public TYPE appendBeansGetVariable(CharSequence bean, CharSequence varName) {
-    return ref(bean).space().append(varName).equalSign().appendBeansGet(bean);
+  public TYPE appendBeansGetVariable(CharSequence beanClass, CharSequence varName) {
+    return ref(beanClass).space().append(varName).equalSign().appendBeansGet(beanClass);
   }
 
   @Override
@@ -60,8 +60,8 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
   }
 
   @Override
-  public TYPE appendBeansGet(CharSequence bean) {
-    IClassNameSupplier beanSupplier = IClassNameSupplier.raw(bean);
+  public TYPE appendBeansGet(CharSequence beanClass) {
+    var beanSupplier = IClassNameSupplier.raw(beanClass);
     return appendBeansGetFrom(null, api -> beanSupplier);
   }
 
@@ -73,7 +73,7 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
 
   @Override
   public TYPE appendExportFormData(CharSequence formDataVarName) {
-    return appendFrom(IScoutApi.class, api -> api.IForm().exportFormDataMethodName()).parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon().nl();
+    return appendFrom(IScoutApi.class, api -> api.IForm().exportFormDataMethodName()).parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon();
   }
 
   @Override

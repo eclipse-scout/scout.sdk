@@ -17,7 +17,6 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -58,7 +57,7 @@ public class CharSequenceInputStream extends InputStream {
         .onMalformedInput(CodingErrorAction.REPLACE)
         .onUnmappableCharacter(CodingErrorAction.REPLACE);
     // Ensure that buffer is long enough to hold a complete character
-    float maxBytesPerChar = m_encoder.maxBytesPerChar();
+    var maxBytesPerChar = m_encoder.maxBytesPerChar();
     if (bufferSize < maxBytesPerChar) {
       throw new IllegalArgumentException("Buffer size " + bufferSize + " is less than maxBytesPerChar " +
           maxBytesPerChar);
@@ -122,7 +121,7 @@ public class CharSequenceInputStream extends InputStream {
    */
   private void fillBuffer() throws CharacterCodingException {
     m_bbuf.compact();
-    CoderResult result = m_encoder.encode(m_cbuf, m_bbuf, true);
+    var result = m_encoder.encode(m_cbuf, m_bbuf, true);
     if (result.isError()) {
       result.throwException();
     }
@@ -141,10 +140,10 @@ public class CharSequenceInputStream extends InputStream {
     if (!m_bbuf.hasRemaining() && !m_cbuf.hasRemaining()) {
       return EOF;
     }
-    int bytesRead = 0;
+    var bytesRead = 0;
     while (len > 0) {
       if (m_bbuf.hasRemaining()) {
-        int chunk = Math.min(m_bbuf.remaining(), len);
+        var chunk = Math.min(m_bbuf.remaining(), len);
         m_bbuf.get(b, off, chunk);
         off += chunk;
         len -= chunk;

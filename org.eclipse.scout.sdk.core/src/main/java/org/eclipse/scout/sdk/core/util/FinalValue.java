@@ -36,7 +36,7 @@ public final class FinalValue<VALUE> {
    */
   @SuppressWarnings("unchecked")
   public VALUE get() {
-    Object value = m_value.get();
+    var value = m_value.get();
     if (value == NULL_VALUE) {
       return null;
     }
@@ -113,7 +113,7 @@ public final class FinalValue<VALUE> {
    *           if the {@link Supplier} throws an exception
    */
   public boolean computeIfAbsent(Supplier<VALUE> producer) {
-    Object value = m_value.get();
+    var value = m_value.get();
     return value == NULL_VALUE && m_value.compareAndSet(NULL_VALUE, Ensure.notNull(producer).get());
   }
 
@@ -126,12 +126,12 @@ public final class FinalValue<VALUE> {
 
   @Override
   public String toString() {
-    String className = FinalValue.class.getSimpleName();
+    var className = FinalValue.class.getSimpleName();
     if (isSet()) {
-      String content = Objects.toString(get());
+      var content = Objects.toString(get());
       return new StringBuilder(className.length() + content.length() + 2).append(className).append('[').append(content).append(']').toString();
     }
-    String notSet = "[<not set>]";
+    var notSet = "[<not set>]";
     return new StringBuilder(className.length() + notSet.length()).append(className).append(notSet).toString();
   }
 
@@ -148,7 +148,7 @@ public final class FinalValue<VALUE> {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    FinalValue<?> other = (FinalValue<?>) obj;
+    var other = (FinalValue<?>) obj;
     return Objects.equals(get(), other.get());
   }
 }

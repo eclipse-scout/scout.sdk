@@ -38,9 +38,9 @@ public class OperationJob extends AbstractJob {
 
   @Override
   protected void execute(IProgressMonitor monitor) {
-    int workForCommit = 1;
-    int workForOperation = 10000;
-    EclipseProgress progress = EclipseEnvironment
+    var workForCommit = 1;
+    var workForOperation = 10000;
+    var progress = EclipseEnvironment
         .toScoutProgress(monitor)
         .init(workForOperation + workForCommit, getName());
 
@@ -48,7 +48,7 @@ public class OperationJob extends AbstractJob {
   }
 
   protected void executeWithWorkingCopyManager(EclipseProgress eclipseProgress) {
-    try (EclipseEnvironment env = new EclipseEnvironment()) {
+    try (var env = new EclipseEnvironment()) {
       operation().accept(env, eclipseProgress);
     }
   }

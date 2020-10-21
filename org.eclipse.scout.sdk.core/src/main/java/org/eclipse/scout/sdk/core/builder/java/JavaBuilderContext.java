@@ -15,6 +15,7 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.imports.IImportValidator;
@@ -22,7 +23,6 @@ import org.eclipse.scout.sdk.core.imports.ImportCollector;
 import org.eclipse.scout.sdk.core.imports.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.PropertySupport;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link JavaBuilderContext}</h3>
@@ -99,8 +99,8 @@ public class JavaBuilderContext implements IJavaBuilderContext {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int h = prime + (m_env == null ? 0 : m_env.hashCode());
+    var prime = 31;
+    var h = prime + (m_env == null ? 0 : m_env.hashCode());
     return prime * h + m_inner.hashCode();
   }
 
@@ -112,7 +112,7 @@ public class JavaBuilderContext implements IJavaBuilderContext {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    JavaBuilderContext other = (JavaBuilderContext) obj;
+    var other = (JavaBuilderContext) obj;
     return Objects.equals(m_env, other.m_env)
         && Objects.equals(m_inner, other.m_inner);
   }

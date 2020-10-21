@@ -12,8 +12,9 @@ package org.eclipse.scout.sdk.s2e.ui.internal.code;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -23,14 +24,12 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.ICodeType;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
@@ -42,7 +41,6 @@ import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -85,7 +83,7 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
   }
 
   protected void createArgumentsGroup(Composite p) {
-    Group parent = FieldToolkit.createGroupBox(p, "Type Arguments");
+    var parent = FieldToolkit.createGroupBox(p, "Type Arguments");
     GridDataFactory
         .defaultsFor(parent)
         .align(SWT.FILL, SWT.CENTER)
@@ -96,7 +94,7 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
         .applyTo(parent);
 
     // type arg fields
-    for (int i = 0; i < NUM_ARG_FIELDS; i++) {
+    for (var i = 0; i < NUM_ARG_FIELDS; i++) {
       m_typeArgFields[i] = FieldToolkit.createTypeProposalField(parent, getTypeArgLabel(i), getJavaProject(), getLabelWidth());
       m_typeArgFields[i].addProposalListener(proposal -> pingStateChanging());
       GridDataFactory
@@ -127,7 +125,7 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
     if (!isControlCreated()) {
       return;
     }
-    for (ProposalTextField field : m_typeArgFields) {
+    for (var field : m_typeArgFields) {
       ((StrictHierarchyTypeContentProvider) field.getContentProvider()).setJavaProject(getJavaProject());
     }
   }
@@ -141,20 +139,20 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
   }
 
   protected void syncTypeArgFieldsToSuperType() {
-    IType superType = getSuperType();
+    var superType = getSuperType();
     if (!JdtUtils.exists(superType)) {
-      for (ProposalTextField field : m_typeArgFields) {
+      for (var field : m_typeArgFields) {
         field.setEnabled(false);
       }
     }
     else {
-      List<ITypeParameter> typeParameters = m_provider.toScoutType(superType).typeParameters().collect(toList());
-      for (int i = 0; i < NUM_ARG_FIELDS; i++) {
-        boolean typeParamAvailable = typeParameters.size() > i;
+      var typeParameters = m_provider.toScoutType(superType).typeParameters().collect(toList());
+      for (var i = 0; i < NUM_ARG_FIELDS; i++) {
+        var typeParamAvailable = typeParameters.size() > i;
         m_typeArgFields[i].setEnabled(typeParamAvailable);
         if (typeParamAvailable) {
-          List<org.eclipse.scout.sdk.core.model.api.IType> bounds = typeParameters.get(i).bounds().collect(toList());
-          StrictHierarchyTypeContentProvider typeContentProvider = (StrictHierarchyTypeContentProvider) m_typeArgFields[i].getContentProvider();
+          var bounds = typeParameters.get(i).bounds().collect(toList());
+          var typeContentProvider = (StrictHierarchyTypeContentProvider) m_typeArgFields[i].getContentProvider();
           if (bounds.isEmpty()) {
             typeContentProvider.setBaseClassFqn(null);
           }
@@ -167,21 +165,21 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
   }
 
   public String getSuperClassReference(EclipseEnvironment environment) {
-    IType superType = getSuperType();
-    StringBuilder superTypeBuilder = new StringBuilder(superType.getFullyQualifiedName());
+    var superType = getSuperType();
+    var superTypeBuilder = new StringBuilder(superType.getFullyQualifiedName());
     try {
-      int numParams = superType.getTypeParameters().length;
+      var numParams = superType.getTypeParameters().length;
       if (numParams > 0) {
         superTypeBuilder.append(JavaTypes.C_GENERIC_START);
-        for (int i = 0; i < numParams; i++) {
+        for (var i = 0; i < numParams; i++) {
           if (i != 0) {
             superTypeBuilder.append(JavaTypes.C_COMMA);
           }
           String param;
-          boolean appendCodeGeneric = false;
+          var appendCodeGeneric = false;
           if (i < NUM_ARG_FIELDS) {
-            IType selectedProposal = (IType) m_typeArgFields[i].getSelectedProposal();
-            Optional<IScoutApi> scoutApi = scoutApi();
+            var selectedProposal = (IType) m_typeArgFields[i].getSelectedProposal();
+            var scoutApi = scoutApi();
             appendCodeGeneric = selectedProposal.getTypeParameters().length > 0
                 && scoutApi.isPresent()
                 && JdtUtils.hierarchyContains(selectedProposal.newSupertypeHierarchy(null), scoutApi.get().ICode().fqn());
@@ -208,18 +206,18 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
   }
 
   public String getCodeIdDataType(EclipseEnvironment environment) {
-    ICodeType iCodeTypeApi = scoutApi().get().ICodeType();
+    var iCodeTypeApi = scoutApi().get().ICodeType();
     return getCodeTypeTypeArgDatatype(iCodeTypeApi.codeIdTypeParamIndex(), iCodeTypeApi, environment);
   }
 
   public String getCodeTypeIdDataType(EclipseEnvironment environment) {
-    ICodeType iCodeTypeApi = scoutApi().get().ICodeType();
+    var iCodeTypeApi = scoutApi().get().ICodeType();
     return getCodeTypeTypeArgDatatype(iCodeTypeApi.codeTypeIdTypeParamIndex(), iCodeTypeApi, environment);
   }
 
-  protected String getCodeTypeTypeArgDatatype(int typeParamIndex, ICodeType iCodeTypeApi, EclipseEnvironment environment) {
-    org.eclipse.scout.sdk.core.model.api.IType superType = environment.toScoutType(getSuperType()); // don't use m_provider here because it might already have been closed.
-    org.eclipse.scout.sdk.core.model.api.IType codeTypeIdArg = superType.superTypes()
+  protected String getCodeTypeTypeArgDatatype(int typeParamIndex, IClassNameSupplier iCodeTypeApi, EclipseEnvironment environment) {
+    var superType = environment.toScoutType(getSuperType()); // don't use m_provider here because it might already have been closed.
+    var codeTypeIdArg = superType.superTypes()
         .withSelf(false)
         .withName(iCodeTypeApi.fqn())
         .first().get()
@@ -229,14 +227,11 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
 
     if (codeTypeIdArg.isParameterType()) {
       // it is a type parameter. So the super class does not define the data type. We must check in our type argument fields
-      List<ITypeParameter> typeParameters = superType.typeParameters().collect(toList());
-      int index = -1;
-      for (int i = 0; i < typeParameters.size(); i++) {
-        if (typeParameters.get(i).elementName().equals(codeTypeIdArg.elementName())) {
-          index = i;
-          break;
-        }
-      }
+      var typeParameters = superType.typeParameters().collect(toList());
+      var index = IntStream.range(0, typeParameters.size())
+          .filter(i -> typeParameters.get(i).elementName().equals(codeTypeIdArg.elementName()))
+          .findFirst()
+          .orElse(-1);
       IType result = null;
       if (index >= 0 && index < NUM_ARG_FIELDS) {
         result = (IType) m_typeArgFields[index].getSelectedProposal();
@@ -265,13 +260,12 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
 
   protected IStatus getStatusTypeArgFields() {
     if (isControlCreated()) {
-      for (ProposalTextField field : m_typeArgFields) {
-        if (field.isEnabled()) {
-          IJavaElement selected = (IJavaElement) field.getSelectedProposal();
-          if (!JdtUtils.exists(selected)) {
-            return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "Please choose the type arguments.");
-          }
-        }
+      var missing = Arrays.stream(m_typeArgFields)
+          .filter(ProposalTextField::isEnabled)
+          .map(field -> (IJavaElement) field.getSelectedProposal())
+          .anyMatch(selected -> !JdtUtils.exists(selected));
+      if (missing) {
+        return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "Please choose the type arguments.");
       }
     }
     return Status.OK_STATUS;

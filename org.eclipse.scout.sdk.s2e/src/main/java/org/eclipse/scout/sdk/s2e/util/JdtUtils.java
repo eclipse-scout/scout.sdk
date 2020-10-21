@@ -18,6 +18,7 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -40,14 +41,11 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
-import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
@@ -102,7 +100,7 @@ public final class JdtUtils {
     }
 
     try {
-      IPackageDeclaration[] packageDeclarations = icu.getPackageDeclarations();
+      var packageDeclarations = icu.getPackageDeclarations();
       if (packageDeclarations.length < 1) {
         return "";
       }
@@ -140,7 +138,7 @@ public final class JdtUtils {
       return emptySet();
     }
     try {
-      IType t = sourceProject.findType(baseTypeFqn.replace(JavaTypes.C_DOLLAR, JavaTypes.C_DOT), monitor);
+      var t = sourceProject.findType(baseTypeFqn.replace(JavaTypes.C_DOLLAR, JavaTypes.C_DOT), monitor);
       return findTypesInStrictHierarchy(sourceProject, t, monitor, filter);
     }
     catch (JavaModelException e) {
@@ -173,14 +171,14 @@ public final class JdtUtils {
     // do not use SearchEngine.createStrictHierarchyScope because there is a bug in Eclipse 2019-12:
     // files open in the Java Editor are not included in the result! Use the type hierarchy instead.
     try {
-      ITypeHierarchy hierarchy = baseType.newTypeHierarchy(sourceProject, monitor);
-      org.eclipse.jdt.core.IType[] jdtTypes = hierarchy.getAllSubtypes(baseType);
+      var hierarchy = baseType.newTypeHierarchy(sourceProject, monitor);
+      var jdtTypes = hierarchy.getAllSubtypes(baseType);
       if (jdtTypes == null || jdtTypes.length < 1) {
         return emptySet();
       }
 
       Set<IType> collector = new TreeSet<>(new ElementNameComparator());
-      for (org.eclipse.jdt.core.IType candidate : jdtTypes) {
+      for (var candidate : jdtTypes) {
         if (filter == null || filter.test(candidate)) {
           collector.add(candidate);
         }
@@ -220,7 +218,7 @@ public final class JdtUtils {
    */
   public static Set<IType> resolveJdtTypes(CharSequence fqn, IJavaSearchScope scope) {
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
-    String fastPat = JavaTypes.simpleName(fqn);
+    var fastPat = JavaTypes.simpleName(fqn);
     Set<IType> matchList = new TreeSet<>(COMPARATOR);
     try {
       new SearchEngine().search(SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH),
@@ -228,9 +226,9 @@ public final class JdtUtils {
           scope, new SearchRequestor() {
             @Override
             public void acceptSearchMatch(SearchMatch match) {
-              Object element = match.getElement();
+              var element = match.getElement();
               if (element instanceof IType) {
-                IType t = (IType) element;
+                var t = (IType) element;
                 if (t.getFullyQualifiedName().contains(fqn)) {
                   matchList.add(t);
                 }
@@ -254,8 +252,8 @@ public final class JdtUtils {
       }
 
       // favor types in the workspace
-      boolean b1 = o1.isBinary();
-      boolean b2 = o2.isBinary();
+      var b1 = o1.isBinary();
+      var b2 = o2.isBinary();
       if (b1 != b2) {
         if (b1) {
           return 1;
@@ -263,18 +261,18 @@ public final class JdtUtils {
         return -1;
       }
 
-      String path1 = buildPath(o1);
-      String path2 = buildPath(o2);
+      var path1 = buildPath(o1);
+      var path2 = buildPath(o2);
 
       // descending (newest first)
       return path2.compareTo(path1);
     }
 
     private static String buildPath(IType t) {
-      String fqn = t.getFullyQualifiedName();
-      String portableString = t.getPath().toPortableString();
+      var fqn = t.getFullyQualifiedName();
+      var portableString = t.getPath().toPortableString();
 
-      StringBuilder sb = new StringBuilder(fqn.length() + portableString.length());
+      var sb = new StringBuilder(fqn.length() + portableString.length());
       sb.append(fqn);
       sb.append(portableString);
       return sb.toString();
@@ -295,11 +293,11 @@ public final class JdtUtils {
       return null;
     }
 
-    String simpleName = JavaTypes.simpleName(fullyQualifiedAnnotation);
-    String startSimple = '@' + simpleName;
-    String startFq = '@' + fullyQualifiedAnnotation;
+    var simpleName = JavaTypes.simpleName(fullyQualifiedAnnotation);
+    var startSimple = '@' + simpleName;
+    var startFq = '@' + fullyQualifiedAnnotation;
 
-    IAnnotation result = getAnnotation(element, simpleName, startSimple, startFq);
+    var result = getAnnotation(element, simpleName, startSimple, startFq);
     if (result != null) {
       return result;
     }
@@ -307,7 +305,7 @@ public final class JdtUtils {
   }
 
   private static IAnnotation getAnnotation(IAnnotatable element, String name, String startSimple, String startFq) {
-    IAnnotation annotation = element.getAnnotation(name);
+    var annotation = element.getAnnotation(name);
     if (!exists(annotation)) {
       return null;
     }
@@ -337,19 +335,19 @@ public final class JdtUtils {
 
   private static String getAnnotationSourceFixed(IMember member, IAnnotation annotation, String startSimple) {
     try {
-      ISourceRange annotSourceRange = annotation.getSourceRange();
-      ISourceRange ownerSourceRange = member.getSourceRange();
+      var annotSourceRange = annotation.getSourceRange();
+      var ownerSourceRange = member.getSourceRange();
 
       if (SourceRange.isAvailable(ownerSourceRange)
           && SourceRange.isAvailable(annotSourceRange)
           && ownerSourceRange.getOffset() > annotSourceRange.getOffset()) {
-        String icuSource = member.getCompilationUnit().getSource();
+        var icuSource = member.getCompilationUnit().getSource();
         if (icuSource != null && icuSource.length() >= ownerSourceRange.getOffset()) {
-          String diff = icuSource.substring(annotSourceRange.getOffset(), ownerSourceRange.getOffset());
-          int offset = diff.lastIndexOf(startSimple);
+          var diff = icuSource.substring(annotSourceRange.getOffset(), ownerSourceRange.getOffset());
+          var offset = diff.lastIndexOf(startSimple);
           if (offset >= 0) {
             offset += annotSourceRange.getOffset();
-            int end = offset + annotSourceRange.getLength();
+            var end = offset + annotSourceRange.getLength();
             if (icuSource.length() >= end) {
               return icuSource.substring(offset, end);
             }
@@ -378,23 +376,23 @@ public final class JdtUtils {
    */
   public static Set<IType> findAllTypesAnnotatedWith(String annotationName, IJavaSearchScope scope, IProgressMonitor monitor) {
     Set<IType> result = new LinkedHashSet<>();
-    SearchRequestor collector = new SearchRequestor() {
+    var collector = new SearchRequestor() {
       @Override
       public void acceptSearchMatch(SearchMatch match) {
         if (monitor != null && monitor.isCanceled()) {
           throw new OperationCanceledException("annotated types search canceled.");
         }
         if (match.getElement() instanceof IType) {
-          IType t = (IType) match.getElement();
+          var t = (IType) match.getElement();
           result.add(t);
         }
       }
     };
-    for (IType annotationType : resolveJdtTypes(annotationName, SearchEngine.createWorkspaceScope())) {
+    for (var annotationType : resolveJdtTypes(annotationName, SearchEngine.createWorkspaceScope())) {
       if (monitor != null && monitor.isCanceled()) {
         return result;
       }
-      SearchPattern pattern = SearchPattern.createPattern(annotationType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE);
+      var pattern = SearchPattern.createPattern(annotationType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE);
       try {
         new SearchEngine().search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, scope, collector, monitor);
       }
@@ -432,11 +430,11 @@ public final class JdtUtils {
     if (!exists(element) || !exists(project)) {
       return false;
     }
-    boolean isInWorkspace = element.getResource() != null;
+    var isInWorkspace = element.getResource() != null;
     if (isInWorkspace) {
       // if the element is in the workspace (not binary in a library): check on the project level. Otherwise the results of IJavaProject#isOnClasspath() may be wrong!
       // do not calculate the classpath visibility based on the project for binary types because their project may be any project having this dependency which may be wrong.
-      IJavaProject javaProjectOfElement = element.getJavaProject();
+      var javaProjectOfElement = element.getJavaProject();
       return project.equals(javaProjectOfElement) || project.isOnClasspath(javaProjectOfElement);
     }
     return project.isOnClasspath(element);
@@ -458,12 +456,12 @@ public final class JdtUtils {
     }
 
     try {
-      IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
-      for (IMemberValuePair p : memberValues) {
+      var memberValues = annotation.getMemberValuePairs();
+      for (var p : memberValues) {
         if (Objects.equals(name, p.getMemberName())) {
           switch (p.getValueKind()) {
             case IMemberValuePair.K_DOUBLE:
-              Double doubleValue = (Double) p.getValue();
+              var doubleValue = (Double) p.getValue();
               return BigDecimal.valueOf(doubleValue);
             case IMemberValuePair.K_FLOAT:
               Number floatValue = (Float) p.getValue();
@@ -475,7 +473,7 @@ public final class JdtUtils {
               Number byteValue = (Byte) p.getValue();
               return BigDecimal.valueOf(byteValue.longValue());
             case IMemberValuePair.K_LONG:
-              Long longValue = (Long) p.getValue();
+              var longValue = (Long) p.getValue();
               return BigDecimal.valueOf(longValue);
             case IMemberValuePair.K_SHORT:
               Number shortValue = (Short) p.getValue();
@@ -508,16 +506,14 @@ public final class JdtUtils {
     }
 
     try {
-      IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
-      for (IMemberValuePair p : memberValues) {
-        if (Objects.equals(name, p.getMemberName())) {
-          Object val = p.getValue();
-          if (val != null) {
-            return val.toString();
-          }
-        }
-      }
-      return null;
+      var memberValues = annotation.getMemberValuePairs();
+      return Arrays.stream(memberValues)
+          .filter(p -> Objects.equals(name, p.getMemberName()))
+          .map(IMemberValuePair::getValue)
+          .filter(Objects::nonNull)
+          .findFirst()
+          .map(Object::toString)
+          .orElse(null);
     }
     catch (JavaModelException e) {
       throw new SdkException(e);
@@ -562,15 +558,15 @@ public final class JdtUtils {
     }
 
     Set<IJavaElement> jset = new HashSet<>(resources.size());
-    for (IResource resource : resources) {
+    for (var resource : resources) {
       if (resource == null || !resource.isAccessible()) {
         continue;
       }
 
-      int type = resource.getType();
+      var type = resource.getType();
       switch (type) {
         case IResource.PROJECT:
-          IProject project = (IProject) resource;
+          var project = (IProject) resource;
           try {
             if (project.isAccessible() && project.hasNature(JavaCore.NATURE_ID)) {
               addJavaElement(jset, JavaCore.create(project));
@@ -587,7 +583,7 @@ public final class JdtUtils {
           try {
             resource.accept(proxy -> {
               if (proxy.getType() == IResource.FOLDER) {
-                IFolder folder = (IFolder) proxy.requestResource();
+                var folder = (IFolder) proxy.requestResource();
                 addJavaElement(jset, JavaCore.create(folder));
                 return true;
               }
@@ -599,10 +595,10 @@ public final class JdtUtils {
           }
           break;
         case IResource.ROOT:
-          IJavaModel model = JavaCore.create((IWorkspaceRoot) resource);
+          var model = JavaCore.create((IWorkspaceRoot) resource);
           if (exists(model)) {
             try {
-              for (IJavaProject jp : model.getJavaProjects()) {
+              for (var jp : model.getJavaProjects()) {
                 addJavaElement(jset, jp);
               }
             }
@@ -638,12 +634,8 @@ public final class JdtUtils {
    * @return {@code true} if it is part of the given {@link ITypeHierarchy}, {@code false} otherwise.
    */
   public static boolean hierarchyContains(ITypeHierarchy h, String fqn) {
-    for (IType t : h.getAllTypes()) {
-      if (fqn.equals(t.getFullyQualifiedName())) {
-        return true;
-      }
-    }
-    return false;
+    return Arrays.stream(h.getAllTypes())
+        .anyMatch(t -> fqn.equals(t.getFullyQualifiedName()));
   }
 
   /**
@@ -661,20 +653,20 @@ public final class JdtUtils {
     if (type == null) {
       return null;
     }
-    IAnnotation ann = getFirstDeclaredAnnotation(type, fullyQualifiedAnnotations);
+    var ann = getFirstDeclaredAnnotation(type, fullyQualifiedAnnotations);
     if (exists(ann)) {
       return ann;
     }
 
     try {
-      ITypeHierarchy h = type.newSupertypeHierarchy(null);
-      for (IType t : h.getAllSuperclasses(type)) {
+      var h = type.newSupertypeHierarchy(null);
+      for (var t : h.getAllSuperclasses(type)) {
         ann = getFirstDeclaredAnnotation(t, fullyQualifiedAnnotations);
         if (exists(ann)) {
           return ann;
         }
       }
-      for (IType t : h.getAllSuperInterfaces(type)) {
+      for (var t : h.getAllSuperInterfaces(type)) {
         ann = getFirstDeclaredAnnotation(t, fullyQualifiedAnnotations);
         if (exists(ann)) {
           return ann;
@@ -697,13 +689,11 @@ public final class JdtUtils {
    * @return the first of the given annotations that was found or {@code null}.
    */
   private static IAnnotation getFirstDeclaredAnnotation(IAnnotatable element, String... fullyQualifiedAnnotations) {
-    for (String fqn : fullyQualifiedAnnotations) {
-      IAnnotation ann = getAnnotation(element, fqn);
-      if (exists(ann)) {
-        return ann;
-      }
-    }
-    return null;
+    return Arrays.stream(fullyQualifiedAnnotations)
+        .map(fqn -> getAnnotation(element, fqn))
+        .filter(JdtUtils::exists)
+        .findFirst()
+        .orElse(null);
   }
 
   /**
@@ -717,7 +707,7 @@ public final class JdtUtils {
         if (candidate.isMember() || candidate.isAnonymous() || candidate.isEnum() || candidate.isLocal()) {
           return false;
         }
-        int modifiers = candidate.getFlags();
+        var modifiers = candidate.getFlags();
         return isPublic(modifiers) && !isDeprecated(modifiers);
       }
       catch (JavaModelException e) {
@@ -733,13 +723,13 @@ public final class JdtUtils {
   public static class PublicAbstractPrimaryTypeFilter extends PublicPrimaryTypeFilter {
     @Override
     public boolean test(IType candidate) {
-      boolean accept = super.test(candidate);
+      var accept = super.test(candidate);
       if (!accept) {
         return false;
       }
 
       try {
-        int modifiers = candidate.getFlags();
+        var modifiers = candidate.getFlags();
         return isAbstract(modifiers) && !isInterface(modifiers);
       }
       catch (JavaModelException e) {
@@ -762,7 +752,7 @@ public final class JdtUtils {
         return 0;
       }
 
-      int res = o1.getElementName().compareTo(o2.getElementName());
+      var res = o1.getElementName().compareTo(o2.getElementName());
       if (res != 0) {
         return res;
       }

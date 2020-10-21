@@ -30,9 +30,9 @@ public class StreamSourceBuilderTest {
 
   @Test
   public void testStreamSourceBuilderBuffered() {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    var out = new ByteArrayOutputStream();
 
-    try (StreamSourceBuilder builder = new StreamSourceBuilder(out)) {
+    try (var builder = new StreamSourceBuilder(out)) {
       PrimaryTypeGenerator.create()
           .withElementName("TestClass")
           .withMethod(MethodGenerator.create()
@@ -46,7 +46,7 @@ public class StreamSourceBuilderTest {
       assertEquals(0, out.toByteArray().length); // the generated content must not yet be flushed to the stream -> buffered
     }
 
-    String generated = new String(out.toByteArray(), StandardCharsets.UTF_8); // here the output is flushed and available
+    var generated = new String(out.toByteArray(), StandardCharsets.UTF_8); // here the output is flushed and available
     assertEquals("publicclassTestClass{publicstaticbooleantestMethod(){}}//commenttest", removeWhitespace(generated));
   }
 }

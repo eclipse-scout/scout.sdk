@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.util;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,14 +27,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -48,9 +48,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
@@ -83,7 +81,7 @@ public final class Xml {
    *           if there is an exception reading the file into the document.
    */
   public static Document get(Path xmlFile) throws IOException {
-    try (InputStream in = Files.newInputStream(Ensure.notNull(xmlFile), StandardOpenOption.READ)) {
+    try (var in = Files.newInputStream(Ensure.notNull(xmlFile), StandardOpenOption.READ)) {
       return get(in);
     }
   }
@@ -99,7 +97,7 @@ public final class Xml {
    */
   public static Document get(URL url) throws IOException {
     // use document builder to download the stream content because it correctly handles the xml encoding as specified in the xml declaration.
-    try (InputStream in = Ensure.notNull(url).openStream()) {
+    try (var in = Ensure.notNull(url).openStream()) {
       return get(in);
     }
   }
@@ -122,7 +120,7 @@ public final class Xml {
     }
   }
 
-  private static Document get(InputStream in) throws IOException {
+  static Document get(InputStream in) throws IOException {
     try {
       return createDocumentBuilder().parse(in);
     }
@@ -148,10 +146,10 @@ public final class Xml {
     if (tagName == null) {
       return Optional.empty();
     }
-    NodeList children = parent.getChildNodes();
-    for (int i = 0; i < children.getLength(); ++i) {
-      Node n = children.item(i);
-      String nodeName = n.getLocalName();
+    var children = parent.getChildNodes();
+    for (var i = 0; i < children.getLength(); ++i) {
+      var n = children.item(i);
+      var nodeName = n.getLocalName();
       if (n.getNodeType() == Node.ELEMENT_NODE && Objects.equals(nodeName, tagName)) {
         return Optional.of((Element) n);
       }
@@ -208,24 +206,19 @@ public final class Xml {
    *           if there is an error during XPath evaluation
    */
   public static List<Element> evaluateXPath(String xPath, Node applyToDocument, Map<String, String> usedPrefixToNamespaceMap) throws XPathExpressionException {
-    NodeList result = doEvaluateXPath(xPath, applyToDocument, usedPrefixToNamespaceMap);
+    var result = doEvaluateXPath(xPath, applyToDocument, usedPrefixToNamespaceMap);
     if (result == null) {
       return emptyList();
     }
-
-    int size = result.getLength();
+    var size = result.getLength();
     if (size < 1) {
       return emptyList();
     }
-
-    List<Element> elements = new ArrayList<>(size);
-    for (int i = 0; i < size; i++) {
-      Node n = result.item(i);
-      if (n.getNodeType() == Node.ELEMENT_NODE) {
-        elements.add((Element) n);
-      }
-    }
-    return elements;
+    return IntStream.range(0, size)
+        .mapToObj(result::item)
+        .filter(n -> n.getNodeType() == Node.ELEMENT_NODE)
+        .map(n -> (Element) n)
+        .collect(toList());
   }
 
   static NodeList doEvaluateXPath(String xPath, Node applyToDocument, Map<String, String> usedPrefixToNamespaceMap) throws XPathExpressionException {
@@ -233,13 +226,13 @@ public final class Xml {
       return null;
     }
 
-    XPathFactory xPathfactory = XPathFactory.newDefaultInstance();
-    XPath xpath = xPathfactory.newXPath();
+    var xPathfactory = XPathFactory.newDefaultInstance();
+    var xpath = xPathfactory.newXPath();
     xpath.setNamespaceContext(new NamespaceContext() {
       @Override
       public String getNamespaceURI(String prefix) {
         if (usedPrefixToNamespaceMap != null) {
-          String ns = usedPrefixToNamespaceMap.get(prefix);
+          var ns = usedPrefixToNamespaceMap.get(prefix);
           if (ns != null) {
             return ns;
           }
@@ -255,7 +248,7 @@ public final class Xml {
       @Override
       public String getPrefix(String uri) {
         if (usedPrefixToNamespaceMap != null) {
-          for (Entry<String, String> entry : usedPrefixToNamespaceMap.entrySet()) {
+          for (var entry : usedPrefixToNamespaceMap.entrySet()) {
             if (entry.getValue().equals(uri)) {
               return entry.getKey();
             }
@@ -265,7 +258,7 @@ public final class Xml {
       }
     });
 
-    XPathExpression expr = xpath.compile(xPath);
+    var expr = xpath.compile(xPath);
     return (NodeList) expr.evaluate(applyToDocument, XPathConstants.NODESET);
   }
 
@@ -273,7 +266,7 @@ public final class Xml {
    * @return A safe pre configured {@link DocumentBuilderFactory}. All external entities are disabled to prevent XXE.
    */
   public static DocumentBuilderFactory createDocumentBuilderFactory() {
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+    var dbf = DocumentBuilderFactory.newDefaultInstance();
     dbf.setXIncludeAware(false);
     dbf.setExpandEntityReferences(false);
     dbf.setNamespaceAware(true); // required!
@@ -296,8 +289,8 @@ public final class Xml {
     features.put("http://xml.org/sax/features/external-parameter-entities", Boolean.FALSE);
     features.put("http://apache.org/xml/features/nonvalidating/load-external-dtd", Boolean.FALSE);
     features.put(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-    for (Entry<String, Boolean> a : features.entrySet()) {
-      String feature = a.getKey();
+    for (var a : features.entrySet()) {
+      var feature = a.getKey();
       boolean enabled = a.getValue();
       try {
         dbf.setFeature(feature, enabled);
@@ -325,15 +318,15 @@ public final class Xml {
    * Transforms the specified {@link Document} into a {@link StringBuffer}.
    *
    * @param document
-   *          The document to transform.
+   *          The document to transform. Must not be {@code null}.
    * @param format
    *          If the document should be formatted ({@code true}) or not ({@code false}).
    * @return The specified {@link Document} as {@link StringBuffer} optionally formatted.
    * @throws TransformerException
-   *           if there is an error during transformation
+   *           if there is an error writing or transforming the document
    */
   public static StringBuffer writeDocument(Document document, boolean format) throws TransformerException {
-    try (StringWriter out = new StringWriter()) {
+    try (var out = new StringWriter()) {
       doWriteDocument(document, format, new StreamResult(out));
       return out.getBuffer();
     }
@@ -342,8 +335,20 @@ public final class Xml {
     }
   }
 
+  /**
+   * Writes the {@link Document} specified into the target file.
+   * 
+   * @param document
+   *          The {@link Document} to transform. Must not be {@code null}.
+   * @param format
+   *          Specifies if the document should be formatted when writing. Please note: this also removes empty lines.
+   * @param targetFile
+   *          The file in which the {@link Document} should be written. Must not be {@code null}.
+   * @throws TransformerException
+   *           if there is an error writing or transforming the document
+   */
   public static void writeDocument(Document document, boolean format, Path targetFile) throws TransformerException {
-    try (OutputStream out = Files.newOutputStream(targetFile, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
+    try (var out = Files.newOutputStream(targetFile, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
       writeDocument(document, format, out);
     }
     catch (IOException e) {
@@ -351,10 +356,34 @@ public final class Xml {
     }
   }
 
+  /**
+   * Writes the {@link Document} specified into the given {@link Writer}.
+   * 
+   * @param document
+   *          The {@link Document} to transform. Must not be {@code null}.
+   * @param format
+   *          Specifies if the document should be formatted when writing. Please note: this also removes empty lines.
+   * @param out
+   *          The {@link Writer} in which the {@link Document} should be written. Must not be {@code null}.
+   * @throws TransformerException
+   *           if there is an error writing or transforming the document
+   */
   public static void writeDocument(Document document, boolean format, Writer out) throws TransformerException {
     doWriteDocument(document, format, new StreamResult(out));
   }
 
+  /**
+   * Writes the {@link Document} specified into the given {@link OutputStream}.
+   * 
+   * @param document
+   *          The {@link Document} to transform. Must not be {@code null}.
+   * @param format
+   *          Specifies if the document should be formatted when writing. Please note: this also removes empty lines.
+   * @param out
+   *          The {@link OutputStream} in which the {@link Document} should be written. Must not be {@code null}.
+   * @throws TransformerException
+   *           if there is an error writing or transforming the document
+   */
   public static void writeDocument(Document document, boolean format, OutputStream out) throws TransformerException {
     doWriteDocument(document, format, new StreamResult(out));
   }
@@ -363,9 +392,9 @@ public final class Xml {
     if (format) {
       document.normalize();
       try {
-        NodeList nodeList = doEvaluateXPath("//text()[normalize-space()='']", document, null);
-        for (int i = 0; i < nodeList.getLength(); ++i) {
-          Node node = nodeList.item(i);
+        var nodeList = doEvaluateXPath("//text()[normalize-space()='']", document, null);
+        for (var i = 0; i < nodeList.getLength(); ++i) {
+          var node = nodeList.item(i);
           node.getParentNode().removeChild(node);
         }
       }
@@ -388,7 +417,7 @@ public final class Xml {
    *           When it is not possible to create a Transformer instance.
    */
   public static Transformer createTransformer(boolean format) throws TransformerConfigurationException {
-    TransformerFactory tf = TransformerFactory.newDefaultInstance();
+    var tf = TransformerFactory.newDefaultInstance();
     try {
       tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
     }
@@ -399,7 +428,7 @@ public final class Xml {
     Map<String, Object> attribs = new HashMap<>(2);
     attribs.put(XMLConstants.ACCESS_EXTERNAL_DTD, "");
     attribs.put(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-    for (Entry<String, Object> a : attribs.entrySet()) {
+    for (var a : attribs.entrySet()) {
       try {
         tf.setAttribute(a.getKey(), a.getValue());
       }
@@ -408,7 +437,7 @@ public final class Xml {
       }
     }
 
-    Transformer transformer = tf.newTransformer();
+    var transformer = tf.newTransformer();
 
     Map<String, String> outputProps = new HashMap<>(4);
     outputProps.put(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
@@ -421,7 +450,7 @@ public final class Xml {
       outputProps.put(OutputKeys.INDENT, "no");
     }
 
-    for (Entry<String, String> o : outputProps.entrySet()) {
+    for (var o : outputProps.entrySet()) {
       try {
         transformer.setOutputProperty(o.getKey(), o.getValue());
       }

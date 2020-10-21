@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws.editor;
 
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
 
@@ -25,7 +26,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -34,7 +34,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -54,16 +53,12 @@ import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.operation.jaxws.RebuildArtifactsOperation;
 import org.eclipse.scout.sdk.s2e.ui.internal.jaxws.WebServiceNewWizard;
-import org.eclipse.scout.sdk.s2e.ui.internal.jaxws.WebServiceNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -85,7 +80,7 @@ public class WebServiceEditor extends FormEditor {
 
   @Override
   protected void addPages() {
-    IEditorInput input = getEditorInput();
+    var input = getEditorInput();
     if (!(input instanceof FileEditorInput)) {
       showError("Invalid input for Web Service Editor: " + input, new IllegalArgumentException());
       return;
@@ -138,13 +133,13 @@ public class WebServiceEditor extends FormEditor {
   }
 
   protected void startNewWebServiceWizard() {
-    WebServiceNewWizard wiz = new WebServiceNewWizard();
+    var wiz = new WebServiceNewWizard();
     IStructuredSelection selection = new StructuredSelection(getJaxwsFile());
     wiz.init(PlatformUI.getWorkbench(), selection);
     wiz.getFinishTask()
         .withUiAction((op, d) -> d.asyncExec(() -> reload(op.getCreatedWsdlFile().getFileName().toString())));
 
-    WebServiceNewWizardPage wizPage = wiz.getWebServiceNewWizardPage();
+    var wizPage = wiz.getWebServiceNewWizardPage();
     wizPage.setIsCreateNewProject(false);
     wizPage.setExistingJaxWsProject(getJavaProject());
 
@@ -153,8 +148,8 @@ public class WebServiceEditor extends FormEditor {
   }
 
   protected boolean collectWebServicesAsync(Widget shell, Collection<WebServiceFormPageInput> webServices, IProgressMonitor monitor) {
-    Set<WebServiceFormPageInput> result = findWebServices(monitor);
-    boolean canceled = monitor.isCanceled();
+    var result = findWebServices(monitor);
+    var canceled = monitor.isCanceled();
     if (canceled) {
       shell.getDisplay().asyncExec(() -> close(false));
     }
@@ -169,8 +164,8 @@ public class WebServiceEditor extends FormEditor {
 
     // find web services
     Collection<WebServiceFormPageInput> webServices = new TreeSet<>();
-    Shell shell = getSite().getShell();
-    boolean[] isCanceled = new boolean[1];
+    var shell = getSite().getShell();
+    var isCanceled = new boolean[1];
     try {
       new ProgressMonitorDialog(shell).run(true, true, monitor -> isCanceled[0] = collectWebServicesAsync(shell, webServices, monitor));
     }
@@ -189,7 +184,7 @@ public class WebServiceEditor extends FormEditor {
     }
 
     // add pages
-    for (WebServiceFormPageInput input : webServices) {
+    for (var input : webServices) {
       addPageSafe(new WebServiceFormPage(this, input));
     }
 
@@ -198,7 +193,7 @@ public class WebServiceEditor extends FormEditor {
       return;
     }
     if (idToActivate != null) {
-      IFormPage activatedPage = setActivePage(idToActivate);
+      var activatedPage = setActivePage(idToActivate);
       if (activatedPage != null) {
         return; // successfully activated requested page
       }
@@ -212,7 +207,7 @@ public class WebServiceEditor extends FormEditor {
   }
 
   protected IFormPage getPage(int index) {
-    Object result = pages.get(index);
+    var result = pages.get(index);
     if (result instanceof IFormPage) {
       return (IFormPage) result;
     }
@@ -221,7 +216,7 @@ public class WebServiceEditor extends FormEditor {
 
   protected void removeAllPages() {
     while (getPageCount() > 0) {
-      IFormPage page = getPage(0);
+      var page = getPage(0);
       removePage(page.getIndex());
       if (!page.isEditor()) {
         page.dispose();
@@ -231,24 +226,24 @@ public class WebServiceEditor extends FormEditor {
 
   @SuppressWarnings("pmd:NPathComplexity")
   protected Set<WebServiceFormPageInput> findWebServices(IProgressMonitor monitor) {
-    SubMonitor progress = SubMonitor.convert(monitor, "Loading contents", 100);
+    var progress = SubMonitor.convert(monitor, "Loading contents", 100);
     if (progress.isCanceled()) {
       return emptySet();
     }
 
-    Path wsdlFolder = AbstractWebServiceNewOperation.getWsdlRootFolder(getJavaProject().getProject().getLocation().toFile().toPath());
+    var wsdlFolder = AbstractWebServiceNewOperation.getWsdlRootFolder(getJavaProject().getProject().getLocation().toFile().toPath());
     progress.worked(5);
 
-    IJavaSearchScope scope = JdtUtils.createJavaSearchScope(getJavaProject());
-    IScoutApi scoutApi = ApiHelper.requireScoutApiFor(getJavaProject());
-    Set<IType> webServiceEntryPointAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(scoutApi.WebServiceEntryPoint().fqn(), scope, progress.newChild(10));
-    Set<IType> webServiceClientAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(scoutApi.WebServiceClient().fqn(), scope, progress.newChild(10));
-    Set<IType> webServiceAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(scoutApi.WebService().fqn(), scope, progress.newChild(10));
+    var scope = JdtUtils.createJavaSearchScope(getJavaProject());
+    var scoutApi = ApiHelper.requireScoutApiFor(getJavaProject());
+    var webServiceEntryPointAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(scoutApi.WebServiceEntryPoint().fqn(), scope, progress.newChild(10));
+    var webServiceClientAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(scoutApi.WebServiceClient().fqn(), scope, progress.newChild(10));
+    var webServiceAnnotatedTypes = JdtUtils.findAllTypesAnnotatedWith(scoutApi.WebService().fqn(), scope, progress.newChild(10));
     if (progress.isCanceled()) {
       return emptySet();
     }
 
-    try (Stream<Path> content = Files.walk(wsdlFolder)) {
+    try (var content = Files.walk(wsdlFolder)) {
       Set<WebServiceFormPageInput> services = content
           .filter(f -> f.getFileName().toString().toLowerCase(Locale.ENGLISH).endsWith(JaxWsUtils.WSDL_FILE_EXTENSION))
           .filter(Files::isReadable)
@@ -261,8 +256,8 @@ public class WebServiceEditor extends FormEditor {
         return emptySet();
       }
 
-      int progressPerItem = 50 / services.size();
-      for (WebServiceFormPageInput s : services) {
+      var progressPerItem = 50 / services.size();
+      for (var s : services) {
         s.load(progress.newChild(progressPerItem));
         if (progress.isCanceled()) {
           return emptySet();
@@ -280,10 +275,10 @@ public class WebServiceEditor extends FormEditor {
 
   @Override
   public void doSave(IProgressMonitor monitor) {
-    List<WebServiceFormPage> allPages = getAllPages();
+    var allPages = getAllPages();
     Collection<WebServiceFormPage> pagesToSave = new ArrayList<>(allPages.size());
-    boolean isValid = true;
-    for (WebServiceFormPage page : allPages) {
+    var isValid = true;
+    for (var page : allPages) {
       if (page.isDirty()) {
         if (page.isValid()) {
           pagesToSave.add(page);
@@ -314,19 +309,16 @@ public class WebServiceEditor extends FormEditor {
   }
 
   protected static BiConsumer<IEnvironment, IProgress> pageToOperation(EclipseEnvironment env, WebServiceFormPage page) {
-    WebServiceUpdateOperation op = new WebServiceUpdateOperation();
+    var op = new WebServiceUpdateOperation();
     page.fillOperation(op, env);
     return op;
   }
 
   public List<WebServiceFormPage> getAllPages() {
-    List<WebServiceFormPage> result = new ArrayList<>(pages.size());
-    for (Object o : pages) {
-      if (o instanceof WebServiceFormPage) {
-        result.add((WebServiceFormPage) o);
-      }
-    }
-    return result;
+    return pages.stream()
+        .filter(o -> o instanceof WebServiceFormPage)
+        .map(o -> (WebServiceFormPage) o)
+        .collect(toList());
   }
 
   @Override
@@ -357,9 +349,9 @@ public class WebServiceEditor extends FormEditor {
 
     @Override
     public void accept(EclipseEnvironment env, EclipseProgress progress) {
-      List<WebServiceFormPage> allPages = getAllPages();
-      Composite c = getContainer();
-      String idToActivate = getActivePageInstance().getId();
+      var allPages = getAllPages();
+      var c = getContainer();
+      var idToActivate = getActivePageInstance().getId();
 
       c.getDisplay().syncExec(() -> {
         c.setCursor(c.getDisplay().getSystemCursor(SWT.CURSOR_WAIT));
@@ -392,7 +384,7 @@ public class WebServiceEditor extends FormEditor {
 
     protected void setEnabled(Iterable<WebServiceFormPage> allPages, boolean enabled) {
       getContainer().setEnabled(enabled);
-      for (WebServiceFormPage page : allPages) {
+      for (var page : allPages) {
         page.setEnabled(enabled);
       }
     }
@@ -422,7 +414,7 @@ public class WebServiceEditor extends FormEditor {
 
     @Override
     protected Set<IType> findAllTypesAnnotatedWith(String fqn) {
-      IScoutApi scoutApi = getScoutApi();
+      var scoutApi = getScoutApi();
       if (scoutApi.WebServiceEntryPoint().fqn().equals(fqn)) {
         return m_typesAnnotatedWithWebServiceEntryPoint;
       }

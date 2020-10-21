@@ -35,7 +35,6 @@ import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerato
 import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
 
 /**
  * <h3>{@link PageGenerator}</h3>
@@ -83,12 +82,12 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
 
     if (isCreateNlsMethod()) {
       mainType
-          .withMethod(ScoutMethodGenerator.createNlsMethod(IScoutApi.class, api -> api.AbstractPage().getConfiguredTitleMethodName(), Strings.ensureStartWithUpperCase(elementName().get())));
+          .withMethod(ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractPage().getConfiguredTitleMethodName(), Strings.ensureStartWithUpperCase(elementName().get())));
     }
   }
 
   protected void appendTypeParameter() {
-    String typeParamBoundary = fullyQualifiedName()
+    var typeParamBoundary = fullyQualifiedName()
         + JavaTypes.C_GENERIC_START
         + TABLE_TYPE_PARAM_NAME
         + JavaTypes.C_GENERIC_END + JavaTypes.C_DOT
@@ -101,7 +100,7 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
   }
 
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createExecLoadData() {
-    IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> execLoadData = MethodGenerator.create()
+    var execLoadData = MethodGenerator.create()
         .asProtected()
         .withReturnType(JavaTypes._void)
         .withElementNameFrom(IScoutApi.class, api -> api.AbstractPageWithTable().execLoadDataMethodName())
@@ -124,22 +123,22 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
 
   protected Function<IScoutApi, String> buildSuperTypeAndAppendTable() {
     if (isPageWithTable()) {
-      ITypeGenerator<?> tableBuilder = createTableBuilder();
+      var tableBuilder = createTableBuilder();
       withType(tableBuilder)
           .withAnnotation(pageData()
               .map(ScoutAnnotationGenerator::createData)
               .orElse(null));
       return buildPageWithTableSuperType(tableBuilder);
     }
-    Optional<ApiFunction<?, String>> predefinedSuperClass = superClass();
+    var predefinedSuperClass = superClass();
     return api -> predefinedSuperClass.map(af -> af.apply(api)).orElse(api.AbstractPageWithNodes().fqn());
   }
 
   protected Function<IScoutApi, String> buildPageWithTableSuperType(ITypeGenerator<?> tableBuilder) {
-    Optional<ApiFunction<?, String>> predefinedSuperClass = superClass();
+    var predefinedSuperClass = superClass();
     return api -> {
-      String existingSuperClassFqn = predefinedSuperClass.map(af -> af.apply(api)).orElse(api.AbstractPageWithTable().fqn());
-      StringBuilder superTypeBuilder = new StringBuilder(existingSuperClassFqn).append(JavaTypes.C_GENERIC_START);
+      var existingSuperClassFqn = predefinedSuperClass.map(af -> af.apply(api)).orElse(api.AbstractPageWithTable().fqn());
+      var superTypeBuilder = new StringBuilder(existingSuperClassFqn).append(JavaTypes.C_GENERIC_START);
       if (isAbstract(flags())) {
         superTypeBuilder.append(TABLE_TYPE_PARAM_NAME);
       }

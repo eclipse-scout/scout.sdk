@@ -33,7 +33,7 @@ public class ColumnProposal extends AbstractTypeProposal {
   @Override
   @SuppressWarnings("unchecked")
   protected void fillRewrite(AstNodeFactory factory, Type superType) throws CoreException {
-    TypeDeclaration columnType = createColumnType(superType);
+    var columnType = createColumnType(superType);
 
     List<BodyDeclaration> bodyDeclarations = columnType.bodyDeclarations();
     setEndPosition(getRewrite().track(bodyDeclarations.get(bodyDeclarations.size() - 1)));

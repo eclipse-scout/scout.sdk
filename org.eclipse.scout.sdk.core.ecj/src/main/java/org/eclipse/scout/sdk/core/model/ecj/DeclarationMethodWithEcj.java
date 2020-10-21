@@ -11,20 +11,17 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.Argument;
-import org.eclipse.jdt.internal.compiler.ast.Javadoc;
 import org.eclipse.jdt.internal.compiler.ast.MethodDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.TypeParameter;
-import org.eclipse.jdt.internal.compiler.ast.TypeReference;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.MethodImplementor;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
@@ -89,7 +86,7 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   public TypeSpi getReturnType() {
     return m_returnType.computeIfAbsentAndGet(() -> {
       if (m_astNode instanceof MethodDeclaration) {
-        TypeReference ref = ((MethodDeclaration) m_astNode).returnType;
+        var ref = ((MethodDeclaration) m_astNode).returnType;
         if (ref.resolvedType == null) {
           synchronized (javaEnvWithEcj().lock()) {
             ref.resolveType(m_astNode.scope);
@@ -116,22 +113,20 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   }
 
   private boolean isVarArgs() {
-    Argument[] arguments = m_astNode.arguments;
+    var arguments = m_astNode.arguments;
     return arguments != null && arguments.length > 0 && arguments[arguments.length - 1].isVarArgs();
   }
 
   @Override
   public List<MethodParameterSpi> getParameters() {
     return m_arguments.computeIfAbsentAndGet(() -> {
-      Argument[] arguments = m_astNode.arguments;
+      var arguments = m_astNode.arguments;
       if (arguments == null || arguments.length < 1) {
         return emptyList();
       }
-      List<MethodParameterSpi> result = new ArrayList<>(arguments.length);
-      for (int i = 0; i < arguments.length; i++) {
-        result.add(javaEnvWithEcj().createDeclarationMethodParameter(this, arguments[i], i));
-      }
-      return result;
+      return IntStream.range(0, arguments.length)
+          .mapToObj(i -> javaEnvWithEcj().createDeclarationMethodParameter(this, arguments[i], i))
+          .collect(toList());
     });
   }
 
@@ -159,19 +154,19 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   @Override
   public List<TypeSpi> getExceptionTypes() {
     return m_exceptions.computeIfAbsentAndGet(() -> {
-      TypeReference[] exceptions = m_astNode.thrownExceptions;
+      var exceptions = m_astNode.thrownExceptions;
       if (exceptions == null || exceptions.length < 1) {
         return emptyList();
       }
 
       List<TypeSpi> result = new ArrayList<>(exceptions.length);
-      for (TypeReference r : exceptions) {
+      for (var r : exceptions) {
         if (r.resolvedType == null) {
           synchronized (javaEnvWithEcj().lock()) {
             r.resolveType(SpiWithEcjUtils.classScopeOf(this));
           }
         }
-        TypeSpi t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), r.resolvedType);
+        var t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), r.resolvedType);
         if (t != null) {
           result.add(t);
         }
@@ -187,15 +182,15 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
 
   @Override
   public boolean hasTypeParameters() {
-    TypeParameter[] typeParams = m_astNode.typeParameters();
+    var typeParams = m_astNode.typeParameters();
     return typeParams != null && typeParams.length > 0;
   }
 
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-      AbstractMethodDeclaration decl = m_astNode;
+      var cu = m_declaringType.getCompilationUnit();
+      var decl = m_astNode;
       return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
     });
   }
@@ -203,8 +198,8 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   @Override
   public ISourceRange getSourceOfBody() {
     return m_bodySource.computeIfAbsentAndGet(() -> {
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-      AbstractMethodDeclaration decl = m_astNode;
+      var cu = m_declaringType.getCompilationUnit();
+      var decl = m_astNode;
       return javaEnvWithEcj().getSource(cu, decl.bodyStart, decl.bodyEnd);
     });
   }
@@ -212,8 +207,8 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   @Override
   public ISourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-      Javadoc doc = m_astNode.javadoc;
+      var cu = m_declaringType.getCompilationUnit();
+      var doc = m_astNode.javadoc;
       if (doc == null) {
         return null;
       }

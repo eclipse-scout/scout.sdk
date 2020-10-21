@@ -38,8 +38,8 @@ public class WebServiceEditorInput extends FileEditorInput {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = super.hashCode();
+    var prime = 31;
+    var result = super.hashCode();
     result = prime * result + ((m_pageIdToActivate == null) ? 0 : m_pageIdToActivate.hashCode());
     return result;
   }
@@ -55,7 +55,7 @@ public class WebServiceEditorInput extends FileEditorInput {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    WebServiceEditorInput other = (WebServiceEditorInput) obj;
+    var other = (WebServiceEditorInput) obj;
     return Objects.equals(m_pageIdToActivate, other.m_pageIdToActivate);
   }
 }

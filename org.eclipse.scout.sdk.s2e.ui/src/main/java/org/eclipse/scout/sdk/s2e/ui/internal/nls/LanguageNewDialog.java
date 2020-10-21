@@ -11,8 +11,9 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.nls;
 
 import static java.util.function.Predicate.isEqual;
+import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
@@ -31,13 +32,11 @@ import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
-import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.AbstractContentProviderAdapter;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -66,7 +65,7 @@ public class LanguageNewDialog extends TitleAreaDialog {
 
   @Override
   protected Control createContents(Composite parent) {
-    Control contents = super.createContents(parent);
+    var contents = super.createContents(parent);
     setTitle(m_title);
 
     revalidate();
@@ -82,21 +81,21 @@ public class LanguageNewDialog extends TitleAreaDialog {
     Composite rootArea = FieldToolkit.createGroupBox(p, "");
 
     // Language
-    P_LanguageContentProvider langContentProvider = new P_LanguageContentProvider();
-    ProposalTextField languageChooser = FieldToolkit.createProposalField(rootArea, "Language", TextField.TYPE_LABEL, 60);
+    var langContentProvider = new P_LanguageContentProvider();
+    var languageChooser = FieldToolkit.createProposalField(rootArea, "Language", TextField.TYPE_LABEL, 60);
     languageChooser.setContentProvider(langContentProvider);
     languageChooser.setLabelProvider(langContentProvider);
     languageChooser.addProposalListener(item -> setLanguageIso(Optional.ofNullable((Locale) item).map(Locale::getLanguage).orElse(null)));
 
     // Country
-    P_CountryContentProvider countryContentProvider = new P_CountryContentProvider();
-    ProposalTextField countryChooser = FieldToolkit.createProposalField(rootArea, "Country", TextField.TYPE_LABEL, 60);
+    var countryContentProvider = new P_CountryContentProvider();
+    var countryChooser = FieldToolkit.createProposalField(rootArea, "Country", TextField.TYPE_LABEL, 60);
     countryChooser.setContentProvider(countryContentProvider);
     countryChooser.setLabelProvider(countryContentProvider);
     countryChooser.addProposalListener(item -> setCountryIso(Optional.ofNullable((Locale) item).map(Locale::getCountry).orElse(null)));
 
     // Store
-    ProposalTextField storeChooser = FieldToolkit.createTranslationStoreProposalField(rootArea, "Create in", stack(), 60);
+    var storeChooser = FieldToolkit.createTranslationStoreProposalField(rootArea, "Create in", stack(), 60);
     storeChooser.addProposalListener(item -> setStore((ITranslationStore) item));
     storeChooser.acceptProposal(stack().primaryEditableStore().orElse(null));
 
@@ -117,7 +116,7 @@ public class LanguageNewDialog extends TitleAreaDialog {
   }
 
   private void revalidate() {
-    Button okButton = getButton(IDialogConstants.OK_ID);
+    var okButton = getButton(IDialogConstants.OK_ID);
     if (okButton != null) {
       okButton.setEnabled(false);
     }
@@ -135,7 +134,7 @@ public class LanguageNewDialog extends TitleAreaDialog {
     }
 
     // check if language already exists
-    Language lang = new Language(new Locale(getLanguageIso(), Strings.notBlank(getCountryIso()).orElse("")));
+    var lang = new Language(new Locale(getLanguageIso(), Strings.notBlank(getCountryIso()).orElse("")));
     if (getStore().languages().anyMatch(isEqual(lang))) {
       setMessage("This language already exists.", IMessageProvider.WARNING);
       return;
@@ -196,11 +195,11 @@ public class LanguageNewDialog extends TitleAreaDialog {
 
     @Override
     public String getText(Object element) {
-      Locale loc = (Locale) element;
-      String ds = loc.getDisplayLanguage();
-      String l = loc.getLanguage();
+      var loc = (Locale) element;
+      var ds = loc.getDisplayLanguage();
+      var l = loc.getLanguage();
 
-      StringBuilder b = new StringBuilder(ds.length() + l.length() + 3);
+      var b = new StringBuilder(ds.length() + l.length() + 3);
       b.append(ds);
       b.append(" (");
       b.append(l);
@@ -215,12 +214,10 @@ public class LanguageNewDialog extends TitleAreaDialog {
 
     @Override
     protected Collection<?> loadProposals(IProgressMonitor monitor) {
-      String[] isoLanguages = Locale.getISOLanguages();
-      Collection<Locale> locs = new ArrayList<>(isoLanguages.length);
-      for (String isoLang : isoLanguages) {
-        locs.add(new Locale(isoLang));
-      }
-      return locs;
+      var isoLanguages = Locale.getISOLanguages();
+      return Arrays.stream(isoLanguages)
+          .map(Locale::new)
+          .collect(toList());
     }
   }
 
@@ -233,11 +230,11 @@ public class LanguageNewDialog extends TitleAreaDialog {
 
     @Override
     public String getText(Object element) {
-      Locale loc = (Locale) element;
-      String dc = loc.getDisplayCountry();
-      String c = loc.getCountry();
+      var loc = (Locale) element;
+      var dc = loc.getDisplayCountry();
+      var c = loc.getCountry();
 
-      StringBuilder b = new StringBuilder(dc.length() + c.length() + 3);
+      var b = new StringBuilder(dc.length() + c.length() + 3);
       b.append(dc);
       b.append(" (");
       b.append(c);
@@ -252,12 +249,10 @@ public class LanguageNewDialog extends TitleAreaDialog {
 
     @Override
     protected Collection<?> loadProposals(IProgressMonitor monitor) {
-      String[] isoCountries = Locale.getISOCountries();
-      Collection<Locale> countries = new ArrayList<>(isoCountries.length);
-      for (String isoCountry : isoCountries) {
-        countries.add(new Locale("", isoCountry));
-      }
-      return countries;
+      var isoCountries = Locale.getISOCountries();
+      return Arrays.stream(isoCountries)
+          .map(isoCountry -> new Locale("", isoCountry))
+          .collect(toList());
     }
   }
 }

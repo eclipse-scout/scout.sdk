@@ -45,8 +45,8 @@ class ProposalPopupEvent {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + m_type;
     result = prime * result + m_values.hashCode();
     return result;
@@ -63,7 +63,7 @@ class ProposalPopupEvent {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    ProposalPopupEvent other = (ProposalPopupEvent) obj;
+    var other = (ProposalPopupEvent) obj;
     return m_type == other.m_type && m_values.equals(other.m_values);
   }
 }

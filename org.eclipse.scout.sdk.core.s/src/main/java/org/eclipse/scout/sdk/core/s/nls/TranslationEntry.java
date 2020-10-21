@@ -51,7 +51,7 @@ public class TranslationEntry extends Translation implements ITranslationEntry {
       return false;
     }
 
-    TranslationEntry other = (TranslationEntry) obj;
+    var other = (TranslationEntry) obj;
     return m_store.equals(other.m_store);
   }
 

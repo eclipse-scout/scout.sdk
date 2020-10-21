@@ -13,14 +13,12 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
@@ -33,6 +31,7 @@ import org.eclipse.scout.sdk.core.model.api.query.SuperMethodQuery;
 import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
@@ -99,7 +98,7 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
 
   @Override
   public String identifier(boolean useErasureOnly) {
-    List<String> parameterTypes = parameters().stream()
+    var parameterTypes = parameters().stream()
         .map(IMethodParameter::dataType)
         .map(p -> p.reference(useErasureOnly))
         .collect(toList());

@@ -74,12 +74,12 @@ public class MethodParameterQuery extends AbstractQuery<IMethodParameter> implem
    */
   @Override
   public boolean test(IMethodParameter p) {
-    String name = getName();
+    var name = getName();
     if (name != null && !name.equals(p.elementName())) {
       return false;
     }
 
-    String dataTypeFqn = getDataType();
+    var dataTypeFqn = getDataType();
     return dataTypeFqn == null || dataTypeFqn.equals(p.dataType().name());
   }
 

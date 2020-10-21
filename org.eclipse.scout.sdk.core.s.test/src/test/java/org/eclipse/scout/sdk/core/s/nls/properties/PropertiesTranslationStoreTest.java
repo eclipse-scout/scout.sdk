@@ -45,9 +45,9 @@ public class PropertiesTranslationStoreTest {
 
   @Test
   public void testStore(TestingEnvironment env) {
-    Language en = TranslationStoreSupplierExtension.EN;
-    Language de = Language.parseThrowingOnError("de");
-    PropertiesTranslationStore store = testingStore(env);
+    var en = TranslationStoreSupplierExtension.EN;
+    var de = Language.parseThrowingOnError("de");
+    var store = testingStore(env);
 
     assertFalse(store.isDirty());
     assertTrue(store.isEditable());
@@ -75,7 +75,7 @@ public class PropertiesTranslationStoreTest {
 
     // modify and flush
     store.addNewLanguage(de); // add new language
-    Translation toAdd = new Translation("added");
+    var toAdd = new Translation("added");
     toAdd.putText(Language.LANGUAGE_DEFAULT, "new def");
     toAdd.putText(de, "new de");
     toAdd.putText(Language.parseThrowingOnError("notexisting"), "new not existing");
@@ -99,7 +99,7 @@ public class PropertiesTranslationStoreTest {
 
   @Test
   public void testReadOnlyStore(TestingEnvironment env) {
-    PropertiesTranslationStore store = createReadOnlyStore(env);
+    var store = createReadOnlyStore(env);
     assertFalse(store.isEditable());
     assertFalse(store.isDirty());
     store.reload(new NullProgress());
@@ -112,7 +112,7 @@ public class PropertiesTranslationStoreTest {
 
   @Test
   public void testEmptyStore(TestingEnvironment env) {
-    PropertiesTranslationStore empty = createEmptyStore(env.primaryEnvironment());
+    var empty = createEmptyStore(env.primaryEnvironment());
 
     assertFalse(empty.keys().findAny().isPresent());
     assertFalse(empty.isEditable());
@@ -122,8 +122,8 @@ public class PropertiesTranslationStoreTest {
   @Test
   @SuppressWarnings({"unlikely-arg-type", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "SimplifiableJUnitAssertion", "EqualsWithItself"})
   public void testStoreEqualsHashCode() {
-    PropertiesTranslationStore store1 = ScoutJavaEnvironmentFactory.call(TranslationStoreSupplierExtension::createEmptyStore, false, false);
-    PropertiesTranslationStore store2 = ScoutJavaEnvironmentFactory.call(TranslationStoreSupplierExtension::createEmptyStore, false, false);
+    var store1 = ScoutJavaEnvironmentFactory.call(TranslationStoreSupplierExtension::createEmptyStore, false, false);
+    var store2 = ScoutJavaEnvironmentFactory.call(TranslationStoreSupplierExtension::createEmptyStore, false, false);
 
     assertFalse(store1.equals(null));
     assertFalse(store1.equals(store2));

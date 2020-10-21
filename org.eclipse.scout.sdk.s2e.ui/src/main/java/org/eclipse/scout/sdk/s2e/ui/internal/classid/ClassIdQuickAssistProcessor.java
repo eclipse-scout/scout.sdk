@@ -13,20 +13,17 @@ package org.eclipse.scout.sdk.s2e.ui.internal.classid;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironmentSync;
 
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jdt.internal.core.DefaultWorkingCopyOwner;
 import org.eclipse.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.internal.ui.JavaPluginImages;
@@ -53,30 +50,30 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
   @Override
   public boolean hasAssists(IInvocationContext context) {
-    IJavaCompletionProposal[] assists = getAssists(context, null);
+    var assists = getAssists(context, null);
     return assists != null && assists.length > 0;
   }
 
   @Override
   @SuppressWarnings("squid:S1168")
   public IJavaCompletionProposal[] getAssists(IInvocationContext context, IProblemLocation[] locations) {
-    ClassIdTarget selectedType = getTarget(context.getCoveringNode());
+    var selectedType = getTarget(context.getCoveringNode());
     if (selectedType != null && !JdtUtils.exists(selectedType.m_annotation)) {
-      CompilationUnitRewrite rewrite = createRewrite(selectedType);
+      var rewrite = createRewrite(selectedType);
       return new IJavaCompletionProposal[]{new ClassIdAddProposal(rewrite)};
     }
     return null;
   }
 
   private static CompilationUnitRewrite createRewrite(ClassIdTarget target) {
-    IType type = target.m_type;
-    TypeDeclaration td = target.m_td;
-    CompilationUnitRewrite cuRewrite = new CompilationUnitRewrite(DefaultWorkingCopyOwner.PRIMARY, type.getCompilationUnit(), (CompilationUnit) td.getRoot());
+    var type = target.m_type;
+    var td = target.m_td;
+    var cuRewrite = new CompilationUnitRewrite(DefaultWorkingCopyOwner.PRIMARY, type.getCompilationUnit(), (CompilationUnit) td.getRoot());
 
-    ListRewrite listRewrite = cuRewrite.getASTRewrite().getListRewrite(td, td.getModifiersProperty());
+    var listRewrite = cuRewrite.getASTRewrite().getListRewrite(td, td.getModifiersProperty());
 
     // create annotation element
-    SingleMemberAnnotation classIdAnnotation = callInEclipseEnvironmentSync(
+    var classIdAnnotation = callInEclipseEnvironmentSync(
         (e, p) -> new AstNodeFactory(td, type.getCompilationUnit(), e, target.m_scoutApi).newClassIdAnnotation(type.getFullyQualifiedName()),
         new NullProgressMonitor());
 
@@ -84,7 +81,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     cuRewrite.getImportRewrite().addImport(classIdAnnotation.getTypeName().getFullyQualifiedName());
 
     // add the annotation
-    ASTNode sibling = AstUtils.getAnnotationSibling(td, classIdAnnotation);
+    var sibling = AstUtils.getAnnotationSibling(td, classIdAnnotation);
     if (sibling == null) {
       listRewrite.insertLast(classIdAnnotation, null);
     }
@@ -97,10 +94,8 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
   private static ClassIdTarget getTarget(ASTNode selectedNode) {
     if (selectedNode != null && selectedNode.getParent() != null) {
-      boolean isValidNodeType = selectedNode.getNodeType() == ASTNode.SIMPLE_NAME
-          || selectedNode.getNodeType() == ASTNode.QUALIFIED_NAME
-          || selectedNode.getNodeType() == ASTNode.MODIFIER
-          || selectedNode.getNodeType() == ASTNode.TYPE_DECLARATION;
+      var isValidNodeType = IntStream.of(ASTNode.SIMPLE_NAME, ASTNode.QUALIFIED_NAME, ASTNode.MODIFIER, ASTNode.TYPE_DECLARATION)
+          .anyMatch(nodeType -> nodeType == selectedNode.getNodeType());
       if (isValidNodeType) {
         TypeDeclaration typeDecl;
         if (selectedNode.getParent().getNodeType() == ASTNode.TYPE_DECLARATION) {
@@ -113,18 +108,18 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
           return null;
         }
 
-        ITypeBinding resolveTypeBinding = typeDecl.resolveBinding();
+        var resolveTypeBinding = typeDecl.resolveBinding();
         if (resolveTypeBinding != null) {
-          IJavaElement javaElement = resolveTypeBinding.getJavaElement();
+          var javaElement = resolveTypeBinding.getJavaElement();
           if (JdtUtils.exists(javaElement) && javaElement.getElementType() == IJavaElement.TYPE) {
-            IType t = (IType) javaElement;
+            var t = (IType) javaElement;
             try {
               if (!t.isBinary() && !t.isAnonymous()) {
-                ITypeHierarchy superTypeHierarchy = t.newSupertypeHierarchy(null);
-                IScoutApi scoutApi = ApiHelper.requireScoutApiFor(t);
-                String classIdFqn = scoutApi.ClassId().fqn();
+                var superTypeHierarchy = t.newSupertypeHierarchy(null);
+                var scoutApi = ApiHelper.requireScoutApiFor(t);
+                var classIdFqn = scoutApi.ClassId().fqn();
                 if (JdtUtils.hierarchyContains(superTypeHierarchy, scoutApi.ITypeWithClassId().fqn())) {
-                  IAnnotation annotation = JdtUtils.getAnnotation(t, classIdFqn);
+                  var annotation = JdtUtils.getAnnotation(t, classIdFqn);
                   return new ClassIdTarget(typeDecl, t, annotation, scoutApi);
                 }
               }

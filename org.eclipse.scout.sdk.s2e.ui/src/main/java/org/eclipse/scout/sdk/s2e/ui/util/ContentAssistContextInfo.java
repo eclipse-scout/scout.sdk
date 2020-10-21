@@ -65,18 +65,18 @@ public class ContentAssistContextInfo {
       return null;
     }
 
-    Bundle bundle = Platform.getBundle(callingPluginId);
+    var bundle = Platform.getBundle(callingPluginId);
     if (bundle == null || bundle.getState() != Bundle.ACTIVE) {
       return null;
     }
 
-    JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-    ICompilationUnit compilationUnit = javaContext.getCompilationUnit();
+    var javaContext = (JavaContentAssistInvocationContext) context;
+    var compilationUnit = javaContext.getCompilationUnit();
     if (!JdtUtils.exists(compilationUnit) || !JdtUtils.exists(compilationUnit.getJavaProject())) {
       return null;
     }
 
-    int offset = javaContext.getInvocationOffset();
+    var offset = javaContext.getInvocationOffset();
     if (offset < 0) {
       return null;
     }
@@ -89,7 +89,7 @@ public class ContentAssistContextInfo {
       return null;
     }
 
-    String identifierPrefix = computeIdentifierPrefix(javaContext);
+    var identifierPrefix = computeIdentifierPrefix(javaContext);
     if (monitor != null && monitor.isCanceled()) {
       return null;
     }
@@ -98,7 +98,7 @@ public class ContentAssistContextInfo {
 
   protected static String computeIdentifierPrefix(ContentAssistInvocationContext javaContext) {
     try {
-      CharSequence prefix = javaContext.computeIdentifierPrefix();
+      var prefix = javaContext.computeIdentifierPrefix();
       if (Strings.hasText(prefix)) {
         return prefix.toString().trim();
       }
@@ -143,7 +143,7 @@ public class ContentAssistContextInfo {
    */
   public IJavaElement computeEnclosingElement() {
     try {
-      IJavaElement element = m_compilationUnit.getElementAt(m_offset);
+      var element = m_compilationUnit.getElementAt(m_offset);
       if (JdtUtils.exists(element) && JdtUtils.exists(element.getJavaProject())) {
         return element;
       }
@@ -156,8 +156,8 @@ public class ContentAssistContextInfo {
 
   @Override
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + ((m_compilationUnit == null) ? 0 : m_compilationUnit.hashCode());
     result = prime * result + ((m_identifierPrefix == null) ? 0 : m_identifierPrefix.hashCode());
     result = prime * result + m_offset;
@@ -175,7 +175,7 @@ public class ContentAssistContextInfo {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    ContentAssistContextInfo other = (ContentAssistContextInfo) obj;
+    var other = (ContentAssistContextInfo) obj;
     return m_offset == other.m_offset
         && Objects.equals(m_identifierPrefix, other.m_identifierPrefix)
         && Objects.equals(m_compilationUnit, other.m_compilationUnit);

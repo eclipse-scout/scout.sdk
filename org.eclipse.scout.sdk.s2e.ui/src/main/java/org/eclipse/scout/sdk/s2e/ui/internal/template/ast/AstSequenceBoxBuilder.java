@@ -10,12 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
 
 /**
  * <h3>{@link AstSequenceBoxBuilder}</h3>
@@ -39,12 +35,12 @@ public class AstSequenceBoxBuilder extends AstTypeBuilder<AstSequenceBoxBuilder>
 
   @SuppressWarnings("unchecked")
   protected void addGetConfiguredAutoCheckFromTo() {
-    AST ast = getFactory().getAst();
-    BooleanLiteral literal = ast.newBooleanLiteral(false);
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var ast = getFactory().getAst();
+    var literal = ast.newBooleanLiteral(false);
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(literal);
 
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
     getFactory().newMethod(getFactory().getScoutApi().AbstractSequenceBox().getConfiguredAutoCheckFromToMethodName())
@@ -56,7 +52,7 @@ public class AstSequenceBoxBuilder extends AstTypeBuilder<AstSequenceBoxBuilder>
         .insert();
 
     // linked positions
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPosition(getFactory().getRewrite().track(literal), true, AstNodeFactory.AUTO_CHECK_GROUP);
       links.addLinkedPositionProposalsBoolean(AstNodeFactory.AUTO_CHECK_GROUP);

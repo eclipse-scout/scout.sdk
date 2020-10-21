@@ -20,8 +20,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -48,25 +46,25 @@ public class MasterFieldFormDataTest {
 
     // fields of MasterFieldTestFormData
     assertEquals(1, masterFieldTestFormData.fields().stream().count(), "field count of 'MasterFieldTestFormData'");
-    IField serialVersionUID = assertFieldExist(masterFieldTestFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(masterFieldTestFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(2, masterFieldTestFormData.methods().stream().count(), "method count of 'MasterFieldTestFormData'");
-    IMethod getMyMaster = assertMethodExist(masterFieldTestFormData, "getMyMaster", new String[]{});
+    var getMyMaster = assertMethodExist(masterFieldTestFormData, "getMyMaster", new String[]{});
     assertMethodReturnType(getMyMaster, "formdata.shared.services.MasterFieldTestFormData$MyMaster");
-    IMethod getMySlave = assertMethodExist(masterFieldTestFormData, "getMySlave", new String[]{});
+    var getMySlave = assertMethodExist(masterFieldTestFormData, "getMySlave", new String[]{});
     assertMethodReturnType(getMySlave, "formdata.shared.services.MasterFieldTestFormData$MySlave");
 
     assertEquals(2, masterFieldTestFormData.innerTypes().stream().count(), "inner types count of 'MasterFieldTestFormData'");
     // type MyMaster
-    IType myMaster = assertTypeExists(masterFieldTestFormData, "MyMaster");
+    var myMaster = assertTypeExists(masterFieldTestFormData, "MyMaster");
     assertHasFlags(myMaster, 9);
     assertHasSuperClass(myMaster, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.String>");
 
     // fields of MyMaster
     assertEquals(1, myMaster.fields().stream().count(), "field count of 'MyMaster'");
-    IField serialVersionUID1 = assertFieldExist(myMaster, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(myMaster, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 
@@ -74,13 +72,13 @@ public class MasterFieldFormDataTest {
 
     assertEquals(0, myMaster.innerTypes().stream().count(), "inner types count of 'MyMaster'");
     // type MySlave
-    IType mySlave = assertTypeExists(masterFieldTestFormData, "MySlave");
+    var mySlave = assertTypeExists(masterFieldTestFormData, "MySlave");
     assertHasFlags(mySlave, 9);
     assertHasSuperClass(mySlave, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.String>");
 
     // fields of MySlave
     assertEquals(1, mySlave.fields().stream().count(), "field count of 'MySlave'");
-    IField serialVersionUID2 = assertFieldExist(mySlave, "serialVersionUID");
+    var serialVersionUID2 = assertFieldExist(mySlave, "serialVersionUID");
     assertHasFlags(serialVersionUID2, 26);
     assertFieldType(serialVersionUID2, "long");
 

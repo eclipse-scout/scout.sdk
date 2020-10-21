@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.testing.context;
 
+import static java.util.stream.Collectors.toCollection;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 import static org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension.createJavaEnvironmentUsingBuilder;
 
@@ -21,13 +22,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
@@ -44,7 +43,6 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcj;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
-import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
@@ -101,11 +99,11 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
   @Override
   public IFuture<IType> writeCompilationUnitAsync(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress) {
     IType result;
-    String className = generator.elementName().get();
+    var className = generator.elementName().get();
     if (className.endsWith(ISdkConstants.SUFFIX_DTO) && generator.packageName().orElse("").contains(".shared.")) {
       result = CoreTestingUtils.registerCompilationUnit(targetFolder.javaEnvironment(), generator);
       // remember for later validation. As soon as the model type has been created the dto will be updated and validated.
-      String baseName = className.substring(0, className.length() - ISdkConstants.SUFFIX_DTO.length());
+      var baseName = className.substring(0, className.length() - ISdkConstants.SUFFIX_DTO.length());
       m_dtoCache.put(baseName, result);
     }
     else {
@@ -122,7 +120,7 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
   }
 
   protected static Throwable writeIcuToDisk(IClasspathEntry sourceFolder, ICompilationUnit icu) {
-    Path targetFolder = sourceFolder.path().resolve(icu.containingPackage().asPath()).normalize();
+    var targetFolder = sourceFolder.path().resolve(icu.containingPackage().asPath()).normalize();
     try {
       writeFile(targetFolder.resolve(icu.elementName()), icu.source().get().asCharSequence().toString().getBytes(StandardCharsets.UTF_8));
       return null;
@@ -133,14 +131,14 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
   }
 
   protected void updateAndValidateDtoFor(IType modelType) {
-    IType dto = m_dtoCache.get(modelType.elementName());
+    var dto = m_dtoCache.get(modelType.elementName());
     if (dto == null) {
       return; // no dto has been registered
     }
 
     // A DTO has been registered for this model: update and validate now
-    IJavaEnvironment shared = getSharedEnvForDtos();
-    IDerivedResourceInput input = new IDerivedResourceInput() {
+    var shared = getSharedEnvForDtos();
+    var input = new IDerivedResourceInput() {
       @Override
       public Optional<IType> getSourceType(IEnvironment env) {
         return Optional.of(modelType);
@@ -159,10 +157,10 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
 
     // write new source from shared environment to primary environment
     if (modelType.javaEnvironment() != shared) {
-      CharSequence newDtoSrc = shared.requireType(dto.name()).requireCompilationUnit().source().get().asCharSequence();
+      var newDtoSrc = shared.requireType(dto.name()).requireCompilationUnit().source().get().asCharSequence();
       dto = CoreTestingUtils.registerCompilationUnit(modelType.javaEnvironment(), dto.containingPackage().elementName(), dto.elementName(), newDtoSrc);
       if (isFlushResourcesToDisk()) {
-        Throwable t = writeIcuToDisk(shared.primarySourceFolder().get(), dto.requireCompilationUnit());
+        var t = writeIcuToDisk(shared.primarySourceFolder().get(), dto.requireCompilationUnit());
         if (t != null) {
           if (t instanceof RuntimeException) {
             throw (RuntimeException) t;
@@ -195,7 +193,7 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
   public IFuture<Void> writeResourceAsync(CharSequence content, Path filePath, IProgress progress) {
     Throwable ex = null;
     if (isFlushResourcesToDisk()) {
-      Path normalizedPath = filePath.normalize();
+      var normalizedPath = filePath.normalize();
       try {
         writeFile(normalizedPath, content.toString().getBytes(StandardCharsets.UTF_8));
       }
@@ -227,8 +225,8 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
   }
 
   protected static StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment env) {
-    JavaBuilderContext context = new JavaBuilderContext(new BuilderContext(), Ensure.notNull(env));
-    MemorySourceBuilder builder = new MemorySourceBuilder(context);
+    var context = new JavaBuilderContext(new BuilderContext(), Ensure.notNull(env));
+    var builder = new MemorySourceBuilder(context);
     generator.generate(builder);
     return builder.source();
   }
@@ -272,7 +270,7 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
         .map(e -> e.findType(fqn))
         .filter(Objects::nonNull)
         .map(TypeSpi::wrap)
-        .collect(Collectors.toCollection(() -> result));
+        .collect(toCollection(() -> result));
     return result.stream();
   }
 
@@ -288,20 +286,20 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
   @Override
   public void close() {
     if (m_env != null) {
-      JavaEnvironmentSpi env = m_env.unwrap();
+      var env = m_env.unwrap();
       if (env instanceof JavaEnvironmentWithEcj) {
         closeSafe((AutoCloseable) env);
       }
     }
 
     if (m_dtoEnv != null) {
-      JavaEnvironmentSpi dto = m_dtoEnv.unwrap();
+      var dto = m_dtoEnv.unwrap();
       if (dto instanceof JavaEnvironmentWithEcj) {
         closeSafe((AutoCloseable) dto);
       }
     }
 
-    Iterator<JavaEnvironmentWithEcj> iterator = m_javaEnvironments.iterator();
+    var iterator = m_javaEnvironments.iterator();
     while (iterator.hasNext()) {
       closeSafe(iterator.next());
       iterator.remove();

@@ -40,11 +40,11 @@ public class MethodTest {
 
   @Test
   public void testChildClassMethods(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
+    var childClassType = env.requireType(ChildClass.class.getName());
     assertEquals(3, childClassType.methods().stream().count());
 
     // constructor
-    IMethod constr = childClassType.methods().first().get();
+    var constr = childClassType.methods().first().get();
     assertEquals(childClassType, constr.requireDeclaringType());
     assertEquals(0, constr.exceptionTypes().count());
     assertEquals(Flags.AccPublic, constr.flags());
@@ -56,7 +56,7 @@ public class MethodTest {
     assertFalse(constr.toWorkingCopy().returnType().isPresent());
 
     // methodInChildClass
-    IMethod methodInChildClass = childClassType.methods().item(1).get();
+    var methodInChildClass = childClassType.methods().item(1).get();
     assertEquals(childClassType, methodInChildClass.requireDeclaringType());
     assertEquals(1, methodInChildClass.exceptionTypes().count());
     assertEquals(IOException.class.getName(), methodInChildClass.exceptionTypes().findAny().get().name());
@@ -69,7 +69,7 @@ public class MethodTest {
     assertEquals(1, methodInChildClass.annotations().stream().count());
 
     // firstCase
-    IMethod firstCase = childClassType.methods().item(2).get();
+    var firstCase = childClassType.methods().item(2).get();
     assertEquals(childClassType, firstCase.requireDeclaringType());
     assertEquals(0, firstCase.exceptionTypes().count());
     assertEquals(Flags.AccPrivate, firstCase.flags());
@@ -82,27 +82,27 @@ public class MethodTest {
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
+    var childClassType = env.requireType(ChildClass.class.getName());
     assertFalse(Strings.isBlank(childClassType.methods().item(1).get().toString()));
   }
 
   @Test
   public void testDefaultMethods(IJavaEnvironment env) {
-    IType type = env.requireType(ClassWithDefaultMethods.class.getName());
+    var type = env.requireType(ClassWithDefaultMethods.class.getName());
     assertEquals(7, type.methods().withSuperInterfaces(true).stream().count());
     assertEquals(4, type.superInterfaces().findAny().get().methods().stream().count());
-    IMethod defaultMethod = type.superInterfaces().findAny().get().methods().withName("defMethod2").first().get();
+    var defaultMethod = type.superInterfaces().findAny().get().methods().withName("defMethod2").first().get();
     assertTrue(isDefaultMethod(defaultMethod.flags()));
   }
 
   @Test
   public void testBaseClassMethods(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
 
     assertEquals(2, baseClassType.methods().stream().count());
 
     // methodInBaseClass
-    IMethod methodInBaseClass = baseClassType.methods().first().get();
+    var methodInBaseClass = baseClassType.methods().first().get();
     assertEquals(baseClassType, methodInBaseClass.requireDeclaringType());
     assertEquals(2, methodInBaseClass.exceptionTypes().count());
     assertEquals(IOError.class.getName(), methodInBaseClass.exceptionTypes().findAny().get().name());
@@ -117,7 +117,7 @@ public class MethodTest {
     assertEquals(2, methodInBaseClass.annotations().stream().count());
 
     // method2InBaseClass
-    IMethod method2InBaseClass = baseClassType.methods().item(1).get();
+    var method2InBaseClass = baseClassType.methods().item(1).get();
     assertEquals(baseClassType, method2InBaseClass.requireDeclaringType());
     assertEquals(0, method2InBaseClass.exceptionTypes().count());
     assertEquals(Flags.AccPublic | Flags.AccSynchronized | Flags.AccFinal, method2InBaseClass.flags());
@@ -131,20 +131,20 @@ public class MethodTest {
 
   @Test
   public void testFindMethodInSuperHierarchy(IJavaEnvironment env) {
-    IMethod methodInBaseClass = env.requireType(ChildClass.class.getName()).methods().withSuperTypes(true).withAnnotation(MarkerAnnotation.class.getName()).first().get();
+    var methodInBaseClass = env.requireType(ChildClass.class.getName()).methods().withSuperTypes(true).withAnnotation(MarkerAnnotation.class.getName()).first().get();
     assertEquals("methodInBaseClass", methodInBaseClass.elementName());
   }
 
   @Test
   public void testConstructor(IJavaEnvironment env) {
-    IMethod secondConstr = env.requireType(ClassWithConstructors.class.getName()).methods().item(1).get();
+    var secondConstr = env.requireType(ClassWithConstructors.class.getName()).methods().item(1).get();
     assertFalse(secondConstr.returnType().isPresent());
     assertTrue(secondConstr.isConstructor());
 
-    IType declarationType = env.requireType(ClassWithConstructors.class.getName()).requireCompilationUnit().types().first().get();
+    var declarationType = env.requireType(ClassWithConstructors.class.getName()).requireCompilationUnit().types().first().get();
     assertTrue(declarationType.unwrap() instanceof DeclarationTypeWithEcj);
     assertEquals(2, declarationType.methods().stream().count());
-    IMethod declarationMethod = declarationType.methods().first().get();
+    var declarationMethod = declarationType.methods().first().get();
     assertTrue(declarationMethod.isConstructor());
     assertFalse(declarationMethod.returnType().isPresent());
 

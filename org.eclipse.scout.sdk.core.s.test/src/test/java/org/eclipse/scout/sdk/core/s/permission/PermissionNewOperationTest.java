@@ -33,9 +33,9 @@ public class PermissionNewOperationTest {
 
   @Test
   public void testPermissionCreation(TestingEnvironment env) {
-    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
+    var scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
 
-    PermissionNewOperation op = new PermissionNewOperation();
+    var op = new PermissionNewOperation();
     op.setPackage("org.eclipse.scout.sdk.s2e.shared.test");
     op.setPermissionName("My" + ISdkConstants.SUFFIX_PERMISSION);
     op.setSharedSourceFolder(env.getTestingSourceFolder());

@@ -67,8 +67,8 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
         .withType(createHandler(NEW_HANDLER_NAME), 50)
         .withType(createHandler(MODIFY_HANDLER_NAME), 60);
 
-    IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> startModify = createStartMethod("startModify", MODIFY_HANDLER_NAME);
-    IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> startNew = createStartMethod("startNew", NEW_HANDLER_NAME);
+    var startModify = createStartMethod("startModify", MODIFY_HANDLER_NAME);
+    var startNew = createStartMethod("startNew", NEW_HANDLER_NAME);
     if (startModify != null) {
       mainType.withMethod(startModify, 30);
     }
@@ -78,15 +78,15 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
   }
 
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetConfiguredTitle() {
-    String nlsKeyName = elementName().orElseThrow(() -> newFail("Form has no name."));
+    var nlsKeyName = elementName().orElseThrow(() -> newFail("Form has no name."));
     if (nlsKeyName.endsWith(ISdkConstants.SUFFIX_FORM)) {
       nlsKeyName = Strings.ensureStartWithUpperCase(nlsKeyName.substring(0, nlsKeyName.length() - ISdkConstants.SUFFIX_FORM.length())).toString();
     }
-    return ScoutMethodGenerator.createNlsMethod(IScoutApi.class, api -> api.AbstractForm().getConfiguredTitleMethodName(), nlsKeyName);
+    return ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractForm().getConfiguredTitleMethodName(), nlsKeyName);
   }
 
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createStartMethod(String methodName, String handlerSimpleName) {
-    String modifyHandlerFqn = fullyQualifiedName() + JavaTypes.C_DOLLAR + handlerSimpleName;
+    var modifyHandlerFqn = fullyQualifiedName() + JavaTypes.C_DOLLAR + handlerSimpleName;
     return MethodGenerator.create()
         .asPublic()
         .withElementName(methodName)
@@ -103,12 +103,12 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
   }
 
   protected ITypeGenerator<? extends ITypeGenerator<?>> createMainBox() {
-    String groupBoxName = "GroupBox";
-    String okButtonName = "Ok" + ISdkConstants.SUFFIX_BUTTON;
-    String cancelButtonName = "Cancel" + ISdkConstants.SUFFIX_BUTTON;
-    String mainBoxName = "MainBox";
+    var groupBoxName = "GroupBox";
+    var okButtonName = "Ok" + ISdkConstants.SUFFIX_BUTTON;
+    var cancelButtonName = "Cancel" + ISdkConstants.SUFFIX_BUTTON;
+    var mainBoxName = "MainBox";
 
-    ITypeGenerator<? extends ITypeGenerator<?>> mainBox = TypeGenerator.create()
+    var mainBox = TypeGenerator.create()
         .asPublic()
         .withAnnotation(ScoutAnnotationGenerator.createOrder(ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
         .withAnnotation(classIdGenerator(1).orElse(null))
@@ -150,7 +150,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
   }
 
   protected ITypeGenerator<? extends ITypeGenerator<?>> createHandler(String name) {
-    boolean isModify = MODIFY_HANDLER_NAME.equals(name);
+    var isModify = MODIFY_HANDLER_NAME.equals(name);
     return TypeGenerator.create()
         .asPublic()
         .withElementName(name)
@@ -176,7 +176,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
    *          specifies if the current method is an execLoad or an execStore method
    */
   protected HandlerMethodBodyGenerator createHandlerMethodBodyGenerator(boolean isModify, boolean isLoad) {
-    HandlerMethodBodyGenerator handlerMethodBodyGenerator = new HandlerMethodBodyGenerator(isModify)
+    var handlerMethodBodyGenerator = new HandlerMethodBodyGenerator(isModify)
         .withFormDataType(formData().orElse(null))
         .withServiceInterface(serviceInterface().orElse(null));
 

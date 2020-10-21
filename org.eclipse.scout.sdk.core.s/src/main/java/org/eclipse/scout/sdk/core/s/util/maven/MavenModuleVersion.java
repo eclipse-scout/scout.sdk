@@ -22,14 +22,17 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
+import org.eclipse.scout.sdk.core.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
-import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
-import org.w3c.dom.Document;
 
+/**
+ * Helper class to compute the version of a Maven module within an {@link IJavaEnvironment}.<br>
+ * The module can be a binary jar or a source folder within the {@link IJavaEnvironment}.
+ */
 public final class MavenModuleVersion {
 
   private static final Map<Path, Optional<ApiVersion>> VERSION_CACHE = new ConcurrentHashMap<>();
@@ -37,6 +40,23 @@ public final class MavenModuleVersion {
   private MavenModuleVersion() {
   }
 
+  /**
+   * Tries to find a module within the given {@link IJavaEnvironment} and computes its Maven version.
+   * <p>
+   * For binary jars the version is taken from the {@link Name#IMPLEMENTATION_VERSION} manifest header.<br>
+   * For source folders it is taken from the parent pom.xml<br>
+   * Source or javadoc jar files are not supported.
+   * </p>
+   * 
+   * @param moduleName
+   *          The name of the Maven module. This is equal to the artifactId of the module. May be {@code null} but then
+   *          the resulting {@link Optional} will always be empty.
+   * @param context
+   *          The {@link IJavaEnvironment} in which the module should be searched. May be {@code null} but then the
+   *          resulting {@link Optional} will always be empty.
+   * @return An {@link Optional} holding the Maven version of the given module or an empty {@link Optional} if the
+   *         module could not be found, the version cannot be parsed or one of the parameters is {@code null}.
+   */
   public static Optional<ApiVersion> get(String moduleName, IJavaEnvironment context) {
     return modulePathIn(moduleName, context).flatMap(MavenModuleVersion::version);
   }
@@ -45,7 +65,7 @@ public final class MavenModuleVersion {
     if (context == null || Strings.isBlank(moduleName)) {
       return Optional.empty();
     }
-    Optional<Path> jarPath = context.classpath()
+    var jarPath = context.classpath()
         .filter(p -> isModuleJar(moduleName, p))
         .map(IClasspathEntry::path)
         .findAny();
@@ -70,9 +90,9 @@ public final class MavenModuleVersion {
   }
 
   static Optional<ApiVersion> versionOfSourceFolder(Path sourceFolder) {
-    Path modulePath = sourceFolder.getParent().getParent().getParent(); // remove src/main/java
+    var modulePath = sourceFolder.getParent().getParent().getParent(); // remove src/main/java
     try {
-      Document pomContent = Xml.get(modulePath.resolve(IMavenConstants.POM));
+      var pomContent = Xml.get(modulePath.resolve(IMavenConstants.POM));
       return Pom.version(pomContent).flatMap(ApiVersion::parse);
     }
     catch (IOException e) {
@@ -81,7 +101,7 @@ public final class MavenModuleVersion {
   }
 
   static Optional<ApiVersion> versionOfJar(Path jar) {
-    try (JarFile f = new JarFile(jar.toFile(), false, ZipFile.OPEN_READ)) {
+    try (var f = new JarFile(jar.toFile(), false, ZipFile.OPEN_READ)) {
       return Optional.ofNullable(f.getManifest())
           .map(mf -> mf.getMainAttributes().getValue(Name.IMPLEMENTATION_VERSION.toString()))
           .flatMap(ApiVersion::parse);
@@ -102,7 +122,7 @@ public final class MavenModuleVersion {
     if (entry.isDirectory()) {
       return false;
     }
-    String fileName = entry.path().getFileName().toString().toLowerCase(Locale.ENGLISH);
+    var fileName = entry.path().getFileName().toString().toLowerCase(Locale.ENGLISH);
     // fileName is of form "org.eclipse.scout.rt.platform-10.0.5.jar" or "org.eclipse.scout.rt.platform-10.0.5-sources.jar"
     return fileName.endsWith(".jar")
         && fileName.startsWith(moduleName + '-')

@@ -26,8 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.annotation.ExtendsAnnotation;
 import org.junit.jupiter.api.Test;
@@ -70,8 +68,8 @@ public class ExtensionFormDataTest {
       testApiOfSimpleTableFormExtensionData(dto);
 
       // verify the value of the @Extends annotation
-      ExtendsAnnotation annotation = dto.annotations().withManagedWrapper(ExtendsAnnotation.class).first().get();
-      IType originalRowData = annotation.value();
+      var annotation = dto.annotations().withManagedWrapper(ExtendsAnnotation.class).first().get();
+      var originalRowData = annotation.value();
       assertEquals("formdata.shared.services.process.SimpleTableFormData$TestTable$TestTableRowData", originalRowData.name());
     });
   }
@@ -88,24 +86,24 @@ public class ExtensionFormDataTest {
 
     // fields of SimpleTableFormExtensionData
     assertEquals(3, simpleTableFormExtensionData.fields().stream().count(), "field count of 'formdata.shared.extension.SimpleTableFormExtensionData'");
-    IField serialVersionUID = assertFieldExist(simpleTableFormExtensionData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(simpleTableFormExtensionData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
-    IField myExtension = assertFieldExist(simpleTableFormExtensionData, "myExtension");
+    var myExtension = assertFieldExist(simpleTableFormExtensionData, "myExtension");
     assertHasFlags(myExtension, 25);
     assertFieldType(myExtension, "java.lang.String");
     assertEquals(0, myExtension.annotations().stream().count(), "annotation count");
-    IField m_myExtension = assertFieldExist(simpleTableFormExtensionData, "m_myExtension");
+    var m_myExtension = assertFieldExist(simpleTableFormExtensionData, "m_myExtension");
     assertHasFlags(m_myExtension, 2);
     assertFieldType(m_myExtension, "java.math.BigDecimal");
     assertEquals(0, m_myExtension.annotations().stream().count(), "annotation count");
 
     assertEquals(2, simpleTableFormExtensionData.methods().stream().count(), "method count of 'formdata.shared.extension.SimpleTableFormExtensionData'");
-    IMethod getMyExtension = assertMethodExist(simpleTableFormExtensionData, "getMyExtension", new String[]{});
+    var getMyExtension = assertMethodExist(simpleTableFormExtensionData, "getMyExtension", new String[]{});
     assertMethodReturnType(getMyExtension, "java.math.BigDecimal");
     assertEquals(0, getMyExtension.annotations().stream().count(), "annotation count");
-    IMethod setMyExtension = assertMethodExist(simpleTableFormExtensionData, "setMyExtension", new String[]{"java.math.BigDecimal"});
+    var setMyExtension = assertMethodExist(simpleTableFormExtensionData, "setMyExtension", new String[]{"java.math.BigDecimal"});
     assertMethodReturnType(setMyExtension, "void");
     assertEquals(0, setMyExtension.annotations().stream().count(), "annotation count");
 
@@ -121,30 +119,30 @@ public class ExtensionFormDataTest {
 
     // fields of MultiColumnExtensionData
     assertEquals(5, multiColumnExtensionData.fields().stream().count(), "field count of 'MultiColumnExtensionData'");
-    IField serialVersionUID = assertFieldExist(multiColumnExtensionData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(multiColumnExtensionData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
-    IField thirdLong = assertFieldExist(multiColumnExtensionData, "thirdLong");
+    var thirdLong = assertFieldExist(multiColumnExtensionData, "thirdLong");
     assertHasFlags(thirdLong, 25);
     assertFieldType(thirdLong, String.class.getName());
-    IField fourthDouble = assertFieldExist(multiColumnExtensionData, "fourthDouble");
+    var fourthDouble = assertFieldExist(multiColumnExtensionData, "fourthDouble");
     assertHasFlags(fourthDouble, 25);
     assertFieldType(fourthDouble, String.class.getName());
-    IField m_thirdLong = assertFieldExist(multiColumnExtensionData, "m_thirdLong");
+    var m_thirdLong = assertFieldExist(multiColumnExtensionData, "m_thirdLong");
     assertHasFlags(m_thirdLong, 2);
     assertFieldType(m_thirdLong, Long.class.getName());
-    IField m_fourthDouble = assertFieldExist(multiColumnExtensionData, "m_fourthDouble");
+    var m_fourthDouble = assertFieldExist(multiColumnExtensionData, "m_fourthDouble");
     assertHasFlags(m_fourthDouble, 2);
     assertFieldType(m_fourthDouble, BigDecimal.class.getName());
 
     assertEquals(4, multiColumnExtensionData.methods().stream().count(), "method count of 'MultiColumnExtensionData'");
-    IMethod getThirdLong = assertMethodExist(multiColumnExtensionData, "getThirdLong", new String[]{});
+    var getThirdLong = assertMethodExist(multiColumnExtensionData, "getThirdLong", new String[]{});
     assertMethodReturnType(getThirdLong, Long.class.getName());
-    IMethod setThirdLong = assertMethodExist(multiColumnExtensionData, "setThirdLong", new String[]{Long.class.getName()});
+    var setThirdLong = assertMethodExist(multiColumnExtensionData, "setThirdLong", new String[]{Long.class.getName()});
     assertMethodReturnType(setThirdLong, "void");
-    IMethod getFourthDouble = assertMethodExist(multiColumnExtensionData, "getFourthDouble", new String[]{});
+    var getFourthDouble = assertMethodExist(multiColumnExtensionData, "getFourthDouble", new String[]{});
     assertMethodReturnType(getFourthDouble, BigDecimal.class.getName());
-    IMethod setFourthDouble = assertMethodExist(multiColumnExtensionData, "setFourthDouble", new String[]{BigDecimal.class.getName()});
+    var setFourthDouble = assertMethodExist(multiColumnExtensionData, "setFourthDouble", new String[]{BigDecimal.class.getName()});
     assertMethodReturnType(setFourthDouble, "void");
 
     assertEquals(0, multiColumnExtensionData.innerTypes().stream().count(), "inner types count of 'MultiColumnExtensionData'");
@@ -159,27 +157,27 @@ public class ExtensionFormDataTest {
 
     // fields of PropertyExtensionData
     assertEquals(1, propertyExtensionData.fields().stream().count(), "field count of 'PropertyExtensionData'");
-    IField serialVersionUID = assertFieldExist(propertyExtensionData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(propertyExtensionData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(3, propertyExtensionData.methods().stream().count(), "method count of 'PropertyExtensionData'");
-    IMethod getLongValue = assertMethodExist(propertyExtensionData, "getLongValue", new String[]{});
+    var getLongValue = assertMethodExist(propertyExtensionData, "getLongValue", new String[]{});
     assertMethodReturnType(getLongValue, Long.class.getName());
-    IMethod setLongValue = assertMethodExist(propertyExtensionData, "setLongValue", new String[]{Long.class.getName()});
+    var setLongValue = assertMethodExist(propertyExtensionData, "setLongValue", new String[]{Long.class.getName()});
     assertMethodReturnType(setLongValue, "void");
-    IMethod getLongValueProperty = assertMethodExist(propertyExtensionData, "getLongValueProperty", new String[]{});
+    var getLongValueProperty = assertMethodExist(propertyExtensionData, "getLongValueProperty", new String[]{});
     assertMethodReturnType(getLongValueProperty, "formdata.shared.extension.PropertyExtensionData$LongValueProperty");
 
     assertEquals(1, propertyExtensionData.innerTypes().stream().count(), "inner types count of 'PropertyExtensionData'");
     // type LongValueProperty
-    IType longValueProperty = assertTypeExists(propertyExtensionData, "LongValueProperty");
+    var longValueProperty = assertTypeExists(propertyExtensionData, "LongValueProperty");
     assertHasFlags(longValueProperty, 9);
     assertHasSuperClass(longValueProperty, "org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData<java.lang.Long>");
 
     // fields of LongValueProperty
     assertEquals(1, longValueProperty.fields().stream().count(), "field count of 'LongValueProperty'");
-    IField serialVersionUID1 = assertFieldExist(longValueProperty, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(longValueProperty, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 
@@ -197,20 +195,20 @@ public class ExtensionFormDataTest {
 
     // fields of ThirdIntegerColumnData
     assertEquals(3, thirdIntegerColumnData.fields().stream().count(), "field count of 'ThirdIntegerColumnData'");
-    IField serialVersionUID = assertFieldExist(thirdIntegerColumnData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(thirdIntegerColumnData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
-    IField thirdInteger = assertFieldExist(thirdIntegerColumnData, "thirdInteger");
+    var thirdInteger = assertFieldExist(thirdIntegerColumnData, "thirdInteger");
     assertHasFlags(thirdInteger, 25);
     assertFieldType(thirdInteger, String.class.getName());
-    IField m_thirdInteger = assertFieldExist(thirdIntegerColumnData, "m_thirdInteger");
+    var m_thirdInteger = assertFieldExist(thirdIntegerColumnData, "m_thirdInteger");
     assertHasFlags(m_thirdInteger, 2);
     assertFieldType(m_thirdInteger, Integer.class.getName());
 
     assertEquals(2, thirdIntegerColumnData.methods().stream().count(), "method count of 'ThirdIntegerColumnData'");
-    IMethod getThirdInteger = assertMethodExist(thirdIntegerColumnData, "getThirdInteger", new String[]{});
+    var getThirdInteger = assertMethodExist(thirdIntegerColumnData, "getThirdInteger", new String[]{});
     assertMethodReturnType(getThirdInteger, Integer.class.getName());
-    IMethod setThirdInteger = assertMethodExist(thirdIntegerColumnData, "setThirdInteger", new String[]{Integer.class.getName()});
+    var setThirdInteger = assertMethodExist(thirdIntegerColumnData, "setThirdInteger", new String[]{Integer.class.getName()});
     assertMethodReturnType(setThirdInteger, "void");
 
     assertEquals(0, thirdIntegerColumnData.innerTypes().stream().count(), "inner types count of 'ThirdIntegerColumnData'");
@@ -225,25 +223,25 @@ public class ExtensionFormDataTest {
 
     // fields of MultipleExtGroupBoxExtensionData
     assertEquals(1, multipleExtGroupBoxExtensionData.fields().stream().count(), "field count of 'MultipleExtGroupBoxExtensionData'");
-    IField serialVersionUID = assertFieldExist(multipleExtGroupBoxExtensionData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(multipleExtGroupBoxExtensionData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(2, multipleExtGroupBoxExtensionData.methods().stream().count(), "method count of 'MultipleExtGroupBoxExtensionData'");
-    IMethod getSecondDouble = assertMethodExist(multipleExtGroupBoxExtensionData, "getSecondDouble", new String[]{});
+    var getSecondDouble = assertMethodExist(multipleExtGroupBoxExtensionData, "getSecondDouble", new String[]{});
     assertMethodReturnType(getSecondDouble, "formdata.shared.extension.MultipleExtGroupBoxExtensionData$SecondDouble");
-    IMethod getThirdDate = assertMethodExist(multipleExtGroupBoxExtensionData, "getThirdDate", new String[]{});
+    var getThirdDate = assertMethodExist(multipleExtGroupBoxExtensionData, "getThirdDate", new String[]{});
     assertMethodReturnType(getThirdDate, "formdata.shared.extension.MultipleExtGroupBoxExtensionData$ThirdDate");
 
     assertEquals(2, multipleExtGroupBoxExtensionData.innerTypes().stream().count(), "inner types count of 'MultipleExtGroupBoxExtensionData'");
     // type SecondDouble
-    IType secondDouble = assertTypeExists(multipleExtGroupBoxExtensionData, "SecondDouble");
+    var secondDouble = assertTypeExists(multipleExtGroupBoxExtensionData, "SecondDouble");
     assertHasFlags(secondDouble, 9);
     assertHasSuperClass(secondDouble, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.math.BigDecimal>");
 
     // fields of SecondDouble
     assertEquals(1, secondDouble.fields().stream().count(), "field count of 'SecondDouble'");
-    IField serialVersionUID1 = assertFieldExist(secondDouble, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(secondDouble, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 
@@ -251,13 +249,13 @@ public class ExtensionFormDataTest {
 
     assertEquals(0, secondDouble.innerTypes().stream().count(), "inner types count of 'SecondDouble'");
     // type ThirdDate
-    IType thirdDate = assertTypeExists(multipleExtGroupBoxExtensionData, "ThirdDate");
+    var thirdDate = assertTypeExists(multipleExtGroupBoxExtensionData, "ThirdDate");
     assertHasFlags(thirdDate, 9);
     assertHasSuperClass(thirdDate, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.util.Date>");
 
     // fields of ThirdDate
     assertEquals(1, thirdDate.fields().stream().count(), "field count of 'ThirdDate'");
-    IField serialVersionUID2 = assertFieldExist(thirdDate, "serialVersionUID");
+    var serialVersionUID2 = assertFieldExist(thirdDate, "serialVersionUID");
     assertHasFlags(serialVersionUID2, 26);
     assertFieldType(serialVersionUID2, "long");
 

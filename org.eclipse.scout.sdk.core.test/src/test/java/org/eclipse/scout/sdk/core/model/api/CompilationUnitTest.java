@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
@@ -32,11 +31,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class CompilationUnitTest {
   @Test
   public void testIcu(IJavaEnvironment env) {
-    ICompilationUnit baseClassIcu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
+    var baseClassIcu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
     assertEquals(BaseClass.class.getName(), baseClassIcu.requireMainType().name());
     assertEquals(BaseClass.class.getSimpleName() + JavaTypes.JAVA_FILE_SUFFIX, baseClassIcu.toWorkingCopy().fileName().get());
 
-    IImport firstImport = baseClassIcu.imports().findAny().get();
+    var firstImport = baseClassIcu.imports().findAny().get();
     assertEquals("import java.io.FileNotFoundException;", firstImport.toWorkingCopy().toSource(identity(), new BuilderContext()).toString());
     assertEquals("package org.eclipse.scout.sdk.core.fixture;", baseClassIcu.containingPackage().toWorkingCopy().toSource(identity(), new BuilderContext()).toString());
 
@@ -50,8 +49,8 @@ public class CompilationUnitTest {
 
   @Test
   public void testFindTypeBySimpleName(IJavaEnvironment env) {
-    ICompilationUnit baseClassIcu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
-    Optional<IType> sdkLong = baseClassIcu.resolveTypeBySimpleName(Long.class.getSimpleName());
+    var baseClassIcu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
+    var sdkLong = baseClassIcu.resolveTypeBySimpleName(Long.class.getSimpleName());
 
     assertTrue(sdkLong.isPresent());
     assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), sdkLong.get().name());
@@ -59,7 +58,7 @@ public class CompilationUnitTest {
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    ICompilationUnit baseClassIcu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
+    var baseClassIcu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
     assertEquals(BaseClass.class.getName() + JavaTypes.JAVA_FILE_SUFFIX, baseClassIcu.toString());
   }
 }

@@ -21,8 +21,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -50,19 +48,19 @@ public class AnnotationCopyTest {
 
     // fields of AnnotationCopyTestFormData
     assertEquals(1, annotationCopyTestFormData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'");
-    IField serialVersionUID = assertFieldExist(annotationCopyTestFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(annotationCopyTestFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, annotationCopyTestFormData.methods().stream().count(), "method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'");
-    IMethod getFirst = assertMethodExist(annotationCopyTestFormData, "getFirst", new String[]{});
+    var getFirst = assertMethodExist(annotationCopyTestFormData, "getFirst", new String[]{});
     assertMethodReturnType(getFirst, "formdata.shared.ui.forms.AnnotationCopyTestFormData$First");
     assertEquals(0, getFirst.annotations().stream().count(), "annotation count");
 
     assertEquals(1, annotationCopyTestFormData.innerTypes().stream().count(), "inner types count of 'AnnotationCopyTestFormData'");
     // type First
-    IType first = assertTypeExists(annotationCopyTestFormData, "First");
+    var first = assertTypeExists(annotationCopyTestFormData, "First");
     assertHasFlags(first, 9);
     assertHasSuperClass(first, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.String>");
     assertEquals(1, first.annotations().stream().count(), "annotation count");
@@ -70,7 +68,7 @@ public class AnnotationCopyTest {
 
     // fields of First
     assertEquals(1, first.fields().stream().count(), "field count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData$First'");
-    IField serialVersionUID1 = assertFieldExist(first, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(first, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");

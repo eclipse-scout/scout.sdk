@@ -10,15 +10,9 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi.AbstractNumberField;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
@@ -35,7 +29,7 @@ public class AstLongFieldBuilder extends AstTypeBuilder<AstLongFieldBuilder> {
   @Override
   public AstLongFieldBuilder insert() {
     super.insert();
-    AbstractNumberField abstractNumberFieldApi = getFactory().getScoutApi().AbstractNumberField();
+    var abstractNumberFieldApi = getFactory().getScoutApi().AbstractNumberField();
     addGetConfigured(abstractNumberFieldApi.getConfiguredMinValueMethodName(), "-999999999999L", AstNodeFactory.MIN_GROUP, get());
     addGetConfigured(abstractNumberFieldApi.getConfiguredMaxValueMethodName(), "999999999999L", AstNodeFactory.MAX_GROUP, get());
     return this;
@@ -43,14 +37,14 @@ public class AstLongFieldBuilder extends AstTypeBuilder<AstLongFieldBuilder> {
 
   @SuppressWarnings("unchecked")
   protected void addGetConfigured(String name, String value, String group, TypeDeclaration newFormField) {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
 
-    Type longType = getFactory().newTypeReference(JavaTypes.Long);
-    NumberLiteral literal = ast.newNumberLiteral(value);
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var longType = getFactory().newTypeReference(JavaTypes.Long);
+    var literal = ast.newNumberLiteral(value);
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(literal);
 
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
     getFactory().newMethod(name)
@@ -62,7 +56,7 @@ public class AstLongFieldBuilder extends AstTypeBuilder<AstLongFieldBuilder> {
         .insert();
 
     // linked positions
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       ITrackedNodePosition literalTracker = new WrappedTrackedNodePosition(getFactory().getRewrite().track(literal), 0, -1);
       links.addLinkedPosition(literalTracker, true, group);

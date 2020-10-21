@@ -43,7 +43,7 @@ public class ImportCollector implements IImportCollector {
   }
 
   protected static void addFiltered(Iterable<ImportElement> elements, boolean includeExisting, Collection<ImportElement> collector) {
-    for (ImportElement e : elements) {
+    for (var e : elements) {
       if (!includeExisting && e.m_fromExisting) {
         continue;
       }
@@ -66,9 +66,9 @@ public class ImportCollector implements IImportCollector {
     addFiltered(unsortedList1, includeExisting, workList);
     addFiltered(unsortedList2, includeExisting, workList);
 
-    int lastGroup = -1;
+    var lastGroup = -1;
     Collection<StringBuilder> result = new ArrayList<>(workList.size() + 7 /* max number of empty group lines */);
-    for (ImportElement e : workList) {
+    for (var e : workList) {
       if (lastGroup > 0 && lastGroup != e.m_group) {
         // add empty lines for import grouping
         result.add(new StringBuilder(0));
@@ -100,7 +100,7 @@ public class ImportCollector implements IImportCollector {
   }
 
   protected String registerElementInternal(TypeReferenceDescriptor cand, boolean markAsUsed) {
-    ImportElement elem = m_imports.get(cand.getSimpleName());
+    var elem = m_imports.get(cand.getSimpleName());
     if (elem == null) {
       m_imports.put(cand.getSimpleName(), new ImportElement(false, cand.getQualifier(), cand.getSimpleName(), markAsUsed, false));
     }
@@ -117,7 +117,7 @@ public class ImportCollector implements IImportCollector {
       return cand.getSimpleName();
     }
 
-    ImportElement existingElem = m_imports.get(cand.getSimpleName());
+    var existingElem = m_imports.get(cand.getSimpleName());
     if (existingElem != null && Objects.equals(existingElem.m_packageName, cand.getQualifier())) {
       // already used with same package -> simple name possible
       if (existingElem.m_used) {
@@ -145,8 +145,8 @@ public class ImportCollector implements IImportCollector {
   }
 
   public void addImport(CharSequence fqn, boolean fromExisting) {
-    String packageName = JavaTypes.qualifier(fqn);
-    String simpleName = JavaTypes.simpleName(fqn);
+    var packageName = JavaTypes.qualifier(fqn);
+    var simpleName = JavaTypes.simpleName(fqn);
     m_imports.put(simpleName, new ImportElement(false, packageName, simpleName, true, fromExisting));
   }
 
@@ -156,8 +156,8 @@ public class ImportCollector implements IImportCollector {
   }
 
   protected void addStaticImport(CharSequence fqn, boolean fromExisting) {
-    String packageName = JavaTypes.qualifier(fqn);
-    String simpleName = JavaTypes.simpleName(fqn);
+    var packageName = JavaTypes.qualifier(fqn);
+    var simpleName = JavaTypes.simpleName(fqn);
     m_staticImports.put(simpleName, new ImportElement(true, packageName, simpleName, true, fromExisting));
   }
 
@@ -233,10 +233,10 @@ public class ImportCollector implements IImportCollector {
   }
 
   public static StringBuilder createImportDeclaration(boolean isStatic, CharSequence fullImportExpr) {
-    String importPart = "import ";
-    String staticPart = "static ";
+    var importPart = "import ";
+    var staticPart = "static ";
 
-    StringBuilder b = new StringBuilder(importPart.length() + staticPart.length() + fullImportExpr.length() + 1);
+    var b = new StringBuilder(importPart.length() + staticPart.length() + fullImportExpr.length() + 1);
     b.append(importPart);
     if (isStatic) {
       b.append(staticPart);
@@ -252,7 +252,7 @@ public class ImportCollector implements IImportCollector {
 
     @Override
     public int compare(ImportElement e1, ImportElement e2) {
-      int result = Integer.compare(e1.m_group, e2.m_group);
+      var result = Integer.compare(e1.m_group, e2.m_group);
       if (result != 0) {
         return result;
       }

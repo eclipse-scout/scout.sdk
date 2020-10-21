@@ -21,45 +21,96 @@ import java.util.function.Consumer;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
 
+/**
+ * Implements an unbound buffer that buffers elements until there are no new elements being submitted for a certain time
+ * ({@link #silentTime()}). When the silent time elapses without a new element being submitted, all buffered elements
+ * are asynchronously executed by a processor. Elements that have been handed over to the processor are removed from the
+ * buffer.
+ * 
+ * @param <T>
+ *          The type of buffered elements
+ */
 public class DelayedBuffer<T> {
 
-  private final long m_delay;
-  private final TimeUnit m_unit;
-  private final ScheduledExecutorService m_executor;
+  private final long m_silentTime;
+  private final TimeUnit m_silentTimeUnit;
+  private final ScheduledExecutorService m_executorService;
   private final boolean m_allowParallelProcessing;
   private final Consumer<List<T>> m_processor;
   private final List<T> m_buffer;
   private final Object m_workLock;
   private ScheduledFuture<?> m_future;
 
-  public DelayedBuffer(long delay, TimeUnit unit, ScheduledExecutorService executor, boolean allowParallelProcessing, Consumer<List<T>> processor) {
-    m_delay = delay;
-    m_unit = Ensure.notNull(unit);
-    m_executor = Ensure.notNull(executor);
+  /**
+   * Creates a new {@link DelayedBuffer}.
+   * 
+   * @param silentTime
+   *          If there are no events for this time, the buffered events are asynchronously executed by the given
+   *          processor.
+   * @param silentTimeUnit
+   *          The {@link TimeUnit} of the silentTime. Must not be {@code null}.
+   * @param executorService
+   *          The {@link ScheduledExecutorService} to use to asynchronously execute the given processor. Must not be
+   *          {@code null}.
+   * @param allowParallelProcessing
+   *          Specifies if only one processor may run at the same time or if they may run in parallel.
+   * @param processor
+   *          The processor to handle the buffered events once the silentTime elapsed without new elements being
+   *          submitted. Must not be {@code null}.
+   */
+  public DelayedBuffer(long silentTime, TimeUnit silentTimeUnit, ScheduledExecutorService executorService, boolean allowParallelProcessing, Consumer<List<T>> processor) {
+    m_silentTime = silentTime;
+    m_silentTimeUnit = Ensure.notNull(silentTimeUnit);
+    m_executorService = Ensure.notNull(executorService);
     m_allowParallelProcessing = allowParallelProcessing;
     m_processor = Ensure.notNull(processor);
     m_workLock = new Object();
     m_buffer = new ArrayList<>();
   }
 
+  /**
+   * Submits a new element to this buffer.
+   * 
+   * @param element
+   *          The new element. May be {@code null}. In that case the {@link #processor()} must be able to handle
+   *          {@code null} elements.
+   */
   public void submit(T element) {
     synchronized (m_buffer) {
-      registerElement(element);
       cancelExistingFuture();
+      registerElement(element);
       scheduleNewProcessing();
     }
   }
 
+  /**
+   * Waits until the ones that are in the buffer at the moment of the invocation of this method are all processed.<br>
+   * It does not wait for elements to be processed that are submitted after the call to this method.
+   * 
+   * @param timeout
+   *          The wait timeout.
+   * @param unit
+   *          The {@link TimeUnit} of the wait timeout.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting
+   * @throws ExecutionException
+   *           if the processor threw an exception
+   * @throws TimeoutException
+   *           if the wait timed out
+   */
   public void awaitAllProcessed(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-    ScheduledFuture<?> current = m_future;
+    var current = m_future;
     if (current == null) {
       return;
     }
     current.get(timeout, unit);
   }
 
+  /**
+   * Asynchronously executed in a worker of {@link #executorService()}.
+   */
   void processElements() {
-    List<T> myWork = getMyWork();
+    var myWork = getMyWork();
     if (myWork.isEmpty()) {
       return;
     }
@@ -85,11 +136,11 @@ public class DelayedBuffer<T> {
   }
 
   void registerElement(T element) {
-    m_buffer.add(Ensure.notNull(element));
+    m_buffer.add(element);
   }
 
   void cancelExistingFuture() {
-    ScheduledFuture<?> current = m_future;
+    var current = m_future;
     if (current == null) {
       return;
     }
@@ -100,26 +151,44 @@ public class DelayedBuffer<T> {
   }
 
   void scheduleNewProcessing() {
-    m_future = executor().schedule(this::processElements, delay(), delayUnit());
+    m_future = executorService().schedule(this::processElements, silentTime(), silentTimeUnit());
   }
 
+  /**
+   * @return {@code true} if the {@link #processor()} may be executed in parallel.
+   */
   public boolean isAllowParallelProcessing() {
     return m_allowParallelProcessing;
   }
 
+  /**
+   * @return The {@link Consumer} that processes the buffered events once the {@link #silentTime()} elapsed. Never
+   *         returns {@code null}.
+   */
   public Consumer<List<T>> processor() {
     return m_processor;
   }
 
-  public long delay() {
-    return m_delay;
+  /**
+   * @return The time that needs to elapse without a new element being submitted so that the {@link #processor()} is
+   *         executed for the buffered elements.
+   */
+  public long silentTime() {
+    return m_silentTime;
   }
 
-  public TimeUnit delayUnit() {
-    return m_unit;
+  /**
+   * @return The {@link TimeUnit} of {@link #silentTime()}. Never returns {@code null}.
+   */
+  public TimeUnit silentTimeUnit() {
+    return m_silentTimeUnit;
   }
 
-  public ScheduledExecutorService executor() {
-    return m_executor;
+  /**
+   * @return The {@link ScheduledExecutorService} that is used to asynchronously execute the {@link #processor()}. Never
+   *         returns {@code null}.
+   */
+  public ScheduledExecutorService executorService() {
+    return m_executorService;
   }
 }

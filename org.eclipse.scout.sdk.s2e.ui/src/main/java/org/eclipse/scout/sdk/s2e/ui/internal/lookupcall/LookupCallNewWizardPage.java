@@ -12,9 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.lookupcall;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -24,12 +22,10 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.ILookupService;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
@@ -43,7 +39,6 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicAbstractPrimaryTypeFilter;
 import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -93,11 +88,11 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
     m_provider = EclipseEnvironment.createUnsafe(env -> getControl().addDisposeListener(e -> env.close()));
 
     // change the filter for the super types to also include the LookupCall class as proposal (which is not abstract and would be excluded otherwise)
-    StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
+    var superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
     superTypeContentProvider.setTypeProposalFilter(new PublicAbstractPrimaryTypeFilter() {
       @Override
       public boolean test(IType candidate) {
-        String lookupCallFqn = scoutApi().map(IScoutApi::LookupCall).map(IClassNameSupplier::fqn).orElse(null);
+        var lookupCallFqn = scoutApi().map(IScoutApi::LookupCall).map(IClassNameSupplier::fqn).orElse(null);
         return JdtUtils.exists(candidate) && (candidate.getFullyQualifiedName().equals(lookupCallFqn) || super.test(candidate));
       }
     });
@@ -117,7 +112,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
   }
 
   protected void createLookupCallPropertiesGroup(Composite p) {
-    Group parent = FieldToolkit.createGroupBox(p, "Lookup Service");
+    var parent = FieldToolkit.createGroupBox(p, "Lookup Service");
 
     // server source folder
     m_serverSourceFolder = FieldToolkit.createSourceFolderField(parent, "Server Source Folder", ScoutTier.Server, getLabelWidth());
@@ -128,7 +123,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
     });
 
     // Lookup Service Super Type
-    IType superType = calcServiceImplSuperTypeDefault();
+    var superType = calcServiceImplSuperTypeDefault();
     if (JdtUtils.exists(superType)) {
       setServiceImplSuperTypeInternal(superType);
     }
@@ -200,7 +195,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
   }
 
   protected void guessServerFolders() {
-    IPackageFragmentRoot sharedSourceFolder = getSourceFolder();
+    var sharedSourceFolder = getSourceFolder();
     if (!JdtUtils.exists(sharedSourceFolder)) {
       return;
     }
@@ -213,7 +208,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
       return;
     }
     m_lookupServiceSuperTypeField.setEnabled(JdtUtils.exists(getServerJavaProject()));
-    StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) m_lookupServiceSuperTypeField.getContentProvider();
+    var superTypeContentProvider = (StrictHierarchyTypeContentProvider) m_lookupServiceSuperTypeField.getContentProvider();
     superTypeContentProvider.setJavaProject(getServerJavaProject());
     m_lookupServiceSuperTypeField.acceptProposal(getServiceImplSuperType(), true, true);
     if (m_lookupServiceSuperTypeField.getSelectedProposal() == null) {
@@ -237,17 +232,17 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
   }
 
   protected void syncKeyTypeFieldToSuperType() {
-    IType superType = getSuperType();
+    var superType = getSuperType();
     if (!JdtUtils.exists(superType)) {
       m_keyTypeField.setEnabled(false);
     }
     else {
-      List<ITypeParameter> typeParameters = m_provider.toScoutType(superType).typeParameters().collect(toList());
-      boolean typeParamAvailable = !typeParameters.isEmpty();
+      var typeParameters = m_provider.toScoutType(superType).typeParameters().collect(toList());
+      var typeParamAvailable = !typeParameters.isEmpty();
       m_keyTypeField.setEnabled(typeParamAvailable);
       if (typeParamAvailable) {
-        List<org.eclipse.scout.sdk.core.model.api.IType> bounds = typeParameters.get(0).bounds().collect(toList());
-        StrictHierarchyTypeContentProvider typeContentProvider = (StrictHierarchyTypeContentProvider) m_keyTypeField.getContentProvider();
+        var bounds = typeParameters.get(0).bounds().collect(toList());
+        var typeContentProvider = (StrictHierarchyTypeContentProvider) m_keyTypeField.getContentProvider();
         if (bounds.isEmpty()) {
           typeContentProvider.setBaseClassFqn(null);
         }
@@ -290,24 +285,24 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
 
   protected IStatus getStatusLookupServiceSuperTypeField() {
     // check if key type and service super type argument are compatible
-    IType serviceImplSuperType = getServiceImplSuperType();
+    var serviceImplSuperType = getServiceImplSuperType();
     if (!JdtUtils.exists(serviceImplSuperType) || !JdtUtils.exists(getKeyType())) {
       return Status.OK_STATUS;
     }
 
-    org.eclipse.scout.sdk.core.model.api.IType scoutSuperType = m_provider.toScoutType(serviceImplSuperType);
-    ILookupService iLookupService = scoutApi().get().ILookupService();
-    Optional<Stream<org.eclipse.scout.sdk.core.model.api.IType>> superClassKeyValue = scoutSuperType.resolveTypeParamValue(iLookupService.keyTypeTypeParamIndex(), iLookupService.fqn());
+    var scoutSuperType = m_provider.toScoutType(serviceImplSuperType);
+    var iLookupService = scoutApi().get().ILookupService();
+    var superClassKeyValue = scoutSuperType.resolveTypeParamValue(iLookupService.keyTypeTypeParamIndex(), iLookupService.fqn());
     if (superClassKeyValue.isEmpty()) {
       return Status.OK_STATUS;
     }
 
-    Optional<org.eclipse.scout.sdk.core.model.api.IType> bound = superClassKeyValue.get().findFirst();
+    var bound = superClassKeyValue.get().findFirst();
     if (bound.isEmpty() || Object.class.getName().equals(bound.get().name())) {
       return Status.OK_STATUS;
     }
 
-    org.eclipse.scout.sdk.core.model.api.IType keyType = m_provider.toScoutType(getKeyType());
+    var keyType = m_provider.toScoutType(getKeyType());
     if (bound.get().isAssignableFrom(keyType)) {
       return Status.OK_STATUS;
     }
@@ -339,7 +334,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
 
   public void setServiceImplSuperTypeBaseClass(String className) {
     setPropertyWithChangingControl(m_lookupServiceSuperTypeField, () -> setServiceImplSuperTypeBaseClassInternal(className), field -> {
-      StrictHierarchyTypeContentProvider superTypeContentProvider = (StrictHierarchyTypeContentProvider) m_lookupServiceSuperTypeField.getContentProvider();
+      var superTypeContentProvider = (StrictHierarchyTypeContentProvider) m_lookupServiceSuperTypeField.getContentProvider();
       superTypeContentProvider.setBaseClassFqn(className);
       field.acceptProposal(calcServiceImplSuperTypeDefault());
     });

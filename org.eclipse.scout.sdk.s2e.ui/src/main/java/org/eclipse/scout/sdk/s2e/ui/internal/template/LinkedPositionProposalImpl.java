@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.text.edits.MalformedTreeException;
-import org.eclipse.text.edits.TextEdit;
 
 class LinkedPositionProposalImpl implements ICompletionProposalExtension2, IJavaCompletionProposal {
 
@@ -40,14 +39,14 @@ class LinkedPositionProposalImpl implements ICompletionProposalExtension2, IJava
 
   @Override
   public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
-    IDocument doc = viewer.getDocument();
-    LinkedPosition position = m_linkedPositionModel.findPosition(new LinkedPosition(doc, offset, 0));
+    var doc = viewer.getDocument();
+    var position = m_linkedPositionModel.findPosition(new LinkedPosition(doc, offset, 0));
     if (position == null) {
       return;
     }
 
     try {
-      TextEdit edit = m_proposal.computeEdits(offset, position, trigger, stateMask, m_linkedPositionModel);
+      var edit = m_proposal.computeEdits(offset, position, trigger, stateMask, m_linkedPositionModel);
       if (edit != null) {
         edit.apply(position.getDocument(), 0);
       }
@@ -108,21 +107,21 @@ class LinkedPositionProposalImpl implements ICompletionProposalExtension2, IJava
   @Override
   public boolean validate(IDocument document, int offset, DocumentEvent event) {
     // ignore event
-    String insert = getDisplayString();
+    var insert = getDisplayString();
 
     int off;
-    LinkedPosition pos = m_linkedPositionModel.findPosition(new LinkedPosition(document, offset, 0));
+    var pos = m_linkedPositionModel.findPosition(new LinkedPosition(document, offset, 0));
     if (pos != null) {
       off = pos.getOffset();
     }
     else {
       off = Math.max(0, offset - insert.length());
     }
-    int length = offset - off;
+    var length = offset - off;
 
     if (offset <= document.getLength()) {
       try {
-        String content = document.get(off, length);
+        var content = document.get(off, length);
         if (insert.startsWith(content)) {
           return true;
         }

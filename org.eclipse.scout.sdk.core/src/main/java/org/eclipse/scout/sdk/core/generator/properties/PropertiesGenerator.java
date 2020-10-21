@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -90,7 +89,7 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
    * @throws IOException
    */
   public static PropertiesGenerator create(InputStream in) throws IOException {
-    PropertiesGenerator result = new PropertiesGenerator(null, null);
+    var result = new PropertiesGenerator(null, null);
     result.load(in);
     return result;
   }
@@ -114,8 +113,8 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
    * @throws IOException
    */
   public PropertiesGenerator load(InputStream input) throws IOException {
-    char[] content = toCharArray(fromInputStream(input, ENCODING));
-    try (BufferedReader reader = new BufferedReader(new CharArrayReader(content))) {
+    var content = toCharArray(fromInputStream(input, ENCODING));
+    try (var reader = new BufferedReader(new CharArrayReader(content))) {
       readHeaderLines(reader);
     }
     try (Reader reader = new CharArrayReader(content)) {
@@ -147,12 +146,12 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
   }
 
   protected Stream<String> getAsPropertiesEncodedLines() {
-    Properties prop = new Properties();
+    var prop = new Properties();
     //noinspection UseOfPropertiesAsHashtable
     prop.putAll(m_properties);
 
     String content;
-    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+    try (var out = new ByteArrayOutputStream()) {
       prop.store(out, null);
       content = out.toString(ENCODING.name());
     }
@@ -172,7 +171,7 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
     String line;
     m_headerLines.clear();
     while ((line = reader.readLine()) != null) {
-      String naturalLine = line.trim();
+      var naturalLine = line.trim();
       if (naturalLine.isEmpty()) {
         m_headerLines.add(line);
       }
@@ -186,12 +185,12 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
   }
 
   private void readProperties(Reader reader) throws IOException {
-    Properties props = new Properties();
+    var props = new Properties();
     props.load(reader);
     m_properties.clear();
-    for (Entry<Object, Object> entry : props.entrySet()) {
-      Object key = entry.getKey();
-      Object value = entry.getValue();
+    for (var entry : props.entrySet()) {
+      var key = entry.getKey();
+      var value = entry.getValue();
       if (key instanceof String && value instanceof String) {
         m_properties.put((String) key, (String) value);
       }
@@ -206,7 +205,7 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PropertiesGenerator that = (PropertiesGenerator) o;
+    var that = (PropertiesGenerator) o;
     return m_properties.equals(that.m_properties) &&
         m_headerLines.equals(that.m_headerLines);
   }

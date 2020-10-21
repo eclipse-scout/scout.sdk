@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 
 /**
@@ -34,7 +33,7 @@ public class AstTreeFieldBuilder extends AstTypeBuilder<AstTreeFieldBuilder> {
         .insert();
 
     // inner calendar
-    Type treeSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractTree().fqn());
+    var treeSuperType = getFactory().newTypeReference(getFactory().getScoutApi().AbstractTree().fqn());
     getFactory().newType(ISdkConstants.INNER_TREE_TYPE_NAME)
         .withCalculatedOrder(false)
         .withModifiers(ModifierKeyword.PUBLIC_KEYWORD)
@@ -47,7 +46,7 @@ public class AstTreeFieldBuilder extends AstTypeBuilder<AstTreeFieldBuilder> {
         .in(get())
         .insert();
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().ITreeField().fqn());
     }

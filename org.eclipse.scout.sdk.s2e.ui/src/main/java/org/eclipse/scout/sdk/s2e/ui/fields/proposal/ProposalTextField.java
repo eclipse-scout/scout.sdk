@@ -10,12 +10,13 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.fields.proposal;
 
+import static java.util.function.Predicate.isEqual;
+
 import java.util.Collection;
 import java.util.Objects;
 
 import javax.swing.event.EventListenerList;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -36,7 +37,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 /**
@@ -96,7 +96,7 @@ public class ProposalTextField extends TextField {
    */
   protected void setInput(Object input) {
     m_input = input;
-    SearchPatternInput searchPatternInput = new SearchPatternInput(input, getText());
+    var searchPatternInput = new SearchPatternInput(input, getText());
     m_popup.setInput(searchPatternInput);
   }
 
@@ -190,10 +190,10 @@ public class ProposalTextField extends TextField {
     attachProposalListener(getTextComponent());
 
     // layout
-    FormData textData = (FormData) text.getLayoutData();
+    var textData = (FormData) text.getLayoutData();
     textData.right = new FormAttachment(m_popupButton, -2);
 
-    FormData buttonData = new FormData(22, 22);
+    var buttonData = new FormData(22, 22);
     buttonData.top = new FormAttachment(0, 0);
     buttonData.right = new FormAttachment(100, 0);
     m_popupButton.setLayoutData(buttonData);
@@ -214,7 +214,7 @@ public class ProposalTextField extends TextField {
   }
 
   protected void notifyAcceptProposal(Object proposal) {
-    for (IProposalListener l : m_eventListeners.getListeners(IProposalListener.class)) {
+    for (var l : m_eventListeners.getListeners(IProposalListener.class)) {
       l.proposalAccepted(proposal);
     }
   }
@@ -278,8 +278,8 @@ public class ProposalTextField extends TextField {
   }
 
   protected boolean isProposalPresent(Object proposal) {
-    IProposalContentProvider contentProvider = m_popup.getContentProvider(); // the real provider, no async loading here
-    IProgressMonitor monitor = Job.getJobManager().createProgressGroup();
+    var contentProvider = m_popup.getContentProvider(); // the real provider, no async loading here
+    var monitor = Job.getJobManager().createProgressGroup();
     Collection<Object> proposals;
     try {
       proposals = contentProvider.getProposals(NormalizedPattern.build(null), monitor);
@@ -292,12 +292,7 @@ public class ProposalTextField extends TextField {
       return false;
     }
 
-    for (Object o : proposals) {
-      if (Objects.equals(o, proposal)) {
-        return true;
-      }
-    }
-    return false;
+    return proposals.stream().anyMatch(isEqual(proposal));
   }
 
   private synchronized void acceptProposalInternal(Object proposal, boolean closeProposalPopup) {
@@ -350,7 +345,7 @@ public class ProposalTextField extends TextField {
 
   @Override
   public boolean getEditable() {
-    boolean editable = super.getEditable();
+    var editable = super.getEditable();
     if (m_popupButton != null && !m_popupButton.isDisposed()) {
       editable = editable && m_popupButton.getEnabled();
     }
@@ -359,7 +354,7 @@ public class ProposalTextField extends TextField {
 
   @Override
   public boolean isEditable() {
-    boolean editable = super.isEditable();
+    var editable = super.isEditable();
     if (m_popupButton != null && !m_popupButton.isDisposed()) {
       editable = editable && m_popupButton.getEnabled();
     }
@@ -376,7 +371,7 @@ public class ProposalTextField extends TextField {
 
   @Override
   public boolean getEnabled() {
-    boolean enabled = super.getEnabled();
+    var enabled = super.getEnabled();
     if (m_popupButton != null && !m_popupButton.isDisposed()) {
       enabled = enabled && m_popupButton.getEnabled();
     }
@@ -385,7 +380,7 @@ public class ProposalTextField extends TextField {
 
   @Override
   public boolean isEnabled() {
-    boolean enabled = super.isEnabled();
+    var enabled = super.isEnabled();
     if (m_popupButton != null && !m_popupButton.isDisposed()) {
       enabled = enabled && m_popupButton.getEnabled();
     }
@@ -402,8 +397,8 @@ public class ProposalTextField extends TextField {
   }
 
   private synchronized void updateProposals() {
-    String pattern = getText();
-    int index = getSelection().x;
+    var pattern = getText();
+    var index = getSelection().x;
     if (index >= 0 && index < pattern.length()) {
       pattern = pattern.substring(0, index);
     }
@@ -418,7 +413,7 @@ public class ProposalTextField extends TextField {
       if (m_popup.isFocusOwner()) {
         return true;
       }
-      Shell[] shells = m_popup.getShell().getShells();
+      var shells = m_popup.getShell().getShells();
       if ((shells != null && shells.length > 0)) {
         return true;
       }
@@ -503,8 +498,8 @@ public class ProposalTextField extends TextField {
               return;
             }
             if (!isProposalFieldFocusOwner() && !isDisposed()) {
-              String text = getText();
-              String input = "";
+              var text = getText();
+              var input = "";
               if (m_selectedProposal != null) {
                 input = m_popup.getText(m_selectedProposal);
               }
@@ -562,12 +557,12 @@ public class ProposalTextField extends TextField {
         case ProposalPopupEvent.TYPE_PROPOSAL_ACCEPTED:
           try {
             m_focusLock.acquire();
-            Boolean moveFocusProp = (Boolean) event.getData(ProposalPopupEvent.IDENTIFIER_MOVE_FOCUS);
-            boolean moveFocus = moveFocusProp != null && moveFocusProp;
+            var moveFocusProp = (Boolean) event.getData(ProposalPopupEvent.IDENTIFIER_MOVE_FOCUS);
+            var moveFocus = moveFocusProp != null && moveFocusProp;
             acceptProposalInternal(event.getData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL), moveFocus);
             if (moveFocus && !isDisposed()) {
               // only move to the next field, if the current field is not the last
-              Control[] siblings = getParent().getChildren();
+              var siblings = getParent().getChildren();
               if (siblings[siblings.length - 1] != ProposalTextField.this) {
                 getTextComponent().traverse(SWT.TRAVERSE_TAB_NEXT);
               }

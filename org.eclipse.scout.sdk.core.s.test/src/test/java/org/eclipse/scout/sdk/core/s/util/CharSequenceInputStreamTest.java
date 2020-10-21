@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +38,7 @@ public class CharSequenceInputStreamTest {
   private static final String TEST_STRING = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
 
   static {
-    StringBuilder buffer = new StringBuilder();
+    var buffer = new StringBuilder();
     buffer.append(TEST_STRING.repeat(100));
     LARGE_TEST_STRING = buffer.toString();
   }
@@ -55,14 +56,14 @@ public class CharSequenceInputStreamTest {
   }
 
   private void testBufferedRead(String testString, String charsetName) throws IOException {
-    byte[] expected = testString.getBytes(charsetName);
+    var expected = testString.getBytes(charsetName);
     try (InputStream in = new CharSequenceInputStream(testString, charsetName, 512)) {
-      byte[] buffer = new byte[128];
-      int offset = 0;
+      var buffer = new byte[128];
+      var offset = 0;
       while (true) {
-        int bufferOffset = m_random.nextInt(64);
-        int bufferLength = m_random.nextInt(64);
-        int read = in.read(buffer, bufferOffset, bufferLength);
+        var bufferOffset = m_random.nextInt(64);
+        var bufferLength = m_random.nextInt(64);
+        var read = in.read(buffer, bufferOffset, bufferLength);
         if (read == -1) {
           assertEquals(expected.length, offset, "EOF: offset should equal length for charset " + charsetName);
           break;
@@ -81,7 +82,7 @@ public class CharSequenceInputStreamTest {
 
   @Test
   public void testBufferedReadAvailableCharset() throws IOException {
-    for (String csName : Charset.availableCharsets().keySet()) {
+    for (var csName : Charset.availableCharsets().keySet()) {
       // prevent java.lang.UnsupportedOperationException at sun.nio.cs.ext.ISO2022_CN.newEncoder.
       if (isAvailabilityTestableForCharset(csName)) {
         testBufferedRead(TEST_STRING, csName);
@@ -91,7 +92,7 @@ public class CharSequenceInputStreamTest {
 
   @Test
   public void testBufferedReadRequiredCharset() throws IOException {
-    for (String csName : getRequiredCharsetNames()) {
+    for (var csName : getRequiredCharsetNames()) {
       testBufferedRead(TEST_STRING, csName);
     }
   }
@@ -104,7 +105,7 @@ public class CharSequenceInputStreamTest {
   private static void testCharsetMismatchInfiniteLoop(String csName) throws IOException {
     // Input is UTF-8 bytes: 0xE0 0xB2 0xA0
     char[] inputChars = {(char) 0xE0, (char) 0xB2, (char) 0xA0};
-    Charset charset = Charset.forName(csName); // infinite loop for US-ASCII, UTF-8 OK
+    var charset = Charset.forName(csName); // infinite loop for US-ASCII, UTF-8 OK
     try (InputStream stream = new CharSequenceInputStream(new String(inputChars), charset, 512)) {
       //noinspection StatementWithEmptyBody
       while (stream.read() != -1) {
@@ -114,7 +115,7 @@ public class CharSequenceInputStreamTest {
 
   @Test
   public void testCharsetMismatchInfiniteLoopRequiredCharsets() throws IOException {
-    for (String csName : getRequiredCharsetNames()) {
+    for (var csName : getRequiredCharsetNames()) {
       testCharsetMismatchInfiniteLoop(csName);
     }
   }
@@ -123,23 +124,23 @@ public class CharSequenceInputStreamTest {
   // This is because the initial read fills the buffer from the CharSequence
   // so data1 gets the first buffer full; data2 will get the next buffer full
   private static void testIO_356(int bufferSize, int dataSize, int readFirst, String csName) throws IOException {
-    try (CharSequenceInputStream is = new CharSequenceInputStream(ALPHABET, csName, bufferSize)) {
+    try (var is = new CharSequenceInputStream(ALPHABET, csName, bufferSize)) {
 
-      for (int i = 0; i < readFirst; i++) {
-        int ch = is.read();
+      for (var i = 0; i < readFirst; i++) {
+        var ch = is.read();
         assertNotEquals(ch, -1);
       }
 
       is.mark(dataSize);
 
-      byte[] data1 = new byte[dataSize];
-      int readCount1 = is.read(data1);
+      var data1 = new byte[dataSize];
+      var readCount1 = is.read(data1);
       assertEquals(dataSize, readCount1);
 
       is.reset(); // should allow data to be re-read
 
-      byte[] data2 = new byte[dataSize];
-      int readCount2 = is.read(data2);
+      var data2 = new byte[dataSize];
+      var readCount2 = is.read(data2);
       assertEquals(dataSize, readCount2);
 
       // data buffers should be identical
@@ -183,8 +184,8 @@ public class CharSequenceInputStreamTest {
   }
 
   private static void testIO_356_Loop(String csName, int maxBytesPerChar) throws IOException {
-    for (int bufferSize = maxBytesPerChar; bufferSize <= 10; bufferSize++) {
-      for (int dataSize = 1; dataSize <= 20; dataSize++) {
+    for (var bufferSize = maxBytesPerChar; bufferSize <= 10; bufferSize++) {
+      for (var dataSize = 1; dataSize <= 20; dataSize++) {
         testIO_356(bufferSize, dataSize, 0, csName);
       }
     }
@@ -202,7 +203,7 @@ public class CharSequenceInputStreamTest {
 
   @Test
   public void testLargeBufferedReadRequiredCharsets() throws IOException {
-    for (String csName : getRequiredCharsetNames()) {
+    for (var csName : getRequiredCharsetNames()) {
       testBufferedRead(LARGE_TEST_STRING, csName);
     }
   }
@@ -214,7 +215,7 @@ public class CharSequenceInputStreamTest {
 
   @Test
   public void testLargeSingleByteReadRequiredCharsets() throws IOException {
-    for (String csName : getRequiredCharsetNames()) {
+    for (var csName : getRequiredCharsetNames()) {
       testSingleByteRead(LARGE_TEST_STRING, csName);
     }
   }
@@ -260,7 +261,7 @@ public class CharSequenceInputStreamTest {
 
   private static void testReadZero(String csName) throws IOException {
     try (InputStream r = new CharSequenceInputStream("test", csName)) {
-      byte[] bytes = new byte[30];
+      var bytes = new byte[30];
       assertEquals(0, r.read(bytes, 0, 0));
     }
   }
@@ -268,23 +269,23 @@ public class CharSequenceInputStreamTest {
   @Test
   public void testReadZeroEmptyString() throws IOException {
     try (InputStream r = new CharSequenceInputStream("", "UTF-8")) {
-      byte[] bytes = new byte[30];
+      var bytes = new byte[30];
       assertEquals(0, r.read(bytes, 0, 0));
     }
   }
 
   @Test
   public void testReadZeroRequiredCharsets() throws IOException {
-    for (String csName : getRequiredCharsetNames()) {
+    for (var csName : getRequiredCharsetNames()) {
       testReadZero(csName);
     }
   }
 
   private static void testSingleByteRead(String testString, String charsetName) throws IOException {
-    byte[] bytes = testString.getBytes(charsetName);
+    var bytes = testString.getBytes(charsetName);
     try (InputStream in = new CharSequenceInputStream(testString, charsetName, 512)) {
-      for (byte b : bytes) {
-        int read = in.read();
+      for (var b : bytes) {
+        var read = in.read();
         assertTrue(read >= 0, "read " + read + " >=0 ");
         //noinspection ConstantConditions
         assertTrue(read <= 255, "read " + read + " <= 255");
@@ -297,7 +298,7 @@ public class CharSequenceInputStreamTest {
 
   @Test
   public void testSingleByteReadRequiredCharsets() throws IOException {
-    for (String csName : getRequiredCharsetNames()) {
+    for (var csName : getRequiredCharsetNames()) {
       testSingleByteRead(TEST_STRING, csName);
     }
   }
@@ -335,15 +336,15 @@ public class CharSequenceInputStreamTest {
   }
 
   private static int checkAvail(InputStream is, int min) throws IOException {
-    int available = is.available();
+    var available = is.available();
     assertTrue(available >= min, "avail should be >= " + min + ", but was " + available);
     return available;
   }
 
   private static void testAvailableSkip(String csName) throws IOException {
-    String input = "test";
+    var input = "test";
     try (InputStream r = new CharSequenceInputStream(input, csName)) {
-      int available = checkAvail(r, input.length());
+      var available = checkAvail(r, input.length());
       assertEquals(available - 1, r.skip(available - 1)); // skip all but one
       checkAvail(r, 1);
       assertEquals(1, r.skip(1));
@@ -352,19 +353,19 @@ public class CharSequenceInputStreamTest {
   }
 
   private static void testAvailableRead(String csName) throws IOException {
-    String input = "test";
+    var input = "test";
     try (InputStream r = new CharSequenceInputStream(input, csName)) {
-      int available = checkAvail(r, input.length());
+      var available = checkAvail(r, input.length());
       assertEquals(available - 1, r.skip(available - 1)); // skip all but one
       available = checkAvail(r, 1);
-      byte[] buff = new byte[available];
+      var buff = new byte[available];
       assertEquals(available, r.read(buff, 0, available));
     }
   }
 
   @Test
   public void testAvailable() throws IOException {
-    for (String csName : Charset.availableCharsets().keySet()) {
+    for (var csName : Charset.availableCharsets().keySet()) {
       // prevent java.lang.UnsupportedOperationException at sun.nio.cs.ext.ISO2022_CN.newEncoder.
       // also try and avoid the following Effor on Continuum
 //          java.lang.UnsupportedOperationException: null
@@ -390,9 +391,6 @@ public class CharSequenceInputStreamTest {
   }
 
   private static boolean isOddBallLegacyCharsetThatDoesNotSupportFrenchCharacters(String csName) {
-    return "x-IBM1388".equalsIgnoreCase(csName) ||
-        "ISO-2022-CN".equalsIgnoreCase(csName) ||
-        "ISO-2022-JP".equalsIgnoreCase(csName) ||
-        "Shift_JIS".equalsIgnoreCase(csName);
+    return Stream.of("x-IBM1388", "ISO-2022-CN", "ISO-2022-JP", "Shift_JIS").anyMatch(s -> s.equalsIgnoreCase(csName));
   }
 }

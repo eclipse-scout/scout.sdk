@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.core.model.api;
 import static org.eclipse.scout.sdk.core.generator.SimpleGenerators.createArrayMetaValueGenerator;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
@@ -45,7 +47,7 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
 
   @Override
   public Stream<IJavaElement> children() {
-    return Stream.of(m_metaArray).flatMap(IMetaValue::children);
+    return Arrays.stream(m_metaArray).flatMap(IMetaValue::children);
   }
 
   /**
@@ -60,13 +62,13 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
       return new IMetaValue[0];
     }
 
-    int numNotNullElements = numNotNullElements(original);
+    var numNotNullElements = numNotNullElements(original);
     if (numNotNullElements == original.length) {
       return original;
     }
-    IMetaValue[] filtered = new IMetaValue[numNotNullElements];
-    int targetPos = 0;
-    for (IMetaValue mv : original) {
+    var filtered = new IMetaValue[numNotNullElements];
+    var targetPos = 0;
+    for (var mv : original) {
       if (mv != null) {
         filtered[targetPos] = mv;
         targetPos++;
@@ -76,13 +78,7 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
   }
 
   private static int numNotNullElements(IMetaValue[] arr) {
-    int num = 0;
-    for (IMetaValue mv : arr) {
-      if (mv != null) {
-        num++;
-      }
-    }
-    return num;
+    return (int) Arrays.stream(arr).filter(Objects::nonNull).count();
   }
 
   @Override
@@ -98,7 +94,7 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
   @Override
   @SuppressWarnings("unchecked")
   public <T> T as(Class<T> expectedType) {
-    int arraySize = m_metaArray.length;
+    var arraySize = m_metaArray.length;
     Class<?> arrayElementType;
     Object result;
     if (expectedType == Object.class) {
@@ -117,7 +113,7 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
       throw new IllegalArgumentException("expected type must be an array type but was: " + expectedType);
     }
 
-    for (int i = 0; i < arraySize; i++) {
+    for (var i = 0; i < arraySize; i++) {
       Array.set(result, i, m_metaArray[i].as(arrayElementType));
     }
     return (T) result;
@@ -125,7 +121,7 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
 
   @Override
   public String toString() {
-    int n = m_metaArray.length;
+    var n = m_metaArray.length;
     //use newlines on multi-dimensional arrays and annotation arrays only
     char blockSeparator;
     if (n > 0 && (m_metaArray[0].type() == MetaValueType.Array || m_metaArray[0].type() == MetaValueType.Annotation)) {
@@ -135,12 +131,12 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
     else {
       blockSeparator = JavaTypes.C_SPACE;
     }
-    StringBuilder buf = new StringBuilder();
+    var buf = new StringBuilder();
     buf.append('{');
     buf.append(blockSeparator);
     if (n > 0) {
-      for (int i = 0; i < n; i++) {
-        IMetaValue element = m_metaArray[i];
+      for (var i = 0; i < n; i++) {
+        var element = m_metaArray[i];
         if (i > 0) {
           buf.append(JavaTypes.C_COMMA);
           buf.append(blockSeparator);

@@ -13,12 +13,13 @@ package org.eclipse.scout.sdk.core.s.form;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 
+import java.util.stream.IntStream;
+
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.permission.PermissionGenerator;
 import org.eclipse.scout.sdk.core.s.service.ServiceInterfaceGenerator;
@@ -48,15 +49,15 @@ public class FormGeneratorTest {
         .withElementName("MyPermission")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.shared");
     assertEqualsRefFile(env, REF_FILE_FOLDER + "FormTest1.txt", permGenerator);
-    IType createdPermission = assertNoCompileErrors(env, permGenerator);
+    var createdPermission = assertNoCompileErrors(env, permGenerator);
 
     // formData
-    PrimaryTypeGenerator<?> formDataGenerator = PrimaryTypeGenerator.create()
+    var formDataGenerator = PrimaryTypeGenerator.create()
         .withElementName("MyFormData")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.shared")
         .withSuperClassFrom(IScoutApi.class, api -> api.AbstractFormData().fqn());
     assertEqualsRefFile(env, REF_FILE_FOLDER + "FormTest2.txt", formDataGenerator);
-    IType createdFormData = assertNoCompileErrors(env, formDataGenerator);
+    var createdFormData = assertNoCompileErrors(env, formDataGenerator);
 
     // service interface
     ServiceInterfaceGenerator<?> svcIfcGenerator = new ServiceInterfaceGenerator<>()
@@ -92,10 +93,10 @@ public class FormGeneratorTest {
                 .withDataType(createdFormData.name())));
 
     assertEqualsRefFile(env, REF_FILE_FOLDER + "FormTest3.txt", svcIfcGenerator);
-    IType createdSvcIfc = assertNoCompileErrors(env, svcIfcGenerator);
+    var createdSvcIfc = assertNoCompileErrors(env, svcIfcGenerator);
 
     // service Impl
-    PrimaryTypeGenerator<?> svcImplGenerator = PrimaryTypeGenerator.create()
+    var svcImplGenerator = PrimaryTypeGenerator.create()
         .withElementName("MyFormService")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.server")
         .withInterface(svcIfcGenerator.fullyQualifiedName())
@@ -104,10 +105,9 @@ public class FormGeneratorTest {
     assertNoCompileErrors(env, svcImplGenerator);
 
     // form
-    String[] classIdValues = new String[FormGenerator.NUM_CLASS_IDS];
-    for (int i = 0; i < classIdValues.length; i++) {
-      classIdValues[i] = "whatever" + i;
-    }
+    var classIdValues = IntStream.range(0, FormGenerator.NUM_CLASS_IDS)
+        .mapToObj(i -> "whatever" + i)
+        .toArray(String[]::new);
     FormGenerator<?> formGenerator = new FormGenerator<>()
         .withElementName("MyForm")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.client")

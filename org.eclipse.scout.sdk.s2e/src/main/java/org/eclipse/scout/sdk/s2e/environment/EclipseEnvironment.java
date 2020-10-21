@@ -14,9 +14,7 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.runWithWorkingCopyManager;
 
-import java.net.URI;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,12 +30,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
@@ -54,9 +50,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
-import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -100,7 +94,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
 
   @Override
   public StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder) {
-    IJavaEnvironment context = targetFolder.javaEnvironment();
+    var context = targetFolder.javaEnvironment();
     return doCreateResource(generator, jdtJavaProjectOf(context), targetFolder.path(), context);
   }
 
@@ -109,14 +103,14 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   }
 
   protected StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath) {
-    IJavaProject javaProject = findJavaProject(filePath)
+    var javaProject = findJavaProject(filePath)
         .orElseThrow(() -> newFail("Cannot find a Java project for path '{}'.", filePath));
     return doCreateResource(generator, javaProject, filePath, toScoutJavaEnvironment(javaProject));
   }
 
   protected static StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, IJavaProject javaProject, Path targetPath, IJavaEnvironment je) {
-    BuilderContext ctx = createBuilderContextFor(javaProject, targetPath);
-    MemorySourceBuilder builder = new MemorySourceBuilder(new JavaBuilderContext(ctx, je));
+    var ctx = createBuilderContextFor(javaProject, targetPath);
+    var builder = new MemorySourceBuilder(new JavaBuilderContext(ctx, je));
     Ensure.notNull(generator).generate(builder);
     return builder.source();
   }
@@ -146,7 +140,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   }
 
   protected IFile pathToWorkspaceFile(Path filePath) {
-    URI uri = Ensure.notNull(filePath).toUri();
+    var uri = Ensure.notNull(filePath).toUri();
     return S2eUtils.findFileInWorkspace(uri)
         .orElseThrow(() -> newFail("Could not find of workspace files for URI '{}'.", uri));
   }
@@ -159,17 +153,17 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
     Ensure.isTrue(Ensure.notNull(targetFolder).isSourceFolder(), "{} is no source folder. It is only allowed to generate new source into source folders.", targetFolder);
 
     // generate new code
-    CompilationUnitPath path = new CompilationUnitPath(generator, targetFolder);
-    IJavaEnvironment env = targetFolder.javaEnvironment();
-    StringBuilder code = doCreateResource(generator, jdtJavaProjectOf(env), path.targetFile(), env);
+    var path = new CompilationUnitPath(generator, targetFolder);
+    var env = targetFolder.javaEnvironment();
+    var code = doCreateResource(generator, jdtJavaProjectOf(env), path.targetFile(), env);
 
     // write to disk
-    IPackageFragmentRoot sourceFolder = ((ClasspathWithJdt) targetFolder.unwrap()).getRoot();
-    String packageName = generator.packageName().orElse(null);
-    String javaFileName = generator.fileName().get();
-    CompilationUnitWriteOperation writeIcu = new CompilationUnitWriteOperation(sourceFolder, packageName, javaFileName, code);
+    var sourceFolder = ((ClasspathWithJdt) targetFolder.unwrap()).getRoot();
+    var packageName = generator.packageName().orElse(null);
+    var javaFileName = generator.fileName().get();
+    var writeIcu = new CompilationUnitWriteOperation(sourceFolder, packageName, javaFileName, code);
     return doRunResourceTask(writeIcu, () -> {
-      ICompilationUnit compilationUnit = writeIcu.getCreatedCompilationUnit();
+      var compilationUnit = writeIcu.getCreatedCompilationUnit();
       if (compilationUnit == null) {
         return null; // may happen if the asynchronous write operation is canceled
       }
@@ -183,10 +177,10 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
       }
 
       // return primary type
-      org.eclipse.jdt.core.IType jdtType = compilationUnit.getType(generator.mainType().get().elementName().get());
+      var jdtType = compilationUnit.getType(generator.mainType().get().elementName().get());
 
-      IJavaEnvironment javaEnvironment = targetFolder.javaEnvironment();
-      boolean reloadRequired = javaEnvironment.registerCompilationUnitOverride(packageName, javaFileName, formattedSource);
+      var javaEnvironment = targetFolder.javaEnvironment();
+      var reloadRequired = javaEnvironment.registerCompilationUnitOverride(packageName, javaFileName, formattedSource);
       if (reloadRequired) {
         javaEnvironment.reload();
       }
@@ -263,8 +257,8 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   }
 
   protected <T> IFuture<T> doRunAsync(Consumer<? super EclipseProgress> operation, ISchedulingRule rule, Supplier<T> resultExtractor) {
-    IWorkingCopyManager workingCopyManager = currentWorkingCopyManager();
-    AbstractJob job = new AbstractJob(OperationJob.getJobName(operation)) {
+    var workingCopyManager = currentWorkingCopyManager();
+    var job = new AbstractJob(OperationJob.getJobName(operation)) {
       @Override
       protected void execute(IProgressMonitor monitor) {
         runWithWorkingCopyManager(() -> operation.accept(toScoutProgress(monitor)), workingCopyManager);
@@ -279,7 +273,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
       return false;
     }
 
-    ISchedulingRule currentRule = Job.getJobManager().currentRule();
+    var currentRule = Job.getJobManager().currentRule();
     if (currentRule == null) {
       return false;
     }
@@ -293,7 +287,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
 
   @Override
   public Path rootOfJavaEnvironment(IJavaEnvironment environment) {
-    JavaEnvironmentWithJdt javaEnv = (JavaEnvironmentWithJdt) Ensure.notNull(environment).unwrap();
+    var javaEnv = (JavaEnvironmentWithJdt) Ensure.notNull(environment).unwrap();
     return javaEnv.javaProject().getProject().getLocation().toFile().toPath();
   }
 
@@ -303,9 +297,9 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
     }
 
     try {
-      IJavaProject[] javaProjects = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
-      for (IJavaProject jp : javaProjects) {
-        IPath location = jp.getProject().getLocation();
+      var javaProjects = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
+      for (var jp : javaProjects) {
+        var location = jp.getProject().getLocation();
         if (location != null && root.startsWith(location.toFile().toPath())) {
           return Optional.of(jp);
         }
@@ -347,7 +341,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
 
   @Override
   public void close() {
-    Iterator<JavaEnvironmentWithJdt> iterator = m_envs.values().iterator();
+    var iterator = m_envs.values().iterator();
     while (iterator.hasNext()) {
       try {
         iterator.next().close();
@@ -389,7 +383,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   }
 
   protected static IType toScoutType(org.eclipse.jdt.core.IType jdtType, JavaEnvironmentSpi env) {
-    TypeSpi typeSpi = env.findType(jdtType.getFullyQualifiedName());
+    var typeSpi = env.findType(jdtType.getFullyQualifiedName());
     if (typeSpi == null) {
       return null;
     }
@@ -410,7 +404,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
     if (!JdtUtils.exists(root)) {
       return null;
     }
-    ClasspathSpi classpath = getOrCreateEnv(root.getJavaProject()).getClasspathFor(root);
+    var classpath = getOrCreateEnv(root.getJavaProject()).getClasspathFor(root);
     if (classpath == null) {
       return null;
     }
@@ -474,7 +468,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
    * @return The corresponding {@link org.eclipse.jdt.core.IType} or {@code null} if it could not be found.
    */
   public static org.eclipse.jdt.core.IType toJdtType(IType scoutType) {
-    IJavaProject javaProject = ((JavaEnvironmentWithJdt) Ensure.notNull(scoutType).javaEnvironment().unwrap()).javaProject();
+    var javaProject = ((JavaEnvironmentWithJdt) Ensure.notNull(scoutType).javaEnvironment().unwrap()).javaProject();
     try {
       return javaProject.findType(scoutType.name().replace(JavaTypes.C_DOLLAR, JavaTypes.C_DOT), (IProgressMonitor) null);
     }
@@ -500,7 +494,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
 
   public static <T> T callInEclipseEnvironmentSync(BiFunction<? super EclipseEnvironment, ? super EclipseProgress, T> task, IProgressMonitor monitor) {
     Ensure.notNull(monitor);
-    try (EclipseEnvironment eclipseEnvironment = new EclipseEnvironment()) {
+    try (var eclipseEnvironment = new EclipseEnvironment()) {
       return task.apply(eclipseEnvironment, toScoutProgress(monitor));
     }
   }
@@ -510,14 +504,14 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   }
 
   public static <T> IFuture<T> callInEclipseEnvironment(BiFunction<? super EclipseEnvironment, ? super EclipseProgress, T> task, ISchedulingRule rule, String jobName) {
-    AtomicReference<T> result = new AtomicReference<>();
-    OperationJob job = new OperationJob((env, progress) -> result.set(task.apply(env, progress)), jobName);
+    var result = new AtomicReference<T>();
+    var job = new OperationJob((env, progress) -> result.set(task.apply(env, progress)), jobName);
     job.setRule(rule);
     return job.scheduleWithFuture(0, TimeUnit.MILLISECONDS, result::get);
   }
 
   public static EclipseEnvironment createUnsafe(Consumer<EclipseEnvironment> registerCloseCallback) {
-    EclipseEnvironment eclipseEnvironment = new EclipseEnvironment();
+    var eclipseEnvironment = new EclipseEnvironment();
     Ensure.notNull(registerCloseCallback).accept(eclipseEnvironment);
     return eclipseEnvironment;
   }

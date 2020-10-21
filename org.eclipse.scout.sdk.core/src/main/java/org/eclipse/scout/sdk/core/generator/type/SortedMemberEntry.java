@@ -77,7 +77,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
   }
 
   protected CompositeObject calculateDefaultOrder() {
-    IMemberGenerator<?> generator = generator();
+    var generator = generator();
     if (isType()) {
       return defaultTypeOrder((ITypeGenerator<?>) generator, m_index);
     }
@@ -121,15 +121,15 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    SortedMemberEntry other = (SortedMemberEntry) obj;
+    var other = (SortedMemberEntry) obj;
     return sortOrder().equals(other.sortOrder());
   }
 
   protected static CompositeObject defaultFieldOrder(@SuppressWarnings("TypeMayBeWeakened") IFieldGenerator<?> generator, long insertionOrder) {
-    int flags = generator.flags();
-    boolean isFinal = isFinal(flags);
-    boolean isConstant = isStatic(flags) && isFinal;
-    boolean isSerialVersionUid = isConstant && isPrivate(flags) && FieldGenerator.SERIAL_VERSION_UID.equals(generator.elementName().orElse(null));
+    var flags = generator.flags();
+    var isFinal = isFinal(flags);
+    var isConstant = isStatic(flags) && isFinal;
+    var isSerialVersionUid = isConstant && isPrivate(flags) && FieldGenerator.SERIAL_VERSION_UID.equals(generator.elementName().orElse(null));
 
     int pos;
     if (isSerialVersionUid) {
@@ -150,7 +150,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
 
   protected static CompositeObject defaultTypeOrder(@SuppressWarnings("TypeMayBeWeakened") ITypeGenerator<?> generator, long insertionOrder) {
     int pos;
-    int flags = generator.flags();
+    var flags = generator.flags();
     if (isPublic(flags)) {
       pos = 1000;
     }
@@ -165,7 +165,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
   }
 
   protected static CompositeObject defaultMethodOrder(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator, long insertionOrder) {
-    boolean isConstructor = generator.returnType().isEmpty();
+    var isConstructor = generator.returnType().isEmpty();
     int pos;
     if (isConstructor) {
       pos = 1000;
@@ -196,7 +196,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
       return new Object[]{DEFAULT_ORDER, objectOrder};
     }
 
-    Object[] result = new Object[orders.length + 2];
+    var result = new Object[orders.length + 2];
     result[0] = DEFAULT_ORDER;
     result[1] = objectOrder;
     System.arraycopy(orders, 0, result, 2, orders.length);

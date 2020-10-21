@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
@@ -62,7 +61,7 @@ public class StringsTest {
 
   @Test
   public void testInputStreamToString() throws IOException {
-    String testData = "my test data";
+    var testData = "my test data";
     assertEquals(testData, fromInputStream(new ByteArrayInputStream(testData.getBytes(StandardCharsets.UTF_16LE)), StandardCharsets.UTF_16LE).toString());
     assertEquals(testData, fromInputStream(new ByteArrayInputStream(testData.getBytes(StandardCharsets.UTF_16BE)), StandardCharsets.UTF_16BE.name()).toString());
   }
@@ -76,7 +75,7 @@ public class StringsTest {
 
   @Test
   public void testFromThrowable() {
-    String s = fromThrowable(new Exception());
+    var s = fromThrowable(new Exception());
     assertFalse(s.startsWith(lineSeparator()));
     assertFalse(s.endsWith(lineSeparator()));
   }
@@ -93,8 +92,8 @@ public class StringsTest {
     assertThrows(IllegalArgumentException.class, () -> fromFileAsChars(null, StandardCharsets.UTF_8));
     assertThrows(IllegalArgumentException.class, () -> fromFileAsCharSequence(null, StandardCharsets.UTF_8));
 
-    String testFileContent = "testcontent\nnewline";
-    Path testFile = Files.createTempFile("scoutSdkTestFile", ".txt");
+    var testFileContent = "testcontent\nnewline";
+    var testFile = Files.createTempFile("scoutSdkTestFile", ".txt");
     try {
       // write test content
       Files.write(testFile, testFileContent.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
@@ -260,11 +259,11 @@ public class StringsTest {
 
   @Test
   public void testEqualsCharArray() {
-    char[] a = "".toCharArray();
-    char[] b = "xx".toCharArray();
-    char[] c = "xx".toCharArray();
-    char[] d = "yy".toCharArray();
-    char[] e = "xxx".toCharArray();
+    var a = "".toCharArray();
+    var b = "xx".toCharArray();
+    var c = "xx".toCharArray();
+    var d = "yy".toCharArray();
+    var e = "xxx".toCharArray();
     assertTrue(Strings.equals(a, a));
     assertTrue(Strings.equals(c, b));
     assertFalse(Strings.equals(null, b));
@@ -276,12 +275,12 @@ public class StringsTest {
 
   @Test
   public void testEqualsCharArrayIgnoreCase() {
-    char[] a = "".toCharArray();
-    char[] b = "xx".toCharArray();
-    char[] c = "xx".toCharArray();
-    char[] d = "yy".toCharArray();
-    char[] e = "xxx".toCharArray();
-    char[] f = "xXx".toCharArray();
+    var a = "".toCharArray();
+    var b = "xx".toCharArray();
+    var c = "xx".toCharArray();
+    var d = "yy".toCharArray();
+    var e = "xxx".toCharArray();
+    var f = "xXx".toCharArray();
     assertTrue(Strings.equals(a, a, true));
     assertTrue(Strings.equals(c, b, true));
     assertFalse(Strings.equals(null, b, true));
@@ -393,15 +392,15 @@ public class StringsTest {
 
   @Test
   public void testIndexOfCharsInChars2() {
-    char[] array = new char[]{'a', 'b', 'c'};
-    char[] array2 = new char[]{'a', 'b', 'c', 'a', 'a'};
+    var array = new char[]{'a', 'b', 'c'};
+    var array2 = new char[]{'a', 'b', 'c', 'a', 'a'};
     assertTrue(indexOf(array, array2, -1, array2.length, true) < 0);
   }
 
   @Test
   public void testIndexOfCharsInChars3() {
-    char[] array = new char[]{'a', 'b', 'c'};
-    char[] array2 = new char[]{'a', 'b', 'c', 'a', 'a'};
+    var array = new char[]{'a', 'b', 'c'};
+    var array2 = new char[]{'a', 'b', 'c', 'a', 'a'};
     assertTrue(indexOf(array, array2, -1, array2.length, false) < 0);
   }
 

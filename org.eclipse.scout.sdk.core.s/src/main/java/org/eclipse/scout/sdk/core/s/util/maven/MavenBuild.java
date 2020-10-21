@@ -19,7 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
@@ -68,8 +67,8 @@ public class MavenBuild {
    */
   public static List<String> getMapAsList(Map<String, String> properties) {
     List<String> props = new ArrayList<>(properties.size());
-    for (Entry<String, String> prop : properties.entrySet()) {
-      StringBuilder propBuilder = new StringBuilder(prop.getKey());
+    for (var prop : properties.entrySet()) {
+      var propBuilder = new StringBuilder(prop.getKey());
       if (prop.getValue() != null) {
         propBuilder.append('=');
         propBuilder.append(prop.getValue());
@@ -260,8 +259,8 @@ public class MavenBuild {
   @Override
   @SuppressWarnings({"pmd:NPathComplexity", "NonFinalFieldReferencedInHashCode"})
   public int hashCode() {
-    int prime = 31;
-    int result = 1;
+    var prime = 31;
+    var result = 1;
     result = prime * result + m_goals.hashCode();
     result = prime * result + m_options.hashCode();
     result = prime * result + m_properties.hashCode();
@@ -281,7 +280,7 @@ public class MavenBuild {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    MavenBuild other = (MavenBuild) obj;
+    var other = (MavenBuild) obj;
     if (!m_goals.equals(other.m_goals)) {
       return false;
     }
@@ -296,15 +295,15 @@ public class MavenBuild {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    var builder = new StringBuilder();
     builder.append("Maven build in dir '").append(getWorkingDirectory()).append("': ");
-    for (String goal : getGoals()) {
+    for (var goal : getGoals()) {
       builder.append(goal).append(' ');
     }
-    for (String option : getOptions()) {
+    for (var option : getOptions()) {
       builder.append('-').append(option).append(' ');
     }
-    for (String prop : getPropertiesAsList()) {
+    for (var prop : getPropertiesAsList()) {
       builder.append("-D").append(prop).append(' ');
     }
     return builder.toString();

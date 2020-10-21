@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.text.edits.MalformedTreeException;
-import org.eclipse.text.edits.TextEdit;
 
 /**
  * <h3>SourceFormatOperation</h3> equivalent to CTRL-SHIFT-F in Eclipse
@@ -56,18 +55,18 @@ public class SourceFormatOperation implements Consumer<EclipseProgress> {
     Ensure.notNull(getDocument());
 
     try {
-      Document document = getDocument();
-      ISourceRange range = getRange();
+      var document = getDocument();
+      var range = getRange();
       if (range == null) {
         // create full range
         range = new SourceRange(0, document.getLength());
       }
-      CodeFormatter formatter = ToolFactory.createCodeFormatter(getProject().getOptions(true));
-      String defaultLineDelimiter = document.getDefaultLineDelimiter();
+      var formatter = ToolFactory.createCodeFormatter(getProject().getOptions(true));
+      var defaultLineDelimiter = document.getDefaultLineDelimiter();
       if (defaultLineDelimiter == null) {
         defaultLineDelimiter = Util.getLineSeparator(null, getProject());
       }
-      TextEdit te = formatter.format(CodeFormatter.F_INCLUDE_COMMENTS, document.get(), range.getOffset(), range.getLength(), 0, defaultLineDelimiter);
+      var te = formatter.format(CodeFormatter.F_INCLUDE_COMMENTS, document.get(), range.getOffset(), range.getLength(), 0, defaultLineDelimiter);
       if (te != null) {
         te.apply(document);
       }

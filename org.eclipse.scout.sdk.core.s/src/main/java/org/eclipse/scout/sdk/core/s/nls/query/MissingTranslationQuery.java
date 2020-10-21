@@ -28,10 +28,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -45,7 +45,6 @@ import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link MissingTranslationQuery}</h3>
@@ -88,21 +87,21 @@ public class MissingTranslationQuery implements IFileQuery {
       return false;
     }
 
-    Path fullPath = candidate.file();
+    var fullPath = candidate.file();
     if (pathContainsSegment(fullPath, "archetype-resources")
         || pathContainsSegment(fullPath, "generated-resources")
         || fullPath.endsWith(JS_TEXTS_FILE_NAME)) {
       return false;
     }
 
-    String fileName = fullPath.getFileName().toString();
+    var fileName = fullPath.getFileName().toString();
     return JAVA_TEXTS_FILE_NAMES.stream()
         .noneMatch(texts -> texts.equals(fileName));
   }
 
   protected static boolean pathContainsSegment(Iterable<Path> path, String name) {
-    Path toSearch = Paths.get(name);
-    for (Path segment : path) {
+    var toSearch = Paths.get(name);
+    for (var segment : path) {
       if (segment.equals(toSearch)) {
         return true;
       }
@@ -116,12 +115,12 @@ public class MissingTranslationQuery implements IFileQuery {
       return;
     }
 
-    List<AbstractTranslationPattern> patterns = m_searchPatterns.get(candidate.fileExtension());
+    var patterns = m_searchPatterns.get(candidate.fileExtension());
     CharSequence content = CharBuffer.wrap(candidate.fileContent());
-    int ticksByPattern = 10000;
+    var ticksByPattern = 10000;
     progress.init(patterns.size() * ticksByPattern, "{}. File: {}", name(), candidate.file());
-    for (AbstractTranslationPattern search : patterns) {
-      Matcher matcher = search.pattern().matcher(content);
+    for (var search : patterns) {
+      var matcher = search.pattern().matcher(content);
       while (matcher.find()) {
         checkMatch(matcher, search, candidate, env, progress.newChild(ticksByPattern));
       }
@@ -134,7 +133,7 @@ public class MissingTranslationQuery implements IFileQuery {
       // pattern with optional literal delimiter: '"' for java, ''' for js
       // check if the literal delimiter is present. if not present: not possible to detect the real key -> add to error list.
       keyGroup = 2;
-      boolean noLiteral = Strings.isEmpty(match.group(1)) || Strings.isEmpty(match.group(3));
+      var noLiteral = Strings.isEmpty(match.group(1)) || Strings.isEmpty(match.group(3));
       if (noLiteral) {
         // is no string literal. might be e variable or concatenation.
         if (!tryToResolveConstant(match.group(keyGroup), fileQueryInput, env, progress)) {
@@ -152,10 +151,10 @@ public class MissingTranslationQuery implements IFileQuery {
   }
 
   protected boolean tryToResolveConstant(String constantName, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
-    AssignmentPattern findAssignment = new AssignmentPattern(constantName);
+    var findAssignment = new AssignmentPattern(constantName);
     CharSequence content = CharBuffer.wrap(fileQueryInput.fileContent());
-    Matcher constantMatcher = findAssignment.pattern().matcher(content);
-    boolean constantFound = false;
+    var constantMatcher = findAssignment.pattern().matcher(content);
+    var constantFound = false;
     while (constantMatcher.find()) {
       registerMatchIfKeyIsMissing(constantMatcher, 1, Level.WARNING.intValue(), findAssignment, fileQueryInput, env, progress);
       constantFound = true;
@@ -164,7 +163,7 @@ public class MissingTranslationQuery implements IFileQuery {
   }
 
   protected void registerMatchIfKeyIsMissing(MatchResult match, int keyGroup, int severity, AbstractTranslationPattern pattern, FileQueryInput queryInput, IEnvironment env, IProgress progress) {
-    String key = match.group(keyGroup);
+    var key = match.group(keyGroup);
     if (keyExistsForModule(queryInput.module(), key, env, progress)) {
       return;
     }
@@ -188,7 +187,7 @@ public class MissingTranslationQuery implements IFileQuery {
   }
 
   protected static Optional<Set<String>> computeAccessibleKeysForModule(Path modulePath, IEnvironment env, IProgress progress) {
-    List<ITranslationStore> stores = allForModule(modulePath, env, progress).collect(toList());
+    var stores = allForModule(modulePath, env, progress).collect(toList());
     if (stores.isEmpty()) {
       return Optional.empty(); // no stores found: it is no scout module. This module will be ignored in the search (no missing translations).
     }
@@ -208,7 +207,7 @@ public class MissingTranslationQuery implements IFileQuery {
   }
 
   protected static <K, V> Set<V> getFromResultMap(Map<K, Set<V>> map, K key) {
-    Set<V> ranges = map.get(key);
+    var ranges = map.get(key);
     if (ranges == null || ranges.isEmpty()) {
       return emptySet();
     }

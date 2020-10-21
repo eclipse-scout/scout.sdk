@@ -15,6 +15,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
@@ -27,8 +30,6 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link IMethodGenerator}</h3>
@@ -69,12 +70,57 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    */
   String identifier(IJavaEnvironment context, boolean useErasureOnly);
 
+  /**
+   * @return An {@link ApiFunction} that describes the return type of this {@link IMethodGenerator} or an empty
+   *         {@link Optional} if this {@link IMethodGenerator} describes a constructor.
+   */
   Optional<ApiFunction<?, String>> returnType();
 
+  /**
+   * Sets the method name to the result of the given nameSupplier.
+   * <p>
+   * This method may be handy if the name of a method changes between different versions of an API. The builder then
+   * decides which API to use based on the version found in the {@link IJavaEnvironment} of the
+   * {@link IJavaBuilderContext}.
+   * </p>
+   * <b>Example:</b> {@code methodGenerator.withElementNameFrom(IJavaApi.class, api -> api.Long().valueOfMethodName())}.
+   * 
+   * @param apiDefinition
+   *          The api type that defines the method name. An instance of this API is passed to the nameSupplier. May be
+   *          {@code null} in case the given nameSupplier can handle a {@code null} input.
+   * @param nameSupplier
+   *          A {@link Function} to be called to obtain the method name of this {@link IMethodGenerator}.
+   * @param <A>
+   *          The API type that contains the class name
+   * @return This generator.
+   * @see #withElementName(String)
+   */
   <A extends IApiSpecification> TYPE withElementNameFrom(Class<A> apiDefinition, Function<A, String> nameSupplier);
 
+  /**
+   * Gets the method name of this generator.
+   * 
+   * @param context
+   *          The context {@link IJavaBuilderContext} for which the method name should be computed. This is required
+   *          because the method name may be API dependent (see
+   *          {@link IMethodGenerator#withElementNameFrom(Class, Function)}).
+   * @return The method name or an empty {@link Optional} if this method has no name.
+   * @see #withElementNameFrom(Class, Function)
+   * @see #withElementName(String)
+   */
   Optional<String> elementName(IJavaBuilderContext context);
 
+  /**
+   * Gets the method name of this generator.
+   * 
+   * @param context
+   *          The context {@link IJavaEnvironment} for which the method name should be computed. This is required
+   *          because the method name may be API dependent (see
+   *          {@link IMethodGenerator#withElementNameFrom(Class, Function)}).
+   * @return The method name or an empty {@link Optional} if this method has no name.
+   * @see #withElementNameFrom(Class, Function)
+   * @see #withElementName(String)
+   */
   Optional<String> elementName(IJavaEnvironment context);
 
   /**
@@ -84,39 +130,81 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    *          The return type (e.g. {@link JavaTypes#_void}) or {@code null} if this {@link IMethodGenerator} is a
    *          constructor.
    * @return This generator.
+   * @see #withReturnTypeFrom(Class, Function)
    */
   TYPE withReturnType(String returnType);
 
+  /**
+   * Sets the method return type to the result of the given returnTypeSupplier.
+   * <p>
+   * This method may be handy if the return type of a method changes between different versions of an API. The builder
+   * then decides which API to use based on the version found in the {@link IJavaEnvironment} of the
+   * {@link IJavaBuilderContext}.
+   * </p>
+   * <b>Example:</b> {@code methodGenerator.withReturnTypeFrom(IJavaApi.class, IJavaApi::Long)}.
+   * 
+   * @param apiDefinition
+   *          The api type that defines the method return type. An instance of this API is passed to the
+   *          returnTypeSupplier. May be {@code null} in case the given returnTypeSupplier can handle a {@code null}
+   *          input.
+   * @param returnTypeSupplier
+   *          A {@link Function} to be called to obtain the method return type of this {@link IMethodGenerator}.
+   * @param <A>
+   *          The API type that contains the class name
+   * @return This generator.
+   * @see #withReturnType(String)
+   */
   <A extends IApiSpecification> TYPE withReturnTypeFrom(Class<A> apiDefinition, Function<A, String> returnTypeSupplier);
 
   /**
-   * @return A {@link Stream} with all {@link Exception} types of the {@code throws} clause of this
+   * @return A {@link Stream} with all {@link Throwable} types of the {@code throws} clause of this
    *         {@link IMethodGenerator}.
    */
-  Stream<ApiFunction<?, String>> exceptions();
+  Stream<ApiFunction<?, IClassNameSupplier>> throwables();
 
   /**
-   * Adds the given reference to the {@link Exception}s of this {@link IMethodGenerator}. They will be printed in the
-   * {@code throws} declaration of the method.
+   * Adds the given reference to the {@link Throwable Throwables} of this {@link IMethodGenerator}. They will be printed
+   * in the {@code throws} declaration of the method.
    * <p>
    * If the same reference is already added, this method does nothing.
    *
-   * @param exceptionReference
+   * @param throwableFqn
    *          Must not be blank (see {@link Strings#isBlank(CharSequence)}).
    * @return This generator.
+   * @see #withThrowableFrom(Class, Function)
    */
-  TYPE withException(String exceptionReference);
-
-  <A extends IApiSpecification> TYPE withExceptionFrom(Class<A> apiDefinition, Function<A, String> exceptionSupplier);
+  TYPE withThrowable(String throwableFqn);
 
   /**
-   * Removes the specified reference from the exception list of this {@link IMethodGenerator}.
+   * Adds the result of the throwableSupplier to the list of thrown throwables.
+   * <p>
+   * This method may be handy if the throwable type changes between different versions of an API. The builder then
+   * decides which API to use based on the version found in the {@link IJavaEnvironment} of the
+   * {@link IJavaBuilderContext}.
+   * </p>
+   * <b>Example:</b> {@code methodGenerator.withThrowableFrom(IJavaApi.class, IJavaApi::IOException)}.
+   * 
+   * @param apiDefinition
+   *          The api type that defines the throwable type. An instance of this API is passed to the throwableSupplier.
+   *          May be {@code null} in case the given throwableSupplier can handle a {@code null} input.
+   * @param throwableSupplier
+   *          A {@link Function} to be called to obtain the throwable type to add to this {@link IMethodGenerator}.
+   * @param <A>
+   *          The API type that contains the class name
+   * @return This generator.
+   * @see #withThrowable(String)
+   */
+  <A extends IApiSpecification> TYPE withThrowableFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> throwableSupplier);
+
+  /**
+   * Removes all throwables for which the given {@link Predicate} returns {@code true}.
    *
-   * @param exceptionReference
-   *          The reference to remove.
+   * @param toRemoveFilter
+   *          A {@link Predicate} that decides if a throwable should be removed. May be {@code null}. In that case all
+   *          throwables are removed.
    * @return This generator.
    */
-  TYPE withoutException(Predicate<ApiFunction<?, String>> toRemove);
+  TYPE withoutThrowable(Predicate<ApiFunction<?, IClassNameSupplier>> toRemoveFilter);
 
   /**
    * @return The {@link ISourceGenerator} that creates the method body content.
@@ -191,4 +279,11 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    * @return This generator.
    */
   TYPE asSynchronized();
+
+  /**
+   * Marks this {@link IMethodGenerator} as {@code default} method (to be used in interfaces).
+   * 
+   * @return This generator.
+   */
+  TYPE asDefaultMethod();
 }

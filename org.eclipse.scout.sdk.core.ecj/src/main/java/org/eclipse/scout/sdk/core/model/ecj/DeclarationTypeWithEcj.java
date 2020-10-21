@@ -11,20 +11,15 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
-import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.Javadoc;
 import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.TypeParameter;
-import org.eclipse.jdt.internal.compiler.ast.TypeReference;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeConstants;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
@@ -86,16 +81,15 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public JavaElementSpi internalFindNewElement() {
-    TypeSpi newSpi = getJavaEnvironment().findType(getName());
+    var newSpi = getJavaEnvironment().findType(getName());
     if (newSpi == null) {
       return null;
     }
-    for (TypeSpi declType : newSpi.getCompilationUnit().getTypes()) {
-      if (declType.getName().equals(getName())) {
-        return declType;
-      }
-    }
-    return null;
+    return newSpi.getCompilationUnit()
+        .getTypes().stream()
+        .filter(declType -> declType.getName().equals(getName()))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
@@ -135,9 +129,9 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public String getName() {
     return m_fqn.computeIfAbsentAndGet(() -> {
-      StringBuilder sb = new StringBuilder(128);
+      var sb = new StringBuilder(128);
 
-      char[] qualifiedPackageName = m_astNode.binding.qualifiedPackageName();
+      var qualifiedPackageName = m_astNode.binding.qualifiedPackageName();
       if (qualifiedPackageName != null && qualifiedPackageName.length > 0) {
         sb.append(qualifiedPackageName);
         sb.append(JavaTypes.C_DOT);
@@ -145,13 +139,13 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
 
       // collect declaring types
       Deque<char[]> namesBottomUp = new ArrayDeque<>();
-      TypeDeclaration declaringType = m_astNode;
+      var declaringType = m_astNode;
       while (declaringType != null) {
         namesBottomUp.add(declaringType.name);
         declaringType = declaringType.enclosingType;
       }
 
-      Iterator<char[]> namesTopDown = namesBottomUp.descendingIterator();
+      var namesTopDown = namesBottomUp.descendingIterator();
       sb.append(namesTopDown.next()); // there must be at least one type name
       while (namesTopDown.hasNext()) {
         sb.append(JavaTypes.C_DOLLAR).append(namesTopDown.next());
@@ -168,7 +162,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public PackageSpi getPackage() {
     return m_package.computeIfAbsentAndGet(() -> {
-      char[] qualifiedPackageName = m_astNode.binding.qualifiedPackageName();
+      var qualifiedPackageName = m_astNode.binding.qualifiedPackageName();
       if (qualifiedPackageName != null && qualifiedPackageName.length > 0) {
         return javaEnvWithEcj().createPackage(new String(qualifiedPackageName));
       }
@@ -184,53 +178,41 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public List<FieldSpi> getFields() {
     return m_fields.computeIfAbsentAndGet(() -> {
-      FieldDeclaration[] fields = m_astNode.fields;
+      var fields = m_astNode.fields;
       if (fields == null || fields.length < 1) {
         return emptyList();
       }
-
-      List<FieldSpi> result = new ArrayList<>(fields.length);
-      for (FieldDeclaration fd : fields) {
-        result.add(javaEnvWithEcj().createDeclarationField(this, fd));
-      }
-      return result;
+      return Arrays.stream(fields)
+          .map(fd -> javaEnvWithEcj().createDeclarationField(this, fd))
+          .collect(toList());
     });
   }
 
   @Override
   public List<MethodSpi> getMethods() {
     return m_methods.computeIfAbsentAndGet(() -> {
-      AbstractMethodDeclaration[] methods = m_astNode.methods;
+      var methods = m_astNode.methods;
       if (methods == null || methods.length < 1) {
         return emptyList();
       }
-
-      List<MethodSpi> result = new ArrayList<>(methods.length);
-      for (AbstractMethodDeclaration a : methods) {
-        if (a.bodyStart <= 0) { // skip compiler generated methods
-          continue;
-        }
-        if (Arrays.equals(TypeConstants.INIT, a.selector)) {
-          continue;
-        }
-        result.add(javaEnvWithEcj().createDeclarationMethod(this, a));
-      }
-      return result;
+      return Arrays.stream(methods)
+          .filter(a -> a.bodyStart > 0) // skip compiler generated methods
+          .filter(a -> !Arrays.equals(TypeConstants.INIT, a.selector))
+          .map(a -> javaEnvWithEcj().createDeclarationMethod(this, a))
+          .collect(toList());
     });
   }
 
   @Override
   public List<TypeSpi> getTypes() {
     return m_memberTypes.computeIfAbsentAndGet(() -> {
-      TypeDeclaration[] memberTypes = m_astNode.memberTypes;
+      var memberTypes = m_astNode.memberTypes;
       if (memberTypes == null || memberTypes.length < 1) {
         return emptyList();
       }
-      List<TypeSpi> result = new ArrayList<>(memberTypes.length);
-      for (TypeDeclaration d : memberTypes) {
-        result.add(new DeclarationTypeWithEcj(javaEnvWithEcj(), m_cu, this, d));
-      }
-      return result;
+      return Arrays.stream(memberTypes)
+          .map(d -> new DeclarationTypeWithEcj(javaEnvWithEcj(), m_cu, this, d))
+          .collect(toList());
     });
   }
 
@@ -240,7 +222,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
       if (m_astNode.superclass == null) {
         return null;
       }
-      TypeBinding tb = m_astNode.superclass.resolvedType;
+      var tb = m_astNode.superclass.resolvedType;
       if (tb == null) {
         return null;
       }
@@ -251,21 +233,16 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public List<TypeSpi> getSuperInterfaces() {
     return m_superInterfaces.computeIfAbsentAndGet(() -> {
-      TypeReference[] refs = m_astNode.superInterfaces;
+      var refs = m_astNode.superInterfaces;
       if (refs == null || refs.length < 1) {
         return emptyList();
       }
-      List<TypeSpi> result = new ArrayList<>(refs.length);
-      for (TypeReference r : refs) {
-        TypeBinding b = r.resolvedType;
-        if (b != null) {
-          TypeSpi t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), b);
-          if (t != null) {
-            result.add(t);
-          }
-        }
-      }
-      return result;
+      return Arrays.stream(refs)
+          .map(r -> r.resolvedType)
+          .filter(Objects::nonNull)
+          .map(b -> SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), b))
+          .filter(Objects::nonNull)
+          .collect(toList());
     });
   }
 
@@ -289,7 +266,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public boolean hasTypeParameters() {
-    TypeParameter[] typeParams = m_astNode.typeParameters;
+    var typeParams = m_astNode.typeParameters;
     return typeParams != null && typeParams.length > 0;
   }
 
@@ -311,22 +288,22 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public ISourceRange getSourceOfStaticInitializer() {
     return m_staticInitSource.computeIfAbsentAndGet(() -> {
-      FieldDeclaration[] fields = m_astNode.fields;
-      if (fields != null) {
-        for (FieldDeclaration fieldDecl : fields) {
-          if (fieldDecl.type == null && fieldDecl.name == null) {
-            return javaEnvWithEcj().getSource(m_cu, fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd);
-          }
-        }
+      var fields = m_astNode.fields;
+      if (fields == null) {
+        return null;
       }
-      return null;
+      return Arrays.stream(fields)
+          .filter(fieldDecl -> fieldDecl.type == null && fieldDecl.name == null)
+          .findFirst()
+          .map(fieldDecl -> javaEnvWithEcj().getSource(m_cu, fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd))
+          .orElse(null);
     });
   }
 
   @Override
   public ISourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
-      Javadoc doc = m_astNode.javadoc;
+      var doc = m_astNode.javadoc;
       if (doc != null) {
         return javaEnvWithEcj().getSource(m_cu, doc.sourceStart, doc.sourceEnd);
       }

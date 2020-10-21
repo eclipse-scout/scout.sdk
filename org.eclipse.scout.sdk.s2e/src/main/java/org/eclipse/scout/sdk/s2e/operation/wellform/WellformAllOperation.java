@@ -19,12 +19,11 @@ import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
@@ -39,19 +38,19 @@ public class WellformAllOperation implements BiConsumer<EclipseEnvironment, Ecli
   @Override
   @SuppressWarnings("squid:S1067")
   public void accept(EclipseEnvironment env, EclipseProgress p) {
-    int numTicks = 100;
-    int searchStepTicks = 1;
-    SubMonitor progress = SubMonitor.convert(p.monitor(), "Wellform Scout classes...", numTicks);
+    var numTicks = 100;
+    var searchStepTicks = 1;
+    var progress = SubMonitor.convert(p.monitor(), "Wellform Scout classes...", numTicks);
     progress.subTask("Searching for classes...");
 
     Set<IType> types = new HashSet<>();
-    Set<String> roots = getRootClasses();
-    for (String root : roots) {
-      Set<IType> rootTypes = JdtUtils.resolveJdtTypes(root);
-      for (IType t : rootTypes) {
+    var roots = getRootClasses();
+    for (var root : roots) {
+      var rootTypes = JdtUtils.resolveJdtTypes(root);
+      for (var t : rootTypes) {
         try {
-          ITypeHierarchy typeHierarchy = t.newTypeHierarchy(null);
-          for (IType candidate : typeHierarchy.getAllClasses()) {
+          var typeHierarchy = t.newTypeHierarchy(null);
+          for (var candidate : typeHierarchy.getAllClasses()) {
             if (JdtUtils.exists(candidate) && !candidate.isInterface() && !candidate.isBinary() && !candidate.isAnonymous() && candidate.getDeclaringType() == null) {
               types.add(candidate);
             }

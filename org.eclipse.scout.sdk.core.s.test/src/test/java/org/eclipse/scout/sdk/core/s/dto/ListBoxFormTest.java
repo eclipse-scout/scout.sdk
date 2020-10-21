@@ -21,8 +21,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -46,23 +44,23 @@ public class ListBoxFormTest {
 
     // fields of ListBoxFormData
     assertEquals(1, listBoxFormData.fields().stream().count(), "field count of 'ListBoxFormData'");
-    IField serialVersionUID = assertFieldExist(listBoxFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(listBoxFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, listBoxFormData.methods().stream().count(), "method count of 'ListBoxFormData'");
-    IMethod getListBox = assertMethodExist(listBoxFormData, "getListBox", new String[]{});
+    var getListBox = assertMethodExist(listBoxFormData, "getListBox", new String[]{});
     assertMethodReturnType(getListBox, "formdata.shared.services.process.ListBoxFormData$ListBox");
 
     assertEquals(1, listBoxFormData.innerTypes().stream().count(), "inner types count of 'ListBoxFormData'");
     // type ListBox
-    IType listBox = assertTypeExists(listBoxFormData, "ListBox");
+    var listBox = assertTypeExists(listBoxFormData, "ListBox");
     assertHasFlags(listBox, 9);
     assertHasSuperClass(listBox, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.util.Set<java.lang.Long>>");
 
     // fields of ListBox
     assertEquals(1, listBox.fields().stream().count(), "field count of 'ListBox'");
-    IField serialVersionUID1 = assertFieldExist(listBox, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(listBox, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
 

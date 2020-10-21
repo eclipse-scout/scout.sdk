@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -30,7 +29,6 @@ import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
@@ -49,11 +47,11 @@ public class RebuildArtifactsOperation implements BiConsumer<IEnvironment, IProg
   @Override
   public void accept(IEnvironment env, IProgress p) {
     Ensure.isTrue(JdtUtils.exists(getJavaProject()), "Java Project must exist.");
-    EclipseProgress progress = toScoutProgress(p).init(100, toString());
+    var progress = toScoutProgress(p).init(100, toString());
 
     try {
       // refresh project
-      IProject project = getJavaProject().getProject();
+      var project = getJavaProject().getProject();
       project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(2).monitor());
 
       // delete /target folder contents
@@ -84,21 +82,21 @@ public class RebuildArtifactsOperation implements BiConsumer<IEnvironment, IProg
   }
 
   protected static void deleteOutputFolderContents(IProject project, SubMonitor progress) throws CoreException {
-    IFolder outFolder = project.getFolder("target");
+    var outFolder = project.getFolder("target");
     if (!outFolder.exists()) {
       return;
     }
 
     Collection<IResource> resourcesToDelete = new HashSet<>();
     outFolder.accept(resource -> {
-      boolean isOutFolder = Objects.equals(outFolder, resource);
+      var isOutFolder = Objects.equals(outFolder, resource);
       if (!isOutFolder) {
         resourcesToDelete.add(resource);
       }
       return isOutFolder;
     });
     progress.beginTask("Delete existing Artifacts", resourcesToDelete.size());
-    for (IResource r : resourcesToDelete) {
+    for (var r : resourcesToDelete) {
       try {
         r.delete(IResource.FORCE, progress.newChild(1));
       }

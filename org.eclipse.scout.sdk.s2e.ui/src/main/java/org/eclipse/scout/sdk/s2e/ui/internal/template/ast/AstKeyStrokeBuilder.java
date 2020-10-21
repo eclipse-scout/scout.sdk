@@ -10,14 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 
 /**
  * <h3>{@link AstKeyStrokeBuilder}</h3>
@@ -50,16 +44,16 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
 
   @SuppressWarnings("unchecked")
   protected void addGetConfiguredKeyStroke() {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
 
-    MethodInvocation defaultValue = getFactory().newCombineKeyStrokes("ALT", "F6");
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var defaultValue = getFactory().newCombineKeyStrokes("ALT", "F6");
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(defaultValue);
 
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
-    Type stringType = getFactory().newTypeReference(String.class.getName());
+    var stringType = getFactory().newTypeReference(String.class.getName());
     getFactory().newMethod(getFactory().getScoutApi().AbstractAction().getConfiguredKeyStrokeMethodName())
         .withModifiers(ModifierKeyword.PROTECTED_KEYWORD)
         .withOverride(true)
@@ -68,11 +62,11 @@ public class AstKeyStrokeBuilder extends AstTypeBuilder<AstKeyStrokeBuilder> {
         .in(get())
         .insert();
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      String iKeyStroke = getFactory().getScoutApi().IKeyStroke().fqn();
-      String iKsSimpleName = getFactory().getImportRewrite().addImport(iKeyStroke);
-      ITrackedNodePosition typeNamePos = getFactory().getRewrite().track(defaultValue);
+      var iKeyStroke = getFactory().getScoutApi().IKeyStroke().fqn();
+      var iKsSimpleName = getFactory().getImportRewrite().addImport(iKeyStroke);
+      var typeNamePos = getFactory().getRewrite().track(defaultValue);
       links.addLinkedPosition(typeNamePos, true, AstNodeFactory.KEY_STROKE_GROUP);
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".F1");
       links.addLinkedPositionProposal(AstNodeFactory.KEY_STROKE_GROUP, iKsSimpleName + ".F2");

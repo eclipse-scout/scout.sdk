@@ -16,6 +16,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -30,9 +33,6 @@ import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link AnnotationQuery}</h3> Annotation query that by default returns all annotations directly defined on the
@@ -64,7 +64,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
       m_ownerInLevelFinder = level -> level.fields().withName(owner.getElementName()).first();
     }
     else if (owner instanceof MethodParameterSpi) {
-      MethodParameterSpi param = (MethodParameterSpi) owner;
+      var param = (MethodParameterSpi) owner;
       m_ownerInLevelFinder = getMethodLookup(param.getDeclaringMethod())
           .andThen(method -> method
               .flatMap(m -> ((IMethod) m).parameters().item(param.getIndex())));
@@ -79,7 +79,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
 
   @SuppressWarnings("TypeMayBeWeakened")
   protected static Function<IType, Optional<? extends IAnnotatable>> getMethodLookup(MethodSpi method) {
-    String methodId = method.wrap().identifier();
+    var methodId = method.wrap().identifier();
     return level -> level.methods().withMethodIdentifier(methodId).first();
   }
 
@@ -185,11 +185,11 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    */
   @Override
   public boolean test(IAnnotation a) {
-    ApiFunction<?, IClassNameSupplier> name = getName();
+    var name = getName();
     if (name == null) {
       return true; // not filtered by name
     }
-    Optional<String> fqn = name.apply(a.javaEnvironment()).map(IClassNameSupplier::fqn);
+    var fqn = name.apply(a.javaEnvironment()).map(IClassNameSupplier::fqn);
     return fqn.isPresent() && fqn.get().equals(a.name());
   }
 
@@ -197,23 +197,23 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
   @SuppressWarnings("unchecked")
   protected Stream<T> createStream() {
     Function<IAnnotatable, Spliterator<IAnnotation>> toAnnotations = o -> new WrappingSpliterator<>(o.unwrap().getAnnotations());
-    Function<IType, Spliterator<IAnnotation>> levelSpliteratorProvider = lookupOwnerOnLevel().andThen(
+    var levelSpliteratorProvider = lookupOwnerOnLevel().andThen(
         owner -> owner
             .map(toAnnotations)
             .orElse(null));
-    Stream<IAnnotation> result = new HierarchicalStreamBuilder<IAnnotation>()
+    var result = new HierarchicalStreamBuilder<IAnnotation>()
         .withSuperClasses(isIncludeSuperClasses())
         .withSuperInterfaces(isIncludeSuperInterfaces())
         .withStartType(true)
         .build(Ensure.notNull(getType()), levelSpliteratorProvider)
         .filter(this);
 
-    Class<AbstractManagedAnnotation> wrapperClass = getManagedWrapper();
+    var wrapperClass = getManagedWrapper();
     if (wrapperClass == null) {
       return (Stream<T>) result;
     }
 
-    Stream<AbstractManagedAnnotation> converted = result.map(annotation -> annotation.wrap(wrapperClass));
+    var converted = result.map(annotation -> annotation.wrap(wrapperClass));
     return (Stream<T>) converted;
   }
 }

@@ -15,7 +15,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
-import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstTableFieldBuilder;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.WrappedTrackedNodePosition;
 
 /**
@@ -33,7 +32,7 @@ public class TableFieldProposal extends FormFieldProposal {
 
   @Override
   protected TypeDeclaration createFormFieldType(Type superType) {
-    AstTableFieldBuilder fieldBuilder = getFactory().newTableField(getProposalContext().getDefaultName())
+    var fieldBuilder = getFactory().newTableField(getProposalContext().getDefaultName())
         .withNlsMethod(getNlsMethodName())
         .withReadOnlyNameSuffix(getProposalContext().getSuffix())
         .withSuperType(superType)

@@ -82,7 +82,7 @@ public abstract class AbstractWizardPage extends WizardPage {
       setMessage(getDescription(), IStatus.OK);
     }
     else {
-      IStatus highestSeverityStatus = getHighestSeverityStatus(status);
+      var highestSeverityStatus = getHighestSeverityStatus(status);
       int messagetype;
       switch (highestSeverityStatus.getSeverity()) {
         case IStatus.INFO:
@@ -98,7 +98,7 @@ public abstract class AbstractWizardPage extends WizardPage {
           messagetype = IMessageProvider.NONE;
           break;
       }
-      String message = highestSeverityStatus.getMessage();
+      var message = highestSeverityStatus.getMessage();
       setMessage(message, messagetype);
     }
     setPageComplete(!status.matches(IStatus.ERROR));
@@ -111,7 +111,7 @@ public abstract class AbstractWizardPage extends WizardPage {
 
   private static IStatus getHighestSeverityStatus(IStatus status, IStatus highestSeverity) {
     if (status.isMultiStatus()) {
-      for (IStatus child : status.getChildren()) {
+      for (var child : status.getChildren()) {
         highestSeverity = getHighestSeverityStatus(child, highestSeverity);
       }
       return highestSeverity;
@@ -161,7 +161,7 @@ public abstract class AbstractWizardPage extends WizardPage {
   }
 
   protected final MultiStatus computePageStatus() {
-    MultiStatus multiStatus = new MultiStatus(S2ESdkUiActivator.PLUGIN_ID, -1, "multi status", null);
+    var multiStatus = new MultiStatus(S2ESdkUiActivator.PLUGIN_ID, -1, "multi status", null);
     validatePage(multiStatus);
     return multiStatus;
   }
@@ -245,7 +245,7 @@ public abstract class AbstractWizardPage extends WizardPage {
   protected <T extends Control> boolean setPropertyWithChangingControl(T controlToChange, BooleanSupplier propertyChanger, Consumer<T> controlChanger) {
     try {
       setStateChanging(true);
-      boolean changed = propertyChanger.getAsBoolean();
+      var changed = propertyChanger.getAsBoolean();
       if (changed && controlToChange != null && isControlCreated()) {
         controlChanger.accept(controlToChange);
       }

@@ -32,19 +32,19 @@ public class MethodParameterTest {
 
   @Test
   public void testDeclaringMethodParameters(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
+    var childClassType = env.requireType(ChildClass.class.getName());
     assertEquals(3, childClassType.methods().stream().count());
-    IMethod method = childClassType.methods().item(1).get();
-    List<IMethodParameter> methodInChildClassParams = method.parameters().stream().collect(toList());
+    var method = childClassType.methods().item(1).get();
+    var methodInChildClassParams = method.parameters().stream().collect(toList());
     assertEquals(2, methodInChildClassParams.size());
 
-    IMethodParameter firstParam = methodInChildClassParams.get(0);
+    var firstParam = methodInChildClassParams.get(0);
     assertEquals("firstParam", firstParam.elementName());
     assertEquals(Flags.AccFinal, firstParam.flags());
     assertEquals(method, firstParam.declaringMethod());
     assertEquals(String.class.getName(), firstParam.dataType().name());
 
-    IMethodParameter secondParam = methodInChildClassParams.get(1);
+    var secondParam = methodInChildClassParams.get(1);
     assertEquals("secondParam", secondParam.elementName());
     assertEquals(Flags.AccFinal, secondParam.flags());
     assertEquals(method, secondParam.declaringMethod());
@@ -54,22 +54,22 @@ public class MethodParameterTest {
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
+    var childClassType = env.requireType(ChildClass.class.getName());
     assertFalse(Strings.isBlank(childClassType.methods().item(1).get().parameters().item(1).get().toString()));
 
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
     assertFalse(Strings.isBlank(baseClassType.methods().first().get().parameters().first().toString()));
   }
 
   @Test
   public void testBindingMethodParameters(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
     assertEquals(2, baseClassType.methods().stream().count());
-    IMethod method = baseClassType.methods().first().get();
-    List<IMethodParameter> methodInBaseClassParams = method.parameters().stream().collect(toList());
+    var method = baseClassType.methods().first().get();
+    var methodInBaseClassParams = method.parameters().stream().collect(toList());
     assertEquals(1, methodInBaseClassParams.size());
 
-    IMethodParameter runnableParam = methodInBaseClassParams.get(0);
+    var runnableParam = methodInBaseClassParams.get(0);
     assertEquals("runnableParam", runnableParam.elementName());
     assertEquals(Flags.AccFinal, runnableParam.flags());
     assertEquals(method, runnableParam.declaringMethod());

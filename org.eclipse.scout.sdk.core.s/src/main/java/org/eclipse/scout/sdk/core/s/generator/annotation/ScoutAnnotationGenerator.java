@@ -15,6 +15,9 @@ import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.raw;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -26,9 +29,6 @@ import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link ScoutAnnotationGenerator}</h3>
@@ -91,12 +91,12 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
   }
 
   public static IAnnotationGenerator<?> createClazz(CharSequence clazzFqn) {
-    IClassNameSupplier fqn = IClassNameSupplier.raw(clazzFqn);
+    var fqn = IClassNameSupplier.raw(clazzFqn);
     return createClazz(null, api -> fqn);
   }
 
   public static IAnnotationGenerator<?> createHandler(CharSequence handlerFqn) {
-    IClassNameSupplier fqn = IClassNameSupplier.raw(handlerFqn);
+    var fqn = IClassNameSupplier.raw(handlerFqn);
     return createHandler(null, api -> fqn);
   }
 
@@ -139,7 +139,7 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
    * @return The created {@link IAnnotationGenerator}.
    */
   public static IAnnotationGenerator<?> createRunWithClientSession(CharSequence clientSession) {
-    IClassNameSupplier session = IClassNameSupplier.raw(clientSession);
+    var session = IClassNameSupplier.raw(clientSession);
     return createRunWithClientSession(null, api -> session);
   }
 
@@ -154,7 +154,7 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
     ApiFunction<API, IClassNameSupplier> sessionFunction;
     if (clientSessionProvider == null) {
       // use default session
-      IClassNameSupplier session = IClassNameSupplier.raw(null);
+      var session = IClassNameSupplier.raw(null);
       sessionFunction = new ApiFunction<>(null, api -> session);
     }
     else {
@@ -172,7 +172,7 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
   }
 
   public static IAnnotationGenerator<?> createRunWithServerSession(CharSequence serverSession) {
-    IClassNameSupplier session = IClassNameSupplier.raw(serverSession);
+    var session = IClassNameSupplier.raw(serverSession);
     return createRunWithServerSession(null, api -> session);
   }
 
@@ -205,7 +205,7 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
   }
 
   public static IAnnotationGenerator<?> createFormData(CharSequence formDataClass, SdkCommand sdkCommand, DefaultSubtypeSdkCommand defaultSubtypeCommand) {
-    IAnnotationGenerator<?> generator = create().withElementNameFrom(IScoutApi.class, IScoutApi::FormData);
+    var generator = create().withElementNameFrom(IScoutApi.class, IScoutApi::FormData);
     if (Strings.hasText(formDataClass)) {
       generator.withElementFrom(IScoutApi.class, api -> api.FormData().valueElementName(), b -> b.classLiteral(formDataClass));
     }

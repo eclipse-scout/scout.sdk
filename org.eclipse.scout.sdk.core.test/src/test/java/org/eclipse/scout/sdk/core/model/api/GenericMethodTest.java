@@ -36,27 +36,27 @@ public class GenericMethodTest {
 
   @Test
   public void testTypeVariables(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithTypeVariables.class.getName());
+    var t = env.requireType(ClassWithTypeVariables.class.getName());
 
     assertEquals(0, t.typeArguments().count());
 
     assertEquals(2, t.typeParameters().count());
-    ITypeParameter p0 = t.typeParameters().findAny().get();
-    ITypeParameter p1 = t.typeParameters().skip(1).findAny().get();
+    var p0 = t.typeParameters().findAny().get();
+    var p1 = t.typeParameters().skip(1).findAny().get();
     assertEquals("IN", p0.elementName());
     assertEquals("OUT", p1.elementName());
 
-    IField f = t.fields().withName("m_value").first().get();
+    var f = t.fields().withName("m_value").first().get();
     assertEquals("OUT", f.dataType().name());
 
-    IMethod m = t.methods().withName("transform").first().get();
+    var m = t.methods().withName("transform").first().get();
     assertEquals("IN", m.parameters().first().get().dataType().name());
     assertEquals("OUT", m.requireReturnType().name());
   }
 
   @Test
   public void testTypeParameters(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithTypeParameters.class.getName());
+    var t = env.requireType(ClassWithTypeParameters.class.getName());
 
     assertEquals(0, t.typeParameters().count());
     assertEquals(0, t.typeArguments().count());
@@ -67,35 +67,35 @@ public class GenericMethodTest {
 
   @Test
   public void testTypeParametersInSyntheticSuperType(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithTypeParameters.class.getName()).requireSuperClass();
+    var t = env.requireType(ClassWithTypeParameters.class.getName()).requireSuperClass();
 
     assertEquals(2, t.typeArguments().count());
-    IType arg0 = t.typeArguments().findAny().get();
-    IType arg1 = t.typeArguments().skip(1).findAny().get();
+    var arg0 = t.typeArguments().findAny().get();
+    var arg1 = t.typeArguments().skip(1).findAny().get();
     assertEquals("java.lang.Integer", arg0.name());
     assertEquals("java.lang.String", arg1.name());
 
     assertEquals(2, t.typeParameters().count());
-    ITypeParameter p0 = t.typeParameters().findAny().get();
-    ITypeParameter p1 = t.typeParameters().skip(1).findAny().get();
+    var p0 = t.typeParameters().findAny().get();
+    var p1 = t.typeParameters().skip(1).findAny().get();
     assertEquals("IN", p0.elementName());
     assertEquals("OUT", p1.elementName());
 
-    IField f = t.fields().withName("m_value").first().get();
+    var f = t.fields().withName("m_value").first().get();
     assertEquals("java.lang.String", f.dataType().name());
 
-    IMethod m = t.methods().withName("transform").first().get();
+    var m = t.methods().withName("transform").first().get();
     assertEquals("java.lang.Integer", m.parameters().first().get().dataType().name());
     assertEquals("java.lang.String", m.requireReturnType().name());
   }
 
   @Test
   public void testTypeParametersAsTypeVariables(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithTypeParametersAsTypeVariables.class.getName());
+    var t = env.requireType(ClassWithTypeParametersAsTypeVariables.class.getName());
 
     assertEquals(2, t.typeParameters().count());
-    ITypeParameter p0 = t.typeParameters().findAny().get();
-    ITypeParameter p1 = t.typeParameters().skip(1).findAny().get();
+    var p0 = t.typeParameters().findAny().get();
+    var p1 = t.typeParameters().skip(1).findAny().get();
     assertEquals("A", p0.elementName());
     assertEquals("B", p1.elementName());
 
@@ -107,24 +107,24 @@ public class GenericMethodTest {
 
   @Test
   public void testTypeParametersAsTypeVariablesInSyntheticSuperType(IJavaEnvironment env) {
-    IType t = env.requireType(ClassWithTypeParametersAsTypeVariables.class.getName()).requireSuperClass();
+    var t = env.requireType(ClassWithTypeParametersAsTypeVariables.class.getName()).requireSuperClass();
 
     assertEquals(2, t.typeArguments().count());
-    IType arg0 = t.typeArguments().findAny().get();
-    IType arg1 = t.typeArguments().skip(1).findAny().get();
+    var arg0 = t.typeArguments().findAny().get();
+    var arg1 = t.typeArguments().skip(1).findAny().get();
     assertEquals("A", arg0.name());
     assertEquals("B", arg1.name());
 
     assertEquals(2, t.typeParameters().count());
-    ITypeParameter p0 = t.typeParameters().findAny().get();
-    ITypeParameter p1 = t.typeParameters().skip(1).findAny().get();
+    var p0 = t.typeParameters().findAny().get();
+    var p1 = t.typeParameters().skip(1).findAny().get();
     assertEquals("IN", p0.elementName());
     assertEquals("OUT", p1.elementName());
 
-    IField f = t.fields().withName("m_value").first().get();
+    var f = t.fields().withName("m_value").first().get();
     assertEquals("B", f.dataType().name());
 
-    IMethod m = t.methods().withName("transform").first().get();
+    var m = t.methods().withName("transform").first().get();
     assertEquals("A", m.parameters().first().get().dataType().name());
     assertEquals("B", m.requireReturnType().name());
   }

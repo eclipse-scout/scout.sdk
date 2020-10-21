@@ -13,11 +13,13 @@ package org.eclipse.scout.sdk.core.builder.java.expression;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 
 /**
  * <h3>{@link IExpressionBuilder}</h3>
@@ -64,7 +66,28 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    */
   TYPE classLiteral(CharSequence reference);
 
-  <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, IClassNameSupplier> referenceProvider);
+  /**
+   * Appends a class literal obtained from an {@link IApiSpecification}. The fully qualified name to use is obtained by
+   * using the {@link IClassNameSupplier} returned by invoking the given nameSupplier.
+   * <p>
+   * This method may be handy if the name of a class changes between different versions of an API. The builder then
+   * decides which API to use based on the version found in the {@link IJavaEnvironment} of the
+   * {@link IJavaBuilderContext}.
+   * </p>
+   * <b>Example:</b> {@code expressionBuilder.classLiteralFrom(IJavaApi.class, IJavaApi::Long)} creates
+   * {@code Long.class}.
+   * 
+   * @param apiClass
+   *          The api type that contains the class name. An instance of this type is passed to the nameSupplier. May be
+   *          {@code null} in case the given nameSupplier can handle a {@code null} input.
+   * @param nameSupplier
+   *          A {@link Function} to be called to obtain the {@link IClassNameSupplier} whose fully qualified name should be
+   *          added as class literal.
+   * @param <T>
+   *          The API type that contains the class name
+   * @return
+   */
+  <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, IClassNameSupplier> nameSupplier);
 
   /**
    * Appends a string literal with given value. The value is automatically escaped as necessary and surrounded with
@@ -97,10 +120,24 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    *          Specifies if a new line should be created for each array element.
    * @return This builder
    * @see #stringLiteral(CharSequence)
+   * @see #stringLiteralArray(CharSequence...)
+   * @see #stringLiteralArray(CharSequence[], boolean)
    * @see #nullLiteral()
    */
   TYPE stringLiteralArray(Stream<? extends CharSequence> elements, boolean formatWithNewlines);
 
+  /**
+   * Appends a string array with the elements specified. The values are automatically escaped as necessary and
+   * surrounded with quotes. All values are placed on a single line.
+   * 
+   * @param elements
+   *          The elements of the array. If a value in the array is {@code null}, a null literal is appended (see
+   *          {@link #nullLiteral()}).
+   * @return This builder
+   * @see #stringLiteral(CharSequence)
+   * @see #stringLiteralArray(CharSequence[], boolean)
+   * @see #stringLiteralArray(Stream, boolean)
+   */
   TYPE stringLiteralArray(CharSequence... elements);
 
   /**
@@ -114,6 +151,8 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    *          Specifies if a new line should be created for each array element.
    * @return This builder
    * @see #stringLiteral(CharSequence)
+   * @see #stringLiteralArray(CharSequence...)
+   * @see #stringLiteralArray(Stream, boolean)
    * @see #nullLiteral()
    */
   TYPE stringLiteralArray(CharSequence[] elements, boolean formatWithNewlines);
@@ -162,7 +201,7 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
   TYPE appendThrow();
 
   /**
-   * Appends an {@code if} expression.
+   * Appends an {@code if} expression with a trailing space.
    *
    * @return This builder
    */

@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.spliterator.HierarchicalStreamBuilder;
 import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
-import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
@@ -54,7 +53,7 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
     if (id == null) {
       return new WrappingSpliterator<>(container.unwrap().getMethods());
     }
-    for (MethodSpi m : container.unwrap().getMethods()) {
+    for (var m : container.unwrap().getMethods()) {
       if (id.equals(m.wrap().identifier())) {
         return new WrappingSpliterator<>(singletonList(m));
       }
@@ -202,22 +201,22 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
    */
   @Override
   public boolean test(IMethod f) {
-    String name = getName();
+    var name = getName();
     if (name != null && !name.equals(f.elementName())) {
       return false;
     }
 
-    int flags = getFlags();
+    var flags = getFlags();
     if (flags >= 0 && (f.flags() & flags) != flags) {
       return false;
     }
 
-    Pattern namePat = getNamePattern();
+    var namePat = getNamePattern();
     if (namePat != null && !namePat.matcher(f.elementName()).matches()) {
       return false;
     }
 
-    String annotFqn = getAnnotationFqn();
+    var annotFqn = getAnnotationFqn();
     return annotFqn == null || f.annotations().withName(annotFqn).existsAny();
   }
 

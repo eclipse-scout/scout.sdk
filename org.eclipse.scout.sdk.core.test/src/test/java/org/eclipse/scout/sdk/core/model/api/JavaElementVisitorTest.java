@@ -14,7 +14,6 @@ import static org.eclipse.scout.sdk.core.util.Strings.repeat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
@@ -43,9 +42,9 @@ public class JavaElementVisitorTest {
 
   @Test
   public void testDepthFirstVisit(IJavaEnvironment env) {
-    ICompilationUnit icu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
-    DepthFirstProtocolVisitor visitor = new DepthFirstProtocolVisitor();
-    TreeVisitResult result = icu.visit(visitor);
+    var icu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
+    var visitor = new DepthFirstProtocolVisitor();
+    var result = icu.visit(visitor);
 
     assertEquals(TreeVisitResult.CONTINUE, result);
     visitor.assertEqualsRefFile("JavaElementVisitorTest1.txt");
@@ -53,8 +52,8 @@ public class JavaElementVisitorTest {
 
   @Test
   public void testDepthFirstVisitSkippingElements(IJavaEnvironment env) {
-    ICompilationUnit icu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
-    DepthFirstProtocolVisitor visitor = new DepthFirstProtocolVisitor() {
+    var icu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
+    var visitor = new DepthFirstProtocolVisitor() {
       /**
        * abort protocol after the first annotation element
        */
@@ -69,7 +68,7 @@ public class JavaElementVisitorTest {
        */
       @Override
       public TreeVisitResult preVisit(IMethod method, int level, int index) {
-        TreeVisitResult result = super.preVisit(method, level, index);
+        var result = super.preVisit(method, level, index);
         if ("methodInChildClass".equals(method.elementName())) {
           return TreeVisitResult.SKIP_SUBTREE;
         }
@@ -81,23 +80,23 @@ public class JavaElementVisitorTest {
        */
       @Override
       public TreeVisitResult preVisit(IAnnotation annotation, int level, int index) {
-        TreeVisitResult result = super.preVisit(annotation, level, index);
+        var result = super.preVisit(annotation, level, index);
         if (SuppressWarnings.class.getName().equals(annotation.type().name())) {
           return TreeVisitResult.TERMINATE;
         }
         return result;
       }
     };
-    TreeVisitResult result = icu.visit(visitor);
+    var result = icu.visit(visitor);
     assertEquals(TreeVisitResult.TERMINATE, result);
     visitor.assertEqualsRefFile("JavaElementVisitorTest2.txt");
   }
 
   @Test
   public void testBreadthFirstVisit(IJavaEnvironment env) {
-    ICompilationUnit icu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
-    BreadthFirstProtocolVisitor visitor = new BreadthFirstProtocolVisitor();
-    TreeVisitResult result = icu.visit(visitor);
+    var icu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
+    var visitor = new BreadthFirstProtocolVisitor();
+    var result = icu.visit(visitor);
 
     assertEquals(TreeVisitResult.CONTINUE, result);
     visitor.assertEqualsRefFile("JavaElementVisitorTest3.txt");
@@ -105,8 +104,8 @@ public class JavaElementVisitorTest {
 
   @Test
   public void testBreadthFirstVisitSkippingElements(IJavaEnvironment env) {
-    ICompilationUnit icu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
-    BreadthFirstProtocolVisitor visitor = new BreadthFirstProtocolVisitor() {
+    var icu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
+    var visitor = new BreadthFirstProtocolVisitor() {
       @Override
       protected TreeVisitResult visitElement(IJavaElement element, int level, int index) {
         if (level == 4) {
@@ -132,15 +131,15 @@ public class JavaElementVisitorTest {
       }
     };
 
-    TreeVisitResult result = icu.visit(visitor);
+    var result = icu.visit(visitor);
     assertEquals(TreeVisitResult.TERMINATE, result);
     visitor.assertEqualsRefFile("JavaElementVisitorTest4.txt");
   }
 
   @Test
   public void testVisitFunction(IJavaEnvironment env) {
-    ICompilationUnit icu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
-    StringBuilder aggregator1 = new StringBuilder();
+    var icu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
+    var aggregator1 = new StringBuilder();
     Function<IJavaElement, TreeVisitResult> function1 = element -> {
       if ("ChildClass".equals(element.elementName())) {
         return TreeVisitResult.TERMINATE;
@@ -148,7 +147,7 @@ public class JavaElementVisitorTest {
       aggregator1.append(element.elementName()).append(',');
       return TreeVisitResult.CONTINUE;
     };
-    TreeVisitResult result = icu.visit(function1);
+    var result = icu.visit(function1);
     assertEquals(TreeVisitResult.TERMINATE, result);
     assertEquals("ChildClass.java,"
         + "org.eclipse.scout.sdk.core.fixture,"
@@ -159,7 +158,7 @@ public class JavaElementVisitorTest {
         + "List,"
         + "Set,", aggregator1.toString());
 
-    StringBuilder aggregator2 = new StringBuilder();
+    var aggregator2 = new StringBuilder();
     Function<IMethod, TreeVisitResult> function2 = element -> {
       aggregator2.append(element.elementName()).append(',');
       return TreeVisitResult.CONTINUE;
@@ -170,8 +169,8 @@ public class JavaElementVisitorTest {
 
   @Test
   public void testVisitNestedAnnotations(IJavaEnvironment env) {
-    IType type = env.requireType(ClassWithAnnotationWithArrayValues.class.getName());
-    StringJoiner protocol = new StringJoiner(",");
+    var type = env.requireType(ClassWithAnnotationWithArrayValues.class.getName());
+    var protocol = new StringJoiner(",");
     Consumer<IJavaElement> visitor = element -> protocol.add(element.elementName());
     type.visit(visitor);
     assertEquals("ClassWithAnnotationWithArrayValues," +
@@ -225,8 +224,8 @@ public class JavaElementVisitorTest {
 
   @Test
   public void testVisitConsumer(IJavaEnvironment env) {
-    ICompilationUnit icu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
-    StringBuilder aggregator1 = new StringBuilder();
+    var icu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
+    var aggregator1 = new StringBuilder();
     Consumer<IJavaElement> consumer1 = element -> aggregator1.append(element.elementName()).append(',');
     icu.visit(consumer1);
     assertEquals("ChildClass.java,"
@@ -261,7 +260,7 @@ public class JavaElementVisitorTest {
         + "SuppressWarnings,"
         + "value,", aggregator1.toString());
 
-    StringBuilder aggregator2 = new StringBuilder();
+    var aggregator2 = new StringBuilder();
     Consumer<IAnnotation> consumer2 = element -> aggregator2.append(element.elementName()).append(',');
     icu.visit(consumer2, IAnnotation.class);
     assertEquals("TestAnnotation,TestAnnotation,TestAnnotation,SuppressWarnings,", aggregator2.toString());
@@ -288,8 +287,8 @@ public class JavaElementVisitorTest {
     }
 
     default void assertEqualsRefFile(String refFile) {
-      try (InputStream in = JavaElementVisitorTest.class.getResourceAsStream(refFile)) {
-        String expected = Strings.fromInputStream(in, StandardCharsets.UTF_8).toString();
+      try (var in = JavaElementVisitorTest.class.getResourceAsStream(refFile)) {
+        var expected = Strings.fromInputStream(in, StandardCharsets.UTF_8).toString();
         assertEquals(expected, protocol().toString());
       }
       catch (IOException e) {

@@ -11,23 +11,16 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
 import static java.util.Collections.addAll;
+import static java.util.stream.Collectors.joining;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.WildcardType;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
@@ -61,7 +54,7 @@ public class AstMenuBuilder extends AstTypeBuilder<AstMenuBuilder> {
         .insert()
         .get();
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IMenu().fqn());
     }
@@ -75,27 +68,27 @@ public class AstMenuBuilder extends AstTypeBuilder<AstMenuBuilder> {
 
   @SuppressWarnings("unchecked")
   protected void addGetConfiguredMenuTypes() {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
 
-    IScoutApi scoutApi = getFactory().getScoutApi();
-    Type iMenuTypeType = getFactory().newTypeReference(scoutApi.IMenuType().fqn());
-    Type setType = getFactory().newTypeReference(Set.class.getName());
+    var scoutApi = getFactory().getScoutApi();
+    var iMenuTypeType = getFactory().newTypeReference(scoutApi.IMenuType().fqn());
+    var setType = getFactory().newTypeReference(Set.class.getName());
 
-    ParameterizedType returnType = ast.newParameterizedType(setType);
-    WildcardType extendsIMenuType = ast.newWildcardType();
+    var returnType = ast.newParameterizedType(setType);
+    var extendsIMenuType = ast.newWildcardType();
     extendsIMenuType.setBound(iMenuTypeType, true);
     returnType.typeArguments().add(extendsIMenuType);
 
-    MethodInvocation hashSet = ast.newMethodInvocation();
-    String methodName = getFactory().getScoutApi().CollectionUtility().hashSetMethodName();
-    Type collectionUtilityType = getFactory().newTypeReference(scoutApi.CollectionUtility().fqn());
+    var hashSet = ast.newMethodInvocation();
+    var methodName = getFactory().getScoutApi().CollectionUtility().hashSetMethodName();
+    var collectionUtilityType = getFactory().newTypeReference(scoutApi.CollectionUtility().fqn());
     hashSet.setName(ast.newSimpleName(methodName));
-    String collectionUtilityRef = collectionUtilityType.toString();
+    var collectionUtilityRef = collectionUtilityType.toString();
     hashSet.setExpression(ast.newSimpleName(collectionUtilityRef));
 
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(hashSet);
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
     getFactory().newMethod(getFactory().getScoutApi().AbstractMenu().getConfiguredMenuTypesMethodName())
@@ -107,22 +100,22 @@ public class AstMenuBuilder extends AstTypeBuilder<AstMenuBuilder> {
         .insert();
 
     // links positions
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
-      int offset = collectionUtilityRef.length() + methodName.length() + 2;
+      var offset = collectionUtilityRef.length() + methodName.length() + 2;
       ITrackedNodePosition typeNamePos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(hashSet), offset, -offset - 1);
       links.addLinkedPosition(typeNamePos, true, AstNodeFactory.MENU_TYPE_GROUP);
 
-      MenuTypeLinkedProposal menuTypeLinkedProposal = getMenuTypeLinkedProposal();
+      var menuTypeLinkedProposal = getMenuTypeLinkedProposal();
       if (menuTypeLinkedProposal != null) {
         getFactory().getImportRewrite().addImport(menuTypeLinkedProposal.m_typeFqn, getFactory().getContext());
 
-        for (String defaultVal : menuTypeLinkedProposal.m_defaultValues) {
+        for (var defaultVal : menuTypeLinkedProposal.m_defaultValues) {
           hashSet.arguments().add(ast.newQualifiedName(ast.newSimpleName(menuTypeLinkedProposal.m_typeSimpleName), ast.newSimpleName(defaultVal)));
         }
 
         if (menuTypeLinkedProposal.m_menuTypeProposals.size() > 1) {
-          for (String menuTypeProposal : menuTypeLinkedProposal.m_menuTypeProposals) {
+          for (var menuTypeProposal : menuTypeLinkedProposal.m_menuTypeProposals) {
             links.addLinkedPositionProposal(AstNodeFactory.MENU_TYPE_GROUP, menuTypeProposal);
           }
         }
@@ -131,10 +124,10 @@ public class AstMenuBuilder extends AstTypeBuilder<AstMenuBuilder> {
   }
 
   private MenuTypeLinkedProposal getMenuTypeLinkedProposal() {
-    ITypeBinding hierarchy = getFactory().getDeclaringTypeBinding();
-    IScoutApi scoutApi = getFactory().getScoutApi();
+    var hierarchy = getFactory().getDeclaringTypeBinding();
+    var scoutApi = getFactory().getScoutApi();
     if (AstUtils.isInstanceOf(hierarchy, scoutApi.AbstractTable().fqn())) {
-      MenuTypeLinkedProposal tableMenuType = new MenuTypeLinkedProposal(scoutApi.TableMenuType().fqn(), scoutApi.TableMenuType().SingleSelection(), scoutApi.TableMenuType().MultiSelection());
+      var tableMenuType = new MenuTypeLinkedProposal(scoutApi.TableMenuType().fqn(), scoutApi.TableMenuType().SingleSelection(), scoutApi.TableMenuType().MultiSelection());
       tableMenuType.addProposal(scoutApi.TableMenuType().EmptySpace());
       tableMenuType.addProposal(scoutApi.TableMenuType().EmptySpace(), scoutApi.TableMenuType().Header());
       tableMenuType.addProposal(scoutApi.TableMenuType().EmptySpace(), scoutApi.TableMenuType().SingleSelection(), scoutApi.TableMenuType().MultiSelection());
@@ -142,14 +135,14 @@ public class AstMenuBuilder extends AstTypeBuilder<AstMenuBuilder> {
     }
 
     if (AstUtils.isInstanceOf(hierarchy, scoutApi.AbstractValueField().fqn())) {
-      MenuTypeLinkedProposal valueFieldMenuType = new MenuTypeLinkedProposal(scoutApi.ValueFieldMenuType().fqn(), scoutApi.ValueFieldMenuType().NotNull());
+      var valueFieldMenuType = new MenuTypeLinkedProposal(scoutApi.ValueFieldMenuType().fqn(), scoutApi.ValueFieldMenuType().NotNull());
       valueFieldMenuType.addProposal(scoutApi.ValueFieldMenuType().Null());
       valueFieldMenuType.addProposal(scoutApi.ValueFieldMenuType().Null(), scoutApi.ValueFieldMenuType().NotNull());
       return valueFieldMenuType;
     }
 
     if (AstUtils.isInstanceOf(hierarchy, scoutApi.AbstractTree().fqn()) || AstUtils.isInstanceOf(hierarchy, scoutApi.AbstractTreeNode().fqn())) {
-      MenuTypeLinkedProposal calMenuType = new MenuTypeLinkedProposal(scoutApi.TreeMenuType().fqn(), scoutApi.TreeMenuType().SingleSelection(), scoutApi.TreeMenuType().MultiSelection());
+      var calMenuType = new MenuTypeLinkedProposal(scoutApi.TreeMenuType().fqn(), scoutApi.TreeMenuType().SingleSelection(), scoutApi.TreeMenuType().MultiSelection());
       calMenuType.addProposal(scoutApi.TreeMenuType().EmptySpace());
       calMenuType.addProposal(scoutApi.TreeMenuType().SingleSelection(), scoutApi.TreeMenuType().MultiSelection(), scoutApi.TreeMenuType().EmptySpace());
       return calMenuType;
@@ -160,7 +153,7 @@ public class AstMenuBuilder extends AstTypeBuilder<AstMenuBuilder> {
     }
 
     if (AstUtils.isInstanceOf(hierarchy, scoutApi.AbstractCalendarItemProvider().fqn()) || AstUtils.isInstanceOf(hierarchy, scoutApi.AbstractCalendar().fqn())) {
-      MenuTypeLinkedProposal calMenuType = new MenuTypeLinkedProposal(scoutApi.CalendarMenuType().fqn(), scoutApi.CalendarMenuType().CalendarComponent());
+      var calMenuType = new MenuTypeLinkedProposal(scoutApi.CalendarMenuType().fqn(), scoutApi.CalendarMenuType().CalendarComponent());
       calMenuType.addProposal(scoutApi.CalendarMenuType().EmptySpace());
       calMenuType.addProposal(scoutApi.CalendarMenuType().CalendarComponent());
       calMenuType.addProposal(scoutApi.CalendarMenuType().EmptySpace(), scoutApi.CalendarMenuType().CalendarComponent());
@@ -185,14 +178,13 @@ public class AstMenuBuilder extends AstTypeBuilder<AstMenuBuilder> {
     }
 
     private void addProposal(String... simpleNames) {
-      StringBuilder builder = new StringBuilder();
+      var builder = "";
       if (simpleNames != null && simpleNames.length > 0) {
-        builder.append(m_typeSimpleName).append(JavaTypes.C_DOT).append(simpleNames[0]);
-        for (int i = 1; i < simpleNames.length; i++) {
-          builder.append(", ").append(m_typeSimpleName).append(JavaTypes.C_DOT).append(simpleNames[i]);
-        }
+        builder = IntStream.range(1, simpleNames.length)
+            .mapToObj(i -> ", " + m_typeSimpleName + JavaTypes.C_DOT + simpleNames[i])
+            .collect(joining("", m_typeSimpleName + JavaTypes.C_DOT + simpleNames[0], ""));
       }
-      m_menuTypeProposals.add(builder.toString());
+      m_menuTypeProposals.add(builder);
     }
   }
 }

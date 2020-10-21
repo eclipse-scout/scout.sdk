@@ -54,9 +54,9 @@ public final class UniqueIds {
    * @return The unique id or {@code null}.
    */
   public static String next(String dataType) {
-    for (Function<String, String> p : providers()) {
+    for (var p : providers()) {
       try {
-        String value = p.apply(dataType);
+        var value = p.apply(dataType);
         if (value != null) {
           return value;
         }

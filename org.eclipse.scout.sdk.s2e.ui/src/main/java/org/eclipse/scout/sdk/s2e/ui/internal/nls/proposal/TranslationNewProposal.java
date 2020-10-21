@@ -53,7 +53,7 @@ public class TranslationNewProposal extends AbstractTranslationProposal {
   @Override
   public void apply(IDocument document, char trigger, int offset) {
     String searchText = null;
-    int initalOffset = getInitialOffset();
+    var initalOffset = getInitialOffset();
     try {
       searchText = document.get(initalOffset - getPrefix().length(), getPrefix().length() + offset - initalOffset);
     }
@@ -69,11 +69,11 @@ public class TranslationNewProposal extends AbstractTranslationProposal {
       proposalFieldText = Strings.fromStringLiteral('"' + searchText + '"').toString();
     }
 
-    String key = m_stack.generateNewKey(proposalFieldText);
-    Translation entry = new Translation(key);
+    var key = m_stack.generateNewKey(proposalFieldText);
+    var entry = new Translation(key);
     entry.putText(Language.LANGUAGE_DEFAULT, proposalFieldText);
 
-    TranslationNewAction action = new TranslationNewAction(Display.getDefault().getActiveShell(), m_stack, entry);
+    var action = new TranslationNewAction(Display.getDefault().getActiveShell(), m_stack, entry);
     action.run();
     action.getCreatedTranslation()
         .ifPresent(createdEntry -> {

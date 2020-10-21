@@ -15,16 +15,12 @@ import static java.util.Collections.emptyList;
 import java.util.List;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
-import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.Initializer;
-import org.eclipse.jdt.internal.compiler.ast.Javadoc;
-import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.FieldImplementor;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
@@ -62,15 +58,14 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
 
   @Override
   public JavaElementSpi internalFindNewElement() {
-    TypeSpi newType = (TypeSpi) getDeclaringType().internalFindNewElement();
-    if (newType != null) {
-      for (FieldSpi newF : newType.getFields()) {
-        if (getElementName().equals(newF.getElementName())) {
-          return newF;
-        }
-      }
+    var newType = (TypeSpi) getDeclaringType().internalFindNewElement();
+    if (newType == null) {
+      return null;
     }
-    return null;
+    return newType.getFields().stream()
+          .filter(newField -> getElementName().equals(newField.getElementName()))
+          .findFirst()
+          .orElse(null);
   }
 
   @Override
@@ -90,7 +85,7 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   @Override
   public IMetaValue getConstantValue() {
     return m_constRef.computeIfAbsentAndGet(() -> {
-      Object compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.initialization, null, javaEnvWithEcj());
+      var compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.initialization, null, javaEnvWithEcj());
       return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, compiledValue);
     });
   }
@@ -102,7 +97,7 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
         //static{ } section
         return javaEnvWithEcj().createVoidType();
       }
-      TypeBinding tb = m_astNode.type.resolvedType;
+      var tb = m_astNode.type.resolvedType;
       if (tb == null) {
         synchronized (javaEnvWithEcj().lock()) {
           tb = m_astNode.type.resolveType(SpiWithEcjUtils.classScopeOf(this));
@@ -143,8 +138,8 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
-      FieldDeclaration decl = m_astNode;
+      var cu = m_declaringType.getCompilationUnit();
+      var decl = m_astNode;
       return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
     });
   }
@@ -152,13 +147,13 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   @Override
   public ISourceRange getSourceOfInitializer() {
     return m_initSource.computeIfAbsentAndGet(() -> {
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+      var cu = m_declaringType.getCompilationUnit();
       if (m_astNode instanceof Initializer) {
         // static initializer
         return javaEnvWithEcj().getSource(cu, m_astNode.declarationSourceStart, m_astNode.declarationSourceEnd);
       }
 
-      Expression decl = m_astNode.initialization;
+      var decl = m_astNode.initialization;
       if (decl == null) {
         return null;
       }
@@ -169,11 +164,11 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   @Override
   public ISourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
-      Javadoc doc = m_astNode.javadoc;
+      var doc = m_astNode.javadoc;
       if (doc == null) {
         return null;
       }
-      CompilationUnitSpi cu = m_declaringType.getCompilationUnit();
+      var cu = m_declaringType.getCompilationUnit();
       return javaEnvWithEcj().getSource(cu, doc.sourceStart, doc.sourceEnd);
     });
   }

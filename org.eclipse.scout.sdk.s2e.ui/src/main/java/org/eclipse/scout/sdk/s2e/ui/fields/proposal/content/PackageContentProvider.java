@@ -20,7 +20,6 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -47,21 +46,21 @@ public class PackageContentProvider extends AbstractContentProviderAdapter {
 
   @Override
   protected Collection<Object> loadProposals(IProgressMonitor monitor) {
-    IJavaProject javaProject = getJavaProject();
+    var javaProject = getJavaProject();
     if (!JdtUtils.exists(javaProject)) {
       return emptyList();
     }
 
     Collection<Object> ret = new TreeSet<>(comparing(this::getText));
     try {
-      IPackageFragment[] packageFragments = javaProject.getPackageFragments();
-      for (IPackageFragment pck : packageFragments) {
+      var packageFragments = javaProject.getPackageFragments();
+      for (var pck : packageFragments) {
         if (monitor.isCanceled()) {
           return ret;
         }
 
         if (pck.getKind() == IPackageFragmentRoot.K_SOURCE) {
-          String packageName = pck.getElementName();
+          var packageName = pck.getElementName();
           if (Strings.hasText(packageName)) {
             ret.add(pck);
           }

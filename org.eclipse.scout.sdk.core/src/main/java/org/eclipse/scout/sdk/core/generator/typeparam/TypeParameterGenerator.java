@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator;
@@ -25,8 +26,6 @@ import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link TypeParameterGenerator}</h3>
@@ -89,7 +88,7 @@ public class TypeParameterGenerator<TYPE extends ITypeParameterGenerator<TYPE>> 
   protected void build(IJavaSourceBuilder<?> builder) {
     super.build(builder);
     builder.append(ensureValidJavaName(elementName().orElse(Character.toString(JavaTypes.C_QUESTION_MARK))));
-    Stream<ISourceGenerator<ISourceBuilder<?>>> bounds = m_bounds.stream()
+    var bounds = m_bounds.stream()
         .<ISourceGenerator<IJavaSourceBuilder<?>>> map(binding -> b -> b.refFrom(binding))
         .map(g -> g.generalize(JavaSourceBuilder::create));
     builder.append(bounds, " " + JavaTypes.EXTENDS + " ", " & ", null);

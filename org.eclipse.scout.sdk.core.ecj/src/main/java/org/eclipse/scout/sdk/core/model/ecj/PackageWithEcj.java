@@ -68,7 +68,7 @@ public class PackageWithEcj extends AbstractJavaElementWithEcj<IPackage> impleme
       // this is the default package. it has no parent package.
       return null;
     }
-    int lastDot = m_name.lastIndexOf(JavaTypes.C_DOT);
+    var lastDot = m_name.lastIndexOf(JavaTypes.C_DOT);
     if (lastDot < 0) {
       // the default package is the parent
       return javaEnvWithEcj().createDefaultPackage();

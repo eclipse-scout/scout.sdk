@@ -43,7 +43,7 @@ public class CompilationUnitGeneratorTest {
 
   @Test
   public void testCompilationUnit(IJavaEnvironment env) {
-    ICompilationUnitGenerator<?> generator = CompilationUnitGenerator.create()
+    var generator = CompilationUnitGenerator.create()
         .withPackageName("pck.test")
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withElementName("TestClass.java")
@@ -73,7 +73,7 @@ public class CompilationUnitGeneratorTest {
 
   @Test
   public void testMainType() {
-    ICompilationUnitGenerator<?> generator = CompilationUnitGenerator.create()
+    var generator = CompilationUnitGenerator.create()
         .withElementName("Test.java")
         .withType(TypeGenerator.create()
             .withElementName("OtherName"));

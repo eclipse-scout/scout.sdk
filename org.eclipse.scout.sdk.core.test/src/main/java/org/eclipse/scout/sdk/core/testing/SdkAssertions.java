@@ -20,15 +20,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiPredicate;
 
+import org.eclipse.scout.sdk.core.apidef.Api;
+import org.eclipse.scout.sdk.core.apidef.Api.ChildElementType;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -45,9 +45,6 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.Api;
-import org.eclipse.scout.sdk.core.util.apidef.Api.ChildElementType;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 import org.opentest4j.AssertionFailedError;
 
 /**
@@ -105,13 +102,13 @@ public final class SdkAssertions {
    */
   @SuppressWarnings("HardcodedLineSeparator")
   public static IType assertNoCompileErrors(IType t) {
-    List<String> compileErrors = t.javaEnvironment().compileErrors(t);
+    var compileErrors = t.javaEnvironment().compileErrors(t);
     if (compileErrors.isEmpty()) {
       return t;
     }
 
-    String errors = String.join("\n", compileErrors);
-    String msg = "Compilation Failure: \n" + errors + "\nSource:\n" + t.requireCompilationUnit().source().get();
+    var errors = String.join("\n", compileErrors);
+    var msg = "Compilation Failure: \n" + errors + "\nSource:\n" + t.requireCompilationUnit().source().get();
     throw new AssertionError(msg);
   }
 
@@ -141,14 +138,14 @@ public final class SdkAssertions {
    */
   public static void assertEqualsRefFile(String fileWithExpectedContent, CharSequence actualContent) {
     CharSequence refSrc;
-    try (InputStream in = SdkAssertions.class.getClassLoader().getResourceAsStream(Ensure.notNull(fileWithExpectedContent))) {
+    try (var in = SdkAssertions.class.getClassLoader().getResourceAsStream(Ensure.notNull(fileWithExpectedContent))) {
       refSrc = Strings.fromInputStream(Ensure.notNull(in, "File '{}' could not be found on classpath.", fileWithExpectedContent), StandardCharsets.UTF_8);
     }
     catch (IOException e) {
       throw new SdkException(e);
     }
-    CharSequence expected = normalizeNewLines(refSrc);
-    CharSequence actual = normalizeNewLines(actualContent);
+    var expected = normalizeNewLines(refSrc);
+    var actual = normalizeNewLines(actualContent);
     if (!Strings.equals(expected, actual)) {
       throw new AssertionFailedError(null, expected, actual);
     }
@@ -169,10 +166,10 @@ public final class SdkAssertions {
   public static IType assertTypeExists(IType declaringType, String typeName, String message) {
     assertNotNull(declaringType);
 
-    Optional<IType> type = declaringType.innerTypes().withSimpleName(typeName).first();
+    var type = declaringType.innerTypes().withSimpleName(typeName).first();
     if (type.isEmpty()) {
       if (message == null) {
-        StringBuilder messageBuilder = new StringBuilder("Type '").append(typeName).append('\'');
+        var messageBuilder = new StringBuilder("Type '").append(typeName).append('\'');
         messageBuilder.append(" in type '").append(declaringType.name()).append('\'');
         messageBuilder.append(" does not exist!");
         message = messageBuilder.toString();
@@ -192,17 +189,17 @@ public final class SdkAssertions {
    * @return the method if found
    */
   public static IMethod assertMethodExist(IType type, String methodName, String[] parameterTypes, String message) {
-    String methodId = JavaTypes.createMethodIdentifier(methodName, Arrays.asList(parameterTypes));
+    var methodId = JavaTypes.createMethodIdentifier(methodName, Arrays.asList(parameterTypes));
     return type.methods().stream()
         .filter(method -> method.identifier().equals(methodId))
         .findAny()
         .<AssertionError> orElseThrow(() -> {
-          String msg = message;
+          var msg = message;
           if (msg == null) {
-            StringBuilder messageBuilder = new StringBuilder("Method '").append(methodName).append('\'');
+            var messageBuilder = new StringBuilder("Method '").append(methodName).append('\'');
             messageBuilder.append(" in type '").append(type.name()).append('\'');
             messageBuilder.append(" does not exist! [parameters: ");
-            for (int i = 0; i < parameterTypes.length; i++) {
+            for (var i = 0; i < parameterTypes.length; i++) {
               messageBuilder.append('\'').append(parameterTypes[i]).append('\'');
               if (i < parameterTypes.length - 1) {
                 messageBuilder.append(", ");
@@ -220,7 +217,7 @@ public final class SdkAssertions {
   }
 
   public static void assertMethodReturnType(IMethod method, String expectedType, String message) {
-    String typeRef = method.requireReturnType().reference();
+    var typeRef = method.requireReturnType().reference();
     assertEquals(expectedType, typeRef, message);
   }
 
@@ -239,9 +236,9 @@ public final class SdkAssertions {
   public static IField assertFieldExist(IType type, String fieldName, String message) {
     return type.fields().withName(fieldName).first()
         .orElseThrow(() -> {
-          String msg = message;
+          var msg = message;
           if (msg == null) {
-            StringBuilder messageBuilder = new StringBuilder("Field '").append(fieldName).append('\'');
+            var messageBuilder = new StringBuilder("Field '").append(fieldName).append('\'');
             messageBuilder.append(" in type '").append(type.name()).append('\'');
             messageBuilder.append(" does not exist!");
             msg = messageBuilder.toString();
@@ -255,7 +252,7 @@ public final class SdkAssertions {
   }
 
   public static void assertFieldType(IField field, String expectedType, String message) {
-    String typeRef = field.dataType().reference();
+    var typeRef = field.dataType().reference();
     assertEquals(expectedType, typeRef, message);
   }
 
@@ -264,7 +261,7 @@ public final class SdkAssertions {
   }
 
   public static void assertHasSuperClass(IType type, String expectedSuperClass, String message) {
-    String refSuperTypeSig = type.requireSuperClass().reference();
+    var refSuperTypeSig = type.requireSuperClass().reference();
     assertEquals(expectedSuperClass, refSuperTypeSig, message);
   }
 
@@ -273,7 +270,7 @@ public final class SdkAssertions {
   }
 
   public static void assertHasSuperInterfaces(IType type, String[] expectedInterfaces, String message) {
-    List<String> interfaces = type.superInterfaces()
+    var interfaces = type.superInterfaces()
         .map(IType::reference)
         .collect(toList());
     assertEquals(Arrays.asList(expectedInterfaces), interfaces, message);
@@ -285,7 +282,7 @@ public final class SdkAssertions {
   public static IAnnotation assertAnnotation(IAnnotatable annotatable, String fqAnnotationTypeName) {
     return annotatable.annotations().withName(fqAnnotationTypeName).first()
         .orElseThrow(() -> {
-          StringBuilder message = new StringBuilder("Element '");
+          var message = new StringBuilder("Element '");
           message.append(annotatable.elementName());
           message.append("' does not have the expected annotation '").append(fqAnnotationTypeName).append("'.");
           return new AssertionError(message.toString());
@@ -297,10 +294,10 @@ public final class SdkAssertions {
   }
 
   public static void assertHasFlags(IMember member, int flags, String message) {
-    int memberFlags = member.flags();
+    var memberFlags = member.flags();
     if ((flags & memberFlags) != flags) {
       if (message == null) {
-        StringBuilder messageBuilder = new StringBuilder("member '").append(member.elementName()).append('\'');
+        var messageBuilder = new StringBuilder("member '").append(member.elementName()).append('\'');
         messageBuilder.append(" has flags [").append(Flags.toString(memberFlags)).append("] expected [").append(Flags.toString(flags)).append("]!");
         message = messageBuilder.toString();
       }
@@ -313,15 +310,17 @@ public final class SdkAssertions {
   }
 
   public static <A extends IApiSpecification> void assertApiValid(Class<A> apiSpec, IJavaEnvironment environment, BiPredicate<IType, A> validateOthers) {
-    A api = environment.requireApi(apiSpec);
+    var api = environment.requireApi(apiSpec);
     Api.dump(api).forEach((key, value) -> assertApiClassValid(key, value, environment, api, validateOthers));
   }
 
   static <A extends IApiSpecification> void assertApiClassValid(String fqn, Map<ChildElementType, Map<String, String>> children, IJavaEnvironment env, A api, BiPredicate<IType, A> validateOthers) {
-    IType type = env.requireType(fqn);
+    var typeOpt = env.findType(fqn);
+    assertTrue(typeOpt.isPresent(), "Type '" + fqn + "' could not be found.");
+    var type = typeOpt.get();
     testMethods(children.get(ChildElementType.METHOD_NAME).values(), type);
     testMethods(children.get(ChildElementType.ANNOTATION_ELEMENT_NAME).values(), type);
-    Map<String, String> notMatchingConvention = children.get(ChildElementType.OTHER);
+    var notMatchingConvention = children.get(ChildElementType.OTHER);
     if (notMatchingConvention == null || notMatchingConvention.isEmpty()) {
       return;
     }

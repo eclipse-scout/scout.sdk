@@ -39,11 +39,11 @@ public class TranslationRefreshAction extends Action {
   @Override
   public void run() {
     if (m_nlsProject.isDirty()) {
-      MessageBox msgBox = new MessageBox(m_table.getShell(), SWT.YES | SWT.NO | SWT.CANCEL);
+      var msgBox = new MessageBox(m_table.getShell(), SWT.YES | SWT.NO | SWT.CANCEL);
       //noinspection HardcodedLineSeparator
       msgBox.setMessage("There are unsaved changes. By refreshing all changes will be lost.\nDo you want to save your changes before refreshing?");
       msgBox.setText("Save changes before refreshing?");
-      int result = msgBox.open();
+      var result = msgBox.open();
       if (result == SWT.CANCEL) {
         return;
       }

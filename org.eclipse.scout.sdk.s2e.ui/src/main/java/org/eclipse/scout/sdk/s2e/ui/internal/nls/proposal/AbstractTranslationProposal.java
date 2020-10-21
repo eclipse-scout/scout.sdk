@@ -15,7 +15,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControlCreator;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
@@ -83,7 +82,7 @@ public abstract class AbstractTranslationProposal implements IJavaCompletionProp
   @Override
   public boolean validate(IDocument document, int offset, DocumentEvent event) {
     try {
-      Point keyRange = findKeyRange(document, offset);
+      var keyRange = findKeyRange(document, offset);
       if (keyRange != null) {
         return keyRange.x < offset && keyRange.y >= offset;
       }
@@ -108,10 +107,10 @@ public abstract class AbstractTranslationProposal implements IJavaCompletionProp
   }
 
   protected static Point findKeyRange(IDocument document, int offset) throws BadLocationException {
-    IRegion lineRange = document.getLineInformationOfOffset(offset);
+    var lineRange = document.getLineInformationOfOffset(offset);
     // find start
-    int startOffset = -1;
-    int index = offset - 1;
+    var startOffset = -1;
+    var index = offset - 1;
     while (index > 0 && index > lineRange.getOffset()) {
       if (document.getChar(index) == '"') {
         if (index > 1) {
@@ -129,9 +128,9 @@ public abstract class AbstractTranslationProposal implements IJavaCompletionProp
     }
 
     // find end
-    int endOffset = -1;
+    var endOffset = -1;
     index = offset;
-    boolean masked = false;
+    var masked = false;
     while ((document.getLength() > index && index < (lineRange.getOffset() + lineRange.getLength()))) {
       if (masked) {
         masked = false; // the current character is masked -> ignore
@@ -157,7 +156,7 @@ public abstract class AbstractTranslationProposal implements IJavaCompletionProp
   }
 
   protected void replaceWith(IDocument document, int offset, String replacement) throws BadLocationException {
-    Point keyRange = findKeyRange(document, offset);
+    var keyRange = findKeyRange(document, offset);
     if (keyRange != null) {
       m_selection = new Point(keyRange.x, replacement.length());
       TextEdit replaceEdit = new ReplaceEdit(keyRange.x, keyRange.y - keyRange.x, replacement);

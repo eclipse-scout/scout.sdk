@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -38,7 +38,7 @@ public class SimpleWorkingCopyTransformerBuilderTest {
   @Test
   public void testBuilder(IJavaEnvironment env) {
     m_counter.set(0);
-    IWorkingCopyTransformer transformer = new SimpleWorkingCopyTransformerBuilder()
+    var transformer = new SimpleWorkingCopyTransformerBuilder()
         .withAnnotationElementMapper(this::count)
         .withAnnotationMapper(this::count)
         .withCompilationUnitMapper(this::count)

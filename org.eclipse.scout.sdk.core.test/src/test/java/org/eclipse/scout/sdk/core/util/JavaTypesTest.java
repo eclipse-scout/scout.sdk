@@ -22,8 +22,6 @@ import java.util.Arrays;
 
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -167,8 +165,8 @@ public class JavaTypesTest {
   @Test
   @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
   public void testCreateMethodIdentifier(IJavaEnvironment env) {
-    IType type = env.requireType(ChildClass.class.getName());
-    IMethod method = type.methods().item(1).get();
+    var type = env.requireType(ChildClass.class.getName());
+    var method = type.methods().item(1).get();
     assertEquals("methodInChildClass(java.lang.String,java.util.List<java.lang.Runnable>)", method.identifier());
     assertEquals("methodInChildClass(java.lang.String,java.util.List)", method.identifier(true));
     assertEquals("methodInChildClass(java.lang.String,java.util.List<java.lang.Runnable>)", method.toWorkingCopy().identifier(env));
@@ -186,7 +184,7 @@ public class JavaTypesTest {
     assertEquals("QX.Member;", JavaTypes.erasure("QX<QObject;>.Member<QList<QT;>;QMap<QU;QABC<QT;>;>;>;"));
     assertEquals("QX.Member;", JavaTypes.erasure("QX<QList<QT;>;QMap<QU;QABC<QT;>;>;>.Member<QObject;>;"));
     assertEquals("X.Member", JavaTypes.erasure("X<List<T>,Map<U,ABC<T>>>.Member<Object>"));
-    String sign = "Ljava.util.List;";
+    var sign = "Ljava.util.List;";
     assertSame(sign, JavaTypes.erasure(sign));
     assertEquals("java.util.List", JavaTypes.erasure("java.util.List<-[java.lang.Number>"));
     assertEquals("java.util.List", JavaTypes.erasure("java.util.List<? extends java.lang.Number>"));

@@ -29,7 +29,7 @@ public class FactoryPathGenerator implements ISourceGenerator<ISourceBuilder<?>>
 
   @Override
   public void generate(ISourceBuilder<?> builder) {
-    String scoutVersion = rtVersion().orElseThrow(() -> newFail("No Scout version provided"));
+    var scoutVersion = rtVersion().orElseThrow(() -> newFail("No Scout version provided"));
     builder.append("<factorypath>").nl();
     builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/org/eclipse/scout/rt/org.eclipse.scout.jaxws.apt/").append(scoutVersion)
         .append("/org.eclipse.scout.jaxws.apt-").append(scoutVersion).append(".jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();

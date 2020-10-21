@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -55,7 +54,7 @@ public class WellformTest {
 
   @Test
   public void testWellform(IJavaEnvironment env) {
-    Wellformer wf = new Wellformer("\n", true);
+    var wf = new Wellformer("\n", true);
 
     Class<?>[] testingClasses = new Class[]{
         AnnotationCopyTestForm.class,
@@ -67,15 +66,15 @@ public class WellformTest {
         ExtendedTablePage.class
     };
 
-    for (Class<?> c : testingClasses) {
-      StringBuilder out = new StringBuilder();
-      String name = c.getName();
-      IType type = env.requireType(name);
+    for (var c : testingClasses) {
+      var out = new StringBuilder();
+      var name = c.getName();
+      var type = env.requireType(name);
 
-      CharSequence cuSource = type.requireCompilationUnit().source().get().asCharSequence();
+      var cuSource = type.requireCompilationUnit().source().get().asCharSequence();
 
       wf.buildSource(type, out);
-      String newCuSource = cuSource.toString().substring(0, type.source().get().start()) + out;
+      var newCuSource = cuSource.toString().substring(0, type.source().get().start()) + out;
       assertNoCompileErrors(env, type.qualifier(), type.elementName(), newCuSource);
     }
   }

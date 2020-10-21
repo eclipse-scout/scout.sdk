@@ -34,7 +34,7 @@ public class DepthFirstVisitorTypeAdapterTest {
 
   @Test
   public void testFunctionToVisitor() {
-    StringBuilder aggregator = new StringBuilder();
+    var aggregator = new StringBuilder();
     IDepthFirstVisitor<Object> visitor = new DepthFirstVisitorTypeAdapter<>(s -> {
       aggregator.append(s);
       return TreeVisitResult.CONTINUE;

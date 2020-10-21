@@ -63,7 +63,7 @@ import javax.swing.text.DefaultEditorKit
 class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() {
 
     private val m_model: NlsTableModel = NlsTableModel(stack, project)
-    private val m_table: TablePreservingSelection
+    private val m_table: TablePreservingSelection = TablePreservingSelection(m_model, { index -> m_model.translationForRow(index) }, { row -> m_model.rowForTranslation(row as ITranslationEntry) })
     private val m_tableSorterFilter = TableRowSorter(m_model)
     private val m_cellMargin = Insets(1, 4, 2, 2)
     private val m_editStartEvent = EventObject(this)
@@ -73,7 +73,6 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
     var contextMenu: JPopupMenu? = null
 
     init {
-        m_table = TablePreservingSelection(m_model, { index -> m_model.translationForRow(index) }, { row -> m_model.rowForTranslation(row as ITranslationEntry) })
         m_table.tableColumnsChangedCallback = { adjustView() }
         m_table.tableChangedCallback = { adjustRowHeights(it) }
         m_table.columnWidthSupplier = { if (it.modelIndex == KEY_COLUMN_INDEX) 250 else 350 }

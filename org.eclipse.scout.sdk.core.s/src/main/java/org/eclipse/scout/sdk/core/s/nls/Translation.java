@@ -63,7 +63,7 @@ public class Translation implements ITranslation {
 
   @Override
   public Translation merged(ITranslation translation) {
-    Translation merged = new Translation(this);
+    var merged = new Translation(this);
     if (translation != null) {
       translation.texts().forEach(merged::putText);
     }
@@ -123,7 +123,7 @@ public class Translation implements ITranslation {
       return false;
     }
 
-    Translation other = (Translation) obj;
+    var other = (Translation) obj;
     return key().equals(other.key())
         && textsMap().equals(other.textsMap());
   }

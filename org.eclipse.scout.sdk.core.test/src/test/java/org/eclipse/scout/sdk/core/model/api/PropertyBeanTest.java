@@ -17,8 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-
 import org.eclipse.scout.sdk.core.fixture.PropertyTestClass;
 import org.eclipse.scout.sdk.core.fixture.PropertyTestClass2;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
@@ -39,50 +37,50 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class PropertyBeanTest {
   @Test
   public void testPropertyBean(IJavaEnvironment env) {
-    IType propTestClass = env.requireType(PropertyTestClass.class.getName());
-    IType propTestClass2 = env.requireType(PropertyTestClass2.class.getName());
-    List<PropertyBean> propertyBeans = PropertyBean.of(propTestClass)
+    var propTestClass = env.requireType(PropertyTestClass.class.getName());
+    var propTestClass2 = env.requireType(PropertyTestClass2.class.getName());
+    var propertyBeans = PropertyBean.of(propTestClass)
         .sorted(comparing(PropertyBean::name))
         .collect(toList());
 
     assertEquals(5, propertyBeans.size());
 
-    PropertyBean aloneProp = propertyBeans.get(0);
+    var aloneProp = propertyBeans.get(0);
     assertEquals("Alone", aloneProp.name());
     assertEquals(String.class.getName(), aloneProp.type().name());
     assertEquals(propTestClass, aloneProp.declaringType());
     assertFalse(aloneProp.readMethod().isPresent());
     assertTrue(aloneProp.writeMethod().isPresent());
 
-    PropertyBean falseProp = propertyBeans.get(1);
+    var falseProp = propertyBeans.get(1);
     assertEquals("False", falseProp.name());
     assertEquals(JavaTypes.Boolean, falseProp.type().name());
     assertEquals(propTestClass, falseProp.declaringType());
     assertTrue(falseProp.readMethod().isPresent());
     assertTrue(falseProp.writeMethod().isPresent());
 
-    PropertyBean onlyProp = propertyBeans.get(2);
+    var onlyProp = propertyBeans.get(2);
     assertEquals("Only", onlyProp.name());
     assertEquals(JavaTypes.Integer, onlyProp.type().name());
     assertEquals(propTestClass, onlyProp.declaringType());
     assertTrue(onlyProp.readMethod().isPresent());
     assertFalse(onlyProp.writeMethod().isPresent());
 
-    PropertyBean stringProp = propertyBeans.get(3);
+    var stringProp = propertyBeans.get(3);
     assertEquals("String", stringProp.name());
     assertEquals(String.class.getName(), stringProp.type().name());
     assertEquals(propTestClass, stringProp.declaringType());
     assertTrue(stringProp.readMethod().isPresent());
     assertTrue(stringProp.writeMethod().isPresent());
 
-    PropertyBean trueProp = propertyBeans.get(4);
+    var trueProp = propertyBeans.get(4);
     assertEquals("True", trueProp.name());
     assertEquals(JavaTypes._boolean, trueProp.type().name());
     assertEquals(propTestClass, trueProp.declaringType());
     assertTrue(trueProp.readMethod().isPresent());
     assertTrue(trueProp.writeMethod().isPresent());
 
-    PropertyBean string2Prop = PropertyBean.of(propTestClass2).findAny().get();
+    var string2Prop = PropertyBean.of(propTestClass2).findAny().get();
     assertEquals(PropertyTestClass2.class.getName() + '#' + "String", string2Prop.toString());
 
     assertFalse(aloneProp.equals(stringProp));
@@ -96,7 +94,7 @@ public class PropertyBeanTest {
     assertNotEquals(string2Prop.hashCode(), stringProp.hashCode());
     assertEquals(aloneProp.hashCode(), aloneProp.hashCode());
 
-    long num = PropertyBean.of(propTestClass)
+    var num = PropertyBean.of(propTestClass)
         .filter(b -> Character.isLowerCase(b.type().elementName().charAt(0)))
         .count();
     assertEquals(1, num);
@@ -104,7 +102,7 @@ public class PropertyBeanTest {
 
   @Test
   public void testDataTypeOf(IJavaEnvironment env) {
-    IType t = env.requireType(PropertyTestClass.class.getName());
+    var t = env.requireType(PropertyTestClass.class.getName());
     assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("getString").first().get()).get().name());
     assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("setString").first().get()).get().name());
 

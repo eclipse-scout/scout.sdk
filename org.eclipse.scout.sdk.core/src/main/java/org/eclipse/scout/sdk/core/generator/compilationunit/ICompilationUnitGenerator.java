@@ -166,10 +166,11 @@ public interface ICompilationUnitGenerator<TYPE extends ICompilationUnitGenerato
   TYPE withType(ITypeGenerator<?> generator, Object... sortObjects);
 
   /**
-   * Removes the {@link ITypeGenerator} with given {@link #elementName()} from this {@link ICompilationUnitGenerator}.
+   * Removes all the {@link ITypeGenerator TypeGenerators} for which the given {@link Predicate} returns {@code true}.
    *
-   * @param elementName
-   *          The simple name of the {@link ITypeGenerator} to remove. Must not be {@code null}.
+   * @param removalFilter
+   *          A {@link Predicate} that decides if an {@link ITypeGenerator} should be removed. May be {@code null}. In
+   *          that case all {@link ITypeGenerator TypeGenerators} are removed.
    * @return This generator.
    */
   TYPE withoutType(Predicate<ITypeGenerator<?>> removalFilter);

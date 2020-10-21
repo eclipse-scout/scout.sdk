@@ -10,15 +10,10 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.derived;
 
-import java.util.Set;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
-import org.eclipse.scout.sdk.s2e.derived.IDerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -35,15 +30,15 @@ public class TriggerSelectedDerivedResourceHandler extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
-    MessageBox messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+    var messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
     messageBox.setMessage("This will update all derived resources in the selected scope.\nDepending on the size of your selection this can take several minutes.\nDo you really want to continue?");
     messageBox.setText("Do you really want to update the derived resources in the selected scope?");
-    int answer = messageBox.open();
+    var answer = messageBox.open();
     if (answer == SWT.YES) {
-      ISelection selection = HandlerUtil.getCurrentSelection(event);
-      Set<IResource> resourcesFromSelection = S2eUiUtils.getResourcesOfSelection(selection);
+      var selection = HandlerUtil.getCurrentSelection(event);
+      var resourcesFromSelection = S2eUiUtils.getResourcesOfSelection(selection);
       if (!resourcesFromSelection.isEmpty()) {
-        IDerivedResourceManager mgr = S2ESdkActivator.getDefault().getDerivedResourceManager();
+        var mgr = S2ESdkActivator.getDefault().getDerivedResourceManager();
         if (mgr != null) {
           mgr.trigger(resourcesFromSelection);
         }

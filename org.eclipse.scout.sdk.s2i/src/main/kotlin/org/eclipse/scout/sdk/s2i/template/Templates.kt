@@ -15,7 +15,7 @@ import com.intellij.psi.util.InheritanceUtil
 import com.intellij.util.containers.ContainerUtil.emptyList
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.apidef.ScoutModelHierarchy
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.Companion.message
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 
 object Templates {
 

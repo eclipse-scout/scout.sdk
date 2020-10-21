@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.fixture.apidef;
 
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 
 public interface ICustomApi extends IApiSpecification {
   int customMethod();

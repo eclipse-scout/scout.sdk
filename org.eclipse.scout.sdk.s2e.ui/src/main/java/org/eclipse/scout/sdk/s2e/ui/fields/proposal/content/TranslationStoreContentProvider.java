@@ -52,9 +52,9 @@ public class TranslationStoreContentProvider extends AbstractContentProviderAdap
 
   @Override
   public String getTextSelected(Object element) {
-    IType t = toTextService(element);
-    StringBuilder sb = new StringBuilder(t.getElementName());
-    String packageName = t.getPackageFragment().getElementName();
+    var t = toTextService(element);
+    var sb = new StringBuilder(t.getElementName());
+    var packageName = t.getPackageFragment().getElementName();
     if (Strings.hasText(packageName)) {
       sb.append(" - ").append(packageName);
     }
@@ -67,7 +67,7 @@ public class TranslationStoreContentProvider extends AbstractContentProviderAdap
   }
 
   public IType toTextService(Object element) {
-    ITranslationStore store = (ITranslationStore) element;
+    var store = (ITranslationStore) element;
     return m_jdtTypeCache.computeIfAbsent(store.service().type(), EclipseEnvironment::toJdtType);
   }
 

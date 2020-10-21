@@ -11,10 +11,8 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.page;
 
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.page.PageNewOperation;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -60,22 +58,22 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
     op.setClientSourceFolder(input.environment().toScoutSourceFolder(m_page1.getSourceFolder()));
     op.setPackage(m_page1.getTargetPackage());
     op.setPageName(m_page1.getIcuName());
-    IPackageFragmentRoot selectedSharedFolder = m_page1.getSharedSourceFolder();
+    var selectedSharedFolder = m_page1.getSharedSourceFolder();
     if (JdtUtils.exists(selectedSharedFolder)) {
       op.setSharedSourceFolder(input.environment().toScoutSourceFolder(selectedSharedFolder));
 
-      IPackageFragmentRoot dtoSourceFolder = S2eUtils.getDtoSourceFolder(selectedSharedFolder);
+      var dtoSourceFolder = S2eUtils.getDtoSourceFolder(selectedSharedFolder);
       op.setPageDataSourceFolder(input.environment().toScoutSourceFolder(dtoSourceFolder));
     }
-    IPackageFragmentRoot selectedServerFolder = m_page1.getServerSourceFolder();
+    var selectedServerFolder = m_page1.getServerSourceFolder();
     IJavaProject serverProject;
     if (JdtUtils.exists(selectedServerFolder)) {
       serverProject = selectedServerFolder.getJavaProject();
-      IClasspathEntry serverSourceFolder = input.environment().toScoutSourceFolder(selectedServerFolder);
+      var serverSourceFolder = input.environment().toScoutSourceFolder(selectedServerFolder);
       op.setServerSourceFolder(serverSourceFolder);
-      IScoutApi scoutApi = serverSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
+      var scoutApi = serverSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
       if (op.getTestSourceFolder() == null) {
-        IPackageFragmentRoot serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(selectedServerFolder, scoutApi.ServerTestRunner().fqn(), "service test");
+        var serviceTestSourceFolder = S2eUiUtils.getTestSourceFolder(selectedServerFolder, scoutApi.ServerTestRunner().fqn(), "service test");
         if (serviceTestSourceFolder != null) {
           op.setTestSourceFolder(input.environment().toScoutSourceFolder(serviceTestSourceFolder));
         }

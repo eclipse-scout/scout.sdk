@@ -10,11 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.util.apidef.ApiLevel;
+import org.eclipse.scout.sdk.core.apidef.ApiLevel;
 
 @ApiLevel(11)
 public interface Scout11Api extends IScoutApi, IScoutChartApi {
-  ChartUiTextContributor CHART_UI_TEXT_CONTRIBUTOR = new ChartUiTextContributor();
+  IScoutChartApi.ChartUiTextContributor CHART_UI_TEXT_CONTRIBUTOR = new ChartUiTextContributor();
 
   @Override
   default IScoutChartApi.ChartUiTextContributor ChartUiTextContributor() {

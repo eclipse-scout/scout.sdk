@@ -11,13 +11,12 @@
 package org.eclipse.scout.sdk.s2e.ui.fields.resource;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.event.EventListenerList;
@@ -135,7 +134,7 @@ public class ResourceTextField extends TextField {
         }
 
         try {
-          Path newFile = Paths.get(path).toRealPath(); // fails on invalid path
+          var newFile = Paths.get(path).toRealPath(); // fails on invalid path
           return newFile.toUri().toURL();
         }
         catch (Exception ex) {
@@ -152,10 +151,10 @@ public class ResourceTextField extends TextField {
     });
 
     // layout
-    FormData textData = (FormData) text.getLayoutData();
+    var textData = (FormData) text.getLayoutData();
     textData.right = new FormAttachment(m_popupButton, -2);
 
-    FormData buttonData = new FormData();
+    var buttonData = new FormData();
     buttonData.width = 70;
     buttonData.top = new FormAttachment(0, -1);
     buttonData.right = new FormAttachment(100, 0);
@@ -163,18 +162,19 @@ public class ResourceTextField extends TextField {
     m_popupButton.setLayoutData(buttonData);
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void showFileChooserDialog() {
     String fileName;
     if (isFolderMode()) {
-      DirectoryDialog dialog = new DirectoryDialog(getShell());
-      Path urlAsPath = getFile();
+      var dialog = new DirectoryDialog(getShell());
+      var urlAsPath = getFile();
       if (urlAsPath != null) {
         dialog.setFilterPath(urlAsPath.toString());
       }
       fileName = dialog.open();
     }
     else {
-      FileDialog dialog = new FileDialog(getShell());
+      var dialog = new FileDialog(getShell());
       if (getFileName() != null) {
         dialog.setFileName(getFileName());
       }
@@ -185,19 +185,15 @@ public class ResourceTextField extends TextField {
       fileName = dialog.open();
 
       if (!Strings.isEmpty(fileName) && getFilterExtensions() != null && getFilterExtensions().length > 0) {
-        Matcher m = Pattern.compile("\\.([^.]*)$").matcher(fileName);
+        var m = Pattern.compile("\\.([^.]*)$").matcher(fileName);
         String extension = null;
         if (m.find()) {
-          String fileNameExt = m.group(1);
-          for (String fExt : getFilterExtensions()) {
-            if (("*." + fileNameExt).equalsIgnoreCase(fExt)) {
-              extension = fileNameExt;
-              break;
-            }
-          }
+          var fileNameExt = m.group(1);
+          extension = Arrays.stream(getFilterExtensions())
+              .anyMatch(("*." + fileNameExt)::equalsIgnoreCase) ? fileNameExt : null;
         }
 
-        int extIndex = dialog.getFilterIndex();
+        var extIndex = dialog.getFilterIndex();
         if (extension == null && extIndex > -1 && extIndex < getFilterExtensions().length) {
           extension = getFilterExtensions()[extIndex];
           extension = Pattern.compile("\\**").matcher(extension).replaceFirst("");
@@ -230,9 +226,9 @@ public class ResourceTextField extends TextField {
   }
 
   private void fireValueChanged() {
-    Path newFile = getFile();
-    URL newUrl = getUrl();
-    for (IResourceChangedListener l : m_eventListeners.getListeners(IResourceChangedListener.class)) {
+    var newFile = getFile();
+    var newUrl = getUrl();
+    for (var l : m_eventListeners.getListeners(IResourceChangedListener.class)) {
       l.resourceChanged(newUrl, newFile);
     }
   }
@@ -276,13 +272,13 @@ public class ResourceTextField extends TextField {
   }
 
   public Path getFile() {
-    URL url = getUrl();
+    var url = getUrl();
     if (url == null) {
       return null;
     }
 
     try {
-      URI uri = url.toURI();
+      var uri = url.toURI();
       if (!"file".equalsIgnoreCase(uri.getScheme())) {
         return null;
       }

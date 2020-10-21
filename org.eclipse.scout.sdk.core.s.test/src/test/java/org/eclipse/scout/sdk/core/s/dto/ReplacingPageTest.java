@@ -21,8 +21,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
@@ -51,50 +49,50 @@ public class ReplacingPageTest {
 
     // fields of ReplacingPageData
     assertEquals(1, replacingPageData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ReplacingPageData'");
-    IField serialVersionUID = assertFieldExist(replacingPageData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(replacingPageData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(7, replacingPageData.methods().stream().count(), "method count of 'formdata.shared.services.pages.ReplacingPageData'");
-    IMethod addRow = assertMethodExist(replacingPageData, "addRow", new String[]{});
+    var addRow = assertMethodExist(replacingPageData, "addRow", new String[]{});
     assertMethodReturnType(addRow, "formdata.shared.services.pages.ReplacingPageData$ReplacingRowData");
     assertEquals(1, addRow.annotations().stream().count(), "annotation count");
     assertAnnotation(addRow, "java.lang.Override");
-    IMethod addRow1 = assertMethodExist(replacingPageData, "addRow", new String[]{"int"});
+    var addRow1 = assertMethodExist(replacingPageData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.pages.ReplacingPageData$ReplacingRowData");
     assertEquals(1, addRow1.annotations().stream().count(), "annotation count");
     assertAnnotation(addRow1, "java.lang.Override");
-    IMethod createRow = assertMethodExist(replacingPageData, "createRow", new String[]{});
+    var createRow = assertMethodExist(replacingPageData, "createRow", new String[]{});
     assertMethodReturnType(createRow, "formdata.shared.services.pages.ReplacingPageData$ReplacingRowData");
     assertEquals(1, createRow.annotations().stream().count(), "annotation count");
     assertAnnotation(createRow, "java.lang.Override");
-    IMethod getRowType = assertMethodExist(replacingPageData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(replacingPageData, "getRowType", new String[]{});
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertEquals(1, getRowType.annotations().stream().count(), "annotation count");
     assertAnnotation(getRowType, "java.lang.Override");
-    IMethod getRows = assertMethodExist(replacingPageData, "getRows", new String[]{});
+    var getRows = assertMethodExist(replacingPageData, "getRows", new String[]{});
     assertMethodReturnType(getRows, "formdata.shared.services.pages.ReplacingPageData$ReplacingRowData[]");
     assertEquals(1, getRows.annotations().stream().count(), "annotation count");
     assertAnnotation(getRows, "java.lang.Override");
-    IMethod rowAt = assertMethodExist(replacingPageData, "rowAt", new String[]{"int"});
+    var rowAt = assertMethodExist(replacingPageData, "rowAt", new String[]{"int"});
     assertMethodReturnType(rowAt, "formdata.shared.services.pages.ReplacingPageData$ReplacingRowData");
     assertEquals(1, rowAt.annotations().stream().count(), "annotation count");
     assertAnnotation(rowAt, "java.lang.Override");
-    IMethod setRows = assertMethodExist(replacingPageData, "setRows", new String[]{"formdata.shared.services.pages.ReplacingPageData$ReplacingRowData[]"});
+    var setRows = assertMethodExist(replacingPageData, "setRows", new String[]{"formdata.shared.services.pages.ReplacingPageData$ReplacingRowData[]"});
     assertMethodReturnType(setRows, "void");
     assertEquals(0, setRows.annotations().stream().count(), "annotation count");
 
     assertEquals(1, replacingPageData.innerTypes().stream().count(), "inner types count of 'ReplacingPageData'");
     // type ReplacingRowData
-    IType replacingRowData = assertTypeExists(replacingPageData, "ReplacingRowData");
+    var replacingRowData = assertTypeExists(replacingPageData, "ReplacingRowData");
     assertHasFlags(replacingRowData, 9);
     assertHasSuperClass(replacingRowData, "formdata.shared.services.pages.BaseTablePageData$BaseTableRowData");
     assertEquals(0, replacingRowData.annotations().stream().count(), "annotation count");
 
     // fields of ReplacingRowData
     assertEquals(1, replacingRowData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ReplacingPageData$ReplacingRowData'");
-    IField serialVersionUID1 = assertFieldExist(replacingRowData, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(replacingRowData, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");

@@ -10,12 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /**
@@ -48,13 +44,13 @@ public class AstImageFieldBuilder extends AstTypeBuilder<AstImageFieldBuilder> {
 
   @SuppressWarnings("unchecked")
   protected void addGetConfiguredAutoFit(String name, TypeDeclaration newFormField) {
-    AST ast = getFactory().getAst();
+    var ast = getFactory().getAst();
 
-    BooleanLiteral literal = ast.newBooleanLiteral(false);
-    ReturnStatement returnStatement = ast.newReturnStatement();
+    var literal = ast.newBooleanLiteral(false);
+    var returnStatement = ast.newReturnStatement();
     returnStatement.setExpression(literal);
 
-    Block body = ast.newBlock();
+    var body = ast.newBlock();
     body.statements().add(returnStatement);
 
     getFactory().newMethod(name)
@@ -66,7 +62,7 @@ public class AstImageFieldBuilder extends AstTypeBuilder<AstImageFieldBuilder> {
         .insert();
 
     // linked positions
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPosition(getFactory().getRewrite().track(literal), true, AstNodeFactory.AUTO_FIT_GROUP);
       links.addLinkedPositionProposalsBoolean(AstNodeFactory.AUTO_FIT_GROUP);

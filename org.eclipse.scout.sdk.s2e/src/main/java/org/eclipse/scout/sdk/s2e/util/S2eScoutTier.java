@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.util;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -60,13 +59,13 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
       return Optional.empty();
     }
 
-    String originJavaProjectName = origin.getElementName();
-    IJavaProject project = origin.getJavaModel().getJavaProject(unwrap().convert(to, originJavaProjectName));
+    var originJavaProjectName = origin.getElementName();
+    var project = origin.getJavaModel().getJavaProject(unwrap().convert(to, originJavaProjectName));
     if (!JdtUtils.exists(project)) {
       return Optional.empty();
     }
 
-    Optional<ScoutTier> projectTier = valueOf(project).map(S2eScoutTier::unwrap);
+    var projectTier = valueOf(project).map(S2eScoutTier::unwrap);
     if (projectTier.isEmpty()) {
       return Optional.empty();
     }
@@ -94,13 +93,13 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
       return Optional.empty();
     }
 
-    Optional<IPackageFragmentRoot> targetSrcFolder = convert(to, JdtUtils.getSourceFolder(origin));
+    var targetSrcFolder = convert(to, JdtUtils.getSourceFolder(origin));
     if (targetSrcFolder.isEmpty()) {
       return Optional.empty();
     }
 
-    String name = unwrap().convert(to, origin.getElementName());
-    IPackageFragment packageFragment = targetSrcFolder.get().getPackageFragment(name);
+    var name = unwrap().convert(to, origin.getElementName());
+    var packageFragment = targetSrcFolder.get().getPackageFragment(name);
     if (JdtUtils.exists(packageFragment)) {
       return Optional.of(packageFragment);
     }
@@ -126,15 +125,15 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
       return Optional.empty();
     }
 
-    Optional<IJavaProject> targetProject = convert(to, origin.getJavaProject());
+    var targetProject = convert(to, origin.getJavaProject());
     if (targetProject.isEmpty()) {
       return Optional.empty();
     }
 
-    String projectRelResourcePath = origin.getPath().removeFirstSegments(1).toString();
-    IFolder folder = targetProject.get().getProject().getFolder(projectRelResourcePath);
+    var projectRelResourcePath = origin.getPath().removeFirstSegments(1).toString();
+    var folder = targetProject.get().getProject().getFolder(projectRelResourcePath);
     if (folder != null && folder.exists()) {
-      IJavaElement element = JavaCore.create(folder);
+      var element = JavaCore.create(folder);
       if (JdtUtils.exists(element) && element.getElementType() == IJavaElement.PACKAGE_FRAGMENT_ROOT) {
         return Optional.of((IPackageFragmentRoot) element);
       }
@@ -166,7 +165,7 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
 
   @Override
   public boolean test(IJavaElement t) {
-    Optional<S2eScoutTier> tier = valueOf(t);
+    var tier = valueOf(t);
     return tier
         .filter(s2eScoutTier -> unwrap().isIncludedIn(s2eScoutTier.unwrap()))
         .isPresent();
@@ -185,7 +184,7 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    S2eScoutTier other = (S2eScoutTier) obj;
+    var other = (S2eScoutTier) obj;
     return m_tier == other.m_tier;
   }
 

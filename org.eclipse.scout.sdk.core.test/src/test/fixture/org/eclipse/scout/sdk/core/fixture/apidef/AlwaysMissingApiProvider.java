@@ -15,10 +15,10 @@ import static java.util.Collections.singletonList;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.apidef.ApiVersion;
+import org.eclipse.scout.sdk.core.apidef.IApiProvider;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.util.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.util.apidef.IApiProvider;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 public class AlwaysMissingApiProvider implements IApiProvider {
 

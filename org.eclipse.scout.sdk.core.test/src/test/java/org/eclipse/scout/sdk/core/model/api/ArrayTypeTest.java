@@ -34,19 +34,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class ArrayTypeTest {
   @Test
   public void testArrayTypes(IJavaEnvironment env) {
-    IType intArr = env.requireType("int[]");
+    var intArr = env.requireType("int[]");
     assertEquals(1, intArr.arrayDimension());
 
-    IType stringArr = env.requireType(String.class.getName() + "[][][]");
+    var stringArr = env.requireType(String.class.getName() + "[][][]");
     assertEquals(3, stringArr.arrayDimension());
 
-    IType entryArr = env.requireType(Entry.class.getName() + "[][][][]");
+    var entryArr = env.requireType(Entry.class.getName() + "[][][][]");
     assertEquals(4, entryArr.arrayDimension());
 
     env.reload();
     assertEquals(4, entryArr.arrayDimension());
 
-    IType roundingModeArr = env.requireType(RoundingMode.class.getName() + "[]");
+    var roundingModeArr = env.requireType(RoundingMode.class.getName() + "[]");
     assertEquals(1, roundingModeArr.arrayDimension());
     assertFalse(roundingModeArr.leafComponentType().get().isArray());
     assertTrue(isEnum(roundingModeArr.leafComponentType().get().flags()));

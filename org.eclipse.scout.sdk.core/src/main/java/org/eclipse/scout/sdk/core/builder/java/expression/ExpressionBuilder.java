@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilderWrapper;
@@ -22,8 +24,6 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link ExpressionBuilder}</h3>
@@ -57,8 +57,8 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
   }
 
   @Override
-  public <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, IClassNameSupplier> referenceProvider) {
-    return refClassFrom(apiClass, referenceProvider).append(JavaTypes.CLASS_FILE_SUFFIX);
+  public <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, IClassNameSupplier> nameSupplier) {
+    return refClassFrom(apiClass, nameSupplier).append(JavaTypes.CLASS_FILE_SUFFIX);
   }
 
   @Override
@@ -78,7 +78,7 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
 
   @Override
   public TYPE appendIf() {
-    return append("if");
+    return append("if ");
   }
 
   @Override
@@ -91,7 +91,7 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
 
   @Override
   public TYPE appendDefaultValueOf(CharSequence dataTypeFqn) {
-    String defaultVal = JavaTypes.defaultValueOf(dataTypeFqn);
+    var defaultVal = JavaTypes.defaultValueOf(dataTypeFqn);
     if (defaultVal != null) {
       return append(defaultVal);
     }
@@ -124,7 +124,7 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
 
   @Override
   public TYPE stringLiteralArray(Stream<? extends CharSequence> elements, boolean formatWithNewlines) {
-    Stream<ISourceGenerator<ISourceBuilder<?>>> stringLiteralGenerators = Ensure.notNull(elements)
+    var stringLiteralGenerators = Ensure.notNull(elements)
         .<ISourceGenerator<IExpressionBuilder<?>>> map(e -> b -> b.stringLiteral(e))
         .map(g -> g.generalize(ExpressionBuilder::create));
     return array(stringLiteralGenerators, formatWithNewlines);

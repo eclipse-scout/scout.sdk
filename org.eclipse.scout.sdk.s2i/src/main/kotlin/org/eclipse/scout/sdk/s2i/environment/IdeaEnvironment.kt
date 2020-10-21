@@ -17,6 +17,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils.runWithWriteActionPriority
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
@@ -43,9 +44,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.repeatUntilPassesWithIndex
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import org.eclipse.scout.sdk.s2i.util.getNioPath
-import org.jetbrains.jps.model.serialization.PathMacroUtil
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -126,8 +125,8 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
     override fun rootOfJavaEnvironment(environment: IJavaEnvironment?): Path {
         val spi = environment?.unwrap() ?: throw newFail("Java environment must not be null")
         val ideaEnv = spi as JavaEnvironmentWithIdea
-        val moduleDirPath = PathMacroUtil.getModuleDir(ideaEnv.module.moduleFilePath) ?: throw newFail("Java environment '{}' has no root directory.", ideaEnv)
-        return Paths.get(moduleDirPath)
+        val root = ideaEnv.module.rootManager.contentRoots.firstOrNull() ?: throw newFail("Java environment '{}' has no root directory.", ideaEnv)
+        return root.getNioPath()
     }
 
     fun toScoutJavaEnvironment(module: Module?): IJavaEnvironment? =

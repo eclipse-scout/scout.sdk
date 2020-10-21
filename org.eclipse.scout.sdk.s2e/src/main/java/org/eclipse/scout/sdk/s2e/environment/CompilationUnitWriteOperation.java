@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
@@ -67,11 +66,11 @@ public class CompilationUnitWriteOperation implements IResourceWriteOperation {
 
   @Override
   public IResource getAffectedResource() {
-    IResource result = getSourceFolder().getResource();
-    IPackageFragment packageFragment = getSourceFolder().getPackageFragment(getPackageName());
+    var result = getSourceFolder().getResource();
+    var packageFragment = getSourceFolder().getPackageFragment(getPackageName());
     if (JdtUtils.exists(packageFragment)) {
       result = packageFragment.getResource();
-      ICompilationUnit compilationUnit = packageFragment.getCompilationUnit(getFileName());
+      var compilationUnit = packageFragment.getCompilationUnit(getFileName());
       if (compilationUnit.exists()) {
         result = compilationUnit.getResource();
       }
@@ -84,8 +83,8 @@ public class CompilationUnitWriteOperation implements IResourceWriteOperation {
     progress.init(5, toString());
 
     try {
-      String newSource = getSourceFormatted(getContent().toString(), m_project, progress.newChild(1));
-      IPackageFragment pck = getSourceFolder().getPackageFragment(getPackageName());
+      var newSource = getSourceFormatted(getContent().toString(), m_project, progress.newChild(1));
+      var pck = getSourceFolder().getPackageFragment(getPackageName());
       if (!JdtUtils.exists(pck)) {
         pck = getSourceFolder().createPackageFragment(getPackageName(), true, progress.newChild(1).monitor());
       }
@@ -114,7 +113,7 @@ public class CompilationUnitWriteOperation implements IResourceWriteOperation {
 
   protected String getSourceFormatted(String unformattedJavaSource, IJavaProject settings, EclipseProgress progress) {
     try {
-      SourceFormatOperation op = new SourceFormatOperation(settings, new Document(unformattedJavaSource));
+      var op = new SourceFormatOperation(settings, new Document(unformattedJavaSource));
       op.accept(progress.newChild(10));
       return op.getDocument().get();
     }
@@ -156,7 +155,7 @@ public class CompilationUnitWriteOperation implements IResourceWriteOperation {
     if (!JdtUtils.exists(m_createdCompilationUnit)) {
       return null;
     }
-    IResource resource = m_createdCompilationUnit.getResource();
+    var resource = m_createdCompilationUnit.getResource();
     if (resource == null || !resource.exists() || resource.getType() != IResource.FILE) {
       return null;
     }
@@ -165,7 +164,7 @@ public class CompilationUnitWriteOperation implements IResourceWriteOperation {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("Write ");
+    var sb = new StringBuilder("Write ");
     sb.append(getSourceFolder().getPath()).append('/');
     if (!getPackageName().isEmpty()) {
       sb.append(getPackageName().replace(JavaTypes.C_DOT, '/')).append('/');

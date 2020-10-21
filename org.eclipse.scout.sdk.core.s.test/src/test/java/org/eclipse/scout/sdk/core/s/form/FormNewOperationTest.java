@@ -44,8 +44,8 @@ public class FormNewOperationTest {
   @ParameterizedTest(name = "withDTO={0}, withPermission={1}, withService={2}, withClientTest={3}, withServerTest={4}")
   public void testFormCreation(boolean isCreateFormData, boolean isCreatePermissions, boolean isCreateService,
       boolean sourceFolderClientTest, boolean sourceFolderServerTest, TestingEnvironment env) {
-    IScoutApi scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
-    FormNewOperation fno = new FormNewOperation();
+    var scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
+    var fno = new FormNewOperation();
     fno.setClientPackage("org.eclipse.scout.sdk.s2e.client.test");
     fno.setClientSourceFolder(env.getTestingSourceFolder());
     if (sourceFolderClientTest) {

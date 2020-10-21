@@ -33,7 +33,6 @@ import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvi
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
-import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
@@ -46,30 +45,30 @@ public class MissingTranslationQueryTest {
 
   @Test
   public void testWithTextServicesAvailable(TestingEnvironment env) {
-    String existingKey = "key";
+    var existingKey = "key";
 
-    String htmlTestFile = "test.html";
-    String htmlTestFile4 = "test4.html";
-    String javaTestFile2 = "test2.java";
-    String javaTestFile3 = "test3.java";
-    String javaTestFile4 = "test4.java";
-    String javaTestFileWithNonExistingConstant = "test7.java";
-    String javaTestFileWithUnresolvableConstant = "test8.java";
-    String javaNonExistingVariableTestFile = "test10.java";
-    String javaTestFileWithSuffix = "test12.java";
+    var htmlTestFile = "test.html";
+    var htmlTestFile4 = "test4.html";
+    var javaTestFile2 = "test2.java";
+    var javaTestFile3 = "test3.java";
+    var javaTestFile4 = "test4.java";
+    var javaTestFileWithNonExistingConstant = "test7.java";
+    var javaTestFileWithUnresolvableConstant = "test8.java";
+    var javaNonExistingVariableTestFile = "test10.java";
+    var javaTestFileWithSuffix = "test12.java";
 
-    String jsTestFile1 = "test1.js";
-    String javaTestFile1 = "test1.java";
-    String jsTestFile2 = "test2.js";
-    String jsTestFileWithNonExistingVariable = "test6.js";
-    String jsTestFileWithUnresolvableConstant = "test8.js";
+    var jsTestFile1 = "test1.js";
+    var javaTestFile1 = "test1.java";
+    var jsTestFile2 = "test2.js";
+    var jsTestFileWithNonExistingVariable = "test6.js";
+    var jsTestFileWithUnresolvableConstant = "test8.js";
 
-    String jsTestFile15 = "test15.js";
-    String jsTestFile16 = "test16.js";
-    String jsTestFile17 = "test17.js";
-    String jsTestFile18 = "test18.js";
+    var jsTestFile15 = "test15.js";
+    var jsTestFile16 = "test16.js";
+    var jsTestFile17 = "test17.js";
+    var jsTestFile18 = "test18.js";
 
-    MissingTranslationQuery query = createQueryWithKeys(existingKey);
+    var query = createQueryWithKeys(existingKey);
 
     searchIn(query, javaTestFile1, "abc TEXTS.get(\"aa\") def", env); // finding
     searchIn(query, javaTestFile2, "abc TEXTS.get(locale, \"bb\") def", env); // finding
@@ -160,7 +159,7 @@ public class MissingTranslationQueryTest {
   @Test
   public void testWithNoTextServiceAvailable(TestingEnvironment env) {
     // if no service is found: all keys should be accepted because they are considered to not be part of a Scout module
-    MissingTranslationQuery query = new MissingTranslationQuery();
+    var query = new MissingTranslationQuery();
     searchIn(query, "test1.java", "TEXTS.get(\"aa\")", env);
     assertEquals(0, query.result().count());
     assertTrue(MissingTranslationQuery.supportedFileTypes().size() > 0);
@@ -169,7 +168,7 @@ public class MissingTranslationQueryTest {
   @Test
   @ExtendWith(TranslationStoreSupplierExtension.class)
   public void testScoutJsModuleKeys(TestingEnvironment env) {
-    MissingTranslationQuery query = new MissingTranslationQuery();
+    var query = new MissingTranslationQuery();
     searchIn(query, "test1.js", "abc; session.text('ui.notExisting.key');", ScoutFixtureHelper.NLS_TEST_DIR, env);
     searchIn(query, "test2.js", "abc; session.text('" + TranslationStoreSupplierExtension.TRANSLATION_KEY_1 + "');", ScoutFixtureHelper.NLS_TEST_DIR, env); // exists in the ui contributor (referenced text service)
     searchIn(query, "test3.js", "var test = '" + TranslationStoreSupplierExtension.TRANSLATION_KEY_1 + "'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR, env); // exists in the ui contributor (literal)
@@ -195,17 +194,17 @@ public class MissingTranslationQueryTest {
   }
 
   protected static void assertFileRange(MissingTranslationQuery query, String fileName, int expectedStart, int expectedEnd, int expectedSeverity) {
-    Set<FileQueryMatch> htmlFileResult = query.result(Paths.get(fileName));
+    var htmlFileResult = query.result(Paths.get(fileName));
     assertEquals(1, htmlFileResult.size());
 
-    FileQueryMatch finding = htmlFileResult.iterator().next();
+    var finding = htmlFileResult.iterator().next();
     assertEquals(expectedStart, finding.start());
     assertEquals(expectedEnd, finding.end());
     assertEquals(expectedSeverity, finding.severity());
   }
 
   protected static MissingTranslationQuery createQueryWithKeys(String... keys) {
-    MissingTranslationQuery spy = Mockito.spy(MissingTranslationQuery.class);
+    var spy = Mockito.spy(MissingTranslationQuery.class);
     Set<String> existingKeys = new HashSet<>(Arrays.asList(keys));
     doReturn(Optional.of(existingKeys)).when(spy).accessibleKeysForModule(any(), any(), any());
     return spy;

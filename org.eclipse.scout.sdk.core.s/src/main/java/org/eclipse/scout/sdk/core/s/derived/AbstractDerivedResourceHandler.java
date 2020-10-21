@@ -38,13 +38,13 @@ public abstract class AbstractDerivedResourceHandler implements IDerivedResource
 
   @Override
   public final Collection<? extends IFuture<?>> apply(IEnvironment env, IProgress progress) {
-    String backup = CoreUtils.getUsername();
+    var backup = CoreUtils.getUsername();
     try {
       CoreUtils.setUsernameForThread("Scout robot");
       return execute(env, progress);
     }
     catch (MissingTypeException mte) {
-      String inputTypeName = getInput().getSourceType(env).map(IType::name).orElse(null);
+      var inputTypeName = getInput().getSourceType(env).map(IType::name).orElse(null);
       SdkLog.info("Skip type '{}' because it contains compile errors", inputTypeName, mte);
       return emptyList();
     }
@@ -72,7 +72,7 @@ public abstract class AbstractDerivedResourceHandler implements IDerivedResource
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    AbstractDerivedResourceHandler other = (AbstractDerivedResourceHandler) obj;
+    var other = (AbstractDerivedResourceHandler) obj;
     return m_input.equals(other.m_input);
   }
 }

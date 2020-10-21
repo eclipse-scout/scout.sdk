@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.util.visitor;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -43,8 +42,8 @@ public class BreadthFirstTraversal<T> implements ITreeTraversal<T> {
     enqueue(dek, root, 0, 0);
 
     while (!dek.isEmpty()) {
-      P_BreadthFirstNode<T> node = dek.poll();
-      TreeVisitResult nextAction = m_visitor.visit(node.m_element, node.m_level, node.m_index);
+      var node = dek.poll();
+      var nextAction = m_visitor.visit(node.m_element, node.m_level, node.m_index);
       if (nextAction == TreeVisitResult.TERMINATE) {
         return TreeVisitResult.TERMINATE;
       }
@@ -62,12 +61,12 @@ public class BreadthFirstTraversal<T> implements ITreeTraversal<T> {
   }
 
   protected void enqueueChildren(Deque<P_BreadthFirstNode<T>> dek, P_BreadthFirstNode<T> node) {
-    Stream<? extends T> children = m_childrenSupplier.apply(node.m_element);
+    var children = m_childrenSupplier.apply(node.m_element);
     if (children == null) {
       return;
     }
 
-    AtomicInteger index = new AtomicInteger();
+    var index = new AtomicInteger();
     children.forEach(child -> enqueueChild(child, dek, node, index.getAndIncrement()));
   }
 
@@ -79,14 +78,14 @@ public class BreadthFirstTraversal<T> implements ITreeTraversal<T> {
   }
 
   protected void enqueue(Deque<P_BreadthFirstNode<T>> dek, T element, int level, int index) {
-    P_BreadthFirstNode<T> e = new P_BreadthFirstNode<>(element, level, index);
+    var e = new P_BreadthFirstNode<>(element, level, index);
     dek.addLast(e);
   }
 
   protected void removeQueuedSiblings(Iterable<P_BreadthFirstNode<T>> dek) {
-    Iterator<P_BreadthFirstNode<T>> iterator = dek.iterator();
+    var iterator = dek.iterator();
     while (iterator.hasNext()) {
-      P_BreadthFirstNode<T> siblingCandidate = iterator.next();
+      var siblingCandidate = iterator.next();
       if (siblingCandidate.m_index > 0) {
         iterator.remove();
       }

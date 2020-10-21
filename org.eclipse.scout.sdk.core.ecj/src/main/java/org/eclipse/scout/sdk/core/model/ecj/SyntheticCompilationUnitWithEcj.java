@@ -39,7 +39,7 @@ public class SyntheticCompilationUnitWithEcj extends AbstractJavaElementWithEcj<
 
   @Override
   public JavaElementSpi internalFindNewElement() {
-    TypeSpi newType = getJavaEnvironment().findType(m_mainType.getName());
+    var newType = getJavaEnvironment().findType(m_mainType.getName());
     if (newType != null) {
       return newType.getCompilationUnit();
     }

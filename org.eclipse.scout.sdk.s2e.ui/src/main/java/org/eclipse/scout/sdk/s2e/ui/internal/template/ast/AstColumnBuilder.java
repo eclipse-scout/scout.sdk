@@ -10,10 +10,6 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
 /**
@@ -40,7 +36,7 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
     // column getter
     addColumnGetter();
 
-    ILinkedPositionHolder links = getFactory().getLinkedPositionHolder();
+    var links = getFactory().getLinkedPositionHolder();
     if (links != null && isCreateLinks()) {
       links.addLinkedPositionProposalsHierarchy(AstNodeFactory.SUPER_TYPE_GROUP, getFactory().getScoutApi().IColumn().fqn());
     }
@@ -49,19 +45,19 @@ public class AstColumnBuilder extends AstTypeBuilder<AstColumnBuilder> {
   }
 
   protected void addColumnGetter() {
-    IScoutApi scoutApi = getFactory().getScoutApi();
-    MethodInvocation getColumnSet = getFactory().getAst().newMethodInvocation();
+    var scoutApi = getFactory().getScoutApi();
+    var getColumnSet = getFactory().getAst().newMethodInvocation();
     getColumnSet.setName(getFactory().getAst().newSimpleName(scoutApi.ITable().getColumnSetMethodName()));
 
     if (AstUtils.isInstanceOf(getFactory().getDeclaringTypeBinding(), scoutApi.IExtension().fqn())) {
       // column in table extension
-      MethodInvocation getOwner = getFactory().getAst().newMethodInvocation();
+      var getOwner = getFactory().getAst().newMethodInvocation();
       getOwner.setName(getFactory().getAst().newSimpleName(scoutApi.IExtension().getOwnerMethodName()));
       getColumnSet.setExpression(getOwner);
     }
 
-    SimpleName columnSimpleName = getFactory().getAst().newSimpleName(getTypeName() + getReadOnlySuffix());
-    Type columnGetterReturnType = AstUtils.getInnerTypeReturnType(columnSimpleName, getDeclaringType());
+    var columnSimpleName = getFactory().getAst().newSimpleName(getTypeName() + getReadOnlySuffix());
+    var columnGetterReturnType = AstUtils.getInnerTypeReturnType(columnSimpleName, getDeclaringType());
 
     getFactory().newInnerTypeGetter()
         .withMethodNameToFindInnerType(scoutApi.ColumnSet().getColumnByClassMethodName())

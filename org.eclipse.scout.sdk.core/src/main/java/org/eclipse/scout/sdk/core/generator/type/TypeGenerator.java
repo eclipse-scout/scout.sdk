@@ -28,14 +28,14 @@ import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.tra
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
@@ -55,7 +55,6 @@ import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerato
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.imports.EnclosingTypeScopedImportCollector;
-import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -69,8 +68,6 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link TypeGenerator}</h3>
@@ -135,7 +132,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
         .peek(s -> applyConnection(s.generator(), this))
         .collect(toCollection(() -> m_members));
 
-    String declaringFqn = type.declaringType()
+    var declaringFqn = type.declaringType()
         .map(IType::name)
         .orElseGet(() -> type.compilationUnit()
             .map(ICompilationUnit::containingPackage)
@@ -178,7 +175,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     super.build(builder);
-    IImportValidator currentValidator = builder.context().validator();
+    var currentValidator = builder.context().validator();
     currentValidator.runWithImportCollector(() -> buildType(builder), inner -> new EnclosingTypeScopedImportCollector(inner, this));
   }
 
@@ -195,8 +192,8 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   protected void buildTypeDeclaration(IMemberBuilder<?> builder) {
     // flags
-    int flags = flags();
-    boolean isInterface = isInterface(flags);
+    var flags = flags();
+    var isInterface = isInterface(flags);
     builder.appendFlags(flags);
 
     // type definition
@@ -226,13 +223,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     }
 
     // interfaces
-    Stream<String> ifcReferences = interfaces()
+    var ifcReferences = interfaces()
         .map(af -> af.apply(builder.context()))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .distinct();
-    String prefix = " " + (isInterface ? JavaTypes.EXTENDS : JavaTypes.IMPLEMENTS) + " ";
-    builder.appendReferences(ifcReferences, prefix, ", ", null);
+    var prefix = " " + (isInterface ? JavaTypes.EXTENDS : JavaTypes.IMPLEMENTS) + " ";
+    builder.references(ifcReferences, prefix, ", ", null);
   }
 
   protected void buildTypeBody(IJavaSourceBuilder<?> builder) {
@@ -250,7 +246,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   protected void buildUnimplementedMethods(IJavaSourceBuilder<?> builder) {
-    Stream<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> unimplementedMethods =
+    var unimplementedMethods =
         UnimplementedMethodGenerator.create(this, builder.context().environment().orElseThrow(() -> newFail("Unimplemented methods can only be added if running with a java environment.")), m_unimplementedMethodsTransformer)
             .sorted(comparing(g -> g.elementName().orElse("")));
     String startDelimiter;
@@ -308,7 +304,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   @Override
   public TYPE withoutInterface(Predicate<ApiFunction<?, String>> filter) {
-    m_interfaces.removeIf(filter);
+    if (filter == null) {
+      m_interfaces.clear();
+    }
+    else {
+      m_interfaces.removeIf(filter);
+    }
     return thisInstance();
   }
 
@@ -344,31 +345,32 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   protected String[] buildQualifier() {
+    //noinspection RedundantExplicitVariableType
     IJavaElementGenerator<?> parent = declaringGenerator().orElse(null);
     if (parent instanceof ITypeGenerator<?>) {
-      String declaringTypeFqn = ((ITypeGenerator<?>) parent).fullyQualifiedName();
+      var declaringTypeFqn = ((ITypeGenerator<?>) parent).fullyQualifiedName();
       return new String[]{declaringTypeFqn, "$"};
     }
 
     if (parent instanceof ICompilationUnitGenerator<?>) {
-      Optional<String> packageName = ((ICompilationUnitGenerator<?>) parent).packageName();
+      var packageName = ((ICompilationUnitGenerator<?>) parent).packageName();
       return packageName
           .map(s -> new String[]{s, "."})
           .orElseGet(() -> new String[]{"", ""});
     }
 
-    String declaringFqn = getDeclaringFullyQualifiedName()
+    var declaringFqn = getDeclaringFullyQualifiedName()
         .orElseThrow(() -> newFail("Cannot calculate the fully qualified name of generator '{}' if no parent context is available.", elementName().orElse(null)));
     return new String[]{declaringFqn, null};
   }
 
   protected String buildFullyQualifiedName() {
-    String[] buildQualifier = buildQualifier();
-    String qualifier = buildQualifier[0];
-    String delimiter = buildQualifier[1];
+    var buildQualifier = buildQualifier();
+    var qualifier = buildQualifier[0];
+    var delimiter = buildQualifier[1];
     if (delimiter == null) {
-      int lastDotPos = qualifier.lastIndexOf(JavaTypes.C_DOT);
-      boolean isInnerType = lastDotPos > 0 && lastDotPos < qualifier.length() && Character.isUpperCase(qualifier.charAt(lastDotPos + 1));
+      var lastDotPos = qualifier.lastIndexOf(JavaTypes.C_DOT);
+      var isInnerType = lastDotPos > 0 && lastDotPos < qualifier.length() && Character.isUpperCase(qualifier.charAt(lastDotPos + 1));
       if (isInnerType) {
         delimiter = "$";
       }
@@ -406,10 +408,10 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   @SuppressWarnings("unchecked")
   protected <T extends IMemberGenerator<?>, P extends IMemberGenerator<?>> List<P> removeMemberIf(Class<T> type, Predicate<P> removalFilter) {
     List<P> removed = new ArrayList<>();
-    for (Iterator<SortedMemberEntry> it = m_members.iterator(); it.hasNext();) {
-      SortedMemberEntry entry = it.next();
+    for (var it = m_members.iterator(); it.hasNext();) {
+      var entry = it.next();
       if (entry.hasType(type)) {
-        P generator = (P) entry.generator();
+        var generator = (P) entry.generator();
         if (removalFilter == null || removalFilter.test(generator)) {
           it.remove();
           removed.add(generator);
@@ -563,7 +565,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     }
 
     protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toMethodGenerator(ITypeGenerator<?> typeGenerator, IMethod unimplementedMethod, IWorkingCopyTransformer transformer) {
-      UnimplementedMethodGenerator generator = new UnimplementedMethodGenerator(transformer)
+      var generator = new UnimplementedMethodGenerator(transformer)
           .withDeclaringGenerator(typeGenerator)
           .withElementName(unimplementedMethod.elementName());
       // add parameters in case the method has an overload
@@ -580,7 +582,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     }
 
     protected static Stream<IMethod> getUnimplementedMethods(IType type) {
-      Map<String, IMethod> abstractMethodIds = type.methods().withSuperTypes(true).stream()
+      var abstractMethodIds = type.methods().withSuperTypes(true).stream()
           .filter(method -> !isDefaultMethod(method.flags()) && !Flags.isStatic(method.flags()))
           .filter(method -> isAbstract(method.flags()) || isInterface(method.flags()) || isInterface(method.requireDeclaringType().flags()))
           .collect(toMap(m -> m.identifier(true), identity(), (u, v) -> u));

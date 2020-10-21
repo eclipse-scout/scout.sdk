@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_BUTTON;
 import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_CODE;
 import static org.eclipse.scout.sdk.core.s.ISdkConstants.SUFFIX_COLUMN;
@@ -44,13 +46,12 @@ import static org.eclipse.scout.sdk.s2e.ui.ISdkIcons.TabBoxAdd;
 import static org.eclipse.scout.sdk.s2e.ui.ISdkIcons.TableFieldAdd;
 import static org.eclipse.scout.sdk.s2e.ui.ISdkIcons.TreeFieldAdd;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -60,10 +61,8 @@ import java.util.function.BiConsumer;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.contentassist.ContentAssistEvent;
 import org.eclipse.jface.text.contentassist.ICompletionListener;
@@ -71,8 +70,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.source.ContentAssistantFacade;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutModelHierarchy;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -109,8 +106,8 @@ public final class ScoutTemplateProposalFactory {
 
   static Map<String, TemplateProposalDescriptor> descriptors(ScoutModelHierarchy hierarchy) {
     Map<String, TemplateProposalDescriptor> templates = new HashMap<>();
-    int relevance = 10000;
-    IScoutApi api = hierarchy.api();
+    var relevance = 10000;
+    var api = hierarchy.api();
 
     templates.put(api.IStringField().fqn(), new TemplateProposalDescriptor(
         api.IStringField().fqn(),
@@ -227,12 +224,12 @@ public final class ScoutTemplateProposalFactory {
   }
 
   public static List<ICompletionProposal> createTemplateProposals(IType declaringType, int offset, String prefix, SourceViewer viewer) {
-    IJavaProject javaProject = declaringType.getJavaProject();
+    var javaProject = declaringType.getJavaProject();
     if (!JdtUtils.exists(javaProject)) {
       return emptyList();
     }
 
-    Optional<IScoutApi> optScoutApi = ApiHelper.scoutApiFor(javaProject);
+    var optScoutApi = ApiHelper.scoutApiFor(javaProject);
     if (optScoutApi.isEmpty()) {
       return emptyList();
     }
@@ -251,13 +248,13 @@ public final class ScoutTemplateProposalFactory {
       return emptyList();
     }
 
-    ScoutModelHierarchy scoutModelHierarchy = optScoutApi.get().hierarchy();
+    var scoutModelHierarchy = optScoutApi.get().hierarchy();
     Collection<String> possibleChildrenIfcFqn = scoutModelHierarchy.possibleChildrenFor(superTypesOfDeclaringType);
     if (possibleChildrenIfcFqn.isEmpty()) {
       return emptyList();
     }
 
-    ICompilationUnit compilationUnit = declaringType.getCompilationUnit();
+    var compilationUnit = declaringType.getCompilationUnit();
 
     // start java environment creation
     RunnableFuture<EclipseEnvironment> javaEnvProviderCreator = new FutureTask<>(new P_JavaEnvironmentPreloader(compilationUnit, prefix != null, offset, viewer));
@@ -268,23 +265,18 @@ public final class ScoutTemplateProposalFactory {
     javaEnvCreatorJob.schedule();
 
     // create proposals
-    List<ICompletionProposal> result = new ArrayList<>();
-    for (TemplateProposalDescriptor candidate : descriptors(scoutModelHierarchy).values()) {
-      if (candidate.isActiveFor(possibleChildrenIfcFqn, scoutModelHierarchy, prefix)) {
-        result.add(candidate.createProposal(compilationUnit, offset, scoutModelHierarchy, surroundingTypeNameRange, javaEnvProviderCreator, prefix));
-      }
-    }
-    return result;
+    return descriptors(scoutModelHierarchy).values().stream()
+        .filter(candidate -> candidate.isActiveFor(possibleChildrenIfcFqn, scoutModelHierarchy, prefix))
+        .map(candidate -> candidate.createProposal(compilationUnit, offset, scoutModelHierarchy, surroundingTypeNameRange, javaEnvProviderCreator, prefix))
+        .collect(toList());
   }
 
   private static Set<String> getAllSuperTypesOf(IType declaringType) throws JavaModelException {
-    ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
-    IType[] allTypes = supertypeHierarchy.getAllTypes();
-    Set<String> superTypesOfDeclaringType = new HashSet<>(allTypes.length);
-    for (IType superType : allTypes) {
-      superTypesOfDeclaringType.add(superType.getFullyQualifiedName());
-    }
-    return superTypesOfDeclaringType;
+    var supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
+    var allTypes = supertypeHierarchy.getAllTypes();
+    return Arrays.stream(allTypes)
+        .map(IType::getFullyQualifiedName)
+        .collect(toSet());
   }
 
   private static final class P_JavaEnvironmentPreloader implements Callable<EclipseEnvironment>, ICompletionListener {
@@ -307,13 +299,13 @@ public final class ScoutTemplateProposalFactory {
 
     @Override
     public EclipseEnvironment call() throws JavaModelException {
-      String pck = JdtUtils.getPackage(m_icu);
+      var pck = JdtUtils.getPackage(m_icu);
       if (Strings.isBlank(pck)) {
         pck = null;
       }
-      IJavaEnvironment env = m_provider.toScoutJavaEnvironment(m_icu.getJavaProject());
+      var env = m_provider.toScoutJavaEnvironment(m_icu.getJavaProject());
 
-      StringBuilder buf = new StringBuilder(m_icu.getSource());
+      var buf = new StringBuilder(m_icu.getSource());
       if (m_hasSearchString) {
         buf.insert(m_pos, AbstractTypeProposal.SEARCH_STRING_END_FIX);
       }
@@ -340,7 +332,7 @@ public final class ScoutTemplateProposalFactory {
     private void scheduleEnvironmentClose() {
       // close the environment async. Because if currently a type lookup is going on (in the environment), the close operation is blocked until it is finished.
       // this method is invoked in the SWT thread. To not freeze the UI close the environment in a worker thread which will finish as soon as the type lookup completes.
-      AbstractJob closeJob = new AbstractJob("close content assist environment") {
+      var closeJob = new AbstractJob("close content assist environment") {
         @Override
         protected void execute(IProgressMonitor monitor) {
           m_provider.close();

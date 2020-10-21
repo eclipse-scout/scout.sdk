@@ -17,7 +17,6 @@ import java.util.Spliterator;
 import java.util.Spliterators.AbstractSpliterator;
 import java.util.function.Consumer;
 import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -54,7 +53,7 @@ public final class StreamUtils {
    * @return A {@link Stream} with all {@link MatchResult results} of the pattern in the input.
    */
   public static Stream<MatchResult> allMatchResults(Pattern pattern, CharSequence input) {
-    Matcher matcher = pattern.matcher(input);
+    var matcher = pattern.matcher(input);
     Spliterator<MatchResult> spliterator = new AbstractSpliterator<>(Long.MAX_VALUE,
         Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE) {
       @Override

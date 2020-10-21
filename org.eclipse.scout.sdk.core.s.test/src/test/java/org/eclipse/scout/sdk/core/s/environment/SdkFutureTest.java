@@ -35,8 +35,8 @@ import org.junit.jupiter.api.Test;
 public class SdkFutureTest {
   @Test
   public void testResultPresent() throws InterruptedException, ExecutionException, TimeoutException {
-    String input = "abc";
-    IFuture<String> f = SdkFuture.completed(input);
+    var input = "abc";
+    var f = SdkFuture.completed(input);
     assertFalse(f.cancel(true));
     assertFalse(f.isCancelled());
     assertFalse(f.isCompletedExceptionally());
@@ -45,7 +45,7 @@ public class SdkFutureTest {
     assertEquals(input, f.result());
     assertEquals(input, f.get(1, TimeUnit.SECONDS).get());
 
-    StringBuilder done = new StringBuilder();
+    var done = new StringBuilder();
     f
         .thenApply(Supplier::get)
         .thenAccept(done::append);
@@ -62,15 +62,15 @@ public class SdkFutureTest {
 
   @Test
   public void testRuntimeException() {
-    RuntimeException t = new RuntimeException();
-    IFuture<Object> f = SdkFuture.completed(null, t);
+    var t = new RuntimeException();
+    var f = SdkFuture.completed(null, t);
     assertSame(t, assertThrows(RuntimeException.class, f::result));
   }
 
   @Test
   public void testException() {
-    Exception t = new Exception("msg");
-    IFuture<Object> f = SdkFuture.completed(null, t);
+    var t = new Exception("msg");
+    var f = SdkFuture.completed(null, t);
     assertFalse(f.cancel(true));
     assertFalse(f.isCancelled());
     assertTrue(f.isCompletedExceptionally());
@@ -79,8 +79,8 @@ public class SdkFutureTest {
     assertSame(t, assertThrows(ExecutionException.class, () -> f.get(1, TimeUnit.SECONDS)).getCause());
     assertSame(t, assertThrows(CompletionException.class, f::awaitDoneThrowingOnErrorOrCancel).getCause());
 
-    String input = "abc";
-    StringBuilder done = new StringBuilder();
+    var input = "abc";
+    var done = new StringBuilder();
     f.exceptionally(ex -> {
       done.append(input);
       return () -> null;
@@ -92,11 +92,11 @@ public class SdkFutureTest {
 
   @Test
   public void testCompositeException() {
-    RuntimeException a = new RuntimeException("first exception");
-    IllegalStateException nested = new IllegalStateException("nested");
-    IllegalArgumentException b = new IllegalArgumentException("second", nested);
+    var a = new RuntimeException("first exception");
+    var nested = new IllegalStateException("nested");
+    var b = new IllegalArgumentException("second", nested);
 
-    String exceptionText = new CompositeException(Arrays.asList(a, b)).toString();
+    var exceptionText = new CompositeException(Arrays.asList(a, b)).toString();
     assertTrue(exceptionText.contains(a.getMessage()));
     assertTrue(exceptionText.contains(b.getMessage()));
     assertTrue(exceptionText.contains(nested.getMessage()));

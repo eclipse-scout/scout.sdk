@@ -87,7 +87,7 @@ public class FileRange {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    FileRange fileRange = (FileRange) o;
+    var fileRange = (FileRange) o;
     return m_start == fileRange.m_start
         && m_end == fileRange.m_end
         && m_textOfRange.equals(fileRange.m_textOfRange)

@@ -11,15 +11,14 @@
 package org.eclipse.scout.sdk.core.model.api;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link AbstractManagedAnnotation}</h3> Base class for managed annotation implementations. <br>
@@ -50,7 +49,7 @@ public abstract class AbstractManagedAnnotation {
    */
   public static <A extends AbstractManagedAnnotation> A wrap(IAnnotation a, Class<A> managedAnnotationType) {
     try {
-      A annotation = managedAnnotationType.getConstructor().newInstance();
+      var annotation = managedAnnotationType.getConstructor().newInstance();
       annotation.postConstruct(a);
       return annotation;
     }
@@ -69,7 +68,7 @@ public abstract class AbstractManagedAnnotation {
     }
 
     try {
-      Field field = a.getDeclaredField(TYPE_NAME_FIELD_NAME);
+      var field = a.getDeclaredField(TYPE_NAME_FIELD_NAME);
       field.setAccessible(true);
       return Ensure.instanceOf(field.get(null), ApiFunction.class);
     }
@@ -84,12 +83,36 @@ public abstract class AbstractManagedAnnotation {
   }
 
   protected <A extends IApiSpecification> String getNameFromApi(Class<A> apiDefinition, Function<A, String> nameSupplier) {
-    A api = Ensure.notNull(m_ann.javaEnvironment().requireApi(apiDefinition));
+    var api = Ensure.notNull(m_ann.javaEnvironment().requireApi(apiDefinition));
     return Ensure.notBlank(nameSupplier.apply(api));
   }
 
+  /**
+   * Gets the annotation element value
+   * 
+   * @param apiDefinition
+   *          The api type that defines element name. An instance of this API is passed to the nameSupplier. May be
+   *          {@code null} in case the given nameSupplier can handle a {@code null} input.
+   * @param nameSupplier
+   *          A {@link Function} to be called to obtain the annotation element name to get the value from.
+   * @param expectedType
+   *          The class into the value should be converted.
+   * @param optionalCustomDefaultValueSupplier
+   *          if this value is omitted, then the default value as declared in the original annotation type declaration
+   *          is returned.<br>
+   *          If this {@link Supplier} is set, then it is used in case the actual annotation does not define a
+   *          <b>direct</b> value for this attribute.
+   * @param <A>
+   *          The API type that contains the class name
+   * @param <T>
+   *          The data type of the element value
+   * @return The element value.
+   * @throws IllegalArgumentException
+   *           If the element name given does not exist for this annotation
+   * @see IAnnotationElement#isDefault()
+   */
   protected <A extends IApiSpecification, T> T getValueFrom(Class<A> apiDefinition, Function<A, String> nameSupplier, Class<T> expectedType, Supplier<T> optionalCustomDefaultValueSupplier) {
-    String name = getNameFromApi(apiDefinition, nameSupplier);
+    var name = getNameFromApi(apiDefinition, nameSupplier);
     return getValue(name, expectedType, optionalCustomDefaultValueSupplier);
   }
 
@@ -112,17 +135,17 @@ public abstract class AbstractManagedAnnotation {
    */
   @SuppressWarnings("unchecked")
   protected <T> T getValue(String name, Class<T> expectedType, Supplier<T> optionalCustomDefaultValueSupplier) {
-    IAnnotationElement av = m_ann.element(name).orElseThrow(() -> elementNotExistingException(name));
+    var av = m_ann.element(name).orElseThrow(() -> elementNotExistingException(name));
     if (optionalCustomDefaultValueSupplier != null && av.isDefault()) {
       return optionalCustomDefaultValueSupplier.get();
     }
 
     // ManagedAnnotation array (from IAnnotation array)
     if (expectedType.isArray() && AbstractManagedAnnotation.class.isAssignableFrom(expectedType.getComponentType())) {
-      IAnnotation[] a = av.value().as(IAnnotation[].class);
-      Class<? extends AbstractManagedAnnotation> componentType = (Class<? extends AbstractManagedAnnotation>) expectedType.getComponentType();
-      T array = (T) Array.newInstance(componentType, a.length);
-      for (int i = 0; i < a.length; i++) {
+      var a = av.value().as(IAnnotation[].class);
+      var componentType = (Class<? extends AbstractManagedAnnotation>) expectedType.getComponentType();
+      var array = (T) Array.newInstance(componentType, a.length);
+      for (var i = 0; i < a.length; i++) {
         Array.set(array, i, a[i].wrap(componentType));
       }
       return array;
@@ -130,19 +153,62 @@ public abstract class AbstractManagedAnnotation {
 
     // ManagedAnnotation element (from IAnnotation)
     if (AbstractManagedAnnotation.class.isAssignableFrom(expectedType)) {
-      Class<? extends AbstractManagedAnnotation> xType = (Class<? extends AbstractManagedAnnotation>) expectedType;
+      var xType = (Class<? extends AbstractManagedAnnotation>) expectedType;
       return (T) av.value().as(IAnnotation.class).wrap(xType);
     }
 
     return av.value().as(expectedType);
   }
 
+  /**
+   * Gets the annotation element as enum value.
+   * 
+   * @param apiDefinition
+   *          The api type that defines element name. An instance of this API is passed to the nameSupplier. May be
+   *          {@code null} in case the given nameSupplier can handle a {@code null} input.
+   * @param nameSupplier
+   *          A {@link Function} to be called to obtain the annotation element name to get the value from.
+   * @param enumType
+   *          The class into the value should be converted.
+   * @param <A>
+   *          The API type that contains the class name
+   * @param <T>
+   *          The enum type of the element value
+   * @return The element value.
+   * @throws IllegalArgumentException
+   *           If the element name given does not exist for this annotation
+   * @see IAnnotationElement#isDefault()
+   */
   protected <A extends IApiSpecification, T extends Enum<T>> T getValueAsEnumFrom(Class<A> apiDefinition, Function<A, String> nameSupplier, Class<T> enumType) {
     return getValueAsEnumFrom(apiDefinition, nameSupplier, enumType, null);
   }
 
+  /**
+   * Gets the annotation element as enum value.
+   * 
+   * @param apiDefinition
+   *          The api type that defines element name. An instance of this API is passed to the nameSupplier. May be
+   *          {@code null} in case the given nameSupplier can handle a {@code null} input.
+   * @param nameSupplier
+   *          A {@link Function} to be called to obtain the annotation element name to get the value from.
+   * @param enumType
+   *          The class into the value should be converted.
+   * @param optionalCustomDefaultValueSupplier
+   *          if this value is omitted then the default value as declared in the original annotation type declaration is
+   *          returned.<br>
+   *          If this {@link Supplier} is set then it is used in case the actual annotation does not define a
+   *          <b>direct</b> value for this attribute.
+   * @param <A>
+   *          The API type that contains the class name
+   * @param <T>
+   *          The enum type of the element value
+   * @return The element value.
+   * @throws IllegalArgumentException
+   *           If the element name given does not exist for this annotation
+   * @see IAnnotationElement#isDefault()
+   */
   protected <A extends IApiSpecification, T extends Enum<T>> T getValueAsEnumFrom(Class<A> apiDefinition, Function<A, String> nameSupplier, Class<T> enumType, Supplier<T> optionalCustomDefaultValueSupplier) {
-    String name = getNameFromApi(apiDefinition, nameSupplier);
+    var name = getNameFromApi(apiDefinition, nameSupplier);
     return getValueAsEnum(name, enumType, optionalCustomDefaultValueSupplier);
   }
 
@@ -190,7 +256,7 @@ public abstract class AbstractManagedAnnotation {
       return optionalCustomDefaultValueSupplier.get();
     }
 
-    IField enumValueField = getValue(elementName, IField.class, null);
+    var enumValueField = getValue(elementName, IField.class, null);
     if (enumValueField == null) {
       throw elementNotExistingException(elementName);
     }

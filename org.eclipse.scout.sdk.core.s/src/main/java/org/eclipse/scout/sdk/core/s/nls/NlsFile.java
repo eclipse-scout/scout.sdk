@@ -52,14 +52,14 @@ public class NlsFile {
   }
 
   protected Optional<String> parseNlsClass() {
-    Properties properties = new Properties();
+    var properties = new Properties();
     try (InputStream in = new BufferedInputStream(Files.newInputStream(path()))) {
       properties.load(in);
     }
     catch (IOException e) {
       throw new SdkException("Unable to read nls file '{}'.", path(), e);
     }
-    String nlsClass = properties.getProperty(NLS_CLASS_KEY_NAME);
+    var nlsClass = properties.getProperty(NLS_CLASS_KEY_NAME);
     if (nlsClass != null) {
       nlsClass = nlsClass.trim();
     }
@@ -96,7 +96,7 @@ public class NlsFile {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    NlsFile nlsFile = (NlsFile) o;
+    var nlsFile = (NlsFile) o;
     return m_file.equals(nlsFile.m_file);
   }
 

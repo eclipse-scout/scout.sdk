@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -88,8 +87,8 @@ public class DeclarationAnnotationWithEcj extends AbstractJavaElementWithEcj<IAn
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      CompilationUnitSpi cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
-      Annotation decl = m_astNode;
+      var cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
+      var decl = m_astNode;
       return javaEnvWithEcj().getSource(cu, decl.sourceStart, decl.declarationSourceEnd);
     });
   }

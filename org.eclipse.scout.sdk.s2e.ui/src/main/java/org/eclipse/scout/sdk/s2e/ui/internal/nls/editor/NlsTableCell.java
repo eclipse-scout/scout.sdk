@@ -74,7 +74,7 @@ public class NlsTableCell {
       return false;
     }
 
-    NlsTableCell other = (NlsTableCell) obj;
+    var other = (NlsTableCell) obj;
     return m_column == other.m_column
         && m_entry.equals(other.m_entry);
   }

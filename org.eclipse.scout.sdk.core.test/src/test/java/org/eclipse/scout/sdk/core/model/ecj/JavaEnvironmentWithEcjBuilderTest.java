@@ -39,21 +39,20 @@ public class JavaEnvironmentWithEcjBuilderTest {
     assertEquals(3, JavaEnvironmentWithEcjBuilder.bucketOf(createClasspathEntryMock(false, false)).intValue());
   }
 
-  @SuppressWarnings("resource")
   private static ClasspathEntry createClasspathEntryMock(boolean isSource, boolean isDirectory) throws IOException {
-    BasicFileAttributes attributes = mock(BasicFileAttributes.class);
+    var attributes = mock(BasicFileAttributes.class);
     when(attributes.isDirectory()).thenReturn(isDirectory);
 
-    FileSystemProvider fsp = mock(FileSystemProvider.class);
+    var fsp = mock(FileSystemProvider.class);
     when(fsp.readAttributes(any(), ArgumentMatchers.<Class<BasicFileAttributes>> any(), any())).thenReturn(attributes);
 
-    FileSystem fs = mock(FileSystem.class);
+    var fs = mock(FileSystem.class);
     when(fs.provider()).thenReturn(fsp);
 
-    Path path = mock(Path.class);
+    var path = mock(Path.class);
     when(path.getFileSystem()).thenReturn(fs);
 
-    ClasspathEntry mock = mock(ClasspathEntry.class);
+    var mock = mock(ClasspathEntry.class);
     when(mock.mode()).thenReturn(isSource ? ClasspathSpi.MODE_SOURCE : ClasspathSpi.MODE_BINARY);
     when(mock.path()).thenReturn(path);
     return mock;

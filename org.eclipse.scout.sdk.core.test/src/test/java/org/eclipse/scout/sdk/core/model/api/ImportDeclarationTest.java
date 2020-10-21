@@ -28,8 +28,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class ImportDeclarationTest {
   @Test
   public void testImportDeclaration(IJavaEnvironment env) {
-    ICompilationUnit childClassIcu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
-    IImport imp = childClassIcu.imports().findAny().get();
+    var childClassIcu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
+    var imp = childClassIcu.imports().findAny().get();
     assertEquals(childClassIcu, imp.compilationUnit());
     assertEquals(IOException.class.getPackage().getName(), imp.qualifier());
     assertEquals(IOException.class.getSimpleName(), imp.elementName());
@@ -38,8 +38,8 @@ public class ImportDeclarationTest {
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    ICompilationUnit childClassIcu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
-    IImport imp = childClassIcu.imports().findAny().get();
+    var childClassIcu = env.requireType(ChildClass.class.getName()).requireCompilationUnit();
+    var imp = childClassIcu.imports().findAny().get();
     assertFalse(Strings.isBlank(imp.toString()));
   }
 }

@@ -16,13 +16,11 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -85,7 +83,7 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
 
   @Override
   public boolean load(IProgress progress) {
-    PropertiesGenerator newContent = readEntries();
+    var newContent = readEntries();
     if (Objects.equals(m_fileContent, newContent)) {
       return false;
     }
@@ -96,9 +94,9 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
   }
 
   private void removeInvalidEntries(Iterable<Entry<String, String>> entries) {
-    Iterator<Entry<String, String>> iterator = entries.iterator();
+    var iterator = entries.iterator();
     while (iterator.hasNext()) {
-      Entry<String, String> entry = iterator.next();
+      var entry = iterator.next();
       if (validateKey(entry.getKey()) != TranslationValidator.OK) {
         if (isEditable()) {
           // only log if you have the chance to fix it (skip logging for read-only files)
@@ -110,7 +108,7 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
   }
 
   private PropertiesGenerator readEntries() {
-    try (InputStream in = Ensure.notNull(m_inputSupplier.get())) {
+    try (var in = Ensure.notNull(m_inputSupplier.get())) {
       return PropertiesGenerator.create(in);
     }
     catch (IOException e) {
@@ -125,7 +123,7 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
     if (text == null) {
       return removeTranslation(key);
     }
-    String oldTranslation = entries().put(key, text);
+    var oldTranslation = entries().put(key, text);
     return !text.equals(oldTranslation);
   }
 
@@ -173,12 +171,12 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
       return Optional.empty();
     }
 
-    Matcher matcher = FILE_PATTERN.matcher(fileName);
+    var matcher = FILE_PATTERN.matcher(fileName);
     if (!matcher.matches()) {
       return Optional.empty();
     }
 
-    String languagePart = matcher.group(1);
+    var languagePart = matcher.group(1);
     if (Strings.isBlank(languagePart)) {
       return Optional.of(Language.LANGUAGE_DEFAULT);
     }

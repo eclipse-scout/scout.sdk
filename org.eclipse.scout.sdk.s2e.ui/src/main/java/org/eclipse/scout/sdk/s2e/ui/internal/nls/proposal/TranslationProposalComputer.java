@@ -14,10 +14,8 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironment;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,8 +23,6 @@ import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -47,33 +43,33 @@ public class TranslationProposalComputer implements IJavaCompletionProposalCompu
     if (!(context instanceof JavaContentAssistInvocationContext)) {
       return emptyList();
     }
-    JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
+    var javaContext = (JavaContentAssistInvocationContext) context;
     return computeProposals(javaContext);
   }
 
   protected static List<ICompletionProposal> computeProposals(JavaContentAssistInvocationContext context) {
-    int offset = context.getInvocationOffset();
-    IDocument doc = context.getDocument();
+    var offset = context.getInvocationOffset();
+    var doc = context.getDocument();
     if (doc == null || offset > doc.getLength()) {
       return emptyList();
     }
 
     try {
-      IRegion lineInfo = doc.getLineInformationOfOffset(offset);
-      String linePart = doc.get(lineInfo.getOffset(), lineInfo.getLength());
-      Matcher m = PATTERN.matcher(linePart);
-      int cursorPosInLine = offset - lineInfo.getOffset();
-      int matchingStart = -1;
+      var lineInfo = doc.getLineInformationOfOffset(offset);
+      var linePart = doc.get(lineInfo.getOffset(), lineInfo.getLength());
+      var m = PATTERN.matcher(linePart);
+      var cursorPosInLine = offset - lineInfo.getOffset();
+      var matchingStart = -1;
       while (m.find()) {
-        int match = m.start(2);
+        var match = m.start(2);
         if (match <= cursorPosInLine && match > matchingStart) {
           matchingStart = match; // find closest match left to the cursor
         }
       }
 
       if (matchingStart >= 0) {
-        String prefix = linePart.substring(matchingStart, offset - lineInfo.getOffset());
-        Path modulePath = context.getCompilationUnit().getJavaProject().getProject().getLocation().toFile().toPath();
+        var prefix = linePart.substring(matchingStart, offset - lineInfo.getOffset());
+        var modulePath = context.getCompilationUnit().getJavaProject().getProject().getLocation().toFile().toPath();
 
         return callInEclipseEnvironment(
             (env, progress) -> TranslationStores.createStack(modulePath, env, progress)

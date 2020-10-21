@@ -13,7 +13,6 @@ package org.slf4j.impl;
 import java.util.logging.Level;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MarkerIgnoringBase;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -200,7 +199,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
     if (!SdkLog.isLevelEnabled(level)) {
       return;
     }
-    FormattingTuple tp = MessageFormatter.format(format, arg1, arg2);
+    var tp = MessageFormatter.format(format, arg1, arg2);
     log(level, tp.getMessage(), tp.getThrowable());
   }
 
@@ -208,7 +207,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
     if (!SdkLog.isLevelEnabled(level)) {
       return;
     }
-    FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+    var tp = MessageFormatter.arrayFormat(format, arguments);
     log(level, tp.getMessage(), tp.getThrowable());
   }
 }

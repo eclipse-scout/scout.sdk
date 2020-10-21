@@ -10,12 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.s.page;
 
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
@@ -74,9 +72,9 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
     progress.init(10, toString());
 
-    String sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getPackage());
-    boolean isPageWithTable = isPageWithTable();
-    boolean isCreatePageData = isPageWithTable && getPageDataSourceFolder() != null;
+    var sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getPackage());
+    var isPageWithTable = isPageWithTable();
+    var isCreatePageData = isPageWithTable && getPageDataSourceFolder() != null;
 
     if (isCreatePageData) {
       if (isCreateAbstractPage()) {
@@ -85,7 +83,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
       setCreatedPageData(createPageData(getPageName(), sharedPackage, env, progress.newChild(1)));
     }
 
-    boolean isCreateService = isCreatePageData && getSharedSourceFolder() != null && getServerSourceFolder() != null;
+    var isCreateService = isCreatePageData && getSharedSourceFolder() != null && getServerSourceFolder() != null;
     if (isCreateService) {
       createService(sharedPackage, calcServiceBaseName(), env, progress.newChild(2));
     }
@@ -119,35 +117,35 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected static boolean isPageWithTable(IType type) {
-    IScoutApi scoutApi = type.javaEnvironment().requireApi(IScoutApi.class);
+    var scoutApi = type.javaEnvironment().requireApi(IScoutApi.class);
     return type.isInstanceOf(scoutApi.IPageWithTable());
   }
 
   protected void updatePageDatas(IEnvironment env, IProgress progress) {
     if (isCreateAbstractPage()) {
-      Optional<ICompilationUnitGenerator<?>> abstractPageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedAbstractPage(), getPageDataSourceFolder().javaEnvironment());
+      var abstractPageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedAbstractPage(), getPageDataSourceFolder().javaEnvironment());
       env.writeCompilationUnit(abstractPageDataGenerator.get(), getPageDataSourceFolder(), progress.newChild(1));
     }
-    Optional<ICompilationUnitGenerator<?>> pageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedPage(), getPageDataSourceFolder().javaEnvironment());
+    var pageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedPage(), getPageDataSourceFolder().javaEnvironment());
     env.writeCompilationUnit(pageDataGenerator.get(), getPageDataSourceFolder(), progress.newChild(1));
   }
 
   protected IType createAbstractPage(boolean isPageWithTable, IEnvironment env, IProgress progress) {
-    PageGenerator<?> pageBuilder = createPageBuilder(isPageWithTable, true);
+    var pageBuilder = createPageBuilder(isPageWithTable, true);
     return env.writeCompilationUnit(pageBuilder, getClientSourceFolder(), progress);
   }
 
   protected String calcServiceMethodName() {
-    String name = calcPageBaseName();
+    var name = calcPageBaseName();
     return "get" + name + "TableData";
   }
 
   protected String calcPageBaseName() {
-    String name = getPageName();
+    var name = getPageName();
     String[] suffixes = {ISdkConstants.SUFFIX_PAGE_WITH_NODES, ISdkConstants.SUFFIX_PAGE_WITH_TABLE, ISdkConstants.SUFFIX_OUTLINE_PAGE};
-    for (String suffix : suffixes) {
-      int suffixLen = suffix.length();
-      int strOffset = name.length() - suffixLen;
+    for (var suffix : suffixes) {
+      var suffixLen = suffix.length();
+      var strOffset = name.length() - suffixLen;
       if (name.regionMatches(true, strOffset, suffix, 0, suffixLen)) {
         name = name.substring(0, name.length() - suffixLen);
       }
@@ -160,22 +158,22 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected IType createServiceTest(IEnvironment env, IProgress progress) {
-    IClasspathEntry testSourceFolder = getTestSourceFolder();
+    var testSourceFolder = getTestSourceFolder();
     if (testSourceFolder == null) {
       return null;
     }
 
-    String serverPackage = JavaTypes.qualifier(getCreatedServiceImpl().name());
-    String baseName = getCreatedServiceImpl().elementName();
-    String elementName = baseName + ISdkConstants.SUFFIX_TEST;
+    var serverPackage = JavaTypes.qualifier(getCreatedServiceImpl().name());
+    var baseName = getCreatedServiceImpl().elementName();
+    var elementName = baseName + ISdkConstants.SUFFIX_TEST;
 
-    Optional<IType> existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
+    var existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
     if (existingServiceTest.isPresent()) {
       // service test class already exists
       return existingServiceTest.get();
     }
 
-    IScoutApi scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
+    var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
     TestGenerator<?> testBuilder = new TestGenerator<>()
         .withElementName(elementName)
         .withPackageName(serverPackage)
@@ -189,7 +187,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected void createService(String sharedPackage, String baseName, IEnvironment env, IProgress progress) {
-    ServiceNewOperation serviceNewOperation = createServiceOperation();
+    var serviceNewOperation = createServiceOperation();
     serviceNewOperation.setServiceName(baseName);
     serviceNewOperation.setSharedPackage(sharedPackage);
     serviceNewOperation.setSharedSourceFolder(getSharedSourceFolder());
@@ -212,7 +210,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
             .withDataTypeFrom(IScoutApi.class, api -> api.SearchFilter().fqn()))
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withBody(b -> {
-          String varName = "pageData";
+          var varName = "pageData";
           b.ref(getCreatedPageData()).space().append(varName).equalSign().appendNew().ref(getCreatedPageData()).parenthesisOpen().parenthesisClose().semicolon().nl()
               .appendTodo("fill " + varName + '.')
               .returnClause().append(varName).semicolon();
@@ -224,11 +222,11 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected PageGenerator<?> createPageBuilder(boolean isPageWithTable, boolean isAbstractPage) {
-    String name = getPageName();
+    var name = getPageName();
     if (isAbstractPage) {
       name = ISdkConstants.PREFIX_ABSTRACT + name;
     }
-    String fqn = getPackage() + JavaTypes.C_DOT + name;
+    var fqn = getPackage() + JavaTypes.C_DOT + name;
     PageGenerator<?> pageBuilder = new PageGenerator<>()
         .withElementName(name)
         .withPackageName(getPackage())
@@ -240,7 +238,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .asPageWithTable(isPageWithTable)
         .withSuperClass(getSuperType());
 
-    IType dto = getCreatedPageData();
+    var dto = getCreatedPageData();
     if (isAbstractPage) {
       dto = getCreatedAbstractPageData();
     }
@@ -254,9 +252,9 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected IType createPage(boolean isPageWithTable, IEnvironment env, IProgress progress) {
-    PageGenerator<?> pageBuilder = createPageBuilder(isPageWithTable, false);
+    var pageBuilder = createPageBuilder(isPageWithTable, false);
     if (isCreateAbstractPage() && isPageWithTable) {
-      String superTypeFqn = getCreatedAbstractPage().name()
+      var superTypeFqn = getCreatedAbstractPage().name()
           + JavaTypes.C_GENERIC_START
           + pageBuilder.fullyQualifiedName()
           + JavaTypes.C_DOLLAR
@@ -271,7 +269,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected IType createPageData(String pageName, String sharedPackage, IEnvironment env, IProgress progress) {
-    PrimaryTypeGenerator<?> pageDataGenerator = PrimaryTypeGenerator.create()
+    var pageDataGenerator = PrimaryTypeGenerator.create()
         .withElementName(pageName + ISdkConstants.SUFFIX_DTO)
         .withPackageName(sharedPackage)
         .asPublic()

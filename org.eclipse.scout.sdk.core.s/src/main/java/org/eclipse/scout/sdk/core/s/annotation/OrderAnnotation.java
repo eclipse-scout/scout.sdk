@@ -14,8 +14,9 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
@@ -24,8 +25,6 @@ import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link OrderAnnotation}</h3>
@@ -37,7 +36,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
   protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(IScoutApi.class, IScoutApi::Order);
 
   public static double valueOf(IAnnotatable owner, boolean isBean) {
-    Optional<OrderAnnotation> first = owner.annotations()
+    var first = owner.annotations()
         .withManagedWrapper(OrderAnnotation.class)
         .first();
 
@@ -68,10 +67,10 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
    *          the declaring type.
    * @return the new order value that should be used.
    */
-  public static double getNewViewOrderValue(IType declaringType, String orderDefinitionType, int pos) {
-    IType[] siblings = findSiblings(declaringType, pos, orderDefinitionType);
-    Double orderValueBefore = getOrderAnnotationValue(siblings[0]);
-    Double orderValueAfter = getOrderAnnotationValue(siblings[1]);
+  public static double getNewViewOrderValue(IType declaringType, CharSequence orderDefinitionType, int pos) {
+    var siblings = findSiblings(declaringType, pos, orderDefinitionType);
+    var orderValueBefore = getOrderAnnotationValue(siblings[0]);
+    var orderValueAfter = getOrderAnnotationValue(siblings[1]);
     return getNewViewOrderValue(orderValueBefore, orderValueAfter);
   }
 
@@ -91,14 +90,14 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
       // insert at last position
       double orderValueBeforeAsDouble = orderValueBefore;
       validateOrderRange(orderValueBeforeAsDouble);
-      double v = Math.ceil(orderValueBeforeAsDouble / ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      var v = Math.ceil(orderValueBeforeAsDouble / ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       return v + ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
     }
     if (orderValueBefore == null && orderValueAfter != null) {
       // insert at first position
       double orderValueAfterAsDouble = orderValueAfter;
       validateOrderRange(orderValueAfterAsDouble);
-      double v = Math.floor(orderValueAfterAsDouble / ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
+      var v = Math.floor(orderValueAfterAsDouble / ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP) * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       if (v > ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP) {
         return ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       }
@@ -120,9 +119,9 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
 
   private static void validateOrderRange(double order) {
     if (order > ISdkConstants.DEFAULT_VIEW_ORDER) {
-      NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
+      var f = NumberFormat.getNumberInstance(Locale.ENGLISH);
       f.setGroupingUsed(false);
-      String orderAsString = f.format(order);
+      var orderAsString = f.format(order);
       SdkLog.warning("The @Order value {} is very large and therefore may not be precise enough. It is recommended to use a lower value.", orderAsString);
     }
   }
@@ -134,13 +133,13 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
     return OrderAnnotation.valueOf(sibling, false);
   }
 
-  static IType[] findSiblings(IType declaringType, int pos, String orderDefinitionType) {
+  static IType[] findSiblings(IType declaringType, int pos, CharSequence orderDefinitionType) {
     Iterable<IType> i = declaringType.innerTypes()
         .withInstanceOf(orderDefinitionType).stream()
         .filter(candidate -> !isAbstract(candidate.flags()))::iterator;
 
     IType prev = null;
-    for (IType t : i) {
+    for (var t : i) {
       if (t.source().get().start() > pos) {
         return new IType[]{prev, t};
       }
@@ -162,14 +161,14 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
    * @return A value in between a and b.
    */
   static double getOrderValueInBetween(double a, double b) {
-    double low = Math.min(a, b);
-    double high = Math.max(a, b);
-    double dif = high - low;
-    double lowFloor = Math.floor(low);
-    double lowCeil = Math.ceil(low);
-    double highFloor = Math.floor(high);
-    double nextIntLow = Math.min(lowCeil, highFloor);
-    double prevIntHigh = Math.max(lowCeil, highFloor);
+    var low = Math.min(a, b);
+    var high = Math.max(a, b);
+    var dif = high - low;
+    var lowFloor = Math.floor(low);
+    var lowCeil = Math.ceil(low);
+    var highFloor = Math.floor(high);
+    var nextIntLow = Math.min(lowCeil, highFloor);
+    var prevIntHigh = Math.max(lowCeil, highFloor);
 
     // special case for stepwise increase
     //noinspection NumericCastThatLosesPrecision
@@ -179,7 +178,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
 
     if (isDoubleDifferent(lowFloor, highFloor) && ((isDoubleDifferent(lowFloor, low) && isDoubleDifferent(highFloor, high)) || dif > 1.0)) {
       // integer value possible
-      double intDif = prevIntHigh - nextIntLow;
+      var intDif = prevIntHigh - nextIntLow;
       if (!isDoubleDifferent(intDif, 1.0)) {
         return prevIntHigh;
       }
@@ -201,11 +200,11 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
    * @return The created source {@link String} ready to be placed into a Java file. Never returns {@code null}.
    */
   public static String convertToJavaSource(double order) {
-    NumberFormat f = NumberFormat.getNumberInstance(Locale.ENGLISH);
+    var f = NumberFormat.getNumberInstance(Locale.ENGLISH);
     f.setGroupingUsed(false);
-    String newOrderStr = f.format(order);
+    var newOrderStr = f.format(order);
 
-    String zeroSuffix = JavaTypes.C_DOT + "0";
+    var zeroSuffix = JavaTypes.C_DOT + "0";
     if (newOrderStr.endsWith(zeroSuffix)) {
       newOrderStr = newOrderStr.substring(0, newOrderStr.length() - zeroSuffix.length());
     }

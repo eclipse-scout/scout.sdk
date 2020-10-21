@@ -13,14 +13,14 @@ package org.eclipse.scout.sdk.core.model.api;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.model.api.query.HierarchyInnerTypeQuery;
 import org.eclipse.scout.sdk.core.model.api.query.MethodQuery;
 import org.eclipse.scout.sdk.core.model.api.query.SuperTypeQuery;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 
 /**
  * <h3>{@link IType}</h3>
@@ -242,6 +242,14 @@ public interface IType extends IMember {
    */
   boolean isInstanceOf(String queryType);
 
+  /**
+   * Checks if the receiver has the given {@link IClassNameSupplier#fqn()} in its super hierarchy.
+   * 
+   * @param typeName
+   *          The {@link IClassNameSupplier} to check. Must not be {@code null}.
+   * @return {@code true} if the given fully qualified name exists in the super hierarchy of this {@link IType}.
+   *         {@code false} otherwise.
+   */
   boolean isInstanceOf(IClassNameSupplier typeName);
 
   /**

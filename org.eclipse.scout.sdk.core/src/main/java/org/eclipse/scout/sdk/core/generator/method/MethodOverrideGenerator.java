@@ -12,15 +12,16 @@ package org.eclipse.scout.sdk.core.generator.method;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transform;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
+import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.transform;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
@@ -28,21 +29,19 @@ import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
-import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
+import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link MethodOverrideGenerator}</h3>
@@ -139,10 +138,10 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
 
   @SuppressWarnings("unchecked")
   protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createDefaultOverrideGenerator(IMethod template) {
-    boolean isFromInterface = isInterface(template.requireDeclaringType().flags());
-    boolean needsImplementation = isFromInterface || isAbstract(template.flags());
+    var isFromInterface = isInterface(template.requireDeclaringType().flags());
+    var needsImplementation = isFromInterface || isAbstract(template.flags());
 
-    IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> innerGenerator =
+    var innerGenerator =
         template.toWorkingCopy(m_transformer)
             .clearAnnotations() // clear annotations from method
             .withComment(null)
@@ -184,7 +183,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   }
 
   protected Optional<IMethod> findMethodToOverride(IType container) {
-    Map<String, IMethod> templateCandidates = container.methods()
+    var templateCandidates = container.methods()
         .withSuperTypes(true).stream()
         .filter(m -> m.elementName().equals(elementName(container.javaEnvironment()).orElseThrow(() -> newFail("To override a method at least the method name must be specified."))))
         .collect(toMap(m -> m.identifier(true), identity(), (a, b) -> a));
@@ -226,16 +225,16 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   }
 
   protected static <T> T callWithTmpType(ITypeGenerator<?> declaringGenerator, IJavaEnvironment env, Function<IType, T> task) {
-    String targetPackage = getTargetPackage(declaringGenerator);
-    String typeName = "ScoutSdkTempClass__";
-    String pckWithPrefix = Strings.notBlank(targetPackage)
+    var targetPackage = getTargetPackage(declaringGenerator);
+    var typeName = "ScoutSdkTempClass__";
+    var pckWithPrefix = Strings.notBlank(targetPackage)
         .map(pck -> pck + JavaTypes.C_DOT)
         .orElse("");
 
     Ensure.notNull(task);
     return env.unwrap().callInEmptyCopy(copy -> {
-      IJavaEnvironment emptyCopy = copy.wrap();
-      StringBuilder tmpTypeSource = PrimaryTypeGenerator.create()
+      var emptyCopy = copy.wrap();
+      var tmpTypeSource = PrimaryTypeGenerator.create()
           .withPackageName(targetPackage)
           .withElementName(typeName)
           .withSuperClass(Ensure.notNull(declaringGenerator)
@@ -244,18 +243,18 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
               .orElse(Object.class.getName()))
           .withInterfaces(declaringGenerator.interfaces()
               .map(af -> af.apply(emptyCopy))
-              .filter(Optional::isPresent)
-              .map(Optional::get))
+              .flatMap(Optional::stream))
           .toJavaSource(emptyCopy);
 
       emptyCopy.registerCompilationUnitOverride(targetPackage, typeName + JavaTypes.JAVA_FILE_SUFFIX, tmpTypeSource);
-      IType tmpType = emptyCopy.requireType(pckWithPrefix + typeName);
+      var tmpType = emptyCopy.requireType(pckWithPrefix + typeName);
       return task.apply(tmpType);
     });
   }
 
   protected static String getTargetPackage(ITypeGenerator<?> declaringGenerator) {
-    ITypeGenerator<?> primary = declaringGenerator;
+    var primary = declaringGenerator;
+    //noinspection RedundantExplicitVariableType
     IJavaElementGenerator<?> next = declaringGenerator.declaringGenerator().orElse(null);
     while (next instanceof ITypeGenerator) {
       primary = (ITypeGenerator<?>) next;

@@ -21,8 +21,6 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodRetur
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
@@ -50,26 +48,26 @@ public class FormFieldMenuTest {
 
     // fields of FormFieldMenuTestFormData
     assertEquals(1, formFieldMenuTestFormData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData'");
-    IField serialVersionUID = assertFieldExist(formFieldMenuTestFormData, "serialVersionUID");
+    var serialVersionUID = assertFieldExist(formFieldMenuTestFormData, "serialVersionUID");
     assertHasFlags(serialVersionUID, 26);
     assertFieldType(serialVersionUID, JavaTypes._long);
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, formFieldMenuTestFormData.methods().stream().count(), "method count of 'formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData'");
-    IMethod getTestBoolean = assertMethodExist(formFieldMenuTestFormData, "getTestBoolean", new String[]{});
+    var getTestBoolean = assertMethodExist(formFieldMenuTestFormData, "getTestBoolean", new String[]{});
     assertMethodReturnType(getTestBoolean, "formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData$TestBoolean");
     assertEquals(0, getTestBoolean.annotations().stream().count(), "annotation count");
 
     assertEquals(1, formFieldMenuTestFormData.innerTypes().stream().count(), "inner types count of 'FormFieldMenuTestFormData'");
     // type TestBoolean
-    IType testBoolean = assertTypeExists(formFieldMenuTestFormData, "TestBoolean");
+    var testBoolean = assertTypeExists(formFieldMenuTestFormData, "TestBoolean");
     assertHasFlags(testBoolean, 9);
     assertHasSuperClass(testBoolean, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.Boolean>");
     assertEquals(0, testBoolean.annotations().stream().count(), "annotation count");
 
     // fields of TestBoolean
     assertEquals(1, testBoolean.fields().stream().count(), "field count of 'formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData$TestBoolean'");
-    IField serialVersionUID1 = assertFieldExist(testBoolean, "serialVersionUID");
+    var serialVersionUID1 = assertFieldExist(testBoolean, "serialVersionUID");
     assertHasFlags(serialVersionUID1, 26);
     assertFieldType(serialVersionUID1, JavaTypes._long);
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");

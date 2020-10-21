@@ -39,7 +39,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
@@ -59,9 +58,9 @@ public class NlsTablePage extends Composite {
     super(parent, SWT.NONE);
     m_stack = Ensure.notNull(stack);
 
-    FormToolkit toolkit = new FormToolkit(getDisplay());
+    var toolkit = new FormToolkit(getDisplay());
     //noinspection ThisEscapedInObjectConstruction
-    Form form = toolkit.createForm(this);
+    var form = toolkit.createForm(this);
     form.setText("Translations");
     createContent(toolkit, form.getBody());
 
@@ -72,7 +71,7 @@ public class NlsTablePage extends Composite {
 
   protected void createContent(FormToolkit toolkit, Composite parent) {
     m_controller = new NlsTableController(stack());
-    Composite rootArea = toolkit.createComposite(parent);
+    var rootArea = toolkit.createComposite(parent);
 
     m_hideReadOnly = toolkit.createButton(rootArea, "Hide read-only rows", SWT.CHECK);
     m_hideReadOnly.setSelection(true);
@@ -121,7 +120,7 @@ public class NlsTablePage extends Composite {
 
     @Override
     public void menuAboutToShow(IMenuManager manager) {
-      List<ITranslationEntry> entries = m_controller.getSelectedEntries();
+      var entries = m_controller.getSelectedEntries();
       if (entries.size() == 1) {
         addSingleSelectMenus(manager, m_view.getCursorSelection().get());
       }
@@ -146,7 +145,7 @@ public class NlsTablePage extends Composite {
       }
       manager.add(new FindReferencesAction(stack(), cursorSelection.entry().key()));
 
-      String text = cursorSelection.text();
+      var text = cursorSelection.text();
       if (!Strings.isEmpty(text)) {
         manager.add(new Separator());
         manager.add(new CopyPasteAction("Copy", text, m_view.getDisplay()));

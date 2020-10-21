@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.log;
 
 import static java.lang.System.lineSeparator;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -85,10 +84,10 @@ public class LogMessage {
    * @return {@link #prefix()} and {@link #text()} and the stack traces of all {@link #throwables()}.
    */
   public String all() {
-    StringBuilder logContent = new StringBuilder(prefix()).append(text());
+    var logContent = new StringBuilder(prefix()).append(text());
     if (!m_throwables.isEmpty()) {
-      Iterator<Throwable> iterator = m_throwables.iterator();
-      Throwable t = iterator.next();
+      var iterator = m_throwables.iterator();
+      var t = iterator.next();
       logContent.append(lineSeparator()).append(Strings.fromThrowable(t));
       while (iterator.hasNext()) {
         t = iterator.next();
@@ -106,7 +105,7 @@ public class LogMessage {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    LogMessage that = (LogMessage) o;
+    var that = (LogMessage) o;
     return m_severity.equals(that.m_severity) &&
         m_prefix.equals(that.m_prefix) &&
         m_text.equals(that.m_text) &&

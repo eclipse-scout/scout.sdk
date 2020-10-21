@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.testing;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
@@ -43,7 +42,7 @@ public final class CoreTestingUtils {
    * @return The {@link IType} that corresponds to the main type of the specified {@link ICompilationUnitGenerator}.
    */
   public static IType registerCompilationUnit(IJavaEnvironment env, ICompilationUnitGenerator<?> generator) {
-    StringBuilder src = Ensure.notNull(generator).toJavaSource(Ensure.notNull(env));
+    var src = Ensure.notNull(generator).toJavaSource(Ensure.notNull(env));
     return registerCompilationUnit(env, generator.packageName().orElse(null), generator.mainType().get().elementName().get(), src);
   }
 
@@ -62,18 +61,18 @@ public final class CoreTestingUtils {
    * @return The {@link IType} that corresponds to the main type of the specified {@link ICompilationUnitGenerator}.
    */
   public static IType registerCompilationUnit(IJavaEnvironment env, String qualifier, String simpleName, CharSequence source) {
-    boolean reloadRequired = env.registerCompilationUnitOverride(qualifier, simpleName + JavaTypes.JAVA_FILE_SUFFIX, source);
+    var reloadRequired = env.registerCompilationUnitOverride(qualifier, simpleName + JavaTypes.JAVA_FILE_SUFFIX, source);
     if (reloadRequired) {
       env.reload();
     }
 
-    StringBuilder fqn = new StringBuilder();
+    var fqn = new StringBuilder();
     if (Strings.hasText(qualifier)) {
       fqn.append(qualifier).append(JavaTypes.C_DOT);
     }
     fqn.append(simpleName);
 
-    Optional<IType> t = env.findType(fqn.toString());
+    var t = env.findType(fqn.toString());
     assertTrue(t.isPresent(), "Generated type '" + fqn + "' could not be found.");
     return t.get();
   }

@@ -10,14 +10,16 @@
  */
 package org.eclipse.scout.sdk.core.builder.java;
 
+import static org.eclipse.scout.sdk.core.apidef.ApiFunction.applyWithApi;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.core.util.apidef.ApiFunction.applyWithApi;
 
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.builder.IBuilderContext;
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.SourceBuilderWrapper;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -25,9 +27,6 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.util.apidef.IClassNameSupplier;
 
 /**
  * <h3>{@link JavaSourceBuilder}</h3>
@@ -40,7 +39,7 @@ public class JavaSourceBuilder extends SourceBuilderWrapper<JavaSourceBuilder> i
 
   protected JavaSourceBuilder(ISourceBuilder<?> inner, IJavaEnvironment env) {
     super(inner);
-    IBuilderContext context = inner.context();
+    var context = inner.context();
     if (context instanceof IJavaBuilderContext) {
       m_context = (IJavaBuilderContext) context;
     }
@@ -137,12 +136,12 @@ public class JavaSourceBuilder extends SourceBuilderWrapper<JavaSourceBuilder> i
   }
 
   @Override
-  public JavaSourceBuilder appendReferences(Stream<? extends CharSequence> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
+  public JavaSourceBuilder references(Stream<? extends CharSequence> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
     if (references == null) {
       return thisInstance();
     }
 
-    Stream<ISourceGenerator<ISourceBuilder<?>>> referenceBuilders = references
+    var referenceBuilders = references
         .<ISourceGenerator<IJavaSourceBuilder<?>>> map(s -> builder -> builder.ref(s))
         .map(builder -> builder.generalize(JavaSourceBuilder::create));
     return append(referenceBuilders, prefix, delimiter, suffix);
@@ -150,37 +149,36 @@ public class JavaSourceBuilder extends SourceBuilderWrapper<JavaSourceBuilder> i
 
   @Override
   public <API extends IApiSpecification> JavaSourceBuilder refClassFrom(Class<API> apiClass, Function<API, IClassNameSupplier> sourceProvider) {
-    return ref(executeWithApi(apiClass, sourceProvider).fqn());
+    return ref(executeApi(apiClass, sourceProvider).fqn());
   }
 
   @Override
-  public <API extends IApiSpecification> JavaSourceBuilder refFrom(ApiFunction<API, String> func) {
+  public <API extends IApiSpecification> JavaSourceBuilder refFrom(ApiFunction<API, ? extends CharSequence> func) {
     Ensure.notNull(func);
     return refFrom(func.apiClass().orElse(null), func.apiFunction());
   }
 
   @Override
-  public <API extends IApiSpecification> JavaSourceBuilder refFrom(Class<API> apiClass, Function<API, String> refProvider) {
-    return ref(executeWithApi(apiClass, refProvider));
+  public <API extends IApiSpecification> JavaSourceBuilder refFrom(Class<API> apiClass, Function<API, ? extends CharSequence> refProvider) {
+    return ref(executeApi(apiClass, refProvider));
   }
 
   @Override
-  public <API extends IApiSpecification> JavaSourceBuilder appendFrom(Class<API> apiClass, Function<API, String> sourceProvider) {
-    return append(executeWithApi(apiClass, sourceProvider));
+  public <API extends IApiSpecification> JavaSourceBuilder appendFrom(Class<API> apiClass, Function<API, ? extends CharSequence> sourceProvider) {
+    return append(executeApi(apiClass, sourceProvider));
   }
 
   @Override
-  public JavaSourceBuilder appendFrom(Stream<ApiFunction<?, String>> apis, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
-    if (apis == null) {
+  public JavaSourceBuilder referencesFrom(Stream<ApiFunction<?, CharSequence>> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
+    if (references == null) {
       return thisInstance();
     }
-    return appendReferences(apis
+    return references(references
         .map(af -> af.apply(context()))
-        .filter(Optional::isPresent)
-        .map(Optional::get), prefix, delimiter, suffix);
+        .flatMap(Optional::stream), prefix, delimiter, suffix);
   }
 
-  protected <API extends IApiSpecification, R> R executeWithApi(Class<API> apiClass, Function<API, R> apiObjectProvider) {
+  protected <API extends IApiSpecification, R> R executeApi(Class<API> apiClass, Function<API, R> apiObjectProvider) {
     return applyWithApi(apiClass, apiObjectProvider, context().environment().orElse(null))
         .orElseThrow(() -> newFail("Api object provider could not be executed for api {}. Either the API could not be found or the function did not return a valid value.", apiClass));
   }

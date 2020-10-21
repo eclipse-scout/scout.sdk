@@ -15,8 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.List;
-
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ConstantTestClass;
 import org.eclipse.scout.sdk.core.fixture.TestAnnotation;
@@ -33,8 +31,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class FieldTest {
   @Test
   public void testStringConstantField(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
-    IField myStringField = childClassType.fields().first().get();
+    var childClassType = env.requireType(ChildClass.class.getName());
+    var myStringField = childClassType.fields().first().get();
     assertNotNull(myStringField);
     assertEquals("public static final String myString = \"myStringValue\";", myStringField.toWorkingCopy().toJavaSource().toString());
 
@@ -47,9 +45,9 @@ public class FieldTest {
 
   @Test
   public void testJavaDocOnField(IJavaEnvironment env) {
-    String javaDocSrc = "/** java doc */";
+    var javaDocSrc = "/** java doc */";
     env.registerCompilationUnitOverride("abc", "JavaDocTestClass.java", "package abc;\npublic class JavaDocTestClass {\n" + javaDocSrc + "\nint a1;\n}");
-    ISourceRange javaDoc = env.requireType("abc.JavaDocTestClass").requireCompilationUnit().requireMainType().fields().withName("a1").first().get().javaDoc().get();
+    var javaDoc = env.requireType("abc.JavaDocTestClass").requireCompilationUnit().requireMainType().fields().withName("a1").first().get().javaDoc().get();
     assertEquals(javaDocSrc, javaDoc.asCharSequence().toString());
     env.reload();
     javaDoc = env.requireType("abc.JavaDocTestClass").requireCompilationUnit().requireMainType().fields().withName("a1").first().get().javaDoc().get();
@@ -58,8 +56,8 @@ public class FieldTest {
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
-    IField myStringField = childClassType.fields().first().get();
+    var childClassType = env.requireType(ChildClass.class.getName());
+    var myStringField = childClassType.fields().first().get();
     assertNotNull(myStringField);
 
     assertFalse(Strings.isBlank(myStringField.toString()));
@@ -67,8 +65,8 @@ public class FieldTest {
 
   @Test
   public void testNullArrayField(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
-    IField mTestField = childClassType.fields().item(1).get();
+    var childClassType = env.requireType(ChildClass.class.getName());
+    var mTestField = childClassType.fields().item(1).get();
 
     assertEquals(MetaValueType.Null, mTestField.constantValue().get().type());
     assertEquals(JavaTypes._int, mTestField.dataType().leafComponentType().get().name());
@@ -80,8 +78,8 @@ public class FieldTest {
 
   @Test
   public void testAnnotationOnFieldChild(IJavaEnvironment env) {
-    IType childClassType = env.requireType(ChildClass.class.getName());
-    IField mTestField = childClassType.fields().item(1).get();
+    var childClassType = env.requireType(ChildClass.class.getName());
+    var mTestField = childClassType.fields().item(1).get();
 
     assertEquals(1, mTestField.annotations().stream().count());
     assertEquals(mTestField, mTestField.annotations().first().get().owner());
@@ -90,8 +88,8 @@ public class FieldTest {
 
   @Test
   public void testAnnotationOnFieldBase(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
-    IField myLongField = baseClassType.fields().first().get();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var myLongField = baseClassType.fields().first().get();
     assertEquals(1, myLongField.annotations().stream().count());
     assertEquals(myLongField, myLongField.annotations().first().get().owner());
     assertEquals(TestAnnotation.class.getName(), myLongField.annotations().first().get().type().name());
@@ -99,8 +97,8 @@ public class FieldTest {
 
   @Test
   public void testLongConstantField(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
-    IField myLongField = baseClassType.fields().first().get();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var myLongField = baseClassType.fields().first().get();
     assertEquals(JavaTypes.Long, myLongField.dataType().name());
     assertEquals(baseClassType, myLongField.requireDeclaringType());
     assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myLongField.flags());
@@ -109,8 +107,8 @@ public class FieldTest {
 
   @Test
   public void testConstantValues(IJavaEnvironment env) {
-    IType constantTestClass = env.requireType(ConstantTestClass.class.getName());
-    List<IField> fields = constantTestClass.fields().stream().collect(toList());
+    var constantTestClass = env.requireType(ConstantTestClass.class.getName());
+    var fields = constantTestClass.fields().stream().collect(toList());
     assertEquals(4, fields.size());
     assertFalse(fields.get(0).constantValue().isPresent());
     assertEquals(MetaValueType.String, fields.get(1).constantValue().get().type());
@@ -120,8 +118,8 @@ public class FieldTest {
 
   @Test
   public void testAnonymousTypeField(IJavaEnvironment env) {
-    IType baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
-    IField anonymousClassField = baseClassType.fields().item(1).get();
+    var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
+    var anonymousClassField = baseClassType.fields().item(1).get();
     assertFalse(anonymousClassField.constantValue().isPresent());
     assertEquals(Runnable.class.getName(), anonymousClassField.dataType().name());
     assertEquals(0, anonymousClassField.dataType().arrayDimension());

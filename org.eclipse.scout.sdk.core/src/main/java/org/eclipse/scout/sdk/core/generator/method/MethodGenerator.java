@@ -21,13 +21,15 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.beans.Introspector;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
@@ -55,8 +57,6 @@ import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilde
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.core.util.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.util.apidef.IApiSpecification;
 
 /**
  * <h3>{@link MethodGenerator}</h3>
@@ -67,7 +67,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
   protected final List<IMethodParameterGenerator<?>> m_parameters;
   protected final List<ITypeParameterGenerator<?>> m_typeParameters;
-  protected final List<ApiFunction<?, String>> m_exceptions;
+  protected final List<ApiFunction<?, IClassNameSupplier>> m_exceptions;
 
   private ApiFunction<?, String> m_returnType;
   private ISourceGenerator<BODY> m_body;
@@ -99,6 +99,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
     m_exceptions = method.exceptionTypes()
         .map(IType::reference)
+        .map(IClassNameSupplier::raw)
         .map(ApiFunction::new)
         .collect(toList());
 
@@ -151,9 +152,9 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    */
   @SuppressWarnings("unchecked")
   public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetter(IFieldGenerator<?> fieldGenerator) {
-    ApiFunction<IApiSpecification, String> dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
+    var dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
         .orElseThrow(() -> newFail("Cannot create getter for field because it has no data type."));
-    String fieldName = Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create getter for field because it has no name."));
+    var fieldName = Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create getter for field because it has no name."));
     return createGetter(fieldName, dataType.apiClass().orElse(null), dataType.apiFunction(), Flags.AccPublic);
   }
 
@@ -186,7 +187,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   public static <A extends IApiSpecification> IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetter(String fieldName, Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags) {
-    String methodBaseName = getGetterSetterBaseName(fieldName);
+    var methodBaseName = getGetterSetterBaseName(fieldName);
     return create()
         .withElementNameFrom(apiDefinition, api -> PropertyBean.getterPrefixFor(dataTypeFunction.apply(api)) + methodBaseName)
         .withFlags(flags)
@@ -204,7 +205,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    */
   @SuppressWarnings("unchecked")
   public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(IFieldGenerator<?> fieldGenerator) {
-    ApiFunction<IApiSpecification, String> dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
+    var dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
         .orElseThrow(() -> newFail("Cannot create setter for field because it has no data type."));
     return createSetter(Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create setter for field because it has no name.")),
         dataType.apiClass().orElse(null), dataType.apiFunction(), Flags.AccPublic, null);
@@ -257,8 +258,8 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
   public static <A extends IApiSpecification> IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(String fieldName,
       Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags, String paramNamePrefix) {
-    String setterBaseName = getGetterSetterBaseName(fieldName); // starts with an uppercase char
-    String parameterName = getPrefixedMethodParameterName(paramNamePrefix, setterBaseName);
+    var setterBaseName = getGetterSetterBaseName(fieldName); // starts with an uppercase char
+    var parameterName = getPrefixedMethodParameterName(paramNamePrefix, setterBaseName);
     return create()
         .withElementName(PropertyBean.SETTER_PREFIX + setterBaseName)
         .withFlags(flags)
@@ -276,7 +277,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   protected static String getGetterSetterBaseName(String fieldName) {
-    StringBuilder sb = new StringBuilder(Ensure.notBlank(fieldName));
+    var sb = new StringBuilder(Ensure.notBlank(fieldName));
     if (sb.length() > 1 && sb.charAt(0) == 'm' && sb.charAt(1) == '_') {
       sb.delete(0, 2);
     }
@@ -292,7 +293,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
       return Introspector.decapitalize(setterBaseName);
     }
 
-    StringBuilder paramNameBuilder = new StringBuilder(paramNamePrefix.length() + setterBaseName.length());
+    var paramNameBuilder = new StringBuilder(paramNamePrefix.length() + setterBaseName.length());
     paramNameBuilder.append(Introspector.decapitalize(paramNamePrefix));
     paramNameBuilder.append(setterBaseName);
     return paramNameBuilder.toString();
@@ -305,8 +306,8 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   protected void buildMethodSource(IMemberBuilder<?> builder) {
-    int flags = flags();
-    boolean isVarargs = isVarargs(flags);
+    var flags = flags();
+    var isVarargs = isVarargs(flags);
     flags &= ~Flags.AccVarargs; // remove varargs flag because it has the same value as transient which would be wrong in Flags.toString()
     if (isDefaultMethod(flags) || isInterface(flags)) {
       flags &= ~(Flags.AccPublic | Flags.AccAbstract); // for interface methods: remove implicit public and abstract flag
@@ -332,7 +333,10 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     builder.parenthesisClose();
 
     // exceptions
-    builder.appendFrom(exceptions(), " throws ", ", ", null);
+    builder.references(throwables()
+        .map(af -> af.apply(builder.context()))
+        .flatMap(Optional::stream)
+        .map(IClassNameSupplier::fqn), " throws ", ", ", null);
 
     if (canHaveBody(flags)) {
       buildBodySource(builder);
@@ -354,21 +358,21 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   protected void buildBodySource(IMemberBuilder<?> builder) {
     builder.space().blockStart();
 
-    String lineDelimiter = builder.context().lineDelimiter();
-    StringBuilder bodySrc = body()
+    var lineDelimiter = builder.context().lineDelimiter();
+    var bodySrc = body()
         .map(g -> g.toSource(this::createMethodBodyBuilder, builder.context()))
         .orElse(new StringBuilder(lineDelimiter));
 
-    boolean srcAvailable = bodySrc.length() > lineDelimiter.length();
+    var srcAvailable = bodySrc.length() > lineDelimiter.length();
     if (srcAvailable && !bodySrc.substring(0, lineDelimiter.length()).equals(lineDelimiter)) {
       // ensure the body starts on a new line
       builder.nl();
     }
     builder.append(bodySrc);
 
-    boolean endsWithNl = srcAvailable && bodySrc.substring(bodySrc.length() - lineDelimiter.length(), bodySrc.length()).equals(lineDelimiter);
+    var endsWithNl = srcAvailable && bodySrc.substring(bodySrc.length() - lineDelimiter.length(), bodySrc.length()).equals(lineDelimiter);
     if (!endsWithNl) {
-      int lastNl = bodySrc.lastIndexOf(lineDelimiter);
+      var lastNl = bodySrc.lastIndexOf(lineDelimiter);
       if (lastNl < 0 || Strings.hasText(bodySrc.substring(lastNl))) {
         // ensure the body ends with a line delimiter
         builder.append(lineDelimiter);
@@ -380,8 +384,8 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   @Override
   protected IJavaElementCommentBuilder<?> createCommentBuilder(ISourceBuilder<?> builder) {
     //noinspection TypeMayBeWeakened
-    IJavaSourceBuilder<?> javaSourceBuilder = (IJavaSourceBuilder<?>) builder;
-    IJavaEnvironment context = javaSourceBuilder.context().environment().orElse(null);
+    var javaSourceBuilder = (IJavaSourceBuilder<?>) builder;
+    var context = javaSourceBuilder.context().environment().orElse(null);
     if (PropertyBean.getterName(this, context).isPresent()) {
       return JavaElementCommentBuilder.createForMethodGetter(builder, this);
     }
@@ -393,7 +397,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
   @Override
   public String identifier(IJavaEnvironment context, boolean useErasureOnly) {
-    List<String> methodParamTypes = m_parameters.stream()
+    var methodParamTypes = m_parameters.stream()
         .map(IMethodParameterGenerator::dataType)
         .map(d -> d.orElseThrow(() -> newFail("Cannot calculate the method identifier because the datatype is missing.")))
         .map(af -> af.apply(context).orElseThrow(() -> newFail("Cannot compute parameter data type of method '{}'.", elementName().orElse(null))))
@@ -473,24 +477,30 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   @Override
-  public Stream<ApiFunction<?, String>> exceptions() {
+  public Stream<ApiFunction<?, IClassNameSupplier>> throwables() {
     return m_exceptions.stream();
   }
 
   @Override
-  public TYPE withException(String exceptionReference) {
-    return withExceptionFrom(null, api -> exceptionReference);
+  public TYPE withThrowable(String throwableFqn) {
+    var fqnSupplier = IClassNameSupplier.raw(throwableFqn);
+    return withThrowableFrom(null, api -> fqnSupplier);
   }
 
   @Override
-  public <A extends IApiSpecification> TYPE withExceptionFrom(Class<A> apiDefinition, Function<A, String> exceptionSupplier) {
-    m_exceptions.add(new ApiFunction<>(apiDefinition, exceptionSupplier));
+  public <A extends IApiSpecification> TYPE withThrowableFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> throwableSupplier) {
+    m_exceptions.add(new ApiFunction<>(apiDefinition, throwableSupplier));
     return thisInstance();
   }
 
   @Override
-  public TYPE withoutException(Predicate<ApiFunction<?, String>> toRemove) {
-    m_exceptions.removeIf(toRemove);
+  public TYPE withoutThrowable(Predicate<ApiFunction<?, IClassNameSupplier>> toRemoveFilter) {
+    if (toRemoveFilter == null) {
+      m_exceptions.clear();
+    }
+    else {
+      m_exceptions.removeIf(toRemoveFilter);
+    }
     return thisInstance();
   }
 
@@ -521,8 +531,8 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   @Override
   public TYPE withoutParameter(String parameterName) {
     Ensure.notBlank(parameterName);
-    for (Iterator<IMethodParameterGenerator<?>> it = m_parameters.iterator(); it.hasNext();) {
-      IMethodParameterGenerator<?> parameter = it.next();
+    for (var it = m_parameters.iterator(); it.hasNext();) {
+      var parameter = it.next();
       if (parameterName.equals(parameter.elementName().orElse(null))) {
         it.remove();
         return thisInstance();
@@ -559,5 +569,10 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   @Override
   public TYPE asSynchronized() {
     return withFlags(Flags.AccSynchronized);
+  }
+
+  @Override
+  public TYPE asDefaultMethod() {
+    return withFlags(Flags.AccDefaultMethod);
   }
 }

@@ -29,8 +29,8 @@ public class ScoutJavaEnvironmentWithEcjBuilder<T extends ScoutJavaEnvironmentWi
   }
 
   public T withScoutServer(boolean withServer) {
-    String rtServer = ".*" + Pattern.quote(".scout.rt.server") + ".*";
-    String mom = ".*" + Pattern.quote(".scout.rt.mom") + ".*";
+    var rtServer = ".*" + Pattern.quote(".scout.rt.server") + ".*";
+    var mom = ".*" + Pattern.quote(".scout.rt.mom") + ".*";
     if (withServer) {
       include(rtServer);
       include(mom);
@@ -43,7 +43,7 @@ public class ScoutJavaEnvironmentWithEcjBuilder<T extends ScoutJavaEnvironmentWi
   }
 
   public T withScoutClient(boolean withClient) {
-    String regex = ".*" + Pattern.quote(".scout.rt.client") + ".*";
+    var regex = ".*" + Pattern.quote(".scout.rt.client") + ".*";
     if (withClient) {
       include(regex);
     }
@@ -54,8 +54,8 @@ public class ScoutJavaEnvironmentWithEcjBuilder<T extends ScoutJavaEnvironmentWi
   }
 
   public T withScoutHtmlUi(boolean withHtmlUi) {
-    String json = ".*" + Pattern.quote(".scout.json") + ".*";
-    String uiHtml = ".*" + Pattern.quote(".scout.rt.ui.html") + ".*";
+    var json = ".*" + Pattern.quote(".scout.json") + ".*";
+    var uiHtml = ".*" + Pattern.quote(".scout.rt.ui.html") + ".*";
     if (withHtmlUi) {
       include(json);
       include(uiHtml);
