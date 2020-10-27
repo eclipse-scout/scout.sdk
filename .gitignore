@@ -23,9 +23,16 @@ target/
 /.project
 
 # IntelliJ IDEA #
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-.idea/**/dictionaries
+/.idea/**/workspace.xml
+/.idea/**/tasks.xml
+/.idea/**/usage.statistics.xml
+/.idea/**/dataSources.local.xml
+/.idea/**/jarRepositories.xml
+/.idea/**/shelf
+/.idea/sonarlint
+/.idea/**/dataSources/
+/.idea/httpRequests/
+/.idea/libraries/
+/.idea/artifacts/
 
 org.eclipse.scout.sdk.s2e*/META-INF/MANIFEST.MF

@@ -108,17 +108,6 @@
 
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.eclipse.scout</groupId>
-          <artifactId>eclipse-settings-maven-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.scout.sdk</groupId>
-              <artifactId>org.eclipse.scout.sdk-settings</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>

@@ -106,17 +106,6 @@
             </target>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.eclipse.scout</groupId>
-          <artifactId>eclipse-settings-maven-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.scout.sdk</groupId>
-              <artifactId>org.eclipse.scout.sdk-settings</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>

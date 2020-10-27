@@ -41,8 +41,6 @@
     <module>../org.eclipse.scout.sdk.s2e.test</module>
     <module>../org.eclipse.scout.sdk.s2e.doc</module>
     <module>../org.eclipse.scout.sdk.s2e.ui</module>
-
-    <module>../org.eclipse.scout.sdk-settings</module>
   </modules>
 
   <properties>
@@ -204,12 +202,6 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
-        <version>11.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2i</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2i</artifactId>
         <version>11.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -963,21 +955,6 @@
   </dependencyManagement>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.eclipse.scout</groupId>
-          <artifactId>eclipse-settings-maven-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.scout.sdk</groupId>
-              <artifactId>org.eclipse.scout.sdk-settings</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
