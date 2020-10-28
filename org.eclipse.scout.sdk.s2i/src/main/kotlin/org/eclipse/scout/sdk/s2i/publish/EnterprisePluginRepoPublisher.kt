@@ -146,12 +146,22 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         }
     }
 
+    /**
+     * @param oldPluginZip The old content of the url attribute of the replaced plugin. May be an absolute URL or a local path relative to the repository root.
+     */
     fun deleteOldPluginFromRepo(oldPluginZip: String?) {
         if (oldPluginZip == null) {
             return
         }
+        val oldPluginZipNormalized = oldPluginZip.replace('\\', '/')
+        val lastSlash = oldPluginZipNormalized.lastIndexOf('/')
+        if (lastSlash < 1) {
+            println("Cannot delete old plugin zip because the filename could not be calculated from old value '$oldPluginZip'.")
+            return
+        }
+        val fileName = oldPluginZipNormalized.substring(lastSlash + 1)
         try {
-            Files.delete(repoDir.resolve(oldPluginZip))
+            Files.delete(repoDir.resolve(PLUGINS_SUB_DIR_NAME).resolve(fileName))
         } catch (e: NoSuchFileException) {
             println("File $oldPluginZip cannot be deleted because it cannot be found. Skipping.")
         }
