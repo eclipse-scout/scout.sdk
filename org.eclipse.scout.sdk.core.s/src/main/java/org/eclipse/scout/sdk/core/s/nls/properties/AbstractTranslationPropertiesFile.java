@@ -100,7 +100,10 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
     while (iterator.hasNext()) {
       Entry<String, String> entry = iterator.next();
       if (validateKey(entry.getKey()) != TranslationValidator.OK) {
-        SdkLog.warning("Skipping entry '{}={}' found in '{}' because the key is invalid.", entry.getKey(), entry.getValue(), source());
+        if (isEditable()) {
+          // only log if you have the chance to fix it (skip logging for read-only files)
+          SdkLog.warning("Skipping entry '{}={}' found in '{}' because the key is invalid.", entry.getKey(), entry.getValue(), source());
+        }
         iterator.remove();
       }
     }
