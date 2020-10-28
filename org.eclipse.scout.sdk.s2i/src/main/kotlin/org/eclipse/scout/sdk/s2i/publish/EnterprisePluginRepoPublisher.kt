@@ -38,12 +38,12 @@ const val PLUGIN_REPO_FILE_NAME = "updatePlugins.xml"
 const val PLUGINS_SUB_DIR_NAME = "plugins"
 
 
-open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: Path) {
+open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: Path, val repoUrl: String?) {
 
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            if (args.size != 2 || args[0].isBlank() || args[1].isBlank()) {
+            if (args.size < 2 || args[0].isBlank() || args[1].isBlank()) {
                 printUsage()
                 exitProcess(1)
             }
@@ -51,7 +51,6 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
             val pluginToDeploy = Paths.get(args[0])
             if (!Files.isRegularFile(pluginToDeploy) || !Files.isReadable(pluginToDeploy)) {
                 println("Plugin file '$pluginToDeploy' could not be found.")
-
                 exitProcess(2)
             }
 
@@ -61,13 +60,14 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
                 exitProcess(3)
             }
 
-            EnterprisePluginRepoPublisher(pluginToDeploy, repoDir).publish()
+            val repoPath = if (args.size > 2) args[2] else null
+            EnterprisePluginRepoPublisher(pluginToDeploy, repoDir, repoPath).publish()
         }
 
         fun printUsage() {
             val pathSep = System.getProperty("path.separator")
             println("usage:")
-            println("java -cp kotlin-runtime.jar" + pathSep + "org.eclipse.scout.sdk.s2i.jar org.eclipse.scout.sdk.s2i.publish.EnterprisePluginRepoPublisher /path/to/plugin.zip /path/to/enterprise/repoDir")
+            println("java -cp kotlin-runtime.jar${pathSep}org.eclipse.scout.sdk.core.jar${pathSep}org.eclipse.scout.sdk.s2i.jar org.eclipse.scout.sdk.s2i.publish.EnterprisePluginRepoPublisher /path/to/plugin.zip /path/to/enterprise/repoDir [https://host/path-to-repo]")
         }
     }
 
@@ -110,7 +110,7 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         }
 
         // add new entry
-        root.appendChild(pluginXml.toPluginElement(root.ownerDocument, pluginToDeploy.fileName.toString()))
+        root.appendChild(pluginXml.toPluginElement(root.ownerDocument, pluginToDeploy.fileName.toString(), repoUrl))
         cleanupXmlDocument(root.ownerDocument)
         writeXmlDocument(root.ownerDocument, updatePluginsXml)
 
@@ -207,10 +207,19 @@ data class PluginXmlDescriptor(val id: String,
                                val name: String,
                                val description: String,
                                val changeNotes: String) {
-    fun toPluginElement(ownerDocument: Document, fileName: String): Element {
+    fun toPluginElement(ownerDocument: Document, fileName: String, repoUrl: String?): Element {
         val pluginElement = ownerDocument.createElement(XML_TAG_NAME_PLUGIN)
         pluginElement.setAttribute(XML_ATTRIBUTE_ID, id)
-        pluginElement.setAttribute(XML_ATTRIBUTE_URL, "$PLUGINS_SUB_DIR_NAME/$fileName")
+
+        var rootUrl = ""
+        if (repoUrl?.isNotBlank() == true) {
+            rootUrl = repoUrl
+            if (!rootUrl.endsWith("/")) {
+                rootUrl = "$rootUrl/"
+            }
+        }
+
+        pluginElement.setAttribute(XML_ATTRIBUTE_URL, "$rootUrl$PLUGINS_SUB_DIR_NAME/$fileName")
         pluginElement.setAttribute(XML_ATTRIBUTE_VERSION, version)
 
         if (name.isNotBlank()) {
