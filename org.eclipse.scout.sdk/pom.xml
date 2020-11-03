@@ -748,22 +748,17 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
-        <version>${org.eclipse.swt}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
         <version>${org.eclipse.swt}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.swt.gtk.linux.x86</artifactId>
+        <artifactId>org.eclipse.swt.gtk.linux.aarch64</artifactId>
         <version>${org.eclipse.swt}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.swt.gtk.linux.ppc64</artifactId>
+        <artifactId>org.eclipse.swt.gtk.linux.ppc64le</artifactId>
         <version>${org.eclipse.swt}</version>
       </dependency>
       <dependency>
@@ -1126,22 +1121,10 @@
       </properties>
     </profile>
     <profile>
-      <id>swt_win_x86</id>
+      <id>swt_unix_x64</id>
       <activation>
         <os>
-          <family>windows</family>
-          <arch>x86</arch>
-        </os>
-      </activation>
-      <properties>
-        <osgi.platform>win32.win32.x86</osgi.platform>
-      </properties>
-    </profile>
-    <profile>
-      <id>swt_linux_x64</id>
-      <activation>
-        <os>
-          <family>linux</family>
+          <family>unix</family>
           <arch>amd64</arch>
         </os>
       </activation>
@@ -1150,27 +1133,27 @@
       </properties>
     </profile>
     <profile>
-      <id>swt_linux_x86</id>
+      <id>swt_unix_aarch64</id>
       <activation>
         <os>
-          <family>linux</family>
-          <arch>x86</arch>
+          <family>unix</family>
+          <arch>aarch64</arch>
         </os>
       </activation>
       <properties>
-        <osgi.platform>gtk.linux.x86</osgi.platform>
+        <osgi.platform>gtk.linux.aarch64</osgi.platform>
       </properties>
     </profile>
     <profile>
-      <id>swt_linux_ppc</id>
+      <id>swt_unix_ppc</id>
       <activation>
         <os>
-          <family>linux</family>
+          <family>unix</family>
           <arch>ppc64</arch>
         </os>
       </activation>
       <properties>
-        <osgi.platform>gtk.linux.ppc64</osgi.platform>
+        <osgi.platform>gtk.linux.ppc64le</osgi.platform>
       </properties>
     </profile>
     <profile>
