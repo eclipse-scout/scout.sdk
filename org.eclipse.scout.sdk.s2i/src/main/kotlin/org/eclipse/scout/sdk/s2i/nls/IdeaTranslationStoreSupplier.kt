@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationProperties
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import java.nio.file.Path
 import java.util.*
@@ -66,18 +67,20 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
 
         val moduleScope = module.getModuleWithDependenciesAndLibrariesScope(false)
         val javaEnv: IJavaEnvironment = env.toScoutJavaEnvironment(module) ?: return Stream.empty()
-        val types = module.project.findTypesByName(IScoutRuntimeTypes.AbstractDynamicNlsTextProviderService, moduleScope)
-                .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false) }
-                .asSequence()
-                .filter { IdeaEnvironment.computeInReadAction(module.project) { !it.isDeprecated } }
-                .filter { !it.isEnum }
-                .filter { it.hasModifierProperty(PsiModifier.PUBLIC) }
-                .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
-                .filter { it.scope is PsiJavaFile }
-                .filter { it.canNavigateToSource() }
-                .map { TypeMapping(it.toScoutType(javaEnv), it) }
-                .filter { it.scoutType != null }
-                .toList()
+
+        val types = computeInReadAction(module.project) {
+            module.project.findTypesByName(IScoutRuntimeTypes.AbstractDynamicNlsTextProviderService, moduleScope)
+                    .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false) }
+                    .asSequence()
+                    .filter { !it.isDeprecated }
+                    .filter { !it.isEnum }
+                    .filter { it.hasModifierProperty(PsiModifier.PUBLIC) }
+                    .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
+                    .filter { it.scope is PsiJavaFile }
+                    .map { TypeMapping(it.toScoutType(javaEnv), it) }
+                    .filter { it.scoutType != null }
+                    .toList()
+        }
 
         val progressForLoad = progress.worked(10).newChild(10).init(types.size, message("load.properties.content"))
         val result = types.mapNotNull { createTranslationStore(it.scoutType!!, it.psiClass, module, progressForLoad).orElse(null) }

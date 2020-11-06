@@ -51,7 +51,7 @@ public class NlsEditor extends EditorPart {
 
     IResource resource = input.getAdapter(IResource.class);
     if (resource != null && resource.exists()) {
-      m_path = resource.getLocation().toFile().toPath();
+      m_path = resource.getProject().getLocation().toFile().toPath();
     }
   }
 
@@ -91,13 +91,13 @@ public class NlsEditor extends EditorPart {
     }
   }
 
-  private void loadAndCreateContentAsync(Composite parent, Path path, IProgressMonitor monitor) {
+  private void loadAndCreateContentAsync(Composite parent, Path modulePath, IProgressMonitor monitor) {
     runInEclipseEnvironment((e, p /* do not use this monitor in here. instead use the monitor from the ProgressMonitorDialog */) -> {
       EclipseProgress progress = toScoutProgress(monitor);
       progress.init(1000, "Loading translation editor...");
 
       try {
-        TranslationStores.createStack(path, e, progress.newChild(1000))
+        TranslationStores.createStack(modulePath, e, progress.newChild(1000))
             .ifPresent(stack -> {
               progress.monitor().setTaskName("Creating table...");
               parent.getDisplay().syncExec(() -> createPageAsync(stack, parent));

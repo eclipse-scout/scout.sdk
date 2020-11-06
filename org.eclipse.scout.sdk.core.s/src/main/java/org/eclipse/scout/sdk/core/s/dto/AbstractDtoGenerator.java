@@ -348,9 +348,8 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
 
   private static Optional<IType> findExtendsAnnotationValue(IType element) {
     return element.superTypes().withSuperInterfaces(false).stream()
-        .map(curType -> curType.annotations().withManagedWrapper(ExtendsAnnotation.class).first())
-        .filter(Optional::isPresent)
-        .map(annot -> annot.get().value())
+        .flatMap(curType -> curType.annotations().withManagedWrapper(ExtendsAnnotation.class).first().stream())
+        .map(ExtendsAnnotation::value)
         .findAny();
   }
 
