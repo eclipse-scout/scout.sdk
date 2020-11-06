@@ -18,12 +18,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -41,10 +44,37 @@ public final class WebModuleTranslationStores {
   static Stream<ITranslationStore> allForModule(Path modulePath, IEnvironment env, IProgress progress) {
     progress.init(1, "Resolve translation stores visible in npm dependencies of module '{}'.", modulePath);
     IProgress childProgress = progress.newChild(0);
+    Supplier<Stream<ITranslationStore>> packageJsonResolver = () -> resolveStoresReferencedInPackageJson(modulePath, env, childProgress);
+    Supplier<Stream<ITranslationStore>> scoutJsBackendModuleResolver = () -> resolveScoutJsBackendModuleStores(modulePath, env, childProgress);
+    return Stream.of(packageJsonResolver, scoutJsBackendModuleResolver).flatMap(Supplier::get);
+  }
+
+  static Stream<ITranslationStore> resolveStoresReferencedInPackageJson(Path modulePath, IEnvironment env, IProgress progress) {
     return loadPackageJson(modulePath)
         .map(WebModuleTranslationStores::getTextContributorsReferencedInPackageJson)
         .orElseGet(Stream::empty)
-        .flatMap(name -> resolveStoresProvidingTranslationsOfContributor(name, env, childProgress));
+        .flatMap(name -> resolveStoresProvidingTranslationsOfContributor(name, env, progress));
+  }
+
+  static Stream<ITranslationStore> resolveScoutJsBackendModuleStores(Path modulePath, IEnvironment env, IProgress progress) {
+    return Stream.of(new SimpleImmutableEntry<>(".ui", ".app"))
+        .map(nameMapping -> findIncludedModuleBySuffixConvention(modulePath, nameMapping.getKey(), nameMapping.getValue()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .flatMap(targetModulePath -> TranslationStores.allForModule(targetModulePath, env, progress));
+  }
+
+  static Optional<Path> findIncludedModuleBySuffixConvention(Path sourceModulePath, String sourceModuleSuffix, String targetModuleSuffix) {
+    String sourceModuleFolderName = sourceModulePath.getFileName().toString().toLowerCase(Locale.ENGLISH);
+    if (!sourceModuleFolderName.endsWith(sourceModuleSuffix)) {
+      return Optional.empty();
+    }
+    String targetModuleName = sourceModuleFolderName.substring(0, sourceModuleFolderName.length() - sourceModuleSuffix.length()) + targetModuleSuffix;
+    Path targetModulePath = sourceModulePath.getParent().resolve(targetModuleName);
+    if (Files.isReadable(targetModulePath) && Files.isDirectory(targetModulePath)) {
+      return Optional.of(targetModulePath);
+    }
+    return Optional.empty();
   }
 
   static Stream<ITranslationStore> resolveStoresProvidingTranslationsOfContributor(String contributorFqn, IEnvironment env, IProgress progress) {

@@ -73,10 +73,10 @@ public class TranslationProposalComputer implements IJavaCompletionProposalCompu
 
       if (matchingStart >= 0) {
         String prefix = linePart.substring(matchingStart, offset - lineInfo.getOffset());
-        Path path = context.getCompilationUnit().getResource().getLocation().toFile().toPath();
+        Path modulePath = context.getCompilationUnit().getJavaProject().getProject().getLocation().toFile().toPath();
 
         return callInEclipseEnvironment(
-            (env, progress) -> TranslationStores.createStack(path, env, progress)
+            (env, progress) -> TranslationStores.createStack(modulePath, env, progress)
                 .map(stack -> collectProposals(stack, prefix, offset))
                 .orElseGet(Collections::emptyList))
                     .result();

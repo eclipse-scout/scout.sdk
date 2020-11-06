@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -224,9 +225,13 @@ public final class TranslationStores {
 
   static Stream<ITranslationStore> getAllStoresForModule(Path modulePath, IEnvironment env, IProgress progress) {
     progress.init(20000, "Resolve all translation stores for module '{}'.", modulePath);
-    return Stream.concat(allForJavaModule(modulePath, env, progress.newChild(10000)), allForWebModule(modulePath, env, progress.newChild(10000)))
+    Supplier<Stream<ITranslationStore>> storesVisibleInJavaDependencies = () -> allForJavaModule(modulePath, env, progress.newChild(10000));
+    Supplier<Stream<ITranslationStore>> storesVisibleInWebDependencies = () -> allForWebModule(modulePath, env, progress.newChild(10000));
+    return Stream.of(storesVisibleInJavaDependencies, storesVisibleInWebDependencies)
+        .flatMap(Supplier::get)
         .collect(toMap(s -> s.service().type().name(), identity(), TranslationStores::keepLargerStore))
-        .values().stream();
+        .values()
+        .stream();
   }
 
   /**

@@ -133,11 +133,12 @@ public class EclipseWorkspaceWalker {
   }
 
   protected static void executeQueryInFile(IFileQuery query, WorkspaceFile file, IEnvironment env, IProgress progress) {
-    if (!file.inWorkspace().isPresent()) {
+    Optional<IFile> iFile = file.inWorkspace();
+    if (!iFile.isPresent()) {
       SdkLog.warning("File '{}' could not be found in the current Eclipse Workspace.", file.path());
       return;
     }
-    Path modulePath = file.inWorkspace().get().getProject().getLocation().toFile().toPath();
+    Path modulePath = iFile.get().getProject().getLocation().toFile().toPath();
     FileQueryInput candidate = new FileQueryInput(file.path(), modulePath, file::content);
     query.searchIn(candidate, env, progress);
   }

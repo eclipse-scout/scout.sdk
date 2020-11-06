@@ -43,6 +43,5 @@ open class DtoUpdateHandlerFactory : DerivedResourceHandlerFactory {
             && !type.isAnnotationType
             && !type.isEnum
             && type.hasModifierProperty(PsiModifier.PUBLIC)
-            && type.canNavigateToSource()
             && type.scope is PsiJavaFile // primary type
 }
