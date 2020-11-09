@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import org.eclipse.jdt.internal.compiler.ast.Expression;
+import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.jdt.internal.compiler.lookup.ElementValuePair;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
@@ -36,6 +37,7 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   private final FinalValue<IMetaValue> m_value;
   private final FinalValue<ISourceRange> m_source;
   private final FinalValue<ISourceRange> m_expressionSource;
+  private final FinalValue<MemberValuePair> m_memberValuePair;
 
   protected BindingAnnotationElementWithEcj(AbstractJavaEnvironment env, AnnotationSpi owner, ElementValuePair bindingPair, boolean syntheticDefaultValue) {
     super(env);
@@ -46,6 +48,7 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
     m_value = new FinalValue<>();
     m_source = new FinalValue<>();
     m_expressionSource = new FinalValue<>();
+    m_memberValuePair = new FinalValue<>();
   }
 
   @Override
@@ -91,29 +94,33 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
     return m_declaringAnnotation;
   }
 
+  MemberValuePair memberValuePair() {
+    return m_memberValuePair.computeIfAbsentAndGet(() -> SpiWithEcjUtils.findAnnotationValueDeclaration(this));
+  }
+
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      var pairDecl = SpiWithEcjUtils.findAnnotationValueDeclaration(this);
-      if (pairDecl != null) {
-        return new SourceRange(pairDecl.toString(), pairDecl.sourceStart, pairDecl.sourceEnd);
+      var pairDecl = memberValuePair();
+      if (pairDecl == null) {
+        return null;
       }
-      return null;
+      return new SourceRange(pairDecl.toString(), pairDecl.sourceStart, pairDecl.sourceEnd);
     });
   }
 
-  protected Expression getSourceExpression() {
-    var pairDecl = SpiWithEcjUtils.findAnnotationValueDeclaration(this);
-    if (pairDecl != null) {
-      return pairDecl.value;
+  protected Expression getValueExpression() {
+    var pairDecl = memberValuePair();
+    if (pairDecl == null) {
+      return null;
     }
-    return null;
+    return pairDecl.value;
   }
 
   @Override
   public ISourceRange getSourceOfExpression() {
     return m_expressionSource.computeIfAbsentAndGet(() -> {
-      var expr = getSourceExpression();
+      var expr = getValueExpression();
       if (expr != null) {
         return new SourceRange(expr.toString(), expr.sourceStart, expr.sourceEnd);
       }

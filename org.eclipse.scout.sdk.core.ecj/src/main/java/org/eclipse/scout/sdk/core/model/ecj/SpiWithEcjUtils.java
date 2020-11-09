@@ -33,6 +33,7 @@ import org.eclipse.jdt.internal.compiler.ast.CharLiteral;
 import org.eclipse.jdt.internal.compiler.ast.ClassLiteralAccess;
 import org.eclipse.jdt.internal.compiler.ast.DoubleLiteral;
 import org.eclipse.jdt.internal.compiler.ast.Expression;
+import org.eclipse.jdt.internal.compiler.ast.FalseLiteral;
 import org.eclipse.jdt.internal.compiler.ast.FloatLiteral;
 import org.eclipse.jdt.internal.compiler.ast.IntLiteral;
 import org.eclipse.jdt.internal.compiler.ast.Literal;
@@ -45,6 +46,8 @@ import org.eclipse.jdt.internal.compiler.ast.NullLiteral;
 import org.eclipse.jdt.internal.compiler.ast.QualifiedNameReference;
 import org.eclipse.jdt.internal.compiler.ast.Reference;
 import org.eclipse.jdt.internal.compiler.ast.SingleMemberAnnotation;
+import org.eclipse.jdt.internal.compiler.ast.StringLiteral;
+import org.eclipse.jdt.internal.compiler.ast.TrueLiteral;
 import org.eclipse.jdt.internal.compiler.ast.TypeParameter;
 import org.eclipse.jdt.internal.compiler.ast.UnaryExpression;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
@@ -393,7 +396,14 @@ public final class SpiWithEcjUtils {
   }
 
   static MemberValuePair findAnnotationValueDeclaration(BindingAnnotationElementWithEcj a) {
-    var annotationDeclaration = findAnnotationDeclaration(a.getDeclaringAnnotation());
+    var declaringAnnotation = a.getDeclaringAnnotation();
+    Annotation annotationDeclaration;
+    if (declaringAnnotation instanceof DeclarationAnnotationWithEcj) {
+      annotationDeclaration = ((DeclarationAnnotationWithEcj) declaringAnnotation).annotationDeclaration();
+    }
+    else {
+      annotationDeclaration = ((BindingAnnotationWithEcj) declaringAnnotation).annotationDeclaration();
+    }
     if (annotationDeclaration == null) {
       return null;
     }
@@ -542,7 +552,6 @@ public final class SpiWithEcjUtils {
     if (compiledValue instanceof NullLiteral) {
       return MetaValueFactory.createNull();
     }
-
     if (compiledValue instanceof Constant) {
       // primitives and string
       return MetaValueFactory.createFromConstant((Constant) compiledValue);
@@ -583,14 +592,23 @@ public final class SpiWithEcjUtils {
   }
 
   static int getTypeIdForLiteral(Literal l) {
-    if (l instanceof LongLiteral) {
-      return TypeIds.T_long;
+    if (l instanceof StringLiteral) {
+      return TypeIds.T_JavaLangString;
+    }
+    if (l instanceof NullLiteral) {
+      return TypeIds.T_null;
+    }
+    if (l instanceof FalseLiteral || l instanceof TrueLiteral) {
+      return TypeIds.T_boolean;
     }
     if (l instanceof IntLiteral) {
       return TypeIds.T_int;
     }
     if (l instanceof FloatLiteral) {
       return TypeIds.T_float;
+    }
+    if (l instanceof LongLiteral) {
+      return TypeIds.T_long;
     }
     if (l instanceof DoubleLiteral) {
       return TypeIds.T_double;
@@ -658,7 +676,7 @@ public final class SpiWithEcjUtils {
     }
 
     @Override
-    public boolean visit(MemberValuePair pair, BlockScope scope0) {
+    public boolean visit(MemberValuePair pair, BlockScope scope) {
       if (pair.compilerElementPair == m_binding) {
         m_result = pair;
       }

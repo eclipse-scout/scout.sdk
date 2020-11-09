@@ -84,6 +84,10 @@ public class DeclarationAnnotationWithEcj extends AbstractJavaElementWithEcj<IAn
     return getType().getElementName();
   }
 
+  Annotation annotationDeclaration() {
+    return m_astNode;
+  }
+
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {

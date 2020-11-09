@@ -40,6 +40,7 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
   private final FinalValue<Map<String, AnnotationElementSpi>> m_values; //sorted
   private final FinalValue<TypeSpi> m_type;
   private final FinalValue<ISourceRange> m_source;
+  private final FinalValue<Annotation> m_annotationDeclaration;
 
   protected BindingAnnotationWithEcj(AbstractJavaEnvironment env, AnnotatableSpi owner, AnnotationBinding binding) {
     super(env);
@@ -48,6 +49,7 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
     m_values = new FinalValue<>();
     m_type = new FinalValue<>();
     m_source = new FinalValue<>();
+    m_annotationDeclaration = new FinalValue<>();
   }
 
   @Override
@@ -182,15 +184,19 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
     return getType().getElementName();
   }
 
+  Annotation annotationDeclaration() {
+    return m_annotationDeclaration.computeIfAbsentAndGet(() -> SpiWithEcjUtils.findAnnotationDeclaration(this));
+  }
+
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      var decl = SpiWithEcjUtils.findAnnotationDeclaration(this);
-      if (decl != null) {
-        var cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
-        return javaEnvWithEcj().getSource(cu, decl.sourceStart, decl.declarationSourceEnd);
+      var decl = annotationDeclaration();
+      if (decl == null) {
+        return null;
       }
-      return null;
+      var cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
+      return javaEnvWithEcj().getSource(cu, decl.sourceStart, decl.declarationSourceEnd);
     });
   }
 }
