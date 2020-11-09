@@ -9,12 +9,3 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 rootProject.name = "org.eclipse.scout.sdk.s2i"
-
-// https://github.com/JetBrains/gradle-intellij-plugin/issues/537
-pluginManagement {
-    repositories {
-        maven("https://jetbrains.bintray.com/intellij-plugin-service")
-        maven("https://plugins.gradle.org/m2/")
-        mavenCentral()
-    }
-}

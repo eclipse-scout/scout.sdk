@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s.project;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -197,10 +199,11 @@ public final class ScoutProjectNewHelper {
       var modules = Xml.firstChildElement(doc.getDocumentElement(), IMavenConstants.MODULES).get();
       var childNodes = modules.getChildNodes();
       var targetDirectoryName = targetDirectory.getFileName().toString();
-      IntStream.range(0, childNodes.getLength())
+      var nodesToRemove = IntStream.range(0, childNodes.getLength())
           .mapToObj(childNodes::item)
           .filter(n -> isNodeToRemove(n, targetDirectoryName))
-          .forEach(modules::removeChild);
+          .collect(toList());
+      nodesToRemove.forEach(modules::removeChild);
 
       Ensure.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");
       Xml.writeDocument(doc, false, pom);
@@ -211,8 +214,15 @@ public final class ScoutProjectNewHelper {
   }
 
   static boolean isNodeToRemove(Node n, String targetDirectoryName) {
-    return n.getNodeType() == Node.TEXT_NODE
-        || (n.getNodeType() == Node.ELEMENT_NODE && IMavenConstants.MODULE.equals(((Element) n).getTagName()) && !targetDirectoryName.equals(n.getTextContent().trim()));
+    if (n == null) {
+      return false;
+    }
+    if (n.getNodeType() == Node.TEXT_NODE) {
+      return true;
+    }
+    return n.getNodeType() == Node.ELEMENT_NODE
+        && IMavenConstants.MODULE.equals(((Element) n).getTagName())
+        && !targetDirectoryName.equals(n.getTextContent().trim());
   }
 
   public static String getDisplayNameErrorMessage(CharSequence displayNameCandidate) {

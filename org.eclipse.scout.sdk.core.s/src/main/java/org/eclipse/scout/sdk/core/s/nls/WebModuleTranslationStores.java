@@ -20,11 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -62,12 +59,12 @@ public final class WebModuleTranslationStores {
   }
 
   static Optional<Path> findIncludedModuleBySuffixConvention(Path sourceModulePath, String sourceModuleSuffix, String targetModuleSuffix) {
-    String sourceModuleFolderName = sourceModulePath.getFileName().toString().toLowerCase(Locale.ENGLISH);
+    var sourceModuleFolderName = sourceModulePath.getFileName().toString().toLowerCase(Locale.ENGLISH);
     if (!sourceModuleFolderName.endsWith(sourceModuleSuffix)) {
       return Optional.empty();
     }
-    String targetModuleName = sourceModuleFolderName.substring(0, sourceModuleFolderName.length() - sourceModuleSuffix.length()) + targetModuleSuffix;
-    Path targetModulePath = sourceModulePath.getParent().resolve(targetModuleName);
+    var targetModuleName = sourceModuleFolderName.substring(0, sourceModuleFolderName.length() - sourceModuleSuffix.length()) + targetModuleSuffix;
+    var targetModulePath = sourceModulePath.getParent().resolve(targetModuleName);
     if (Files.isReadable(targetModulePath) && Files.isDirectory(targetModulePath)) {
       return Optional.of(targetModulePath);
     }

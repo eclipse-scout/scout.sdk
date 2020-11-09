@@ -49,12 +49,10 @@ public class MavenBuild {
     m_options = new LinkedHashSet<>();
 
     // default properties
-    withProperty("master_sanityCheck_skip", "true") // workaround for animal sniffer bug that does not close zip files! See https://github.com/mojohaus/animal-sniffer/pull/52
-        .withProperty("master_coverage_skip", "true")
+    withProperty("master_coverage_skip", "true")
         .withProperty("master_test_forkCount", "1")
         .withProperty("master_test_runOrder", "filesystem")
-        .withProperty("master_git-id_skip", "true")
-        .withProperty("master_enforcerCheck_skip", "true");
+        .withProperty("master_git-id_skip", "true");
   }
 
   /**

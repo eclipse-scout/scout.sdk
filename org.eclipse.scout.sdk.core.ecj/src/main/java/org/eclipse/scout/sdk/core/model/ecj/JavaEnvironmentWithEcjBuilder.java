@@ -95,6 +95,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
    */
   public T withoutScoutSdk() {
     excludeIfContains("wsdl4j");
+    exclude(".*" + Pattern.quote(".scout.sdk.") + ".*target/.*\\.jar");
     return exclude(".*" + Pattern.quote(".scout.sdk.") + ".*target/classes");
   }
 

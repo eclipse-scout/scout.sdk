@@ -9,18 +9,19 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-@file:Suppress("PropertyName")
-
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Clock
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
 
-val SCOUT_SDK_VERSION = "11.0.0-SNAPSHOT"
-val SCOUT_RT_VERSION = "11.0-SNAPSHOT"
-val SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
-val JAVA_VERSION = JavaVersion.VERSION_11
+val scoutSdkVersion = "11.0.0-SNAPSHOT"
+val scoutSdkPluginVersion = scoutSdkVersion.replace("-SNAPSHOT", "." + timestamp())
+
+val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "11.0-SNAPSHOT")
+val javaVersion = JavaVersion.VERSION_11
+val intellijVersion = projectPropertyOr("intellij_version", "IU-2020.1.2") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
+val kotlinVersion = "1.3"
 
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
@@ -28,16 +29,28 @@ fun timestamp(): String {
     return now.format(DateTimeFormatter.ofPattern("yyMMddHHmm"))
 }
 
+fun projectPropertyOr(propertyKey: String, defaultValue: String): String {
+    val sysProp = System.getProperty(propertyKey)
+    if (sysProp is String && sysProp.isNotBlank()) {
+        return sysProp.trim()
+    }
+    val projectProp = project.findProperty(propertyKey)
+    if (projectProp is String && projectProp.isNotBlank()) {
+        return projectProp.trim()
+    }
+    return defaultValue
+}
+
 plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "0.4.26"
+    id("org.jetbrains.intellij") version "0.5.1"
     kotlin("jvm") version "1.3.72"
 }
 
 group = "org.eclipse.scout.sdk.s2i"
-version = SCOUT_SDK_VERSION
+version = scoutSdkVersion
 
 repositories {
     mavenLocal()
@@ -45,19 +58,18 @@ repositories {
 }
 
 dependencies {
-    api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", SCOUT_SDK_VERSION)
-    api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", SCOUT_SDK_VERSION)
+    api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
+    api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", scoutSdkVersion)
     api("org.apache.poi", "poi-ooxml", "4.1.2")
     implementation(kotlin("stdlib-jdk8"))
     testImplementation("org.mockito", "mockito-core", "3.5.13")
-    testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", SCOUT_RT_VERSION)
-    testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", SCOUT_SDK_VERSION)
+    testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
+    testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
-    version = "IU-2020.1.2"
+    version = intellijVersion
     downloadSources = true
 
     setPlugins("java", "maven", "copyright", "properties", "CSS", "JavaScriptLanguage")
@@ -65,28 +77,34 @@ intellij {
 
     tasks {
         withType<PatchPluginXmlTask> {
-            version(SCOUT_SDK_PLUGIN_VERSION)
+            version(scoutSdkPluginVersion)
         }
     }
 }
 
 allprojects {
     configure<JavaPluginConvention> {
-        sourceCompatibility = JAVA_VERSION
-        targetCompatibility = JAVA_VERSION
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 }
 
+tasks.withType<org.jetbrains.intellij.tasks.PrepareSandboxTask> {
+    // prepareSandbox Task may copy duplicate libraries from transitive dependencies.
+    // See https://intellij-support.jetbrains.com/hc/en-us/community/posts/360009478700-Kotlin-Getting-Copying-or-archiving-duplicate-paths-deprecation-warnings-when-building-plugin
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 tasks.withType<JavaCompile>().configureEach {
-    sourceCompatibility = JAVA_VERSION.toString()
-    targetCompatibility = JAVA_VERSION.toString()
+    sourceCompatibility = javaVersion.toString()
+    targetCompatibility = javaVersion.toString()
 }
 
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
-        jvmTarget = JAVA_VERSION.toString()
-        apiVersion = "1.3"
-        languageVersion = "1.3"
+        jvmTarget = javaVersion.toString()
+        apiVersion = kotlinVersion
+        languageVersion = kotlinVersion
     }
 }
 

@@ -72,18 +72,21 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
         if (!scoutApi.isPresent) {
             return Stream.empty()
         }
-        val types = module.project.findTypesByName(scoutApi.get().AbstractDynamicNlsTextProviderService().fqn(), moduleScope)
-                .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false) }
-                .asSequence()
-                .filter { computeInReadAction(module.project) { !it.isDeprecated } }
-                .filter { !it.isEnum }
-                .filter { it.hasModifierProperty(PsiModifier.PUBLIC) }
-                .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
-                .filter { it.scope is PsiJavaFile }
-                .filter { it.canNavigateToSource() }
-                .map { TypeMapping(it.toScoutType(javaEnv), it) }
-                .filter { it.scoutType != null }
-                .toList()
+
+        val types = computeInReadAction(module.project) {
+            module.project.findTypesByName(scoutApi.get().AbstractDynamicNlsTextProviderService().fqn(), moduleScope)
+                    .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false) }
+                    .asSequence()
+                    .filter { !it.isDeprecated }
+                    .filter { !it.isEnum }
+                    .filter { it.hasModifierProperty(PsiModifier.PUBLIC) }
+                    .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
+                    .filter { it.scope is PsiJavaFile }
+                    .filter { it.canNavigateToSource() }
+                    .map { TypeMapping(it.toScoutType(javaEnv), it) }
+                    .filter { it.scoutType != null }
+                    .toList()
+        }
 
         val progressForLoad = progress.worked(10).newChild(10).init(types.size, message("load.properties.content"))
         val result = types.mapNotNull { createTranslationStore(it.scoutType!!, it.psiClass, module, progressForLoad).orElse(null) }

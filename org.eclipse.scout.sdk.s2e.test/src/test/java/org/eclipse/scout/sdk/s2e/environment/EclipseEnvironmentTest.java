@@ -61,6 +61,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 7.0.0
  */
+@SuppressWarnings({"resource", "IOResourceOpenedButNotSafelyClosed"})
 public class EclipseEnvironmentTest {
   @Test
   public void testWriteResourceWithGeneratorSync() {
@@ -172,6 +173,7 @@ public class EclipseEnvironmentTest {
     try (var e = new EclipseEnvironment(); var adapter = spy(e)) {
       doAnswer(invocation -> new JavaEnvironmentWithJdt(invocation.getArgument(0), null)).when(adapter).createNewJavaEnvironmentFor(any());
       var javaProject = MockFactory.createJavaProjectMock();
+      //noinspection NestedTryStatement
       try (var env = (JavaEnvironmentWithJdt) adapter.toScoutJavaEnvironment(javaProject).unwrap()) {
         assertNotNull(env);
         assertSame(javaProject, env.javaProject());

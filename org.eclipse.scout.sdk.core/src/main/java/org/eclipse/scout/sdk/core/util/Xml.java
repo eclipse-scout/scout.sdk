@@ -226,8 +226,8 @@ public final class Xml {
       return null;
     }
 
-    var xPathfactory = XPathFactory.newDefaultInstance();
-    var xpath = xPathfactory.newXPath();
+    var xPathFactory = XPathFactory.newDefaultInstance();
+    var xpath = xPathFactory.newXPath();
     xpath.setNamespaceContext(new NamespaceContext() {
       @Override
       public String getNamespaceURI(String prefix) {
@@ -348,7 +348,7 @@ public final class Xml {
    *           if there is an error writing or transforming the document
    */
   public static void writeDocument(Document document, boolean format, Path targetFile) throws TransformerException {
-    try (var out = Files.newOutputStream(targetFile, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
+    try (var out = Files.newOutputStream(targetFile, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
       writeDocument(document, format, out);
     }
     catch (IOException e) {
@@ -411,7 +411,7 @@ public final class Xml {
    * document.
    *
    * @param format
-   *          {@code true} to have the document formatted (indent) during transformation. <code>false</otherwise>.
+   *          {@code true} to have the document formatted (indent) during transformation. {@code false} otherwise.
    * @return The created {@link Transformer}. All external entities are disabled to prevent XXE.
    * @throws TransformerConfigurationException
    *           When it is not possible to create a Transformer instance.

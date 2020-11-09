@@ -131,7 +131,7 @@ public class EclipseWorkspaceWalker {
   }
 
   protected static void executeQueryInFile(IFileQuery query, WorkspaceFile file, IEnvironment env, IProgress progress) {
-    Optional<IFile> iFile = file.inWorkspace();
+    var iFile = file.inWorkspace();
     if (iFile.isEmpty()) {
       SdkLog.warning("File '{}' could not be found in the current Eclipse Workspace.", file.path());
       return;

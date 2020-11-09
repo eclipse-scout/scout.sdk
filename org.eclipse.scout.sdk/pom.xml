@@ -44,9 +44,8 @@
   </modules>
 
   <properties>
-    <scout.base.version>11.0.0</scout.base.version>
-    <base.version>${scout.base.version}</base.version>
-    <org.eclipse.scout.rt_version>11.0-SNAPSHOT</org.eclipse.scout.rt_version> <!-- Don't replace version number with scout.base.version: Required by regex replacement -->
+    <scout.osgi.version>11.0.0</scout.osgi.version>
+    <org.eclipse.scout.rt_version>11.0-SNAPSHOT</org.eclipse.scout.rt_version>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <master_test_forkCount>1</master_test_forkCount>
@@ -951,10 +950,35 @@
         <version>${org.eclipse.scout.rt_version}</version>
         <classifier>sources</classifier>
       </dependency>
+      <dependency>
+        <!-- explicitly set version here because the imported scout.rt parent has no version for this dependency in 10.0.0 -->
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.chart.ui.html</artifactId>
+        <version>${org.eclipse.scout.rt_version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <!-- use the javac compiler for the SDK because of bugs in ECJ concerning type arguments with Java 11 -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <compilerId>javac</compilerId>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.codehaus.plexus</groupId>
+              <artifactId>plexus-compiler-javac</artifactId>
+              <version>2.8.8</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

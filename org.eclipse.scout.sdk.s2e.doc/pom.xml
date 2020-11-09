@@ -27,7 +27,7 @@
   <properties>
     <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
     <bundle.namespace>${project.artifactId}</bundle.namespace>
-    <bundle.version>11.0.0</bundle.version>
+    <bundle.version>${scout.osgi.version}</bundle.version>
   </properties>
 
   <dependencies>
