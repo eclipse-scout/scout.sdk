@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
@@ -25,17 +24,18 @@ public class PublishMojo extends AbstractStagingMojo {
   private String stagingArea;
 
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  @SuppressWarnings("ConstantConditions")
+  public void execute() throws MojoExecutionException {
     try {
-      File input = getStageTargetDir();
-      File stagingAreaFile = new File(getStagingArea());
+      var input = getStageTargetDir();
+      var stagingAreaFile = new File(getStagingArea());
       if (input.isDirectory()) {
-        for (File f : input.listFiles()) {
+        for (var f : input.listFiles()) {
           if (f.getName().startsWith("stage")) {
             FileUtility.copyToDir(f, stagingAreaFile);
           }
         }
-        for (File f : input.listFiles()) {
+        for (var f : input.listFiles()) {
           if (f.getName().startsWith("do")) {
             FileUtility.copyToDir(f, stagingAreaFile);
           }

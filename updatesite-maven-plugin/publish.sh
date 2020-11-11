@@ -47,7 +47,7 @@ processZipFile() {
     rm -rf $stagingArea/working
     cd $backupDir
   else
-    echo "md5 not valid for $zipFile!"
+    echo "sha256 not valid for $zipFile!"
   fi
 }
 
@@ -117,7 +117,7 @@ cd $stagingArea
   if [ -f "$f" ]; then
      echo "Processing $f ";
      mv $f processing;
-     processZipFile $(md5sum -c $stagingArea/processing);
+     processZipFile $(sha256sum -c $stagingArea/processing);
   fi
  done
 rm -rf $stagingArea/*;

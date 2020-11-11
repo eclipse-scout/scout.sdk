@@ -18,12 +18,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -32,7 +28,6 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -51,7 +46,8 @@ public final class FileUtility {
   public static void copy(File inputFile, File outputFile) throws IOException {
     if (inputFile.isDirectory()) {
       ensureDirExists(outputFile);
-      for (File f : inputFile.listFiles()) {
+      //noinspection ConstantConditions
+      for (var f : inputFile.listFiles()) {
         copyToDir(f, outputFile);
       }
       return;
@@ -63,7 +59,7 @@ public final class FileUtility {
   }
 
   public static void copy(InputStream in, OutputStream out) throws IOException {
-    byte[] buffer = new byte[8192];
+    var buffer = new byte[8192];
     int read;
     while ((read = in.read(buffer)) != -1) {
       out.write(buffer, 0, read);
@@ -77,14 +73,15 @@ public final class FileUtility {
   public static void copyToDir(File input, File toDir, URI relPath) throws IOException {
     // folder
     if (input.isDirectory()) {
-      for (File f : input.listFiles()) {
+      //noinspection ConstantConditions
+      for (var f : input.listFiles()) {
         copyToDir(f, toDir, relPath);
       }
       return;
     }
 
     // file
-    File outFile = new File(toDir.getAbsolutePath() + File.separator + relPath.relativize(input.toURI()).toString());
+    var outFile = new File(toDir.getAbsolutePath() + File.separator + relPath.relativize(input.toURI()).toString());
     ensureDirExists(outFile);
 
     try (InputStream in = new FileInputStream(input); OutputStream out = new FileOutputStream(outFile)) {
@@ -94,8 +91,9 @@ public final class FileUtility {
 
   public static boolean deleteFile(File file) {
     if (file.isDirectory()) {
-      for (File f : file.listFiles()) {
-        boolean success = deleteFile(f);
+      //noinspection ConstantConditions
+      for (var f : file.listFiles()) {
+        var success = deleteFile(f);
         if (!success) {
           return false;
         }
@@ -105,8 +103,9 @@ public final class FileUtility {
   }
 
   public static void compressArchive(File srcDir, File archiveFile) throws IOException {
+    //noinspection ResultOfMethodCallIgnored
     archiveFile.delete();
-    try (JarOutputStream zOut = new JarOutputStream(new FileOutputStream(archiveFile))) {
+    try (var zOut = new JarOutputStream(new FileOutputStream(archiveFile))) {
       addFolderToJar(srcDir, srcDir, zOut);
     }
   }
@@ -115,7 +114,8 @@ public final class FileUtility {
     if (!srcdir.exists() || !srcdir.isDirectory()) {
       throw new IOException("source directory " + srcdir + " does not exist or is not a folder");
     }
-    for (File f : srcdir.listFiles()) {
+    //noinspection ConstantConditions
+    for (var f : srcdir.listFiles()) {
       if (f.exists() && (!f.isHidden())) {
         if (f.isDirectory()) {
           addFolderToJar(baseDir, f, zOut);
@@ -128,20 +128,20 @@ public final class FileUtility {
   }
 
   private static void addFileToJar(File baseDir, File src, JarOutputStream zOut) throws IOException {
-    String name = src.getAbsolutePath();
-    String prefix = baseDir.getAbsolutePath();
+    var name = src.getAbsolutePath();
+    var prefix = baseDir.getAbsolutePath();
     if (prefix.endsWith("/") || prefix.endsWith("\\")) {
       prefix = prefix.substring(0, prefix.length() - 1);
     }
     name = name.substring(prefix.length() + 1);
     name = name.replace('\\', '/');
-    long timestamp = src.lastModified();
-    byte[] data = readFile(src);
+    var timestamp = src.lastModified();
+    var data = readFile(src);
     addFileToJar(name, data, timestamp, zOut);
   }
 
   private static void addFileToJar(String name, byte[] data, long timestamp, JarOutputStream zOut) throws IOException {
-    ZipEntry entry = new ZipEntry(name);
+    var entry = new ZipEntry(name);
     entry.setTime(timestamp);
     zOut.putNextEntry(entry);
     zOut.write(data);
@@ -152,10 +152,10 @@ public final class FileUtility {
     return Files.readAllBytes(source.toPath());
   }
 
-  @SuppressWarnings({"squid:S1166", "squid:S1141"})
+  @SuppressWarnings({"squid:S1166", "squid:S1141", "NestedTryStatement"})
   public static void writeDOM(Document doc, File file) throws MojoExecutionException {
     try {
-      TransformerFactory tf = TransformerFactory.newInstance();
+      var tf = TransformerFactory.newInstance();
       try {
         tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
       }
@@ -174,12 +174,9 @@ public final class FileUtility {
       catch (IllegalArgumentException e) {
         // nop
       }
-      Transformer transformer = tf.newTransformer();
+      var transformer = tf.newTransformer();
 
       transformer.transform(new DOMSource(doc), new StreamResult(file));
-    }
-    catch (TransformerConfigurationException e) {
-      throw new MojoExecutionException("Could not write XML file ", e);
     }
     catch (TransformerException e) {
       throw new MojoExecutionException("Could not write XML file ", e);
@@ -198,24 +195,25 @@ public final class FileUtility {
     }
   }
 
+  @SuppressWarnings({"NestedTryStatement", "ResultOfMethodCallIgnored"})
   public static void extractArchive(File archiveFile, File targetDir) throws IOException {
-    File destinationDir = targetDir.getCanonicalFile();
-    Path destinationPath = destinationDir.toPath();
+    var destinationDir = targetDir.getCanonicalFile();
+    var destinationPath = destinationDir.toPath();
     destinationDir.mkdirs();
     destinationDir.setLastModified(archiveFile.lastModified());
-    String localFile = destinationDir.getName();
-    try (JarFile jar = new JarFile(archiveFile)) {
-      Enumeration<JarEntry> entries = jar.entries();
+    var localFile = destinationDir.getName();
+    try (var jar = new JarFile(archiveFile)) {
+      var entries = jar.entries();
       while (entries.hasMoreElements()) {
-        JarEntry file = entries.nextElement();
-        String name = file.getName();
+        var file = entries.nextElement();
+        var name = file.getName();
         if (name.startsWith(localFile)) {
           name = name.substring(localFile.length());
         }
         while (name.startsWith("/") || name.startsWith("\\")) {
           name = name.substring(1);
         }
-        File f = new File(destinationDir, name).getCanonicalFile();
+        var f = new File(destinationDir, name).getCanonicalFile();
         if (!f.toPath().startsWith(destinationPath)) {
           // security check (see https://github.com/snyk/zip-slip-vulnerability)
           throw new IllegalArgumentException("Entry is outside of the target dir: " + name);
@@ -226,7 +224,7 @@ public final class FileUtility {
         }
         else {
           ensureDirExists(f.getParentFile());
-          try (InputStream is = jar.getInputStream(file); FileOutputStream fos = new FileOutputStream(f)) {
+          try (var is = jar.getInputStream(file); var fos = new FileOutputStream(f)) {
             copy(is, fos);
           }
         }
@@ -238,14 +236,12 @@ public final class FileUtility {
   }
 
   public static Document readDOM(File xmlFile) throws ParserConfigurationException, SAXException, IOException {
-    DocumentBuilder builder = createDocumentBuilder();
-    Document doc = builder.parse(xmlFile);
-    return doc;
+    return createDocumentBuilder().parse(xmlFile);
   }
 
   /**
    * Creates a new {@link DocumentBuilder} to create a DOM of an XML file.<br>
-   * Use {@link DocumentBuilder#parse()} to create a new {@link Document}.
+   * Use {@link DocumentBuilder#parse(File)} to create a new {@link Document}.
    *
    * @return The created builder. All external entities are disabled to prevent XXE.
    * @throws ParserConfigurationException
@@ -253,7 +249,7 @@ public final class FileUtility {
    */
   @SuppressWarnings("squid:S1166")
   public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    var dbf = DocumentBuilderFactory.newInstance();
     Map<String, Boolean> features = new HashMap<>(5);
     features.put("http://apache.org/xml/features/disallow-doctype-decl", Boolean.TRUE);
     features.put("http://xml.org/sax/features/external-general-entities", Boolean.FALSE);
@@ -263,9 +259,9 @@ public final class FileUtility {
     dbf.setXIncludeAware(false);
     dbf.setExpandEntityReferences(false);
 
-    for (Entry<String, Boolean> a : features.entrySet()) {
-      String feature = a.getKey();
-      boolean enabled = a.getValue().booleanValue();
+    for (var a : features.entrySet()) {
+      var feature = a.getKey();
+      var enabled = a.getValue();
       try {
         dbf.setFeature(feature, enabled);
       }

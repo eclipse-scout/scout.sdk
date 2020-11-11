@@ -10,27 +10,29 @@
  ******************************************************************************/
 package org.eclipse.scout.maven.plugins.updatesite;
 
+import static java.time.LocalDateTime.now;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.Clock;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.stream.IntStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -106,13 +108,13 @@ public class StagingMojo extends AbstractStagingMojo {
 
   @Override
   public void execute() throws MojoExecutionException {
-    File compositeRepo = createCompositeRepo();
+    var compositeRepo = createCompositeRepo();
     updateCompositeJars(compositeRepo);
-    File stageTargetDir = getStageTargetDir();
+    var stageTargetDir = getStageTargetDir();
     try {
       FileUtility.ensureDirExists(stageTargetDir);
-      String timestamp = createTimestamp();
-      File zipFile = createStageZip(getStageDir(), timestamp);
+      var timestamp = createTimestamp();
+      var zipFile = createStageZip(getStageDir(), timestamp);
       createDoStageFile(zipFile, timestamp);
     }
     catch (IOException e) {
@@ -126,10 +128,10 @@ public class StagingMojo extends AbstractStagingMojo {
     }
     getLog().info("Creating composite Repository");
     try {
-      File compositeRepo = new File(getStageDir(), getCompositeDirName());
-      File p2Dir = new File(compositeRepo.getPath(), getUpdatesiteDir());
+      var compositeRepo = new File(getStageDir(), getCompositeDirName());
+      var p2Dir = new File(compositeRepo.getPath(), getUpdatesiteDir());
       FileUtility.ensureDirExists(p2Dir);
-      File p2InputDir = new File(getP2InputDirectory());
+      var p2InputDir = new File(getP2InputDirectory());
       FileUtility.copy(p2InputDir, p2Dir);
       return compositeRepo;
     }
@@ -139,8 +141,8 @@ public class StagingMojo extends AbstractStagingMojo {
   }
 
   private void updateCompositeJars(File outputDir) throws MojoExecutionException {
-    File contentJar = downloadJar(getCompositeUrl(), COMPOSITE_CONTENT_JAR, outputDir.getPath());
-    File artifactsJar = downloadJar(getCompositeUrl(), COMPOSITE_ARTIFACTS_JAR, outputDir.getPath());
+    var contentJar = downloadJar(getCompositeUrl(), COMPOSITE_CONTENT_JAR, outputDir.getPath());
+    var artifactsJar = downloadJar(getCompositeUrl(), COMPOSITE_ARTIFACTS_JAR, outputDir.getPath());
 
     updateComposite(outputDir, contentJar, COMPOSITE_CONTENT);
     updateComposite(outputDir, artifactsJar, COMPOSITE_ARTIFACTS);
@@ -149,14 +151,14 @@ public class StagingMojo extends AbstractStagingMojo {
   public void updateComposite(File outputDir, File contentJar, String folderName) throws MojoExecutionException {
     try {
       getLog().info("Downloading " + contentJar);
-      String jarName = contentJar.getName();
-      File contentXML = extractCompositeArchive(outputDir, contentJar);
+      var jarName = contentJar.getName();
+      var contentXML = extractCompositeArchive(outputDir, contentJar);
       appendChild(contentXML, getUpdatesiteDir());
       truncateChildren(contentXML, getMaxSize());
-      File contentFolder = new File(outputDir, folderName);
+      var contentFolder = new File(outputDir, folderName);
       FileUtility.ensureDirExists(contentFolder);
       FileUtility.copyToDir(contentXML, contentFolder);
-      File newContentJar = new File(outputDir, jarName);
+      var newContentJar = new File(outputDir, jarName);
       FileUtility.compressArchive(contentFolder, newContentJar);
       FileUtility.deleteFile(contentXML);
       FileUtility.deleteFile(contentFolder);
@@ -167,8 +169,8 @@ public class StagingMojo extends AbstractStagingMojo {
   }
 
   public static File extractCompositeArchive(File outputDir, File content) throws MojoExecutionException {
-    if (content.getName() == null || !content.getName().endsWith(".jar")) {
-      throw new IllegalArgumentException("Composite Archive must be a jar file " + content.getName());
+    if (content == null || !content.getName().endsWith(".jar")) {
+      throw new IllegalArgumentException("Composite Archive must be a jar file " + content);
     }
     try {
       FileUtility.extractArchive(content, outputDir);
@@ -176,87 +178,68 @@ public class StagingMojo extends AbstractStagingMojo {
     catch (IOException e) {
       throw new MojoExecutionException("Could not extract archive", e);
     }
-    String xmlName = content.getName().replace(".jar", ".xml");
-    File xmlFile = new File(content.getParent(), xmlName);
+    var xmlName = content.getName().replace(".jar", ".xml");
+    var xmlFile = new File(content.getParent(), xmlName);
     if (!xmlFile.exists()) {
       throw new MojoExecutionException("Could not extract composite archive. XML File not found " + xmlName);
     }
     return xmlFile;
   }
 
-  public void appendChild(File contentXML, String locationName) throws MojoExecutionException {
+  public static void appendChild(File contentXML, String locationName) throws MojoExecutionException {
     try {
-      Document doc = FileUtility.readDOM(contentXML);
-      NodeList childrenNodes = doc.getElementsByTagName("children");
-      Node children = childrenNodes.item(0);
+      var doc = FileUtility.readDOM(contentXML);
+      var childrenNodes = doc.getElementsByTagName("children");
+      var children = childrenNodes.item(0);
 
-      Element childElement = doc.createElement("child");
+      var childElement = doc.createElement("child");
       childElement.setAttribute("location", locationName);
       children.appendChild(childElement);
 
-      String size = getChildElementCount(children);
+      var size = getChildElementCount(children);
       children.getAttributes().getNamedItem("size").setNodeValue(size);
       FileUtility.writeDOM(doc, contentXML);
     }
-    catch (ParserConfigurationException e) {
-      throw new MojoExecutionException("Could not append child", e);
-    }
-    catch (SAXException e) {
-      throw new MojoExecutionException("Could not append child", e);
-    }
-    catch (IOException e) {
+    catch (ParserConfigurationException | IOException | SAXException e) {
       throw new MojoExecutionException("Could not append child", e);
     }
   }
 
-  public void truncateChildren(File contentXML, int truncateSize) throws MojoExecutionException {
+  public static void truncateChildren(File contentXML, int truncateSize) throws MojoExecutionException {
     try {
-      Document doc = FileUtility.readDOM(contentXML);
-      NodeList childrenNodes = doc.getElementsByTagName("children");
-      Node children = childrenNodes.item(0);
+      var doc = FileUtility.readDOM(contentXML);
+      var childrenNodes = doc.getElementsByTagName("children");
+      var children = childrenNodes.item(0);
 
-      NodeList childNodes = doc.getElementsByTagName("child");
-      int removeCount = childNodes.getLength() - truncateSize;
-      for (int i = 0; i < removeCount; i++) {
+      var childNodes = doc.getElementsByTagName("child");
+      var removeCount = childNodes.getLength() - truncateSize;
+      for (var i = 0; i < removeCount; i++) {
         children.removeChild(children.getFirstChild());
       }
       children.getAttributes().getNamedItem("size").setNodeValue(String.valueOf(truncateSize));
       FileUtility.writeDOM(doc, contentXML);
     }
-    catch (ParserConfigurationException e) {
-      throw new MojoExecutionException("Could not truncate children", e);
-    }
-    catch (SAXException e) {
-      throw new MojoExecutionException("Could not truncate children", e);
-    }
-    catch (IOException e) {
+    catch (ParserConfigurationException | IOException | SAXException e) {
       throw new MojoExecutionException("Could not truncate children", e);
     }
   }
 
   private static String getChildElementCount(Node node) {
-    int count = 0;
-    NodeList childNodes = node.getChildNodes();
-    for (int i = 0; i < childNodes.getLength(); i++) {
-      if (childNodes.item(i) instanceof Element) {
-        count++;
-      }
-    }
+    var childNodes = node.getChildNodes();
+    var count = IntStream.range(0, childNodes.getLength()).filter(i -> childNodes.item(i) instanceof Element).count();
     return "" + count;
   }
 
   private static File downloadJar(String url, String jarName, String outputDir) throws MojoExecutionException {
     try {
-      URL u = new URL(url + "/" + jarName);
-      URLConnection conn = u.openConnection();
-      File outfile = new File(outputDir, jarName);
-      try (InputStream inputStream = conn.getInputStream(); FileOutputStream f = new FileOutputStream(outfile)) {
+      var u = new URL(url + "/" + jarName);
+      var conn = u.openConnection();
+      var outfile = new File(outputDir, jarName);
+      //noinspection NestedTryStatement
+      try (var inputStream = conn.getInputStream(); var f = new FileOutputStream(outfile)) {
         FileUtility.copy(inputStream, f);
       }
       return outfile;
-    }
-    catch (MalformedURLException e) {
-      throw new MojoExecutionException("Could not downlaod Jar " + e);
     }
     catch (IOException e) {
       throw new MojoExecutionException("Could not downlaod Jar " + e);
@@ -264,10 +247,11 @@ public class StagingMojo extends AbstractStagingMojo {
   }
 
   public File createStageZip(File directory, String timestamp) throws MojoExecutionException {
-    File stageTargetDir = getStageTargetDir();
+    var stageTargetDir = getStageTargetDir();
+    //noinspection ResultOfMethodCallIgnored
     stageTargetDir.mkdirs();
 
-    File outZipFile = new File(stageTargetDir, "stage" + timestamp + ".zip");
+    var outZipFile = new File(stageTargetDir, "stage" + timestamp + ".zip");
     try {
       getLog().info("Zipping " + directory + " to " + outZipFile.getPath());
       FileUtility.compressArchive(directory, outZipFile);
@@ -279,41 +263,40 @@ public class StagingMojo extends AbstractStagingMojo {
   }
 
   private File createDoStageFile(File zipInputFile, String timestamp) throws MojoExecutionException {
-    try {
-      File out = new File(getStageTargetDir(), "doStage_" + timestamp);
-      String md5 = createMD5(zipInputFile) + "  " + zipInputFile.getName();
-      try (FileWriter writer = new FileWriter(out)) {
-        writer.write(md5);
-      }
-      return out;
+    var out = new File(getStageTargetDir(), "doStage_" + timestamp);
+    var line = createSha256(zipInputFile) + "  " + zipInputFile.getName();
+    try (var writer = new FileWriter(out, StandardCharsets.UTF_8)) {
+      writer.write(line);
     }
     catch (IOException e) {
       throw new MojoExecutionException("Could not create doStage file", e);
     }
+    return out;
   }
 
-  public String createMD5(File data) throws MojoExecutionException {
-    try {
-      byte[] content = FileUtility.readFile(data);
-      java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-      byte[] array = md.digest(content);
-      StringBuilder sb = new StringBuilder();
-      for (byte element : array) {
-        sb.append(Integer.toHexString((element & 0xFF) | 0x100).substring(1, 3));
+  public static String createSha256(File data) throws MojoExecutionException {
+    try (var is = Files.newInputStream(data.toPath())) {
+      var md = MessageDigest.getInstance("SHA-256");
+      var buffer = new byte[8192];
+      var numRead = 0;
+      while ((numRead = is.read(buffer)) != -1) {
+        md.update(buffer, 0, numRead);
+      }
+
+      var array = md.digest();
+      var sb = new StringBuilder(array.length * 2);
+      for (var element : array) {
+        sb.append(Integer.toHexString((element & 0xFF) | 0x100), 1, 3);
       }
       return sb.toString();
     }
-    catch (java.security.NoSuchAlgorithmException e) {
-      throw new MojoExecutionException("Could not create md5", e);
-    }
-    catch (IOException e) {
-      throw new MojoExecutionException("Could not create md5", e);
+    catch (NoSuchAlgorithmException | IOException e) {
+      throw new MojoExecutionException("Could not create sha256", e);
     }
   }
 
-  private static String createTimestamp() {
-    SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd-hhmmss-SSS", Locale.ENGLISH);
-    return f.format(new Date());
+  protected static String createTimestamp() {
+    return now(Clock.systemUTC()).format(DateTimeFormatter.ofPattern("yyyyMMdd-hhmmss-SSS", Locale.ENGLISH));
   }
 
   /**
