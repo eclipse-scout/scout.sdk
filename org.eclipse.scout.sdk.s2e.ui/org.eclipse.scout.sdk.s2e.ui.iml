@@ -207,7 +207,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.mom.api:11.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared.test:11.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform.test:11.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.13" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.13.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: jakarta.servlet:jakarta.servlet-api:4.0.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.jaxws:11.0-SNAPSHOT" level="project" />
