@@ -34,7 +34,7 @@ public class WebModuleTranslationStoresTest {
   @Test
   public void testLoadKeysForJsModule(TestingEnvironment env) {
     var keysVisibleForJs = WebModuleTranslationStores
-        .allForModule(ScoutFixtureHelper.NLS_TEST_DIR, env, new NullProgress())
+        .allForNodeModule(ScoutFixtureHelper.NLS_TEST_DIR, env, new NullProgress())
         .flatMap(ITranslationStore::keys)
         .collect(toSet());
     assertEquals(new HashSet<>(asList(

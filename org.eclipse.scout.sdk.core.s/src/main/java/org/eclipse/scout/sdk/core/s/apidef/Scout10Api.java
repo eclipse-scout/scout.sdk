@@ -4143,4 +4143,32 @@ public interface Scout10Api extends IScoutApi {
       return "getColumnByClass";
     }
   }
+
+  IScoutAnnotationApi.NlsKey NLS_KEY = new NlsKey();
+
+  @Override
+  default IScoutAnnotationApi.NlsKey NlsKey() {
+    return NLS_KEY;
+  }
+
+  IScoutInterfaceApi.IUiTextContributor I_UI_TEXT_CONTRIBUTOR = new IUiTextContributor();
+
+  @Override
+  default IScoutInterfaceApi.IUiTextContributor IUiTextContributor() {
+    return I_UI_TEXT_CONTRIBUTOR;
+  }
+
+  class NlsKey implements IScoutAnnotationApi.NlsKey {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.platform.text.NlsKey";
+    }
+  }
+
+  class IUiTextContributor implements IScoutInterfaceApi.IUiTextContributor {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.ui.html.IUiTextContributor";
+    }
+  }
 }

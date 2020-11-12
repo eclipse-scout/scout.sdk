@@ -242,7 +242,7 @@ public final class S2eUtils {
     }
 
     return sourceFoldersOrdered(project)
-        .filter(element -> element.getPath().removeFirstSegments(1).toString().toLowerCase(Locale.ENGLISH).contains("test"))
+        .filter(element -> element.getPath().removeFirstSegments(1).toString().toLowerCase(Locale.US).contains("test"))
         .findAny()
         .orElse(null);
   }

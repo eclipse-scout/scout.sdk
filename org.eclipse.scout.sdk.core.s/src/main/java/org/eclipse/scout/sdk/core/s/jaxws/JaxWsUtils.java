@@ -153,8 +153,8 @@ public final class JaxWsUtils {
     }
     var prefix = "p";
     var p = prefix + ':';
-    var lc = wsdlFileName.toLowerCase(Locale.ENGLISH);
-    var uc = wsdlFileName.toUpperCase(Locale.ENGLISH);
+    var lc = wsdlFileName.toLowerCase(Locale.US);
+    var uc = wsdlFileName.toUpperCase(Locale.US);
     var bindingFilesXpathBuilder = new StringBuilder();
     bindingFilesXpathBuilder.append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.BUILD).append('/').append(p).append(IMavenConstants.PLUGINS).append('/').append(p).append(IMavenConstants.PLUGIN)
         .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='").append(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID)
@@ -274,7 +274,7 @@ public final class JaxWsUtils {
 
     String[] suffixes = {"xml", "soap", "porttype", "port", "webservice", "services", "service"};
     for (var s : suffixes) {
-      if (input.toLowerCase(Locale.ENGLISH).endsWith(s)) {
+      if (input.toLowerCase(Locale.US).endsWith(s)) {
         var newInputCandidate = input.substring(0, input.length() - s.length());
         if (Strings.isBlank(newInputCandidate)) {
           return input; // cancel suffix removal if we come to an empty name

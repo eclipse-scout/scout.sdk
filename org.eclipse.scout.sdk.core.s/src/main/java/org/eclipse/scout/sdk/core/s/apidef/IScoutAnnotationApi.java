@@ -57,6 +57,11 @@ public interface IScoutAnnotationApi {
 
   WebServiceEntryPoint WebServiceEntryPoint();
 
+  NlsKey NlsKey();
+
+  interface NlsKey extends IClassNameSupplier {
+  }
+
   interface ApplicationScoped extends IClassNameSupplier {
   }
 

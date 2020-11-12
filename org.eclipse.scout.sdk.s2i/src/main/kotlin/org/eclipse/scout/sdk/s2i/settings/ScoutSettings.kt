@@ -16,7 +16,9 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.util.EventListenerList
+import org.eclipse.scout.sdk.core.util.Strings
 import java.util.*
 import javax.swing.JComponent
 
@@ -26,26 +28,38 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
 
         const val KEY_AUTO_UPDATE_DERIVED_RESOURCES = "org.eclipse.scout.sdk.s2i.autoUpdateDerivedResources"
         const val KEY_AUTO_CREATE_CLASS_ID = "org.eclipse.scout.sdk.s2i.autoCreateClassIdAnnotations"
+        const val KEY_TRANSLATION_DEFAULT_LANG = "org.eclipse.scout.sdk.s2i.translationDefaultLanguage"
 
         private val listeners = EventListenerList()
 
-        fun isAutoUpdateDerivedResources(project: Project): Boolean {
-            val store = PropertiesComponent.getInstance(project)
-            return store.getBoolean(KEY_AUTO_UPDATE_DERIVED_RESOURCES, true)
-        }
+        fun getCodeFoldingSettings() = ScoutCodeFoldingSettings.getInstance()
 
-        @Suppress("unused")
+        fun isAutoUpdateDerivedResources(project: Project) =
+                projectSettings(project).getBoolean(KEY_AUTO_UPDATE_DERIVED_RESOURCES, true)
+
         fun setAutoUpdateDerivedResources(project: Project, newValue: Boolean) =
-                changeProperty(PropertiesComponent.getInstance(project), KEY_AUTO_UPDATE_DERIVED_RESOURCES, isAutoUpdateDerivedResources(project).toString(), newValue.toString())
+                changeProperty(projectSettings(project), KEY_AUTO_UPDATE_DERIVED_RESOURCES, isAutoUpdateDerivedResources(project).toString(), newValue.toString())
 
-        fun isAutoCreateClassIdAnnotations(project: Project): Boolean {
-            val store = PropertiesComponent.getInstance(project)
-            return store.getBoolean(KEY_AUTO_CREATE_CLASS_ID, false)
-        }
+        fun isAutoCreateClassIdAnnotations(project: Project) =
+                projectSettings(project).getBoolean(KEY_AUTO_CREATE_CLASS_ID, false)
 
         fun setAutoCreateClassIdAnnotations(project: Project, newValue: Boolean) =
-                changeProperty(PropertiesComponent.getInstance(project), KEY_AUTO_CREATE_CLASS_ID, isAutoCreateClassIdAnnotations(project).toString(), newValue.toString())
+                changeProperty(projectSettings(project), KEY_AUTO_CREATE_CLASS_ID, isAutoCreateClassIdAnnotations(project).toString(), newValue.toString())
 
+        fun getTranslationLanguage(project: Project): Language {
+            val raw = projectSettings(project).getValue(KEY_TRANSLATION_DEFAULT_LANG)
+            return Strings.notBlank(raw)
+                    .flatMap(Language::parse)
+                    .orElse(Language.LANGUAGE_DEFAULT)
+        }
+
+        fun setTranslationLanguage(project: Project, language: Language?) {
+            val name = language?.locale().toString()
+            val oldName = getTranslationLanguage(project).locale().toString()
+            changeProperty(projectSettings(project), KEY_TRANSLATION_DEFAULT_LANG, oldName, name)
+        }
+
+        protected fun projectSettings(project: Project): PropertiesComponent = PropertiesComponent.getInstance(project)
 
         fun addListener(listener: SettingsChangedListener) {
             listeners.add(listener)
@@ -55,11 +69,11 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
             listeners.remove(listener)
         }
 
-        private fun changeProperty(scope: PropertiesComponent, key: String, oldValue: String?, newValue: String?): Boolean {
+        private fun changeProperty(store: PropertiesComponent, key: String, oldValue: String?, newValue: String?): Boolean {
             if (Objects.equals(oldValue, newValue)) {
                 return false
             }
-            scope.setValue(key, newValue)
+            store.setValue(key, newValue)
             notifyListeners(key, oldValue, newValue)
             return true
         }
@@ -81,10 +95,12 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
 
     private fun isAutoCreateClassIdAnnotationsInUi() = m_form?.isAutoCreateClassId ?: false
 
-    override fun isModified(): Boolean {
-        return isAutoUpdateDerivedResourcesInUi() != isAutoUpdateDerivedResources(project)
-                || isAutoCreateClassIdAnnotationsInUi() != isAutoCreateClassIdAnnotations(project)
-    }
+    private fun getTranslationLanguageInUi() = m_form?.translationLanguage ?: Language.LANGUAGE_DEFAULT
+
+    override fun isModified() =
+            isAutoUpdateDerivedResourcesInUi() != isAutoUpdateDerivedResources(project)
+                    || isAutoCreateClassIdAnnotationsInUi() != isAutoCreateClassIdAnnotations(project)
+                    || getTranslationLanguageInUi() != getTranslationLanguage(project)
 
     override fun getId(): String {
         return "preferences.ScoutSettings"
@@ -95,22 +111,15 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
     }
 
     override fun apply() {
-        val projectSettings = PropertiesComponent.getInstance(project)
-        changeProperty(
-                projectSettings, KEY_AUTO_UPDATE_DERIVED_RESOURCES,
-                isAutoUpdateDerivedResources(project).toString(),
-                isAutoUpdateDerivedResourcesInUi().toString()
-        )
-        changeProperty(
-                projectSettings, KEY_AUTO_CREATE_CLASS_ID,
-                isAutoCreateClassIdAnnotations(project).toString(),
-                isAutoCreateClassIdAnnotationsInUi().toString()
-        )
+        setAutoUpdateDerivedResources(project, isAutoUpdateDerivedResourcesInUi())
+        setAutoCreateClassIdAnnotations(project, isAutoCreateClassIdAnnotationsInUi())
+        setTranslationLanguage(project, getTranslationLanguageInUi())
     }
 
     override fun reset() {
         m_form?.isAutoUpdateDerivedResources = isAutoUpdateDerivedResources(project)
         m_form?.isAutoCreateClassId = isAutoCreateClassIdAnnotations(project)
+        m_form?.translationLanguage = getTranslationLanguage(project)
     }
 
     override fun createComponent(): JComponent? {

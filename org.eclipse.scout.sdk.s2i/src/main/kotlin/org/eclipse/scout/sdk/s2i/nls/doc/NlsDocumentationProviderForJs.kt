@@ -11,20 +11,8 @@
 package org.eclipse.scout.sdk.s2i.nls.doc
 
 import com.intellij.psi.PsiElement
-import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
-import org.eclipse.scout.sdk.core.util.Strings.withoutQuotes
-import org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJs.Companion.allNlsPatternsInJs
+import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatternsForJs.getTranslationKeyOf
 
 class NlsDocumentationProviderForJs : AbstractNlsDocumentationProvider() {
-    override fun accept(element: PsiElement?) = allNlsPatternsInJs().accepts(element)
-
-    override fun psiElementToKey(element: PsiElement): String {
-        var text = withoutQuotes(element.text).toString()
-        val jsonPrefix = TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX
-        val jsonSuffix = TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX
-        if (text.startsWith(jsonPrefix) && text.endsWith(jsonSuffix)) {
-            text = text.substring(jsonPrefix.length, text.length - jsonSuffix.length)
-        }
-        return text
-    }
+    override fun translationKeyOf(element: PsiElement?) = getTranslationKeyOf(element)
 }

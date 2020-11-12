@@ -128,7 +128,7 @@ public class NlsFilterComponent extends Composite {
 
     private P_ViewerFilter(Language lang, String pattern) {
       m_lang = lang;
-      m_pattern = (pattern.toLowerCase(Locale.ENGLISH) + '*').toCharArray();
+      m_pattern = (pattern.toLowerCase(Locale.US) + '*').toCharArray();
     }
 
     @Override

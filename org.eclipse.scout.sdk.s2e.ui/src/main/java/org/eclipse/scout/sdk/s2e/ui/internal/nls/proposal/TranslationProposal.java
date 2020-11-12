@@ -13,13 +13,12 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls.proposal;
 import static org.eclipse.scout.sdk.core.util.Strings.escapeHtml;
 import static org.eclipse.scout.sdk.core.util.Strings.replaceEach;
 
-import java.util.Locale;
-
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.swt.graphics.Image;
@@ -91,7 +90,7 @@ public class TranslationProposal extends AbstractTranslationProposal {
         }
 
         var prefix = document.get(keyRange.x, offset - keyRange.x);
-        return m_translation.key().toLowerCase(Locale.ENGLISH).startsWith(prefix.toLowerCase(Locale.ENGLISH));
+        return Strings.startsWith(m_translation.key(), prefix, false);
       }
       catch (BadLocationException e) {
         SdkLog.warning(e);

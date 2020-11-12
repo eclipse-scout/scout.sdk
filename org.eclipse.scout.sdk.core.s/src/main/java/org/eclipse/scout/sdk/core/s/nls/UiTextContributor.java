@@ -10,11 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 import static java.util.stream.Stream.concat;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.core.util.StreamUtils.allMatchResults;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -22,7 +21,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
@@ -62,17 +61,18 @@ public class UiTextContributor {
   }
 
   protected Set<String> loadAllKeys(IProgress progress) {
-    var methodName = type().javaEnvironment().requireApi(IScoutApi.class).UiTextContributor().contributeUiTextKeysMethodName();
     return type()
-        .methods()
-        .withName(methodName)
-        .first()
-        .flatMap(IMethod::sourceOfBody)
+        .source()
         .map(ISourceRange::asCharSequence)
         .map(CoreUtils::removeComments)
         .flatMap(Strings::notBlank)
         .map(src -> loadAllKeys(src, progress))
-        .orElseThrow(() -> newFail("Could not calculate available translation keys for '{}'. No source code for method '{}' could be found.", type().name(), methodName));
+        .orElseGet(this::noKeysFound);
+  }
+
+  protected Set<String> noKeysFound() {
+    SdkLog.warning("Could not calculate available translation keys for '{}'. No source code available. Please ensure to enable Maven source download.", type().name());
+    return emptySet();
   }
 
   protected Set<String> loadAllKeys(CharSequence methodSource, IProgress progress) {
@@ -81,14 +81,16 @@ public class UiTextContributor {
   }
 
   protected static Stream<String> loadDirectLiterals(CharSequence contributeUiTextKeysMethodSource) {
-    return allMatchResults(KEY_LITERAL_PAT, contributeUiTextKeysMethodSource)
+    return KEY_LITERAL_PAT.matcher(contributeUiTextKeysMethodSource)
+        .results()
         .map(match -> match.group(1));
   }
 
   protected Stream<String> loadReferencedTextProviderServices(CharSequence contributeUiTextKeysMethodSource, IProgress progress) {
     var contributor = type();
     var scoutApi = contributor.javaEnvironment().requireApi(IScoutApi.class);
-    var referencedTextServices = allMatchResults(TEXT_SERVICE_CLASS_LITERAL_PAT, contributeUiTextKeysMethodSource)
+    var referencedTextServices = TEXT_SERVICE_CLASS_LITERAL_PAT.matcher(contributeUiTextKeysMethodSource)
+        .results()
         .map(match -> match.group(1))
         .map(contributor::resolveSimpleName)
         .flatMap(Optional::stream)
@@ -96,8 +98,7 @@ public class UiTextContributor {
         .collect(toList());
     progress.init(referencedTextServices.size(), "Load referenced text provider service");
     return referencedTextServices.stream()
-        .map(txtService -> TranslationStores.create(txtService, progress.newChild(1)))
-        .flatMap(Optional::stream)
+        .flatMap(txtService -> TranslationStores.create(txtService, progress.newChild(1)).stream())
         .flatMap(ITranslationStore::keys);
   }
 

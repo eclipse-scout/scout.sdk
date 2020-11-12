@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2i.nls.editor
 
 import com.intellij.find.impl.RegExHelpPopup
 import com.intellij.icons.AllIcons
-import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
@@ -28,7 +27,6 @@ import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiManager
 import com.intellij.ui.BalloonImpl
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.awt.RelativePoint
@@ -37,15 +35,12 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.*
-import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
-import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
-import org.eclipse.scout.sdk.core.s.nls.properties.ReadOnlyTranslationFile
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.OperationTask
+import org.eclipse.scout.sdk.s2i.resolveProperty
 import org.eclipse.scout.sdk.s2i.resolvePsi
 import org.eclipse.scout.sdk.s2i.toScoutProgress
-import org.eclipse.scout.sdk.s2i.toVirtualFile
 import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import org.eclipse.scout.sdk.s2i.util.Xlsx
@@ -300,31 +295,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
 
     private inner class TranslationTextLocateAction(val translation: ITranslationEntry, val language: Language) : DumbAwareAction(message("jump.to.property"), null, AllIcons.Nodes.ResourceBundle) {
         override fun actionPerformed(e: AnActionEvent) {
-            val store = translation.store()
-            if (store !is PropertiesTranslationStore) {
-                return
-            }
-
-            val file = store.files()[language] ?: return
-            if (file is EditableTranslationFile) {
-                // in project
-                val origin = file.path().toVirtualFile() ?: return
-                open(origin)
-            } else if (file is ReadOnlyTranslationFile) {
-                // in libraries
-                val source = file.source()
-                if (source is VirtualFile) {
-                    open(source)
-                }
-            }
-        }
-
-        private fun open(file: VirtualFile) {
-            val psi = PsiManager.getInstance(project).findFile(file)
-            if (psi !is PropertiesFile) {
-                return
-            }
-            psi.findPropertyByKey(translation.key())?.navigate(true)
+            translation.resolveProperty(language, project)?.navigate(true)
         }
     }
 

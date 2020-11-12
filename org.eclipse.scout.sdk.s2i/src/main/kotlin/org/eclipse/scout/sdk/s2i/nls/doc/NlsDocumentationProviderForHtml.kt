@@ -11,11 +11,8 @@
 package org.eclipse.scout.sdk.s2i.nls.doc
 
 import com.intellij.psi.PsiElement
-import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns
+import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns.getTranslationKeyOf
 
 open class NlsDocumentationProviderForHtml : AbstractNlsDocumentationProvider() {
-
-    override fun accept(element: PsiElement?) = PsiTranslationPatterns.HTML_KEY_PATTERN.accepts(element)
-
-    override fun psiElementToKey(element: PsiElement): String = element.text
+    override fun translationKeyOf(element: PsiElement?) = getTranslationKeyOf(element?.parent)
 }

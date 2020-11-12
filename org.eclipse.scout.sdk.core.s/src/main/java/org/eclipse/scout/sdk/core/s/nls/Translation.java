@@ -10,8 +10,13 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
+import java.util.Locale;
+import java.util.Locale.LanguageRange;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -102,6 +107,23 @@ public class Translation implements ITranslation {
   @Override
   public Optional<String> text(Language language) {
     return Optional.ofNullable(textsMap().get(Ensure.notNull(language)));
+  }
+
+  @Override
+  public Optional<String> bestText(Language language) {
+    if (language == null) {
+      return text(Language.LANGUAGE_DEFAULT);
+    }
+
+    var availableLocales = textsMap().keySet().stream()
+        .collect(toMap(Language::locale, identity()));
+    var range = new LanguageRange(language.locale().toLanguageTag(), LanguageRange.MAX_WEIGHT);
+    var result = Locale.lookup(singletonList(range), availableLocales.keySet());
+
+    return Optional.ofNullable(result)
+        .map(availableLocales::get)
+        .flatMap(this::text)
+        .or(() -> text(Language.LANGUAGE_DEFAULT));
   }
 
   @Override

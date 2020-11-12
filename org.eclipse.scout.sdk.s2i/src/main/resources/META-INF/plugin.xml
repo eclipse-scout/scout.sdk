@@ -19,26 +19,32 @@
       <p>
       Eclipse Scout integration for IntelliJ IDEA
       </p>
+      <p>Supports Scout runtime versions 10 and 11.</p>
       <p>
-      Includes:
+      Features:
         <br>
         <ul>
           <li>Derived resource update for FormData and PageData</li>
+          <li>Java code completion for Scout elements like FormFields, Menus, KeyStrokes, Codes and more.</li>
+          <li>Scout national language support
+            <ul>
+              <li>Editor for Scout nls files</li>
+              <li>Inspections for missing and unused translations</li>
+              <li>Code completion for Scout translation keys in Java, JavaScript and HTML</li>
+              <li>Tooltip documentation for Scout translation keys</li>
+              <li>Code folding support for Scout translations with configurable display language</li>
+            </ul>
+          </li>
           <li>@ClassId validation inspections (missing, duplicates)</li>
-          <li>Editor for Scout nls files</li>
-          <li>Inspection for missing translations</li>
-          <li>Code completion for Scout nls keys in Java, JavaScript and HTML</li>
-          <li>Java code completion for Scout elements like FormFields, Menus, KeyStrokes, Codes and much more.</li>
         </ul>
         </p>
   ]]></description>
 
   <change-notes><![CDATA[
         <ul>
-          <li>Adds an editor for Scout nls files.</li>
-          <li>Adds a quick-fix for the 'Missing translation' inspection.</li>
-          <li>Adds code completion for Scout nls keys in Java, JavaScript and HTML.</li>
-          <li>Adds Java code completion for Scout elements like FormFields, Menus, KeyStrokes, Codes and much more.</li>
+          <li>Adds support for Scout 11.</li>
+          <li>Adds an inspection reporting unused translations (not referred in the code) that might be deleted.</li>
+          <li>Adds code folding support for Scout translations with configurable display language.</li>
         </ul>
   ]]></change-notes>
 
@@ -65,6 +71,8 @@
                     serviceImplementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.classid.ClassIdCache"
                     serviceImplementation="org.eclipse.scout.sdk.s2i.classid.ClassIdCacheImplementor"/>
+    <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache"/>
+    <applicationService serviceImplementation="org.eclipse.scout.sdk.s2i.settings.ScoutCodeFoldingSettings"/>
     <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                          instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
     <macro implementation="org.eclipse.scout.sdk.s2i.IdeaHomePathMacro"/>
@@ -74,6 +82,8 @@
                      implementationClass="org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection"/>
     <localInspection shortName="MissingTranslation" groupName="Scout" enabledByDefault="true" level="WARNING" key="missing.translation.inspection.displayName"
                      implementationClass="org.eclipse.scout.sdk.s2i.nls.inspection.MissingTranslationInspection"/>
+    <globalInspection shortName="UnusedTranslation" groupName="Scout" enabledByDefault="false" level="WARNING" key="unused.translation.inspection.displayName"
+                      implementationClass="org.eclipse.scout.sdk.s2i.nls.inspection.UnusedTranslationInspection"/>
     <fileType name="Scout National Language Support" extensions="nls" fieldName="INSTANCE" implementationClass="org.eclipse.scout.sdk.s2i.nls.NlsFileType"/>
     <fileEditorProvider implementation="org.eclipse.scout.sdk.s2i.nls.editor.NlsFileEditorProvider"/>
     <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJava" id="scoutNlsCompletionJava" order="before propertiesCompletion"/>
@@ -81,6 +91,9 @@
     <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.template.TemplateCompletionContributor" id="scoutTemplateCompletionJava" order="first"/>
     <lang.documentationProvider language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForJava" id="scoutNlsKeyDocumentationJava" order="first"/>
     <lang.documentationProvider language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForHtml" id="scoutNlsKeyDocumentationHtml" order="first"/>
+    <lang.foldingBuilder language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForJava"/>
+    <lang.foldingBuilder language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForHtml"/>
+    <codeFoldingOptionsProvider instance="org.eclipse.scout.sdk.s2i.settings.ScoutCodeFoldingOptionsProvider"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.DescendantAbstractClassesEnumMacro"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.PsiExpressionEnumMacro"/>

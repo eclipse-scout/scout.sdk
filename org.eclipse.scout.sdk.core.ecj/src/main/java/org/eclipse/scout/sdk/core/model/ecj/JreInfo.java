@@ -10,9 +10,12 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static java.nio.file.Files.readAllLines;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
+import static org.eclipse.scout.sdk.core.util.Strings.startsWith;
 import static org.eclipse.scout.sdk.core.util.Strings.withoutQuotes;
 
 import java.io.File;
@@ -135,7 +138,7 @@ public class JreInfo {
     }
 
     try {
-      return Ensure.notNull(parseVersion(Files.readAllLines(release, StandardCharsets.UTF_8)), "Cannot parse Java version for location '{}'.", jreHome);
+      return Ensure.notNull(parseVersion(readAllLines(release, StandardCharsets.UTF_8)), "Cannot parse Java version for location '{}'.", jreHome);
     }
     catch (IOException e) {
       throw new SdkException("Error parsing Java release file: '{}'.", jreHome, e);
@@ -148,8 +151,8 @@ public class JreInfo {
       if (Strings.isBlank(line)) {
         continue;
       }
-      if (line.toUpperCase(Locale.ENGLISH).startsWith(prefix)) {
-        var value = withoutQuotes(line.substring(prefix.length()).trim()).toString();
+      if (startsWith(line, prefix, false)) {
+        var value = withoutQuotes(line.substring(prefix.length()).trim());
         if (value.length() > 0) {
           return parseVersion(value);
         }
@@ -158,16 +161,16 @@ public class JreInfo {
     return null;
   }
 
-  protected static String parseVersion(String versionString) {
+  protected static String parseVersion(CharSequence versionString) {
     var dot = '.';
-    var firstDot = versionString.indexOf(dot);
+    var firstDot = indexOf(dot, versionString);
     if (firstDot < 1) {
-      return versionString;
+      return versionString.toString();
     }
     var majorAndMinor = new StringBuilder(5);
     majorAndMinor.append(versionString.subSequence(0, firstDot));
 
-    var secondDot = versionString.indexOf(dot, firstDot + 1);
+    var secondDot = indexOf(dot, versionString, firstDot + 1);
     if (secondDot > firstDot + 1) {
       majorAndMinor.append(dot).append(versionString.subSequence(firstDot + 1, secondDot));
     }
@@ -197,7 +200,7 @@ public class JreInfo {
     if (fileName == null) {
       return false;
     }
-    var name = fileName.toString().toLowerCase(Locale.ENGLISH);
+    var name = fileName.toString().toLowerCase(Locale.US);
     return name.endsWith(".jar") || name.endsWith(".zip");
   }
 

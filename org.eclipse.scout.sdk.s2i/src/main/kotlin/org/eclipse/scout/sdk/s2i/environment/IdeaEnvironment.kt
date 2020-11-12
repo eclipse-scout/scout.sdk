@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.GlobalSearchScope.allScope
 import org.eclipse.scout.sdk.core.builder.BuilderContext
 import org.eclipse.scout.sdk.core.builder.IBuilderContext
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder
@@ -47,17 +47,12 @@ import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.streams.asStream
 
 
 open class IdeaEnvironment private constructor(val project: Project) : IEnvironment, AutoCloseable {
 
     companion object Factory {
-
-        fun createUnsafeFor(project: Project, registerCloseCallback: (IdeaEnvironment) -> Unit): IdeaEnvironment {
-            val ideaEnvironment = IdeaEnvironment(project)
-            registerCloseCallback.invoke(ideaEnvironment)
-            return ideaEnvironment
-        }
 
         fun <T> callInIdeaEnvironmentSync(project: Project, progressIndicator: IdeaProgress, task: (IdeaEnvironment, IdeaProgress) -> T): T =
                 IdeaEnvironment(project).use {
@@ -105,9 +100,10 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         m_envs.clear()
     }
 
-    override fun findType(fqn: String) = project.findTypesByName(Ensure.notBlank(fqn), GlobalSearchScope.allScope(project))
+    override fun findType(fqn: String) = project
+            .findTypesByName(Ensure.notBlank(fqn), allScope(project))
             .mapNotNull { it.toScoutType(this) }
-            .stream()
+            .asStream()
 
     override fun findJavaEnvironment(root: Path?): Optional<IJavaEnvironment> {
         var path = root
@@ -121,7 +117,6 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         return Optional.empty()
     }
 
-
     override fun rootOfJavaEnvironment(environment: IJavaEnvironment?): Path {
         val spi = environment?.unwrap() ?: throw newFail("Java environment must not be null")
         val ideaEnv = spi as JavaEnvironmentWithIdea
@@ -129,23 +124,20 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         return root.getNioPath()
     }
 
-    fun toScoutJavaEnvironment(module: Module?): IJavaEnvironment? =
-            module
-                    ?.takeIf { it.isJavaModule() }
-                    ?.let { getOrCreateEnv(it) }
-                    ?.wrap()
+    fun toScoutJavaEnvironment(module: Module?): IJavaEnvironment? = module
+            ?.takeIf { it.isJavaModule() }
+            ?.let { getOrCreateEnv(it) }
+            ?.wrap()
 
-    fun findClasspathEntry(classpathRoot: VirtualFile?): IClasspathEntry? =
-            classpathRoot
-                    ?.let { ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(it) }
-                    ?.let { toScoutJavaEnvironment(it) }
-                    ?.let { findClasspathEntry(classpathRoot, it) }
+    fun findClasspathEntry(classpathRoot: VirtualFile?): IClasspathEntry? = classpathRoot
+            ?.let { ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(it) }
+            ?.let { toScoutJavaEnvironment(it) }
+            ?.let { findClasspathEntry(classpathRoot, it) }
 
-    protected fun findClasspathEntry(file: VirtualFile, env: IJavaEnvironment): IClasspathEntry? =
-            env.sourceFolders()
-                    .filter { it.path().startsWith(file.getNioPath()) }
-                    .findAny()
-                    .orElse(null)
+    protected fun findClasspathEntry(file: VirtualFile, env: IJavaEnvironment): IClasspathEntry? = env.sourceFolders()
+            .filter { it.path().startsWith(file.getNioPath()) }
+            .findAny()
+            .orElse(null)
 
     protected fun getOrCreateEnv(module: Module): JavaEnvironmentWithIdea = m_envs.computeIfAbsent(module.name) { createNewJavaEnvironmentFor(module) }
 

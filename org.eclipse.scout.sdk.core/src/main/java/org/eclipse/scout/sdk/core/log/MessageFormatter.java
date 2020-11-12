@@ -52,18 +52,20 @@ public final class MessageFormatter {
       rawMessage = "";
     }
 
+    if (args == null || args.length <= 0) {
+      return new FormattingTuple(rawMessage.toString(), emptyList());
+    }
+
+    int curIndex;
     var nextIndex = 0;
+    var lastPos = 0;
     var messageBuilder = new StringBuilder(rawMessage);
-    if (args != null) {
-      int curIndex;
-      var lastPos = 0;
-      while ((curIndex = messageBuilder.indexOf(ARG_REPLACE_PATTERN, lastPos)) >= 0 && nextIndex < args.length) {
-        var endPos = curIndex + ARG_REPLACE_PATTERN.length();
-        var replacement = toString(args[nextIndex]);
-        messageBuilder.replace(curIndex, endPos, replacement);
-        nextIndex++;
-        lastPos = curIndex + replacement.length();
-      }
+    while ((curIndex = messageBuilder.indexOf(ARG_REPLACE_PATTERN, lastPos)) >= 0 && nextIndex < args.length) {
+      var endPos = curIndex + ARG_REPLACE_PATTERN.length();
+      var replacement = toString(args[nextIndex]);
+      messageBuilder.replace(curIndex, endPos, replacement);
+      nextIndex++;
+      lastPos = curIndex + replacement.length();
     }
     return new FormattingTuple(messageBuilder.toString(), extractThrowables(nextIndex, args));
   }

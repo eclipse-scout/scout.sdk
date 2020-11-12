@@ -11,22 +11,25 @@
 package org.eclipse.scout.sdk.s2i.nls.completion
 
 import com.intellij.codeInsight.completion.*
+import com.intellij.patterns.PsiJavaPatterns.psiElement
+import com.intellij.psi.PsiLiteralExpression
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns
 import org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionHelper.computeLookupElements
-import kotlin.streams.toList
 
 class NlsCompletionContributorForJava : CompletionContributor() {
 
     init {
-        extend(CompletionType.BASIC, PsiTranslationPatterns.JAVA_TEXTS_GET_PATTERN, DefaultNlsCompletionProvider())
+        extend(CompletionType.BASIC, psiElement()
+                .withParent(psiElement(PsiLiteralExpression::class.java)
+                        .and(PsiTranslationPatterns.JAVA_NLS_KEY_PATTERN)), DefaultNlsCompletionProvider())
     }
 
     class DefaultNlsCompletionProvider : CompletionProvider<CompletionParameters>() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
             val module = parameters.position.containingModule() ?: return
-            result.addAllElements(computeLookupElements(module).toList())
+            result.addAllElements(computeLookupElements(module, parameters.position.parent))
             result.stopHere()
         }
     }

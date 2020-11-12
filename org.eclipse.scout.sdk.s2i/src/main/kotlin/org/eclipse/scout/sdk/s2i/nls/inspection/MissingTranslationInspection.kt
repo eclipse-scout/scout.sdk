@@ -11,88 +11,77 @@
 package org.eclipse.scout.sdk.s2i.nls.inspection
 
 import com.intellij.codeInspection.*
-import com.intellij.openapi.module.Module
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.environment.IProgress
-import org.eclipse.scout.sdk.core.s.nls.query.MissingTranslationQuery
-import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput
-import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch
-import org.eclipse.scout.sdk.core.s.util.search.IFileQuery
+import com.intellij.psi.PsiRecursiveElementVisitor
+import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
+import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.moduleDirPath
-import org.eclipse.scout.sdk.s2i.toScoutProgress
-import org.eclipse.scout.sdk.s2i.util.getNioPath
+import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns
+import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache.Companion.createCacheKey
+import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
+import org.eclipse.scout.sdk.s2i.nlsDependencyScope
+import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
-import java.util.logging.Level
+import java.util.stream.Collectors.toSet
 
 open class MissingTranslationInspection : LocalInspectionTool() {
 
-    private val m_environmentByProject = ConcurrentHashMap<Project, Pair<IdeaEnvironment, MissingTranslationQuery>>()
-    private val m_supportedFileTypes = MissingTranslationQuery.supportedFileTypes()
+    private val m_cachedKeysByProject = ConcurrentHashMap<Project, MutableMap<Pair<Path, TranslationStores.DependencyScope?>, Set<String>>>()
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
-        if (!m_supportedFileTypes.contains(file.virtualFile.extension)) {
+        val nlsDependencyScope = file.nlsDependencyScope() ?: return ProblemDescriptor.EMPTY_ARRAY
+        val module = file.containingModule(false) ?: return ProblemDescriptor.EMPTY_ARRAY
+        return if (isOnTheFly) {
+            val stack = createStack(module, nlsDependencyScope, true) ?: return ProblemDescriptor.EMPTY_ARRAY
+            checkFile(file, keysOfStack(stack), manager, true)
+        } else {
+            // batch inspection run: create cache. Will be removed in cleanup function
+            val cacheKey = createCacheKey(module.moduleDirPath(), nlsDependencyScope)
+            val projectCache = m_cachedKeysByProject.computeIfAbsent(file.project) { ConcurrentHashMap() }
+            val keys = projectCache.computeIfAbsent(cacheKey) {
+                createStack(module, nlsDependencyScope)
+                        ?.let { keysOfStack(it) }
+                        ?: emptySet() // do not use null because the ConcurrentHashMap does not store null values
+            }
+            if (keys.isEmpty()) {
+                // there are no translations at all. it is no scout module
+                return ProblemDescriptor.EMPTY_ARRAY
+            }
+            checkFile(file, keys, manager, false)
+        }
+    }
+
+    private fun keysOfStack(stack: TranslationStoreStack): Set<String> = stack.allEntries().map(ITranslationEntry::key).collect(toSet())
+
+    private fun checkFile(file: PsiFile, visibleKeys: Set<String>, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
+        val problems = ArrayList<ProblemDescriptor>()
+        file.accept(object : PsiRecursiveElementVisitor() {
+            override fun visitElement(element: PsiElement) {
+                super.visitElement(element)
+                val translationKey = PsiTranslationPatterns.getTranslationKeyOf(element) ?: return
+                if (!visibleKeys.contains(translationKey)) {
+                    problems.add(toProblemDescription(element, translationKey, manager, isOnTheFly))
+                }
+            }
+        })
+        if (problems.isEmpty()) {
             return ProblemDescriptor.EMPTY_ARRAY
         }
-
-        val module = file.containingModule(false) ?: return ProblemDescriptor.EMPTY_ARRAY
-        val progress = ProgressManager.getInstance().progressIndicator
-        return if (isOnTheFly) {
-            // single file: create short living environment for this file only
-            val query = MissingTranslationQuery()
-            IdeaEnvironment.callInIdeaEnvironmentSync(file.project, progress.toScoutProgress()) { e, p ->
-                checkFile(file, module, query, manager, true, e, p)
-            }
-        } else {
-            // batch inspection run: create environment and query in cache. Will be removed and closed in cleanup function
-            val cache = m_environmentByProject.computeIfAbsent(file.project) { project ->
-                Pair(IdeaEnvironment.createUnsafeFor(project) { }, MissingTranslationQuery())
-            }
-            checkFile(file, module, cache.second, manager, false, cache.first, progress.toScoutProgress())
-        }
+        return problems.toTypedArray()
     }
 
-    fun checkFile(file: PsiFile, module: Module, query: IFileQuery, manager: InspectionManager, isOnTheFly: Boolean, environment: IdeaEnvironment, progress: IProgress): Array<ProblemDescriptor> {
-        val start = System.currentTimeMillis()
-        val path = file.virtualFile.getNioPath()
-        val queryInput = FileQueryInput(path, module.moduleDirPath()) { file.textToCharArray() }
-
-        query.searchIn(queryInput, environment, progress)
-
-        val result = query.result(path)
-                .filter { it.severity() >= Level.WARNING.intValue() } // only report important findings
-                .mapNotNull { toProblemDescription(it, file, manager, isOnTheFly) }
-                .toTypedArray()
-        SdkLog.debug("Missing translation inspection took {}ms", System.currentTimeMillis() - start)
-        return result
-    }
-
-    protected fun toProblemDescription(range: FileQueryMatch, file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
-        return IdeaEnvironment.computeInReadAction(file.project) {
-            val element = file.findElementAt(range.start()) ?: return@computeInReadAction null
-            val type = julLevelToProblemHighlightType(range.severity())
-            val msg = when (range.severity()) {
-                Level.INFO.intValue() -> message("possibly.missing.translation")
-                else -> message("missing.translation.for.key.x", range.text())
-            }
-            val fixes = if (isOnTheFly) arrayOf(AddMissingTranslationQuickFix(range.text())) else LocalQuickFix.EMPTY_ARRAY
-            return@computeInReadAction manager.createProblemDescriptor(element, msg, isOnTheFly, fixes, type)
-        }
-    }
-
-    protected fun julLevelToProblemHighlightType(severity: Int): ProblemHighlightType = when (severity) {
-        Level.INFO.intValue() -> ProblemHighlightType.WEAK_WARNING
-        Level.SEVERE.intValue() -> ProblemHighlightType.ERROR
-        else -> ProblemHighlightType.WARNING
+    protected fun toProblemDescription(element: PsiElement, missingKey: String, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor {
+        val fixes = if (isOnTheFly) arrayOf(AddMissingTranslationQuickFix(missingKey)) else LocalQuickFix.EMPTY_ARRAY
+        return manager.createProblemDescriptor(element, message("missing.translation.for.key.x", missingKey), isOnTheFly, fixes, ProblemHighlightType.WARNING)
     }
 
     override fun cleanup(project: Project) {
-        m_environmentByProject.remove(project)?.first?.close()
+        m_cachedKeysByProject.remove(project)?.clear()
         super.cleanup(project)
     }
 }

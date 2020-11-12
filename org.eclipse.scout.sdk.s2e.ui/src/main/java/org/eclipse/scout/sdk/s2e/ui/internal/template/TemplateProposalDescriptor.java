@@ -93,12 +93,12 @@ public class TemplateProposalDescriptor {
       return true; // no filter
     }
 
-    searchString = searchString.toLowerCase(Locale.ENGLISH);
-    if (JavaTypes.simpleName(m_proposalIfcTypeFqn).toLowerCase(Locale.ENGLISH).contains(searchString)) {
+    searchString = searchString.toLowerCase(Locale.US);
+    if (JavaTypes.simpleName(m_proposalIfcTypeFqn).toLowerCase(Locale.US).contains(searchString)) {
       return true;
     }
 
-    if (m_displayName.toLowerCase(Locale.ENGLISH).contains(searchString)) {
+    if (m_displayName.toLowerCase(Locale.US).contains(searchString)) {
       return true;
     }
 
@@ -107,13 +107,13 @@ public class TemplateProposalDescriptor {
       if (simpleName.startsWith(ISdkConstants.PREFIX_ABSTRACT)) {
         simpleName = simpleName.substring(ISdkConstants.PREFIX_ABSTRACT.length());
       }
-      if (simpleName.toLowerCase(Locale.ENGLISH).contains(searchString)) {
+      if (simpleName.toLowerCase(Locale.US).contains(searchString)) {
         return true;
       }
     }
 
     for (var alias : m_aliasNames) {
-      if (alias.toLowerCase(Locale.ENGLISH).contains(searchString)) {
+      if (alias.toLowerCase(Locale.US).contains(searchString)) {
         return true;
       }
     }

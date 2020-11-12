@@ -13,66 +13,36 @@ package org.eclipse.scout.sdk.core.util;
 import static java.util.stream.StreamSupport.stream;
 
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Spliterator;
 import java.util.Spliterators.AbstractSpliterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.regex.MatchResult;
-import java.util.regex.Pattern;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-/**
- * Helper class to create a {@link Stream} of a Regex {@link Pattern} execution.
- */
 public final class StreamUtils {
 
   private StreamUtils() {
   }
 
   /**
-   * Creates a {@link Stream} of all matches of the the {@link Pattern} specified in the input {@link CharSequence}
-   * specified.
+   * Returns a {@link Predicate} only accepting the first element as returned by the given selector function.
    * 
-   * @param pattern
-   *          The {@link Pattern} to execute. Must not be {@code null}.
-   * @param input
-   *          The {@link CharSequence} on which the pattern should be executed. Must not be {@code null}.
-   * @return A {@link Stream} with all findings (returns the main group of the pattern {@link MatchResult#group()}).
+   * @param selector
+   *          The {@link Function} to apply to elements to compute the attribute to compare. Must not be {@code null}.
+   * @param <T>
+   *          The element type
+   * @return A {@link Predicate} only accepting the first element according to the attribute of the element returned by
+   *         the selector.
+   * @throws IllegalArgumentException
+   *           if the selector is {@code null}.
    */
-  public static Stream<String> allMatches(Pattern pattern, CharSequence input) {
-    return allMatchResults(pattern, input).map(MatchResult::group);
-  }
-
-  /**
-   * Creates a {@link Stream} of all matches of the the {@link Pattern} specified in the input {@link CharSequence}
-   * specified.
-   * 
-   * @param pattern
-   *          The {@link Pattern} to execute. Must not be {@code null}.
-   * @param input
-   *          The {@link CharSequence} on which the pattern should be executed. Must not be {@code null}.
-   * @return A {@link Stream} with all {@link MatchResult results} of the pattern in the input.
-   */
-  public static Stream<MatchResult> allMatchResults(Pattern pattern, CharSequence input) {
-    var matcher = pattern.matcher(input);
-    Spliterator<MatchResult> spliterator = new AbstractSpliterator<>(Long.MAX_VALUE,
-        Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE) {
-      @Override
-      public boolean tryAdvance(Consumer<? super MatchResult> action) {
-        if (!matcher.find()) {
-          return false;
-        }
-        action.accept(matcher.toMatchResult());
-        return true;
-      }
-
-      @Override
-      public void forEachRemaining(Consumer<? super MatchResult> action) {
-        while (matcher.find()) {
-          action.accept(matcher.toMatchResult());
-        }
-      }
-    };
-    return stream(spliterator, false);
+  public static <T> Predicate<T> firstBy(Function<? super T, ?> selector) {
+    Ensure.notNull(selector);
+    Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+    return t -> seen.putIfAbsent(selector.apply(t), Boolean.TRUE) == null;
   }
 
   /**

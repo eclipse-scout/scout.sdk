@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.s.nls.query;
 
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInCode;
 import static org.eclipse.scout.sdk.core.util.SourceState.isInString;
 import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
@@ -19,10 +18,8 @@ import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
 import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -39,7 +36,8 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public final class TranslationPatterns {
 
   public static final String IGNORE_MARKER = "NO-NLS-CHECK";
-  private static final String JS_FILE_EXTENSION = "js";
+  public static final String JS_FILE_EXTENSION = "js";
+  public static final String HTML_FILE_EXTENSION = "html";
 
   private static final Map<Class<? extends AbstractTranslationPattern>, AbstractTranslationPattern> PATTERN_MAP = new HashMap<>();
   static {
@@ -52,7 +50,7 @@ public final class TranslationPatterns {
 
   /**
    * Adds an {@link AbstractTranslationPattern} to the list of known patterns.
-   * 
+   *
    * @param pattern
    *          The {@link AbstractTranslationPattern} to add. Must not be {@code null}.
    * @return {@code true} if the element was already registered (and was replaced), {@code false} if this pattern was
@@ -64,7 +62,7 @@ public final class TranslationPatterns {
 
   /**
    * Remove a pattern from the list of known patterns.
-   * 
+   *
    * @param pattern
    *          The {@link AbstractTranslationPattern} to remove. Must not be {@code null}.
    * @return {@code true} if it was successfully removed, {@code false} if the element was not in the list and therefore
@@ -81,15 +79,6 @@ public final class TranslationPatterns {
     return new HashSet<>(PATTERN_MAP.values()).stream();
   }
 
-  /**
-   * @return A {@link Set} containing all file extensions in which Scout translation may exist.
-   */
-  public static Set<String> supportedFileExtensions() {
-    return all()
-        .map(AbstractTranslationPattern::fileExtension)
-        .collect(toSet());
-  }
-
   public abstract static class AbstractTranslationPattern {
     protected static final String NLS_KEY_PAT = ITranslation.KEY_REGEX.pattern();
 
@@ -102,23 +91,23 @@ public final class TranslationPatterns {
     protected static FileRange toFileRange(MatchResult match, FileQueryInput fileQueryInput, int keyGroup) {
       var startIndex = match.start(keyGroup);
       var endIndex = match.end(keyGroup);
-      CharSequence key = CharBuffer.wrap(fileQueryInput.fileContent(), startIndex, endIndex - startIndex);
-      return new FileRange(fileQueryInput.file(), key, startIndex, endIndex);
+      var key = CharBuffer.wrap(fileQueryInput.fileContent(), startIndex, endIndex);
+      return new FileRange(fileQueryInput.file(), fileQueryInput.module(), key, startIndex, endIndex);
     }
 
-    protected static boolean lineEndsWithIgnoreMarker(char[] content, int offset) {
-      var lineEnd = Strings.nextLineEnd(content, offset); // because of the regex patterns the full content cannot be shorter than the ignore marker -> no need to check for the bounds
-      var end = CharBuffer.wrap(content, lineEnd - IGNORE_MARKER.length(), IGNORE_MARKER.length());
+    protected static boolean lineEndsWithIgnoreMarker(CharSequence content, int offset) {
+      var lineEnd = nextLineEnd(content, offset); // because of the regex patterns the full content cannot be shorter than the ignore marker -> no need to check for the bounds
+      var end = CharBuffer.wrap(content, lineEnd - IGNORE_MARKER.length(), lineEnd);
       return Strings.equals(IGNORE_MARKER, end, false);
     }
 
-    protected static boolean isKeyInCode(char[] content, int offset) {
+    protected static boolean isKeyInCode(CharSequence content, int offset) {
       /* the start index itself is inside of the string literal and therefore never in the code. subtract two (one to get to the string delimiter and one to get to the char before */
       var posBeforeKeyMatch = offset - 2;
       return isInCode(content, posBeforeKeyMatch);
     }
 
-    protected static boolean isAcceptedCodeMatch(MatchResult match, int keyGroup, char[] content) {
+    protected static boolean isAcceptedCodeMatch(MatchResult match, int keyGroup, CharSequence content) {
       var endIndex = match.end(keyGroup);
       if (lineEndsWithIgnoreMarker(content, endIndex)) {
         return false;
@@ -199,7 +188,6 @@ public final class TranslationPatterns {
   public static final class JavaTextsGetPattern extends AbstractTranslationPattern {
 
     public static final AbstractTranslationPattern INSTANCE = new JavaTextsGetPattern();
-
     public static final Pattern REGEX = Pattern.compile(computeTextsGetRegex());
 
     private static String computeTextsGetRegex() {
@@ -236,6 +224,7 @@ public final class TranslationPatterns {
   public static final class HtmlScoutMessagePattern extends AbstractTranslationPattern {
 
     public static final String ATTRIBUTE_NAME = "key";
+    public static final String SCOUT_MESSAGE_TAG_NAME = "scout:message";
     public static final AbstractTranslationPattern INSTANCE = new HtmlScoutMessagePattern();
     public static final Pattern REGEX = Pattern.compile("\\s+" + ATTRIBUTE_NAME + "=['\"](" + NLS_KEY_PAT + ")[\"']"); // there is no 'key' attribute in html. so no need to check for the scout:message tag
 
@@ -249,24 +238,23 @@ public final class TranslationPatterns {
 
     @Override
     public String fileExtension() {
-      return "html";
+      return HTML_FILE_EXTENSION;
     }
 
     @Override
     public Optional<FileRange> keyRangeIfAccept(MatchResult match, FileQueryInput fileQueryInput) {
       var keyGroup = 1;
-      var isIgnored = textToNextNewLine(fileQueryInput.fileContent(), match.end(keyGroup))
-          .toUpperCase(Locale.ENGLISH)
-          .endsWith(IGNORE_MARKER + " -->");
+      var textToNextNewLine = textToNextNewLine(fileQueryInput.fileContent(), match.end(keyGroup));
+      var isIgnored = Strings.endsWith(textToNextNewLine, IGNORE_MARKER + " -->", false);
       if (isIgnored) {
         return Optional.empty();
       }
       return Optional.of(toFileRange(match, fileQueryInput, keyGroup));
     }
 
-    public static String textToNextNewLine(char[] searchIn, int offset) {
+    public static CharSequence textToNextNewLine(CharSequence searchIn, int offset) {
       var lineEnd = nextLineEnd(searchIn, offset);
-      return new String(searchIn, offset, lineEnd - offset);
+      return searchIn.subSequence(offset, lineEnd);
     }
   }
 }

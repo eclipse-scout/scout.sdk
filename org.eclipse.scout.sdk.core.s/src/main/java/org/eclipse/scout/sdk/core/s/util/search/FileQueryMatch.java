@@ -30,8 +30,8 @@ public class FileQueryMatch extends FileRange {
    * @param end
    *          The zero based end index.
    */
-  public FileQueryMatch(Path file, CharSequence textOfRange, int start, int end) {
-    this(file, textOfRange, start, end, Level.OFF.intValue());
+  public FileQueryMatch(Path file, Path module, CharSequence textOfRange, int start, int end) {
+    this(file, module, textOfRange, start, end, Level.OFF.intValue());
   }
 
   /**
@@ -44,15 +44,15 @@ public class FileQueryMatch extends FileRange {
    * @param end
    * @param severity
    */
-  public FileQueryMatch(Path file, CharSequence textOfRange, int start, int end, int severity) {
-    super(file, textOfRange, start, end);
+  public FileQueryMatch(Path file, Path module, CharSequence textOfRange, int start, int end, int severity) {
+    super(file, module, textOfRange, start, end);
     m_severity = severity;
   }
 
   /**
    * Creates a new {@link FileQueryMatch} with severity {@link Level#OFF}. The attributes from the {@link FileRange} are
    * copied to the result.
-   * 
+   *
    * @param range
    *          The {@link FileRange} to copy from.
    * @return The new {@link FileQueryMatch}
@@ -64,7 +64,7 @@ public class FileQueryMatch extends FileRange {
   /**
    * Creates a new {@link FileQueryMatch} with the given severity. The attributes from the {@link FileRange} are copied
    * to the result.
-   * 
+   *
    * @param range
    *          The {@link FileRange} to copy from.
    * @param severity
@@ -73,7 +73,7 @@ public class FileQueryMatch extends FileRange {
    */
   public static FileQueryMatch fromFileRange(FileRange range, int severity) {
     Ensure.notNull(range);
-    return new FileQueryMatch(range.file(), range.text(), range.start(), range.end(), severity);
+    return new FileQueryMatch(range.file(), range.module(), range.text(), range.start(), range.end(), severity);
   }
 
   /**

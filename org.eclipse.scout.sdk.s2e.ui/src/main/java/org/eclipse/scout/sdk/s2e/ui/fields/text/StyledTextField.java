@@ -134,11 +134,11 @@ public class StyledTextField extends TextField {
 
     var start = 0;
     var end = text.length();
-    var lowerText = text.toLowerCase(Locale.ENGLISH);
-    if (Strings.hasText(prefix) && lowerText.startsWith(prefix.toLowerCase(Locale.ENGLISH))) {
+    var lowerText = text.toLowerCase(Locale.US);
+    if (Strings.hasText(prefix) && lowerText.startsWith(prefix.toLowerCase(Locale.US))) {
       start = prefix.length();
     }
-    if (Strings.hasText(suffix) && lowerText.endsWith(suffix.toLowerCase(Locale.ENGLISH))) {
+    if (Strings.hasText(suffix) && lowerText.endsWith(suffix.toLowerCase(Locale.US))) {
       end = text.length() - suffix.length();
     }
 

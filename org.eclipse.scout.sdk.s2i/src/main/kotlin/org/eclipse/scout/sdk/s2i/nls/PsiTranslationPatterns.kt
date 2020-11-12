@@ -10,103 +10,128 @@
  */
 package org.eclipse.scout.sdk.s2i.nls
 
-import com.intellij.openapi.util.text.StringUtil.startsWith
+import com.intellij.codeInsight.AnnotationUtil
+import com.intellij.codeInsight.AnnotationUtil.isAnnotated
+import com.intellij.lang.java.JavaLanguage
+import com.intellij.lang.xml.XMLLanguage
 import com.intellij.patterns.*
-import com.intellij.patterns.PsiJavaPatterns.literalExpression
-import com.intellij.patterns.PsiJavaPatterns.psiMethod
-import com.intellij.patterns.StandardPatterns.or
-import com.intellij.patterns.StandardPatterns.string
+import com.intellij.patterns.PsiJavaPatterns.psiExpression
 import com.intellij.patterns.XmlPatterns.xmlAttribute
 import com.intellij.patterns.XmlPatterns.xmlTag
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiLiteralExpression
+import com.intellij.psi.*
+import com.intellij.psi.impl.source.tree.ElementType
+import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl
 import com.intellij.psi.xml.XmlAttributeValue
+import com.intellij.util.ArrayUtil
 import com.intellij.util.ProcessingContext
-import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
-import org.eclipse.scout.sdk.core.util.Strings.fromStringLiteral
-import org.eclipse.scout.sdk.core.util.Strings.withoutQuotes
-import java.util.*
 
 /**
  * The JS patterns are in [org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJs] because the dependency to the JS module is optional!
  */
 object PsiTranslationPatterns {
 
+    /**
+     * A pattern selecting <scout:message> tags and the containing keys attributes. This pattern is valid for xml files (which includes html files).
+     */
     val HTML_KEY_PATTERN = htmlKeyPattern()
-    val JAVA_TEXTS_GET_PATTERN = javaTextsGetPattern()
-    private val JAVA_PATTERNS: MutableSet<ElementPattern<out PsiElement>> = HashSet()
 
-    init {
-        registerJavaPattern(JAVA_TEXTS_GET_PATTERN)
+    /**
+     * A pattern selecting all arguments passed to Java methods having the @NlsKey annotation. This pattern is valid for java files.
+     */
+    val JAVA_NLS_KEY_PATTERN = javaNlsKeyArgumentPattern()
+
+    /**
+     * An optional function selecting text keys used in session.text() methods or '${textKey:}' placeholders. This pattern is valid for js files.
+     */
+    private val JS_TRANSLATION_KEY_SUPPLIER = getJsTranslationKeySupplierIfAvailable()
+
+    /**
+     * Gets the Scout translation key referenced by the [PsiElement] given.
+     * @param element The [PsiElement] to check.
+     * @return The Scout translation key referenced by the [PsiElement] given or null if the element does not point to a translation key.
+     */
+    fun getTranslationKeyOf(element: PsiElement?): String? {
+        val elementLang = element?.language ?: return null
+        return when {
+            elementLang.isKindOf(JavaLanguage.INSTANCE) -> getTranslationKeyFromJava(element)
+            elementLang.isKindOf("JavaScript" /* do not use class here */) -> JS_TRANSLATION_KEY_SUPPLIER?.invoke(element)
+            elementLang.isKindOf(XMLLanguage.INSTANCE) -> getTranslationKeyFromHtml(element)
+            else -> null
+        }
     }
 
-    fun registerJavaPattern(pattern: ElementPattern<out PsiElement>): Boolean = synchronized(this) {
-        return JAVA_PATTERNS.add(pattern)
+    private fun getTranslationKeyFromJava(element: PsiElement?): String? {
+        if (element is PsiLiteralExpressionImpl) {
+            return asStringLiteral(element)
+                    .takeIf { JAVA_NLS_KEY_PATTERN.accepts(it) }
+                    ?.value as? String
+        }
+
+        // reference to variable or constant
+        val variable = (element as? PsiReference)
+                ?.takeIf { JAVA_NLS_KEY_PATTERN.accepts(it) }
+                ?.resolve() as? PsiVariable ?: return null
+        val constant = variable.computeConstantValue() as? String
+        if (constant != null) {
+            return constant
+        }
+        return asStringLiteral(variable.initializer)?.value as? String
     }
 
-    @Suppress("unused")
-    fun removeJavaPattern(pattern: ElementPattern<out PsiElement>): Boolean = synchronized(this) {
-        return JAVA_PATTERNS.remove(pattern)
+    private fun asStringLiteral(element: PsiElement?) = (element as? PsiLiteralExpressionImpl)
+            ?.takeIf { ElementType.STRING_LITERALS.contains(it.literalElementType) }
+
+    private fun getJsTranslationKeySupplierIfAvailable(): ((PsiElement?) -> String?)? {
+        try {
+            PsiTranslationPatternsForJs.getTranslationKeyOf(null) // check if class can be loaded. fails in IJ community edition
+            return { PsiTranslationPatternsForJs.getTranslationKeyOf(it) }
+        } catch (e: Throwable) {
+            SdkLog.debug("Skipping registration of JavaScript translation pattern.", e)
+            return null
+        }
     }
 
-    fun allJavaPatterns(): List<ElementPattern<out PsiElement>> = synchronized(this) {
-        return@synchronized ArrayList(JAVA_PATTERNS)
-    }
-
-    fun anyJavaPatternAccepts(element: PsiElement?) = allJavaPatterns().any { it.accepts(element) }
-
-    fun startsWithIgnoringQuotes(s: CharSequence, unescape: Boolean): StringPattern {
-        return string().with(object : PatternCondition<String>("startsWithIgnoringQuotes=$s") {
-            override fun accepts(str: String, context: ProcessingContext): Boolean {
-                val text = if (unescape) fromStringLiteral(str) else withoutQuotes(str)
-                return startsWith(text, s)
-            }
-        })
+    private fun getTranslationKeyFromHtml(element: PsiElement?): String? {
+        val takeIf = (element as? XmlAttributeValue)
+                ?.takeIf { HTML_KEY_PATTERN.accepts(it) }
+        return takeIf
+                ?.value
     }
 
     private fun htmlKeyPattern(): PsiElementPattern.Capture<PsiElement> = PlatformPatterns.psiElement()
-            .withParent(XmlAttributeValue::class.java)
-            .withSuperParent(2, xmlAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME))
-            .withSuperParent(3, xmlTag().withName("scout:message"))
+            .withParent(xmlAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME)
+                    .withParent(xmlTag().withName(TranslationPatterns.HtmlScoutMessagePattern.SCOUT_MESSAGE_TAG_NAME)))
 
-    private fun javaTextsGetPattern(): PsiJavaElementPattern.Capture<PsiElement> {
+    private fun javaNlsKeyArgumentPattern(): PsiExpressionPattern.Capture<PsiExpression> {
         val patternsForAllScoutVersions = ScoutApi.allKnown()
-                .map { it.TEXTS() }
+                .map { it.NlsKey().fqn() }
                 .distinct()
-                .map { javaTextsGetPattern(it) }
-                .toArray<ElementPattern<PsiLiteralExpression>> { len -> arrayOfNulls(len) }
-        return PsiJavaPatterns.psiElement().withParent(or(*patternsForAllScoutVersions))
+                .map { psiExpression().with(ArgumentToMethodParameterHavingAnnotation(it)) }
+                .toArray<ElementPattern<PsiExpression>> { len -> arrayOfNulls(len) }
+        if (patternsForAllScoutVersions.size == 1) {
+            return psiExpression().and(patternsForAllScoutVersions[0])
+        }
+        return psiExpression().andOr(*patternsForAllScoutVersions)
     }
 
-    private fun javaTextsGetPattern(texts: IScoutVariousApi.TEXTS): ElementPattern<PsiLiteralExpression> {
-        val stringFqn = String::class.java.name
-        val localeFqn = Locale::class.java.name
-        val wildcardArgument = ".."
-        val getWithoutLocale = psiMethod()
-                .withName(texts.methodName)
-                .definedInClass(texts.fqn())
-                .withParameters(stringFqn, wildcardArgument)
-        val getWithLocale = psiMethod()
-                .withName(texts.methodName)
-                .definedInClass(texts.fqn())
-                .withParameters(localeFqn, stringFqn, wildcardArgument)
-        val getWithFallbackWithoutLocale = psiMethod()
-                .withName(texts.withFallbackMethodName)
-                .definedInClass(texts.fqn())
-                .withParameters(stringFqn, stringFqn, wildcardArgument)
-        val getWithFallbackWithLocale = psiMethod()
-                .withName(texts.withFallbackMethodName)
-                .definedInClass(texts.fqn())
-                .withParameters(localeFqn, stringFqn, stringFqn, wildcardArgument)
-        return or(
-                literalExpression().methodCallParameter(0, getWithoutLocale),
-                literalExpression().methodCallParameter(1, getWithLocale),
-                literalExpression().methodCallParameter(0, getWithFallbackWithoutLocale),
-                literalExpression().methodCallParameter(1, getWithFallbackWithoutLocale),
-                literalExpression().methodCallParameter(1, getWithFallbackWithLocale),
-                literalExpression().methodCallParameter(2, getWithFallbackWithLocale)
-        )
+    private class ArgumentToMethodParameterHavingAnnotation(val annotationFqn: String) : PatternCondition<PsiExpression>("argumentToMethodParameterHavingAnnotation=$annotationFqn") {
+        override fun accepts(expression: PsiExpression, context: ProcessingContext?): Boolean {
+            val parent = expression.parent as? PsiExpressionList ?: return false
+            val grandParent = parent.parent as? PsiCall ?: return false
+            val parameterIndex = ArrayUtil.indexOf(parent.expressions, expression)
+            if (parameterIndex < 0) return false
+            val calledMethod = grandParent.resolveMethod() ?: return false
+            return isMethodParameterAnnotated(calledMethod, parameterIndex)
+        }
+
+        private fun isMethodParameterAnnotated(method: PsiMethod, paramIndex: Int): Boolean {
+            val params = method.parameterList.parameters
+            if (paramIndex >= params.size) return false
+            val param = params[paramIndex]
+            return isAnnotated(param, annotationFqn, AnnotationUtil.CHECK_TYPE or AnnotationUtil.CHECK_HIERARCHY)
+        }
     }
 }

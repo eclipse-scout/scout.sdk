@@ -139,6 +139,10 @@ public class FilteredTranslationStore implements IEditableTranslationStore {
     return m_keysFilter;
   }
 
+  protected ITranslationStore nestedStore() {
+    return m_store;
+  }
+
   @Override
   public Optional<String> get(String key, Language language) {
     if (!keysFilter().contains(key)) {

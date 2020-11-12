@@ -87,7 +87,10 @@ abstract class AbstractTranslationDialog(val project: Project, val store: ITrans
 
         isOKActionEnabled = false
         installValidation()
-        defaultLanguageTextField().document.addDocumentListener(KeyAutoGenerator())
+        if (initialKey == null) {
+            // only generate key if not opened with an explicit one
+            defaultLanguageTextField().document.addDocumentListener(KeyAutoGenerator())
+        }
 
         rootPanel.isFocusTraversalPolicyProvider = true
         rootPanel.isFocusCycleRoot = true

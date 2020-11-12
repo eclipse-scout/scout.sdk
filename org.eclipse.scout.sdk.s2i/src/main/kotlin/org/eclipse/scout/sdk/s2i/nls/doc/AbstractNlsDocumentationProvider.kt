@@ -19,31 +19,21 @@ import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.util.Strings.escapeHtml
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
+import org.eclipse.scout.sdk.s2i.nlsDependencyScope
 
 abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider() {
-    override fun getCustomDocumentationElement(editor: Editor, file: PsiFile, contextElement: PsiElement?, targetOffset: Int): PsiElement? {
-        if (accept(contextElement)) {
-            return contextElement
-        }
-        return null
-    }
+
+    override fun getCustomDocumentationElement(editor: Editor, file: PsiFile, contextElement: PsiElement?, targetOffset: Int) =
+            contextElement?.takeIf { translationKeyOf(it) != null }
 
     override fun generateDoc(element: PsiElement?, originalElement: PsiElement?): String? {
-        if (element == null || !accept(element)) {
-            return null
-        }
-        val translation = findTranslationFor(element) ?: return null
+        val dependencyScope = element?.nlsDependencyScope() ?: return null
+        val module = element.containingModule() ?: return null
+        val key = translationKeyOf(element) ?: return null
+        val stack = createStack(module, dependencyScope) ?: return null
+        val translation = stack.translation(key).orElse(null) ?: return null
         return generateDoc(translation)
     }
-
-    private fun findTranslationFor(element: PsiElement): ITranslationEntry? {
-        val module = element.containingModule() ?: return null
-        val stack = createStack(module) ?: return null
-        val key = psiElementToKey(element) ?: return null
-        return stack.translation(key).orElse(null)
-    }
-
-    protected abstract fun psiElementToKey(element: PsiElement): String?
 
     private fun generateDoc(translation: ITranslationEntry): String {
         val doc = StringBuilder()
@@ -60,5 +50,5 @@ abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider(
         return doc.toString()
     }
 
-    protected abstract fun accept(element: PsiElement?): Boolean
+    protected abstract fun translationKeyOf(element: PsiElement?): String?
 }

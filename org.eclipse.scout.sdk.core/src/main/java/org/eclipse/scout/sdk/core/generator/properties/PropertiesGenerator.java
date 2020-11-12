@@ -117,7 +117,7 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
     try (var reader = new BufferedReader(new CharArrayReader(content))) {
       readHeaderLines(reader);
     }
-    try (Reader reader = new CharArrayReader(content)) {
+    try (var reader = new CharArrayReader(content)) {
       readProperties(reader);
     }
     return this;

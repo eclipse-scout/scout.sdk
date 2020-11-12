@@ -28,6 +28,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
 
 /**
  * <h3>{@link TranslationProposalComputer}</h3>
@@ -72,7 +73,7 @@ public class TranslationProposalComputer implements IJavaCompletionProposalCompu
         var modulePath = context.getCompilationUnit().getJavaProject().getProject().getLocation().toFile().toPath();
 
         return callInEclipseEnvironment(
-            (env, progress) -> TranslationStores.createStack(modulePath, env, progress)
+            (env, progress) -> TranslationStores.createStack(modulePath, env, progress, DependencyScope.JAVA)
                 .map(stack -> collectProposals(stack, prefix, offset))
                 .orElseGet(Collections::emptyList))
                     .result();

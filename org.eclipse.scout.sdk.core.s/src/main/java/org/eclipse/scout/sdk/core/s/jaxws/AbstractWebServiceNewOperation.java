@@ -266,9 +266,9 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     }
   }
 
-  protected Path getWsdlFolder(String wsBaseName) {
-    var wsdlFolderName = wsBaseName.toLowerCase(Locale.ENGLISH);
-    return getWsdlRootFolder(getProjectRoot()).resolve(wsdlFolderName);
+  protected static Path getBindingFolder(Path jaxWsProject, String wsBaseName) {
+    var bindingFolderName = wsBaseName.toLowerCase(Locale.US);
+    return getBindingRootFolder(jaxWsProject).resolve(bindingFolderName);
   }
 
   protected URI getTargetWsdlFileUri(String baseName) {
@@ -298,9 +298,9 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     }
   }
 
-  protected static Path getBindingFolder(Path jaxWsProject, String wsBaseName) {
-    var bindingFolderName = wsBaseName.toLowerCase(Locale.ENGLISH);
-    return getBindingRootFolder(jaxWsProject).resolve(bindingFolderName);
+  protected Path getWsdlFolder(String wsBaseName) {
+    var wsdlFolderName = wsBaseName.toLowerCase(Locale.US);
+    return getWsdlRootFolder(getProjectRoot()).resolve(wsdlFolderName);
   }
 
   protected void createJaxwsBindings(Path wsdlBindingsFolder, IEnvironment env, IProgress progress) {
@@ -318,7 +318,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
           throw new IllegalArgumentException("zero length path found.");
         }
 
-        var partName = pathFileName.toLowerCase(Locale.ENGLISH);
+        var partName = pathFileName.toLowerCase(Locale.US);
         if (partName.endsWith(JaxWsUtils.WSDL_FILE_EXTENSION)) {
           partName = partName.substring(0, partName.length() - JaxWsUtils.WSDL_FILE_EXTENSION.length());
         }

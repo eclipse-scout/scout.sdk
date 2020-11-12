@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
@@ -30,6 +31,7 @@ import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader
 import org.eclipse.scout.sdk.s2i.nls.editor.TranslationNewDialog
+import org.eclipse.scout.sdk.s2i.nlsDependencyScope
 import java.util.stream.Collectors.toList
 
 class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
@@ -39,11 +41,15 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
     override fun getFamilyName(): String = quickFixName
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-        val module = descriptor.psiElement.containingModule() ?: return
-        val psiFile = descriptor.psiElement.containingFile
-        TranslationStoreStackLoader.createModalLoader(module, null, message("searching.text.provider.services"))
-                .withStackCreatedHandler { ApplicationManager.getApplication().invokeLater { showStoreChooser(module, psiFile, it?.stack) } }
-                .queue()
+        applyFix(descriptor.psiElement)
+    }
+
+    fun applyFix(psiElement: PsiElement) {
+        val module = psiElement.containingModule() ?: return
+        val scope = psiElement.nlsDependencyScope() ?: return
+        val psiFile = psiElement.containingFile
+        val stack = TranslationStoreStackLoader.createStack(module, scope)
+        ApplicationManager.getApplication().invokeLater { showStoreChooser(module, psiFile, stack) }
     }
 
     private fun showStoreChooser(module: Module, psiFile: PsiFile, stack: TranslationStoreStack?) {
@@ -59,7 +65,7 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
             return
         }
 
-        val fileEditor = FileEditorManager.getInstance(project).getSelectedEditor(psiFile.virtualFile)
+        val fileEditor = if (psiFile.isPhysical) FileEditorManager.getInstance(project).getSelectedEditor(psiFile.virtualFile) else null
         val editor = if (fileEditor is TextEditor) fileEditor.editor else null
         val popup = JBPopupFactory.getInstance().createListPopup(TranslationStorePopupStep(project, stack, stores), 10)
         if (editor != null) {

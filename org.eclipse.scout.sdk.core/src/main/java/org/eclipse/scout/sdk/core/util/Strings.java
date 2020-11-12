@@ -14,16 +14,17 @@ import static java.lang.System.lineSeparator;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.beans.Introspector;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -58,7 +59,6 @@ public final class Strings {
    *          The second array
    * @return {@code true} if both have equal content or both are {@code null}.
    */
-  @SuppressWarnings("Convert2streamapi")
   public static boolean equals(char[] first, char[] second) {
     //noinspection ArrayEquality
     if (first == second) {
@@ -70,6 +70,7 @@ public final class Strings {
     if (first.length != second.length) {
       return false;
     }
+    //noinspection Convert2streamapi
     for (var i = first.length - 1; i >= 0; i--) {
       if (first[i] != second[i]) {
         return false;
@@ -91,7 +92,6 @@ public final class Strings {
    * @return {@code true} if the two arrays are identical character by character according to the value of
    *         isCaseSensitive or if both are {@code null}.
    */
-  @SuppressWarnings("Convert2streamapi")
   public static boolean equals(char[] first, char[] second, boolean isCaseSensitive) {
     if (isCaseSensitive) {
       return equals(first, second);
@@ -106,6 +106,7 @@ public final class Strings {
     if (first.length != second.length) {
       return false;
     }
+    //noinspection Convert2streamapi
     for (var i = first.length - 1; i >= 0; i--) {
       if (Character.toLowerCase(first[i]) != Character.toLowerCase(second[i])) {
         return false;
@@ -130,7 +131,6 @@ public final class Strings {
    *          The second {@link CharSequence}
    * @return {@code true} if both have equal content or both are {@code null}.
    */
-  @SuppressWarnings("Convert2streamapi")
   public static boolean equals(CharSequence first, CharSequence second) {
     if (first == second) {
       return true;
@@ -141,6 +141,7 @@ public final class Strings {
     if (first.length() != second.length()) {
       return false;
     }
+    //noinspection Convert2streamapi
     for (var i = first.length() - 1; i >= 0; i--) {
       if (first.charAt(i) != second.charAt(i)) {
         return false;
@@ -162,7 +163,6 @@ public final class Strings {
    * @return {@code true} if the two sequences are identical character by character according to the value of
    *         isCaseSensitive or if both are {@code null}.
    */
-  @SuppressWarnings("Convert2streamapi")
   public static boolean equals(CharSequence first, CharSequence second, boolean isCaseSensitive) {
     if (isCaseSensitive) {
       return equals(first, second);
@@ -177,6 +177,7 @@ public final class Strings {
     if (first.length() != second.length()) {
       return false;
     }
+    //noinspection Convert2streamapi
     for (var i = first.length() - 1; i >= 0; i--) {
       if (Character.toLowerCase(first.charAt(i)) != Character.toLowerCase(second.charAt(i))) {
         return false;
@@ -234,9 +235,9 @@ public final class Strings {
    * @throws NullPointerException
    *           if the array is {@code null}.
    */
-  @SuppressWarnings("Convert2streamapi")
   public static int indexOf(char toBeFound, char[] searchIn, int start, int end) {
     var limit = Math.min(end, searchIn.length);
+    //noinspection Convert2streamapi
     for (var i = start; i < limit; ++i) {
       if (toBeFound == searchIn[i]) {
         return i;
@@ -294,9 +295,9 @@ public final class Strings {
    * @throws NullPointerException
    *           if the {@link CharSequence} is {@code null}.
    */
-  @SuppressWarnings("Convert2streamapi")
   public static int indexOf(char toBeFound, CharSequence searchIn, int start, int end) {
     var limit = Math.max(Math.min(end, searchIn.length()), 0);
+    //noinspection Convert2streamapi
     for (var i = start; i < limit; i++) {
       if (toBeFound == searchIn.charAt(i)) {
         return i;
@@ -509,22 +510,23 @@ public final class Strings {
   }
 
   /**
-   * Gets the next index after the given offset at which the current line ends. If invoked for the last line, the array
-   * length (end) is returned.
+   * Gets the next index after the given offset at which the current line ends. If invoked for the last line, the
+   * {@link CharSequence} length (end) is returned.
    *
    * @param searchIn
-   *          The array to search in.
+   *          The {@link CharSequence} to search in.
    * @param offset
-   *          The offset within the array where to start the search.
-   * @return The next line end character after the given offset. If no one can be found the array length is returned.
+   *          The offset within the {@link CharSequence} where to start the search.
+   * @return The next line end character after the given offset. If no one can be found the {@link CharSequence} length
+   *         is returned.
    */
   @SuppressWarnings("HardcodedLineSeparator")
-  public static int nextLineEnd(char[] searchIn, int offset) {
+  public static int nextLineEnd(CharSequence searchIn, int offset) {
     var nlPos = indexOf('\n', searchIn, offset);
     if (nlPos < 0) {
-      return searchIn.length; // no more newline found: search to the end of searchIn
+      return searchIn.length(); // no more newline found: search to the end of searchIn
     }
-    if (nlPos > 0 && searchIn[nlPos - 1] == '\r') {
+    if (nlPos > 0 && searchIn.charAt(nlPos - 1) == '\r') {
       nlPos--;
     }
     return nlPos;
@@ -726,6 +728,30 @@ public final class Strings {
   }
 
   /**
+   * Creates a {@link StringBuilder} holding the content of the file specified.
+   *
+   * @param file
+   *          The file to load. Must not be {@code null}.
+   * @param charset
+   *          The {@link Charset} to use to transform the bytes in the file into characters. Consider using one of the
+   *          {@link StandardCharsets} constants. Must not be {@code null}.
+   * @return A {@link StringBuilder} holding the content.
+   * @apiNote This method is intended for simple cases where it is convenient to read all chars. It is not intended for
+   *          reading large files.
+   * @throws IOException
+   *           If {@link Path} does not point to a readable file or there was an error during read.
+   */
+  public static StringBuilder fromFile(Path file, Charset charset) throws IOException {
+    Ensure.notNull(file);
+    Ensure.notNull(charset);
+    //noinspection NumericCastThatLosesPrecision
+    var size = (int) Files.size(file);
+    try (Reader reader = Files.newBufferedReader(file, charset)) {
+      return read(reader, size);
+    }
+  }
+
+  /**
    * Reads all bytes from the given {@link InputStream} and converts them into a {@link StringBuilder} using the given
    * charset name.<br>
    *
@@ -735,72 +761,18 @@ public final class Strings {
    *          The name of the {@link Charset} to use. Must be supported by the platform.
    * @return A {@link StringBuilder} holding the contents.
    * @throws IOException
-   *           While reading data from the stream or if the given charsetName does not exist on this platform.
+   *           While reading data from the stream.
+   * @throws IllegalCharsetNameException
+   *           If the given charset name is illegal.
+   * @throws IllegalArgumentException
+   *           If the given charset name is null.
+   * @throws UnsupportedCharsetException
+   *           If no support for the named charset is available in this instance of the Java virtual machine.
    * @see Charset#isSupported(String)
+   * @see Charset#forName(String)
    */
   public static StringBuilder fromInputStream(InputStream is, String charsetName) throws IOException {
-    if (!Charset.isSupported(charsetName)) {
-      throw new IOException("Charset '" + charsetName + "' is not supported.");
-    }
     return fromInputStream(is, Charset.forName(charsetName));
-  }
-
-  /**
-   * Creates a {@link String} holding the content of the file specified.
-   *
-   * @param file
-   *          The file to load. Must not be {@code null}.
-   * @param charset
-   *          The {@link Charset} to use to transform the bytes in the file into characters. Consider using one of the
-   *          {@link StandardCharsets} constants. Must not be {@code null}.
-   * @return A {@link String} holding the content.
-   * @throws IOException
-   *           If {@link Path} does not point to a readable file or there was an error during read.
-   */
-  public static String fromFileAsString(Path file, Charset charset) throws IOException {
-    Ensure.notNull(charset);
-    return new String(fileRawBytes(file), charset);
-  }
-
-  /**
-   * Creates a char array holding the content of the file specified.
-   *
-   * @param file
-   *          The file to load. Must not be {@code null}.
-   * @param charset
-   *          The {@link Charset} to use to transform the bytes in the file into characters. Consider using one of the
-   *          {@link StandardCharsets} constants. Must not be {@code null}.
-   * @return The chars of the file.
-   * @throws IOException
-   *           If {@link Path} does not point to a readable file or there was an error during read.
-   */
-  public static char[] fromFileAsChars(Path file, Charset charset) throws IOException {
-    Ensure.notNull(charset);
-    return charset.decode(ByteBuffer.wrap(fileRawBytes(file))).array();
-  }
-
-  /**
-   * Creates a {@link CharSequence} holding the content of the file specified.
-   *
-   * @param file
-   *          The file to load. Must not be {@code null}.
-   * @param charset
-   *          The {@link Charset} to use to transform the bytes in the file into characters. Consider using one of the
-   *          {@link StandardCharsets} constants. Must not be {@code null}.
-   * @return A {@link CharSequence} holding the content.
-   * @throws IOException
-   *           If {@link Path} does not point to a readable file or there was an error during read.
-   */
-  public static CharSequence fromFileAsCharSequence(Path file, Charset charset) throws IOException {
-    return CharBuffer.wrap(fromFileAsChars(file, charset));
-  }
-
-  private static byte[] fileRawBytes(Path file) throws IOException {
-    Ensure.notNull(file);
-    if (!Files.isRegularFile(file) || !Files.isReadable(file)) {
-      throw new IOException(file + " cannot be read.");
-    }
-    return Files.readAllBytes(file);
   }
 
   /**
@@ -817,11 +789,32 @@ public final class Strings {
    *           While reading data from the stream.
    */
   public static StringBuilder fromInputStream(InputStream is, Charset charset) throws IOException {
-    var buffer = new char[8192];
-    var out = new StringBuilder(buffer.length);
+    return fromInputStream(is, charset, -1);
+  }
+
+  /**
+   * Reads all bytes from the given {@link InputStream} and converts them into a {@link StringBuilder} using the given
+   * {@link Charset}.<br>
+   * The specified {@link InputStream} is not closed!
+   *
+   * @param is
+   *          The data source. Must not be {@code null}.
+   * @param charset
+   *          The {@link Charset} to use for the byte-to-char conversion.
+   * @param estimatedSize
+   *          The estimated number of bytes returned by the {@link InputStream} or -1 if unknown.
+   * @return A {@link StringBuilder} holding the contents.
+   * @throws IOException
+   *           While reading data from the stream.
+   */
+  public static StringBuilder fromInputStream(InputStream is, Charset charset, int estimatedSize) throws IOException {
+    return read(new BufferedReader(new InputStreamReader(is, charset)), estimatedSize);
+  }
+
+  private static StringBuilder read(Reader in, int estimatedSize) throws IOException {
     int length;
-    //noinspection resource,IOResourceOpenedButNotSafelyClosed
-    Reader in = new InputStreamReader(is, charset);
+    var buffer = new char[8192];
+    var out = new StringBuilder(estimatedSize > 0 ? estimatedSize : buffer.length);
     while ((length = in.read(buffer)) != INDEX_NOT_FOUND) {
       out.append(buffer, 0, length);
     }
@@ -1098,10 +1091,10 @@ public final class Strings {
     return result;
   }
 
-  @SuppressWarnings("Convert2streamapi")
   private static int getLengthIncreaseGuess(CharSequence text, CharSequence[] searchList, CharSequence[] replacementList) {
     var increase = 0;
     // count the replacement text elements that are larger than their corresponding text being replaced
+    //noinspection Convert2streamapi
     for (var i = 0; i < searchList.length; i++) {
       if (searchList[i] == null || replacementList[i] == null) {
         continue;
@@ -1132,12 +1125,12 @@ public final class Strings {
    * @return {@code true} if the CharSequence is null, empty or whitespace
    * @see #hasText(CharSequence)
    */
-  @SuppressWarnings("Convert2streamapi")
   public static boolean isBlank(CharSequence cs) {
     int strLen;
     if (cs == null || (strLen = cs.length()) == 0) {
       return true;
     }
+    //noinspection Convert2streamapi
     for (var i = 0; i < strLen; i++) {
       if (!Character.isWhitespace(cs.charAt(i))) {
         return false;
@@ -1147,28 +1140,151 @@ public final class Strings {
   }
 
   /**
+   * Case-sensitively checks if str starts with the given prefix
+   * 
+   * @param str
+   *          The {@link CharSequence} to check, may be {@code null}.
+   * @param prefix
+   *          The prefix, may be {@code null}.
+   * @return {@code true} if both sequences are not {@code null} and str case-sensitively starts with the given prefix
+   *         or the prefix has length 0.
+   */
+  public static boolean startsWith(CharSequence str, CharSequence prefix) {
+    return startsWith(str, prefix, true);
+  }
+
+  /**
+   * Checks if str starts with the given prefix
+   *
+   * @param str
+   *          The {@link CharSequence} to check, may be {@code null}.
+   * @param prefix
+   *          The prefix, may be {@code null}.
+   * @param isCaseSensitive
+   *          Specifies if a case-sensitive check should be performed ({@code true}) or not ({@code false}).
+   * @return {@code true} if both sequences are not {@code null} and str starts with the given prefix or the prefix has
+   *         length 0.
+   */
+  @SuppressWarnings("DuplicatedCode")
+  public static boolean startsWith(CharSequence str, CharSequence prefix, boolean isCaseSensitive) {
+    if (str == null || prefix == null) {
+      return false;
+    }
+    var strLength = str.length();
+    var prefixLength = prefix.length();
+    if (strLength < prefixLength) {
+      return false;
+    }
+    if (prefixLength == 0) {
+      return true;
+    }
+
+    var prefixIter = prefix.codePoints().iterator();
+    var strIter = str.codePoints().iterator();
+    if (isCaseSensitive) {
+      while (prefixIter.hasNext() && strIter.hasNext()) {
+        if (prefixIter.nextInt() != strIter.nextInt()) {
+          return false;
+        }
+      }
+    }
+    else {
+      while (prefixIter.hasNext() && strIter.hasNext()) {
+        if (Character.toLowerCase(prefixIter.nextInt()) != Character.toLowerCase(strIter.nextInt())) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Case-sensitively checks if str starts with the given prefix
+   *
+   * @param str
+   *          The {@link String} to check, may be {@code null}.
+   * @param prefix
+   *          The prefix, may be {@code null}.
+   * @return {@code true} if both strings are not {@code null} and str case-sensitively starts with the given prefix or
+   *         the prefix has length 0.
+   */
+  public static boolean startsWith(String str, String prefix) {
+    return startsWith(str, prefix, true);
+  }
+
+  /**
+   * Checks if str starts with the given prefix
+   *
+   * @param str
+   *          The {@link String} to check, may be {@code null}.
+   * @param prefix
+   *          The prefix, may be {@code null}.
+   * @param isCaseSensitive
+   *          Specifies if a case-sensitive check should be performed ({@code true}) or not ({@code false}).
+   * @return {@code true} if both sequences are not {@code null} and str starts with the given prefix or the prefix has
+   *         length 0.
+   */
+  public static boolean startsWith(String str, String prefix, boolean isCaseSensitive) {
+    if (str == null || prefix == null) {
+      return false;
+    }
+    var stringLength = str.length();
+    var prefixLength = prefix.length();
+    return stringLength >= prefixLength
+        && str.regionMatches(!isCaseSensitive, 0, prefix, 0, prefixLength);
+  }
+
+  /**
    * Tests if the string specified ends with the specified suffix.
    *
    * @param string
-   *          The {@link CharSequence} to test
+   *          The {@link CharSequence}, may be {@code null}.
    * @param suffix
-   *          The suffix to search
-   * @return {@code true} if the string ends with the specified suffix or the suffix has length 0. If the string or
-   *         suffix are {@code null} or the string does not end with the suffix specified, {@code false} is returned.
+   *          The suffix to search, may be {@code null}.
+   * @return {@code true} if both sequences are not {@code null} and the string ends with the specified suffix or the
+   *         suffix has length 0.
    */
   public static boolean endsWith(CharSequence string, CharSequence suffix) {
+    return endsWith(string, suffix, true);
+  }
+
+  /**
+   * Tests if the string specified ends with the specified suffix.
+   *
+   * @param string
+   *          The {@link CharSequence} to test, or
+   * @param suffix
+   *          The suffix to search
+   * @param isCaseSensitive
+   *          Specifies if a case-sensitive check should be performed ({@code true}) or not ({@code false}).
+   * @return {@code true} if both sequences are not {@code null} and the string ends with the specified suffix or the
+   *         suffix has length 0.
+   */
+  @SuppressWarnings("DuplicatedCode")
+  public static boolean endsWith(CharSequence string, CharSequence suffix, boolean isCaseSensitive) {
     if (string == null || suffix == null) {
       return false;
     }
-    if (suffix.length() == 0) {
-      return true;
-    }
-    if (string.length() < suffix.length()) {
+    var stringLength = string.length();
+    var suffixLength = suffix.length();
+    if (stringLength < suffixLength) {
       return false;
     }
-    for (int i = string.length() - 1, j = suffix.length() - 1; j >= 0; i--, j--) {
-      if (string.charAt(i) != suffix.charAt(j)) {
-        return false;
+    if (suffixLength == 0) {
+      return true;
+    }
+    if (isCaseSensitive) {
+      for (int i = stringLength - 1, j = suffixLength - 1; j >= 0; i--, j--) {
+        if (string.charAt(i) != suffix.charAt(j)) {
+          return false;
+        }
+      }
+    }
+    else {
+      for (int i = stringLength - 1, j = suffixLength - 1; j >= 0; i--, j--) {
+        if (Character.toLowerCase(string.charAt(i)) != Character.toLowerCase(suffix.charAt(j))) {
+          return false;
+        }
       }
     }
     return true;

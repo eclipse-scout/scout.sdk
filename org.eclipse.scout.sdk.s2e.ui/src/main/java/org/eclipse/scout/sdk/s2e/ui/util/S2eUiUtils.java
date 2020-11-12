@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -446,7 +445,7 @@ public final class S2eUiUtils {
 
   /**
    * Adds all {@link FileRange}s to the {@link FileSearchResult}. The {@link FileSearchResult} is cleared before.
-   * 
+   *
    * @param from
    *          The data source
    * @param to
@@ -457,13 +456,14 @@ public final class S2eUiUtils {
   public static void queryResultToSearchResult(Stream<? extends FileRange> from, FileSearchResult to) {
     to.removeAll();
     from
-        .map(S2eUiUtils::toEclipseMatch)
-        .flatMap(Optional::stream)
+        .flatMap(S2eUiUtils::toEclipseMatch)
         .forEach(to::addMatch);
   }
 
-  static Optional<Match> toEclipseMatch(FileRange range) {
-    return new WorkspaceFile(range.file(), StandardCharsets.UTF_8).inWorkspace()
+  static Stream<Match> toEclipseMatch(FileRange range) {
+    return new WorkspaceFile(range.file(), range.module(), StandardCharsets.UTF_8)
+        .inWorkspace().stream()
+        .filter(IFile::exists)
         .map(iFile -> new Match(iFile, range.start(), range.length()));
   }
 }

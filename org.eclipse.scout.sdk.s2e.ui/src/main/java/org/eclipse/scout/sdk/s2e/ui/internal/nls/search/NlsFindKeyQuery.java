@@ -52,8 +52,9 @@ public class NlsFindKeyQuery extends FileSearchQuery {
 
   @Override
   public IStatus run(IProgressMonitor monitor) {
-    var query = EclipseWorkspaceWalker.executeQuerySync(new TranslationKeysQuery(getNlsKey(), getLabel()), monitor);
-    queryResultToSearchResult(query.result(), getSearchResult());
+    var query = new TranslationKeysQuery(getLabel());
+    EclipseWorkspaceWalker.executeQuerySync(query, monitor);
+    queryResultToSearchResult(query.result(getNlsKey()), getSearchResult());
     return Status.OK_STATUS;
   }
 

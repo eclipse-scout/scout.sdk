@@ -47,6 +47,7 @@ public class TranslationStoresTest {
     assertFalse(isContentAvailable(null));
 
     var store = mock(ITranslationStore.class);
+    when(store.size()).thenReturn(4L);
     when(store.languages()).thenAnswer(invocation -> Stream.empty());
     assertFalse(isContentAvailable(store));
 
@@ -55,5 +56,8 @@ public class TranslationStoresTest {
 
     when(store.languages()).thenAnswer(invocation -> Stream.of(Language.LANGUAGE_DEFAULT));
     assertTrue(isContentAvailable(store));
+
+    when(store.size()).thenReturn(0L);
+    assertFalse(isContentAvailable(store));
   }
 }

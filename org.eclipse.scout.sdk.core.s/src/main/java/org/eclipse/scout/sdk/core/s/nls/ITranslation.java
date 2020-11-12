@@ -59,10 +59,23 @@ public interface ITranslation extends Comparable<ITranslation> {
    *
    * @param language
    *          The {@link Language} for which the text should be returned. The language must match exactly (including
-   *          country and variant of the {@link Language#locale()}). Must not be {@code null}.
+   *          country and variant of the {@link Language#locale()}). As alternative use {@link #bestText(Language)}.
+   *          Must not be {@code null}.
    * @return The translation text or an empty {@link Optional}.
+   * @see #bestText(Language)
    */
   Optional<String> text(Language language);
+
+  /**
+   * Gets the translation text that best suites the given {@link Language}.
+   * 
+   * @param language
+   *          The {@link Language} for which the best matching text should be returned. May be {@code null}. In that
+   *          case the text for the {@link Language#LANGUAGE_DEFAULT} is returned.
+   * @return The best text of this translation that matches the given {@link Language}.
+   * @see #text(Language)
+   */
+  Optional<String> bestText(Language language);
 
   /**
    * @return An unmodifiable view on all language-text mappings of this {@link ITranslation}.

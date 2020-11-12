@@ -42,6 +42,7 @@ public interface ISdkConstants {
   String SUFFIX_WS_SERVICE = SUFFIX_SERVICE;
   String SUFFIX_WS_ENTRY_POINT = "WebServiceEntryPoint";
   String SUFFIX_WS_ENTRY_POINT_DEFINITION = SUFFIX_WS_ENTRY_POINT + "Definition";
+  String SUFFIX_TEXT_PROVIDER_SERVICE = "TextProviderService";
 
   String PREFIX_ABSTRACT = "Abstract";
 

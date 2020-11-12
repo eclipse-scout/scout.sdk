@@ -126,7 +126,7 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
     try {
       var result = new IFile[1];
       owner.accept((IResourceProxyVisitor) proxy -> {
-        if (result[0] == null && proxy.getType() == IResource.FILE && proxy.getName().toLowerCase(Locale.ENGLISH).endsWith('.' + WebServiceEditor.WEB_SERVICE_FILE_EXTENSION)) {
+        if (result[0] == null && proxy.getType() == IResource.FILE && proxy.getName().toLowerCase(Locale.US).endsWith('.' + WebServiceEditor.WEB_SERVICE_FILE_EXTENSION)) {
           var resource = (IFile) proxy.requestResource();
           if (resource.exists()) {
             result[0] = resource;

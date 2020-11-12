@@ -119,7 +119,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
 
   private static void validateOrderRange(double order) {
     if (order > ISdkConstants.DEFAULT_VIEW_ORDER) {
-      var f = NumberFormat.getNumberInstance(Locale.ENGLISH);
+      var f = NumberFormat.getNumberInstance(Locale.US);
       f.setGroupingUsed(false);
       var orderAsString = f.format(order);
       SdkLog.warning("The @Order value {} is very large and therefore may not be precise enough. It is recommended to use a lower value.", orderAsString);
@@ -200,7 +200,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
    * @return The created source {@link String} ready to be placed into a Java file. Never returns {@code null}.
    */
   public static String convertToJavaSource(double order) {
-    var f = NumberFormat.getNumberInstance(Locale.ENGLISH);
+    var f = NumberFormat.getNumberInstance(Locale.US);
     f.setGroupingUsed(false);
     var newOrderStr = f.format(order);
 

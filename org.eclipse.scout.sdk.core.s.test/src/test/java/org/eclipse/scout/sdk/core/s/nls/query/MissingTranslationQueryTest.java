@@ -10,12 +10,13 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.query;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.s.nls.query.TranslationKeysQueryTest.searchIn;
 import static org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.HtmlScoutMessagePattern.textToNextNewLine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 import java.nio.file.Path;
@@ -27,7 +28,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreSupplierExtension;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
@@ -44,7 +48,7 @@ import org.mockito.Mockito;
 public class MissingTranslationQueryTest {
 
   @Test
-  public void testWithTextServicesAvailable(TestingEnvironment env) {
+  public void testWithTextServicesAvailable() {
     var existingKey = "key";
 
     var htmlTestFile = "test.html";
@@ -68,47 +72,47 @@ public class MissingTranslationQueryTest {
     var jsTestFile17 = "test17.js";
     var jsTestFile18 = "test18.js";
 
-    var query = createQueryWithKeys(existingKey);
+    var query = createQueryWithKeys(new String[]{existingKey}, existingKey);
 
-    searchIn(query, javaTestFile1, "abc TEXTS.get(\"aa\") def", env); // finding
-    searchIn(query, javaTestFile2, "abc TEXTS.get(locale, \"bb\") def", env); // finding
-    searchIn(query, javaTestFile3, "abc TEXTS.get(\"cc\", arg1, arg2) def", env); // finding
-    searchIn(query, javaTestFile4, "abc TEXTS.get(locale, \"dd\", arg1, arg2) def", env); // finding
-    searchIn(query, "test5.java", "abc TEXTS.get(\"" + existingKey + "\") def", env); // ignored because key exists
-    searchIn(query, "test6.java", "public static final String CONSTANT = \"" + existingKey + "\";\nTEXTS.get(CONSTANT) def", env); // ignored because key exists
-    searchIn(query, javaTestFileWithNonExistingConstant, "public static final String CONSTANT = \"non_existing\"; TEXTS.get(CONSTANT) def", env); // finding
-    searchIn(query, javaTestFileWithUnresolvableConstant, "abc TEXTS.get(flag ? \"first\" : \"second\") def", env); // ignored because with business logic
-    searchIn(query, "test9.java", "String var = \"" + existingKey + "\";\nTEXTS.get(var) def", env); // ignored because key exists
-    searchIn(query, javaNonExistingVariableTestFile, "String varName = \"non_existing\"; TEXTS.get(varName) def", env); // finding
-    searchIn(query, "test11.java", "abc \"TEXTS.get(locale, \"bb\")\" def", env); // ignored because in string
-    searchIn(query, javaTestFileWithSuffix, "abc TEXTS.get(locale, \"bb\" + suffixVariable) def", env); // weak finding
-    searchIn(query, "test13.java", "abc TEXTS.get(\"bb\" + suffixVariable) def", env); // ignore because of suffix concatenation
+    searchIn(query, javaTestFile1, "abc TEXTS.get(\"aa\") def"); // finding
+    searchIn(query, javaTestFile2, "abc TEXTS.get(locale, \"bb\") def"); // finding
+    searchIn(query, javaTestFile3, "abc TEXTS.get(\"cc\", arg1, arg2) def"); // finding
+    searchIn(query, javaTestFile4, "abc TEXTS.get(locale, \"dd\", arg1, arg2) def"); // finding
+    searchIn(query, "test5.java", "abc TEXTS.get(\"" + existingKey + "\") def"); // ignored because key exists
+    searchIn(query, "test6.java", "public static final String CONSTANT = \"" + existingKey + "\";\nTEXTS.get(CONSTANT) def"); // ignored because key exists
+    searchIn(query, javaTestFileWithNonExistingConstant, "public static final String CONSTANT = \"non_existing\"; TEXTS.get(CONSTANT) def"); // finding
+    searchIn(query, javaTestFileWithUnresolvableConstant, "abc TEXTS.get(flag ? \"first\" : \"second\") def"); // ignored because with business logic
+    searchIn(query, "test9.java", "String var = \"" + existingKey + "\";\nTEXTS.get(var) def"); // ignored because key exists
+    searchIn(query, javaNonExistingVariableTestFile, "String varName = \"non_existing\"; TEXTS.get(varName) def"); // finding
+    searchIn(query, "test11.java", "abc \"TEXTS.get(locale, \"bb\")\" def"); // ignored because in string
+    searchIn(query, javaTestFileWithSuffix, "abc TEXTS.get(locale, \"bb\" + suffixVariable) def"); // weak finding
+    searchIn(query, "test13.java", "abc TEXTS.get(\"bb\" + suffixVariable) def"); // ignore because of suffix concatenation
 
-    searchIn(query, jsTestFile1, "abc '${textKey:ee}' def", env); // finding
-    searchIn(query, jsTestFile2, "abc session.text('ff') def", env); // finding
-    searchIn(query, "test3.js", "abc session.text('gg') def " + TranslationPatterns.IGNORE_MARKER, env); // ignore by marker
-    searchIn(query, "test4.js", "abc session.text('hh') def " + TranslationPatterns.IGNORE_MARKER + "\nnextline", env); // ignore by marker
-    searchIn(query, "test5.js", "abc session.text('ii') def " + TranslationPatterns.IGNORE_MARKER + "\r\nnextline", env); // ignore by marker
-    searchIn(query, jsTestFileWithNonExistingVariable, "abc session.text(variable) def", env); // weak finding
-    searchIn(query, "test7.js", "let variable = '" + existingKey + "'; abc; session.text(variable)} def", env); // ignored because key exists
-    searchIn(query, jsTestFileWithUnresolvableConstant, "let variable = 'non_existing'; abc; session.text(variable)} def", env); // finding
-    searchIn(query, "test9.js", "abc 'session.text(\\'ii\\')}' def \r\nnextline", env); // ignore because in string
-    searchIn(query, "test10.js", "abc /*session.text('ii') */def \r\nnextline", env); // ignore because in comment
-    searchIn(query, "test11.js", "abc session.text('ii'+suffix) def \r\nnextline", env); // ignore because of suffix concatenation
-    searchIn(query, "test12.js", "abc session.text('" + existingKey + "', param, param2) def \r\nnextline", env); // ignored because key exists
-    searchIn(query, "test13.js", "abc ${textKey:ee} def", env); // ignored because json pattern is not in string
-    searchIn(query, "test14.js", "abc '${textKey:ee}' def // " + TranslationPatterns.IGNORE_MARKER, env); // ignored by marker
-    searchIn(query, jsTestFile15, "abc \"${textKey:ee}\" def", env); // finding
-    searchIn(query, jsTestFile16, "abc session.text(\"ff\") def", env); // finding
-    searchIn(query, jsTestFile17, "abc `${textKey:ee}` def", env); // finding
-    searchIn(query, jsTestFile18, "abc session.text(`ff`) def", env); // finding
+    searchIn(query, jsTestFile1, "abc '${textKey:ee}' def"); // finding
+    searchIn(query, jsTestFile2, "abc session.text('ff') def"); // finding
+    searchIn(query, "test3.js", "abc session.text('gg') def " + TranslationPatterns.IGNORE_MARKER); // ignore by marker
+    searchIn(query, "test4.js", "abc session.text('hh') def " + TranslationPatterns.IGNORE_MARKER + "\nnextline"); // ignore by marker
+    searchIn(query, "test5.js", "abc session.text('ii') def " + TranslationPatterns.IGNORE_MARKER + "\r\nnextline"); // ignore by marker
+    searchIn(query, jsTestFileWithNonExistingVariable, "abc session.text(variable) def"); // weak finding
+    searchIn(query, "test7.js", "let variable = '" + existingKey + "'; abc; session.text(variable)} def"); // ignored because key exists
+    searchIn(query, jsTestFileWithUnresolvableConstant, "let variable = 'non_existing'; abc; session.text(variable)} def"); // finding
+    searchIn(query, "test9.js", "abc 'session.text(\\'ii\\')}' def \r\nnextline"); // ignore because in string
+    searchIn(query, "test10.js", "abc /*session.text('ii') */def \r\nnextline"); // ignore because in comment
+    searchIn(query, "test11.js", "abc session.text('ii'+suffix) def \r\nnextline"); // ignore because of suffix concatenation
+    searchIn(query, "test12.js", "abc session.text('" + existingKey + "', param, param2) def \r\nnextline"); // ignored because key exists
+    searchIn(query, "test13.js", "abc ${textKey:ee} def"); // ignored because json pattern is not in string
+    searchIn(query, "test14.js", "abc '${textKey:ee}' def // " + TranslationPatterns.IGNORE_MARKER); // ignored by marker
+    searchIn(query, jsTestFile15, "abc \"${textKey:ee}\" def"); // finding
+    searchIn(query, jsTestFile16, "abc session.text(\"ff\") def"); // finding
+    searchIn(query, jsTestFile17, "abc `${textKey:ee}` def"); // finding
+    searchIn(query, jsTestFile18, "abc session.text(`ff`) def"); // finding
 
-    searchIn(query, htmlTestFile, "abc <scout:message key=\"jj\"> def", env); // finding
-    searchIn(query, "test2.html", "abc <scout:message key=\"jj\"> def <!-- " + TranslationPatterns.IGNORE_MARKER + " -->", env); // ignored by marker
-    searchIn(query, "test3.html", "abc <scout:message akey=\"jj\"> def", env); // ignored because wrong attribute
-    searchIn(query, htmlTestFile4, "abc <scout:message key='jj'> def", env); // finding
-    searchIn(query, "test.xml", "abc <scout:message key=\"kk\"> def", env); // ignore because of file type
-    searchIn(query, "abc/src/main/resources/archetype-resources/test.html", "abc <scout:message key=\"ll\"> def", env); // path ignored
+    searchIn(query, htmlTestFile, "abc <scout:message key=\"jj\"> def"); // finding
+    searchIn(query, "test2.html", "abc <scout:message key=\"jj\"> def <!-- " + TranslationPatterns.IGNORE_MARKER + " -->"); // ignored by marker
+    searchIn(query, "test3.html", "abc <scout:message akey=\"jj\"> def"); // ignored because wrong attribute
+    searchIn(query, htmlTestFile4, "abc <scout:message key='jj'> def"); // finding
+    searchIn(query, "test.xml", "abc <scout:message key=\"kk\"> def"); // ignore because of file type
+    searchIn(query, "abc/src/main/resources/archetype-resources/test.html", "abc <scout:message key=\"ll\"> def"); // path ignored
 
     // verify all findings
     assertEquals(Stream.of(
@@ -159,38 +163,17 @@ public class MissingTranslationQueryTest {
   @Test
   public void testWithNoTextServiceAvailable(TestingEnvironment env) {
     // if no service is found: all keys should be accepted because they are considered to not be part of a Scout module
-    var query = new MissingTranslationQuery();
-    searchIn(query, "test1.java", "TEXTS.get(\"aa\")", env);
+    var query = createQuery(env);
+    searchIn(query, "test1.java", "TEXTS.get(\"aa\")");
     assertEquals(0, query.result().count());
-    assertTrue(MissingTranslationQuery.supportedFileTypes().size() > 0);
-  }
-
-  @Test
-  @ExtendWith(TranslationStoreSupplierExtension.class)
-  public void testScoutJsModuleKeys(TestingEnvironment env) {
-    var query = new MissingTranslationQuery();
-    searchIn(query, "test1.js", "abc; session.text('ui.notExisting.key');", ScoutFixtureHelper.NLS_TEST_DIR, env);
-    searchIn(query, "test2.js", "abc; session.text('" + TranslationStoreSupplierExtension.TRANSLATION_KEY_1 + "');", ScoutFixtureHelper.NLS_TEST_DIR, env); // exists in the ui contributor (referenced text service)
-    searchIn(query, "test3.js", "var test = '" + TranslationStoreSupplierExtension.TRANSLATION_KEY_1 + "'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR, env); // exists in the ui contributor (literal)
-    searchIn(query, "test4.js", "var test = 'ui.does.not.exist.key'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR, env);
-    searchIn(query, "test5.js", "session.text('ui.from');", env); // is not in the scout js module
-
-    assertEquals(Stream.of("test1.js", "test4.js", "test5.js")
-        .sorted()
-        .collect(toList()),
-        query.result()
-            .map(FileRange::file)
-            .map(Path::toString)
-            .sorted()
-            .collect(toList()));
   }
 
   @Test
   public void testTextToNextNewLine() {
-    assertEquals("abc", textToNextNewLine("abc\ndd".toCharArray(), 0));
-    assertEquals("", textToNextNewLine("abc\ndd\r\nxx".toCharArray(), 3));
-    assertEquals("dd", textToNextNewLine("abc\ndd\r\nxxdd".toCharArray(), 4));
-    assertEquals("xdd", textToNextNewLine("abc\ndd\r\nxxdd".toCharArray(), 9));
+    assertEquals("abc", textToNextNewLine("abc\ndd", 0));
+    assertEquals("", textToNextNewLine("abc\ndd\r\nxx", 3));
+    assertEquals("dd", textToNextNewLine("abc\ndd\r\nxxdd", 4));
+    assertEquals("xdd", textToNextNewLine("abc\ndd\r\nxxdd", 9));
   }
 
   protected static void assertFileRange(MissingTranslationQuery query, String fileName, int expectedStart, int expectedEnd, int expectedSeverity) {
@@ -203,10 +186,36 @@ public class MissingTranslationQueryTest {
     assertEquals(expectedSeverity, finding.severity());
   }
 
-  protected static MissingTranslationQuery createQueryWithKeys(String... keys) {
-    var spy = Mockito.spy(MissingTranslationQuery.class);
-    Set<String> existingKeys = new HashSet<>(Arrays.asList(keys));
-    doReturn(Optional.of(existingKeys)).when(spy).accessibleKeysForModule(any(), any(), any());
+  @Test
+  @ExtendWith(TranslationStoreSupplierExtension.class)
+  public void testScoutJsModuleKeys(TestingEnvironment env) {
+    var query = createQuery(env);
+    searchIn(query, "test1.js", "abc; session.text('ui.notExisting.key');", ScoutFixtureHelper.NLS_TEST_DIR);
+    searchIn(query, "test2.js", "abc; session.text('" + TranslationStoreSupplierExtension.TRANSLATION_KEY_1 + "');", ScoutFixtureHelper.NLS_TEST_DIR); // exists in the ui contributor (referenced text service)
+    searchIn(query, "test3.js", "var test = '" + TranslationStoreSupplierExtension.TRANSLATION_KEY_1 + "'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR); // exists in the ui contributor (literal)
+    searchIn(query, "test4.js", "var test = 'ui.does.not.exist.key'; abc; session.text(test);", ScoutFixtureHelper.NLS_TEST_DIR);
+    searchIn(query, "test5.js", "session.text('ui.from');"); // is not in the scout js module
+
+    assertEquals(Stream.of("test1.js", "test4.js", "test5.js")
+        .sorted()
+        .collect(toList()),
+        query.result()
+            .map(FileRange::file)
+            .map(Path::toString)
+            .sorted()
+            .collect(toList()));
+  }
+
+  protected static MissingTranslationQuery createQuery(TestingEnvironment env) {
+    return new MissingTranslationQuery((p, s) -> TranslationStores.forModule(p, env, new NullProgress(), s).collect(toList()));
+  }
+
+  protected static MissingTranslationQuery createQueryWithKeys(String[] javaKeys, String... nodeKeys) {
+    var spy = Mockito.spy(new MissingTranslationQuery((p, s) -> emptyList()));
+    Set<String> existingJavaKeys = new HashSet<>(Arrays.asList(javaKeys));
+    Set<String> existingNodeKeys = new HashSet<>(Arrays.asList(nodeKeys));
+    doReturn(Optional.of(existingJavaKeys)).when(spy).accessibleKeysForModule(any(), eq(DependencyScope.JAVA));
+    doReturn(Optional.of(existingNodeKeys)).when(spy).accessibleKeysForModule(any(), eq(DependencyScope.NODE));
     return spy;
   }
 }

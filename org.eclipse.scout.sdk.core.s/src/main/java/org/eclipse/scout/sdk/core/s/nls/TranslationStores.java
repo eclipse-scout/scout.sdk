@@ -10,19 +10,22 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
@@ -33,7 +36,10 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutChartApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * Main access for Scout translation related data.
@@ -43,7 +49,12 @@ public final class TranslationStores {
   private TranslationStores() {
   }
 
+  private static final DependencyScope[] ALL_SCOPES = Arrays.stream(DependencyScope.values())
+      .filter(scope -> scope != DependencyScope.ALL)
+      .toArray(DependencyScope[]::new);
+
   private static final Set<ITranslationStoreSupplier> SUPPLIERS = new HashSet<>();
+
   private static final Map<String /*npm dependency name*/, Set<String> /* UiTextContributor FQNs */> UI_TEXT_CONTRIBUTORS = new HashMap<>();
   static {
     ScoutApi.allKnown()
@@ -63,7 +74,7 @@ public final class TranslationStores {
 
   /**
    * Registers a new UiTextContributor mapping
-   * 
+   *
    * @param ownerNodeModuleName
    *          The Node module name for which the contributor is created
    * @param contributorFqn
@@ -76,7 +87,7 @@ public final class TranslationStores {
 
   /**
    * Removes all UiTextContributor mappings for the given Node module.
-   * 
+   *
    * @param ownerNodeModuleName
    *          The Node module name for which the contributor should be removed.
    * @return {@code true} if there was a mapping and has been removed. {@code false} if there was no mapping already.
@@ -98,7 +109,7 @@ public final class TranslationStores {
 
   /**
    * Registers a new {@link ITranslationStoreSupplier}
-   * 
+   *
    * @param supplier
    *          The new supplier. Must not be {@code null}.
    * @return {@code true} if this element has not been registered yet. {@code false} if it was already registered and
@@ -110,7 +121,7 @@ public final class TranslationStores {
 
   /**
    * Removes a {@link ITranslationStoreSupplier}.
-   * 
+   *
    * @param supplier
    *          The supplier to remove.
    * @return {@code true} if supplier was removed. {@code false} if it was not registered and therefore could not be
@@ -132,10 +143,15 @@ public final class TranslationStores {
    * The {@link TranslationStoreStack} contains all {@link ITranslationStore}s of the module in the correct order
    * according to the @Order annotation of the corresponding Scout TextProviderService. It also handles translation
    * overriding and modifications to the {@link ITranslationStore}s.
-   * 
+   *
    * @param modulePath
    *          The modulePath for which the stack (containing all accessible stores) should be returned. Points to the
-   *          root folder of the Java/JavaScript module. Must not be {@code null}.
+   *          root folder of the Java/JavaScript module (the folder that contains the pom.xml/package.json). Must not be
+   *          {@code null}.
+   * @param scope
+   *          The {@link DependencyScope} to consider when resolving the visible {@link ITranslationStore} instances.
+   *          The resulting {@link TranslationStoreStack} contains the stores as found according to the scope given. If
+   *          {@code null}, all scopes are searched.
    * @param env
    *          The {@link IEnvironment} of the request. Must not be {@code null}.
    * @param progress
@@ -143,38 +159,116 @@ public final class TranslationStores {
    * @return A new {@link TranslationStoreStack} for the specified {@link Path}.
    * @see TranslationStoreStack
    */
-  public static Optional<TranslationStoreStack> createStack(Path modulePath, IEnvironment env, IProgress progress) {
-    Ensure.notNull(modulePath);
-    Ensure.notNull(env);
-    Ensure.notNull(progress);
-    return Optional.of(new TranslationStoreStack(getAllStoresForModule(modulePath, env, progress)))
-        .filter(stack -> stack.allStores().count() > 0);
+  public static Optional<TranslationStoreStack> createStack(Path modulePath, IEnvironment env, IProgress progress, DependencyScope scope) {
+    return createStack(forModule(modulePath, env, progress, scope));
   }
 
   /**
-   * Gets all accessible {@link ITranslationStore}s for the module at the path given. The stores are in no particular
-   * order. <br/>
-   * For ordered stores use {@link #createStack(Path, IEnvironment, IProgress)}.
-   * 
+   * Creates a {@link TranslationStoreStack} for a Java/JavaScript module.<br>
+   * The {@link TranslationStoreStack} contains all {@link ITranslationStore}s of the module in the correct order
+   * according to the @Order annotation of the corresponding Scout TextProviderService. It also handles translation
+   * overriding and modifications to the {@link ITranslationStore}s.
+   *
    * @param modulePath
-   *          The modulePath for which the {@link ITranslationStore}s should be returned. Points to the root folder of
-   *          the Java/JavaScript module. Must not be {@code null}.
+   *          The modulePath for which the stack (containing all accessible stores) should be returned. Points to the
+   *          root folder of the Java/JavaScript module (the folder that contains the pom.xml/package.json). Must not be
+   *          {@code null}.
+   * @param scopes
+   *          The {@link DependencyScope scopes} to consider when resolving the visible {@link ITranslationStore}
+   *          instances. The resulting {@link TranslationStoreStack} contains the stores as found according to the
+   *          scopes given. If {@code null}, all scopes are searched.
    * @param env
    *          The {@link IEnvironment} of the request. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Must not be {@code null}.
-   * @return all accessible {@link ITranslationStore}s for the module at the path given in no particular order.
+   * @return A new {@link TranslationStoreStack} for the specified {@link Path}.
+   * @see TranslationStoreStack
    */
-  public static Stream<ITranslationStore> allForModule(Path modulePath, IEnvironment env, IProgress progress) {
-    Ensure.notNull(modulePath);
-    Ensure.notNull(env);
-    Ensure.notNull(progress);
-    return getAllStoresForModule(modulePath, env, progress);
+  public static Optional<TranslationStoreStack> createStack(Path modulePath, IEnvironment env, IProgress progress, DependencyScope... scopes) {
+    return createStack(forModule(modulePath, env, progress, scopes));
+  }
+
+  /**
+   * Creates a {@link TranslationStoreStack} for the {@link ITranslationStore stores} given.
+   * 
+   * @param stores
+   *          The {@link ITranslationStore} instances that should be added to the stack. Must not be {@code null}.
+   * @return A {@link TranslationStoreStack} if the {@link Stream} given contains any stores.
+   */
+  public static Optional<TranslationStoreStack> createStack(Stream<ITranslationStore> stores) {
+    return Optional.of(new TranslationStoreStack(stores))
+        .filter(stack -> stack.allStores().count() > 0);
+  }
+
+  /**
+   * Computes all {@link ITranslationStore} instances accessible for the given module.
+   * 
+   * @param modulePath
+   *          The modulePath for which the stores should be returned. Points to the root folder of the Java/JavaScript
+   *          module (the folder that contains the pom.xml/package.json). Must not be {@code null}.
+   * @param env
+   *          The {@link IEnvironment} of the request. Must not be {@code null}.
+   * @param progress
+   *          The {@link IProgress} monitor. Must not be {@code null}.
+   * @param scopes
+   *          The {@link DependencyScope scopes} to consider when resolving the visible {@link ITranslationStore}
+   *          instances. If {@code null}, all scopes are searched.
+   * @return All {@link ITranslationStore} instances accessible in the module given according to the requested
+   *         {@link DependencyScope scopes}.
+   */
+  public static Stream<ITranslationStore> forModule(Path modulePath, IEnvironment env, IProgress progress, DependencyScope... scopes) {
+    return combineSameStores(computeStoresForModule(modulePath, env, progress, scopes));
+  }
+
+  /**
+   * Computes all {@link ITranslationStore} instances accessible for the given module.
+   *
+   * @param modulePath
+   *          The modulePath for which the stores should be returned. Points to the root folder of the Java/JavaScript
+   *          module (the folder that contains the pom.xml/package.json). Must not be {@code null}.
+   * @param env
+   *          The {@link IEnvironment} of the request. Must not be {@code null}.
+   * @param progress
+   *          The {@link IProgress} monitor. Must not be {@code null}.
+   * @param scope
+   *          The {@link DependencyScope} to consider when resolving the visible {@link ITranslationStore} instances. If
+   *          {@code null}, all scopes are searched.
+   * @return All {@link ITranslationStore} instances accessible in the module given according to the requested
+   *         {@link DependencyScope}.
+   */
+  public static Stream<ITranslationStore> forModule(Path modulePath, IEnvironment env, IProgress progress, DependencyScope scope) {
+    return combineSameStores(computeStoresForModule(modulePath, env, progress, scope));
+  }
+
+  static Stream<ITranslationStore> computeStoresForModule(Path modulePath, IEnvironment env, IProgress progress, DependencyScope... scopes) {
+    if (scopes == null || scopes.length < 1) {
+      return computeStoresForModule(modulePath, env, progress, DependencyScope.ALL);
+    }
+
+    var ticksByScope = 10000;
+    progress.init(ticksByScope * scopes.length, "Resolve translation stores for module '{}'.", modulePath);
+    return Arrays.stream(scopes)
+        .flatMap(scope -> computeStoresForModule(modulePath, env, progress.newChild(ticksByScope), scope));
+  }
+
+  static Stream<ITranslationStore> computeStoresForModule(Path modulePath, IEnvironment env, IProgress progress, DependencyScope scope) {
+    if (scope == null || scope == DependencyScope.ALL) {
+      return computeStoresForModule(modulePath, env, progress, ALL_SCOPES);
+    }
+
+    switch (scope) {
+      case JAVA:
+        return forJavaModule(modulePath, env, progress);
+      case NODE:
+        return forNodeModule(modulePath, env, progress);
+      default:
+        throw newFail("Scope not implemented: {}", scope);
+    }
   }
 
   /**
    * Gets all accessible {@link ITranslationStore}s for the Java module at the path given.
-   * 
+   *
    * @param modulePath
    *          The modulePath for which the {@link ITranslationStore}s should be returned. Points to the root folder of
    *          the Java module (the folder holding e.g. the source folder). Must not be {@code null}.
@@ -184,23 +278,18 @@ public final class TranslationStores {
    *          The {@link IProgress} monitor. Must not be {@code null}.
    * @return all {@link ITranslationStore}s accessible to the Java code of the module given in no particular order.
    */
-  public static Stream<ITranslationStore> allForJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
-    Ensure.notNull(modulePath);
-    Ensure.notNull(env);
-    Ensure.notNull(progress);
-
+  static Stream<ITranslationStore> forJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
     var ticksBySupplier = 1000;
     var suppliers = storeSuppliers();
-    progress.init(suppliers.size() * ticksBySupplier, "Search translation stores for {}", modulePath);
-
+    progress.init(suppliers.size() * ticksBySupplier, "Search translation stores for Java module at '{}'.", modulePath);
     return suppliers.stream()
-        .flatMap(supplier -> supplier.all(modulePath, env, progress.newChild(ticksBySupplier)))
+        .flatMap(supplier -> supplier.visibleStoresForJavaModule(modulePath, env, progress.newChild(ticksBySupplier)))
         .filter(TranslationStores::isContentAvailable);
   }
 
   /**
-   * Gets all accessible {@link ITranslationStore}s for the web (npm) module at the path given.
-   * 
+   * Gets all accessible {@link ITranslationStore}s for the Node module at the path given.
+   *
    * @param modulePath
    *          The modulePath for which the {@link ITranslationStore}s should be returned. Points to the root folder of
    *          the web module (the folder containing the package.json file). Must not be {@code null}.
@@ -211,13 +300,16 @@ public final class TranslationStores {
    * @return all {@link ITranslationStore}s accessible to the EcmaScript code of the module given in no particular
    *         order.
    */
-  public static Stream<ITranslationStore> allForWebModule(Path modulePath, IEnvironment env, IProgress progress) {
-    Ensure.notNull(modulePath);
-    Ensure.notNull(env);
-    Ensure.notNull(progress);
-
-    return WebModuleTranslationStores.allForModule(modulePath, env, progress)
+  static Stream<ITranslationStore> forNodeModule(Path modulePath, IEnvironment env, IProgress progress) {
+    SdkLog.debug("Search translation stores for Node module at '{}'.", modulePath);
+    return WebModuleTranslationStores.allForNodeModule(modulePath, env, progress)
         .filter(TranslationStores::isContentAvailable);
+  }
+
+  static Stream<ITranslationStore> combineSameStores(Stream<ITranslationStore> stores) {
+    return stores.collect(toMap(s -> s.service().type().name(), identity(), TranslationStores::mergeStores))
+        .values()
+        .stream();
   }
 
   /**
@@ -237,31 +329,35 @@ public final class TranslationStores {
     var suppliers = storeSuppliers();
     progress.init(ticksBySupplier * suppliers.size(), "Creating translation store for service '{}'.", textService);
     return suppliers.stream()
-        .map(supplier -> supplier.single(textService, progress.newChild(ticksBySupplier)))
+        .map(supplier -> supplier.createStoreForService(textService, progress.newChild(ticksBySupplier)))
         .flatMap(Optional::stream)
         .findFirst();
   }
 
-  static Stream<ITranslationStore> getAllStoresForModule(Path modulePath, IEnvironment env, IProgress progress) {
-    progress.init(20000, "Resolve all translation stores for module '{}'.", modulePath);
-    Supplier<Stream<ITranslationStore>> storesVisibleInJavaDependencies = () -> allForJavaModule(modulePath, env, progress.newChild(10000));
-    Supplier<Stream<ITranslationStore>> storesVisibleInWebDependencies = () -> allForWebModule(modulePath, env, progress.newChild(10000));
-    return Stream.of(storesVisibleInJavaDependencies, storesVisibleInWebDependencies)
-        .flatMap(Supplier::get)
-        .collect(toMap(s -> s.service().type().name(), identity(), TranslationStores::keepLargerStore))
-        .values()
-        .stream();
-  }
-
-  /**
-   * In case the same store is part of the java module list and the web module list: keep the one that contains more
-   * elements (unfiltered)
-   */
-  private static ITranslationStore keepLargerStore(ITranslationStore a, ITranslationStore b) {
-    if (a.size() >= b.size()) {
+  static ITranslationStore mergeStores(ITranslationStore a, ITranslationStore b) {
+    var aIsFiltered = a instanceof FilteredTranslationStore;
+    var bIsFiltered = b instanceof FilteredTranslationStore;
+    if (!aIsFiltered && !bIsFiltered) {
+      // both are unfiltered. Usually they have the same content so it doesn't matter which one to use
+      return a.size() >= b.size() ? a : b;
+    }
+    if (aIsFiltered && !bIsFiltered) {
+      // b is unfiltered. It contains all elements: use it
+      return b;
+    }
+    if (!aIsFiltered) {
+      // a is unfiltered. It contains all elements: use it
       return a;
     }
-    return b;
+    // here a and b are filtered. combine them to a new store holding the union of both filters
+    var filteredA = (FilteredTranslationStore) a;
+    var filteredB = (FilteredTranslationStore) b;
+    var filterA = filteredA.keysFilter();
+    var filterB = filteredB.keysFilter();
+    Set<String> newFilter = new HashSet<>(filterA.size() + filterB.size());
+    newFilter.addAll(filterA);
+    newFilter.addAll(filterB);
+    return new FilteredTranslationStore(filteredA.nestedStore(), newFilter);
   }
 
   static boolean isContentAvailable(ITranslationStore s) {
@@ -279,6 +375,67 @@ public final class TranslationStores {
       return false;
     }
 
+    if (s.size() < 1) {
+      SdkLog.warning("{} does not contain any translations.", s);
+      return false;
+    }
     return true;
+  }
+
+  /**
+   * A translation dependency scope
+   */
+  public enum DependencyScope {
+    /**
+     * Represents the Java classpath dependency scope typically defined in a Maven pom.xml
+     */
+    JAVA,
+
+    /**
+     * Represents the node_modules dependency scope typically defined in a package.json.
+     */
+    NODE,
+
+    /**
+     * Represents all possible dependency scopes.
+     */
+    ALL;
+
+    private static final Map<String, DependencyScope> FILE_TYPE_MAPPING = new HashMap<>(3);
+    static {
+      FILE_TYPE_MAPPING.put(JavaTypes.JAVA_FILE_EXTENSION, DependencyScope.JAVA);
+      FILE_TYPE_MAPPING.put(TranslationPatterns.JS_FILE_EXTENSION, DependencyScope.NODE);
+      FILE_TYPE_MAPPING.put(TranslationPatterns.HTML_FILE_EXTENSION, DependencyScope.JAVA); // message tags are evaluated on the Java backend
+    }
+
+    /**
+     * Gets the {@link DependencyScope} to be used for a file type.
+     * 
+     * @param name
+     *          A file name, file path or file extension (with or without dot). E.g. "MyClass.java" or "java" or "html"
+     *          or "path/to/MyFile.js".
+     * @return An {@link Optional} holding the {@link DependencyScope} if the given name is supported. An empty
+     *         {@link Optional} otherwise.
+     */
+    public static Optional<DependencyScope> forFileExtension(CharSequence name) {
+      return FILE_TYPE_MAPPING
+          .entrySet().stream()
+          .filter(entry -> isOrHasExtension(name, entry.getKey()))
+          .findAny()
+          .map(Entry::getValue);
+    }
+
+    private static boolean isOrHasExtension(CharSequence name, String extension) {
+      return Strings.equals(name, extension, false)
+          || Strings.endsWith(name, '.' + extension, false);
+    }
+
+    /**
+     * @return An unmodifiable {@link Map} containing all file extensions in which Scout translation may exist and the
+     *         corresponding {@link DependencyScope}.
+     */
+    public static Map<String, DependencyScope> supportedFileExtensions() {
+      return unmodifiableMap(FILE_TYPE_MAPPING);
+    }
   }
 }

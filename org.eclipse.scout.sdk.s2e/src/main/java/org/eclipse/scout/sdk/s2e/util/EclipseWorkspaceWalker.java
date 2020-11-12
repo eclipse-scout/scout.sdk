@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2e.util;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableCollection;
 import static java.util.stream.Collectors.toSet;
-import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironment;
+import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.callInEclipseEnvironmentSync;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
 
@@ -28,11 +28,15 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import org.eclipse.core.resources.IFile;
@@ -44,7 +48,6 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -55,7 +58,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
+import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
 
 /**
  * <h3>{@link EclipseWorkspaceWalker}</h3>
@@ -104,7 +107,22 @@ public class EclipseWorkspaceWalker {
    * @return The {@link IFileQueryResult} after execution.
    */
   public static IFileQueryResult executeQuerySync(IFileQuery query, IProgressMonitor monitor) {
-    return callInEclipseEnvironmentSync((e, p) -> executeQueryInWorkspace(query, e, p), monitor);
+    return executeQueryInWorkspace(query, monitor);
+  }
+
+  /**
+   * Executes the query created by the given queryFactory in the current Eclipse workspace. The execution uses default
+   * visit settings (see {@link EclipseWorkspaceWalker}).
+   * 
+   * @param queryFactory
+   *          A factory to create queries requiring an {@link IEnvironment}. The {@link IEnvironment} is valid during
+   *          the execution of the returned query only.
+   * @param monitor
+   *          The {@link IProgressMonitor} to use.
+   * @return The {@link IFileQueryResult} of the {@link IFileQuery}.
+   */
+  public static IFileQueryResult executeQuerySync(BiFunction<IEnvironment, IProgress, IFileQuery> queryFactory, IProgressMonitor monitor) {
+    return callInEclipseEnvironmentSync((e, p) -> executeQueryInWorkspace(queryFactory.apply(e, p), monitor), monitor);
   }
 
   /**
@@ -116,13 +134,19 @@ public class EclipseWorkspaceWalker {
    * @return An {@link IFuture} to control the asynchronous computation (cancel, wait, retrieve result).
    */
   public static IFuture<IFileQueryResult> executeQuery(IFileQuery query) {
-    return callInEclipseEnvironment((e, p) -> executeQueryInWorkspace(query, e, p), null, query.name());
+    var result = new AtomicReference<IFileQueryResult>();
+    return new AbstractJob(query.name()) {
+      @Override
+      protected void execute(IProgressMonitor monitor) {
+        result.set(executeQueryInWorkspace(query, monitor));
+      }
+    }.scheduleWithFuture(0, TimeUnit.MILLISECONDS, result::get);
   }
 
-  protected static IFileQuery executeQueryInWorkspace(IFileQuery query, IEnvironment e, EclipseProgress p) {
+  protected static IFileQuery executeQueryInWorkspace(IFileQuery query, IProgressMonitor monitor) {
     try {
       new EclipseWorkspaceWalker(query.name())
-          .walk((file, progress) -> executeQueryInFile(query, file, e, progress), p.monitor());
+          .walk((file, progress) -> executeQueryInFile(query, file), monitor);
       return query;
     }
     catch (CoreException ex) {
@@ -130,15 +154,9 @@ public class EclipseWorkspaceWalker {
     }
   }
 
-  protected static void executeQueryInFile(IFileQuery query, WorkspaceFile file, IEnvironment env, IProgress progress) {
-    var iFile = file.inWorkspace();
-    if (iFile.isEmpty()) {
-      SdkLog.warning("File '{}' could not be found in the current Eclipse Workspace.", file.path());
-      return;
-    }
-    var modulePath = iFile.get().getProject().getLocation().toFile().toPath();
-    var candidate = new FileQueryInput(file.path(), modulePath, file::content);
-    query.searchIn(candidate, env, progress);
+  protected static void executeQueryInFile(IFileQuery query, WorkspaceFile file) {
+    var candidate = new FileQueryInput(file.path(), file.projectPath(), file::content);
+    query.searchIn(candidate);
   }
 
   /**
@@ -155,6 +173,9 @@ public class EclipseWorkspaceWalker {
     var projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
     var subMonitor = SubMonitor.convert(monitor, taskName(), projects.length * 2);
     for (var root : projects) {
+      if (!root.isAccessible()) {
+        continue;
+      }
       Set<Path> outputLocations = emptySet();
       subMonitor.subTask(root.getName());
       if (isSkipOutputLocation()) {
@@ -212,7 +233,7 @@ public class EclipseWorkspaceWalker {
                 return FileVisitResult.TERMINATE;
               }
               if (allFiltersAccepted(file, attrs)) {
-                visitor.accept(new WorkspaceFile(file, charset), toScoutProgress(monitor));
+                visitor.accept(new WorkspaceFile(file, folder, charset), toScoutProgress(monitor));
               }
               return FileVisitResult.CONTINUE;
             }
@@ -253,7 +274,7 @@ public class EclipseWorkspaceWalker {
     if (path == null) {
       return false;
     }
-    var fileName = path.toString().toLowerCase(Locale.ENGLISH);
+    var fileName = path.toString().toLowerCase(Locale.US);
     return extensionsAccepted().stream().anyMatch(fileName::endsWith);
   }
 
@@ -379,14 +400,16 @@ public class EclipseWorkspaceWalker {
    */
   public static class WorkspaceFile {
     private final Path m_file;
+    private final Path m_projectPath;
     private final Charset m_charset;
-    private final FinalValue<IFile> m_workspaceFile; // loaded on request
-    private char[] m_content; // loaded on request
+    private final FinalValue<List<IFile>> m_workspaceFiles; // loaded on request
+    private CharSequence m_content; // loaded on request
 
-    public WorkspaceFile(Path file, Charset charset) {
+    public WorkspaceFile(Path file, Path projectPath, Charset charset) {
       m_file = Ensure.notNull(file);
+      m_projectPath = Ensure.notNull(projectPath);
       m_charset = Ensure.notNull(charset);
-      m_workspaceFile = new FinalValue<>();
+      m_workspaceFiles = new FinalValue<>();
     }
 
     /**
@@ -397,39 +420,39 @@ public class EclipseWorkspaceWalker {
     }
 
     /**
-     * @return The absolute path to the file on the filesystem
+     * @return The absolute path to the file on the file-system
      */
     public Path path() {
       return m_file;
     }
 
     /**
-     * @return Resolves the file in the Eclipse workspace. Returns an empty {@link Optional} if it could not be found
-     *         (e.g. because the path is not part of the Eclipse workspace).
+     * @return The absolute path to the root of the module that contains the file.
      */
-    public Optional<IFile> inWorkspace() {
-      return Optional.ofNullable(m_workspaceFile.computeIfAbsentAndGet(() -> resolveInWorkspace(path())));
+    public Path projectPath() {
+      return m_projectPath;
     }
 
-    protected static IFile resolveInWorkspace(Path file) {
-      var workspaceFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toUri());
-      if (workspaceFiles.length < 1) {
-        return null;
-      }
-      var workspaceFile = workspaceFiles[0];
-      if (!workspaceFile.exists()) {
-        return null;
-      }
-      return workspaceFile;
+    /**
+     * @return Resolves the {@link IFile IFiles} in the Eclipse workspace pointing to {@link #path()}.
+     */
+    public List<IFile> inWorkspace() {
+      return m_workspaceFiles.computeIfAbsentAndGet(() -> resolveInWorkspace(path()));
+    }
+
+    protected static List<IFile> resolveInWorkspace(Path file) {
+      return Arrays.stream(ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toUri()))
+          .filter(IFile::exists)
+          .collect(toUnmodifiableList());
     }
 
     /**
      * @return The content of the file
      */
-    public char[] content() {
+    public CharSequence content() {
       if (m_content == null) {
         try {
-          m_content = Strings.fromFileAsChars(path(), charset());
+          m_content = Strings.fromFile(path(), charset());
         }
         catch (IOException e) {
           throw new SdkException("Unable to read content of file '{}'.", path(), e);

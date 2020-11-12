@@ -109,7 +109,7 @@ public interface IFuture<V> extends Future<Supplier<V>>, CompletionStage<Supplie
   V result();
 
   /**
-   * Same as {@link #join()} but returns this {@link IFuture} instead of the result value.
+   * Same as {@link #result()} but returns this {@link IFuture} instead of the result value.
    *
    * @return this
    */

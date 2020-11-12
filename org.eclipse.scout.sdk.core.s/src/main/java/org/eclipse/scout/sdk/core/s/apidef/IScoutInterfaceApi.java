@@ -468,4 +468,9 @@ public interface IScoutInterfaceApi {
     String getKeyMethodName();
     String descriptionMethodName();
   }
+
+  IUiTextContributor IUiTextContributor();
+
+  interface IUiTextContributor extends IClassNameSupplier {
+  }
 }

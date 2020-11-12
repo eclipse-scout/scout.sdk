@@ -338,7 +338,7 @@ public final class CoreUtils {
     if (lastDot < 0) {
       return "";
     }
-    return filePath.substring(lastDot + 1).toLowerCase(Locale.ENGLISH);
+    return filePath.substring(lastDot + 1).toLowerCase(Locale.US);
   }
 
   /**

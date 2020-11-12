@@ -34,8 +34,8 @@ class NlsKeysEnumMacro : Macro() {
     override fun calculateResult(params: Array<out Expression>, context: ExpressionContext?): Result? = null
 
     override fun calculateLookupItems(params: Array<out Expression>, context: ExpressionContext?): Array<LookupElement>? {
-        val module = context?.psiElementAtStartOffset?.containingModule() ?: return null
-        return NlsCompletionHelper.computeLookupElements(module)
-                .toArray<LookupElement> { length -> arrayOfNulls(length) }
+        val psiElement = context?.psiElementAtStartOffset ?: return null
+        val module = psiElement.containingModule() ?: return null
+        return NlsCompletionHelper.computeLookupElements(module, psiElement, false).toTypedArray()
     }
 }

@@ -60,4 +60,23 @@ public class TranslationEntryTest {
     assertFalse(a.equals(c));
     assertNotNull(a.toString());
   }
+
+  @Test
+  public void testBestText() {
+    var t = new Translation("whatever");
+    var defaultText = "default";
+    var englishText = "en";
+    var germanSwitzerlandText = "de-CH";
+    t.putText(Language.LANGUAGE_DEFAULT, defaultText);
+    t.putText(Language.parseThrowingOnError("en"), englishText);
+    t.putText(Language.parseThrowingOnError("de_CH"), germanSwitzerlandText);
+    t.putText(Language.parseThrowingOnError("de_DE"), "de-DE");
+    t.putText(Language.parseThrowingOnError("de_DE_x"), "de-DE-x");
+
+    assertEquals(defaultText, t.bestText(null).get());
+    assertEquals(defaultText, t.bestText(Language.parseThrowingOnError("es")).get());
+    assertEquals(englishText, t.bestText(Language.parseThrowingOnError("en_GB")).get());
+    assertEquals(germanSwitzerlandText, t.bestText(Language.parseThrowingOnError("de_CH")).get());
+    assertEquals(defaultText, t.bestText(Language.parseThrowingOnError("de")).get()); // return default because it is unspecified which german locale should win
+  }
 }

@@ -50,7 +50,7 @@ public class NlsFindMissingKeysQuery extends FileSearchQuery {
 
   @Override
   public IStatus run(IProgressMonitor monitor) {
-    var query = EclipseWorkspaceWalker.executeQuerySync(new MissingTranslationQuery(), monitor);
+    var query = EclipseWorkspaceWalker.executeQuerySync(MissingTranslationQuery::new, monitor);
     queryResultToSearchResult(query
         .result()
         .filter(r -> r.severity() >= Level.WARNING.intValue()), getSearchResult());

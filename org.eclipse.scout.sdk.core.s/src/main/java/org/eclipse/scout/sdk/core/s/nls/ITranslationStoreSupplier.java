@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.ITextProviderService;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi.IUiTextContributor;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 
@@ -34,27 +36,41 @@ import org.eclipse.scout.sdk.core.s.environment.IProgress;
 public interface ITranslationStoreSupplier {
 
   /**
-   * Gets all {@link ITranslationStore}s that are available for the module at the {@link Path} specified.
+   * Gets all {@link ITranslationStore}s that are visible for the module at the {@link Path} specified.
    * 
    * @param modulePath
    *          The path for which all accessible stores should be returned. Points to the root folder of the
-   *          Java/JavaScript module. Must not be {@code null}.
+   *          Java/JavaScript module (the folder that contains the pom.xml/package.json). Must not be {@code null}.
    * @param env
    *          The {@link IEnvironment} of the request. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Must not be {@code null}.
    * @return A {@link Stream} with all stores the supplier can provide for the path given. Is never {@code null}.
    */
-  Stream<ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress);
+  Stream<ITranslationStore> visibleStoresForJavaModule(Path modulePath, IEnvironment env, IProgress progress);
+
+  /**
+   * Gets all {@link IUiTextContributor} types visible for the module at the {@link Path} specified.
+   * 
+   * @param modulePath
+   *          The path for which all accessible contributors should be returned. Points to the root folder of the
+   *          Java/JavaScript module (the folder that contains the pom.xml/package.json). Must not be {@code null}.
+   * @param env
+   *          The {@link IEnvironment} of the request. Must not be {@code null}.
+   * @param progress
+   *          The {@link IProgress} monitor. Must not be {@code null}.
+   * @return A {@link Stream} with all contributors accessible to the module given.
+   */
+  Stream<IType> visibleTextContributorsForJavaModule(Path modulePath, IEnvironment env, IProgress progress);
 
   /**
    * Creates a {@link ITranslationStore} holding all data of this single store.
    * 
    * @param textService
-   *          The text provider service for which the data should be loaded. Must not be {@code null}.
+   *          The {@link ITextProviderService} for which the data should be loaded. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Must not be {@code null}.
    * @return An {@link Optional} holding the store if it could be parsed for the {@link IType} given.
    */
-  Optional<ITranslationStore> single(IType textService, IProgress progress);
+  Optional<ITranslationStore> createStoreForService(IType textService, IProgress progress);
 }

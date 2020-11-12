@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.nls;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.uiTextContributorMappings;
+import static org.eclipse.scout.sdk.core.util.StreamUtils.firstBy;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -29,6 +31,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -37,47 +40,65 @@ public final class WebModuleTranslationStores {
   private WebModuleTranslationStores() {
   }
 
-  static Stream<ITranslationStore> allForModule(Path modulePath, IEnvironment env, IProgress progress) {
-    progress.init(1, "Resolve translation stores visible in npm dependencies of module '{}'.", modulePath);
-    var childProgress = progress.newChild(0);
-    Supplier<Stream<ITranslationStore>> packageJsonResolver = () -> resolveStoresReferencedInPackageJson(modulePath, env, childProgress);
-    Supplier<Stream<ITranslationStore>> scoutJsBackendModuleResolver = () -> resolveScoutJsBackendModuleStores(modulePath, env, childProgress);
-    return Stream.of(packageJsonResolver, scoutJsBackendModuleResolver).flatMap(Supplier::get);
+  static Stream<ITranslationStore> allForNodeModule(Path modulePath, IEnvironment env, IProgress progress) {
+    progress.init(20, "Resolve translation stores visible in npm and UiTextContributor dependencies of module '{}'.", modulePath);
+
+    // translations supplied by UiTextContributors (Scout classic case)
+    Supplier<Stream<ITranslationStore>> uiTextContributorResolver = () -> resolveStoresReferencedInUiTextContributors(modulePath, env, progress.newChild(10));
+
+    // translation stores from Java classpath of a corresponding backend module (ScoutJS case)
+    Supplier<Stream<ITranslationStore>> scoutJsBackendModuleResolver = () -> resolveStoresFromScoutJsBackend(modulePath, env, progress.newChild(10));
+
+    return Stream.of(uiTextContributorResolver, scoutJsBackendModuleResolver).flatMap(Supplier::get);
   }
 
-  static Stream<ITranslationStore> resolveStoresReferencedInPackageJson(Path modulePath, IEnvironment env, IProgress progress) {
-    return loadPackageJson(modulePath)
-        .map(WebModuleTranslationStores::getTextContributorsReferencedInPackageJson)
-        .orElseGet(Stream::empty)
-        .flatMap(name -> resolveStoresProvidingTranslationsOfContributor(name, env, progress));
-  }
-
-  static Stream<ITranslationStore> resolveScoutJsBackendModuleStores(Path modulePath, IEnvironment env, IProgress progress) {
-    return Stream.of(new SimpleImmutableEntry<>(".ui", ".app"))
-        .flatMap(nameMapping -> findIncludedModuleBySuffixConvention(modulePath, nameMapping.getKey(), nameMapping.getValue()).stream())
-        .flatMap(targetModulePath -> TranslationStores.allForModule(targetModulePath, env, progress));
-  }
-
-  static Optional<Path> findIncludedModuleBySuffixConvention(Path sourceModulePath, String sourceModuleSuffix, String targetModuleSuffix) {
-    var sourceModuleFolderName = sourceModulePath.getFileName().toString().toLowerCase(Locale.ENGLISH);
-    if (!sourceModuleFolderName.endsWith(sourceModuleSuffix)) {
-      return Optional.empty();
-    }
-    var targetModuleName = sourceModuleFolderName.substring(0, sourceModuleFolderName.length() - sourceModuleSuffix.length()) + targetModuleSuffix;
-    var targetModulePath = sourceModulePath.getParent().resolve(targetModuleName);
-    if (Files.isReadable(targetModulePath) && Files.isDirectory(targetModulePath)) {
-      return Optional.of(targetModulePath);
-    }
-    return Optional.empty();
-  }
-
-  static Stream<ITranslationStore> resolveStoresProvidingTranslationsOfContributor(String contributorFqn, IEnvironment env, IProgress progress) {
-    var textContributorsByModule = env.findType(contributorFqn)
+  static Stream<ITranslationStore> resolveStoresReferencedInUiTextContributors(Path modulePath, IEnvironment env, IProgress progress) {
+    Supplier<Stream<IType>> javaUiTextContributorResolver = () -> resolveTextContributorsReferencedInPom(modulePath, env, progress);
+    Supplier<Stream<IType>> nodeUiTextContributorResolver = () -> resolveTextContributorsReferencedInPackageJson(modulePath, env);
+    var textContributorsByModule = Stream.of(javaUiTextContributorResolver, nodeUiTextContributorResolver)
+        .flatMap(Supplier::get)
+        .filter(firstBy(IType::name))
         .map(type -> createUiTextContributor(type, progress))
         .collect(groupingBy(c -> moduleOfContributor(c, env)));
     return textContributorsByModule
         .entrySet().stream()
         .flatMap(entry -> resolveStoresProvidingTranslationsOfContributor(entry.getKey(), entry.getValue(), env, progress));
+  }
+
+  static Stream<IType> resolveTextContributorsReferencedInPom(Path modulePath, IEnvironment env, IProgress progress) {
+    return TranslationStores.storeSuppliers().stream()
+        .flatMap(supplier -> supplier.visibleTextContributorsForJavaModule(modulePath, env, progress));
+  }
+
+  static Stream<IType> resolveTextContributorsReferencedInPackageJson(Path modulePath, IEnvironment env) {
+    return loadPackageJson(modulePath)
+        .map(WebModuleTranslationStores::getTextContributorsReferencedInPackageJson)
+        .orElseGet(Stream::empty)
+        .flatMap(env::findType);
+  }
+
+  static Stream<ITranslationStore> resolveStoresFromScoutJsBackend(Path modulePath, IEnvironment env, IProgress progress) {
+    var includedModulesByNamingConventions = Stream.of(
+        new SimpleImmutableEntry<>(".ui", ".app"),
+        new SimpleImmutableEntry<>(".ui.html", ".app"),
+        new SimpleImmutableEntry<>(".ui.html", ".ui.html.app"))
+        .map(nameMapping -> findIncludedModuleByNamingConvention(modulePath, nameMapping.getKey(), nameMapping.getValue()))
+        .filter(Objects::nonNull);
+    return Stream.concat(includedModulesByNamingConventions, Stream.of(modulePath) /* always include own module (blocks) */)
+        .flatMap(targetModulePath -> TranslationStores.forModule(targetModulePath, env, progress, DependencyScope.JAVA));
+  }
+
+  static Path findIncludedModuleByNamingConvention(Path sourceModulePath, String sourceModuleSuffix, String targetModuleSuffix) {
+    var sourceModuleFolderName = sourceModulePath.getFileName().toString().toLowerCase(Locale.US);
+    if (!sourceModuleFolderName.endsWith(sourceModuleSuffix)) {
+      return null;
+    }
+    var targetModuleName = sourceModuleFolderName.substring(0, sourceModuleFolderName.length() - sourceModuleSuffix.length()) + targetModuleSuffix;
+    var targetModulePath = sourceModulePath.getParent().resolve(targetModuleName);
+    if (Files.isReadable(targetModulePath) && Files.isDirectory(targetModulePath)) {
+      return targetModulePath;
+    }
+    return null;
   }
 
   static Path moduleOfContributor(UiTextContributor contributor, IEnvironment env) {
@@ -92,26 +113,26 @@ public final class WebModuleTranslationStores {
     if (keysOfContributor.isEmpty()) {
       return Stream.empty();
     }
-    return TranslationStores.allForJavaModule(modulePath, env, progress) // only calculate the visible text services once for each module.
+    return TranslationStores.forModule(modulePath, env, progress, DependencyScope.JAVA) // only calculate the visible text services once for each module.
         .<ITranslationStore> map(store -> new FilteredTranslationStore(store, keysOfContributor))
         .filter(store -> store.entries().count() > 0) // ignore stores that are not mentioned in the contributors
-        .peek(store -> SdkLog.debug("Translation store '{}' found in module '{}' (referenced because of npm dependency).", store, modulePath));
+        .peek(store -> SdkLog.debug("Translation store '{}' found in module '{}' (referenced from accessible UiTextContributor).", store, modulePath));
   }
 
-  static Stream<String> getTextContributorsReferencedInPackageJson(String packageJsonContent) {
+  static Stream<String> getTextContributorsReferencedInPackageJson(CharSequence packageJsonContent) {
     return uiTextContributorMappings().entrySet().stream()
-        .filter(entry -> packageJsonContent.contains(entry.getKey()))
+        .filter(entry -> Strings.indexOf(entry.getKey(), packageJsonContent) >= 0)
         .flatMap(entry -> entry.getValue().stream())
         .distinct();
   }
 
-  static Optional<String> loadPackageJson(Path modulePath) {
+  static Optional<CharSequence> loadPackageJson(Path modulePath) {
     var packageJsonFile = modulePath.resolve("package.json");
     if (!Files.isRegularFile(packageJsonFile) || !Files.isReadable(packageJsonFile)) {
       return Optional.empty();
     }
     try {
-      return Optional.of(Strings.fromFileAsString(packageJsonFile, StandardCharsets.UTF_8));
+      return Optional.of(Strings.fromFile(packageJsonFile, StandardCharsets.UTF_8));
     }
     catch (IOException e) {
       throw new SdkException("Cannot read package.json file to analyze dependency structure.", e);

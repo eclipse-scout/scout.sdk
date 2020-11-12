@@ -75,7 +75,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
   }
 
   public String urlPropertyName() {
-    return "jaxws." + getBaseName().toLowerCase(Locale.ENGLISH) + ".url";
+    return "jaxws." + getBaseName().toLowerCase(Locale.US) + ".url";
   }
 
   protected String getPropertyClassName() {

@@ -245,7 +245,7 @@ public class WebServiceEditor extends FormEditor {
 
     try (var content = Files.walk(wsdlFolder)) {
       Set<WebServiceFormPageInput> services = content
-          .filter(f -> f.getFileName().toString().toLowerCase(Locale.ENGLISH).endsWith(JaxWsUtils.WSDL_FILE_EXTENSION))
+          .filter(f -> f.getFileName().toString().toLowerCase(Locale.US).endsWith(JaxWsUtils.WSDL_FILE_EXTENSION))
           .filter(Files::isReadable)
           .filter(Files::isRegularFile)
           .map(f -> new P_PreloadedWebServiceData(f, getJavaProject(), scoutApi, webServiceEntryPointAnnotatedTypes, webServiceClientAnnotatedTypes, webServiceAnnotatedTypes))

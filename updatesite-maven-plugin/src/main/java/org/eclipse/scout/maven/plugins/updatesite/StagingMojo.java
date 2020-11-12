@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.maven.plugins.updatesite;
 
 import static java.time.LocalDateTime.now;
@@ -296,7 +296,7 @@ public class StagingMojo extends AbstractStagingMojo {
   }
 
   protected static String createTimestamp() {
-    return now(Clock.systemUTC()).format(DateTimeFormatter.ofPattern("yyyyMMdd-hhmmss-SSS", Locale.ENGLISH));
+    return now(Clock.systemUTC()).format(DateTimeFormatter.ofPattern("yyyyMMdd-hhmmss-SSS", Locale.US));
   }
 
   /**

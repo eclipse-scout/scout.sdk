@@ -16,9 +16,8 @@ import static java.util.concurrent.ConcurrentHashMap.newKeySet;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.allForModule;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import java.nio.CharBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -26,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
@@ -38,11 +38,15 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.AbstractTranslationPattern;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery;
+import org.eclipse.scout.sdk.core.util.CompositeObject;
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -64,14 +68,16 @@ public class MissingTranslationQuery implements IFileQuery {
   public static final String JS_TEXTS_FILE_NAME = "texts.js";
 
   private final Map<String, List<AbstractTranslationPattern>> m_searchPatterns;
-  private final Map<Path, Optional<Set<String>>> m_keysByModuleCache;
+  private final Map<CompositeObject, Optional<Set<String>>> m_keysByModuleCache;
   private final Map<Path, Set<FileQueryMatch>> m_matches;
+  private final BiFunction<Path, DependencyScope, List<ITranslationStore>> m_storeSupplier;
 
-  public static Set<String> supportedFileTypes() {
-    return TranslationPatterns.all().map(AbstractTranslationPattern::fileExtension).collect(toSet());
+  public MissingTranslationQuery(IEnvironment env, IProgress progress) {
+    this((p, s) -> TranslationStores.forModule(p, env, progress, s).collect(toList()));
   }
 
-  public MissingTranslationQuery() {
+  public MissingTranslationQuery(BiFunction<Path, DependencyScope, List<ITranslationStore>> storeSupplier) {
+    m_storeSupplier = Ensure.notNull(storeSupplier);
     m_keysByModuleCache = new ConcurrentHashMap<>();
     m_matches = new ConcurrentHashMap<>();
     m_searchPatterns = TranslationPatterns.all().collect(groupingBy(AbstractTranslationPattern::fileExtension));
@@ -95,8 +101,7 @@ public class MissingTranslationQuery implements IFileQuery {
     }
 
     var fileName = fullPath.getFileName().toString();
-    return JAVA_TEXTS_FILE_NAMES.stream()
-        .noneMatch(texts -> texts.equals(fileName));
+    return !JAVA_TEXTS_FILE_NAMES.contains(fileName);
   }
 
   protected static boolean pathContainsSegment(Iterable<Path> path, String name) {
@@ -110,25 +115,27 @@ public class MissingTranslationQuery implements IFileQuery {
   }
 
   @Override
-  public void searchIn(FileQueryInput candidate, IEnvironment env, IProgress progress) {
-    if (!acceptCandidate(candidate)) {
+  public void searchIn(FileQueryInput input) {
+    if (!acceptCandidate(input)) {
       return;
     }
 
-    var patterns = m_searchPatterns.get(candidate.fileExtension());
-    CharSequence content = CharBuffer.wrap(candidate.fileContent());
-    var ticksByPattern = 10000;
-    progress.init(patterns.size() * ticksByPattern, "{}. File: {}", name(), candidate.file());
+    var fileExtension = input.fileExtension();
+    var dependencyScope = DependencyScope.forFileExtension(fileExtension)
+        .orElseThrow(() -> newFail("Unsupported file extension: {}.", fileExtension));
+    var patterns = m_searchPatterns.get(fileExtension);
+    var content = input.fileContent();
     for (var search : patterns) {
       var matcher = search.pattern().matcher(content);
       while (matcher.find()) {
-        checkMatch(matcher, search, candidate, env, progress.newChild(ticksByPattern));
+        checkMatch(matcher, search, input, dependencyScope);
       }
     }
   }
 
-  protected void checkMatch(MatchResult match, AbstractTranslationPattern search, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
+  protected void checkMatch(MatchResult match, AbstractTranslationPattern search, FileQueryInput fileQueryInput, DependencyScope scope) {
     int keyGroup;
+
     if (match.groupCount() > 1) {
       // pattern with optional literal delimiter: '"' for java, ''' for js
       // check if the literal delimiter is present. if not present: not possible to detect the real key -> add to error list.
@@ -136,7 +143,7 @@ public class MissingTranslationQuery implements IFileQuery {
       var noLiteral = Strings.isEmpty(match.group(1)) || Strings.isEmpty(match.group(3));
       if (noLiteral) {
         // is no string literal. might be e variable or concatenation.
-        if (!tryToResolveConstant(match.group(keyGroup), fileQueryInput, env, progress)) {
+        if (!tryToResolveConstant(match.group(keyGroup), fileQueryInput, scope)) {
           // cannot be resolved as constant. register as match for manual review
           registerMatchIfNotIgnored(match, Level.INFO.intValue(), search, fileQueryInput);
         }
@@ -147,24 +154,24 @@ public class MissingTranslationQuery implements IFileQuery {
       // pattern without literal delimiter
       keyGroup = 1;
     }
-    registerMatchIfKeyIsMissing(match, keyGroup, Level.WARNING.intValue(), search, fileQueryInput, env, progress);
+    registerMatchIfKeyIsMissing(match, keyGroup, Level.WARNING.intValue(), search, scope, fileQueryInput);
   }
 
-  protected boolean tryToResolveConstant(String constantName, FileQueryInput fileQueryInput, IEnvironment env, IProgress progress) {
+  protected boolean tryToResolveConstant(String constantName, FileQueryInput fileQueryInput, DependencyScope scope) {
     var findAssignment = new AssignmentPattern(constantName);
-    CharSequence content = CharBuffer.wrap(fileQueryInput.fileContent());
+    var content = fileQueryInput.fileContent();
     var constantMatcher = findAssignment.pattern().matcher(content);
     var constantFound = false;
     while (constantMatcher.find()) {
-      registerMatchIfKeyIsMissing(constantMatcher, 1, Level.WARNING.intValue(), findAssignment, fileQueryInput, env, progress);
+      registerMatchIfKeyIsMissing(constantMatcher, 1, Level.WARNING.intValue(), findAssignment, scope, fileQueryInput);
       constantFound = true;
     }
     return constantFound;
   }
 
-  protected void registerMatchIfKeyIsMissing(MatchResult match, int keyGroup, int severity, AbstractTranslationPattern pattern, FileQueryInput queryInput, IEnvironment env, IProgress progress) {
+  protected void registerMatchIfKeyIsMissing(MatchResult match, int keyGroup, int severity, AbstractTranslationPattern pattern, DependencyScope scope, FileQueryInput queryInput) {
     var key = match.group(keyGroup);
-    if (keyExistsForModule(queryInput.module(), key, env, progress)) {
+    if (keyExistsForModule(queryInput.module(), key, scope)) {
       return;
     }
     registerMatchIfNotIgnored(match, severity, pattern, queryInput);
@@ -176,18 +183,19 @@ public class MissingTranslationQuery implements IFileQuery {
         .ifPresent(m -> m_matches.computeIfAbsent(queryInput.file(), file -> newKeySet()).add(m));
   }
 
-  protected boolean keyExistsForModule(Path modulePath, String key, IEnvironment env, IProgress progress) {
-    return accessibleKeysForModule(modulePath, env, progress)
+  protected boolean keyExistsForModule(Path modulePath, String key, DependencyScope scope) {
+    return accessibleKeysForModule(modulePath, scope)
         .map(keys -> keys.contains(key))
         .orElse(true); // no stack could be created: the module is no scout module (no TextProviderService visible, but at least the Scout service should be available). In that case no markers should be created.
   }
 
-  protected Optional<Set<String>> accessibleKeysForModule(Path modulePath, IEnvironment env, IProgress progress) {
-    return m_keysByModuleCache.computeIfAbsent(modulePath, mp -> computeAccessibleKeysForModule(mp, env, progress));
+  protected Optional<Set<String>> accessibleKeysForModule(Path modulePath, DependencyScope scope) {
+    var key = new CompositeObject(modulePath, scope);
+    return m_keysByModuleCache.computeIfAbsent(key, mp -> computeAccessibleKeysForModule(modulePath, scope));
   }
 
-  protected static Optional<Set<String>> computeAccessibleKeysForModule(Path modulePath, IEnvironment env, IProgress progress) {
-    var stores = allForModule(modulePath, env, progress).collect(toList());
+  protected Optional<Set<String>> computeAccessibleKeysForModule(Path modulePath, DependencyScope scope) {
+    var stores = m_storeSupplier.apply(modulePath, scope);
     if (stores.isEmpty()) {
       return Optional.empty(); // no stores found: it is no scout module. This module will be ignored in the search (no missing translations).
     }

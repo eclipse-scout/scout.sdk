@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 public class FileRange {
 
   private final Path m_file;
+  private final Path m_module;
   private final CharSequence m_textOfRange;
   private final int m_start;
   private final int m_end;
@@ -37,8 +38,9 @@ public class FileRange {
    * @param end
    *          The zero based end index.
    */
-  public FileRange(Path file, CharSequence textOfRange, int start, int end) {
+  public FileRange(Path file, Path modulePath, CharSequence textOfRange, int start, int end) {
     m_file = Ensure.notNull(file);
+    m_module = Ensure.notNull(modulePath);
     m_textOfRange = Ensure.notNull(textOfRange);
     m_start = start;
     m_end = end;
@@ -49,6 +51,13 @@ public class FileRange {
    */
   public Path file() {
     return m_file;
+  }
+
+  /**
+   * @return The absolute path to the java module that contains the {@link #file()}.
+   */
+  public Path module() {
+    return m_module;
   }
 
   /**

@@ -14,6 +14,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseLanguageFromFileName;
+import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -41,7 +42,9 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
@@ -66,24 +69,28 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicPrimaryTypeFilter;
 public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplier {
 
   @Override
-  @SuppressWarnings("resource") // false positive
-  public Stream<ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress) {
+  public Stream<ITranslationStore> visibleStoresForJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
     var e = EclipseEnvironment.narrow(env);
-    var p = EclipseEnvironment.toScoutProgress(progress);
+    var p = toScoutProgress(progress);
     return e.findJavaProject(modulePath)
         .map(jp -> visibleTranslationStores(jp, e, p))
         .orElseGet(Stream::empty);
   }
 
-  @Override
-  public Optional<ITranslationStore> single(org.eclipse.scout.sdk.core.model.api.IType textService, IProgress progress) {
-    progress.init(1, "Search properties text provider service.");
-    return createTranslationStore(textService, progress);
-  }
-
-  private static Stream<ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, @SuppressWarnings("TypeMayBeWeakened") EclipseProgress progress) {
+  private static Stream<ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, EclipseProgress progress) {
     progress.init(20, "Search properties text provider services.");
 
+    var dynamicNlsTextProviderServices = resolveSubClasses(jp, IScoutApi::AbstractDynamicNlsTextProviderService, env, progress.newChild(10)).collect(toList());
+    var loopProgress = progress
+        .newChild(10)
+        .setWorkRemaining(dynamicNlsTextProviderServices.size());
+
+    return dynamicNlsTextProviderServices.stream()
+        .map(svc -> createTranslationStore(svc, loopProgress))
+        .flatMap(Optional::stream);
+  }
+
+  private static Stream<org.eclipse.scout.sdk.core.model.api.IType> resolveSubClasses(IJavaProject jp, Function<IScoutApi, IClassNameSupplier> nameFunction, EclipseEnvironment env, EclipseProgress progress) {
     var scoutApi = ApiHelper.scoutApiFor(jp, env);
     if (scoutApi.isEmpty()) {
       return Stream.empty();
@@ -104,16 +111,25 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
       }
     };
 
-    var abstractDynamicNlsTextProviderSvcFqn = scoutApi.get().AbstractDynamicNlsTextProviderService().fqn();
-    var dynamicNlsTextProviderServices = JdtUtils.findTypesInStrictHierarchy(jp, abstractDynamicNlsTextProviderSvcFqn, progress.newChild(10).monitor(), filter);
-    var loopProgress = progress
-        .newChild(10)
-        .setWorkRemaining(dynamicNlsTextProviderServices.size());
+    var fqn = nameFunction.apply(scoutApi.get()).fqn();
+    return JdtUtils.findTypesInStrictHierarchy(jp, fqn, progress.monitor(), filter).stream()
+        .map(env::toScoutType);
+  }
 
-    return dynamicNlsTextProviderServices.stream()
-        .map(env::toScoutType)
-        .map(svc -> createTranslationStore(svc, loopProgress))
-        .flatMap(Optional::stream);
+  @Override
+  public Optional<ITranslationStore> createStoreForService(org.eclipse.scout.sdk.core.model.api.IType textService, IProgress progress) {
+    progress.init(1, "Search properties text provider service.");
+    return createTranslationStore(textService, progress);
+  }
+
+  @Override
+  public Stream<org.eclipse.scout.sdk.core.model.api.IType> visibleTextContributorsForJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
+    progress.init(20, "Search UiTextContributors.");
+    var e = EclipseEnvironment.narrow(env);
+    var p = toScoutProgress(progress);
+    return e.findJavaProject(modulePath)
+        .map(jp -> resolveSubClasses(jp, IScoutApi::IUiTextContributor, e, p))
+        .orElseGet(Stream::empty);
   }
 
   private static Optional<ITranslationStore> createTranslationStore(org.eclipse.scout.sdk.core.model.api.IType textProviderServiceType, IProgress progress) {

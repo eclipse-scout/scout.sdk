@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project
 import org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener
 import org.eclipse.scout.sdk.s2i.classid.ClassIdCache
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
+import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache
 import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
@@ -35,5 +36,9 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
     fun autoCreateClassIdListener(project: Project): AutoCreateClassIdListener =
             ServiceManager.getService(project, AutoCreateClassIdListener::class.java)
 
-    fun classIdCache(project: Project): ClassIdCache = ServiceManager.getService(project, ClassIdCache::class.java)
+    fun classIdCache(project: Project): ClassIdCache =
+            ServiceManager.getService(project, ClassIdCache::class.java)
+
+    fun translationStoreStackCache(project: Project): TranslationStoreStackCache =
+            ServiceManager.getService(project, TranslationStoreStackCache::class.java)
 }

@@ -11,10 +11,10 @@
 
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.util.Locale
 import java.time.Clock
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 val scoutSdkVersion = "11.0.0-SNAPSHOT"
 val scoutSdkPluginVersion = scoutSdkVersion.replace("-SNAPSHOT", "." + timestamp())
@@ -27,7 +27,7 @@ val kotlinVersion = "1.3"
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
     // returned number must be a valid integer (not too big)
-    return now.format(DateTimeFormatter.ofPattern("yyMMddHHmm", Locale.ENGLISH))
+    return now.format(DateTimeFormatter.ofPattern("yyMMddHHmm", Locale.US))
 }
 
 fun projectPropertyOr(propertyKey: String, defaultValue: String): String {

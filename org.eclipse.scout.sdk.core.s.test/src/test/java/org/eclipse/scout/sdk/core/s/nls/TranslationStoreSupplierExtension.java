@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.ITranslationPropertiesFile;
@@ -102,7 +103,7 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
   }
 
   public static TranslationStoreStack testingStack(IEnvironment env) {
-    return createStack(Paths.get(""), env, new NullProgress())
+    return createStack(Paths.get(""), env, new NullProgress(), DependencyScope.ALL)
         .orElseThrow(TranslationStoreSupplierExtension::createExtensionNotRegisteredError);
   }
 
@@ -190,14 +191,19 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
     }
 
     @Override
-    public Stream<ITranslationStore> all(Path modulePath, IEnvironment env, IProgress progress) {
+    public Stream<ITranslationStore> visibleStoresForJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
       return Stream.of(
           createTestingStore(env, false, ScoutTextProviderService.class.getName(), m_dir),
           createTestingStore(env, true, ScoutSecurityTextProviderService.class.getName(), m_dir));
     }
 
     @Override
-    public Optional<ITranslationStore> single(IType textService, IProgress progress) {
+    public Stream<IType> visibleTextContributorsForJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
+      return Stream.empty();
+    }
+
+    @Override
+    public Optional<ITranslationStore> createStoreForService(IType textService, IProgress progress) {
       return Optional.of(createTestingStore(textService, false, m_dir));
     }
   }

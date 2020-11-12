@@ -10,24 +10,17 @@
  */
 package org.eclipse.scout.sdk.core.s.util.search;
 
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.environment.IProgress;
-
 /**
  * Represents a query executed on a set of files.
  */
 public interface IFileQuery extends IFileQueryResult {
 
   /**
-   * Performs the query search on the candidate given.
+   * Performs the query search on the input given.
    * 
-   * @param candidate
+   * @param input
    *          The {@link FileQueryInput} to search in. Must not be {@code null}.
-   * @param env
-   *          The {@link IEnvironment} which may be used by the query. Must not be {@code null}.
-   * @param progress
-   *          To report progress of the query. Must not be {@code null}.
    */
-  void searchIn(FileQueryInput candidate, IEnvironment env, IProgress progress);
+  void searchIn(FileQueryInput input);
 
 }

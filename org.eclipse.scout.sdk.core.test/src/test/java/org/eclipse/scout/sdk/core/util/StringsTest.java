@@ -16,9 +16,7 @@ import static org.eclipse.scout.sdk.core.util.Strings.countMatches;
 import static org.eclipse.scout.sdk.core.util.Strings.endsWith;
 import static org.eclipse.scout.sdk.core.util.Strings.ensureStartWithUpperCase;
 import static org.eclipse.scout.sdk.core.util.Strings.escapeHtml;
-import static org.eclipse.scout.sdk.core.util.Strings.fromFileAsCharSequence;
-import static org.eclipse.scout.sdk.core.util.Strings.fromFileAsChars;
-import static org.eclipse.scout.sdk.core.util.Strings.fromFileAsString;
+import static org.eclipse.scout.sdk.core.util.Strings.fromFile;
 import static org.eclipse.scout.sdk.core.util.Strings.fromInputStream;
 import static org.eclipse.scout.sdk.core.util.Strings.fromStringLiteral;
 import static org.eclipse.scout.sdk.core.util.Strings.fromThrowable;
@@ -45,7 +43,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.CharBuffer;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -82,25 +82,17 @@ public class StringsTest {
 
   @Test
   public void testFromFile() throws IOException {
-    assertThrows(IOException.class, () -> fromFileAsString(Paths.get("not.existing.file"), StandardCharsets.UTF_8));
-    assertThrows(IOException.class, () -> fromFileAsChars(Paths.get("not.existing.file"), StandardCharsets.UTF_8));
-    assertThrows(IOException.class, () -> fromFileAsCharSequence(Paths.get("not.existing.file"), StandardCharsets.UTF_8));
-    assertThrows(IllegalArgumentException.class, () -> fromFileAsString(Paths.get("not.existing.file"), null));
-    assertThrows(IllegalArgumentException.class, () -> fromFileAsChars(Paths.get("not.existing.file"), null));
-    assertThrows(IllegalArgumentException.class, () -> fromFileAsCharSequence(Paths.get("not.existing.file"), null));
-    assertThrows(IllegalArgumentException.class, () -> fromFileAsString(null, StandardCharsets.UTF_8));
-    assertThrows(IllegalArgumentException.class, () -> fromFileAsChars(null, StandardCharsets.UTF_8));
-    assertThrows(IllegalArgumentException.class, () -> fromFileAsCharSequence(null, StandardCharsets.UTF_8));
+    assertThrows(IOException.class, () -> fromFile(Paths.get("not.existing.file"), StandardCharsets.UTF_8));
+    assertThrows(IllegalArgumentException.class, () -> fromFile(Paths.get("not.existing.file"), null));
+    assertThrows(IllegalArgumentException.class, () -> fromFile(null, StandardCharsets.UTF_8));
 
-    var testFileContent = "testcontent\nnewline";
+    var testFileContent = "testcontent\nnewline\n👌👌";
     var testFile = Files.createTempFile("scoutSdkTestFile", ".txt");
     try {
       // write test content
       Files.write(testFile, testFileContent.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 
-      assertEquals(testFileContent, fromFileAsCharSequence(testFile, StandardCharsets.UTF_8).toString());
-      assertArrayEquals(testFileContent.toCharArray(), fromFileAsChars(testFile, StandardCharsets.UTF_8));
-      assertEquals(testFileContent, fromFileAsString(testFile, StandardCharsets.UTF_8));
+      assertEquals(testFileContent, fromFile(testFile, StandardCharsets.UTF_8).toString());
     }
     finally {
       Files.delete(testFile);
@@ -132,6 +124,24 @@ public class StringsTest {
     assertTrue(endsWith("aa  ", " "));
     assertTrue(endsWith("", ""));
     assertTrue(endsWith("abcd", "abcd"));
+    assertTrue(endsWith("ABcd", "cd"));
+
+    assertTrue(endsWith("", "", false));
+    assertTrue(endsWith("abc", "", false));
+    assertFalse(endsWith(null, "", false));
+    assertFalse(endsWith("abc", null, false));
+    assertFalse(endsWith("", null, false));
+    assertFalse(endsWith(null, null, false));
+    assertFalse(endsWith(null, "abc", false));
+    assertFalse(endsWith("abc", "de", false));
+    assertFalse(endsWith("abc", "abcde", false));
+    assertTrue(endsWith("aabc", "bc", false));
+    assertTrue(endsWith("aa  ", " ", false));
+    assertTrue(endsWith("", "", false));
+    assertTrue(endsWith("abcd", "abcd", false));
+    assertTrue(endsWith("abcd", "abCd", false));
+    assertTrue(endsWith("abcd", "abCD", false));
+    assertTrue(endsWith("abcd", "CD", false));
   }
 
   @Test
@@ -159,7 +169,9 @@ public class StringsTest {
 
   @Test
   public void testInputStreamToStringWrongCharset() {
-    assertThrows(IOException.class, () -> fromInputStream(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_16LE)), "not-existing"));
+    assertThrows(UnsupportedCharsetException.class, () -> fromInputStream(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_16LE)), "not-existing"));
+    assertThrows(IllegalArgumentException.class, () -> fromInputStream(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_16LE)), (String) null));
+    assertThrows(IllegalCharsetNameException.class, () -> fromInputStream(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_16LE)), "##"));
   }
 
   @Test
@@ -445,17 +457,17 @@ public class StringsTest {
 
   @Test
   public void testNextLineEnd() {
-    assertEquals(3, nextLineEnd("abc".toCharArray(), 0));
-    assertEquals(5, nextLineEnd("first\nsecond\nthird".toCharArray(), 0));
-    assertEquals(12, nextLineEnd("first\nsecond\nthird".toCharArray(), 6));
-    assertEquals(12, nextLineEnd("first\nsecond\r\nthird".toCharArray(), 6));
-    assertEquals(19, nextLineEnd("first\nsecond\r\nthird".toCharArray(), 14));
-    assertEquals(19, nextLineEnd("first\nsecond\r\nthird".toCharArray(), 100));
-    assertEquals(3, nextLineEnd("abc\n".toCharArray(), 0));
-    assertEquals(3, nextLineEnd("abc\r\n".toCharArray(), 0));
-    assertEquals(3, nextLineEnd("abc\r\n".toCharArray(), 3));
-    assertEquals(3, nextLineEnd("abc\r\n".toCharArray(), 4));
-    assertEquals(0, nextLineEnd("\nsecond".toCharArray(), 0));
+    assertEquals(3, nextLineEnd("abc", 0));
+    assertEquals(5, nextLineEnd("first\nsecond\nthird", 0));
+    assertEquals(12, nextLineEnd("first\nsecond\nthird", 6));
+    assertEquals(12, nextLineEnd("first\nsecond\r\nthird", 6));
+    assertEquals(19, nextLineEnd("first\nsecond\r\nthird", 14));
+    assertEquals(19, nextLineEnd("first\nsecond\r\nthird", 100));
+    assertEquals(3, nextLineEnd("abc\n", 0));
+    assertEquals(3, nextLineEnd("abc\r\n", 0));
+    assertEquals(3, nextLineEnd("abc\r\n", 3));
+    assertEquals(3, nextLineEnd("abc\r\n", 4));
+    assertEquals(0, nextLineEnd("\nsecond", 0));
   }
 
   @Test
@@ -478,6 +490,42 @@ public class StringsTest {
     assertEquals("akdf", replace("asdf", 's', 'k').toString());
     assertEquals("ksdf", replace("asdf", 'a', 'k').toString());
     assertEquals("asdk", replace("asdf", 'f', 'k').toString());
+  }
+
+  @Test
+  public void testStartsWithString() {
+    assertFalse(Strings.startsWith(null, null));
+    assertFalse(Strings.startsWith("a", null));
+    assertFalse(Strings.startsWith(null, "b"));
+    assertFalse(Strings.startsWith("abc", "abcd"));
+    assertFalse(Strings.startsWith("a👌b", "abc"));
+    assertTrue(Strings.startsWith("a👌b", "a👌b"));
+    assertTrue(Strings.startsWith("abc", "ab"));
+    assertFalse(Strings.startsWith("abc", "aB"));
+    assertFalse(Strings.startsWith("ab", "👌👌"));
+
+    assertFalse(Strings.startsWith("abc", "abcd", false));
+    assertFalse(Strings.startsWith("a👌b", "abc", false));
+    assertTrue(Strings.startsWith("a👌b", "A👌B", false));
+    assertTrue(Strings.startsWith("abc", "AB", false));
+  }
+
+  @Test
+  public void testStartsWithCharSequence() {
+    assertFalse(Strings.startsWith(null, null));
+    assertFalse(Strings.startsWith("a", null));
+    assertFalse(Strings.startsWith(null, "b"));
+    assertFalse(Strings.startsWith(CharBuffer.wrap("abc"), CharBuffer.wrap("abcd")));
+    assertFalse(Strings.startsWith(CharBuffer.wrap("a👌b"), CharBuffer.wrap("abc")));
+    assertTrue(Strings.startsWith(CharBuffer.wrap("a👌b"), CharBuffer.wrap("a👌b")));
+    assertTrue(Strings.startsWith(CharBuffer.wrap("abc"), CharBuffer.wrap("ab")));
+    assertFalse(Strings.startsWith(CharBuffer.wrap("abc"), CharBuffer.wrap("aB")));
+    assertFalse(Strings.startsWith(CharBuffer.wrap("ab"), CharBuffer.wrap("👌👌")));
+
+    assertFalse(Strings.startsWith(CharBuffer.wrap("abc"), CharBuffer.wrap("abcd"), false));
+    assertFalse(Strings.startsWith(CharBuffer.wrap("a👌b"), CharBuffer.wrap("abc"), false));
+    assertTrue(Strings.startsWith(CharBuffer.wrap("a👌b"), CharBuffer.wrap("A👌B"), false));
+    assertTrue(Strings.startsWith(CharBuffer.wrap("abc"), CharBuffer.wrap("AB"), false));
   }
 
   @Test

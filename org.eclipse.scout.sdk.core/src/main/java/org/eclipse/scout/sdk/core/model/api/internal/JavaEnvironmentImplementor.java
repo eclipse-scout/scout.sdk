@@ -52,7 +52,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class JavaEnvironmentImplementor implements IJavaEnvironment {
   private final JavaEnvironmentSpi m_spi;
   private FinalValue<List<IClasspathEntry>> m_sourceFoldersSorted;
-  private final Map<Class<? extends IApiSpecification>, IApiSpecification> m_apiCache;
+  private final Map<Class<? extends IApiSpecification>, Optional<? extends IApiSpecification>> m_apiCache;
 
   public JavaEnvironmentImplementor(JavaEnvironmentSpi spi) {
     m_spi = spi;
@@ -153,8 +153,8 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   @SuppressWarnings("unchecked")
   public <A extends IApiSpecification> Optional<A> api(Class<A> apiDefinition) {
     var key = apiDefinition == null ? (Class<A>) IApiSpecification.class : apiDefinition;
-    var api = (A) m_apiCache.computeIfAbsent(key, this::createApi);
-    return Optional.ofNullable(api); // is empty in case the apiDefinition class is null or the API could not be found in this environment.
+    var api = m_apiCache.computeIfAbsent(key, this::createApi);
+    return (Optional<A>) api; // is empty in case the apiDefinition class is null or the API could not be found in this environment.
   }
 
   @Override
@@ -162,11 +162,11 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
     return api(apiDefinition).orElseThrow(() -> newFail("API '{}' could not be found.", apiDefinition.getSimpleName()));
   }
 
-  protected <A extends IApiSpecification> A createApi(Class<A> apiDefinition) {
+  protected <A extends IApiSpecification> Optional<A> createApi(Class<A> apiDefinition) {
     if (apiDefinition == IApiSpecification.class) {
-      return null;
+      return Optional.empty();
     }
-    return Api.create(apiDefinition, this).orElse(null);
+    return Api.create(apiDefinition, this);
   }
 
   @Override

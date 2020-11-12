@@ -122,7 +122,7 @@ public final class MavenModuleVersion {
     if (entry.isDirectory()) {
       return false;
     }
-    var fileName = entry.path().getFileName().toString().toLowerCase(Locale.ENGLISH);
+    var fileName = entry.path().getFileName().toString().toLowerCase(Locale.US);
     // fileName is of form "org.eclipse.scout.rt.platform-10.0.5.jar" or "org.eclipse.scout.rt.platform-10.0.5-sources.jar"
     return fileName.endsWith(".jar")
         && fileName.startsWith(moduleName + '-')

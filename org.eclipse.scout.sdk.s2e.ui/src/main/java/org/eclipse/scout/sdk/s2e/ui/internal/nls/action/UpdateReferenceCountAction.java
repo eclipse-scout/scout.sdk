@@ -43,7 +43,7 @@ public class UpdateReferenceCountAction extends Action {
   public void run() {
     setEnabled(false);
 
-    EclipseWorkspaceWalker.executeQuery(new TranslationKeysQuery(m_controller.stack(), getText()))
+    EclipseWorkspaceWalker.executeQuery(new TranslationKeysQuery(getText()))
         .whenComplete(this::handleEndSearch);
   }
 

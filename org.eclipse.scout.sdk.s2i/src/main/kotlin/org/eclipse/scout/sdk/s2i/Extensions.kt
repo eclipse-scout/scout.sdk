@@ -11,8 +11,9 @@
 package org.eclipse.scout.sdk.s2i
 
 import com.intellij.lang.java.JavaLanguage
+import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleUtil
+import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
@@ -42,6 +43,13 @@ import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
+import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
+import org.eclipse.scout.sdk.core.s.nls.Language
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope
+import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
+import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
+import org.eclipse.scout.sdk.core.s.nls.properties.ReadOnlyTranslationFile
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
@@ -51,6 +59,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInRe
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import org.eclipse.scout.sdk.s2i.util.ApiHelper
+import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.function.Function
@@ -60,7 +69,7 @@ import java.util.stream.Stream
  * @return The [PsiClass] corresponding to this [IType].
  */
 fun IType.resolvePsi(): PsiClass? {
-    val module = this.javaEnvironment().toIdea().module
+    val module = javaEnvironment().toIdea().module
     return computeInReadAction(module.project) {
         module.findTypeByName(name())
     }
@@ -71,11 +80,14 @@ fun ProgressIndicator.toScoutProgress(): IdeaProgress = IdeaProgress(this)
 /**
  * @return the module source root (source folder) or library source root in which this PsiElement exists.
  */
-fun PsiElement.resolveSourceRoot(): VirtualFile? {
-    return this.containingFile
-            ?.virtualFile
-            ?.let { ProjectFileIndex.getInstance(this.project).getSourceRootForFile(it) }
-}
+fun PsiElement.resolveSourceRoot() = containingFile
+        ?.virtualFile
+        ?.let { ProjectFileIndex.getInstance(project).getSourceRootForFile(it) }
+
+/**
+ * @return The best matching [DependencyScope] for this [PsiElement]
+ */
+fun PsiElement.nlsDependencyScope(): DependencyScope? = DependencyScope.forFileExtension(containingFile.name).orElse(null)
 
 /**
  * Converts this [PsiClass] into its corresponding Scout [IType].
@@ -100,7 +112,7 @@ fun PsiClass.toScoutType(env: IdeaEnvironment, returnReferencingModuleIfNotInFil
  * @return The [IType] within the given [IJavaEnvironment] that corresponds to this [PsiClass]
  */
 fun PsiClass.toScoutType(env: IJavaEnvironment): IType? {
-    val fqn = computeInReadAction(this.project) { this.qualifiedName }
+    val fqn = computeInReadAction(project) { qualifiedName }
     return env.findType(fqn).orElse(null)
 }
 
@@ -182,16 +194,17 @@ fun PsiType.resolveTypeArgument(index: Int): PsiType? {
  *
  */
 fun PsiElement.containingModule(returnReferencingModuleIfNotInFilesystem: Boolean = true): Module? {
-    val isInProject = containingFile?.virtualFile?.isInLocalFileSystem ?: true /* a psi element which has not a file (e.g. PsiDirectory) */
+    val psiFile = containingFile
+    val isInProject = psiFile?.virtualFile?.isInLocalFileSystem ?: true /* a psi element which has not a file (e.g. PsiDirectory) */
     if (!returnReferencingModuleIfNotInFilesystem && !isInProject) {
         return null
     }
 
-    val searchElement = if (isInProject) this else containingFile ?: this
-    return computeInReadAction(this.project) {
+    val searchElement = if (isInProject) this else psiFile ?: this
+    return computeInReadAction(project) {
         this
                 .takeIf { it.isValid }
-                ?.let { ModuleUtil.findModuleForPsiElement(searchElement) }
+                ?.let { ModuleUtilCore.findModuleForPsiElement(searchElement) }
     }
 }
 
@@ -208,7 +221,7 @@ fun Module.isJavaModule(): Boolean = ModuleRootManager.getInstance(this).sdk?.sd
 
 fun IEnvironment.toIdea(): IdeaEnvironment = this as IdeaEnvironment
 
-fun IJavaEnvironment.toIdea(): JavaEnvironmentWithIdea = this.unwrap() as JavaEnvironmentWithIdea
+fun IJavaEnvironment.toIdea(): JavaEnvironmentWithIdea = unwrap() as JavaEnvironmentWithIdea
 
 /**
  * @param scope The scope in which the PsiClasses should be searched.
@@ -292,25 +305,38 @@ fun Project.findTypesByName(fqn: String) = findTypesByName(fqn, GlobalSearchScop
  */
 fun Project.findTypesByName(fqn: String, scope: GlobalSearchScope) =
         computeInReadAction(this) { JavaPsiFacade.getInstance(this).findClasses(fqn, scope) }
+                .asSequence()
                 .filter { it.isValid }
-                .toSet()
 
 /**
  * Gets the [PsiClass] from the classpath of this [Module] having the give fully qualified name
  * @param fqn The fully qualified name to search
+ * @param includeTests If test classpath should be included or not
  * @return the [PsiClass] from the classpath of this [Module] having the give fully qualified name
  */
-fun Module.findTypeByName(fqn: String) = project.findTypesByName(fqn, moduleWithDependenciesAndLibrariesScope(this, true)).firstOrNull()
+fun Module.findTypeByName(fqn: String, includeTests: Boolean = true) = project
+        .findTypesByName(fqn, moduleWithDependenciesAndLibrariesScope(this, includeTests))
+        .firstOrNull()
 
 /**
  * @return The [Module] within the given [Project] in which this file exists.
  */
-fun VirtualFile.containingModule(project: Project) = ProjectFileIndex.getInstance(project).getModuleForFile(this)
+fun VirtualFile.containingModule(project: Project) = ModuleUtilCore.findModuleForFile(this, project)
 
 /**
  * @return The directory [Path] of this [Module].
  */
-fun Module.moduleDirPath(): Path = Paths.get(ModuleUtil.getModuleDirPath(this))
+fun Module.moduleDirPath(): Path {
+    val contentRoots = ModuleRootManager.getInstance(this).contentRoots.filter { it.isDirectory }
+    var virtualDirectory: VirtualFile? = null
+    if (contentRoots.size > 1) {
+        virtualDirectory = contentRoots.find { it.name == name }
+    }
+    if (virtualDirectory == null) {
+        virtualDirectory = contentRoots.firstOrNull()
+    }
+    return virtualDirectory?.getNioPath() ?: Paths.get(ModuleUtilCore.getModuleDirPath(this))
+}
 
 /**
  * Executes the given [IBreadthFirstVisitor] on all super classes. The starting [PsiClass] is visited as well.
@@ -338,3 +364,39 @@ fun PsiClass.isInstanceOf(vararg parentFqn: String): Boolean = computeInReadActi
     }
     visitSupers(visitor) == TreeVisitResult.TERMINATE
 }
+
+/**
+ * Tries to resolve the [PropertiesFile] that contains the text properties for the [Language] given.
+ * @param language The [Language] of this [ITranslationStore] for which the [PropertiesFile] should be returned.
+ * @param psiManager The [PsiManager] to lookup the file.
+ * @return The [PropertiesFile] or null if no file could be found for the given [Language].
+ */
+fun ITranslationStore.resolvePropertiesFile(language: Language, psiManager: PsiManager): PropertiesFile? {
+    val store = this as? PropertiesTranslationStore ?: return null
+    val file = store.files()[language] ?: return null
+    val virtualFile = when (file) {
+        is EditableTranslationFile -> file.path().toVirtualFile()
+        is ReadOnlyTranslationFile -> file.source() as? VirtualFile
+        else -> null
+    } ?: return null
+    val propertiesFile = psiManager.findFile(virtualFile)
+    return propertiesFile as? PropertiesFile
+}
+
+/**
+ * Tries to resolve the [com.intellij.lang.properties.IProperty] that corresponds to this [ITranslationEntry] and the [Language] given.
+ * @param language The [Language] of this [ITranslationEntry] for which the [com.intellij.lang.properties.IProperty] should be returned.
+ * @param project The [Project] in which the [com.intellij.lang.properties.IProperty] should be searched.
+ * @return The [com.intellij.lang.properties.IProperty] of this [ITranslationEntry] and the [Language] given or null if it could not be found.
+ */
+fun ITranslationEntry.resolveProperty(language: Language, project: Project) = resolveProperty(language, PsiManager.getInstance(project))
+
+/**
+ * Tries to resolve the [com.intellij.lang.properties.IProperty] that corresponds to this [ITranslationEntry] and the [Language] given.
+ * @param language The [Language] of this [ITranslationEntry] for which the [com.intellij.lang.properties.IProperty] should be returned.
+ * @param psiManager The [PsiManager] to lookup the file.
+ * @return The [com.intellij.lang.properties.IProperty] of this [ITranslationEntry] and the [Language] given or null if it could not be found.
+ */
+fun ITranslationEntry.resolveProperty(language: Language, psiManager: PsiManager) = store()
+        .resolvePropertiesFile(language, psiManager)
+        ?.findPropertyByKey(key())

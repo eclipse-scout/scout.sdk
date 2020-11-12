@@ -26,10 +26,10 @@ public class FileQueryInput {
   private final Path m_file;
   private final Path m_module;
   private final String m_extension;
-  private final Supplier<char[]> m_fileContentLoader;
-  private final FinalValue<char[]> m_fileContent;
+  private final Supplier<CharSequence> m_fileContentLoader;
+  private final FinalValue<CharSequence> m_fileContent;
 
-  public FileQueryInput(Path file, Path module, Supplier<char[]> fileContentLoader) {
+  public FileQueryInput(Path file, Path module, Supplier<CharSequence> fileContentLoader) {
     m_file = Ensure.notNull(file);
     m_module = Ensure.notNull(module);
     m_fileContentLoader = Ensure.notNull(fileContentLoader);
@@ -61,7 +61,7 @@ public class FileQueryInput {
   /**
    * @return The lazy loaded file content.
    */
-  public char[] fileContent() {
+  public CharSequence fileContent() {
     return m_fileContent.computeIfAbsentAndGet(m_fileContentLoader);
   }
 

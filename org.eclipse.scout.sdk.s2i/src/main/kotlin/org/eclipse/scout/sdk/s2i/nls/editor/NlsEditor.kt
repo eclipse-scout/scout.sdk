@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLabel
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader
@@ -39,7 +40,7 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
                 // do not schedule directly. instead schedule after this paint. otherwise there might be ArrayIndexOutOfBoundsExceptions in swing.
                 ApplicationManager.getApplication().invokeLater {
                     FileDocumentManager.getInstance().saveAllDocuments() // ensures all changes are visible to the loader.
-                    TranslationStoreStackLoader.createModalLoader(vFile, project)
+                    TranslationStoreStackLoader.createModalLoader(vFile, project, TranslationStores.DependencyScope.ALL)
                             .withErrorHandler { onLoadError(it) }
                             .withStackCreatedHandler { onStackCreated(it) }
                             .queue()

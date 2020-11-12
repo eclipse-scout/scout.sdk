@@ -394,59 +394,6 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     setArtifactId(getServerProject().getElementName() + ".ws");
   }
 
-  @SuppressWarnings("pmd:NPathComplexity")
-  protected void guessPackage() {
-    if (isPackageChanged()) {
-      return; // already changed manually. don't update
-    }
-    Optional<String> groupId = Optional.empty();
-    Optional<String> artifactId = Optional.empty();
-    if (isCreateNewProject()) {
-      if (Strings.hasText(getArtifactId()) && JdtUtils.exists(getServerProject())) {
-        var pom = getPomDocument(getServerProject());
-        groupId = Pom.groupId(pom);
-        artifactId = Optional.ofNullable(getArtifactId());
-      }
-    }
-    else if (JdtUtils.exists(getExistingJaxWsProject())) {
-      var pom = getPomDocument(getExistingJaxWsProject());
-      groupId = Pom.groupId(pom);
-      artifactId = Pom.artifactId(pom);
-    }
-
-    if (artifactId.isEmpty()) {
-      return;
-    }
-
-    String baseName;
-    if (WebServiceType.PROVIDER_FROM_EMPTY_WSDL == getWebServiceType()) {
-      baseName = getWsdlName();
-      if (Strings.hasText(baseName)) {
-        baseName = JaxWsUtils.removeCommonSuffixes(baseName.toLowerCase(Locale.ENGLISH));
-      }
-    }
-    else if (WebServiceType.PROVIDER_FROM_EXISTING_WSDL == getWebServiceType()) {
-      baseName = getWebServiceNameFromUrl(getProviderWsdlUrl());
-    }
-    else {
-      baseName = getWebServiceNameFromUrl(getConsumerWsdlUrl());
-    }
-
-    if (Strings.isBlank(baseName)) {
-      return;
-    }
-
-    var pckBuilder = new StringBuilder();
-    if (groupId.isPresent() && !artifactId.get().startsWith(groupId.get())) {
-      pckBuilder.append(groupId.get());
-      pckBuilder.append(JavaTypes.C_DOT);
-    }
-    pckBuilder.append(artifactId.get());
-    pckBuilder.append(JavaTypes.C_DOT);
-    pckBuilder.append(baseName);
-    setTargetPackage(pckBuilder.toString());
-  }
-
   protected static String getWebServiceNameFromUrl(String url) {
     if (Strings.isBlank(url)) {
       return null;
@@ -458,7 +405,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
         if (lastSlashPos >= 0) {
           path = path.substring(lastSlashPos + 1);
         }
-        path = path.toLowerCase(Locale.ENGLISH);
+        path = path.toLowerCase(Locale.US);
 
         var lastDotPos = path.lastIndexOf('.');
         if (lastDotPos > 0) {
@@ -471,30 +418,6 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       SdkLog.debug("Invalid URL passed.", e);
     }
     return null;
-  }
-
-  protected static Document getPomDocument(IJavaProject project) {
-    try {
-      return S2eUtils.getPomDocument(project.getProject());
-    }
-    catch (RuntimeException e) {
-      SdkLog.debug("Unable to load pom of project '{}'.", project.getElementName(), e);
-      return null;
-    }
-  }
-
-  protected static boolean isServerProject(IJavaProject jp) {
-    try {
-      var scoutApi = ApiHelper.scoutApiFor(jp);
-      return scoutApi.isPresent()
-          && JdtUtils.exists(jp.findType(scoutApi.get().IServerSession().fqn()))
-          && !jp.getProject().getFolder(IScoutSourceFolders.WEBAPP_RESOURCE_FOLDER + "/WEB-INF").exists()
-          && !Files.exists(AbstractWebServiceNewOperation.getWsdlRootFolder(jp.getProject().getLocation().toFile().toPath()));
-    }
-    catch (JavaModelException e) {
-      SdkLog.warning("Cannot check type of project '{}'. This project will be ignored.", jp.getElementName(), e);
-      return false;
-    }
   }
 
   protected static boolean isJaxWsProject(IJavaProject jp) {
@@ -516,7 +439,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       }
 
       var primarySourceFolder = primarySourceFolderOpt.get();
-      if (!JdtUtils.exists(primarySourceFolder) || !primarySourceFolder.getResource().getProjectRelativePath().toString().toLowerCase(Locale.ENGLISH).contains("java")) {
+      if (!JdtUtils.exists(primarySourceFolder) || !primarySourceFolder.getResource().getProjectRelativePath().toString().toLowerCase(Locale.US).contains("java")) {
         return false;
       }
       var scoutApi = ApiHelper.scoutApiFor(jp);
@@ -546,6 +469,83 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       SdkLog.warning("Cannot check type of project '{}'. This project will be ignored.", jp.getElementName(), e);
       return false;
     }
+  }
+
+  protected static Document getPomDocument(IJavaProject project) {
+    try {
+      return S2eUtils.getPomDocument(project.getProject());
+    }
+    catch (RuntimeException e) {
+      SdkLog.debug("Unable to load pom of project '{}'.", project.getElementName(), e);
+      return null;
+    }
+  }
+
+  protected static boolean isServerProject(IJavaProject jp) {
+    try {
+      var scoutApi = ApiHelper.scoutApiFor(jp);
+      return scoutApi.isPresent()
+          && JdtUtils.exists(jp.findType(scoutApi.get().IServerSession().fqn()))
+          && !jp.getProject().getFolder(IScoutSourceFolders.WEBAPP_RESOURCE_FOLDER + "/WEB-INF").exists()
+          && !Files.exists(AbstractWebServiceNewOperation.getWsdlRootFolder(jp.getProject().getLocation().toFile().toPath()));
+    }
+    catch (JavaModelException e) {
+      SdkLog.warning("Cannot check type of project '{}'. This project will be ignored.", jp.getElementName(), e);
+      return false;
+    }
+  }
+
+  @SuppressWarnings("pmd:NPathComplexity")
+  protected void guessPackage() {
+    if (isPackageChanged()) {
+      return; // already changed manually. don't update
+    }
+    Optional<String> groupId = Optional.empty();
+    Optional<String> artifactId = Optional.empty();
+    if (isCreateNewProject()) {
+      if (Strings.hasText(getArtifactId()) && JdtUtils.exists(getServerProject())) {
+        var pom = getPomDocument(getServerProject());
+        groupId = Pom.groupId(pom);
+        artifactId = Optional.ofNullable(getArtifactId());
+      }
+    }
+    else if (JdtUtils.exists(getExistingJaxWsProject())) {
+      var pom = getPomDocument(getExistingJaxWsProject());
+      groupId = Pom.groupId(pom);
+      artifactId = Pom.artifactId(pom);
+    }
+
+    if (artifactId.isEmpty()) {
+      return;
+    }
+
+    String baseName;
+    if (WebServiceType.PROVIDER_FROM_EMPTY_WSDL == getWebServiceType()) {
+      baseName = getWsdlName();
+      if (Strings.hasText(baseName)) {
+        baseName = JaxWsUtils.removeCommonSuffixes(baseName.toLowerCase(Locale.US));
+      }
+    }
+    else if (WebServiceType.PROVIDER_FROM_EXISTING_WSDL == getWebServiceType()) {
+      baseName = getWebServiceNameFromUrl(getProviderWsdlUrl());
+    }
+    else {
+      baseName = getWebServiceNameFromUrl(getConsumerWsdlUrl());
+    }
+
+    if (Strings.isBlank(baseName)) {
+      return;
+    }
+
+    var pckBuilder = new StringBuilder();
+    if (groupId.isPresent() && !artifactId.get().startsWith(groupId.get())) {
+      pckBuilder.append(groupId.get());
+      pckBuilder.append(JavaTypes.C_DOT);
+    }
+    pckBuilder.append(artifactId.get());
+    pckBuilder.append(JavaTypes.C_DOT);
+    pckBuilder.append(baseName);
+    setTargetPackage(pckBuilder.toString());
   }
 
   protected static boolean containsWsdls(Path wsdlFolder) {

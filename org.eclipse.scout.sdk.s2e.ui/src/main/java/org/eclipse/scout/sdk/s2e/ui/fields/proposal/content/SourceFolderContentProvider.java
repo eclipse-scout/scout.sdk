@@ -56,7 +56,7 @@ public class SourceFolderContentProvider extends AbstractContentProviderAdapter 
           S2eUtils.sourceFoldersOrdered(jp)
               .filter(root -> {
                 // filter generated source folders (except the form-data-generated source folder)
-                var srcFolderName = root.getPath().removeFirstSegments(1).toString().toLowerCase(Locale.ENGLISH);
+                var srcFolderName = root.getPath().removeFirstSegments(1).toString().toLowerCase(Locale.US);
                 return IScoutSourceFolders.GENERATED_SOURCE_FOLDER.equals(srcFolderName)
                     || !srcFolderName.contains("generated");
               })

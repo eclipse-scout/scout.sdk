@@ -47,6 +47,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.EventListenerList;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -57,8 +58,8 @@ import org.eclipse.scout.sdk.core.util.Strings;
  * Represents a stack of {@link ITranslationStore}s as available at runtime. In the Scout runtime such a stack is
  * represented by all {@code org.eclipse.scout.rt.shared.services.common.text.ITextProviderService}s available.
  * <p>
- * Use {@link TranslationStores#createStack(Path, IEnvironment, IProgress)} to create a {@link TranslationStoreStack}
- * for a specific {@link Path}.
+ * Use {@link TranslationStores#createStack(Path, IEnvironment, IProgress, DependencyScope)} to create a
+ * {@link TranslationStoreStack} for a specific {@link Path}.
  *
  * @since 7.0.0
  */
