@@ -62,7 +62,7 @@ import org.w3c.dom.NodeList;
  */
 public final class ScoutProjectNewHelper {
 
-  public static final String SCOUT_ARCHETYPES_VERSION = "10.0.0-SNAPSHOT";
+  public static final String SCOUT_ARCHETYPES_VERSION = "10.0.40";
   public static final String SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID = "scout-helloworld-app";
   public static final String SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID = "scout-hellojs-app";
   public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
