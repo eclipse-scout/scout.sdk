@@ -38,16 +38,20 @@ open class OperationTask(title: String, project: Project, private val transactio
         val workForCommit = 10
         val workForTask = 1000
         scoutProgress.init(workForTask + workForCommit, title)
-        if (transactionManager == null) {
-            // new independent top level transaction
-            callInNewTransaction(project, title, { scoutProgress.newChild(workForCommit) }) {
-                task.invoke(scoutProgress.newChild(workForTask))
+        try {
+            if (transactionManager == null) {
+                // new independent top level transaction
+                callInNewTransaction(project, title, { scoutProgress.newChild(workForCommit) }) {
+                    task.invoke(scoutProgress.newChild(workForTask))
+                }
+            } else {
+                // new asynchronous task running in existing parent transaction
+                callInExistingTransaction(transactionManager) {
+                    task.invoke(scoutProgress.newChild(workForTask))
+                }
             }
-        } else {
-            // new asynchronous task running in existing parent transaction
-            callInExistingTransaction(transactionManager) {
-                task.invoke(scoutProgress.newChild(workForTask))
-            }
+        } catch (e: RuntimeException) {
+            SdkLog.error("Error in background job.", e)
         }
     }
 
