@@ -15,6 +15,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -81,7 +82,7 @@ public final class Xml {
    *           if there is an exception reading the file into the document.
    */
   public static Document get(Path xmlFile) throws IOException {
-    try (var in = Files.newInputStream(Ensure.notNull(xmlFile), StandardOpenOption.READ)) {
+    try (var in = new BufferedInputStream(Files.newInputStream(Ensure.notNull(xmlFile), StandardOpenOption.READ))) {
       return get(in);
     }
   }

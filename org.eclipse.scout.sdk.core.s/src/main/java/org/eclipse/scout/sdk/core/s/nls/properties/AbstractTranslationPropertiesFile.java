@@ -87,9 +87,9 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
     if (Objects.equals(m_fileContent, newContent)) {
       return false;
     }
+
     m_fileContent = newContent;
     removeInvalidEntries(newContent.properties().entrySet());
-
     return true;
   }
 

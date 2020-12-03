@@ -12,6 +12,7 @@ package org.eclipse.scout.maven.plugins.updatesite;
 
 import static java.time.LocalDateTime.now;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -275,7 +276,7 @@ public class StagingMojo extends AbstractStagingMojo {
   }
 
   public static String createSha256(File data) throws MojoExecutionException {
-    try (var is = Files.newInputStream(data.toPath())) {
+    try (var is = new BufferedInputStream(Files.newInputStream(data.toPath()))) {
       var md = MessageDigest.getInstance("SHA-256");
       var buffer = new byte[8192];
       var numRead = 0;

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.nls.properties;
 
 import static org.eclipse.scout.sdk.core.util.Strings.isBlank;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +48,7 @@ public class EditableTranslationFile extends AbstractTranslationPropertiesFile {
     }
 
     try {
-      return Files.newInputStream(file, StandardOpenOption.READ);
+      return new BufferedInputStream(Files.newInputStream(file, StandardOpenOption.READ));
     }
     catch (IOException e) {
       throw new SdkException("Cannot read file '{}'.", file, e);

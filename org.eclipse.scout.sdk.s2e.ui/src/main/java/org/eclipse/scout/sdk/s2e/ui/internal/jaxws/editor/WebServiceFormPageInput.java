@@ -18,6 +18,7 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -178,7 +179,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   protected void loadWsdlServices() {
-    try (var in = Files.newInputStream(getWsdl(), StandardOpenOption.READ)) {
+    try (var in = new BufferedInputStream(Files.newInputStream(getWsdl(), StandardOpenOption.READ))) {
       setServicesFromWsdl(ParsedWsdl.create(getWsdl().toUri(), in, false));
     }
     catch (IOException | WSDLException e) {

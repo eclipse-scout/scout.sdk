@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.core.util.Xml
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
-import java.io.FileInputStream
+import java.io.BufferedInputStream
 import java.nio.file.*
 import java.util.*
 import java.util.zip.ZipEntry
@@ -72,7 +72,7 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
     }
 
     fun publish() {
-        val pluginXml = ZipInputStream(FileInputStream(pluginToDeploy.toFile())).use { findPluginXml(it) }
+        val pluginXml = ZipInputStream(BufferedInputStream(Files.newInputStream(pluginToDeploy))).use { findPluginXml(it) }
         if (pluginXml == null) {
             println("No plugin could be found in the zip '$pluginToDeploy'.")
             exitProcess(4)
