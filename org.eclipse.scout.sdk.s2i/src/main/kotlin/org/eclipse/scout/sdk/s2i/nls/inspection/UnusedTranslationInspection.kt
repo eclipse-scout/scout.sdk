@@ -103,9 +103,9 @@ open class UnusedTranslationInspection : GlobalInspectionTool() {
 
     protected fun createProblemsForUnusedTranslations(store: ITranslationStore, file: PropertiesFile, unusedKeys: List<String>, inspectionManager: InspectionManager,
                                                       globalContext: GlobalInspectionContext, problemDescriptionsProcessor: ProblemDescriptionsProcessor) = unusedKeys.forEach {
-        val propertyElement = file.findPropertyByKey(it)?.psiElement ?: return
+        val propertyElement = file.containingFile // don't pass the exact property but only the file instead. the property might become invalid when applying multiple fixes on the same file!
         val quickFix = RemoveUnusedTranslationQuickFix(it, store)
-        val problem = inspectionManager.createProblemDescriptor(propertyElement, message("translation.x.not.used", it), false, arrayOf(quickFix), ProblemHighlightType.WARNING)
+        val problem = inspectionManager.createProblemDescriptor(propertyElement, message("translation.x.not.used", it), quickFix, ProblemHighlightType.WARNING, false)
         problemDescriptionsProcessor.addProblemElement(GlobalInspectionContextUtil.retrieveRefElement(propertyElement, globalContext), problem)
     }
 

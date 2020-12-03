@@ -10,7 +10,10 @@
  */
 package org.eclipse.scout.sdk.s2i.nls.inspection
 
-import com.intellij.codeInspection.*
+import com.intellij.codeInspection.InspectionManager
+import com.intellij.codeInspection.LocalInspectionTool
+import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -76,8 +79,8 @@ open class MissingTranslationInspection : LocalInspectionTool() {
     }
 
     protected fun toProblemDescription(element: PsiElement, missingKey: String, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor {
-        val fixes = if (isOnTheFly) arrayOf(AddMissingTranslationQuickFix(missingKey)) else LocalQuickFix.EMPTY_ARRAY
-        return manager.createProblemDescriptor(element, message("missing.translation.for.key.x", missingKey), isOnTheFly, fixes, ProblemHighlightType.WARNING)
+        val quickFix = if (isOnTheFly) AddMissingTranslationQuickFix(missingKey) else null
+        return manager.createProblemDescriptor(element, message("missing.translation.for.key.x", missingKey), quickFix, ProblemHighlightType.WARNING, isOnTheFly)
     }
 
     override fun cleanup(project: Project) {
