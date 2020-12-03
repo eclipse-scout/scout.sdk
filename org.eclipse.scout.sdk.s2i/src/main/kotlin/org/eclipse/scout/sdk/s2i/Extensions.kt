@@ -38,6 +38,7 @@ import com.intellij.util.CollectionQuery
 import com.intellij.util.Query
 import com.intellij.util.containers.stream
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
@@ -194,17 +195,22 @@ fun PsiType.resolveTypeArgument(index: Int): PsiType? {
  *
  */
 fun PsiElement.containingModule(returnReferencingModuleIfNotInFilesystem: Boolean = true): Module? {
-    val psiFile = containingFile
-    val isInProject = psiFile?.virtualFile?.isInLocalFileSystem ?: true /* a psi element which has not a file (e.g. PsiDirectory) */
-    if (!returnReferencingModuleIfNotInFilesystem && !isInProject) {
-        return null
-    }
+    try {
+        val psiFile = containingFile
+        val isInProject = psiFile?.virtualFile?.isInLocalFileSystem ?: true /* a psi element which has not a file (e.g. PsiDirectory) */
+        if (!returnReferencingModuleIfNotInFilesystem && !isInProject) {
+            return null
+        }
 
-    val searchElement = if (isInProject) this else psiFile ?: this
-    return computeInReadAction(project) {
-        this
-                .takeIf { it.isValid }
-                ?.let { ModuleUtilCore.findModuleForPsiElement(searchElement) }
+        val searchElement = if (isInProject) this else psiFile ?: this
+        return computeInReadAction(project) {
+            this
+                    .takeIf { it.isValid }
+                    ?.let { ModuleUtilCore.findModuleForPsiElement(searchElement) }
+        }
+    } catch (e: RuntimeException) {
+        SdkLog.warning("Unable to compute module of '{}'.", this, e)
+        return null
     }
 }
 
