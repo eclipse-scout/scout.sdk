@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2i.environment
 
-import com.intellij.openapi.progress.EmptyProgressIndicator
-import com.intellij.openapi.progress.PerformInBackgroundOption
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.Task
+import com.intellij.openapi.progress.*
 import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
@@ -50,6 +47,8 @@ open class OperationTask(title: String, project: Project, private val transactio
                     task.invoke(scoutProgress.newChild(workForTask))
                 }
             }
+        } catch (e: ProcessCanceledException) {
+            throw e
         } catch (e: RuntimeException) {
             SdkLog.error("Error in background job.", e)
         }
