@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.VfsUtilCore.iterateChildrenRecursively
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.SearchScope
+import org.eclipse.scout.sdk.core.s.ISdkConstants
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
@@ -103,10 +104,11 @@ open class UnusedTranslationInspection : GlobalInspectionTool() {
 
     protected fun createProblemsForUnusedTranslations(store: ITranslationStore, file: PropertiesFile, unusedKeys: List<String>, inspectionManager: InspectionManager,
                                                       globalContext: GlobalInspectionContext, problemDescriptionsProcessor: ProblemDescriptionsProcessor) = unusedKeys.forEach {
-        val propertyElement = file.containingFile // don't pass the exact property but only the file instead. the property might become invalid when applying multiple fixes on the same file!
+        val psiFile = file.containingFile // don't pass the exact property but only the file and the property range instead. the property might become invalid when applying multiple fixes on the same file!
+        val propertyElementRange = file.findPropertyByKey(it)?.psiElement?.textRange
         val quickFix = RemoveUnusedTranslationQuickFix(it, store)
-        val problem = inspectionManager.createProblemDescriptor(propertyElement, message("translation.x.not.used", it), quickFix, ProblemHighlightType.WARNING, false)
-        problemDescriptionsProcessor.addProblemElement(GlobalInspectionContextUtil.retrieveRefElement(propertyElement, globalContext), problem)
+        val problem = inspectionManager.createProblemDescriptor(psiFile, propertyElementRange, message("translation.x.not.used", it), ProblemHighlightType.WARNING, false, quickFix)
+        problemDescriptionsProcessor.addProblemElement(GlobalInspectionContextUtil.retrieveRefElement(psiFile, globalContext), problem)
     }
 
     protected fun getAllTranslationKeysIn(scope: SearchScope, project: Project): MutableMap<String, ITranslationStore> {
@@ -121,6 +123,7 @@ open class UnusedTranslationInspection : GlobalInspectionTool() {
             .distinct()
             .flatMap { project.findTypesByName(it) }
             .flatMap { it.newSubTypeHierarchy(scope, true, includeAnonymous = false, includeRoot = false).asSequence() }
+            .filter { it.name?.endsWith(ISdkConstants.SUFFIX_PERMISSION_TEXT_PROVIDER_SERVICE) == false }
             .mapNotNull { it.toScoutType(env, false) }
             .mapNotNull { TranslationStores.create(it, progress).orElse(null) }
             .filter { it.isEditable }
