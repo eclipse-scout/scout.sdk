@@ -20,10 +20,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -36,10 +36,11 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 /**
  * Main access class for obtaining {@link IApiSpecification} instances.
  */
+@SuppressWarnings("SynchronizationOnStaticField")
 public final class Api {
 
-  private static final Map<Class<? extends IApiSpecification>, IApiProvider> REGISTRY = new ConcurrentHashMap<>();
-  private static final Map<Entry<Class<? extends IApiSpecification>, ApiVersion>, IApiSpecification> API_CACHE = new ConcurrentHashMap<>();
+  private static final Map<Class<? extends IApiSpecification>, IApiProvider> REGISTRY = new HashMap<>();
+  private static final Map<Entry<Class<? extends IApiSpecification>, ApiVersion>, IApiSpecification> API_CACHE = new HashMap<>();
 
   private Api() {
   }
@@ -77,7 +78,9 @@ public final class Api {
   public static IApiProvider getProvider(Class<? extends IApiSpecification> apiDefinition) {
     Ensure.notNull(apiDefinition);
     ensureInitialized(apiDefinition);
-    return Ensure.notNull(REGISTRY.get(apiDefinition), "No provider for API class '{}' found.", apiDefinition);
+    synchronized (REGISTRY) {
+      return Ensure.notNull(REGISTRY.get(apiDefinition), "No provider for API class '{}' found.", apiDefinition);
+    }
   }
 
   /**
@@ -91,7 +94,10 @@ public final class Api {
    *         for that class which was replaced.
    */
   public static boolean registerProvider(Class<? extends IApiSpecification> apiDefinition, IApiProvider provider) {
-    return REGISTRY.put(Ensure.notNull(apiDefinition), Ensure.notNull(provider)) != null;
+    synchronized (REGISTRY) {
+      removeCachedApisOf(apiDefinition);
+      return REGISTRY.put(Ensure.notNull(apiDefinition), Ensure.notNull(provider)) != null;
+    }
   }
 
   /**
@@ -102,7 +108,14 @@ public final class Api {
    * @return {@code true} if a mapping was removed, {@code false} if there was already no mapping for this class.
    */
   public static boolean unregisterProvider(Class<? extends IApiSpecification> apiDefinition) {
-    return REGISTRY.remove(apiDefinition) != null;
+    synchronized (REGISTRY) {
+      removeCachedApisOf(apiDefinition);
+      return REGISTRY.remove(apiDefinition) != null;
+    }
+  }
+
+  static void removeCachedApisOf(Class<? extends IApiSpecification> apiDefinition) {
+    API_CACHE.keySet().removeIf(e -> e.getKey() == apiDefinition);
   }
 
   static void ensureInitialized(Class<?> classToInit) {
@@ -228,8 +241,10 @@ public final class Api {
    */
   public static <API extends IApiSpecification> API create(Class<API> api, ApiVersion version) {
     Entry<Class<? extends IApiSpecification>, ApiVersion> key = new SimpleImmutableEntry<>(api, version);
-    var definition = API_CACHE.computeIfAbsent(key, Api::doCreateApi);
-    return api.cast(definition);
+    synchronized (REGISTRY) {
+      var definition = API_CACHE.computeIfAbsent(key, Api::doCreateApi);
+      return api.cast(definition);
+    }
   }
 
   static IApiSpecification doCreateApi(Entry<Class<? extends IApiSpecification>, ApiVersion> entry) {
