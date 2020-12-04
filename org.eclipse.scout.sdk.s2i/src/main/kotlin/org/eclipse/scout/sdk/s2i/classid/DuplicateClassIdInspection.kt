@@ -14,7 +14,6 @@ import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaFile
@@ -36,8 +35,8 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
                     .mapNotNull { createProblemFor(it.value, javaFile, manager, isOnTheFly) }
                     .flatten()
                     .toTypedArray()
-        } catch (e: ProcessCanceledException) {
-            SdkLog.debug("Duplicate @ClassId inspection canceled.", e)
+        } catch (e: Exception) {
+            SdkLog.error("Duplicate @ClassId inspection failed for file '{}'.", file, e)
             ProblemDescriptor.EMPTY_ARRAY
         }
     }

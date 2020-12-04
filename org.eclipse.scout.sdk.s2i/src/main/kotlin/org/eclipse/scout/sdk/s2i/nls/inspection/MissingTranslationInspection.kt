@@ -40,20 +40,25 @@ open class MissingTranslationInspection : LocalInspectionTool() {
             return ProblemDescriptor.EMPTY_ARRAY
         }
 
-        val module = file.containingModule(false) ?: return ProblemDescriptor.EMPTY_ARRAY
-        val progress = ProgressManager.getInstance().progressIndicator
-        return if (isOnTheFly) {
-            // single file: create short living environment for this file only
-            val query = MissingTranslationQuery()
-            IdeaEnvironment.callInIdeaEnvironmentSync(file.project, progress.toScoutProgress()) { e, p ->
-                checkFile(file, module, query, manager, true, e, p)
+        try {
+            val module = file.containingModule(false) ?: return ProblemDescriptor.EMPTY_ARRAY
+            val progress = ProgressManager.getInstance().progressIndicator
+            return if (isOnTheFly) {
+                // single file: create short living environment for this file only
+                val query = MissingTranslationQuery()
+                IdeaEnvironment.callInIdeaEnvironmentSync(file.project, progress.toScoutProgress()) { e, p ->
+                    checkFile(file, module, query, manager, true, e, p)
+                }
+            } else {
+                // batch inspection run: create environment and query in cache. Will be removed and closed in cleanup function
+                val cache = m_environmentByProject.computeIfAbsent(file.project) { project ->
+                    Pair(IdeaEnvironment.createUnsafeFor(project) { }, MissingTranslationQuery())
+                }
+                checkFile(file, module, cache.second, manager, false, cache.first, progress.toScoutProgress())
             }
-        } else {
-            // batch inspection run: create environment and query in cache. Will be removed and closed in cleanup function
-            val cache = m_environmentByProject.computeIfAbsent(file.project) { project ->
-                Pair(IdeaEnvironment.createUnsafeFor(project) { }, MissingTranslationQuery())
-            }
-            checkFile(file, module, cache.second, manager, false, cache.first, progress.toScoutProgress())
+        } catch (e: Exception) {
+            SdkLog.error("Failed to check for missing translations in {}.", file, e)
+            return ProblemDescriptor.EMPTY_ARRAY
         }
     }
 

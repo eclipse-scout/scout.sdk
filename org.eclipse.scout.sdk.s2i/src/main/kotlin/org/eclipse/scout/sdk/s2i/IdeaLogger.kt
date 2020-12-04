@@ -27,6 +27,7 @@ import java.util.logging.Level
 open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
 
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
+
     @Suppress("MissingRecentApi") // method does not exist on the companion, but static access is available -> ok
     private val m_balloonLog = NotificationGroup.balloonGroup("Scout")
 
@@ -80,20 +81,26 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
         notification.notify(null)
     }
 
+    protected fun isControlFlowException(t: Throwable) = t is ControlFlowException
+
     protected fun logToTextFile(msg: LogMessage) {
-        val exception: Throwable? = msg.throwables()
-                .filter { it !is ControlFlowException } // ControlFlowExceptions should not be logged. See com.intellij.openapi.diagnostic.Logger.checkException
-                .findFirst()
-                .orElse(null)
+        // ControlFlowExceptions should not be logged. See com.intellij.openapi.diagnostic.Logger.checkException
+        val controlFlowException = msg.throwableList().firstOrNull { isControlFlowException(it) }
+        val loggableThrowable = msg.throwableList().firstOrNull { !isControlFlowException(it) }
+        if (controlFlowException != null && loggableThrowable == null) {
+            // the log event is from a ControlFlowException. These must not be logged. Instead: rethrow
+            throw controlFlowException
+        }
+
         // do not log the prefix here as this information is already logged by the text logger
         when (msg.severity()) {
-            Level.SEVERE -> m_textLog.error(msg.text(), exception)
-            Level.WARNING -> m_textLog.warn(msg.text(), exception)
-            Level.INFO -> m_textLog.info(msg.text(), exception)
-            Level.FINE -> m_textLog.debug(msg.text(), exception)
+            Level.SEVERE -> m_textLog.warn(msg.text(), loggableThrowable) // do not use m_textLog.error() because this is registered as fatal plugin error
+            Level.WARNING -> m_textLog.warn(msg.text(), loggableThrowable)
+            Level.INFO -> m_textLog.info(msg.text(), loggableThrowable)
+            Level.FINE -> m_textLog.debug(msg.text(), loggableThrowable)
             else -> {
                 m_textLog.trace(msg.text())
-                exception?.let { m_textLog.trace(it) }
+                loggableThrowable?.let { m_textLog.trace(it) }
             }
         }
     }
