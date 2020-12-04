@@ -51,8 +51,11 @@ public class TranslationStoresTest {
     when(store.languages()).thenAnswer(invocation -> Stream.empty());
     assertFalse(isContentAvailable(store));
 
+    // do not complain if no default language is present
+    // if a text from the scout rt is overwritten (e.g. a spanish text is modified), the default text from scout may be fine.
+    // therefore only the spanish file may exist and may contain translations
     when(store.languages()).thenAnswer(invocation -> Stream.of(Language.parseThrowingOnError("es")));
-    assertFalse(isContentAvailable(store));
+    assertTrue(isContentAvailable(store));
 
     when(store.languages()).thenAnswer(invocation -> Stream.of(Language.LANGUAGE_DEFAULT));
     assertTrue(isContentAvailable(store));

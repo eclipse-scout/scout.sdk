@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.log;
 
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.unmodifiableList;
 
 import java.util.List;
 import java.util.Objects;
@@ -57,6 +58,14 @@ public class LogMessage {
    */
   public Stream<Throwable> throwables() {
     return m_throwables.stream();
+  }
+
+  /**
+   * @return All {@link Throwable}s of the arguments as unmodifiable {@link List}. Neither the {@link List} nor one of
+   *         its elements may be {@code null}.
+   */
+  public List<Throwable> throwableList() {
+    return unmodifiableList(m_throwables);
   }
 
   /**

@@ -16,6 +16,7 @@ import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiTypeParameter
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.util.Strings
@@ -44,14 +45,19 @@ open class MissingClassIdInspection : AbstractBaseJavaLocalInspectionTool() {
             return ProblemDescriptor.EMPTY_ARRAY
         }
 
-        val hasClassIdValue = matchingApis.mapNotNull { ClassIdAnnotation.of(aClass, it) }.any { it.hasValue() }
-        if (hasClassIdValue) {
+        try {
+            val hasClassIdValue = matchingApis.mapNotNull { ClassIdAnnotation.of(aClass, it) }.any { it.hasValue() }
+            if (hasClassIdValue) {
+                return ProblemDescriptor.EMPTY_ARRAY
+            }
+
+            val nameElement = aClass.nameIdentifier ?: return ProblemDescriptor.EMPTY_ARRAY
+            val problem = manager.createProblemDescriptor(nameElement, m_template, isOnTheFly, arrayOf(m_addMissingClassIdQuickFix), ProblemHighlightType.ERROR)
+            return arrayOf(problem)
+        } catch (e: Exception) {
+            SdkLog.error("Failed to check for missing @ClassId in {}.", aClass, e)
             return ProblemDescriptor.EMPTY_ARRAY
         }
-
-        val nameElement = aClass.nameIdentifier ?: return ProblemDescriptor.EMPTY_ARRAY
-        val problem = manager.createProblemDescriptor(nameElement, m_template, isOnTheFly, arrayOf(m_addMissingClassIdQuickFix), ProblemHighlightType.ERROR)
-        return arrayOf(problem)
     }
 
     protected fun getClassIdApiCandidatesFor(aClass: PsiClass): Set<IScoutApi>? {

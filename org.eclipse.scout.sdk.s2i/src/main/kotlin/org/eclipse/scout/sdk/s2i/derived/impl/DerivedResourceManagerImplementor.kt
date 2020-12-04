@@ -14,7 +14,6 @@ import com.intellij.AppTopics
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -24,7 +23,6 @@ import com.intellij.psi.search.SearchScope
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.messages.MessageBusConnection
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
@@ -182,9 +180,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
                 SdkLog.debug("About to execute derived resource handler: {}", handler)
                 return@callInExistingTransaction handler.apply(env, progress)
             }
-        } catch (e: ProcessCanceledException) {
-            SdkLog.debug("Derived resources update canceled.", onTrace(e))
-        } catch (e: RuntimeException) {
+        } catch (e: Exception) {
             // log the exception but continue processing. The failure of one handler does not abort the transaction
             SdkLog.error("Error while: {}", handler, e)
         } finally {

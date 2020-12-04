@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2i.classid
 
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.AsyncFileListener
@@ -29,7 +28,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.FileContentUtilCore
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator
@@ -72,8 +70,6 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
             m_cacheReady = true
 
             duplicates().forEach { SdkLog.debug("Duplicate @ClassId value '{}' found for types {}.", it.key, it.value) }
-        } catch (e: ProcessCanceledException) {
-            SdkLog.debug("@ClassId value cache creation canceled. Retry on next use.", onTrace(e))
         } catch (t: Exception) {
             SdkLog.warning("Error building @ClassId value cache.", t)
         }

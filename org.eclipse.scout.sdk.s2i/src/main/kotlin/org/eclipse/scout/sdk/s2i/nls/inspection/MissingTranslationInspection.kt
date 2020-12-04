@@ -18,6 +18,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiRecursiveElementVisitor
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
 import org.eclipse.scout.sdk.core.s.nls.TranslationStores
@@ -38,24 +39,29 @@ open class MissingTranslationInspection : LocalInspectionTool() {
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
         val nlsDependencyScope = file.nlsDependencyScope() ?: return ProblemDescriptor.EMPTY_ARRAY
-        val module = file.containingModule(false) ?: return ProblemDescriptor.EMPTY_ARRAY
-        return if (isOnTheFly) {
-            val stack = createStack(module, nlsDependencyScope, true) ?: return ProblemDescriptor.EMPTY_ARRAY
-            checkFile(file, keysOfStack(stack), manager, true)
-        } else {
-            // batch inspection run: create cache. Will be removed in cleanup function
-            val cacheKey = createCacheKey(module.moduleDirPath(), nlsDependencyScope)
-            val projectCache = m_cachedKeysByProject.computeIfAbsent(file.project) { ConcurrentHashMap() }
-            val keys = projectCache.computeIfAbsent(cacheKey) {
-                createStack(module, nlsDependencyScope)
-                        ?.let { keysOfStack(it) }
-                        ?: emptySet() // do not use null because the ConcurrentHashMap does not store null values
+        try {
+            val module = file.containingModule(false) ?: return ProblemDescriptor.EMPTY_ARRAY
+            return if (isOnTheFly) {
+                val stack = createStack(module, nlsDependencyScope, true) ?: return ProblemDescriptor.EMPTY_ARRAY
+                checkFile(file, keysOfStack(stack), manager, true)
+            } else {
+                // batch inspection run: create cache. Will be removed in cleanup function
+                val cacheKey = createCacheKey(module.moduleDirPath(), nlsDependencyScope)
+                val projectCache = m_cachedKeysByProject.computeIfAbsent(file.project) { ConcurrentHashMap() }
+                val keys = projectCache.computeIfAbsent(cacheKey) {
+                    createStack(module, nlsDependencyScope)
+                            ?.let { keysOfStack(it) }
+                            ?: emptySet() // do not use null because the ConcurrentHashMap does not store null values
+                }
+                if (keys.isEmpty()) {
+                    // there are no translations at all. it is no scout module
+                    return ProblemDescriptor.EMPTY_ARRAY
+                }
+                checkFile(file, keys, manager, false)
             }
-            if (keys.isEmpty()) {
-                // there are no translations at all. it is no scout module
-                return ProblemDescriptor.EMPTY_ARRAY
-            }
-            checkFile(file, keys, manager, false)
+        } catch (e: Exception) {
+            SdkLog.error("Failed to check for missing translations in {}.", file, e)
+            return ProblemDescriptor.EMPTY_ARRAY
         }
     }
 

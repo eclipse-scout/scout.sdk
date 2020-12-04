@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.VfsUtilCore.iterateChildrenRecursively
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.SearchScope
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.ISdkConstants
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.environment.IProgress
@@ -48,14 +49,18 @@ open class UnusedTranslationInspection : GlobalInspectionTool() {
     private val m_keys = Key.create<MutableMap<String, ITranslationStore>>("scout.UnusedTranslationInspection.unusedKeys")
 
     override fun runInspection(scope: AnalysisScope, manager: InspectionManager, globalContext: GlobalInspectionContext, problemDescriptionsProcessor: ProblemDescriptionsProcessor) {
-        val unusedKeys = getAllTranslationKeysIn(scope.toSearchScope(), manager.project)
-        globalContext.putUserData(m_keys, unusedKeys)
-        super.runInspection(scope, manager, globalContext, problemDescriptionsProcessor)
-        if (unusedKeys.isNotEmpty()) {
-            val psiManager = PsiManager.getInstance(manager.project)
-            unusedKeys.entries
-                    .groupBy({ it.value }, { it.key })
-                    .forEach { createProblemsForUnusedTranslations(it.key, it.value, psiManager, manager, globalContext, problemDescriptionsProcessor) }
+        try {
+            val unusedKeys = getAllTranslationKeysIn(scope.toSearchScope(), manager.project)
+            globalContext.putUserData(m_keys, unusedKeys)
+            super.runInspection(scope, manager, globalContext, problemDescriptionsProcessor)
+            if (unusedKeys.isNotEmpty()) {
+                val psiManager = PsiManager.getInstance(manager.project)
+                unusedKeys.entries
+                        .groupBy({ it.value }, { it.key })
+                        .forEach { createProblemsForUnusedTranslations(it.key, it.value, psiManager, manager, globalContext, problemDescriptionsProcessor) }
+            }
+        } catch (e: Exception) {
+            SdkLog.error("Unused translation inspection failed.", e)
         }
     }
 

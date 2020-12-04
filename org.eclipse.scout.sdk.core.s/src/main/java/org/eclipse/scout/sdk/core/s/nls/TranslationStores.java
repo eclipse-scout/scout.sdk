@@ -370,11 +370,6 @@ public final class TranslationStores {
       return false;
     }
 
-    if (s.languages().noneMatch(l -> l == Language.LANGUAGE_DEFAULT)) {
-      SdkLog.warning("{} does not contain a default language!", s);
-      return false;
-    }
-
     if (s.size() < 1) {
       SdkLog.warning("{} does not contain any translations.", s);
       return false;
