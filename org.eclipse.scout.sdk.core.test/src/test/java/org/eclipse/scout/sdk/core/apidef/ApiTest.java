@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFacto
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -50,7 +49,6 @@ public class ApiTest {
   }
 
   @Test
-  @Tag("IntegrationTest") // seems to fail on CI build infrastructure. unknown why.
   public void testDump() {
     var dump = Api.dump(Api.create(IJavaApi.class, new ApiVersion(11)));
     assertNotNull(dump.get(TestClass.TEST_CLASS_FQN));

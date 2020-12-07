@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.eclipse.jface.text.link.LinkedModeUI;
 import org.junit.jupiter.api.Test;
 
-public class ApiTest {
+public class EclipseUiApiTest {
 
   @Test
   public void testLinkedModeUIApi() throws NoSuchMethodException {

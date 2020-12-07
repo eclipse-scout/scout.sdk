@@ -20,11 +20,11 @@ import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * <h3>{@link ApiTest}</h3>
+ * <h3>{@link EclipseApiTest}</h3>
  *
  * @since 5.2.0
  */
-public class ApiTest {
+public class EclipseApiTest {
   @Test
   public void testAstUtilsApi() throws NoSuchMethodException {
     var parser = ASTParser.newParser(AST.JLS14);

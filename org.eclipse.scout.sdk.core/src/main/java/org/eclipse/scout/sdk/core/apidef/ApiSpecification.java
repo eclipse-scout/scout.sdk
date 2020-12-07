@@ -131,8 +131,9 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
   }
 
   protected boolean mergeMethodsIntoCache(ApiSpecification spec) {
-    Arrays.stream(spec.apiInterface().getMethods())
-        .filter(Method::isDefault)
+    Arrays.stream(spec.apiInterface().getDeclaredMethods())
+        .filter(Method::isDefault) // includes public, non-static, non-abstract
+        .filter(m -> !m.isBridge() && !m.isSynthetic()) // only "real" methods
         .forEach(m -> m_methods.putIfAbsent(JavaTypes.createMethodIdentifier(m), new SimpleImmutableEntry<>(m, spec)));
     return true; // continue with the next spec
   }
