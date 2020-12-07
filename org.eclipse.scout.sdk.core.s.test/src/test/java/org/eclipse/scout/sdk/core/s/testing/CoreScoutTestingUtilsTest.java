@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.testing;
 
+import static org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils.rtToSdkVersion;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,6 +35,18 @@ public class CoreScoutTestingUtilsTest {
         System.setProperty(CoreScoutTestingUtils.SCOUT_VERSION_KEY, oldValue);
       }
     }
+  }
+
+  @Test
+  public void testRtToSdkVersion() {
+    assertEquals("10.0.0", rtToSdkVersion("10"));
+    assertEquals("10.1.0", rtToSdkVersion("10.1"));
+    assertEquals("10.0.4", rtToSdkVersion("10.0.4"));
+    assertEquals("10.0.0-SNAPSHOT", rtToSdkVersion("10.0.0-SNAPSHOT"));
+    assertEquals("11.0.0-SNAPSHOT", rtToSdkVersion("11.0-SNAPSHOT"));
+    assertEquals("12.0.0-SNAPSHOT", rtToSdkVersion("12.0-SNAPSHOT"));
+    assertEquals("11.0.0-alpha.5", rtToSdkVersion("11.0.0-alpha.5"));
+    assertEquals("11.0.0-alpha.5", rtToSdkVersion("11.0-alpha.5"));
   }
 
   @Test

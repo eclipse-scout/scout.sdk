@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.testing;
 
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -23,7 +24,6 @@ import javax.xml.transform.TransformerException;
 
 import org.eclipse.scout.sdk.core.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
@@ -37,7 +37,6 @@ import org.eclipse.scout.sdk.core.s.testing.maven.MavenCliRunner;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
-import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
@@ -82,10 +81,39 @@ public final class CoreScoutTestingUtils {
     // The testing runner does not make use of the environment and the progress: pass empty mocks
     //noinspection AccessOfSystemProperties
     ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", System.getProperty("java.specification.version"),
-        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, currentScoutVersion(), mock(IEnvironment.class), mock(IProgress.class));
+        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, currentSdkVersion(), mock(IEnvironment.class), mock(IProgress.class));
     return targetDirectory;
   }
 
+  /**
+   * @return The SDK version that belongs to the {@link #currentScoutVersion()}.
+   *         <p>
+   *         The SDK version uses more number segments to fulfill the OSGi version requirements. While
+   *         {@code 11.0-SNAPSHOT} is valid maven version for OSGi at least three numbers are required. Therefore
+   *         {@code 11.0.0-SNAPSHOT} is the matching SDK version.
+   */
+  public static String currentSdkVersion() {
+    // do not compute sdk version based on maven module. This version would always be the same.
+    // instead derive it from the Scout RT version which might be modified using parameters.
+    return rtToSdkVersion(currentScoutVersion());
+  }
+
+  static String rtToSdkVersion(CharSequence rtVersion) {
+    var version = ApiVersion.parse(rtVersion).orElseThrow(() -> newFail("Invalid Scout RT version '{}'.", rtVersion));
+    var numberSegments = version.segments();
+    if (numberSegments.length < 2) {
+      numberSegments = new int[]{numberSegments[0], 0};
+    }
+    if (numberSegments.length < 3) {
+      numberSegments = new int[]{numberSegments[0], numberSegments[1], 0};
+    }
+    return new ApiVersion(numberSegments, version.suffix()).asString();
+  }
+
+  /**
+   * @return The Scout runtime version of the current test run. Uses the version present in the maven dependencies or
+   *         from the {@link #SCOUT_VERSION_KEY} system property if present.
+   */
   @SuppressWarnings("AccessOfSystemProperties")
   public static String currentScoutVersion() {
     var prop = System.getProperty(SCOUT_VERSION_KEY);
@@ -96,13 +124,7 @@ public final class CoreScoutTestingUtils {
         .withoutScoutSdk()
         .call(ScoutApi::version)
         .map(ApiVersion::asString)
-        .orElseGet(CoreScoutTestingUtils::latestScoutVersion);
-  }
-
-  static String latestScoutVersion() {
-    var latestSnapshot = ScoutApi.latestMajorVersion() + ".0-SNAPSHOT";
-    SdkLog.warning("Unable to determine Scout version for tests. Fallback to latest supported snapshot: {}", latestSnapshot);
-    return latestSnapshot;
+        .orElseThrow(() -> newFail("Unable to determine Scout RT version."));
   }
 
   /**
@@ -133,7 +155,7 @@ public final class CoreScoutTestingUtils {
       var createDocumentBuilder = Xml.createDocumentBuilder();
       var pom = createDocumentBuilder.parse(pomFile.toFile());
       var dependenciesElement = Xml.firstChildElement(pom.getDocumentElement(), IMavenConstants.DEPENDENCIES)
-          .orElseThrow(() -> Ensure.newFail("Pom '{}' does not contain a '{}' element.", pomFile, IMavenConstants.DEPENDENCIES));
+          .orElseThrow(() -> newFail("Pom '{}' does not contain a '{}' element.", pomFile, IMavenConstants.DEPENDENCIES));
 
       // add jaxws Metro as test-dependency because the default implementor specific is Metro and it must be present so that the test platform can be started
       var metroDependencyElement = pom.createElement(IMavenConstants.DEPENDENCY);

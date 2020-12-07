@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
- * Represents an API version consisting of a list of integers followed by an optional {@link String} suffix.
+ * Represents an API version consisting of up to three integers followed by an optional {@link String} suffix.
  */
 public class ApiVersion implements Comparable<ApiVersion> {
 
