@@ -23,6 +23,7 @@ public class ScoutSdkStartupExtension implements IStartup {
 
   @Override
   public void earlyStartup() {
+    //noinspection ResultOfMethodCallIgnored
     S2ESdkUiActivator.getDefault();
   }
 }

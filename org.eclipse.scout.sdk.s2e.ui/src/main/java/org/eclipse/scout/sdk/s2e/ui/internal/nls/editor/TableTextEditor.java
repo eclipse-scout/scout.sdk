@@ -38,6 +38,7 @@ public class TableTextEditor {
     m_shell.setBackground(parent.getShell().getDisplay().getSystemColor(SWT.COLOR_GREEN));
 
     var layout = new FillLayout();
+    //noinspection SuspiciousNameCombination
     layout.marginHeight = BORDER_WIDTH;
     layout.marginWidth = BORDER_WIDTH;
     m_shell.setLayout(layout);

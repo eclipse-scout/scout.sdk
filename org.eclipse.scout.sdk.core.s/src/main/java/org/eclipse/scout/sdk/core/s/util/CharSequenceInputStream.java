@@ -184,6 +184,7 @@ public class CharSequenceInputStream extends InputStream {
      */
     long skipped = 0;
     while (n > 0 && available() > 0) {
+      //noinspection ResultOfMethodCallIgnored
       read();
       n--;
       skipped++;

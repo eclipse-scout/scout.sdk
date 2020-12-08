@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaE
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.callInExistingTransaction
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
 import java.util.Collections.emptyList
@@ -176,7 +177,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         val start = System.currentTimeMillis()
 
         try {
-            return TransactionManager.callInExistingTransaction(transaction) {
+            return callInExistingTransaction(transaction) {
                 SdkLog.debug("About to execute derived resource handler: {}", handler)
                 return@callInExistingTransaction handler.apply(env, progress)
             }

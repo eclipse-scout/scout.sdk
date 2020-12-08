@@ -64,16 +64,16 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
      */
     private fun startTemplateWithTempSettings(template: TemplateImpl, editor: Editor) {
         val project = editor.project
-        val settingsManager = CodeStyleSettingsManager.getInstance(project)
-        val origTempSettings = settingsManager.temporarySettings
-        val tempSettings = CompatibilityHelper.createTempSettings(CodeStyle.getSettings(editor), settingsManager)
-        val tempJavaSettings = tempSettings.getCustomSettings(JavaCodeStyleSettings::class.java)
-        tempJavaSettings.isInsertInnerClassImports = false
 
         writeCommandAction(project).run(ThrowableRunnable<RuntimeException> {
+            val settingsManager = CodeStyleSettingsManager.getInstance(project)
+            val origTempSettings = settingsManager.temporarySettings
+            val origProjectSettings = CodeStyle.getSettings(editor) // must be obtained before creating temp settings!
+            val tempSettings = CompatibilityHelper.createTempSettings(origProjectSettings, settingsManager)
+            tempSettings.getCustomSettings(JavaCodeStyleSettings::class.java).isInsertInnerClassImports = false
+
             val templateListener = TemplateListener(templateDescriptor, settingsManager, origTempSettings)
             removePrefix(editor)
-            settingsManager.setTemporarySettings(tempSettings)
             TemplateManager.getInstance(project).startTemplate(editor, template, templateListener)
         })
     }

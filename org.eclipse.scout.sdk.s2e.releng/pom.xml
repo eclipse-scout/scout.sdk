@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2015 BSI Business Systems Integration AG.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the Eclipse Public License v1.0
-  which accompanies this distribution, and is available at
-  http://www.eclipse.org/legal/epl-v10.html
-
-  Contributors:
-  BSI Business Systems Integration AG - initial API and implementation
--->
+  ~ Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+  ~ All rights reserved. This program and the accompanying materials
+  ~ are made available under the terms of the Eclipse Public License v1.0
+  ~ which accompanies this distribution, and is available at
+  ~ http://www.eclipse.org/legal/epl-v10.html
+  ~
+  ~ Contributors:
+  ~     BSI Business Systems Integration AG - initial API and implementation
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -30,21 +30,25 @@
     2.  Update versions in the parent POM: ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui}, ${org.eclipse.m2e.archetype.common}, ...
     3a. For deploying snapshots (to be used by Eclipse Scout SDK snapshots)
         - In org.eclipse.scout.sdk.s2e.releng/, execute
-          mvn clean deploy -DforgeSnapshotUrl=https://scout.bsiag.com/repository/org.eclipse.scout-snapshot-local -DforgeSnapshotId=bsi-tools-snapshot
+          mvn clean deploy
     3b. For deploying releases (to be used by Tycho releases):
         - Prerequisite: 1. you need to have GPG properly set up, see http://central.sonatype.org/pages/working-with-pgp-signatures.html
                         2. if not already present: you need to add the server with id of property DforgeReleaseId into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
         - Make sure that ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui}, ${org.eclipse.m2e.archetype.common},... in the parent POM don't have a '-SNAPSHOT' suffix
         3b.1 For full deploy: In org.eclipse.scout.sdk.s2e.releng/, execute
-             mvn clean deploy -Pdeploy-releases -DforgeReleaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DforgeReleaseId=forge-releases -Dgpg.passphrase=<your_passphrase>
+             mvn clean deploy -Pdeploy-releases -Dgpg.passphrase=<your_passphrase>
         3b.2 For single additional deps: In org.eclipse.scout.sdk.s2e.releng/, execute
-             mvn clean deploy -Pdeploy-releases-addNewDeps -DforgeReleaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DforgeReleaseId=forge-releases -Dgpg.passphrase=<your_passphrase>
+             mvn clean deploy -Pdeploy-releases-addNewDeps -Dgpg.passphrase=<your_passphrase>
         - Login to https://oss.sonatype.org: Close and release staged artifacts into repository 'Releases'
   -->
   <properties>
     <downloaded>${project.build.directory}/repository/plugins/</downloaded>
     <!-- don't deploy this helper pom -->
     <maven.deploy.skip>true</maven.deploy.skip>
+    <forgeSnapshotId>bsi-tools-snapshot</forgeSnapshotId>
+    <forgeSnapshotUrl>https://scout.bsiag.com/repository/org.eclipse.scout-snapshot-local</forgeSnapshotUrl>
+    <forgeReleaseId>forge-releases</forgeReleaseId>
+    <forgeReleaseUrl>https://oss.sonatype.org/service/local/staging/deploy/maven2/</forgeReleaseUrl>
   </properties>
 
   <build>

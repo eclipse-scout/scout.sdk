@@ -45,7 +45,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
 
     private val m_fileCache = ConcurrentHashMap<String /* file path */, MutableMap<String /* fqn */, String /* classid */>>()
     private val m_stopTypes: Array<Class<out PsiElement>> = arrayOf(PsiClass::class.java, PsiModifierList::class.java, PsiTypeElement::class.java, PsiTypeParameter::class.java, PsiJavaFile::class.java)
-    private val m_delayedProcessor = DelayedBuffer<PsiFile>(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::processFileEvents)
+    private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::processFileEvents)
 
     @Volatile
     private var m_cacheReady = false

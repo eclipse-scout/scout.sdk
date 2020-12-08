@@ -20,7 +20,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VfsUtilCore.iterateChildrenRecursively
 import com.intellij.openapi.vfs.VirtualFile
@@ -40,7 +40,6 @@ import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
-import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.nio.file.Path
 import kotlin.streams.asSequence
 
@@ -81,7 +80,7 @@ open class UnusedTranslationInspection : GlobalInspectionTool() {
         return null
     }
 
-    private fun interestingFoldersOf(module: Module): List<VirtualFile> = ModuleRootManager.getInstance(module)
+    private fun interestingFoldersOf(module: Module): List<VirtualFile> = module.rootManager
             .contentRoots
             .flatMap { listOf(it.findChild("src"), it.findChild("test")) }
             .filterNotNull()
@@ -89,7 +88,8 @@ open class UnusedTranslationInspection : GlobalInspectionTool() {
     private fun acceptFile(fileOrDirectory: VirtualFile) = fileOrDirectory.isValid && fileOrDirectory.isInLocalFileSystem
 
     private fun removeKeysFoundIn(file: VirtualFile, modulePath: Path, unusedKeys: MutableMap<String, ITranslationStore>): Boolean {
-        val queryInput = FileQueryInput(file.getNioPath(), modulePath) {
+        val filePath = file.resolveLocalPath() ?: return true
+        val queryInput = FileQueryInput(filePath, modulePath) {
             file.inputStream.use {
                 Strings.fromInputStream(it, file.charset, file.length.toInt())
             }

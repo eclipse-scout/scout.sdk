@@ -19,10 +19,10 @@ import java.util.*
 val scoutSdkVersion = "11.0.0-SNAPSHOT"
 val scoutSdkPluginVersion = scoutSdkVersion.replace("-SNAPSHOT", "." + timestamp())
 
-val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "11.0-SNAPSHOT")
-val javaVersion = JavaVersion.VERSION_11
-val intellijVersion = projectPropertyOr("intellij_version", "IU-2020.1.2") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 val kotlinVersion = "1.3"
+val javaVersion = JavaVersion.VERSION_11
+val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "11.0-SNAPSHOT")
+val intellijVersion = projectPropertyOr("intellij_version", "IU-2020.1.2") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
@@ -46,7 +46,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "0.5.1"
+    id("org.jetbrains.intellij") version "0.6.5"
     kotlin("jvm") version "1.3.72"
 }
 
@@ -63,7 +63,7 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", scoutSdkVersion)
     api("org.apache.poi", "poi-ooxml", "4.1.2")
     implementation(kotlin("stdlib-jdk8"))
-    testImplementation("org.mockito", "mockito-core", "3.5.13")
+    testImplementation("org.mockito", "mockito-core", "3.6.28")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }

@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
 @SuppressWarnings("unchecked")
 public class AstValueFieldBuilder<INSTANCE extends AstValueFieldBuilder<INSTANCE>> extends AstTypeBuilder<INSTANCE> {
 
+  @SuppressWarnings("PublicStaticCollectionField")
   public static final Set<String> PROPOSAL_VALUE_DATA_TYPES = new ConcurrentSkipListSet<>();
 
   static {

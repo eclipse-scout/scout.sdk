@@ -107,7 +107,6 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
   protected String parseCodeIdTypeFromCodeType() {
     var codeType = getDeclaringCodeType();
     var typeBinding = Ensure.notNull(AstUtils.getTypeBinding(codeType));
-    //noinspection resource
     var scoutType = getFactory().getScoutElementProvider().toScoutType(typeBinding);
     var iCodeType = getFactory().getScoutApi().ICodeType();
     return scoutType.resolveTypeParamValue(iCodeType.codeIdTypeParamIndex(), iCodeType.fqn())

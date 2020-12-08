@@ -82,11 +82,12 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   private ParsedWsdl m_parsedWsdl;
 
   protected AbstractWebServiceNewOperation() {
-    m_createdWebServiceClients = new ArrayList<>(2);
-    m_createdEntryPointDefinitions = new ArrayList<>(m_createdWebServiceClients.size());
-    m_createdProviderServiceImpls = new ArrayList<>(m_createdWebServiceClients.size());
-    m_createdUrlProperties = new ArrayList<>(m_createdWebServiceClients.size());
-    m_createdJaxwsBindingFiles = new ArrayList<>(m_createdWebServiceClients.size());
+    var capacity = 2;
+    m_createdWebServiceClients = new ArrayList<>(capacity);
+    m_createdEntryPointDefinitions = new ArrayList<>(capacity);
+    m_createdProviderServiceImpls = new ArrayList<>(capacity);
+    m_createdUrlProperties = new ArrayList<>(capacity);
+    m_createdJaxwsBindingFiles = new ArrayList<>(capacity);
   }
 
   @Override

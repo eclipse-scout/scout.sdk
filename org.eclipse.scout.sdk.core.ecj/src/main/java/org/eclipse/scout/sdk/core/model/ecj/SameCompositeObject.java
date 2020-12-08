@@ -47,6 +47,7 @@ final class SameCompositeObject {
   }
 
   private static boolean sameElements(Object[] a1, Object[] a2) {
+    //noinspection ArrayEquality
     if (a1 == a2) {
       return true;
     }

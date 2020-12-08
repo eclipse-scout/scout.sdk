@@ -51,6 +51,7 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicPrimaryTypeFilter;
  */
 public class TypeContentProvider extends StrictHierarchyTypeContentProvider {
 
+  @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized")
   private NormalizedPattern m_lastPattern;
   private int m_maxProposalCount;
   private final List<String> m_mostlyUsedTypes;

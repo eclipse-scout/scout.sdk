@@ -38,13 +38,13 @@ import org.eclipse.scout.sdk.core.s.nls.*
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.OperationTask
+import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import org.eclipse.scout.sdk.s2i.resolveProperty
 import org.eclipse.scout.sdk.s2i.resolvePsi
 import org.eclipse.scout.sdk.s2i.toScoutProgress
 import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import org.eclipse.scout.sdk.s2i.util.Xlsx
-import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
@@ -338,8 +338,8 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
                     .withFileFilter { it.isValid && it.exists() && it.extension == "xlsx" }
             val vFile = FileChooser.chooseFile(descriptor, project, null) ?: return
             try {
-                val file = vFile.getNioPath().toFile()
-                if (!file.exists()) {
+                val file = vFile.resolveLocalPath()?.toFile()
+                if (file?.exists() != true) {
                     showBalloon(message("file.not.found"), MessageType.ERROR)
                     return
                 }

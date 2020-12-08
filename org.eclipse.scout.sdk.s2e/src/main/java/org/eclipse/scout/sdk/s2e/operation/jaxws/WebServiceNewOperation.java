@@ -68,7 +68,6 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
     var jaxWsProject = getJaxWsProject();
     if (JdtUtils.exists(jaxWsProject)) {
       setProjectRoot(jaxWsProject.getProject().getLocation().toFile().toPath());
-      //noinspection resource
       setSourceFolder(EclipseEnvironment.narrow(env)
           .toScoutJavaEnvironment(jaxWsProject)
           .primarySourceFolder()

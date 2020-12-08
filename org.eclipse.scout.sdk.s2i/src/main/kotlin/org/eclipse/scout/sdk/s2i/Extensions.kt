@@ -17,8 +17,8 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.projectRoots.JavaSdk
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -35,6 +35,7 @@ import com.intellij.structuralsearch.MatchVariableConstraint
 import com.intellij.structuralsearch.Matcher
 import com.intellij.structuralsearch.plugin.util.CollectingMatchResultSink
 import com.intellij.util.CollectionQuery
+import com.intellij.util.PathUtil
 import com.intellij.util.Query
 import com.intellij.util.containers.stream
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier
@@ -60,7 +61,6 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInRe
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import org.eclipse.scout.sdk.s2i.util.ApiHelper
-import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.function.Function
@@ -223,7 +223,7 @@ fun IProgress.toIdea(): IdeaProgress = this as IdeaProgress
 /**
  * @return true if this [Module] has a Java SDK.
  */
-fun Module.isJavaModule(): Boolean = ModuleRootManager.getInstance(this).sdk?.sdkType == JavaSdk.getInstance()
+fun Module.isJavaModule(): Boolean = rootManager.sdk?.sdkType == JavaSdk.getInstance()
 
 fun IEnvironment.toIdea(): IdeaEnvironment = this as IdeaEnvironment
 
@@ -330,10 +330,10 @@ fun Module.findTypeByName(fqn: String, includeTests: Boolean = true) = project
 fun VirtualFile.containingModule(project: Project) = ModuleUtilCore.findModuleForFile(this, project)
 
 /**
- * @return The directory [Path] of this [Module].
+ * @return The directory [Path] of this [Module]. It is the main content root of the [Module] or the directory containing the .iml file if no content roots are available
  */
 fun Module.moduleDirPath(): Path {
-    val contentRoots = ModuleRootManager.getInstance(this).contentRoots.filter { it.isDirectory }
+    val contentRoots = rootManager.contentRoots.filter { it.isDirectory }
     var virtualDirectory: VirtualFile? = null
     if (contentRoots.size > 1) {
         virtualDirectory = contentRoots.find { it.name == name }
@@ -341,7 +341,7 @@ fun Module.moduleDirPath(): Path {
     if (virtualDirectory == null) {
         virtualDirectory = contentRoots.firstOrNull()
     }
-    return virtualDirectory?.getNioPath() ?: Paths.get(ModuleUtilCore.getModuleDirPath(this))
+    return virtualDirectory?.resolveLocalPath() ?: Paths.get(ModuleUtilCore.getModuleDirPath(this))
 }
 
 /**
@@ -406,3 +406,11 @@ fun ITranslationEntry.resolveProperty(language: Language, project: Project) = re
 fun ITranslationEntry.resolveProperty(language: Language, psiManager: PsiManager) = store()
         .resolvePropertiesFile(language, psiManager)
         ?.findPropertyByKey(key())
+
+/**
+ * Tries to resolve the local [Path] of this [VirtualFile] if this [VirtualFile] points to such a file.
+ * If it cannot be resolved (e.g. because it is a file in a zip or jar), null is returned.
+ * @return The local [Path] of this [VirtualFile] or null if it cannot be computed.
+ * @throws java.nio.file.InvalidPathException if the location of this [VirtualFile] cannot be converted to a [Path]
+ */
+fun VirtualFile.resolveLocalPath() = PathUtil.getLocalPath(this)?.let { Paths.get(it) }

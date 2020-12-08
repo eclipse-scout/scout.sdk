@@ -27,6 +27,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  */
 public class CreateAllMissingClassIdsHandler extends AbstractHandler {
   @Override
+  @SuppressWarnings("HardcodedLineSeparator")
   public Object execute(ExecutionEvent event) throws ExecutionException {
     var messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
     messageBox.setMessage("This will create all missing @ClassId annotations in the workspace.\nDepending on the size of your workspace this can take several minutes.\nDo you really want to continue?");

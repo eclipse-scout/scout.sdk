@@ -49,11 +49,11 @@ public final class SimpleGenerators {
       case Null:
         return b -> b.append("null");
       case Int:
-        return b -> b.append(mv.as(Integer.class).intValue());
+        return b -> b.append(mv.as(Integer.class));
       case Byte:
-        return b -> b.append(mv.as(Byte.class).byteValue());
+        return b -> b.append(mv.as(Byte.class));
       case Short:
-        return b -> b.append(mv.as(Short.class).shortValue());
+        return b -> b.append(mv.as(Short.class));
       case Char:
         return b -> b.append('\'')
             .append(mv.as(Character.class))
@@ -62,9 +62,9 @@ public final class SimpleGenerators {
         return b -> b.append(mv.as(Float.class))
             .append('f');
       case Double:
-        return b -> b.append(mv.as(Double.class).doubleValue());
+        return b -> b.append(mv.as(Double.class));
       case Bool:
-        return b -> b.append(mv.as(Boolean.class).booleanValue());
+        return b -> b.append(mv.as(Boolean.class));
       case Long:
         return b -> b.append(mv.as(Long.class))
             .append('L');

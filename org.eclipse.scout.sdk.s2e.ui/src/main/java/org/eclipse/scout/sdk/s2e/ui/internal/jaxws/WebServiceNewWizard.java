@@ -144,9 +144,7 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
   }
 
   protected static void openJaxwsEditor(IFile jaxwsFile, String wsdlName) {
-    var input = new WebServiceEditorInput(jaxwsFile);
-    input.setPageIdToActivate(wsdlName);
-    S2eUiUtils.openInEditor(input, WebServiceEditor.WEB_SERVICE_EDITOR_ID, true);
+    S2eUiUtils.openInEditor(new WebServiceEditorInput(jaxwsFile, wsdlName), WebServiceEditor.WEB_SERVICE_EDITOR_ID, true);
   }
 
   @Override

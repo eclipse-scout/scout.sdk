@@ -78,7 +78,6 @@ public class AstRadioButtonBuilder extends AstTypeBuilder<AstRadioButtonBuilder>
 
   protected String parseValueTypeTypeFromGroup() {
     var typeBinding = Ensure.notNull(AstUtils.getTypeBinding(getDeclaringType()));
-    //noinspection resource
     var scoutType = getFactory().getScoutElementProvider().toScoutType(typeBinding);
     var iValueField = getFactory().getScoutApi().IValueField();
     return scoutType.resolveTypeParamValue(iValueField.valueTypeParamIndex(), iValueField.fqn())

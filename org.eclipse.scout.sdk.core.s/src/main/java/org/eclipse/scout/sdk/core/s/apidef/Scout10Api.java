@@ -143,7 +143,7 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  Data DATA_ANNOTATION = new Data();
+  IScoutAnnotationApi.Data DATA_ANNOTATION = new Data();
 
   @Override
   default IScoutAnnotationApi.Data Data() {
@@ -162,11 +162,11 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutAnnotationApi.DtoRelevant DTORELEVANT_ANNOTATION = new DtoRelevant();
+  IScoutAnnotationApi.DtoRelevant DTO_RELEVANT_ANNOTATION = new DtoRelevant();
 
   @Override
   default IScoutAnnotationApi.DtoRelevant DtoRelevant() {
-    return DTORELEVANT_ANNOTATION;
+    return DTO_RELEVANT_ANNOTATION;
   }
 
   class DtoRelevant implements IScoutAnnotationApi.DtoRelevant {
@@ -277,11 +277,11 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutAnnotationApi.PageData PAGEDATA_ANNOTATION = new PageData();
+  IScoutAnnotationApi.PageData PAGE_DATA_ANNOTATION = new PageData();
 
   @Override
   default IScoutAnnotationApi.PageData PageData() {
-    return PAGEDATA_ANNOTATION;
+    return PAGE_DATA_ANNOTATION;
   }
 
   class PageData implements IScoutAnnotationApi.PageData {
@@ -310,11 +310,11 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutAnnotationApi.RunWith RUNWITH_ANNOTATION = new RunWith();
+  IScoutAnnotationApi.RunWith RUN_WITH_ANNOTATION = new RunWith();
 
   @Override
   default IScoutAnnotationApi.RunWith RunWith() {
-    return RUNWITH_ANNOTATION;
+    return RUN_WITH_ANNOTATION;
   }
 
   class RunWith implements IScoutAnnotationApi.RunWith {
@@ -329,11 +329,11 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutAnnotationApi.RunWithClientSession RUNWITHCLIENTSESSION_ANNOTATION = new RunWithClientSession();
+  IScoutAnnotationApi.RunWithClientSession RUN_WITH_CLIENT_SESSION_ANNOTATION = new RunWithClientSession();
 
   @Override
   default IScoutAnnotationApi.RunWithClientSession RunWithClientSession() {
-    return RUNWITHCLIENTSESSION_ANNOTATION;
+    return RUN_WITH_CLIENT_SESSION_ANNOTATION;
   }
 
   class RunWithClientSession implements IScoutAnnotationApi.RunWithClientSession {
@@ -348,11 +348,11 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutAnnotationApi.RunWithServerSession RUNWITHSERVERSESSION_ANNOTATION = new RunWithServerSession();
+  IScoutAnnotationApi.RunWithServerSession RUN_WITH_SERVER_SESSION_ANNOTATION = new RunWithServerSession();
 
   @Override
   default IScoutAnnotationApi.RunWithServerSession RunWithServerSession() {
-    return RUNWITHSERVERSESSION_ANNOTATION;
+    return RUN_WITH_SERVER_SESSION_ANNOTATION;
   }
 
   class RunWithServerSession implements IScoutAnnotationApi.RunWithServerSession {
@@ -367,11 +367,11 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutAnnotationApi.RunWithSubject RUNWITHSUBJECT_ANNOTATION = new RunWithSubject();
+  IScoutAnnotationApi.RunWithSubject RUN_WITH_SUBJECT_ANNOTATION = new RunWithSubject();
 
   @Override
   default IScoutAnnotationApi.RunWithSubject RunWithSubject() {
-    return RUNWITHSUBJECT_ANNOTATION;
+    return RUN_WITH_SUBJECT_ANNOTATION;
   }
 
   class RunWithSubject implements IScoutAnnotationApi.RunWithSubject {
@@ -400,11 +400,11 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutAnnotationApi.TunnelToServer TUNNELTOSERVER_ANNOTATION = new TunnelToServer();
+  IScoutAnnotationApi.TunnelToServer TUNNEL_TO_SERVER_ANNOTATION = new TunnelToServer();
 
   @Override
   default IScoutAnnotationApi.TunnelToServer TunnelToServer() {
-    return TUNNELTOSERVER_ANNOTATION;
+    return TUNNEL_TO_SERVER_ANNOTATION;
   }
 
   class TunnelToServer implements IScoutAnnotationApi.TunnelToServer {
@@ -414,11 +414,11 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutAnnotationApi.WebServiceEntryPoint WEBSERVICEENTRYPOINT_ANNOTATION = new WebServiceEntryPoint();
+  IScoutAnnotationApi.WebServiceEntryPoint WEB_SERVICE_ENTRY_POINT_ANNOTATION = new WebServiceEntryPoint();
 
   @Override
   default IScoutAnnotationApi.WebServiceEntryPoint WebServiceEntryPoint() {
-    return WEBSERVICEENTRYPOINT_ANNOTATION;
+    return WEB_SERVICE_ENTRY_POINT_ANNOTATION;
   }
 
   class WebServiceEntryPoint implements IScoutAnnotationApi.WebServiceEntryPoint {

@@ -30,8 +30,8 @@ import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInLongReadAction
 import org.eclipse.scout.sdk.s2i.moduleDirPath
+import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import org.eclipse.scout.sdk.s2i.toScoutProgress
-import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.nio.file.Path
 
 object TranslationStoreStackLoader {
@@ -135,7 +135,7 @@ object TranslationStoreStackLoader {
     }
 
     private fun findPrimaryStore(nlsFile: VirtualFile?, stack: TranslationStoreStack): ITranslationStore {
-        val parsedNlsFile = nlsFile?.getNioPath()?.let { NlsFile(it) }
+        val parsedNlsFile = nlsFile?.resolveLocalPath()?.let { NlsFile(it) }
         return parsedNlsFile?.findMatchingStoreIn(stack)?.orElse(null)
                 ?: firstStoreIn(stack, parsedNlsFile)
     }

@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
  */
 public final class ClassIds {
 
+  @SuppressWarnings("PublicStaticCollectionField")
   public static final Collection<Function<String, String>> STORE = new CopyOnWriteArrayList<>();
   static {
     STORE.add(context -> UUID.randomUUID().toString());

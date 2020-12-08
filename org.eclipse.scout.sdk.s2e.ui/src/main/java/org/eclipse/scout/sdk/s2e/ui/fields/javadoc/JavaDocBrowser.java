@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Composite;
  *
  * @since 5.2.0
  */
+@SuppressWarnings("HardcodedLineSeparator")
 public final class JavaDocBrowser {
 
   private JavaDocBrowser() {

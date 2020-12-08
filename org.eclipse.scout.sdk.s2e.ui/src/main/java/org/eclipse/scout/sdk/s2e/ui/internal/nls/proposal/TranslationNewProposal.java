@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls.proposal;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
@@ -46,16 +45,11 @@ public class TranslationNewProposal extends AbstractTranslationProposal {
   }
 
   @Override
-  public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
-    apply(viewer.getDocument(), trigger, offset);
-  }
-
-  @Override
   public void apply(IDocument document, char trigger, int offset) {
     String searchText = null;
-    var initalOffset = getInitialOffset();
+    var initialOffset = getInitialOffset();
     try {
-      searchText = document.get(initalOffset - getPrefix().length(), getPrefix().length() + offset - initalOffset);
+      searchText = document.get(initialOffset - getPrefix().length(), getPrefix().length() + offset - initialOffset);
     }
     catch (BadLocationException e1) {
       SdkLog.warning(e1);

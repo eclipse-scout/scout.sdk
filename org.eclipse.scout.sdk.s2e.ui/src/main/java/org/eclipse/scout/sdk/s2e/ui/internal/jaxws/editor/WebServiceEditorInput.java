@@ -22,18 +22,15 @@ import org.eclipse.ui.part.FileEditorInput;
  */
 public class WebServiceEditorInput extends FileEditorInput {
 
-  private String m_pageIdToActivate;
+  private final String m_pageIdToActivate;
 
-  public WebServiceEditorInput(IFile file) {
+  public WebServiceEditorInput(IFile file, String pageIdToActivate) {
     super(file);
+    m_pageIdToActivate = pageIdToActivate;
   }
 
   public String getPageIdToActivate() {
     return m_pageIdToActivate;
-  }
-
-  public void setPageIdToActivate(String pageIdToActivate) {
-    m_pageIdToActivate = pageIdToActivate;
   }
 
   @Override

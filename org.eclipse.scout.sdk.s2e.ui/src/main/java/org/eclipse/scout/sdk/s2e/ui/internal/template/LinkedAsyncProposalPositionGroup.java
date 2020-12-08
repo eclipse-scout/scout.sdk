@@ -84,6 +84,7 @@ public class LinkedAsyncProposalPositionGroup extends LinkedProposalPositionGrou
 
       private void fireLoaded() {
         ILinkedAsyncProposalListener[] listeners;
+        //noinspection SynchronizeOnThis
         synchronized (this) {
           listeners = m_listeners.toArray(new ILinkedAsyncProposalListener[0]);
         }

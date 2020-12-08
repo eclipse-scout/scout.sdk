@@ -51,6 +51,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
 
   private final IJavaProject m_project;
+  @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized")
   private FinalValue<Map<IPackageFragmentRoot, ClasspathSpi>> m_classpath;
 
   public JavaEnvironmentWithJdt(IJavaProject project) {

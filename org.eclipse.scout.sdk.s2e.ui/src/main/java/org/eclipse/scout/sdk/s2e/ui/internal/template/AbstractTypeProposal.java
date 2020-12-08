@@ -131,7 +131,6 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
   }
 
   protected Type getBestMatchingSuperType(Iterable<String> candidates) {
-    //noinspection resource
     var env = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
     for (var superTypeCandidate : candidates) {
       if (env.exists(superTypeCandidate)) {

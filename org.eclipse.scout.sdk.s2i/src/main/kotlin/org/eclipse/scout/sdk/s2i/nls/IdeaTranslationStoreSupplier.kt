@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2i.nls
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
@@ -36,7 +36,6 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
-import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.nio.file.Path
 import java.util.*
 import java.util.stream.Stream
@@ -112,19 +111,19 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
     }
 
     protected fun loadTranslationFiles(psiClass: PsiClass, store: PropertiesTranslationStore, progress: IProgress): Boolean {
-        val isWritable = psiClass.isWritable
-        val rootType = if (isWritable) OrderRootType.SOURCES else OrderRootType.CLASSES
+        val rootType = if (psiClass.isWritable) OrderRootType.SOURCES else OrderRootType.CLASSES
         val roots = findRootDirectories(psiClass, rootType) ?: return false
         val prefix = store.service().filePrefix()
         val folder = store.service().folder()
         val translationFiles = roots
                 .asSequence()
                 .mapNotNull { it.findFileByRelativePath(folder) }
-                .filter { it.isDirectory }
                 .filter { it.isValid }
+                .filter { it.isDirectory }
                 .flatMap { it.children.asSequence() }
+                .filter { it.isValid }
                 .filter { !it.isDirectory }
-                .mapNotNull { toTranslationPropertiesFile(it, prefix, isWritable) }
+                .mapNotNull { toTranslationPropertiesFile(it, prefix) }
                 .toList()
         if (translationFiles.isEmpty()) {
             SdkLog.warning("Skipping TextProviderService '{}' because no properties files could be found.", store.service().type().name())
@@ -141,16 +140,17 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
      */
     protected fun findRootDirectories(psiClass: PsiClass, rootType: OrderRootType): Array<VirtualFile>? {
         val module = psiClass.containingModule() ?: return null
-        return ModuleRootManager.getInstance(module)
+        return module.rootManager
                 .fileIndex
                 .getOrderEntryForFile(psiClass.containingFile.virtualFile)
                 ?.getFiles(rootType)
     }
 
-    protected fun toTranslationPropertiesFile(file: VirtualFile, prefix: String, isEditable: Boolean): ITranslationPropertiesFile? {
+    protected fun toTranslationPropertiesFile(file: VirtualFile, prefix: String): ITranslationPropertiesFile? {
         val language = parseLanguageFromFileName(file.name, prefix).orElse(null) ?: return null
-        if (isEditable) {
-            return EditableTranslationFile(file.getNioPath(), language)
+        val path = file.resolveLocalPath()
+        if (path != null) {
+            return EditableTranslationFile(path, language)
         }
         return ReadOnlyTranslationFile({ file.inputStream }, language, file)
     }

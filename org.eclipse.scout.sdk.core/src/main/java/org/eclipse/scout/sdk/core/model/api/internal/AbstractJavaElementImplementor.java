@@ -120,6 +120,7 @@ public abstract class AbstractJavaElementImplementor<SPI extends JavaElementSpi>
 
   @Override
   public int hashCode() {
+    //noinspection NonFinalFieldReferencedInHashCode
     return m_spi.hashCode();
   }
 

@@ -17,7 +17,6 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils.runWithWriteActionPriority
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope.allScope
@@ -43,7 +42,6 @@ import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.repeatUntilPassesWithIndex
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
-import org.eclipse.scout.sdk.s2i.util.getNioPath
 import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -120,8 +118,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
     override fun rootOfJavaEnvironment(environment: IJavaEnvironment?): Path {
         val spi = environment?.unwrap() ?: throw newFail("Java environment must not be null")
         val ideaEnv = spi as JavaEnvironmentWithIdea
-        val root = ideaEnv.module.rootManager.contentRoots.firstOrNull() ?: throw newFail("Java environment '{}' has no root directory.", ideaEnv)
-        return root.getNioPath()
+        return ideaEnv.module.moduleDirPath()
     }
 
     fun toScoutJavaEnvironment(module: Module?): IJavaEnvironment? = module
@@ -134,10 +131,12 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
             ?.let { toScoutJavaEnvironment(it) }
             ?.let { findClasspathEntry(classpathRoot, it) }
 
-    protected fun findClasspathEntry(file: VirtualFile, env: IJavaEnvironment): IClasspathEntry? = env.sourceFolders()
-            .filter { it.path().startsWith(file.getNioPath()) }
-            .findAny()
-            .orElse(null)
+    protected fun findClasspathEntry(file: VirtualFile, env: IJavaEnvironment) = file.resolveLocalPath()?.let { filePath ->
+        env.sourceFolders()
+                .filter { it.path().startsWith(filePath) }
+                .findAny()
+                .orElse(null)
+    }
 
     protected fun getOrCreateEnv(module: Module): JavaEnvironmentWithIdea = m_envs.computeIfAbsent(module.name) { createNewJavaEnvironmentFor(module) }
 

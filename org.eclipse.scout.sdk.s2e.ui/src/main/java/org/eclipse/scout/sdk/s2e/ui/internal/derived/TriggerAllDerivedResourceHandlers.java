@@ -32,6 +32,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class TriggerAllDerivedResourceHandlers extends AbstractHandler {
 
   @Override
+  @SuppressWarnings("HardcodedLineSeparator")
   public Object execute(ExecutionEvent event) throws ExecutionException {
     var messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
     messageBox.setMessage("This will update all derived resources.\nDepending on the size of your workspace this can take several minutes.\nDo you really want to continue?");

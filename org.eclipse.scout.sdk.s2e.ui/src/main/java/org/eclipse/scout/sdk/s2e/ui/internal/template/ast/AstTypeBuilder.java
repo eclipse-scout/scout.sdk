@@ -203,7 +203,6 @@ public class AstTypeBuilder<INSTANCE extends AstTypeBuilder<INSTANCE>> extends A
     if (isCreateOrderAnnotation()) {
       double newOrder = ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP;
       if (isCalculateOrderValue()) {
-        //noinspection resource
         var environment = getFactory().getScoutElementProvider().toScoutJavaEnvironment(getFactory().getJavaProject());
         newOrder = OrderAnnotation.getNewViewOrderValue(environment.requireType(declaringTypeFqn), getOrderDefinitionType(), getInsertPosition());
       }

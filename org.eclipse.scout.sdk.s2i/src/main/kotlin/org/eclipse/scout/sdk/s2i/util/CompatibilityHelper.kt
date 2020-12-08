@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.s2i.util
 
 import com.intellij.codeInsight.completion.JavaCompletionContributor
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.vfs.VfsUtilCore
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager
@@ -21,7 +19,6 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.util.FinalValue
 import java.lang.reflect.Method
-import java.nio.file.Path
 
 /**
  * Holds all API version dependent logic.
@@ -37,14 +34,16 @@ object CompatibilityHelper {
     fun createTempSettings(origSettings: CodeStyleSettings, settingsManager: CodeStyleSettingsManager): CodeStyleSettings {
         val createTemporarySettings = CREATE_TEMP_SETTINGS_METHOD.computeIfAbsentAndGet { createTemporarySettingsMethod() }
         if (createTemporarySettings != null) {
-            // use createTemporarySettings() factory method in IJ 2020.2 and newer
+            // use createTemporarySettings() factory method in IJ 2020.2 and newer. The created settings are already activated.
             val tempSettings = createTemporarySettings.invoke(settingsManager) as CodeStyleSettings
             tempSettings.copyFrom(origSettings)
             return tempSettings
         }
 
         // use clone method until IJ 2020.1
-        return CodeStyleSettings::class.java.getMethod("clone").invoke(origSettings) as CodeStyleSettings
+        val cloned = CodeStyleSettings::class.java.getMethod("clone").invoke(origSettings) as CodeStyleSettings
+        settingsManager.setTemporarySettings(cloned)
+        return cloned
     }
 
     private fun createTemporarySettingsMethod() =
@@ -80,8 +79,3 @@ object CompatibilityHelper {
 
     private fun semicolonNeededLegacy() = JavaCompletionContributor::class.java.getMethod("semicolonNeeded", Editor::class.java, PsiFile::class.java, Int::class.java)
 }
-
-/**
- * @return A [Path] representing this [VirtualFile].
- */
-fun VirtualFile.getNioPath(): Path = VfsUtilCore.virtualToIoFile(this).toPath() // don't use toNioPath as method name because this name already exists in VirtualFile since IJ 2020.2. Can be removed if IJ 2020.2 is the oldest supported release.
