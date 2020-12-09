@@ -10,9 +10,14 @@
  */
 package org.eclipse.scout.sdk.s2i.settings
 
+import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.State
+import com.intellij.openapi.components.Storage
+import com.intellij.util.xmlb.XmlSerializerUtil
 
-class ScoutCodeFoldingSettings {
+@State(name = "ScoutCodeFoldingSettings", storages = [Storage("editor.xml")])
+class ScoutCodeFoldingSettings : PersistentStateComponent<ScoutCodeFoldingSettings> {
     private var m_collapseTranslations = true
 
     companion object {
@@ -26,4 +31,8 @@ class ScoutCodeFoldingSettings {
     fun setCollapseTranslations(value: Boolean) {
         m_collapseTranslations = value
     }
+
+    override fun getState() = this
+
+    override fun loadState(state: ScoutCodeFoldingSettings) = XmlSerializerUtil.copyBean(state, this)
 }
