@@ -27,4 +27,38 @@ public interface Scout11Api extends IScoutApi, IScoutChartApi {
       return "org.eclipse.scout.rt.chart.ui.html.ChartUiTextContributor";
     }
   }
+
+  IScoutVariousApi.JaxWsConstants JAX_WS_CONSTANTS = new JaxWsConstants();
+
+  @Override
+  default IScoutVariousApi.JaxWsConstants JaxWsConstants() {
+    return JAX_WS_CONSTANTS;
+  }
+
+  class JaxWsConstants implements IScoutVariousApi.JaxWsConstants {
+    @Override
+    public String mavenPluginGroupId() {
+      return "com.sun.xml.ws";
+    }
+
+    @Override
+    public String codeModelFactoryPath() {
+      return "org/glassfish/jaxb/codemodel/2.3.3/codemodel-2.3.3.jar";
+    }
+
+    @Override
+    public String servletFactoryPath() {
+      return "jakarta/servlet/jakarta.servlet-api/4.0.4/jakarta.servlet-api-4.0.4.jar";
+    }
+
+    @Override
+    public String slf4jFactoryPath() {
+      return "org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar";
+    }
+
+    @Override
+    public String jwsFactoryPath() {
+      return "jakarta/jws/jakarta.jws-api/2.1.0/jakarta.jws-api-2.1.0.jar";
+    }
+  }
 }

@@ -442,20 +442,17 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       if (!JdtUtils.exists(primarySourceFolder) || !primarySourceFolder.getResource().getProjectRelativePath().toString().toLowerCase(Locale.US).contains("java")) {
         return false;
       }
-      var scoutApi = ApiHelper.scoutApiFor(jp);
-      if (scoutApi.isEmpty()) {
+      var optScoutApi = ApiHelper.scoutApiFor(jp);
+      if (optScoutApi.isEmpty()) {
         return false;
       }
-      if (!JdtUtils.exists(jp.findType(scoutApi.get().AbstractWebServiceClient().fqn()))) {
+      var scoutApi = optScoutApi.get();
+      if (!JdtUtils.exists(jp.findType(scoutApi.AbstractWebServiceClient().fqn()))) {
         return false;
       }
 
       var prefix = "p";
-      var p = prefix + ':';
-      var bindingFilesXpathBuilder = new StringBuilder();
-      bindingFilesXpathBuilder.append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.BUILD).append('/').append(p).append(IMavenConstants.PLUGINS).append('/').append(p).append(IMavenConstants.PLUGIN)
-          .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(JaxWsUtils.JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='")
-          .append(JaxWsUtils.JAXWS_MAVEN_PLUGIN_ARTIFACT_ID).append("']");
+      var bindingFilesXpathBuilder = JaxWsUtils.getJaxWsMavenPluginXPath(prefix + ':', scoutApi);
       var elements = Xml.evaluateXPath(bindingFilesXpathBuilder.toString(), S2eUtils.getPomDocument(project), prefix, IMavenConstants.POM_XML_NAMESPACE);
       //noinspection RedundantIfStatement
       if (elements.isEmpty() && containsWsdls(wsdlFolder)) {

@@ -41,6 +41,8 @@ import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils.JaxWsBindingMapping;
@@ -115,6 +117,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
       setSourceFolder(primarySrcFolderOfNewModule);
     }
     progress.setWorkRemaining(61);
+    var scoutApi = getSourceFolder().javaEnvironment().requireApi(IScoutApi.class);
 
     // read wsdl data from remote
     var wsdlBaseName = getWsdlBaseName();
@@ -147,7 +150,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     setCreatedJaxbBindingFile(createJaxbBinding(bindingFolder, env, progress.newChild(1)));
     createJaxwsBindings(bindingFolder, env, progress.newChild(2));
     var wsdlFolderRelativePath = getWsdlRootFolder(getProjectRoot()).relativize(getCreatedWsdlFile());
-    addWsdlToPom(wsdlFolderRelativePath, bindingFolder.getFileName().toString(), env, progress.newChild(2));
+    addWsdlToPom(wsdlFolderRelativePath, bindingFolder.getFileName().toString(), env, progress.newChild(2), scoutApi);
 
     if (isCreateConsumer()) {
       // create web service client class
@@ -279,7 +282,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  protected void addWsdlToPom(Path wsdlFolderRelativePath, String bindingFolderName, IEnvironment env, IProgress progress) {
+  protected void addWsdlToPom(Path wsdlFolderRelativePath, String bindingFolderName, IEnvironment env, IProgress progress, IScoutVariousApi api) {
     var pom = getProjectRoot().resolve(IMavenConstants.POM);
     if (!Files.isReadable(pom) || !Files.isRegularFile(pom)) {
       return;
@@ -291,7 +294,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
 
     try {
       var document = Xml.get(pom);
-      JaxWsUtils.addWsdlToPom(document, wsdlFolderRelativePath.toString().replace('\\', '/'), bindingFolderName, bindingFileNames);
+      JaxWsUtils.addWsdlToPom(document, wsdlFolderRelativePath.toString().replace('\\', '/'), bindingFolderName, bindingFileNames, api);
       env.writeResource(Xml.writeDocument(document, true), pom, progress);
     }
     catch (IOException | TransformerException e) {
@@ -446,7 +449,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   public static Path getWebInfFolder(Path jaxWsProject) {
-    return jaxWsProject.resolve(JaxWsUtils.MODULE_REL_WEBINF_FOLDER_PATH);
+    return jaxWsProject.resolve(JaxWsUtils.MODULE_REL_WEB_INF_FOLDER_PATH);
   }
 
   public boolean isCreateNewModule() {

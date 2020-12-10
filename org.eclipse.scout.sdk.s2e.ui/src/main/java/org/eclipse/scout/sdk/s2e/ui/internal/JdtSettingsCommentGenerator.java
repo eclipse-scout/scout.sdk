@@ -304,6 +304,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
         .map(context -> context.getNode(JavaUI.ID_PLUGIN))
         .filter(Objects::nonNull)
         .map(node -> node.get(PreferenceConstants.CODEGEN_ADD_COMMENTS, null))
+        .filter(Objects::nonNull)
         .findFirst()
         .map("true"::equals)
         .orElse(true);

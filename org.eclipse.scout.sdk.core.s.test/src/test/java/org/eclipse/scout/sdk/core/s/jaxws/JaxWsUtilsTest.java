@@ -26,6 +26,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils.JaxWsBindingMapping;
 import org.eclipse.scout.sdk.core.util.Xml;
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,7 @@ public class JaxWsUtilsTest {
 
   @Test
   public void testGetBindingPathsFromPomInvalidInput() {
-    assertThrows(IllegalArgumentException.class, () -> JaxWsUtils.getBindingPathsFromPom(null, "my'test.wsdl"));
+    assertThrows(IllegalArgumentException.class, () -> JaxWsUtils.getBindingPathsFromPom(null, "my'test.wsdl", null));
   }
 
   @Test
@@ -261,7 +262,7 @@ public class JaxWsUtilsTest {
     try (Reader r = new StringReader(xml)) {
       d = Xml.createDocumentBuilder().parse(new InputSource(r));
     }
-    var bindingPathsFromPom = JaxWsUtils.getBindingPathsFromPom(d, wsdlName);
+    var bindingPathsFromPom = JaxWsUtils.getBindingPathsFromPom(d, wsdlName, ScoutApi.latest());
     assertEquals(expectedPaths, bindingPathsFromPom);
   }
 }

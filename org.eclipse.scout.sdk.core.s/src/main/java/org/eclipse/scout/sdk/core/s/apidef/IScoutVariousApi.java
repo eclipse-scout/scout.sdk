@@ -235,4 +235,18 @@ public interface IScoutVariousApi {
   interface ColumnSet extends IClassNameSupplier {
     String getColumnByClassMethodName();
   }
+
+  JaxWsConstants JaxWsConstants();
+
+  interface JaxWsConstants {
+    String mavenPluginGroupId();
+
+    String codeModelFactoryPath();
+
+    String servletFactoryPath();
+
+    String slf4jFactoryPath();
+
+    String jwsFactoryPath();
+  }
 }

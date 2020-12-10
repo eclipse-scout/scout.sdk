@@ -4171,4 +4171,38 @@ public interface Scout10Api extends IScoutApi {
       return "org.eclipse.scout.rt.ui.html.IUiTextContributor";
     }
   }
+
+  IScoutVariousApi.JaxWsConstants JAX_WS_CONSTANTS = new JaxWsConstants();
+
+  @Override
+  default IScoutVariousApi.JaxWsConstants JaxWsConstants() {
+    return JAX_WS_CONSTANTS;
+  }
+
+  class JaxWsConstants implements IScoutVariousApi.JaxWsConstants {
+    @Override
+    public String mavenPluginGroupId() {
+      return "com.helger.maven";
+    }
+
+    @Override
+    public String codeModelFactoryPath() {
+      return "com/unquietcode/tools/jcodemodel/codemodel/1.0.3/codemodel-1.0.3.jar";
+    }
+
+    @Override
+    public String servletFactoryPath() {
+      return "jakarta/servlet/jakarta.servlet-api/4.0.3/jakarta.servlet-api-4.0.3.jar";
+    }
+
+    @Override
+    public String slf4jFactoryPath() {
+      return "org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar";
+    }
+
+    @Override
+    public String jwsFactoryPath() {
+      return "jakarta/jws/jakarta.jws-api/1.1.1/jakarta.jws-api-1.1.1.jar";
+    }
+  }
 }

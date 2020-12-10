@@ -173,7 +173,7 @@ public final class JaxWsModuleNewHelper {
 
   static void deleteGitKeepFiles(Path createdProjectDir) throws IOException {
     // delete .gitkeep files
-    Files.delete(Ensure.isFile(createdProjectDir.resolve(JaxWsUtils.MODULE_REL_WEBINF_FOLDER_PATH + "/wsdl/.gitkeep")));
+    Files.delete(Ensure.isFile(createdProjectDir.resolve(JaxWsUtils.MODULE_REL_WEB_INF_FOLDER_PATH + "/wsdl/.gitkeep")));
     Files.delete(Ensure.isFile(createdProjectDir.resolve(ISourceFolders.MAIN_JAVA_SOURCE_FOLDER + "/.gitkeep")));
   }
 

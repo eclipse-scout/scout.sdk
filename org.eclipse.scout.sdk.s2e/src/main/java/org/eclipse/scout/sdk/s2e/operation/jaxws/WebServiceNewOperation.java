@@ -29,7 +29,9 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.ISourceFolders;
+import org.eclipse.scout.sdk.core.apidef.Api;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
@@ -127,7 +129,11 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
     var factoryPathFile = getProjectRoot().resolve(FACTORY_PATH_FILE_NAME);
     var scoutVersion = scoutVersionOf(getJaxWsProject(), EclipseEnvironment.narrow(env))
         .orElseThrow(() -> newFail("JaxWs module '{}' has no Scout dependency.", getJaxWsProject().getElementName()));
-    env.writeResource(new FactoryPathGenerator().withRtVersion(scoutVersion.asString()), factoryPathFile, progress);
+    var scoutApi = Api.create(IScoutApi.class, scoutVersion);
+    var generator = new FactoryPathGenerator()
+        .withRtVersion(scoutVersion.asString())
+        .withJaxWsConstants(scoutApi.JaxWsConstants());
+    env.writeResource(generator, factoryPathFile, progress);
   }
 
   protected void setIgnoreOptionalProblems(String entryPath, IProgressMonitor monitor) {

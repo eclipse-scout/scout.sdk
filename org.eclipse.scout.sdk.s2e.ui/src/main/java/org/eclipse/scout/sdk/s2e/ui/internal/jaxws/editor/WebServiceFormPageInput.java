@@ -61,6 +61,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
@@ -494,7 +495,8 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
 
     try {
       var wsdlFolderRelativePath = AbstractWebServiceNewOperation.getWsdlRootFolder(projectPath).relativize(getWsdl());
-      var paths = JaxWsUtils.getBindingPathsFromPom(pomDocument, wsdlFolderRelativePath.toString().replace('\\', '/'));
+      var scoutApi = ApiHelper.requireScoutApiFor(getJavaProject());
+      var paths = JaxWsUtils.getBindingPathsFromPom(pomDocument, wsdlFolderRelativePath.toString().replace('\\', '/'), scoutApi);
       if (paths.isEmpty()) {
         //noinspection NestedTryStatement
         try (var ps = Files.list(bindingFolder)) {

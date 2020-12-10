@@ -22,6 +22,8 @@ import java.util.stream.IntStream;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
@@ -47,7 +49,7 @@ public final class JaxWsUtils {
   public static final String BINDINGS_ELEMENT_NAME = "bindings";
   public static final String GENERATE_ELEMENT_ATTRIBUTE_NAME = "generateElementProperty";
   public static final String GLOBAL_BINDINGS_ELEMENT_NAME = "globalBindings";
-  public static final String MODULE_REL_WEBINF_FOLDER_PATH = ISourceFolders.MAIN_RESOURCE_FOLDER + "/WEB-INF";
+  public static final String MODULE_REL_WEB_INF_FOLDER_PATH = ISourceFolders.MAIN_RESOURCE_FOLDER + "/WEB-INF";
   public static final String BINDING_FILE_ELEMENT_NAME = "bindingFile";
   public static final String BINDING_FILES_ELEMENT_NAME = "bindingFiles";
   public static final String WSDL_FILE_ELEMENT_NAME = "wsdlFile";
@@ -58,8 +60,7 @@ public final class JaxWsUtils {
   public static final String JAXWS_BINDINGS_FILE_NAME = "jaxws-binding.xml";
   public static final String WSDL_FOLDER_NAME = "wsdl";
   public static final String BINDING_FOLDER_NAME = "binding";
-  public static final String WSIMPORT_TOOL_NAME = "wsimport";
-  public static final String JAXWS_MAVEN_PLUGIN_GROUP_ID = "com.sun.xml.ws";
+  public static final String WS_IMPORT_TOOL_NAME = "wsimport";
   public static final String JAXWS_MAVEN_PLUGIN_ARTIFACT_ID = "jaxws-maven-plugin";
 
   public static final String PACKAGE_XPATH = "wsdl:definitions";
@@ -103,10 +104,12 @@ public final class JaxWsUtils {
    *          The name of the binding folder
    * @param bindingFileNames
    *          The file names of all bindings in the binding folder.
+   * @param api
+   *          The {@link IScoutApi} to use. Must not be {@code null}.
    */
-  public static void addWsdlToPom(Document pomDocument, String wsdlFileName, String bindingFolderName, Iterable<String> bindingFileNames) {
+  public static void addWsdlToPom(Document pomDocument, String wsdlFileName, String bindingFolderName, Iterable<String> bindingFileNames, IScoutVariousApi api) {
     var root = pomDocument.getDocumentElement();
-    var executions = getExecutionsElement(root);
+    var executions = getExecutionsElement(root, api);
     var nextId = getNextExecutionId(executions);
 
     var newExecution = root.getOwnerDocument().createElement(IMavenConstants.EXECUTION);
@@ -114,7 +117,7 @@ public final class JaxWsUtils {
     idElement.setTextContent(nextId);
     var goalsElement = getOrCreateElement(newExecution, IMavenConstants.GOALS);
     var goalElement = getOrCreateElement(goalsElement, IMavenConstants.GOAL);
-    goalElement.setTextContent(WSIMPORT_TOOL_NAME);
+    goalElement.setTextContent(WS_IMPORT_TOOL_NAME);
     var configurationElement = getOrCreateElement(newExecution, IMavenConstants.CONFIGURATION);
     var wsdlLocationElement = getOrCreateElement(configurationElement, WSDL_LOCATION);
     wsdlLocationElement.setTextContent("WEB-INF/" + WSDL_FOLDER_NAME + '/' + wsdlFileName);
@@ -143,11 +146,13 @@ public final class JaxWsUtils {
    *          The pom.xml {@link Document}.
    * @param wsdlFileName
    *          The WSDL file name as it appears in the &lt;wsdlFile&gt; tag of the pom.
+   * @param api
+   *          The {@link IScoutApi} to use. Must not be {@code null}.
    * @return A {@link List} holding all binding paths that belong to the given WSDL.
    * @throws XPathExpressionException
    *           if there is an error in the xpath expression
    */
-  public static List<String> getBindingPathsFromPom(Node pom, String wsdlFileName) throws XPathExpressionException {
+  public static List<String> getBindingPathsFromPom(Node pom, String wsdlFileName, IScoutVariousApi api) throws XPathExpressionException {
     if (wsdlFileName.indexOf('\'') >= 0) {
       throw new IllegalArgumentException("apos character (') is not allowed in a WSDL file name.");
     }
@@ -155,15 +160,12 @@ public final class JaxWsUtils {
     var p = prefix + ':';
     var lc = wsdlFileName.toLowerCase(Locale.US);
     var uc = wsdlFileName.toUpperCase(Locale.US);
-    var bindingFilesXpathBuilder = new StringBuilder();
-    bindingFilesXpathBuilder.append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.BUILD).append('/').append(p).append(IMavenConstants.PLUGINS).append('/').append(p).append(IMavenConstants.PLUGIN)
-        .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(JAXWS_MAVEN_PLUGIN_GROUP_ID).append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='").append(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID)
-        .append("']")
+    var bindingFilesXPathBuilder = getJaxWsMavenPluginXPath(p, api)
         .append('/').append(p).append(IMavenConstants.EXECUTIONS).append('/').append(p).append(IMavenConstants.EXECUTION).append('/').append(p).append(IMavenConstants.CONFIGURATION)
         .append("[translate(./").append(p).append(WSDL_FILES_ELEMENT_NAME).append('/').append(p).append(WSDL_FILE_ELEMENT_NAME).append(", '").append(uc).append("', '").append(lc).append("')='").append(lc).append("']/").append(p)
         .append(BINDING_FILES_ELEMENT_NAME).append('/').append(p).append(BINDING_FILE_ELEMENT_NAME);
 
-    var nl = Xml.evaluateXPath(bindingFilesXpathBuilder.toString(), pom, prefix, IMavenConstants.POM_XML_NAMESPACE);
+    var nl = Xml.evaluateXPath(bindingFilesXPathBuilder.toString(), pom, prefix, IMavenConstants.POM_XML_NAMESPACE);
     if (nl.isEmpty()) {
       return emptyList();
     }
@@ -174,9 +176,26 @@ public final class JaxWsUtils {
         .collect(toList());
   }
 
+  /**
+   * Gets a xpath {@link StringBuilder} selecting the jax-ws maven build plugin in a pom.xml
+   * (project/build/plugins/plugin[groupId=jaxws and artifactId=jaxws]
+   * 
+   * @param p
+   *          The xml tag namespace prefix including a trailing colon (:). Must not be {@code null} but may be an empty
+   *          {@link String}.
+   * @param api
+   *          The {@link IScoutApi} to use. Must not be {@code null}.
+   * @return A {@link StringBuilder} containing the xpath expression.
+   */
+  public static StringBuilder getJaxWsMavenPluginXPath(String p, IScoutVariousApi api) {
+    return new StringBuilder().append(p).append(IMavenConstants.PROJECT).append('/').append(p).append(IMavenConstants.BUILD).append('/').append(p).append(IMavenConstants.PLUGINS).append('/').append(p).append(IMavenConstants.PLUGIN)
+        .append("[./").append(p).append(IMavenConstants.GROUP_ID).append("='").append(api.JaxWsConstants().mavenPluginGroupId())
+        .append("' and ./").append(p).append(IMavenConstants.ARTIFACT_ID).append("='").append(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID).append("']");
+  }
+
   static String getNextExecutionId(Node executions) {
     var curNum = 1;
-    var idPrefix = WSIMPORT_TOOL_NAME + '-';
+    var idPrefix = WS_IMPORT_TOOL_NAME + '-';
     var children = executions.getChildNodes();
     while (isExecutionIdUsed(idPrefix + curNum, children)) {
       curNum++;
@@ -193,22 +212,23 @@ public final class JaxWsUtils {
         .anyMatch(idElement -> id.equals(idElement.getTextContent().trim()));
   }
 
-  static Element getExecutionsElement(Node root) {
+  static Element getExecutionsElement(Node root, IScoutVariousApi api) {
     var build = getOrCreateElement(root, IMavenConstants.BUILD);
     var plugins = getOrCreateElement(build, IMavenConstants.PLUGINS);
-    var jaxWsMavenPluginElement = getOrCreateJaxWsMavenPluginElement(plugins);
+    var jaxWsMavenPluginElement = getOrCreateJaxWsMavenPluginElement(plugins, api);
     return getOrCreateElement(jaxWsMavenPluginElement, IMavenConstants.EXECUTIONS);
   }
 
-  static Element getOrCreateJaxWsMavenPluginElement(Node pluginsElement) {
+  static Element getOrCreateJaxWsMavenPluginElement(Node pluginsElement, IScoutVariousApi api) {
     var plugins = pluginsElement.getChildNodes();
+    var jaxWsMavenPluginGroupId = api.JaxWsConstants().mavenPluginGroupId();
     for (var i = 0; i < plugins.getLength(); i++) {
       var plugin = plugins.item(i);
       if (plugin.getNodeType() == Node.ELEMENT_NODE && IMavenConstants.PLUGIN.equals(plugin.getNodeName())) {
         var pluginCandidate = (Element) plugin;
         var group = Xml.firstChildElement(pluginCandidate, IMavenConstants.GROUP_ID);
         var artifact = Xml.firstChildElement(pluginCandidate, IMavenConstants.ARTIFACT_ID);
-        if (group.isPresent() && JAXWS_MAVEN_PLUGIN_GROUP_ID.equals(group.get().getTextContent())
+        if (group.isPresent() && jaxWsMavenPluginGroupId.equals(group.get().getTextContent())
             && artifact.isPresent() && JAXWS_MAVEN_PLUGIN_ARTIFACT_ID.equals(artifact.get().getTextContent())) {
           return pluginCandidate;
         }
@@ -218,7 +238,7 @@ public final class JaxWsUtils {
     // plugin does not exist yet: create a new one
     var plugin = getOrCreateElement(pluginsElement, IMavenConstants.PLUGIN);
     var groupId = getOrCreateElement(plugin, IMavenConstants.GROUP_ID);
-    groupId.setTextContent(JAXWS_MAVEN_PLUGIN_GROUP_ID);
+    groupId.setTextContent(jaxWsMavenPluginGroupId);
     var artifactId = getOrCreateElement(plugin, IMavenConstants.ARTIFACT_ID);
     artifactId.setTextContent(JAXWS_MAVEN_PLUGIN_ARTIFACT_ID);
     return plugin;
