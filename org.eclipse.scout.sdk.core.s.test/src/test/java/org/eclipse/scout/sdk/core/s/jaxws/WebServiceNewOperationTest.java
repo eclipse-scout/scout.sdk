@@ -77,11 +77,6 @@ public class WebServiceNewOperationTest {
         var executedOperation = createEmptyWebServiceProvider(root, false, "TestEmpty" + ISdkConstants.SUFFIX_WS_PROVIDER, "test.provider.empty", env);
         assertEmptyWsdlCorrect(executedOperation);
       });
-
-      runInExistingJaxWsModule(projectRoot.get(), env -> {
-        var executedOperation = createWebServiceProvider(root, false, MULTI_SERVICE_WSDL, "test.provider.multiservice", env);
-        assertMultiServiceWsdlCorrect(executedOperation, false);
-      });
     }
     finally {
       if (root != null) {
@@ -105,11 +100,6 @@ public class WebServiceNewOperationTest {
       runInExistingJaxWsModule(projectRoot.get(), env -> {
         var executedOperation = createWebServiceConsumer(root, false, MULTI_SERVICE_WSDL, "test.consumer.multiservice", env);
         assertMultiServiceWsdlCorrect(executedOperation, true);
-      });
-
-      runInExistingJaxWsModule(projectRoot.get(), env -> {
-        var executedOperation = createEmptyWebServiceProvider(root, false, "Whatever", "test.provider.empty", env);
-        assertEmptyWsdlCorrect(executedOperation);
       });
     }
     finally {
