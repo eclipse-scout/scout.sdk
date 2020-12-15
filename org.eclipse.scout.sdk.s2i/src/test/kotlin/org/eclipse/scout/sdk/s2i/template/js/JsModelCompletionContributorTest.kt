@@ -136,10 +136,11 @@ class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
     private fun doCompletion(testClassName: String, finishLookupName: String): Pair<PsiFile, JsModelElement?> {
         val psiFile = myFixture.configureByFile(testClassName)
         myFixture.complete(CompletionType.BASIC, 1)
-        val lookupElementToSelect = myFixture.lookupElements
+        val lookupElements = myFixture.lookupElements?.asList()
+        val lookupElementToSelect = lookupElements
                 ?.filter { it.getUserData(TemplateHelper.SCOUT_LOOKUP_ELEMENT_MARKER) ?: false }
                 ?.firstOrNull { it.lookupString == finishLookupName }
-                ?: throw AssertionFailedError("No LookupElement with name '$finishLookupName' found in completion list.")
+                ?: throw AssertionFailedError("No LookupElement with name '$finishLookupName' found in completion list. Available names: " + lookupElements?.map { it.lookupString })
         val modelElement = lookupElementToSelect.getUserData(JsModelCompletionHelper.SELECTED_ELEMENT)
         val lookup = myFixture.lookup as LookupImpl
         lookup.finishLookup('\t', lookupElementToSelect)
