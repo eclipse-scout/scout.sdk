@@ -113,8 +113,8 @@ tasks.withType<Test> {
     // see com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
     // this Property allows AbstractTestCaseWithRunningClasspathModule to access all libraries of the running user classpath
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", project.findProperty("NO_FS_ROOTS_ACCESS_CHECK") ?: "true")
-
     systemProperty("file.encoding", "utf-8")
+    ignoreFailures = true
 }
 
 tasks.jar {
