@@ -53,6 +53,7 @@ import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
 import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
 import org.eclipse.scout.sdk.core.s.nls.properties.ReadOnlyTranslationFile
 import org.eclipse.scout.sdk.core.util.JavaTypes
+import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult
@@ -414,3 +415,17 @@ fun ITranslationEntry.resolveProperty(language: Language, psiManager: PsiManager
  * @throws java.nio.file.InvalidPathException if the location of this [VirtualFile] cannot be converted to a [Path]
  */
 fun VirtualFile.resolveLocalPath() = PathUtil.getLocalPath(this)?.let { Paths.get(it) }
+
+/**
+ * Gets the content of this [VirtualFile] as [java.lang.StringBuilder].
+ *
+ * The StringBuilder does not contain a BOM if there is any in the [VirtualFile].
+ * See <a href=http://unicode.org/faq/utf_bom.html>Unicode Byte Order Mark FAQ</a> for an explanation.
+ *
+ * @return The content of this [VirtualFile] as [java.lang.StringBuilder]
+ * @throws java.io.IOException if an I/O error occurs
+ * @see [VirtualFile.contentsToByteArray]
+ */
+fun VirtualFile.contentAsText(): StringBuilder = inputStream.use {
+    Strings.fromInputStream(it, charset, length.toInt())
+}

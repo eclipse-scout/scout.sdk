@@ -80,7 +80,7 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
 
     var postProcess = toScoutProgress(progress).newChild(2);
     if (isCreateNewModule()) {
-      setIgnoreOptionalProblems(ISourceFolders.GENERATED_WSIMPORT_SOURCE_FOLDER, postProcess.monitor());
+      setIgnoreOptionalProblems(ISourceFolders.GENERATED_WS_IMPORT_SOURCE_FOLDER, postProcess.monitor());
     }
     else {
       S2eUtils.mavenUpdate(singleton(getJaxWsProject().getProject()), false, true, false, false, postProcess.monitor());

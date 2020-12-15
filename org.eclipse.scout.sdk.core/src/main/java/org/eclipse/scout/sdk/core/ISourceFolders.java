@@ -45,6 +45,6 @@ public interface ISourceFolders {
   /**
    * Generated source folder for web-service stubs
    */
-  String GENERATED_WSIMPORT_SOURCE_FOLDER = "target/generated-sources/wsimport";
+  String GENERATED_WS_IMPORT_SOURCE_FOLDER = "target/generated-sources/wsimport";
 
 }

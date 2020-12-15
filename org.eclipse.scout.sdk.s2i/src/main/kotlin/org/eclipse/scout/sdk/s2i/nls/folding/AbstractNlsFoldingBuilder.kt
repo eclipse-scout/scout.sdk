@@ -35,9 +35,9 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
         const val PLACEHOLDER_MAX_LEN = 60
         const val PLACEHOLDER_START_CHAR = '{'
         const val PLACEHOLDER_END_CHAR = '}'
+        private val PLACEHOLDER_PATTERN = Pattern.compile("\\{(\\d+){0,9}}")
     }
 
-    private val m_placeholderPattern = Pattern.compile("\\{(\\d+){0,9}}")
     private var m_javaLangStringType: PsiType? = null
     private var m_requestedLanguage: Language? = null
 
@@ -81,7 +81,7 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
         return FoldingDescriptor(element.node, element.textRange, null, '"' + maxLength(text, FOLDING_MAX_LEN) + '"', true, emptySet())
     }
 
-    protected fun replacePlaceholders(text: String, replacements: Array<String>): String = m_placeholderPattern.matcher(text).replaceAll {
+    protected fun replacePlaceholders(text: String, replacements: Array<String>): String = PLACEHOLDER_PATTERN.matcher(text).replaceAll {
         val index = Integer.parseInt(it.group(1))
         if (index >= 0 && index < replacements.size) {
             return@replaceAll replacements[index]

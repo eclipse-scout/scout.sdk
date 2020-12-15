@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.template
+package org.eclipse.scout.sdk.s2i.template.java
 
 import com.intellij.application.options.CodeStyle
 import com.intellij.codeInsight.completion.InsertHandler
@@ -39,12 +39,13 @@ import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.findTypeByName
 import org.eclipse.scout.sdk.s2i.isInstanceOf
+import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 import org.eclipse.scout.sdk.s2i.util.CompatibilityHelper
 
 /**
  * Handler that inserts a selected [TemplateDescriptor].
  */
-class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scoutApi: IScoutApi, val prefix: String) : InsertHandler<LookupElement> {
+class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scoutApi: IScoutApi, val prefix: CharSequence) : InsertHandler<LookupElement> {
 
     private lateinit var m_engine: TemplateEngine
 
@@ -73,29 +74,10 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
             tempSettings.getCustomSettings(JavaCodeStyleSettings::class.java).isInsertInnerClassImports = false
 
             val templateListener = TemplateListener(templateDescriptor, settingsManager, origTempSettings)
-            removePrefix(editor)
+            TemplateHelper.removePrefix(editor, prefix)
             TemplateManager.getInstance(project).startTemplate(editor, template, templateListener)
         })
     }
-
-    private fun removePrefix(editor: Editor) {
-        if (Strings.isEmpty(prefix)) {
-            return
-        }
-        val document = editor.document
-        val offset = editor.caretModel.offset
-        var start = offset - prefix.length - 1
-        val limit = 0.coerceAtLeast(start - 5)
-        val chars = document.immutableCharSequence
-        // reduce start index of removal to any preceding alphabet characters
-        // this is required for fast typing where the prefix is "older" than the current content of the document
-        while (start >= limit && isAlphaChar(chars[start])) {
-            start--
-        }
-        document.replaceString(start + 1, offset, "")
-    }
-
-    private fun isAlphaChar(char: Char) = char in 'a'..'z' || char in 'A'..'Z'
 
     private fun buildTemplate(): TemplateImpl {
         val source = m_engine.buildTemplate()

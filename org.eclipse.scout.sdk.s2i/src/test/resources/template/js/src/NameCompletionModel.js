@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.template.variable
-
-data class VariableDescriptor(val name: String, val expression: String?, val defaultValueExpression: String? = null)
+export default function() {
+  return {
+    id: "TopLevel",
+    objectType: "StringField"
+      < caret >
+  }
+}

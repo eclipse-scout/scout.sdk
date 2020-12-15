@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.template
+package org.eclipse.scout.sdk.s2i.template.java
 
 import com.intellij.psi.PsiClass
 import com.intellij.psi.util.InheritanceUtil

@@ -88,11 +88,7 @@ object NlsCompletionHelper {
         val requestedLanguage = ScoutSettings.getTranslationLanguage(lookupObj.module.project)
         translation.bestText(requestedLanguage).ifPresent { presentation.appendTailText("=$it", true) }
 
-        var storeName = store.service().type().elementName()
-        if (storeName.endsWith(ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE)) {
-            storeName = storeName.substring(0, storeName.length - ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE.length)
-        }
-        presentation.typeText = storeName
+        presentation.typeText = store.service().type().elementName().removeSuffix(ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE)
     }
 
     private data class NewTranslationLookupObject(val psiElement: PsiElement, val key: String)

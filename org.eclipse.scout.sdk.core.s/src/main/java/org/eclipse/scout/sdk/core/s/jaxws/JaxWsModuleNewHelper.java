@@ -153,7 +153,7 @@ public final class JaxWsModuleNewHelper {
       try (var files = Files.list(tempDirectory)) {
         var createdProjectDir = files.findAny().orElseThrow(() -> new IOException("Created project dir not found. Project creation failed."));
         deleteGitKeepFiles(createdProjectDir);
-        Files.createDirectories(createdProjectDir.resolve(ISourceFolders.GENERATED_WSIMPORT_SOURCE_FOLDER));
+        Files.createDirectories(createdProjectDir.resolve(ISourceFolders.GENERATED_WS_IMPORT_SOURCE_FOLDER));
         Files.createDirectories(createdProjectDir.resolve(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER));
         createdProjectName = createdProjectDir.getFileName().toString();
 

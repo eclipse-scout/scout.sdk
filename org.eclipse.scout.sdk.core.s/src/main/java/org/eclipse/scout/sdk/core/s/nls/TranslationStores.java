@@ -31,12 +31,12 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.IWebConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutChartApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -67,8 +67,8 @@ public final class TranslationStores {
 
   private static Map<String /* node module name */, IClassNameSupplier /* text contributor */> getPredefinedTextContributorMappings(IScoutApi api) {
     Map<String, IClassNameSupplier> mappings = new HashMap<>(2);
-    mappings.put("@eclipse-scout/core", api.UiTextContributor());
-    api.api(IScoutChartApi.class).ifPresent(chartApi -> mappings.put("@eclipse-scout/chart", chartApi.ChartUiTextContributor()));
+    mappings.put(IWebConstants.SCOUT_JS_CORE_MODULE_NAME, api.UiTextContributor());
+    api.api(IScoutChartApi.class).ifPresent(chartApi -> mappings.put(IWebConstants.SCOUT_JS_CHART_MODULE_NAME, chartApi.ChartUiTextContributor()));
     return mappings;
   }
 
@@ -399,8 +399,8 @@ public final class TranslationStores {
     private static final Map<String, DependencyScope> FILE_TYPE_MAPPING = new HashMap<>(3);
     static {
       FILE_TYPE_MAPPING.put(JavaTypes.JAVA_FILE_EXTENSION, DependencyScope.JAVA);
-      FILE_TYPE_MAPPING.put(TranslationPatterns.JS_FILE_EXTENSION, DependencyScope.NODE);
-      FILE_TYPE_MAPPING.put(TranslationPatterns.HTML_FILE_EXTENSION, DependencyScope.JAVA); // message tags are evaluated on the Java backend
+      FILE_TYPE_MAPPING.put(IWebConstants.JS_FILE_EXTENSION, DependencyScope.NODE);
+      FILE_TYPE_MAPPING.put(IWebConstants.HTML_FILE_EXTENSION, DependencyScope.JAVA); // message tags are evaluated on the Java backend
     }
 
     /**

@@ -122,7 +122,7 @@ public class WebServiceNewOperationTest {
             .withScoutClient(false)
             .withScoutHtmlUi(false)
             .withAbsoluteSourcePath(path.resolve(ISourceFolders.MAIN_JAVA_SOURCE_FOLDER).toString())
-            .withAbsoluteSourcePath(path.resolve(ISourceFolders.GENERATED_WSIMPORT_SOURCE_FOLDER).toString())
+            .withAbsoluteSourcePath(path.resolve(ISourceFolders.GENERATED_WS_IMPORT_SOURCE_FOLDER).toString())
             .withAbsoluteSourcePath(path.resolve(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER).toString())
             .accept(task))
         .run(consumer);
@@ -170,7 +170,7 @@ public class WebServiceNewOperationTest {
    */
   protected static void ensureGeneratedSourceFoldersExist(Path root) {
     try {
-      Files.createDirectories(root.resolve(ISourceFolders.GENERATED_WSIMPORT_SOURCE_FOLDER));
+      Files.createDirectories(root.resolve(ISourceFolders.GENERATED_WS_IMPORT_SOURCE_FOLDER));
       Files.createDirectories(root.resolve(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER));
     }
     catch (IOException e) {

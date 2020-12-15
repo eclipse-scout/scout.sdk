@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.template.variable
+package org.eclipse.scout.sdk.s2i.template.java
 
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.s2i.template.DescendantAbstractClassesEnumMacro
-import org.eclipse.scout.sdk.s2i.template.TemplateEngine
+import org.eclipse.scout.sdk.s2i.template.VariableDescriptor
 
-open class AbstractClassesEnumVariableAdapter(val name: String) : (TemplateEngine) -> VariableDescriptor? {
+open class DescendantAbstractClassesEnumVariableAdapter(val name: String) : (TemplateEngine) -> VariableDescriptor? {
 
     override fun invoke(context: TemplateEngine): VariableDescriptor? {
         val superClassInfo = context.templateDescriptor.superClassInfo() ?: throw newFail("No super class info specified for variable '{}'.", name)

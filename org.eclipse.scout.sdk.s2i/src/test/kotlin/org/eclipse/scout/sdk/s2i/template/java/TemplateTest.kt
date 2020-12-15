@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.template
+package org.eclipse.scout.sdk.s2i.template.java
 
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.impl.LookupImpl
@@ -19,11 +19,12 @@ import org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.AbstractTestCaseWithRunningClasspathModule
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
+import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 
 
 class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
 
-    override fun getTestDataPath() = "src/test/resources/template"
+    override fun getTestDataPath() = "src/test/resources/template/java"
     private var m_oldAutoCreateClassId: Boolean = false
 
     override fun setUp() {
@@ -181,7 +182,7 @@ class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
         val psiFile = myFixture.configureByFile(testClassName + JavaTypes.JAVA_FILE_SUFFIX)
         myFixture.complete(CompletionType.BASIC, 1)
         val lookupElementToSelect = myFixture.lookupElements
-                ?.filter { it.getUserData(TemplateCompletionContributor.SCOUT_TEMPLATE_MARKER) ?: false }
+                ?.filter { it.getUserData(TemplateHelper.SCOUT_LOOKUP_ELEMENT_MARKER) ?: false }
                 ?.first { it.lookupString == finishLookupName }
                 ?: throw AssertionFailedError("No LookupElement with name '$finishLookupName' found in completion list.")
         val lookup = myFixture.lookup as LookupImpl

@@ -13,5 +13,7 @@
     <lang.foldingBuilder language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForJs"/>
     <completion.contributor language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJs" id="scoutNlsCompletionJs"/>
     <lang.documentationProvider language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForJs" id="scoutNlsKeyDocumentationJs" order="first"/>
+    <completion.contributor language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.template.js.JsModelNameCompletionContributor" id="scoutModelNameCompletionJs" order="first"/>
+    <completion.contributor language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.template.js.JsModelValueCompletionContributor" id="scoutModelValueCompletionJs" order="first"/>
   </extensions>
 </idea-plugin>

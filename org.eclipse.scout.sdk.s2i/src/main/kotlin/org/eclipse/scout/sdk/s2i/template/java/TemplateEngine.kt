@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.template
+package org.eclipse.scout.sdk.s2i.template.java
 
 import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
@@ -35,7 +35,7 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
         const val VALUE_OPTION_DEFAULT_VAL = "default"
         const val VALUE_OPTION_UNCHANGED = "unchanged"
 
-        private val DECLARING_TYPE_ARG_REGEX = Pattern.compile("\\\$declaringTypeArg\\(([\\w.]+),\\s*(\\d+),\\s*(${VALUE_OPTION_BOX}|${VALUE_OPTION_UNBOX}|${VALUE_OPTION_DEFAULT_VAL}|${VALUE_OPTION_UNCHANGED})\\)\\\$")
+        private val DECLARING_TYPE_ARG_REGEX = Pattern.compile("\\\$declaringTypeArg\\(([\\w.]+),\\s*(\\d+),\\s*($VALUE_OPTION_BOX|$VALUE_OPTION_UNBOX|$VALUE_OPTION_DEFAULT_VAL|$VALUE_OPTION_UNCHANGED)\\)\\\$")
         private val ENCLOSING_INSTANCE_FQN_REGEX = Pattern.compile("\\\$enclosingInstanceInScopeFqn\\((.*)\\)\\\$")
         private val CLASS_ID_REGEX = Pattern.compile("\\\$newClassId\\(\\)\\\$")
         private val UNIQUE_ID_REGEX = Pattern.compile("\\\$newUniqueId\\((.+)\\)\\\$")

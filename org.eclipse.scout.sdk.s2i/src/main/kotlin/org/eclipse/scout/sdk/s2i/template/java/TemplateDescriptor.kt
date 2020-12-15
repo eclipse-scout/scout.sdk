@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.template
+package org.eclipse.scout.sdk.s2i.template.java
 
 import com.intellij.codeInsight.template.impl.TemplateImpl
 import org.eclipse.scout.sdk.core.util.Ensure
@@ -18,10 +18,9 @@ import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.core.util.Strings.toStringLiteral
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro
-import org.eclipse.scout.sdk.s2i.template.variable.AbstractClassesEnumVariableAdapter
-import org.eclipse.scout.sdk.s2i.template.variable.BoolVariableAdapter
-import org.eclipse.scout.sdk.s2i.template.variable.EnumVariableAdapter
-import org.eclipse.scout.sdk.s2i.template.variable.VariableDescriptor
+import org.eclipse.scout.sdk.s2i.template.BoolVariableAdapter
+import org.eclipse.scout.sdk.s2i.template.EnumVariableAdapter
+import org.eclipse.scout.sdk.s2i.template.VariableDescriptor
 
 class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader = TemplateDescriptor::class.java.classLoader) {
 
@@ -54,7 +53,7 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
         withVariable(PREDEFINED_VARIABLE_KEYSTROKES, EnumVariableAdapter(PREDEFINED_VARIABLE_KEYSTROKES, PsiExpressionEnumMacro.NAME) {
             it.keyStrokes
         })
-        withVariable(PREDEFINED_VARIABLE_SUPER, AbstractClassesEnumVariableAdapter(PREDEFINED_VARIABLE_SUPER))
+        withVariable(PREDEFINED_VARIABLE_SUPER, DescendantAbstractClassesEnumVariableAdapter(PREDEFINED_VARIABLE_SUPER))
         withVariable(PREDEFINED_VARIABLE_COMPLETE) { VariableDescriptor(PREDEFINED_VARIABLE_COMPLETE, "complete()") }
     }
 
@@ -76,6 +75,7 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
 
     fun withEnumVariable(name: String, values: Iterable<String>, macroName: String? = null) = withVariable(name, EnumVariableAdapter(name, macroName, values))
     fun withBoolVariable(name: String, defaultValue: Boolean) = withVariable(name, BoolVariableAdapter(name, defaultValue.toString()))
+
     fun withNlsVariable(name: String, defaultValue: String? = null) = withVariable(name) { VariableDescriptor(name, "${NlsKeysEnumMacro.NAME}()", toStringLiteral(defaultValue)?.toString()) }
     fun withVariable(name: String, value: String) = withVariable(name) { VariableDescriptor(name, null, toStringLiteral(value)?.toString()) }
     fun withVariable(name: String, variableAdapter: (TemplateEngine) -> VariableDescriptor?) = apply {

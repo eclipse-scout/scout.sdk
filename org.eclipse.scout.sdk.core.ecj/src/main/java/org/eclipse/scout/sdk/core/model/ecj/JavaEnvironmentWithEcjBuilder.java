@@ -377,7 +377,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
       if (path.endsWith("target/classes")) {
         filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.MAIN_JAVA_SOURCE_FOLDER), collector);
         filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER), collector);
-        filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.GENERATED_WSIMPORT_SOURCE_FOLDER), collector);
+        filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.GENERATED_WS_IMPORT_SOURCE_FOLDER), collector);
       }
       else if (path.endsWith("target/test-classes")) {
         filterAndAppendSourcePath(path.getParent().getParent().resolve(ISourceFolders.TEST_JAVA_SOURCE_FOLDER), collector);

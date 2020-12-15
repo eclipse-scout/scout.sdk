@@ -35,7 +35,6 @@ import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.TranslationStores
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationKeysQuery
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput
-import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
@@ -89,11 +88,7 @@ open class UnusedTranslationInspection : GlobalInspectionTool() {
 
     private fun removeKeysFoundIn(file: VirtualFile, modulePath: Path, unusedKeys: MutableMap<String, ITranslationStore>): Boolean {
         val filePath = file.resolveLocalPath() ?: return true
-        val queryInput = FileQueryInput(filePath, modulePath) {
-            file.inputStream.use {
-                Strings.fromInputStream(it, file.charset, file.length.toInt())
-            }
-        }
+        val queryInput = FileQueryInput(filePath, modulePath) { file.contentAsText() }
         val query = TranslationKeysQuery()
         query.searchIn(queryInput)
         query.keysFound().forEach {

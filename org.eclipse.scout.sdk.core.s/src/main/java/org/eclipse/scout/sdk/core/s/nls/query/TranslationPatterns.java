@@ -24,6 +24,7 @@ import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.s.IWebConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
@@ -36,8 +37,6 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public final class TranslationPatterns {
 
   public static final String IGNORE_MARKER = "NO-NLS-CHECK";
-  public static final String JS_FILE_EXTENSION = "js";
-  public static final String HTML_FILE_EXTENSION = "html";
 
   private static final Map<Class<? extends AbstractTranslationPattern>, AbstractTranslationPattern> PATTERN_MAP = new HashMap<>();
   static {
@@ -140,7 +139,7 @@ public final class TranslationPatterns {
 
     @Override
     public String fileExtension() {
-      return JS_FILE_EXTENSION;
+      return IWebConstants.JS_FILE_EXTENSION;
     }
 
     @Override
@@ -166,7 +165,7 @@ public final class TranslationPatterns {
 
     @Override
     public String fileExtension() {
-      return JS_FILE_EXTENSION;
+      return IWebConstants.JS_FILE_EXTENSION;
     }
 
     @Override
@@ -238,7 +237,7 @@ public final class TranslationPatterns {
 
     @Override
     public String fileExtension() {
-      return HTML_FILE_EXTENSION;
+      return IWebConstants.HTML_FILE_EXTENSION;
     }
 
     @Override

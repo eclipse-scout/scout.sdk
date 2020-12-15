@@ -8,6 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.template.variable
-
-class BoolVariableAdapter(name: String, defaultValue: String) : EnumVariableAdapter(name, null, listOf(defaultValue, if ("true" == defaultValue) "false" else "true"))
+export default function() {
+  return {
+    id: "TopLevel",
+    objectType: "StringField",
+    onlyHere: {
+      < caret >
+  }
+}
+}

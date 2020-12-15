@@ -26,6 +26,7 @@
         <ul>
           <li>Derived resource update for FormData and PageData</li>
           <li>Java code completion for Scout elements like FormFields, Menus, KeyStrokes, Codes and more.</li>
+          <li>JavaScript code completion for Scout JS models.</li>
           <li>Scout national language support
             <ul>
               <li>Editor for Scout nls files</li>
@@ -43,6 +44,7 @@
   <change-notes><![CDATA[
         <ul>
           <li>Adds support for Scout 11.</li>
+          <li>Adds JavaScript code completion for Scout JS models.</li>
           <li>Adds an inspection reporting unused translations (not referred in the code) that might be deleted.</li>
           <li>Adds code folding support for Scout translations with configurable display language.</li>
         </ul>
@@ -88,15 +90,15 @@
     <fileEditorProvider implementation="org.eclipse.scout.sdk.s2i.nls.editor.NlsFileEditorProvider"/>
     <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJava" id="scoutNlsCompletionJava" order="before propertiesCompletion"/>
     <completion.contributor language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForHtml" id="scoutNlsCompletionHtml" order="before html"/>
-    <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.template.TemplateCompletionContributor" id="scoutTemplateCompletionJava" order="first"/>
+    <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.template.java.TemplateCompletionContributor" id="scoutTemplateCompletionJava" order="first"/>
     <lang.documentationProvider language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForJava" id="scoutNlsKeyDocumentationJava" order="first"/>
     <lang.documentationProvider language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForHtml" id="scoutNlsKeyDocumentationHtml" order="first"/>
     <lang.foldingBuilder language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForJava"/>
     <lang.foldingBuilder language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForHtml"/>
     <codeFoldingOptionsProvider instance="org.eclipse.scout.sdk.s2i.settings.ScoutCodeFoldingOptionsProvider"/>
-    <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.DescendantAbstractClassesEnumMacro"/>
+    <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.java.DescendantAbstractClassesEnumMacro"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro"/>
-    <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.PsiExpressionEnumMacro"/>
+    <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.java.PsiExpressionEnumMacro"/>
   </extensions>
 
   <actions>

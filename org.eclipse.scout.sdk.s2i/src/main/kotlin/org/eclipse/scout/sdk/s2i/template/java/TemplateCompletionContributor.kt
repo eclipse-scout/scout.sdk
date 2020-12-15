@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.template
+package org.eclipse.scout.sdk.s2i.template.java
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.util.Key
 import com.intellij.patterns.PsiJavaPatterns.psiClass
 import com.intellij.patterns.PsiJavaPatterns.psiElement
 import com.intellij.psi.*
@@ -23,12 +22,13 @@ import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.scoutApi
+import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 import org.eclipse.scout.sdk.s2i.util.CompatibilityHelper
 
 class TemplateCompletionContributor : CompletionContributor() {
 
     companion object {
-        val SCOUT_TEMPLATE_MARKER = Key.create<Boolean>("ScoutTemplateCompletion.marker")
+
     }
 
     init {
@@ -59,7 +59,7 @@ class TemplateCompletionContributor : CompletionContributor() {
                     .withLookupStrings(templateDescriptor.aliasNames())
                     .withInsertHandler(TemplateInsertHandler(templateDescriptor, scoutApi, prefix))
             element.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true) // instructs the completion engine to not insert the name of the LookupElement into the source
-            element.putUserData(SCOUT_TEMPLATE_MARKER, true) // to identify scout LookupElements. Used for testing.
+            element.putUserData(TemplateHelper.SCOUT_LOOKUP_ELEMENT_MARKER, true) // to identify scout LookupElements. Used for testing.
             return element
         }
     }
