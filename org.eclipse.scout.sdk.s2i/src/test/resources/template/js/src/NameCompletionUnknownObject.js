@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+// @formatter:off
 export default function() {
   return {
     id: "TopLevel",
     objectType: "StringField",
     onlyHere: {
-      < caret >
+      <caret>
+    }
   }
 }
-}
+// @formatter:on

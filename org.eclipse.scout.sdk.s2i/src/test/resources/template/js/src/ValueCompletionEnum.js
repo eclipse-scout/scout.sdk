@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+// @formatter:off
 export default function() {
   return {
     id: "TopLevel",
@@ -15,7 +16,8 @@ export default function() {
     onlyHere: {
       id: "Child",
       objectType: "Widget",
-      state: < caret >
+      state: <caret>
+    }
   }
 }
-}
+// @formatter:on
