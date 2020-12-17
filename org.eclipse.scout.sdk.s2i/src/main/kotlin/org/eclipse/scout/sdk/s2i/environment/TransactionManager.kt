@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -112,7 +112,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
                 ApplicationManager.getApplication().invokeAndWait {
                     // this is executed in the UI thread! keep short to prevent freezes!
                     // write operations are only allowed in the UI thread
-                    // see http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html
+                    // see https://jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html
                     result.computeIfAbsent {
                         WriteAction.compute<T, RuntimeException> { computeInCommandProcessor(project, name, callable) }
                     }

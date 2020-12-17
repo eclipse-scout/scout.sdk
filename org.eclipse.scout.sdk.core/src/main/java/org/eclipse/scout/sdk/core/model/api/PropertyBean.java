@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -75,7 +75,7 @@ public class PropertyBean {
    * @param type
    *          the type within properties are searched
    * @return Returns a {@link Stream} of property bean descriptions.
-   * @see <a href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">JavaBeans Spec</a>
+   * @see <a href="https://www.oracle.com/java/technologies/javase/javabeans-spec.html">JavaBeans Spec</a>
    */
   public static Stream<PropertyBean> of(IType type) {
     var methods = type.methods()

@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -71,7 +71,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
           SdkLog.warning("Cannot detect used Scout version. Fallback to latest version.");
           return ScoutApi.latestMajorVersion() + ".0";
         });
-    var base = "http://eclipsescout.github.io/";
+    var base = "https://eclipsescout.github.io/";
     return base + majorAndMinor + "/technical-guide.html#webservices-with-jax-ws";
   }
 

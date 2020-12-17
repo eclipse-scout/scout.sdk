@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -420,7 +420,7 @@ fun VirtualFile.resolveLocalPath() = PathUtil.getLocalPath(this)?.let { Paths.ge
  * Gets the content of this [VirtualFile] as [java.lang.StringBuilder].
  *
  * The StringBuilder does not contain a BOM if there is any in the [VirtualFile].
- * See <a href=http://unicode.org/faq/utf_bom.html>Unicode Byte Order Mark FAQ</a> for an explanation.
+ * See [Unicode Byte Order Mark FAQ](https://unicode.org/faq/utf_bom.html) for an explanation.
  *
  * @return The content of this [VirtualFile] as [java.lang.StringBuilder]
  * @throws java.io.IOException if an I/O error occurs
