@@ -32,8 +32,8 @@
         - In org.eclipse.scout.sdk.s2e.releng/, execute
           mvn clean deploy
     3b. For deploying releases (to be used by Tycho releases):
-        - Prerequisite: 1. you need to have GPG properly set up, see http://central.sonatype.org/pages/working-with-pgp-signatures.html
-                        2. if not already present: you need to add the server with id of property DforgeReleaseId into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
+        - Prerequisite: 1. you need to have GPG properly set up, see https://central.sonatype.org/pages/working-with-pgp-signatures.html
+                        2. if not already present: you need to add the server with id 'forge-releases' into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
         - Make sure that ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui}, ${org.eclipse.m2e.archetype.common},... in the parent POM don't have a '-SNAPSHOT' suffix
         3b.1 For full deploy: In org.eclipse.scout.sdk.s2e.releng/, execute
              mvn clean deploy -Pdeploy-releases -Dgpg.passphrase=<your_passphrase>
@@ -114,8 +114,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_2020_09</id>
-              <url>http://download.eclipse.org/releases/2020-09/</url>
+              <id>eclipse_2020_12</id>
+              <url>https://download.eclipse.org/releases/2020-12/</url>
               <layout>p2</layout>
             </repository>
           </source>
@@ -167,7 +167,7 @@
     <site>
       <id>eclipse.scout.sdk.site</id>
       <name>Eclipse Scout SDK Site</name>
-      <!-- >workaround for http://jira.codehaus.org/browse/MSITE-671 -->
+      <!-- >workaround for https://issues.apache.org/jira/browse/MSITE-671 -->
       <url>http://staging</url>
     </site>
   </distributionManagement>
@@ -176,7 +176,7 @@
     <pluginRepository>
       <id>apache.snapshots</id>
       <name>Apache Snapshot Repository</name>
-      <url>http://repository.apache.org/snapshots</url>
+      <url>https://repository.apache.org/content/groups/snapshots/</url>
       <releases>
         <enabled>false</enabled>
       </releases>
