@@ -1235,7 +1235,7 @@ public final class Strings {
   }
 
   /**
-   * Tests if the string specified ends with the specified suffix.
+   * Tests if the string specified ends with the specified suffix (case sensitive).
    *
    * @param string
    *          The {@link CharSequence}, may be {@code null}.

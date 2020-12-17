@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.core.s.jaxws;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -39,7 +41,7 @@ import org.w3c.dom.NodeList;
  */
 public final class JaxWsUtils {
 
-  public static final String WSDL_FILE_EXTENSION = ".wsdl";
+  public static final String WSDL_FILE_SUFFIX = ".wsdl";
   public static final String BINDINGS_NAME_ATTRIBUTE = "name";
   public static final String BINDINGS_CLASS_ELEMENT_NAME = "class";
   public static final String BINDING_PACKAGE_ELEMENT_NAME = "package";
@@ -69,6 +71,22 @@ public final class JaxWsUtils {
   private static final String XPATH_END = "']";
 
   private JaxWsUtils() {
+  }
+
+  /**
+   * @param p
+   *          The {@link Path} to check.
+   * @return {@code true} if the given {@link Path} points to a file having the {@link JaxWsUtils#WSDL_FILE_SUFFIX}
+   */
+  public static boolean isWsdlFile(Path p) {
+    if (p == null) {
+      return false;
+    }
+    var fileName = p.getFileName();
+    if (fileName == null || !Strings.endsWith(fileName.toString(), JaxWsUtils.WSDL_FILE_SUFFIX, false)) {
+      return false;
+    }
+    return Files.isRegularFile(p) && Files.isReadable(p);
   }
 
   /**

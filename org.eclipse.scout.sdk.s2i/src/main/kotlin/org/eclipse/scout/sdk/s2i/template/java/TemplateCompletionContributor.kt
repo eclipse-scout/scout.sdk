@@ -27,10 +27,6 @@ import org.eclipse.scout.sdk.s2i.util.CompatibilityHelper
 
 class TemplateCompletionContributor : CompletionContributor() {
 
-    companion object {
-
-    }
-
     init {
         extend(CompletionType.BASIC, capture(), TemplateCompletionProvider())
     }

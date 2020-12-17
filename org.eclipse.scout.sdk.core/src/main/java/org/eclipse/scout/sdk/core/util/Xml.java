@@ -394,9 +394,11 @@ public final class Xml {
       document.normalize();
       try {
         var nodeList = doEvaluateXPath("//text()[normalize-space()='']", document, null);
-        for (var i = 0; i < nodeList.getLength(); ++i) {
-          var node = nodeList.item(i);
-          node.getParentNode().removeChild(node);
+        if (nodeList != null) {
+          for (var i = 0; i < nodeList.getLength(); ++i) {
+            var node = nodeList.item(i);
+            node.getParentNode().removeChild(node);
+          }
         }
       }
       catch (XPathExpressionException e) {

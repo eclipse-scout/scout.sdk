@@ -65,6 +65,7 @@ public class JavaEnvironmentExtension extends AbstractContextExtension<IJavaEnvi
   }
 
   @Override
+  @SuppressWarnings("resource")
   protected IJavaEnvironment annotationToContext(ExtendWithJavaEnvironmentFactory annotation) {
     return createJavaEnvironmentUsingBuilder(annotation.value()).get().wrap();
   }

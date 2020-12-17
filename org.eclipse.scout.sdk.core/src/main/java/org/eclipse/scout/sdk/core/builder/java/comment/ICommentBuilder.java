@@ -40,6 +40,7 @@ public interface ICommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends ISo
    *
    * @return This builder
    */
+  @SuppressWarnings("HtmlTagCanBeJavadocTag")
   TYPE appendBlockCommentEnd();
 
   /**
@@ -87,6 +88,7 @@ public interface ICommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends ISo
    *          The comment text without any line delimiters. May not be {@code null}.
    * @return This builder
    */
+  @SuppressWarnings("HtmlTagCanBeJavadocTag")
   TYPE appendJavaDocLine(CharSequence comment);
 
   /**

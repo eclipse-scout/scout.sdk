@@ -169,7 +169,9 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
 
   protected String getWsdlBaseName() {
     var wsdlFileName = getWsdlFileName();
-    wsdlFileName = wsdlFileName.substring(0, wsdlFileName.length() - JaxWsUtils.WSDL_FILE_EXTENSION.length());
+    if (wsdlFileName.endsWith(JaxWsUtils.WSDL_FILE_SUFFIX)) {
+      wsdlFileName = wsdlFileName.substring(0, wsdlFileName.length() - JaxWsUtils.WSDL_FILE_SUFFIX.length());
+    }
     return JaxWsUtils.removeCommonSuffixes(wsdlFileName);
   }
 
@@ -239,6 +241,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
       var wsdlFolder = getWsdlFolder(baseName);
       var target = wsdlFolder.resolve(relPath);
       try {
+        @SuppressWarnings("squid:S1149") // replace StringBuffer with StringBuilder
         var content = readXmlFromUrl(sourceUri.toURL());
         env.writeResource(content, target, progress);
       }
@@ -323,8 +326,8 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
         }
 
         var partName = pathFileName.toLowerCase(Locale.US);
-        if (partName.endsWith(JaxWsUtils.WSDL_FILE_EXTENSION)) {
-          partName = partName.substring(0, partName.length() - JaxWsUtils.WSDL_FILE_EXTENSION.length());
+        if (partName.endsWith(JaxWsUtils.WSDL_FILE_SUFFIX)) {
+          partName = partName.substring(0, partName.length() - JaxWsUtils.WSDL_FILE_SUFFIX.length());
         }
 
         var lastDotPos = JaxWsUtils.JAXWS_BINDINGS_FILE_NAME.lastIndexOf('.');
@@ -420,7 +423,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
         wsdlFileName = wsdlFileName.substring(0, wsdlFileName.length() - ISdkConstants.SUFFIX_WS_PROVIDER.length());
       }
     }
-    wsdlFileName += JaxWsUtils.WSDL_FILE_EXTENSION;
+    wsdlFileName += JaxWsUtils.WSDL_FILE_SUFFIX;
     return wsdlFileName;
   }
 
@@ -431,6 +434,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     return wsdlFile;
   }
 
+  @SuppressWarnings("squid:S1149") // replace StringBuffer with StringBuilder
   protected static StringBuffer readXmlFromUrl(URL url) {
     try {
       return Xml.writeDocument(Xml.get(url), false);

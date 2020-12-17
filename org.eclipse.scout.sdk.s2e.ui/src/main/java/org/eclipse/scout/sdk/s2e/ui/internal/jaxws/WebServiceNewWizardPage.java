@@ -455,7 +455,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       var bindingFilesXpathBuilder = JaxWsUtils.getJaxWsMavenPluginXPath(prefix + ':', scoutApi);
       var elements = Xml.evaluateXPath(bindingFilesXpathBuilder.toString(), S2eUtils.getPomDocument(project), prefix, IMavenConstants.POM_XML_NAMESPACE);
       //noinspection RedundantIfStatement
-      if (elements.isEmpty() && containsWsdls(wsdlFolder)) {
+      if (elements.isEmpty() && containsWsdl(wsdlFolder)) {
         // these are jaxws project that contain wsdls but they are not listed in the pom (auto discovery).
         // we do not support these because when adding a new wsdl to the pom, the existing ones will be ignored.
         return false;
@@ -545,12 +545,9 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     setTargetPackage(pckBuilder.toString());
   }
 
-  protected static boolean containsWsdls(Path wsdlFolder) {
+  protected static boolean containsWsdl(Path wsdlFolder) {
     try (var paths = Files.walk(wsdlFolder)) {
-      return paths
-          .filter(p -> p.getFileName().toString().endsWith(JaxWsUtils.WSDL_FILE_EXTENSION))
-          .filter(Files::isRegularFile)
-          .anyMatch(Files::isReadable);
+      return paths.anyMatch(JaxWsUtils::isWsdlFile);
     }
     catch (IOException e) {
       SdkLog.warning("Unable to search WSDL files in folder '{}'.", wsdlFolder, e);

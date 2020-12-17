@@ -41,7 +41,6 @@ public class CodeTypeNewWizard extends AbstractWizard implements INewWizard {
         .withUiAction((op, d) -> d.asyncExec(() -> S2eUiUtils.openInEditor(op.getCreatedCodeType(), false)));
   }
 
-  @SuppressWarnings("resource")
   protected void mapPageToOperation(PageToOperationMappingInput input, CodeTypeNewOperation op) {
     op.setCodeTypeName(m_page1.getIcuName());
     op.setPackage(m_page1.getTargetPackage());

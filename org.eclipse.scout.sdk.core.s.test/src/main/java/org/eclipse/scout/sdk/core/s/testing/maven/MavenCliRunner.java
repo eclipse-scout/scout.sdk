@@ -50,7 +50,7 @@ import okhttp3.internal.connection.RealConnectionPool;
 @SuppressWarnings({"AccessOfSystemProperties", "CallToNativeMethodWhileLocked"})
 public class MavenCliRunner implements IMavenRunnerSpi {
 
-  private static final String OKHTTP_KEEP_ALIVE = "http.keepAlive";
+  private static final String OK_HTTP_KEEP_ALIVE = "http.keepAlive";
   private static final String MAVEN_CALL_FAILED_MSG = "Maven call failed.";
 
   @Override
@@ -59,7 +59,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
     assertNotNull(build.getWorkingDirectory());
 
     try (var loader = MavenSandboxClassLoaderFactory.build()) {
-      SdkLog.debug("Executing embedded {}", build.toString());
+      SdkLog.debug("Executing embedded {}", build);
       execute(build.getWorkingDirectory(), build.getOptions(), build.getGoals(), build.getProperties(), loader);
     }
     catch (IOException e) {
@@ -69,12 +69,12 @@ public class MavenCliRunner implements IMavenRunnerSpi {
 
   protected static synchronized void execute(Path workingDirectory, Set<String> options, Collection<String> goals, Map<String, String> props, ClassLoader loader) throws IOException {
     var oldMultiModuleProjectDir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
-    var oldHttpKeepAlive = System.getProperty(OKHTTP_KEEP_ALIVE);
+    var oldHttpKeepAlive = System.getProperty(OK_HTTP_KEEP_ALIVE);
     var oldContextClassLoader = Thread.currentThread().getContextClassLoader(); // backup context class loader because maven-cli changes it
     var origSystemIn = System.in; // backup system.in and provide a dummy because maven-cli closes the stream.
     try {
       System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, workingDirectory.toAbsolutePath().toString());
-      System.setProperty(OKHTTP_KEEP_ALIVE, Boolean.toString(false)); // disable OkHttp keepAlive
+      System.setProperty(OK_HTTP_KEEP_ALIVE, Boolean.toString(false)); // disable OkHttp keepAlive
       System.setIn(new ByteArrayInputStream(new byte[]{}));
       Thread.currentThread().setContextClassLoader(loader);
       //noinspection ResultOfMethodCallIgnored
@@ -94,10 +94,10 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       }
 
       if (oldHttpKeepAlive == null) {
-        System.clearProperty(OKHTTP_KEEP_ALIVE);
+        System.clearProperty(OK_HTTP_KEEP_ALIVE);
       }
       else {
-        System.setProperty(OKHTTP_KEEP_ALIVE, oldHttpKeepAlive);
+        System.setProperty(OK_HTTP_KEEP_ALIVE, oldHttpKeepAlive);
       }
     }
   }

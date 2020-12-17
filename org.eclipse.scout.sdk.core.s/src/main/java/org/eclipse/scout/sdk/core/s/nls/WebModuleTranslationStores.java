@@ -89,12 +89,20 @@ public final class WebModuleTranslationStores {
   }
 
   static Path findIncludedModuleByNamingConvention(Path sourceModulePath, String sourceModuleSuffix, String targetModuleSuffix) {
-    var sourceModuleFolderName = sourceModulePath.getFileName().toString().toLowerCase(Locale.US);
+    var fileName = sourceModulePath.getFileName();
+    if (fileName == null) {
+      return null;
+    }
+    var sourceModuleFolderName = fileName.toString().toLowerCase(Locale.US);
     if (!sourceModuleFolderName.endsWith(sourceModuleSuffix)) {
       return null;
     }
     var targetModuleName = sourceModuleFolderName.substring(0, sourceModuleFolderName.length() - sourceModuleSuffix.length()) + targetModuleSuffix;
-    var targetModulePath = sourceModulePath.getParent().resolve(targetModuleName);
+    var parent = sourceModulePath.getParent();
+    if (parent == null) {
+      return null;
+    }
+    var targetModulePath = parent.resolve(targetModuleName);
     if (Files.isReadable(targetModulePath) && Files.isDirectory(targetModulePath)) {
       return targetModulePath;
     }

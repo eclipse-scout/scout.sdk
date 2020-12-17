@@ -52,7 +52,6 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     return m_finishTask;
   }
 
-  @SuppressWarnings("resource")
   protected void mapPageToOperation(PageToOperationMappingInput input, FormNewOperation op) {
     var page = m_page1;
 

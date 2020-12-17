@@ -51,7 +51,6 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
     return m_finishTask;
   }
 
-  @SuppressWarnings("resource")
   protected void mapPageToOperation(PageToOperationMappingInput input, LookupCallNewOperation op) {
     op.setPackage(m_page1.getTargetPackage());
     op.setLookupCallName(m_page1.getIcuName());

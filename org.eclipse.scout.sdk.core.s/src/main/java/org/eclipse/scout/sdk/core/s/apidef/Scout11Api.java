@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.apidef;
 import org.eclipse.scout.sdk.core.apidef.ApiLevel;
 
 @ApiLevel(11)
+@SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100"}) // naming conventions
 public interface Scout11Api extends IScoutApi, IScoutChartApi {
   IScoutChartApi.ChartUiTextContributor CHART_UI_TEXT_CONTRIBUTOR = new ChartUiTextContributor();
 

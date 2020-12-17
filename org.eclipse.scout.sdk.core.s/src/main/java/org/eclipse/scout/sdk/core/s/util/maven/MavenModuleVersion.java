@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.s.util.maven;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,7 +89,20 @@ public final class MavenModuleVersion {
   }
 
   static Optional<ApiVersion> versionOfSourceFolder(Path sourceFolder) {
-    var modulePath = sourceFolder.getParent().getParent().getParent(); // remove src/main/java
+    // remove src/main/java
+    var mainFolder = sourceFolder.getParent();
+    if (mainFolder == null) {
+      return Optional.empty();
+    }
+    var srcFolder = mainFolder.getParent();
+    if (srcFolder == null) {
+      return Optional.empty();
+    }
+    var modulePath = srcFolder.getParent();
+    if (modulePath == null) {
+      return Optional.empty();
+    }
+
     try {
       var pomContent = Xml.get(modulePath.resolve(IMavenConstants.POM));
       return Pom.version(pomContent).flatMap(ApiVersion::parse);
@@ -122,11 +134,15 @@ public final class MavenModuleVersion {
     if (entry.isDirectory()) {
       return false;
     }
-    var fileName = entry.path().getFileName().toString().toLowerCase(Locale.US);
+    var lastSegment = entry.path().getFileName();
+    if (lastSegment == null) {
+      return false;
+    }
+    var fileName = lastSegment.toString();
     // fileName is of form "org.eclipse.scout.rt.platform-10.0.5.jar" or "org.eclipse.scout.rt.platform-10.0.5-sources.jar"
-    return fileName.endsWith(".jar")
-        && fileName.startsWith(moduleName + '-')
-        && !fileName.endsWith("-sources.jar")
-        && !fileName.endsWith("-javadoc.jar");
+    return Strings.endsWith(fileName, ".jar", false)
+        && Strings.startsWith(fileName, moduleName + '-')
+        && !Strings.endsWith(fileName, "-sources.jar", false)
+        && !Strings.endsWith(fileName, "-javadoc.jar", false);
   }
 }

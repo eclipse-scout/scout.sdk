@@ -93,7 +93,7 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "squid:SwitchLastCaseIsDefaultCheck"})
   public Object invoke(Object proxy, Method method, Object[] args) {
     if (method.getDeclaringClass() == Object.class) {
       var methodName = method.getName();

@@ -56,6 +56,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
   private final IJavaProject m_jaxWsProject;
   private boolean m_isCopyToClipboard;
 
+  @SuppressWarnings("squid:S00107") // to many constructor arguments
   protected WebServiceMessageDialog(Shell parentShell, String dialogTitle, Image image, String msg, int dialogImageType, String[] dialogButtonLabels, int defaultIndex,
       String toggleMessage, boolean toggleState, IJavaProject jaxWsProject) {
     super(parentShell, dialogTitle, image, msg, dialogImageType, dialogButtonLabels, defaultIndex, toggleMessage, toggleState);

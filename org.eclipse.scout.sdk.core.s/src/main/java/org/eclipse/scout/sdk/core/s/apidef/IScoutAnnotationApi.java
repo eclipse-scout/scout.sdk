@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.apidef;
 
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 
+@SuppressWarnings("squid:S00100") // method naming conventions
 public interface IScoutAnnotationApi {
   ApplicationScoped ApplicationScoped();
 

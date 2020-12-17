@@ -100,8 +100,12 @@ public class MissingTranslationQuery implements IFileQuery {
       return false;
     }
 
-    var fileName = fullPath.getFileName().toString();
-    return !JAVA_TEXTS_FILE_NAMES.contains(fileName);
+    var fileName = fullPath.getFileName();
+    if (fileName == null) {
+      return false;
+    }
+    var fileNameAsString = fileName.toString();
+    return !JAVA_TEXTS_FILE_NAMES.contains(fileNameAsString);
   }
 
   protected static boolean pathContainsSegment(Iterable<Path> path, String name) {

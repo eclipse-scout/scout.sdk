@@ -52,7 +52,6 @@ public class PageNewWizard extends AbstractWizard implements INewWizard {
     return m_finishTask;
   }
 
-  @SuppressWarnings("resource")
   protected void mapPageToOperation(PageToOperationMappingInput input, PageNewOperation op) {
     op.setCreateAbstractPage(m_page1.isCreateAbstractPage());
     op.setClientSourceFolder(input.environment().toScoutSourceFolder(m_page1.getSourceFolder()));
