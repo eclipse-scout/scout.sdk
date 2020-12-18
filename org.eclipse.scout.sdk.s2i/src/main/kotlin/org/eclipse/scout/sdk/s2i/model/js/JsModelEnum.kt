@@ -17,18 +17,19 @@ import com.intellij.lang.javascript.psi.ecmal4.JSClass
 /**
  * Represents a top-level or nested enumeration.
  */
-class JsModelEnum(name: String, properties: List<JsModelProperty>, scoutJsModule: JsModule) : JsModelElement(name, properties, scoutJsModule) {
+class JsModelEnum(name: String, scoutJsModule: JsModule) : AbstractJsModelElement(name, scoutJsModule) {
 
     companion object {
         fun parse(variable: JSVariable, declaringClass: JSClass?, scoutJsModule: JsModule): JsModelEnum? {
             val enumName = variable.name ?: return null
             if (isPrivateOrJQueryLikeName(enumName)) return null
             val enum = variable.initializer as? JSObjectLiteralExpression ?: return null
-            val values = enum.properties
-                    .mapNotNull { it.name }
-                    .map { JsModelProperty(it, scoutJsModule, JsModelProperty.JsPropertyDataType.UNKNOWN, false) }
             val name = declaringClass?.name?.let { "$it.$enumName" } ?: enumName
-            return JsModelEnum(name, values, scoutJsModule)
+            val result = JsModelEnum(name, scoutJsModule)
+            result.properties = enum.properties
+                    .mapNotNull { it.name }
+                    .map { JsModelProperty(it, result, JsModelProperty.JsPropertyDataType.UNKNOWN, false) }
+            return result
         }
     }
 }

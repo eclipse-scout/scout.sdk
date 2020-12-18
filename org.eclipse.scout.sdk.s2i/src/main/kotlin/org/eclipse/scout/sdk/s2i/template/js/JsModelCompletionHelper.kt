@@ -37,9 +37,9 @@ import icons.JavaScriptPsiIcons
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.containingModule
+import org.eclipse.scout.sdk.s2i.model.js.AbstractJsModelElement
 import org.eclipse.scout.sdk.s2i.model.js.JsModel
 import org.eclipse.scout.sdk.s2i.model.js.JsModelClass
-import org.eclipse.scout.sdk.s2i.model.js.JsModelElement
 import org.eclipse.scout.sdk.s2i.model.js.JsModelProperty
 import org.eclipse.scout.sdk.s2i.template.BoolVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
@@ -49,7 +49,7 @@ import javax.swing.Icon
 object JsModelCompletionHelper {
 
     const val ID_DEFAULT_TEXT = "MyId"
-    val SELECTED_ELEMENT = Key.create<JsModelElement?>("ScoutLookupJsModelElement")
+    val SELECTED_ELEMENT = Key.create<AbstractJsModelElement?>("ScoutLookupJsModelElement")
 
     val BOOL_VARIABLE = BoolVariableAdapter<Unit?>("BOOL", false.toString()).invoke(null)
     val TEXT_VARIABLE = VariableDescriptor("TXT", null)
@@ -102,7 +102,7 @@ object JsModelCompletionHelper {
         return if (Strings.isBlank(objectType)) null else objectType
     }
 
-    fun createLookupElement(elementText: String, element: JsModelElement?, property: JsModelProperty, completionInfo: PropertyCompletionInfo): LookupElementBuilder {
+    fun createLookupElement(elementText: String, element: AbstractJsModelElement?, property: JsModelProperty, completionInfo: PropertyCompletionInfo): LookupElementBuilder {
         val icon = when (element) {
             is JsModelClass -> JavaScriptPsiIcons.Classes.JavaScriptClass
             is JsModelProperty -> when (element.dataType) {
@@ -119,19 +119,22 @@ object JsModelCompletionHelper {
             else -> AllIcons.Nodes.Enum
         }
 
+        val tailText = if (completionInfo.isPropertyNameCompletion && element is JsModelProperty) element.owner.shortName() else null
         val nodeModuleName = element?.scoutJsModule?.name
         val isTemplateRequired = completionInfo.isPropertyNameCompletion || (property.dataType == JsModelProperty.JsPropertyDataType.WIDGET && completionInfo.propertyName != JsModel.OBJECT_TYPE_PROPERTY_NAME)
-        return createLookupElement(elementText, element, nodeModuleName, icon, completionInfo.searchPrefix, isTemplateRequired) {
+        return createLookupElement(elementText, element, nodeModuleName, tailText, icon, completionInfo.searchPrefix, isTemplateRequired) {
             buildPropertyTemplate(property, element, !completionInfo.isLast, completionInfo.isPropertyNameCompletion)
         }
     }
 
-    fun createLookupElement(name: String, modelElement: JsModelElement?, nodeModuleName: String?, icon: Icon, prefix: CharSequence, isTemplateRequired: Boolean, templateProvider: () -> Template): LookupElementBuilder {
+    fun createLookupElement(name: String, modelElement: AbstractJsModelElement?, nodeModuleName: String?, tailText: String?, icon: Icon, prefix: CharSequence, isTemplateRequired: Boolean, templateProvider: () -> Template): LookupElementBuilder {
         var element = LookupElementBuilder.create(name, name)
                 .withCaseSensitivity(true)
                 .withPresentableText(name)
+                .withTailText(tailText, true)
                 .withTypeText(nodeModuleName)
                 .withIcon(icon)
+        tailText?.let { element = element.withTailText(" ($it)", true) }
         if (isTemplateRequired) {
             element = element.withInsertHandler { context, _ -> startTemplate(context.editor, prefix, templateProvider.invoke()) }
             element.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
@@ -149,7 +152,7 @@ object JsModelCompletionHelper {
         })
     }
 
-    private fun buildPropertyTemplate(property: JsModelProperty, selectedElement: JsModelElement?, includeTrailingComma: Boolean, isPropertyNameCompletion: Boolean): TemplateImpl {
+    private fun buildPropertyTemplate(property: JsModelProperty, selectedElement: AbstractJsModelElement?, includeTrailingComma: Boolean, isPropertyNameCompletion: Boolean): TemplateImpl {
         val src = StringBuilder()
         if (isPropertyNameCompletion) {
             src.append(property.name).append(": ")

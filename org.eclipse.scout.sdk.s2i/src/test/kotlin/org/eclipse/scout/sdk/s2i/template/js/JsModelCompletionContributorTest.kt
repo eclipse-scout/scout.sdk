@@ -17,8 +17,8 @@ import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase
 import junit.framework.AssertionFailedError
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils.removeWhitespace
+import org.eclipse.scout.sdk.s2i.model.js.AbstractJsModelElement
 import org.eclipse.scout.sdk.s2i.model.js.JsModel
-import org.eclipse.scout.sdk.s2i.model.js.JsModelElement
 import org.eclipse.scout.sdk.s2i.model.js.JsModelProperty
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 
@@ -122,7 +122,7 @@ class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
                 "import {${JsModel.WIDGET_CLASS_NAME}} from 'index';")
     }
 
-    private fun doCompleteAssertContent(filePath: String, finishLookupName: String, vararg expectedFileContent: String): JsModelElement? {
+    private fun doCompleteAssertContent(filePath: String, finishLookupName: String, vararg expectedFileContent: String): AbstractJsModelElement? {
         val (file, modelElement) = doCompletion(filePath, finishLookupName)
         val fileContent = file.text
         val cleanFunc = { it: String -> removeWhitespace(it).replace('\"', '\'') }
@@ -133,7 +133,7 @@ class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
         return modelElement
     }
 
-    private fun doCompletion(testClassName: String, finishLookupName: String): Pair<PsiFile, JsModelElement?> {
+    private fun doCompletion(testClassName: String, finishLookupName: String): Pair<PsiFile, AbstractJsModelElement?> {
         val psiFile = myFixture.configureByFile(testClassName)
         myFixture.complete(CompletionType.BASIC, 1)
         val lookupElements = myFixture.lookupElements?.asList()

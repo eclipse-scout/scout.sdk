@@ -19,13 +19,17 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 /**
  * Represents a JavaScript class.
  */
-class JsModelClass(name: String, jsClass: JSClass, scoutJsModule: JsModule, constructor: JSFunction?, init: JSFunction?)
-    : JsModelElement(name, parseProperties(jsClass, scoutJsModule, constructor, init), scoutJsModule) {
+class JsModelClass(name: String, jsClass: JSClass, scoutJsModule: JsModule, constructor: JSFunction?, init: JSFunction?) : AbstractJsModelElement(name, scoutJsModule) {
 
     /**
      * The qualified super class names
      */
-    val superClassNames = getQualifiedSuperClassNames(jsClass, scoutJsModule)
+    val superClassNames: List<String>
+
+    init {
+        superClassNames = getQualifiedSuperClassNames(jsClass, scoutJsModule)
+        properties = parseProperties(jsClass, constructor, init)
+    }
 
     companion object {
 
@@ -40,38 +44,6 @@ class JsModelClass(name: String, jsClass: JSClass, scoutJsModule: JsModule, cons
             val constructor = findMethodIn(jsClass, CONSTRUCTOR_METHOD_NAME)
             val init = findMethodIn(jsClass, INIT_METHOD_NAME)
             return JsModelClass(className, jsClass, scoutJsModule, constructor, init)
-        }
-
-        private fun getQualifiedSuperClassNames(jsClass: JSClass, scoutJsModule: JsModule) = jsClass.superClasses.mapNotNull { superClass ->
-            val superClassName = superClass.name ?: return@mapNotNull null
-            val superClassFile = superClass.containingFile.virtualFile
-            val superClassModule = scoutJsModule.jsModel.containingModule(superClassFile)
-            val namespace = superClassModule?.namespace ?: return@mapNotNull superClassName
-            return@mapNotNull "$namespace.$superClassName"
-        }
-
-        private fun parseProperties(jsClass: JSClass, scoutJsModule: JsModule, constructor: JSFunction?, init: JSFunction?): List<JsModelProperty> {
-            if (constructor == null) return emptyList()
-            val widgetProperties = parseMethodCallWithStringArgumentsIn(constructor, WIDGET_PROPERTIES_METHOD_PART)
-            val translationProperties = init?.let { parseMethodCallWithStringArgumentsIn(it, TEXT_KEYS_METHOD_PART) } ?: emptySet()
-            val specialPropertyTypes = listOf(
-                    JsModelPropertyRecorder(widgetProperties, JsModelProperty.JsPropertyDataType.WIDGET, scoutJsModule),
-                    JsModelPropertyRecorder(translationProperties, JsModelProperty.JsPropertyDataType.TEXT_KEY, scoutJsModule))
-
-            val result = ArrayList<JsModelProperty>()
-            constructor.accept(object : JSRecursiveWalkingElementVisitor() {
-                override fun visitJSAssignmentExpression(node: JSAssignmentExpression) {
-                    super.visitJSAssignmentExpression(node)
-                    JsModelProperty.parse(node, scoutJsModule, specialPropertyTypes)?.let { result.add(it) }
-                }
-            })
-
-            // register properties that have no initializer but are declared as widget or translation properties
-            // in that case it is unknown if it is an array or not but it is known that the property exists. it is assumed it is no array
-            result.addAll(specialPropertyTypes
-                    .flatMap { it.unused() }
-                    .onEach { SdkLog.debug("Property {}.{} is declared as {} property but is not initialized in the constructor.", jsClass.name, it.name, it.dataType.type) })
-            return result
         }
 
         private fun parseMethodCallWithStringArgumentsIn(function: PsiElement, methodNameSubstring: String): Set<String> {
@@ -118,15 +90,47 @@ class JsModelClass(name: String, jsClass: JSClass, scoutJsModule: JsModule, cons
         }
     }
 
-    class JsModelPropertyRecorder(private val propertyNames: Collection<String>, private val type: JsModelProperty.JsPropertyDataType, private val module: JsModule) {
+    private fun getQualifiedSuperClassNames(jsClass: JSClass, scoutJsModule: JsModule) = jsClass.superClasses.mapNotNull { superClass ->
+        val superClassName = superClass.name ?: return@mapNotNull null
+        val superClassFile = superClass.containingFile.virtualFile
+        val superClassModule = scoutJsModule.jsModel.containingModule(superClassFile)
+        val namespace = superClassModule?.namespace ?: return@mapNotNull superClassName
+        return@mapNotNull "$namespace.$superClassName"
+    }
+
+    private fun parseProperties(jsClass: JSClass, constructor: JSFunction?, init: JSFunction?): List<JsModelProperty> {
+        if (constructor == null) return emptyList()
+        val widgetProperties = parseMethodCallWithStringArgumentsIn(constructor, WIDGET_PROPERTIES_METHOD_PART)
+        val translationProperties = init?.let { parseMethodCallWithStringArgumentsIn(it, TEXT_KEYS_METHOD_PART) } ?: emptySet()
+        val specialPropertyTypes = listOf(
+                JsModelPropertyRecorder(widgetProperties, JsModelProperty.JsPropertyDataType.WIDGET, this),
+                JsModelPropertyRecorder(translationProperties, JsModelProperty.JsPropertyDataType.TEXT_KEY, this))
+
+        val result = ArrayList<JsModelProperty>()
+        constructor.accept(object : JSRecursiveWalkingElementVisitor() {
+            override fun visitJSAssignmentExpression(node: JSAssignmentExpression) {
+                super.visitJSAssignmentExpression(node)
+                JsModelProperty.parse(node, this@JsModelClass, specialPropertyTypes)?.let { result.add(it) }
+            }
+        })
+
+        // register properties that have no initializer but are declared as widget or translation properties
+        // in that case it is unknown if it is an array or not but it is known that the property exists. it is assumed it is no array
+        result.addAll(specialPropertyTypes
+                .flatMap { it.unused() }
+                .onEach { SdkLog.debug("Property {}.{} is declared as {} property but is not initialized in the constructor.", jsClass.name, it.name, it.dataType.type) })
+        return result
+    }
+
+    class JsModelPropertyRecorder(private val propertyNames: Collection<String>, private val type: JsModelProperty.JsPropertyDataType, private val owner: AbstractJsModelElement) {
         private val m_unused = HashSet(propertyNames)
         fun use(name: String, isArray: Boolean) = name.takeIf { propertyNames.contains(name) }?.let {
             m_unused.remove(name) // mark as used
-            JsModelProperty(name, module, type, isArray)
+            JsModelProperty(name, owner, type, isArray)
         }
 
         fun unused() = m_unused.map {
-            JsModelProperty(it, module, type, false)
+            JsModelProperty(it, owner, type, false)
         }
     }
 }

@@ -48,7 +48,7 @@ class JsModelNameCompletionContributor : CompletionContributor() {
         }
 
         private fun lookupElementForUnknownObjectType(propertyName: String, completionInfo: JsModelCompletionHelper.PropertyCompletionInfo) =
-                createLookupElement(propertyName, null, IWebConstants.SCOUT_JS_CORE_MODULE_NAME, JavaScriptPsiIcons.Classes.Alias, completionInfo.searchPrefix, true) {
+                createLookupElement(propertyName, null, IWebConstants.SCOUT_JS_CORE_MODULE_NAME, JsModel.WIDGET_CLASS_NAME, JavaScriptPsiIcons.Classes.Alias, completionInfo.searchPrefix, true) {
                     buildUnknownObjectTemplate(propertyName, completionInfo)
                 }
 

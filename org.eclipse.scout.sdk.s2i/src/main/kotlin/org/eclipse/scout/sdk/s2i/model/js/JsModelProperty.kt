@@ -14,16 +14,20 @@ import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.impl.JSPsiElementFactory
 
 /**
- * Represents a property of a [JsModelElement]
+ * Represents a property of a [AbstractJsModelElement]
  */
-class JsModelProperty(name: String, scoutJsModule: JsModule, val dataType: JsPropertyDataType, val isArray: Boolean) : JsModelElement(name, emptyList(), scoutJsModule) {
+class JsModelProperty(name: String, val owner: AbstractJsModelElement, val dataType: JsPropertyDataType, val isArray: Boolean) : AbstractJsModelElement(name, owner.scoutJsModule) {
+
+    init {
+        properties = emptyList()
+    }
 
     companion object {
 
         private val ENUM_REGEX = "([\\w\\.]+)\\.[A-Z_]+".toRegex()
         private val CONSTANT_REGEX = "[A-Z_]+".toRegex()
 
-        fun parse(property: JSAssignmentExpression, scoutJsModule: JsModule, propertyTypesByName: List<JsModelClass.JsModelPropertyRecorder>): JsModelProperty? {
+        fun parse(property: JSAssignmentExpression, owner: AbstractJsModelElement, propertyTypesByName: List<JsModelClass.JsModelPropertyRecorder>): JsModelProperty? {
             val lhs = property.definitionExpression?.expression as? JSReferenceExpression ?: return null
             val rhs = property.rOperand ?: return null
             if (lhs.qualifier !is JSThisExpression) return null
@@ -31,6 +35,7 @@ class JsModelProperty(name: String, scoutJsModule: JsModule, val dataType: JsPro
             if (isPrivateOrJQueryLikeName(name)) return null
             if (name.contains('.')) return null // complex fields or expressions
             if (name.matches(CONSTANT_REGEX)) return null // constants
+            if (JsModel.EXCLUDED_PROPERTIES.contains(name)) return null // special properties that must not be explicitly assigned
 
             val isArray = rhs is JSArrayLiteralExpression
             val propertyTypedByName = propertyTypesByName
@@ -41,8 +46,8 @@ class JsModelProperty(name: String, scoutJsModule: JsModule, val dataType: JsPro
             }
 
             val elementToDetectDataType = if (rhs is JSArrayLiteralExpression) rhs.expressions.firstOrNull() else rhs
-            val dataType = elementToDetectDataType?.let { parseDataType(it, scoutJsModule) }
-            return JsModelProperty(name, scoutJsModule, dataType ?: JsPropertyDataType.UNKNOWN, isArray)
+            val dataType = elementToDetectDataType?.let { parseDataType(it, owner.scoutJsModule) }
+            return JsModelProperty(name, owner, dataType ?: JsPropertyDataType.UNKNOWN, isArray)
         }
 
         private fun parseDataType(valueExpression: JSExpression, scoutJsModule: JsModule): JsPropertyDataType? {

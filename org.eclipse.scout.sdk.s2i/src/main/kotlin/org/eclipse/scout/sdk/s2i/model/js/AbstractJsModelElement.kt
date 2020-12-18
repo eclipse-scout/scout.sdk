@@ -13,7 +13,12 @@ package org.eclipse.scout.sdk.s2i.model.js
 /**
  * Base class for JavaScript model elements
  */
-open class JsModelElement(val name: String, val properties: List<JsModelProperty>, val scoutJsModule: JsModule) {
+abstract class AbstractJsModelElement(val name: String, val scoutJsModule: JsModule) {
+
+    /**
+     * All properties of this element
+     */
+    lateinit var properties: List<JsModelProperty>
 
     companion object {
         /**
@@ -29,7 +34,7 @@ open class JsModelElement(val name: String, val properties: List<JsModelProperty
     fun qualifiedName() = scoutJsModule.namespace + '.' + name
 
     /**
-     * @return The short name is [JsModelElement.qualifiedName] for custom namespaces and the simple [JsModelElement.name] for the 'scout' namespace. E.g. 'helloworld.Person' but only 'GroupBox' for 'scout.GroupBox'.
+     * @return The short name is [AbstractJsModelElement.qualifiedName] for custom namespaces and the simple [AbstractJsModelElement.name] for the 'scout' namespace. E.g. 'helloworld.Person' but only 'GroupBox' for 'scout.GroupBox'.
      */
     fun shortName() = if (scoutJsModule.namespace == JsModel.DEFAULT_SCOUT_JS_NAMESPACE) name else qualifiedName()
 
@@ -41,7 +46,7 @@ open class JsModelElement(val name: String, val properties: List<JsModelProperty
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as JsModelElement
+        other as AbstractJsModelElement
         if (name != other.name) return false
         if (scoutJsModule != other.scoutJsModule) return false
         return properties == other.properties

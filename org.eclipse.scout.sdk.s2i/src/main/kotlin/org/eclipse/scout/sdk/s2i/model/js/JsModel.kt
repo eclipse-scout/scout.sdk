@@ -44,9 +44,10 @@ class JsModel {
         private val NAMESPACE_PATTERN = Pattern.compile("window\\.([\\w._]+)\\s*=\\s*Object\\.assign\\(window\\.")
         private const val ADAPTER_FILE_SUFFIX = "Adapter${IWebConstants.JS_FILE_SUFFIX}"
         private const val MODEL_FILE_SUFFIX = "Model${IWebConstants.JS_FILE_SUFFIX}"
+        val EXCLUDED_PROPERTIES = setOf("enabledComputed")
     }
 
-    private val m_elements = HashMap<String /*qualified element name*/, JsModelElement>()
+    private val m_elements = HashMap<String /*qualified element name*/, AbstractJsModelElement>()
     private val m_moduleByFile = HashMap<VirtualFile, JsModule>()
 
     /**
@@ -89,11 +90,11 @@ class JsModel {
     /**
      * @return A [Collection] containing [JsModelClass] instances as well as top-level and nested [JsModelEnum] instances.
      */
-    fun elements(): Collection<JsModelElement> = m_elements.values
+    fun elements(): Collection<AbstractJsModelElement> = m_elements.values
 
     /**
      * @param objectType The objectType (e.g. 'scout.GroupBox'). The default 'scout' namespace may be omitted. All other namespaces are required.
-     * @return The [JsModelElement] that corresponds to the given [objectType]. May be a [JsModelClass] or a top-level or nested [JsModelEnum].
+     * @return The [AbstractJsModelElement] that corresponds to the given [objectType]. May be a [JsModelClass] or a top-level or nested [JsModelEnum].
      */
     fun element(objectType: String?) = m_elements[objectType] ?: m_elements["$DEFAULT_SCOUT_JS_NAMESPACE.$objectType"]
 
@@ -158,18 +159,18 @@ class JsModel {
     }
 
     /**
-     * @param element The [JsModelElement] to check.
+     * @param element The [AbstractJsModelElement] to check.
      * @return true if the [element] is a [JsModelClass] that inherits from scout.Widget.
      */
-    fun isWidget(element: JsModelElement?): Boolean {
+    fun isWidget(element: AbstractJsModelElement?): Boolean {
         val modelClass = element as? JsModelClass ?: return false
         return visitElementAndParents(modelClass) {
             it.name != WIDGET_CLASS_NAME || it.scoutJsModule.name != IWebConstants.SCOUT_JS_CORE_MODULE_NAME
         }
     }
 
-    private fun visitElementAndParents(modelElement: JsModelElement, visitor: (JsModelElement) -> Boolean): Boolean {
-        val superElements = ArrayDeque<JsModelElement>()
+    private fun visitElementAndParents(modelElement: AbstractJsModelElement, visitor: (AbstractJsModelElement) -> Boolean): Boolean {
+        val superElements = ArrayDeque<AbstractJsModelElement>()
         superElements.addLast(modelElement)
         while (superElements.isNotEmpty()) {
             val element = superElements.removeFirst()
@@ -260,7 +261,7 @@ class JsModel {
 
     private fun parseClass(jsClass: JSClass, module: JsModule) = registerElement(JsModelClass.parse(jsClass, module))
 
-    private fun registerElement(toRegister: JsModelElement?) {
+    private fun registerElement(toRegister: AbstractJsModelElement?) {
         if (toRegister == null) return
 
         val qualifiedName = toRegister.qualifiedName()
@@ -271,10 +272,10 @@ class JsModel {
         }
     }
 
-    private fun chooseElement(a: JsModelElement, b: JsModelElement) = if (a.properties.size > b.properties.size) a else b
+    private fun chooseElement(a: AbstractJsModelElement, b: AbstractJsModelElement) = if (a.properties.size > b.properties.size) a else b
 
     /**
      * Represents a possible [JsModelProperty] value to insert into the source. Can be obtained using [JsModel.valuesForProperty]
      */
-    data class PropertyValue(val displayText: String, val element: JsModelElement? = null)
+    data class PropertyValue(val displayText: String, val element: AbstractJsModelElement? = null)
 }
