@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.s.apidef;
 import org.eclipse.scout.sdk.core.apidef.ApiLevel;
 
 @ApiLevel(10)
-@SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION"}) // naming conventions
+@SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
 public interface Scout10Api extends IScoutApi {
 
   IScoutAnnotationApi.ApplicationScoped APPLICATION_SCOPED_ANNOTATION = new ApplicationScoped();
