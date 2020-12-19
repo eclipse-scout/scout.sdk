@@ -77,6 +77,7 @@
     <applicationService serviceImplementation="org.eclipse.scout.sdk.s2i.settings.ScoutCodeFoldingSettings"/>
     <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                          instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
+    <search.optionContributor implementation="org.eclipse.scout.sdk.s2i.settings.ScoutSearchableOptionContributor"/>
     <macro implementation="org.eclipse.scout.sdk.s2i.IdeaHomePathMacro"/>
     <localInspection language="JAVA" shortName="MissingClassId" groupName="Scout" enabledByDefault="false" level="ERROR" key="missing.classid.annotation"
                      implementationClass="org.eclipse.scout.sdk.s2i.classid.MissingClassIdInspection"/>

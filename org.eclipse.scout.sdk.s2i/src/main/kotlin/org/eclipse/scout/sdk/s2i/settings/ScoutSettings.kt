@@ -11,10 +11,8 @@
 package org.eclipse.scout.sdk.s2i.settings
 
 import com.intellij.ide.util.PropertiesComponent
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.util.EventListenerList
@@ -22,10 +20,12 @@ import org.eclipse.scout.sdk.core.util.Strings
 import java.util.*
 import javax.swing.JComponent
 
-open class ScoutSettings(private val project: Project) : SearchableConfigurable, Disposable {
+open class ScoutSettings(private val project: Project) : SearchableConfigurable {
 
     companion object Current {
 
+        const val CONFIGURABLE_ID = "preferences.ScoutSettings"
+        const val DISPLAY_NAME = "Scout"
         const val KEY_AUTO_UPDATE_DERIVED_RESOURCES = "org.eclipse.scout.sdk.s2i.autoUpdateDerivedResources"
         const val KEY_AUTO_CREATE_CLASS_ID = "org.eclipse.scout.sdk.s2i.autoCreateClassIdAnnotations"
         const val KEY_TRANSLATION_DEFAULT_LANG = "org.eclipse.scout.sdk.s2i.translationDefaultLanguage"
@@ -89,26 +89,22 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
         }
     }
 
-    private var m_form: ScoutSettingsForm? = null
+    private val m_form: ScoutSettingsForm by lazy { ScoutSettingsForm() }
 
-    private fun isAutoUpdateDerivedResourcesInUi() = m_form?.isAutoUpdateDerivedResources ?: false
+    private fun isAutoUpdateDerivedResourcesInUi() = m_form.isAutoUpdateDerivedResources
 
-    private fun isAutoCreateClassIdAnnotationsInUi() = m_form?.isAutoCreateClassId ?: false
+    private fun isAutoCreateClassIdAnnotationsInUi() = m_form.isAutoCreateClassId
 
-    private fun getTranslationLanguageInUi() = m_form?.translationLanguage ?: Language.LANGUAGE_DEFAULT
+    private fun getTranslationLanguageInUi() = m_form.translationLanguage
 
     override fun isModified() =
             isAutoUpdateDerivedResourcesInUi() != isAutoUpdateDerivedResources(project)
                     || isAutoCreateClassIdAnnotationsInUi() != isAutoCreateClassIdAnnotations(project)
                     || getTranslationLanguageInUi() != getTranslationLanguage(project)
 
-    override fun getId(): String {
-        return "preferences.ScoutSettings"
-    }
+    override fun getId() = CONFIGURABLE_ID
 
-    override fun getDisplayName(): String {
-        return "Scout"
-    }
+    override fun getDisplayName() = DISPLAY_NAME
 
     override fun apply() {
         setAutoUpdateDerivedResources(project, isAutoUpdateDerivedResourcesInUi())
@@ -117,22 +113,13 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable,
     }
 
     override fun reset() {
-        m_form?.isAutoUpdateDerivedResources = isAutoUpdateDerivedResources(project)
-        m_form?.isAutoCreateClassId = isAutoCreateClassIdAnnotations(project)
-        m_form?.translationLanguage = getTranslationLanguage(project)
+        m_form.isAutoUpdateDerivedResources = isAutoUpdateDerivedResources(project)
+        m_form.isAutoCreateClassId = isAutoCreateClassIdAnnotations(project)
+        m_form.translationLanguage = getTranslationLanguage(project)
     }
 
     override fun createComponent(): JComponent? {
-        m_form = ScoutSettingsForm()
         reset()
         return m_form
-    }
-
-    override fun disposeUIResources() {
-        Disposer.dispose(this)
-    }
-
-    override fun dispose() {
-        m_form = null
     }
 }
