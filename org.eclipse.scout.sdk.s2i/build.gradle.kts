@@ -10,6 +10,9 @@
  */
 
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
+import org.jetbrains.intellij.tasks.PrepareSandboxTask
+import org.jetbrains.intellij.tasks.RunPluginVerifierTask
+import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Clock
 import java.time.LocalDateTime.now
@@ -76,10 +79,14 @@ intellij {
     setPlugins("java", "maven", "copyright", "properties", "CSS", "JavaScriptLanguage")
     updateSinceUntilBuild = false
 
-    tasks {
-        withType<PatchPluginXmlTask> {
-            version(scoutSdkPluginVersion)
-        }
+    tasks.withType<PatchPluginXmlTask> {
+        version(scoutSdkPluginVersion)
+    }
+
+    tasks.withType<RunPluginVerifierTask> {
+        setIdeVersions(listOf("IU-2020.2.4", "IU-2020.3"))
+        setSubsystemsToCheck("without-android")
+        failureLevel = FailureLevel.ALL
     }
 }
 
@@ -90,7 +97,7 @@ allprojects {
     }
 }
 
-tasks.withType<org.jetbrains.intellij.tasks.PrepareSandboxTask> {
+tasks.withType<PrepareSandboxTask> {
     // prepareSandbox Task may copy duplicate libraries from transitive dependencies.
     // See https://intellij-support.jetbrains.com/hc/en-us/community/posts/360009478700-Kotlin-Getting-Copying-or-archiving-duplicate-paths-deprecation-warnings-when-building-plugin
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
