@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2i.model.js
 
 import com.intellij.javascript.nodejs.NodeModuleSearchUtil.collectVisibleNodeModules
+import com.intellij.javascript.nodejs.PackageJsonData
 import com.intellij.lang.javascript.buildTools.npm.PackageJsonUtil
 import com.intellij.lang.javascript.inspections.JSRecursiveWalkingElementSkippingNestedFunctionsVisitor
 import com.intellij.lang.javascript.psi.JSElementVisitor
@@ -206,7 +207,7 @@ class JsModel {
     }
 
     private fun parseModule(moduleRoot: VirtualFile): JsModule? {
-        val packageJsonData = moduleRoot.findChild(PackageJsonUtil.FILE_NAME)?.let { PackageJsonUtil.getOrCreateData(it) } ?: return null
+        val packageJsonData = moduleRoot.findChild(PackageJsonUtil.FILE_NAME)?.let { PackageJsonData.getOrCreate(it) } ?: return null
         val main = packageJsonData.main ?: return null
         val moduleName = packageJsonData.name?.takeIf { it.startsWith('@') } ?: return null
         val mainFile = moduleRoot.findFileByRelativePath(main)?.takeIf { it.isValid } ?: return null

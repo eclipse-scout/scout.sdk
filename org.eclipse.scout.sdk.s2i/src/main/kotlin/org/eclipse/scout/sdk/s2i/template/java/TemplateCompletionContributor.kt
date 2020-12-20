@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.scoutApi
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
-import org.eclipse.scout.sdk.s2i.util.CompatibilityHelper
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 
 class TemplateCompletionContributor : CompletionContributor() {
 

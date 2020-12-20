@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.s2i
 
-import com.intellij.notification.NotificationGroup
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.Logger
@@ -22,14 +21,13 @@ import org.eclipse.scout.sdk.core.log.ISdkConsoleSpi
 import org.eclipse.scout.sdk.core.log.LogMessage
 import org.eclipse.scout.sdk.core.log.SdkConsole
 import org.eclipse.scout.sdk.core.util.Strings
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 import java.util.logging.Level
 
 open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
 
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
-
-    @Suppress("MissingRecentApi") // method does not exist on the companion, but static access is available -> ok
-    private val m_balloonLog = NotificationGroup.balloonGroup("Scout")
+    private val m_balloonLog = CompatibilityHelper.balloonGroup()
 
     /**
      * Executed on [Project] open

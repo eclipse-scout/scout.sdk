@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.findTypeByName
 import org.eclipse.scout.sdk.s2i.isInstanceOf
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
-import org.eclipse.scout.sdk.s2i.util.CompatibilityHelper
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 
 /**
  * Handler that inserts a selected [TemplateDescriptor].

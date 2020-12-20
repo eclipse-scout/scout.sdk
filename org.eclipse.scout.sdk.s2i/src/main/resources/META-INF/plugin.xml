@@ -62,6 +62,7 @@
   <depends optional="true" config-file="withJavaScript.xml">JavaScript</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <notificationGroup displayType="BALLOON" id="scout.notification" key="notification.group.name"/> <!-- required for IJ 2020.3 -->
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.nls.IdeaTranslationStoreSupplier"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator"/>

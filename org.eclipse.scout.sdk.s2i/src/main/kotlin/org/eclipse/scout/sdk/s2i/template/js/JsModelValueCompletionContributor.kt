@@ -15,6 +15,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.ecmascript6.actions.ES6AddImportExecutor
 import com.intellij.lang.ecmascript6.psi.impl.ES6ImportPsiUtil
+import com.intellij.lang.ecmascript6.psi.impl.ES6ImportPsiUtil.CreateImportExportInfo
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
@@ -26,6 +27,8 @@ import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.PropertyCom
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.createLookupElement
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.getPropertyValueInfo
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.propertyElementPattern
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller.ResolvedMethod
 
 class JsModelValueCompletionContributor : CompletionContributor() {
 
@@ -84,9 +87,36 @@ class JsModelValueCompletionContributor : CompletionContributor() {
                 var importName = type.name
                 val firstDot = importName.indexOf('.')
                 if (firstDot > 0) importName = importName.take(firstDot)
-                val info = ES6ImportPsiUtil.CreateImportExportInfo(importName, ES6ImportPsiUtil.ImportExportType.SPECIFIER)
-                ES6AddImportExecutor(context.editor, place).createImportOrUseExisting(info, null, Strings.toStringLiteral(moduleOrNamespaceName).toString())
+                val executor = ES6AddImportExecutor(context.editor, place)
+                createImportOrUseExisting(importName, moduleOrNamespaceName, executor)
             }
         }
+
+        /**
+         * CreateImportExportInfo creation changed with IJ 2020.3
+         * Can be removed if the minimal supported IJ version is >= 2020.3
+         */
+        private val m_createImportOrUseExisting = CompatibilityMethodCaller<CreateImportExportInfo>()
+                .withCandidate("com.intellij.lang.ecmascript6.psi.impl.ES6ImportPsiUtil\$CreateImportExportInfo", CompatibilityMethodCaller.CONSTRUCTOR_NAME,
+                        String::class.java.name, "com.intellij.lang.javascript.modules.imports.JSImportExportType") {
+                    val moduleOrNamespaceName = it.args[1] as String
+                    // IJ 2020.3: module must not be quoted
+                    createImportOrUseExisting(moduleOrNamespaceName, it)
+                }
+                .withCandidate(CreateImportExportInfo::class.java, CompatibilityMethodCaller.CONSTRUCTOR_NAME, String::class.java, ES6ImportPsiUtil.ImportExportType::class.java) {
+                    val moduleOrNamespaceName = it.args[1] as String
+                    // before IJ 2020.3: module must be quoted
+                    createImportOrUseExisting(Strings.toStringLiteral(moduleOrNamespaceName).toString(), it)
+                }
+
+        private fun createImportOrUseExisting(moduleOrNamespaceName: String, constr: ResolvedMethod<CreateImportExportInfo>): CreateImportExportInfo {
+            val importedName = constr.args[0] as String
+            val executor = constr.args[2] as ES6AddImportExecutor
+            val info = constr.invokeStatic(importedName, ES6ImportPsiUtil.ImportExportType.SPECIFIER)
+            executor.createImportOrUseExisting(info, null, moduleOrNamespaceName)
+            return info
+        }
+
+        fun createImportOrUseExisting(importedName: String, moduleOrNamespaceName: String, executor: ES6AddImportExecutor) = m_createImportOrUseExisting.invoke(importedName, moduleOrNamespaceName, executor)
     }
 }
