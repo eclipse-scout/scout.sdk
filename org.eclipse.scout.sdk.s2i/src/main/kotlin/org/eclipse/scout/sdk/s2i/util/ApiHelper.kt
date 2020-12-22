@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.toIdeaProgress
+import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 
 object ApiHelper {
 
@@ -34,7 +34,7 @@ object ApiHelper {
 
     fun <T : IApiSpecification> apiFor(module: Module, api: Class<T>, environment: IdeaEnvironment? = null): T? {
         if (environment == null) {
-            return callInIdeaEnvironmentSync(module.project, toIdeaProgress(null)) { env, _ ->
+            return callInIdeaEnvironmentSync(module.project, IdeaProgress.empty()) { env, _ ->
                 createApiFor(module, api, env)
             }
         }

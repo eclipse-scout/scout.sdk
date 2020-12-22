@@ -95,7 +95,7 @@ class JsModelClass(name: String, jsClass: JSClass, scoutJsModule: JsModule, cons
         val superClassFile = superClass.containingFile.virtualFile
         val superClassModule = scoutJsModule.jsModel.containingModule(superClassFile)
         val namespace = superClassModule?.namespace ?: return@mapNotNull superClassName
-        return@mapNotNull "$namespace.$superClassName"
+        "$namespace.$superClassName"
     }
 
     private fun parseProperties(jsClass: JSClass, constructor: JSFunction?, init: JSFunction?): List<JsModelProperty> {

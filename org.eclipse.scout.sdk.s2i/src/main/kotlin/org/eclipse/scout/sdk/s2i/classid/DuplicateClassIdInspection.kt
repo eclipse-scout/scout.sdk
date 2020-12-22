@@ -59,7 +59,7 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
     }
 
     protected fun resolvePsi(duplicates: Collection<String>, file: PsiJavaFile): List<PsiClass> = computeInReadAction(file.project) {
-        return@computeInReadAction PsiTreeUtil.findChildrenOfType(file, PsiClass::class.java)
+        PsiTreeUtil.findChildrenOfType(file, PsiClass::class.java)
                 .associateBy { it.qualifiedName }
                 .filter { it.key != null }
                 .filter { duplicates.contains(it.key) }

@@ -93,7 +93,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
 
     private fun resolveSubClasses(module: Module, fqn: String, javaEnv: IJavaEnvironment): Sequence<TypeMapping> = computeInReadAction(module.project) {
         val moduleScope = module.getModuleWithDependenciesAndLibrariesScope(false)
-        return@computeInReadAction module.project.findTypesByName(fqn, moduleScope)
+        module.project.findTypesByName(fqn, moduleScope)
                 .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false).asSequence() }
                 .filter { !it.isEnum }
                 .filter { it.hasModifierProperty(PsiModifier.PUBLIC) }

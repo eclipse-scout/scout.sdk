@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator
 import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import java.nio.file.Path
 import java.util.*
 
@@ -97,7 +97,7 @@ open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, St
 
         val project = module.project
         val virtualFile = path.toVirtualFile() ?: return null
-        val psiFile = IdeaEnvironment.computeInReadAction(project) { psiManager.findFile(virtualFile) } ?: return null
+        val psiFile = computeInReadAction(project) { psiManager.findFile(virtualFile) } ?: return null
 
         val raw = copyrightManager.getCopyrightOptions(psiFile)?.notice ?: return null
         return VelocityHelper.evaluate(psiFile, project, module, EntityUtil.decode(raw))

@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.toIdeaProgress
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import java.io.File
 import java.nio.file.Path
 
@@ -65,7 +65,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
 
     protected fun formatSource(newJavaPsi: PsiFile) {
         try {
-            IdeaEnvironment.computeInReadAction(project) { CodeStyleManager.getInstance(project).reformat(newJavaPsi) }
+            computeInReadAction(project) { CodeStyleManager.getInstance(project).reformat(newJavaPsi) }
         } catch (e: Exception) {
             SdkLog.warning("Error formatting Java source of file '{}'.", newJavaPsi.name, e)
         }
@@ -98,7 +98,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
                     SdkLog.debug("Add new compilation unit '{}'.", psi.name)
                     dir.add(psi)
                 } else {
-                    FileWriter(targetFile, psi.text, psi.project).commit(toIdeaProgress(null))
+                    FileWriter(targetFile, psi.text, psi.project).commit(IdeaProgress.empty())
                 }
                 progress.worked(1)
                 return true

@@ -16,6 +16,7 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
@@ -29,6 +30,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils.callInContext
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
+import org.eclipse.scout.sdk.s2i.toIdea
 import org.eclipse.scout.sdk.s2i.toVirtualFile
 import java.nio.file.Path
 import java.util.Collections.singletonList
@@ -49,7 +51,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
          * @param progressProvider A provider for a progress indicator to use when committing the transaction. This provider is also used to determine if the task has been canceled. Only if not canceled the transaction will be committed.
          * @param runnable The runnable to execute
          */
-        fun runInNewTransaction(project: Project, name: String? = null, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, runnable: () -> Unit) {
+        fun runInNewTransaction(project: Project, name: String? = null, progressProvider: () -> IdeaProgress = { IdeaProgress.empty() }, runnable: () -> Unit) {
             callInNewTransaction(project, name, progressProvider) {
                 runnable.invoke()
             }
@@ -64,7 +66,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
          * @param progressProvider A provider for a progress indicator to use when committing the transaction. This provider is also used to determine if the task has been canceled. Only if not canceled the transaction will be committed.
          * @param callable The runnable to execute
          */
-        fun <R> callInNewTransaction(project: Project, name: String? = null, progressProvider: () -> IdeaProgress = { IdeaEnvironment.toIdeaProgress(null) }, callable: () -> R?): R? {
+        fun <R> callInNewTransaction(project: Project, name: String? = null, progressProvider: () -> IdeaProgress = { IdeaProgress.empty() }, callable: () -> R?): R? {
             var save = false
             val transactionManager = TransactionManager(project, name)
             val result: R?
@@ -108,7 +110,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
         fun <T> computeInWriteAction(project: Project, name: String? = null, callable: () -> T): T {
             val result = FinalValue<T>()
             // repeat outside the write lock to release the UI thread between retries (prevent freezes)
-            repeatUntilPassesWithIndex(project, false/* not allowed because entering a write action afterwards */) {
+            repeatUntilPassesWithIndex(project) {
                 ApplicationManager.getApplication().invokeAndWait {
                     // this is executed in the UI thread! keep short to prevent freezes!
                     // write operations are only allowed in the UI thread
@@ -127,29 +129,37 @@ class TransactionManager constructor(val project: Project, val transactionName: 
                 return result.get()
             }
             CommandProcessor.getInstance().executeCommand(project, {
-                DumbService.getInstance(project).runReadActionInSmartMode {
-                    result.computeIfAbsent(callable)
-                }
+                result.computeIfAbsent(callable)
             }, name, null)
             return result.get()
         }
 
-        internal fun <T> repeatUntilPassesWithIndex(project: Project, executeInReadAction: Boolean, callable: () -> T): T {
+        private fun <T> repeatUntilPassesWithIndex(project: Project, callable: () -> T): T {
+            val dumbService = DumbService.getInstance(project)
+            val readAccessAllowed = ApplicationManager.getApplication().isReadAccessAllowed
             while (true) {
                 try {
-                    if (project.isInitialized) { // includes !disposed & open
-                        return if (executeInReadAction) {
-                            DumbService.getInstance(project).runReadActionInSmartMode(callable)
-                        } else {
-                            callable.invoke()
-                        }
-                    } else {
+                    ProgressManager.checkCanceled()
+                    if (!project.isInitialized) { // includes disposed | !open
                         throw ProcessCanceledException()
+                    }
+                    return if (readAccessAllowed) {
+                        // we can't wait for smart mode to begin (it would result in a deadlock)
+                        // so let's just pretend it's already smart and fail with IndexNotReadyException if not
+                        callable.invoke()
+                    } else {
+                        dumbService.waitForSmartMode()
+                        ProgressManager.checkCanceled()
+                        callable.invoke()
                     }
                 } catch (e: RuntimeException) {
                     val rootException = unwrap(e)
                     if (rootException is IndexNotReadyException) {
                         SdkLog.debug("Project entered dumb mode unexpectedly. Retrying task.", onTrace(e))
+                        if (readAccessAllowed) {
+                            // as there is no "waitForSmartMode" when holding the readLock already: quickly wait before retry
+                            Thread.sleep(500)
+                        }
                     } else {
                         throw e
                     }
@@ -193,7 +203,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
      * @return true if all [TransactionMember]s have been committed successfully
      */
     @Suppress("unused")
-    fun checkpoint(progress: IdeaProgress?) = synchronized(this) { finishTransactionImpl(true, IdeaEnvironment.toIdeaProgress(progress)) }
+    fun checkpoint(progress: IdeaProgress?) = synchronized(this) { finishTransactionImpl(true, progress.toIdea()) }
 
     /**
      * Registers the [TransactionMember] specified. If the running transaction ends the member is asked to commit. If the transaction is not committed

@@ -17,9 +17,13 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.util.Strings
 
-open class IdeaProgress(ind: ProgressIndicator?) : IProgress {
+open class IdeaProgress(indicator: ProgressIndicator?) : IProgress {
 
-    val indicator = ind ?: EmptyProgressIndicator()
+    companion object {
+        fun empty() = IdeaProgress(null)
+    }
+
+    val indicator = indicator ?: EmptyProgressIndicator()
     private var m_totalTicks = 0
     private var m_ticksDone = 0
 

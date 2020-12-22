@@ -15,7 +15,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.JavaTypes
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 
 abstract class AbstractClassAnnotation protected constructor(val psiClass: PsiClass, val psiAnnotation: PsiAnnotation, val scoutApi: IScoutApi) {
 
@@ -27,16 +27,16 @@ abstract class AbstractClassAnnotation protected constructor(val psiClass: PsiCl
                 return null
             }
 
-            val declaringClass = owner ?: IdeaEnvironment.computeInReadAction(annotation!!.project) { PsiTreeUtil.getParentOfType(annotation, PsiClass::class.java) } ?: return null
+            val declaringClass = owner ?: computeInReadAction(annotation!!.project) { PsiTreeUtil.getParentOfType(annotation, PsiClass::class.java) } ?: return null
             val annotationElement = resolveAnnotation(fqn, annotation, declaringClass) ?: return null
             return declaringClass to annotationElement
         }
 
         private fun resolveAnnotation(fqn: String, annotation: PsiAnnotation?, owner: PsiClass): PsiAnnotation? {
             if (annotation == null) {
-                return IdeaEnvironment.computeInReadAction(owner.project) { owner.getAnnotation(fqn) }
+                return computeInReadAction(owner.project) { owner.getAnnotation(fqn) }
             }
-            val annotationName = IdeaEnvironment.computeInReadAction(annotation.project) {
+            val annotationName = computeInReadAction(annotation.project) {
                 // do not use annotation.qualifiedName here because it requires a resolve (slow and might not be allowed in contexts like psi change listeners)
                 annotation.nameReferenceElement?.referenceName
             } ?: return null
@@ -48,7 +48,7 @@ abstract class AbstractClassAnnotation protected constructor(val psiClass: PsiCl
     }
 
     fun ownerFqn(): String? = m_ownerFqn.computeIfAbsentAndGet {
-        IdeaEnvironment.computeInReadAction(psiClass.project) {
+        computeInReadAction(psiClass.project) {
             psiClass.qualifiedName
         }
     }

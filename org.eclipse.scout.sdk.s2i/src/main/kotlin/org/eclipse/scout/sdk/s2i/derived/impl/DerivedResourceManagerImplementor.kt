@@ -179,7 +179,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         try {
             return callInExistingTransaction(transaction) {
                 SdkLog.debug("About to execute derived resource handler: {}", handler)
-                return@callInExistingTransaction handler.apply(env, progress)
+                handler.apply(env, progress)
             }
         } catch (e: Exception) {
             // log the exception but continue processing. The failure of one handler does not abort the transaction

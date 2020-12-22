@@ -77,7 +77,25 @@ fun IType.resolvePsi(): PsiClass? {
     }
 }
 
-fun ProgressIndicator.toScoutProgress(): IdeaProgress = IdeaProgress(this)
+/**
+ * @return this [ProgressIndicator] converted to a Scout [IProgress].
+ */
+fun ProgressIndicator?.toScoutProgress() = IdeaProgress(this)
+
+/**
+ * @return this Scout [IProgress] converted to an [IdeaProgress].
+ */
+fun IProgress?.toIdea() = this as? IdeaProgress ?: IdeaProgress.empty()
+
+/**
+ * @return this [IEnvironment] converted to a [IdeaEnvironment].
+ */
+fun IEnvironment.toIdea() = this as IdeaEnvironment
+
+/**
+ * @return this [IJavaEnvironment] converted to an [JavaEnvironmentWithIdea]
+ */
+fun IJavaEnvironment.toIdea() = unwrap() as JavaEnvironmentWithIdea
 
 /**
  * @return the module source root (source folder) or library source root in which this PsiElement exists.
@@ -219,16 +237,10 @@ fun PsiElement.scoutApi() = ApiHelper.scoutApiFor(this)
 
 fun PsiElement.requireScoutApi() = ApiHelper.requireScoutApiFor(this)
 
-fun IProgress.toIdea(): IdeaProgress = this as IdeaProgress
-
 /**
  * @return true if this [Module] has a Java SDK.
  */
 fun Module.isJavaModule(): Boolean = rootManager.sdk?.sdkType == JavaSdk.getInstance()
-
-fun IEnvironment.toIdea(): IdeaEnvironment = this as IdeaEnvironment
-
-fun IJavaEnvironment.toIdea(): JavaEnvironmentWithIdea = unwrap() as JavaEnvironmentWithIdea
 
 /**
  * @param scope The scope in which the PsiClasses should be searched.

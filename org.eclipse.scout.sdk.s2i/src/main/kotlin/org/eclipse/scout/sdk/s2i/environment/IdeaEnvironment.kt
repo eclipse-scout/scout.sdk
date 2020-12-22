@@ -11,15 +11,14 @@
 package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.util.ProgressIndicatorUtils
-import com.intellij.openapi.progress.util.ProgressIndicatorUtils.runWithWriteActionPriority
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope.allScope
+import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.builder.BuilderContext
 import org.eclipse.scout.sdk.core.builder.IBuilderContext
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder
@@ -40,8 +39,9 @@ import org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
-import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.repeatUntilPassesWithIndex
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
+import org.jetbrains.concurrency.CancellablePromise
+import org.jetbrains.concurrency.resolvedCancellablePromise
 import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -52,43 +52,58 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
 
     companion object Factory {
 
+        /**
+         * Executes the [task] synchronously in the current thread
+         */
         fun <T> callInIdeaEnvironmentSync(project: Project, progressIndicator: IdeaProgress, task: (IdeaEnvironment, IdeaProgress) -> T): T =
                 IdeaEnvironment(project).use {
                     return task.invoke(it, progressIndicator)
                 }
 
+        /**
+         * Asynchronously executes the given [task] in a [OperationTask]. The task is executed with an active [TransactionManager].
+         * @param title The description of the async task. Will be displayed to the user. If empty, the [toString] method of the task is used (if available).
+         */
         fun <T> callInIdeaEnvironment(project: Project, title: String, task: (IdeaEnvironment, IdeaProgress) -> T): IFuture<T> {
             val result = FinalValue<T>()
             val name = Strings.notBlank(title).orElseGet { toStringIfOverwritten(task).orElse(message("unnamed.task.x", task)) }
-            val job = OperationTask(name, project) { pr ->
-                callInIdeaEnvironmentSync(project, pr) { e, p ->
+            val job = OperationTask(name, project) { progress ->
+                callInIdeaEnvironmentSync(project, progress) { e, p ->
                     result.setIfAbsent(task.invoke(e, p))
                 }
             }
             return job.schedule({ result.get() })
         }
 
-        fun <T> computeInReadAction(project: Project, callable: () -> T): T = repeatUntilPassesWithIndex(project, true, callable)
+        /**
+         * Like [computeInReadActionAsync] but the calling thread is blocked until the result is available.
+         */
+        fun <T> computeInReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): T =
+                computeInReadActionAsync(project, requireSmartMode, progress, callable).get()
 
-        fun <T> computeInLongReadAction(project: Project, progressIndicator: ProgressIndicator, callable: () -> T): T {
+        /**
+         * Executes the given [callable] in a read action. If the method is invoked when already holding the read lock, it is directly executed in the calling thread.
+         * Otherwise it is executed in an asynchronous action bound to the given [Project].
+         * @param requireSmartMode If true, the read action waits until smart mode is available and is repeated until successful while in smart mode.
+         * @param progress An optional [ProgressIndicator] to use if executed asynchronously.
+         * @return A [CancellablePromise] representing the asynchronous computation.
+         */
+        fun <T> computeInReadActionAsync(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): CancellablePromise<T> {
             if (ApplicationManager.getApplication().isReadAccessAllowed) {
-                return callable.invoke()
+                // already in read action: don't submit non-blocking read-action (could end up in a dead-lock). Instead directly execute
+                // also don't repeat until indexes are ready. If here the read-lock is already held, it must be released so that the dump mode can end
+                return resolvedCancellablePromise(callable.invoke())
             }
 
-            val result = FinalValue<T>()
-            var success = false
-            while (!success && !progressIndicator.isCanceled) {
-                /* do not pass outer progress indicator. otherwise it might be canceled inside but then it is not possible to perform a retry (it is canceled already) */
-                /* therefore use a fresh indicator for each retry and use the outer indicator to stop retrying */
-                success = runWithWriteActionPriority({ result.set(computeInReadAction(project, callable)) }, EmptyProgressIndicator())
-                if (!success) {
-                    ProgressIndicatorUtils.yieldToPendingWriteActions()
-                }
+            var action = ReadAction.nonBlocking(callable).expireWith(project)
+            if (progress != null) {
+                action = action.wrapProgress(progress)
             }
-            return result.get()
+            if (requireSmartMode) {
+                action = action.inSmartMode(project)
+            }
+            return action.submit(AppExecutorUtil.getAppExecutorService())
         }
-
-        fun toIdeaProgress(progress: IProgress?): IdeaProgress = progress?.toIdea() ?: IdeaProgress(null)
     }
 
     private val m_envs = ConcurrentHashMap<String, JavaEnvironmentWithIdea>()
@@ -146,10 +161,10 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
             writeCompilationUnit(generator, targetFolder, null)
 
     override fun writeCompilationUnit(generator: ICompilationUnitGenerator<*>, targetFolder: IClasspathEntry, progress: IProgress?): IType? =
-            doWriteCompilationUnit(generator, targetFolder, toIdeaProgress(progress), true).result()
+            doWriteCompilationUnit(generator, targetFolder, progress.toIdea(), true).result()
 
     override fun writeCompilationUnitAsync(generator: ICompilationUnitGenerator<*>, targetFolder: IClasspathEntry, progress: IProgress?): IFuture<IType?> =
-            doWriteCompilationUnit(generator, targetFolder, toIdeaProgress(progress), false)
+            doWriteCompilationUnit(generator, targetFolder, progress.toIdea(), false)
 
     fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, filePath: Path): StringBuilder =
             createResource(generator, findJavaEnvironment(filePath).orElseThrow { newFail("Cannot find Java environment for path '{}'.", filePath) }, filePath)
@@ -215,7 +230,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
             }
             fqn.append(name)
 
-            return@lambda javaEnv.findType(fqn.toString()).orElse(null)
+            javaEnv.findType(fqn.toString()).orElse(null)
         }
 
         if (sync) {

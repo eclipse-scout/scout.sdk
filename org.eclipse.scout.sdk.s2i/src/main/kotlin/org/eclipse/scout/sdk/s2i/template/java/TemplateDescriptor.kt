@@ -100,7 +100,7 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
 
     fun source(): String = m_source.computeIfAbsentAndGet {
         val templatePath = id.replace('.', '/') + ".txt"
-        return@computeIfAbsentAndGet resourceLoader.getResource(templatePath)?.readText() ?: throw newFail("Template source could not be found on classpath '{}' in classloader '{}'.", templatePath, resourceLoader)
+        resourceLoader.getResource(templatePath)?.readText() ?: throw newFail("Template source could not be found on classpath '{}' in classloader '{}'.", templatePath, resourceLoader)
     }
 
     fun copy() = TemplateDescriptor(this)

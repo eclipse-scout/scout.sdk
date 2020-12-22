@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.translationStoreStackCache
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInLongReadAction
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.moduleDirPath
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import org.eclipse.scout.sdk.s2i.toScoutProgress
@@ -122,7 +122,7 @@ object TranslationStoreStackLoader {
         return try {
             val indicator = ProgressManager.getInstance().progressIndicator ?: EmptyProgressIndicator()
             callInIdeaEnvironmentSync(project, indicator.toScoutProgress()) { e, p ->
-                computeInLongReadAction(project, p.indicator) {
+                computeInReadAction(project, progress = p.indicator) {
                     TranslationStores.createStack(modulePath, e, p, scope).orElse(null)
                 }
             }

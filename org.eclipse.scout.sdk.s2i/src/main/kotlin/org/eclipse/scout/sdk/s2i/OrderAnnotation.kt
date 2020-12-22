@@ -15,7 +15,7 @@ import com.intellij.psi.PsiClass
 import org.eclipse.scout.sdk.core.s.ISdkConstants
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.FinalValue
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 
 class OrderAnnotation private constructor(psiClass: PsiClass, psiAnnotation: PsiAnnotation, scoutApi: IScoutApi) : AbstractClassAnnotation(psiClass, psiAnnotation, scoutApi) {
 
@@ -34,7 +34,7 @@ class OrderAnnotation private constructor(psiClass: PsiClass, psiAnnotation: Psi
 
     fun value(): Double = m_value.computeIfAbsentAndGet {
         val valueElementName = scoutApi.ClassId().valueElementName()
-        IdeaEnvironment.computeInReadAction(psiClass.project) {
+        computeInReadAction(psiClass.project) {
             psiAnnotation.findAttributeValue(valueElementName)
                     ?.valueAs(Number::class.java)
                     ?.toDouble() ?: defaultOrder()

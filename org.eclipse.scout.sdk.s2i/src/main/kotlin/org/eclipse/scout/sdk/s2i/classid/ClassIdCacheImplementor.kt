@@ -34,7 +34,6 @@ import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator
 import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
-import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
 import org.eclipse.scout.sdk.s2i.util.ApiHelper
 import java.util.concurrent.ConcurrentHashMap
@@ -59,7 +58,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
         }
 
         try {
-            TransactionManager.repeatUntilPassesWithIndex(project, false) {
+            computeInReadAction(project) {
                 trySetupCache()
             }
 
