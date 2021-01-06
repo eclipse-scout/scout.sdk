@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
-import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
 
 class NlsFoldingBuilderForJava : AbstractNlsFoldingBuilder() {
 
@@ -32,7 +32,7 @@ class NlsFoldingBuilderForJava : AbstractNlsFoldingBuilder() {
             }
 
             private fun visitElement(expression: PsiExpression) {
-                val translationKey = PsiTranslationPatterns.getTranslationKeyOf(expression) ?: return
+                val translationKey = expression.translationSpec()?.resolveTranslationKey() ?: return
                 createFoldingDescriptor(translationKey, expression, stack)?.let { folds.add(it) }
             }
         })

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,10 +25,10 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationStores
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.moduleDirPath
-import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache.Companion.createCacheKey
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
-import org.eclipse.scout.sdk.s2i.nlsDependencyScope
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Collectors.toSet
@@ -38,7 +38,7 @@ open class MissingTranslationInspection : LocalInspectionTool() {
     private val m_cachedKeysByProject = ConcurrentHashMap<Project, MutableMap<Pair<Path, TranslationStores.DependencyScope?>, Set<String>>>()
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
-        val nlsDependencyScope = file.nlsDependencyScope() ?: return ProblemDescriptor.EMPTY_ARRAY
+        val nlsDependencyScope = file.translationDependencyScope() ?: return ProblemDescriptor.EMPTY_ARRAY
         try {
             val module = file.containingModule(false) ?: return ProblemDescriptor.EMPTY_ARRAY
             return if (isOnTheFly) {
@@ -72,7 +72,7 @@ open class MissingTranslationInspection : LocalInspectionTool() {
         file.accept(object : PsiRecursiveElementVisitor() {
             override fun visitElement(element: PsiElement) {
                 super.visitElement(element)
-                val translationKey = PsiTranslationPatterns.getTranslationKeyOf(element) ?: return
+                val translationKey = element.translationSpec()?.resolveTranslationKey() ?: return
                 if (!visibleKeys.contains(translationKey)) {
                     problems.add(toProblemDescription(element, translationKey, manager, isOnTheFly))
                 }

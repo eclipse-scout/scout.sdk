@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,18 +12,22 @@ package org.eclipse.scout.sdk.s2i.nls.completion
 
 import com.intellij.codeInsight.completion.CodeCompletionHandlerBase
 import com.intellij.codeInsight.completion.CompletionInitializationContext
+import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.*
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.module.Module
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.refactoring.suggested.endOffset
 import org.eclipse.scout.sdk.core.s.ISdkConstants
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
-import org.eclipse.scout.sdk.s2i.nls.PsiTranslationPatterns
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
 import org.eclipse.scout.sdk.s2i.nls.inspection.AddMissingTranslationQuickFix
-import org.eclipse.scout.sdk.s2i.nlsDependencyScope
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import java.util.stream.Collectors.toList
 
@@ -36,9 +40,9 @@ object NlsCompletionHelper {
     }
 
     fun computeLookupElements(module: Module, psiElement: PsiElement, includeNewTranslationEntry: Boolean = true, lookupStringProvider: (String) -> String = { it }): List<LookupElementBuilder> {
-        val stack = createStack(module, psiElement.nlsDependencyScope(), true) ?: return emptyList()
+        val stack = createStack(module, psiElement.translationDependencyScope(), true) ?: return emptyList()
         val elements = stack.allEntries()
-                .map { lookupElementFor(it, module, lookupStringProvider) }
+                .map { createExistingTranslationLookupElement(it, module, lookupStringProvider) }
                 .collect(toList())
         if (includeNewTranslationEntry) {
             createNewTranslationLookupElement(psiElement, lookupStringProvider)?.let { elements.add(it) }
@@ -47,7 +51,8 @@ object NlsCompletionHelper {
     }
 
     private fun createNewTranslationLookupElement(psiElement: PsiElement, lookupStringProvider: (String) -> String): LookupElementBuilder? {
-        val key = PsiTranslationPatterns.getTranslationKeyOf(psiElement)
+        val key = psiElement.translationSpec()
+                ?.resolveTranslationKey()
                 ?.let {
                     Strings.replaceEach(it,
                             arrayOf(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED + ';', CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED),
@@ -61,7 +66,7 @@ object NlsCompletionHelper {
                 .withLookupStrings(listOf(lookupStringProvider.invoke(key)))
                 .withIcon(AllIcons.General.Add)
         builder.withAutoCompletionPolicy(AutoCompletionPolicy.NEVER_AUTOCOMPLETE)
-        builder.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, false)
+        builder.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
         return builder
     }
 
@@ -70,10 +75,32 @@ object NlsCompletionHelper {
         AddMissingTranslationQuickFix(lookupObj.key).applyFix(lookupObj.psiElement)
     }
 
-    private fun lookupElementFor(translation: ITranslationEntry, module: Module, lookupStringProvider: (String) -> String) =
-            LookupElementBuilder.create(TranslationLookupObject(translation, module), lookupStringProvider.invoke(translation.key()))
-                    .withCaseSensitivity(true)
-                    .withRenderer(RENDERER)
+    private fun createExistingTranslationLookupElement(translation: ITranslationEntry, module: Module, lookupStringProvider: (String) -> String): LookupElementBuilder {
+        val element = LookupElementBuilder.create(TranslationLookupObject(translation, module), lookupStringProvider.invoke(translation.key()))
+                .withCaseSensitivity(true)
+                .withInsertHandler { context, item -> insertTranslationKey(context, item, lookupStringProvider) }
+                .withRenderer(RENDERER)
+        element.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
+        return element
+    }
+
+    private fun insertTranslationKey(context: InsertionContext, element: LookupElement, contentProvider: (String) -> String?) {
+        val editor = context.editor
+        val project = context.project
+        val psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return
+        val currentCaret = editor.caretModel.currentCaret
+        val position = currentCaret.offset
+        val literal = psiFile.findElementAt(position) ?: return
+        val translationSpec = literal.translationSpec() ?: return
+        val lookupObj = element.getObject() as TranslationLookupObject
+        val nlsKey = lookupObj.translationEntry.key()
+        val newValue = contentProvider.invoke(nlsKey) ?: return
+        val newElement = translationSpec.createNewLiteral(newValue)
+        WriteAction.run<RuntimeException> {
+            val inserted = literal.replace(newElement)
+            currentCaret.moveToOffset(inserted.endOffset)
+        }
+    }
 
     private fun renderLookupElement(element: LookupElement, presentation: LookupElementPresentation) {
         val lookupObj = element.getObject() as TranslationLookupObject

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,13 @@
  */
 package org.eclipse.scout.sdk.s2i.nls
 
+import com.intellij.lang.javascript.JSTokenTypes
 import com.intellij.lang.javascript.patterns.JSPatterns.*
 import com.intellij.lang.javascript.psi.JSCallExpression
 import com.intellij.lang.javascript.psi.JSInitializerOwner
 import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.lang.javascript.psi.JSReferenceExpression
+import com.intellij.lang.javascript.psi.impl.JSChangeUtil
 import com.intellij.patterns.ElementPattern
 import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.StandardPatterns.and
@@ -23,6 +25,7 @@ import com.intellij.patterns.StringPattern
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.util.ProcessingContext
+import org.eclipse.scout.sdk.core.s.nls.TranslationStores
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsonTextKeyPattern
 import org.eclipse.scout.sdk.core.util.Strings
 
@@ -35,7 +38,7 @@ object PsiTranslationPatternsForJs {
     val TEXT_KEY_PATTERN = textKeyPattern()
     val ANY_JS_PATTERN = or(SESSION_TEXT_PATTERN, TEXT_KEY_PATTERN)
 
-    fun getTranslationKeyOf(element: PsiElement?): String? {
+    private fun getTranslationKeyFromJs(element: PsiElement?): String? {
         val literal = if (element is JSLiteralExpression)
             element.takeIf { it.isStringLiteral }.takeIf { ANY_JS_PATTERN.accepts(it) }
         else
@@ -90,5 +93,9 @@ object PsiTranslationPatternsForJs {
             val expression = t.methodExpression
             return expression is JSReferenceExpression && jsReferenceExpression().withReferenceName(methodQualifier).accepts(expression.qualifier)
         }
+    }
+
+    class JsTranslationSpec(element: PsiElement) : TranslationLanguageSpec(element, TranslationStores.DependencyScope.NODE, "'", PsiTranslationPatternsForJs::getTranslationKeyFromJs) {
+        override fun createNewLiteral(text: String) = JSChangeUtil.createTokenElement(element, JSTokenTypes.STRING_LITERAL, Strings.toStringLiteral(text, stringDelimiter, true))
     }
 }

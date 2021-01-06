@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,8 +23,8 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
 import org.eclipse.scout.sdk.s2i.containingModule
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader
-import org.eclipse.scout.sdk.s2i.nlsDependencyScope
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import java.util.regex.Pattern
 
@@ -46,7 +46,7 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
             return FoldingDescriptor.EMPTY
         }
         val start = System.currentTimeMillis()
-        val scope = root.nlsDependencyScope() ?: return FoldingDescriptor.EMPTY
+        val scope = root.translationDependencyScope() ?: return FoldingDescriptor.EMPTY
         val module = root.containingModule() ?: return FoldingDescriptor.EMPTY
         val project = root.project
         val stack = TranslationStoreStackLoader.createStack(module, scope, true) ?: return FoldingDescriptor.EMPTY

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,7 +48,6 @@ import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.Language
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope
 import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
 import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
 import org.eclipse.scout.sdk.core.s.nls.properties.ReadOnlyTranslationFile
@@ -103,11 +102,6 @@ fun IJavaEnvironment.toIdea() = unwrap() as JavaEnvironmentWithIdea
 fun PsiElement.resolveSourceRoot() = containingFile
         ?.virtualFile
         ?.let { ProjectFileIndex.getInstance(project).getSourceRootForFile(it) }
-
-/**
- * @return The best matching [DependencyScope] for this [PsiElement]
- */
-fun PsiElement.nlsDependencyScope(): DependencyScope? = DependencyScope.forFileExtension(containingFile.name).orElse(null)
 
 /**
  * Converts this [PsiClass] into its corresponding Scout [IType].

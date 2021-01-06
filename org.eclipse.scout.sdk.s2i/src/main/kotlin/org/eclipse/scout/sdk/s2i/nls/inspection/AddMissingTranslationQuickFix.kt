@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,9 +29,9 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader
 import org.eclipse.scout.sdk.s2i.nls.editor.TranslationNewDialog
-import org.eclipse.scout.sdk.s2i.nlsDependencyScope
 import java.util.stream.Collectors.toList
 
 class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
@@ -46,7 +46,7 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
 
     fun applyFix(psiElement: PsiElement) {
         val module = psiElement.containingModule() ?: return
-        val scope = psiElement.nlsDependencyScope() ?: return
+        val scope = psiElement.translationDependencyScope() ?: return
         val psiFile = psiElement.containingFile
         val stack = TranslationStoreStackLoader.createStack(module, scope)
         ApplicationManager.getApplication().invokeLater { showStoreChooser(module, psiFile, stack) }

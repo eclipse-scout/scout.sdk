@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,8 +18,8 @@ import com.intellij.psi.PsiFile
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.util.Strings.escapeHtml
 import org.eclipse.scout.sdk.s2i.containingModule
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
-import org.eclipse.scout.sdk.s2i.nlsDependencyScope
 
 abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider() {
 
@@ -27,7 +27,7 @@ abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider(
             contextElement?.takeIf { translationKeyOf(it) != null }
 
     override fun generateDoc(element: PsiElement?, originalElement: PsiElement?): String? {
-        val dependencyScope = element?.nlsDependencyScope() ?: return null
+        val dependencyScope = element?.translationDependencyScope() ?: return null
         val module = element.containingModule() ?: return null
         val key = translationKeyOf(element) ?: return null
         val stack = createStack(module, dependencyScope) ?: return null
