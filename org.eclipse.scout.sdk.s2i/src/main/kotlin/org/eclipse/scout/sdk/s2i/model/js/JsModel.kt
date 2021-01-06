@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,24 +11,15 @@
 package org.eclipse.scout.sdk.s2i.model.js
 
 import com.intellij.javascript.nodejs.NodeModuleSearchUtil.collectVisibleNodeModules
-import com.intellij.javascript.nodejs.PackageJsonData
-import com.intellij.lang.javascript.buildTools.npm.PackageJsonUtil
-import com.intellij.lang.javascript.inspections.JSRecursiveWalkingElementSkippingNestedFunctionsVisitor
-import com.intellij.lang.javascript.psi.JSElementVisitor
-import com.intellij.lang.javascript.psi.JSFile
-import com.intellij.lang.javascript.psi.JSVarStatement
-import com.intellij.lang.javascript.psi.JSVariable
-import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList
-import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.guessModuleDir
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.IWebConstants
-import org.eclipse.scout.sdk.s2i.contentAsText
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.jsModuleCache
 import java.util.*
-import java.util.regex.Pattern
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
@@ -40,16 +31,11 @@ class JsModel {
     companion object {
         const val OBJECT_TYPE_PROPERTY_NAME = "objectType"
         const val ID_PROPERTY_NAME = "id"
-        const val DEFAULT_SCOUT_JS_NAMESPACE = "scout"
+        const val SCOUT_JS_NAMESPACE = "scout"
         const val WIDGET_CLASS_NAME = "Widget"
-        private val NAMESPACE_PATTERN = Pattern.compile("window\\.([\\w._]+)\\s*=\\s*Object\\.assign\\(window\\.")
-        private const val ADAPTER_FILE_SUFFIX = "Adapter${IWebConstants.JS_FILE_SUFFIX}"
-        private const val MODEL_FILE_SUFFIX = "Model${IWebConstants.JS_FILE_SUFFIX}"
-        val EXCLUDED_PROPERTIES = setOf("enabledComputed")
     }
 
-    private val m_elements = HashMap<String /*qualified element name*/, AbstractJsModelElement>()
-    private val m_moduleByFile = HashMap<VirtualFile, JsModule>()
+    private val m_modules = ArrayList<JsModule>()
 
     /**
      * Creates the model for the [Module] given.
@@ -57,26 +43,32 @@ class JsModel {
      * @return This instance
      */
     fun build(module: Module): JsModel {
-        m_elements.clear()
-        m_moduleByFile.clear()
+        m_modules.clear()
         val moduleRoot = module.guessModuleDir() ?: return this
-
         val start = System.currentTimeMillis()
+        val project = module.project
+        val jsModuleCache = jsModuleCache(project)
+        val psiManager = PsiManager.getInstance(project)
 
         // find all module candidate roots
-        val jsModuleRootDirs = sequenceOf(moduleRoot) + collectVisibleNodeModules(HashMap(), module.project, moduleRoot)
+        val jsModuleRoots = sequenceOf(moduleRoot) + collectVisibleNodeModules(HashMap(), project, moduleRoot)
                 .asSequence()
                 .mapNotNull { it.virtualFile }
 
-        // parse all modules
-        val modules = jsModuleRootDirs.mapNotNull { parseModule(it) }.toList()
+        // Pass 1: get or create the module meta data (name, namespace, containing files, etc.)
+        // this pass is necessary because the next pass (parse) needs the mapping which file belongs to which module (it will call containingModule())
+        jsModuleRoots
+                .mapNotNull { getOrCreateModule(jsModuleCache, it) }
+                .forEach { m_modules.add(it) }
 
-        // collect all files of all modules into one map
-        modules.forEach { m -> m.files.forEach { f -> f.canonicalFile?.let { m_moduleByFile[it] = m } } }
-
-        // parse files of modules
-        val psiManager = PsiManager.getInstance(module.project)
-        modules.forEach { parseModuleFiles(it, psiManager) }
+        // Pass 2: parse files of modules into AbstractJsModelElements and store in cache
+        m_modules
+                .asSequence()
+                .filter { !it.isParsed() } // only the new ones. the others are from the cache
+                .forEach {
+                    it.parseModelElements(psiManager)
+                    jsModuleCache.putModule(it.moduleRoot, it)
+                }
 
         SdkLog.debug("JS model creation took {}ms.", System.currentTimeMillis() - start)
         return this
@@ -86,18 +78,22 @@ class JsModel {
      * @param file The [VirtualFile] for which the containing [JsModule] should be returned. Only files having a [IWebConstants.JS_FILE_SUFFIX] can be passed.
      * @return The [JsModule] that contains the [VirtualFile] given.
      */
-    fun containingModule(file: VirtualFile?) = file?.canonicalFile?.let { m_moduleByFile[it] }
+    fun containingModule(file: VirtualFile?) = file?.canonicalFile?.let { f ->
+        m_modules.firstOrNull { it.files.contains(f) }
+    }
 
     /**
-     * @return A [Collection] containing [JsModelClass] instances as well as top-level and nested [JsModelEnum] instances.
+     * @return A [Sequence] containing all [JsModelClass] instances as well as top-level and nested [JsModelEnum] instances of this [JsModel].
      */
-    fun elements(): Collection<AbstractJsModelElement> = m_elements.values
+    fun elements(): Sequence<AbstractJsModelElement> = m_modules.asSequence().flatMap { it.elements() }
 
     /**
      * @param objectType The objectType (e.g. 'scout.GroupBox'). The default 'scout' namespace may be omitted. All other namespaces are required.
      * @return The [AbstractJsModelElement] that corresponds to the given [objectType]. May be a [JsModelClass] or a top-level or nested [JsModelEnum].
      */
-    fun element(objectType: String?) = m_elements[objectType] ?: m_elements["$DEFAULT_SCOUT_JS_NAMESPACE.$objectType"]
+    fun element(objectType: String?) = m_modules.asSequence()
+            .mapNotNull { it.element(objectType) }
+            .firstOrNull()
 
     /**
      * @param objectType The objectType (e.g. 'scout.GroupBox'). The default 'scout' namespace may be omitted. All other namespaces are required.
@@ -146,14 +142,15 @@ class JsModel {
         }
         if (property.name == OBJECT_TYPE_PROPERTY_NAME) {
             // object types property: get all top level classes
-            return m_elements.values
+            return elements()
                     .filter { it.name.isNotEmpty() }
                     .filter { Character.isUpperCase(it.name[0]) } // only classes
                     .filter { !it.name.contains('.') } // only top-level elements
                     .map { PropertyValue(it.shortName(), it) }
+                    .toList()
         }
         return when (property.dataType) {
-            JsModelProperty.JsPropertyDataType.WIDGET -> resolveWidgetProposals()
+            JsModelProperty.JsPropertyDataType.WIDGET -> resolveWidgetProposals().toList()
             JsModelProperty.JsPropertyDataType.BOOL -> listOf(PropertyValue(true.toString()), PropertyValue(false.toString()))
             else -> emptyList() // we cannot know
         }
@@ -186,8 +183,7 @@ class JsModel {
         return false
     }
 
-    private fun resolveWidgetProposals() = m_elements
-            .values
+    private fun resolveWidgetProposals() = elements()
             .filter { isWidget(it) }
             .map { PropertyValue(it.shortName(), it) }
 
@@ -206,74 +202,7 @@ class JsModel {
         return lower
     }
 
-    private fun parseModule(moduleRoot: VirtualFile): JsModule? {
-        val packageJsonData = moduleRoot.findChild(PackageJsonUtil.FILE_NAME)?.let { PackageJsonData.getOrCreate(it) } ?: return null
-        val main = packageJsonData.main ?: return null
-        val moduleName = packageJsonData.name?.takeIf { it.startsWith('@') } ?: return null
-        val mainFile = moduleRoot.findFileByRelativePath(main)?.takeIf { it.isValid } ?: return null
-        val ns = detectNamespace(mainFile) ?: return null
-        return JsModule(moduleName, ns, mainFile.parent, mainFile, this)
-    }
-
-    private fun detectNamespace(moduleMainFile: VirtualFile): String? {
-        val fileContent = moduleMainFile
-                .takeIf { it.isValid }
-                ?.takeIf { it.isInLocalFileSystem }
-                ?.contentAsText() ?: return null
-        val matcher = NAMESPACE_PATTERN.matcher(fileContent)
-        var ns: String? = null
-        while (matcher.find()) {
-            ns = matcher.group(1)
-        }
-        return ns
-    }
-
-    private fun parseModuleFiles(module: JsModule, psiManager: PsiManager) = module.files
-            .filter { !it.name.endsWith(ADAPTER_FILE_SUFFIX) }
-            .filter { !it.name.endsWith(MODEL_FILE_SUFFIX) }
-            .forEach { child ->
-                val jsFile = psiManager.findFile(child) as? JSFile
-                jsFile?.let { parseJsFile(it, module) }
-            }
-
-    private fun parseJsFile(jsFile: JSFile, module: JsModule) {
-        jsFile.accept(object : JSRecursiveWalkingElementSkippingNestedFunctionsVisitor() {
-            override fun visitJSClass(aClass: JSClass) = parseJsClass(aClass, module)
-            override fun visitJSVariable(node: JSVariable) = parseTopLevelEnum(node, module)
-        })
-    }
-
-    private fun parseJsClass(jsClass: JSClass, module: JsModule) {
-        parseClass(jsClass, module)
-
-        // nested enum
-        jsClass.acceptChildren(object : JSElementVisitor() {
-            override fun visitJSVarStatement(node: JSVarStatement) {
-                if (node.attributeList?.hasModifier(JSAttributeList.ModifierType.STATIC) == true) {
-                    node.stubSafeVariables.forEach { parseNestedEnum(it, jsClass, module) }
-                }
-            }
-        })
-    }
-
-    private fun parseTopLevelEnum(jsVariable: JSVariable, module: JsModule) = registerElement(JsModelEnum.parse(jsVariable, null, module))
-
-    private fun parseNestedEnum(staticField: JSVariable, parentClass: JSClass, module: JsModule) = registerElement(JsModelEnum.parse(staticField, parentClass, module))
-
-    private fun parseClass(jsClass: JSClass, module: JsModule) = registerElement(JsModelClass.parse(jsClass, module))
-
-    private fun registerElement(toRegister: AbstractJsModelElement?) {
-        if (toRegister == null) return
-
-        val qualifiedName = toRegister.qualifiedName()
-        val previous = m_elements.put(qualifiedName, toRegister)
-        if (previous != null) {
-            m_elements[qualifiedName] = chooseElement(toRegister, previous)
-            SdkLog.info("Duplicate JS element '{}' in module '{}'.", qualifiedName, toRegister.scoutJsModule.name)
-        }
-    }
-
-    private fun chooseElement(a: AbstractJsModelElement, b: AbstractJsModelElement) = if (a.properties.size > b.properties.size) a else b
+    private fun getOrCreateModule(jsModuleCache: JsModuleCacheImplementor, moduleRoot: VirtualFile) = jsModuleCache.getModule(moduleRoot) ?: JsModule.parse(moduleRoot, this)
 
     /**
      * Represents a possible [JsModelProperty] value to insert into the source. Can be obtained using [JsModel.valuesForProperty]

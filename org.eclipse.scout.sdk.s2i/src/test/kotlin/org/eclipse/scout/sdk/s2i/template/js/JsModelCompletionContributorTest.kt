@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
         const val LABEL_PROPERTY_NAME = "label"
         const val STATE_PROPERTY_NAME = "state"
         const val CHILD_PROPERTY_NAME = "child"
-        const val CHILDREN_PROPERTY_NAME = "children"
+        const val FIELDS_PROPERTY_NAME = "fields"
         const val MAX_LENGTH_PROPERTY_NAME = "maxLength"
         const val VISIBLE_PROPERTY_NAME = "visible"
         const val NAME_PROPERTY_NAME = "name"
@@ -57,9 +57,9 @@ class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
 
     fun testJsModel() {
         val model = JsModel().build(myFixture.module)
-        assertEquals(3, model.elements().size)
+        assertEquals(3, model.elements().count())
         assertEquals("JsModelEnum $WIDGET_STATE [A=unknown, B=unknown, C=unknown]", model.element(WIDGET_STATE).toString())
-        assertEquals("JsModelClass ${JsModel.WIDGET_CLASS_NAME} [${JsModel.ID_PROPERTY_NAME}=object, ${JsModel.OBJECT_TYPE_PROPERTY_NAME}=object, $VISIBLE_PROPERTY_NAME=boolean, $NAME_PROPERTY_NAME=string, $CHILDREN_PROPERTY_NAME=widget[]," +
+        assertEquals("JsModelClass ${JsModel.WIDGET_CLASS_NAME} [${JsModel.ID_PROPERTY_NAME}=object, ${JsModel.OBJECT_TYPE_PROPERTY_NAME}=object, $VISIBLE_PROPERTY_NAME=boolean, $NAME_PROPERTY_NAME=string, $FIELDS_PROPERTY_NAME=widget[]," +
                 " $CHILD_PROPERTY_NAME=widget, $STATE_PROPERTY_NAME=scout.$WIDGET_STATE, $LABEL_PROPERTY_NAME=text-key, $ONLY_HERE_PROPERTY_NAME=widget]",
                 model.element(JsModel.WIDGET_CLASS_NAME).toString())
         val stringField = model.element(STRING_FIELD_NAME)
@@ -72,7 +72,7 @@ class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
         assertEquals(setOf(WIDGET_STATE_A, WIDGET_STATE_B, WIDGET_STATE_C), model.valuesForProperty(model.property(JsModel.WIDGET_CLASS_NAME, STATE_PROPERTY_NAME)!!).map { it.displayText }.toSet())
         assertEquals(setOf(JsModel.WIDGET_CLASS_NAME, STRING_FIELD_NAME), model.valuesForProperty(model.property(JsModel.WIDGET_CLASS_NAME, JsModel.OBJECT_TYPE_PROPERTY_NAME)!!).map { it.displayText }.toSet())
 
-        assertEquals(setOf(JsModel.ID_PROPERTY_NAME, JsModel.OBJECT_TYPE_PROPERTY_NAME, VISIBLE_PROPERTY_NAME, NAME_PROPERTY_NAME, CHILDREN_PROPERTY_NAME, CHILD_PROPERTY_NAME,
+        assertEquals(setOf(JsModel.ID_PROPERTY_NAME, JsModel.OBJECT_TYPE_PROPERTY_NAME, VISIBLE_PROPERTY_NAME, NAME_PROPERTY_NAME, FIELDS_PROPERTY_NAME, CHILD_PROPERTY_NAME,
                 STATE_PROPERTY_NAME, LABEL_PROPERTY_NAME, ONLY_HERE_PROPERTY_NAME, MAX_LENGTH_PROPERTY_NAME), model.properties(STRING_FIELD_NAME).keys)
         assertEquals(JsModelProperty.JsPropertyDataType.NUMERIC, model.property(STRING_FIELD_NAME, MAX_LENGTH_PROPERTY_NAME)?.dataType)
     }
@@ -84,8 +84,8 @@ class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
     }
 
     fun testNameCompletionWidgetArray() {
-        val selectedElement = doCompleteAssertContent(NAME_COMPLETION_FILE, CHILDREN_PROPERTY_NAME,
-                "$CHILDREN_PROPERTY_NAME: [{ ${JsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${JsModel.OBJECT_TYPE_PROPERTY_NAME}: '$TEMPLATE_COMPLETION_CONTENT'}]")
+        val selectedElement = doCompleteAssertContent(NAME_COMPLETION_FILE, FIELDS_PROPERTY_NAME,
+                "$FIELDS_PROPERTY_NAME: [{ ${JsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${JsModel.OBJECT_TYPE_PROPERTY_NAME}: '$TEMPLATE_COMPLETION_CONTENT'}]")
         val prop = selectedElement as JsModelProperty
         assertEquals(JsModelProperty.JsPropertyDataType.WIDGET, prop.dataType)
         assertTrue(prop.isArray)

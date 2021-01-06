@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -178,7 +178,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     private inner class PsiListener : PsiTreeChangeAdapter() {
         override fun childrenChanged(event: PsiTreeChangeEvent) {
             val file = event.file ?: return
-            if (file.language != JavaLanguage.INSTANCE || !file.isPhysical) {
+            if (!file.isPhysical || !file.language.isKindOf(JavaLanguage.INSTANCE)) {
                 return
             }
             m_delayedProcessor.submit(file)

@@ -10,6 +10,7 @@
   -->
 <idea-plugin allow-bundled-update="true">
   <extensions defaultExtensionNs="com.intellij">
+    <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.model.js.JsModuleCacheImplementor"/>
     <lang.foldingBuilder language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForJs"/>
     <completion.contributor language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJs" id="scoutNlsCompletionJs" order="first"/>
     <lang.documentationProvider language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForJs" id="scoutNlsKeyDocumentationJs" order="first"/>

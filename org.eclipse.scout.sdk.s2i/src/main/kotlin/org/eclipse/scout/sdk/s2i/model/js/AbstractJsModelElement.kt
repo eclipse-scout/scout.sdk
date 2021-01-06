@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ abstract class AbstractJsModelElement(val name: String, val scoutJsModule: JsMod
     /**
      * @return The short name is [AbstractJsModelElement.qualifiedName] for custom namespaces and the simple [AbstractJsModelElement.name] for the 'scout' namespace. E.g. 'helloworld.Person' but only 'GroupBox' for 'scout.GroupBox'.
      */
-    fun shortName() = if (scoutJsModule.namespace == JsModel.DEFAULT_SCOUT_JS_NAMESPACE) name else qualifiedName()
+    fun shortName() = if (scoutJsModule.namespace == JsModel.SCOUT_JS_NAMESPACE) name else qualifiedName()
 
     override fun toString(): String {
         return javaClass.simpleName + " $name" + (if (properties.isEmpty()) "" else " $properties")

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project
 import org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener
 import org.eclipse.scout.sdk.s2i.classid.ClassIdCache
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
+import org.eclipse.scout.sdk.s2i.model.js.JsModuleCacheImplementor
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache
 import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NonNls
@@ -41,4 +42,7 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
     fun translationStoreStackCache(project: Project): TranslationStoreStackCache =
             ServiceManager.getService(project, TranslationStoreStackCache::class.java)
+
+    fun jsModuleCache(project: Project): JsModuleCacheImplementor =
+            ServiceManager.getService(project, JsModuleCacheImplementor::class.java)
 }
