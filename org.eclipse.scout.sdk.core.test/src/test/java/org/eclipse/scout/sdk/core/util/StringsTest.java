@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -201,20 +201,46 @@ public class StringsTest {
   @Test
   public void testFromStringLiteral() {
     assertNull(fromStringLiteral(null));
-    assertEquals("a", fromStringLiteral("a"));
+    assertEquals("a", fromStringLiteral("a").toString());
     assertEquals("\"a\nb", fromStringLiteral("\"a\\nb").toString());
     assertEquals("aaa\"", fromStringLiteral("aaa\"").toString());
-    assertEquals("a\nb", fromStringLiteral("\"a\\nb\"").toString());
     assertEquals("", fromStringLiteral("\"\"").toString());
     assertEquals("a\"b", fromStringLiteral("\"a\\\"b\"").toString());
+    assertEquals("a'b", fromStringLiteral("'a\\'b'").toString());
+    assertEquals("a\rb", fromStringLiteral("\"a\\rb\"").toString());
+    assertEquals("a\nb", fromStringLiteral("\"a\\nb\"").toString());
+    assertEquals("a\bb", fromStringLiteral("\"a\\bb\"").toString());
+    assertEquals("a\tb", fromStringLiteral("\"a\\tb\"").toString());
+    assertEquals("a\fb", fromStringLiteral("\"a\\fb\"").toString());
+    assertEquals("a\\b", fromStringLiteral("\"a\\\\b\"").toString());
+    assertEquals("a\0b", fromStringLiteral("\"a\\0b\"").toString());
+    assertEquals("a\1b", fromStringLiteral("\"a\\1b\"").toString());
+    assertEquals("a\2b", fromStringLiteral("\"a\\2b\"").toString());
+    assertEquals("a\3b", fromStringLiteral("\"a\\3b\"").toString());
+    assertEquals("a\4b", fromStringLiteral("\"a\\4b\"").toString());
+    assertEquals("a\5b", fromStringLiteral("\"a\\5b\"").toString());
+    assertEquals("a\6b", fromStringLiteral("\"a\\6b\"").toString());
+    assertEquals("a\7b", fromStringLiteral("\"a\\7b\"").toString());
+    assertEquals("aäb", fromStringLiteral("\"a\\u00E4b\"").toString());
+    assertEquals("字", fromStringLiteral("\"字\"").toString());
   }
 
   @Test
   public void testToStringLiteral() {
-    assertEquals("\"a\\nb\"", toStringLiteral("a\nb").toString());
-    assertEquals("\"a\\\"b\"", toStringLiteral("a\"b").toString());
-    assertNull(toStringLiteral(null));
     CharSequence in = "teststring \na\"";
+    assertNull(toStringLiteral(null));
+    assertEquals("\"a\\nb\"", toStringLiteral("a\nb").toString());
+    assertEquals("\"a\\bb\"", toStringLiteral("a\bb").toString());
+    assertEquals("\"a\\tb\"", toStringLiteral("a\tb").toString());
+    assertEquals("\"a\\fb\"", toStringLiteral("a\fb").toString());
+    assertEquals("\"a\\rb\"", toStringLiteral("a\rb").toString());
+    assertEquals("\"a\\\\b\"", toStringLiteral("a\\b").toString());
+    assertEquals("\"a\\u0000b\"", toStringLiteral("a\0b").toString());
+    assertEquals("\"a\\\"b\"", toStringLiteral("a\"b").toString());
+    assertEquals("a\\\"b", toStringLiteral("a\"b", "\"", false).toString());
+    assertEquals("'a\"b'", toStringLiteral("a\"b", "'", true).toString());
+    assertEquals("'a\\'b'", toStringLiteral("a'b", "'", true).toString());
+    assertEquals("\"字\"", toStringLiteral("字").toString());
     assertEquals(in, fromStringLiteral(toStringLiteral(in)).toString());
   }
 
