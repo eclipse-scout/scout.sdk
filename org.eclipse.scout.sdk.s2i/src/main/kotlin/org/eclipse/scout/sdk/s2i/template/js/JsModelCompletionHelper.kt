@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.codeInsight.template.impl.TemplateImplUtil
 import com.intellij.icons.AllIcons
+import com.intellij.lang.javascript.JSStubElementTypes
 import com.intellij.lang.javascript.patterns.JSPatterns.jsProperty
 import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
@@ -32,6 +33,7 @@ import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.patterns.StandardPatterns.or
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
 import com.intellij.util.ThrowableRunnable
 import icons.JavaScriptPsiIcons
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
@@ -67,9 +69,9 @@ object JsModelCompletionHelper {
             psiElement().withSuperParent(2, jsProperty()),
             psiElement().withParent(jsProperty()))
 
-    fun getPropertyNameInfo(parameters: CompletionParameters, result: CompletionResultSet) = getPropertyInfo(parameters.position, result.prefixMatcher.prefix, true)
+    fun getPropertyNameInfo(parameters: CompletionParameters, result: CompletionResultSet) = getPropertyInfo(parameters.position.parent, result.prefixMatcher.prefix, true)
 
-    fun getPropertyValueInfo(parameters: CompletionParameters, result: CompletionResultSet) = getPropertyInfo(parameters.position, result.prefixMatcher.prefix, false)
+    fun getPropertyValueInfo(parameters: CompletionParameters, result: CompletionResultSet) = getPropertyInfo(parameters.position.parent, result.prefixMatcher.prefix, false)
 
     fun getPropertyValueInfo(element: PsiElement, prefix: String) = getPropertyInfo(element, prefix, false)
 
@@ -88,11 +90,14 @@ object JsModelCompletionHelper {
         } else if (isPropertyNameCompletion) {
             propertyName = propertyName.take(propertyName.length - CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED.length)
         }
-        val siblings = objectLiteral.properties
-        val usedPropertyNames = siblings.mapNotNull { it.name }.toSet()
-        val isLastProperty = siblings.indexOf(property) == siblings.size - 1
-        return PropertyCompletionInfo(property, propertyName, module, isLastProperty, isPropertyNameCompletion,
-                findObjectType(objectLiteral), usedPropertyNames, prefix)
+        val usedPropertyNames = objectLiteral.properties.mapNotNull { it.name }.toSet()
+        val contextElement = if (isPropertyNameCompletion) element.parent else element // on property completion there is one more element (a jsProperty with DUMMY_IDENTIFIER name)
+        val contextParent = contextElement.parent
+        val isInArray = contextParent.elementType == JSStubElementTypes.ARRAY_LITERAL_EXPRESSION
+        val siblings = contextParent.children
+        val isLast = siblings.indexOf(contextElement) == siblings.size - 1
+        return PropertyCompletionInfo(property, propertyName, module, isLast, isPropertyNameCompletion,
+                findObjectType(objectLiteral), usedPropertyNames, prefix, isInArray)
     }
 
     private fun findObjectType(objectLiteral: JSObjectLiteralExpression): String? {
@@ -123,7 +128,7 @@ object JsModelCompletionHelper {
         val nodeModuleName = element?.scoutJsModule?.name
         val isTemplateRequired = completionInfo.isPropertyNameCompletion || (property.dataType == JsModelProperty.JsPropertyDataType.WIDGET && completionInfo.propertyName != JsModel.OBJECT_TYPE_PROPERTY_NAME)
         return createLookupElement(elementText, element, nodeModuleName, tailText, icon, completionInfo.searchPrefix, isTemplateRequired) {
-            buildPropertyTemplate(property, element, !completionInfo.isLast, completionInfo.isPropertyNameCompletion)
+            buildPropertyTemplate(property, element, completionInfo)
         }
     }
 
@@ -152,15 +157,15 @@ object JsModelCompletionHelper {
         })
     }
 
-    private fun buildPropertyTemplate(property: JsModelProperty, selectedElement: AbstractJsModelElement?, includeTrailingComma: Boolean, isPropertyNameCompletion: Boolean): TemplateImpl {
+    private fun buildPropertyTemplate(property: JsModelProperty, selectedElement: AbstractJsModelElement?, completionInfo: PropertyCompletionInfo): TemplateImpl {
         val src = StringBuilder()
-        if (isPropertyNameCompletion) {
+        if (completionInfo.isPropertyNameCompletion) {
             src.append(property.name).append(": ")
         }
 
         val valueSrc = WrappingStringBuilder()
         // wrappings
-        if (property.isArray) {
+        if (property.isArray && !completionInfo.isInArray) {
             valueSrc.appendWrapping("[", "]")
         }
         val stringLiteralDelimiter = "'"
@@ -190,7 +195,7 @@ object JsModelCompletionHelper {
         }
         src.append(valueSrc.toString())
 
-        if (includeTrailingComma) {
+        if (!completionInfo.isLast) {
             src.append(',')
         }
         if (!src.contains(END_VARIABLE_SRC)) {
@@ -228,7 +233,7 @@ object JsModelCompletionHelper {
     }
 
     data class PropertyCompletionInfo(val property: JSProperty, val propertyName: String, val module: Module, val isLast: Boolean, val isPropertyNameCompletion: Boolean,
-                                      val objectType: String?, val siblingPropertyNames: Set<String>, val searchPrefix: String)
+                                      val objectType: String?, val siblingPropertyNames: Set<String>, val searchPrefix: String, val isInArray: Boolean)
 
     private class WrappingStringBuilder {
         private val m_builder = StringBuilder()

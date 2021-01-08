@@ -36,6 +36,7 @@ class JsModelClass(name: String, jsClass: JSClass, scoutJsModule: JsModule, cons
         private const val CONSTRUCTOR_METHOD_NAME = "constructor"
         private const val INIT_METHOD_NAME = "_init"
         private const val WIDGET_PROPERTIES_METHOD_PART = "WidgetProperties" // "_addWidgetProperties" method
+        private const val PRESERVE_ON_PROPERTIES_CHANGE_PROPERTIES_METHOD_PART = "PreserveOnPropertyChangeProperties" // "_addPreserveOnPropertyChangeProperties" method
         private const val TEXT_KEYS_METHOD_PART = "TextKeys" // "resolveTextKeys" method
 
         fun parse(jsClass: JSClass, scoutJsModule: JsModule): JsModelClass? {
@@ -101,8 +102,10 @@ class JsModelClass(name: String, jsClass: JSClass, scoutJsModule: JsModule, cons
     private fun parseProperties(jsClass: JSClass, constructor: JSFunction?, init: JSFunction?): List<JsModelProperty> {
         if (constructor == null) return emptyList()
         val widgetProperties = parseMethodCallWithStringArgumentsIn(constructor, WIDGET_PROPERTIES_METHOD_PART)
+        val preserveOnPropertyChangeProperties = parseMethodCallWithStringArgumentsIn(constructor, PRESERVE_ON_PROPERTIES_CHANGE_PROPERTIES_METHOD_PART)
         val translationProperties = init?.let { parseMethodCallWithStringArgumentsIn(it, TEXT_KEYS_METHOD_PART) } ?: emptySet()
         val specialPropertyTypes = listOf(
+                JsModelPropertyRecorder(preserveOnPropertyChangeProperties, JsModelProperty.JsPropertyDataType.STRING, this), // must be before the widget properties
                 JsModelPropertyRecorder(widgetProperties, JsModelProperty.JsPropertyDataType.WIDGET, this),
                 JsModelPropertyRecorder(translationProperties, JsModelProperty.JsPropertyDataType.TEXT_KEY, this))
 

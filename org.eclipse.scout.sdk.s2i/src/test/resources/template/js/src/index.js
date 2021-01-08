@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,15 +9,19 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-export {default as Widget} from './Widget';
-export {default as StringField} from './StringField';
-export {default as NameCompletionModel} from './NameCompletionModel'
-export {default as NameCompletionUnknownObject} from './NameCompletionUnknownObject'
-export {default as ValueCompletionObjectType} from './ValueCompletionObjectType'
-export {default as ValueCompletionWidget} from './ValueCompletionWidget'
-export {default as ValueCompletionEnum} from './ValueCompletionEnum'
+export {default as Widget} from './rt/Widget';
+export {default as StringField} from './rt/StringField';
+// noinspection JSUnusedGlobalSymbols
+export {default as NameCompletionModel} from './models/NameCompletionModel'
+// noinspection JSUnusedGlobalSymbols
+export {default as NameCompletionUnknownObject} from './models/NameCompletionUnknownObject'
+// noinspection JSUnusedGlobalSymbols
+export {default as ValueCompletionObjectType} from './models/ValueCompletionObjectType'
+// noinspection JSUnusedGlobalSymbols
+export {default as ValueCompletionWidget} from './models/ValueCompletionWidget'
+// noinspection JSUnusedGlobalSymbols
+export {default as ValueCompletionEnum} from './models/ValueCompletionEnum'
 
 import * as self from './index.js';
 
-export default self;
 window.scout = Object.assign(window.scout || {}, self);

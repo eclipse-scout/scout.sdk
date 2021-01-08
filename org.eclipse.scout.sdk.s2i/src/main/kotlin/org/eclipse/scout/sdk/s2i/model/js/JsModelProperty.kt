@@ -10,8 +10,13 @@
  */
 package org.eclipse.scout.sdk.s2i.model.js
 
+import com.intellij.lang.ecmascript6.psi.ES6ImportExportSpecifierAlias
+import com.intellij.lang.ecmascript6.psi.JSExportAssignment
 import com.intellij.lang.javascript.psi.*
+import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.lang.javascript.psi.impl.JSPsiElementFactory
+import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
 
 /**
  * Represents a property of a [AbstractJsModelElement]
@@ -24,7 +29,6 @@ class JsModelProperty(name: String, val owner: AbstractJsModelElement, val dataT
 
     companion object {
 
-        private val ENUM_REGEX = "([\\w\\.]+)\\.[A-Z_]+".toRegex()
         private val CONSTANT_REGEX = "[A-Z_]+".toRegex()
         private const val WIDGET_QUALIFIED_CLASS_NAME = "${JsModel.SCOUT_JS_NAMESPACE}.${JsModel.WIDGET_CLASS_NAME}"
         private const val GROUP_BOX_QUALIFIED_CLASS_NAME = JsModel.SCOUT_JS_NAMESPACE + ".GroupBox"
@@ -57,6 +61,7 @@ class JsModelProperty(name: String, val owner: AbstractJsModelElement, val dataT
                 GROUP_BOX_QUALIFIED_CLASS_NAME to "processButtons",
                 GROUP_BOX_QUALIFIED_CLASS_NAME to "processMenus",
                 GROUP_BOX_QUALIFIED_CLASS_NAME to "systemButtons",
+                GROUP_BOX_QUALIFIED_CLASS_NAME to "customButtons",
                 TAG_FIELD_QUALIFIED_CLASS_NAME to "fieldHtmlComp",
                 TAG_FIELD_QUALIFIED_CLASS_NAME to "popup",
                 SMART_FIELD_QUALIFIED_CLASS_NAME to "lookupSeqNo",
@@ -125,48 +130,47 @@ class JsModelProperty(name: String, val owner: AbstractJsModelElement, val dataT
         fun isInternalProperty(ownerFqn: String, propertyName: String) = EXCLUDED_PROPERTIES.contains(ownerFqn to propertyName)
 
         private fun parseDataType(valueExpression: JSExpression, scoutJsModule: JsModule): JsPropertyDataType? {
-            if (valueExpression is JSLiteralExpression) {
-                return parseDataTypeFromLiteral(valueExpression)
+            val expressionToDetectDataType = resolveReferenceTarget(valueExpression)
+
+            // literal type
+            if (expressionToDetectDataType is JSLiteralExpression) {
+                val dataTypeFromLiteral = parseDataTypeFromLiteral(expressionToDetectDataType)
+                if (dataTypeFromLiteral != JsPropertyDataType.UNKNOWN) {
+                    return dataTypeFromLiteral
+                }
             }
 
-            if (valueExpression is JSReferenceExpression) {
-                val literal = resolveReferenceToLiteral(valueExpression)
-                if (literal != null) {
-                    val dataTypeFromConstant = parseDataTypeFromLiteral(literal)
-                    if (dataTypeFromConstant != JsPropertyDataType.UNKNOWN) {
-                        return dataTypeFromConstant
-                    }
-                }
-
-                val matchResult = ENUM_REGEX.matchEntire(valueExpression.text)
-                if (matchResult != null) {
-                    // match enum type
-                    return JsPropertyDataType(scoutJsModule.namespace + '.' + matchResult.groupValues[1])
+            // enum type
+            if (expressionToDetectDataType is JSProperty) {
+                val enumFieldDeclaration = expressionToDetectDataType.parent?.parent as? JSFieldVariable
+                if (enumFieldDeclaration != null) {
+                    val enumName = enumFieldDeclaration.name
+                    val declaringClass = PsiTreeUtil.getParentOfType(enumFieldDeclaration, JSClass::class.java)
+                    val declaringClassPrefix = declaringClass?.let { it.name + '.' } ?: ""
+                    return JsPropertyDataType("${scoutJsModule.namespace}.$declaringClassPrefix$enumName")
                 }
             }
 
             return null // cannot parse
         }
 
-        private fun resolveReferenceToLiteral(referenceExpression: JSReferenceExpression): JSLiteralExpression? {
-            var ref: JSReferenceExpression? = referenceExpression
-            var literal: JSLiteralExpression? = null
-            while (ref != null && literal == null) {
-                val refText = ref.text
-                // treat these JS constants as the corresponding number literal (to detect it is number type)
-                if ("Number.MIN_SAFE_INTEGER" == refText || "Number.MAX_SAFE_INTEGER" == ref.text) {
+        private fun resolveReferenceTarget(element: JSElement?): PsiElement? {
+            var ref = element as? JSReferenceExpression ?: return element
+            while (true) {
+                val refName = ref.referenceName
+                if (refName == "MIN_SAFE_INTEGER" || refName == "MAX_SAFE_INTEGER") {
+                    // treat these JS constants as the corresponding number literal (to detect it is number type)
                     return JSPsiElementFactory.createJSExpression("9007199254740991", ref) as? JSLiteralExpression
                 }
-                val refToField = ref.resolve() as? JSField
-                var initializer = refToField?.initializer
-                if (initializer is JSPrefixExpression) initializer = initializer.expression
-                when (initializer) {
-                    is JSLiteralExpression -> literal = initializer // stop
-                    is JSReferenceExpression -> ref = initializer // resolve next reference
-                    else -> ref = null // stop
-                }
+                var refTarget = ref.resolve()
+                if (refTarget === ref) return null // self-reference (e.g. 'undefined')
+                if (refTarget is JSField) refTarget = refTarget.initializer
+                if (refTarget is JSPrefixExpression) refTarget = refTarget.expression
+                if (refTarget is ES6ImportExportSpecifierAlias) refTarget = refTarget.findAliasedElement()
+                if (refTarget is JSExportAssignment) refTarget = refTarget.stubSafeElement
+                if (refTarget !is JSReferenceExpression) return refTarget // last reference found
+                ref = refTarget // resolve next reference
             }
-            return literal
         }
 
         private fun parseDataTypeFromLiteral(literalExpression: JSLiteralExpression) = when {

@@ -117,10 +117,8 @@ class JsModule(val name: String, val namespace: String, val sourceRoot: VirtualF
         files
                 .filter { !it.name.endsWith(ADAPTER_FILE_SUFFIX) }
                 .filter { !it.name.endsWith(MODEL_FILE_SUFFIX) }
-                .forEach { child ->
-                    val jsFile = psiManager.findFile(child) as? JSFile
-                    jsFile?.let { parseJsFile(it) }
-                }
+                .mapNotNull { psiManager.findFile(it) as? JSFile }
+                .forEach { parseJsFile(it) }
         m_parsed = true
         SdkLog.debug("Parsed module '{}'.", this)
     }

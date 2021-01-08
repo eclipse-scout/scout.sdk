@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,10 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.ecmascript6.actions.ES6AddImportExecutor
 import com.intellij.lang.ecmascript6.psi.impl.ES6ImportPsiUtil
 import com.intellij.lang.ecmascript6.psi.impl.ES6ImportPsiUtil.CreateImportExportInfo
+import com.intellij.lang.javascript.patterns.JSPatterns.jsProperty
+import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
 import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.core.s.IWebConstants
@@ -33,7 +36,11 @@ import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller.ResolvedM
 class JsModelValueCompletionContributor : CompletionContributor() {
 
     init {
+        // normal value completion
         extend(CompletionType.BASIC, propertyElementPattern(), JsModelValueCompletionProvider())
+
+        // value completion when within an array (to add an additional array element)
+        extend(CompletionType.BASIC, psiElement().withSuperParent(2, psiElement(JSArrayLiteralExpression::class.java).withParent(jsProperty())), JsModelValueCompletionProvider())
     }
 
     private class JsModelValueCompletionProvider : CompletionProvider<CompletionParameters>() {

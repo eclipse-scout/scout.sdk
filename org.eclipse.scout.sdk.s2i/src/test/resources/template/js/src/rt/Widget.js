@@ -10,21 +10,30 @@
  */
 export default class Widget {
   constructor() {
+    // noinspection JSUnusedGlobalSymbols
     this.id = null;
+    // noinspection JSUnusedGlobalSymbols
     this.objectType = null;
+    // noinspection JSUnusedGlobalSymbols
     this.visible = true;
     this.name = '';
     this.fields = [];
     this.children = [];
     this.child = null;
+    // noinspection JSUnusedGlobalSymbols
     this.enabledComputed = false;
+    // noinspection JSUnusedGlobalSymbols
     this.state = Widget.WidgetState.B;
     this.label = null;
+    this.selectedTab = null;
 
+    // noinspection JSUnusedGlobalSymbols
     this._private = null;
+    // noinspection JSUnusedGlobalSymbols
     this.$jQuery = null;
 
-    this._addWidgetProperties(['fields', 'children', 'child', 'onlyHere']);
+    this._addWidgetProperties(['fields', 'children', 'child', 'selectedTab', 'onlyHere']);
+    this._addPreserveOnPropertyChangeProperties(['selectedTab']);
     this._init()
   }
 
@@ -42,5 +51,8 @@ export default class Widget {
   }
 
   _addWidgetProperties() {
+  }
+
+  _addPreserveOnPropertyChangeProperties() {
   }
 }
