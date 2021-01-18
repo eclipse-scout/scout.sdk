@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -305,7 +305,7 @@ public final class Api {
   public static Entry<String /* fqn of the IClassNameSupplier */, Map<ChildElementType, Map<String /* method name in the IClassNameSupplier */, String /* method value */>>> dump(IClassNameSupplier cns) {
     var supplierClass = Ensure.notNull(cns).getClass();
     var methods = Arrays.stream(supplierClass.getMethods())
-        .filter(m -> m.getDeclaringClass() == supplierClass)
+        .filter(m -> m.getDeclaringClass() != Object.class)
         .filter(m -> m.getParameterCount() == 0)
         .filter(m -> m.getReturnType() != void.class)
         .filter(m -> !"fqn".equals(m.getName()) && !"simpleName".equals(m.getName())) // methods defined in IClassNameSupplier
