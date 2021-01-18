@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
   ~ All rights reserved. This program and the accompanying materials
   ~ are made available under the terms of the Eclipse Public License v1.0
   ~ which accompanies this distribution, and is available at
@@ -101,6 +101,11 @@
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.java.DescendantAbstractClassesEnumMacro"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.java.PsiExpressionEnumMacro"/>
+    <intentionAction order="first">
+      <className>org.eclipse.scout.sdk.s2i.nls.intention.TranslationEditIntention</className>
+      <bundleName>messages.EclipseScoutBundle</bundleName>
+      <category>Scout</category>
+    </intentionAction>
   </extensions>
 
   <actions>
