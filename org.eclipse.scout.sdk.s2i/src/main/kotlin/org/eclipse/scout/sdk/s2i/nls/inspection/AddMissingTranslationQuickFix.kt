@@ -24,6 +24,9 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment
+import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
@@ -37,6 +40,7 @@ import java.util.stream.Collectors.toList
 class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
 
     val quickFixName = message("add.missing.translation")
+    private val m_saveTasks = ArrayList<(ITranslationEntry, IEnvironment, IProgress) -> Unit>()
 
     override fun getFamilyName(): String = quickFixName
 
@@ -47,9 +51,20 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
     fun applyFix(psiElement: PsiElement) {
         val module = psiElement.containingModule() ?: return
         val scope = psiElement.translationDependencyScope() ?: return
-        val psiFile = psiElement.containingFile
         val stack = TranslationStoreStackLoader.createStack(module, scope)
-        ApplicationManager.getApplication().invokeLater { showStoreChooser(module, psiFile, stack) }
+        ApplicationManager.getApplication().invokeLater { showStoreChooser(module, psiElement.containingFile, stack) }
+    }
+
+    /**
+     * Add custom save tasks to the [LocalQuickFix].
+     * These tasks are executed in a worker thread when the missing translation is added.
+     * It therefore requires the [TranslationNewDialog] to be finished with "ok".
+     * It is not necessary to save the new [ITranslationEntry]. This is done automatically.
+     *
+     * The [ITranslationEntry] passed to the save task is the one created in the [TranslationNewDialog].
+     */
+    fun withSaveTask(task: (ITranslationEntry, IEnvironment, IProgress) -> Unit) = apply {
+        m_saveTasks.add(task)
     }
 
     private fun showStoreChooser(module: Module, psiFile: PsiFile, stack: TranslationStoreStack?) {
@@ -79,8 +94,11 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
         val dialog = TranslationNewDialog(project, store, stack, stack.generateNewKey(key.toString()))
         val ok = dialog.showAndGet()
         if (ok) {
-            callInIdeaEnvironment(project, message("store.new.translation")) { env, progress -> stack.flush(env, progress) }
-            // no need to call DaemonCodeAnalyzer.getInstance(project).restart() after flush because it is triggered automatically
+            val created = dialog.createdTranslation() ?: return
+            callInIdeaEnvironment(project, message("store.new.translation")) { env, progress ->
+                stack.flush(env, progress)
+                m_saveTasks.forEach { it.invoke(created, env, progress) }
+            }
         }
     }
 

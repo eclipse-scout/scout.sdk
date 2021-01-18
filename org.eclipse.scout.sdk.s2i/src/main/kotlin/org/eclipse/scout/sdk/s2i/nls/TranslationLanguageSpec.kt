@@ -41,5 +41,7 @@ abstract class TranslationLanguageSpec(val element: PsiElement, val translationD
     fun resolveTranslationKey() = translationKeyResolver.invoke(element)
 
     abstract fun createNewLiteral(text: String): PsiElement
+
+    open fun decorateTranslationKey(nlsKey: String): String = nlsKey
 }
 

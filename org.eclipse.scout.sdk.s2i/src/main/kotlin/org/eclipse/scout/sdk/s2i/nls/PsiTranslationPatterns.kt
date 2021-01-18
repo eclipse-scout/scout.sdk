@@ -19,9 +19,7 @@ import com.intellij.patterns.XmlPatterns.xmlTag
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.ElementType
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl
-import com.intellij.psi.util.elementType
 import com.intellij.psi.xml.XmlAttributeValue
-import com.intellij.psi.xml.XmlElementType
 import com.intellij.util.ArrayUtil
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
@@ -107,16 +105,15 @@ object PsiTranslationPatterns {
     }
 
     class JavaTranslationSpec(element: PsiElement) : TranslationLanguageSpec(element, TranslationStores.DependencyScope.JAVA, "\"", PsiTranslationPatterns::getTranslationKeyFromJava) {
-        override fun createNewLiteral(text: String): PsiElement = JavaPsiFacade.getElementFactory(element.project)
-                .createExpressionFromText(Strings.toStringLiteral(text, stringDelimiter, true).toString(), element)
-                .firstChild
+        override fun createNewLiteral(text: String): PsiElement {
+            val literalValue = Strings.toStringLiteral(decorateTranslationKey(text), stringDelimiter, true).toString()
+            return JavaPsiFacade.getElementFactory(element.project).createExpressionFromText(literalValue, element)
+        }
     }
 
     class HtmlTranslationSpec(element: PsiElement) : TranslationLanguageSpec(element, TranslationStores.DependencyScope.JAVA, "\"", PsiTranslationPatterns::getTranslationKeyFromHtml) {
         override fun createNewLiteral(text: String): PsiElement = XmlElementFactory.getInstance(element.project)
-                .createAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME, text, element)
+                .createAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME, decorateTranslationKey(text), element)
                 .valueElement!!
-                .children
-                .first { it.elementType == XmlElementType.XML_ATTRIBUTE_VALUE_TOKEN }
     }
 }

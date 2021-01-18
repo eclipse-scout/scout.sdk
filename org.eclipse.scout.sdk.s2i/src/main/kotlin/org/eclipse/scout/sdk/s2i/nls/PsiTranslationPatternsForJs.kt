@@ -10,13 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2i.nls
 
-import com.intellij.lang.javascript.JSTokenTypes
 import com.intellij.lang.javascript.patterns.JSPatterns.*
 import com.intellij.lang.javascript.psi.JSCallExpression
 import com.intellij.lang.javascript.psi.JSInitializerOwner
 import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.lang.javascript.psi.JSReferenceExpression
-import com.intellij.lang.javascript.psi.impl.JSChangeUtil
+import com.intellij.lang.javascript.psi.impl.JSPsiElementFactory
 import com.intellij.patterns.ElementPattern
 import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.StandardPatterns.and
@@ -96,6 +95,16 @@ object PsiTranslationPatternsForJs {
     }
 
     class JsTranslationSpec(element: PsiElement) : TranslationLanguageSpec(element, TranslationStores.DependencyScope.NODE, "'", PsiTranslationPatternsForJs::getTranslationKeyFromJs) {
-        override fun createNewLiteral(text: String) = JSChangeUtil.createTokenElement(element, JSTokenTypes.STRING_LITERAL, Strings.toStringLiteral(text, stringDelimiter, true))
+
+        override fun decorateTranslationKey(nlsKey: String) =
+                if (TEXT_KEY_PATTERN.accepts(element) || TEXT_KEY_PATTERN.accepts(element.parent))
+                    JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX + nlsKey + JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX
+                else
+                    nlsKey
+
+        override fun createNewLiteral(text: String): PsiElement {
+            val literalValue = Strings.toStringLiteral(decorateTranslationKey(text), stringDelimiter, true).toString()
+            return JSPsiElementFactory.createJSExpression(literalValue, element)
+        }
     }
 }

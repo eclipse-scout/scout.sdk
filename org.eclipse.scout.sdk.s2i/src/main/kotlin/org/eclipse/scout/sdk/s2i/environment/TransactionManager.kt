@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -107,7 +107,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
          * @param callable The task to execute
          * @return The result of the [callable].
          */
-        fun <T> computeInWriteAction(project: Project, name: String? = null, callable: () -> T): T {
+        private fun <T> computeInWriteAction(project: Project, name: String? = null, callable: () -> T): T {
             val result = FinalValue<T>()
             // repeat outside the write lock to release the UI thread between retries (prevent freezes)
             repeatUntilPassesWithIndex(project) {
