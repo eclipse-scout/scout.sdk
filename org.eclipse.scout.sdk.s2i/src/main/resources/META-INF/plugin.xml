@@ -94,6 +94,7 @@
     <completion.contributor language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForHtml" id="scoutNlsCompletionHtml" order="before html"/>
     <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.template.java.TemplateCompletionContributor" id="scoutTemplateCompletionJava" order="first"/>
     <lang.documentationProvider language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForJava" id="scoutNlsKeyDocumentationJava" order="first"/>
+    <lang.documentationProvider language="Properties" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForJava" id="scoutNlsKeyDocumentationProperties" order="first"/>
     <lang.documentationProvider language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.doc.NlsDocumentationProviderForHtml" id="scoutNlsKeyDocumentationHtml" order="first"/>
     <lang.foldingBuilder language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForJava"/>
     <lang.foldingBuilder language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForHtml"/>

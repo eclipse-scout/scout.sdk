@@ -19,10 +19,12 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
 import com.intellij.refactoring.suggested.endOffset
 import com.intellij.refactoring.suggested.startOffset
 import org.eclipse.scout.sdk.core.s.ISdkConstants
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
+import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
@@ -33,6 +35,7 @@ import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translati
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
 import org.eclipse.scout.sdk.s2i.nls.inspection.AddMissingTranslationQuickFix
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
+import org.eclipse.scout.sdk.s2i.resolveProperty
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import java.nio.file.Path
 import java.util.stream.Collectors.toList
@@ -51,8 +54,9 @@ object NlsCompletionHelper {
         val element = psiFile.findElementAt(psiElement.startOffset)?.parent ?: return emptyList()
         val translationSpec = element.translationSpec() ?: return emptyList()
         val stack = createStack(module, translationSpec.translationDependencyScope, true) ?: return emptyList()
+        val psiManager = PsiManager.getInstance(module.project)
         val elements = stack.allEntries()
-                .map { createExistingTranslationLookupElement(it, module, translationSpec) }
+                .map { createExistingTranslationLookupElement(it, module, translationSpec, psiManager) }
                 .collect(toList())
         if (includeNewTranslationEntry) {
             createNewTranslationLookupElement(element, translationSpec)?.let { elements.add(it) }
@@ -93,13 +97,14 @@ object NlsCompletionHelper {
         TransactionManager.current().register(UpdateTranslationKeyMember(path, createdKey, translationSpec))
     }
 
-    private fun createExistingTranslationLookupElement(translation: ITranslationEntry, module: Module, translationSpec: TranslationLanguageSpec): LookupElementBuilder {
-        val element = LookupElementBuilder.create(TranslationLookupObject(translation, module), translationSpec.decorateTranslationKey(translation.key()))
+    private fun createExistingTranslationLookupElement(translation: ITranslationEntry, module: Module, translationSpec: TranslationLanguageSpec, psiManager: PsiManager): LookupElementBuilder {
+        val prop = translation.resolveProperty(Language.LANGUAGE_DEFAULT, psiManager)?.psiElement
+        val lookupElement = LookupElementBuilder.create(TranslationLookupObject(translation, prop, module), translationSpec.decorateTranslationKey(translation.key()))
                 .withCaseSensitivity(true)
                 .withInsertHandler { context, item -> insertTranslationKey(context, item, translationSpec) }
                 .withRenderer(RENDERER)
-        element.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
-        return element
+        lookupElement.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
+        return lookupElement
     }
 
     private fun insertTranslationKey(context: InsertionContext, element: LookupElement, translationSpec: TranslationLanguageSpec) {
@@ -141,7 +146,7 @@ object NlsCompletionHelper {
         }
     }
 
-    private data class NewTranslationLookupObject(val psiElement: PsiElement, val key: String)
+    data class NewTranslationLookupObject(val psiElement: PsiElement, val key: String)
 
-    private data class TranslationLookupObject(val translationEntry: ITranslationEntry, val module: Module)
+    data class TranslationLookupObject(val translationEntry: ITranslationEntry, val element: PsiElement?, val module: Module)
 }
