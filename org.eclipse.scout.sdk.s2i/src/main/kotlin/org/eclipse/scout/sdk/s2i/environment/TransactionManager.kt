@@ -33,7 +33,6 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.toIdea
 import org.eclipse.scout.sdk.s2i.toVirtualFile
 import java.nio.file.Path
-import java.util.Collections.singletonList
 
 class TransactionManager constructor(val project: Project, val transactionName: String? = null) {
 
@@ -107,7 +106,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
          * @param callable The task to execute
          * @return The result of the [callable].
          */
-        private fun <T> computeInWriteAction(project: Project, name: String? = null, callable: () -> T): T {
+        private fun <T> computeInWriteAction(project: Project, name: String? = null, callable: () -> T): T? {
             val result = FinalValue<T>()
             // repeat outside the write lock to release the UI thread between retries (prevent freezes)
             repeatUntilPassesWithIndex(project) {
@@ -224,17 +223,10 @@ class TransactionManager constructor(val project: Project, val transactionName: 
 
     private fun finishTransactionImpl(save: Boolean, progress: IdeaProgress): Boolean {
         ensureOpen(null)
-        if (m_members.isEmpty()) {
-            return true
-        }
-
+        if (m_members.isEmpty()) return true
         try {
-            if (!save || (progress.indicator.isCanceled)) {
-                return false
-            }
-            // the boolean result might be null in case the callable was not executed because the project is closing
-            @Suppress("RedundantNullableReturnType") val result: Boolean? = computeInWriteAction(project, transactionName) { commitAllInUiThread(progress) }
-            return result ?: return false
+            if (!save || progress.indicator.isCanceled) return false
+            return computeInWriteAction(project, transactionName) { commitAllInUiThread(progress) } ?: return false
         } finally {
             m_members.clear()
             m_size = 0
@@ -304,11 +296,9 @@ class TransactionManager constructor(val project: Project, val transactionName: 
         documentManager.saveDocument(document)
     }
 
-    private fun commitAllMembers(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, documentManager: FileDocumentManager, progress: IdeaProgress): Boolean {
-        return m_members.entries
-                .map { commitMembers(it.key, it.value, documentMappings, documentManager, progress) }
-                .min() ?: false
-    }
+    private fun commitAllMembers(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, documentManager: FileDocumentManager, progress: IdeaProgress) = m_members.entries
+            .map { commitMembers(it.key, it.value, documentMappings, documentManager, progress) }
+            .min() ?: false
 
     private fun commitMembers(path: Path, members: List<TransactionMember>, fileMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, documentManager: FileDocumentManager, progress: IdeaProgress): Boolean {
         val success = members
@@ -324,7 +314,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
             // This is e.g. done for .properties files where the encoding might be changed in the project settings.
             // After this the indices are no longer valid and throw exceptions. To solve this: re-parse the file in case something changed.
             // this must be executed right after the transaction members of that file and before the psi or document is saved!
-            FileContentUtilCore.reparseFiles(singletonList(vFile))
+            FileContentUtilCore.reparseFiles(listOf(vFile))
             var doc = mapping?.second
             if (doc == null && vFile != null) {
                 doc = documentManager.getDocument(vFile)
@@ -338,7 +328,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
 
     private fun documentReady(document: Document?, psiDocumentManager: PsiDocumentManager): Boolean {
         if (document == null) {
-            return true// no document exists yet: new file
+            return true // no document exists yet: new file
         }
         if (!document.isWritable) {
             return false
