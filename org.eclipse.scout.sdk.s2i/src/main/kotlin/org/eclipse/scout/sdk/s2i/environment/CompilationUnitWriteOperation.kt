@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,9 @@
  */
 package org.eclipse.scout.sdk.s2i.environment
 
-import com.intellij.codeInsight.actions.OptimizeImportsProcessor
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.util.DirectoryUtil
+import com.intellij.lang.LanguageImportStatements
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
@@ -26,13 +26,11 @@ import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
-import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.toIdeaProgress
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import java.io.File
 import java.nio.file.Path
 
 open class CompilationUnitWriteOperation(val project: Project, val source: CharSequence, val cuPath: CompilationUnitPath) {
-
-    var createdPsi: PsiFile? = null
 
     fun run(progress: IdeaProgress, resultSupplier: () -> IType?): IFuture<IType?> {
         doWriteCompilationUnit(progress)
@@ -52,59 +50,49 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
                 .createFileFromText(cuPath.fileName(), JavaFileType.INSTANCE, source, LocalTimeCounter.currentTime(), false, false)
         progress.worked(1)
 
-        formatSource(newPsi)
-        progress.worked(1)
+        formatAndOptimizeImports(newPsi, progress.newChild(2))
 
-        optimizeImports(newPsi)
-        progress.worked(1)
-
-        TransactionManager.current().register(CompilationUnitWriter(cuPath.targetFile(), newPsi))
-
-        createdPsi = newPsi
+        TransactionManager.current().register(CompilationUnitWriter(cuPath.targetFile(), newPsi, newPsi.text /* create source here to have the transaction member as short as possible */))
     }
 
-    protected fun formatSource(newJavaPsi: PsiFile) {
+    protected fun formatAndOptimizeImports(psi: PsiFile, progress: IdeaProgress) = computeInReadAction(project) {
+        progress.init(2, message("format.java.source"))
         try {
-            IdeaEnvironment.computeInReadAction(project) { CodeStyleManager.getInstance(project).reformat(newJavaPsi) }
+            CodeStyleManager.getInstance(project).reformat(psi)
+            progress.worked(1)
+            LanguageImportStatements.INSTANCE.forFile(psi)
+                    .filter { it.supports(psi) }
+                    .forEach { it.processFile(psi).run() }
+            progress.worked(1)
         } catch (e: Exception) {
-            SdkLog.warning("Error formatting Java source of file '{}'.", newJavaPsi.name, e)
+            SdkLog.warning("Error formatting Java source of file '{}'.", psi.name, e)
         }
     }
 
-    protected fun optimizeImports(newJavaPsi: PsiFile) {
-        try {
-            OptimizeImportsProcessor(project, newJavaPsi).run()
-        } catch (e: Exception) {
-            SdkLog.warning("Error optimizing imports in file '{}'.", newJavaPsi.name, e)
-        }
-    }
+    private class CompilationUnitWriter(val targetFile: Path, val psi: PsiFile, val source: CharSequence) : TransactionMember {
 
+        override fun file() = targetFile
 
-    companion object {
-        private class CompilationUnitWriter(val targetFile: Path, val psi: PsiFile) : TransactionMember {
+        override fun commit(progress: IdeaProgress): Boolean {
+            progress.init(2, toString())
 
-            override fun file() = targetFile
+            val project = psi.project
+            val targetDirectory = targetFile.parent
+            val dir = DirectoryUtil.mkdirs(PsiManager.getInstance(project), targetDirectory.toString().replace(File.separatorChar, '/'))
+                    ?: throw SdkException("Cannot write '$targetFile' because the directory could not be created.")
+            progress.worked(1)
 
-            override fun commit(progress: IdeaProgress): Boolean {
-                progress.init(2, message("write.cu.x", psi.name))
-
-                val targetDirectory = targetFile.parent
-                val dir = DirectoryUtil.mkdirs(PsiManager.getInstance(psi.project), targetDirectory.toString().replace(File.separatorChar, '/'))
-                        ?: throw SdkException("Cannot write '$targetFile' because the directory could not be created.")
+            val existingFile = dir.findFile(targetFile.fileName.toString())
+            if (existingFile == null) {
+                SdkLog.debug("Add new compilation unit '{}'.", targetFile)
+                dir.add(psi)
                 progress.worked(1)
-
-                val existingFile = dir.findFile(targetFile.fileName.toString())
-                if (existingFile == null) {
-                    SdkLog.debug("Add new compilation unit '{}'.", psi.name)
-                    dir.add(psi)
-                } else {
-                    FileWriter(targetFile, psi.text, psi.project).commit(toIdeaProgress(null))
-                }
-                progress.worked(1)
-                return true
+            } else {
+                FileWriter(targetFile, source, project).commit(progress.newChild(1))
             }
-
-            override fun toString() = message("write.cu.x", targetFile)
+            return true
         }
+
+        override fun toString() = message("write.cu.x", targetFile.fileName)
     }
 }

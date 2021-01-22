@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -211,9 +211,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         val javaEnv = targetFolder.javaEnvironment()
         val writer = CompilationUnitWriteOperation(project, code, path)
         val supplier = lambda@{
-            val createdUnit = writer.createdPsi ?: return@lambda null
-
-            val reloadRequired = javaEnv.registerCompilationUnitOverride(pck, name + JavaTypes.JAVA_FILE_SUFFIX, createdUnit.text)
+            val reloadRequired = javaEnv.registerCompilationUnitOverride(pck, name + JavaTypes.JAVA_FILE_SUFFIX, code)
             if (reloadRequired) {
                 javaEnv.reload()
             }
