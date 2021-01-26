@@ -31,7 +31,14 @@ import java.util.regex.Pattern
 abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
 
     companion object {
+        /**
+         * Visible text content max length (without surrounding quotes)
+         */
         const val FOLDING_MAX_LEN = 100
+
+        /**
+         * Visible placholder text max length (without surrounding [PLACEHOLDER_START_CHAR] and [PLACEHOLDER_END_CHAR]
+         */
         const val PLACEHOLDER_MAX_LEN = 60
         const val PLACEHOLDER_START_CHAR = '{'
         const val PLACEHOLDER_END_CHAR = '}'
@@ -63,7 +70,7 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
 
     override fun isCollapsedByDefault(node: ASTNode) = isFoldingOn()
 
-    protected fun createFoldingDescriptor(element: PsiElement, key: String, stack: TranslationStoreStack): FoldingDescriptor? {
+    protected open fun createFoldingDescriptor(element: PsiElement, key: String, stack: TranslationStoreStack): FoldingDescriptor? {
         val translation = stack.translation(key).orElse(null) ?: return null
         var text = translation.bestText(m_requestedLanguage).orElse(null) ?: return null
 
@@ -72,16 +79,19 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
                     .filter { it.type == m_javaLangStringType }
                     .drop(1)
                     .map { it.text.trim() }
-                    .map { PLACEHOLDER_START_CHAR + maxLength(it, PLACEHOLDER_MAX_LEN) + PLACEHOLDER_END_CHAR }
+                    .map { PLACEHOLDER_START_CHAR + limitLength(it, PLACEHOLDER_MAX_LEN) + PLACEHOLDER_END_CHAR }
                     .toTypedArray()
             if (textArgs.isNotEmpty()) {
                 text = replacePlaceholders(text, textArgs)
             }
         }
-        return FoldingDescriptor(element.node, element.textRange, null, '"' + maxLength(text, FOLDING_MAX_LEN) + '"', true, emptySet())
+        val prefixAndSuffix = textPrefixAndSuffix()
+        return FoldingDescriptor(element.node, element.textRange, null, prefixAndSuffix + limitLength(text, FOLDING_MAX_LEN) + prefixAndSuffix, true, emptySet())
     }
 
-    protected fun replacePlaceholders(text: String, replacements: Array<String>): String = PLACEHOLDER_PATTERN.matcher(text).replaceAll {
+    protected open fun textPrefixAndSuffix(): String = "\""
+
+    protected open fun replacePlaceholders(text: String, replacements: Array<String>): String = PLACEHOLDER_PATTERN.matcher(text).replaceAll {
         val index = Integer.parseInt(it.group(1))
         if (index >= 0 && index < replacements.size) {
             return@replaceAll replacements[index]
@@ -89,11 +99,11 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
         PLACEHOLDER_START_CHAR + it.group(1) + PLACEHOLDER_END_CHAR
     }
 
-    protected fun maxLength(text: String, maxLen: Int): String {
+    protected fun limitLength(text: String, maxLen: Int): String {
         if (text.length <= maxLen) return text
         val suffix = "..."
         return text.take(maxLen - suffix.length) + suffix
     }
 
-    protected fun isFoldingOn() = ScoutSettings.getCodeFoldingSettings().isCollapseTranslations()
+    protected open fun isFoldingOn() = ScoutSettings.getCodeFoldingSettings().isCollapseTranslations()
 }

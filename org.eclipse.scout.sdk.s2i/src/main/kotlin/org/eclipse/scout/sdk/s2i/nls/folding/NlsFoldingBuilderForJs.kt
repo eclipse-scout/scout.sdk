@@ -39,6 +39,8 @@ class NlsFoldingBuilderForJs : AbstractNlsFoldingBuilder() {
         return folds
     }
 
+    override fun textPrefixAndSuffix() = "'"
+
     private fun createFoldingDescriptor(key: String, element: PsiElement, stack: TranslationStoreStack): FoldingDescriptor? {
         val isJsonTextKey = element is JSLiteralExpression && element.stringValue?.startsWith(JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX) == true
         val psiElement = if (isJsonTextKey) element else PsiTreeUtil.getParentOfType(element, JSCallExpression::class.java) ?: return null
