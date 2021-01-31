@@ -64,20 +64,20 @@ public class JavaNameChangeSetTest {
     @Test
     public void testScriptIssue1() throws IOException {
         JavaNameChangeSet set = new JavaNameChangeSet();
-        //set.addScript(loadScript("ticket-245457-RENAME-Java.txt"));
-        set.addScript(loadScript("ticket-245457-fixed-RENAME-Java.txt"));
+        //set.addScript(loadScript("issue-RENAME-Java.txt"));
+        set.addScript(loadScript("fixed-RENAME-Java.txt"));
 
-        assertReplacement(set.getQualifiedNameReplacement("com.bsiag.crm.client.core.person.PersonForm"), "com.bsiag.crm.client.core.customer.CustomerForm");
-        assertReplacement(set.getQualifiedNameReplacement("com.bsiag.crm.shared.core.person.PersonFormData"), "com.bsiag.crm.shared.core.customer.CustomerFormData");
+        assertReplacement(set.getQualifiedNameReplacement("myproject.client.core.person.PersonForm"), "myproject.client.core.customer.CustomerForm");
+        assertReplacement(set.getQualifiedNameReplacement("myproject.shared.core.person.PersonFormData"), "myproject.shared.core.customer.CustomerFormData");
 
-        assertReplacement(set.getMemberReplacement("com.bsiag.crm.client.core.customer.CustomerForm#getPersonKey"), "getCustomerKey");
-        assertReplacement(set.getMemberReplacement("com.bsiag.crm.shared.core.customer.CustomerFormData#getPersonKey"), "getCustomerKey");
+        assertReplacement(set.getMemberReplacement("myproject.client.core.customer.CustomerForm#getPersonKey"), "getCustomerKey");
+        assertReplacement(set.getMemberReplacement("myproject.shared.core.customer.CustomerFormData#getPersonKey"), "getCustomerKey");
 
-        assertReplacement(set.getQualifiedNameReplacement("com.bsiag.crm.shared.core.person.PersonKey"), "com.bsiag.crm.shared.core.customer.CustomerKey");
-        assertReplacement(set.getQualifiedNameReplacement("com.bsiag.crm.shared.core.person.CustomerKey"), "com.bsiag.crm.shared.core.customer.CustomerKey");
-        assertReplacement(set.getQualifiedNameReplacement("com.bsiag.crm.shared.core.customer.PersonKey"), null);
-        assertReplacement(set.getMemberReplacement("com.bsiag.crm.shared.core.customer.CustomerKey#getDirectoryPersonKey"), "getDirectoryCustomerKey");
-        assertReplacement(set.getMemberReplacement("com.bsiag.crm.shared.core.customer.CustomerKey#toPersonKey"), "toCustomerKey");
+        assertReplacement(set.getQualifiedNameReplacement("myproject.shared.core.person.PersonKey"), "myproject.shared.core.customer.CustomerKey");
+        assertReplacement(set.getQualifiedNameReplacement("myproject.shared.core.person.CustomerKey"), "myproject.shared.core.customer.CustomerKey");
+        assertReplacement(set.getQualifiedNameReplacement("myproject.shared.core.customer.PersonKey"), null);
+        assertReplacement(set.getMemberReplacement("myproject.shared.core.customer.CustomerKey#getDirectoryPersonKey"), "getDirectoryCustomerKey");
+        assertReplacement(set.getMemberReplacement("myproject.shared.core.customer.CustomerKey#toPersonKey"), "toCustomerKey");
     }
 
     private String loadScript(String name) throws IOException {
