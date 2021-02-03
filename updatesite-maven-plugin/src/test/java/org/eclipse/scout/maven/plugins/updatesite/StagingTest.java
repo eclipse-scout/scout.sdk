@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,12 +64,12 @@ public class StagingTest {
   }
 
   @Test
-  public void testCreateSha256() throws IOException, MojoExecutionException {
+  public void testCreateMD5() throws IOException, MojoExecutionException {
     var tmp = Files.createTempFile("stagingMojoTest", null);
     try {
       Files.writeString(tmp, "testcontent", StandardCharsets.UTF_8);
-      var sha = StagingMojo.createSha256(tmp.toFile());
-      assertEquals("25edaa1f62bd4f2a7e4aa7088cf4c93449c1881af03434bfca027f1f82d69dba", sha);
+      var md5 = StagingMojo.createMD5(tmp.toFile());
+      assertEquals("296ab49302a43553e323fb8cb43fcd7a", md5);
     }
     finally {
       Files.delete(tmp);

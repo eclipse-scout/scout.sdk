@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -265,7 +265,7 @@ public class StagingMojo extends AbstractStagingMojo {
 
   private File createDoStageFile(File zipInputFile, String timestamp) throws MojoExecutionException {
     var out = new File(getStageTargetDir(), "doStage_" + timestamp);
-    var line = createSha256(zipInputFile) + "  " + zipInputFile.getName();
+    var line = createMD5(zipInputFile) + "  " + zipInputFile.getName();
     try (var writer = new FileWriter(out, StandardCharsets.UTF_8)) {
       writer.write(line);
     }
@@ -275,9 +275,13 @@ public class StagingMojo extends AbstractStagingMojo {
     return out;
   }
 
-  public static String createSha256(File data) throws MojoExecutionException {
+  /**
+   * Use MD5 because it is not security relevant. The hash is only used to verify if the file copy was successful (no
+   * binary changes)<br>
+   */
+  public static String createMD5(File data) throws MojoExecutionException {
     try (var is = new BufferedInputStream(Files.newInputStream(data.toPath()))) {
-      var md = MessageDigest.getInstance("SHA-256");
+      var md = MessageDigest.getInstance("MD5");
       var buffer = new byte[8192];
       var numRead = 0;
       while ((numRead = is.read(buffer)) != -1) {
@@ -292,7 +296,7 @@ public class StagingMojo extends AbstractStagingMojo {
       return sb.toString();
     }
     catch (NoSuchAlgorithmException | IOException e) {
-      throw new MojoExecutionException("Could not create sha256", e);
+      throw new MojoExecutionException("Could not create md5", e);
     }
   }
 
