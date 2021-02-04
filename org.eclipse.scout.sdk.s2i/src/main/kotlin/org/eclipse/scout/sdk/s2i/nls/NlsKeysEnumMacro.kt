@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import com.intellij.codeInsight.template.Expression
 import com.intellij.codeInsight.template.ExpressionContext
 import com.intellij.codeInsight.template.Macro
 import com.intellij.codeInsight.template.Result
+import com.intellij.psi.PsiDocumentManager
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionHelper
 
@@ -34,7 +35,11 @@ class NlsKeysEnumMacro : Macro() {
     override fun calculateResult(params: Array<out Expression>, context: ExpressionContext?): Result? = null
 
     override fun calculateLookupItems(params: Array<out Expression>, context: ExpressionContext?): Array<LookupElement>? {
-        val psiElement = context?.psiElementAtStartOffset ?: return null
+        if (context == null) return null
+        val document = context.editor?.document ?: return null
+        val psiFile = PsiDocumentManager.getInstance(context.project).getPsiFile(document) ?: return null
+        // do not use context.getPsiElementAtStartOffset() because it uses context.getTemplateStartOffset() but here context.getStartOffset() is required
+        val psiElement = psiFile.findElementAt(context.startOffset) ?: return null
         val module = psiElement.containingModule() ?: return null
         return NlsCompletionHelper.computeLookupElements(module, psiElement, false).toTypedArray()
     }
