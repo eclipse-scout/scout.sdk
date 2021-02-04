@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import com.intellij.codeInsight.template.TemplateEditingAdapter
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.codeInsight.template.impl.TemplateImplUtil
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.openapi.command.WriteCommandAction.writeCommandAction
 import com.intellij.openapi.editor.Document
@@ -48,6 +49,7 @@ import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scoutApi: IScoutApi, val prefix: CharSequence) : InsertHandler<LookupElement> {
 
     private lateinit var m_engine: TemplateEngine
+    private var m_insertPos: Int = -1
 
     override fun handleInsert(context: InsertionContext, item: LookupElement) {
         val editor = context.editor
@@ -73,9 +75,15 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
             val tempSettings = CompatibilityHelper.createTempSettings(origProjectSettings, settingsManager)
             tempSettings.getCustomSettings(JavaCodeStyleSettings::class.java).isInsertInnerClassImports = false
 
-            val templateListener = TemplateListener(templateDescriptor, settingsManager, origTempSettings)
+            val templateListener = TemplateListener(templateDescriptor, editor, settingsManager, origTempSettings) {
+                m_insertPos
+            }
             TemplateHelper.removePrefix(editor, prefix)
             TemplateManager.getInstance(project).startTemplate(editor, template, templateListener)
+
+            m_insertPos = TemplateManagerImpl.getTemplateState(editor)
+                    ?.getVariableRange(TemplateDescriptor.VARIABLE_NAME)
+                    ?.startOffset ?: -1
         })
     }
 
@@ -105,18 +113,32 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
         target.addVariable(descriptor.name, descriptor.expression, descriptor.defaultValueExpression, true)
     }
 
-    private class TemplateListener(private val templateDescriptor: TemplateDescriptor, private val settingsManager: CodeStyleSettingsManager, private val origSettings: CodeStyleSettings?) : TemplateEditingAdapter() {
+    private class TemplateListener(private val templateDescriptor: TemplateDescriptor, private val editor: Editor, private val settingsManager: CodeStyleSettingsManager, private val origSettings: CodeStyleSettings?, private val positionSupplier: () -> Int) : TemplateEditingAdapter() {
 
         override fun templateCancelled(template: Template?) {
-            resetTemporarySettings()
+            onTemplateCompletedOrCancelled(null)
         }
 
         override fun beforeTemplateFinished(state: TemplateState, template: Template) {
+            onTemplateCompletedOrCancelled(state)
+        }
+
+        private fun onTemplateCompletedOrCancelled(state: TemplateState?) {
             try {
-                insertInnerTypeGetter(state)
+                insertInnerTypeGetter(computeCompletionPosition(state))
             } finally {
                 resetTemporarySettings()
             }
+        }
+
+        private fun computeCompletionPosition(state: TemplateState?): Int {
+            if (state != null) {
+                val start = state.getVariableRange(TemplateDescriptor.VARIABLE_NAME)?.startOffset ?: -1
+                if (start >= 0) {
+                    return start
+                }
+            }
+            return positionSupplier.invoke()
         }
 
         private fun resetTemporarySettings() {
@@ -145,14 +167,13 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
             return null
         }
 
-        private fun insertInnerTypeGetter(state: TemplateState) {
-            val editor = state.editor
+        private fun insertInnerTypeGetter(insertPos: Int) {
+            if (insertPos < 0) return
             val project = editor.project ?: return
             val document = editor.document
-            val nameRange = state.getVariableRange(TemplateDescriptor.VARIABLE_NAME) ?: return
             val psiDocumentManager = PsiDocumentManager.getInstance(project)
             val file = psiDocumentManager.getPsiFile(document) ?: return
-            val element = file.findElementAt(nameRange.startOffset) ?: return
+            val element = file.findElementAt(insertPos) ?: return
             val createdClass = PsiTreeUtil.getParentOfType(element, PsiClass::class.java) ?: return
             val innerTypeGetterInfo = resolveInnerTypeGetterContainer(createdClass) ?: return
 
