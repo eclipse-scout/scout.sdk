@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,7 +67,7 @@ public class CommentBuilderTest {
 
   protected static void assertJavaElementCommentEquals(String expectedSrc, String expectedImports, Consumer<IJavaElementCommentBuilder<?>> task, IJavaEnvironment env) {
     var context = new JavaBuilderContext(env);
-    var inner = new MemorySourceBuilder(context);
+    var inner = MemorySourceBuilder.create(context);
     IJavaElementCommentBuilder<?> builder = new JavaElementCommentBuilder<>(inner, () -> null);
 
     task.accept(builder);
@@ -81,13 +81,13 @@ public class CommentBuilderTest {
   }
 
   protected static void assertJavaDocEquals(String expected, String input) {
-    var inner = new MemorySourceBuilder();
+    var inner = MemorySourceBuilder.create();
     new CommentBuilder<>(inner).appendJavaDocComment(input);
     assertEquals(expected, inner.source().toString());
   }
 
   protected static void assertCommentEquals(String expected, String input) {
-    var inner = new MemorySourceBuilder();
+    var inner = MemorySourceBuilder.create();
     new CommentBuilder<>(inner).appendBlockComment(input);
     assertEquals(expected, inner.source().toString());
   }

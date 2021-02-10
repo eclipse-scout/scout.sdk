@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,13 +23,30 @@ public class MemorySourceBuilder extends AbstractSourceBuilder<MemorySourceBuild
 
   private final StringBuilder m_builder;
 
-  public MemorySourceBuilder() {
-    this(new BuilderContext());
-  }
-
-  public MemorySourceBuilder(IBuilderContext context) {
+  protected MemorySourceBuilder(IBuilderContext context) {
     super(context);
     m_builder = new StringBuilder(256);
+  }
+
+  /**
+   * Creates a new {@link MemorySourceBuilder} using the {@link IBuilderContext} given.
+   * 
+   * @param context
+   *          The {@link IBuilderContext} to use. Must not be {@code null}.
+   * @return a new {@link MemorySourceBuilder}
+   */
+  public static MemorySourceBuilder create(IBuilderContext context) {
+    return new MemorySourceBuilder(context);
+  }
+
+  /**
+   * Creates a new {@link MemorySourceBuilder} using a default {@link IBuilderContext} which uses {@code \n} as line
+   * separator.
+   * 
+   * @return a new {@link MemorySourceBuilder}
+   */
+  public static MemorySourceBuilder create() {
+    return create(new BuilderContext());
   }
 
   /**

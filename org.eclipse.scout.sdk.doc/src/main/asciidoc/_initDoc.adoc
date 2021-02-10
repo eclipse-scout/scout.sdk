@@ -1,0 +1,9 @@
+ifndef::imgsdir[:imgsdir: img]
+ifndef::imagesdir[:imagesdir: img]
+ifndef::codedir[:codedir: ../java/org/eclipse/scout/sdk/doc]
+ifndef::mdledir[:mdledir: .]
+
+include::{mdledir}/_initCommon.adoc[]
+
+:finaldoc: true
+

@@ -1,0 +1,9 @@
+:experimental:
+:sectanchors:
+:idprefix:
+:idseparator: -
+:toc: left
+:toclevels: 4
+:listing-caption: Listing
+:xrefstyle: short
+:source-highlighter: rouge

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,55 +43,6 @@ import org.eclipse.scout.sdk.core.model.api.IUnresolvedType;
  * <p>
  * Transforms a {@link IJavaElement} model into a working copy {@link ISourceGenerator}.
  * <p>
- * <b>Examples:</b><br>
- * <br>
- * <b>Override Methods with modifications on the overridden components:</b>
- *
- * <pre>
- * IWorkingCopyTransformer transformer = new DefaultWorkingCopyTransformer() {
- *   &#64;Override
- *   public IMethodGenerator&#60;?, ? extends IMethodBodyBuilder&#60;?&#62;&#62; transformMethod(ITransformInput&#60;IMethod, IMethodGenerator&#60;?, ? extends IMethodBodyBuilder&#60;?&#62;&#62;&#62; input) {
- *     IMethod templateMethod = input.model();
- *     IMethodGenerator&#60;?, ? extends IMethodBodyBuilder&#60;?&#62;&#62; overrideGenerator = input.requestDefaultWorkingCopy();
- *     switch (templateMethod.elementName()) {
- *       case "toString":
- *         // provide method body for toString method
- *         return overrideGenerator.withBody(b -&#62; b.returnClause().stringLiteral("SampleCloseable class").semicolon());
- *       case "close":
- *         // remove throws declaration for close method
- *         return overrideGenerator.withoutException(Exception.class.getName());
- *       default:
- *         return overrideGenerator;
- *     }
- *   }
- * };
- *
- * PrimaryTypeGenerator&#60;?&#62; generator = PrimaryTypeGenerator.create()
- *     .withElementName("SampleCloseable")
- *     .withInterface(AutoCloseable.class.getName()) // defines the methods that can be overridden
- *     .withMethod(MethodOverrideGenerator.createOverride(transformer)
- *         .withElementName("toString")) // override toString
- *     .withAllMethodsImplemented(transformer); // override all methods required by super types.
- * </pre>
- *
- * <b>Convert to working copy applying modifications:</b>
- *
- * <pre>
- * ICompilationUnit icu = env.requireType(Long.class.getName()).requireCompilationUnit();
- * ICompilationUnitGenerator&#60;?&#62; workingCopy = icu.toWorkingCopy(
- *     new SimpleWorkingCopyTransformerBuilder()
- *         .withAnnotationMapper(this::transformAnnotation) // change SuppressWarnings to 'all'
- *         .withMethodParameterMapper(IWorkingCopyTransformer::remove) // remove all parameters from methods
- *         .build());
- *
- * private IAnnotationGenerator&#60;?&#62; transformAnnotation(ITransformInput&#60;IAnnotation, IAnnotationGenerator&#60;?&#62;&#62; input) {
- *   if (SuppressWarnings.class.getName().equals(input.model().type().name())) {
- *     // modify all suppress-warning annotations to suppress all warnings
- *     return input.requestDefaultWorkingCopy().withElement("value", b -&#62; b.stringLiteral("all"));
- *   }
- *   return input.requestDefaultWorkingCopy();
- * }
- * </pre>
  *
  * @see DefaultWorkingCopyTransformer
  * @see SimpleWorkingCopyTransformerBuilder

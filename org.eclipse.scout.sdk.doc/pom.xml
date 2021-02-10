@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2015 BSI Business Systems Integration AG.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    https://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+        BSI Business Systems Integration AG - initial API and implementation
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.scout.sdk</groupId>
+    <artifactId>org.eclipse.scout.sdk</artifactId>
+    <version>11.0.0-SNAPSHOT</version>
+    <relativePath>../org.eclipse.scout.sdk</relativePath>
+  </parent>
+
+  <artifactId>org.eclipse.scout.sdk.doc</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <id>parse-version</id>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.asciidoctor</groupId>
+        <artifactId>asciidoctor-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>scout-sdk-doc-to-html</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>process-asciidoc</goal>
+            </goals>
+            <configuration>
+              <backend>html5</backend>
+              <sourceDirectory>${project.basedir}/src/main/asciidoc</sourceDirectory>
+              <attributes>
+                <git-branch>${project.scm.tag}</git-branch>
+                <doc-short-version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</doc-short-version>
+                <project-version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</project-version>
+                <icons>font</icons>
+              </attributes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

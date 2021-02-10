@@ -182,7 +182,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
         // do not use CodeStyle.getSettings(project).lineSeparator because the CompilationUnitWriter uses createFileFromText
         val nl = "\n"
         val ctx = BuilderContext(nl, props)
-        val builder = MemorySourceBuilder(JavaBuilderContext(ctx, context))
+        val builder = MemorySourceBuilder.create(JavaBuilderContext(ctx, context))
         generator.generate(builder)
         return builder.source()
     }

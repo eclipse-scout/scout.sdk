@@ -1,0 +1,621 @@
+// suppress inspection "RedundantMethodOverride" for whole file
+:doctype: article
+:author: Scout Team
+:email: scout-dev@eclipse.org
+:revnumber: {project-version}
+ifndef::finaldoc[]
+include::_initDoc.adoc[]
+endif::finaldoc[]
+
+= Eclipse Scout: SDK Technical Documentation
+
+== Introduction
+
+This document describes the Scout SDK software architecture and explains important concepts.
+
+NOTE: This document is not complete.
+Contributions are welcome! +
+If you like to help, please create a Gerrit change for Repository https://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/.
+Thanks!
+
+== Module Overview
+
+The Scout SDK currently offers plugins for https://www.eclipse.org/downloads/packages/installer[Eclipse] and https://plugins.jetbrains.com/plugin/13393-eclipse-scout[IntelliJ IDEA].
+
+The code basically consists of two layers: An IDE independent part (modules named `core`) and IDE specific modules as shown in <<img-overview>>.
+
+[#img-overview]
+.Scout SDK module overview. The `org.eclipse.scout.sdk` prefix has been omitted.
+image::overview.svg[module overview]
+
+=== Core Modules
+
+The primary core module is the `org.eclipse.scout.sdk.core` library (blue modules in <<img-overview>>).
+It contains classes to deal with source code in general and Java source code in particular.
+Furthermore, various utility classes are provided to support common use cases (like xml parsing or string operations).
+This module contains no Scout specific code.
+More details on this module and how to use it is explained later in this document.
+
+The `org.eclipse.scout.sdk.core.s` (please note the extra `s` at the end) introduces Scout specific classes, e.g. to create a form data or page (orange in <<img-overview>>).
+
+For both parts corresponding `test` modules are available holding classes to support unit testing.
+
+=== IDE specific modules
+
+The IDE specific modules (green for IntelliJ and violet for Eclipse as shown in <<img-overview>>) use an IDE identifier in the module name:
+
+* `s2e`: Scout to Eclipse: The Eclipse plugins
+* `s2i`: Scout to IDEA: The IntelliJ IDEA plugin
+
+NOTE:  For historical reasons (and because of the different platform architecture) the Eclipse integration of Scout is divided into various plugins separating business logic, testing, help and user interface (UI).
+This is not the case for the IntelliJ plugin for which all aspects are implemented in one module.
+
+== Architecture
+
+This section describes the architecture principles used by the Scout SDK. For illustration, it is explained with the IntelliJ plugin as example, but the concepts are the same for the Eclipse plugins.
+
+[#img-architecture]
+.Scout SDK architecture overview shown for the IntelliJ plugin. The concepts are the same for the Eclipse plugins except that it is divided into multiple modules as explained in <<IDE specific modules>>.
+image::architecture.svg[architecture]
+
+=== Core
+
+The core module provides classes for two main topics:
+
+. Parse Java code into a model representation.
+. Build source code (most importantly Java source code, but not limited to it).
+
+These two topics are explained in the next chapters.
+
+==== Java Parsing
+
+The package `org.eclipse.scout.sdk.core.model` contains classes that represent Java code (source or binary bytecode) as a model.
+It contains no Java parser itself.
+Such a parser is contributed using a service provider interface (SPI).
+See <<SPI>> for more details.
+
+For the most important Java elements (like classes, fields or methods) corresponding model classes exist.
+In the next chapters the models and their usages are explained.
+
+===== Java Classpath Environment
+
+The main entry point is the `org.eclipse.scout.sdk.core.model.api.IJavaEnvironment` which represents a Java class path.
+It provides methods to retrieve Java types by name returning a model of type `IType` (see <<Type>>).
+
+Such an environment can be created by using the `JavaEnvironmentWithEcjBuilder` or one of the predefined factories as shown in <<source-running-classpath>> (see <<SPI>> for more details).
+
+[#source-running-classpath]
+[source,java,indent=0]
+.Print the running classpath
+----
+include::{codedir}/PrintClasspathSample.java[tags=printRunningClassPath]
+----
+<1> Creates a new `IJavaEnvironment` using the classpath of the running Java process (`RunningJavaEnvironmentFactory`) and calls `printRunningClasspath` with the created `IJavaEnvironment` closing it afterwards.
+<2> Retrieves a Stream of `IClasspathEntry` from the `IJavaEnvironment`.
+<3> Prints the classpath entries using the default PATH delimiter.
+
+===== Type
+
+An `org.eclipse.scout.sdk.core.model.api.IType` represents a Java type (e.g. class, interface, enum, array or primitive type) and provides access to super classes or interfaces, inner (nested) types, annotations, type-parameters, methods, fields and more.
+See <<source-methods-of-list>> for an example.
+
+[#source-methods-of-list]
+[source,java,indent=0]
+.Print methods of `java.util.List`
+----
+include::{codedir}/PrintMethodsOfListSample.java[tags=printMethodsOfList]
+----
+<1> Creates a new `IJavaEnvironment` using a builder providing custom classpath entries.
+<2> Adds a source folder (relative to the working directory) to the classpath.
+Because it is added as source folder, the `IJavaEnvironment` will parse `*.java` files in this directory.
+<3> Adds a binary `jar` file to the classpath.
+<4> Retrieves the model for the class `java.util.List`.
+This returns an `IType`.
+<5> Gets all methods from the `IType` model.
+<6> Gets the identifier (method name with parameter types) of each method.
+
+===== Compilation Unit
+
+The `org.eclipse.scout.sdk.core.model.api.ICompilationUnit` represent a `*.java` file and provides access to the imports (`IImport`) and `IPackage` and may contain multiple `IType` instances.
+
+An `ICompilationUnit` may be `synthetic` which means it is created from a `\*.class` file instead a `*.java` file.
+In that case it only contains a single `IType` (the one matching the `\*.class` file) and no imports (as no imports are available in a `*.class` file).
+
+===== Member
+
+Members exist in an `IType` and may be a field (`IField`), method (`IMethod`) or a nested type (`IType`).
+
+<<source-methods-parameter-datatypes>> shows an example on how to retrieve the parameter data types of a specific method in a type.
+
+[#source-methods-parameter-datatypes]
+[source,java,indent=0]
+.Print parameter data types of `java.lang.String#getChars`
+----
+include::{codedir}/PrintMethodParamTypes.java[tags=printMethodParamTypes]
+----
+<1> Creates an empty `IJavaEnvironment` which means no custom libraries or source folders are available.
+Only the default Java bootstrap classpath is available.
+<2> Only methods with a specific name.
+<3> Only methods with a `public` modifier.
+<4> Gets the parameters of the method.
+<5> Gets the data type of the parameter.
+<6> Gets the reference (data type with all type arguments as string) of the method parameter data type.
+
+===== Annotation
+
+The `org.eclipse.scout.sdk.core.model.api.IAnnotation` represents a Java annotation which may be present on any `IAnnotatable` element (<<Members>>, `IMethodParameter`, `IPackage`).
+
+It may contain `IAnnotationElement` instances in case the annotation has attributes. `IAnnotationElement` instances have a value of type `IMetaValue` which corresponds to a compile-time constant (see <<Constants>>).
+
+Annotations can be wrapped with a typed annotation model simplifying the access to annotation element values as shown in <<source-annoation-element-values>>.
+
+[#source-annoation-element-values]
+[source,java,indent=0]
+.Print annotation element value
+----
+include::{codedir}/PrintAnnotationElementValues.java[tags=printAnnotationElementValues]
+----
+<1> Gets the annotations for which the annotation type matches the `GeneratedAnnotation` model (in this case `javax.annotation.Generated`) and wraps the `IAnnotation` into an instance of `GeneratedAnnotation` (typed).
+<2> The `GeneratedAnnotation` has named getters like `comments()` in this example which correspond to the matching annotation attribute.
+
+===== Constant Values
+
+Compile time constants may be available to the model already at parse time.
+This includes the value of `IAnnotationElement` or `IField` (if it is known at compile time).
+Such constants may be retrieved using the `IMetaValue` class which holds information about the constant data type (`MetaValueType`) and its value.
+See <<source-constant-value>> as an example.
+
+[#source-constant-value]
+[source,java,indent=0]
+.Print value of constant
+----
+include::{codedir}/PrintConstantValue.java[tags=printConstantValue]
+----
+<1> Prints `type: String`.
+<2> Prints `value: Austin Powers`.
+
+===== Query
+
+Some model methods allow to narrow the result before retrieving its result.
+Such methods return a query which allows specifying search constraints before the actual elements are created and returned.
+
+Queries are used at various locations:
+
+* `InnerTypeQuery`: Used in `ICompilationUnit#types()` to search for nested `IType` instances.
+It allows searching by name, simple name, flags or super classes.
+Nested types can be searched on the first level only or recursively.
+* `HierarchyInnerTypeQuery`: Used in `ITypes#innerTypes()`.
+Provides the same functionality as `InnerTypeQuery` but furthermore allows including inner types inherited from super classes.
+* `AnnotationQuery`: Available on all `IAnnotatable` models.
+Allows including annotations declared on super types, limiting to annotations with a certain annotation type name or using a managed (typed) annotation as shown in <<source-annoation-element-values>>.
+* `FieldQuery`: Used in `IType#fields()`.
+Allows including fields declared on super types, filtering fields by name and flags (modifiers like `public` or `private`).
+See <<source-constant-value>> for an example.
+* `MethodQuery`: Used in `IType#methods()`.
+Allows including methods declared in super types, limiting by annotations, flags, name or method identifier.
+See <<source-methods-parameter-datatypes>> for an example.
+* `SuperMethodQuery`: Used in `IMethod#superMethods()`.
+Allows getting super methods of an existing `IMethod` including or excluding itself and super methods from classes and/or interfaces.
+* `MethodParameterQuery`: Used in `IMethod#parameters()`.
+Allows filtering parameters by data type and parameter name (note: some binary class files may not contain original names for parameters).
+* `SuperTypeQuery`: Used in `IType#superTypes()`.
+Allows getting super types of an existing `IType` including or excluding itself and super types including classes and/or interfaces.
+The `IType` instances can be filtered by flags, name and simple name.
+
+===== SPI
+
+The `org.eclipse.scout.sdk.core` module contains the Java model implementation including queries, annotations and various other helper classes as explained before.
+
+It does not contain a Java source and bytecode parser.
+Instead, this functionality is externalized using a service provider interface.
+This has the advantage that the parser may be exchanged without breaking the model API.
+It also provides the capability to use multiple parsers for dedicated environments or requirements.
+
+Therefore, the `core` module is not standalone but requires an SPI implementation to run.
+The SPI can be found in the package `org.eclipse.scout.sdk.core.model.spi`.
+The model functionality is then built on top of the SPI instances.
+
+Currently, there is one SPI implementation available.
+It exists in the `org.eclipse.scout.sdk.core.ecj` module and uses the https://wiki.eclipse.org/JDT_Core_Programmer_Guide/ECJ[Eclipse Compiler for Java] as parser.
+It also contains the predefined `IJavaEnvironment` factories (like `EmptyJavaEnvironmentFactory`, `RunningJavaEnvironmentFactory`, `JavaEnvironmentWithEcjBuilder`) used in the samples of this document.
+
+In the future more parsers might be added e.g. to include the `core` module into IntelliJ IDEA without requiring the `ecj` dependency but using the IntelliJ parser (https://plugins.jetbrains.com/docs/intellij/psi.html[PSI]) instead.
+Another parser could be the https://openjdk.java.net/groups/compiler/guide/compilerAPI.html[javac] already built into the JDK.
+
+==== Build Source
+
+The source code generation uses five main types of classes:
+
+. Source Builders: These are the classes that store the created source code.
+They contain methods to append source fragments similar to a `StringBuilder`.
+. Generators: A generator is responsible for appending the necessary source fragments into source builders so that they result in a specific element.
+There are e.g. generators to create classes or methods.
+There might also be generators for business elements like a Scout form or page.
+. Transformers: A transformer is like an adapter that converts a parsed Java model (see <<Java Parsing>>) into a modifiable generator.
+During the transformation from model to generator modifications might be applied.
+. Import Collectors: Classes helping to automatically create imports as needed and deciding where to use simple versus full qualification for references.
+. API definitions: Version dependent information about an API for which source code should be generated.
+
+The next sections describe these types in more detail and provides some examples how to use them.
+
+===== Source Builder
+
+The main interface is `org.eclipse.scout.sdk.core.builder.ISourceBuilder`.
+It provides generic methods to append source code using a builder pattern.
+
+A source builder is always executed in a specific context (`IBuilderContext`).
+Such a context may contain custom properties and specifies e.g. the line separator to use for this builder.
+This ensures the line separators are consistent within a file.
+<<source-source-builder-simple>> shows a minimal example for a simple source builder:
+
+[#source-source-builder-simple]
+[source,java,indent=0]
+.Create a simple source builder and log its content
+----
+include::{codedir}/ExecuteSourceBuilder.java[tags=builderSimple]
+----
+<1> Creates a `ISourceBuilder` that stores its content in memory.
+It uses a default `IBuilderContext`.
+There is also an `OutputStream` based implementation called `StreamSourceBuilder`.
+<2> Appends the given text including a trailing line separator.
+<3> Logs the content of the builder.
+Prints `Hello World!` (with a trailing line separator).
+
+Source builders may be used for any source code of any language but there may be specific ones for certain languages.
+There is e.g. a source builder for Java code (`org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder`) which adds methods for Java specific source elements like a semicolon or a reference to a Java type.
+Such a language specific source builder may also introduce more attributes on the context as done for Java with the `IJavaBuilderContext`.
+In addition to the normal context properties the `IJavaBuilderContext` also includes an `IJavaEnvironment` (see <<Java Classpath Environment>>) used to perform classpath dependent tasks like the `import` resolution.
+
+There are even more specific builders e.g. `IMethodBodyBuilder` or `IExpressionBuilder` which extend `IJavaSourceBuilder` and add some additional methods helpful in the corresponding context.
+
+Source builders may be wrapped to convert from one to another as shown in <<source-source-builder-complex>>.
+
+[#source-source-builder-complex]
+[source,java,indent=0]
+.Creates a more complex builder setup and builds some Java code
+----
+include::{codedir}/ExecuteSourceBuilder.java[tags=builderComplex]
+----
+<1> Creates a new `IBuilderContext` specifying the line separator to be the default system line separator.
+<2> Adds a custom property to the context.
+<3> Creates an `ISourceBuilder` that stores its content in memory.
+The context is passed as argument.
+<4> Wraps the builder with a `JavaSourceBuilder` and specifies an `IJavaEnvironment` which will be available on the `IJavaBuilderContext` of the created `IJavaSourceBuilder`.
+<5> Wraps the builder again with an `ExpressionBuilder` which also provides Java expression specific methods.
+<6> Appends a Java String literal array with the given values to the source code.
+This is a method specific to the `ExpressionBuilder`.
+<7> Appends a semicolon at the end.
+This is a method specific to the `JavaSourceBuilder`.
+<8> Prints `{"1", "2", "3"};`.
+
+===== Generator
+
+Generators are classes appending code to an `ISourceBuilder` to create a specific element.
+A generator can create a Java annotation (`IAnnotationGenerator`), a method (`IMethodGenerator`) or a `.properties` file (`PropertiesGenerator`) for instance.
+All generators implement the interface `org.eclipse.scout.sdk.core.generator.ISourceGenerator`.
+
+The interface requires a single method `void generate(ISourceBuilder<?> builder)`.
+Therefore, it is a functional interface and can be expressed as lambda for small source blocks.
+
+Specific generators usually have additional methods to configure the created source.
+The `IMethodGenerator` for instance can take method name, modifiers, parameters or exception types.
+Some of these attributes may be optional while others are required.
+
+Generators itself have no knowledge about the context in which they might be executed.
+Only the `ISourceBuilder` (with its `IBuilderContext`) can bring in this information.
+This means a generator may be created and configured to be executed later maybe even several times.
+As with each execution (`generate` invocation) a new `ISourceBuilder` may be passed (bringing a new context), the resulting content might be different for each execution.
+
+Therefore, the generator can be seen as functional descriptor what to generate (e.g. a method) without the knowledge of the context in which it is created.
+This context is only given to the generator at execution time by passing an `ISourceBuilder` to its `generate` method.
+See <<source-generator-sample>> for an example on how to use generators.
+
+[#source-generator-sample]
+[source,java,indent=0]
+.Creates a generator for a list bound to CharSequence
+----
+include::{codedir}/GeneratorSample.java[tags=generatorSample]
+----
+<1> Create the generator once.
+<2> Build a reference for the super type which includes type arguments: `java.util.AbstractList<CharSequence>`.
+Imports are created automatically for all names that are part of the reference.
+<3> Create a new generator for primary types.
+These are top-level types of a compilation unit where the name matches the `.java` file.
+<4> Creates and adds a new `IFieldGenerator` which is pre-configured to create a `serialVersionUID`.
+<5> Creates a new `IMethodGenerator` and adds it to the type generator.
+<6> Creates a new `IAnnotationGenerator` which is pre-configured to create an `Override` annotation and adds it to the method.
+<7> Creates a new `IMethodParameterGenerator` and adds it to the method.
+<8> Configures the method parameter to use a primitive `int` as data type.
+<9> `withBody` takes an `ISourceGenerator<IMethodBodyBuilder<?>>` as argument.
+As `ISourceGenerator` is a functional interface, the generator can be expressed as lambda or method reference as in this example.
+So here the method `buildGetMethodBody` becomes the generator itself.
+<10> The `MethodOverrideGenerator` is a special generator which allows to inherit the configuration of a method from the super types declared.
+In this example the generator looks for a method called `iterator` in all the super types of the declaring generator.
+The super types are `AbstractList`, `Serializable` and their super types up to `java.lang.Object`.
+The method is found in `AbstractList` where it is configured to be `public`, having no parameters and returning an `Iterator<E>`.
+This configuration is used to automatically build the matching `IMethodGenerator` setup.
+The type parameter `E` is automatically replaced with the corresponding binds (`CharSequence` in this example).
+Please note that this generator only works if the current `IJavaSourceBuilder` has an `IJavaEnvironment` associated and that it is much slower than a manual configuration (because it requires the lookup of the method in the super hierarchy).
+<11> Builds the body content of the `get` method.
+Here it should just return `null`.
+<12> Creates an `IJavaSourceBuilder` including a nested context to execute the generator with.
+<13> Executes the generator using the builder.
+<14> Creates an `IJavaBuilderContext` to execute the generator with.
+<15> Executes the same generator again this time using the created context.
+In this case the builder is created automatically.
+
+The content of the builder after the generator execution is shown in <<source-generator-output>>.
+
+[#source-generator-output]
+[source,java,indent=0]
+.The output of the generator created in <<source-generator-sample>>
+----
+import java.io.Serializable; // <1>
+import java.util.AbstractList;
+import java.util.Iterator;
+
+public class CharSequenceList extends AbstractList<CharSequence> implements Serializable {
+  private static final long serialVersionUID = 1L;
+
+  @Override
+  public Iterator<CharSequence> iterator() { // <2>
+    return super.iterator(); // <3>
+  }
+
+  @Override
+  public int size() {
+    // TODO [user] Auto-generated method stub.
+    return 0;
+  }
+
+  @Override
+  public CharSequence get(int i) {
+    return null; // <4>
+  }
+}
+
+----
+<1> Imports are created automatically.
+In the created source simple qualification is used where ever possible.
+<2> Here the method signature has been derived from the super class, and the type arguments have automatically been substituted.
+<3> As there is a super method available, the generator automatically includes a valid body.
+<4> The method body as created by the `IMethodBodyBuilder<?>` of `buildGetMethodBody`.
+
+===== Converting between Model and Generator
+
+This section explains how get a modifiable generator from a model instance and the way back from generated code to a parsed model again.
+
+====== From Model to Generator
+
+The Java model classes (see <<Java Parsing>>) can be converted to `ISourceGenerator` instances to apply modifications.
+This is done with the method `toWorkingCopy` which exists for all Java models and returns an `ISourceGenerator`.
+
+By default, such a generator creates source similar to the model it was created from.
+There might be small differences like formatting differences, white spaces or new lines.
+Structurally the generated source is identical.
+
+If some elements of the source model instance (or one of its children) should be modified during the conversion, an `IWorkingCopyTransformer` can be used as shown in <<source-working-copy-transformer>>.
+
+[#source-working-copy-transformer]
+[source,java,indent=0]
+.Modify the generator when converting from the model
+----
+include::{codedir}/WorkingCopyTransformerSample.java[tags=transformWorkingCopy]
+----
+<1> Use a `SimpleWorkingCopyTransformerBuilder` to create a transformer.
+<2> Registers a mapping function which is called for each field that is converted.
+The input is the field model, the output the generator that should be used for this field.
+The returned generator may be modified, completely replaced or may be `null` if the field should be skipped in the transformation (remove).
+<3> A mapper that removes all method parameters of all functions that are converted.
+<4> Creates the default generator for the field which generates source code similar to the input model.
+<5> If the field is a `serialVersionUID`, its value is replaced with `42L`.
+
+An `IWorkingCopyTransformer` may also be used when deriving methods from parent types using `MethodOverrideGenerator` or `ITypeGenerator#withAllMethodsImplemented`.
+Technically this is a transformation from the template model method (which comes from a super type).
+Therefore, the transformer can also be used to adapt the way how methods are derived as shown in <<source-auto-generate-transformer>>.
+
+[#source-auto-generate-transformer]
+[source,java,indent=0]
+.Modify the automatically generated methods of the super types
+----
+include::{codedir}/WorkingCopyTransformerSample.java[tags=transformAutoGeneration]
+----
+<1> Create a new transformer using sub classing.
+<2> Get the source method model which should be transformed.
+<3> Get the default generator (which produces source similar to the model).
+<4> If it is the `toString` method: replace its body.
+<5> If it is the `close` method: Remove all throwables from the method declaration.
+<6> Specifies the methods which will be created (all as required by this interface).
+<7> Overrides the `toString` method passing the transformer so that the modification is applied.
+<8> Instructs the generator to implement all missing methods as required by the super types.
+The transformer can be passed here as well to modify the created methods.
+
+====== From Generator to Model
+
+If some compilation unit source has been generated, it may be parsed again into a model by using `IJavaEnvironment#registerCompilationUnitOverride` as shown in <<source-generator-to-model>>.
+
+[#source-generator-to-model]
+[source,java,indent=0]
+.Example how to parse any Java code into a model instance
+----
+include::{codedir}/CompilationUnitOverrideSample.java[tags=generatorToModel]
+----
+<1> Create any Java source code
+<2> Register the compilation unit source in the `IJavaEnvironment` using `registerCompilationUnitOverride`.
+This includes the source in the classpath of the Java environment.
+<3> There could already be a class with that name in the environment.
+In that case the registration has no effect.
+Call `reload` to discard any loaded classes to ensure the next parse uses the new source.
+<4> Obtain the `IType` for the created class by fully qualified name and get the source of the `close` method.
+
+===== Import Collector
+
+Import collectors (base interface `org.eclipse.scout.sdk.core.imports.IImportCollector`) are used in an `IJavaBuilderContext` to collect all imports used.
+This also works with complex references like `AbstractMap<String, List<OutputStream>>` where `AbstractMap`, `List` and `OutputStream` would be imported automatically.
+The collectors also knows about names which don't need an import (like the `String` class because the `java.lang` package is always automatically imported).
+
+Furthermore, import collectors decide whether a reference can be inserted using its simple name (and adding the required `import`) or if a full qualification is required (e.g. because such a simple name is already imported).
+
+To use this feature it is best practice when building source code to always refer to other classes using `IJavaSourceBuilder#ref()` or one of its overloads.
+
+===== API Definition
+
+When generating source code the created code must always match a certain API (e.g. the Java API) to be valid.
+Therefore, a generator needs to know the e.g. class- and method names of the API to build the correct source.
+As APIs may change over time, a mechanism is required to generate source code for different API versions.
+This is where API definitions may come in handy.
+An API definition holds all necessary information (like names of classes, methods, annotation elements or any other API dependent information) for each version of the API that needs to be supported.
+<<img-apidef>> illustrates the API definition classes (left-hand side) including a sample Java API definition (right-hand side).
+
+[#img-apidef]
+.UML diagram illustrating the core API definition classes and a sample Java API.
+image::apidef.png[API definition]
+
+The main entry point to retrieve an API definition is the `org.eclipse.scout.sdk.core.apidef.Api` class.
+It allows to create a definition (`create` method) or to get the version of a specific API (`version` method).
+Both methods take the type of API as class (of type `IApiSpecification`), and an `IJavaEnvironment` defining the classpath to search in.
+The `Api` class will then search for an `IApiProvider` accepting the class given and will use this provider to detect which version of this API is available in the `IJavaEnvironment`.
+It is therefore the responsibility of the provider to implement the required logic which detects the API version available within a given classpath (`IJavaEnvironment`).
+
+If the API is available in the classpath, an `ApiSpecification` is created which includes all `IApiSpecification` classes known to the provider which are required for the API version found on the classpath.
+Using dynamic proxies the `ApiSpecification` class then returns an instance of the root API interface calling the best `IApiSpecification` for each method of the interface.
+The following example should clarify the process:
+
+. `Api#create(IJavaApi.class, javaEnvironment)` is called for a classpath using a Java 8 runtime.
+. The `Api` class retrieves the provider for `IJavaApi` which as been registered before.
+It gets the `JavaApiProvider` and calls the `version` method.
+. The `JavaApiProvider` detects the Java version used in the environment and returns `8`.
+. The `Api` class know knows that the `IJavaApi` is available and uses version `8`.
+It then asks the provider for all known `IApiSpecification` classes which results in `Java8Api` and `Java9Api`.
+. It creates an instance of the `ApiSpecification` class and passes the version and the two known specifications.
+. The `ApiSpecification` reads the `ApiLevel` annotation of the two specification classes and discards all which have a level higher than the version requested.
+Only the `Java8Api` specification remains.
+. Using this specification the `ApiSpecification` creates a dynamic proxy for `IJavaApi` delegating all method calls to the `Java8Api` and returns this proxy.
+. The original caller now gets an instance of `IJavaApi` which internally is bound to the `Java8Api`.
+This results in a stable API definition that matches the version of the classpath.
+. This definition can now be used in e.g. generators to build API specific code.
+
+This also means that the `IJavaApi` interface must only include elements which exist in all version of the API supported.
+If some elements only exist from a certain version onward (like in <<img-apidef>> the `HttpClient` class name), this method must not be included in the root `IJavaApi`.
+Instead, a new root interface (e.g. `IHttpClientApi`) should be created to encapsulate all the optional API elements that belong to the `HttpClient`.
+The `Java9Api` class can then implement this `IHttpClientApi` as well.
+So if a `Java9Api` is used, the `IHttpClientApi` would be available as well, if the `Java8Api` is used, not.
+To retrieve such optionally available API parts the `IApiSpecification` contains the `api` method as shown in <<source-optional-api>>.
+
+[#source-optional-api]
+[source,java,indent=0]
+.Example how to use an optional API.
+----
+include::{codedir}/OptionalApiSample.java[tags=optionalApiSample]
+----
+<1> The method is only called if the `Java9Api` is available.
+
+NOTE:  The `Java9Api` does not need to re-implement the `longClassName` or `stringClassName` methods as these are already part of the `Java8Api`.
+So for a Java 9 classpath the resulting API definition contains both specifications, and it is sufficient if a method is only implemented on one specification available.
+This eliminates redundant code as a new API specification may only contain the changes to the previous one.
+
+====== Using API Definitions in Generators
+
+As generators have no context (and therefore no `IJavaEnvironment`), the final API names cannot be computed when configuring the generator.
+Instead, the API class and the method on that class which returns the required value is passed to the generator.
+During execution the generator will obtain the API and invoke the method on it using the `IJavaEnvironment` available on the context of the builder.
+An example is shown in <<source-generator-with-api>>.
+
+[#source-generator-with-api]
+[source,java,indent=0]
+.Example how to use an optional API.
+----
+include::{codedir}/GeneratorWithApiSample.java[tags=generatorWithApi]
+----
+
+=== Core.s
+
+The `org.eclipse.scout.sdk.core.s` module uses the concepts of the `core` module discussed in the previous chapter to create Scout specific elements:
+
+* Annotations (see <<Annotations>>) like `ClassIdAnnotation`, `FormDataAnnotation` or `OrderAnnotation` to parse Scout annotation more conveniently.
+* Source builders (see <<Source Builders>>) like `ScoutMethodBodyBuilder` which add Scout specific source fragments like `BEANS.get(Class)` calls.
+* Generators (see <<Generators>>) for various Scout elements like `CodeTypeGenerator`, `FormGenerator`, `ScoutAnnotationGenerator` or `LookupCallGenerator`.
+
+The module introduces some new concept too (orange in <<img-architecture>>).
+These are explained in the next sections.
+
+==== Environment
+
+An environment represents the context in which Scout source code is generated.
+Typically, this is an IDE (e.g. IntelliJ or Eclipse), but it is also used in testing.
+The base interface `org.eclipse.scout.sdk.core.s.environment.IEnvironment` contains methods to handle context specific tasks like writing files or getting Maven modules by name.
+To encapsulate such tasks in context specific strategies helps to share more code between various IDEs.
+
+==== Operation
+
+A generator or builder always belongs to a single file.
+Operations on the other hand are classes creating a business entity which may consist of several elements spread over several files.
+
+Operations always get an `IEnvironment` and a progress monitor as input but may have other custom parameters as well.
+An example for an operation is the `FormNewOperation` which may create a form, a form-data, a service, permissions and testing classes.
+Such operations typically make heavy use of generators like the `FormGenerator` or `PermissionGenerator` in this example and use the `IEnvironment` to write the resulting code into the IDE.
+
+==== Extension
+
+The `core` and `core.s` modules provide various extension points which allow to programmatically add higher level functions as shown in <<img-architecture>>.
+Some extensions (like the `Logger` or `DefaultElementCommentGenerator`) can be provided using a service provider interface while others may contain registries to store multiple extensions.
+
+The idea of this concept is that the `core` and `core.s` modules can contain business logic which depends on functionality that is only provided from a higher level.
+Using the extensions e.g. the `core.s` module can execute Maven commands without having a Maven runner itself relying on someone else to contribute one.
+The following extensions are currently available:
+
+* Logger: A logger strategy may be contributed by implementing `ISdkConsoleSpi` and activating it using `SdkConsole#setConsoleSpi`.
+* DefaultElementCommentGenerator: The generator used to create default JavaDoc comments for Java elements.
+Allows using IDE settings dependent JavaDoc.
+Requires implementing `IDefaultElementCommentGeneratorSpi` and activating using `JavaElementCommentBuilder#setCommentGeneratorSpi`.
+* Java Model SPI: Documentation can be found in <<SPI>>.
+* MavenRunner: Specifies the runner to use when executing Maven commands.
+Requires implementing `IMavenRunnerSpi` and activating it using `MavenRunner#set`.
+* `UniqueIds`: A registry of data type dependent id providers to be used when a unique id is required in generated source code.
+* Environment: A strategy that must be implemented to execute operations (see <<Operations>>).
+Only an interface is provided.
+* `ClassIds`: A registry of class name dependent @ClassId providers.
+By default, a random UUID provider is registered but others may be added.
+* `TranslationStoreSupplier`: A registry of `ITranslationStoreSupplier` implementations.
+Such classes can discover and load Scout text provider services in a given scope.
+Use `TranslationStores#registerStoreSupplier` to add a supplier.
+
+=== Testing
+
+Tests are written using https://junit.org/junit5/[JUnit 5].
+Various https://junit.org/junit5/docs/current/user-guide/#extensions[Extensions] are provided:
+
+* `JavaEnvironmentExtension`
+* `DefaultCommentGeneratorExtension`
+* `UsernameExtension`
+* `ClassIdAutoCreationExtension`
+* `TestingEnvironmentExtension`
+* `UniqueIdExtension`
+
+Furthermore, have a look at the following useful helper classes:
+
+* `SdkAssertions`
+* `CoreTestingUtils`
+* `ApiTestGenerator`
+* `CoreScoutTestingUtils`
+
+<<source-example-test>> shows a simple generator test case.
+
+[#source-example-test]
+[source,java,indent=0]
+.A simple example test for a type generator.
+----
+include::{codedir}/ExampleTest.java[tags=exampleTest]
+----
+<1> Executes the given generator, registers the created source in the `IJavaEnvironment` (see <<From Generator to Model>>) and checks the generated source for compile errors.
+
+=== S2i
+
+The `s2i` module represents the Scout plugin for https://www.jetbrains.com/idea/[IntelliJ IDEA].
+
+It is written in https://kotlinlang.org/[Kotlin] and uses https://gradle.org/[Gradle] as build tool.
+
+The plugin is published on the https://plugins.jetbrains.com/plugin/13393-eclipse-scout[JetBrains Marketplace].
+
+:_footer-link-path: src/main/adoc/{docname}.adoc
+

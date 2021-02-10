@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -110,7 +110,7 @@ public class ImportValidatorTest {
             .withElementName("MyClass")
             .withSuperClass("a.b.SuperClass<test.External>"));
 
-    var jsb = JavaSourceBuilder.create(new MemorySourceBuilder());
+    var jsb = JavaSourceBuilder.create(MemorySourceBuilder.create());
     cu.generate(jsb);
 
     Collection<String> imports = toStringList(jsb.context().validator().importCollector().getImports());
@@ -128,7 +128,7 @@ public class ImportValidatorTest {
             .withElementName("MyClass")
             .withSuperClass("a.b.SuperClass<test.MyClass.Inner>"));
 
-    var jsb = JavaSourceBuilder.create(new MemorySourceBuilder());
+    var jsb = JavaSourceBuilder.create(MemorySourceBuilder.create());
     cu.generate(jsb);
 
     Collection<String> imports = toStringList(jsb.context().validator().importCollector().getImports());

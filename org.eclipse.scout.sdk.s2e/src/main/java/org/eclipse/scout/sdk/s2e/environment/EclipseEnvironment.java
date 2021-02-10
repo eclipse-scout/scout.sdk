@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -110,7 +110,7 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
 
   protected static StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, IJavaProject javaProject, Path targetPath, IJavaEnvironment je) {
     var ctx = createBuilderContextFor(javaProject, targetPath);
-    var builder = new MemorySourceBuilder(new JavaBuilderContext(ctx, je));
+    var builder = MemorySourceBuilder.create(new JavaBuilderContext(ctx, je));
     Ensure.notNull(generator).generate(builder);
     return builder.source();
   }

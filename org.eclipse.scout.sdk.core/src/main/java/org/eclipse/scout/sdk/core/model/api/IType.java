@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -243,7 +243,7 @@ public interface IType extends IMember {
   boolean isInstanceOf(String queryType);
 
   /**
-   * Checks if the receiver has the given {@link IClassNameSupplier#fqn()} in its super hierarchy.
+   * Checks if the receiver (this) has the given {@link IClassNameSupplier#fqn()} in its super hierarchy.
    * 
    * @param typeName
    *          The {@link IClassNameSupplier} to check. Must not be {@code null}.
@@ -257,7 +257,7 @@ public interface IType extends IMember {
    * {@link Class#isAssignableFrom(Class)}
    *
    * @return {@code true} if the declaration {@code BaseClass a = (SpecificClass)s;} is valid, where this is the base
-   *         class
+   *         class.
    */
   boolean isAssignableFrom(IType specificClass);
 
