@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,16 +11,34 @@
 package org.eclipse.scout.sdk.s2i.util.compat
 
 import com.intellij.codeInsight.completion.JavaCompletionContributor
+import com.intellij.find.impl.RegExHelpPopup
 import com.intellij.notification.NotificationGroup
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager
+import com.intellij.ui.components.labels.LinkLabel
+import java.awt.Component
 
 /**
  * Holds all API version dependent logic.
  */
 object CompatibilityHelper {
+
+    /**
+     * createRegExLink() method changed with IJ 2021.1
+     * Can be removed if the minimal supported IJ version is >= 2021.1
+     */
+    private val REGEX_LINK_HELP_CREATOR = CompatibilityMethodCaller<LinkLabel<*>>()
+            .withCandidate(RegExHelpPopup::class.java, "createRegExLink", String::class.java, Component::class.java) {
+                it.invokeStatic(it.args[0], it.args[1]) // >= IJ 2021.1
+            }
+            .withCandidate(RegExHelpPopup::class.java, "createRegExLink", String::class.java, Component::class.java, Logger::class.java) {
+                it.invokeStatic(it.args[0], it.args[1], null) // < IJ 2021.1
+            }
+
+    fun createRegExLink(title: String, owner: Component) = REGEX_LINK_HELP_CREATOR.invoke(title, owner)
 
     /**
      * NotificationGroup creation changed with IJ 2020.3

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,9 @@
 package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import com.intellij.testFramework.fixtures.BasePlatformTestCase.assertThrows
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.junit.Assert
+import org.junit.jupiter.api.Assertions
 import java.util.concurrent.CancellationException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -25,7 +25,7 @@ class OperationTaskTest : BasePlatformTestCase() {
         val t = OperationTask("Test with Exception", project) { throw ex }
         val f = t.schedule<Any>()
 
-        assertThrows<NullPointerException>(ex.javaClass) { f.result() }
+        Assertions.assertThrows(ex.javaClass) { f.result() } // do not use assertThrows of the super class as the API has changed in IJ 2021.1
         assertFalse(f.isCancelled)
         assertTrue(f.isDone)
         assertTrue(f.isCompletedExceptionally)
