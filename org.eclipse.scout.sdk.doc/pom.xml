@@ -60,7 +60,6 @@
               <backend>html5</backend>
               <sourceDirectory>${project.basedir}/src/main/asciidoc</sourceDirectory>
               <attributes>
-                <git-branch>${project.scm.tag}</git-branch>
                 <doc-short-version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</doc-short-version>
                 <project-version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</project-version>
                 <icons>font</icons>
