@@ -5,7 +5,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
 
-@SuppressWarnings({"MethodMayBeStatic", "UtilityClassWithoutPrivateConstructor"})
+@SuppressWarnings({"MethodMayBeStatic", "UtilityClassWithoutPrivateConstructor", "squid:S1118"})
 public class PrintConstantValue {
 
   public static void main(String[] args) {

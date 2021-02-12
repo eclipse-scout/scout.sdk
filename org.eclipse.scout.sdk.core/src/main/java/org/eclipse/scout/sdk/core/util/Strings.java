@@ -864,7 +864,7 @@ public final class Strings {
    *          The literal with optional leading and ending quotes (single, double or backtick) or {@code null}.
    * @return the un-escaped string or {@code null} if the input is {@code null}.
    */
-  @SuppressWarnings("HardcodedLineSeparator")
+  @SuppressWarnings({"HardcodedLineSeparator", "squid:ForLoopCounterChangedCheck"})
   public static CharSequence fromStringLiteral(CharSequence literal) {
     if (literal == null) {
       return null;
@@ -938,14 +938,15 @@ public final class Strings {
           case '6':
           case '7':
             var escapeEnd = idx + 1;
-            while (escapeEnd < length && escapeEnd < idx + octalEscapeMaxLength && isOctalDigit(s.charAt(escapeEnd)))
+            while (escapeEnd < length && escapeEnd < idx + octalEscapeMaxLength && isOctalDigit(s.charAt(escapeEnd))) {
               escapeEnd++;
+            }
             try {
               //noinspection NumericCastThatLosesPrecision
               buffer.append((char) Integer.parseInt(s, idx, escapeEnd, 8));
             }
             catch (NumberFormatException e) {
-              throw new RuntimeException("Couldn't parse " + s.subSequence(idx, escapeEnd), e); // shouldn't happen
+              throw new IllegalStateException("Couldn't parse " + s.subSequence(idx, escapeEnd), e); // shouldn't happen
             }
             //noinspection AssignmentToForLoopParameter
             idx = escapeEnd - 1;
@@ -957,7 +958,9 @@ public final class Strings {
         escaped = false;
       }
     }
-    if (escaped) buffer.append('\\');
+    if (escaped) {
+      buffer.append('\\');
+    }
     return buffer;
   }
 
@@ -1003,7 +1006,7 @@ public final class Strings {
    *          Specifies if the resulting {@link CharSequence} should be surrounded with the stringDelimiter given.
    * @return the literal string or {@code null} if the input string is {@code null}.
    */
-  @SuppressWarnings("HardcodedLineSeparator")
+  @SuppressWarnings({"HardcodedLineSeparator", "squid:S881" /* -- operators should not be mixed with other operators */})
   public static CharSequence toStringLiteral(CharSequence s, CharSequence stringDelimiter, boolean surroundWithStringDelimiter) {
     if (s == null) {
       return null;
@@ -1058,6 +1061,7 @@ public final class Strings {
     return buffer;
   }
 
+  @SuppressWarnings("squid:S1067") // Reduce the number of conditional operators
   private static boolean isPrintableUnicode(char c) {
     var t = Character.getType(c);
     return t != Character.UNASSIGNED && t != Character.LINE_SEPARATOR && t != Character.PARAGRAPH_SEPARATOR
