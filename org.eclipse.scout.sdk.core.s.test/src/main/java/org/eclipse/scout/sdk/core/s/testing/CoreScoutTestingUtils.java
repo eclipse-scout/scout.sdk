@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,7 +81,7 @@ public final class CoreScoutTestingUtils {
     // The testing runner does not make use of the environment and the progress: pass empty mocks
     //noinspection AccessOfSystemProperties
     ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", System.getProperty("java.specification.version"),
-        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, currentSdkVersion(), mock(IEnvironment.class), mock(IProgress.class));
+        ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, archetypeVersion(), mock(IEnvironment.class), mock(IProgress.class));
     return targetDirectory;
   }
 
@@ -91,8 +91,11 @@ public final class CoreScoutTestingUtils {
    *         The SDK version uses more number segments to fulfill the OSGi version requirements. While
    *         {@code 11.0-SNAPSHOT} is valid maven version for OSGi at least three numbers are required. Therefore
    *         {@code 11.0.0-SNAPSHOT} is the matching SDK version.
+   *         <p>
+   *         Furthermore there is no SDK for Scout RT 22. Instead still SDK 11 is returned. This might change in the
+   *         future when the archetypes are moved to the RT git repo.
    */
-  public static String currentSdkVersion() {
+  static String archetypeVersion() {
     // do not compute sdk version based on maven module. This version would always be the same.
     // instead derive it from the Scout RT version which might be modified using parameters.
     return rtToSdkVersion(currentScoutVersion());
@@ -101,6 +104,10 @@ public final class CoreScoutTestingUtils {
   static String rtToSdkVersion(CharSequence rtVersion) {
     var version = ApiVersion.parse(rtVersion).orElseThrow(() -> newFail("Invalid Scout RT version '{}'.", rtVersion));
     var numberSegments = version.segments();
+    if (numberSegments[0] > 11) { // e.g. Scout RT 22.0-SNAPSHOT
+      // there is no SDK 22 matching RT 22. Instead the latest SDK 11 is used
+      return new ApiVersion("-SNAPSHOT", 11, 0, 0).asString();
+    }
     if (numberSegments.length < 2) {
       numberSegments = new int[]{numberSegments[0], 0};
     }
