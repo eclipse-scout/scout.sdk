@@ -143,9 +143,9 @@ Only the default Java bootstrap classpath is available.
 
 ===== Annotation
 
-The `org.eclipse.scout.sdk.core.model.api.IAnnotation` represents a Java annotation which may be present on any `IAnnotatable` element (<<Members>>, `IMethodParameter`, `IPackage`).
+The `org.eclipse.scout.sdk.core.model.api.IAnnotation` represents a Java annotation which may be present on any `IAnnotatable` element (<<Member>>, `IMethodParameter`, `IPackage`).
 
-It may contain `IAnnotationElement` instances in case the annotation has attributes. `IAnnotationElement` instances have a value of type `IMetaValue` which corresponds to a compile-time constant (see <<Constants>>).
+It may contain `IAnnotationElement` instances in case the annotation has attributes. `IAnnotationElement` instances have a value of type `IMetaValue` which corresponds to a compile-time constant (see <<Constant Values>>).
 
 Annotations can be wrapped with a typed annotation model simplifying the access to annotation element values as shown in <<source-annoation-element-values>>.
 
@@ -377,7 +377,7 @@ public class CharSequenceList extends AbstractList<CharSequence> implements Seri
 ----
 <1> Imports are created automatically.
 In the created source simple qualification is used where ever possible.
-<2> Here the method signature has been derived from the super class, and the type arguments have automatically been substituted.
+<2> Here the method signature has been derived from the super class and the type arguments have automatically been substituted.
 <3> As there is a super method available, the generator automatically includes a valid body.
 <4> The method body as created by the `IMethodBodyBuilder<?>` of `buildGetMethodBody`.
 
@@ -473,7 +473,7 @@ image::apidef.png[API definition]
 
 The main entry point to retrieve an API definition is the `org.eclipse.scout.sdk.core.apidef.Api` class.
 It allows to create a definition (`create` method) or to get the version of a specific API (`version` method).
-Both methods take the type of API as class (of type `IApiSpecification`), and an `IJavaEnvironment` defining the classpath to search in.
+Both methods take the type of API as class (of type `IApiSpecification`) and an `IJavaEnvironment` defining the classpath to search in.
 The `Api` class will then search for an `IApiProvider` accepting the class given and will use this provider to detect which version of this API is available in the `IJavaEnvironment`.
 It is therefore the responsibility of the provider to implement the required logic which detects the API version available within a given classpath (`IJavaEnvironment`).
 
@@ -511,7 +511,7 @@ include::{codedir}/OptionalApiSample.java[tags=optionalApiSample]
 <1> The method is only called if the `Java9Api` is available.
 
 NOTE:  The `Java9Api` does not need to re-implement the `longClassName` or `stringClassName` methods as these are already part of the `Java8Api`.
-So for a Java 9 classpath the resulting API definition contains both specifications, and it is sufficient if a method is only implemented on one specification available.
+So for a Java 9 classpath the resulting API definition contains both specifications and it is sufficient if a method is only implemented on one specification available.
 This eliminates redundant code as a new API specification may only contain the changes to the previous one.
 
 ====== Using API Definitions in Generators
@@ -532,9 +532,9 @@ include::{codedir}/GeneratorWithApiSample.java[tags=generatorWithApi]
 
 The `org.eclipse.scout.sdk.core.s` module uses the concepts of the `core` module discussed in the previous chapter to create Scout specific elements:
 
-* Annotations (see <<Annotations>>) like `ClassIdAnnotation`, `FormDataAnnotation` or `OrderAnnotation` to parse Scout annotation more conveniently.
-* Source builders (see <<Source Builders>>) like `ScoutMethodBodyBuilder` which add Scout specific source fragments like `BEANS.get(Class)` calls.
-* Generators (see <<Generators>>) for various Scout elements like `CodeTypeGenerator`, `FormGenerator`, `ScoutAnnotationGenerator` or `LookupCallGenerator`.
+* Annotations (see <<Annotation>>) like `ClassIdAnnotation`, `FormDataAnnotation` or `OrderAnnotation` to parse Scout annotation more conveniently.
+* Source builders (see <<Source Builder>>) like `ScoutMethodBodyBuilder` which add Scout specific source fragments like `BEANS.get(Class)` calls.
+* Generators (see <<Generator>>) for various Scout elements like `CodeTypeGenerator`, `FormGenerator`, `ScoutAnnotationGenerator` or `LookupCallGenerator`.
 
 The module introduces some new concept too (orange in <<img-architecture>>).
 These are explained in the next sections.
@@ -572,9 +572,9 @@ Requires implementing `IDefaultElementCommentGeneratorSpi` and activating using 
 * MavenRunner: Specifies the runner to use when executing Maven commands.
 Requires implementing `IMavenRunnerSpi` and activating it using `MavenRunner#set`.
 * `UniqueIds`: A registry of data type dependent id providers to be used when a unique id is required in generated source code.
-* Environment: A strategy that must be implemented to execute operations (see <<Operations>>).
+* Environment: A strategy that must be implemented to execute operations (see <<Operation>>).
 Only an interface is provided.
-* `ClassIds`: A registry of class name dependent @ClassId providers.
+* `ClassIds`: A registry of @ClassId providers.
 By default, a random UUID provider is registered but others may be added.
 * `TranslationStoreSupplier`: A registry of `ITranslationStoreSupplier` implementations.
 Such classes can discover and load Scout text provider services in a given scope.
