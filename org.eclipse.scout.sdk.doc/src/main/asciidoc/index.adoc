@@ -485,7 +485,7 @@ The following example should clarify the process:
 . The `Api` class retrieves the provider for `IJavaApi` which as been registered before.
 It gets the `JavaApiProvider` and calls the `version` method.
 . The `JavaApiProvider` detects the Java version used in the environment and returns `8`.
-. The `Api` class know knows that the `IJavaApi` is available and uses version `8`.
+. The `Api` class now knows that the `IJavaApi` is available and uses version `8`.
 It then asks the provider for all known `IApiSpecification` classes which results in `Java8Api` and `Java9Api`.
 . It creates an instance of the `ApiSpecification` class and passes the version and the two known specifications.
 . The `ApiSpecification` reads the `ApiLevel` annotation of the two specification classes and discards all which have a level higher than the version requested.
