@@ -86,27 +86,26 @@ public final class CoreScoutTestingUtils {
   }
 
   /**
-   * @return The SDK version that belongs to the {@link #currentScoutVersion()}.
+   * @return The archetype version that belongs to the {@link #currentScoutVersion()}.
    *         <p>
-   *         The SDK version uses more number segments to fulfill the OSGi version requirements. While
-   *         {@code 11.0-SNAPSHOT} is valid maven version for OSGi at least three numbers are required. Therefore
-   *         {@code 11.0.0-SNAPSHOT} is the matching SDK version.
+   *         The archetype version for numbers <= 11 is based on the SDK version which uses more number segments to
+   *         fulfill the OSGi version requirements. While {@code 11.0-SNAPSHOT} is valid maven version, for OSGi at
+   *         least three numbers are required. Therefore {@code 11.0.0-SNAPSHOT} is the matching SDK version.
    *         <p>
-   *         Furthermore there is no SDK for Scout RT 22. Instead still SDK 11 is returned. This might change in the
-   *         future when the archetypes are moved to the RT git repo.
+   *         For versions > 11 the archetypes use the same version schema as the RT.
    */
   static String archetypeVersion() {
     // do not compute sdk version based on maven module. This version would always be the same.
     // instead derive it from the Scout RT version which might be modified using parameters.
-    return rtToSdkVersion(currentScoutVersion());
+    return rtToArchetypeVersion(currentScoutVersion());
   }
 
-  static String rtToSdkVersion(CharSequence rtVersion) {
+  static String rtToArchetypeVersion(String rtVersion) {
     var version = ApiVersion.parse(rtVersion).orElseThrow(() -> newFail("Invalid Scout RT version '{}'.", rtVersion));
     var numberSegments = version.segments();
     if (numberSegments[0] > 11) { // e.g. Scout RT 22.0-SNAPSHOT
-      // there is no SDK 22 matching RT 22. Instead the latest SDK 11 is used
-      return new ApiVersion("-SNAPSHOT", 11, 0, 0).asString();
+      // For Scout RT version > 11 the archetype version uses the same version schema as the RT
+      return rtVersion;
     }
     if (numberSegments.length < 2) {
       numberSegments = new int[]{numberSegments[0], 0};
