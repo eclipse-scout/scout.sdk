@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,7 @@
 package org.eclipse.scout.sdk.s2i.nls
 
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -29,9 +27,9 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.translationStoreStackCache
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
+import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.moduleDirPath
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
-import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.nio.file.Path
 
 object TranslationStoreStackLoader {
@@ -120,8 +118,7 @@ object TranslationStoreStackLoader {
 
         val start = System.currentTimeMillis()
         return try {
-            val indicator = ProgressManager.getInstance().progressIndicator ?: EmptyProgressIndicator()
-            callInIdeaEnvironmentSync(project, indicator.toScoutProgress()) { e, p ->
+            callInIdeaEnvironmentSync(project, IdeaProgress.currentOrEmpty()) { e, p ->
                 computeInReadAction(project, progress = p.indicator) {
                     TranslationStores.createStack(modulePath, e, p, scope).orElse(null)
                 }

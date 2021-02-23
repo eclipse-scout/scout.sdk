@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,15 +12,22 @@ package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
 import org.eclipse.scout.sdk.core.log.MessageFormatter.arrayFormat
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.util.Strings
+import org.eclipse.scout.sdk.s2i.toScoutProgress
 
 open class IdeaProgress(indicator: ProgressIndicator?) : IProgress {
 
     companion object {
         fun empty() = IdeaProgress(null)
+
+        fun currentOrEmpty(): IdeaProgress {
+            val indicator = ProgressManager.getInstance().progressIndicator ?: EmptyProgressIndicator()
+            return indicator.toScoutProgress()
+        }
     }
 
     val indicator = indicator ?: EmptyProgressIndicator()

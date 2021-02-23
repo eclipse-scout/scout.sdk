@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import com.intellij.codeInspection.reference.RefEntity
 import com.intellij.codeInspection.reference.RefModule
 import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.rootManager
@@ -39,6 +38,7 @@ import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
+import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import java.nio.file.Path
 import kotlin.streams.asSequence
 
@@ -112,8 +112,7 @@ open class UnusedTranslationInspection : GlobalInspectionTool() {
     }
 
     protected fun getAllTranslationKeysIn(scope: SearchScope, project: Project): MutableMap<String, ITranslationStore> {
-        val indicator = ProgressManager.getInstance().progressIndicator ?: EmptyProgressIndicator()
-        return callInIdeaEnvironmentSync(project, indicator.toScoutProgress()) { e, p ->
+        return callInIdeaEnvironmentSync(project, IdeaProgress.currentOrEmpty()) { e, p ->
             getAllTranslationKeysIn(scope, project, e, p)
         }
     }
