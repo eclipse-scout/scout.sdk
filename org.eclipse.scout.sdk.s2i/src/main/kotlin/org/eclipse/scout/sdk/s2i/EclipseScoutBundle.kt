@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.s2i
 import com.intellij.AbstractBundle
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
+import com.intellij.ui.IconManager
+import com.intellij.util.IconUtil
 import org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener
 import org.eclipse.scout.sdk.s2i.classid.ClassIdCache
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
@@ -26,6 +28,8 @@ import org.jetbrains.annotations.PropertyKey
 private const val RESOURCE_BUNDLE = "messages.EclipseScoutBundle"
 
 object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
+
+    val ScoutIcon = load("/META-INF/pluginIcon.svg")
 
     @Nls
     fun message(@PropertyKey(resourceBundle = RESOURCE_BUNDLE) key: String, vararg params: Any): String =
@@ -45,4 +49,8 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
     fun jsModuleCache(project: Project): JsModuleCacheImplementor =
             ServiceManager.getService(project, JsModuleCacheImplementor::class.java)
+
+    fun scoutIcon(size: Int) = IconUtil.scale(ScoutIcon, null, size / ScoutIcon.iconWidth.toFloat())
+
+    private fun load(path: String) = IconManager.getInstance().getIcon(path, EclipseScoutBundle::class.java)
 }

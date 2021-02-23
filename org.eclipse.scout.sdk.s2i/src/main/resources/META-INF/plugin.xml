@@ -66,7 +66,7 @@
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.nls.IdeaTranslationStoreSupplier"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator"/>
-    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaMavenRunner"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.maven.IdeaMavenRunner"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdStartup"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerStartup"/>
     <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener"/>
@@ -102,11 +102,15 @@
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.java.DescendantAbstractClassesEnumMacro"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.java.PsiExpressionEnumMacro"/>
+    <moduleBuilder builderClass="org.eclipse.scout.sdk.s2i.project.ScoutModuleBuilder"/>
     <intentionAction order="first">
       <className>org.eclipse.scout.sdk.s2i.nls.intention.TranslationEditIntention</className>
       <bundleName>messages.EclipseScoutBundle</bundleName>
       <category>Scout</category>
     </intentionAction>
+  </extensions>
+  <extensions defaultExtensionNs="org.jetbrains.idea.maven">
+    <archetypesProvider implementation="org.eclipse.scout.sdk.s2i.maven.ScoutArchetypesProvider"/>
   </extensions>
 
   <actions>
