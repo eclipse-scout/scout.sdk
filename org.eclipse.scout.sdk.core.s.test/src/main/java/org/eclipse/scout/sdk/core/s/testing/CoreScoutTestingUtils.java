@@ -284,7 +284,7 @@ public final class CoreScoutTestingUtils {
     ensureMavenRunnerCreated();
     var build = new MavenBuild()
         .withWorkingDirectory(pomDir)
-        .withOption(MavenBuild.OPTION_BATCH_MODE)
+        .withProperty(MavenBuild.PROPERTY_INTERACTIVE_MODE, "false")
         .withOption(MavenBuild.OPTION_DEBUG);
     if (goals != null && goals.length > 0) {
       for (var goal : goals) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,13 +31,21 @@ import org.eclipse.scout.sdk.core.util.Ensure;
  */
 public class MavenBuild {
 
-  public static final char OPTION_BATCH_MODE = 'B';
+  public static final String GOAL_ARCHETYPE_GENERATE = "archetype:generate";
+
   public static final char OPTION_DEBUG = 'X';
   public static final char OPTION_UPDATE_SNAPSHOTS = 'U';
   public static final char OPTION_OFFLINE = 'o';
   public static final char OPTION_NON_RECURSIVE = 'N';
+
+  public static final String PROPERTY_INTERACTIVE_MODE = "interactiveMode"; // batch mode
   public static final String PROPERTY_SKIP_TESTS = "skipTests";
   public static final String PROPERTY_SKIP_TEST_CREATION = "maven.test.skip";
+  public static final String PROPERTY_ARCHETYPE_GROUP_ID = "archetypeGroupId";
+  public static final String PROPERTY_ARCHETYPE_ARTIFACT_ID = "archetypeArtifactId";
+  public static final String PROPERTY_ARCHETYPE_VERSION = "archetypeVersion";
+  public static final String PROPERTY_PACKAGE = "package";
+
   private final Set<String> m_goals;
   private final Map<String, String> m_properties;
   private final Set<String> m_options;

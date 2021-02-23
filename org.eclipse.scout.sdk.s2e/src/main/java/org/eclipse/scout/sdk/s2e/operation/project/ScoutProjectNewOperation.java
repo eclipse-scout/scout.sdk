@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,25 +67,9 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
   @Override
   public void accept(EclipseEnvironment env, EclipseProgress progress) {
     try {
-      // get archetype settings
-      var bundleContext = S2ESdkActivator.getDefault().getBundle().getBundleContext();
-      var version = bundleContext.getProperty(TEMPLATE_VERSION);
-      if (Strings.isBlank(version)) {
-        version = null; // will use the latest
-      }
-
-      String artifactId;
-      if (isUseJsClient()) {
-        artifactId = ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
-      }
-      else {
-        artifactId = ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID;
-      }
-
       // create project on disk (using archetype)
       progress.init(100, toString());
-      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), getDefaultWorkspaceJavaVersion(),
-          ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, artifactId, version, env, progress.newChild(5));
+      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), isUseJsClient(), getDefaultWorkspaceJavaVersion(), env, progress.newChild(5));
 
       // import into workspace
       m_createdProjects = importIntoWorkspace(progress.newChild(90));
@@ -93,7 +77,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
       // format all compilation units with current workspace settings
       formatCreatedProjects(progress.newChild(5));
     }
-    catch (IOException | CoreException e) {
+    catch (Exception e) {
       throw new SdkException("Unable to create Scout Project.", e);
     }
   }

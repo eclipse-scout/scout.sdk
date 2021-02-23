@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -135,15 +135,15 @@ public final class JaxWsModuleNewHelper {
     try {
       var archetypeBuild = new MavenBuild()
           .withWorkingDirectory(tempDirectory)
-          .withGoal("archetype:generate")
-          .withOption(MavenBuild.OPTION_BATCH_MODE)
-          .withProperty("archetypeGroupId", ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID)
-          .withProperty("archetypeArtifactId", ScoutProjectNewHelper.SCOUT_ARCHETYPES_JAXWS_MODULE_ID)
-          .withProperty("archetypeVersion", scoutVersionOfModule(targetModulePomFile, env))
-          .withProperty("groupId", groupId)
-          .withProperty("artifactId", artifactId)
-          .withProperty("version", version)
-          .withProperty("package", "not.used") // we must specify a package value, but this variable is not used by the archetype
+          .withGoal(MavenBuild.GOAL_ARCHETYPE_GENERATE)
+          .withProperty(MavenBuild.PROPERTY_INTERACTIVE_MODE, "false")
+          .withProperty(MavenBuild.PROPERTY_ARCHETYPE_GROUP_ID, ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID)
+          .withProperty(MavenBuild.PROPERTY_ARCHETYPE_ARTIFACT_ID, ScoutProjectNewHelper.SCOUT_ARCHETYPES_JAXWS_MODULE_ID)
+          .withProperty(MavenBuild.PROPERTY_ARCHETYPE_VERSION, scoutVersionOfModule(targetModulePomFile, env))
+          .withProperty(IMavenConstants.GROUP_ID, groupId)
+          .withProperty(IMavenConstants.ARTIFACT_ID, artifactId)
+          .withProperty(IMavenConstants.VERSION, version)
+          .withProperty(MavenBuild.PROPERTY_PACKAGE, "not.used") // package value must be specified, but this variable is not used by the archetype
           .withProperty("displayName", displayName)
           .withProperty("parentArtifactId", parentArtifactId);
 
