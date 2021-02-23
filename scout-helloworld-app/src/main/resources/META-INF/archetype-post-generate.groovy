@@ -84,8 +84,6 @@ static def generateKeyPairSafe() {
     }
     catch (GeneralSecurityException e) {
         log(e.message)
-        System.err.println(e.message)
-        e.printStackTrace()
         String keyPlaceholder = "TODO_use_org.eclipse.scout.rt.platform.security.SecurityUtility.main(String[])"
         String[] fallback = new String[2]
         fallback[0] = keyPlaceholder
