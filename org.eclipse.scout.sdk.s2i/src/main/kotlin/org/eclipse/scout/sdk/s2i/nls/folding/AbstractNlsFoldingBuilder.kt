@@ -37,7 +37,7 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
         const val FOLDING_MAX_LEN = 100
 
         /**
-         * Visible placholder text max length (without surrounding [PLACEHOLDER_START_CHAR] and [PLACEHOLDER_END_CHAR]
+         * Visible placeholder text max length (without surrounding [PLACEHOLDER_START_CHAR] and [PLACEHOLDER_END_CHAR]
          */
         const val PLACEHOLDER_MAX_LEN = 60
         const val PLACEHOLDER_START_CHAR = '{'
