@@ -185,7 +185,7 @@
                 <goals>
                   <goal>replace</goal>
                 </goals>
-                <phase>generate-resources</phase>
+                <phase>initialize</phase>
                 <configuration>
                   <basedir>${project.basedir}/src/main/resources/archetype-resources</basedir>
                   <includes>
@@ -202,7 +202,7 @@
                 <goals>
                   <goal>replace</goal>
                 </goals>
-                <phase>generate-resources</phase>
+                <phase>initialize</phase>
                 <configuration>
                   <basedir>${project.basedir}/src/main/resources/archetype-resources</basedir>
                   <includes>

@@ -1171,7 +1171,7 @@
                 <goals>
                   <goal>replace</goal>
                 </goals>
-                <phase>generate-resources</phase>
+                <phase>initialize</phase>
                 <configuration>
                   <basedir>${project.basedir}</basedir>
                   <includes>
