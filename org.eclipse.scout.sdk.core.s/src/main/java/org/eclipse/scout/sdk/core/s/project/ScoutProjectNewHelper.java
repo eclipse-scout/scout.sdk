@@ -10,10 +10,15 @@
  */
 package org.eclipse.scout.sdk.core.s.project;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+
+import javax.xml.transform.TransformerException;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -25,6 +30,9 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.core.util.Xml;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * <h3>{@link ScoutProjectNewHelper}</h3>
@@ -115,6 +123,52 @@ public final class ScoutProjectNewHelper {
 
     // execute archetype generation
     MavenRunner.execute(archetypeBuild, env, progress);
+
+    postProcessRootPom(workingDir.resolve(artifactId));
+  }
+
+  /**
+   * Workaround so that only the parent module is referenced in the root (remove non-parent modules).<br>
+   * Otherwise maven returns errors like
+   * {@code org.apache.maven.project.DuplicateProjectException: Project 'xyz' is duplicated
+   * in the reactor}.
+   */
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+  static void postProcessRootPom(Path targetDirectory) throws IOException {
+    try {
+      var pom = targetDirectory.resolve(IMavenConstants.POM);
+      if (!Files.isReadable(pom) || !Files.isRegularFile(pom)) {
+        return;
+      }
+
+      var doc = Xml.get(pom);
+      var modules = Xml.firstChildElement(doc.getDocumentElement(), IMavenConstants.MODULES).get();
+      var childNodes = modules.getChildNodes();
+      var targetDirectoryName = targetDirectory.getFileName().toString();
+      var nodesToRemove = IntStream.range(0, childNodes.getLength())
+          .mapToObj(childNodes::item)
+          .filter(n -> isNodeToRemove(n, targetDirectoryName))
+          .collect(toList());
+      nodesToRemove.forEach(modules::removeChild);
+
+      Ensure.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");
+      Xml.writeDocument(doc, true, pom);
+    }
+    catch (TransformerException e) {
+      throw new IOException(e);
+    }
+  }
+
+  static boolean isNodeToRemove(Node n, String targetDirectoryName) {
+    if (n == null) {
+      return false;
+    }
+    if (n.getNodeType() == Node.TEXT_NODE) {
+      return true;
+    }
+    return n.getNodeType() == Node.ELEMENT_NODE
+        && IMavenConstants.MODULE.equals(((Element) n).getTagName())
+        && !targetDirectoryName.equals(n.getTextContent().trim());
   }
 
   static String getArtifactName(String artifactId) {
