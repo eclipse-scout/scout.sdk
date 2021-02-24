@@ -73,11 +73,14 @@ static def renameFile(File file, String newName) {
     }
 }
 
-static def writeDbPassword(File appDevModuleFile) {
+def writeDbPassword(File appDevModuleFile) {
+    log('Generate random password for dev db')
     Path dbConfig = new File(appDevModuleFile, 'src/main/resources/dev.db.config.properties').toPath()
     byte[] rnd = new byte[32]
     new SecureRandom().nextBytes(rnd)
     String pwd = new BigInteger(1, rnd).toString(32)
+
+    log('replace password in dev.db.config.properties')
     String content = Files.readString(dbConfig, StandardCharsets.UTF_8).replace('changeme', pwd)
     Files.writeString(dbConfig, content, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)
 }

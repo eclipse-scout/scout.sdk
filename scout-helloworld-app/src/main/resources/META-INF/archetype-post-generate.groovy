@@ -72,7 +72,7 @@ static def renameFile(File file, String newName) {
     }
 }
 
-static def writeKeyPair(File serverModuleDir, File uiModuleDir) {
+def writeKeyPair(File serverModuleDir, File uiModuleDir) {
     String[] keyPair = generateKeyPairSafe()
     String configPropertiesPath = 'src/main/resources/config.properties'
 
@@ -88,7 +88,7 @@ static def replaceIn(Path file, String search, String replace) {
     Files.writeString(file, content, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)
 }
 
-static def generateKeyPairSafe() {
+def generateKeyPairSafe() {
     try {
         return generateKeyPair()
     }
