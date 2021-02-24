@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -133,5 +143,5 @@ def log(String message) {
     }
     SimpleDateFormat format = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
     message = format.format(new Date()) + ' ' + message + '\n'
-    new File('archetype-log.txt').append(message as Object, StandardCharsets.UTF_8.name(), false)
+    new File('archetype-log.txt').append(message)
 }
