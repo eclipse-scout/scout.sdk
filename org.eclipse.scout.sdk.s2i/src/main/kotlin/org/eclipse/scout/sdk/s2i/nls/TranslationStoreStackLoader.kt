@@ -57,7 +57,7 @@ object TranslationStoreStackLoader {
 
         override fun onThrowable(error: Throwable) {
             val handler = m_errorHandler ?: { SdkLog.error("Error computing texts for module '{}'.", module.name, it) }
-            handler.invoke(error)
+            handler(error)
         }
     }
 

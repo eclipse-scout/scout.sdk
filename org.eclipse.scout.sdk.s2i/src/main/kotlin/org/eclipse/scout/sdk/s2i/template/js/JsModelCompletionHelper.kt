@@ -141,7 +141,7 @@ object JsModelCompletionHelper {
                 .withIcon(icon)
         tailText?.let { element = element.withTailText(" ($it)", true) }
         if (isTemplateRequired) {
-            element = element.withInsertHandler { context, _ -> startTemplate(context.editor, prefix, templateProvider.invoke()) }
+            element = element.withInsertHandler { context, _ -> startTemplate(context.editor, prefix, templateProvider()) }
             element.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
         }
         element.putUserData(SELECTED_ELEMENT, modelElement)
@@ -228,7 +228,7 @@ object JsModelCompletionHelper {
         if (TemplateImpl.INTERNAL_VARS_SET.contains(name)) {
             return
         }
-        val defaultValue = Strings.toStringLiteral(defaultValueProvider.invoke(name)).toString()
+        val defaultValue = Strings.toStringLiteral(defaultValueProvider(name)).toString()
         target.addVariable(name, descriptor.expression, defaultValue, true)
     }
 

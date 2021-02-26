@@ -107,7 +107,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
                 .asSequence()
                 .map { it.entries }
                 .flatten()
-                .filter { nullSafeFilter.invoke(it) }
+                .filter { nullSafeFilter(it) }
                 .groupBy({ it.value }, { it.key })
     }
 

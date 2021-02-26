@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,12 +41,12 @@ open class OperationTask(title: String, project: Project, private val transactio
         if (transactionManager == null) {
             // new independent top level transaction
             callInNewTransaction(project, title, { scoutProgress.newChild(workForCommit) }) {
-                task.invoke(scoutProgress.newChild(workForTask))
+                task(scoutProgress.newChild(workForTask))
             }
         } else {
             // new asynchronous task running in existing parent transaction
             callInExistingTransaction(transactionManager) {
-                task.invoke(scoutProgress.newChild(workForTask))
+                task(scoutProgress.newChild(workForTask))
             }
         }
     }

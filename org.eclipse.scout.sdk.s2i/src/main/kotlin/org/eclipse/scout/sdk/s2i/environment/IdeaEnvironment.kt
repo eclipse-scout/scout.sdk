@@ -57,7 +57,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
          */
         fun <T> callInIdeaEnvironmentSync(project: Project, progressIndicator: IdeaProgress, task: (IdeaEnvironment, IdeaProgress) -> T): T =
                 IdeaEnvironment(project).use {
-                    return task.invoke(it, progressIndicator)
+                    return task(it, progressIndicator)
                 }
 
         /**
@@ -69,7 +69,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
             val name = Strings.notBlank(title).orElseGet { toStringIfOverwritten(task).orElse(message("unnamed.task.x", task)) }
             val job = OperationTask(name, project) { progress ->
                 callInIdeaEnvironmentSync(project, progress) { e, p ->
-                    result.setIfAbsent(task.invoke(e, p))
+                    result.setIfAbsent(task(e, p))
                 }
             }
             return job.schedule({ result.get() })
@@ -92,7 +92,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
             if (ApplicationManager.getApplication().isReadAccessAllowed) {
                 // already in read action: don't submit non-blocking read-action (could end up in a dead-lock). Instead directly execute
                 // also don't repeat until indexes are ready. If here the read-lock is already held, it must be released so that the dump mode can end
-                return resolvedCancellablePromise(callable.invoke())
+                return resolvedCancellablePromise(callable())
             }
 
             var action = ReadAction.nonBlocking(callable).expireWith(project)

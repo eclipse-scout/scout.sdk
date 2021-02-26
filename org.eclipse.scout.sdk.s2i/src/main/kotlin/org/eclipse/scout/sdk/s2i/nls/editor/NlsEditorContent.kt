@@ -434,9 +434,9 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
                 return
             }
             if (stores.size == 1) {
-                stores[0]?.let { task.invoke(it).actionPerformed(e) }
+                stores[0]?.let { task(it).actionPerformed(e) }
             } else {
-                val popupActions = stores.map { task.invoke(it) }
+                val popupActions = stores.map { task(it) }
                 val group = DefaultActionGroup(popupActions)
                 val popup = JBPopupFactory.getInstance().createActionGroupPopup(groupTitle, group, e.dataContext, JBPopupFactory.ActionSelectionAid.ALPHA_NUMBERING, false)
                 popup.showUnderneathOf(e.inputEvent.component)

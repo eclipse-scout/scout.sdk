@@ -109,7 +109,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
         }
 
         val adapter = templateDescriptor.variable(name) ?: throw newFail("Variable '{}' is used in the template source but not declared in the template descriptor.", name)
-        val descriptor = adapter.invoke(m_engine) ?: return
+        val descriptor = adapter(m_engine) ?: return
         target.addVariable(descriptor.name, descriptor.expression, descriptor.defaultValueExpression, true)
     }
 
@@ -138,7 +138,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
                     return start
                 }
             }
-            return positionSupplier.invoke()
+            return positionSupplier()
         }
 
         private fun resetTemporarySettings() {

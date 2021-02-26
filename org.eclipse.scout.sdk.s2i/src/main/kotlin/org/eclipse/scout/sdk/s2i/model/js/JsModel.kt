@@ -172,7 +172,7 @@ class JsModel {
         superElements.addLast(modelElement)
         while (superElements.isNotEmpty()) {
             val element = superElements.removeFirst()
-            val continueVisiting = visitor.invoke(element)
+            val continueVisiting = visitor(element)
             if (!continueVisiting) {
                 return true // early abort
             }

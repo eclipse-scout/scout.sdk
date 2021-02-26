@@ -97,7 +97,7 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
             val created = dialog.createdTranslation() ?: return
             callInIdeaEnvironment(project, message("store.new.translation")) { env, progress ->
                 stack.flush(env, progress)
-                m_saveTasks.forEach { it.invoke(created, env, progress) }
+                m_saveTasks.forEach { it(created, env, progress) }
             }
         }
     }

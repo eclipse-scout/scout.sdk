@@ -52,7 +52,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
          */
         fun runInNewTransaction(project: Project, name: String? = null, progressProvider: () -> IdeaProgress = { IdeaProgress.empty() }, runnable: () -> Unit) {
             callInNewTransaction(project, name, progressProvider) {
-                runnable.invoke()
+                runnable()
             }
         }
 
@@ -73,7 +73,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
                 result = callInExistingTransaction(transactionManager, callable)
                 save = true
             } finally {
-                transactionManager.finishTransaction(save, progressProvider.invoke())
+                transactionManager.finishTransaction(save, progressProvider())
             }
             return result
         }
@@ -145,11 +145,11 @@ class TransactionManager constructor(val project: Project, val transactionName: 
                     return if (readAccessAllowed) {
                         // we can't wait for smart mode to begin (it would result in a deadlock)
                         // so let's just pretend it's already smart and fail with IndexNotReadyException if not
-                        callable.invoke()
+                        callable()
                     } else {
                         dumbService.waitForSmartMode()
                         ProgressManager.checkCanceled()
-                        callable.invoke()
+                        callable()
                     }
                 } catch (e: RuntimeException) {
                     val rootException = unwrap(e)

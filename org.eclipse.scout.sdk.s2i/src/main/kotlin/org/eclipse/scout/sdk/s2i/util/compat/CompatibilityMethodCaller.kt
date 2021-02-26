@@ -39,13 +39,13 @@ class CompatibilityMethodCaller<T> {
 
     fun invoke(vararg arguments: Any?): T {
         val (selectedDescriptor, methodCallable) = m_selectedDescriptorWithCallable
-        return selectedDescriptor.handler.invoke(ResolvedMethod(selectedDescriptor, methodCallable, *arguments))
+        return selectedDescriptor.handler(ResolvedMethod(selectedDescriptor, methodCallable, *arguments))
     }
 
     class ResolvedMethod<R>(val descriptor: MethodDescriptor<R>, private val callable: (Any?, Array<out Any?>) -> R, vararg val args: Any?) {
 
         fun invoke(obj: Any?, vararg parameters: Any?) = try {
-            callable.invoke(obj, parameters)
+            callable(obj, parameters)
         } catch (e: InvocationTargetException) {
             throw e.targetException
         }
