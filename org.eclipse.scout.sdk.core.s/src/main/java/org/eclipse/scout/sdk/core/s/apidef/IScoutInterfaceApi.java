@@ -72,6 +72,7 @@ public interface IScoutInterfaceApi {
   IClientSession IClientSession();
 
   interface IClientSession extends IClassNameSupplier {
+    String getDesktopMethodName();
   }
 
   ICode ICode();
@@ -84,7 +85,9 @@ public interface IScoutInterfaceApi {
 
   interface ICodeType extends IClassNameSupplier {
     int codeTypeIdTypeParamIndex();
+
     int codeIdTypeParamIndex();
+
     String getIdMethodName();
   }
 
@@ -92,7 +95,9 @@ public interface IScoutInterfaceApi {
 
   interface ITableBeanHolder extends IClassNameSupplier {
     String addRowMethodName();
+
     String getRowTypeMethodName();
+
     String getRowsMethodName();
   }
 
@@ -124,6 +129,12 @@ public interface IScoutInterfaceApi {
   interface IContextMenuOwner extends IClassNameSupplier {
   }
 
+  IDataChangeObserver IDataChangeObserver();
+
+  interface IDataChangeObserver extends IClassNameSupplier {
+    String registerDataChangeListenerMethodName();
+  }
+
   IDataModelAttribute IDataModelAttribute();
 
   interface IDataModelAttribute extends IClassNameSupplier {
@@ -152,6 +163,7 @@ public interface IScoutInterfaceApi {
   IDesktop IDesktop();
 
   interface IDesktop extends IClassNameSupplier {
+    String dataChangedMethodName();
   }
 
   IDesktopExtension IDesktopExtension();
@@ -163,6 +175,7 @@ public interface IScoutInterfaceApi {
 
   interface IExtension extends IClassNameSupplier {
     int ownerTypeParamIndex();
+
     String getOwnerMethodName();
   }
 
@@ -180,8 +193,12 @@ public interface IScoutInterfaceApi {
 
   interface IForm extends IClassNameSupplier {
     String getFieldByClassMethodName();
+
     String exportFormDataMethodName();
+
     String importFormDataMethodName();
+
+    String startMethodName();
   }
 
   IFormExtension IFormExtension();
@@ -263,6 +280,10 @@ public interface IScoutInterfaceApi {
 
   interface ILookupService extends IClassNameSupplier {
     int keyTypeTypeParamIndex();
+
+    String getDataByKeyMethodName();
+
+    String getDataByTextMethodName();
   }
 
   IMenu IMenu();
@@ -273,6 +294,14 @@ public interface IScoutInterfaceApi {
   IMenuType IMenuType();
 
   interface IMenuType extends IClassNameSupplier {
+  }
+
+  IMessageBox IMessageBox();
+
+  interface IMessageBox extends IClassNameSupplier {
+    String showMethodName();
+
+    String withHeaderMethodName();
   }
 
   IMode IMode();
@@ -298,6 +327,7 @@ public interface IScoutInterfaceApi {
   IPage IPage();
 
   interface IPage extends IClassNameSupplier {
+    String initPageMethodName();
   }
 
   IPageWithNodes IPageWithNodes();
@@ -374,6 +404,8 @@ public interface IScoutInterfaceApi {
 
   interface ITable extends IClassNameSupplier {
     String getColumnSetMethodName();
+
+    String getSelectedRowCountMethodName();
   }
 
   ITableControl ITableControl();
@@ -429,6 +461,7 @@ public interface IScoutInterfaceApi {
   ITreeNode ITreeNode();
 
   interface ITreeNode extends IClassNameSupplier {
+    String setVisibleGrantedMethodName();
   }
 
   ITypeWithClassId ITypeWithClassId();
@@ -456,6 +489,8 @@ public interface IScoutInterfaceApi {
 
   interface IWidget extends IClassNameSupplier {
     String setEnabledPermissionMethodName();
+
+    String setEnabledGrantedMethodName();
   }
 
   IWizard IWizard();
@@ -472,6 +507,7 @@ public interface IScoutInterfaceApi {
 
   interface IConfigProperty extends IClassNameSupplier {
     String getKeyMethodName();
+
     String descriptionMethodName();
   }
 

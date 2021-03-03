@@ -630,6 +630,11 @@ public interface Scout10Api extends IScoutApi {
     public String fqn() {
       return "org.eclipse.scout.rt.client.IClientSession";
     }
+
+    @Override
+    public String getDesktopMethodName() {
+      return "getDesktop";
+    }
   }
 
   IScoutInterfaceApi.ICode I_CODE = new ICode();
@@ -794,6 +799,25 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
+  IScoutInterfaceApi.IDataChangeObserver I_DATA_CHANGE_OBSERVER = new IDataChangeObserver();
+
+  @Override
+  default IScoutInterfaceApi.IDataChangeObserver IDataChangeObserver() {
+    return I_DATA_CHANGE_OBSERVER;
+  }
+
+  class IDataChangeObserver implements IScoutInterfaceApi.IDataChangeObserver {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver";
+    }
+
+    @Override
+    public String registerDataChangeListenerMethodName() {
+      return "registerDataChangeListener";
+    }
+  }
+
   IScoutInterfaceApi.IDataModelAttribute I_DATA_MODEL_ATTRIBUTE = new IDataModelAttribute();
 
   @Override
@@ -875,6 +899,11 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.client.ui.desktop.IDesktop";
+    }
+
+    @Override
+    public String dataChangedMethodName() {
+      return "dataChanged";
     }
   }
 
@@ -970,6 +999,11 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String importFormDataMethodName() {
       return "importFormData";
+    }
+
+    @Override
+    public String startMethodName() {
+      return "start";
     }
   }
 
@@ -1200,6 +1234,16 @@ public interface Scout10Api extends IScoutApi {
     public int keyTypeTypeParamIndex() {
       return 0;
     }
+
+    @Override
+    public String getDataByKeyMethodName() {
+      return "getDataByKey";
+    }
+
+    @Override
+    public String getDataByTextMethodName() {
+      return "getDataByText";
+    }
   }
 
   IScoutInterfaceApi.IMenu I_MENU = new IMenu();
@@ -1227,6 +1271,30 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.client.ui.action.menu.IMenuType";
+    }
+  }
+
+  IScoutInterfaceApi.IMessageBox I_MESSAGE_BOX = new IMessageBox();
+
+  @Override
+  default IScoutInterfaceApi.IMessageBox IMessageBox() {
+    return I_MESSAGE_BOX;
+  }
+
+  class IMessageBox implements IScoutInterfaceApi.IMessageBox {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.client.ui.messagebox.IMessageBox";
+    }
+
+    @Override
+    public String showMethodName() {
+      return "show";
+    }
+
+    @Override
+    public String withHeaderMethodName() {
+      return "withHeader";
     }
   }
 
@@ -1297,6 +1365,11 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage";
+    }
+
+    @Override
+    public String initPageMethodName() {
+      return "initPage";
     }
   }
 
@@ -1513,6 +1586,11 @@ public interface Scout10Api extends IScoutApi {
     public String getColumnSetMethodName() {
       return "getColumnSet";
     }
+
+    @Override
+    public String getSelectedRowCountMethodName() {
+      return "getSelectedRowCount";
+    }
   }
 
   IScoutInterfaceApi.ITableControl I_TABLE_CONTROL = new ITableControl();
@@ -1667,6 +1745,11 @@ public interface Scout10Api extends IScoutApi {
     public String fqn() {
       return "org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode";
     }
+
+    @Override
+    public String setVisibleGrantedMethodName() {
+      return "setVisibleGranted";
+    }
   }
 
   IScoutInterfaceApi.ITypeWithClassId I_TYPE_WITH_CLASS_ID = new ITypeWithClassId();
@@ -1746,6 +1829,11 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String setEnabledPermissionMethodName() {
       return "setEnabledPermission";
+    }
+
+    @Override
+    public String setEnabledGrantedMethodName() {
+      return "setEnabledGranted";
     }
   }
 
@@ -2185,6 +2273,11 @@ public interface Scout10Api extends IScoutApi {
     }
 
     @Override
+    public String setHandlerMethodName() {
+      return "setHandler";
+    }
+
+    @Override
     public String startInternalExclusiveMethodName() {
       return "startInternalExclusive";
     }
@@ -2235,6 +2328,11 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String getConfiguredLabelVisibleMethodName() {
       return "getConfiguredLabelVisible";
+    }
+
+    @Override
+    public String getConfiguredMandatoryMethodName() {
+      return "getConfiguredMandatory";
     }
   }
 
@@ -2542,6 +2640,11 @@ public interface Scout10Api extends IScoutApi {
     public String fqn() {
       return "org.eclipse.scout.rt.security.AbstractPermission";
     }
+
+    @Override
+    public String getAccessCheckFailedMessageMethodName() {
+      return "getAccessCheckFailedMessage";
+    }
   }
 
   IScoutAbstractApi.AbstractPropertyData ABSTRACT_PROPERTY_DATA = new AbstractPropertyData();
@@ -2669,6 +2772,26 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String getConfiguredWidthMethodName() {
       return "getConfiguredWidth";
+    }
+
+    @Override
+    public String getConfiguredDisplayableMethodName() {
+      return "getConfiguredDisplayable";
+    }
+
+    @Override
+    public String getConfiguredPrimaryKeyMethodName() {
+      return "getConfiguredPrimaryKey";
+    }
+
+    @Override
+    public String getSelectedValueMethodName() {
+      return "getSelectedValue";
+    }
+
+    @Override
+    public String getSelectedValuesMethodName() {
+      return "getSelectedValues";
     }
   }
 
@@ -2928,6 +3051,11 @@ public interface Scout10Api extends IScoutApi {
     public String fqn() {
       return "org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode";
     }
+
+    @Override
+    public String getConfiguredLeafMethodName() {
+      return "getConfiguredLeaf";
+    }
   }
 
   IScoutAbstractApi.AbstractValueField ABSTRACT_VALUE_FIELD = new AbstractValueField();
@@ -2955,6 +3083,16 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData";
+    }
+
+    @Override
+    public String getValueMethodName() {
+      return "getValue";
+    }
+
+    @Override
+    public String setValueMethodName() {
+      return "setValue";
     }
   }
 
@@ -3049,6 +3187,11 @@ public interface Scout10Api extends IScoutApi {
     }
 
     @Override
+    public String execInitActionMethodName() {
+      return "execInitAction";
+    }
+
+    @Override
     public String getConfiguredKeyStrokeMethodName() {
       return "getConfiguredKeyStroke";
     }
@@ -3056,6 +3199,11 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String getConfiguredTextMethodName() {
       return "getConfiguredText";
+    }
+
+    @Override
+    public String setVisibleGrantedMethodName() {
+      return "setVisibleGranted";
     }
   }
 
@@ -3855,6 +4003,11 @@ public interface Scout10Api extends IScoutApi {
     public String hashSetMethodName() {
       return "hashSet";
     }
+
+    @Override
+    public String hashSetWithoutNullElementsMethodName() {
+      return "hashSetWithoutNullElements";
+    }
   }
 
   IScoutVariousApi.ConfigFileCredentialVerifier CONFIG_FILE_CREDENTIAL_VERIFIER = new ConfigFileCredentialVerifier();
@@ -3944,6 +4097,11 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter";
+    }
+
+    @Override
+    public String getFormDataMethodName() {
+      return "getFormData";
     }
   }
 
@@ -4294,6 +4452,31 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.dataobject.IgnoreConvenienceMethodGeneration";
+    }
+  }
+
+  IScoutVariousApi.MessageBoxes MESSAGE_BOXES = new MessageBoxes();
+
+  @Override
+  default IScoutVariousApi.MessageBoxes MessageBoxes() {
+    return MESSAGE_BOXES;
+  }
+
+  class MessageBoxes implements IScoutVariousApi.MessageBoxes {
+
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes";
+    }
+
+    @Override
+    public String createOkMethodName() {
+      return "createOk";
+    }
+
+    @Override
+    public String showDeleteConfirmationMessageMethodName() {
+      return "showDeleteConfirmationMessage";
     }
   }
 }

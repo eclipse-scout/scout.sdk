@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,6 +44,8 @@ public interface ISdkConstants {
   String SUFFIX_WS_ENTRY_POINT_DEFINITION = SUFFIX_WS_ENTRY_POINT + "Definition";
   String SUFFIX_TEXT_PROVIDER_SERVICE = "TextProviderService";
   String SUFFIX_PERMISSION_TEXT_PROVIDER_SERVICE = "PermissionDescriptionTextProviderService";
+  String SUFFIX_ROW_DATA = "RowData";
+  String SUFFIX_TABLE_ROW_DATA = "Table" + SUFFIX_ROW_DATA;
 
   String PREFIX_ABSTRACT = "Abstract";
 

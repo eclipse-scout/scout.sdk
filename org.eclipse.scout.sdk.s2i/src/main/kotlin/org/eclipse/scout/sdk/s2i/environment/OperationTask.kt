@@ -34,6 +34,7 @@ open class OperationTask(title: String, project: Project, private val transactio
     override fun run(indicator: ProgressIndicator) {
         m_progress.setIfAbsent(indicator)
         indicator.checkCanceled()
+        val start = System.currentTimeMillis()
         val scoutProgress = indicator.toScoutProgress()
         val workForCommit = 10
         val workForTask = 1000
@@ -49,6 +50,7 @@ open class OperationTask(title: String, project: Project, private val transactio
                 task(scoutProgress.newChild(workForTask))
             }
         }
+        SdkLog.debug("Task '{}' finished after {}ms.", title, System.currentTimeMillis() - start)
     }
 
     fun cancel(): Boolean = m_progress.opt()

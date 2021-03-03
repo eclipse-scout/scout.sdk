@@ -48,6 +48,8 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
   private static final String TABLE_TYPE_PARAM_NAME = "T";
 
   private boolean m_isPageWithTable;
+  private boolean m_isLeaf = true;
+  private boolean m_createLeafMethod = true;
   private boolean m_createNlsMethod = true;
   private String m_pageData;
   private String m_pageServiceIfc;
@@ -71,6 +73,19 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
       }
     }
     else {
+      if (isCreateLeafMethod()) {
+        mainType.withMethod(MethodGenerator.create()
+            .withAnnotation(AnnotationGenerator.createOverride())
+            .asProtected()
+            .withReturnType(JavaTypes._boolean)
+            .withElementNameFrom(IScoutApi.class, api -> api.AbstractTreeNode().getConfiguredLeafMethodName())
+            .withBody(b -> b
+                .returnClause()
+                .append(isLeaf())
+                .semicolon())
+
+        );
+      }
       if (isPageWithTable()) {
         mainType.withMethod(createExecLoadData());
       }
@@ -91,7 +106,7 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
 
     if (isCreateNlsMethod()) {
       mainType
-          .withMethod(ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractPage().getConfiguredTitleMethodName(), Strings.ensureStartWithUpperCase(elementName().get())));
+          .withMethod(ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractPage().getConfiguredTitleMethodName(), Strings.capitalize(elementName().get())));
     }
   }
 
@@ -175,6 +190,24 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
 
   public TYPE asPageWithTable(boolean isPageWithTable) {
     m_isPageWithTable = isPageWithTable;
+    return thisInstance();
+  }
+
+  public boolean isLeaf() {
+    return m_isLeaf;
+  }
+
+  public TYPE asLeaf(boolean isLeaf) {
+    m_isLeaf = isLeaf;
+    return thisInstance();
+  }
+
+  public boolean isCreateLeafMethod() {
+    return m_createLeafMethod;
+  }
+
+  public TYPE withLeafMethod(boolean createLeafMethod) {
+    m_createLeafMethod = createLeafMethod;
     return thisInstance();
   }
 

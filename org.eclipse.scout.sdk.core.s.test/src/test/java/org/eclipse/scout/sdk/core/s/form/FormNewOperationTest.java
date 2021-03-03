@@ -12,6 +12,9 @@ package org.eclipse.scout.sdk.core.s.form;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.AbstractBooleanPermutationArgumentsProvider;
@@ -41,9 +44,9 @@ public class FormNewOperationTest {
 
   @DisplayName("Test Form Creation")
   @ArgumentsSource(FormTestArgumentsProvider.class)
-  @ParameterizedTest(name = "withDTO={0}, withPermission={1}, withService={2}, withClientTest={3}, withServerTest={4}")
+  @ParameterizedTest(name = "withDTO={0}, withPermission={1}, withService={2}, withClientTest={3}, withServerTest={4}, withAttributes={5}")
   public void testFormCreation(boolean isCreateFormData, boolean isCreatePermissions, boolean isCreateService,
-      boolean sourceFolderClientTest, boolean sourceFolderServerTest, TestingEnvironment env) {
+      boolean sourceFolderClientTest, boolean sourceFolderServerTest, boolean withAttributes, TestingEnvironment env) {
     var scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
     var fno = new FormNewOperation();
     fno.setClientPackage("org.eclipse.scout.sdk.s2e.client.test");
@@ -62,6 +65,14 @@ public class FormNewOperationTest {
     }
     fno.setSharedSourceFolder(env.dtoSourceFolder());
     fno.setSuperType(scoutApi.AbstractForm().fqn());
+
+    List<String> attributes = null;
+    if (withAttributes) {
+      attributes = new ArrayList<>(2);
+      attributes.add("LastName");
+      attributes.add("FirstName");
+    }
+    fno.setAttributes(attributes);
 
     env.run(fno);
 
@@ -88,7 +99,7 @@ public class FormNewOperationTest {
 
   private static class FormTestArgumentsProvider extends AbstractBooleanPermutationArgumentsProvider {
     protected FormTestArgumentsProvider() {
-      super(5);
+      super(6);
     }
   }
 }

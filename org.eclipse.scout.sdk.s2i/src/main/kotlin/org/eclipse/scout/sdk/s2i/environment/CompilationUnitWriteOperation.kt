@@ -59,7 +59,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
 
         formattedSource = formatAndOptimizeImports(newPsi, progress)
 
-        TransactionManager.current().register(CompilationUnitWriter(cuInfo.targetFile(), newPsi, formattedSource))
+        TransactionManager.current().register(CompilationUnitWriter(cuInfo.targetFile(), newPsi.project, formattedSource))
     }
 
     protected fun formatAndOptimizeImports(psi: PsiFile, progress: IdeaProgress): String = computeInReadAction(project) {
@@ -76,14 +76,13 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
         return@computeInReadAction psi.text /* create source here to have the transaction member as short as possible (is executed in ui thread) */
     }
 
-    private class CompilationUnitWriter(val targetFile: Path, val psi: PsiFile, val source: CharSequence) : TransactionMember {
+    private class CompilationUnitWriter(val targetFile: Path, val project: Project, val source: CharSequence) : TransactionMember {
 
         override fun file() = targetFile
 
         override fun commit(progress: IdeaProgress): Boolean {
             progress.init(2, toString())
 
-            val project = psi.project
             val targetDirectory = targetFile.parent
             val dir = DirectoryUtil.mkdirs(PsiManager.getInstance(project), targetDirectory.toString().replace(File.separatorChar, '/'))
                     ?: throw SdkException("Cannot write '$targetFile' because the directory could not be created.")
@@ -92,11 +91,11 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
             val existingFile = dir.findFile(targetFile.fileName.toString())
             if (existingFile == null) {
                 SdkLog.debug("Add new compilation unit '{}'.", targetFile)
-                dir.add(psi)
+                dir.add(PsiFileFactory.getInstance(project)
+                        .createFileFromText(targetFile.fileName.toString(), JavaFileType.INSTANCE, "", LocalTimeCounter.currentTime(), false, false))
                 progress.worked(1)
-            } else {
-                FileWriter(targetFile, source, project).commit(progress.newChild(1))
             }
+            FileWriter(targetFile, source, project).commit(progress.newChild(1))
             return true
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.core.s.form;
 
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
-
-import java.util.stream.IntStream;
 
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
@@ -105,14 +103,10 @@ public class FormGeneratorTest {
     assertNoCompileErrors(env, svcImplGenerator);
 
     // form
-    var classIdValues = IntStream.range(0, FormGenerator.NUM_CLASS_IDS)
-        .mapToObj(i -> "whatever" + i)
-        .toArray(String[]::new);
     FormGenerator<?> formGenerator = new FormGenerator<>()
         .withElementName("MyForm")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.client")
         .withSuperClassFrom(IScoutApi.class, api -> api.AbstractForm().fqn())
-        .withClassIdValues(classIdValues)
         .withFormData(createdFormData.name())
         .withServiceInterface(createdSvcIfc.name())
         .withPermissionUpdate(createdPermission.name())

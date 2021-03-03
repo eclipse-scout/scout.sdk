@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.comment.CommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
+import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
@@ -200,5 +201,15 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
   @Override
   public IMethodGenerator<?, ?> surroundingMethod() {
     return m_surroundingMethod;
+  }
+
+  @Override
+  public TYPE appendNewInstance(CharSequence fqn, CharSequence variableName, ISourceGenerator<IExpressionBuilder<?>> constructorArg) {
+    var newInstance = ref(fqn).space().append(variableName).equalSign().appendNew().ref(fqn).parenthesisOpen();
+    if (constructorArg != null) {
+      newInstance.append(constructorArg.generalize(ExpressionBuilder::create));
+    }
+    newInstance.parenthesisClose().semicolon();
+    return newInstance;
   }
 }

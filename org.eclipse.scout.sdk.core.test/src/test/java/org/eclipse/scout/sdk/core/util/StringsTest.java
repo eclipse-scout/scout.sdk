@@ -11,10 +11,13 @@
 package org.eclipse.scout.sdk.core.util;
 
 import static java.lang.System.lineSeparator;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.eclipse.scout.sdk.core.util.Strings.capitalize;
 import static org.eclipse.scout.sdk.core.util.Strings.compareTo;
 import static org.eclipse.scout.sdk.core.util.Strings.countMatches;
+import static org.eclipse.scout.sdk.core.util.Strings.decapitalize;
 import static org.eclipse.scout.sdk.core.util.Strings.endsWith;
-import static org.eclipse.scout.sdk.core.util.Strings.ensureStartWithUpperCase;
 import static org.eclipse.scout.sdk.core.util.Strings.escapeHtml;
 import static org.eclipse.scout.sdk.core.util.Strings.fromFile;
 import static org.eclipse.scout.sdk.core.util.Strings.fromInputStream;
@@ -24,6 +27,7 @@ import static org.eclipse.scout.sdk.core.util.Strings.hasText;
 import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
 import static org.eclipse.scout.sdk.core.util.Strings.isBlank;
 import static org.eclipse.scout.sdk.core.util.Strings.lastIndexOf;
+import static org.eclipse.scout.sdk.core.util.Strings.levenshteinDistance;
 import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
 import static org.eclipse.scout.sdk.core.util.Strings.notBlank;
 import static org.eclipse.scout.sdk.core.util.Strings.notEmpty;
@@ -49,6 +53,8 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Collection;
+import java.util.stream.IntStream;
 
 import javax.swing.text.Segment;
 
@@ -288,17 +294,52 @@ public class StringsTest {
   }
 
   @Test
-  public void testEnsureStartWithUpperCase() {
-    assertNull(ensureStartWithUpperCase(null));
-    assertEquals("", ensureStartWithUpperCase(""));
-    assertEquals("  ", ensureStartWithUpperCase("  ").toString());
-    assertEquals("A", ensureStartWithUpperCase("a").toString());
-    assertEquals("Ab", ensureStartWithUpperCase("ab").toString());
-    assertEquals("A", ensureStartWithUpperCase("A").toString());
-    assertEquals("Ab", ensureStartWithUpperCase("Ab").toString());
-    assertEquals("ABC", ensureStartWithUpperCase("ABC").toString());
-    assertEquals("Abc", ensureStartWithUpperCase("abc").toString());
-    assertEquals("ABC", ensureStartWithUpperCase("aBC").toString());
+  public void testCapitalize() {
+    assertNull(capitalize((CharSequence) null));
+    assertEquals("", capitalize(""));
+    assertEquals("  ", capitalize("  ").toString());
+    assertEquals("A", capitalize("a").toString());
+    assertEquals("Ab", capitalize("ab").toString());
+    assertEquals("A", capitalize("A").toString());
+    assertEquals("Ab", capitalize("Ab").toString());
+    assertEquals("ABC", capitalize("ABC").toString());
+    assertEquals("Abc", capitalize("abc").toString());
+    assertEquals("ABC", capitalize("aBC").toString());
+
+    assertEquals(emptyList(), capitalize((Collection<CharSequence>) null));
+    assertTrue(arrayToStringEquals(new String[]{null, "", "  ", "A", "Ab", "Abc"}, capitalize(asList(null, "", "  ", "a", "ab", "abc")).toArray()));
+    assertTrue(arrayToStringEquals(new String[]{null, "", "  ", "A", "Ab", "Abc"}, capitalize(asList(null, "", "  ", "A", "Ab", "Abc")).toArray()));
+  }
+
+  @Test
+  public void testDecapitalize() {
+    assertEquals(emptyList(), decapitalize(null));
+    assertTrue(arrayToStringEquals(new String[]{null, "", "  ", "a", "ab", "abc"}, decapitalize(asList(null, "", "  ", "A", "Ab", "Abc")).toArray()));
+    assertTrue(arrayToStringEquals(new String[]{null, "", "  ", "a", "ab", "abc"}, decapitalize(asList(null, "", "  ", "a", "ab", "abc")).toArray()));
+  }
+
+  private static boolean arrayToStringEquals(String[] expected, Object[] actual) {
+    if (expected == null && actual == null) {
+      return true;
+    }
+    if (expected == null || actual == null) {
+      return false;
+    }
+    if (expected.length != actual.length) {
+      return false;
+    }
+    return IntStream.range(0, expected.length)
+        .allMatch(i -> {
+          var e = expected[i];
+          var a = actual[i];
+          if (e == null && a == null) {
+            return true;
+          }
+          if (e == null || a == null) {
+            return false;
+          }
+          return e.equals(a.toString());
+        });
   }
 
   @Test
@@ -588,5 +629,26 @@ public class StringsTest {
     assertEquals(0, compareTo(null, null));
     assertEquals(0, compareTo("", ""));
     assertTrue(compareTo("a", "ab") < 0);
+  }
+
+  @Test
+  public void testLevenshteinDistance() {
+    assertEquals(0, levenshteinDistance(null, null));
+    assertEquals(0, levenshteinDistance(null, "something"));
+    assertEquals(0, levenshteinDistance("something", null));
+    assertEquals(0, levenshteinDistance("something", "something"));
+    assertEquals(0, levenshteinDistance("", ""));
+
+    assertEquals(9, levenshteinDistance("", "something"));
+    assertEquals(9, levenshteinDistance("something", ""));
+
+    assertEquals(8, levenshteinDistance("else", "something"));
+    assertEquals(8, levenshteinDistance("something", "else"));
+
+    assertEquals(5, levenshteinDistance("some", "something"));
+    assertEquals(5, levenshteinDistance("something", "some"));
+
+    assertEquals(4, levenshteinDistance("thing", "something"));
+    assertEquals(4, levenshteinDistance("something", "thing"));
   }
 }

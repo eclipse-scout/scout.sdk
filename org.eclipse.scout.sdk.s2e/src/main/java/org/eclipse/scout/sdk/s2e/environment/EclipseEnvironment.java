@@ -68,7 +68,7 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  * @since 7.0.0
  */
 @SuppressWarnings("MethodMayBeStatic")
-public class EclipseEnvironment extends AbstractEnvironment implements AutoCloseable {
+public class EclipseEnvironment extends AbstractEnvironment {
 
   private final Map<IJavaProject, JavaEnvironmentWithJdt> m_envs;
 
@@ -217,6 +217,7 @@ public class EclipseEnvironment extends AbstractEnvironment implements AutoClose
 
   @Override
   public void close() {
+    super.close();
     var iterator = m_envs.values().iterator();
     while (iterator.hasNext()) {
       try {

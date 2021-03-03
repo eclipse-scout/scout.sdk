@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.s.testcase.TestGenerator;
@@ -53,21 +54,39 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
   private String m_serverSession;
 
   // out
-  private IType m_createdLookupCall;
-  private IType m_createdLookupServiceIfc;
-  private IType m_createdLookupServiceImpl;
-  private IType m_createdLookupCallTest;
+  private IFuture<IType> m_createdLookupCall;
+  private String m_createdLookupCallFqn;
+
+  private IFuture<IType> m_createdLookupServiceIfc;
+  private String m_createdLookupServiceIfcFqn;
+
+  private IFuture<IType> m_createdLookupServiceImpl;
+  private String m_createdLookupServiceImplFqn;
+
+  private IFuture<IType> m_createdLookupCallTest;
+
+  private String m_createdLookupCallTestFqn;
 
   @Override
   public void accept(IEnvironment env, IProgress progress) {
+    validateOperation();
+    prepareProgress(progress);
+    executeOperation(env, progress);
+  }
+
+  protected void validateOperation() {
     Ensure.notBlank(getLookupCallName(), "No lookup call name provided");
     Ensure.notNull(getSharedSourceFolder(), "No shared source folder provided");
     Ensure.notNull(getKeyType(), "No key type provided");
     Ensure.notBlank(getPackage(), "No package name provided");
     Ensure.notNull(getSuperType(), "No supertype provided");
+  }
 
-    progress.init(4, toString());
+  protected void prepareProgress(IProgress progress) {
+    progress.init(getTotalWork(), toString());
+  }
 
+  protected void executeOperation(IEnvironment env, IProgress progress) {
     var svcName = getLookupCallName();
     var suffix = "Call";
     if (svcName.endsWith(suffix)) {
@@ -87,14 +106,19 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     setCreatedLookupCallTest(createLookupCallTest(env, progress.newChild(1)));
   }
 
-  protected IType createLookupCallTest(IEnvironment env, IProgress progress) {
+  protected int getTotalWork() {
+    return 4; // lookupcall, service ifc & impl, test
+  }
+
+  protected IFuture<IType> createLookupCallTest(IEnvironment env, IProgress progress) {
     var testSourceFolder = getTestSourceFolder();
     if (testSourceFolder == null) {
       return null;
     }
+    var testEnv = testSourceFolder.javaEnvironment();
 
-    var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
-    var targetTier = ScoutTier.valueOf(testSourceFolder.javaEnvironment())
+    var scoutApi = testEnv.requireApi(IScoutApi.class);
+    var targetTier = ScoutTier.valueOf(testEnv)
         .orElseThrow(() -> newFail("Test-source-folder {} has no access to Scout classes", testSourceFolder));
     var testPackage = ScoutTier.Shared.convert(targetTier, getPackage());
     var isClient = ScoutTier.Client.isIncludedIn(targetTier);
@@ -107,7 +131,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     }
 
     // validate source folder
-    if (!testSourceFolder.javaEnvironment().exists(runnerFqn)) {
+    if (!testEnv.exists(runnerFqn)) {
       // source folder cannot be used: required runner is not accessible
       SdkLog.warning("Cannot generate a LookupCall test class because the class '{}' is not on the classpath. Consider adding the required dependency.", runnerFqn);
       return null;
@@ -122,8 +146,8 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
         .withMethod(MethodGenerator.create()
             .asProtected()
             .withElementName(createLookupCallMethodName)
-            .withReturnType(getCreatedLookupCall().name())
-            .withBody(b -> b.returnClause().appendNew().ref(getCreatedLookupCall()).parenthesisOpen().parenthesisClose().semicolon()))
+            .withReturnType(getCreatedLookupCallFqn())
+            .withBody(b -> b.returnClause().appendNew().ref(getCreatedLookupCallFqn()).parenthesisOpen().parenthesisClose().semicolon()))
         .withMethod(createTestMethod(createLookupCallMethodName, scoutApi.LookupCall().getDataByAllMethodName()))
         .withMethod(createTestMethod(createLookupCallMethodName, scoutApi.LookupCall().getDataByKeyMethodName()))
         .withMethod(createTestMethod(createLookupCallMethodName, scoutApi.LookupCall().getDataByTextMethodName()));
@@ -131,7 +155,8 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
       lookupCallTestBuilder.withSession(getServerSession());
     }
 
-    return env.writeCompilationUnit(lookupCallTestBuilder, testSourceFolder, progress);
+    setCreatedLookupCallTestFqn(lookupCallTestBuilder.fullyQualifiedName());
+    return env.writeCompilationUnitAsync(lookupCallTestBuilder, testSourceFolder, progress);
   }
 
   protected IMethodGenerator<?, ?> createTestMethod(String createLookupCallMethodName, String getDataByMethodName) {
@@ -139,7 +164,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
         .withAnnotation(ScoutAnnotationGenerator.createTest())
         .asPublic()
         .withReturnType(JavaTypes._void)
-        .withElementName("test" + Strings.ensureStartWithUpperCase(getDataByMethodName))
+        .withElementName("test" + Strings.capitalize(getDataByMethodName))
         .withBody(b -> {
           var callVarName = "call";
           var scoutApi = b.context().requireApi(IScoutApi.class);
@@ -147,14 +172,14 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
               .append("? extends ").append(scoutApi.ILookupRow().fqn()).append(JavaTypes.C_GENERIC_START).append(getKeyType())
               .append(JavaTypes.C_GENERIC_END).append(JavaTypes.C_GENERIC_END).toString();
 
-          b.ref(getCreatedLookupCall()).space().append(callVarName).equalSign().append(createLookupCallMethodName).parenthesisOpen().parenthesisClose().semicolon().nl()
+          b.ref(getCreatedLookupCallFqn()).space().append(callVarName).equalSign().append(createLookupCallMethodName).parenthesisOpen().parenthesisClose().semicolon().nl()
               .appendTodo("fill call")
               .ref(dataType).space().append("data").equalSign().append(callVarName).dot().append(getDataByMethodName).parenthesisOpen().parenthesisClose().semicolon().nl()
               .appendTodo("verify data");
         });
   }
 
-  protected IType createLookupServiceIfc(String svcName, IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createLookupServiceIfc(String svcName, IEnvironment env, IProgress progress) {
     var ifcName = 'I' + svcName;
     var scoutApi = getSharedSourceFolder().javaEnvironment().requireApi(IScoutApi.class);
     var superTypeBuilder = new StringBuilder(scoutApi.ILookupService().fqn());
@@ -171,53 +196,67 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withInterface(superTypeBuilder.toString());
 
-    return env.writeCompilationUnit(ifc, getSharedSourceFolder(), progress);
+    setCreatedLookupServiceIfcFqn(ifc.fullyQualifiedName());
+    return env.writeCompilationUnitAsync(ifc, getSharedSourceFolder(), progress);
   }
 
-  protected IType createLookupServiceImpl(String svcName, String serverPackage, IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createLookupServiceImpl(String svcName, String serverPackage, IEnvironment env, IProgress progress) {
+    var impl = createLookupServiceImplGenerator()
+        .withElementName(svcName)
+        .withPackageName(serverPackage);
+
+    setCreatedLookupServiceImplFqn(impl.fullyQualifiedName());
+    getCreatedLookupServiceIfc().result();
+    return env.writeCompilationUnitAsync(impl, getServerSourceFolder(), progress);
+  }
+
+  protected PrimaryTypeGenerator<?> createLookupServiceImplGenerator() {
     var superTypeBuilder = new StringBuilder(getLookupServiceSuperType());
     superTypeBuilder.append(JavaTypes.C_GENERIC_START);
     superTypeBuilder.append(getKeyType());
     superTypeBuilder.append(JavaTypes.C_GENERIC_END);
-
-    var impl = PrimaryTypeGenerator.create()
-        .withElementName(svcName)
-        .withPackageName(serverPackage)
+    return PrimaryTypeGenerator.create()
         .asPublic()
         .withSuperClass(superTypeBuilder.toString())
-        .withInterface(getCreatedLookupServiceIfc().name())
+        .withInterface(getCreatedLookupServiceIfcFqn())
         .withAllMethodsImplemented();
-
-    return env.writeCompilationUnit(impl, getServerSourceFolder(), progress);
   }
 
-  protected IType createLookupCall(IEnvironment env, IProgress progress) {
-
-    var superTypeBuilder = new StringBuilder(getSuperType());
-    superTypeBuilder.append(JavaTypes.C_GENERIC_START);
-    superTypeBuilder.append(getKeyType());
-    superTypeBuilder.append(JavaTypes.C_GENERIC_END);
-
-    LookupCallGenerator<?> lcsb = new LookupCallGenerator<>()
+  protected IFuture<IType> createLookupCall(IEnvironment env, IProgress progress) {
+    var lcsb = createLookupCallGenerator()
         .withElementName(getLookupCallName())
         .withPackageName(getPackage())
-        .withSuperClass(superTypeBuilder.toString())
-        .withClassIdValue(ClassIds.nextIfEnabled(getPackage() + JavaTypes.C_DOT + getLookupCallName()))
-        .withAllMethodsImplemented();
+        .withSuperType(getSuperType())
+        .withKeyType(getKeyType())
+        .withClassIdValue(ClassIds.nextIfEnabled(getPackage() + JavaTypes.C_DOT + getLookupCallName()));
 
     if (getCreatedLookupServiceIfc() != null) {
-      lcsb.withLookupServiceInterface(getCreatedLookupServiceIfc().name());
+      lcsb.withLookupServiceInterface(getCreatedLookupServiceIfcFqn());
     }
 
-    return env.writeCompilationUnit(lcsb, getSharedSourceFolder(), progress);
+    setCreatedLookupCallFqn(lcsb.fullyQualifiedName());
+    return env.writeCompilationUnitAsync(lcsb, getSharedSourceFolder(), progress);
   }
 
-  public IType getCreatedLookupCall() {
+  protected LookupCallGenerator<?> createLookupCallGenerator() {
+    return new LookupCallGenerator<>()
+        .withAllMethodsImplemented();
+  }
+
+  public IFuture<IType> getCreatedLookupCall() {
     return m_createdLookupCall;
   }
 
-  protected void setCreatedLookupCall(IType createdLookupCall) {
+  protected void setCreatedLookupCall(IFuture<IType> createdLookupCall) {
     m_createdLookupCall = createdLookupCall;
+  }
+
+  public String getCreatedLookupCallFqn() {
+    return m_createdLookupCallFqn;
+  }
+
+  protected void setCreatedLookupCallFqn(String createdLookupCallFqn) {
+    m_createdLookupCallFqn = createdLookupCallFqn;
   }
 
   public String getLookupCallName() {
@@ -268,20 +307,36 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     m_serverSourceFolder = serverSourceFolder;
   }
 
-  public IType getCreatedLookupServiceIfc() {
+  public IFuture<IType> getCreatedLookupServiceIfc() {
     return m_createdLookupServiceIfc;
   }
 
-  protected void setCreatedLookupServiceIfc(IType createdLookupServiceIfc) {
+  protected void setCreatedLookupServiceIfc(IFuture<IType> createdLookupServiceIfc) {
     m_createdLookupServiceIfc = createdLookupServiceIfc;
   }
 
-  public IType getCreatedLookupServiceImpl() {
+  public String getCreatedLookupServiceIfcFqn() {
+    return m_createdLookupServiceIfcFqn;
+  }
+
+  protected void setCreatedLookupServiceIfcFqn(String createdLookupServiceIfcFqn) {
+    m_createdLookupServiceIfcFqn = createdLookupServiceIfcFqn;
+  }
+
+  public IFuture<IType> getCreatedLookupServiceImpl() {
     return m_createdLookupServiceImpl;
   }
 
-  protected void setCreatedLookupServiceImpl(IType createdLookupServiceImpl) {
+  protected void setCreatedLookupServiceImpl(IFuture<IType> createdLookupServiceImpl) {
     m_createdLookupServiceImpl = createdLookupServiceImpl;
+  }
+
+  public String getCreatedLookupServiceImplFqn() {
+    return m_createdLookupServiceImplFqn;
+  }
+
+  protected void setCreatedLookupServiceImplFqn(String createdLookupServiceImplFqn) {
+    m_createdLookupServiceImplFqn = createdLookupServiceImplFqn;
   }
 
   public String getLookupServiceSuperType() {
@@ -300,12 +355,20 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     m_testSourceFolder = testSourceFolder;
   }
 
-  public IType getCreatedLookupCallTest() {
+  public IFuture<IType> getCreatedLookupCallTest() {
     return m_createdLookupCallTest;
   }
 
-  protected void setCreatedLookupCallTest(IType createdLookupCallTest) {
+  protected void setCreatedLookupCallTest(IFuture<IType> createdLookupCallTest) {
     m_createdLookupCallTest = createdLookupCallTest;
+  }
+
+  public String getCreatedLookupCallTestFqn() {
+    return m_createdLookupCallTestFqn;
+  }
+
+  protected void setCreatedLookupCallTestFqn(String createdLookupCallTestFqn) {
+    m_createdLookupCallTestFqn = createdLookupCallTestFqn;
   }
 
   public String getServerSession() {
@@ -318,6 +381,6 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
 
   @Override
   public String toString() {
-    return "Create new LookupCall";
+    return "Create new Lookup Call";
   }
 }

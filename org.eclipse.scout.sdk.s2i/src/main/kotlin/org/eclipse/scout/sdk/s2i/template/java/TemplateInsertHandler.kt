@@ -180,7 +180,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
             val innerTypeGetterInfo = resolveInnerTypeGetterContainer(createdClass) ?: return
 
             val createdClassFqn = createdClass.qualifiedName
-            val createdClassSimpleName = Strings.ensureStartWithUpperCase(createdClass.name)
+            val createdClassSimpleName = Strings.capitalize(createdClass.name)
             val psiElementFactory = JavaPsiFacade.getElementFactory(project)
             val methodName = PropertyBean.GETTER_PREFIX + createdClassSimpleName
             val innerTypeGetterContainer = innerTypeGetterInfo.first

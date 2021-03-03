@@ -51,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.streams.asStream
 
 
-open class IdeaEnvironment private constructor(val project: Project) : AbstractEnvironment(), AutoCloseable {
+open class IdeaEnvironment private constructor(val project: Project) : AbstractEnvironment() {
 
     companion object Factory {
 
@@ -120,6 +120,7 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
     private val m_envs = ConcurrentHashMap<String, JavaEnvironmentWithIdea>()
 
     override fun close() {
+        super.close()
         m_envs.values.forEach(AutoCloseable::close)
         m_envs.clear()
     }

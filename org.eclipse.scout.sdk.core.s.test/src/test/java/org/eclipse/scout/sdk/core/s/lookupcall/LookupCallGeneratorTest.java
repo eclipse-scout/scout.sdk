@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,8 @@ public class LookupCallGeneratorTest {
     LookupCallGenerator<?> lookupCallGenerator = new LookupCallGenerator<>()
         .withPackageName("org.eclipse.scout.sdk.core.s.test")
         .withElementName("MyLookupCall")
-        .withSuperClassFrom(IScoutApi.class, api -> api.LookupCall().fqn() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END)
+        .withSuperType(scoutApi.LookupCall().fqn())
+        .withKeyType(String.class.getName())
         .withLookupServiceInterface(createdLookupSvcIfc.name());
 
     assertEqualsRefFile(env, REF_FILE_FOLDER + "LookupCall2.txt", lookupCallGenerator);

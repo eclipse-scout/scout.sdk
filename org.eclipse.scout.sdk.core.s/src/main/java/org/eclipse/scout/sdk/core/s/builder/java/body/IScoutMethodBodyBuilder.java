@@ -15,6 +15,8 @@ import java.util.function.Function;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
+import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 
 /**
  * <h3>{@link IScoutMethodBodyBuilder}</h3>
@@ -155,4 +157,26 @@ public interface IScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TY
    * @return this builder
    */
   TYPE appendPermissionCheck(CharSequence permission);
+
+  /**
+   * Creates source like {@code form.setHandler(form.new Handler());}.
+   *
+   * @param formVariableName
+   *          The variable name of the form.
+   * @param handlerSimpleName
+   *          The simple name of the handler class.
+   * @return this builder
+   */
+  TYPE appendFormSetHandler(CharSequence formVariableName, CharSequence handlerSimpleName);
+
+  /**
+   * Creates source like {@code throw new VetoException(TEXTS.get("Something"));}.
+   *
+   * @param nlsKeyName
+   *          The nls key to insert.
+   * @param varArg
+   *          A sourceGenerator that allows to add arguments to the TEXTS.get-call.
+   * @return this builder
+   */
+  TYPE appendThrowVetoException(CharSequence nlsKeyName, ISourceGenerator<IExpressionBuilder<?>> varArg);
 }

@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
+import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 
 /**
@@ -124,4 +125,17 @@ public interface IMethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> exten
    * @see #surroundingMethod()
    */
   boolean needsReturnClause();
+
+  /**
+   * Creates source like {@code Something sth = new Something();}.
+   *
+   * @param fqn
+   *          The fully qualified name of the class from which a instance should be created.
+   * @param variableName
+   *          The name of the created variable.
+   * @param constructorArg
+   *          A sourceGenerator that allows to add constructor arguments.
+   * @return this builder
+   */
+  TYPE appendNewInstance(CharSequence fqn, CharSequence variableName, ISourceGenerator<IExpressionBuilder<?>> constructorArg);
 }

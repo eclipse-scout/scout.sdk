@@ -13,13 +13,17 @@ package org.eclipse.scout.sdk.core.s.generator.method;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.joining;
 import static org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator.createDoConvenienceMethodsGenerated;
-import static org.eclipse.scout.sdk.core.util.Strings.ensureStartWithUpperCase;
+import static org.eclipse.scout.sdk.core.util.Strings.capitalize;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
+import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
+import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
@@ -78,7 +82,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
     var fieldSimpleName = JavaTypes.simpleName(dotBasedFqn);
     return create()
         .asPublic()
-        .withElementName(PropertyBean.GETTER_PREFIX + ensureStartWithUpperCase(fieldSimpleName))
+        .withElementName(PropertyBean.GETTER_PREFIX + capitalize(fieldSimpleName))
         .withReturnType(fieldFqn)
         .withBody(b -> b.returnClause().appendGetFieldByClass(fieldFqn).semicolon());
   }
@@ -169,7 +173,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
     return create()
         .asPublic()
         .withReturnType(returnTypeReference)
-        .withElementName(PropertyBean.CHAINED_SETTER_PREFIX + ensureStartWithUpperCase(name))
+        .withElementName(PropertyBean.CHAINED_SETTER_PREFIX + capitalize(name))
         .withParameter(MethodParameterGenerator.create()
             .withElementName(name)
             .withDataType(dataTypeReference))
@@ -199,7 +203,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoListSetterCollection(String name, CharSequence dataTypeReference, IType owner) {
-    var methodName = PropertyBean.CHAINED_SETTER_PREFIX + ensureStartWithUpperCase(name);
+    var methodName = PropertyBean.CHAINED_SETTER_PREFIX + capitalize(name);
     var paramDataType = computeDoNodeCollectionSetterParameterDataType(owner, methodName, dataTypeReference);
     return create()
         .asPublic()
@@ -286,7 +290,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
     return create()
         .asPublic()
         .withReturnType(returnTypeReference)
-        .withElementName(getterPrefix + ensureStartWithUpperCase(name))
+        .withElementName(getterPrefix + capitalize(name))
         .withAnnotation(createDoConvenienceMethodsGenerated())
         .withBody(b -> b.returnClause().appendDoNodeGet(name).semicolon());
   }
@@ -334,5 +338,179 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
     return owner.typeParameters()
         .map(IJavaElement::elementName)
         .collect(joining(", ", ref + JavaTypes.C_GENERIC_START, JavaTypes.C_GENERIC_END + ""));
+  }
+
+  /**
+   * Creates a getConfiguredDisplayable method of the form:
+   *
+   * <pre>
+   * &#64;Override
+   * protected boolean getConfiguredDisplayable() {
+   *   return true;
+   * }
+   * </pre>
+   *
+   * @param displayable
+   *          The boolean return value.
+   * @return The created {@link IScoutMethodGenerator}.
+   */
+  public static IScoutMethodGenerator<?, ?> createGetConfiguredDisplayable(boolean displayable) {
+    return create()
+        .withAnnotation(AnnotationGenerator.createOverride())
+        .withElementNameFrom(IScoutApi.class, api -> api.AbstractColumn().getConfiguredDisplayableMethodName())
+        .asProtected()
+        .withReturnType(JavaTypes._boolean)
+        .withBody(b -> b.returnClause().append(displayable).semicolon());
+  }
+
+  /**
+   * Creates a getConfiguredPrimaryKey method of the form:
+   *
+   * <pre>
+   * &#64;Override
+   * protected boolean getConfiguredPrimaryKey() {
+   *   return false;
+   * }
+   * </pre>
+   *
+   * @param primaryKey
+   *          The boolean return value.
+   * @return The created {@link IScoutMethodGenerator}.
+   */
+  public static IScoutMethodGenerator<?, ?> createGetConfiguredPrimaryKey(boolean primaryKey) {
+    return create()
+        .withAnnotation(AnnotationGenerator.createOverride())
+        .withElementNameFrom(IScoutApi.class, api -> api.AbstractColumn().getConfiguredPrimaryKeyMethodName())
+        .asProtected()
+        .withReturnType(JavaTypes._boolean)
+        .withBody(b -> b.returnClause().append(primaryKey).semicolon());
+  }
+
+  /**
+   * Creates a getConfiguredWidth method of the form:
+   *
+   * <pre>
+   * &#64;Override
+   * protected int getConfiguredWidth() {
+   *   return 60;
+   * }
+   * </pre>
+   *
+   * @param width
+   *          The int return value.
+   * @return The created {@link IScoutMethodGenerator}.
+   */
+  public static IScoutMethodGenerator<?, ?> createGetConfiguredWidth(int width) {
+    return create()
+        .withAnnotation(AnnotationGenerator.createOverride())
+        .asProtected()
+        .withReturnType(JavaTypes._int)
+        .withElementNameFrom(IScoutApi.class, api -> api.AbstractColumn().getConfiguredWidthMethodName())
+        .withBody(b -> b.returnClause().append(width).semicolon());
+  }
+
+  /**
+   * Creates a getConfiguredMenuTypes method of the form:
+   *
+   * <pre>
+   * &#64;Override
+   * protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+   *   return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+   * }
+   * </pre>
+   *
+   * @param menuTypes
+   *          A sourceGenerator that allows to add menu types.
+   * @return The created {@link IScoutMethodGenerator}.
+   */
+  public static IScoutMethodGenerator<?, ?> createGetConfiguredMenuTypes(ISourceGenerator<IExpressionBuilder<?>> menuTypes) {
+    return create()
+        .withAnnotation(AnnotationGenerator.createOverride())
+        .withElementNameFrom(IScoutApi.class, api -> api.AbstractMenu().getConfiguredMenuTypesMethodName())
+        .asProtected()
+        .withReturnTypeFrom(IScoutApi.class, api -> new StringBuilder(Set.class.getName()).append(JavaTypes.C_GENERIC_START)
+            .append(JavaTypes.C_QUESTION_MARK).append(' ').append(JavaTypes.EXTENDS).append(' ').append(api.IMenuType().fqn())
+            .append(JavaTypes.C_GENERIC_END).toString())
+        .withBody(b -> {
+          b.returnClause().refClassFrom(IScoutApi.class, IScoutApi::CollectionUtility).dot().appendFrom(IScoutApi.class, api -> api.CollectionUtility().hashSetMethodName()).parenthesisOpen();
+          if (menuTypes != null) {
+            b.append(menuTypes.generalize(ExpressionBuilder::create));
+          }
+          b.parenthesisClose().semicolon();
+        });
+  }
+
+  /**
+   * Creates a getConfiguredMandatory method of the form:
+   *
+   * <pre>
+   * &#64;Override
+   * protected boolean getConfiguredMandatory() {
+   *   return false;
+   * }
+   * </pre>
+   *
+   * @param mandatory
+   *          The boolean return value.
+   * @return The created {@link IScoutMethodGenerator}.
+   */
+  public static IScoutMethodGenerator<?, ?> createGetConfiguredMandatory(boolean mandatory) {
+    return create()
+        .withAnnotation(AnnotationGenerator.createOverride())
+        .withElementNameFrom(IScoutApi.class, api -> api.AbstractFormField().getConfiguredMandatoryMethodName())
+        .asProtected()
+        .withReturnType(JavaTypes._boolean)
+        .withBody(b -> b.returnClause().append(mandatory).semicolon());
+  }
+
+  /**
+   * Creates a getConfiguredMaxLength method of the form:
+   *
+   * <pre>
+   * &#64;Override
+   * protected int getConfiguredMaxLength() {
+   *   return 60;
+   * }
+   * </pre>
+   *
+   * @param maxLength
+   *          The int return value.
+   * @return The created {@link IScoutMethodGenerator}.
+   */
+  public static IScoutMethodGenerator<?, ?> createGetConfiguredMaxLength(int maxLength) {
+    return create()
+        .withAnnotation(AnnotationGenerator.createOverride())
+        .asProtected()
+        .withReturnType(JavaTypes._int)
+        .withElementNameFrom(IScoutApi.class, api -> api.AbstractStringField().getConfiguredMaxLengthMethodName())
+        .withBody(b -> b.returnClause().append(maxLength).semicolon());
+  }
+
+  /**
+   * Creates a getConfiguredService method of the form:
+   *
+   * <pre>
+   * &#64;Override
+   * protected Class<? extends ILookupService<EntityKey>> getConfiguredService() {
+   *   return IEntityLookupService.class;
+   * }
+   * </pre>
+   *
+   * @param serviceIfc
+   *          The fully qualified name of the service interface.
+   * @param keyType
+   *          The fully qualified name of the key type.
+   * @return The created {@link IScoutMethodGenerator}.
+   */
+  public static IScoutMethodGenerator<?, ?> createGetConfiguredService(CharSequence serviceIfc, String keyType) {
+    return create()
+        .withAnnotation(AnnotationGenerator.createOverride())
+        .asProtected()
+        .withReturnTypeFrom(IScoutApi.class, api -> new StringBuilder(Class.class.getName()).append(JavaTypes.C_GENERIC_START)
+            .append(JavaTypes.C_QUESTION_MARK).append(JavaTypes.C_SPACE).append(JavaTypes.EXTENDS).append(JavaTypes.C_SPACE)
+            .append(api.ILookupService().fqn()).append(JavaTypes.C_GENERIC_START).append(keyType).append(JavaTypes.C_GENERIC_END)
+            .append(JavaTypes.C_GENERIC_END).toString())
+        .withElementNameFrom(IScoutApi.class, api -> api.LookupCall().getConfiguredServiceMethodName())
+        .withBody(b -> b.returnClause().classLiteral(serviceIfc).semicolon());
   }
 }

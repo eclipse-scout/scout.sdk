@@ -69,6 +69,6 @@ public class CodeTypeNewOperationTest {
 
     env.run(op);
     assertNotNull(op.getCreatedCodeType());
-    return op.getCreatedCodeType();
+    return op.getCreatedCodeType().result();
   }
 }

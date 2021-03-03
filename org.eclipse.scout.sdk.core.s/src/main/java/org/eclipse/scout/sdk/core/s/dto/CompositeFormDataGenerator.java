@@ -108,7 +108,7 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
 
       // Scout RT requires the first char to be upper-case for a getter.
       // See org.eclipse.scout.rt.platform.reflect.FastBeanUtility.BEAN_METHOD_PAT.
-      var methodName = Strings.ensureStartWithUpperCase(formDataTypeName).toString();
+      var methodName = Strings.capitalize(formDataTypeName).toString();
       this
           .withType(dtoGenerator.withElementName(formDataTypeName), DtoMemberSortObjectFactory.forTypeFormDataFormField(formDataTypeName))
           .withMethod(ScoutMethodGenerator.create()

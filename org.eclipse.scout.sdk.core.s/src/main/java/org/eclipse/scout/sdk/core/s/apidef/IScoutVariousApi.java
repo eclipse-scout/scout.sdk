@@ -87,6 +87,7 @@ public interface IScoutVariousApi {
 
   interface WebService extends IClassNameSupplier {
     String nameElementName();
+
     String targetNamespaceElementName();
   }
 
@@ -102,6 +103,7 @@ public interface IScoutVariousApi {
 
   interface ACCESS extends IClassNameSupplier {
     String checkMethodName();
+
     String checkAndThrowMethodName();
   }
 
@@ -135,6 +137,8 @@ public interface IScoutVariousApi {
 
   interface CollectionUtility extends IClassNameSupplier {
     String hashSetMethodName();
+
+    String hashSetWithoutNullElementsMethodName();
   }
 
   ConfigFileCredentialVerifier ConfigFileCredentialVerifier();
@@ -151,8 +155,11 @@ public interface IScoutVariousApi {
 
   interface LookupCall extends IClassNameSupplier {
     String getConfiguredServiceMethodName();
+
     String getDataByAllMethodName();
+
     String getDataByKeyMethodName();
+
     String getDataByTextMethodName();
   }
 
@@ -164,6 +171,7 @@ public interface IScoutVariousApi {
   SearchFilter SearchFilter();
 
   interface SearchFilter extends IClassNameSupplier {
+    String getFormDataMethodName();
   }
 
   ServerTestRunner ServerTestRunner();
@@ -225,6 +233,7 @@ public interface IScoutVariousApi {
   interface Mockito extends IClassNameSupplier {
     String whenMethodName();
   }
+
   ArgumentMatchers ArgumentMatchers();
 
   interface ArgumentMatchers extends IClassNameSupplier {
@@ -270,5 +279,13 @@ public interface IScoutVariousApi {
     String getMethodName();
 
     String setMethodName();
+  }
+
+  MessageBoxes MessageBoxes();
+
+  interface MessageBoxes extends IClassNameSupplier {
+    String createOkMethodName();
+
+    String showDeleteConfirmationMessageMethodName();
   }
 }

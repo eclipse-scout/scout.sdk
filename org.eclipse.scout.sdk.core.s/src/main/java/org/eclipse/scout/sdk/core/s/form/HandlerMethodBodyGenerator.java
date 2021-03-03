@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyBuilder<?>> {
 
-  public static final String SERVICE_VAR_NAME = "service";
   public static final String FORM_DATA_VAR_NAME = "formData";
 
   private String m_serviceIfc;
@@ -43,28 +42,26 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
     m_createFormDataInLoad = true;
   }
 
-    @Override
-    public void generate(IMethodBodyBuilder<?> builder) {
-      var declaringMethod = builder.surroundingMethod();
-      var execLoadMethodName = builder.context().requireApi(IScoutApi.class).AbstractFormHandler().execLoadMethodName();
-      var isLoad = execLoadMethodName.equals(declaringMethod.elementName(builder.context()).get());
+  @Override
+  public void generate(IMethodBodyBuilder<?> builder) {
+    var declaringMethod = builder.surroundingMethod();
+    var execLoadMethodName = builder.context().requireApi(IScoutApi.class).AbstractFormHandler().execLoadMethodName();
+    var isLoad = execLoadMethodName.equals(declaringMethod.elementName(builder.context()).get());
 
-      serviceInterface().ifPresent(svcIfc -> buildBackendCall(ScoutMethodBodyBuilder.create(builder), svcIfc, isLoad));
+    serviceInterface().ifPresent(svcIfc -> buildBackendCall(ScoutMethodBodyBuilder.create(builder), svcIfc, isLoad));
 
-      if (isLoad && permission().isPresent()) {
-        builder
-            .nl().nl().appendFrom(IScoutApi.class, api -> api.IWidget().setEnabledPermissionMethodName()).parenthesisOpen().appendNew().ref(permission().get()).parenthesisOpen()
-            .append(permissionArgGenerator()
-                .orElseGet(ISourceGenerator::empty)
-                .generalize(builder))
-            .parenthesisClose().parenthesisClose().semicolon();
-      }
+    if (isLoad && permission().isPresent()) {
+      builder
+          .nl().nl().appendFrom(IScoutApi.class, api -> api.IWidget().setEnabledPermissionMethodName()).parenthesisOpen().appendNew().ref(permission().get()).parenthesisOpen()
+          .append(permissionArgGenerator()
+              .orElseGet(ISourceGenerator::empty)
+              .generalize(builder))
+          .parenthesisClose().parenthesisClose().semicolon();
     }
+  }
 
   protected void buildBackendCall(IScoutMethodBodyBuilder<?> builder, CharSequence serviceInterface, boolean isLoad) {
     var isDtoAvailable = formDataType().isPresent();
-
-    builder.appendBeansGetVariable(serviceInterface, SERVICE_VAR_NAME).semicolon().nl();
 
     if (isDtoAvailable) {
       builder.ref(formDataType().get()).space().append(FORM_DATA_VAR_NAME).equalSign();
@@ -74,14 +71,12 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
                 .orElseGet(() -> b -> b.appendNew().ref(formDataType().get()).parenthesisOpen().parenthesisClose().semicolon().nl())
                 .generalize(builder))
             .appendExportFormData(FORM_DATA_VAR_NAME).nl();
-        if (isLoad) {
-          builder.append(FORM_DATA_VAR_NAME).equalSign();
-        }
+        builder.append(FORM_DATA_VAR_NAME).equalSign();
       }
     }
 
     builder
-        .append(SERVICE_VAR_NAME).dot().append(getBackendServiceMethodName(isLoad))
+        .appendBeansGet(serviceInterface).dot().append(getBackendServiceMethodName(isLoad))
         .parenthesisOpen()
         .append(methodArgGenerator()
             .orElseGet(() -> b -> {
@@ -92,7 +87,7 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
             .generalize(builder))
         .parenthesisClose()
         .semicolon();
-    if (isLoad && isDtoAvailable) {
+    if (isDtoAvailable) {
       builder.nl().appendImportFormData(FORM_DATA_VAR_NAME);
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.uniqueid.UniqueIds;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -38,7 +39,8 @@ public class CodeTypeNewOperation implements BiConsumer<IEnvironment, IProgress>
   private String m_codeTypeIdDataType;
 
   //out
-  private IType m_createdCodeType;
+  private IFuture<IType> m_createdCodeType;
+  private String m_createdCodeTypeFqn;
 
   @Override
   public void accept(IEnvironment env, IProgress progress) {
@@ -47,7 +49,7 @@ public class CodeTypeNewOperation implements BiConsumer<IEnvironment, IProgress>
     setCreatedCodeType(createCodeType);
   }
 
-  protected IType createCodeType(IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createCodeType(IEnvironment env, IProgress progress) {
     Ensure.notBlank(getCodeTypeName(), "No codetype name provided");
     Ensure.notNull(getSharedSourceFolder(), "No source folder provided");
     Ensure.notBlank(getPackage(), "No package name provided");
@@ -69,7 +71,8 @@ public class CodeTypeNewOperation implements BiConsumer<IEnvironment, IProgress>
       codeTypeBuilder.withIdValueBuilder(ISourceGenerator.raw(idValue));
     }
 
-    return env.writeCompilationUnit(codeTypeBuilder, getSharedSourceFolder(), progress);
+    setCreatedCodeTypeFqn(codeTypeBuilder.fullyQualifiedName());
+    return env.writeCompilationUnitAsync(codeTypeBuilder, getSharedSourceFolder(), progress);
   }
 
   public String getCodeTypeName() {
@@ -88,12 +91,20 @@ public class CodeTypeNewOperation implements BiConsumer<IEnvironment, IProgress>
     m_sharedSourceFolder = sharedSourceFolder;
   }
 
-  protected void setCreatedCodeType(IType createdCodeType) {
+  protected void setCreatedCodeType(IFuture<IType> createdCodeType) {
     m_createdCodeType = createdCodeType;
   }
 
-  public IType getCreatedCodeType() {
+  public IFuture<IType> getCreatedCodeType() {
     return m_createdCodeType;
+  }
+
+  protected void setCreatedCodeTypeFqn(String createdCodeTypeFqn) {
+    m_createdCodeTypeFqn = createdCodeTypeFqn;
+  }
+
+  public String getCreatedCodeTypeFqn() {
+    return m_createdCodeTypeFqn;
   }
 
   public String getSuperType() {
@@ -122,6 +133,6 @@ public class CodeTypeNewOperation implements BiConsumer<IEnvironment, IProgress>
 
   @Override
   public String toString() {
-    return "Create new CodeType";
+    return "Create new Code Type";
   }
 }

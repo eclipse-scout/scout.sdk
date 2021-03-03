@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 public abstract class AbstractEnvironment implements IEnvironment {
 
   private final Map<CompilationUnitInfo, CharSequence> m_createdCompilationUnits = new ConcurrentHashMap<>();
+  private final Map<IFuture<?>, Boolean> m_uncompletedFutures = new ConcurrentHashMap<>();
 
   @Override
   public IType writeCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder) {
@@ -80,12 +81,12 @@ public abstract class AbstractEnvironment implements IEnvironment {
 
   protected IFuture<IType> writeCuWithExistingSource(CharSequence source, IClasspathEntry targetSourceFolder, Path sourceFolderRelPath, IProgress progress, boolean sync) {
     var cuInfo = new CompilationUnitInfoWithClasspath(targetSourceFolder, sourceFolderRelPath);
-    return doWriteCompilationUnit(source, cuInfo, progress, sync);
+    return writeCompilationUnit(source, cuInfo, progress, sync);
   }
 
   @Override
   public void writeResource(CharSequence content, Path filePath, IProgress progress) {
-    doWriteResource(content, filePath, progress, true).awaitDoneThrowingOnErrorOrCancel();
+    writeResource(content, filePath, progress, true).awaitDoneThrowingOnErrorOrCancel();
   }
 
   @Override
@@ -100,14 +101,28 @@ public abstract class AbstractEnvironment implements IEnvironment {
 
   @Override
   public IFuture<Void> writeResourceAsync(CharSequence content, Path filePath, IProgress progress) {
-    return doWriteResource(content, filePath, progress, false);
+    return writeResource(content, filePath, progress, false);
+  }
+
+  protected IFuture<Void> writeResource(CharSequence content, Path filePath, IProgress progress, boolean sync) {
+    return handleUncompletedFuture(doWriteResource(content, filePath, progress, sync));
   }
 
   protected IFuture<IType> writeCompilationUnitGenerator(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress, boolean sync) {
     Ensure.isTrue(Ensure.notNull(targetFolder).isSourceFolder(), "{} is no source folder. It is only allowed to generate new source into source folders.", targetFolder);
     var info = new CompilationUnitInfoWithClasspath(targetFolder, generator);
     var code = runGenerator(generator, targetFolder.javaEnvironment(), info.targetFile());
-    return doWriteCompilationUnit(code, info, progress, sync);
+    return writeCompilationUnit(code, info, progress, sync);
+  }
+
+  protected IFuture<IType> writeCompilationUnit(CharSequence source, CompilationUnitInfoWithClasspath cuInfo, IProgress progress, boolean sync) {
+    return handleUncompletedFuture(doWriteCompilationUnit(source, cuInfo, progress, sync));
+  }
+
+  protected <T> IFuture<T> handleUncompletedFuture(IFuture<T> future) {
+    m_uncompletedFutures.put(future, Boolean.FALSE);
+    future.whenComplete((f, e) -> m_uncompletedFutures.remove(future));
+    return future;
   }
 
   protected IType registerCompilationUnit(CharSequence code, CompilationUnitInfoWithClasspath cuInfo) {
@@ -149,6 +164,13 @@ public abstract class AbstractEnvironment implements IEnvironment {
   @Override
   public StringBuilder executeGenerator(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder) {
     return runGenerator(generator, targetFolder.javaEnvironment(), targetFolder.path());
+  }
+
+  @Override
+  public void close() {
+    SdkFuture.awaitAllLoggingOnError(m_uncompletedFutures.keySet());
+    m_uncompletedFutures.clear();
+    m_createdCompilationUnits.clear();
   }
 
   protected abstract Collection<? extends JavaEnvironmentSpi> javaEnvironments();

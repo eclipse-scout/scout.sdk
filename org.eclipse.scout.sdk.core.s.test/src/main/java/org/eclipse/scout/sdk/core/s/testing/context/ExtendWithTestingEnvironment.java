@@ -65,4 +65,11 @@ public @interface ExtendWithTestingEnvironment {
    * {@code false}.
    */
   boolean flushToDisk() default false;
+
+  /**
+   * Specifies whether to ensure that created resources do not have compile errors. The default is {@code true}. Turning
+   * this property off can be useful when testing the creation of multiple cyclic classes. Here, you must then manually
+   * ensure that there are no compile errors.
+   */
+  boolean assertNoCompileErrors() default true;
 }

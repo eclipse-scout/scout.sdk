@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.core.util;
 
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.beans.Introspector;
@@ -28,6 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -1144,13 +1148,41 @@ public final class Strings {
    * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
    *         Otherwise the input string is returned with the first character modified to upper case.
    */
-  public static CharSequence ensureStartWithUpperCase(CharSequence name) {
+  public static CharSequence capitalize(CharSequence name) {
     if (isEmpty(name) || Character.isUpperCase(name.charAt(0))) {
       return name;
     }
     return new StringBuilder(name.length())
         .append(Character.toUpperCase(name.charAt(0)))
         .append(name, 1, name.length());
+  }
+
+  /**
+   * Ensures the given names all start with an upper case character.<br>
+   *
+   * @param names
+   *          The names to handle.
+   * @return a list with all elements of the given names with the first character modified to upper case.
+   */
+  public static List<CharSequence> capitalize(Collection<? extends CharSequence> names) {
+    return Optional.ofNullable(names).orElse(emptyList())
+        .stream()
+        .map(Strings::capitalize)
+        .collect(toList());
+  }
+
+  /**
+   * Ensures the given names all start with an lower case character.<br>
+   *
+   * @param names
+   *          The names to handle.
+   * @return a list with all elements of the given names with the first character modified to lower case.
+   */
+  public static List<CharSequence> decapitalize(Collection<? extends CharSequence> names) {
+    return Optional.ofNullable(names).orElse(emptyList())
+        .stream()
+        .map(s -> s != null ? Introspector.decapitalize(s.toString()) : null)
+        .collect(toList());
   }
 
   /**
@@ -1577,5 +1609,60 @@ public final class Strings {
       }
     }
     return a.length() - b.length();
+  }
+
+  /**
+   * Method calculates the levenshtein distance, also known as string edit distance.
+   *
+   * @param s1
+   *          The first string.
+   * @param s2
+   *          The second string.
+   * @return Amount of edit operations to transform s1 into s2.
+   */
+  public static int levenshteinDistance(CharSequence s1, CharSequence s2) {
+    if (s1 == null || s2 == null || s1.equals(s2)) {
+      return 0;
+    }
+
+    var l1 = s1.length();
+    var l2 = s2.length();
+
+    if (l1 == 0) {
+      return l2;
+    }
+    else if (l2 == 0) {
+      return l1;
+    }
+
+    var col0 = new int[l1 + 1];
+    var col1 = new int[l1 + 1];
+    int[] col;
+
+    // indexes into strings s1 and s2
+    int i;
+    int j;
+    char jth;
+    int cost;
+
+    for (i = 0; i <= l1; i++) {
+      col0[i] = i;
+    }
+
+    for (j = 1; j <= l2; j++) {
+      jth = s2.charAt(j - 1);
+      col1[0] = j;
+
+      for (i = 1; i <= l1; i++) {
+        cost = s1.charAt(i - 1) == jth ? 0 : 1;
+        col1[i] = Math.min(Math.min(col1[i - 1] + 1, col0[i] + 1), col0[i - 1] + cost);
+      }
+
+      col = col0;
+      col0 = col1;
+      col1 = col;
+    }
+
+    return col0[l1];
   }
 }

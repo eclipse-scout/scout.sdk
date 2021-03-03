@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -49,8 +50,11 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
   private final List<IMethodGenerator<?, ?>> m_methods;
 
   // out
-  private IType m_createdServiceInterface;
-  private IType m_createdServiceImpl;
+  private IFuture<IType> m_createdServiceInterface;
+  private String m_createdServiceInterfaceFqn;
+
+  private IFuture<IType> m_createdServiceImpl;
+  private String m_createdServiceImplFqn;
 
   public ServiceNewOperation() {
     m_methods = new ArrayList<>();
@@ -108,9 +112,10 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     return implBuilder;
   }
 
-  protected IType createServiceImpl(String svcName, String serverPackage, IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createServiceImpl(String svcName, String serverPackage, IEnvironment env, IProgress progress) {
     var implBuilder = createServiceImplBuilder(svcName, serverPackage);
-    return env.writeCompilationUnit(implBuilder, getServerSourceFolder(), progress);
+    implBuilder.mainType().ifPresent(gen -> setCreatedServiceImplFqn(gen.fullyQualifiedName()));
+    return env.writeCompilationUnitAsync(implBuilder, getServerSourceFolder(), progress);
   }
 
   protected ICompilationUnitGenerator<?> createServiceIfcBuilder(String svcName, String sharedPackage) {
@@ -140,9 +145,10 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     return ifcBuilder;
   }
 
-  protected IType createServiceIfc(String svcName, String sharedPackage, IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createServiceIfc(String svcName, String sharedPackage, IEnvironment env, IProgress progress) {
     var ifcBuilder = createServiceIfcBuilder(svcName, sharedPackage);
-    var createdIfc = env.writeCompilationUnit(ifcBuilder, getSharedSourceFolder(), progress);
+    ifcBuilder.mainType().ifPresent(gen -> setCreatedServiceInterfaceFqn(gen.fullyQualifiedName()));
+    var createdIfc = env.writeCompilationUnitAsync(ifcBuilder, getSharedSourceFolder(), progress);
     setServiceIfcBuilder(ifcBuilder.mainType().orElse(null));
     return createdIfc;
   }
@@ -171,20 +177,36 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     m_serviceIfcBuilder = serviceIfcBuilder;
   }
 
-  public IType getCreatedServiceInterface() {
+  public IFuture<IType> getCreatedServiceInterface() {
     return m_createdServiceInterface;
   }
 
-  protected void setCreatedServiceInterface(IType createdServiceInterface) {
+  protected void setCreatedServiceInterface(IFuture<IType> createdServiceInterface) {
     m_createdServiceInterface = createdServiceInterface;
   }
 
-  public IType getCreatedServiceImpl() {
+  public String getCreatedServiceInterfaceFqn() {
+    return m_createdServiceInterfaceFqn;
+  }
+
+  protected void setCreatedServiceInterfaceFqn(String createdServiceInterfaceFqn) {
+    m_createdServiceInterfaceFqn = createdServiceInterfaceFqn;
+  }
+
+  public IFuture<IType> getCreatedServiceImpl() {
     return m_createdServiceImpl;
   }
 
-  protected void setCreatedServiceImpl(IType createdServiceImpl) {
+  protected void setCreatedServiceImpl(IFuture<IType> createdServiceImpl) {
     m_createdServiceImpl = createdServiceImpl;
+  }
+
+  public String getCreatedServiceImplFqn() {
+    return m_createdServiceImplFqn;
+  }
+
+  protected void setCreatedServiceImplFqn(String createdServiceImplFqn) {
+    m_createdServiceImplFqn = createdServiceImplFqn;
   }
 
   public String getSharedPackage() {

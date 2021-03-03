@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 public class TestingEnvironmentBuilder {
 
   private boolean m_flushResourcesToDisk;
+  private boolean m_assertNoCompileErrors = true;
   private Consumer<Consumer<IJavaEnvironment>> m_primaryEnv;
   private Consumer<Consumer<IJavaEnvironment>> m_dtoEnv;
 
@@ -35,6 +36,15 @@ public class TestingEnvironmentBuilder {
 
   public TestingEnvironmentBuilder withFlushResourcesToDisk(boolean flushResourcesToDisk) {
     m_flushResourcesToDisk = flushResourcesToDisk;
+    return this;
+  }
+
+  public boolean isAssertNoCompileErrors() {
+    return m_assertNoCompileErrors;
+  }
+
+  public TestingEnvironmentBuilder withAssertNoCompileErrors(boolean assertNoCompileErrors) {
+    m_assertNoCompileErrors = assertNoCompileErrors;
     return this;
   }
 
@@ -68,12 +78,12 @@ public class TestingEnvironmentBuilder {
     var ret = new AtomicReference<T>();
     getPrimaryEnvironment().orElse(nullEnvironment())
         .accept(first -> getDtoEnvironment().orElse(nullEnvironment())
-            .accept(second -> ret.set(runInTestingEnvironment(task, first, isFlushResourcesToDisk(), second))));
+            .accept(second -> ret.set(runInTestingEnvironment(task, first, isFlushResourcesToDisk(), isAssertNoCompileErrors(), second))));
     return ret.get();
   }
 
-  private static <T> T runInTestingEnvironment(Function<TestingEnvironment, T> task, IJavaEnvironment first, boolean isFlushResourcesToDisk, IJavaEnvironment second) {
-    try (var env = new TestingEnvironment(first, isFlushResourcesToDisk, second)) {
+  private static <T> T runInTestingEnvironment(Function<TestingEnvironment, T> task, IJavaEnvironment first, boolean isFlushResourcesToDisk, boolean assertNoCompileErrors, IJavaEnvironment second) {
+    try (var env = new TestingEnvironment(first, isFlushResourcesToDisk, assertNoCompileErrors, second)) {
       return task.apply(env);
     }
   }
