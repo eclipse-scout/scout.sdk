@@ -1,25 +1,14 @@
-<!--
-  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
-  ~ All rights reserved. This program and the accompanying materials
-  ~ are made available under the terms of the Eclipse Public License v1.0
-  ~ which accompanies this distribution, and is available at
-  ~ https://www.eclipse.org/legal/epl-v10.html
-  ~
-  ~ Contributors:
-  ~     BSI Business Systems Integration AG - initial API and implementation
-  -->
 <!doctype html>
 <html lang="en">
  <head>
   <meta charset="UTF-8">
-  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="generator" content="Asciidoctor 1.5.5">
+  <meta name="generator" content="Asciidoctor 2.0.10">
   <title>NLS Editor</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
   <link rel="stylesheet" href="css/eclipse.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
-  <link rel="stylesheet" href="css/coderay-eclipse.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
  </head>
  <body class="article">
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
@@ -40,12 +29,12 @@
    <div class="sect2">
     <h3 id="nls-editor"><a class="anchor" href="#nls-editor"></a>NLS Editor</h3>
     <div class="paragraph">
-     <p>The NLS Editor allows to edit the different properties files containing the translated text entries. It is an efficient way to edit all the property files for multilingual texts in one go.</p>
+     <p>The NLS Editor allows to edit the different properties files containing the translated text entries. It is a efficient way to edit all the property files for multilingual texts in one go.</p>
     </div>
     <div class="sect3">
      <h4 id="accessing-the-nls-editor"><a class="anchor" href="#accessing-the-nls-editor"></a>Accessing the NLS Editor</h4>
      <div class="paragraph">
-      <p>Search for the <code>*.nls</code> files in the <code>shared</code> projects. Select <span class="menuseq"><span class="menu">Open With</span>&nbsp;&#x25b8; <span class="menuitem">NLS Editor</span></span> in the context menu</p>
+      <p>Search for the <code>*.nls</code> files in the <code>shared</code> projects. Select <span class="menuseq"><b class="menu">Open With</b>&nbsp;<i class="fa fa-angle-right caret"></i> <b class="menuitem">NLS Editor</b></span> in the context menu</p>
      </div>
     </div>
     <div class="sect3">
@@ -64,7 +53,7 @@
      <div class="paragraph">
       <p>Actions on the top right corner:</p>
      </div>
-     <table class="tableblock frame-all grid-all spread">
+     <table class="tableblock frame-all grid-all stretch">
       <colgroup>
        <col style="width: 10%;">
        <col style="width: 45%;">
@@ -72,12 +61,12 @@
       </colgroup>
       <tbody>
        <tr>
-        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_refresh.gif" alt="icon refresh"></span></p></td>
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_refresh.png" alt="icon refresh"></span></p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Refresh NLS Project</p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Reload the content of the editor.</p></td>
        </tr>
        <tr>
-        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_find_obj.gif" alt="icon find obj"></span></p></td>
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_find_obj.png" alt="icon find obj"></span></p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Show NLS entry usage</p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">For each row, search in the Java code where the NLS Key is used. Results are displayed in the first column.</p></td>
        </tr>
@@ -87,17 +76,17 @@
         <td class="tableblock halign-left valign-top"><p class="tableblock">Opens the <a href="sdk_wizard_nls-entry.html">New Text Entry Wizard</a></p></td>
        </tr>
        <tr>
-        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_fileadd_pending.gif" alt="icon fileadd pending"></span></p></td>
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_fileadd_pending.png" alt="icon fileadd pending"></span></p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">New language&#x2026;&#x200b;</p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Opens the <a href="sdk_wizard_language.html">Add a Language Wizard</a></p></td>
        </tr>
        <tr>
-        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_import.gif" alt="icon import"></span></p></td>
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_import.png" alt="icon import"></span></p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Import&#x2026;&#x200b;</p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Import the NLS entries of an external file</p></td>
        </tr>
        <tr>
-        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_export.gif" alt="icon export"></span></p></td>
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_export.png" alt="icon export"></span></p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Export&#x2026;&#x200b;</p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Export the NLS entries to an external file</p></td>
        </tr>
@@ -118,7 +107,7 @@
      <div class="paragraph">
       <p>On each row it is possible to call following context menu:</p>
      </div>
-     <table class="tableblock frame-all grid-all spread">
+     <table class="tableblock frame-all grid-all stretch">
       <colgroup>
        <col style="width: 10%;">
        <col style="width: 45%;">
@@ -131,7 +120,7 @@
         <td class="tableblock halign-left valign-top"><p class="tableblock">Opens the <a href="sdk_wizard_nls-entry.html">New Text Entry Wizard</a></p></td>
        </tr>
        <tr>
-        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_find_obj.gif" alt="icon find obj"></span></p></td>
+        <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/icon_find_obj.png" alt="icon find obj"></span></p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Find references to 'Xxx'</p></td>
         <td class="tableblock halign-left valign-top"><p class="tableblock">Search in the Java code where the NLS Key is used.</p></td>
        </tr>
@@ -158,19 +147,30 @@
         <div class="ulist">
          <ul>
           <li> <p><code>Texts.properties</code> is the default language</p> </li>
-          <li> <p><code>Texts_de.properties</code> is for german</p> </li>
-          <li> <p><code>Texts_fr_BE</code> will be for french in Belgium</p> </li>
+          <li> <p><code>Texts_de.properties</code> is for German</p> </li>
+          <li> <p><code>Texts_fr_BE</code> will be for French in Belgium</p> </li>
          </ul>
         </div> </li>
       </ul>
      </div>
-     <hr>
+    </div>
+    <div class="sect3">
+     <h4 id="find-missing-nls-keys"><a class="anchor" href="#find-missing-nls-keys"></a>Find missing NLS Keys</h4>
      <div class="paragraph">
-      <p>Go back to the <a href="sdk.html">Scout Tooling</a>.</p>
+      <p>If NLS keys are used in the code that do not exist in a properties file, an ugly placeholder is displayed to the user. To find such missing translations the Menu <code>Scout &#x2192; Search missing text keys&#x2026;&#x200b;</code> may be handy. The result is listed in the Eclipse <code>Search</code> view.</p>
      </div>
      <div class="paragraph">
-      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0/docs/build/eclipse_help/src/docs/sdk_editor_nls.adoc" target="_blank">sources</a> on
-        GitHub.</p>
+      <p>The search also takes the scope of each NLS key into account. So that the key is considered to be available there must be a <code>TextProviderService</code> with that key on the classpath of that module.</p>
+     </div>
+     <div class="paragraph">
+      <p>Reported false positives can be suppressed using the following comment at the end of the corresponding line: <code>NO-NLS-CHECK</code>. Matches on that line are then not reported in future searches anymore.</p>
+     </div>
+     <hr>
+     <div class="paragraph">
+      <p>Go back to the <a href="sdk.html#scout-tooling">Scout Tooling</a>.</p>
+     </div>
+     <div class="paragraph">
+      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0/docs/build/eclipse_help/src/docs/sdk_editor_nls.adoc" target="_blank">sources</a> on GitHub.</p>
      </div>
     </div>
    </div>
@@ -190,7 +190,7 @@
   <div id="footer">
    <div id="footer-text">
      Version 11.0
-    <br> Last updated 2018-04-03 14:49:24 CEST
+    <br> Last updated 2021-03-05 08:41:30 +0100
    </div>
   </div>
  </body>

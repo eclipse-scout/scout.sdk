@@ -3,18 +3,17 @@
 	<topic href="html/tutorial.html" label="Getting Started">
 		<topic href="html/tutorial_helloworld.html" label="Hello World Tutorial">
 			<topic href="html/tutorial_helloworld.html#create-a-scout-project" label="Create a Scout Project"></topic>
-			<topic href="html/tutorial_helloworld.html#run-the-application" label="Run the Application"></topic>
-			<topic href="html/tutorial_helloworld.html#what-s-next" label="What’s Next?"></topic>
+			<topic href="html/tutorial_helloworld.html#whats-next" label="What’s Next?"></topic>
 		</topic>
 		<topic href="html/tutorial_existingdemo.html" label="Import the Scout Demo Applications">
-			<topic href="html/tutorial_existingdemo.html#install-the-scout-demo-application" label="Install the Scout Demo Application">
+			<topic href="html/tutorial_existingdemo.html#install-the-scout-demo-applications" label="Install the Scout Demo Applications">
 				<topic href="html/tutorial_existingdemo.html#setup-result" label="Setup result"></topic>
 			</topic>
 			<topic href="html/tutorial_existingdemo.html#run-the-contacts-demo-application" label="Run the Contacts Demo Application">
 				<topic href="html/tutorial_existingdemo.html#start-the-application-in-the-ide" label="Start the application in the IDE"></topic>
 				<topic href="html/tutorial_existingdemo.html#use-the-contacts-demo-in-a-browser" label="Use the Contacts Demo in a Browser"></topic>
 			</topic>
-			<topic href="html/tutorial_existingdemo.html#what-s-next" label="What’s Next?"></topic>
+			<topic href="html/tutorial_existingdemo.html#whats-next" label="What’s Next?"></topic>
 		</topic>
 	</topic>
 	<topic href="html/sdk.html" label="Scout Tooling">
@@ -31,6 +30,7 @@
 			<topic href="html/sdk_editor_nls.html#the-nls-editor" label="The NLS Editor"></topic>
 			<topic href="html/sdk_editor_nls.html#action-buttons" label="Action Buttons"></topic>
 			<topic href="html/sdk_editor_nls.html#default-mapping-to-properties-files" label="Default Mapping to Properties Files"></topic>
+			<topic href="html/sdk_editor_nls.html#find-missing-nls-keys" label="Find missing NLS Keys"></topic>
 		</topic>
 		<topic href="html/sdk_wizard.html" label="Scout Wizards">
 			<topic href="html/sdk_wizard.html#new-project-wizard" label="New Project Wizard"></topic>

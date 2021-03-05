@@ -1,25 +1,14 @@
-<!--
-  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
-  ~ All rights reserved. This program and the accompanying materials
-  ~ are made available under the terms of the Eclipse Public License v1.0
-  ~ which accompanies this distribution, and is available at
-  ~ https://www.eclipse.org/legal/epl-v10.html
-  ~
-  ~ Contributors:
-  ~     BSI Business Systems Integration AG - initial API and implementation
-  -->
 <!doctype html>
 <html lang="en">
  <head>
   <meta charset="UTF-8">
-  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="generator" content="Asciidoctor 1.5.5">
+  <meta name="generator" content="Asciidoctor 2.0.10">
   <title>Import the Scout Demo Applications</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
   <link rel="stylesheet" href="css/eclipse.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
-  <link rel="stylesheet" href="css/coderay-eclipse.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
  </head>
  <body class="article">
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
@@ -40,7 +29,7 @@
    <div class="sect2">
     <h3 id="import-the-scout-demo-applications"><a class="anchor" href="#import-the-scout-demo-applications"></a>Import the Scout Demo Applications</h3>
     <div class="paragraph">
-     <p>With this tutorial you will learn how to import the Scout Demo Application into your workspace. The tutorial consists of the following two parts:</p>
+     <p>With this tutorial you will learn how to import the Scout Demo applications into your workspace. The tutorial consists of the following two parts:</p>
     </div>
     <div class="ulist">
      <ul>
@@ -49,12 +38,12 @@
      </ul>
     </div>
     <div class="sect3">
-     <h4 id="install-the-scout-demo-applications"><a class="anchor" href="#install-the-scout-demo-application"></a>Install the Scout Demo Applications</h4>
+     <h4 id="install-the-scout-demo-applications"><a class="anchor" href="#install-the-scout-demo-applications"></a>Install the Scout Demo Applications</h4>
      <div class="paragraph">
       <p>In the first part of the tutorial we import the demo applications using the <a href="https://wiki.eclipse.org/Eclipse_Installer" target="_blank">Oomph Eclipse installer</a> tool.</p>
      </div>
      <div class="paragraph">
-      <p>In the Eclipse IDE open the <em class="wizard">Import</em> wizard with menu <span class="menuseq"><span class="menu">File</span>&nbsp;&#x25b8; <span class="menuitem">Import&#x2026;&#x200b;</span></span>. This opens the dialog shown in <a href="#img-oomph_existing_project">Figure 1</a>. Next, under folder <em class="folder">Oomph</em> select the node <em class="folder">Projects into Workspace</em> and click the <b class="button">Next</b> button.</p>
+      <p>In the Eclipse IDE open the <em class="wizard">Import</em> wizard with menu <span class="menuseq"><b class="menu">File</b>&nbsp;<i class="fa fa-angle-right caret"></i> <b class="menuitem">Import&#x2026;&#x200b;</b></span>. This opens the dialog shown in <a href="#img-oomph_existing_project">Figure 1</a>. Next, under folder <em class="folder">Oomph</em> select the node <em class="folder">Projects into Workspace</em> and click the <b class="button">Next</b> button.</p>
      </div>
      <div id="img-oomph_existing_project" class="imageblock">
       <div class="content">
@@ -65,16 +54,17 @@
       </div>
      </div>
      <div class="paragraph">
-       <p>Now select Scout Demo App, check in the table below that 'Stream' shows the desired Scout version and click <b class="button">Next</b>.</p>
+      <p>Now select Scout Demo App, check in the table below that 'Stream' shows the desired Scout version and click <b class="button">Next</b>.</p>
      </div>
      <div id="img-oomph_existing_project1" class="imageblock">
       <div class="content">
-       <img src="images/oomph_existing_project1.png" alt="oomph existing projects1">
+       <img src="images/oomph_existing_projects1.png" alt="oomph existing projects1">
       </div>
       <div class="title">
-       Figure 2. Select Scout Demo App</div>
+       Figure 2. Select Scout Demo App
       </div>
-	       <div class="paragraph">
+     </div>
+     <div class="paragraph">
       <p>On the next wizard page, select the <em>Show all variables</em> check box in the bottom left corner.</p>
      </div>
      <div id="img-oomph_existing_variables" class="imageblock">
@@ -93,19 +83,14 @@
        <li> <p><code>Git clone location rule</code>: &#x201c;Located in a folder named '.git/&lt;repo&gt;' within the workspace folder&#x201d;</p> </li>
        <li> <p><code>Target Platform</code>: &#x201c;None&#x201d;</p> </li>
        <li> <p><code>JRE 1.8 Location</code>: Path to your Java 8 JRE</p> </li>
-       <li> <p><code>Scout Demo App Github repository</code>: &#8220;HTTPS (read-only, anonymous)&#8221;</p></li>
+       <li> <p><code>Scout Demo App Github repository</code>: &#x201c;HTTPS (read-only, anonymous)&#x201d;</p> </li>
       </ul>
      </div>
      <div class="paragraph">
-  <p>Once you finished setting the variables click <b class="button">Next</b>.
-This leads to the <em class="wizard">Confirmation</em> dialog.
-This last step can be completed by clicking on <b class="button">Finish</b>.</p>     </div>
+      <p>Once you finished setting the variables click <b class="button">Next</b>. This leads to the <em class="wizard">Confirmation</em> dialog. This last step can be completed by clicking on <b class="button">Finish</b>.</p>
+     </div>
      <div class="paragraph">
-<p>The Oomph installer first makes sure that all necessary Scout components and M2E connectors are available.
-In case one or more components are missing, Oomph will first download and install them.
-This triggers a restart request as shown in <a href="#img-oomph_restart">Figure 4</a>.
-If the dialog does not automatically appear, click on the small icon in the status bar on the bottom as shown in <a href="#img-oomph_status">Figure 4</a>.</p>
-
+      <p>The Oomph installer first makes sure that all necessary Scout components and M2E connectors are available. In case one or more components are missing, Oomph will first download and install them. This triggers a restart request as shown in <a href="#img-oomph_restart">Figure 4</a>. If the dialog does not automatically appear, click on the small icon in the status bar on the bottom as shown in <a href="#img-oomph_status">Figure 5</a>.</p>
      </div>
      <div id="img-oomph_restart" class="imageblock">
       <div class="content">
@@ -115,11 +100,19 @@ If the dialog does not automatically appear, click on the small icon in the stat
        Figure 4. Restart of the IDE after installation.
       </div>
      </div>
+     <div id="img-oomph_status" class="imageblock">
+      <div class="content">
+       <img src="images/oomph_status.png" alt="oomph status">
+      </div>
+      <div class="title">
+       Figure 5. Status icon
+      </div>
+     </div>
      <div class="paragraph">
       <p>To complete the installation click <b class="button">Finish</b>. If your IDE needs to be restarted, select the same workspace in the <em class="wizard">Eclipse Launcher</em> dialog.</p>
      </div>
      <div class="paragraph">
-      <p>After the restart Oomph will continue to download and install the Scout demo application showing the progress in the Eclipse importer dialog. Once the download and installation has completed you may close the dialog with clicking the <b class="button">Finish</b> button.</p>
+      <p>After the restart Oomph will continue to download and install the Scout demo applications showing the progress in the Eclipse importer dialog. Once the download and installation has completed you can close the dialog with clicking the <b class="button">Finish</b> button.</p>
      </div>
      <div class="sect4">
       <h5 id="setup-result"><a class="anchor" href="#setup-result"></a>Setup result</h5>
@@ -157,7 +150,7 @@ If the dialog does not automatically appear, click on the small icon in the stat
        </div>
       </div>
       <div class="paragraph">
-       <p>If you do not see the workingsets, you might need to select "<span class="menuseq"><span class="menu">Top Level Elements</span>&nbsp;&#x25b8; <span class="menuitem">Working Sets</span></span>" from the Menu as displayed in <a href="#img-workingsets_top_level">Figure 7</a></p>
+       <p>If you do not see the workingsets, you might need to select "<span class="menuseq"><b class="menu">Top Level Elements</b>&nbsp;<i class="fa fa-angle-right caret"></i> <b class="menuitem">Working Sets</b></span>" from the Menu as displayed in <a href="#img-workingsets_top_level">Figure 7</a></p>
       </div>
       <div id="img-workingsets_top_level" class="imageblock">
        <div class="content">
@@ -172,15 +165,12 @@ If the dialog does not automatically appear, click on the small icon in the stat
     <div class="sect3">
      <h4 id="run-the-contacts-demo-application"><a class="anchor" href="#run-the-contacts-demo-application"></a>Run the Contacts Demo Application</h4>
      <div class="paragraph">
-      <p>With the Scout demo installed in our workspace we are now ready to start the application from within our IDE.</p>
+      <p>With the Scout demo installed in our workspace we are now ready to start the applications from within our IDE.</p>
      </div>
      <div class="sect4">
       <h5 id="start-the-application-in-the-ide"><a class="anchor" href="#start-the-application-in-the-ide"></a>Start the application in the IDE</h5>
       <div class="paragraph">
-<p>Open the <em class="menu">Run As</em> menu as shown in <a href="#img-oomph_run_contacts_all">Figure 8</a>.
-There are 3 launch groups available, one for each application.
-Each launch group will start all the necessary builds and servers.
-Now select <em>[contacts] all</em> to run the Contacts application.</p>
+       <p>Open the <em class="menu">Run As</em> menu as shown in <a href="#img-oomph_run_contacts_all">Figure 8</a>. There are 3 launch groups available, one for each application. Each launch group will start all the necessary builds and servers. Now select <em>[contacts] all</em> (Windows or Unix variant) to run the Contacts application.</p>
       </div>
       <div id="img-oomph_run_contacts_all" class="imageblock">
        <div class="content">
@@ -218,7 +208,7 @@ Now select <em>[contacts] all</em> to run the Contacts application.</p>
      </div>
     </div>
     <div class="sect3">
-     <h4 id="what-s-next"><a class="anchor" href="#what-s-next"></a>What&#x2019;s Next?</h4>
+     <h4 id="whats-next"><a class="anchor" href="#whats-next"></a>What&#x2019;s Next?</h4>
      <div class="paragraph">
       <p>Play with the Contacts application. This provides a good overview of a typical Scout application. You can browse through the data, open different forms and add/change entities.</p>
      </div>
@@ -230,7 +220,8 @@ Now select <em>[contacts] all</em> to run the Contacts application.</p>
        Listing 1. ContactOutline implementation.
       </div>
       <div class="content">
-       <pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">ContactOutline</span> <span class="directive">extends</span> AbstractOutline {
+       <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@ClassId</span>(<span class="string"><span class="delimiter">"</span><span class="content">303c0267-3c99-4736-a7f5-3097c5e011b6</span><span class="delimiter">"</span></span>)
+<span class="directive">public</span> <span class="type">class</span> <span class="class">ContactOutline</span> <span class="directive">extends</span> AbstractOutline {
   <span class="annotation">@Override</span>
   <span class="directive">protected</span> <span class="type">void</span> execCreateChildPages(<span class="predefined-type">List</span>&lt;IPage&lt;?&gt;&gt; pageList) {
     <span class="comment">// pages to be shown in the navigation area of this outline</span>
@@ -243,7 +234,7 @@ Now select <em>[contacts] all</em> to run the Contacts application.</p>
   }
   <span class="annotation">@Override</span>
   <span class="directive">protected</span> <span class="predefined-type">String</span> getConfiguredIconId() {
-    <span class="keyword">return</span> Icons.Category;
+    <span class="keyword">return</span> Icons.CategoryBold;
   }
 }</code></pre>
       </div>
@@ -252,12 +243,11 @@ Now select <em>[contacts] all</em> to run the Contacts application.</p>
       <p>If you have clicked on the <em class="folder">Persons</em> node a page with all available persons is shown. This page is implemented in class <span class="java">PersonTablePage</span> and the dialog to show/edit persons is implemented in class <span class="java">PersonForm</span>.</p>
      </div>
      <div class="paragraph">
-      <p>This is the end of the <a href="tutorial.html#tutorial">getting started</a> guide.</p>
+      <p>This is the end of the <a href="tutorial.html#getting-started">getting started</a> guide.</p>
      </div>
      <hr>
      <div class="paragraph">
-      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0.x/docs/build/eclipse_help/src/docs/tutorial_existingdemo.adoc" target="_blank">sources</a>
-        on GitHub.</p>
+      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0/docs/build/eclipse_help/src/docs/tutorial_existingdemo.adoc" target="_blank">sources</a> on GitHub.</p>
      </div>
     </div>
    </div>
@@ -277,8 +267,9 @@ Now select <em>[contacts] all</em> to run the Contacts application.</p>
   <div id="footer">
    <div id="footer-text">
      Version 11.0
-    <br> Last updated 2020-04-10 14:49:24 CEST
+    <br> Last updated 2021-03-05 08:41:30 +0100
    </div>
   </div>
+  <link rel="stylesheet" href="css/coderay-eclipse.css">
  </body>
 </html>

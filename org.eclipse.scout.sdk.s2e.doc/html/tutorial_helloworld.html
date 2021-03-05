@@ -1,25 +1,14 @@
-<!--
-  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
-  ~ All rights reserved. This program and the accompanying materials
-  ~ are made available under the terms of the Eclipse Public License v1.0
-  ~ which accompanies this distribution, and is available at
-  ~ https://www.eclipse.org/legal/epl-v10.html
-  ~
-  ~ Contributors:
-  ~     BSI Business Systems Integration AG - initial API and implementation
-  -->
 <!doctype html>
 <html lang="en">
  <head>
   <meta charset="UTF-8">
-  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="generator" content="Asciidoctor 1.5.5">
+  <meta name="generator" content="Asciidoctor 2.0.10">
   <title>Hello World Tutorial</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
   <link rel="stylesheet" href="css/eclipse.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
-  <link rel="stylesheet" href="css/coderay-eclipse.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
  </head>
  <body class="article">
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
@@ -45,7 +34,7 @@
     <div class="sect3">
      <h4 id="create-a-scout-project"><a class="anchor" href="#create-a-scout-project"></a>Create a Scout Project</h4>
      <div class="paragraph">
-      <p>Start your Eclipse IDE and select an empty directory for your workspace as shown in <a href="#img-sdk_start_new_workspace">Figure 1</a>. This workspace directory will then hold all the project code for the <code>Hello World</code> application. Once the Eclipse IDE is running it will show the Java perspective.</p>
+      <p>Start your Eclipse IDE and select an empty directory for your workspace as shown in <a href="#img-sdk_start_new_workspace">Figure 1</a>. This workspace directory will then hold all the project code for the <code>Hello Scout</code> application. Once the Eclipse IDE is running it will show the Java perspective.</p>
      </div>
      <div id="img-sdk_start_new_workspace" class="imageblock">
       <div class="content">
@@ -56,9 +45,7 @@
       </div>
      </div>
      <div class="paragraph">
-      <p>To create a new Scout project select the menu <span class="menuseq"><span class="menu">File</span>&nbsp;&#x25b8; <span class="submenu">New</span>&nbsp;&#x25b8; <span class="menuitem">Project&#x2026;&#x200b;</span></span> and type &#x201c;Scout Project&#x201d; in the wizard search field. 
-	  Select the Scout Project wizard and press <b class="button">Next</b>.
-	  The <em class="wizard">New Scout Project</em> wizard is then started as shown in <a href="#img-sdk_new_project_wizard">Figure 2</a>.</p>
+      <p>To create a new Scout project select the menu <span class="menuseq"><b class="menu">File</b>&nbsp;<i class="fa fa-angle-right caret"></i> <b class="submenu">New</b>&nbsp;<i class="fa fa-angle-right caret"></i> <b class="menuitem">Project&#x2026;&#x200b;</b></span> and type <code>Scout Project</code> in the wizard search field. Select the Scout Project wizard and press <b class="button">Next</b>. The <em class="wizard">New Scout Project</em> wizard is then started as shown in <a href="#img-sdk_new_project_wizard">Figure 2</a>.</p>
      </div>
      <div id="img-sdk_new_project_wizard" class="imageblock">
       <div class="content">
@@ -69,13 +56,13 @@
       </div>
      </div>
      <div class="paragraph">
-      <p>In the <em class="wizard">New Scout Project</em> wizard you have to enter a <code>group id</code>, <code>artifact id</code> and a <code>display name</code> for your Scout project. As the created project will make use of <a href="https://maven.apache.org/" target="_blank">Apache Maven</a> please refer to the <a href="https://maven.apache.org/guides/mini/guide-naming-conventions.html" target="_blank">Maven naming conventions</a> to choose <code>group id</code> and <code>artifact id</code> for your project. The <code>artifact id</code> will then also be the project name in the Eclipse workspace. The <code>display name</code> is used as the application name presented to the user (e.g. in the Browser title bar).</p>
+      <p>In the <em class="wizard">New Scout Project</em> wizard you have to enter a <code>Group Id</code>, <code>Artifact Id</code> and a <code>Display Name</code> for your Scout project. As the created project will make use of <a href="https://maven.apache.org/" target="_blank">Apache Maven</a> please refer to the <a href="https://maven.apache.org/guides/mini/guide-naming-conventions.html" target="_blank">Maven naming conventions</a> to choose <code>Group Id</code> and <code>Artifact Id</code> for your project. The <code>Display Name</code> is used as the application name presented to the user (e.g. in the browser title bar).</p>
      </div>
      <div class="paragraph">
-      <p>For the <code>Hello World</code> application just use the already prefilled values as sown in <a href="#img-sdk_new_project_wizard">Figure 2</a>. Then, click the <b class="button">Finish</b> button to let the Scout SDK create the initial project code for you.</p>
+      <p>For the <code>Hello Scout</code> application just use the already pre-filled values and ensure the user interface programming language is set to <code>Java</code> as sown in <a href="#img-sdk_new_project_wizard">Figure 2</a>. Then click the <b class="button">Finish</b> button to let the Scout SDK create the initial project code for you.</p>
      </div>
      <div class="paragraph">
-      <p>Depending on your Eclipse installation some <code>Maven plugin connectors</code> may be missing initially. In that case a dialog as shown in <a href="#img-sdk_new_project_connector">Figure 3</a> may be shown. To continue click on <b class="button">Finish</b> to resolve the selected connectors. Afterwards confirm the installation, accept the license and the message that some content has not been signed. Finally, the installation of the maven plugin connectors requires a restart of the Eclipse IDE.</p>
+      <p>Depending on your Eclipse installation some <code>Maven plugin connectors</code> may initially be missing. In that case a dialog as shown in <a href="#img-sdk_new_project_connector">Figure 3</a> may be shown. To continue click on <b class="button">Finish</b> to resolve the selected connectors. Afterwards confirm the installation, accept the license and the message that some content has not been signed. Finally, the installation of the maven plugin connectors requires a restart of the Eclipse IDE.</p>
      </div>
      <div id="img-sdk_new_project_connector" class="imageblock">
       <div class="content">
@@ -86,103 +73,63 @@
       </div>
      </div>
      <div class="paragraph">
-      <p>After the <em class="wizard">New Scout Project</em> wizard has created the initial Maven modules for the <code>Hello World</code> application these modules are compiled and built by the Eclipse IDE. In case of a successful Eclipse Scout installation your Eclipse IDE should display all created Maven modules in the Package Explorer and have an empty Problems view as shown in <a href="#img-sdk_new_project_initial_helloworld">Figure 4</a>.</p>
+      <p>After the <em class="wizard">New Scout Project</em> wizard has created the Maven modules for the <code>Hello Scout</code> application the code is compiled by the Eclipse IDE. You can see the created Maven modules in the <code>Package Explorer</code> as shown in <a href="#img-sdk_new_project_initial_helloworld">Figure 4</a>.</p>
      </div>
      <div id="img-sdk_new_project_initial_helloworld" class="imageblock">
       <div class="content">
        <img src="images/sdk_new_project_initial_helloworld.png" alt="sdk new project initial helloworld">
       </div>
       <div class="title">
-       Figure 4. The inital set of Maven modules created for the Hello World application.
+       Figure 4. The initial set of Maven modules created for the Hello Scout application.
       </div>
      </div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-You need to adjust the Maven build if Java 9 is the minimal required version of your project. Open <code>helloworld/pom.xml</code> (replace <code>helloworld</code> with the <code>artifact id</code> you chose earlier) and add <code>&lt;master_signatureCheck_skip&gt;true&lt;/master_signatureCheck_skip&gt;</code> to the <code>&lt;properties&gt;</code>-element. Note: the minimal required Java version is declared by property <code>jdk.source.version</code> within the very same <code>&lt;properties&gt;</code>-element.
-</td>
-</tr>
-</table>
-     </div>
-    </div>
-    <div class="sect3">
-     <h4 id="run-the-application"><a class="anchor" href="#run-the-application"></a>Run the Application</h4>
      <div class="paragraph">
-   <p>After the initial project creation step we can try to start the Scout application for the first time.
-Since the Hello World app consists of a backend and a frontend, we need to start two servers, one for the backend and one for the frontend.
-We also need to launch the JavaScript build that creates the JS and CSS bundles which will be served by the frontend server.
-We could start each launch configuration separately, but for the sake of convenience there is a launch group available which starts all at once.</p>
-     </div>
-<div class="paragraph">
-<p>To start the launch group we use the <em class="menu">Run As</em> menu as shown in <a href="#img-start_all">Figure 5</a>.</p>
-</div>
-<div id="img-start_all" class="imageblock">
-<div class="content">
-<img src="images/sdk_start_all.png" alt="sdk start all">
-</div>
-<div class="title">Figure 5. Starting the Hello World application.</div>
- 
+      <p>After the compilation, you can start the Scout application for the first time. Since the <code>Hello Scout</code> app consists of a backend and a frontend, two servers need to be started. Before the frontend server can deliver any JavaScript code to the browser the JavaScript build needs to be executed as well. You could start each launch configuration separately, but for the sake of convenience there is a launch group available which starts all at once.</p>
      </div>
      <div class="paragraph">
-     <p>Because the JavaScript build needs a Node.js installation, the launching will fail if Node.js is not installed, see <a href="#img-start_missing_node">Figure 6</a></p>
+      <p>To start the launch group use the <em class="menu">Run As</em> menu as shown in <a href="#img-start_all">Figure 5</a>.</p>
      </div>
-     <div id="img-start_missing_node" class="imageblock">
+     <div id="img-start_all" class="imageblock">
       <div class="content">
-       <img src="images/sdk_start_missing_node.png" alt="sdk start missing node">
+       <img src="images/sdk_start_all.png" alt="sdk start all">
       </div>
       <div class="title">
-       Figure 6. Launching fails due to missing Node.js
+       Figure 5. Starting the Hello Scout application.
       </div>
      </div>
-     <div class="paragraph">
-    <p>If that is the case, we need to install a recent Node.js version.
-	To do this, we visit the official download page <a href="https://nodejs.org/en/" class="bare">https://nodejs.org/en/</a>, download the LTS version for our platform and install it.</p>
-     </div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-The installation process could also fail if the installed Node.js is too old.
-Scout requires at least Node.js 12.1.0.
-</td>
-</tr>
-</table>
-</div>
-     <div class="paragraph">
- <p>After Node.js has been installed, we can try to launch the application again using the <em class="menu">Run as</em> menu we used before.
-This time you should see console output providing information about the JS build process.
-Once the JS build has been completed successfully, the frontend and backend servers will be started automatically.
-The servers are ready as soon as the console shows <em>Server ready</em>.
-We can now access the Hello World application by navigating to <a href="http://localhost:8082/" class="bare">http://localhost:8082/</a> in our favorite web browser.</p>
+     <div class="admonitionblock important">
+      <table>
+       <tbody>
+        <tr>
+         <td class="icon"> <i class="fa icon-important" title="Important"></i> </td>
+         <td class="content"> The JavaScript build could fail in case the installed Node.js could not be found or is too old. In that case follow the instructions in the section <a href="#Prerequisites">[Prerequisites]</a>. </td>
+        </tr>
+       </tbody>
+      </table>
      </div>
      <div class="paragraph">
-      <p>The running Hello World application should then be started in your browser as shown in <a href="#img-start_browser">Figure 7</a>.</p>
+      <p>Once the JS build has been completed successfully, the frontend and backend servers will be started automatically. The servers are ready as soon as the console shows <code>Server ready</code>. You can now access the <code>Hello Scout</code> application by navigating to <a href="http://localhost:8082/" class="bare" target="_blank">http://localhost:8082/</a> in your favorite web browser.</p>
+     </div>
+     <div class="paragraph">
+      <p>The <code>Hello Scout</code> application is then presented as shown in <a href="#img-start_browser">Figure 6</a>.</p>
      </div>
      <div id="img-start_browser" class="imageblock">
       <div class="content">
        <img src="images/run_helloworld_in_browser.png" alt="run helloworld in browser">
       </div>
       <div class="title">
-       Figure 7. The Hello World application in the browser.
+       Figure 6. The Hello Scout application in the browser.
       </div>
      </div>
     </div>
     <div class="sect3">
-     <h4 id="what-s-next"><a class="anchor" href="#what-s-next"></a>What&#x2019;s Next?</h4>
+     <h4 id="whats-next"><a class="anchor" href="#whats-next"></a>What&#x2019;s Next?</h4>
      <div class="paragraph">
-      <p>In the <a href="tutorial_existingdemo.html#import-the-scout-demo-applications-tutorial">next tutorial</a>, you will learn how to import the Scout demo applications into your workspace.</p>
+      <p>In the <a href="tutorial_existingdemo.html#import-the-scout-demo-applications">next tutorial</a>, you will learn how to import the Scout demo applications into your workspace.</p>
      </div>
      <hr>
      <div class="paragraph">
-      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0.x/docs/build/eclipse_help/src/docs/tutorial_helloworld.adoc" target="_blank">sources</a> on
-        GitHub.</p>
+      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0/docs/build/eclipse_help/src/docs/tutorial_helloworld.adoc" target="_blank">sources</a> on GitHub.</p>
      </div>
     </div>
    </div>
@@ -202,7 +149,7 @@ We can now access the Hello World application by navigating to <a href="http://l
   <div id="footer">
    <div id="footer-text">
      Version 11.0
-    <br> Last updated 2020-03-10 14:49:24 CEST
+    <br> Last updated 2021-03-05 08:41:30 +0100
    </div>
   </div>
  </body>

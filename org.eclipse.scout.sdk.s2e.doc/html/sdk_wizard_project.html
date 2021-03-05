@@ -1,25 +1,14 @@
-<!--
-  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
-  ~ All rights reserved. This program and the accompanying materials
-  ~ are made available under the terms of the Eclipse Public License v1.0
-  ~ which accompanies this distribution, and is available at
-  ~ https://www.eclipse.org/legal/epl-v10.html
-  ~
-  ~ Contributors:
-  ~     BSI Business Systems Integration AG - initial API and implementation
-  -->
 <!doctype html>
 <html lang="en">
  <head>
   <meta charset="UTF-8">
-  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="generator" content="Asciidoctor 1.5.5">
+  <meta name="generator" content="Asciidoctor 2.0.10">
   <title>New Scout Project Wizard</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
   <link rel="stylesheet" href="css/eclipse.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
-  <link rel="stylesheet" href="css/coderay-eclipse.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
  </head>
  <body class="article">
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
@@ -43,7 +32,7 @@
      <p>The <em>New Scout Project</em> wizard can be used to create a new Scout project from scratch.</p>
     </div>
     <div class="paragraph">
-     <p>To open the wizard press <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>N</kbd></span> or use <span class="menuseq"><span class="menu">File</span>&nbsp;&#x25b8; <span class="submenu">New</span>&nbsp;&#x25b8; <span class="menuitem">Other&#x2026;&#x200b;</span></span> and type "<em>Scout</em>" into the <strong>Wizards</strong> search field. Then, select the entry "<em>Scout Project</em>" and click on <b class="button">Next</b>. This leads to the initial dialog of the <em>New Scout Project</em> wizard as shown in <a href="#img-sdk_wizard_project">Figure 1</a>.</p>
+     <p>To open the wizard press <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>N</kbd></span> or use <span class="menuseq"><b class="menu">File</b>&nbsp;<i class="fa fa-angle-right caret"></i> <b class="submenu">New</b>&nbsp;<i class="fa fa-angle-right caret"></i> <b class="menuitem">Other&#x2026;&#x200b;</b></span> and type "<em>Scout</em>" into the <strong>Wizards</strong> search field. Then, select the entry "<em>Scout Project</em>" and click on <b class="button">Next</b>. This leads to the initial dialog of the <em>New Scout Project</em> wizard as shown in <a href="#img-sdk_wizard_project">Figure 1</a>.</p>
     </div>
     <div id="img-sdk_wizard_project" class="imageblock">
      <div class="content">
@@ -147,6 +136,7 @@
          <ul>
           <li> <p>Contains servlet filters and the HTML pages as well as custom CSS and JavaScript files for the Scout UI Server.</p> </li>
           <li> <p>See class <code>UiServletFilter</code> in <code>src/main/java</code> and folder <code>WebContent</code> in <code>source/main/resources</code>.</p> </li>
+          <li> <p>The file <code>js build.launch</code> contains the launch configuration for the Eclipse IDE that executes the JavaScript build.</p> </li>
          </ul>
         </div> </li>
        <li> <p>Maven module <strong>helloworld.ui.html.app.dev</strong></p>
@@ -172,11 +162,10 @@
      </div>
      <hr>
      <div class="paragraph">
-      <p>Go back to the <a href="sdk_wizard.html">Scout Wizards</a>.</p>
+      <p>Go back to the <a href="sdk_wizard.html#scout-wizards">Scout Wizards</a>.</p>
      </div>
      <div class="paragraph">
-      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0/docs/build/eclipse_help/src/docs/sdk_wizard_project.adoc" target="_blank">sources</a> on
-        GitHub.</p>
+      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0/docs/build/eclipse_help/src/docs/sdk_wizard_project.adoc" target="_blank">sources</a> on GitHub.</p>
      </div>
     </div>
    </div>
@@ -196,7 +185,7 @@
   <div id="footer">
    <div id="footer-text">
      Version 11.0
-    <br> Last updated 2018-04-03 14:49:24 CEST
+    <br> Last updated 2021-03-05 08:41:30 +0100
    </div>
   </div>
  </body>

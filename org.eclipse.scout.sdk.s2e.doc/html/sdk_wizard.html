@@ -1,25 +1,14 @@
-<!--
-  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
-  ~ All rights reserved. This program and the accompanying materials
-  ~ are made available under the terms of the Eclipse Public License v1.0
-  ~ which accompanies this distribution, and is available at
-  ~ https://www.eclipse.org/legal/epl-v10.html
-  ~
-  ~ Contributors:
-  ~     BSI Business Systems Integration AG - initial API and implementation
-  -->
 <!doctype html>
 <html lang="en">
  <head>
   <meta charset="UTF-8">
-  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="generator" content="Asciidoctor 1.5.5">
+  <meta name="generator" content="Asciidoctor 2.0.10">
   <title>Scout Wizards</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
   <link rel="stylesheet" href="css/eclipse.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
-  <link rel="stylesheet" href="css/coderay-eclipse.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
  </head>
  <body class="article">
   <table border="0" class="navigation" style="width: 100%;" summary="navigation">
@@ -43,7 +32,7 @@
      <p>The Scout SDK provides a set of wizards to create new Scout projects and various components for your Scout applications.</p>
     </div>
     <div class="paragraph">
-     <p>To start any of these wizards press <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>N</kbd></span> or use menu <span class="menuseq"><span class="menu">File</span>&nbsp;&#x25b8; <span class="submenu">New</span>&nbsp;&#x25b8; <span class="menuitem">Other&#x2026;&#x200b;</span></span>. In the first wizard step type "<em>Scout</em>" into the <strong>Wizards</strong> field as shown in <a href="#img-sdk_wizard_new">Figure 1</a>.</p>
+     <p>To start any of these wizards press <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>N</kbd></span> or use menu <span class="menuseq"><b class="menu">File</b>&nbsp;<i class="fa fa-angle-right caret"></i> <b class="submenu">New</b>&nbsp;<i class="fa fa-angle-right caret"></i> <b class="menuitem">Other&#x2026;&#x200b;</b></span>. In the first wizard step type "<em>Scout</em>" into the <strong>Wizards</strong> field as shown in <a href="#img-sdk_wizard_new">Figure 1</a>.</p>
     </div>
     <div id="img-sdk_wizard_new" class="imageblock">
      <div class="content">
@@ -56,7 +45,7 @@
     <div class="sect3">
      <h4 id="new-project-wizard"><a class="anchor" href="#new-project-wizard"></a>New Project Wizard</h4>
      <div class="paragraph">
-      <p>With the <a href="sdk_wizard_project.html">New Project Wizard</a> a new Scout client server application project is created from scratch.</p>
+      <p>With the <a href="sdk_wizard_project.html#new-scout-project-wizard">New Project Wizard</a> a new Scout client server application project is created from scratch.</p>
      </div>
     </div>
     <div class="sect3">
@@ -66,11 +55,11 @@
      </div>
      <div class="ulist">
       <ul>
-       <li> <p><a href="sdk_wizard_form.html">New Form Wizard</a>, includes creation of a form, a form data, a service and permissions.</p> </li>
-       <li> <p><a href="sdk_wizard_page.html">New Page Wizard</a>, includes creation of a page and a page data.</p> </li>
-       <li> <p><a href="sdk_wizard_lookupcall.html">New LookupCall Wizard</a>, includes creation of a lookup call and a lookup service.</p> </li>
-       <li> <p><a href="sdk_wizard_code-type.html">New CodeType Wizard</a></p> </li>
-       <li> <p><a href="sdk_wizard_permission.html">New Permission Wizard</a></p> </li>
+       <li> <p><a href="sdk_wizard_form.html#new-form-wizard">New Form Wizard</a>, includes creation of a form, a form data, a service and permissions.</p> </li>
+       <li> <p><a href="sdk_wizard_page.html#new-page-wizard">New Page Wizard</a>, includes creation of a page and a page data.</p> </li>
+       <li> <p><a href="sdk_wizard_lookupcall.html#new-lookupcall-wizard">New LookupCall Wizard</a>, includes creation of a lookup call and a lookup service.</p> </li>
+       <li> <p><a href="sdk_wizard_code-type.html#new-codetype-wizard">New CodeType Wizard</a></p> </li>
+       <li> <p><a href="sdk_wizard_permission.html#new-permission-wizard">New Permission Wizard</a></p> </li>
       </ul>
      </div>
     </div>
@@ -80,15 +69,14 @@
       <p>For the Scout NLS support two additional wizards are provided by the Scout SDK.</p>
      </div>
      <div class="paragraph">
-      <p>Content assistance for the String parameter in <code>TEXTS.get()</code> is added to the Java editor. There, the <a href="sdk_wizard_nls-entry.html">New Text Entry Wizard</a> can be used to add translated texts. Adding additional translated languages with the <a href="sdk_wizard_language.html">Add a Language Wizard</a> is handled in the <a href="sdk_editor_nls.html">NLS Editor</a>.</p>
+      <p>Content assistance for the String parameter in <code>TEXTS.get()</code> is added to the Java editor. There, the <a href="sdk_wizard_nls-entry.html#nls-entry-wizard">New Text Entry Wizard</a> can be used to add translated texts. Adding additional translated languages with the <a href="sdk_wizard_language.html">Add a Language Wizard</a> is handled in the <a href="sdk_editor_nls.html#nls-editor">NLS Editor</a>.</p>
      </div>
      <hr>
      <div class="paragraph">
-      <p>Go back to the <a href="sdk.html">Scout Tooling</a>.</p>
+      <p>Go back to the <a href="sdk.html#scout-tooling">Scout Tooling</a>.</p>
      </div>
      <div class="paragraph">
-      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0/docs/build/eclipse_help/src/docs/sdk_wizard.adoc" target="_blank">sources</a> on GitHub.
-      </p>
+      <p>Do you want to improve this document? Have a look at the <a href="https://github.com/bsi-software/org.eclipse.scout.docs/blob/releases/11.0/docs/build/eclipse_help/src/docs/sdk_wizard.adoc" target="_blank">sources</a> on GitHub.</p>
      </div>
     </div>
    </div>
@@ -108,7 +96,7 @@
   <div id="footer">
    <div id="footer-text">
      Version 11.0
-    <br> Last updated 2018-04-03 14:49:24 CEST
+    <br> Last updated 2021-03-05 08:41:30 +0100
    </div>
   </div>
  </body>
