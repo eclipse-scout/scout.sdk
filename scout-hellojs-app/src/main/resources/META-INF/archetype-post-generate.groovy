@@ -20,8 +20,10 @@ String artifactId = request.artifactId
 //noinspection GrUnresolvedAccess
 File outputDirectoryFile = new File(request.outputDirectory as String)
 Path projectsDirectoryPath = new File(outputDirectoryFile, artifactId).toPath()
+Path parentModulePath = projectsDirectoryPath.resolve(artifactId)
 File uiModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui')).toFile()
 File appModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.app')).toFile()
+File runConfigsFile = parentModulePath.resolve('run-configs').toFile()
 File appDevModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.app.dev')).toFile()
 
 String osName = System.properties.get('os.name')
@@ -32,30 +34,37 @@ dumpObject(request)
 
 log('Building on '.concat(osName))
 if (osName.toLowerCase().contains('windows')) {
-    log('Deleting and renaming files in folder '.concat(appModuleFile.toString()))
-    deleteFile(new File(appModuleFile, 'js build.sh'))
-    deleteFile(new File(appModuleFile, 'js build.launch'))
-    renameFile(new File(appModuleFile, 'win js build.cmd'), 'js build.cmd')
-    renameFile(new File(appModuleFile, 'win js build.launch'), 'js build.launch')
-
-    log('Deleting and renaming files in folder '.concat(uiModuleFile.toString()))
-    deleteFile(new File(uiModuleFile, 'js tests.sh'))
-    deleteFile(new File(uiModuleFile, 'js tests.launch'))
-    renameFile(new File(uiModuleFile, 'win js tests.cmd'), 'js tests.cmd')
-    renameFile(new File(uiModuleFile, 'win js tests.launch'), 'js tests.launch')
+    log('Deleting and renaming files in folder '.concat(runConfigsFile.toString()))
+    deleteFile(new File(runConfigsFile, 'js build.sh'))
+    deleteFile(new File(runConfigsFile, 'js build.launch'))
+    renameFile(new File(runConfigsFile, 'win js build.cmd'), 'js build.cmd')
+    renameFile(new File(runConfigsFile, 'win js build.launch'), 'js build.launch')
+    deleteFile(new File(runConfigsFile, 'js tests.sh'))
+    deleteFile(new File(runConfigsFile, 'js tests.launch'))
+    renameFile(new File(runConfigsFile, 'win js tests.cmd'), 'js tests.cmd')
+    renameFile(new File(runConfigsFile, 'win js tests.launch'), 'js tests.launch')
 } else {
-    log('Deleting files in folder '.concat(appModuleFile.toString()))
-    deleteFile(new File(appModuleFile, 'win js build.cmd'))
-    deleteFile(new File(appModuleFile, 'win js build.launch'))
-
-    log('Deleting files in folder '.concat(uiModuleFile.toString()))
-    deleteFile(new File(uiModuleFile, 'win js tests.cmd'))
-    deleteFile(new File(uiModuleFile, 'win js tests.launch'))
+    log('Deleting files in folder '.concat(runConfigsFile.toString()))
+    deleteFile(new File(runConfigsFile, 'win js build.cmd'))
+    deleteFile(new File(runConfigsFile, 'win js build.launch'))
+    deleteFile(new File(runConfigsFile, 'win js tests.cmd'))
+    deleteFile(new File(runConfigsFile, 'win js tests.launch'))
 
     log('Setting executable permissions')
-    new File(appModuleFile, 'js build.sh').setExecutable(true, false)
-    new File(uiModuleFile, 'js tests.sh').setExecutable(true, false)
+    new File(runConfigsFile, 'js build.sh').setExecutable(true, false)
+    new File(runConfigsFile, 'js tests.sh').setExecutable(true, false)
 }
+
+log('Rename IntelliJ run configs.')
+renameFile(new File(runConfigsFile, 'Generate jooq classes based on DB.run_.xml'), 'Generate jooq classes based on DB.run.xml')
+renameFile(new File(runConfigsFile, 'js build.run_.xml'), 'js build.run.xml')
+renameFile(new File(runConfigsFile, 'js tests.run_.xml'), 'js tests.run.xml')
+renameFile(new File(runConfigsFile, 'Launch dev server.run_.xml'), 'Launch '.concat(artifactId).concat('dev server.run.xml'))
+renameFile(new File(runConfigsFile, 'launch all.run_.xml'), 'launch all.run.xml')
+renameFile(new File(runConfigsFile, 'pnpm-install.run_.xml'), 'pnpm-install.run.xml')
+renameFile(new File(runConfigsFile, 'Setup local dev database.run_.xml'), 'Setup local dev database.run.xml')
+renameFile(new File(uiModuleFile,  'dotgitignore'), '.gitignore')
+renameFile(new File(appModuleFile,  'dotgitignore'), '.gitignore')
 
 writeDbPassword(appDevModuleFile)
 

@@ -24,11 +24,12 @@ String artifactId = request.artifactId
 //noinspection GrUnresolvedAccess
 File outputDirectoryFile = new File(request.outputDirectory as String)
 Path projectsDirectoryPath = new File(outputDirectoryFile, artifactId).toPath()
-File uiModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui.html')).toFile()
+Path parentModulePath = projectsDirectoryPath.resolve(artifactId)
+File runConfigsFile = parentModulePath.resolve('run-configs').toFile()
 
+File uiHtmlModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui.html')).toFile()
 File serverAppDevModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.server.app.dev')).toFile()
 File uiAppDevModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui.html.app.dev')).toFile()
-
 File serverAppWarModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.server.app.war')).toFile()
 File uiAppWarModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui.html.app.war')).toFile()
 
@@ -40,20 +41,27 @@ dumpObject(request)
 
 log('Building on '.concat(osName))
 if (osName.toLowerCase().contains('windows')) {
-    log('Deleting and renaming files in folder '.concat(uiModuleFile.toString()))
-    deleteFile(new File(uiModuleFile, 'js build.sh'))
-    deleteFile(new File(uiModuleFile, 'js build.launch'))
-
-    renameFile(new File(uiModuleFile, 'win js build.cmd'), 'js build.cmd')
-    renameFile(new File(uiModuleFile, 'win js build.launch'), 'js build.launch')
+    log('Deleting and renaming files in folder '.concat(runConfigsFile.toString()))
+    deleteFile(new File(runConfigsFile, 'js build.sh'))
+    deleteFile(new File(runConfigsFile, 'js build.launch'))
+    renameFile(new File(runConfigsFile, 'win js build.cmd'), 'js build.cmd')
+    renameFile(new File(runConfigsFile, 'win js build.launch'), 'js build.launch')
 } else {
-    log('Deleting files in folder '.concat(uiModuleFile.toString()))
-    deleteFile(new File(uiModuleFile, 'win js build.cmd'))
-    deleteFile(new File(uiModuleFile, 'win js build.launch'))
+    log('Deleting files in folder '.concat(runConfigsFile.toString()))
+    deleteFile(new File(runConfigsFile, 'win js build.cmd'))
+    deleteFile(new File(runConfigsFile, 'win js build.launch'))
 
     log('Setting executable permissions')
-    new File(uiModuleFile, 'js build.sh').setExecutable(true, false)
+    new File(runConfigsFile, 'js build.sh').setExecutable(true, false)
 }
+
+log('Rename IntelliJ run configs.')
+renameFile(new File(runConfigsFile, '[webapp] all.run_.xml'), '[webapp] all.run.xml')
+renameFile(new File(runConfigsFile, '[webapp] dev server.run_.xml'), '[webapp] dev server.run.xml')
+renameFile(new File(runConfigsFile, '[webapp] dev ui.run_.xml'), '[webapp] dev ui.run.xml')
+renameFile(new File(runConfigsFile, 'js build.run_.xml'), 'js build.run.xml')
+renameFile(new File(runConfigsFile, 'pnpm-install.run_.xml'), 'pnpm-install.run.xml')
+renameFile(new File(uiHtmlModuleFile, 'dotgitignore'), '.gitignore')
 
 writeKeyPair(serverAppWarModuleFile, uiAppWarModuleFile)
 writeKeyPair(serverAppDevModuleFile, uiAppDevModuleFile)
