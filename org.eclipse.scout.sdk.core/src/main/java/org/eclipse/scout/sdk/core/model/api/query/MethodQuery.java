@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,8 +18,10 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.spliterator.HierarchicalStreamBuilder;
@@ -161,10 +163,11 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
   }
 
   /**
-   * Limit the {@link IMethod}s to the given method identifier.
+   * Limit the {@link IMethod}s to the given method identifier (erasure only).
    *
    * @param id
-   *          The id of the {@link IMethod}. Use {@link IMethod#identifier(boolean)} or
+   *          The id (with type erasure only) of the {@link IMethod}. <br>
+   *          Use {@link IMethod#identifier()}, {@link IMethodGenerator#identifier(IJavaEnvironment)} or
    *          {@link JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)} to create a method
    *          identifier.
    * @return this

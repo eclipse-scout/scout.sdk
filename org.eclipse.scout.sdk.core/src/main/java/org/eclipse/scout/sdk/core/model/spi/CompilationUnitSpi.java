@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.model.spi;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,18 @@ public interface CompilationUnitSpi extends JavaElementSpi {
    *         Synthetic {@link CompilationUnitSpi}s have a singleton type list, no imports and no source attached
    */
   boolean isSynthetic();
+
+  /**
+   * @return The absolute path of this {@link CompilationUnitSpi} on the local file system if it is a non-synthetic
+   *         compilation unit. {@code null} otherwise.
+   */
+  Path absolutePath();
+
+  /**
+   * @return The {@link ClasspathSpi} in which this {@link CompilationUnitSpi} was found. Returns {@code null} if this
+   *         {@link CompilationUnitSpi} is synthetic or does not come from a directory (but e.g. a jar instead).
+   */
+  ClasspathSpi getContainingClasspathFolder();
 
   /**
    * Gets the {@link PackageSpi} of this {@link CompilationUnitSpi}.

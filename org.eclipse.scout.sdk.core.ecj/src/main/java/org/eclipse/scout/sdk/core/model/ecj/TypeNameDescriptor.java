@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.model.ecj;
+
+import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 
 import java.util.Objects;
 
@@ -43,7 +45,7 @@ public class TypeNameDescriptor {
   }
 
   protected static int getArrayDimension(String fqn) {
-    var pos = fqn.indexOf("[]");
+    var pos = fqn.indexOf(arrayMarker());
     if (pos < 0) {
       return 0;
     }

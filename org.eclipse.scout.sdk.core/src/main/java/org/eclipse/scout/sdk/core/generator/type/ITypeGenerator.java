@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -262,14 +262,14 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
    *          method parameter data types may be API dependent (see
    *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
-   * @param useErasureOnly
-   *          If {@code true} only the type erasure is used for all method parameter types.
+   * @param includeTypeArguments
+   *          If {@code false} only the type erasure is used for all method parameter types.
    * @return The {@link IMethodGenerator} with the specified method id or an empty {@link Optional}.
    * @see IMethodGenerator#identifier(IJavaEnvironment, boolean)
    * @see IMethod#identifier()
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    */
-  Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean useErasureOnly);
+  Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments);
 
   /**
    * @return A {@link Stream} returning all member {@link ITypeGenerator}s in this {@link ITypeGenerator}.

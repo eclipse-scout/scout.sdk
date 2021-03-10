@@ -35,10 +35,9 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcj;
@@ -48,6 +47,7 @@ import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler;
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceInput;
+import org.eclipse.scout.sdk.core.s.environment.AbstractEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -62,7 +62,7 @@ import org.eclipse.scout.sdk.core.util.SdkException;
  *
  * @since 7.0.0
  */
-public class TestingEnvironment implements IEnvironment, AutoCloseable {
+public class TestingEnvironment extends AbstractEnvironment implements AutoCloseable {
 
   private final boolean m_flushResourcesToDisk;
   private final Map<String, IType> m_dtoCache;
@@ -78,6 +78,55 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
     m_javaEnvironments = new ArrayList<>();
   }
 
+  @Override
+  protected StringBuilder runGenerator(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment env, Path filePath) {
+    //noinspection TypeMayBeWeakened
+    var context = new JavaBuilderContext(new BuilderContext(), Ensure.notNull(env));
+    var builder = MemorySourceBuilder.create(context);
+    generator.generate(builder);
+    return builder.source();
+  }
+
+  @Override
+  protected IFuture<Void> doWriteResource(CharSequence content, Path filePath, IProgress progress, boolean sync) {
+    Throwable ex = null;
+    if (isFlushResourcesToDisk()) {
+      var normalizedPath = filePath.normalize();
+      try {
+        writeFile(normalizedPath, content.toString().getBytes(StandardCharsets.UTF_8));
+      }
+      catch (IOException e) {
+        ex = e;
+      }
+    }
+    return SdkFuture.completed(null, ex);
+  }
+
+  @Override
+  protected IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfo cuInfo, IProgress progress, boolean sync) {
+    IType result;
+    var javaEnv = cuInfo.sourceFolder().javaEnvironment();
+    var name = cuInfo.mainTypeSimpleName();
+    var pck = cuInfo.packageName();
+    if (name.endsWith(ISdkConstants.SUFFIX_DTO) && pck.contains(".shared.")) {
+      result = CoreTestingUtils.registerCompilationUnit(javaEnv, pck, name, source);
+      // remember for later validation. As soon as the model type has been created the dto will be updated and validated.
+      var baseName = name.substring(0, name.length() - ISdkConstants.SUFFIX_DTO.length());
+      m_dtoCache.put(baseName, result);
+    }
+    else {
+      result = CoreTestingUtils.registerCompilationUnit(javaEnv, pck, name, source);
+      updateAndValidateDtoFor(result);
+      assertNoCompileErrors(result);
+    }
+
+    Throwable err = null;
+    if (isFlushResourcesToDisk()) {
+      err = writeIcuToDisk(cuInfo.targetFile(), source);
+    }
+    return SdkFuture.completed(result, err);
+  }
+
   public IClasspathEntry getTestingSourceFolder() {
     return m_env.primarySourceFolder().get();
   }
@@ -86,43 +135,9 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
     return m_env;
   }
 
-  @Override
-  public IType writeCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder) {
-    return writeCompilationUnit(generator, targetFolder, null);
-  }
-
-  @Override
-  public IType writeCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress) {
-    return writeCompilationUnitAsync(generator, targetFolder, progress).result();
-  }
-
-  @Override
-  public IFuture<IType> writeCompilationUnitAsync(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress) {
-    IType result;
-    var className = generator.elementName().get();
-    if (className.endsWith(ISdkConstants.SUFFIX_DTO) && generator.packageName().orElse("").contains(".shared.")) {
-      result = CoreTestingUtils.registerCompilationUnit(targetFolder.javaEnvironment(), generator);
-      // remember for later validation. As soon as the model type has been created the dto will be updated and validated.
-      var baseName = className.substring(0, className.length() - ISdkConstants.SUFFIX_DTO.length());
-      m_dtoCache.put(baseName, result);
-    }
-    else {
-      result = CoreTestingUtils.registerCompilationUnit(targetFolder.javaEnvironment(), generator);
-      updateAndValidateDtoFor(result);
-      assertNoCompileErrors(result);
-    }
-
-    Throwable err = null;
-    if (isFlushResourcesToDisk()) {
-      err = writeIcuToDisk(targetFolder, result.requireCompilationUnit());
-    }
-    return SdkFuture.completed(result, err);
-  }
-
-  protected static Throwable writeIcuToDisk(IClasspathEntry sourceFolder, ICompilationUnit icu) {
-    var targetFolder = sourceFolder.path().resolve(icu.containingPackage().asPath()).normalize();
+  protected static Throwable writeIcuToDisk(Path targetFile, CharSequence source) {
     try {
-      writeFile(targetFolder.resolve(icu.elementName()), icu.source().get().asCharSequence().toString().getBytes(StandardCharsets.UTF_8));
+      writeFile(targetFile, source.toString().getBytes(StandardCharsets.UTF_8));
       return null;
     }
     catch (IOException e) {
@@ -160,7 +175,7 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
       var newDtoSrc = shared.requireType(dto.name()).requireCompilationUnit().source().get().asCharSequence();
       dto = CoreTestingUtils.registerCompilationUnit(modelType.javaEnvironment(), dto.containingPackage().elementName(), dto.elementName(), newDtoSrc);
       if (isFlushResourcesToDisk()) {
-        var t = writeIcuToDisk(shared.primarySourceFolder().get(), dto.requireCompilationUnit());
+        var t = writeIcuToDisk(shared.primarySourceFolder().get().path(), newDtoSrc);
         if (t != null) {
           if (t instanceof RuntimeException) {
             throw (RuntimeException) t;
@@ -179,31 +194,6 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
     return m_dtoEnv;
   }
 
-  @Override
-  public void writeResource(CharSequence content, Path filePath, IProgress progress) {
-    writeResourceAsync(content, filePath, progress).awaitDoneThrowingOnErrorOrCancel();
-  }
-
-  @Override
-  public IFuture<Void> writeResourceAsync(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath, IProgress progress) {
-    return writeResourceAsync(doCreateResource(generator, filePath), filePath, progress);
-  }
-
-  @Override
-  public IFuture<Void> writeResourceAsync(CharSequence content, Path filePath, IProgress progress) {
-    Throwable ex = null;
-    if (isFlushResourcesToDisk()) {
-      var normalizedPath = filePath.normalize();
-      try {
-        writeFile(normalizedPath, content.toString().getBytes(StandardCharsets.UTF_8));
-      }
-      catch (IOException e) {
-        ex = e;
-      }
-    }
-    return SdkFuture.completed(null, ex);
-  }
-
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected static void writeFile(Path filePath, byte[] content) throws IOException {
     Files.createDirectories(filePath.getParent());
@@ -213,28 +203,6 @@ public class TestingEnvironment implements IEnvironment, AutoCloseable {
   public void run(BiConsumer<IEnvironment, IProgress> operation) {
     IProgress progress = new NullProgress();
     Ensure.notNull(operation).accept(this, progress);
-  }
-
-  @Override
-  public StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder) {
-    return doCreateResource(generator, targetFolder.javaEnvironment());
-  }
-
-  protected StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath) {
-    return doCreateResource(generator, findJavaEnvironment(filePath).orElse(null));
-  }
-
-  protected static StringBuilder doCreateResource(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment env) {
-    //noinspection TypeMayBeWeakened
-    var context = new JavaBuilderContext(new BuilderContext(), Ensure.notNull(env));
-    var builder = MemorySourceBuilder.create(context);
-    generator.generate(builder);
-    return builder.source();
-  }
-
-  @Override
-  public void writeResource(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath, IProgress progress) {
-    writeResourceAsync(doCreateResource(generator, filePath), filePath, progress).awaitDoneThrowingOnErrorOrCancel();
   }
 
   @Override

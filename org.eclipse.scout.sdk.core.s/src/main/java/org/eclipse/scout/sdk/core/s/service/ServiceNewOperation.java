@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -90,10 +90,10 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     }
 
     for (var msb : getMethods()) {
-      var methodIdToSearch = msb.identifier(javaEnvironment, true);
+      var methodIdToSearch = msb.identifier(javaEnvironment);
       var existingMethod = implBuilder
           .mainType()
-          .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, true));
+          .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, false));
       if (existingMethod.isEmpty()) {
         var existsInInterface = isInterface(msb.flags()) || isPublic(msb.flags());
         if (existsInInterface) {
@@ -127,9 +127,9 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
 
     for (var msb : getMethods()) {
       if (isPublic(msb.flags()) || isInterface(msb.flags())) {
-        var methodIdToSearch = msb.identifier(javaEnvironment, true);
+        var methodIdToSearch = msb.identifier(javaEnvironment);
         var existingMethod = ifcBuilder.mainType()
-            .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, true));
+            .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, false));
         if (existingMethod.isEmpty()) {
           ifcBuilder.mainType().ifPresent(t -> t
               .withMethod(msb

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.Long;
+import org.eclipse.scout.sdk.core.testing.FixtureHelper;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -45,6 +46,9 @@ public class CompilationUnitTest {
 
     assertEquals(BaseClass.class.getSimpleName() + JavaTypes.JAVA_FILE_SUFFIX, baseClassIcu.elementName());
     assertEquals(Paths.get(BaseClass.class.getName().replace('.', '/') + JavaTypes.JAVA_FILE_SUFFIX), baseClassIcu.path());
+
+    assertTrue(baseClassIcu.containingClasspathFolder().get().path().endsWith(Paths.get(FixtureHelper.FIXTURE_PATH)));
+    assertTrue(baseClassIcu.absolutePath().get().toString().replace('\\', '/').endsWith("org/eclipse/scout/sdk/core/fixture/BaseClass.java"));
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,13 +42,14 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
 
   /**
    * Returns a unique identifier for this {@link IMethod}. The identifier looks like
-   * 'methodName(dataTypeParam1,dataTypeParam2)'.
+   * 'methodName(dataTypeParam1,dataTypeParam2)'. Only the type erasure is used (no type arguments).
    *
    * @param context
    *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
    *          method parameter data types may be API dependent (see
    *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
-   * @return The created identifier
+   * @return The created identifier using the type erasure only.
+   * @see #identifier(IJavaEnvironment, boolean)
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    * @see IMethod#identifier()
    */
@@ -62,13 +63,15 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
    *          method parameter data types may be API dependent (see
    *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
-   * @param useErasureOnly
-   *          If {@code true} only the type erasure is used for all method parameter types.
+   * @param includeTypeArguments
+   *          If {@code true} the type arguments of all parameter types are included. If {@code false} only the type
+   *          erasure is used.
    * @return The created identifier
+   * @see #identifier(IJavaEnvironment)
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    * @see IMethod#identifier(boolean)
    */
-  String identifier(IJavaEnvironment context, boolean useErasureOnly);
+  String identifier(IJavaEnvironment context, boolean includeTypeArguments);
 
   /**
    * @return An {@link ApiFunction} that describes the return type of this {@link IMethodGenerator} or an empty

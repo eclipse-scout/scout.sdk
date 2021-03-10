@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,12 +13,14 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.CompilationUnitImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.ImportSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
@@ -43,6 +45,16 @@ public class SyntheticCompilationUnitWithEcj extends AbstractJavaElementWithEcj<
     if (newType != null) {
       return newType.getCompilationUnit();
     }
+    return null;
+  }
+
+  @Override
+  public Path absolutePath() {
+    return null;
+  }
+
+  @Override
+  public ClasspathSpi getContainingClasspathFolder() {
     return null;
   }
 

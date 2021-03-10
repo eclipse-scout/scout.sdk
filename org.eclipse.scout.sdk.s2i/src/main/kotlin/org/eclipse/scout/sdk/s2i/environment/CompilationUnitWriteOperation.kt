@@ -19,18 +19,19 @@ import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.util.LocalTimeCounter
-import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitPath
+import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitInfo
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.SdkException
+import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import java.io.File
 import java.nio.file.Path
 
-open class CompilationUnitWriteOperation(val project: Project, val source: CharSequence, val cuPath: CompilationUnitPath) {
+open class CompilationUnitWriteOperation(val project: Project, val source: CharSequence, val cuInfo: CompilationUnitInfo) {
 
     fun run(progress: IdeaProgress, resultSupplier: () -> IType?): IFuture<IType?> {
         doWriteCompilationUnit(progress)
@@ -38,21 +39,25 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
     }
 
     fun schedule(resultSupplier: () -> IType?): IFuture<IType?> {
-        val task = OperationTask(message("write.cu.x", cuPath.fileName()), project, TransactionManager.current(), this::doWriteCompilationUnit)
+        val task = OperationTask(message("write.cu.x", cuInfo.fileName()), project, TransactionManager.current(), this::doWriteCompilationUnit)
         return task.schedule(resultSupplier, hidden = true)
     }
 
     protected fun doWriteCompilationUnit(progress: IdeaProgress) {
-        progress.init(3, message("write.cu.x", cuPath.fileName()))
+        progress.init(3, message("write.cu.x", cuInfo.fileName()))
+
+        // PSI requires all line separators to be "\n".
+        // As the source might be constructed from existing source fragments, it must be cleaned to ensure no crlf exists
+        val sourceClean = Strings.replace(source, "\r", "")
 
         // create in memory file
         val newPsi = PsiFileFactory.getInstance(project)
-                .createFileFromText(cuPath.fileName(), JavaFileType.INSTANCE, source, LocalTimeCounter.currentTime(), false, false)
+                .createFileFromText(cuInfo.fileName(), JavaFileType.INSTANCE, sourceClean, LocalTimeCounter.currentTime(), false, false)
         progress.worked(1)
 
         formatAndOptimizeImports(newPsi, progress)
 
-        TransactionManager.current().register(CompilationUnitWriter(cuPath.targetFile(), newPsi, newPsi.text /* create source here to have the transaction member as short as possible */))
+        TransactionManager.current().register(CompilationUnitWriter(cuInfo.targetFile(), newPsi, newPsi.text /* create source here to have the transaction member as short as possible */))
     }
 
     protected fun formatAndOptimizeImports(psi: PsiFile, progress: IdeaProgress) = computeInReadAction(project) {

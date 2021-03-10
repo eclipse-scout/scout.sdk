@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -833,6 +833,20 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.dataobject.IDataObject";
+    }
+  }
+
+  IScoutInterfaceApi.IDoEntity I_DO_ENTITY = new IDoEntity();
+
+  @Override
+  default IScoutInterfaceApi.IDoEntity IDoEntity() {
+    return I_DO_ENTITY;
+  }
+
+  class IDoEntity implements IScoutInterfaceApi.IDoEntity {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.IDoEntity";
     }
   }
 
@@ -4152,18 +4166,18 @@ public interface Scout10Api extends IScoutApi {
     return NLS_KEY;
   }
 
-  IScoutInterfaceApi.IUiTextContributor I_UI_TEXT_CONTRIBUTOR = new IUiTextContributor();
-
-  @Override
-  default IScoutInterfaceApi.IUiTextContributor IUiTextContributor() {
-    return I_UI_TEXT_CONTRIBUTOR;
-  }
-
   class NlsKey implements IScoutAnnotationApi.NlsKey {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.platform.text.NlsKey";
     }
+  }
+
+  IScoutInterfaceApi.IUiTextContributor I_UI_TEXT_CONTRIBUTOR = new IUiTextContributor();
+
+  @Override
+  default IScoutInterfaceApi.IUiTextContributor IUiTextContributor() {
+    return I_UI_TEXT_CONTRIBUTOR;
   }
 
   class IUiTextContributor implements IScoutInterfaceApi.IUiTextContributor {
@@ -4204,6 +4218,82 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String jwsFactoryPath() {
       return "jakarta/jws/jakarta.jws-api/1.1.1/jakarta.jws-api-1.1.1.jar";
+    }
+  }
+
+  IScoutVariousApi.DoValue DO_VALUE = new DoValue();
+
+  @Override
+  default IScoutVariousApi.DoValue DoValue() {
+    return DO_VALUE;
+  }
+
+  class DoValue implements IScoutVariousApi.DoValue {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.DoValue";
+    }
+  }
+
+  IScoutVariousApi.DoList DO_LIST = new DoList();
+
+  @Override
+  default IScoutVariousApi.DoList DoList() {
+    return DO_LIST;
+  }
+
+  class DoList implements IScoutVariousApi.DoList {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.DoList";
+    }
+
+    @Override
+    public String updateAllMethodName() {
+      return "updateAll";
+    }
+  }
+
+  IScoutVariousApi.DoNode DO_NODE = new DoNode();
+
+  @Override
+  default IScoutVariousApi.DoNode DoNode() {
+    return DO_NODE;
+  }
+
+  class DoNode implements IScoutVariousApi.DoNode {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.DoNode";
+    }
+
+    @Override
+    public int valueTypeParamIndex() {
+      return 0;
+    }
+
+    @Override
+    public String getMethodName() {
+      return "get";
+    }
+
+    @Override
+    public String setMethodName() {
+      return "set";
+    }
+  }
+
+  IScoutAnnotationApi.IgnoreConvenienceMethodGeneration IGNORE_CONVENIENCE_METHOD_GENERATION = new IgnoreConvenienceMethodGeneration();
+
+  @Override
+  default IScoutAnnotationApi.IgnoreConvenienceMethodGeneration IgnoreConvenienceMethodGeneration() {
+    return IGNORE_CONVENIENCE_METHOD_GENERATION;
+  }
+
+  class IgnoreConvenienceMethodGeneration implements IScoutAnnotationApi.IgnoreConvenienceMethodGeneration {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.IgnoreConvenienceMethodGeneration";
     }
   }
 }

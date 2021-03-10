@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,14 @@
  */
 package org.eclipse.scout.sdk.core.model.api.query;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.spliterator.SuperTypeHierarchySpliterator;
@@ -34,7 +38,7 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
   private boolean m_includeSuperClasses = true;
   private boolean m_includeSuperInterfaces = true;
 
-  private String m_name;
+  private ApiFunction<?, IClassNameSupplier> m_name;
   private String m_simpleName;
   private int m_flags = -1;
 
@@ -128,16 +132,38 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
   /**
    * Limit the result to {@link IType}s with the given fully qualified name (see {@link IType#name()}).
    *
-   * @param name
+   * @param fullyQualifiedName
    *          The fully qualified name to limit to.
    * @return this
    */
-  public SuperTypeQuery withName(String name) {
-    m_name = name;
+  public SuperTypeQuery withName(CharSequence fullyQualifiedName) {
+    return withNameFrom(null, api -> IClassNameSupplier.raw(fullyQualifiedName));
+  }
+
+  /**
+   * Limit the {@link IType}s to the {@link IClassNameSupplier} returned by the given nameFunction.<br>
+   * <b>Example:</b> {@code type.superTypes().withNameFrom(IJavaApi.class, IJavaApi::List)}.
+   *
+   * @param api
+   *          The api type that defines the type. An instance of this API is passed to the nameFunction. May be
+   *          {@code null} in case the given nameFunction can handle a {@code null} input.
+   * @param nameFunction
+   *          A {@link Function} to be called to obtain the fully qualified type name to search.
+   * @param <API>
+   *          The API type that contains the class name
+   * @return this
+   */
+  public <API extends IApiSpecification> SuperTypeQuery withNameFrom(Class<API> api, Function<API, IClassNameSupplier> nameFunction) {
+    if (nameFunction == null) {
+      m_name = null;
+    }
+    else {
+      m_name = new ApiFunction<>(api, nameFunction);
+    }
     return this;
   }
 
-  protected String getName() {
+  protected ApiFunction<?, IClassNameSupplier> getName() {
     return m_name;
   }
 
@@ -168,8 +194,12 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
     }
 
     var name = getName();
-    if (name != null && !name.equals(t.name())) {
-      return false;
+    if (name != null) {
+      var fqn = name.apply(t.javaEnvironment()).map(IClassNameSupplier::fqn);
+      var fqnMatches = fqn.isPresent() && fqn.get().equals(t.name());
+      if (!fqnMatches) {
+        return false;
+      }
     }
 
     var simpleName = getSimpleName();

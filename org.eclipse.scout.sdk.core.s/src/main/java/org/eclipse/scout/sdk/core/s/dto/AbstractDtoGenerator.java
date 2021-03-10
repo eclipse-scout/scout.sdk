@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -132,16 +132,16 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
       return thisInstance();
     }
 
+    var javaEnvironment = targetEnvironment();
     var allSuperInterfaceMethods = interfaces.stream()
-        .filter(targetEnvironment()::exists)
+        .filter(javaEnvironment::exists)
         .peek(ifcType -> withInterface(ifcType.reference()))
-        .flatMap(ifcType -> ifcType.superTypes().withSuperClasses(false).stream())
-        .flatMap(superIfc -> superIfc.methods().stream())
+        .flatMap(ifcType -> ifcType.methods().withSuperTypes(true).stream())
         .map(IMethod::identifier)
         .collect(toSet());
 
     methods()
-        .filter(msb -> allSuperInterfaceMethods.contains(msb.identifier(targetEnvironment())))
+        .filter(msb -> allSuperInterfaceMethods.contains(msb.identifier(javaEnvironment)))
         .forEach(msb -> msb.withAnnotation(AnnotationGenerator.createOverride()));
     return thisInstance();
   }

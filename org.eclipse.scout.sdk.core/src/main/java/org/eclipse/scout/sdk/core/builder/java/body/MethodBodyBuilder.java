@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,6 +77,11 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
   }
 
   @Override
+  public TYPE appendThis() {
+    return append("this");
+  }
+
+  @Override
   public TYPE appendSuperCall() {
     return appendCallToSame(JavaTypes.SUPER);
   }
@@ -93,7 +98,7 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
     var isConstructor = surroundingMethod().returnType().isEmpty();
     if (!isConstructor) {
       dot()
-          .append(surroundingMethod().elementName().orElseThrow(() -> newFail("Cannot create a super call because method has no name.")));
+          .append(surroundingMethod().elementName(context()).orElseThrow(() -> newFail("Cannot create a super call because method has no name.")));
     }
 
     var parameterNames = surroundingMethod().parameters()

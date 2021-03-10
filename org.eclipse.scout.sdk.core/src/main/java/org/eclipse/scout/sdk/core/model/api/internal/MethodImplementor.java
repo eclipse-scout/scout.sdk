@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,7 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
   @Override
   public IType requireReturnType() {
     return returnType()
-        .orElseThrow(() -> newFail("Method {} in type {} is a constructor and therefore has no return type.", identifier(true), requireDeclaringType().name()));
+        .orElseThrow(() -> newFail("Method {} in type {} is a constructor and therefore has no return type.", identifier(), requireDeclaringType().name()));
   }
 
   @Override
@@ -97,10 +97,10 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
   }
 
   @Override
-  public String identifier(boolean useErasureOnly) {
+  public String identifier(boolean includeTypeArguments) {
     var parameterTypes = parameters().stream()
         .map(IMethodParameter::dataType)
-        .map(p -> p.reference(useErasureOnly))
+        .map(p -> p.reference(!includeTypeArguments))
         .collect(toList());
     return JavaTypes.createMethodIdentifier(elementName(), parameterTypes);
   }

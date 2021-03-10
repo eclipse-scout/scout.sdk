@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.builder.java.comment;
 
 import static java.util.stream.Collectors.joining;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.function.Consumer;
@@ -62,7 +63,7 @@ public class CommentBuilderTest {
         b -> b.appendLink(BaseClass.class.getName()), env);
     assertJavaElementCommentEquals(JavaTypes._boolean, "", b -> b.appendLink(env.requireType(JavaTypes._boolean)), env);
     assertJavaElementCommentEquals(JavaTypes._void, "", b -> b.appendLink(env.requireType(JavaTypes._void)), env);
-    assertJavaElementCommentEquals(String.class.getSimpleName() + "[]", "", b -> b.appendLink(env.requireType(String.class.getName() + "[]")), env);
+    assertJavaElementCommentEquals(String.class.getSimpleName() + arrayMarker(), "", b -> b.appendLink(env.requireType(String.class.getName() + arrayMarker())), env);
   }
 
   protected static void assertJavaElementCommentEquals(String expectedSrc, String expectedImports, Consumer<IJavaElementCommentBuilder<?>> task, IJavaEnvironment env) {

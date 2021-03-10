@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.query.InnerTypeQuery;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 
 /**
  * <h3>{@link ICompilationUnit}</h3> Represents a compilation unit usually defined by a .java file.
@@ -28,7 +28,7 @@ public interface ICompilationUnit extends IJavaElement {
 
   /**
    * Synthetic {@link ICompilationUnit}s are based on binary {@link IType}s. Such {@link ICompilationUnit}s have a
-   * singleton type list, no imports and no source attached.
+   * singleton type list, no imports, no absolute path and no source attached.
    *
    * @return {@code true} if this {@link ICompilationUnit} is synthetic based on a binary type.
    */
@@ -40,6 +40,13 @@ public interface ICompilationUnit extends IJavaElement {
    * @return The {@link IPackage} of this {@link ICompilationUnit}.
    */
   IPackage containingPackage();
+
+  /**
+   * @return The {@link IClasspathEntry} in which this {@link ICompilationUnit} was found. Returns an empty
+   *         {@link Optional} if this {@link ICompilationUnit} is synthetic or does not come from a directory (but e.g.
+   *         a jar instead).
+   */
+  Optional<IClasspathEntry> containingClasspathFolder();
 
   /**
    * Gets all import declarations in this {@link ICompilationUnit}.
@@ -108,6 +115,13 @@ public interface ICompilationUnit extends IJavaElement {
    *         E.g. "org/eclipse/scout/myapp/MyClass.java"
    */
   Path path();
+
+  /**
+   * @return The absolute {@link Path} of this {@link ICompilationUnit} on the local file system. The {@link Optional}
+   *         is empty if this is a synthetic compilation unit (see {@link #isSynthetic()}).
+   * @see #isSynthetic()
+   */
+  Optional<Path> absolutePath();
 
   /**
    * @return The name of this {@link ICompilationUnit}. This is the name of the java file.<br>

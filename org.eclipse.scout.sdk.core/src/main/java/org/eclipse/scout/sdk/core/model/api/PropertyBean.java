@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,6 +34,7 @@ public class PropertyBean {
   public static final String GETTER_PREFIX = "get";
   public static final String SETTER_PREFIX = "set";
   public static final String GETTER_BOOL_PREFIX = "is";
+  public static final String CHAINED_SETTER_PREFIX = "with";
 
   /**
    * Regular expression matching bean method names (is..., get..., set...)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.core.util;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.createMethodIdentifier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -19,8 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
+import org.eclipse.scout.sdk.core.fixture.ClassWithArrayMethodParams;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -164,13 +168,73 @@ public class JavaTypesTest {
 
   @Test
   @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
-  public void testCreateMethodIdentifier(IJavaEnvironment env) {
+  public void testCreateMethodIdentifier(IJavaEnvironment env) throws NoSuchMethodException {
     var type = env.requireType(ChildClass.class.getName());
     var method = type.methods().item(1).get();
-    assertEquals("methodInChildClass(java.lang.String,java.util.List<java.lang.Runnable>)", method.identifier());
-    assertEquals("methodInChildClass(java.lang.String,java.util.List)", method.identifier(true));
-    assertEquals("methodInChildClass(java.lang.String,java.util.List<java.lang.Runnable>)", method.toWorkingCopy().identifier(env));
-    assertEquals("methodInChildClass()", JavaTypes.createMethodIdentifier("methodInChildClass", null));
+    assertEquals("methodInChildClass(java.lang.String,java.util.List<java.lang.Runnable>)", method.identifier(true));
+    assertEquals("methodInChildClass(java.lang.String,java.util.List)", method.identifier());
+    assertEquals("methodInChildClass(java.lang.String,java.util.List<java.lang.Runnable>)", method.toWorkingCopy().identifier(env, true));
+    assertEquals("methodInChildClass(java.lang.String,java.util.List)", method.toWorkingCopy().identifier(env));
+    assertEquals("methodInChildClass()", createMethodIdentifier("methodInChildClass", null));
+
+    var arrayType = env.requireType(ClassWithArrayMethodParams.class.getName());
+    var expectedForMethod1 = "method1(java.lang.String[])";
+    assertEquals(expectedForMethod1, createMethodIdentifier(ClassWithArrayMethodParams.class.getMethod("method1", String[].class)));
+    assertEquals(expectedForMethod1, arrayType.methods().withName("method1").first().get().identifier());
+
+    var method2 = arrayType.methods().withName("method2").first().get();
+    var expectedForMethod2 = "method2(java.lang.String[][][])";
+    assertEquals(expectedForMethod2, method2.identifier());
+    assertEquals(expectedForMethod2, method2.toWorkingCopy().identifier(env));
+    assertEquals(expectedForMethod2, createMethodIdentifier(ClassWithArrayMethodParams.class.getMethod("method2", String[][][].class)));
+
+    var method3 = arrayType.methods().withName("method3").first().get();
+    var expectedForMethod3 = "method3(java.lang.String[])";
+    assertEquals(expectedForMethod3, method3.identifier());
+    assertEquals(expectedForMethod3, method3.toWorkingCopy().identifier(env));
+    assertEquals(expectedForMethod3, createMethodIdentifier(ClassWithArrayMethodParams.class.getMethod("method3", String[].class)));
+
+    var method4 = arrayType.methods().withName("method4").first().get();
+    var expectedForMethod4 = "method4(java.util.List<java.lang.String[]>)";
+    var expectedForMethod4Erasure = "method4(java.util.List)";
+    assertEquals(expectedForMethod4, method4.identifier(true));
+    assertEquals(expectedForMethod4, method4.toWorkingCopy().identifier(env, true));
+    assertEquals(expectedForMethod4, createMethodIdentifier(ClassWithArrayMethodParams.class.getMethod("method4", List.class), true));
+    assertEquals(expectedForMethod4Erasure, method4.identifier());
+    assertEquals(expectedForMethod4Erasure, method4.toWorkingCopy().identifier(env));
+    assertEquals(expectedForMethod4Erasure, createMethodIdentifier(ClassWithArrayMethodParams.class.getMethod("method4", List.class)));
+
+    var expectedForMethod5 = "method5(boolean[])";
+    assertEquals(expectedForMethod5, arrayType.methods().withName("method5").first().get().identifier());
+    assertEquals(expectedForMethod5, createMethodIdentifier(ClassWithArrayMethodParams.class.getMethod("method5", boolean[].class)));
+
+    var method6 = arrayType.methods().withName("method6").first().get();
+    var method6_reflect = Arrays.stream(ClassWithArrayMethodParams.class.getMethods())
+        .filter(m -> "method6".equals(m.getName()))
+        .findFirst().get();
+    var expectedForMethod6 = "method6(X[])";
+    assertEquals(expectedForMethod6, method6.identifier());
+    assertEquals(expectedForMethod6, method6.toWorkingCopy().identifier(env));
+    assertEquals(expectedForMethod6, createMethodIdentifier(method6_reflect, true));
+    assertEquals("method6(java.lang.Object[])", createMethodIdentifier(method6_reflect));
+
+    var method7 = arrayType.methods().withName("method7").first().get();
+    var expectedForMethod7 = "method7(java.util.List<java.util.Map<java.lang.String,java.lang.String[]>>)";
+    var expectedForMethod7Erasure = "method7(java.util.List)";
+    assertEquals(expectedForMethod7, method7.identifier(true));
+    assertEquals(expectedForMethod7, method7.toWorkingCopy().identifier(env, true));
+    assertEquals(expectedForMethod7, createMethodIdentifier(ClassWithArrayMethodParams.class.getMethod("method7", List.class), true));
+    assertEquals(expectedForMethod7Erasure, method7.identifier());
+    assertEquals(expectedForMethod7Erasure, method7.toWorkingCopy().identifier(env));
+    assertEquals(expectedForMethod7Erasure, createMethodIdentifier(ClassWithArrayMethodParams.class.getMethod("method7", List.class)));
+  }
+
+  @Test
+  public void testArrayMarker() {
+    assertEquals("[]", arrayMarker());
+    assertEquals("[][][][]", arrayMarker(4));
+    assertEquals("", arrayMarker(0));
+    assertEquals("", arrayMarker(-1));
   }
 
   @Test

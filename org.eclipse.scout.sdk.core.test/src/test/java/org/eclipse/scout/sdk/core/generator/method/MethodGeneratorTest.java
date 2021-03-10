@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,10 +12,13 @@ package org.eclipse.scout.sdk.core.generator.method;
 
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.fixture.AbstractClass;
@@ -107,7 +110,7 @@ public class MethodGeneratorTest {
                 .withComment(b -> b.appendJavaDocLine("type param"))
                 .withBinding(Serializable.class.getName()));
 
-    assertEquals("testMethod(java.lang.Integer,T,int)", generator.identifier(env));
+    assertEquals("testMethod(java.lang.Integer,T,int[])", generator.identifier(env));
 
     assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest1.txt", generator);
   }
@@ -197,6 +200,28 @@ public class MethodGeneratorTest {
         .withElementName("m_testField")
         .withDataType(JavaTypes._long);
     assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest3.txt", MethodGenerator.createGetter(generator));
+  }
+
+  @Test
+  public void testMethodParameterReference() {
+    var arrayRef = MethodParameterGenerator.create()
+        .withDataType(String.class.getName() + arrayMarker(2))
+        .reference(null);
+    assertEquals("java.lang.String[][]", arrayRef);
+
+    var varargsArrayRef = MethodParameterGenerator.create()
+        .withDataType(String.class.getName() + arrayMarker(2))
+        .asVarargs()
+        .reference(null);
+    assertEquals("java.lang.String[][][]", varargsArrayRef);
+
+    var typeWithGenerics = Map.class.getName() + JavaTypes.C_GENERIC_START + Long.class.getName() + ',' +
+        List.class.getName() + JavaTypes.C_GENERIC_START + String.class.getName() + arrayMarker() + JavaTypes.C_GENERIC_END + JavaTypes.C_GENERIC_END;
+    var generator = MethodParameterGenerator.create()
+        .withDataType(typeWithGenerics)
+        .asVarargs();
+    assertEquals(typeWithGenerics + "[]", generator.reference(null));
+    assertEquals(Map.class.getName() + "[]", generator.reference(null, true));
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.page;
 
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -21,7 +22,6 @@ import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
@@ -75,8 +75,17 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
         mainType.withMethod(createExecLoadData());
       }
       else {
-        mainType.withMethod(MethodOverrideGenerator.createOverride()
-            .withElementNameFrom(IScoutApi.class, api -> api.AbstractPageWithNodes().execCreateChildPagesMethodName()));
+        var variableName = "pageList";
+        mainType.withMethod(MethodGenerator.create()
+            .asProtected()
+            .withReturnType(JavaTypes._void)
+            .withElementNameFrom(IScoutApi.class, api -> api.AbstractPageWithNodes().execCreateChildPagesMethodName())
+            .withAnnotation(AnnotationGenerator.createOverride())
+            .withParameter(MethodParameterGenerator.create()
+                .withDataTypeFrom(IScoutApi.class, api -> List.class.getName() + JavaTypes.C_GENERIC_START + api.IPage().fqn() +
+                    JavaTypes.C_GENERIC_START + JavaTypes.C_QUESTION_MARK + JavaTypes.C_GENERIC_END + JavaTypes.C_GENERIC_END)
+                .withElementName(variableName))
+            .withBody(IMethodBodyBuilder::appendSuperCall));
       }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.util;
 
+import static java.util.Collections.addAll;
 import static java.util.Collections.emptySet;
 
 import java.net.MalformedURLException;
@@ -19,15 +20,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -58,6 +62,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.ide.IDE;
 
 /**
@@ -341,6 +346,27 @@ public final class S2eUiUtils {
   }
 
   /**
+   * Gets all types in the selection of the given event.
+   *
+   * @param event
+   *          The even. Must not be {@code null}.
+   * @return All types found in the selection of the given even.
+   */
+  public static Set<org.eclipse.jdt.core.IType> getTypesInEventSelection(ExecutionEvent event) {
+    var selection = HandlerUtil.getCurrentSelection(event);
+    var resourcesFromSelection = S2eUiUtils.getResourcesOfSelection(selection);
+    if (resourcesFromSelection.isEmpty()) {
+      return emptySet();
+    }
+
+    var types = S2eUiUtils.resourcesToTypes(resourcesFromSelection);
+    if (types.isEmpty()) {
+      return emptySet();
+    }
+    return types;
+  }
+
+  /**
    * Gets the resources of the given {@link ISelection}. Only accessible resources are returned (
    * {@link IResource#isAccessible()}). If a {@link IWorkingSet} is selected, the resources of the working set are
    * returned.<br>
@@ -383,6 +409,37 @@ public final class S2eUiUtils {
     if (resource != null && resource.isAccessible()) {
       collector.add(resource);
     }
+  }
+
+  /**
+   * Gets all types in the given resources.
+   *
+   * @param resources
+   *          The resources. Must not be {@code null}.
+   * @return The types found.
+   */
+  public static Set<org.eclipse.jdt.core.IType> resourcesToTypes(Collection<IResource> resources) {
+    Set<org.eclipse.jdt.core.IType> result = new HashSet<>(resources.size());
+    for (var r : resources) {
+      if (r != null && r.isAccessible()) {
+        var element = JavaCore.create(r);
+        if (JdtUtils.exists(element)) {
+          if (element.getElementType() == IJavaElement.TYPE) {
+            result.add((org.eclipse.jdt.core.IType) element);
+          }
+          else if (element.getElementType() == IJavaElement.COMPILATION_UNIT) {
+            var icu = (ICompilationUnit) element;
+            try {
+              addAll(result, icu.getTypes());
+            }
+            catch (JavaModelException e) {
+              SdkLog.warning("Unable to wellform types in compilation unit {}. Skipping.", icu.getElementName(), e);
+            }
+          }
+        }
+      }
+    }
+    return result;
   }
 
   /**

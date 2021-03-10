@@ -27,9 +27,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -44,13 +42,13 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitPath;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
+import org.eclipse.scout.sdk.core.s.environment.AbstractEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -69,7 +67,7 @@ import org.eclipse.scout.sdk.s2e.util.S2eUtils;
  * @since 7.0.0
  */
 @SuppressWarnings("MethodMayBeStatic")
-public class EclipseEnvironment implements IEnvironment, AutoCloseable {
+public class EclipseEnvironment extends AbstractEnvironment implements AutoCloseable {
 
   private final Map<IJavaProject, JavaEnvironmentWithJdt> m_envs;
 
@@ -78,24 +76,45 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   }
 
   @Override
-  public IType writeCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder) {
-    return writeCompilationUnit(generator, targetFolder, null);
+  protected StringBuilder runGenerator(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment context, Path targetPath) {
+    return doCreateResource(generator, jdtJavaProjectOf(context), targetPath, context);
   }
 
   @Override
-  public IType writeCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress p) {
-    return doWriteCompilationUnit(generator, targetFolder, toScoutProgress(p), true).result();
+  protected IFuture<Void> doWriteResource(CharSequence content, Path filePath, IProgress progress, boolean sync) {
+    IResourceWriteOperation writeFile = new ResourceWriteOperation(pathToWorkspaceFile(filePath), content);
+    return doRunResourceTask(writeFile, null, toScoutProgress(progress), sync);
   }
 
   @Override
-  public IFuture<IType> writeCompilationUnitAsync(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress p) {
-    return doWriteCompilationUnit(generator, targetFolder, toScoutProgress(p), false);
-  }
+  protected IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfo cuInfo, IProgress progress, boolean sync) {
+    var sourceFolder = ((ClasspathWithJdt) cuInfo.sourceFolder().unwrap()).getRoot();
+    var javaFileName = cuInfo.fileName();
+    var packageName = cuInfo.packageName();
+    var writeIcu = new CompilationUnitWriteOperation(sourceFolder, packageName, javaFileName, source);
+    return doRunResourceTask(writeIcu, () -> {
+      var compilationUnit = writeIcu.getCreatedCompilationUnit();
+      if (compilationUnit == null) {
+        return null; // may happen if the asynchronous write operation is canceled
+      }
 
-  @Override
-  public StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder) {
-    var context = targetFolder.javaEnvironment();
-    return doCreateResource(generator, jdtJavaProjectOf(context), targetFolder.path(), context);
+      String formattedSource;
+      try {
+        formattedSource = compilationUnit.getSource();
+      }
+      catch (JavaModelException e) {
+        throw new SdkException(e);
+      }
+
+      // return primary type
+      var jdtType = compilationUnit.getType(cuInfo.mainTypeSimpleName());
+      var env = cuInfo.sourceFolder().javaEnvironment();
+      var reloadRequired = env.registerCompilationUnitOverride(packageName, javaFileName, formattedSource);
+      if (reloadRequired) {
+        env.reload();
+      }
+      return toScoutType(jdtType, env.unwrap());
+    }, toScoutProgress(progress), sync);
   }
 
   protected IJavaProject jdtJavaProjectOf(IJavaEnvironment env) {
@@ -115,30 +134,6 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
     return builder.source();
   }
 
-  @Override
-  public void writeResource(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath, IProgress progress) {
-    writeResource(doCreateResource(generator, filePath), filePath, progress);
-  }
-
-  @Override
-  public void writeResource(CharSequence content, Path filePath, IProgress progress) {
-    doWriteResource(filePath, content, progress, true).awaitDoneThrowingOnErrorOrCancel();
-  }
-
-  @Override
-  public IFuture<Void> writeResourceAsync(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath, IProgress progress) {
-    return writeResourceAsync(doCreateResource(generator, filePath), filePath, progress);
-  }
-
-  @Override
-  public IFuture<Void> writeResourceAsync(CharSequence content, Path filePath, IProgress progress) {
-    return doWriteResource(filePath, content, progress, false);
-  }
-
-  protected IFuture<Void> doWriteResource(Path filePath, CharSequence content, IProgress progress, boolean syncRun) {
-    return doWriteResource(pathToWorkspaceFile(filePath), content, toScoutProgress(progress), syncRun);
-  }
-
   protected IFile pathToWorkspaceFile(Path filePath) {
     var uri = Ensure.notNull(filePath).toUri();
     return S2eUtils.findFileInWorkspace(uri)
@@ -147,90 +142,6 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
 
   protected static BuilderContext createBuilderContextFor(IJavaProject javaProject, Path targetPath) {
     return new BuilderContext(Util.getLineSeparator(null, javaProject), S2eUtils.propertyMap(javaProject, targetPath));
-  }
-
-  protected IFuture<IType> doWriteCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, EclipseProgress progress, boolean syncRun) {
-    Ensure.isTrue(Ensure.notNull(targetFolder).isSourceFolder(), "{} is no source folder. It is only allowed to generate new source into source folders.", targetFolder);
-
-    // generate new code
-    var path = new CompilationUnitPath(generator, targetFolder);
-    var env = targetFolder.javaEnvironment();
-    var code = doCreateResource(generator, jdtJavaProjectOf(env), path.targetFile(), env);
-
-    // write to disk
-    var sourceFolder = ((ClasspathWithJdt) targetFolder.unwrap()).getRoot();
-    var packageName = generator.packageName().orElse(null);
-    var javaFileName = generator.fileName().get();
-    var writeIcu = new CompilationUnitWriteOperation(sourceFolder, packageName, javaFileName, code);
-    return doRunResourceTask(writeIcu, () -> {
-      var compilationUnit = writeIcu.getCreatedCompilationUnit();
-      if (compilationUnit == null) {
-        return null; // may happen if the asynchronous write operation is canceled
-      }
-
-      String formattedSource;
-      try {
-        formattedSource = compilationUnit.getSource();
-      }
-      catch (JavaModelException e) {
-        throw new SdkException(e);
-      }
-
-      // return primary type
-      var jdtType = compilationUnit.getType(generator.mainType().get().elementName().get());
-
-      var javaEnvironment = targetFolder.javaEnvironment();
-      var reloadRequired = javaEnvironment.registerCompilationUnitOverride(packageName, javaFileName, formattedSource);
-      if (reloadRequired) {
-        javaEnvironment.reload();
-      }
-      return toScoutType(jdtType, javaEnvironment.unwrap());
-    }, progress, syncRun);
-  }
-
-  /**
-   * Writes the specified content to the specified {@link IFile}.
-   *
-   * @param content
-   *          The new content of the file. Must not be {@code null}.
-   * @param file
-   *          The {@link IFile} to write the content to. Must not be {@code null}. If the {@link IFile} does not exist,
-   *          it is created.
-   * @param progress
-   *          The {@link EclipseProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
-   *          argument. Must not be {@code null}.
-   */
-  public void writeResource(CharSequence content, IFile file, EclipseProgress progress) {
-    doWriteResource(file, content, progress, true).awaitDoneThrowingOnErrorOrCancel();
-  }
-
-  /**
-   * Asynchronously writes the specified content to the specified {@link IFile}.
-   * <p>
-   * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
-   * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
-   * {@link IEnvironment} will be closed.
-   *
-   * @param content
-   *          The new content of the file. Must not be {@code null}.
-   * @param file
-   *          The {@link IFile} to write the content to. Must not be {@code null}. If the {@link IFile} does not exist,
-   *          it is created.
-   * @param progress
-   *          The {@link EclipseProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
-   *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
-   *          argument. Must not be {@code null}.
-   * @return An {@link IFuture} that can be used to wait until the file has been written. If there was an exception
-   *         writing the resource, this exception will be thrown on result access of this {@link IFuture}.
-   */
-  public IFuture<Void> writeResourceAsync(CharSequence content, IFile file, EclipseProgress progress) {
-    return doWriteResource(file, content, progress, false);
-  }
-
-  protected IFuture<Void> doWriteResource(IFile file, CharSequence content, EclipseProgress progress, boolean syncRun) {
-    IResourceWriteOperation writeFile = new ResourceWriteOperation(file, content);
-    return doRunResourceTask(writeFile, null, progress, syncRun);
   }
 
   protected <T> IFuture<T> doRunResourceTask(IResourceWriteOperation task, Supplier<T> resultExtractor, EclipseProgress progress, boolean syncRun) {
@@ -318,19 +229,6 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
         .map(this::toScoutType);
   }
 
-  protected static boolean hasJavaNature(IProject p) {
-    if (p == null || !p.isOpen()) {
-      return false;
-    }
-    try {
-      return p.hasNature(JavaCore.NATURE_ID);
-    }
-    catch (CoreException e) {
-      SdkLog.warning("Unable to check for natures of project {}.", p, e);
-      return false;
-    }
-  }
-
   protected JavaEnvironmentWithJdt getOrCreateEnv(IJavaProject jdtProject) {
     return m_envs.computeIfAbsent(jdtProject, this::createNewJavaEnvironmentFor);
   }
@@ -383,6 +281,9 @@ public class EclipseEnvironment implements IEnvironment, AutoCloseable {
   }
 
   protected static IType toScoutType(org.eclipse.jdt.core.IType jdtType, JavaEnvironmentSpi env) {
+    if (jdtType == null || env == null) {
+      return null;
+    }
     var typeSpi = env.findType(jdtType.getFullyQualifiedName());
     if (typeSpi == null) {
       return null;

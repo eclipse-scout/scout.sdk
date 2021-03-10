@@ -10,8 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2i
 
+import com.intellij.analysis.AnalysisScope
+import com.intellij.analysis.AnalysisUIOptions
+import com.intellij.analysis.BaseAnalysisActionDialog
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.lang.properties.psi.PropertiesFile
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.progress.EmptyProgressIndicator
@@ -434,4 +438,22 @@ fun VirtualFile.resolveLocalPath() = PathUtil.getLocalPath(this)?.let { Paths.ge
  */
 fun VirtualFile.contentAsText(): StringBuilder = inputStream.use {
     Strings.fromInputStream(it, charset, length.toInt())
+}
+
+/**
+ * Starts a Scope selection dialog ([BaseAnalysisActionDialog]) based on this [AnActionEvent].
+ * @return The [AnalysisScope] selected by the user or null of the user canceled the dialog.
+ */
+fun AnActionEvent.chooseAnalysisScope(title: String, analysisNoon: String): AnalysisScope? {
+    val data = DataContextHelper(dataContext)
+    val project = data.project() ?: return null
+    val initialAnalysisScope = data.scope() ?: return null
+
+    val items = BaseAnalysisActionDialog.standardItems(project, initialAnalysisScope, data.module(), data.psiElement())
+    val options = AnalysisUIOptions.getInstance(project)
+    val dialog = BaseAnalysisActionDialog(title, analysisNoon, project, items, options, true)
+    if (dialog.showAndGet()) {
+        return dialog.getScope(initialAnalysisScope)
+    }
+    return null
 }

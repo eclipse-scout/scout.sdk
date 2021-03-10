@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -125,7 +125,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
       var generator = new EmptyWsdlGenerator()
           .withName(wsdlBaseName)
           .withPackage(getPackage());
-      setWsdlContent(env.createResource(generator, getSourceFolder()));
+      setWsdlContent(env.executeGenerator(generator, getSourceFolder()));
     }
     else {
       setWsdlContent(readXmlFromUrl(getWsdlUrl()));
@@ -392,7 +392,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
             .withNames(binding.getValue())
             .withWsdlLocation(relPath)
             .withWsPackage(targetPackage);
-        var jaxwsBindingContent = env.createResource(generator, getSourceFolder());
+        var jaxwsBindingContent = env.executeGenerator(generator, getSourceFolder());
         result.put(path.getFileName().toString(), jaxwsBindingContent);
       }
     }

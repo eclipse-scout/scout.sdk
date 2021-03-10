@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -206,7 +207,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   protected static void buildReferenceRec(IType type, boolean erasureOnly, StringBuilder builder) {
     if (type.isArray()) {
       buildReferenceRec(type.leafComponentType().get(), erasureOnly, builder);
-      builder.append("[]".repeat(type.arrayDimension()));
+      builder.append(arrayMarker(type.arrayDimension()));
       return;
     }
 

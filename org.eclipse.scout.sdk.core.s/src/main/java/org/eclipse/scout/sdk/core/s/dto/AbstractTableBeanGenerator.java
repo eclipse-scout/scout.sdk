@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.dto;
 
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
@@ -54,7 +55,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
 
   protected TYPE withTableBeanContent(IType table) {
     var rowDataName = getRowDataName(removeFieldSuffix(modelType().elementName()));
-    var tableRowArray = rowDataName + "[]";
+    var tableRowArray = rowDataName + arrayMarker();
     var abstractTableFieldBeanDataApi = scoutApi().AbstractTableFieldBeanData();
     var rowAtMethodName = abstractTableFieldBeanDataApi.rowAtMethodName();
     var setRowsMethodName = abstractTableFieldBeanDataApi.setRowsMethodName();

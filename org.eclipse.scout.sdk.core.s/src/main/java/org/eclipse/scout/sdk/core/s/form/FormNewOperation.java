@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.s.form;
-
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -309,10 +307,9 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected static Optional<String> getParamNameHavingDataType(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb, String returnType, IJavaBuilderContext context) {
+    var environment = context.environment().orElse(null);
     return msb.parameters()
-        .filter(p -> returnType.equals(p.dataType()
-            .flatMap(af -> af.apply(context))
-            .orElseThrow(() -> newFail("Parameter {} in method {} is missing a data type.", p.elementName().orElse(null), msb.elementName().orElse(null)))))
+        .filter(p -> returnType.equals(p.reference(environment)))
         .findAny()
         .flatMap(IMethodParameterGenerator::elementName);
   }

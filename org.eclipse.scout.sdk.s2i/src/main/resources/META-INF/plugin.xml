@@ -68,10 +68,12 @@
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.maven.IdeaMavenRunner"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdStartup"/>
-    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerStartup"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManagerStartup"/>
     <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager"
-                    serviceImplementation="org.eclipse.scout.sdk.s2i.derived.impl.DerivedResourceManagerImplementor"/>
+                    serviceImplementation="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManagerImplementor"/>
+    <projectService serviceInterface="org.eclipse.scout.sdk.s2i.dataobject.DataObjectManager"
+                    serviceImplementation="org.eclipse.scout.sdk.s2i.dataobject.DataObjectManagerImpl"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.classid.ClassIdCache"
                     serviceImplementation="org.eclipse.scout.sdk.s2i.classid.ClassIdCacheImplementor"/>
     <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache"/>
@@ -117,7 +119,13 @@
     <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" text="Scout">
       <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"/>
       <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu"
-              class="org.eclipse.scout.sdk.s2i.derived.impl.UpdateAllDerivedResourcesMenu"/>
+              class="org.eclipse.scout.sdk.s2i.derived.UpdateAllDerivedResourcesMenu"/>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInScopeMenu"
+              class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInScopeMenu"/>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInFileMenu"
+              class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInFileMenu">
+        <keyboard-shortcut keymap="$default" first-keystroke="control alt shift O"/>
+      </action>
     </group>
   </actions>
 

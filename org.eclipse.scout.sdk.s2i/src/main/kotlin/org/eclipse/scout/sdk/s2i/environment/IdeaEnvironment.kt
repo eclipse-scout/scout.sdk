@@ -25,15 +25,11 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator
-import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitPath
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator
+import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitInfo
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment
-import org.eclipse.scout.sdk.core.s.environment.IFuture
-import org.eclipse.scout.sdk.core.s.environment.IProgress
-import org.eclipse.scout.sdk.core.s.environment.SdkFuture
+import org.eclipse.scout.sdk.core.s.environment.*
 import org.eclipse.scout.sdk.core.util.*
 import org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
@@ -48,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.streams.asStream
 
 
-open class IdeaEnvironment private constructor(val project: Project) : IEnvironment, AutoCloseable {
+open class IdeaEnvironment private constructor(val project: Project) : AbstractEnvironment(), AutoCloseable {
 
     companion object Factory {
 
@@ -157,22 +153,7 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
 
     protected fun createNewJavaEnvironmentFor(module: Module): JavaEnvironmentWithIdea = JavaEnvironmentWithIdea(module)
 
-    override fun writeCompilationUnit(generator: ICompilationUnitGenerator<*>, targetFolder: IClasspathEntry): IType? =
-            writeCompilationUnit(generator, targetFolder, null)
-
-    override fun writeCompilationUnit(generator: ICompilationUnitGenerator<*>, targetFolder: IClasspathEntry, progress: IProgress?): IType? =
-            doWriteCompilationUnit(generator, targetFolder, progress.toIdea(), true).result()
-
-    override fun writeCompilationUnitAsync(generator: ICompilationUnitGenerator<*>, targetFolder: IClasspathEntry, progress: IProgress?): IFuture<IType?> =
-            doWriteCompilationUnit(generator, targetFolder, progress.toIdea(), false)
-
-    fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, filePath: Path): StringBuilder =
-            createResource(generator, findJavaEnvironment(filePath).orElseThrow { newFail("Cannot find Java environment for path '{}'.", filePath) }, filePath)
-
-    override fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, targetFolder: IClasspathEntry): StringBuilder =
-            createResource(generator, targetFolder.javaEnvironment(), targetFolder.path())
-
-    protected fun createResource(generator: ISourceGenerator<ISourceBuilder<*>>, context: IJavaEnvironment, filePath: Path): StringBuilder {
+    override fun runGenerator(generator: ISourceGenerator<ISourceBuilder<*>>, context: IJavaEnvironment, filePath: Path): StringBuilder {
         val env = context.unwrap() as JavaEnvironmentWithIdea
         val props = PropertySupport(2)
         props.setProperty(IBuilderContext.PROPERTY_JAVA_MODULE, env.module)
@@ -180,59 +161,33 @@ open class IdeaEnvironment private constructor(val project: Project) : IEnvironm
 
         // must be \n! see https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/modifying_psi.html
         // do not use CodeStyle.getSettings(project).lineSeparator because the CompilationUnitWriter uses createFileFromText
-        val nl = "\n"
-        val ctx = BuilderContext(nl, props)
+        val ctx = BuilderContext("\n", props)
         val builder = MemorySourceBuilder.create(JavaBuilderContext(ctx, context))
         generator.generate(builder)
         return builder.source()
     }
 
-    override fun writeResource(content: CharSequence, filePath: Path, progress: IProgress?) {
-        doWriteResource(filePath, content).awaitDoneThrowingOnErrorOrCancel()
-        return
-    }
-
-    override fun writeResource(generator: ISourceGenerator<ISourceBuilder<*>>, filePath: Path, progress: IProgress?) =
-            writeResource(createResource(generator, filePath), filePath, progress)
-
-    override fun writeResourceAsync(generator: ISourceGenerator<ISourceBuilder<*>>, filePath: Path, progress: IProgress?): IFuture<Void> =
-            writeResourceAsync(createResource(generator, filePath), filePath, progress)
-
-    override fun writeResourceAsync(content: CharSequence, filePath: Path, progress: IProgress?): IFuture<Void> =
-            doWriteResource(filePath, content)
-
-    protected fun doWriteResource(filePath: Path, content: CharSequence): IFuture<Void> {
-        // No need for async support here as the FIleWriter is just registered and no actual action is performed yet
+    override fun doWriteResource(content: CharSequence, filePath: Path, progress: IProgress?, sync: Boolean): IFuture<Void> {
+        // No need for async support here as the FileWriter is just registered and no actual action is performed yet
         // The real write is done on transaction commit
         TransactionManager.current().register(FileWriter(filePath, content, project))
         return SdkFuture.completed(null)
     }
 
-    protected fun doWriteCompilationUnit(generator: ICompilationUnitGenerator<*>, targetFolder: IClasspathEntry, progress: IdeaProgress, sync: Boolean): IFuture<IType?> {
-        Ensure.isTrue(targetFolder.isSourceFolder)
-        val pck = generator.packageName().orElse("")
-        val name = generator.elementName().orElseThrow { newFail("File name missing in generator") }
-        val path = CompilationUnitPath(generator, targetFolder)
-        val code = createResource(generator, targetFolder.javaEnvironment(), path.targetFile())
-        val javaEnv = targetFolder.javaEnvironment()
-        val writer = CompilationUnitWriteOperation(project, code, path)
+    override fun doWriteCompilationUnit(code: CharSequence, cuInfo: CompilationUnitInfo, progress: IProgress, sync: Boolean): IFuture<IType?> {
+        val writer = CompilationUnitWriteOperation(project, code, cuInfo)
         val supplier = lambda@{
-            val reloadRequired = javaEnv.registerCompilationUnitOverride(pck, name + JavaTypes.JAVA_FILE_SUFFIX, code)
+            val javaEnv = cuInfo.sourceFolder().javaEnvironment()
+            val pck = cuInfo.packageName()
+            val reloadRequired = javaEnv.registerCompilationUnitOverride(pck, cuInfo.fileName(), code)
             if (reloadRequired) {
                 javaEnv.reload()
             }
-
-            val fqn = StringBuilder()
-            if (Strings.hasText(pck)) {
-                fqn.append(pck).append(JavaTypes.C_DOT)
-            }
-            fqn.append(name)
-
-            javaEnv.findType(fqn.toString()).orElse(null)
+            javaEnv.findType(cuInfo.mainTypeFullyQualifiedName()).orElse(null)
         }
 
         if (sync) {
-            return writer.run(progress, supplier)
+            return writer.run(progress.toIdea(), supplier)
         }
         return writer.schedule(supplier)
     }

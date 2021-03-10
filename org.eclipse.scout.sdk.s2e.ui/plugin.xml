@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
-    Copyright (c) 2015 BSI Business Systems Integration AG.
-    All rights reserved. This program and the accompanying materials
-    are made available under the terms of the Eclipse Public License v1.0
-    which accompanies this distribution, and is available at
-    https://www.eclipse.org/legal/epl-v10.html
-
-    Contributors:
-        BSI Business Systems Integration AG - initial API and implementation
-
--->
+  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+  ~ All rights reserved. This program and the accompanying materials
+  ~ are made available under the terms of the Eclipse Public License v1.0
+  ~ which accompanies this distribution, and is available at
+  ~ https://www.eclipse.org/legal/epl-v10.html
+  ~
+  ~ Contributors:
+  ~     BSI Business Systems Integration AG - initial API and implementation
+  -->
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="nlsImporter" name="Translation Importer" schema="schema/nlsImporter.exsd"/>
@@ -143,16 +141,26 @@
                tooltip="Searches duplicate @ClassId Values in the current Workspace and marks all findings with Error Markers in the Problems View."
                style="push">
             </command>
-            <separator
+           <separator
                name="org.eclipse.scout.sdk.s2e.ui.menu.separator03"
                visible="true">
-            </separator>
-            <command
+           </separator>
+           <command
                commandId="org.eclipse.scout.sdk.s2e.ui.commands.searchMissingTextKeys"
                id="org.eclipse.scout.sdk.s2e.ui.menu.searchMissingTextKeys"
                tooltip="Searches text keys that are used in the code but do not exist in a visible Scout Text Provider Service."
                style="push">
-            </command>
+           </command>
+           <separator
+               name="org.eclipse.scout.sdk.s2e.ui.menu.separator04"
+               visible="true">
+           </separator>
+           <command
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.doConvenienceMethodUpdateSelected"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.doConvenienceMethodUpdateSelected"
+               tooltip="Update the DataObject convenience methods in the selected scope."
+               style="push">
+           </command>
          </menu>
       </menuContribution>
    </extension>
@@ -250,26 +258,31 @@
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
       <command
-            name="Wellform all Scout Classes..."
-            id="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
-            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+          name="Wellform all Scout Classes..."
+          id="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
+          categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
-      <command
-            name="Wellform Classes in selected Scope"
-            id="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
-            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
-      </command>
-      <command
-            name="Create all missing @ClassId Annotations..."
-            id="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
-            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
-      </command>
-      <command
-            name="Search for duplicate @ClassId Values"
-            id="org.eclipse.scout.sdk.s2e.ui.commands.searchForDuplicateClassIdValues"
-            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
-      </command>
-      <command
+     <command
+         name="Wellform Classes in selected Scope"
+         id="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
+         categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+     </command>
+     <command
+         name="Update DO convenience Methods in selected Scope"
+         id="org.eclipse.scout.sdk.s2e.ui.commands.doConvenienceMethodUpdateSelected"
+         categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+     </command>
+     <command
+         name="Create all missing @ClassId Annotations..."
+         id="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
+         categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+     </command>
+     <command
+         name="Search for duplicate @ClassId Values"
+         id="org.eclipse.scout.sdk.s2e.ui.commands.searchForDuplicateClassIdValues"
+         categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+     </command>
+     <command
             name="Create missing @ClassId Annotations in selected Scope"
             id="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
@@ -286,26 +299,30 @@
             class="org.eclipse.scout.sdk.s2e.ui.internal.derived.TriggerAllDerivedResourceHandlers">
       </handler>
       <handler
-            commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.derived.TriggerSelectedDerivedResourceHandler">
+          commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
+          class="org.eclipse.scout.sdk.s2e.ui.internal.derived.TriggerSelectedDerivedResourceHandler">
       </handler>
-      <handler
-            commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.wellform.WellformAllHandler">
-      </handler>
-      <handler
-          commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
-          class="org.eclipse.scout.sdk.s2e.ui.internal.wellform.WellformSelectedHandler">
-      </handler>
-      <handler
-            commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.classid.CreateAllMissingClassIdsHandler">
-      </handler>
-      <handler
-            commandId="org.eclipse.scout.sdk.s2e.ui.commands.searchForDuplicateClassIdValues"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.SearchDuplicateClassIdValuesHandler">
-      </handler>
-      <handler
+     <handler
+         commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
+         class="org.eclipse.scout.sdk.s2e.ui.internal.wellform.WellformAllHandler">
+     </handler>
+     <handler
+         commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellformSelected"
+         class="org.eclipse.scout.sdk.s2e.ui.internal.wellform.WellformSelectedHandler">
+     </handler>
+     <handler
+         commandId="org.eclipse.scout.sdk.s2e.ui.commands.doConvenienceMethodUpdateSelected"
+         class="org.eclipse.scout.sdk.s2e.ui.internal.dataobject.UpdateDoConvenienceMethodsInSelectionHandler">
+     </handler>
+     <handler
+         commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
+         class="org.eclipse.scout.sdk.s2e.ui.internal.classid.CreateAllMissingClassIdsHandler">
+     </handler>
+     <handler
+         commandId="org.eclipse.scout.sdk.s2e.ui.commands.searchForDuplicateClassIdValues"
+         class="org.eclipse.scout.sdk.s2e.ui.internal.handler.SearchDuplicateClassIdValuesHandler">
+     </handler>
+     <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassIdSelected"
             class="org.eclipse.scout.sdk.s2e.ui.internal.classid.CreateSelectedMissingClassIdsHandler">
       </handler>

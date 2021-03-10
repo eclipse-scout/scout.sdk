@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,8 +58,8 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
 
   /**
    * Creates a new {@link IMethodGenerator} that will override the method (having the same
-   * {@link #identifier(IJavaEnvironment, boolean)}) in the super hierarchy of the owning {@link ITypeGenerator}. If
-   * there is only one overload for a method it is sufficient to provide the method name.
+   * {@link #identifier(IJavaEnvironment)}) in the super hierarchy of the owning {@link ITypeGenerator}. If there is
+   * only one overload for a method it is sufficient to provide the method name.
    * <p>
    * The generated method uses the signature, return type and exceptions from the overridden method. An {@link Override}
    * annotation is added automatically. If the overridden method is annotated, these annotations are NOT automatically
@@ -97,8 +97,8 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
 
   /**
    * Creates a new {@link IMethodGenerator} that will override the method (having the same
-   * {@link #identifier(IJavaEnvironment, boolean)}) in the super hierarchy of the owning {@link ITypeGenerator}. If
-   * there is only one overload for a method it is sufficient to provide the method name.
+   * {@link #identifier(IJavaEnvironment)}) in the super hierarchy of the owning {@link ITypeGenerator}. If there is
+   * only one overload for a method it is sufficient to provide the method name.
    * <p>
    * By default the generated method uses the signature, return type and exceptions from the overridden method. An
    * {@link Override} annotation is added automatically. If the overridden method is annotated, these annotations are
@@ -186,7 +186,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
     var templateCandidates = container.methods()
         .withSuperTypes(true).stream()
         .filter(m -> m.elementName().equals(elementName(container.javaEnvironment()).orElseThrow(() -> newFail("To override a method at least the method name must be specified."))))
-        .collect(toMap(m -> m.identifier(true), identity(), (a, b) -> a));
+        .collect(toMap(IMethod::identifier, identity(), (a, b) -> a));
 
     if (templateCandidates.isEmpty()) {
       return Optional.empty();
@@ -195,7 +195,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
       return Optional.of(templateCandidates.values().iterator().next());
     }
 
-    return Optional.ofNullable(templateCandidates.get(identifier(container.javaEnvironment(), true)));
+    return Optional.ofNullable(templateCandidates.get(identifier(container.javaEnvironment())));
   }
 
   @Override

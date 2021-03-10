@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model.api;
 
 import static org.eclipse.scout.sdk.core.model.api.Flags.isEnum;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,19 +35,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class ArrayTypeTest {
   @Test
   public void testArrayTypes(IJavaEnvironment env) {
-    var intArr = env.requireType("int[]");
+    var intArr = env.requireType("int" + arrayMarker());
     assertEquals(1, intArr.arrayDimension());
 
-    var stringArr = env.requireType(String.class.getName() + "[][][]");
+    var stringArr = env.requireType(String.class.getName() + arrayMarker(3));
     assertEquals(3, stringArr.arrayDimension());
 
-    var entryArr = env.requireType(Entry.class.getName() + "[][][][]");
+    var entryArr = env.requireType(Entry.class.getName() + arrayMarker(4));
     assertEquals(4, entryArr.arrayDimension());
 
     env.reload();
     assertEquals(4, entryArr.arrayDimension());
 
-    var roundingModeArr = env.requireType(RoundingMode.class.getName() + "[]");
+    var roundingModeArr = env.requireType(RoundingMode.class.getName() + arrayMarker());
     assertEquals(1, roundingModeArr.arrayDimension());
     assertFalse(roundingModeArr.leafComponentType().get().isArray());
     assertTrue(isEnum(roundingModeArr.leafComponentType().get().flags()));

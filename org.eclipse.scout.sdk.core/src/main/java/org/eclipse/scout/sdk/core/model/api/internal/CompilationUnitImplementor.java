@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IImport;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
@@ -27,8 +27,10 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.query.InnerTypeQuery;
 import org.eclipse.scout.sdk.core.model.api.spliterator.WrappingSpliterator;
+import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
@@ -51,6 +53,12 @@ public class CompilationUnitImplementor extends AbstractJavaElementImplementor<C
   }
 
   @Override
+  public Optional<IClasspathEntry> containingClasspathFolder() {
+    return Optional.ofNullable(m_spi.getContainingClasspathFolder())
+        .map(ClasspathSpi::wrap);
+  }
+
+  @Override
   public Optional<IType> resolveTypeBySimpleName(String simpleName) {
     return Optional.ofNullable(m_spi.findTypeBySimpleName(simpleName))
         .map(TypeSpi::wrap);
@@ -60,6 +68,11 @@ public class CompilationUnitImplementor extends AbstractJavaElementImplementor<C
   public Stream<? extends IJavaElement> children() {
     Stream<? extends IJavaElement> packageAndImports = Stream.concat(Stream.of(containingPackage()), imports());
     return Stream.concat(packageAndImports, types().stream());
+  }
+
+  @Override
+  public Optional<Path> absolutePath() {
+    return Optional.ofNullable(m_spi.absolutePath());
   }
 
   @Override

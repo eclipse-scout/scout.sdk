@@ -148,6 +148,19 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
     return withNameFrom(null, api -> IClassNameSupplier.raw(fullyQualifiedName));
   }
 
+  /**
+   * Limit the {@link IAnnotation}s to the {@link IClassNameSupplier} returned by the given nameFunction.<br>
+   * <b>Example:</b> {@code type.annotations().withNameFrom(IJavaApi.class, IJavaApi::Override)}.
+   *
+   * @param api
+   *          The api type that defines the type. An instance of this API is passed to the nameFunction. May be
+   *          {@code null} in case the given nameFunction can handle a {@code null} input.
+   * @param nameFunction
+   *          A {@link Function} to be called to obtain the fully qualified type name to search.
+   * @param <API>
+   *          The API type that contains the class name
+   * @return this
+   */
   public <API extends IApiSpecification> AnnotationQuery<T> withNameFrom(Class<API> api, Function<API, IClassNameSupplier> nameFunction) {
     if (nameFunction == null) {
       m_name = null;

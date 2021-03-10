@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,8 @@ open class DataContextHelper(val context: DataContext) {
     fun psiFile(): PsiFile? = CommonDataKeys.PSI_FILE.getData(context) ?: psiElement()?.containingFile
 
     fun virtualFile(): VirtualFile? = CommonDataKeys.VIRTUAL_FILE.getData(context) ?: psiFile()?.virtualFile
+
+    fun editor() = CommonDataKeys.EDITOR.getData(context)
 
     fun scope(): AnalysisScope? {
         val project = project() ?: return null

@@ -38,7 +38,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
 
     companion object {
 
-        const val BULK_UPDATE_LIMIT = 100
+        const val BULK_UPDATE_LIMIT = 100 // see also com.intellij.openapi.application.impl.NonBlockingReadActionImpl.Submission.preventTooManySubmissions
         private val CURRENT = ThreadLocal.withInitial<TransactionManager> { null }
 
         /**

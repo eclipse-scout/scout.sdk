@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -84,6 +84,33 @@ public interface IMethodParameterGenerator<TYPE extends IMethodParameterGenerato
    * @return This generator.
    */
   TYPE asVarargs(boolean newVarargsValue);
+
+  /**
+   * Gets the full reference of the data type of this {@link IMethodParameterGenerator} including all type arguments.
+   * 
+   * @param context
+   *          The {@link IJavaEnvironment} to use to compute the data types in case they are context dependent (e.g.
+   *          using an {@link IApiSpecification}). May be {@code null}.
+   * @return The reference of the data type of this {@link IMethodParameterGenerator}.
+   * @see #withDataType(String)
+   * @see #isVarargs()
+   */
+  String reference(IJavaEnvironment context);
+
+  /**
+   * Gets the data type reference of this {@link IMethodParameterGenerator}.
+   * 
+   * @param context
+   *          The {@link IJavaEnvironment} to use to compute the data types in case they are context dependent (e.g.
+   *          using an {@link IApiSpecification}). May be {@code null}.
+   * @param useErasureOnly
+   *          If {@code true}, no type arguments are included. If {@code false}, all type arguments are part of the
+   *          reference.
+   * @return The reference of the data type of this {@link IMethodParameterGenerator}
+   * @see #withDataType(String)
+   * @see #isVarargs()
+   */
+  String reference(IJavaEnvironment context, boolean useErasureOnly);
 
   /**
    * @return An {@link ApiFunction} that describes the data type of this {@link IMethodParameterGenerator} or an empty

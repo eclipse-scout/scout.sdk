@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
 import static org.eclipse.scout.sdk.core.util.Strings.lastIndexOf;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -181,6 +182,11 @@ public final class JavaTypes {
    * module info java file name: {@code module-info.java}.
    */
   public static final String ModuleInfoJava = ModuleInfo + JAVA_FILE_SUFFIX;
+  /**
+   * The array marker for one array dimension: {@code []}. Use {@link #arrayMarker(int)} to get a marker for a certain
+   * dimension.
+   */
+  private static final String ARRAY_MARKER = "[]";
 
   private static final char C_ARRAY = '[';
   private static final FinalValue<Set<String>> JAVA_KEYWORDS = new FinalValue<>();
@@ -454,17 +460,53 @@ public final class JavaTypes {
 
   /**
    * Returns an unique identifier for the given {@link Method}. The identifier looks like
+   * '{@code methodName(dataTypeOfParam1,dataTypeOfParam2)}'. Only the type erasure is used.
+   *
+   * @param method
+   *          The method for which the identifier should be computed. Must not be {@code null}.
+   * @return The created identifier containing the type erasure only.
+   */
+  public static String createMethodIdentifier(Method method) {
+    return createMethodIdentifier(method, false);
+  }
+
+  /**
+   * Returns an unique identifier for the given {@link Method}. The identifier looks like
    * '{@code methodName(dataTypeOfParam1,dataTypeOfParam2)}'.
    *
    * @param method
    *          The method for which the identifier should be computed. Must not be {@code null}.
+   * @param includeTypeArguments
+   *          If {@code true} the created identifier includes the type arguments. If {@code false} only the type erasure
+   *          is used.
    * @return The created identifier
    */
-  public static String createMethodIdentifier(Method method) {
-    var args = Arrays.stream(method.getParameterTypes())
-        .map(Class::getName)
+  public static String createMethodIdentifier(Method method, boolean includeTypeArguments) {
+    var paramTypes = includeTypeArguments ? method.getGenericParameterTypes() : method.getParameterTypes();
+    var args = Arrays.stream(paramTypes)
+        .map(Type::getTypeName)
+        .map(name -> name.replace(" ", ""))
         .collect(toList());
     return createMethodIdentifier(method.getName(), args);
+  }
+
+  /**
+   * @return An array marker ({@code []}) for a one dimension array.
+   */
+  public static String arrayMarker() {
+    return arrayMarker(1);
+  }
+
+  /**
+   * @param dimension
+   *          The number of array dimensions.
+   * @return An array marker ({@code []}) for the given dimension number.
+   */
+  public static String arrayMarker(int dimension) {
+    if (dimension < 1) {
+      return "";
+    }
+    return ARRAY_MARKER.repeat(dimension);
   }
 
   /**

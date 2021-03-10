@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -396,23 +396,12 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   @Override
-  public String identifier(IJavaEnvironment context, boolean useErasureOnly) {
+  public String identifier(IJavaEnvironment context, boolean includeTypeArguments) {
     var methodParamTypes = m_parameters.stream()
-        .map(IMethodParameterGenerator::dataType)
-        .map(d -> d.orElseThrow(() -> newFail("Cannot calculate the method identifier because the datatype is missing.")))
-        .map(af -> af.apply(context).orElseThrow(() -> newFail("Cannot compute parameter data type of method '{}'.", elementName().orElse(null))))
-        .map(d -> typeErasureIfNecessary(d, useErasureOnly))
+        .map(param -> param.reference(context, !includeTypeArguments))
         .collect(toList());
-
     return JavaTypes.createMethodIdentifier(elementName().orElseThrow(() -> newFail("Cannot calculate method identifier because the method name is missing.")),
         methodParamTypes);
-  }
-
-  protected static String typeErasureIfNecessary(String name, boolean useErasureOnly) {
-    if (useErasureOnly) {
-      return JavaTypes.erasure(name);
-    }
-    return name;
   }
 
   @Override

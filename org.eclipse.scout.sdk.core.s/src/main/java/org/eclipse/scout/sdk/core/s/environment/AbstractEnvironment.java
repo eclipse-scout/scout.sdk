@@ -1,0 +1,116 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+package org.eclipse.scout.sdk.core.s.environment;
+
+import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+
+import java.nio.file.Path;
+
+import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitInfo;
+import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.util.Ensure;
+
+public abstract class AbstractEnvironment implements IEnvironment {
+
+  @Override
+  public IType writeCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder) {
+    return writeCompilationUnit(generator, targetFolder, null);
+  }
+
+  @Override
+  public IType writeCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress) {
+    return writeCompilationUnitGenerator(generator, targetFolder, progress, true).result();
+  }
+
+  @Override
+  public IFuture<IType> writeCompilationUnitAsync(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress) {
+    return writeCompilationUnitGenerator(generator, targetFolder, progress, false);
+  }
+
+  public StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath) {
+    var context = findJavaEnvironment(filePath).orElseThrow(() -> newFail("Cannot find Java environment for path '{}'.", filePath));
+    return runGenerator(generator, context, filePath);
+  }
+
+  @Override
+  public IFuture<IType> writeCompilationUnitAsync(CharSequence newSource, ICompilationUnit existingCompilationUnit, IProgress progress) {
+    return overwriteExistingCu(newSource, existingCompilationUnit, progress, false);
+  }
+
+  @Override
+  public IType writeCompilationUnit(CharSequence newSource, ICompilationUnit existingCompilationUnit, IProgress progress) {
+    return overwriteExistingCu(newSource, existingCompilationUnit, progress, true).result();
+  }
+
+  protected IFuture<IType> overwriteExistingCu(CharSequence newSource, ICompilationUnit existingCompilationUnit, IProgress progress, boolean sync) {
+    var sourceFolder = existingCompilationUnit.containingClasspathFolder().orElseThrow(() -> newFail("Compilation unit '{}' cannot be updated because the containing source folder could not be computed.", existingCompilationUnit));
+    return writeCuWithExistingSource(newSource, sourceFolder, existingCompilationUnit.path(), progress, sync);
+  }
+
+  @Override
+  public IFuture<IType> writeCompilationUnitAsync(CharSequence source, IClasspathEntry targetSourceFolder, Path sourceFolderRelPath, IProgress progress) {
+    return writeCuWithExistingSource(source, targetSourceFolder, sourceFolderRelPath, progress, false);
+  }
+
+  @Override
+  public IType writeCompilationUnit(CharSequence source, IClasspathEntry targetSourceFolder, Path sourceFolderRelPath, IProgress progress) {
+    return writeCuWithExistingSource(source, targetSourceFolder, sourceFolderRelPath, progress, true).result();
+  }
+
+  protected IFuture<IType> writeCuWithExistingSource(CharSequence source, IClasspathEntry targetSourceFolder, Path sourceFolderRelPath, IProgress progress, boolean sync) {
+    var cuInfo = new CompilationUnitInfo(targetSourceFolder, sourceFolderRelPath);
+    return doWriteCompilationUnit(source, cuInfo, progress, sync);
+  }
+
+  @Override
+  public void writeResource(CharSequence content, Path filePath, IProgress progress) {
+    doWriteResource(content, filePath, progress, true).awaitDoneThrowingOnErrorOrCancel();
+  }
+
+  @Override
+  public void writeResource(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath, IProgress progress) {
+    writeResource(createResource(generator, filePath), filePath, progress);
+  }
+
+  @Override
+  public IFuture<Void> writeResourceAsync(ISourceGenerator<ISourceBuilder<?>> generator, Path filePath, IProgress progress) {
+    return writeResourceAsync(createResource(generator, filePath), filePath, progress);
+  }
+
+  @Override
+  public IFuture<Void> writeResourceAsync(CharSequence content, Path filePath, IProgress progress) {
+    return doWriteResource(content, filePath, progress, false);
+  }
+
+  protected IFuture<IType> writeCompilationUnitGenerator(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress, boolean sync) {
+    Ensure.isTrue(Ensure.notNull(targetFolder).isSourceFolder(), "{} is no source folder. It is only allowed to generate new source into source folders.", targetFolder);
+    var info = new CompilationUnitInfo(generator, targetFolder);
+    var code = runGenerator(generator, targetFolder.javaEnvironment(), info.targetFile());
+    return doWriteCompilationUnit(code, info, progress, sync);
+  }
+
+  @Override
+  public StringBuilder executeGenerator(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder) {
+    return runGenerator(generator, targetFolder.javaEnvironment(), targetFolder.path());
+  }
+
+  protected abstract StringBuilder runGenerator(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment context, Path filePath);
+
+  protected abstract IFuture<Void> doWriteResource(CharSequence content, Path filePath, IProgress progress, boolean sync);
+
+  protected abstract IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfo cuInfo, IProgress progress, boolean sync);
+}

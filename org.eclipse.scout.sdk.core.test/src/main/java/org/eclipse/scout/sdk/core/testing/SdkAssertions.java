@@ -191,7 +191,7 @@ public final class SdkAssertions {
   public static IMethod assertMethodExist(IType type, String methodName, String[] parameterTypes, String message) {
     var methodId = JavaTypes.createMethodIdentifier(methodName, Arrays.asList(parameterTypes));
     return type.methods().stream()
-        .filter(method -> method.identifier().equals(methodId))
+        .filter(method -> method.identifier(true).equals(methodId))
         .findAny()
         .<AssertionError> orElseThrow(() -> {
           var msg = message;

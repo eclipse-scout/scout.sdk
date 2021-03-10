@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.s2i.derived.impl
+package org.eclipse.scout.sdk.s2i.derived
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler
-import org.eclipse.scout.sdk.s2i.derived.DerivedResourceHandlerFactory
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
 import kotlin.streams.asSequence
 

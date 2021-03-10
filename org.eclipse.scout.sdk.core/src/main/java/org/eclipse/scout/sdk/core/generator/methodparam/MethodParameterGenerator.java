@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.generator.methodparam;
 
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -23,6 +24,7 @@ import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.MemberBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
@@ -177,5 +179,23 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
   public TYPE asVarargs(boolean newVarargsValue) {
     m_isVarargs = newVarargsValue;
     return thisInstance();
+  }
+
+  @Override
+  public String reference(IJavaEnvironment context) {
+    return reference(context, false);
+  }
+
+  @Override
+  public String reference(IJavaEnvironment context, boolean useErasureOnly) {
+    var dataTypeFunc = dataType().orElseThrow(() -> newFail("Cannot calculate the method identifier because the datatype is missing."));
+    var typeString = dataTypeFunc.apply(context).orElseThrow(() -> newFail("Cannot compute parameter data type of method '{}'.", elementName().orElse(null)));
+    if (useErasureOnly) {
+      typeString = JavaTypes.erasure(typeString);
+    }
+    if (isVarargs()) {
+      typeString += arrayMarker();
+    }
+    return typeString;
   }
 }

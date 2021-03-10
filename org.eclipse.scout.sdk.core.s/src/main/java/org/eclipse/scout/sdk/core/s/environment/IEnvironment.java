@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -47,6 +48,7 @@ public interface IEnvironment {
    *          The absolute {@link Path} pointing to the root of the module defining the {@link IJavaEnvironment}.
    * @return An {@link Optional} with the {@link IJavaEnvironment} rooting at the specified path or an empty
    *         {@link Optional} if no {@link IJavaEnvironment} exists at this location.
+   * @see #rootOfJavaEnvironment(IJavaEnvironment)
    */
   Optional<IJavaEnvironment> findJavaEnvironment(Path root);
 
@@ -58,6 +60,7 @@ public interface IEnvironment {
    * @return The root path of the module the given {@link IJavaEnvironment} was created on.
    * @throws IllegalArgumentException
    *           if the environment is {@code null}.
+   * @see #findJavaEnvironment(Path)
    */
   Path rootOfJavaEnvironment(IJavaEnvironment environment);
 
@@ -146,6 +149,102 @@ public interface IEnvironment {
   IFuture<IType> writeCompilationUnitAsync(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress);
 
   /**
+   * Overwrites the {@link ICompilationUnit} given with the new source given.
+   * 
+   * @param newSource
+   *          The new source. Must not be {@code null}.
+   * @param existingCompilationUnit
+   *          The existing {@link ICompilationUnit} that should be overwritten. It must not be {@code null} and must be
+   *          a non {@link ICompilationUnit#isSynthetic() synthetic} compilation unit stored in a source folder.
+   * @param progress
+   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
+   *          argument. May be {@code null} if no progress indication is required.
+   * @return The updated main {@link IType} within the specified {@link ICompilationUnit}.
+   * @see ICompilationUnit#containingClasspathFolder()
+   */
+  IType writeCompilationUnit(CharSequence newSource, ICompilationUnit existingCompilationUnit, IProgress progress);
+
+  /**
+   * Asynchronously overwrites the {@link ICompilationUnit} given with the new source given.
+   * <p>
+   * <b>Notes:</b>
+   * <ul>
+   * <li>The async write operation runs in the same transaction as the calling thread. Therefore at some point the
+   * calling thread must wait for the async write operation to complete to ensure its result is registered in the
+   * transaction before committing it!</li>
+   * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
+   * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
+   * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
+   * {@link IEnvironment} will be closed.</li>
+   * </ul>
+   * 
+   * @param newSource
+   *          The new source. Must not be {@code null}.
+   * @param existingCompilationUnit
+   *          The existing {@link ICompilationUnit} that should be overwritten. It must not be {@code null} and must be
+   *          a non {@link ICompilationUnit#isSynthetic() synthetic} compilation unit stored in a source folder.
+   * @param progress
+   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
+   *          argument. May be {@code null} if no progress indication is required.
+   * @return The updated main {@link IType} within the specified {@link ICompilationUnit}.
+   * @see ICompilationUnit#containingClasspathFolder()
+   */
+  IFuture<IType> writeCompilationUnitAsync(CharSequence newSource, ICompilationUnit existingCompilationUnit, IProgress progress);
+
+  /**
+   * Writes the source given to a Java file.
+   * 
+   * @param source
+   *          The new source. Must not be {@code null}.
+   * @param targetSourceFolder
+   *          The absolute source folder in which the new Java file should be created. Must not be {@code null}.
+   *          {@link IClasspathEntry#isSourceFolder()} must be {@code true}. E.g.
+   *          {@code /dev/myProject/myModule/src/main/java}.
+   * @param compilationUnitPath
+   *          The file {@link Path} relative to the source folder in which the compilation unit should be created. e.g.
+   *          {@code org/eclipse/scout/MyClass.java}.
+   * @param progress
+   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
+   *          argument. May be {@code null} if no progress indication is required.
+   * @return The created main {@link IType} within the specified file.
+   */
+  IType writeCompilationUnit(CharSequence source, IClasspathEntry targetSourceFolder, Path compilationUnitPath, IProgress progress);
+
+  /**
+   * Asynchronously writes the source given to a Java file.
+   * <p>
+   * <b>Notes:</b>
+   * <ul>
+   * <li>The async write operation runs in the same transaction as the calling thread. Therefore at some point the
+   * calling thread must wait for the async write operation to complete to ensure its result is registered in the
+   * transaction before committing it!</li>
+   * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
+   * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
+   * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
+   * {@link IEnvironment} will be closed.</li>
+   * </ul>
+   *
+   * @param source
+   *          The new source. Must not be {@code null}.
+   * @param targetSourceFolder
+   *          The absolute source folder in which the new Java file should be created. Must not be {@code null}.
+   *          {@link IClasspathEntry#isSourceFolder()} must be {@code true}. E.g.
+   *          {@code /dev/myProject/myModule/src/main/java}.
+   * @param compilationUnitPath
+   *          The file {@link Path} relative to the source folder in which the compilation unit should be created. e.g.
+   *          {@code org/eclipse/scout/MyClass.java}.
+   * @param progress
+   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
+   *          argument. May be {@code null} if no progress indication is required.
+   * @return The created main {@link IType} within the specified file.
+   */
+  IFuture<IType> writeCompilationUnitAsync(CharSequence source, IClasspathEntry targetSourceFolder, Path compilationUnitPath, IProgress progress);
+
+  /**
    * Executes the specified {@link ISourceGenerator} in the context of the specified {@link IJavaEnvironment}. The
    * result of the {@link ISourceGenerator} is created in memory.
    *
@@ -161,7 +260,7 @@ public interface IEnvironment {
    * @see IJavaBuilderContext#environment()
    * @see IJavaElementGenerator#toJavaSource(IJavaEnvironment)
    */
-  StringBuilder createResource(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder);
+  StringBuilder executeGenerator(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder);
 
   /**
    * Writes the specified content to the specified file path.

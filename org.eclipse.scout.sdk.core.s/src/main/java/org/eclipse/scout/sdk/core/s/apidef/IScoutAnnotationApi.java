@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,6 +60,8 @@ public interface IScoutAnnotationApi {
 
   NlsKey NlsKey();
 
+  IgnoreConvenienceMethodGeneration IgnoreConvenienceMethodGeneration();
+
   interface NlsKey extends IClassNameSupplier {
   }
 
@@ -67,39 +69,32 @@ public interface IScoutAnnotationApi {
   }
 
   interface Authentication extends IClassNameSupplier {
-
     String methodElementName();
 
     String verifierElementName();
   }
 
   interface BeanMock extends IClassNameSupplier {
-
   }
 
   interface Before extends IClassNameSupplier {
-
   }
 
   interface ClassId extends IClassNameSupplier {
-
     String valueElementName();
   }
 
   interface Clazz extends IClassNameSupplier {
-
     String valueElementName();
 
     String qualifiedNameElementName();
   }
 
   interface ColumnData extends IClassNameSupplier {
-
     String valueElementName();
   }
 
   interface Data extends IClassNameSupplier {
-
     String valueElementName();
   }
 
@@ -108,14 +103,12 @@ public interface IScoutAnnotationApi {
   }
 
   interface Extends extends IClassNameSupplier {
-
     String valueElementName();
 
     String pathToContainerElementName();
   }
 
   interface FormData extends IClassNameSupplier {
-
     String valueElementName();
 
     String interfacesElementName();
@@ -128,54 +121,43 @@ public interface IScoutAnnotationApi {
   }
 
   interface Handler extends IClassNameSupplier {
-
     String valueElementName();
   }
 
   interface Order extends IClassNameSupplier {
-
     String valueElementName();
   }
 
   interface PageData extends IClassNameSupplier {
-
     String valueElementName();
   }
 
   interface Replace extends IClassNameSupplier {
-
   }
 
   interface RunWith extends IClassNameSupplier {
-
     String valueElementName();
   }
 
   interface RunWithClientSession extends IClassNameSupplier {
-
     String valueElementName();
   }
 
   interface RunWithServerSession extends IClassNameSupplier {
-
     String valueElementName();
   }
 
   interface RunWithSubject extends IClassNameSupplier {
-
     String valueElementName();
   }
 
   interface Test extends IClassNameSupplier {
-
   }
 
   interface TunnelToServer extends IClassNameSupplier {
-
   }
 
   interface WebServiceEntryPoint extends IClassNameSupplier {
-
     String endpointInterfaceElementName();
 
     String entryPointNameElementName();
@@ -189,5 +171,8 @@ public interface IScoutAnnotationApi {
     String authenticationElementName();
 
     String handlerChainElementName();
+  }
+
+  interface IgnoreConvenienceMethodGeneration extends IClassNameSupplier {
   }
 }

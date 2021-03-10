@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -179,9 +179,8 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
           break;
         case METHOD_TYPE_SETTER:
           templateName = CodeTemplateContextType.SETTERCOMMENT_ID;
-          var firstParam = target.parameters().findAny()
-              .flatMap(IMethodParameterGenerator::dataType)
-              .flatMap(af -> af.apply(builderContext));
+          var javaEnv = builderContext.environment().orElse(null);
+          var firstParam = target.parameters().findAny().map(p -> p.reference(javaEnv));
           if (firstParam.isPresent()) {
             fieldTypeSimpleName = JavaTypes.simpleName(firstParam.get());
           }

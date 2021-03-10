@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -442,10 +442,10 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean useErasureOnly) {
+  public Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments) {
     Ensure.notBlank(methodId);
     return methods()
-        .filter(m -> methodId.equals(m.identifier(context, useErasureOnly)))
+        .filter(m -> methodId.equals(m.identifier(context, includeTypeArguments)))
         .findAny();
   }
 
@@ -585,12 +585,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
       var abstractMethodIds = type.methods().withSuperTypes(true).stream()
           .filter(method -> !isDefaultMethod(method.flags()) && !Flags.isStatic(method.flags()))
           .filter(method -> isAbstract(method.flags()) || isInterface(method.flags()) || isInterface(method.requireDeclaringType().flags()))
-          .collect(toMap(m -> m.identifier(true), identity(), (u, v) -> u));
+          .collect(toMap(IMethod::identifier, identity(), (u, v) -> u));
 
       // remove all implemented methods
       type.methods().withSuperClasses(true).stream()
           .filter(m -> !isPrivate(m.flags()) && !isAbstract(m.flags()))
-          .map(m -> m.identifier(true))
+          .map(IMethod::identifier)
           .forEach(abstractMethodIds::remove);
 
       return abstractMethodIds.values().stream();

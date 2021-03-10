@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.eclipse.scout.sdk.core.util.Strings.repeat;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 
 import java.util.List;
 
@@ -110,7 +110,7 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
       var componentTypeName = getLeafComponentType().getName();
       var b = new StringBuilder(componentTypeName.length() + (2 * m_arrayDimension));
       b.append(componentTypeName);
-      b.append(repeat("[]", m_arrayDimension));
+      b.append(arrayMarker(m_arrayDimension));
       return b.toString();
     });
   }

@@ -17,6 +17,7 @@ import com.intellij.ui.IconManager
 import com.intellij.util.IconUtil
 import org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener
 import org.eclipse.scout.sdk.s2i.classid.ClassIdCache
+import org.eclipse.scout.sdk.s2i.dataobject.DataObjectManager
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.model.js.JsModuleCacheImplementor
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache
@@ -37,6 +38,9 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
     fun derivedResourceManager(project: Project): DerivedResourceManager =
             ServiceManager.getService(project, DerivedResourceManager::class.java)
+
+    fun dataObjectManager(project: Project): DataObjectManager =
+            ServiceManager.getService(project, DataObjectManager::class.java)
 
     fun autoCreateClassIdListener(project: Project): AutoCreateClassIdListener =
             ServiceManager.getService(project, AutoCreateClassIdListener::class.java)

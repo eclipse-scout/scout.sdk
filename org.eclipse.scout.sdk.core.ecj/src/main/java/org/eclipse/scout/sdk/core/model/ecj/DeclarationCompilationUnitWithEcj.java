@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +30,7 @@ import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.CompilationUnitImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
@@ -47,6 +50,8 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
   private final FinalValue<List<DeclarationImportWithEcj>> m_imports;
   private final FinalValue<ISourceRange> m_source;
   private final FinalValue<ISourceRange> m_javaDocSource;
+  private final FinalValue<Path> m_absolutePath;
+  private final FinalValue<ClasspathSpi> m_containingClasspathFolder;
 
   protected DeclarationCompilationUnitWithEcj(AbstractJavaEnvironment env, CompilationUnitDeclaration astNode) {
     super(env);
@@ -58,6 +63,8 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
     m_imports = new FinalValue<>();
     m_source = new FinalValue<>();
     m_javaDocSource = new FinalValue<>();
+    m_absolutePath = new FinalValue<>();
+    m_containingClasspathFolder = new FinalValue<>();
   }
 
   protected static TypeSpi findTypeBySimpleNameInternal(String simpleName, Scope scopeForTypeLookup, JavaEnvironmentWithEcj env) {
@@ -90,6 +97,40 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
 
   public CompilationUnitDeclaration getInternalCompilationUnitDeclaration() {
     return m_astNode;
+  }
+
+  @Override
+  public Path absolutePath() {
+    return m_absolutePath.computeIfAbsentAndGet(this::computeAbsolutePath);
+  }
+
+  protected Path computeAbsolutePath() {
+    var compilationResult = getInternalCompilationUnitDeclaration().compilationResult();
+    if (compilationResult == null) {
+      return null;
+    }
+    var fileName = compilationResult.getFileName();
+    if (fileName == null) {
+      return null;
+    }
+    return Paths.get(new String(fileName));
+  }
+
+  @Override
+  public ClasspathSpi getContainingClasspathFolder() {
+    return m_containingClasspathFolder.computeIfAbsentAndGet(this::computeContainingClasspathFolder);
+  }
+
+  protected ClasspathSpi computeContainingClasspathFolder() {
+    var myPath = absolutePath();
+    if (myPath == null) {
+      return null;
+    }
+    return getJavaEnvironment().getClasspath().stream()
+        .filter(ClasspathSpi::isDirectory)
+        .filter(cp -> myPath.startsWith(cp.getPath()))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override

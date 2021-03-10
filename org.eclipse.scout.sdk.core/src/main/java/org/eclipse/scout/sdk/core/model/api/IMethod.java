@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,10 +15,10 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.query.MethodParameterQuery;
 import org.eclipse.scout.sdk.core.model.api.query.SuperMethodQuery;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
@@ -100,21 +100,24 @@ public interface IMethod extends IMember {
 
   /**
    * Returns the unique identifier for this {@link IMethod}. The identifier looks like
-   * 'methodName(dataTypeParam1,dataTypeParam2)'.
+   * 'methodName(dataTypeParam1,dataTypeParam2)' optionally including the type arguments.
    *
-   * @param useErasureOnly
-   *          If {@code true} only the type erasure is used for all method parameter types.
+   * @param includeTypeArguments
+   *          {@code true} to include the type arguments or {@code false} to use type erasure for all method parameter
+   *          types.
    * @return The created identifier
+   * @see #identifier()
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    * @see IMethodGenerator#identifier(IJavaEnvironment, boolean)
    */
-  String identifier(boolean useErasureOnly);
+  String identifier(boolean includeTypeArguments);
 
   /**
    * Returns a unique identifier for this {@link IMethod}. The identifier looks like
-   * 'methodName(dataTypeParam1,dataTypeParam2)'.
+   * 'methodName(dataTypeParam1,dataTypeParam2)' and only includes the type erasure (no type arguments).
    *
-   * @return The created identifier
+   * @return The created identifier using the type erasure only.
+   * @see #identifier(boolean)
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    * @see IMethodGenerator#identifier(IJavaEnvironment)
    */
