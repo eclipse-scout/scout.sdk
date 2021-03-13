@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.findTypesByName
 import org.eclipse.scout.sdk.s2i.newSubTypeHierarchy
+import org.eclipse.scout.sdk.s2i.toIdea
 import org.eclipse.scout.sdk.s2i.toScoutType
 import kotlin.streams.asSequence
 
@@ -43,7 +44,7 @@ class DataObjectManagerImpl(val project: Project) : DataObjectManager {
         val totalWork = 200
         val workForDiscovery = 10
         progress.init(totalWork, message("update.dataobject.in.scope"))
-        val doEntities = computeInReadAction(project, true, progress.indicator) {
+        val doEntities = computeInReadAction(project, true, progress.newChild(workForDiscovery).indicator) {
             ScoutApi.allKnown().asSequence()
                     .map { it.IDoEntity().fqn() }
                     .distinct()
@@ -62,11 +63,14 @@ class DataObjectManagerImpl(val project: Project) : DataObjectManager {
         if (doEntities.isEmpty()) {
             return
         }
-        progress.worked(workForDiscovery)
         val operation = object : DoConvenienceMethodsUpdateOperation() {
             private var m_counter = 0
 
             override fun write(newSource: CharSequence, dataObjectType: IType, environment: IEnvironment, progress: IProgress): IFuture<IType> {
+                val indicator = progress.toIdea().indicator
+                indicator.text2 = dataObjectType.name()
+                indicator.checkCanceled()
+
                 val future = super.write(newSource, dataObjectType, environment, progress)
                 commitIfNecessary()
                 return future
