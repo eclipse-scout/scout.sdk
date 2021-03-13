@@ -38,6 +38,7 @@ public class CompilationUnitInfo {
    *          The {@link Path} to the compilation unit relative to the given sourceFolder. Must not be {@code null}.
    *          E.g. {@code 'org/eclipse/scout/MyClass.java'} or {@code 'MyClassInDefaultPackage.java'}.
    */
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public CompilationUnitInfo(IClasspathEntry sourceFolder, Path sourceFolderRelPath) {
     m_sourceFolder = sourceFolder;
     m_fileName = sourceFolderRelPath.getFileName().toString();

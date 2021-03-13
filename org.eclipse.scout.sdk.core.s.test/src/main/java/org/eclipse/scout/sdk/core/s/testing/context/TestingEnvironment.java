@@ -80,7 +80,6 @@ public class TestingEnvironment extends AbstractEnvironment implements AutoClose
 
   @Override
   protected StringBuilder runGenerator(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment env, Path filePath) {
-    //noinspection TypeMayBeWeakened
     var context = new JavaBuilderContext(new BuilderContext(), Ensure.notNull(env));
     var builder = MemorySourceBuilder.create(context);
     generator.generate(builder);

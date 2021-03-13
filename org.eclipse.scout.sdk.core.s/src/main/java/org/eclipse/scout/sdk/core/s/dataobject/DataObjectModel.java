@@ -97,7 +97,10 @@ public class DataObjectModel {
 
   protected static Optional<DataObjectNode> parseDoMethod(IType source, IMethod method) {
     var flags = method.flags();
-    if (method.isConstructor() || Flags.isAbstract(flags) || Flags.isStatic(flags) || Flags.isBridge(flags) || Flags.isSynthetic(flags)) {
+    if (method.isConstructor() || Flags.isAbstract(flags) || Flags.isStatic(flags)) {
+      return Optional.empty();
+    }
+    if (Flags.isBridge(flags) || Flags.isSynthetic(flags)) {
       return Optional.empty();
     }
     var hasParameters = method.parameters().first().isPresent();
@@ -113,7 +116,7 @@ public class DataObjectModel {
     }
 
     // value type
-    var optDoValue = parseValueType(returnType, optKind.get());
+    var optDoValue = parseValueType(returnType);
     if (optDoValue.isEmpty()) {
       return Optional.empty();
     }
@@ -125,7 +128,7 @@ public class DataObjectModel {
     return Optional.of(new DataObjectNode(optKind.get(), method.elementName(), optDoValue.get(), isInherited));
   }
 
-  protected static Optional<IType> parseValueType(IType returnType, DataObjectNodeKind kind) {
+  protected static Optional<IType> parseValueType(IType returnType) {
     return returnType.typeArguments().findAny();
   }
 

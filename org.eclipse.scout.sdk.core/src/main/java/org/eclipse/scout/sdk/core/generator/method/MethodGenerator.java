@@ -383,7 +383,6 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
   @Override
   protected IJavaElementCommentBuilder<?> createCommentBuilder(ISourceBuilder<?> builder) {
-    //noinspection TypeMayBeWeakened
     var javaSourceBuilder = (IJavaSourceBuilder<?>) builder;
     var context = javaSourceBuilder.context().environment().orElse(null);
     if (PropertyBean.getterName(this, context).isPresent()) {

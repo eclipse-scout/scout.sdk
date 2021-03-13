@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 
 import org.apache.maven.cli.CLIManager;
@@ -169,8 +169,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       var poolClass = loader.loadClass(RealConnectionPool.class.getName());
       var field = poolClass.getDeclaredField("executor");
       field.setAccessible(true);
-      //noinspection TypeMayBeWeakened
-      var executor = (ThreadPoolExecutor) field.get(null);
+      var executor = (ExecutorService) field.get(null);
       executor.shutdownNow();
 
       for (var candidate : Thread.getAllStackTraces().keySet()) {

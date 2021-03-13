@@ -27,13 +27,13 @@ public class DataObjectNode {
    * The Node type
    */
   public enum DataObjectNodeKind {
-    DoValue,
-    DoList;
+    DO_VALUE,
+    DO_LIST;
 
     /**
      * Parses the given {@link IType} to the {@link DataObjectNodeKind}.<br>
-     * If it is the {@code DoValue} type, {@link #DoValue} is returned.<br>
-     * If it is the {@code DoList} type, {@link #DoList} is returned.<br>
+     * If it is the {@code DoValue} type, {@link #DO_VALUE} is returned.<br>
+     * If it is the {@code DoList} type, {@link #DO_LIST} is returned.<br>
      * Otherwise an empty optional is returned.
      * 
      * @param t
@@ -53,10 +53,10 @@ public class DataObjectNode {
       var scoutApi = optScoutApi.get();
       var name = t.name();
       if (scoutApi.DoValue().fqn().equals(name)) {
-        return Optional.of(DoValue);
+        return Optional.of(DO_VALUE);
       }
       if (scoutApi.DoList().fqn().equals(name)) {
-        return Optional.of(DoList);
+        return Optional.of(DO_LIST);
       }
       return Optional.empty();
     }
@@ -75,7 +75,7 @@ public class DataObjectNode {
   }
 
   /**
-   * @return {@link DataObjectNodeKind#DoValue} or {@link DataObjectNodeKind#DoList}. Is never {@code null}.
+   * @return {@link DataObjectNodeKind#DO_VALUE} or {@link DataObjectNodeKind#DO_LIST}. Is never {@code null}.
    */
   public DataObjectNodeKind kind() {
     return m_kind;
@@ -89,7 +89,7 @@ public class DataObjectNode {
   }
 
   /**
-   * @return The data type of the node. Is never {@code null}. If the node is of kind {@link DataObjectNodeKind#DoList}
+   * @return The data type of the node. Is never {@code null}. If the node is of kind {@link DataObjectNodeKind#DO_LIST}
    *         this data type represents the list element type.
    */
   public IType dataType() {

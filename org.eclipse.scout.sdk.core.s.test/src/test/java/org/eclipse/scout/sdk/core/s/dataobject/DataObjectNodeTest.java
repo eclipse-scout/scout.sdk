@@ -34,8 +34,8 @@ public class DataObjectNodeTest {
   @Test
   public void testDataObjectNodeKindValueOf(IJavaEnvironment env) {
     var scoutApi = env.requireApi(IScoutApi.class);
-    assertEquals(DataObjectNodeKind.DoList, valueOf(env.requireType(scoutApi.DoList())).get());
-    assertEquals(DataObjectNodeKind.DoValue, valueOf(env.requireType(scoutApi.DoValue())).get());
+    assertEquals(DataObjectNodeKind.DO_LIST, valueOf(env.requireType(scoutApi.DoList())).get());
+    assertEquals(DataObjectNodeKind.DO_VALUE, valueOf(env.requireType(scoutApi.DoValue())).get());
     assertFalse(valueOf(env.requireType(Long.class.getName())).isPresent());
     assertFalse(valueOf((IType) null).isPresent());
 
@@ -47,15 +47,15 @@ public class DataObjectNodeTest {
   public void testGetters(IJavaEnvironment env) {
     var name = "myName";
     var dataType = env.requireType(String.class.getName());
-    var node1 = new DataObjectNode(DataObjectNodeKind.DoValue, name, dataType, true);
-    var node2 = new DataObjectNode(DataObjectNodeKind.DoList, name, dataType, false);
+    var node1 = new DataObjectNode(DataObjectNodeKind.DO_VALUE, name, dataType, true);
+    var node2 = new DataObjectNode(DataObjectNodeKind.DO_LIST, name, dataType, false);
 
-    assertSame(DataObjectNodeKind.DoValue, node1.kind());
+    assertSame(DataObjectNodeKind.DO_VALUE, node1.kind());
     assertSame(name, node1.name());
     assertSame(dataType, node1.dataType());
     assertTrue(node1.isInherited());
 
-    assertSame(DataObjectNodeKind.DoList, node2.kind());
+    assertSame(DataObjectNodeKind.DO_LIST, node2.kind());
     assertSame(name, node2.name());
     assertSame(dataType, node2.dataType());
     assertFalse(node2.isInherited());
@@ -66,9 +66,9 @@ public class DataObjectNodeTest {
   public void testHashCodeEqualsToString(IJavaEnvironment env) {
     var name = "myName";
     var dataType = env.requireType(String.class.getName());
-    var node1 = new DataObjectNode(DataObjectNodeKind.DoValue, name, dataType, true);
-    var node2 = new DataObjectNode(DataObjectNodeKind.DoList, name, dataType, false);
-    var node3 = new DataObjectNode(DataObjectNodeKind.DoValue, "otherName", dataType, true);
+    var node1 = new DataObjectNode(DataObjectNodeKind.DO_VALUE, name, dataType, true);
+    var node2 = new DataObjectNode(DataObjectNodeKind.DO_LIST, name, dataType, false);
+    var node3 = new DataObjectNode(DataObjectNodeKind.DO_VALUE, "otherName", dataType, true);
 
     assertFalse(node1.equals(null));
     assertFalse(node1.equals(""));

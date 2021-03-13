@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
-@SuppressWarnings({"MethodMayBeStatic", "TypeMayBeWeakened"})
+@SuppressWarnings({"MethodMayBeStatic"})
 public class GeneratorSample {
 
   public static void main(String[] args) {

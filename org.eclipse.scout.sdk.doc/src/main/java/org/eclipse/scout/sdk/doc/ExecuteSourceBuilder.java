@@ -13,7 +13,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 
-@SuppressWarnings({"MethodMayBeStatic", "TypeMayBeWeakened"})
+@SuppressWarnings({"MethodMayBeStatic"})
 public class ExecuteSourceBuilder {
 
   public static void main(String[] args) {

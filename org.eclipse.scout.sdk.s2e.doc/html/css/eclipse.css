@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
  /* Stylesheet for Asciidoctor */
 
 div#footer-text {
@@ -6,24 +16,21 @@ div#footer-text {
   visibility: hidden;
 }
 pre.highlight{
-  background:#EEE;
-  padding-top: 1em;
-  padding-right: 0px;
-  padding-bottom: 1em;
-  padding-left: 0px;
+  background: #EEE;
+  padding: 1em 0;
 }
 .conum[data-value] {
-  background-color:rgba(0,0,0,.8);
-  border-radius:100px;
-  color:#fff!important;
-  display:inline-block;
-  font-size:.75em;
-  font-style:normal;
-  font-weight:bold
-  height:1.67em;
-  line-height:1.67em;
-  text-align:center;
-  width:1.67em;
+  background-color: rgba(0, 0, 0, .8);
+  border-radius: 100px;
+  color: #fff !important;
+  display: inline-block;
+  font-size: .75em;
+  font-style: normal;
+  font-weight: bold;
+  height: 1.67em;
+  line-height: 1.67em;
+  text-align: center;
+  width: 1.67em;
 }
 .conum[data-value] * {
   color:#fff!important

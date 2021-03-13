@@ -160,9 +160,9 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
 
   protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsFor(DataObjectNode node, IType owner) {
     switch (node.kind()) {
-      case DoValue:
+      case DO_VALUE:
         return buildMethodGeneratorsForValue(node, owner);
-      case DoList:
+      case DO_LIST:
         return buildMethodGeneratorsForList(node, owner);
       default:
         throw newFail("DataObject node type '{}' of '{}' is not supported yet.", node.kind(), node);
@@ -316,7 +316,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
 
   private static class Replacement {
 
-    private final static AtomicLong ORDER_SEQUENCE = new AtomicLong();
+    private static final AtomicLong ORDER_SEQUENCE = new AtomicLong();
     private final int m_offset;
     private final int m_length;
     private final CharSequence m_newSource;
