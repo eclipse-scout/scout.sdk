@@ -25,6 +25,7 @@
         <br>
         <ul>
           <li>Derived resource update for FormData and PageData</li>
+          <li>DataObject convenience methods update</li>
           <li>Java code completion for Scout elements like FormFields, Menus, KeyStrokes, Codes and more.</li>
           <li>JavaScript code completion for Scout JS models.</li>
           <li>Scout national language support
@@ -37,16 +38,15 @@
             </ul>
           </li>
           <li>@ClassId validation inspections (missing, duplicates)</li>
+          <li>Project creation support</li>
         </ul>
         </p>
   ]]></description>
 
   <change-notes><![CDATA[
         <ul>
-          <li>Adds support for Scout 11.</li>
-          <li>Adds JavaScript code completion for Scout JS models.</li>
-          <li>Adds an inspection reporting unused translations (not referred in the code) that might be deleted.</li>
-          <li>Adds code folding support for Scout translations with configurable display language.</li>
+          <li>Adds Scout project creation support</li>
+          <li>Adds an action to update DataObject convenience methods</li>
         </ul>
   ]]></change-notes>
 
