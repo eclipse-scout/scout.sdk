@@ -51,6 +51,7 @@ plugins {
     id("idea")
     id("org.jetbrains.intellij") version "0.8.0-SNAPSHOT"
     kotlin("jvm") version "1.4.31"
+    id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
 
 buildscript {
