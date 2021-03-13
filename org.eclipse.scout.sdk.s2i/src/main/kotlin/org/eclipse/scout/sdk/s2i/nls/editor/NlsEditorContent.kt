@@ -117,7 +117,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
 
     private fun filterChanged() {
         m_searchPattern = toPredicate(m_textFilter.text)
-        m_table.setFilter(Predicate { acceptTranslation(it) })
+        m_table.setFilter { acceptTranslation(it) }
     }
 
     private fun acceptTranslation(candidate: ITranslationEntry): Boolean {

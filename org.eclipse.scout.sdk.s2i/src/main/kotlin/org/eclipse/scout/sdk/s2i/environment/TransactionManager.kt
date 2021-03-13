@@ -298,12 +298,12 @@ class TransactionManager constructor(val project: Project, val transactionName: 
 
     private fun commitAllMembers(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, documentManager: FileDocumentManager, progress: IdeaProgress) = m_members.entries
             .map { commitMembers(it.key, it.value, documentMappings, documentManager, progress) }
-            .min() ?: false
+            .minOrNull() ?: false
 
     private fun commitMembers(path: Path, members: List<TransactionMember>, fileMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, documentManager: FileDocumentManager, progress: IdeaProgress): Boolean {
         val success = members
                 .map { member -> commitMember(member, progress.newChild(1)) }
-                .min() ?: false
+                .minOrNull() ?: false
         if (success) {
             val mapping = fileMappings[path]
             var vFile = mapping?.first
