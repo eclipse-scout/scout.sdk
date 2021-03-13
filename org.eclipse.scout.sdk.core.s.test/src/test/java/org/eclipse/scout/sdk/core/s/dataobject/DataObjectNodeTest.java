@@ -77,6 +77,6 @@ public class DataObjectNodeTest {
     assertNotEquals(node1.hashCode(), node2.hashCode());
     assertNotEquals(node1, node3);
 
-    assertEquals(DataObjectNode.class.getSimpleName() + " [name='myName', kind=DoValue, dataType='java.lang.String', inherited=true]", node1.toString());
+    assertEquals(DataObjectNode.class.getSimpleName() + " [name='myName', kind=DO_VALUE, dataType='java.lang.String', inherited=true]", node1.toString());
   }
 }

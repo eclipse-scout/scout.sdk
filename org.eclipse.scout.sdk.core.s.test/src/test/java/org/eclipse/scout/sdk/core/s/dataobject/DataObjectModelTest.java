@@ -47,10 +47,10 @@ public class DataObjectModelTest {
     assertSame(childDo, model.unwrap());
     assertEquals(4, model.nodes().size());
     assertEquals(
-        "DataObjectModel [source=" + childDo.name() + ", nodes=[DataObjectNode [name='notANodeBecauseAbstract', kind=DoValue, dataType='java.lang.String', inherited=false], " +
-            "DataObjectNode [name='id', kind=DoValue, dataType='java.lang.CharSequence', inherited=true], " +
-            "DataObjectNode [name='versions', kind=DoList, dataType='java.lang.Long', inherited=true], " +
-            "DataObjectNode [name='enabled', kind=DoValue, dataType='java.lang.Boolean', inherited=true]]]",
+        "DataObjectModel [source=" + childDo.name() + ", nodes=[DataObjectNode [name='notANodeBecauseAbstract', kind=DO_VALUE, dataType='java.lang.String', inherited=false], " +
+            "DataObjectNode [name='id', kind=DO_VALUE, dataType='java.lang.CharSequence', inherited=true], " +
+            "DataObjectNode [name='versions', kind=DO_LIST, dataType='java.lang.Long', inherited=true], " +
+            "DataObjectNode [name='enabled', kind=DO_VALUE, dataType='java.lang.Boolean', inherited=true]]]",
         model.toString());
   }
 
