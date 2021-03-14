@@ -192,6 +192,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
 
             JavaCodeStyleManager.getInstance(project).shortenClassReferences(innerTypeGetter)
             writeCommandAction(project).run(ThrowableRunnable<RuntimeException> {
+                psiDocumentManager.commitDocument(document)
                 if (anchorInfo == null) {
                     innerTypeGetterContainer.add(innerTypeGetter)
                 } else {
