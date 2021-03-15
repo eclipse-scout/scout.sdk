@@ -174,7 +174,7 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
         return SdkFuture.completed(null)
     }
 
-    override fun doWriteCompilationUnit(code: CharSequence, cuInfo: CompilationUnitInfo, progress: IProgress, sync: Boolean): IFuture<IType?> {
+    override fun doWriteCompilationUnit(code: CharSequence, cuInfo: CompilationUnitInfo, progress: IProgress?, sync: Boolean): IFuture<IType?> {
         val writer = CompilationUnitWriteOperation(project, code, cuInfo)
         val supplier = lambda@{
             val javaEnv = cuInfo.sourceFolder().javaEnvironment()
