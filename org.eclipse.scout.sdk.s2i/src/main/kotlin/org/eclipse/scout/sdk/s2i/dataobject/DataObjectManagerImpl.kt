@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2i.dataobject
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.SearchScope
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectModel
@@ -37,7 +38,11 @@ class DataObjectManagerImpl(val project: Project) : DataObjectManager {
     override fun createDataObjectModel(type: IType): DataObjectModel? = DataObjectModel.wrap(type).orElse(null)
 
     override fun scheduleConvenienceMethodsUpdate(scope: SearchScope) = callInIdeaEnvironment(project, message("update.dataobject.in.scope")) { e, p ->
-        updateConvenienceMethods(scope, e, p)
+        try {
+            updateConvenienceMethods(scope, e, p)
+        } catch (t: Throwable) {
+            SdkLog.warning("DataObject convenience methods update failed.", t)
+        }
     }
 
     private fun updateConvenienceMethods(scope: SearchScope, env: IdeaEnvironment, progress: IdeaProgress) {
@@ -84,6 +89,9 @@ class DataObjectManagerImpl(val project: Project) : DataObjectManager {
                 }
             }
         }
-        operation.withDataObjects(doEntities).accept(env, progress.newChild(totalWork - workForDiscovery))
+        operation
+                .withDataObjects(doEntities)
+                .withLineSeparator("\n") // always use \n for IntelliJ. Line separators are cleaned on file write anyway.
+                .accept(env, progress.newChild(totalWork - workForDiscovery))
     }
 }

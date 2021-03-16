@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.core.s.dataobject;
 
 import static java.util.Collections.singleton;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
@@ -45,7 +46,6 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SourceState;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -54,10 +54,9 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironment, IProgress> {
 
   private static final Pattern IMPORT_PATTERN = Pattern.compile("import\\s+[\\w_.]+;");
-  @SuppressWarnings("HardcodedLineSeparator")
-  private static final String NL = "\n";
 
   private final List<IType> m_dataObjects = new ArrayList<>();
+  private String m_lineSeparator;
 
   @Override
   public void accept(IEnvironment environment, IProgress progress) {
@@ -86,26 +85,35 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
       return Optional.empty(); // cannot update. no source available
     }
 
-    var buildContext = new JavaBuilderContext(dataObjectType.javaEnvironment());
+    var cuSource = originalSource.get().asCharSequence();
+    var buildContext = new JavaBuilderContext(dataObjectType.javaEnvironment()); // to collect all imports
     var replacements = dataObject
         .nodes().stream()
         .flatMap(node -> buildMethodGeneratorsFor(node, dataObjectType))
-        .map(gen -> toReplacement(gen, dataObjectType, buildContext))
-        .sorted(Comparator.comparingInt(Replacement::offset).thenComparing(Replacement::order))
+        .flatMap(gen -> buildReplacements(gen, dataObjectType, cuSource, buildContext))
+        .sorted(comparingInt(Replacement::offset).thenComparing(Replacement::order))
         .collect(toList());
     if (replacements.isEmpty()) {
       return Optional.empty(); // no attributes
     }
 
-    var newSource = applyReplacements(replacements, originalSource.get().asCharSequence());
+    addConvenienceMethodsMarkerCommentToFirst(replacements);
+    var newSource = applyReplacements(replacements, cuSource);
     return Optional.of(insertMissingImports(buildContext, newSource));
+  }
+
+  protected void addConvenienceMethodsMarkerCommentToFirst(Collection<Replacement> replacements) {
+    replacements.stream()
+        .filter(r -> r.newSource().length() > 0) // not a delete replacement
+        .findFirst()
+        .ifPresent(r -> r.setNewSource(convenienceMethodsMarker() + r.newSource()));
   }
 
   protected CharSequence insertMissingImports(IJavaBuilderContext buildContext, CharSequence newSource) {
     var importsToAdd = buildContext
         .validator().importCollector()
         .createImportDeclarations(false)
-        .collect(joining(NL, NL, ""));
+        .collect(joining(lineSeparator(), lineSeparator(), ""));
     if (Strings.isBlank(importsToAdd)) {
       return newSource;
     }
@@ -132,30 +140,30 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return newSource.toString();
   }
 
-  protected Replacement toReplacement(IMethodGenerator<?, ?> generator, IType dataObjectType, IJavaBuilderContext buildContext) {
-    var environment = dataObjectType.javaEnvironment();
-    var newSourceForReplace = generator.toJavaSource(buildContext);
-    var methodId = generator.identifier(environment);
+  protected Stream<Replacement> buildReplacements(IMethodGenerator<?, ?> generator, IType dataObjectType, CharSequence cuSource, IJavaBuilderContext buildContext) {
+    var newSource = generator.toJavaSource(buildContext); // pass a shared BuilderContext to collect imports
+    var methodId = generator.identifier(dataObjectType.javaEnvironment());
     var existingMethod = dataObjectType.methods().withMethodIdentifier(methodId).first();
-    if (existingMethod.isPresent()) {
-      // replace
-      var sourceRange = existingMethod.get().source().get();
-      var offset = sourceRange.start();
-      var fullMethodSourceSequence = sourceRange.asCharSequence(); // including leading documentations
-      var methodSourceSequenceWithoutComments = CoreUtils.removeComments(fullMethodSourceSequence).trim();
-      var methodStartWithoutComments = Strings.indexOf(methodSourceSequenceWithoutComments, fullMethodSourceSequence);
-      if (methodStartWithoutComments > 0) {
-        offset += methodStartWithoutComments;
-      }
-      return new Replacement(offset, sourceRange.end() - offset + 1, newSourceForReplace);
+
+    // insert at the bottom of the class
+    var insertIndex = dataObjectType.source().get().end() - 1;
+    var newMethodReplacement = new Replacement(insertIndex, 0, newSource);
+    if (existingMethod.isEmpty()) {
+      return Stream.of(newMethodReplacement);
     }
 
-    // insert new method at the bottom of the class
-    var newSourceForInsert = new StringBuilder(newSourceForReplace.length() + 1)
-        .append(NL) // when inserting a new method: add newline before
-        .append(newSourceForReplace);
-    var insertIndex = dataObjectType.source().get().end() - 1;
-    return new Replacement(insertIndex, 0, newSourceForInsert);
+    // additionally delete existing method
+    var methodDeleteReplacement = getMethodDeleteReplacement(existingMethod.get(), cuSource);
+    return Stream.of(methodDeleteReplacement, newMethodReplacement);
+  }
+
+  protected Replacement getMethodDeleteReplacement(IJavaElement method, CharSequence cuSource) {
+    var sourceRange = method.source().get();
+    var methodStartOffset = sourceRange.start();
+    while (methodStartOffset >= 1 && Character.isWhitespace(cuSource.charAt(methodStartOffset - 1))) {
+      methodStartOffset--;
+    }
+    return new Replacement(methodStartOffset, sourceRange.end() - methodStartOffset + 1, "");
   }
 
   protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsFor(DataObjectNode node, IType owner) {
@@ -194,7 +202,11 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
         .withElementName(getterPrefix + upperCaseName)
         .withAnnotation(createGenerated())
         .withBody(b -> buildValueGetterBody(node, b));
-    withOverrideAnnotationIfNecessary(valueGetter, owner);
+    var overridden = withOverrideAnnotationIfNecessary(valueGetter, owner);
+    if (overridden && implementedInSuperClass(valueGetter, owner)) {
+      // the method already exists in the super class. no need to override
+      return Stream.of(chainedSetter);
+    }
     return Stream.of(chainedSetter, valueGetter);
   }
 
@@ -217,6 +229,14 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return owner.typeParameters()
         .map(IJavaElement::elementName)
         .collect(joining(", ", ref + JavaTypes.C_GENERIC_START, JavaTypes.C_GENERIC_END + ""));
+  }
+
+  protected String convenienceMethodsMarker() {
+    return lineSeparator() + lineSeparator()
+        + "/* **************************************************************************" + lineSeparator()
+        + "   * GENERATED CONVENIENCE METHODS" + lineSeparator()
+        + "   * *************************************************************************/"
+        + lineSeparator() + lineSeparator();
   }
 
   protected void appendCollectionSetterParameter(IType owner, IMethodGenerator<?, ?> generator, String nodeName, IType dataType) {
@@ -253,6 +273,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     var upperCaseName = Strings.ensureStartWithUpperCase(node.name());
     var dataTypeRef = node.dataType().reference();
     var ownerRetRef = buildReturnTypeReferenceFor(owner);
+
     var chainedSetterCollection = MethodGenerator.create()
         .asPublic()
         .withReturnType(ownerRetRef)
@@ -261,6 +282,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
         .withBody(b -> buildListChainedSetterBody(node, b));
     appendCollectionSetterParameter(owner, chainedSetterCollection, node.name(), node.dataType());
     withOverrideAnnotationIfNecessary(chainedSetterCollection, owner);
+
     var chainedSetterArray = MethodGenerator.create()
         .asPublic()
         .withReturnType(ownerRetRef)
@@ -276,6 +298,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
       // for inherited nodes: only overwrite (and narrow) the chained setter
       return Stream.of(chainedSetterCollection, chainedSetterArray);
     }
+
     var getterPrefix = getterPrefixFor(dataTypeRef);
     var listGetter = MethodGenerator.create()
         .asPublic()
@@ -283,18 +306,34 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
         .withElementName(getterPrefix + upperCaseName)
         .withAnnotation(createGenerated())
         .withBody(b -> buildValueGetterBody(node, b));
-    withOverrideAnnotationIfNecessary(listGetter, owner);
+    var overridden = withOverrideAnnotationIfNecessary(listGetter, owner);
+    if (overridden && implementedInSuperClass(listGetter, owner)) {
+      // the method already exists in the super class. no need to override the getter
+      return Stream.of(chainedSetterCollection, chainedSetterArray);
+    }
     return Stream.of(chainedSetterCollection, chainedSetterArray, listGetter);
   }
 
-  protected void withOverrideAnnotationIfNecessary(IMethodGenerator<?, ?> method, IType owner) {
+  protected boolean implementedInSuperClass(IMethodGenerator<?, ?> method, IType owner) {
+    var methodId = method.identifier(owner.javaEnvironment());
+    return owner
+        .superTypes()
+        .withSelf(false)
+        .stream()
+        .flatMap(t -> t.methods().withMethodIdentifier(methodId).stream())
+        .anyMatch(m -> !Flags.isAbstract(m.flags()) || Flags.isDefaultMethod(m.flags()));
+  }
+
+  protected boolean withOverrideAnnotationIfNecessary(IMethodGenerator<?, ?> method, IType owner) {
     var methodId = method.identifier(owner.javaEnvironment());
     var existsInSuperHierarchy = owner.superTypes().withSelf(false).stream()
         .flatMap(st -> st.methods().withMethodIdentifier(methodId).stream())
         .findAny().isPresent();
-    if (existsInSuperHierarchy) {
-      method.withAnnotation(AnnotationGenerator.createOverride());
+    if (!existsInSuperHierarchy) {
+      return false;
     }
+    method.withAnnotation(AnnotationGenerator.createOverride());
+    return true;
   }
 
   protected void buildValueGetterBody(DataObjectNode node, IMethodBodyBuilder<?> builder) {
@@ -319,7 +358,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     private static final AtomicLong ORDER_SEQUENCE = new AtomicLong();
     private final int m_offset;
     private final int m_length;
-    private final CharSequence m_newSource;
+    private CharSequence m_newSource;
     private final long m_order;
 
     public Replacement(int offset, int length, CharSequence newSource) {
@@ -344,6 +383,10 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     public CharSequence newSource() {
       return m_newSource;
     }
+
+    public void setNewSource(CharSequence src) {
+      m_newSource = src;
+    }
   }
 
   public List<IType> dataObjects() {
@@ -354,6 +397,15 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     m_dataObjects.clear();
     m_dataObjects.addAll(dos);
     return this;
+  }
+
+  public DoConvenienceMethodsUpdateOperation withLineSeparator(String lineSeparator) {
+    m_lineSeparator = lineSeparator;
+    return this;
+  }
+
+  public String lineSeparator() {
+    return m_lineSeparator;
   }
 
   @Override

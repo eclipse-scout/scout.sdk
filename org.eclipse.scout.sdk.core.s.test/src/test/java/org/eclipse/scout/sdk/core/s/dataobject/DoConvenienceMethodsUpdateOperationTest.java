@@ -48,6 +48,7 @@ public class DoConvenienceMethodsUpdateOperationTest {
     var sampleDo = javaEnvironment.requireType(SampleDo.class.getName());
 
     new DoConvenienceMethodsUpdateOperation()
+        .withLineSeparator("\n")
         .withDataObjects(asList(childDo, sampleDo))
         .accept(env, new NullProgress());
     javaEnvironment.reload();
@@ -62,6 +63,7 @@ public class DoConvenienceMethodsUpdateOperationTest {
     var doWithTypeParams = javaEnvironment.requireType(DoWithTypeParams.class.getName());
 
     new DoConvenienceMethodsUpdateOperation()
+        .withLineSeparator("\n")
         .withDataObjects(singletonList(doWithTypeParams))
         .accept(env, new NullProgress());
     javaEnvironment.reload();

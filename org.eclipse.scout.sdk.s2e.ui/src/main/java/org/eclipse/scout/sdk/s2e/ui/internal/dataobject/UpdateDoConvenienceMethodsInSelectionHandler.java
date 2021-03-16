@@ -18,6 +18,7 @@ import java.util.Collection;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.dataobject.DoConvenienceMethodsUpdateOperation;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -43,7 +44,9 @@ public class UpdateDoConvenienceMethodsInSelectionHandler extends AbstractHandle
     var scoutTypes = types.stream()
         .map(env::toScoutType)
         .collect(toList());
-    new DoConvenienceMethodsUpdateOperation().withDataObjects(scoutTypes).accept(env, progress);
+    new DoConvenienceMethodsUpdateOperation()
+        .withLineSeparator(Util.getLineSeparator(null, null))
+        .withDataObjects(scoutTypes).accept(env, progress);
   }
 
   private static void logNoSelection() {
