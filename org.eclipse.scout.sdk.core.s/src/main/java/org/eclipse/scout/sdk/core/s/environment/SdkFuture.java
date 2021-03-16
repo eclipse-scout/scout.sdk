@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,13 +20,11 @@ import java.util.Collection;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.FinalValue;
-import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -76,9 +74,9 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
   }
 
   /**
-   * Waits until all of the futures specified have completed. A future is completed if it ends successfully, threw an
-   * exception or was canceled.<br>
-   * If there is at least one {@link Future} that ended exceptionally, this method throws an exception as well.
+   * Waits until all of the {@link IFuture futures} specified have completed. A future is completed if it ends
+   * successfully, threw an exception or was canceled.<br>
+   * If there is at least one {@link IFuture} that ended exceptionally, this method throws an exception as well.
    *
    * @param futures
    *          The futures to wait for
@@ -87,25 +85,22 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
    *           {@link Future}s.
    */
   @SuppressWarnings("squid:S1166") // "Exception handlers should preserve the original exceptions". this is given as the exceptions are collected and then thrown at once
-  public static void awaitAll(Iterable<? extends Future<?>> futures) {
+  public static void awaitAll(Iterable<? extends IFuture<?>> futures) {
     if (futures == null) {
       return;
     }
 
     Collection<Throwable> errors = new ArrayList<>();
-    for (Future<?> future : futures) {
+    for (IFuture<?> future : futures) {
       if (future == null) {
         continue;
       }
 
       try {
-        future.get();
+        future.join();
       }
-      catch (ExecutionException e) {
+      catch (CompletionException e) {
         errors.add(e.getCause());
-      }
-      catch (InterruptedException e) {
-        throw new SdkException(e);
       }
       catch (CancellationException e) {
         SdkLog.debug("Cancellation silently ignored", onTrace(e));

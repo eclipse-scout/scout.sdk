@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.NonBlockingReadAction
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
@@ -37,7 +38,6 @@ import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import org.jetbrains.concurrency.CancellablePromise
-import org.jetbrains.concurrency.resolvedCancellablePromise
 import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -74,8 +74,15 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
         /**
          * Like [computeInReadActionAsync] but the calling thread is blocked until the result is available.
          */
-        fun <T> computeInReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): T =
-                computeInReadActionAsync(project, requireSmartMode, progress, callable).get()
+        fun <T> computeInReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): T {
+            if (ApplicationManager.getApplication().isReadAccessAllowed) {
+                // already in read action: don't submit non-blocking read-action (could end up in a dead-lock). Instead directly execute
+                // also don't repeat until indexes are ready. If here the read-lock is already held, it must be released so that the dump mode can end
+                return callable()
+            }
+            return createReadAction(project, requireSmartMode, progress, callable).executeSynchronously()
+        }
+
 
         /**
          * Executes the given [callable] in a read action. If the method is invoked when already holding the read lock, it is directly executed in the calling thread.
@@ -85,12 +92,13 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
          * @return A [CancellablePromise] representing the asynchronous computation.
          */
         fun <T> computeInReadActionAsync(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): CancellablePromise<T> {
-            if (ApplicationManager.getApplication().isReadAccessAllowed) {
-                // already in read action: don't submit non-blocking read-action (could end up in a dead-lock). Instead directly execute
-                // also don't repeat until indexes are ready. If here the read-lock is already held, it must be released so that the dump mode can end
-                return resolvedCancellablePromise(callable())
-            }
+            val action = createReadAction(project, requireSmartMode, progress, callable)
+            // use WrappingCancellablePromise to unwrap ExecutionExceptions.
+            // this is required so that ControlFlowExceptions are correctly rethrown.
+            return WrappingCancellablePromise(action.submit(AppExecutorUtil.getAppExecutorService()))
+        }
 
+        private fun <T> createReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): NonBlockingReadAction<T> {
             var action = ReadAction.nonBlocking(callable).expireWith(project)
             if (progress != null) {
                 action = action.wrapProgress(progress)
@@ -98,7 +106,7 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
             if (requireSmartMode) {
                 action = action.inSmartMode(project)
             }
-            return action.submit(AppExecutorUtil.getAppExecutorService())
+            return action
         }
     }
 
