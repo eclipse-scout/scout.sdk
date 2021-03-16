@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -19,6 +20,7 @@ import org.eclipse.scout.sdk.core.apidef.Api;
 import org.eclipse.scout.sdk.core.apidef.IApiProvider;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
@@ -197,14 +199,56 @@ public interface IJavaEnvironment {
    * @param packageName
    *          The package name of the compilation unit. Use {@code null} for the default package.
    * @param fileName
-   *          The filename of the compilation unit (e.g. MyClass.java).
-   * @param src
-   *          A {@link CharSequence} holding the compilation unit source.
+   *          The filename of the compilation unit (e.g. MyClass.java). Must not be {@code null} or empty.
+   * @param source
+   *          A {@link CharSequence} holding the compilation unit source. Must not be {@code null}.
    * @return {@code true} if a type with given fully qualified name was already loaded and a call to {@link #reload()}
    *         would therefore be necessary so that the given type becomes active. {@code false} if the given type has not
    *         been used yet.
    */
-  boolean registerCompilationUnitOverride(String packageName, String fileName, CharSequence src);
+  boolean registerCompilationUnitOverride(String packageName, String fileName, CharSequence source);
+
+  /**
+   * Register an override for a (possibly) existing compilation unit.
+   * <p>
+   * When the type was NEVER loaded before using {@link #findType(String)}, {@link #findUnresolvedType(String)} and is
+   * not implicitly referenced by any of the currently loaded types, THEN a call to {@link #findType(String)} will
+   * immediately parse and resolve this new type.
+   * <p>
+   * In all other cases it is recommended to call {@link #reload()}
+   *
+   * @param sourceFolder
+   *          The source folder in which the new compilation unit should be registered. May be {@code null}.
+   * @param packageName
+   *          The package name of the compilation unit. Use {@code null} for the default package.
+   * @param fileName
+   *          The filename of the compilation unit (e.g. MyClass.java). Must not be {@code null} or empty.
+   * @param source
+   *          A {@link CharSequence} holding the compilation unit source. Must not be {@code null}.
+   * @return {@code true} if a type with given fully qualified name was already loaded and a call to {@link #reload()}
+   *         would therefore be necessary so that the given type becomes active. {@code false} if the given type has not
+   *         been used yet.
+   */
+  boolean registerCompilationUnitOverride(Path sourceFolder, String packageName, String fileName, CharSequence source);
+
+  /**
+   * Register an override for a (possibly) existing compilation unit.
+   * <p>
+   * When the type was NEVER loaded before using {@link #findType(String)}, {@link #findUnresolvedType(String)} and is
+   * not implicitly referenced by any of the currently loaded types, THEN a call to {@link #findType(String)} will
+   * immediately parse and resolve this new type.
+   * <p>
+   * In all other cases it is recommended to call {@link #reload()}
+   *
+   * @param cuInfo
+   *          The {@link CompilationUnitInfo} holding information about name and location. Must not be {@code null}.
+   * @param source
+   *          A {@link CharSequence} holding the compilation unit source. Must not be {@code null}.
+   * @return {@code true} if a type with given fully qualified name was already loaded and a call to {@link #reload()}
+   *         would therefore be necessary so that the given type becomes active. {@code false} if the given type has not
+   *         been used yet.
+   */
+  boolean registerCompilationUnitOverride(CompilationUnitInfo cuInfo, CharSequence source);
 
   /**
    * Unwraps the {@link IJavaEnvironment} into its underlying SPI class.

@@ -50,6 +50,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+import javax.swing.text.Segment;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -70,7 +72,11 @@ public class StringsTest {
   public void testToCharArray() {
     assertArrayEquals("".toCharArray(), toCharArray(new StringBuilder()));
     assertArrayEquals("abc".toCharArray(), toCharArray(new StringBuilder("abc")));
-    assertThrows(IllegalArgumentException.class, () -> toCharArray(null));
+    assertArrayEquals("abc".toCharArray(), toCharArray(new StringBuffer("abc")));
+    assertArrayEquals("abc".toCharArray(), toCharArray("abc"));
+    assertArrayEquals("abc".toCharArray(), toCharArray(CharBuffer.wrap("abc".toCharArray())));
+    assertArrayEquals("abc".toCharArray(), toCharArray(new Segment("abc".toCharArray(), 0, 3)));
+    assertThrows(NullPointerException.class, () -> toCharArray(null));
   }
 
   @Test

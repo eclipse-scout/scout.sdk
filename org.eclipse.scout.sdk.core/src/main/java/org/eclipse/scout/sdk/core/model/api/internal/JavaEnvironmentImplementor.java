@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.apidef.ApiFunction.applyWithApi;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.core.util.Strings.toCharArray;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,6 +32,7 @@ import org.eclipse.scout.sdk.core.apidef.Api;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -125,12 +127,18 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
-  public boolean registerCompilationUnitOverride(String packageName, String fileName, CharSequence buf) {
-    var arr = new char[buf.length()];
-    for (var i = 0; i < buf.length(); i++) {
-      arr[i] = buf.charAt(i);
-    }
-    return m_spi.registerCompilationUnitOverride(packageName, fileName, arr);
+  public boolean registerCompilationUnitOverride(String packageName, String fileName, CharSequence source) {
+    return registerCompilationUnitOverride(null, packageName, fileName, source);
+  }
+
+  @Override
+  public boolean registerCompilationUnitOverride(Path sourceFolder, String packageName, String fileName, CharSequence source) {
+    return registerCompilationUnitOverride(new CompilationUnitInfo(sourceFolder, packageName, fileName), source);
+  }
+
+  @Override
+  public boolean registerCompilationUnitOverride(CompilationUnitInfo cuInfo, CharSequence source) {
+    return m_spi.registerCompilationUnitOverride(cuInfo, toCharArray(source));
   }
 
   @Override

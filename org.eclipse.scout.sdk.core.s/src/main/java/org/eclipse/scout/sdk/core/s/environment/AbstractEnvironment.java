@@ -16,8 +16,8 @@ import java.nio.file.Path;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -72,7 +72,7 @@ public abstract class AbstractEnvironment implements IEnvironment {
   }
 
   protected IFuture<IType> writeCuWithExistingSource(CharSequence source, IClasspathEntry targetSourceFolder, Path sourceFolderRelPath, IProgress progress, boolean sync) {
-    var cuInfo = new CompilationUnitInfo(targetSourceFolder, sourceFolderRelPath);
+    var cuInfo = new CompilationUnitInfoWithClasspath(targetSourceFolder, sourceFolderRelPath);
     return doWriteCompilationUnit(source, cuInfo, progress, sync);
   }
 
@@ -98,7 +98,7 @@ public abstract class AbstractEnvironment implements IEnvironment {
 
   protected IFuture<IType> writeCompilationUnitGenerator(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder, IProgress progress, boolean sync) {
     Ensure.isTrue(Ensure.notNull(targetFolder).isSourceFolder(), "{} is no source folder. It is only allowed to generate new source into source folders.", targetFolder);
-    var info = new CompilationUnitInfo(generator, targetFolder);
+    var info = new CompilationUnitInfoWithClasspath(targetFolder, generator);
     var code = runGenerator(generator, targetFolder.javaEnvironment(), info.targetFile());
     return doWriteCompilationUnit(code, info, progress, sync);
   }
@@ -112,5 +112,5 @@ public abstract class AbstractEnvironment implements IEnvironment {
 
   protected abstract IFuture<Void> doWriteResource(CharSequence content, Path filePath, IProgress progress, boolean sync);
 
-  protected abstract IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfo cuInfo, IProgress progress, boolean sync);
+  protected abstract IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfoWithClasspath cuInfo, IProgress progress, boolean sync);
 }

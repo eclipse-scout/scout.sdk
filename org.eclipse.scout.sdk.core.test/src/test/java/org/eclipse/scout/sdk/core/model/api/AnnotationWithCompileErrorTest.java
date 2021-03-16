@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
+import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.registerCompilationUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -23,7 +24,6 @@ import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -45,8 +45,7 @@ public class AnnotationWithCompileErrorTest {
         "@" + Generated.class.getName() + "(null)\n" +
         "public class " + className + " {}\n";
 
-    env.registerCompilationUnitOverride(pck, className + JavaTypes.JAVA_FILE_SUFFIX, testClass);
-    var type = env.requireType(pck + JavaTypes.C_DOT + className);
+    var type = registerCompilationUnit(env, pck, className, testClass);
     assertFalse(env.compileErrors(type).isEmpty());
 
     var generatedValue = type.annotations().withManagedWrapper(GeneratedAnnotation.class).first().get().value();
@@ -74,8 +73,7 @@ public class AnnotationWithCompileErrorTest {
         "      })\n" +
         "public class " + className + " {}\n";
 
-    env.registerCompilationUnitOverride(pck, className + JavaTypes.JAVA_FILE_SUFFIX, testClass);
-    var type = env.requireType(pck + JavaTypes.C_DOT + className);
+    var type = registerCompilationUnit(env, pck, className, testClass);
     assertFalse(env.compileErrors(type).isEmpty());
 
     var nestedAnnotations = type.annotations().withManagedWrapper(AnnotationWithArrayValues.class).first().get().annos();

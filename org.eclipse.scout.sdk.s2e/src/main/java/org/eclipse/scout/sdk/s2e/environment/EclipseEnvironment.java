@@ -42,8 +42,8 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -87,11 +87,10 @@ public class EclipseEnvironment extends AbstractEnvironment implements AutoClose
   }
 
   @Override
-  protected IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfo cuInfo, IProgress progress, boolean sync) {
-    var sourceFolder = ((ClasspathWithJdt) cuInfo.sourceFolder().unwrap()).getRoot();
-    var javaFileName = cuInfo.fileName();
-    var packageName = cuInfo.packageName();
-    var writeIcu = new CompilationUnitWriteOperation(sourceFolder, packageName, javaFileName, source);
+  protected IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfoWithClasspath cuInfo, IProgress progress, boolean sync) {
+    var sourceFolder = cuInfo.classpathEntry();
+    var packageFragmentRoot = ((ClasspathWithJdt) sourceFolder.unwrap()).getRoot();
+    var writeIcu = new CompilationUnitWriteOperation(packageFragmentRoot, cuInfo.packageName(), cuInfo.fileName(), source);
     return doRunResourceTask(writeIcu, () -> {
       var compilationUnit = writeIcu.getCreatedCompilationUnit();
       if (compilationUnit == null) {
@@ -108,8 +107,8 @@ public class EclipseEnvironment extends AbstractEnvironment implements AutoClose
 
       // return primary type
       var jdtType = compilationUnit.getType(cuInfo.mainTypeSimpleName());
-      var env = cuInfo.sourceFolder().javaEnvironment();
-      var reloadRequired = env.registerCompilationUnitOverride(packageName, javaFileName, formattedSource);
+      var env = sourceFolder.javaEnvironment();
+      var reloadRequired = env.registerCompilationUnitOverride(cuInfo, formattedSource);
       if (reloadRequired) {
         env.reload();
       }

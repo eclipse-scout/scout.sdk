@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator
-import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitInfo
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
@@ -182,12 +182,11 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
         return SdkFuture.completed(null)
     }
 
-    override fun doWriteCompilationUnit(code: CharSequence, cuInfo: CompilationUnitInfo, progress: IProgress?, sync: Boolean): IFuture<IType?> {
+    override fun doWriteCompilationUnit(code: CharSequence, cuInfo: CompilationUnitInfoWithClasspath, progress: IProgress?, sync: Boolean): IFuture<IType?> {
         val writer = CompilationUnitWriteOperation(project, code, cuInfo)
         val supplier = lambda@{
-            val javaEnv = cuInfo.sourceFolder().javaEnvironment()
-            val pck = cuInfo.packageName()
-            val reloadRequired = javaEnv.registerCompilationUnitOverride(pck, cuInfo.fileName(), code)
+            val javaEnv = cuInfo.classpathEntry().javaEnvironment()
+            val reloadRequired = javaEnv.registerCompilationUnitOverride(cuInfo, code)
             if (reloadRequired) {
                 javaEnv.reload()
             }

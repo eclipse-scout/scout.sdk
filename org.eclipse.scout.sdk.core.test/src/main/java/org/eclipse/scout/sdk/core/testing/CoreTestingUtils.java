@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,16 +10,17 @@
  */
 package org.eclipse.scout.sdk.core.testing;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.opentest4j.AssertionFailedError;
 
 /**
  * Testing helpers
@@ -61,20 +62,35 @@ public final class CoreTestingUtils {
    * @return The {@link IType} that corresponds to the main type of the specified {@link ICompilationUnitGenerator}.
    */
   public static IType registerCompilationUnit(IJavaEnvironment env, String qualifier, String simpleName, CharSequence source) {
-    var reloadRequired = env.registerCompilationUnitOverride(qualifier, simpleName + JavaTypes.JAVA_FILE_SUFFIX, source);
+    return registerCompilationUnit(env, qualifier, simpleName, source, null);
+  }
+
+  /**
+   * Registers a compilation unit override with the specified configuration.
+   *
+   * @param env
+   *          The {@link IJavaEnvironment} in which the override should be registered.
+   * @param qualifier
+   *          The package qualifier of the compilation unit or {@code null} for the default package.
+   * @param simpleName
+   *          The simple name of the compilation unit (this is the Java file name without file extension. Corresponds to
+   *          the name of the main type).
+   * @param source
+   *          The source of the compilation unit.
+   * @param sourceFolder
+   *          The source folder to which the compilation unit belongs. May be {@code null}.
+   * @return The {@link IType} that corresponds to the main type of the specified {@link ICompilationUnitGenerator}.
+   */
+  public static IType registerCompilationUnit(IJavaEnvironment env, String qualifier, String simpleName, CharSequence source, Path sourceFolder) {
+    var cuInfo = new CompilationUnitInfo(sourceFolder, qualifier, simpleName + JavaTypes.JAVA_FILE_SUFFIX);
+    var reloadRequired = env.registerCompilationUnitOverride(cuInfo, source);
     if (reloadRequired) {
       env.reload();
     }
 
-    var fqn = new StringBuilder();
-    if (Strings.hasText(qualifier)) {
-      fqn.append(qualifier).append(JavaTypes.C_DOT);
-    }
-    fqn.append(simpleName);
-
-    var t = env.findType(fqn.toString());
-    assertTrue(t.isPresent(), "Generated type '" + fqn + "' could not be found.");
-    return t.get();
+    var fqn = cuInfo.mainTypeFullyQualifiedName();
+    return env.findType(fqn)
+        .orElseThrow(() -> new AssertionFailedError("Generated type '" + fqn + "' could not be found."));
   }
 
   /**

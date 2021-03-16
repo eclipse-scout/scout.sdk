@@ -35,8 +35,8 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -102,19 +102,19 @@ public class TestingEnvironment extends AbstractEnvironment implements AutoClose
   }
 
   @Override
-  protected IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfo cuInfo, IProgress progress, boolean sync) {
+  protected IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfoWithClasspath cuInfo, IProgress progress, boolean sync) {
     IType result;
-    var javaEnv = cuInfo.sourceFolder().javaEnvironment();
+    var javaEnv = cuInfo.classpathEntry().javaEnvironment();
     var name = cuInfo.mainTypeSimpleName();
     var pck = cuInfo.packageName();
     if (name.endsWith(ISdkConstants.SUFFIX_DTO) && pck.contains(".shared.")) {
-      result = CoreTestingUtils.registerCompilationUnit(javaEnv, pck, name, source);
+      result = CoreTestingUtils.registerCompilationUnit(javaEnv, pck, name, source, cuInfo.targetFile());
       // remember for later validation. As soon as the model type has been created the dto will be updated and validated.
       var baseName = name.substring(0, name.length() - ISdkConstants.SUFFIX_DTO.length());
       m_dtoCache.put(baseName, result);
     }
     else {
-      result = CoreTestingUtils.registerCompilationUnit(javaEnv, pck, name, source);
+      result = CoreTestingUtils.registerCompilationUnit(javaEnv, pck, name, source, cuInfo.targetFile());
       updateAndValidateDtoFor(result);
       assertNoCompileErrors(result);
     }

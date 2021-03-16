@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,6 +58,7 @@ import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.SourceRange;
 import org.eclipse.scout.sdk.core.model.ecj.SourcePositionComparators.MethodBindingComparator;
@@ -317,11 +318,11 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   @Override
-  public boolean registerCompilationUnitOverride(String packageName, String fileName, char[] src) {
-    Ensure.notNull(fileName);
+  public boolean registerCompilationUnitOverride(CompilationUnitInfo cuInfo, char[] src) {
+    Ensure.notNull(cuInfo);
     Ensure.notNull(src);
 
-    var cu = new StringBasedCompilationUnitWithEcj(packageName, fileName, src, ""/*ModuleBinding.UNNAMED*/, fileName);
+    var cu = new StringBasedCompilationUnitWithEcj(cuInfo, src, null /* ModuleBinding.UNNAMED */);
     synchronized (lock()) {
       var reloadRequired = getNameEnvironment().overrideSupport().addCompilationUnit(cu);
 
@@ -333,7 +334,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
       }
 
       // ensure the package of the new override CU exists. It may be in the lookupEnv cache as 'notExisting' from a call before where it really did not exist.
-      if (!Strings.isEmpty(packageName) && isInitialized()) {
+      if (!Strings.isEmpty(cuInfo.packageName()) && isInitialized()) {
         getCompiler().lookupEnvironment.createPackage(cu.getPackageName());
       }
 

@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
@@ -566,19 +567,39 @@ public final class Strings {
   }
 
   /**
-   * Converts the {@link StringBuilder} specified into a {@code char[]}.
+   * Converts the {@link CharSequence} specified into a {@code char[]}.
    *
    * @param s
-   *          The {@link StringBuilder} to convert. Must not be {@code null}.
+   *          The {@link CharSequence} to convert. Must not be {@code null}.
    * @return The full contents as {@code char[]}.
-   * @throws IllegalArgumentException
-   *           if the {@link StringBuilder} is {@code null}.
+   * @throws NullPointerException
+   *           if the {@link CharSequence} is {@code null}.
    */
-  public static char[] toCharArray(StringBuilder s) {
-    Ensure.notNull(s);
-    var buf = new char[s.length()];
-    s.getChars(0, buf.length, buf, 0);
-    return buf;
+  public static char[] toCharArray(CharSequence s) {
+    if (s instanceof StringBuilder) {
+      var buf = new char[s.length()];
+      //noinspection OverlyStrongTypeCast
+      ((StringBuilder) s).getChars(0, buf.length, buf, 0);
+      return buf;
+    }
+    if (s instanceof String) {
+      return ((String) s).toCharArray();
+    }
+    if (s instanceof CharBuffer) {
+      return ((CharBuffer) s).array();
+    }
+    if (s instanceof StringBuffer) {
+      var buf = new char[s.length()];
+      //noinspection OverlyStrongTypeCast
+      ((StringBuffer) s).getChars(0, buf.length, buf, 0);
+      return buf;
+    }
+
+    var arr = new char[s.length()];
+    for (var i = 0; i < s.length(); i++) {
+      arr[i] = s.charAt(i);
+    }
+    return arr;
   }
 
   /**

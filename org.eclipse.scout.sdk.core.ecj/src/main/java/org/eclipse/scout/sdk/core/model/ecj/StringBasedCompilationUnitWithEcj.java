@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.lookup.ModuleBinding;
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -30,16 +31,15 @@ public class StringBasedCompilationUnitWithEcj implements ICompilationUnit {
   private final char[] m_moduleName;
   private final String m_destinationPath;
 
-  public StringBasedCompilationUnitWithEcj(String packageName, String fileName, char[] src, String moduleName, String destinationPath) {
-    m_destinationPath = destinationPath;
-    var dot = fileName.indexOf(JavaTypes.C_DOT);
-    var mainTypeName = dot >= 0 ? fileName.substring(0, dot) : fileName;
-    m_packageName = packageName != null ? CharOperation.splitOn(JavaTypes.C_DOT, packageName.toCharArray()) : null;
-    m_fileName = fileName.toCharArray();
-    m_mainTypeName = mainTypeName.toCharArray();
-    m_fqn = calcFqn(packageName, mainTypeName);
+  public StringBasedCompilationUnitWithEcj(CompilationUnitInfo cuInfo, char[] src, String moduleName) {
+    m_destinationPath = cuInfo.targetFileAsString();
+    var pck = cuInfo.packageName();
+    m_packageName = pck != null ? CharOperation.splitOn(JavaTypes.C_DOT, pck.toCharArray()) : null;
+    m_fileName = m_destinationPath.toCharArray(); // must be the full file name
+    m_mainTypeName = cuInfo.mainTypeSimpleName().toCharArray();
+    m_fqn = cuInfo.mainTypeFullyQualifiedName();
     m_src = src;
-    if (Strings.isBlank(moduleName)) {
+    if (Strings.isEmpty(moduleName)) {
       m_moduleName = ModuleBinding.UNNAMED;
     }
     else {
@@ -84,14 +84,5 @@ public class StringBasedCompilationUnitWithEcj implements ICompilationUnit {
   @Override
   public String getDestinationPath() {
     return m_destinationPath;
-  }
-
-  protected static String calcFqn(String packageName, String mainTypeName) {
-    var fqnBuilder = new StringBuilder();
-    if (Strings.hasText(packageName)) {
-      fqnBuilder.append(packageName);
-      fqnBuilder.append(JavaTypes.C_DOT);
-    }
-    return fqnBuilder.append(mainTypeName).toString();
   }
 }

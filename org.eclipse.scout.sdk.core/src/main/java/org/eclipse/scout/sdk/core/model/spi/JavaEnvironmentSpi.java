@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.spi;
 import java.util.List;
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 
 /**
@@ -45,10 +46,9 @@ public interface JavaEnvironmentSpi {
   void reload();
 
   /**
-   * Register an override for a (possibly) existing compilation unit. This only has an effect after a call to
-   * {@link #reload()}
+   * Register an override for a (possibly) existing compilation unit.
    */
-  boolean registerCompilationUnitOverride(String packageName, String fileName, char[] src);
+  boolean registerCompilationUnitOverride(CompilationUnitInfo cuInfo, char[] src);
 
   /**
    * @param fqn

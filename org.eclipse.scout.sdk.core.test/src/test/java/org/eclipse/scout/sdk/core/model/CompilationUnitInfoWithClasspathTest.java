@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.generator.compilationunit;
+package org.eclipse.scout.sdk.core.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,11 +23,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
 
-public class CompilationUnitInfoTest {
+public class CompilationUnitInfoWithClasspathTest {
   @Test
   public void testWithPackage() {
     var packageName = "test.pck";
@@ -37,25 +38,59 @@ public class CompilationUnitInfoTest {
     var expectedAbsoluteDirectory = Paths.get("dev", "src", "main", "java", "test", "pck");
     var expectedToStringValue = "CompilationUnitInfo [dev/src/main/java/test/pck/Test.java]";
 
-    var info1 = new CompilationUnitInfo(sourceFolder, packageName, classSimpleName);
+    var info1 = new CompilationUnitInfoWithClasspath(sourceFolder, packageName, classSimpleName + JavaTypes.JAVA_FILE_SUFFIX);
     assertEquals(expectedFileName, info1.fileName());
     assertEquals(expectedAbsoluteDirectory, info1.targetDirectory());
     assertEquals(Paths.get("dev", "src", "main", "java", "test", "pck", expectedFileName), info1.targetFile());
-    assertSame(sourceFolder, info1.sourceFolder());
+    assertEquals(Paths.get("dev/src/main/java"), info1.sourceFolder());
+    assertSame(sourceFolder, info1.classpathEntry());
     assertEquals(classSimpleName, info1.mainTypeSimpleName());
     assertEquals("test.pck.Test", info1.mainTypeFullyQualifiedName());
     assertEquals(packageName, info1.packageName());
     assertEquals(expectedToStringValue, info1.toString());
+    assertEquals("dev/src/main/java/test/pck/Test.java", info1.targetFileAsString());
+    assertEquals("dev/src/main/java", info1.sourceDirectoryAsString());
+    assertEquals("dev/src/main/java/test/pck", info1.targetDirectoryAsString());
 
-    var info2 = new CompilationUnitInfo(sourceFolder, Paths.get("test", "pck", expectedFileName));
+    var info2 = new CompilationUnitInfoWithClasspath(sourceFolder, Paths.get("test", "pck", expectedFileName));
     assertEquals(expectedFileName, info2.fileName());
     assertEquals(expectedAbsoluteDirectory, info2.targetDirectory());
     assertEquals(Paths.get("dev", "src", "main", "java", "test", "pck", expectedFileName), info2.targetFile());
-    assertSame(sourceFolder, info2.sourceFolder());
+    assertEquals(Paths.get("dev", "src", "main", "java"), info2.sourceFolder());
+    assertSame(sourceFolder, info2.classpathEntry());
     assertEquals(classSimpleName, info2.mainTypeSimpleName());
     assertEquals(packageName + JavaTypes.C_DOT + classSimpleName, info2.mainTypeFullyQualifiedName());
     assertEquals(packageName, info2.packageName());
     assertEquals(expectedToStringValue, info2.toString());
+  }
+
+  @Test
+  public void testWithoutSourceFolder() {
+    var relPath = "org/eclipse/scout/sdk/test/Test.java";
+    var sourceFolderRelPath = Paths.get(relPath);
+    var info1 = new CompilationUnitInfo(null, sourceFolderRelPath);
+    assertEquals("Test.java", info1.fileName());
+    assertEquals(Paths.get("org/eclipse/scout/sdk/test"), info1.targetDirectory());
+    assertEquals(Paths.get("org/eclipse/scout/sdk/test/Test.java"), info1.targetFile());
+    assertEquals(Paths.get(""), info1.sourceFolder());
+    assertEquals("Test", info1.mainTypeSimpleName());
+    assertEquals("org.eclipse.scout.sdk.test.Test", info1.mainTypeFullyQualifiedName());
+    assertEquals("org.eclipse.scout.sdk.test", info1.packageName());
+    assertEquals(relPath, info1.targetFileAsString());
+    assertEquals("", info1.sourceDirectoryAsString());
+    assertEquals("org/eclipse/scout/sdk/test", info1.targetDirectoryAsString());
+
+    var info2 = new CompilationUnitInfo(null, "org.eclipse.scout.sdk.test", "Test.java");
+    assertEquals("Test.java", info2.fileName());
+    assertEquals(Paths.get("org/eclipse/scout/sdk/test"), info2.targetDirectory());
+    assertEquals(Paths.get("org/eclipse/scout/sdk/test/Test.java"), info2.targetFile());
+    assertEquals(Paths.get(""), info2.sourceFolder());
+    assertEquals("Test", info2.mainTypeSimpleName());
+    assertEquals("org.eclipse.scout.sdk.test.Test", info2.mainTypeFullyQualifiedName());
+    assertEquals("org.eclipse.scout.sdk.test", info2.packageName());
+    assertEquals(relPath, info2.targetFileAsString());
+    assertEquals("", info2.sourceDirectoryAsString());
+    assertEquals("org/eclipse/scout/sdk/test", info2.targetDirectoryAsString());
   }
 
   @Test
@@ -66,21 +101,23 @@ public class CompilationUnitInfoTest {
     var expectedToStringValue = "CompilationUnitInfo [dev/src/main/java/Test.java]";
     var expectedAbsoluteDirectory = Paths.get("dev", "src", "main", "java");
 
-    var info1 = new CompilationUnitInfo(sourceFolder, null, classSimpleName);
+    var info1 = new CompilationUnitInfoWithClasspath(sourceFolder, null, classSimpleName + JavaTypes.JAVA_FILE_SUFFIX);
     assertEquals(expectedFileName, info1.fileName());
     assertEquals(Paths.get("dev", "src", "main", "java"), info1.targetDirectory());
     assertEquals(Paths.get("dev", "src", "main", "java", expectedFileName), info1.targetFile());
-    assertSame(sourceFolder, info1.sourceFolder());
+    assertEquals(Paths.get("dev", "src", "main", "java"), info1.sourceFolder());
+    assertSame(sourceFolder, info1.classpathEntry());
     assertEquals(classSimpleName, info1.mainTypeSimpleName());
     assertEquals(classSimpleName, info1.mainTypeFullyQualifiedName());
     assertNull(info1.packageName());
     assertEquals(expectedToStringValue, info1.toString());
 
-    var info2 = new CompilationUnitInfo(sourceFolder, Paths.get(expectedFileName));
+    var info2 = new CompilationUnitInfoWithClasspath(sourceFolder, Paths.get(expectedFileName));
     assertEquals(expectedFileName, info2.fileName());
     assertEquals(expectedAbsoluteDirectory, info2.targetDirectory());
     assertEquals(Paths.get("dev", "src", "main", "java", expectedFileName), info2.targetFile());
-    assertSame(sourceFolder, info2.sourceFolder());
+    assertEquals(Paths.get("dev", "src", "main", "java"), info2.sourceFolder());
+    assertSame(sourceFolder, info2.classpathEntry());
     assertEquals(classSimpleName, info2.mainTypeSimpleName());
     assertEquals(classSimpleName, info2.mainTypeFullyQualifiedName());
     assertNull(info2.packageName());
@@ -91,9 +128,10 @@ public class CompilationUnitInfoTest {
   @SuppressWarnings({"SimplifiableJUnitAssertion", "EqualsBetweenInconvertibleTypes", "ConstantConditions", "EqualsWithItself"})
   public void testEqualsAndHashCode() {
     var sourceFolder = createMockClasspathEntry("dev");
-    var a = new CompilationUnitInfo(sourceFolder, null, "Test");
-    var b = new CompilationUnitInfo(sourceFolder, null, "Test");
-    var c = new CompilationUnitInfo(sourceFolder, "pck", "Test");
+    var fileName = "Test" + JavaTypes.JAVA_FILE_SUFFIX;
+    var a = new CompilationUnitInfoWithClasspath(sourceFolder, null, fileName);
+    var b = new CompilationUnitInfoWithClasspath(sourceFolder, null, fileName);
+    var c = new CompilationUnitInfoWithClasspath(sourceFolder, "pck", fileName);
 
     assertEquals(a, b);
     assertNotEquals(a, c);
@@ -108,28 +146,30 @@ public class CompilationUnitInfoTest {
   public void testWithGenerator() {
     ICompilationUnitGenerator<?> generator = mock(ICompilationUnitGenerator.class);
     when(generator.packageName()).thenReturn(Optional.of("a.b.c"));
-    when(generator.elementName()).thenReturn(Optional.of("Test"));
+    var fileName = "Test" + JavaTypes.JAVA_FILE_SUFFIX;
+    when(generator.fileName()).thenReturn(Optional.of(fileName));
     var sourceFolder = mock(IClasspathEntry.class);
     when(sourceFolder.path()).thenReturn(Paths.get("dev", "src", "main", "java"));
 
-    var a = new CompilationUnitInfo(generator, sourceFolder);
+    var a = new CompilationUnitInfoWithClasspath(sourceFolder, generator);
     assertEquals("Test.java", a.fileName());
     assertEquals(Paths.get("dev", "src", "main", "java", "a", "b", "c"), a.targetDirectory());
-    assertEquals(Paths.get("dev", "src", "main", "java", "a", "b", "c", "Test.java"), a.targetFile());
+    assertEquals(Paths.get("dev", "src", "main", "java", "a", "b", "c", fileName), a.targetFile());
   }
 
   @Test
   public void testWithGeneratorAndDefaultPackage() {
     ICompilationUnitGenerator<?> generator = mock(ICompilationUnitGenerator.class);
     when(generator.packageName()).thenReturn(Optional.empty());
-    when(generator.elementName()).thenReturn(Optional.of("Test"));
+    var fileName = "Test" + JavaTypes.JAVA_FILE_SUFFIX;
+    when(generator.fileName()).thenReturn(Optional.of(fileName));
     var sourceFolder = mock(IClasspathEntry.class);
     when(sourceFolder.path()).thenReturn(Paths.get("dev", "src", "main", "java"));
 
-    var a = new CompilationUnitInfo(generator, sourceFolder);
+    var a = new CompilationUnitInfoWithClasspath(sourceFolder, generator);
     assertEquals("Test.java", a.fileName());
     assertEquals(Paths.get("dev", "src", "main", "java"), a.targetDirectory());
-    assertEquals(Paths.get("dev", "src", "main", "java", "Test.java"), a.targetFile());
+    assertEquals(Paths.get("dev", "src", "main", "java", fileName), a.targetFile());
   }
 
   protected static IClasspathEntry createMockClasspathEntry(String first, String... more) {
