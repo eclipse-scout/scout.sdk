@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,9 +36,9 @@ import org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.PackageGenerator;
+import org.eclipse.scout.sdk.core.generator.member.AbstractMemberGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.SortedMemberEntry;
-import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.imports.CompilationUnitScopedImportCollector;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IImport;
@@ -290,8 +290,8 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   }
 
   protected static ITypeGenerator<?> applyConnection(ITypeGenerator<?> child, IJavaElementGenerator<?> parent) {
-    if (child instanceof TypeGenerator) {
-      ((TypeGenerator<?>) child).withDeclaringGenerator(parent);
+    if (child instanceof AbstractMemberGenerator) {
+      ((AbstractMemberGenerator<?>) child).withDeclaringGenerator(parent);
     }
     return child;
   }

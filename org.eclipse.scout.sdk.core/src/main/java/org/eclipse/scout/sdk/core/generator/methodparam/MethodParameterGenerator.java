@@ -188,8 +188,8 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
 
   @Override
   public String reference(IJavaEnvironment context, boolean useErasureOnly) {
-    var dataTypeFunc = dataType().orElseThrow(() -> newFail("Cannot calculate the method identifier because the datatype is missing."));
-    var typeString = dataTypeFunc.apply(context).orElseThrow(() -> newFail("Cannot compute parameter data type of method '{}'.", elementName().orElse(null)));
+    var dataTypeFunc = dataType().orElseThrow(() -> newFail("Cannot calculate the method parameter reference because the datatype is missing."));
+    var typeString = dataTypeFunc.apply(context).orElseThrow(() -> newFail("Cannot compute parameter data type of method parameter '{}'.", elementName().orElse(null)));
     if (useErasureOnly) {
       typeString = JavaTypes.erasure(typeString);
     }

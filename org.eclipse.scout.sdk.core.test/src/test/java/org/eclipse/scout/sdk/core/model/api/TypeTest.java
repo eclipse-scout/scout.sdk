@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -71,6 +72,10 @@ public class TypeTest {
     // super interfaces
     assertEquals(1, childClassType.superInterfaces().count());
     assertEquals(InterfaceLevel0.class.getName(), childClassType.superInterfaces().findAny().get().name());
+
+    // direct super types
+    assertEquals(asList(childClassType.requireSuperClass().elementName(), childClassType.superInterfaces().map(IType::elementName).findAny().get()),
+        childClassType.directSuperTypes().map(IType::elementName).collect(toList()));
 
     // type parameters
     assertEquals(1, childClassType.typeParameters().count());
@@ -146,7 +151,10 @@ public class TypeTest {
     assertEquals(1, resolvedTypeParamValueSignature.size());
     assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), resolvedTypeParamValueSignature.get(0).name());
 
-    resolvedTypeParamValueSignature = env.requireType(ChildClass.class.getName()).resolveTypeParamValue(0, BaseClass.class.getName()).get().collect(toList());
+    resolvedTypeParamValueSignature = env.requireType(ChildClass.class.getName())
+        .resolveTypeParamValue(0, BaseClass.class.getName())
+        .get()
+        .collect(toList());
     assertEquals(3, resolvedTypeParamValueSignature.size());
     assertEquals(AbstractList.class.getName() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END, resolvedTypeParamValueSignature.get(0).reference());
     assertEquals(AbstractList.class.getName(), resolvedTypeParamValueSignature.get(0).reference(true));

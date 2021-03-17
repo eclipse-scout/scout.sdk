@@ -14,11 +14,16 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFi
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.fixture.AbstractClass;
@@ -64,6 +69,36 @@ public class MethodGeneratorTest {
     assertEquals(Flags.AccFinal | Flags.AccStatic | Flags.AccProtected, MethodGenerator.create().asStatic().asFinal().asPrivate().asProtected().flags());
     assertEquals(Flags.AccFinal | Flags.AccStatic | Flags.AccPrivate, MethodGenerator.create().asStatic().asFinal().asPublic().asPrivate().flags());
     assertEquals(Flags.AccFinal | Flags.AccStatic, MethodGenerator.create().asStatic().asFinal().asPrivate().asPackagePrivate().flags());
+  }
+
+  @Test
+  public void testOverrideIfNecessary(IJavaEnvironment env) {
+    var supplierMethodName = "get";
+    var withExplicitSuperType = MethodGenerator.create()
+        .withElementName(supplierMethodName)
+        .withOverrideIfNecessary(true, Stream.of(Supplier.class.getName()));
+    var fromTypeGenerator = MethodGenerator.create()
+        .withElementName(supplierMethodName)
+        .withOverrideIfNecessary();
+    TypeGenerator.create().withInterface(Supplier.class.getName()).withMethod(fromTypeGenerator); // apply connection
+    var withAlreadyExistingOverride = MethodGenerator.create()
+        .withElementName(supplierMethodName)
+        .withAnnotation(AnnotationGenerator.createOverride())
+        .withOverrideIfNecessary(true, Stream.of(Supplier.class.getName()));
+    var withMethodNotInSuperHierarchy = MethodGenerator.create()
+        .withElementName(supplierMethodName)
+        .withOverrideIfNecessary(true, Stream.of(Function.class.getName()));
+    var withEmptyExplicit = MethodGenerator.create()
+        .withElementName(supplierMethodName)
+        .withoutOverrideIfNecessary()
+        .withOverrideIfNecessary(true, Stream.empty());
+
+    var overrideSource = '@' + Override.class.getSimpleName();
+    assertTrue(withExplicitSuperType.toJavaSource(env).toString().contains(overrideSource));
+    assertTrue(fromTypeGenerator.toJavaSource(env).toString().contains(overrideSource));
+    assertTrue(withAlreadyExistingOverride.toJavaSource(env).toString().contains(overrideSource));
+    assertFalse(withMethodNotInSuperHierarchy.toJavaSource(env).toString().contains(overrideSource));
+    assertFalse(withEmptyExplicit.toJavaSource(env).toString().contains(overrideSource));
   }
 
   @Test

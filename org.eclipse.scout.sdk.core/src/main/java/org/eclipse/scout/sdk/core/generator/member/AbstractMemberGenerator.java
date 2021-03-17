@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,13 +10,16 @@
  */
 package org.eclipse.scout.sdk.core.generator.member;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractAnnotatableGenerator;
+import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 
 /**
  * <h3>{@link AbstractMemberGenerator}</h3>
@@ -26,6 +29,7 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 public abstract class AbstractMemberGenerator<TYPE extends IMemberGenerator<TYPE>> extends AbstractAnnotatableGenerator<TYPE> implements IMemberGenerator<TYPE> {
 
   private int m_flags;
+  private IJavaElementGenerator<?> m_declaringGenerator;
 
   protected AbstractMemberGenerator(IMember member, IWorkingCopyTransformer transformer) {
     super(member, transformer);
@@ -89,5 +93,22 @@ public abstract class AbstractMemberGenerator<TYPE extends IMemberGenerator<TYPE
   @Override
   public TYPE asFinal() {
     return withFlags(Flags.AccFinal);
+  }
+
+  @Override
+  public Optional<IJavaElementGenerator<?>> declaringGenerator() {
+    return Optional.ofNullable(m_declaringGenerator);
+  }
+
+  /**
+   * Sets the declaring {@link IJavaElementGenerator} of this {@link AbstractMemberGenerator}.
+   *
+   * @param parent
+   *          The declaring generator.
+   * @return This generator.
+   */
+  public TYPE withDeclaringGenerator(IJavaElementGenerator<?> parent) {
+    m_declaringGenerator = parent;
+    return thisInstance();
   }
 }

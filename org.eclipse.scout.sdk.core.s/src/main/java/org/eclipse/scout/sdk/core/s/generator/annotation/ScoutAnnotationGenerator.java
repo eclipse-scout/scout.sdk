@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,8 @@ import org.eclipse.scout.sdk.core.util.Strings;
  * @since 6.1.0
  */
 public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE>> extends AnnotationGenerator<TYPE> {
+
+  public static final String DO_CONVENIENCE_METHODS_GENERATED_COMMENT = "DoConvenienceMethodsGenerator";
 
   public static IAnnotationGenerator<?> createOrder(double orderNr) {
     return create()
@@ -75,6 +77,10 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
   public static IAnnotationGenerator<?> createBeanMock() {
     return create()
         .withElementNameFrom(IScoutApi.class, IScoutApi::BeanMock);
+  }
+
+  public static IAnnotationGenerator<?> createDoConvenienceMethodsGenerated() {
+    return createGenerated(DO_CONVENIENCE_METHODS_GENERATED_COMMENT, null);
   }
 
   public static IAnnotationGenerator<?> createAuthentication() {

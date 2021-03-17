@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,5 +87,23 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
   @Override
   public TYPE appendImportFormData(CharSequence formDataVarName) {
     return appendFrom(IScoutApi.class, api -> api.IForm().importFormDataMethodName()).parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon();
+  }
+
+  @Override
+  public TYPE appendDoNodeSet(CharSequence nodeName, CharSequence value) {
+    return append(nodeName).parenthesisOpen().parenthesisClose().dot().appendFrom(IScoutApi.class, api -> api.DoNode().setMethodName())
+        .parenthesisOpen().append(value).parenthesisClose().semicolon();
+  }
+
+  @Override
+  public TYPE appendDoNodeUpdateAll(CharSequence nodeName, CharSequence value) {
+    return append(nodeName).parenthesisOpen().parenthesisClose().dot().appendFrom(IScoutApi.class, api -> api.DoList().updateAllMethodName())
+        .parenthesisOpen().append(value).parenthesisClose().semicolon();
+  }
+
+  @Override
+  public TYPE appendDoNodeGet(CharSequence nodeName) {
+    return append(nodeName).parenthesisOpen().parenthesisClose().dot()
+        .appendFrom(IScoutApi.class, api -> api.DoNode().getMethodName()).parenthesisOpen().parenthesisClose();
   }
 }

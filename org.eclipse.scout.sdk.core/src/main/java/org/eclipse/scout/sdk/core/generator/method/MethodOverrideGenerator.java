@@ -53,7 +53,6 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY extends IMethodBodyBuilder<?>> extends MethodGenerator<TYPE, BODY> {
 
-  private ITypeGenerator<?> m_typeGenerator;
   private final IWorkingCopyTransformer m_transformer; // may be null
 
   /**
@@ -200,28 +199,10 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
-    callWithTmpType(declaringTypeGenerator(), builder.context().environment().orElseThrow(() -> newFail("Cannot override a method without java environment.")),
+    var declaring = (ITypeGenerator<?>) Ensure.instanceOf(declaringGenerator().orElse(null), ITypeGenerator.class, "Method can only be overridden if existing in a type.");
+    callWithTmpType(declaring, builder.context().environment().orElseThrow(() -> newFail("Cannot override a method without java environment.")),
         tmpType -> createOverrideGenerator(findMethodToOverride(tmpType).orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName().orElse(null)))))
             .ifPresent(generator -> generator.generate(builder));
-  }
-
-  /**
-   * @return The {@link ITypeGenerator} in which this {@link IMethodGenerator} will be generated.
-   */
-  public ITypeGenerator<?> declaringTypeGenerator() {
-    return m_typeGenerator;
-  }
-
-  /**
-   * Sets the declaring {@link ITypeGenerator} of this {@link IMethodGenerator}.
-   *
-   * @param declaring
-   *          The declaring generator. Must not be {@code null}.
-   * @return This generator.
-   */
-  public TYPE withDeclaringGenerator(ITypeGenerator<?> declaring) {
-    m_typeGenerator = declaring;
-    return thisInstance();
   }
 
   protected static <T> T callWithTmpType(ITypeGenerator<?> declaringGenerator, IJavaEnvironment env, Function<IType, T> task) {

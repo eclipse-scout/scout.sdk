@@ -77,9 +77,8 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   @Override
   public Stream<? extends IJavaElement> children() {
     Comparator<IJavaElement> c = Comparator.comparing(e -> e.source().map(ISourceRange::start).orElse(0));
-    Stream<? extends IJavaElement> fieldsAndMethods = Stream.concat(fields().stream(), methods().stream());
-    Stream<? extends IJavaElement> innerTypesAndTypeParams = Stream.concat(innerTypes().stream(), typeParameters());
-    return Stream.concat(Stream.concat(innerTypesAndTypeParams, fieldsAndMethods), annotations().stream())
+    return Stream.of(fields().stream(), methods().stream(), innerTypes().stream(), typeParameters(), annotations().stream())
+        .flatMap(f -> f)
         .sorted(c);
   }
 
@@ -118,6 +117,11 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   @Override
   public Stream<IType> superInterfaces() {
     return WrappingSpliterator.stream(m_spi.getSuperInterfaces());
+  }
+
+  @Override
+  public Stream<IType> directSuperTypes() {
+    return Stream.concat(superClass().stream(), superInterfaces());
   }
 
   @Override
@@ -277,10 +281,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   @Override
   public Optional<Stream<IType>> resolveTypeParamValue(int typeParamIndex) {
     return typeArguments().skip(typeParamIndex).findAny()
-        .map(t -> t.isParameterType() ? Stream.concat(
-            t.superClass().stream(),
-            t.superInterfaces())
-            : Stream.of(t));
+        .map(t -> t.isParameterType() ? t.directSuperTypes() : Stream.of(t));
   }
 
   @Override

@@ -83,7 +83,6 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   private final FinalValue<String> m_qualifier;
   private ApiFunction<?, String> m_superClass;
   private String m_declaringFullyQualifiedName;
-  private IJavaElementGenerator<?> m_declaringGenerator;
   private boolean m_addAllNecessaryMethods;
   private IWorkingCopyTransformer m_unimplementedMethodsTransformer;
 
@@ -394,14 +393,14 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public TYPE withField(IFieldGenerator<?> builder, Object... sortObject) {
-    m_members.add(new SortedMemberEntry(builder, sortObject));
+  public TYPE withField(IFieldGenerator<?> generator, Object... sortObject) {
+    m_members.add(new SortedMemberEntry(applyConnection(generator, this), sortObject));
     return thisInstance();
   }
 
   @Override
   public TYPE withoutField(Predicate<IFieldGenerator<?>> removalFilter) {
-    removeMemberIf(IFieldGenerator.class, removalFilter);
+    removeMemberIf(IFieldGenerator.class, removalFilter).forEach(removed -> applyConnection(removed, null));
     return thisInstance();
   }
 
@@ -504,12 +503,9 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     return thisInstance();
   }
 
-  protected static <T extends IMemberGenerator<?>> T applyConnection(T child, ITypeGenerator<?> parent) {
-    if (child instanceof TypeGenerator) {
-      ((TypeGenerator<?>) child).withDeclaringGenerator(parent);
-    }
-    if (child instanceof MethodOverrideGenerator) {
-      ((MethodOverrideGenerator<?, ?>) child).withDeclaringGenerator(parent);
+  protected static <T extends IMemberGenerator<?>> T applyConnection(T child, IJavaElementGenerator<?> parent) {
+    if (child instanceof AbstractMemberGenerator) {
+      ((AbstractMemberGenerator<?>) child).withDeclaringGenerator(parent);
     }
     return child;
   }
@@ -529,16 +525,6 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   public TYPE withoutTypeParameter(String elementName) {
     Ensure.notNull(elementName);
     m_typeParameters.removeIf(generator -> elementName.equals(generator.elementName().orElse(null)));
-    return thisInstance();
-  }
-
-  @Override
-  public Optional<IJavaElementGenerator<?>> declaringGenerator() {
-    return Optional.ofNullable(m_declaringGenerator);
-  }
-
-  public TYPE withDeclaringGenerator(IJavaElementGenerator<?> parent) {
-    m_declaringGenerator = parent;
     return thisInstance();
   }
 
@@ -564,7 +550,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
           .map(m -> toMethodGenerator(typeGenerator, m, transformer)));
     }
 
-    protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toMethodGenerator(ITypeGenerator<?> typeGenerator, IMethod unimplementedMethod, IWorkingCopyTransformer transformer) {
+    protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toMethodGenerator(IJavaElementGenerator<?> typeGenerator, IMethod unimplementedMethod, IWorkingCopyTransformer transformer) {
       var generator = new UnimplementedMethodGenerator(transformer)
           .withDeclaringGenerator(typeGenerator)
           .withElementName(unimplementedMethod.elementName());

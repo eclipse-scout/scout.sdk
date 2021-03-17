@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.generator.method;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator.createOverride;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isDefaultMethod;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
@@ -40,10 +41,12 @@ import org.eclipse.scout.sdk.core.builder.java.comment.JavaElementCommentBuilder
 import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.MemberBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.member.AbstractMemberGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
+import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -72,6 +75,8 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   private ApiFunction<?, String> m_returnType;
   private ISourceGenerator<BODY> m_body;
   private ApiFunction<?, String> m_methodName;
+  private boolean m_withOverrideIfNecessary;
+  private List<String> m_superTypesForOverrideIfNecessary;
 
   protected MethodGenerator() {
     m_parameters = new ArrayList<>();
@@ -301,8 +306,58 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
-    super.build(builder);
-    buildMethodSource(MemberBuilder.create(builder));
+    var overrideAnnotation = createOverrideAnnotationIfNecessary(builder.context());
+    withAnnotation(overrideAnnotation); // temporary append
+    try {
+      super.build(builder);
+      buildMethodSource(MemberBuilder.create(builder));
+    }
+    finally {
+      if (overrideAnnotation != null) {
+        withoutAnnotation(a -> a == overrideAnnotation); // remove again in case generator is executed again using a different Java environment
+      }
+    }
+  }
+
+  protected IAnnotationGenerator<?> createOverrideAnnotationIfNecessary(IJavaBuilderContext context) {
+    if (!isWithOverrideIfNecessary()) {
+      return null;
+    }
+    var overrideFqn = Override.class.getName();
+    if (annotations().anyMatch(a -> overrideFqn.equals(a.elementName(context).orElse(null)))) {
+      return null; // already exists
+    }
+    var javaEnvironment = context.environment().orElseThrow(() -> newFail("To add an override annotation if necessary a Java environment is required."));
+    if (!methodExistsInSuperHierarchy(javaEnvironment)) {
+      return null;
+    }
+    return createOverride();
+  }
+
+  protected boolean methodExistsInSuperHierarchy(IJavaEnvironment javaEnvironment) {
+    var methodId = identifier(javaEnvironment);
+    return superTypesForOverrideIfNecessary(javaEnvironment)
+        .map(javaEnvironment::findType)
+        .flatMap(Optional::stream)
+        .anyMatch(t -> t.methods().withSuperTypes(true).withMethodIdentifier(methodId).existsAny());
+  }
+
+  protected Stream<String> superTypesForOverrideIfNecessary(IJavaEnvironment javaEnvironment) {
+    var explicitSuperTypes = superTypesForOverrideIfNecessary();
+    if (explicitSuperTypes != null) {
+      // explicit super types have been given.
+      return explicitSuperTypes.stream();
+    }
+    var declaringGenerator = declaringGenerator().orElse(null);
+    if (declaringGenerator instanceof ITypeGenerator) {
+      // use super types from declaring (surrounding) type generator
+      //noinspection rawtypes
+      var t = (ITypeGenerator) declaringGenerator;
+      var declaringTypeGenerator = (ITypeGenerator<?>) t;
+      return Stream.concat(declaringTypeGenerator.superClass().stream(), declaringTypeGenerator.interfaces())
+          .flatMap(af -> af.apply(javaEnvironment).stream());
+    }
+    return Stream.empty(); // unknown super hierarchy
   }
 
   protected void buildMethodSource(IMemberBuilder<?> builder) {
@@ -547,6 +602,42 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     Ensure.notNull(elementName);
     m_typeParameters.removeIf(generator -> elementName.equals(generator.elementName().orElse(null)));
     return thisInstance();
+  }
+
+  @Override
+  public TYPE withOverrideIfNecessary() {
+    return withOverrideIfNecessary(true, null);
+  }
+
+  @Override
+  public TYPE withoutOverrideIfNecessary() {
+    return withOverrideIfNecessary(false, null);
+  }
+
+  @Override
+  public TYPE withOverrideIfNecessary(boolean withOverrideIfNecessary, Stream<String> superTypesToConsider) {
+    m_withOverrideIfNecessary = withOverrideIfNecessary;
+    if (!withOverrideIfNecessary || superTypesToConsider == null) {
+      m_superTypesForOverrideIfNecessary = null;
+    }
+    else {
+      m_superTypesForOverrideIfNecessary = superTypesToConsider
+          .filter(Strings::hasText)
+          .collect(toList());
+      if (m_superTypesForOverrideIfNecessary.isEmpty()) {
+        m_superTypesForOverrideIfNecessary = null;
+      }
+    }
+    return thisInstance();
+  }
+
+  @Override
+  public boolean isWithOverrideIfNecessary() {
+    return m_withOverrideIfNecessary;
+  }
+
+  protected List<String> superTypesForOverrideIfNecessary() {
+    return m_superTypesForOverrideIfNecessary;
   }
 
   @Override

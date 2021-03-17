@@ -104,6 +104,17 @@ public interface IType extends IMember {
   Stream<IType> superInterfaces();
 
   /**
+   * @return A {@link Stream} with all direct super types (super class and interfaces). This is the union of
+   *         {@link #superClass()} and {@link #superInterfaces()}.<br>
+   *         Use {@link #superTypes()} to get super hierarchies.
+   * @see #superTypes()
+   * @see #superClass()
+   * @see #requireSuperClass()
+   * @see #superInterfaces()
+   */
+  Stream<IType> directSuperTypes();
+
+  /**
    * @return the source of the static initializer with the {@code static} keyword and the leading and trailing brackets.
    */
   Optional<ISourceRange> sourceOfStaticInitializer();

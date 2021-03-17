@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -230,7 +230,9 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
   protected void build(IJavaSourceBuilder<?> builder) {
     super.build(builder);
 
-    builder.at().ref(elementName(builder.context().environment().orElse(null)).orElseThrow(() -> newFail("Annotation name missing for generator {}", this)));
+    var annotationName = elementName(builder.context())
+        .orElseThrow(() -> newFail("Annotation name missing for generator {}", this));
+    builder.at().ref(annotationName);
 
     if (m_values.isEmpty()) {
       return;
@@ -239,6 +241,14 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
     builder.parenthesisOpen();
     buildElements(ExpressionBuilder.create(builder));
     builder.parenthesisClose();
+  }
+
+  @Override
+  public Optional<String> elementName(IJavaBuilderContext context) {
+    var env = Optional.ofNullable(context)
+        .flatMap(IJavaBuilderContext::environment)
+        .orElse(null);
+    return elementName(env);
   }
 
   @Override

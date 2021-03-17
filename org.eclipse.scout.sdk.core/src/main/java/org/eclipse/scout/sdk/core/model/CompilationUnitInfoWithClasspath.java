@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
@@ -68,5 +69,25 @@ public class CompilationUnitInfoWithClasspath extends CompilationUnitInfo {
    */
   public IClasspathEntry classpathEntry() {
     return m_cpEntry;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    var that = (CompilationUnitInfoWithClasspath) o;
+    return Objects.equals(m_cpEntry, that.m_cpEntry);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), m_cpEntry);
   }
 }

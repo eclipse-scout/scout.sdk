@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.member.IMemberGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
+import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
@@ -268,6 +269,45 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    * @return This generator.
    */
   TYPE withoutTypeParameter(String elementName);
+
+  /**
+   * Appends an {@link Override} annotation if there is a method with the same signature in the super type hierarchy of
+   * the declaring {@link ITypeGenerator}.<br>
+   * For this to work this {@link IMethodGenerator} must be added to a {@link ITypeGenerator} by using
+   * {@link ITypeGenerator#withMethod(IMethodGenerator, Object...)}.
+   * <p>
+   * If there is no declaring generator use {@link #withOverrideIfNecessary(boolean, Stream)} to explicitly specify the
+   * super types.
+   * 
+   * @return This generator.
+   */
+  TYPE withOverrideIfNecessary();
+
+  /**
+   * Does no longer append an {@link Override} annotation if necessary.
+   * 
+   * @return This generator.
+   */
+  TYPE withoutOverrideIfNecessary();
+
+  /**
+   * Appends an {@link Override} annotation if there is a method with the same signature in the super type hierarchy of
+   * the given super types.
+   * 
+   * @param withOverrideIfNecessary
+   *          If {@code true} an {@link Override} annotation is added as required based on the super hierarchies of the
+   *          given super types.
+   * @param superTypesToConsider
+   *          A {@link Stream} with the super types to check.
+   * @return This generator.
+   */
+  TYPE withOverrideIfNecessary(boolean withOverrideIfNecessary, Stream<String> superTypesToConsider);
+
+  /**
+   * @return {@code true} if this {@link IMethodGenerator} is configured to automatically add an {@link Override}
+   *         annotation if required based on super types.
+   */
+  boolean isWithOverrideIfNecessary();
 
   /**
    * Marks this {@link IMethodGenerator} to be {@code abstract}.

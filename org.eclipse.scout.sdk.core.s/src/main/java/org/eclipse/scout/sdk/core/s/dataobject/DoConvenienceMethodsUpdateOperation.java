@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.dataobject;
 
-import static java.util.Collections.singleton;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.joining;
@@ -18,7 +18,9 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -28,24 +30,21 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
+import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.api.PropertyBean;
-import org.eclipse.scout.sdk.core.model.api.query.AbstractQuery;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
+import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
+import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SourceState;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -87,19 +86,31 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
 
     var cuSource = originalSource.get().asCharSequence();
     var buildContext = new JavaBuilderContext(dataObjectType.javaEnvironment()); // to collect all imports
+    var replacedMethods = new HashSet<IMethod>();
+
+    // methods to add or update 
     var replacements = dataObject
         .nodes().stream()
         .flatMap(node -> buildMethodGeneratorsFor(node, dataObjectType))
-        .flatMap(gen -> buildReplacements(gen, dataObjectType, cuSource, buildContext))
-        .sorted(comparingInt(Replacement::offset).thenComparing(Replacement::order))
+        .flatMap(gen -> buildReplacements(gen, dataObjectType, cuSource, buildContext, replacedMethods))
         .collect(toList());
+
+    // already existing methods which are no longer necessary: all annotated methods which are not updated
+    dataObjectType.methods()
+        .withAnnotation(GeneratedAnnotation.FQN)
+        .stream()
+        .filter(m -> !replacedMethods.contains(m))
+        .filter(this::hasDoConvenienceGeneratedAnnotation)
+        .map(m -> toMethodDeleteReplacement(m, cuSource))
+        .forEach(replacements::add);
     if (replacements.isEmpty()) {
-      return Optional.empty(); // no attributes
+      return Optional.empty(); // nothing to do
     }
 
+    replacements.sort(comparingInt(Replacement::offset).thenComparing(Replacement::order));
     addConvenienceMethodsMarkerCommentToFirst(replacements);
-    var newSource = applyReplacements(replacements, cuSource);
-    return Optional.of(insertMissingImports(buildContext, newSource));
+    var newSource = insertMissingImports(buildContext, applyModifications(replacements, cuSource));
+    return Optional.of(newSource);
   }
 
   protected void addConvenienceMethodsMarkerCommentToFirst(Collection<Replacement> replacements) {
@@ -128,7 +139,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return new StringBuilder(target).insert(pos, insertText);
   }
 
-  protected CharSequence applyReplacements(Iterable<Replacement> replacements, CharSequence originalSource) {
+  protected CharSequence applyModifications(Iterable<Replacement> replacements, CharSequence originalSource) {
     var newSource = new StringBuilder();
     var startPos = 0;
     for (var replacement : replacements) {
@@ -140,7 +151,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return newSource.toString();
   }
 
-  protected Stream<Replacement> buildReplacements(IMethodGenerator<?, ?> generator, IType dataObjectType, CharSequence cuSource, IJavaBuilderContext buildContext) {
+  protected Stream<Replacement> buildReplacements(IMethodGenerator<?, ?> generator, IType dataObjectType, CharSequence cuSource, IJavaBuilderContext buildContext, Collection<IMethod> replacedMethods) {
     var newSource = generator.toJavaSource(buildContext); // pass a shared BuilderContext to collect imports
     var methodId = generator.identifier(dataObjectType.javaEnvironment());
     var existingMethod = dataObjectType.methods().withMethodIdentifier(methodId).first();
@@ -153,11 +164,26 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     }
 
     // additionally delete existing method
-    var methodDeleteReplacement = getMethodDeleteReplacement(existingMethod.get(), cuSource);
+    var methodToDelete = existingMethod.get();
+    replacedMethods.add(methodToDelete);
+    var methodDeleteReplacement = toMethodDeleteReplacement(methodToDelete, cuSource);
     return Stream.of(methodDeleteReplacement, newMethodReplacement);
   }
 
-  protected Replacement getMethodDeleteReplacement(IJavaElement method, CharSequence cuSource) {
+  protected boolean hasDoConvenienceGeneratedAnnotation(IAnnotatable annotatable) {
+    var generatedValues = annotatable.annotations()
+        .withManagedWrapper(GeneratedAnnotation.class)
+        .first()
+        .map(GeneratedAnnotation::value)
+        .map(Arrays::asList)
+        .orElse(emptyList());
+    if (generatedValues.isEmpty()) {
+      return false;
+    }
+    return generatedValues.contains(ScoutAnnotationGenerator.DO_CONVENIENCE_METHODS_GENERATED_COMMENT);
+  }
+
+  protected Replacement toMethodDeleteReplacement(IJavaElement method, CharSequence cuSource) {
     var sourceRange = method.source().get();
     var methodStartOffset = sourceRange.start();
     while (methodStartOffset >= 1 && Character.isWhitespace(cuSource.charAt(methodStartOffset - 1))) {
@@ -178,57 +204,37 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
   }
 
   protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForValue(DataObjectNode node, IType owner) {
-    var upperCaseName = Strings.ensureStartWithUpperCase(node.name());
     var dataTypeRef = node.dataType().reference();
-    var chainedSetter = MethodGenerator.create()
-        .asPublic()
-        .withReturnType(buildReturnTypeReferenceFor(owner))
-        .withElementName(PropertyBean.CHAINED_SETTER_PREFIX + upperCaseName)
-        .withParameter(MethodParameterGenerator.create()
-            .withElementName(node.name())
-            .withDataType(dataTypeRef))
-        .withAnnotation(createGenerated())
-        .withBody(b -> buildValueChainedSetterBody(node, b));
-    withOverrideAnnotationIfNecessary(chainedSetter, owner);
+    var chainedSetter = ScoutMethodGenerator.createDoNodeSetter(node.name(), dataTypeRef, owner);
     if (node.isInherited()) {
       // for inherited nodes: only overwrite (and narrow) the chained setter
       return Stream.of(chainedSetter);
     }
 
-    var getterPrefix = getterPrefixFor(dataTypeRef);
-    var valueGetter = MethodGenerator.create()
-        .asPublic()
-        .withReturnType(dataTypeRef)
-        .withElementName(getterPrefix + upperCaseName)
-        .withAnnotation(createGenerated())
-        .withBody(b -> buildValueGetterBody(node, b));
-    var overridden = withOverrideAnnotationIfNecessary(valueGetter, owner);
-    if (overridden && implementedInSuperClass(valueGetter, owner)) {
+    var valueGetter = ScoutMethodGenerator.createDoNodeGetter(node.name(), dataTypeRef, owner);
+    if (implementedInSuperClass(valueGetter, owner)) {
       // the method already exists in the super class. no need to override
       return Stream.of(chainedSetter);
     }
     return Stream.of(chainedSetter, valueGetter);
   }
 
-  protected String getterPrefixFor(String type) {
-    if (Boolean.class.getName().equals(type)) {
-      return PropertyBean.GETTER_BOOL_PREFIX;
+  protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForList(DataObjectNode node, IType owner) {
+    var dataTypeRef = node.dataType().reference();
+    var chainedSetterCollection = ScoutMethodGenerator.createDoNodeSetterCollection(node.name(), dataTypeRef, owner);
+    var chainedSetterArray = ScoutMethodGenerator.createDoNodeSetterArray(node.name(), dataTypeRef, owner);
+    if (node.isInherited()) {
+      // for inherited nodes: only overwrite (and narrow) the chained setter
+      return Stream.of(chainedSetterCollection, chainedSetterArray);
     }
-    return PropertyBean.GETTER_PREFIX;
-  }
 
-  protected IAnnotationGenerator<?> createGenerated() {
-    return AnnotationGenerator.createGenerated("DoConvenienceMethodsGenerator", null);
-  }
-
-  protected String buildReturnTypeReferenceFor(IType owner) {
-    var ref = owner.reference();
-    if (!owner.hasTypeParameters()) {
-      return ref;
+    var listGetterReturnTypeReference = List.class.getName() + JavaTypes.C_GENERIC_START + dataTypeRef + JavaTypes.C_GENERIC_END;
+    var listGetter = ScoutMethodGenerator.createDoNodeGetter(node.name(), listGetterReturnTypeReference, owner);
+    if (implementedInSuperClass(listGetter, owner)) {
+      // the method already exists in the super class. no need to override the getter
+      return Stream.of(chainedSetterCollection, chainedSetterArray);
     }
-    return owner.typeParameters()
-        .map(IJavaElement::elementName)
-        .collect(joining(", ", ref + JavaTypes.C_GENERIC_START, JavaTypes.C_GENERIC_END + ""));
+    return Stream.of(chainedSetterCollection, chainedSetterArray, listGetter);
   }
 
   protected String convenienceMethodsMarker() {
@@ -239,79 +245,8 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
         + lineSeparator() + lineSeparator();
   }
 
-  protected void appendCollectionSetterParameter(IType owner, IMethodGenerator<?, ?> generator, String nodeName, IType dataType) {
-    var methodId = JavaTypes.createMethodIdentifier(generator.elementName(owner.javaEnvironment()).get(), singleton(Collection.class.getName()));
-    var parentMethod = owner.superTypes()
-        .withSelf(false).stream()
-        .flatMap(st -> st.methods().withMethodIdentifier(methodId).stream())
-        .findAny();
-
-    // inherit parameter signature from parent (sometimes it is Collection<? extends Xyz> and sometimes only implemented as Collection<Xyz>).
-    var needsExtends = parentMethod
-        .map(IMethod::parameters)
-        .flatMap(AbstractQuery::first)
-        .map(IMethodParameter::dataType)
-        .map(IType::reference)
-        .map(ref -> ref.contains(JavaTypes.EXTENDS))
-        .orElse(true);
-
-    var collectionDataTypeRef = new StringBuilder(Collection.class.getName()).append(JavaTypes.C_GENERIC_START);
-    if (needsExtends) {
-      collectionDataTypeRef.append(JavaTypes.C_QUESTION_MARK).append(' ').append(JavaTypes.EXTENDS).append(' ').append(dataType.reference());
-    }
-    else {
-      collectionDataTypeRef.append(dataType.reference());
-    }
-    collectionDataTypeRef.append(JavaTypes.C_GENERIC_END);
-
-    generator.withParameter(MethodParameterGenerator.create()
-        .withElementName(nodeName)
-        .withDataType(collectionDataTypeRef.toString()));
-  }
-
-  protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForList(DataObjectNode node, IType owner) {
-    var upperCaseName = Strings.ensureStartWithUpperCase(node.name());
-    var dataTypeRef = node.dataType().reference();
-    var ownerRetRef = buildReturnTypeReferenceFor(owner);
-
-    var chainedSetterCollection = MethodGenerator.create()
-        .asPublic()
-        .withReturnType(ownerRetRef)
-        .withElementName(PropertyBean.CHAINED_SETTER_PREFIX + upperCaseName)
-        .withAnnotation(createGenerated())
-        .withBody(b -> buildListChainedSetterBody(node, b));
-    appendCollectionSetterParameter(owner, chainedSetterCollection, node.name(), node.dataType());
-    withOverrideAnnotationIfNecessary(chainedSetterCollection, owner);
-
-    var chainedSetterArray = MethodGenerator.create()
-        .asPublic()
-        .withReturnType(ownerRetRef)
-        .withElementName(PropertyBean.CHAINED_SETTER_PREFIX + upperCaseName)
-        .withParameter(MethodParameterGenerator.create()
-            .withElementName(node.name())
-            .asVarargs()
-            .withDataType(dataTypeRef))
-        .withAnnotation(createGenerated())
-        .withBody(b -> buildListChainedSetterBody(node, b));
-    withOverrideAnnotationIfNecessary(chainedSetterArray, owner);
-    if (node.isInherited()) {
-      // for inherited nodes: only overwrite (and narrow) the chained setter
-      return Stream.of(chainedSetterCollection, chainedSetterArray);
-    }
-
-    var getterPrefix = getterPrefixFor(dataTypeRef);
-    var listGetter = MethodGenerator.create()
-        .asPublic()
-        .withReturnType(List.class.getName() + JavaTypes.C_GENERIC_START + dataTypeRef + JavaTypes.C_GENERIC_END)
-        .withElementName(getterPrefix + upperCaseName)
-        .withAnnotation(createGenerated())
-        .withBody(b -> buildValueGetterBody(node, b));
-    var overridden = withOverrideAnnotationIfNecessary(listGetter, owner);
-    if (overridden && implementedInSuperClass(listGetter, owner)) {
-      // the method already exists in the super class. no need to override the getter
-      return Stream.of(chainedSetterCollection, chainedSetterArray);
-    }
-    return Stream.of(chainedSetterCollection, chainedSetterArray, listGetter);
+  protected IAnnotationGenerator<?> createGenerated() {
+    return AnnotationGenerator.createGenerated("DoConvenienceMethodsGenerator", null);
   }
 
   protected boolean implementedInSuperClass(IMethodGenerator<?, ?> method, IType owner) {
@@ -324,36 +259,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
         .anyMatch(m -> !Flags.isAbstract(m.flags()) || Flags.isDefaultMethod(m.flags()));
   }
 
-  protected boolean withOverrideAnnotationIfNecessary(IMethodGenerator<?, ?> method, IType owner) {
-    var methodId = method.identifier(owner.javaEnvironment());
-    var existsInSuperHierarchy = owner.superTypes().withSelf(false).stream()
-        .flatMap(st -> st.methods().withMethodIdentifier(methodId).stream())
-        .findAny().isPresent();
-    if (!existsInSuperHierarchy) {
-      return false;
-    }
-    method.withAnnotation(AnnotationGenerator.createOverride());
-    return true;
-  }
-
-  protected void buildValueGetterBody(DataObjectNode node, IMethodBodyBuilder<?> builder) {
-    builder.returnClause().append(node.name()).parenthesisOpen().parenthesisClose().dot()
-        .appendFrom(IScoutApi.class, api -> api.DoNode().getMethodName()).parenthesisOpen().parenthesisClose().semicolon();
-  }
-
-  protected void buildValueChainedSetterBody(DataObjectNode node, IMethodBodyBuilder<?> builder) {
-    builder.append(node.name()).parenthesisOpen().parenthesisClose().dot().appendFrom(IScoutApi.class, api -> api.DoNode().setMethodName())
-        .parenthesisOpen().append(node.name()).parenthesisClose().semicolon().nl()
-        .returnClause().appendThis().semicolon();
-  }
-
-  protected void buildListChainedSetterBody(DataObjectNode node, IMethodBodyBuilder<?> builder) {
-    builder.append(node.name()).parenthesisOpen().parenthesisClose().dot().appendFrom(IScoutApi.class, api -> api.DoList().updateAllMethodName())
-        .parenthesisOpen().append(node.name()).parenthesisClose().semicolon().nl()
-        .returnClause().appendThis().semicolon();
-  }
-
-  private static class Replacement {
+  protected static class Replacement {
 
     private static final AtomicLong ORDER_SEQUENCE = new AtomicLong();
     private final int m_offset;

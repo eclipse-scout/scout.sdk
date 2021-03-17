@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,6 +55,38 @@ public interface IScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TY
    * @see #appendExportFormData(CharSequence)
    */
   TYPE appendImportFormData(CharSequence formDataVarName);
+
+  /**
+   * Appends a set value of a DoNode like {@code nodeName().set(value);} including a trailing semicolon.
+   * 
+   * @param nodeName
+   *          The node name to set.
+   * @param value
+   *          The value source to pass to the setter.
+   * @return this builder
+   */
+  TYPE appendDoNodeSet(CharSequence nodeName, CharSequence value);
+
+  /**
+   * Appends an updateAll method call of a DoList like {@code nodeName().updateAll(value);} including a trailing
+   * semicolon.
+   * 
+   * @param nodeName
+   *          The node name to update.
+   * @param value
+   *          The source to pass to the updateAll method
+   * @return this builder
+   */
+  TYPE appendDoNodeUpdateAll(CharSequence nodeName, CharSequence value);
+
+  /**
+   * Appends a get call to a DoNode like {@code nodeName().get()} without a trailing semicolon.
+   * 
+   * @param nodeName
+   *          The node name to get.
+   * @return this builder.
+   */
+  TYPE appendDoNodeGet(CharSequence nodeName);
 
   /**
    * Creates source like {@code BEANS.get(BeanClass.class)} without trailing semicolon.

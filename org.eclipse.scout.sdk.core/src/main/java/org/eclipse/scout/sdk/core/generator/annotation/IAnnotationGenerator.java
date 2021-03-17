@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,7 +37,8 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
    * <p>
    * <b>Note</b>: If the annotation name is specified using {@link #withElementNameFrom(Class, Function)} it may be API
    * dependent and this method may therefore return an empty {@link Optional} for such cases even though an element name
-   * is set. To be sure use {@link #elementName(IJavaEnvironment)} whenever possible.
+   * is set. To be sure use {@link #elementName(IJavaEnvironment)} or {@link #elementName(IJavaEnvironment)} whenever
+   * possible.
    * </p>
    * E.g. {@code java.lang.Override}
    *
@@ -56,6 +57,16 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
    * @return the fully qualified name of the annotation or an empty {@link Optional} if it is not yet set.
    */
   Optional<String> elementName(IJavaEnvironment context);
+
+  /**
+   * Gets the fully qualified name of the annotation type.<br>
+   * E.g. {@code java.lang.Override}
+   * 
+   * @param context
+   *          The {@link IJavaBuilderContext} to use in case the element name is API dependent.
+   * @return the fully qualified name of the annotation or an empty {@link Optional} if it is not yet set.
+   */
+  Optional<String> elementName(IJavaBuilderContext context);
 
   /**
    * Sets the fully qualified name of the annotation type (e.g. java.lang.Override).
@@ -177,8 +188,8 @@ public interface IAnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> e
   /**
    * Gets a {@link Map} with all elements of this {@link IAnnotationGenerator}.
    * <p>
-   * The key is the {@link ApiFunction} defining the element name. The value is the {@link ISourceGenerator} generating the value source for the
-   * corresponding element.
+   * The key is the {@link ApiFunction} defining the element name. The value is the {@link ISourceGenerator} generating
+   * the value source for the corresponding element.
    * <p>
    * The {@link Map} iterates through the elements in the order in which they have been added.
    *

@@ -365,12 +365,6 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
   TYPE asEnum();
 
   /**
-   * @return The {@link IJavaElementGenerator} this {@link ITypeGenerator} will be created in. This is either an
-   *         {@link ICompilationUnitGenerator}, another {@link ITypeGenerator} or nothing.
-   */
-  Optional<IJavaElementGenerator<?>> declaringGenerator();
-
-  /**
    * @return The fully qualified name of the declaring element (type or compilation unit). Member types are separated
    *         using the $ sign.
    * @see #fullyQualifiedName()
