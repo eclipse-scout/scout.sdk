@@ -16,7 +16,6 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -111,12 +110,12 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
   }
 
   @Override
-  public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer) {
+  public IMethodGenerator<?, ?> toWorkingCopy(IWorkingCopyTransformer transformer) {
     return MethodGenerator.create(this, transformer);
   }
 
   @Override
-  public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toWorkingCopy() {
+  public IMethodGenerator<?, ?> toWorkingCopy() {
     return toWorkingCopy(null);
   }
 }

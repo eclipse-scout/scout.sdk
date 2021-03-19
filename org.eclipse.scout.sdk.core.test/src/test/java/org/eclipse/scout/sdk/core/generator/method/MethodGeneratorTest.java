@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.fixture.AbstractClass;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
@@ -73,25 +73,40 @@ public class MethodGeneratorTest {
 
   @Test
   public void testOverrideIfNecessary(IJavaEnvironment env) {
+    var declaringType = CoreTestingUtils.registerCompilationUnit(env,
+        PrimaryTypeGenerator.create()
+            .withElementName("TestClass")
+            .withInterface(Supplier.class.getName() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END));
     var supplierMethodName = "get";
+
     var withExplicitSuperType = MethodGenerator.create()
         .withElementName(supplierMethodName)
-        .withOverrideIfNecessary(true, Stream.of(Supplier.class.getName()));
+        .withOverrideIfNecessary(true, declaringType);
+
     var fromTypeGenerator = MethodGenerator.create()
-        .withElementName(supplierMethodName)
+        .withElementName("apply")
+        .withParameter(MethodParameterGenerator.create()
+            .withElementName("input")
+            .withDataType(String.class.getName()))
         .withOverrideIfNecessary();
-    TypeGenerator.create().withInterface(Supplier.class.getName()).withMethod(fromTypeGenerator); // apply connection
+    var superTypeRef = Function.class.getName() + JavaTypes.C_GENERIC_START + String.class.getName() + ", " + Long.class.getName() + JavaTypes.C_GENERIC_END;
+    TypeGenerator.create()
+        .withInterface(superTypeRef)
+        .withMethod(fromTypeGenerator); // apply connection
+
     var withAlreadyExistingOverride = MethodGenerator.create()
         .withElementName(supplierMethodName)
         .withAnnotation(AnnotationGenerator.createOverride())
-        .withOverrideIfNecessary(true, Stream.of(Supplier.class.getName()));
+        .withOverrideIfNecessary(true, declaringType);
+
     var withMethodNotInSuperHierarchy = MethodGenerator.create()
         .withElementName(supplierMethodName)
-        .withOverrideIfNecessary(true, Stream.of(Function.class.getName()));
+        .withOverrideIfNecessary(true, env.requireType(Function.class.getName()));
+
     var withEmptyExplicit = MethodGenerator.create()
         .withElementName(supplierMethodName)
         .withoutOverrideIfNecessary()
-        .withOverrideIfNecessary(true, Stream.empty());
+        .withOverrideIfNecessary(true, null);
 
     var overrideSource = '@' + Override.class.getSimpleName();
     assertTrue(withExplicitSuperType.toJavaSource(env).toString().contains(overrideSource));

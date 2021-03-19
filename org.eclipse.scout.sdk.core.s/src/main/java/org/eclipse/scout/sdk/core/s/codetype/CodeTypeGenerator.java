@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -54,7 +53,7 @@ public class CodeTypeGenerator<TYPE extends CodeTypeGenerator<TYPE>> extends Pri
         .withMethod(createIdGetter());
   }
 
-  protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createIdGetter() {
+  protected static IMethodGenerator<?, ?> createIdGetter() {
     return MethodOverrideGenerator.createOverride()
         .withElementNameFrom(IScoutApi.class, api -> api.ICodeType().getIdMethodName())
         .withBody(b -> b.returnClause().append(ID_CONSTANT_NAME).semicolon());

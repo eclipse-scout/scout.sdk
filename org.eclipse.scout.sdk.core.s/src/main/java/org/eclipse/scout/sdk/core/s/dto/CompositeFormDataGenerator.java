@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -129,7 +128,7 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
    * @return {@code true} if the given {@link IMethodGenerator} has the same method name as a getter for the given
    *         formDataTypeName would have.
    */
-  protected boolean hasSimilarNameAs(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb, String formDataTypeName) {
+  protected boolean hasSimilarNameAs(IMethodGenerator<?, ?> msb, String formDataTypeName) {
     var dataType = msb.returnType()
         .flatMap(af -> af.apply(this.targetEnvironment()))
         .get();

@@ -108,7 +108,7 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
             .withBinding(typeParamBoundary));
   }
 
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createExecLoadData() {
+  protected IMethodGenerator<?, ?> createExecLoadData() {
     var execLoadData = MethodGenerator.create()
         .asProtected()
         .withReturnType(JavaTypes._void)

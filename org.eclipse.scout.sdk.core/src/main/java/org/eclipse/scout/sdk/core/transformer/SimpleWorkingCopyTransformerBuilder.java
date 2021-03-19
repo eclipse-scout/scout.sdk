@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.transformer;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.PackageGenerator;
@@ -22,7 +21,6 @@ import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGene
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -37,6 +35,7 @@ import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.model.api.IUnresolvedType;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
 
 /**
  * <h3>{@link SimpleWorkingCopyTransformerBuilder}</h3>
@@ -53,7 +52,7 @@ public class SimpleWorkingCopyTransformerBuilder {
   private Function<ITransformInput<ITypeParameter, ITypeParameterGenerator<?>>, ITypeParameterGenerator<?>> m_typeParameterMapper = ITransformInput::requestDefaultWorkingCopy;
   private Function<ITransformInput<IMethodParameter, IMethodParameterGenerator<?>>, IMethodParameterGenerator<?>> m_methodParameterMapper = ITransformInput::requestDefaultWorkingCopy;
   private Function<ITransformInput<IField, IFieldGenerator<?>>, IFieldGenerator<?>> m_fieldMapper = ITransformInput::requestDefaultWorkingCopy;
-  private Function<ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>>, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> m_methodMapper = ITransformInput::requestDefaultWorkingCopy;
+  private Function<ITransformInput<IMethod, IMethodGenerator<?, ?>>, IMethodGenerator<?, ?>> m_methodMapper = ITransformInput::requestDefaultWorkingCopy;
   private Function<ITransformInput<IType, ITypeGenerator<?>>, ITypeGenerator<?>> m_typeMapper = ITransformInput::requestDefaultWorkingCopy;
   private Function<ITransformInput<IUnresolvedType, ITypeGenerator<?>>, ITypeGenerator<?>> m_unresolvedTypeMapper = ITransformInput::requestDefaultWorkingCopy;
   private Function<ITransformInput<IPackage, PackageGenerator>, PackageGenerator> m_packageMapper = ITransformInput::requestDefaultWorkingCopy;
@@ -105,11 +104,11 @@ public class SimpleWorkingCopyTransformerBuilder {
     return this;
   }
 
-  public Function<ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>>, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methodMapper() {
+  public Function<ITransformInput<IMethod, IMethodGenerator<?, ?>>, IMethodGenerator<?, ?>> methodMapper() {
     return m_methodMapper;
   }
 
-  public SimpleWorkingCopyTransformerBuilder withMethodMapper(Function<ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>>, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methodFunction) {
+  public SimpleWorkingCopyTransformerBuilder withMethodMapper(Function<ITransformInput<IMethod, IMethodGenerator<?, ?>>, IMethodGenerator<?, ?>> methodFunction) {
     m_methodMapper = defaultIfNull(methodFunction);
     return this;
   }
@@ -193,7 +192,7 @@ public class SimpleWorkingCopyTransformerBuilder {
       }
 
       @Override
-      public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+      public IMethodGenerator<?, ?> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ?>> input) {
         return methodMapper().apply(input);
       }
 

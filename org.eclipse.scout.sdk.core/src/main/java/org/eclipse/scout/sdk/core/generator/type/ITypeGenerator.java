@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
@@ -222,7 +221,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
   /**
    * @return A {@link Stream} returning all {@link IMethodGenerator}s in this {@link ITypeGenerator}.
    */
-  Stream<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methods();
+  Stream<IMethodGenerator<?, ?>> methods();
 
   /**
    * Adds the specified method to this {@link ITypeGenerator}.
@@ -239,7 +238,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @see MethodGenerator#createSetter(IFieldGenerator)
    * @see MethodOverrideGenerator#create()
    */
-  TYPE withMethod(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator, Object... sortObject);
+  TYPE withMethod(IMethodGenerator<?, ?> generator, Object... sortObject);
 
   /**
    * Removes all {@link IMethodGenerator IMethodGenerators} for which the specified {@link Predicate} returns
@@ -269,7 +268,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @see IMethod#identifier()
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    */
-  Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments);
+  Optional<IMethodGenerator<?, ?>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments);
 
   /**
    * @return A {@link Stream} returning all member {@link ITypeGenerator}s in this {@link ITypeGenerator}.

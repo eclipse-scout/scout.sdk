@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
@@ -47,7 +46,7 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
   private IClasspathEntry m_serverSourceFolder;
   private String m_sharedPackage;
   private String m_serviceName;
-  private final List<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> m_methods;
+  private final List<IMethodGenerator<?, ?>> m_methods;
 
   // out
   private IType m_createdServiceInterface;
@@ -200,11 +199,11 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     return m_serviceName;
   }
 
-  public void addMethod(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb) {
+  public void addMethod(IMethodGenerator<?, ?> msb) {
     m_methods.add(msb);
   }
 
-  public List<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> getMethods() {
+  public List<IMethodGenerator<?, ?>> getMethods() {
     return m_methods;
   }
 

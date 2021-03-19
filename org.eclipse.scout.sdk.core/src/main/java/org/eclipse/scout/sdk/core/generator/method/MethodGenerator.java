@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.generator.method;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator.createOverride;
+import static org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator.callWithTmpType;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isDefaultMethod;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
@@ -76,7 +77,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   private ISourceGenerator<BODY> m_body;
   private ApiFunction<?, String> m_methodName;
   private boolean m_withOverrideIfNecessary;
-  private List<String> m_superTypesForOverrideIfNecessary;
+  private IType m_overrideIfNecessaryDeclaringType;
 
   protected MethodGenerator() {
     m_parameters = new ArrayList<>();
@@ -137,14 +138,14 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    * @see DefaultWorkingCopyTransformer
    * @see SimpleWorkingCopyTransformerBuilder
    */
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> create(IMethod method, IWorkingCopyTransformer transformer) {
+  public static IMethodGenerator<?, ?> create(IMethod method, IWorkingCopyTransformer transformer) {
     return new MethodGenerator<>(method, transformer);
   }
 
   /**
    * @return A new empty {@link IMethodGenerator}.
    */
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> create() {
+  public static IMethodGenerator<?, ?> create() {
     return new MethodGenerator<>();
   }
 
@@ -156,7 +157,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    * @return The new {@link IMethodGenerator}.
    */
   @SuppressWarnings("unchecked")
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetter(IFieldGenerator<?> fieldGenerator) {
+  public static IMethodGenerator<?, ?> createGetter(IFieldGenerator<?> fieldGenerator) {
     var dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
         .orElseThrow(() -> newFail("Cannot create getter for field because it has no data type."));
     var fieldName = Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create getter for field because it has no name."));
@@ -172,7 +173,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    *          The data type of the specified field.
    * @return A new {@link IMethodGenerator} that creates a public getter for the specified field.
    */
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetter(String fieldName, String dataType) {
+  public static IMethodGenerator<?, ?> createGetter(String fieldName, String dataType) {
     return createGetter(fieldName, dataType, Flags.AccPublic);
   }
 
@@ -187,11 +188,11 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    *          The flags of the getter. see {@link Flags}.
    * @return A new {@link IMethodGenerator} that creates a getter for the specified field.
    */
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetter(String fieldName, String dataType, int flags) {
+  public static IMethodGenerator<?, ?> createGetter(String fieldName, String dataType, int flags) {
     return createGetter(fieldName, null, api -> dataType, flags);
   }
 
-  public static <A extends IApiSpecification> IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetter(String fieldName, Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags) {
+  public static <A extends IApiSpecification> IMethodGenerator<?, ?> createGetter(String fieldName, Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags) {
     var methodBaseName = getGetterSetterBaseName(fieldName);
     return create()
         .withElementNameFrom(apiDefinition, api -> PropertyBean.getterPrefixFor(dataTypeFunction.apply(api)) + methodBaseName)
@@ -209,7 +210,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    * @return The new {@link IMethodGenerator}.
    */
   @SuppressWarnings("unchecked")
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(IFieldGenerator<?> fieldGenerator) {
+  public static IMethodGenerator<?, ?> createSetter(IFieldGenerator<?> fieldGenerator) {
     var dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
         .orElseThrow(() -> newFail("Cannot create setter for field because it has no data type."));
     return createSetter(Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create setter for field because it has no name.")),
@@ -225,7 +226,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    *          The data type of the specified field.
    * @return The new {@link IMethodGenerator}
    */
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(String fieldName, String dataType) {
+  public static IMethodGenerator<?, ?> createSetter(String fieldName, String dataType) {
     return createSetter(fieldName, dataType, Flags.AccPublic);
   }
 
@@ -240,7 +241,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    *          The flags of the setter. see {@link Flags}.
    * @return The new {@link IMethodGenerator}
    */
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(String fieldName, String dataType, int flags) {
+  public static IMethodGenerator<?, ?> createSetter(String fieldName, String dataType, int flags) {
     return createSetter(fieldName, dataType, flags, null);
   }
 
@@ -257,12 +258,11 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    *          An optional prefix that will be appended to the parameter name of the setter. May be {@code null}.
    * @return The new {@link IMethodGenerator}
    */
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(String fieldName, String dataType, int flags, String paramNamePrefix) {
+  public static IMethodGenerator<?, ?> createSetter(String fieldName, String dataType, int flags, String paramNamePrefix) {
     return createSetter(fieldName, null, api -> dataType, flags, paramNamePrefix);
   }
 
-  public static <A extends IApiSpecification> IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createSetter(String fieldName,
-      Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags, String paramNamePrefix) {
+  public static <A extends IApiSpecification> IMethodGenerator<?, ?> createSetter(String fieldName, Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags, String paramNamePrefix) {
     var setterBaseName = getGetterSetterBaseName(fieldName); // starts with an uppercase char
     var parameterName = getPrefixedMethodParameterName(paramNamePrefix, setterBaseName);
     return create()
@@ -328,36 +328,38 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
       return null; // already exists
     }
     var javaEnvironment = context.environment().orElseThrow(() -> newFail("To add an override annotation if necessary a Java environment is required."));
-    if (!methodExistsInSuperHierarchy(javaEnvironment)) {
+    if (!existsMethodInSuperHierarchy(javaEnvironment)) {
       return null;
     }
     return createOverride();
   }
 
-  protected boolean methodExistsInSuperHierarchy(IJavaEnvironment javaEnvironment) {
+  protected boolean existsMethodInSuperHierarchy(IJavaEnvironment javaEnvironment) {
     var methodId = identifier(javaEnvironment);
-    return superTypesForOverrideIfNecessary(javaEnvironment)
-        .map(javaEnvironment::findType)
-        .flatMap(Optional::stream)
-        .anyMatch(t -> t.methods().withSuperTypes(true).withMethodIdentifier(methodId).existsAny());
-  }
-
-  protected Stream<String> superTypesForOverrideIfNecessary(IJavaEnvironment javaEnvironment) {
-    var explicitSuperTypes = superTypesForOverrideIfNecessary();
-    if (explicitSuperTypes != null) {
-      // explicit super types have been given.
-      return explicitSuperTypes.stream();
+    var explicitDeclaringType = getOverrideIfNecessaryDeclaringType();
+    if (explicitDeclaringType != null) {
+      // explicit declaring type has been given.
+      return explicitDeclaringType.directSuperTypes()
+          .anyMatch(t -> existsMethodInSuperHierarchy(t, methodId));
     }
+
     var declaringGenerator = declaringGenerator().orElse(null);
     if (declaringGenerator instanceof ITypeGenerator) {
-      // use super types from declaring (surrounding) type generator
       //noinspection rawtypes
-      var t = (ITypeGenerator) declaringGenerator;
-      var declaringTypeGenerator = (ITypeGenerator<?>) t;
-      return Stream.concat(declaringTypeGenerator.superClass().stream(), declaringTypeGenerator.interfaces())
-          .flatMap(af -> af.apply(javaEnvironment).stream());
+      var gen = (ITypeGenerator) declaringGenerator;
+      var declaringTypeGenerator = (ITypeGenerator<?>) gen;
+
+      // use super types from declaring (surrounding) type generator
+      return callWithTmpType(declaringTypeGenerator, javaEnvironment, t -> existsMethodInSuperHierarchy(t, methodId));
     }
-    return Stream.empty(); // unknown super hierarchy
+    return false;
+  }
+
+  protected static boolean existsMethodInSuperHierarchy(IType t, String methodId) {
+    return t.methods()
+        .withSuperTypes(true)
+        .withMethodIdentifier(methodId)
+        .existsAny();
   }
 
   protected void buildMethodSource(IMemberBuilder<?> builder) {
@@ -406,7 +408,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   @SuppressWarnings("unchecked")
-  protected BODY createMethodBodyBuilder(ISourceBuilder<?> inner, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> surroundingMethod) {
+  protected BODY createMethodBodyBuilder(ISourceBuilder<?> inner, IMethodGenerator<?, ?> surroundingMethod) {
     return (BODY) MethodBodyBuilder.create(inner, surroundingMethod);
   }
 
@@ -615,18 +617,13 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   @Override
-  public TYPE withOverrideIfNecessary(boolean withOverrideIfNecessary, Stream<String> superTypesToConsider) {
+  public TYPE withOverrideIfNecessary(boolean withOverrideIfNecessary, IType declaringType) {
     m_withOverrideIfNecessary = withOverrideIfNecessary;
-    if (!withOverrideIfNecessary || superTypesToConsider == null) {
-      m_superTypesForOverrideIfNecessary = null;
+    if (withOverrideIfNecessary) {
+      m_overrideIfNecessaryDeclaringType = declaringType;
     }
     else {
-      m_superTypesForOverrideIfNecessary = superTypesToConsider
-          .filter(Strings::hasText)
-          .collect(toList());
-      if (m_superTypesForOverrideIfNecessary.isEmpty()) {
-        m_superTypesForOverrideIfNecessary = null;
-      }
+      m_overrideIfNecessaryDeclaringType = null;
     }
     return thisInstance();
   }
@@ -636,8 +633,8 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     return m_withOverrideIfNecessary;
   }
 
-  protected List<String> superTypesForOverrideIfNecessary() {
-    return m_superTypesForOverrideIfNecessary;
+  protected IType getOverrideIfNecessaryDeclaringType() {
+    return m_overrideIfNecessaryDeclaringType;
   }
 
   @Override

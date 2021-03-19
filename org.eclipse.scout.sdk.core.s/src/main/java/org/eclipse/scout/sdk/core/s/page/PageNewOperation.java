@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.s.page;
 
 import java.util.function.BiConsumer;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
@@ -199,7 +198,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     setCreatedServiceIfc(serviceNewOperation.getCreatedServiceInterface());
   }
 
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createServiceMethod() {
+  protected IMethodGenerator<?, ?> createServiceMethod() {
     setDataFetchMethodName(calcServiceMethodName());
     return MethodGenerator.create()
         .asPublic()

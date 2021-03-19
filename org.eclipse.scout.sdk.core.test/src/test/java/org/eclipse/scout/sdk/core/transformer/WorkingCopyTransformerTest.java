@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.fixture.AnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
@@ -100,7 +99,7 @@ public class WorkingCopyTransformerTest {
        * Tests the modification of a working copy.
        */
       @Override
-      public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+      public IMethodGenerator<?, ?> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ?>> input) {
         var generator = super.transformMethod(input);
         if ("methodInChildClass".equals(input.model().elementName())) {
           generator.withoutFlags(Flags.AccSynchronized);
@@ -241,7 +240,7 @@ public class WorkingCopyTransformerTest {
   public void testTransformationOfOverriddenMethod(IJavaEnvironment env) {
     IWorkingCopyTransformer transformer = new DefaultWorkingCopyTransformer() {
       @Override
-      public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+      public IMethodGenerator<?, ?> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ?>> input) {
         var templateMethod = input.model();
         var overrideGenerator = input.requestDefaultWorkingCopy();
         switch (templateMethod.elementName()) {
@@ -278,7 +277,7 @@ public class WorkingCopyTransformerTest {
   public void testTransformerDocumentation(IJavaEnvironment env) {
     IWorkingCopyTransformer transformer = new DefaultWorkingCopyTransformer() {
       @Override
-      public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+      public IMethodGenerator<?, ?> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ?>> input) {
         var templateMethod = input.model();
         var overrideGenerator = input.requestDefaultWorkingCopy();
         switch (templateMethod.elementName()) {
@@ -382,7 +381,7 @@ public class WorkingCopyTransformerTest {
     assertEquals(numMethodsWithoutTransformer - 1 /* the method removed by the transformer */, numMethodsWithTransformer);
   }
 
-  private static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+  private static IMethodGenerator<?, ?> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ?>> input) {
     if ("charAt".equals(input.model().elementName())) {
       return null;
     }
@@ -527,7 +526,7 @@ public class WorkingCopyTransformerTest {
     }
 
     @Override
-    public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+    public IMethodGenerator<?, ?> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ?>> input) {
       remember(input.model(), "method");
       return super.transformMethod(input);
     }

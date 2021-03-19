@@ -41,7 +41,6 @@ import org.eclipse.jface.text.templates.TemplateVariableResolver;
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -128,17 +127,17 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
   }
 
   @Override
-  public ISourceGenerator<ICommentBuilder<?>> createMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
+  public ISourceGenerator<ICommentBuilder<?>> createMethodComment(IMethodGenerator<?, ?> target) {
     return createMethodCommentInternal(target, METHOD_TYPE_NORMAL);
   }
 
   @Override
-  public ISourceGenerator<ICommentBuilder<?>> createGetterMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
+  public ISourceGenerator<ICommentBuilder<?>> createGetterMethodComment(IMethodGenerator<?, ?> target) {
     return createMethodCommentInternal(target, METHOD_TYPE_GETTER);
   }
 
   @Override
-  public ISourceGenerator<ICommentBuilder<?>> createSetterMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
+  public ISourceGenerator<ICommentBuilder<?>> createSetterMethodComment(IMethodGenerator<?, ?> target) {
     return createMethodCommentInternal(target, METHOD_TYPE_SETTER);
   }
 
@@ -149,7 +148,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
     b.nl();
   }
 
-  private static ISourceGenerator<ICommentBuilder<?>> createMethodCommentInternal(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target, int type) {
+  private static ISourceGenerator<ICommentBuilder<?>> createMethodCommentInternal(IMethodGenerator<?, ?> target, int type) {
     return b -> {
       var builderCtx = b.context().properties();
       if (!isAutomaticallyAddComments(builderCtx)) {

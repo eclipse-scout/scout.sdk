@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.model.api;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.api.query.MethodParameterQuery;
 import org.eclipse.scout.sdk.core.model.api.query.SuperMethodQuery;
@@ -124,8 +123,8 @@ public interface IMethod extends IMember {
   String identifier();
 
   @Override
-  IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toWorkingCopy();
+  IMethodGenerator<?, ?> toWorkingCopy();
 
   @Override
-  IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toWorkingCopy(IWorkingCopyTransformer transformer);
+  IMethodGenerator<?, ?> toWorkingCopy(IWorkingCopyTransformer transformer);
 }

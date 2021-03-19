@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.s.permission;
 
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
@@ -36,7 +35,7 @@ public class PermissionGenerator<TYPE extends PermissionGenerator<TYPE>> extends
         .withMethod(createConstructor(mainType));
   }
 
-  protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createConstructor(IJavaElementGenerator<?> constructorOwner) {
+  protected static IMethodGenerator<?, ?> createConstructor(IJavaElementGenerator<?> constructorOwner) {
     var permissionName = constructorOwner.elementName().orElseThrow(() -> newFail("Permission name is missing"));
     return MethodGenerator.create()
         .asPublic()

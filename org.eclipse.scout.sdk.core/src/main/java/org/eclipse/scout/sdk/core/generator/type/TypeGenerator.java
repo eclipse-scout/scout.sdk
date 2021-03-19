@@ -421,7 +421,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public Stream<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methods() {
+  public Stream<IMethodGenerator<?, ?>> methods() {
     return m_members.stream()
         .filter(SortedMemberEntry::isMethod)
         .map(SortedMemberEntry::generator)
@@ -429,7 +429,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public TYPE withMethod(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> builder, Object... sortObject) {
+  public TYPE withMethod(IMethodGenerator<?, ?> builder, Object... sortObject) {
     m_members.add(new SortedMemberEntry(applyConnection(builder, this), sortObject));
     return thisInstance();
   }
@@ -441,7 +441,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments) {
+  public Optional<IMethodGenerator<?, ?>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments) {
     Ensure.notBlank(methodId);
     return methods()
         .filter(m -> methodId.equals(m.identifier(context, includeTypeArguments)))
@@ -545,12 +545,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
       super(transformer);
     }
 
-    protected static Stream<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> create(ITypeGenerator<?> typeGenerator, IJavaEnvironment env, IWorkingCopyTransformer transformer) {
+    protected static Stream<IMethodGenerator<?, ?>> create(ITypeGenerator<?> typeGenerator, IJavaEnvironment env, IWorkingCopyTransformer transformer) {
       return callWithTmpType(typeGenerator, env, tmpType -> getUnimplementedMethods(tmpType)
           .map(m -> toMethodGenerator(typeGenerator, m, transformer)));
     }
 
-    protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> toMethodGenerator(IJavaElementGenerator<?> typeGenerator, IMethod unimplementedMethod, IWorkingCopyTransformer transformer) {
+    protected static IMethodGenerator<?, ?> toMethodGenerator(IJavaElementGenerator<?> typeGenerator, IMethod unimplementedMethod, IWorkingCopyTransformer transformer) {
       var generator = new UnimplementedMethodGenerator(transformer)
           .withDeclaringGenerator(typeGenerator)
           .withElementName(unimplementedMethod.elementName());

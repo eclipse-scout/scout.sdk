@@ -33,10 +33,10 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  */
 public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends ExpressionBuilder<TYPE> implements IMethodBodyBuilder<TYPE> {
 
-  private final IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m_surroundingMethod;
+  private final IMethodGenerator<?, ?> m_surroundingMethod;
   private final ICommentBuilder<?> m_commentBuilder;
 
-  protected MethodBodyBuilder(ISourceBuilder<?> inner, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> surroundingMethod) {
+  protected MethodBodyBuilder(ISourceBuilder<?> inner, IMethodGenerator<?, ?> surroundingMethod) {
     super(inner);
     m_surroundingMethod = Ensure.notNull(surroundingMethod);
     m_commentBuilder = CommentBuilder.create(inner);
@@ -55,7 +55,7 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
    *          The {@link IMethodGenerator} the new {@link IMethodBodyBuilder} will belong to. Must not be {@code null}.
    * @return A new {@link IMethodBodyBuilder}.
    */
-  public static IMethodBodyBuilder<?> create(ISourceBuilder<?> inner, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> surroundingMethod) {
+  public static IMethodBodyBuilder<?> create(ISourceBuilder<?> inner, IMethodGenerator<?, ?> surroundingMethod) {
     return new MethodBodyBuilder<>(inner, surroundingMethod);
   }
 
@@ -198,7 +198,7 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
   }
 
   @Override
-  public IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> surroundingMethod() {
+  public IMethodGenerator<?, ?> surroundingMethod() {
     return m_surroundingMethod;
   }
 }

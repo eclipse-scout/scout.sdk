@@ -221,8 +221,8 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
 
   protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForList(DataObjectNode node, IType owner) {
     var dataTypeRef = node.dataType().reference();
-    var chainedSetterCollection = ScoutMethodGenerator.createDoNodeSetterCollection(node.name(), dataTypeRef, owner);
-    var chainedSetterArray = ScoutMethodGenerator.createDoNodeSetterArray(node.name(), dataTypeRef, owner);
+    var chainedSetterCollection = ScoutMethodGenerator.createDoListSetterCollection(node.name(), dataTypeRef, owner);
+    var chainedSetterArray = ScoutMethodGenerator.createDoListSetterArray(node.name(), dataTypeRef, owner);
     if (node.isInherited()) {
       // for inherited nodes: only overwrite (and narrow) the chained setter
       return Stream.of(chainedSetterCollection, chainedSetterArray);

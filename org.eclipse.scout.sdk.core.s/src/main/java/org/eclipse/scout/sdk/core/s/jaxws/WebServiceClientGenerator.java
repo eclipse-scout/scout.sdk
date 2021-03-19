@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Locale;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
@@ -62,7 +61,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
   }
 
   @SuppressWarnings("MethodMayBeStatic")
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> fillOverriddenMethods(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input) {
+  protected IMethodGenerator<?, ?> fillOverriddenMethods(ITransformInput<IMethod, IMethodGenerator<?, ?>> input) {
     return input.requestDefaultWorkingCopy().withBody(b -> b.appendCallToSame(b.context().requireApi(IScoutApi.class).AbstractWebServiceClient().newInvocationContextMethodName() + "().getPort()"));
   }
 
@@ -102,13 +101,13 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
             .withAnnotation(AnnotationGenerator.createOverride()));
   }
 
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetConfiguredEndpointUrlProperty() {
+  protected IMethodGenerator<?, ?> createGetConfiguredEndpointUrlProperty() {
     return MethodOverrideGenerator.createOverride()
         .withElementNameFrom(IScoutApi.class, api -> api.AbstractWebServiceClient().getConfiguredEndpointUrlPropertyMethodName())
         .withBody(b -> b.returnClassLiteral(getPropertyClassName()));
   }
 
-  protected static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createExecInstallHandlers() {
+  protected static IMethodGenerator<?, ?> createExecInstallHandlers() {
     return MethodOverrideGenerator.createOverride()
         .withElementNameFrom(IScoutApi.class, api -> api.AbstractWebServiceClient().execInstallHandlersMethodName())
         .withBody(b -> ScoutMethodBodyBuilder.create(b)

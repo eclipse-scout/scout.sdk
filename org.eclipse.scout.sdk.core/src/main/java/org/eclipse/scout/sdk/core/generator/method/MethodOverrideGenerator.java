@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
-import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
@@ -41,7 +40,6 @@ import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransform
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link MethodOverrideGenerator}</h3>
@@ -90,7 +88,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
    *           if no {@link IJavaEnvironment} is available in the builder context (see
    *           {@link IJavaBuilderContext#environment()}).
    */
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createOverride() {
+  public static IMethodGenerator<?, ?> createOverride() {
     return createOverride(null);
   }
 
@@ -127,7 +125,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
    * @see DefaultWorkingCopyTransformer
    * @see SimpleWorkingCopyTransformerBuilder
    */
-  public static IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createOverride(IWorkingCopyTransformer transformer) {
+  public static IMethodGenerator<?, ?> createOverride(IWorkingCopyTransformer transformer) {
     return new MethodOverrideGenerator<>(transformer);
   }
 
@@ -136,7 +134,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   }
 
   @SuppressWarnings("unchecked")
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createDefaultOverrideGenerator(IMethod template) {
+  protected IMethodGenerator<?, ?> createDefaultOverrideGenerator(IMethod template) {
     var isFromInterface = isInterface(template.requireDeclaringType().flags());
     var needsImplementation = isFromInterface || isAbstract(template.flags());
 
@@ -177,14 +175,15 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
     };
   }
 
-  protected Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> createOverrideGenerator(IMethod template) {
+  protected Optional<IMethodGenerator<?, ?>> createOverrideGenerator(IMethod template) {
     return transform(m_transformer, template, () -> createDefaultOverrideGenerator(template), (t, i) -> t.transformMethod(i));
   }
 
   protected Optional<IMethod> findMethodToOverride(IType container) {
+    var javaEnvironment = container.javaEnvironment();
     var templateCandidates = container.methods()
         .withSuperTypes(true).stream()
-        .filter(m -> m.elementName().equals(elementName(container.javaEnvironment()).orElseThrow(() -> newFail("To override a method at least the method name must be specified."))))
+        .filter(m -> m.elementName().equals(elementName(javaEnvironment).orElseThrow(() -> newFail("To override a method at least the method name must be specified."))))
         .collect(toMap(IMethod::identifier, identity(), (a, b) -> a));
 
     if (templateCandidates.isEmpty()) {
@@ -194,25 +193,27 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
       return Optional.of(templateCandidates.values().iterator().next());
     }
 
-    return Optional.ofNullable(templateCandidates.get(identifier(container.javaEnvironment())));
+    return Optional.ofNullable(templateCandidates.get(identifier(javaEnvironment)));
   }
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     var declaring = (ITypeGenerator<?>) Ensure.instanceOf(declaringGenerator().orElse(null), ITypeGenerator.class, "Method can only be overridden if existing in a type.");
-    callWithTmpType(declaring, builder.context().environment().orElseThrow(() -> newFail("Cannot override a method without java environment.")),
-        tmpType -> createOverrideGenerator(findMethodToOverride(tmpType).orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName().orElse(null)))))
-            .ifPresent(generator -> generator.generate(builder));
+    var javaEnvironment = builder.context().environment().orElseThrow(() -> newFail("Cannot override a method without java environment."));
+    callWithTmpType(declaring, javaEnvironment, this::createOverrideGenerator)
+        .ifPresent(overrideGenerator -> overrideGenerator.generate(builder));
+  }
+
+  protected Optional<IMethodGenerator<?, ?>> createOverrideGenerator(IType tmpType) {
+    var template = findMethodToOverride(tmpType).orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName().orElse(null)));
+    return createOverrideGenerator(template);
   }
 
   protected static <T> T callWithTmpType(ITypeGenerator<?> declaringGenerator, IJavaEnvironment env, Function<IType, T> task) {
-    var targetPackage = getTargetPackage(declaringGenerator);
-    var typeName = "ScoutSdkTempClass__";
-    var pckWithPrefix = Strings.notBlank(targetPackage)
-        .map(pck -> pck + JavaTypes.C_DOT)
-        .orElse("");
-
     Ensure.notNull(task);
+
+    var targetPackage = "not.existing.scout.sdk.tmp_pck";
+    var typeName = "ScoutSdkTempClass__";
     return env.unwrap().callInEmptyCopy(copy -> {
       var emptyCopy = copy.wrap();
       var tmpTypeSource = PrimaryTypeGenerator.create()
@@ -228,19 +229,8 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
           .toJavaSource(emptyCopy);
 
       emptyCopy.registerCompilationUnitOverride(targetPackage, typeName + JavaTypes.JAVA_FILE_SUFFIX, tmpTypeSource);
-      var tmpType = emptyCopy.requireType(pckWithPrefix + typeName);
+      var tmpType = emptyCopy.requireType(targetPackage + JavaTypes.C_DOT + typeName);
       return task.apply(tmpType);
     });
-  }
-
-  protected static String getTargetPackage(ITypeGenerator<?> declaringGenerator) {
-    var primary = declaringGenerator;
-    //noinspection RedundantExplicitVariableType
-    IJavaElementGenerator<?> next = declaringGenerator.declaringGenerator().orElse(null);
-    while (next instanceof ITypeGenerator) {
-      primary = (ITypeGenerator<?>) next;
-      next = primary.declaringGenerator().orElse(null);
-    }
-    return primary.qualifier();
   }
 }

@@ -56,7 +56,8 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
       return new WrappingSpliterator<>(container.unwrap().getMethods());
     }
     for (var m : container.unwrap().getMethods()) {
-      if (id.equals(m.wrap().identifier())) {
+      var methodName = m.getElementName(); // performance improvement: only compute identifier for methods where at least the name matches
+      if (id.startsWith(methodName) && id.equals(m.wrap().identifier())) {
         return new WrappingSpliterator<>(singletonList(m));
       }
     }

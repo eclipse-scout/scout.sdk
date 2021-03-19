@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.fixture.InterfaceWithTypeParam;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
@@ -267,7 +266,7 @@ public class TypeGeneratorTest {
     assertEquals(2, result.requireCompilationUnit().imports().count());
   }
 
-  protected static void assertMethodOrder(int expectedOrder, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator) {
+  protected static void assertMethodOrder(int expectedOrder, IMethodGenerator<?, ?> generator) {
     var insertionOrder = INSERTION_ORDER.getAndIncrement();
     assertMemberOrder(expectedOrder, SortedMemberEntry.METHOD_ORDER, insertionOrder, SortedMemberEntry.defaultMethodOrder(generator, insertionOrder));
   }

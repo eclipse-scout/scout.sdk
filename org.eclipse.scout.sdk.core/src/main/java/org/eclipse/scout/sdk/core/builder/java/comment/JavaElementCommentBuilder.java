@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
@@ -108,7 +107,7 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
    * @return A new {@link IJavaElementCommentBuilder} that creates default comments for the given
    *         {@link IMethodGenerator}.
    */
-  public static IJavaElementCommentBuilder<?> createForMethod(ISourceBuilder<?> inner, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
+  public static IJavaElementCommentBuilder<?> createForMethod(ISourceBuilder<?> inner, IMethodGenerator<?, ?> target) {
     return newJavaElementCommentBuilder(inner, spi -> spi.createMethodComment(target));
   }
 
@@ -120,7 +119,7 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
    * @return A new {@link IJavaElementCommentBuilder} that creates default comments for the given getter
    *         {@link IMethodGenerator}.
    */
-  public static IJavaElementCommentBuilder<?> createForMethodGetter(ISourceBuilder<?> inner, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
+  public static IJavaElementCommentBuilder<?> createForMethodGetter(ISourceBuilder<?> inner, IMethodGenerator<?, ?> target) {
     return newJavaElementCommentBuilder(inner, spi -> spi.createGetterMethodComment(target));
   }
 
@@ -132,7 +131,7 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
    * @return A new {@link IJavaElementCommentBuilder} that creates default comments for the given setter
    *         {@link IMethodGenerator}.
    */
-  public static IJavaElementCommentBuilder<?> createForMethodSetter(ISourceBuilder<?> inner, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
+  public static IJavaElementCommentBuilder<?> createForMethodSetter(ISourceBuilder<?> inner, IMethodGenerator<?, ?> target) {
     return newJavaElementCommentBuilder(inner, spi -> spi.createSetterMethodComment(target));
   }
 

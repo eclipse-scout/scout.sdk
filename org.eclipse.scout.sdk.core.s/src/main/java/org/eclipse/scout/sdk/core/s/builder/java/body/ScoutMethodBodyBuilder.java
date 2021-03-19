@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
  */
 public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> extends MethodBodyBuilder<TYPE> implements IScoutMethodBodyBuilder<TYPE> {
 
-  protected ScoutMethodBodyBuilder(ISourceBuilder<?> inner, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> surroundingMethod) {
+  protected ScoutMethodBodyBuilder(ISourceBuilder<?> inner, IMethodGenerator<?, ?> surroundingMethod) {
     super(inner, surroundingMethod);
   }
 
@@ -35,7 +35,7 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
     return create(inner, inner.surroundingMethod());
   }
 
-  public static IScoutMethodBodyBuilder<?> create(ISourceBuilder<?> inner, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> surroundingMethod) {
+  public static IScoutMethodBodyBuilder<?> create(ISourceBuilder<?> inner, IMethodGenerator<?, ?> surroundingMethod) {
     return new ScoutMethodBodyBuilder<>(inner, surroundingMethod);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
@@ -77,7 +76,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
     }
   }
 
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createGetConfiguredTitle() {
+  protected IMethodGenerator<?, ?> createGetConfiguredTitle() {
     var nlsKeyName = elementName().orElseThrow(() -> newFail("Form has no name."));
     if (nlsKeyName.endsWith(ISdkConstants.SUFFIX_FORM)) {
       nlsKeyName = Strings.ensureStartWithUpperCase(nlsKeyName.substring(0, nlsKeyName.length() - ISdkConstants.SUFFIX_FORM.length())).toString();
@@ -85,7 +84,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
     return ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractForm().getConfiguredTitleMethodName(), nlsKeyName);
   }
 
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createStartMethod(String methodName, String handlerSimpleName) {
+  protected IMethodGenerator<?, ?> createStartMethod(String methodName, String handlerSimpleName) {
     var modifyHandlerFqn = fullyQualifiedName() + JavaTypes.C_DOLLAR + handlerSimpleName;
     return MethodGenerator.create()
         .asPublic()

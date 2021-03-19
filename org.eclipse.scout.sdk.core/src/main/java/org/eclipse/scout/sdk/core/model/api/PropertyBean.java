@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -126,7 +125,7 @@ public class PropertyBean {
    * @return An {@link Optional} containing the property name if the given {@link IMethodGenerator} is a valid getter.
    *         Otherwise an empty {@link Optional} is returned.
    */
-  public static Optional<String> getterName(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m, IJavaEnvironment context) {
+  public static Optional<String> getterName(IMethodGenerator<?, ?> m, IJavaEnvironment context) {
     return nameOf(m, false, context);
   }
 
@@ -179,7 +178,7 @@ public class PropertyBean {
    * @return An {@link Optional} containing the property name if the given {@link IMethodGenerator} is a valid setter.
    *         Otherwise an empty {@link Optional} is returned.
    */
-  public static Optional<String> setterName(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m, IJavaEnvironment context) {
+  public static Optional<String> setterName(IMethodGenerator<?, ?> m, IJavaEnvironment context) {
     return nameOf(m, true, context);
   }
 
@@ -211,7 +210,7 @@ public class PropertyBean {
     return Optional.of(matcher.group(2));
   }
 
-  protected static Optional<String> nameOf(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> m, boolean setter, IJavaEnvironment context) {
+  protected static Optional<String> nameOf(IMethodGenerator<?, ?> m, boolean setter, IJavaEnvironment context) {
     var returnType = m.returnType();
     if (returnType.isEmpty()) {
       return Optional.empty();

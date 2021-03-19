@@ -252,8 +252,8 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     setCreatedServiceInterface(serviceNewOperation.getCreatedServiceInterface());
   }
 
-  protected IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> createServiceMethod(String name) {
-    IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> methodBuilder = ScoutMethodGenerator.create()
+  protected IMethodGenerator<?, ?> createServiceMethod(String name) {
+    IMethodGenerator<?, ?> methodBuilder = ScoutMethodGenerator.create()
         .asPublic()
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withElementName(name)
@@ -306,7 +306,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .semicolon();
   }
 
-  protected static Optional<String> getParamNameHavingDataType(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> msb, String returnType, IJavaBuilderContext context) {
+  protected static Optional<String> getParamNameHavingDataType(IMethodGenerator<?, ?> msb, String returnType, IJavaBuilderContext context) {
     var environment = context.environment().orElse(null);
     return msb.parameters()
         .filter(p -> returnType.equals(p.reference(environment)))

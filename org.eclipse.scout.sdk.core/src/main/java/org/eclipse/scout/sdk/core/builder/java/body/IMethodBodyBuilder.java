@@ -111,7 +111,7 @@ public interface IMethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> exten
   /**
    * @return The {@link IMethodGenerator} this {@link IMethodBodyBuilder} belongs to.
    */
-  IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> surroundingMethod();
+  IMethodGenerator<?, ?> surroundingMethod();
 
   /**
    * @return The return data type reference of the method this {@link IMethodBodyBuilder} belongs to.

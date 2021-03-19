@@ -143,7 +143,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    */
   public static IScoutMethodGenerator<?, ?> createDoNodeSetter(String name, String dataTypeReference, IType owner) {
     return createDoNodeSetter(name, dataTypeReference, buildReturnTypeReferenceFor(owner))
-        .withOverrideIfNecessary(true, owner.directSuperTypes().map(IType::name));
+        .withOverrideIfNecessary(true, owner);
   }
 
   /**
@@ -198,7 +198,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    *          The {@link IType} in which the method will be added.
    * @return The created {@link IScoutMethodGenerator}.
    */
-  public static IScoutMethodGenerator<?, ?> createDoNodeSetterCollection(String name, CharSequence dataTypeReference, IType owner) {
+  public static IScoutMethodGenerator<?, ?> createDoListSetterCollection(String name, CharSequence dataTypeReference, IType owner) {
     var methodName = PropertyBean.CHAINED_SETTER_PREFIX + ensureStartWithUpperCase(name);
     var paramDataType = computeDoNodeCollectionSetterParameterDataType(owner, methodName, dataTypeReference);
     return create()
@@ -210,7 +210,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
             .withDataType(paramDataType))
         .withAnnotation(createDoConvenienceMethodsGenerated())
         .withBody(b -> b.appendDoNodeUpdateAll(name, name).nl().returnClause().appendThis().semicolon())
-        .withOverrideIfNecessary(true, owner.directSuperTypes().map(IType::name));
+        .withOverrideIfNecessary(true, owner);
   }
 
   /**
@@ -234,8 +234,8 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    *          The {@link IType} in which the method will be added.
    * @return The created {@link IScoutMethodGenerator}.
    */
-  public static IScoutMethodGenerator<?, ?> createDoNodeSetterArray(String name, String dataTypeReference, IType owner) {
-    var generator = createDoNodeSetterCollection(name, dataTypeReference, owner);
+  public static IScoutMethodGenerator<?, ?> createDoListSetterArray(String name, String dataTypeReference, IType owner) {
+    var generator = createDoListSetterCollection(name, dataTypeReference, owner);
     generator.parameters().findAny().get().withDataType(dataTypeReference).asVarargs();
     return generator;
   }
@@ -262,7 +262,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    */
   public static IScoutMethodGenerator<?, ?> createDoNodeGetter(CharSequence name, String returnTypeReference, IType owner) {
     return createDoNodeGetter(name, returnTypeReference)
-        .withOverrideIfNecessary(true, owner.directSuperTypes().map(IType::name));
+        .withOverrideIfNecessary(true, owner);
   }
 
   /**

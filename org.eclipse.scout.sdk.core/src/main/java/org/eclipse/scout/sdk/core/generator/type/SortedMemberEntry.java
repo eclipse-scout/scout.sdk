@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isStatic;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.member.IMemberGenerator;
@@ -164,7 +163,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
     return new CompositeObject(DEFAULT_ORDER, TYPE_ORDER, pos, insertionOrder);
   }
 
-  protected static CompositeObject defaultMethodOrder(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> generator, long insertionOrder) {
+  protected static CompositeObject defaultMethodOrder(IMethodGenerator<?, ?> generator, long insertionOrder) {
     var isConstructor = generator.returnType().isEmpty();
     int pos;
     if (isConstructor) {

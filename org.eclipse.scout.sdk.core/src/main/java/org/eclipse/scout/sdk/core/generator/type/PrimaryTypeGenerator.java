@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
@@ -333,12 +332,12 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   }
 
   @Override
-  public Stream<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> methods() {
+  public Stream<IMethodGenerator<?, ?>> methods() {
     return primary().methods();
   }
 
   @Override
-  public TYPE withMethod(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> builder, Object... sortObject) {
+  public TYPE withMethod(IMethodGenerator<?, ?> builder, Object... sortObject) {
     primary().withMethod(builder, sortObject);
     return thisInstance();
   }
@@ -350,7 +349,7 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   }
 
   @Override
-  public Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments) {
+  public Optional<IMethodGenerator<?, ?>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments) {
     return primary().method(methodId, context, includeTypeArguments);
   }
 

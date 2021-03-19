@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.PackageGenerator;
@@ -151,7 +150,7 @@ public interface IWorkingCopyTransformer {
    * @return The {@link IMethodGenerator} to use as working copy for the {@link IMethod} specified or an empty
    *         {@link Optional} if the method should be removed.
    */
-  static Optional<IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> transformMethod(IMethod m, IWorkingCopyTransformer transformer) {
+  static Optional<IMethodGenerator<?, ?>> transformMethod(IMethod m, IWorkingCopyTransformer transformer) {
     return transform(transformer, m, () -> m.toWorkingCopy(transformer), (t, i) -> t.transformMethod(i));
   }
 
@@ -359,7 +358,7 @@ public interface IWorkingCopyTransformer {
    * @return The {@link IMethodGenerator} to use as working copy for the {@link IMethod}. May be {@code null} if the
    *         method should be removed (use {@link #remove()}).
    */
-  IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ? extends IMethodBodyBuilder<?>>> input);
+  IMethodGenerator<?, ?> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ?>> input);
 
   /**
    * Transforms an {@link IType} to an {@link ITypeGenerator}. Either the default working copy can be modified and

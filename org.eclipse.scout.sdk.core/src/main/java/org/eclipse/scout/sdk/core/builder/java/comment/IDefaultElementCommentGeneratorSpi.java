@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.builder.java.comment;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
@@ -51,21 +50,21 @@ public interface IDefaultElementCommentGeneratorSpi {
    *          The {@link IMethodGenerator} for which the default comment should be generated.
    * @return The {@link ISourceGenerator} that creates the default java comment for the given {@link IMethodGenerator}.
    */
-  ISourceGenerator<ICommentBuilder<?>> createMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target);
+  ISourceGenerator<ICommentBuilder<?>> createMethodComment(IMethodGenerator<?, ?> target);
 
   /**
    * @param target
    *          The getter {@link IMethodGenerator} for which the default comment should be generated.
    * @return The {@link ISourceGenerator} that creates the default java comment for the given {@link IMethodGenerator}.
    */
-  ISourceGenerator<ICommentBuilder<?>> createGetterMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target);
+  ISourceGenerator<ICommentBuilder<?>> createGetterMethodComment(IMethodGenerator<?, ?> target);
 
   /**
    * @param target
    *          The setter {@link IMethodGenerator} for which the default comment should be generated.
    * @return The {@link ISourceGenerator} that creates the default java comment for the given {@link IMethodGenerator}.
    */
-  ISourceGenerator<ICommentBuilder<?>> createSetterMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target);
+  ISourceGenerator<ICommentBuilder<?>> createSetterMethodComment(IMethodGenerator<?, ?> target);
 
   /**
    * @param target

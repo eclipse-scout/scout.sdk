@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.testing;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -38,17 +37,17 @@ public class TestingElementCommentGenerator implements IDefaultElementCommentGen
   }
 
   @Override
-  public ISourceGenerator<ICommentBuilder<?>> createMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
+  public ISourceGenerator<ICommentBuilder<?>> createMethodComment(IMethodGenerator<?, ?> target) {
     return b -> b.appendJavaDocComment("Default Testing Comment for\nMethod " + target.elementName().orElse(""));
   }
 
   @Override
-  public ISourceGenerator<ICommentBuilder<?>> createGetterMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
+  public ISourceGenerator<ICommentBuilder<?>> createGetterMethodComment(IMethodGenerator<?, ?> target) {
     return b -> b.appendJavaDocComment("Default Testing Comment for\nGetter " + target.elementName().orElse(""));
   }
 
   @Override
-  public ISourceGenerator<ICommentBuilder<?>> createSetterMethodComment(IMethodGenerator<?, ? extends IMethodBodyBuilder<?>> target) {
+  public ISourceGenerator<ICommentBuilder<?>> createSetterMethodComment(IMethodGenerator<?, ?> target) {
     return b -> b.appendJavaDocComment("Default Testing Comment for\nSetter " + target.elementName().orElse(""));
   }
 

@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -276,8 +277,8 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    * For this to work this {@link IMethodGenerator} must be added to a {@link ITypeGenerator} by using
    * {@link ITypeGenerator#withMethod(IMethodGenerator, Object...)}.
    * <p>
-   * If there is no declaring generator use {@link #withOverrideIfNecessary(boolean, Stream)} to explicitly specify the
-   * super types.
+   * If there is no declaring generator use {@link #withOverrideIfNecessary(boolean, IType)} to explicitly specify the
+   * declaring type.
    * 
    * @return This generator.
    */
@@ -297,11 +298,13 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    * @param withOverrideIfNecessary
    *          If {@code true} an {@link Override} annotation is added as required based on the super hierarchies of the
    *          given super types.
-   * @param superTypesToConsider
-   *          A {@link Stream} with the super types to check.
+   * @param declaringType
+   *          An {@link IType} to use to calculate if an {@link Override} annotation is necessary. This type is
+   *          considered to be the declaring type of this {@link IMethodGenerator}. Therefore only the super types of it
+   *          are searched to check if an override annotation is necessary.
    * @return This generator.
    */
-  TYPE withOverrideIfNecessary(boolean withOverrideIfNecessary, Stream<String> superTypesToConsider);
+  TYPE withOverrideIfNecessary(boolean withOverrideIfNecessary, IType declaringType);
 
   /**
    * @return {@code true} if this {@link IMethodGenerator} is configured to automatically add an {@link Override}
