@@ -53,6 +53,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironment, IProgress> {
 
   private static final Pattern IMPORT_PATTERN = Pattern.compile("import\\s+[\\w_.]+;");
+  public static final String CONVENIENCE_METHOD_MARKER_START = "/* ******************";
 
   private final List<IType> m_dataObjects = new ArrayList<>();
   private String m_lineSeparator;
@@ -186,6 +187,10 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
   protected Replacement toMethodDeleteReplacement(IJavaElement method, CharSequence cuSource) {
     var sourceRange = method.source().get();
     var methodStartOffset = sourceRange.start();
+    var pos = Strings.indexOf(CONVENIENCE_METHOD_MARKER_START, method.source().get().asCharSequence());
+    if (pos > 0) {
+      methodStartOffset += pos;
+    }
     while (methodStartOffset >= 1 && Character.isWhitespace(cuSource.charAt(methodStartOffset - 1))) {
       methodStartOffset--;
     }
@@ -239,7 +244,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
 
   protected String convenienceMethodsMarker() {
     return lineSeparator() + lineSeparator()
-        + "/* **************************************************************************" + lineSeparator()
+        + CONVENIENCE_METHOD_MARKER_START + "********************************************************" + lineSeparator()
         + "   * GENERATED CONVENIENCE METHODS" + lineSeparator()
         + "   * *************************************************************************/"
         + lineSeparator() + lineSeparator();

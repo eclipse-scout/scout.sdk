@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.dataobject;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertAnnotation;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperInterfaces;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import dataobject.ChildDo;
+import dataobject.ChildDoWithTypeArg;
 import dataobject.DoWithTypeParams;
 import dataobject.SampleDo;
 
@@ -41,6 +43,9 @@ import dataobject.SampleDo;
 @ExtendWith(ClassIdAutoCreationExtension.class)
 @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class))
 public class DoConvenienceMethodsUpdateOperationTest {
+
+  private static final String REF_FILE_FOLDER = "org/eclipse/scout/sdk/core/s/dataobject/";
+
   @Test
   public void testDo(TestingEnvironment env) {
     var javaEnvironment = env.primaryEnvironment();
@@ -55,6 +60,24 @@ public class DoConvenienceMethodsUpdateOperationTest {
 
     testApiOfChildDo(assertNoCompileErrors(childDo));
     testApiOfSampleDo(assertNoCompileErrors(sampleDo));
+  }
+
+  @Test
+  public void testWithTypeParametersAndOverride(TestingEnvironment env) {
+    var javaEnvironment = env.primaryEnvironment();
+    var childDoWithTypeArg = javaEnvironment.requireType(ChildDoWithTypeArg.class.getName());
+
+    new DoConvenienceMethodsUpdateOperation()
+        .withLineSeparator("\n")
+        .withDataObjects(singletonList(childDoWithTypeArg))
+        .accept(env, new NullProgress());
+    javaEnvironment.reload();
+
+    // checks the following:
+    // 1. The method 'public Long getId()' is moved down into the generated section
+    // 2. The single-line comment before the convenience method generated marker comment is preserved
+    // 3. The method 'public ChildDoWithTypeArg withId(Long id)' gets an override annotation
+    assertEqualsRefFile(REF_FILE_FOLDER + "WithTypeParametersAndOverride.txt", childDoWithTypeArg.requireCompilationUnit().source().get().asCharSequence());
   }
 
   @Test
