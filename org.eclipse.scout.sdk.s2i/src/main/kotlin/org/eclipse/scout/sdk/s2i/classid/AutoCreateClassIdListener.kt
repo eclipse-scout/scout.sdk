@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ class AutoCreateClassIdListener(val project: Project) : SettingsChangedListener,
 
     override fun changed(key: String, oldVal: String?, newVal: String?) {
         if (ScoutSettings.KEY_AUTO_CREATE_CLASS_ID == key) {
-            updateClassIdAutoGeneration(project)
+            updateClassIdAutoGeneration()
         }
     }
 
@@ -33,7 +33,7 @@ class AutoCreateClassIdListener(val project: Project) : SettingsChangedListener,
         ScoutSettings.removeListener(this)
     }
 
-    fun updateClassIdAutoGeneration(project: Project) {
+    fun updateClassIdAutoGeneration() {
         // the settings are retrieved from the project given
         // but as the ClassIds class does not support multiple different values the value from the first project is used for the moment
         // this might be wrong in case multiple projects are open having different classid generation settings
