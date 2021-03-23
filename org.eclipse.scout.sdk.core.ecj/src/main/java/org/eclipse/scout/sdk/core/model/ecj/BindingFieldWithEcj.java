@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -139,11 +139,10 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
       var decl = m_binding.sourceField();
-      if (decl != null) {
-        var cu = m_declaringType.getCompilationUnit();
-        return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+      if (decl == null) {
+        return null;
       }
-      return null;
+      return javaEnvWithEcj().getSource(m_declaringType.getCompilationUnit(), decl.declarationSourceStart, decl.declarationSourceEnd);
     });
   }
 
@@ -151,14 +150,10 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   public ISourceRange getSourceOfInitializer() {
     return m_initializerSource.computeIfAbsentAndGet(() -> {
       var decl = m_binding.sourceField();
-      if (decl != null) {
-        var expr = decl.initialization;
-        if (expr != null) {
-          var cu = m_declaringType.getCompilationUnit();
-          return javaEnvWithEcj().getSource(cu, expr.sourceStart, expr.sourceEnd);
-        }
+      if (decl == null) {
+        return null;
       }
-      return null;
+      return SpiWithEcjUtils.createSourceRange(decl.initialization, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
     });
   }
 
@@ -169,7 +164,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
       if (decl == null) {
         return null;
       }
-      return SpiWithEcjUtils.getJavaDocSource(decl.javadoc, m_declaringType, javaEnvWithEcj());
+      return SpiWithEcjUtils.createSourceRange(decl.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
     });
   }
 }

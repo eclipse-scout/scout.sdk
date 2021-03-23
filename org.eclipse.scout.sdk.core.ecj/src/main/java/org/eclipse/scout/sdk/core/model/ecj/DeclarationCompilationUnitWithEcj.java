@@ -236,7 +236,7 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
 
   @Override
   public ISourceRange getSource() {
-    return m_source.computeIfAbsentAndGet(() -> javaEnvWithEcj().getSource(this, m_astNode.sourceStart, m_astNode.sourceEnd));
+    return m_source.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createSourceRange(m_astNode, this, javaEnvWithEcj()));
   }
 
   @Override
@@ -244,14 +244,12 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
       var doc = m_astNode.javadoc;
       if (doc != null) {
-        return javaEnvWithEcj().getSource(this, doc.sourceStart, doc.sourceEnd);
+        return SpiWithEcjUtils.createSourceRange(doc, this, javaEnvWithEcj());
       }
-      else if (m_astNode.currentPackage != null && m_astNode.currentPackage.declarationSourceStart > 0) {
+      if (m_astNode.currentPackage != null && m_astNode.currentPackage.declarationSourceStart > 0) {
         return javaEnvWithEcj().getSource(this, 0, m_astNode.currentPackage.declarationSourceStart - 1);
       }
-      else {
-        return null;
-      }
+      return null;
     });
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -412,12 +412,11 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
     return m_staticInitSource.computeIfAbsentAndGet(() -> {
       if (m_binding instanceof SourceTypeBinding) {
         var decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
-        for (var fieldDecl : decl.fields) {
-          if (fieldDecl.type == null && fieldDecl.name == null) {
-            var cu = getCompilationUnit();
-            return javaEnvWithEcj().getSource(cu, fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd);
-          }
-        }
+        return Arrays.stream(decl.fields)
+            .filter(fieldDecl -> fieldDecl.type == null && fieldDecl.name == null)
+            .findAny()
+            .map(fieldDecl -> javaEnvWithEcj().getSource(getCompilationUnit(), fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd))
+            .orElse(null);
       }
       return null;
     });
@@ -428,11 +427,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
       if (m_binding instanceof SourceTypeBinding) {
         var decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
-        var doc = decl.javadoc;
-        if (doc != null) {
-          var cu = getCompilationUnit();
-          return javaEnvWithEcj().getSource(cu, doc.sourceStart, doc.sourceEnd);
-        }
+        return SpiWithEcjUtils.createSourceRange(decl.javadoc, getCompilationUnit(), javaEnvWithEcj());
       }
       return null;
     });

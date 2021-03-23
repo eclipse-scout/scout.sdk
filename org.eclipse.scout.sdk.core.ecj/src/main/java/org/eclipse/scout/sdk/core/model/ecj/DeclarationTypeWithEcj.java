@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -294,7 +294,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
       }
       return Arrays.stream(fields)
           .filter(fieldDecl -> fieldDecl.type == null && fieldDecl.name == null)
-          .findFirst()
+          .findAny()
           .map(fieldDecl -> javaEnvWithEcj().getSource(m_cu, fieldDecl.declarationSourceStart, fieldDecl.declarationSourceEnd))
           .orElse(null);
     });
@@ -302,13 +302,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public ISourceRange getJavaDoc() {
-    return m_javaDocSource.computeIfAbsentAndGet(() -> {
-      var doc = m_astNode.javadoc;
-      if (doc != null) {
-        return javaEnvWithEcj().getSource(m_cu, doc.sourceStart, doc.sourceEnd);
-      }
-      return null;
-    });
+    return m_javaDocSource.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createSourceRange(m_astNode.javadoc, m_cu, javaEnvWithEcj()));
   }
 
   @Override

@@ -81,6 +81,11 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
   }
 
   @Override
+  public Optional<ISourceRange> sourceOfDeclaration() {
+    return Optional.ofNullable(m_spi.getSourceOfDeclaration());
+  }
+
+  @Override
   public SuperMethodQuery superMethods() {
     return new SuperMethodQuery(this);
   }

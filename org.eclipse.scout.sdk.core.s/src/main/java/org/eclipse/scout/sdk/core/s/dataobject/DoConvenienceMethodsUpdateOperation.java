@@ -36,7 +36,6 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -184,11 +183,14 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return generatedValues.contains(ScoutAnnotationGenerator.DO_CONVENIENCE_METHODS_GENERATED_COMMENT);
   }
 
-  protected Replacement toMethodDeleteReplacement(IJavaElement method, CharSequence cuSource) {
+  protected Replacement toMethodDeleteReplacement(IMethod method, CharSequence cuSource) {
     var sourceRange = method.source().get();
     var methodStartOffset = sourceRange.start();
-    var pos = Strings.indexOf(CONVENIENCE_METHOD_MARKER_START, method.source().get().asCharSequence());
+
+    var declarationStartRelativeToMethodSource = method.sourceOfDeclaration().get().start() - sourceRange.start();
+    var pos = Strings.indexOf(CONVENIENCE_METHOD_MARKER_START, sourceRange.asCharSequence(), 0, declarationStartRelativeToMethodSource);
     if (pos > 0) {
+      // if a convenience marker comment start is found before the method declaration start
       methodStartOffset += pos;
     }
     while (methodStartOffset >= 1 && Character.isWhitespace(cuSource.charAt(methodStartOffset - 1))) {

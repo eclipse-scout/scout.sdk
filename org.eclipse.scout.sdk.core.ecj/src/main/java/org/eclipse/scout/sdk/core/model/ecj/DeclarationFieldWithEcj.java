@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -63,9 +63,9 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
       return null;
     }
     return newType.getFields().stream()
-          .filter(newField -> getElementName().equals(newField.getElementName()))
-          .findFirst()
-          .orElse(null);
+        .filter(newField -> getElementName().equals(newField.getElementName()))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
@@ -137,11 +137,7 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
 
   @Override
   public ISourceRange getSource() {
-    return m_source.computeIfAbsentAndGet(() -> {
-      var cu = m_declaringType.getCompilationUnit();
-      var decl = m_astNode;
-      return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
-    });
+    return m_source.computeIfAbsentAndGet(() -> javaEnvWithEcj().getSource(m_declaringType.getCompilationUnit(), m_astNode.declarationSourceStart, m_astNode.declarationSourceEnd));
   }
 
   @Override
@@ -152,24 +148,12 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
         // static initializer
         return javaEnvWithEcj().getSource(cu, m_astNode.declarationSourceStart, m_astNode.declarationSourceEnd);
       }
-
-      var decl = m_astNode.initialization;
-      if (decl == null) {
-        return null;
-      }
-      return javaEnvWithEcj().getSource(cu, decl.sourceStart, decl.sourceEnd);
+      return SpiWithEcjUtils.createSourceRange(m_astNode.initialization, cu, javaEnvWithEcj());
     });
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    return m_javaDocSource.computeIfAbsentAndGet(() -> {
-      var doc = m_astNode.javadoc;
-      if (doc == null) {
-        return null;
-      }
-      var cu = m_declaringType.getCompilationUnit();
-      return javaEnvWithEcj().getSource(cu, doc.sourceStart, doc.sourceEnd);
-    });
+    return m_javaDocSource.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createSourceRange(m_astNode.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj()));
   }
 }

@@ -72,6 +72,33 @@ public interface IMethod extends IMember {
    */
   Optional<ISourceRange> sourceOfBody();
 
+  /**
+   * Gets the {@link ISourceRange} of the method declaration.<br>
+   * This is the range from the method name to the end of the {@code throws} declaration.
+   * <p>
+   * Note: Preceding modifiers (e.g. like {@code public}), the return type, annotations or comments (like javadoc) are
+   * not part of the source range!
+   * <p>
+   * <br>
+   * <b>Example:</b><br>
+   * For the following method:
+   * 
+   * <pre>
+   * &#64;Override
+   * public static void myMethodName(int firstArg, String secondArg) throws IOException {
+   * }
+   * </pre>
+   * 
+   * The declaration source is
+   * 
+   * <pre>
+   * myMethodName(int firstArg, String secondArg) throws IOException
+   * </pre>
+   * 
+   * @return An Optional holding the source range of the method declaration section.
+   */
+  Optional<ISourceRange> sourceOfDeclaration();
+
   @Override
   MethodSpi unwrap();
 

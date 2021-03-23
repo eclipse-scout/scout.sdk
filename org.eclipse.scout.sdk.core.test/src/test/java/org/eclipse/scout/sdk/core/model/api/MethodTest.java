@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -140,13 +140,16 @@ public class MethodTest {
     var secondConstr = env.requireType(ClassWithConstructors.class.getName()).methods().item(1).get();
     assertFalse(secondConstr.returnType().isPresent());
     assertTrue(secondConstr.isConstructor());
+    assertEquals("ClassWithConstructors(String other) throws IOException", secondConstr.sourceOfDeclaration().get().asCharSequence().toString());
 
     var declarationType = env.requireType(ClassWithConstructors.class.getName()).requireCompilationUnit().types().first().get();
     assertTrue(declarationType.unwrap() instanceof DeclarationTypeWithEcj);
     assertEquals(2, declarationType.methods().stream().count());
+
     var declarationMethod = declarationType.methods().first().get();
     assertTrue(declarationMethod.isConstructor());
     assertFalse(declarationMethod.returnType().isPresent());
+    assertEquals("ClassWithConstructors() throws IOException", declarationMethod.sourceOfDeclaration().get().asCharSequence().toString());
 
     new CoreJavaEnvironmentBinaryOnlyFactory().accept(binEnv -> {
       binEnv.requireType(ClassWithConstructors.class.getName()).methods().item(1).get();

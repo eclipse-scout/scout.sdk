@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -198,8 +198,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
       if (decl == null) {
         return null;
       }
-      var cu = m_declaringType.getCompilationUnit();
-      return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
+      return javaEnvWithEcj().getSource(m_declaringType.getCompilationUnit(), decl.declarationSourceStart, decl.declarationSourceEnd);
     });
   }
 
@@ -210,8 +209,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
       if (decl == null) {
         return null;
       }
-      var cu = m_declaringType.getCompilationUnit();
-      return javaEnvWithEcj().getSource(cu, decl.bodyStart, decl.bodyEnd);
+      return javaEnvWithEcj().getSource(m_declaringType.getCompilationUnit(), decl.bodyStart, decl.bodyEnd);
     });
   }
 
@@ -222,7 +220,12 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
       if (decl == null) {
         return null;
       }
-      return SpiWithEcjUtils.getJavaDocSource(decl.javadoc, m_declaringType, javaEnvWithEcj());
+      return SpiWithEcjUtils.createSourceRange(decl.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
     });
+  }
+
+  @Override
+  public ISourceRange getSourceOfDeclaration() {
+    return SpiWithEcjUtils.createSourceRange(SpiWithEcjUtils.sourceMethodOf(m_binding), m_declaringType.getCompilationUnit(), javaEnvWithEcj());
   }
 }

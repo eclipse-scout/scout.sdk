@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,6 +81,7 @@ import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
+import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
@@ -163,12 +164,14 @@ public final class SpiWithEcjUtils {
         .collect(toList());
   }
 
-  static ISourceRange getJavaDocSource(ASTNode doc, TypeSpi declaringType, JavaEnvironmentWithEcj env) {
-    if (doc == null) {
+  static ISourceRange createSourceRange(ASTNode node, CompilationUnitSpi cu, JavaEnvironmentWithEcj env) {
+    if (node == null) {
       return null;
     }
-    var cu = declaringType.getCompilationUnit();
-    return env.getSource(cu, doc.sourceStart, doc.sourceEnd);
+    if (cu == null) {
+      return null;
+    }
+    return env.getSource(cu, node.sourceStart(), node.sourceEnd());
   }
 
   static MethodSpi findNewMethodIn(MethodSpi m) {

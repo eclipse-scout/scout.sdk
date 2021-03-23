@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -188,31 +188,21 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
 
   @Override
   public ISourceRange getSource() {
-    return m_source.computeIfAbsentAndGet(() -> {
-      var cu = m_declaringType.getCompilationUnit();
-      var decl = m_astNode;
-      return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
-    });
+    return m_source.computeIfAbsentAndGet(() -> javaEnvWithEcj().getSource(m_declaringType.getCompilationUnit(), m_astNode.declarationSourceStart, m_astNode.declarationSourceEnd));
   }
 
   @Override
   public ISourceRange getSourceOfBody() {
-    return m_bodySource.computeIfAbsentAndGet(() -> {
-      var cu = m_declaringType.getCompilationUnit();
-      var decl = m_astNode;
-      return javaEnvWithEcj().getSource(cu, decl.bodyStart, decl.bodyEnd);
-    });
+    return m_bodySource.computeIfAbsentAndGet(() -> javaEnvWithEcj().getSource(m_declaringType.getCompilationUnit(), m_astNode.bodyStart, m_astNode.bodyEnd));
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    return m_javaDocSource.computeIfAbsentAndGet(() -> {
-      var cu = m_declaringType.getCompilationUnit();
-      var doc = m_astNode.javadoc;
-      if (doc == null) {
-        return null;
-      }
-      return javaEnvWithEcj().getSource(cu, doc.sourceStart, doc.sourceEnd);
-    });
+    return m_javaDocSource.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createSourceRange(m_astNode.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj()));
+  }
+
+  @Override
+  public ISourceRange getSourceOfDeclaration() {
+    return SpiWithEcjUtils.createSourceRange(m_astNode, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
   }
 }
