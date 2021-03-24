@@ -30,10 +30,17 @@ import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.s.environment.*
-import org.eclipse.scout.sdk.core.util.*
+import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi
+import org.eclipse.scout.sdk.core.s.environment.AbstractEnvironment
+import org.eclipse.scout.sdk.core.s.environment.IFuture
+import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten
+import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
+import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.PropertySupport
+import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
@@ -159,7 +166,7 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
 
     protected fun getOrCreateEnv(module: Module): JavaEnvironmentWithIdea = m_envs.computeIfAbsent(module.name) { createNewJavaEnvironmentFor(module) }
 
-    protected fun createNewJavaEnvironmentFor(module: Module): JavaEnvironmentWithIdea = JavaEnvironmentWithIdea(module)
+    protected fun createNewJavaEnvironmentFor(module: Module): JavaEnvironmentWithIdea = initNewJavaEnvironment(JavaEnvironmentWithIdea(module))
 
     override fun runGenerator(generator: ISourceGenerator<ISourceBuilder<*>>, context: IJavaEnvironment, filePath: Path): StringBuilder {
         val env = context.unwrap() as JavaEnvironmentWithIdea
@@ -184,18 +191,12 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
 
     override fun doWriteCompilationUnit(code: CharSequence, cuInfo: CompilationUnitInfoWithClasspath, progress: IProgress?, sync: Boolean): IFuture<IType?> {
         val writer = CompilationUnitWriteOperation(project, code, cuInfo)
-        val supplier = lambda@{
-            val javaEnv = cuInfo.classpathEntry().javaEnvironment()
-            val reloadRequired = javaEnv.registerCompilationUnitOverride(cuInfo, code)
-            if (reloadRequired) {
-                javaEnv.reload()
-            }
-            javaEnv.findType(cuInfo.mainTypeFullyQualifiedName()).orElse(null)
-        }
-
+        val supplier = { registerCompilationUnit(writer.formattedSource /* use formatted source! better performance in array equals of JavaEnvironmentWithEcj.isLoadedInCompiler */, cuInfo) }
         if (sync) {
             return writer.run(progress.toIdea(), supplier)
         }
         return writer.schedule(supplier)
     }
+
+    override fun javaEnvironments(): MutableCollection<out JavaEnvironmentSpi> = m_envs.values
 }

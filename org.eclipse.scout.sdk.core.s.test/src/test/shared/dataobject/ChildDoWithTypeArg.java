@@ -40,5 +40,6 @@ public class ChildDoWithTypeArg extends AbstractBaseDoWithTypeParam<Long> {
 
   @Generated("DoConvenienceMethodsGenerator")
   public void oldAnnotatedMethodThatShouldBeRemoved(Long id) {
+    doValue("whatever" + id);
   }
 }

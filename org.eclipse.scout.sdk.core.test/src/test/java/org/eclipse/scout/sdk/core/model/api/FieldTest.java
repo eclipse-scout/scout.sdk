@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model.api;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.registerCompilationUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -46,9 +47,10 @@ public class FieldTest {
   @Test
   public void testJavaDocOnField(IJavaEnvironment env) {
     var javaDocSrc = "/** java doc */";
-    env.registerCompilationUnitOverride("abc", "JavaDocTestClass.java", "package abc;\npublic class JavaDocTestClass {\n" + javaDocSrc + "\nint a1;\n}");
-    var javaDoc = env.requireType("abc.JavaDocTestClass").requireCompilationUnit().requireMainType().fields().withName("a1").first().get().javaDoc().get();
+    var type = registerCompilationUnit(env, "package abc;\npublic class JavaDocTestClass {\n" + javaDocSrc + "\nint a1;\n}", "abc", "JavaDocTestClass");
+    var javaDoc = type.fields().withName("a1").first().get().javaDoc().get();
     assertEquals(javaDocSrc, javaDoc.asCharSequence().toString());
+
     env.reload();
     javaDoc = env.requireType("abc.JavaDocTestClass").requireCompilationUnit().requireMainType().fields().withName("a1").first().get().javaDoc().get();
     assertEquals(javaDocSrc, javaDoc.asCharSequence().toString());

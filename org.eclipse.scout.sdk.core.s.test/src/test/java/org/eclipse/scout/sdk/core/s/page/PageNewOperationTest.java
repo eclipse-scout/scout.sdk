@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,7 @@ public class PageNewOperationTest {
     var scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
 
     var pno = new PageNewOperation();
-    pno.setClientSourceFolder(env.getTestingSourceFolder());
+    pno.setClientSourceFolder(env.primarySourceFolder());
     pno.setPackage("org.eclipse.scout.sdk.s2e.client.test");
     String suffix;
     String superType;
@@ -61,16 +61,16 @@ public class PageNewOperationTest {
     pno.setPageName("My" + System.currentTimeMillis() + suffix);
     pno.setSuperType(superType);
     if (dtoSourceFolder) {
-      pno.setPageDataSourceFolder(env.getTestingSourceFolder());
+      pno.setPageDataSourceFolder(env.dtoSourceFolder());
     }
     if (serverSourceFolder) {
-      pno.setServerSourceFolder(env.getTestingSourceFolder());
+      pno.setServerSourceFolder(env.primarySourceFolder());
     }
     if (sharedSourceFolder) {
-      pno.setSharedSourceFolder(env.getTestingSourceFolder());
+      pno.setSharedSourceFolder(env.dtoSourceFolder());
     }
     if (testSourceFolder) {
-      pno.setTestSourceFolder(env.getTestingSourceFolder());
+      pno.setTestSourceFolder(env.primarySourceFolder());
     }
 
     env.run(pno);

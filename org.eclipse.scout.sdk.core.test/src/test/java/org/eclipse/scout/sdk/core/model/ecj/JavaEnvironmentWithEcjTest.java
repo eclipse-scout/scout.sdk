@@ -52,9 +52,11 @@ public class JavaEnvironmentWithEcjTest {
     var className = "Test";
     var closedEnv = createClosedJavaEnvironment();
     assertEnvironmentClosed(closedEnv);
-    closedEnv.registerCompilationUnitOverride(new CompilationUnitInfo(null, null, className + JavaTypes.JAVA_FILE_SUFFIX), ("package " + pck + "; public class " + className + " {}").toCharArray());
+    closedEnv.registerCompilationUnitOverride(("package " + pck + "; public class " + className + " {}").toCharArray(),
+        new CompilationUnitInfo(null, null, className + JavaTypes.JAVA_FILE_SUFFIX));
     assertEnvironmentClosed(closedEnv);
-    closedEnv.registerCompilationUnitOverride(new CompilationUnitInfo(null, pck, className + JavaTypes.JAVA_FILE_SUFFIX), ("package " + pck + "; public class " + className + " {}").toCharArray());
+    closedEnv.registerCompilationUnitOverride(("package " + pck + "; public class " + className + " {}").toCharArray(),
+        new CompilationUnitInfo(null, pck, className + JavaTypes.JAVA_FILE_SUFFIX));
 
     var fqn = pck + '.' + className;
     assertThrows(IllegalArgumentException.class, () -> closedEnv.findType(fqn));

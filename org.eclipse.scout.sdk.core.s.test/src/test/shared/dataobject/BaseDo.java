@@ -27,8 +27,8 @@ public abstract class BaseDo extends DoEntity {
     return doValue("enabled");
   }
 
-  public DoValue<Boolean> notANodeBecauseHasArg(int argument) {
-    return doValue("notANodeBecauseHasArg");
+  public DoValue<Boolean> notANodeBecauseHasArg(boolean argument) {
+    return doValue("notANodeBecauseHasArg" + argument);
   }
 
   protected DoValue<String> notANodeBecauseNotPublic() {

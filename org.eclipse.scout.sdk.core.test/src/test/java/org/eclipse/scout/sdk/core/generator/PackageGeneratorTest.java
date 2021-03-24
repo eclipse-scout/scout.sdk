@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.generator;
 
-import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.registerCompilationUnit;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 
@@ -50,7 +49,7 @@ public class PackageGeneratorTest {
                 .withElementName(PackageAnnotation.class.getName())
                 .withElement("testAttrib", Strings.toStringLiteral("testValue"))));
     assertEqualsRefFile(env, REF_FILE_FOLDER + "PackageGeneratorTest1.txt", generator);
-    assertNoCompileErrors(registerCompilationUnit(env, generator.packageName().get(), generator.elementName().get(), generator.toJavaSource(env)));
+    assertNoCompileErrors(env, generator);
   }
 
   @Test
@@ -58,7 +57,7 @@ public class PackageGeneratorTest {
     var testClass = env.requireType("org.eclipse.scout.sdk.core.fixture.sub.package-info");
     var generator = testClass.requireCompilationUnit().toWorkingCopy();
     assertEqualsRefFile(env, REF_FILE_FOLDER + "PackageGeneratorTest2.txt", generator);
-    assertNoCompileErrors(registerCompilationUnit(env, generator.packageName().get(), generator.elementName().get(), generator.toJavaSource(env)));
+    assertNoCompileErrors(env, generator);
   }
 
   @Test
@@ -72,7 +71,7 @@ public class PackageGeneratorTest {
         .toWorkingCopy(transformer)
         .withComment(null);
     assertEqualsRefFile(env, REF_FILE_FOLDER + "PackageGeneratorTest3.txt", generator);
-    assertNoCompileErrors(registerCompilationUnit(env, generator.packageName().get(), generator.elementName().get(), generator.toJavaSource(env)));
+    assertNoCompileErrors(env, generator);
   }
 
   private static ISourceGenerator<IExpressionBuilder<?>> transformAnnotationElement(ITransformInput<IAnnotationElement, ISourceGenerator<IExpressionBuilder<?>>> input) {

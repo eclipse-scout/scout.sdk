@@ -318,7 +318,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   @Override
-  public boolean registerCompilationUnitOverride(CompilationUnitInfo cuInfo, char[] src) {
+  public boolean registerCompilationUnitOverride(char[] src, CompilationUnitInfo cuInfo) {
     Ensure.notNull(cuInfo);
     Ensure.notNull(src);
 

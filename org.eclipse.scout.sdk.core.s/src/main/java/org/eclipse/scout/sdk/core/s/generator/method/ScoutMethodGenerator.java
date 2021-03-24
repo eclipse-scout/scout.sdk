@@ -51,11 +51,11 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
     super(method, transformer);
   }
 
-  public static IScoutMethodGenerator<?, ? extends IScoutMethodBodyBuilder<?>> create(IMethod method, IWorkingCopyTransformer transformer) {
+  public static IScoutMethodGenerator<?, ?> create(IMethod method, IWorkingCopyTransformer transformer) {
     return new ScoutMethodGenerator<>(method, transformer);
   }
 
-  public static IScoutMethodGenerator<?, ? extends IScoutMethodBodyBuilder<?>> create() {
+  public static IScoutMethodGenerator<?, ?> create() {
     return new ScoutMethodGenerator<>();
   }
 
@@ -68,7 +68,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
   /**
    * Creates an {@link IScoutMethodGenerator} which creates a form field getter of the form {@code public MyField
    * getMyField() { return getFieldByClass(MyField.class); }}
-   * 
+   *
    * @param fieldFqn
    *          The fully qualified name of the form field.
    * @return The created {@link IScoutMethodGenerator}.
@@ -86,7 +86,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
   /**
    * Creates a protected method that returns the text value of the given translation key of the form {@code @Override
    * protected methodName() { return TEXTS.get("nlsKeyName"); }}
-   * 
+   *
    * @param methodName
    *          The name of the method
    * @param nlsKeyName
@@ -122,7 +122,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
 
   /**
    * Creates a DoNode chained setter method of the form:
-   * 
+   *
    * <pre>
    * &#64;Generated
    * public OwnerClass withName(dataType name) {
@@ -130,9 +130,9 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    *   return this;
    * }
    * </pre>
-   * 
+   *
    * An {@link Override} annotation is added automatically if required.
-   * 
+   *
    * @param name
    *          The DoNode name used for the method name without the "with" prefix.
    * @param dataTypeReference
@@ -179,7 +179,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
 
   /**
    * Creates a DoList chained setter for collection values of the form:
-   * 
+   *
    * <pre>
    * &#64;Generated
    * public OwnerClass withName(Collection&#60;? extends dataType&#62; name) {
@@ -187,9 +187,9 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    *   return this;
    * }
    * </pre>
-   * 
+   *
    * An {@link Override} annotation is added automatically if required.
-   * 
+   *
    * @param name
    *          The DoNode name used for the method name without the "with" prefix.
    * @param dataTypeReference
@@ -242,16 +242,16 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
 
   /**
    * Creates a DoNode getter of the form:
-   * 
+   *
    * <pre>
    * &#64;Generated
    * public dataType getName() {
    *   return name().get();
    * }
    * </pre>
-   * 
+   *
    * An {@link Override} annotation is added automatically if required.
-   * 
+   *
    * @param name
    *          The DoNode name used for the method name without the "get" or "is" prefix.
    * @param returnTypeReference

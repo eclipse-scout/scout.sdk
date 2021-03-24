@@ -198,7 +198,7 @@ class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
                 .excludeIfContains("/org.jetbrains.kotlin/")
                 .excludeIfContains("/xml-apis/xml-apis/") // because also present in the JRE
                 .accept {
-                    assertNoCompileErrors(it, null, simpleName, source)
+                    assertNoCompileErrors(it, source, null, simpleName)
                 }
     }
 }

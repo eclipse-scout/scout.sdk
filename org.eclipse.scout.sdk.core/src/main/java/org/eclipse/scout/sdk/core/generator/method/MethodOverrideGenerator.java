@@ -198,7 +198,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
-    var declaring = (ITypeGenerator<?>) Ensure.instanceOf(declaringGenerator().orElse(null), ITypeGenerator.class, "Method can only be overridden if existing in a type.");
+    var declaring = Ensure.instanceOf(declaringGenerator().orElse(null), ITypeGenerator.class, "Method can only be overridden if existing in a type.");
     var javaEnvironment = builder.context().environment().orElseThrow(() -> newFail("Cannot override a method without java environment."));
     callWithTmpType(declaring, javaEnvironment, this::createOverrideGenerator)
         .ifPresent(overrideGenerator -> overrideGenerator.generate(builder));
@@ -228,7 +228,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
               .flatMap(Optional::stream))
           .toJavaSource(emptyCopy);
 
-      emptyCopy.registerCompilationUnitOverride(targetPackage, typeName + JavaTypes.JAVA_FILE_SUFFIX, tmpTypeSource);
+      emptyCopy.registerCompilationUnitOverride(tmpTypeSource, targetPackage, typeName + JavaTypes.JAVA_FILE_SUFFIX);
       var tmpType = emptyCopy.requireType(targetPackage + JavaTypes.C_DOT + typeName);
       return task.apply(tmpType);
     });

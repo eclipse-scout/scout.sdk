@@ -13,18 +13,25 @@ package org.eclipse.scout.sdk.core.s.environment;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 public abstract class AbstractEnvironment implements IEnvironment {
+
+  private final Map<CompilationUnitInfo, CharSequence> m_createdCompilationUnits = new ConcurrentHashMap<>();
 
   @Override
   public IType writeCompilationUnit(ICompilationUnitGenerator<?> generator, IClasspathEntry targetFolder) {
@@ -103,10 +110,48 @@ public abstract class AbstractEnvironment implements IEnvironment {
     return doWriteCompilationUnit(code, info, progress, sync);
   }
 
+  protected IType registerCompilationUnit(CharSequence code, CompilationUnitInfoWithClasspath cuInfo) {
+    // remember for future Java environments
+    m_createdCompilationUnits.put(cuInfo, code);
+
+    // register in existing environments
+    registerInJavaEnvironments(code, cuInfo);
+
+    return cuInfo
+        .classpathEntry()
+        .javaEnvironment()
+        .findType(cuInfo.mainTypeFullyQualifiedName())
+        .orElse(null);
+  }
+
+  protected void registerInJavaEnvironments(CharSequence code, CompilationUnitInfo cuInfo) {
+    var cuPath = cuInfo.targetFile();
+    javaEnvironments().stream()
+        .map(JavaEnvironmentSpi::wrap)
+        .filter(je -> je.classpathContains(cuPath))
+        .filter(je -> je.registerCompilationUnitOverride(code, cuInfo))
+        .forEach(IJavaEnvironment::reload);
+  }
+
+  protected <T extends JavaEnvironmentSpi> T initNewJavaEnvironment(T javaEnvironment) {
+    if (m_createdCompilationUnits.isEmpty()) {
+      return javaEnvironment;
+    }
+
+    var env = javaEnvironment.wrap();
+    m_createdCompilationUnits.entrySet().stream()
+        .filter(e -> env.classpathContains(e.getKey().targetFile()))
+        .forEach(e -> env.registerCompilationUnitOverride(e.getValue(), e.getKey()));
+    // no need to reload as it must be a new environment
+    return javaEnvironment;
+  }
+
   @Override
   public StringBuilder executeGenerator(ISourceGenerator<ISourceBuilder<?>> generator, IClasspathEntry targetFolder) {
     return runGenerator(generator, targetFolder.javaEnvironment(), targetFolder.path());
   }
+
+  protected abstract Collection<? extends JavaEnvironmentSpi> javaEnvironments();
 
   protected abstract StringBuilder runGenerator(ISourceGenerator<ISourceBuilder<?>> generator, IJavaEnvironment context, Path filePath);
 

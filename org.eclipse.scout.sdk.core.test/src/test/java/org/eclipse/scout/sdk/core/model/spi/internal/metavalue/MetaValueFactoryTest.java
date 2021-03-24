@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.MetaValueType;
 import org.eclipse.scout.sdk.core.model.ecj.metavalue.MetaValueFactory;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
@@ -101,7 +102,7 @@ public class MetaValueFactoryTest {
     var metaValue = MetaValueFactory.createFromAnnotation(annot.unwrap());
     assertSame(annot, metaValue.as(Object.class));
     assertSame(annot, metaValue.as(IAnnotation.class));
-    assertEquals(annot.unwrap(), metaValue.as(String.class));
+    assertEquals(annot.unwrap(), metaValue.as(AnnotationSpi.class));
     assertEquals(annot.toString(), metaValue.toString());
     assertEquals(MetaValueType.Annotation, metaValue.type());
   }

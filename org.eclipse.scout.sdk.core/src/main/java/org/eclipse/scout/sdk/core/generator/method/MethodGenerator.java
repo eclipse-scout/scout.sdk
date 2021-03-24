@@ -41,6 +41,7 @@ import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilde
 import org.eclipse.scout.sdk.core.builder.java.comment.JavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.MemberBuilder;
+import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
@@ -343,12 +344,10 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
           .anyMatch(t -> existsMethodInSuperHierarchy(t, methodId));
     }
 
-    var declaringGenerator = declaringGenerator().orElse(null);
+    //noinspection RedundantExplicitVariableType
+    IJavaElementGenerator<?> declaringGenerator = declaringGenerator().orElse(null);
     if (declaringGenerator instanceof ITypeGenerator) {
-      //noinspection rawtypes
-      var gen = (ITypeGenerator) declaringGenerator;
-      var declaringTypeGenerator = (ITypeGenerator<?>) gen;
-
+      var declaringTypeGenerator = (ITypeGenerator<?>) declaringGenerator;
       // use super types from declaring (surrounding) type generator
       return callWithTmpType(declaringTypeGenerator, javaEnvironment, t -> existsMethodInSuperHierarchy(t, methodId));
     }

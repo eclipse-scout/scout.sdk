@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -309,7 +309,7 @@ public final class ScoutTemplateProposalFactory {
       if (m_hasSearchString) {
         buf.insert(m_pos, AbstractTypeProposal.SEARCH_STRING_END_FIX);
       }
-      env.registerCompilationUnitOverride(pck, m_icu.getElementName(), buf);
+      env.registerCompilationUnitOverride(buf, pck, m_icu.getElementName());
 
       env.findType(m_icu.findPrimaryType().getFullyQualifiedName()); // pre-load
       return m_provider;

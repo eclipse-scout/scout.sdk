@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.AbstractBooleanPermutationArgumentsProvider;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutServerJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
@@ -37,7 +38,9 @@ public class LookupCallNewOperationTest {
   @DisplayName("Test LookupCall Creation")
   @ArgumentsSource(LookupCallTestArgumentsProvider.class)
   @ParameterizedTest(name = "withLookupService={0}, withServer={1}, withTest={2}")
-  @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutServerJavaEnvironmentFactory.class))
+  @ExtendWithTestingEnvironment(
+      primary = @ExtendWithJavaEnvironmentFactory(ScoutServerJavaEnvironmentFactory.class),
+      dto = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class))
   public void testLookupCallCreation(boolean lookupServiceSuperTypeFqn, boolean serverSourceFolder, boolean testSourceFolder, TestingEnvironment env) {
     var scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
 
@@ -49,12 +52,12 @@ public class LookupCallNewOperationTest {
     }
     op.setPackage("org.eclipse.scout.sdk.s2e.shared.test");
     if (serverSourceFolder) {
-      op.setServerSourceFolder(env.getTestingSourceFolder());
+      op.setServerSourceFolder(env.primarySourceFolder());
     }
-    op.setSharedSourceFolder(env.getTestingSourceFolder());
+    op.setSharedSourceFolder(env.dtoSourceFolder());
     op.setSuperType(scoutApi.LookupCall().fqn());
     if (testSourceFolder) {
-      op.setTestSourceFolder(env.getTestingSourceFolder());
+      op.setTestSourceFolder(env.primarySourceFolder());
     }
     op.setServerSession(scoutApi.IServerSession().fqn());
 

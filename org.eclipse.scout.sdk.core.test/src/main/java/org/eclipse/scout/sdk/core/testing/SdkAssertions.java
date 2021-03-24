@@ -63,18 +63,18 @@ public final class SdkAssertions {
    *
    * @param env
    *          The {@link IJavaEnvironment} to do the compilation.
+   * @param source
+   *          The source of the whole compilation unit of the given primary class.
    * @param qualifier
    *          The qualifier of the class (e.g. org.eclipse.scout.sdk.test)
    * @param simpleName
    *          The simple name of the class (e.g. MyClass)
-   * @param source
-   *          The source of the whole compilation unit of the given primary class.
    * @return The {@link IType} representing the given type and source.
    * @throws AssertionError
    *           if the given type has compile errors within the given {@link IJavaEnvironment}.
    */
-  public static IType assertNoCompileErrors(IJavaEnvironment env, String qualifier, String simpleName, CharSequence source) {
-    return assertNoCompileErrors(registerCompilationUnit(env, qualifier, simpleName, source));
+  public static IType assertNoCompileErrors(IJavaEnvironment env, CharSequence source, String qualifier, String simpleName) {
+    return assertNoCompileErrors(registerCompilationUnit(env, source, qualifier, simpleName));
   }
 
   /**

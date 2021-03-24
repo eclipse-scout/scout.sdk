@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,21 +43,21 @@ public class JavaEnvironmentTest {
         + "int a = 0;"
         + "}\n";
 
-    var reload = env.registerCompilationUnitOverride(packageName, fileName, firstSrc);
+    var reload = env.registerCompilationUnitOverride(firstSrc, packageName, fileName);
     assertFalse(reload);
     var testClass = env.requireType(packageName + ".TestClass");
     assertFalse(testClass.fields().existsAny());
 
-    reload = env.registerCompilationUnitOverride(packageName, fileName, firstSrc);
+    reload = env.registerCompilationUnitOverride(firstSrc, packageName, fileName);
     assertFalse(reload);
 
-    reload = env.registerCompilationUnitOverride(packageName, fileName, secondSrc);
+    reload = env.registerCompilationUnitOverride(secondSrc, packageName, fileName);
     assertTrue(reload);
     assertFalse(testClass.fields().existsAny());
     env.reload();
     assertTrue(testClass.fields().existsAny());
 
-    reload = env.registerCompilationUnitOverride(packageName, fileName, secondSrc);
+    reload = env.registerCompilationUnitOverride(secondSrc, packageName, fileName);
     assertFalse(reload);
   }
 
@@ -83,7 +83,7 @@ public class JavaEnvironmentTest {
     var longType = env.requireType(Long.class.getName());
     assertFalse(longType.fields().withName("a").existsAny());
 
-    assertTrue(env.registerCompilationUnitOverride(packageName, fileName, firstSrc));
+    assertTrue(env.registerCompilationUnitOverride(firstSrc, packageName, fileName));
     env.reload();
     assertTrue(longType.fields().withName("a").existsAny());
   }

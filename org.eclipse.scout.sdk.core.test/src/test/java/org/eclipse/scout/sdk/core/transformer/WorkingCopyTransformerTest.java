@@ -424,7 +424,12 @@ public class WorkingCopyTransformerTest {
       }
     };
     var generator = baseType.toWorkingCopy(removeAllAnnotationsTransformer);
-    generator.mainType().get().withElementName("OtherClass"); // change the name so that the original class is not changed in the IJavaEnvironment. Otherwise it is modified for later tests
+
+    // change the name so that the original class is not changed in the IJavaEnvironment. Otherwise it is modified for later tests
+    var newClassName = "OtherClass";
+    generator.mainType().get().withElementName(newClassName);
+    generator.withElementName(newClassName);
+
     var baseTypeWithoutAnnotations = assertNoCompileErrors(env, generator);
     assertEquals(0, numberOfAnnotationsIn(baseTypeWithoutAnnotations));
   }

@@ -33,6 +33,8 @@ import java.nio.file.Path
 
 open class CompilationUnitWriteOperation(val project: Project, val source: CharSequence, val cuInfo: CompilationUnitInfo) {
 
+    lateinit var formattedSource: String
+
     fun run(progress: IdeaProgress, resultSupplier: () -> IType?): IFuture<IType?> {
         doWriteCompilationUnit(progress)
         return SdkFuture.completed(resultSupplier, null)
@@ -57,7 +59,9 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
 
         formatAndOptimizeImports(newPsi, progress)
 
-        TransactionManager.current().register(CompilationUnitWriter(cuInfo.targetFile(), newPsi, newPsi.text /* create source here to have the transaction member as short as possible */))
+        formattedSource = newPsi.text /* create source here to have the transaction member as short as possible (is executed in ui thread) */
+
+        TransactionManager.current().register(CompilationUnitWriter(cuInfo.targetFile(), newPsi, formattedSource))
     }
 
     protected fun formatAndOptimizeImports(psi: PsiFile, progress: IdeaProgress) = computeInReadAction(project) {

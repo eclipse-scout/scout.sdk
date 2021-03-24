@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ public class PermissionNewOperationTest {
     var op = new PermissionNewOperation();
     op.setPackage("org.eclipse.scout.sdk.s2e.shared.test");
     op.setPermissionName("My" + ISdkConstants.SUFFIX_PERMISSION);
-    op.setSharedSourceFolder(env.getTestingSourceFolder());
+    op.setSharedSourceFolder(env.primarySourceFolder());
     op.setSuperType(scoutApi.AbstractPermission().fqn());
     env.run(op);
     assertNotNull(op.getCreatedPermission());

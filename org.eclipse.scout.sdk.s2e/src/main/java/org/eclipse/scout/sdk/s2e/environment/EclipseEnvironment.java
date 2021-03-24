@@ -15,6 +15,7 @@ import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWo
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.runWithWorkingCopyManager;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,29 +92,7 @@ public class EclipseEnvironment extends AbstractEnvironment implements AutoClose
     var sourceFolder = cuInfo.classpathEntry();
     var packageFragmentRoot = ((ClasspathWithJdt) sourceFolder.unwrap()).getRoot();
     var writeIcu = new CompilationUnitWriteOperation(packageFragmentRoot, cuInfo.packageName(), cuInfo.fileName(), source);
-    return doRunResourceTask(writeIcu, () -> {
-      var compilationUnit = writeIcu.getCreatedCompilationUnit();
-      if (compilationUnit == null) {
-        return null; // may happen if the asynchronous write operation is canceled
-      }
-
-      String formattedSource;
-      try {
-        formattedSource = compilationUnit.getSource();
-      }
-      catch (JavaModelException e) {
-        throw new SdkException(e);
-      }
-
-      // return primary type
-      var jdtType = compilationUnit.getType(cuInfo.mainTypeSimpleName());
-      var env = sourceFolder.javaEnvironment();
-      var reloadRequired = env.registerCompilationUnitOverride(cuInfo, formattedSource);
-      if (reloadRequired) {
-        env.reload();
-      }
-      return toScoutType(jdtType, env.unwrap());
-    }, toScoutProgress(progress), sync);
+    return doRunResourceTask(writeIcu, () -> registerCompilationUnit(writeIcu.getFormattedSource()/*use formatted source here*/, cuInfo), toScoutProgress(progress), sync);
   }
 
   protected IJavaProject jdtJavaProjectOf(IJavaEnvironment env) {
@@ -233,7 +212,7 @@ public class EclipseEnvironment extends AbstractEnvironment implements AutoClose
   }
 
   protected JavaEnvironmentWithJdt createNewJavaEnvironmentFor(IJavaProject jdtProject) {
-    return new JavaEnvironmentWithJdt(jdtProject);
+    return initNewJavaEnvironment(new JavaEnvironmentWithJdt(jdtProject));
   }
 
   @Override
@@ -375,6 +354,11 @@ public class EclipseEnvironment extends AbstractEnvironment implements AutoClose
     catch (JavaModelException e) {
       throw new SdkException(e);
     }
+  }
+
+  @Override
+  protected Collection<? extends JavaEnvironmentSpi> javaEnvironments() {
+    return m_envs.values();
   }
 
   public static IFuture<Void> runInEclipseEnvironment(BiConsumer<? super EclipseEnvironment, ? super EclipseProgress> task) {

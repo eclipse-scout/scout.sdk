@@ -37,14 +37,14 @@ public final class CoreTestingUtils {
    *
    * @param env
    *          The {@link IJavaEnvironment} in which the compilation unit should be registered as override (see
-   *          {@link IJavaEnvironment#registerCompilationUnitOverride(String, String, CharSequence)}.
+   *          {@link IJavaEnvironment#registerCompilationUnitOverride(CharSequence, String, String)}.
    * @param generator
    *          The {@link ICompilationUnitGenerator} that builds the source.
    * @return The {@link IType} that corresponds to the main type of the specified {@link ICompilationUnitGenerator}.
    */
   public static IType registerCompilationUnit(IJavaEnvironment env, ICompilationUnitGenerator<?> generator) {
     var src = Ensure.notNull(generator).toJavaSource(Ensure.notNull(env));
-    return registerCompilationUnit(env, generator.packageName().orElse(null), generator.mainType().get().elementName().get(), src);
+    return registerCompilationUnit(env, src, generator.packageName().orElse(null), generator.elementName().get());
   }
 
   /**
@@ -52,17 +52,17 @@ public final class CoreTestingUtils {
    *
    * @param env
    *          The {@link IJavaEnvironment} in which the override should be registered.
+   * @param source
+   *          The source of the compilation unit.
    * @param qualifier
    *          The package qualifier of the compilation unit or {@code null} for the default package.
    * @param simpleName
    *          The simple name of the compilation unit (this is the Java file name without file extension. Corresponds to
    *          the name of the main type).
-   * @param source
-   *          The source of the compilation unit.
    * @return The {@link IType} that corresponds to the main type of the specified {@link ICompilationUnitGenerator}.
    */
-  public static IType registerCompilationUnit(IJavaEnvironment env, String qualifier, String simpleName, CharSequence source) {
-    return registerCompilationUnit(env, qualifier, simpleName, source, null);
+  public static IType registerCompilationUnit(IJavaEnvironment env, CharSequence source, String qualifier, String simpleName) {
+    return registerCompilationUnit(env, source, qualifier, simpleName, null);
   }
 
   /**
@@ -70,20 +70,20 @@ public final class CoreTestingUtils {
    *
    * @param env
    *          The {@link IJavaEnvironment} in which the override should be registered.
+   * @param source
+   *          The source of the compilation unit.
    * @param qualifier
    *          The package qualifier of the compilation unit or {@code null} for the default package.
    * @param simpleName
    *          The simple name of the compilation unit (this is the Java file name without file extension. Corresponds to
    *          the name of the main type).
-   * @param source
-   *          The source of the compilation unit.
    * @param sourceFolder
    *          The source folder to which the compilation unit belongs. May be {@code null}.
    * @return The {@link IType} that corresponds to the main type of the specified {@link ICompilationUnitGenerator}.
    */
-  public static IType registerCompilationUnit(IJavaEnvironment env, String qualifier, String simpleName, CharSequence source, Path sourceFolder) {
+  public static IType registerCompilationUnit(IJavaEnvironment env, CharSequence source, String qualifier, String simpleName, Path sourceFolder) {
     var cuInfo = new CompilationUnitInfo(sourceFolder, qualifier, simpleName + JavaTypes.JAVA_FILE_SUFFIX);
-    var reloadRequired = env.registerCompilationUnitOverride(cuInfo, source);
+    var reloadRequired = env.registerCompilationUnitOverride(source, cuInfo);
     if (reloadRequired) {
       env.reload();
     }

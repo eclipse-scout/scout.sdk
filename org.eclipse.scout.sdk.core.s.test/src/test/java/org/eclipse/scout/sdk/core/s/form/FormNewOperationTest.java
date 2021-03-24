@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,20 +47,20 @@ public class FormNewOperationTest {
     var scoutApi = env.primaryEnvironment().requireApi(IScoutApi.class);
     var fno = new FormNewOperation();
     fno.setClientPackage("org.eclipse.scout.sdk.s2e.client.test");
-    fno.setClientSourceFolder(env.getTestingSourceFolder());
+    fno.setClientSourceFolder(env.primarySourceFolder());
     if (sourceFolderClientTest) {
-      fno.setClientTestSourceFolder(env.getTestingSourceFolder());
+      fno.setClientTestSourceFolder(env.primarySourceFolder());
     }
     fno.setCreateFormData(isCreateFormData);
     fno.setCreatePermissions(isCreatePermissions);
     fno.setCreateService(isCreateService);
-    fno.setFormDataSourceFolder(env.getTestingSourceFolder());
+    fno.setFormDataSourceFolder(env.dtoSourceFolder());
     fno.setFormName("My" + ISdkConstants.SUFFIX_FORM);
-    fno.setServerSourceFolder(env.getTestingSourceFolder());
+    fno.setServerSourceFolder(env.primarySourceFolder());
     if (sourceFolderServerTest) {
-      fno.setServerTestSourceFolder(env.getTestingSourceFolder());
+      fno.setServerTestSourceFolder(env.primarySourceFolder());
     }
-    fno.setSharedSourceFolder(env.getTestingSourceFolder());
+    fno.setSharedSourceFolder(env.dtoSourceFolder());
     fno.setSuperType(scoutApi.AbstractForm().fqn());
 
     env.run(fno);

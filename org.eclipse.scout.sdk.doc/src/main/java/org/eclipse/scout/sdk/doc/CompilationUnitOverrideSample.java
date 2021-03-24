@@ -29,8 +29,8 @@ public class CompilationUnitOverrideSample {
         .withElementName(className)
         .withAllMethodsImplemented()
         .toJavaSource(javaEnvironment);
-    var requiresReload = javaEnvironment.registerCompilationUnitOverride(packageName,
-        className + JavaTypes.JAVA_FILE_SUFFIX, source); // <2>
+    var requiresReload = javaEnvironment.registerCompilationUnitOverride(source,
+        packageName, className + JavaTypes.JAVA_FILE_SUFFIX); // <2>
     if (requiresReload) {
       javaEnvironment.reload(); // <3>
     }

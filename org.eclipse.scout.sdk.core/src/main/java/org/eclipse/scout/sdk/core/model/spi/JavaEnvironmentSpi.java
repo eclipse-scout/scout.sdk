@@ -48,7 +48,7 @@ public interface JavaEnvironmentSpi {
   /**
    * Register an override for a (possibly) existing compilation unit.
    */
-  boolean registerCompilationUnitOverride(CompilationUnitInfo cuInfo, char[] src);
+  boolean registerCompilationUnitOverride(char[] src, CompilationUnitInfo cuInfo);
 
   /**
    * @param fqn

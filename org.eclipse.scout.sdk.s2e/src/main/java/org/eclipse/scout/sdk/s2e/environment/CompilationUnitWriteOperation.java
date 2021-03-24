@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.operation.OrganizeImportOperation;
 import org.eclipse.scout.sdk.s2e.operation.SourceFormatOperation;
@@ -60,8 +61,23 @@ public class CompilationUnitWriteOperation implements IResourceWriteOperation {
     m_content = Ensure.notNull(content);
   }
 
+  /**
+   * @return The created compilation unit
+   */
   public ICompilationUnit getCreatedCompilationUnit() {
     return m_createdCompilationUnit;
+  }
+
+  /**
+   * @return The formatted source of the created compilation unit.
+   */
+  public String getFormattedSource() {
+    try {
+      return getCreatedCompilationUnit().getSource();
+    }
+    catch (JavaModelException e) {
+      throw new SdkException("Source of created compilation unit '{}' cannot be computed.", getFileName(), e);
+    }
   }
 
   @Override
@@ -111,16 +127,16 @@ public class CompilationUnitWriteOperation implements IResourceWriteOperation {
     }
   }
 
-  protected String getSourceFormatted(String unformattedJavaSource, IJavaProject settings, EclipseProgress progress) {
+  protected String getSourceFormatted(String rawJavaSource, IJavaProject settings, EclipseProgress progress) {
     try {
-      var op = new SourceFormatOperation(settings, new Document(unformattedJavaSource));
+      var op = new SourceFormatOperation(settings, new Document(rawJavaSource));
       op.accept(progress.newChild(10));
       return op.getDocument().get();
     }
     catch (RuntimeException e) {
       // if source format fails: still write compilation unit
       SdkLog.warning("Unable to format source of compilation unit '{}'.", getFileName(), e);
-      return unformattedJavaSource;
+      return rawJavaSource;
     }
   }
 

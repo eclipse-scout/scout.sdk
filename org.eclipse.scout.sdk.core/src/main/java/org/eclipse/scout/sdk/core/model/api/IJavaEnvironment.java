@@ -183,7 +183,7 @@ public interface IJavaEnvironment {
    * <p>
    * All {@link IJavaElement}s remain valid (if they still exist) and are updated with the new state of the file system
    * including optional overrides that were registered using
-   * {@link #registerCompilationUnitOverride(String, String, CharSequence)}
+   * {@link #registerCompilationUnitOverride(CharSequence, String, String)}
    */
   void reload();
 
@@ -196,17 +196,17 @@ public interface IJavaEnvironment {
    * <p>
    * In all other cases it is recommended to call {@link #reload()}
    *
+   * @param source
+   *          A {@link CharSequence} holding the compilation unit source. Must not be {@code null}.
    * @param packageName
    *          The package name of the compilation unit. Use {@code null} for the default package.
    * @param fileName
    *          The filename of the compilation unit (e.g. MyClass.java). Must not be {@code null} or empty.
-   * @param source
-   *          A {@link CharSequence} holding the compilation unit source. Must not be {@code null}.
    * @return {@code true} if a type with given fully qualified name was already loaded and a call to {@link #reload()}
    *         would therefore be necessary so that the given type becomes active. {@code false} if the given type has not
    *         been used yet.
    */
-  boolean registerCompilationUnitOverride(String packageName, String fileName, CharSequence source);
+  boolean registerCompilationUnitOverride(CharSequence source, String packageName, String fileName);
 
   /**
    * Register an override for a (possibly) existing compilation unit.
@@ -217,19 +217,19 @@ public interface IJavaEnvironment {
    * <p>
    * In all other cases it is recommended to call {@link #reload()}
    *
+   * @param source
+   *          A {@link CharSequence} holding the compilation unit source. Must not be {@code null}.
    * @param sourceFolder
    *          The source folder in which the new compilation unit should be registered. May be {@code null}.
    * @param packageName
    *          The package name of the compilation unit. Use {@code null} for the default package.
    * @param fileName
    *          The filename of the compilation unit (e.g. MyClass.java). Must not be {@code null} or empty.
-   * @param source
-   *          A {@link CharSequence} holding the compilation unit source. Must not be {@code null}.
    * @return {@code true} if a type with given fully qualified name was already loaded and a call to {@link #reload()}
    *         would therefore be necessary so that the given type becomes active. {@code false} if the given type has not
    *         been used yet.
    */
-  boolean registerCompilationUnitOverride(Path sourceFolder, String packageName, String fileName, CharSequence source);
+  boolean registerCompilationUnitOverride(CharSequence source, Path sourceFolder, String packageName, String fileName);
 
   /**
    * Register an override for a (possibly) existing compilation unit.
@@ -240,15 +240,15 @@ public interface IJavaEnvironment {
    * <p>
    * In all other cases it is recommended to call {@link #reload()}
    *
-   * @param cuInfo
-   *          The {@link CompilationUnitInfo} holding information about name and location. Must not be {@code null}.
    * @param source
    *          A {@link CharSequence} holding the compilation unit source. Must not be {@code null}.
+   * @param cuInfo
+   *          The {@link CompilationUnitInfo} holding information about name and location. Must not be {@code null}.
    * @return {@code true} if a type with given fully qualified name was already loaded and a call to {@link #reload()}
    *         would therefore be necessary so that the given type becomes active. {@code false} if the given type has not
    *         been used yet.
    */
-  boolean registerCompilationUnitOverride(CompilationUnitInfo cuInfo, CharSequence source);
+  boolean registerCompilationUnitOverride(CharSequence source, CompilationUnitInfo cuInfo);
 
   /**
    * Unwraps the {@link IJavaEnvironment} into its underlying SPI class.
@@ -294,6 +294,15 @@ public interface IJavaEnvironment {
    *         entries returned by the stream are the same as used by the {@link IJavaEnvironment}.
    */
   Stream<IClasspathEntry> classpath();
+
+  /**
+   * Checks if the given {@link Path} is part of the classpath of this {@link IJavaEnvironment}.
+   * 
+   * @param path
+   *          The {@link Path} to check.
+   * @return {@code true} if the {@link Path} given is in the classpath of this {@link IJavaEnvironment}.
+   */
+  boolean classpathContains(Path path);
 
   /**
    * A {@link Stream} with all {@link IClasspathEntry}s that are source folders (see

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -221,7 +221,7 @@ public class WebServiceNewOperationTest {
 
     if (!isCreateNewModule) {
       op.setProjectRoot(jaxWsModule);
-      op.setSourceFolder(env.getTestingSourceFolder());
+      op.setSourceFolder(env.primarySourceFolder());
     }
     op.setPackage(pck);
     env.run(op);

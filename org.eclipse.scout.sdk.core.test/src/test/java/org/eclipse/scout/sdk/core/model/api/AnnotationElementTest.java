@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -115,8 +115,7 @@ public class AnnotationElementTest {
     var annotationName = AnnotationWithSingleValues.class.getName();
     var elementName = "num";
 
-    var myClass = registerCompilationUnit(env, "test", "MyClass",
-        "@" + annotationName + "() public class MyClass {}");
+    var myClass = registerCompilationUnit(env, "@" + annotationName + "() public class MyClass {}", "test", "MyClass");
 
     var elements = myClass.annotations().withName(annotationName).first().get().elements();
     assertEquals(5, elements.size());

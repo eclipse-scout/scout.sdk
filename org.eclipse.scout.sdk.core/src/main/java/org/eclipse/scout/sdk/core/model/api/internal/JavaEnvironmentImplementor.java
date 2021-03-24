@@ -127,18 +127,18 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
-  public boolean registerCompilationUnitOverride(String packageName, String fileName, CharSequence source) {
-    return registerCompilationUnitOverride(null, packageName, fileName, source);
+  public boolean registerCompilationUnitOverride(CharSequence source, String packageName, String fileName) {
+    return registerCompilationUnitOverride(source, null, packageName, fileName);
   }
 
   @Override
-  public boolean registerCompilationUnitOverride(Path sourceFolder, String packageName, String fileName, CharSequence source) {
-    return registerCompilationUnitOverride(new CompilationUnitInfo(sourceFolder, packageName, fileName), source);
+  public boolean registerCompilationUnitOverride(CharSequence source, Path sourceFolder, String packageName, String fileName) {
+    return registerCompilationUnitOverride(source, new CompilationUnitInfo(sourceFolder, packageName, fileName));
   }
 
   @Override
-  public boolean registerCompilationUnitOverride(CompilationUnitInfo cuInfo, CharSequence source) {
-    return m_spi.registerCompilationUnitOverride(cuInfo, toCharArray(source));
+  public boolean registerCompilationUnitOverride(CharSequence source, CompilationUnitInfo cuInfo) {
+    return m_spi.registerCompilationUnitOverride(toCharArray(source), cuInfo);
   }
 
   @Override
@@ -155,6 +155,16 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   public Stream<IClasspathEntry> classpath() {
     return m_spi.getClasspath().stream()
         .map(ClasspathSpi::wrap);
+  }
+
+  @Override
+  public boolean classpathContains(Path path) {
+    if (path == null) {
+      return false;
+    }
+    return m_spi.getClasspath().stream()
+        .map(ClasspathSpi::getPath)
+        .anyMatch(path::startsWith);
   }
 
   @Override
