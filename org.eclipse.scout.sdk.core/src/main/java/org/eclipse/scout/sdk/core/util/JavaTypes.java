@@ -26,7 +26,12 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
+import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
+import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 
 /**
  * <h3>{@link JavaTypes}</h3>
@@ -430,6 +435,22 @@ public final class JavaTypes {
     }
 
     return erasure.subSequence(lastSegmentStart, erasure.length()).toString();
+  }
+
+  /**
+   * Returns an unique identifier for a method with given name and given parameter types. The identifier looks like
+   * '{@code methodName(dataTypeOfParam1,dataTypeOfParam2)}'.
+   * 
+   * @param method
+   *          The method for which the identifier should be computed. Must not be {@code null}.
+   * @return The created identifier
+   */
+  public static String createMethodIdentifier(MethodSpi method) {
+    var paramTypeNames = method.getParameters().stream()
+        .map(MethodParameterSpi::getDataType)
+        .map(TypeSpi::getName)
+        .collect(Collectors.toList());
+    return JavaTypes.createMethodIdentifier(method.getElementName(), paramTypeNames);
   }
 
   /**

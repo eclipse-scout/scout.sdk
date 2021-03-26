@@ -12,12 +12,14 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
@@ -26,13 +28,13 @@ import org.eclipse.jdt.internal.compiler.lookup.MissingTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.ProblemReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.Scope;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.CompilationUnitImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -67,18 +69,25 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
     m_containingClasspathFolder = new FinalValue<>();
   }
 
-  protected static TypeSpi findTypeBySimpleNameInternal(String simpleName, Scope scopeForTypeLookup, JavaEnvironmentWithEcj env) {
+  protected TypeSpi findTypeBySimpleNameInternal(String simpleName, Scope scopeForTypeLookup) {
     var type = scopeForTypeLookup.getType(simpleName.toCharArray());
     if (type instanceof MissingTypeBinding || type instanceof ProblemReferenceBinding) {
       return null;
     }
-    return SpiWithEcjUtils.bindingToType(env, type);
+    Function<DeclarationCompilationUnitWithEcj, TypeBinding> innerTypeFunc = cu -> {
+      var t = ((AbstractTypeWithEcj) cu.findTypeBySimpleName(simpleName));
+      if (t == null) {
+        return null;
+      }
+      return t.getInternalBinding();
+    };
+    return bindingToType(javaEnvWithEcj(), type, () -> withNewElement(innerTypeFunc));
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public CompilationUnitSpi internalFindNewElement() {
     return getTypes().stream()
-        .map(oldType -> (TypeSpi) oldType.internalFindNewElement())
+        .map(DeclarationTypeWithEcj::internalFindNewElement)
         .filter(Objects::nonNull)
         .findFirst()
         .map(TypeSpi::getCompilationUnit)
@@ -149,7 +158,7 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
 
   @Override
   public TypeSpi findTypeBySimpleName(String simpleName) {
-    var result = findTypeBySimpleNameInternal(simpleName, m_astNode.scope, javaEnvWithEcj());
+    var result = findTypeBySimpleNameInternal(simpleName, m_astNode.scope);
     if (result != null) {
       return result;
     }
@@ -169,7 +178,7 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
       return null;
     }
     var stb = (SourceTypeBinding) b;
-    var result = findTypeBySimpleNameInternal(simpleName, stb.scope, javaEnvWithEcj());
+    var result = findTypeBySimpleNameInternal(simpleName, stb.scope);
     if (result != null) {
       return result;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingsToTypes;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.ast.Expression;
@@ -23,7 +27,6 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeParameterImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
@@ -71,7 +74,7 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public TypeParameterSpi internalFindNewElement() {
     var newMember = (MemberSpi) getDeclaringMember().internalFindNewElement();
     if (newMember != null && newMember.getTypeParameters().size() > m_index) {
       return newMember.getTypeParameters().get(m_index);
@@ -90,34 +93,42 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
 
   @Override
   public List<TypeSpi> getBounds() {
-    return m_bounds.computeIfAbsentAndGet(() -> {
-      var hasType = m_astNode.type != null;
-      var hasBounds = m_astNode.bounds != null && m_astNode.bounds.length > 0;
-      var size = 0;
-      if (hasType) {
-        size++;
+    return m_bounds.computeIfAbsentAndGet(this::computeBounds);
+  }
+
+  protected List<TypeSpi> computeBounds() {
+    var hasType = m_astNode.type != null;
+    var hasBounds = m_astNode.bounds != null && m_astNode.bounds.length > 0;
+    var size = 0;
+    if (hasType) {
+      size++;
+    }
+    if (hasBounds) {
+      size += m_astNode.bounds.length;
+    }
+    List<TypeSpi> bounds = new ArrayList<>(size);
+    if (hasType) {
+      var t = bindingToType(javaEnvWithEcj(), resolveType(this), () -> withNewElement(this::resolveType));
+      if (t != null) {
+        bounds.add(t);
       }
-      if (hasBounds) {
-        size += m_astNode.bounds.length;
-      }
-      List<TypeSpi> result = new ArrayList<>(size);
-      var scope = SpiWithEcjUtils.memberScopeOf(this);
-      if (hasType) {
-        var t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), ensureResolvedType(scope, m_astNode.type));
-        if (t != null) {
-          result.add(t);
-        }
-      }
-      if (hasBounds) {
-        for (var r : m_astNode.bounds) {
-          var t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), ensureResolvedType(scope, r));
-          if (t != null) {
-            result.add(t);
-          }
-        }
-      }
-      return result;
-    });
+    }
+    if (hasBounds) {
+      bounds.addAll(bindingsToTypes(javaEnvWithEcj(), resolveBounds(this), () -> withNewElement(this::resolveBounds)));
+    }
+    return bounds;
+  }
+
+  protected TypeBinding resolveType(DeclarationTypeParameterWithEcj parameter) {
+    var scope = SpiWithEcjUtils.memberScopeOf(parameter);
+    return ensureResolvedType(scope, parameter.m_astNode.type);
+  }
+
+  protected TypeBinding[] resolveBounds(DeclarationTypeParameterWithEcj parameter) {
+    var scope = SpiWithEcjUtils.memberScopeOf(parameter);
+    return Arrays.stream(parameter.m_astNode.bounds)
+        .map(b -> ensureResolvedType(scope, b))
+        .toArray(TypeBinding[]::new);
   }
 
   @Override

@@ -19,7 +19,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.StringTokenizer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
@@ -28,6 +30,7 @@ import org.eclipse.jdt.internal.compiler.ast.ASTNode;
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.AllocationExpression;
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
+import org.eclipse.jdt.internal.compiler.ast.Argument;
 import org.eclipse.jdt.internal.compiler.ast.ArrayInitializer;
 import org.eclipse.jdt.internal.compiler.ast.CharLiteral;
 import org.eclipse.jdt.internal.compiler.ast.ClassLiteralAccess;
@@ -78,6 +81,7 @@ import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.ecj.metavalue.MetaValueFactory;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.spi.AbstractSpiElement;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
@@ -88,7 +92,9 @@ import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public final class SpiWithEcjUtils {
 
@@ -112,47 +118,33 @@ public final class SpiWithEcjUtils {
     return result;
   }
 
-  static TypeSpi bindingToInnerType(JavaEnvironmentWithEcj env, TypeBinding primaryTypeBinding, String innerTypes) {
-    if (primaryTypeBinding == null) {
-      return null;
-    }
-
-    var result = bindingToType(env, primaryTypeBinding);
-
-    // it is an inner type: step into
-    var st = new StringTokenizer(innerTypes, "$", false);
-    while (st.hasMoreTokens()) {
-      var name = st.nextToken();
-
-      var innerType = result.getTypes().stream()
-          .filter(t -> t.getElementName().equals(name))
-          .findFirst()
-          .orElse(null);
-      if (innerType == null) {
-        return null;
-      }
-      result = innerType;
-    }
-    return result;
+  static List<TypeSpi> bindingsToTypes(JavaEnvironmentWithEcj env, TypeBinding[] bindings, Supplier<TypeBinding[]> newElementLookupStrategy) {
+    return bindingsToTypes(env, bindings, null, newElementLookupStrategy);
   }
 
-  static List<TypeSpi> bindingsToTypes(JavaEnvironmentWithEcj env, ReferenceBinding[] exceptions) {
-    if (exceptions == null || exceptions.length < 1) {
+  static List<TypeSpi> bindingsToTypes(JavaEnvironmentWithEcj env, TypeBinding[] bindings, TypeSpi declaringType, Supplier<TypeBinding[]> newElementLookupStrategy) {
+    if (bindings == null || bindings.length < 1) {
       return emptyList();
     }
-    return Arrays.stream(exceptions)
-        .map(r -> bindingToType(env, r))
+
+    BiFunction<TypeBinding[], char[], TypeBinding> selector = (newBindings, key) -> newBindings == null ? null
+        : Arrays.stream(newBindings)
+            .filter(b -> Strings.equals(b.signableName(), key))
+            .findAny().orElse(null);
+
+    return Arrays.stream(bindings)
+        .map(binding -> bindingToType(env, binding, declaringType, () -> selector.apply(newElementLookupStrategy.get(), binding.signableName())))
         .filter(Objects::nonNull)
         .collect(toList());
   }
 
   //public only for junit testing purposes
-  static TypeSpi bindingToType(JavaEnvironmentWithEcj env, TypeBinding b) {
-    return bindingToType(env, b, null);
+  static TypeSpi bindingToType(JavaEnvironmentWithEcj env, TypeBinding b, Supplier<? extends TypeBinding> newElementLookupStrategy) {
+    return bindingToType(env, b, null, newElementLookupStrategy);
   }
 
-  static TypeSpi bindingToType(JavaEnvironmentWithEcj env, TypeBinding b, BindingTypeWithEcj declaringType) {
-    return bindingToType(env, b, declaringType, false);
+  static TypeSpi bindingToType(JavaEnvironmentWithEcj env, TypeBinding b, TypeSpi declaringType, Supplier<? extends TypeBinding> newElementLookupStrategy) {
+    return bindingToType(env, b, declaringType, false, newElementLookupStrategy);
   }
 
   static List<TypeParameterSpi> toTypeParameterSpi(TypeParameter[] typeParams, AbstractMemberWithEcj<?> method, JavaEnvironmentWithEcj env) {
@@ -174,20 +166,84 @@ public final class SpiWithEcjUtils {
     return env.getSource(cu, node.sourceStart(), node.sourceEnd());
   }
 
-  static MethodSpi findNewMethodIn(MethodSpi m) {
-    var declaringType = (AbstractJavaElementWithEcj<?>) m.getDeclaringType();
-    var newType = (TypeSpi) declaringType.internalFindNewElement();
-    if (newType != null) {
-      var oldSig = m.wrap().identifier();
-      return newType.getMethods().stream()
-          .filter(newM -> oldSig.equals(newM.wrap().identifier()))
-          .findFirst()
-          .orElse(null);
+  static AnnotationSpi findNewAnnotationIn(AnnotatableSpi owner, String typeName) {
+    var newOwner = (AnnotatableSpi) ((AbstractSpiElement<?>) owner).internalFindNewElement();
+    if (newOwner == null) {
+      return null;
     }
-    return null;
+    // currently only annotations directly on the owner are supported. nested annotations cannot be resolved at the moment
+    return newOwner.getAnnotations().stream()
+        .filter(a -> typeName.equals(a.getElementName()))
+        .findAny()
+        .orElse(null);
   }
 
-  static TypeSpi bindingToType(JavaEnvironmentWithEcj env, TypeBinding b, BindingTypeWithEcj declaringType, boolean isWildCard) {
+  static AnnotationElementSpi findNewAnnotationElementIn(AnnotationSpi annotation, String name) {
+    var newDeclaringAnnotation = (AnnotationSpi) ((AbstractSpiElement<?>) annotation).internalFindNewElement();
+    if (newDeclaringAnnotation == null) {
+      return null;
+    }
+    return newDeclaringAnnotation.getValues().get(name);
+  }
+
+  static MethodSpi findNewMethodIn(TypeSpi declaringType, String methodId) {
+    var newType = (TypeSpi) ((AbstractSpiElement<?>) declaringType).internalFindNewElement();
+    if (newType == null) {
+      return null;
+    }
+
+    return newType.getMethods().stream()
+        .filter(newM -> methodId.equals(newM.getMethodId()))
+        .findFirst()
+        .orElse(null);
+  }
+
+  static String qualifiedNameOf(char[] pck, char[] sourceName) {
+    var pckLen = pck.length;
+    var hasPackage = pckLen > 0;
+    var fqnLength = pckLen + sourceName.length;
+    if (hasPackage) {
+      fqnLength++;
+    }
+    var fqn = new char[fqnLength];
+    var nameInsertPos = 0;
+
+    // package name
+    if (hasPackage) {
+      System.arraycopy(pck, 0, fqn, 0, pckLen);
+      fqn[pckLen] = JavaTypes.C_DOT;
+      nameInsertPos = pckLen + 1;
+    }
+
+    // class names (e.g. MyClass.Inner.Inner2)
+    System.arraycopy(sourceName, 0, fqn, nameInsertPos, sourceName.length);
+
+    // replace . to $ for nested classes
+    for (var i = nameInsertPos; i < fqn.length; i++) {
+      if (fqn[i] == JavaTypes.C_DOT) {
+        fqn[i] = JavaTypes.C_DOLLAR;
+      }
+    }
+    return new String(fqn);
+  }
+
+  static TypeBinding resolveTypeOfArgument(Argument argument, BlockScope scope, AbstractJavaEnvironment env) {
+    var type = argument.type;
+    var result = type.resolvedType;
+    if (result != null) {
+      return result;
+    }
+
+    synchronized (env.lock()) {
+      type.resolveType(scope);
+    }
+    return type.resolvedType;
+  }
+
+  static TypeSpi bindingToType(JavaEnvironmentWithEcj env, TypeBinding b, TypeSpi declaringType, boolean isWildCard, Supplier<? extends TypeBinding> newElementLookupStrategy) {
+    if (b == null) {
+      return null;
+    }
     if (b instanceof VoidTypeBinding) {
       return env.createVoidType();
     }
@@ -198,21 +254,17 @@ public final class SpiWithEcjUtils {
         // wildcard only binding: <?>
         return env.createWildcardOnlyType();
       }
-      return bindingToType(env, allBounds, declaringType, true);
+      return bindingToType(env, allBounds, declaringType, true, newElementLookupStrategy);
     }
     if (b instanceof ReferenceBinding) {
       // reference to complex type
-      return env.createBindingType((ReferenceBinding) b, declaringType, isWildCard);
+      return env.createBindingType((ReferenceBinding) b, declaringType, isWildCard, () -> (ReferenceBinding) newElementLookupStrategy.get());
     }
     if (b instanceof BaseTypeBinding) {
       return env.createBindingBaseType((BaseTypeBinding) b);
     }
     if (b instanceof ArrayBinding) {
-      return env.createBindingArrayType((ArrayBinding) b, isWildCard);
-    }
-
-    if (b == null) {
-      throw new IllegalArgumentException("TypeBinding cannot be null");
+      return env.createBindingArrayType((ArrayBinding) b, isWildCard, () -> (ArrayBinding) newElementLookupStrategy.get());
     }
     throw new IllegalStateException("Unsupported binding type: " + b.getClass().getName());
   }
@@ -548,7 +600,7 @@ public final class SpiWithEcjUtils {
    * wrapped inside a {@link AnnotationElementSpi}
    */
   @SuppressWarnings("pmd:NPathComplexity")
-  static IMetaValue resolveCompiledValue(JavaEnvironmentWithEcj env, AnnotatableSpi owner, Object compiledValue) {
+  static IMetaValue resolveCompiledValue(JavaEnvironmentWithEcj env, AnnotatableSpi owner, Object compiledValue, Supplier<Object> compiledValueSupplier) {
     if (compiledValue == null || Constant.NotAConstant.equals(compiledValue)) {
       return null;
     }
@@ -561,12 +613,12 @@ public final class SpiWithEcjUtils {
     }
     if (compiledValue instanceof TypeBinding) {
       // type
-      return MetaValueFactory.createFromType(bindingToType(env, (TypeBinding) compiledValue));
+      return MetaValueFactory.createFromType(bindingToType(env, (TypeBinding) compiledValue, () -> (TypeBinding) compiledValueSupplier.get()));
     }
     if (compiledValue instanceof FieldBinding) {
       // enum constants
       var fb = (FieldBinding) compiledValue;
-      var type = bindingToType(env, fb.declaringClass);
+      var type = bindingToType(env, fb.declaringClass, () -> withNewElement(FieldBinding.class, f -> f.declaringClass, compiledValueSupplier));
       var name = new String(fb.name);
       for (var f : type.getFields()) {
         if (f.getElementName().equals(name)) {
@@ -586,12 +638,31 @@ public final class SpiWithEcjUtils {
       var metaArray = new IMetaValue[n];
       if (n > 0) {
         metaArray = IntStream.range(0, n)
-            .mapToObj(i -> resolveCompiledValue(env, owner, Array.get(compiledValue, i)))
+            .mapToObj(i -> resolveCompiledValue(env, owner, getElementFromArray(compiledValue, i), () -> withNewElement(Object.class, t -> getElementFromArray(t, i), compiledValueSupplier)))
             .toArray(IMetaValue[]::new);
       }
       return MetaValueFactory.createArray(metaArray);
     }
     return MetaValueFactory.createUnknown(compiledValue);
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T, R> R withNewElement(Class<T> type, Function<T, R> bla, Supplier<Object> valueSupplier) {
+    var val = valueSupplier.get();
+    if (val == null) {
+      return null;
+    }
+    if (!type.isInstance(val)) {
+      return null;
+    }
+    return bla.apply((T) val);
+  }
+
+  static Object getElementFromArray(Object arr, int i) {
+    if (i >= Array.getLength(arr)) {
+      return null;
+    }
+    return Array.get(arr, i);
   }
 
   static int getTypeIdForLiteral(Literal l) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,13 @@
  */
 package org.eclipse.scout.sdk.core.model.spi;
 
+import static java.util.stream.Collectors.groupingBy;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
@@ -35,10 +38,12 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
   private final Map<String, Object> m_typeCache;
   private final JavaEnvironmentImplementor m_api;
   private final Object m_instanceLock;
+  private final Map<AbstractJavaElementImplementor<JavaElementSpi>, Object> m_detachedApis;
 
   protected AbstractJavaEnvironment() {
     m_instanceLock = new Object();
-    m_typeCache = new ConcurrentHashMap<>();
+    m_typeCache = new HashMap<>();
+    m_detachedApis = new WeakHashMap<>();
     //noinspection ThisEscapedInObjectConstruction
     m_api = new JavaEnvironmentImplementor(this);
     m_hashSeq = new AtomicInteger();
@@ -57,7 +62,7 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
   public TypeSpi findType(String fqn) {
     var elem = m_typeCache.get(fqn); // fast check without synchronizing
     if (elem == null) {
-      synchronized (lock()) { // do not use computeIfAbsent outside the instance lock because the map uses its own lock which might lead to deadlocks
+      synchronized (lock()) {
         elem = m_typeCache.computeIfAbsent(fqn, this::doFindTypeInternal);
       }
     }
@@ -120,17 +125,39 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
     synchronized (lock()) {
       // this includes all TypeSPIs as well. So no need to include m_typeCache from here.
       Iterable<JavaElementSpi> detachedSpiElements = new ArrayList<>(allElements()); // create a new list here because the elements are cleared afterwards in reinitialize
-      onReloadStart();
+
+      // includes all previously detached APIs including a reference to an SPI element that belongs to the currently closing compiler instance.
+      var detachedApisBySpi = m_detachedApis
+          .keySet().stream()
+          .collect(groupingBy(IJavaElement::unwrap));
+
       try {
+        onReloadStart();
         // reconnect all new SPI/API mappings
         for (var old : detachedSpiElements) {
           var oldSpiElement = (AbstractSpiElement<? extends IJavaElement>) old;
-          var apiElement = (AbstractJavaElementImplementor<JavaElementSpi>) oldSpiElement.wrap();
-          var newSpiElement = oldSpiElement.internalFindNewElement();
+          var apiElement = (AbstractJavaElementImplementor<JavaElementSpi>) oldSpiElement.getExistingApi(); // do not call wrap() to never create a new one
+          if (apiElement == null) {
+            continue; // there is no api element. no need to resolve it anymore
+          }
 
+          var newSpiElement = oldSpiElement.internalFindNewElement();
           apiElement.internalSetSpi(newSpiElement);
           if (newSpiElement != null) {
-            ((AbstractSpiElement<IJavaElement>) newSpiElement).internalSetApi(apiElement);
+            var newAbsSpiElement = (AbstractSpiElement<IJavaElement>) newSpiElement;
+            var previousApi = (AbstractJavaElementImplementor<JavaElementSpi>) newAbsSpiElement.internalSetApi(apiElement);
+            if (previousApi != null && previousApi != apiElement) {
+              // An existing API has been overwritten. This would mean it is getting lost (the next reload cannot find it anymore and would not refresh its SPI).
+              // To prevent this: remember for future reloads
+              // This may happen if the internalFindNewElement returns the same new element for different old SPI elements.
+              // Usually such collisions should not happen.
+              m_detachedApis.put(previousApi, null);
+            }
+          }
+
+          var detachedApisToUpdate = detachedApisBySpi.get(oldSpiElement);
+          if (detachedApisToUpdate != null && !detachedApisToUpdate.isEmpty()) {
+            detachedApisToUpdate.forEach(api -> api.internalSetSpi(newSpiElement));
           }
 
           oldSpiElement.internalSetApi(null); // detach old SPI from API

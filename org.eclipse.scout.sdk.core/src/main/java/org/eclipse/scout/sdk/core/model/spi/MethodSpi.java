@@ -10,12 +10,14 @@
  */
 package org.eclipse.scout.sdk.core.model.spi;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.IBreadthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
@@ -45,6 +47,12 @@ public interface MethodSpi extends MemberSpi {
    * @return a {@link List} containing all thrown {@link TypeSpi}s of this {@link MethodSpi}.
    */
   List<TypeSpi> getExceptionTypes();
+
+  /**
+   * @return The method identifier without type arguments (type erasure only)
+   * @see JavaTypes#createMethodIdentifier(CharSequence, Collection)
+   */
+  String getMethodId();
 
   /**
    * Gets if this method is a constructor.

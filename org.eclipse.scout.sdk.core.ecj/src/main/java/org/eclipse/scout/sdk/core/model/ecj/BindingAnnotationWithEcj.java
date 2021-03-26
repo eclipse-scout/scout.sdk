@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,14 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
@@ -29,7 +32,6 @@ import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -53,9 +55,8 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
-    //not supported
-    return null;
+  public AnnotationSpi internalFindNewElement() {
+    return SpiWithEcjUtils.findNewAnnotationIn(getOwner(), getElementName());
   }
 
   @Override
@@ -69,7 +70,10 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
 
   @Override
   public TypeSpi getType() {
-    return m_type.computeIfAbsentAndGet(() -> SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), m_binding.getAnnotationType()));
+    return m_type.computeIfAbsentAndGet(() -> {
+      Function<BindingAnnotationWithEcj, ReferenceBinding> annotationTypeFunction = a -> a.m_binding.getAnnotationType();
+      return bindingToType(javaEnvWithEcj(), annotationTypeFunction.apply(this), () -> withNewElement(annotationTypeFunction));
+    });
   }
 
   private static <T> Map<T, Integer> buildPositionsMap(Collection<T> collection) {

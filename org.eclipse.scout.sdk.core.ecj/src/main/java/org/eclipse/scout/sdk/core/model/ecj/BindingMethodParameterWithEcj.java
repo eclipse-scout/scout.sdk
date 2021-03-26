@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Collections.emptyList;
 
 import java.util.List;
+import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.lookup.AnnotationBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
@@ -20,7 +21,6 @@ import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.MethodParameterImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
@@ -55,7 +55,7 @@ public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IM
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public MethodParameterSpi internalFindNewElement() {
     var newMethod = (MethodSpi) getDeclaringMethod().internalFindNewElement();
     if (newMethod != null && newMethod.getParameters().size() > m_index) {
       return newMethod.getParameters().get(m_index);
@@ -79,7 +79,10 @@ public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IM
 
   @Override
   public TypeSpi getDataType() {
-    return m_dataType.computeIfAbsentAndGet(() -> SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), m_binding));
+    return m_dataType.computeIfAbsentAndGet(() -> {
+      Function<BindingMethodParameterWithEcj, TypeBinding> dataTypeFunc = mp -> mp.m_binding;
+      return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), dataTypeFunc.apply(this), () -> withNewElement(dataTypeFunc));
+    });
   }
 
   @Override

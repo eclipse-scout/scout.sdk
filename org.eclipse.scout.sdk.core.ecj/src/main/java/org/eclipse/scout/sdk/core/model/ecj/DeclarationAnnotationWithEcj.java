@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,10 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static org.eclipse.scout.sdk.core.model.ecj.BindingAnnotationWithEcj.buildAnnotationElementMap;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 
 import java.util.Map;
+import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
@@ -23,7 +25,6 @@ import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -34,8 +35,7 @@ import org.eclipse.scout.sdk.core.util.FinalValue;
 public class DeclarationAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnotation> implements AnnotationSpi {
   private final AnnotatableSpi m_owner;
   private final Annotation m_astNode;
-  private final TypeBinding m_typeBinding;
-  private final FinalValue<Map<String, AnnotationElementSpi>> m_values;//sorted
+  private final FinalValue<Map<String, AnnotationElementSpi>> m_values; // sorted
   private final FinalValue<TypeSpi> m_type;
   private final FinalValue<ISourceRange> m_source;
 
@@ -43,16 +43,14 @@ public class DeclarationAnnotationWithEcj extends AbstractJavaElementWithEcj<IAn
     super(env);
     m_astNode = Ensure.notNull(astNode);
     m_owner = Ensure.notNull(owner);
-    m_typeBinding = m_astNode.type.resolveType(SpiWithEcjUtils.classScopeOf(m_owner));
     m_values = new FinalValue<>();
     m_type = new FinalValue<>();
     m_source = new FinalValue<>();
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
-    //not supported
-    return null;
+  public AnnotationSpi internalFindNewElement() {
+    return SpiWithEcjUtils.findNewAnnotationIn(getOwner(), getElementName());
   }
 
   @Override
@@ -66,7 +64,10 @@ public class DeclarationAnnotationWithEcj extends AbstractJavaElementWithEcj<IAn
 
   @Override
   public TypeSpi getType() {
-    return m_type.computeIfAbsentAndGet(() -> SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), m_typeBinding));
+    return m_type.computeIfAbsentAndGet(() -> {
+      Function<DeclarationAnnotationWithEcj, TypeBinding> annotationTypeFunction = a -> a.m_astNode.type.resolveType(SpiWithEcjUtils.classScopeOf(a.getOwner()));
+      return bindingToType(javaEnvWithEcj(), annotationTypeFunction.apply(this), () -> withNewElement(annotationTypeFunction));
+    });
   }
 
   @Override

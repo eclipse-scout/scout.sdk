@@ -13,15 +13,16 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Collections.emptyList;
 
 import java.util.List;
+import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.FieldImplementor;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -57,7 +58,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public FieldSpi internalFindNewElement() {
     var newType = (TypeSpi) getDeclaringType().internalFindNewElement();
     if (newType == null) {
       return null;
@@ -93,7 +94,10 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
 
   @Override
   public TypeSpi getDataType() {
-    return m_type.computeIfAbsentAndGet(() -> SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), m_binding.type));
+    return m_type.computeIfAbsentAndGet(() -> {
+      Function<BindingFieldWithEcj, TypeBinding> dataTypeFunc = f -> f.m_binding.type;
+      return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), dataTypeFunc.apply(this), () -> withNewElement(dataTypeFunc));
+    });
   }
 
   @Override
@@ -109,20 +113,24 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   @Override
   public IMetaValue getConstantValue() {
     return m_constRef.computeIfAbsentAndGet(() -> {
-      var resolvedValue = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, m_binding.constant());
+      Function<BindingFieldWithEcj, Object> constantFunction = f -> f.m_binding.constant();
+      var resolvedValue = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, constantFunction.apply(this), () -> withNewElement(constantFunction));
       if (resolvedValue != null) {
         return resolvedValue;
       }
-
-      var origBinding = m_binding.original();
-      var refBinding = origBinding.declaringClass;
-      if (refBinding instanceof SourceTypeBinding) {
-        var stb = (SourceTypeBinding) refBinding;
-        var initEx = stb.scope.referenceContext.declarationOf(origBinding).initialization;
-        return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, SpiWithEcjUtils.compileExpression(initEx, SpiWithEcjUtils.classScopeOf(this), javaEnvWithEcj()));
-      }
-      return null;
+      return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, resolveExpressionOf(this), () -> withNewElement(this::resolveExpressionOf));
     });
+  }
+
+  protected Object resolveExpressionOf(BindingFieldWithEcj field) {
+    var origBinding = field.m_binding.original();
+    var refBinding = origBinding.declaringClass;
+    if (refBinding instanceof SourceTypeBinding) {
+      var stb = (SourceTypeBinding) refBinding;
+      var initEx = stb.scope.referenceContext.declarationOf(origBinding).initialization;
+      return SpiWithEcjUtils.compileExpression(initEx, stb.scope, javaEnvWithEcj());
+    }
+    return null;
   }
 
   @Override

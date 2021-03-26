@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import org.eclipse.scout.sdk.core.model.api.internal.ImportImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.ImportSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
 /**
@@ -43,7 +42,7 @@ public class DeclarationImportWithEcj extends AbstractJavaElementWithEcj<IImport
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public ImportSpi internalFindNewElement() {
     var newCu = (CompilationUnitSpi) getCompilationUnit().internalFindNewElement();
     if (newCu == null) {
       return null;

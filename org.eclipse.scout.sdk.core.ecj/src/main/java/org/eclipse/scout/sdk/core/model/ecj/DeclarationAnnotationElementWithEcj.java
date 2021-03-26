@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.model.ecj;
+
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.resolveCompiledValue;
+
+import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
@@ -20,7 +24,6 @@ import org.eclipse.scout.sdk.core.model.ecj.metavalue.MetaValueFactory;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
 /**
@@ -47,9 +50,8 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
-    //not supported
-    return null;
+  public AnnotationElementSpi internalFindNewElement() {
+    return SpiWithEcjUtils.findNewAnnotationElementIn(getDeclaringAnnotation(), getElementName());
   }
 
   @Override
@@ -65,16 +67,20 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
   @Override
   public IMetaValue getMetaValue() {
     return m_value.computeIfAbsentAndGet(() -> {
-      var scope = SpiWithEcjUtils.classScopeOf(m_declaringAnnotation.getOwner());
-      var compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.value, scope, javaEnvWithEcj());
-      var value = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), compiledValue);
+      Function<DeclarationAnnotationElementWithEcj, Object> valueFunc = this::resolveExpressionOf;
+      var compiledValue = valueFunc.apply(this);
+      var value = resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), compiledValue, () -> withNewElement(valueFunc));
       if (value != null) {
         return value;
       }
-
       // value cannot be determined. use unknown because annotation values cannot be null.
       return MetaValueFactory.createUnknown(compiledValue);
     });
+  }
+
+  protected Object resolveExpressionOf(DeclarationAnnotationElementWithEcj element) {
+    var scope = SpiWithEcjUtils.classScopeOf(element.getDeclaringAnnotation().getOwner());
+    return SpiWithEcjUtils.compileExpression(element.m_astNode.value, scope, javaEnvWithEcj());
   }
 
   @Override

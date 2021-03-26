@@ -11,18 +11,21 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.compileExpression;
 
 import java.util.List;
+import java.util.function.Function;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.Initializer;
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.FieldImplementor;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -57,7 +60,7 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public FieldSpi internalFindNewElement() {
     var newType = (TypeSpi) getDeclaringType().internalFindNewElement();
     if (newType == null) {
       return null;
@@ -85,8 +88,8 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   @Override
   public IMetaValue getConstantValue() {
     return m_constRef.computeIfAbsentAndGet(() -> {
-      var compiledValue = SpiWithEcjUtils.compileExpression(m_astNode.initialization, null, javaEnvWithEcj());
-      return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, compiledValue);
+      Function<DeclarationFieldWithEcj, Object> constantValueFunc = f -> compileExpression(f.m_astNode.initialization, null, javaEnvWithEcj());
+      return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, constantValueFunc.apply(this), () -> withNewElement(constantValueFunc));
     });
   }
 
@@ -94,16 +97,20 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   public TypeSpi getDataType() {
     return m_type.computeIfAbsentAndGet(() -> {
       if (m_astNode.type == null) {
-        //static{ } section
+        // static { } section
         return javaEnvWithEcj().createVoidType();
       }
-      var tb = m_astNode.type.resolvedType;
-      if (tb == null) {
-        synchronized (javaEnvWithEcj().lock()) {
-          tb = m_astNode.type.resolveType(SpiWithEcjUtils.classScopeOf(this));
+
+      Function<DeclarationFieldWithEcj, TypeBinding> dataTypeFunc = fd -> {
+        var tb = fd.m_astNode.type.resolvedType;
+        if (tb != null) {
+          return tb;
         }
-      }
-      return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), tb);
+        synchronized (javaEnvWithEcj().lock()) {
+          return fd.m_astNode.type.resolveType(SpiWithEcjUtils.classScopeOf(fd));
+        }
+      };
+      return bindingToType(javaEnvWithEcj(), dataTypeFunc.apply(this), () -> withNewElement(dataTypeFunc));
     });
   }
 

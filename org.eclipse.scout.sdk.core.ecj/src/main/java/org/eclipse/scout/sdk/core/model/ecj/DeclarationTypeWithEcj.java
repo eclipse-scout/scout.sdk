@@ -12,14 +12,17 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingsToTypes;
 
-import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
+import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
+import org.eclipse.jdt.internal.compiler.lookup.Binding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeConstants;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
@@ -27,14 +30,12 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   private final CompilationUnitSpi m_cu;
@@ -80,7 +81,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public TypeSpi internalFindNewElement() {
     var newSpi = getJavaEnvironment().findType(getName());
     if (newSpi == null) {
       return null;
@@ -128,30 +129,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public String getName() {
-    return m_fqn.computeIfAbsentAndGet(() -> {
-      var sb = new StringBuilder(128);
-
-      var qualifiedPackageName = m_astNode.binding.qualifiedPackageName();
-      if (qualifiedPackageName != null && qualifiedPackageName.length > 0) {
-        sb.append(qualifiedPackageName);
-        sb.append(JavaTypes.C_DOT);
-      }
-
-      // collect declaring types
-      Deque<char[]> namesBottomUp = new ArrayDeque<>();
-      var declaringType = m_astNode;
-      while (declaringType != null) {
-        namesBottomUp.add(declaringType.name);
-        declaringType = declaringType.enclosingType;
-      }
-
-      var namesTopDown = namesBottomUp.descendingIterator();
-      sb.append(namesTopDown.next()); // there must be at least one type name
-      while (namesTopDown.hasNext()) {
-        sb.append(JavaTypes.C_DOLLAR).append(namesTopDown.next());
-      }
-      return sb.toString();
-    });
+    return m_fqn.computeIfAbsentAndGet(() -> SpiWithEcjUtils.qualifiedNameOf(isAnonymous() ? CharOperation.NO_CHAR : m_astNode.binding.qualifiedPackageName(), m_astNode.binding.qualifiedSourceName()));
   }
 
   @Override
@@ -211,7 +189,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
         return emptyList();
       }
       return Arrays.stream(memberTypes)
-          .map(d -> new DeclarationTypeWithEcj(javaEnvWithEcj(), m_cu, this, d))
+          .map(d -> javaEnvWithEcj().createDeclarationType(m_cu, this, d))
           .collect(toList());
     });
   }
@@ -219,30 +197,30 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   @Override
   public TypeSpi getSuperClass() {
     return m_superType.computeIfAbsentAndGet(() -> {
-      if (m_astNode.superclass == null) {
-        return null;
-      }
-      var tb = m_astNode.superclass.resolvedType;
-      if (tb == null) {
-        return null;
-      }
-      return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), tb);
+      Function<DeclarationTypeWithEcj, TypeBinding> superClassFunction = decl -> {
+        if (decl.m_astNode.superclass == null) {
+          return null;
+        }
+        return decl.m_astNode.superclass.resolvedType;
+      };
+      return bindingToType(javaEnvWithEcj(), superClassFunction.apply(this), () -> withNewElement(superClassFunction));
     });
   }
 
   @Override
   public List<TypeSpi> getSuperInterfaces() {
     return m_superInterfaces.computeIfAbsentAndGet(() -> {
-      var refs = m_astNode.superInterfaces;
-      if (refs == null || refs.length < 1) {
-        return emptyList();
-      }
-      return Arrays.stream(refs)
-          .map(r -> r.resolvedType)
-          .filter(Objects::nonNull)
-          .map(b -> SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), b))
-          .filter(Objects::nonNull)
-          .collect(toList());
+      Function<DeclarationTypeWithEcj, TypeBinding[]> superInterfaceFunction = d -> {
+        var interfaces = d.m_astNode.superInterfaces;
+        if (interfaces == null) {
+          return Binding.NO_TYPES;
+        }
+        return Arrays.stream(interfaces)
+            .map(i -> i.resolvedType)
+            .filter(Objects::nonNull)
+            .toArray(TypeBinding[]::new);
+      };
+      return bindingsToTypes(javaEnvWithEcj(), superInterfaceFunction.apply(this), () -> withNewElement(superInterfaceFunction));
     });
   }
 

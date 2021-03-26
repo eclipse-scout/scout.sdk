@@ -16,8 +16,8 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.eclipse.scout.sdk.core.log.SdkLog.onTrace;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 import static org.eclipse.scout.sdk.core.util.Ensure.fail;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.nio.CharBuffer;
 import java.nio.file.FileSystemAlreadyExistsException;
@@ -30,8 +30,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
@@ -131,27 +133,57 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   protected TypeSpi doFindType(String fqn) {
     assertInitialized();
     var desc = TypeNameDescriptor.of(fqn);
+    if (desc.getArrayDimension() <= 0) {
+      return resolveAsType(desc);
+    }
+    return resolveAsArray(desc);
+  }
+
+  protected TypeSpi resolveAsType(TypeNameDescriptor desc) {
     var binding = lookupTypeBinding(desc.getPrimaryTypeName());
     if (binding == null) {
       return null;
     }
-
-    TypeSpi result;
-    if (desc.hasInnerType()) {
-      result = SpiWithEcjUtils.bindingToInnerType(this, binding, desc.getInnerTypeNames());
+    var result = bindingToType(this, binding, () -> {
+      var type = (AbstractTypeWithEcj) findType(desc.getFullyQualifiedName());
+      if (type == null) {
+        return null;
+      }
+      return type.getInternalBinding();
+    });
+    if (!desc.hasInnerType()) {
+      return result;
     }
-    else {
-      // no inner types: directly use answer
-      result = SpiWithEcjUtils.bindingToType(this, binding);
-    }
+    return findInnerType(result, desc.getInnerTypeNames());
+  }
 
-    if (desc.getArrayDimension() > 0) {
-      var b = Ensure.notNull(((AbstractTypeWithEcj) result).getInternalBinding(), "Cannot find internal binding to create array type.");
-      ArrayBinding arrayType;
-      arrayType = getCompiler().lookupEnvironment.createArrayType(b, desc.getArrayDimension());
-      return SpiWithEcjUtils.bindingToType(this, arrayType);
+  protected static TypeSpi findInnerType(TypeSpi primaryType, String innerTypes) {
+    var result = primaryType;
+    var st = new StringTokenizer(innerTypes, "$", false);
+    while (st.hasMoreTokens()) {
+      var name = st.nextToken();
+      var innerType = result.getTypes().stream()
+          .filter(t -> t.getElementName().equals(name))
+          .findFirst()
+          .orElse(null);
+      if (innerType == null) {
+        return null;
+      }
+      result = innerType;
     }
     return result;
+  }
+
+  protected TypeSpi resolveAsArray(TypeNameDescriptor desc) {
+    Supplier<TypeBinding> arrayTypeBindingSupplier = () -> {
+      var elementType = resolveAsType(desc);
+      if (elementType == null) {
+        return null;
+      }
+      var elementTypeBinding = ((AbstractTypeWithEcj) elementType).getInternalBinding();
+      return getCompiler().lookupEnvironment.createArrayType(elementTypeBinding, desc.getArrayDimension());
+    };
+    return bindingToType(this, arrayTypeBindingSupplier.get(), arrayTypeBindingSupplier);
   }
 
   protected TypeBinding lookupTypeBinding(String fqn) {
@@ -303,10 +335,8 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   @Override
   public List<String> getCompileErrors(TypeSpi typeSpi) {
     var cuSpi = Ensure.notNull(typeSpi).getCompilationUnit();
-    if (!(cuSpi instanceof DeclarationCompilationUnitWithEcj)) {
-      throw newFail("Type '{}' is not a source type.", typeSpi.getName());
-    }
-    var decl = ((DeclarationCompilationUnitWithEcj) cuSpi).getInternalCompilationUnitDeclaration();
+    var decl = Ensure.instanceOf(cuSpi, DeclarationCompilationUnitWithEcj.class, "Type '{}' is not a source type.", typeSpi.getName())
+        .getInternalCompilationUnitDeclaration();
     synchronized (lock()) {
       return getCompiler().getCompileErrors(decl);
     }
@@ -463,7 +493,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingAnnotationWithEcj createBindingAnnotation(AnnotatableSpi owner, AnnotationBinding binding) {
     assertInitialized();
     synchronized (lock()) {
-      var key = new SameCompositeObject(binding);
+      var key = new SameCompositeObject(binding, owner); // binding may be shared amongst different owners if it is a marker annotation. therefore include the owner in the key.
       return (BindingAnnotationWithEcj) m_elements.computeIfAbsent(key, k -> new BindingAnnotationWithEcj(this, owner, binding));
     }
   }
@@ -484,11 +514,11 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     }
   }
 
-  public BindingArrayTypeWithEcj createBindingArrayType(ArrayBinding binding, boolean isWildcard) {
+  public BindingArrayTypeWithEcj createBindingArrayType(ArrayBinding binding, boolean isWildcard, Supplier<ArrayBinding> newElementLookupStrategy) {
     assertInitialized();
     synchronized (lock()) {
       var key = new SameCompositeObject(binding, isWildcard);
-      return (BindingArrayTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingArrayTypeWithEcj(this, binding, isWildcard));
+      return (BindingArrayTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingArrayTypeWithEcj(this, binding, isWildcard, newElementLookupStrategy));
     }
   }
 
@@ -524,11 +554,11 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     }
   }
 
-  public BindingTypeWithEcj createBindingType(ReferenceBinding binding, BindingTypeWithEcj declaringType, boolean isWildcard) {
+  public BindingTypeWithEcj createBindingType(ReferenceBinding binding, TypeSpi declaringType, boolean isWildcard, Supplier<? extends ReferenceBinding> newElementLookupStrategy) {
     assertInitialized();
     synchronized (lock()) {
       var key = new SameCompositeObject(binding, isWildcard);
-      return (BindingTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingTypeWithEcj(this, binding, declaringType, isWildcard));
+      return (BindingTypeWithEcj) m_elements.computeIfAbsent(key, k -> new BindingTypeWithEcj(this, binding, declaringType, isWildcard, newElementLookupStrategy));
     }
   }
 

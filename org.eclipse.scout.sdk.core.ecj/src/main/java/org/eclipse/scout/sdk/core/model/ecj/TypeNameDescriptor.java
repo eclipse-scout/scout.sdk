@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  */
 public class TypeNameDescriptor {
 
+  private final String m_fqn;
   private final String m_primaryTypeName;
   private final String m_innerTypeNames;
   private final int m_arrayDimension;
@@ -39,9 +40,9 @@ public class TypeNameDescriptor {
     if (firstDollarPos > 0) {
       var primaryType = fqn.substring(0, firstDollarPos);
       var innerTypePart = fqn.substring(firstDollarPos + 1);
-      return new TypeNameDescriptor(primaryType, innerTypePart, arrayDim);
+      return new TypeNameDescriptor(fqn, primaryType, innerTypePart, arrayDim);
     }
-    return new TypeNameDescriptor(fqn, null, arrayDim);
+    return new TypeNameDescriptor(fqn, fqn, null, arrayDim);
   }
 
   protected static int getArrayDimension(String fqn) {
@@ -52,7 +53,8 @@ public class TypeNameDescriptor {
     return (fqn.length() - pos) / 2;
   }
 
-  protected TypeNameDescriptor(String primaryTypeName, String innerTypeNames, int arrayDimension) {
+  protected TypeNameDescriptor(String fqn, String primaryTypeName, String innerTypeNames, int arrayDimension) {
+    m_fqn = fqn;
     m_primaryTypeName = primaryTypeName;
     m_innerTypeNames = innerTypeNames;
     m_arrayDimension = arrayDimension;
@@ -60,6 +62,14 @@ public class TypeNameDescriptor {
 
   public boolean hasInnerType() {
     return m_innerTypeNames != null;
+  }
+
+  /**
+   * @return The full name including inner types and array indicators. Is the same {@link String} as this descriptor was
+   *         created on.
+   */
+  public String getFullyQualifiedName() {
+    return m_fqn;
   }
 
   public String getPrimaryTypeName() {

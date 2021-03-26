@@ -12,9 +12,12 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
@@ -25,7 +28,6 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
@@ -50,10 +52,12 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
   private final FinalValue<String> m_elementName;
   private final FinalValue<List<BindingAnnotationWithEcj>> m_annotations;
   private final FinalValue<List<FieldSpi>> m_fields;
+  private final Supplier<ArrayBinding> m_newElementLookupStrategy;
 
-  protected BindingArrayTypeWithEcj(JavaEnvironmentWithEcj env, ArrayBinding binding, boolean isWildcard) {
+  protected BindingArrayTypeWithEcj(JavaEnvironmentWithEcj env, ArrayBinding binding, boolean isWildcard, Supplier<ArrayBinding> newElementLookupStrategy) {
     super(env);
     m_binding = Ensure.notNull(binding);
+    m_newElementLookupStrategy = Ensure.notNull(newElementLookupStrategy);
     m_isWildcard = isWildcard;
     m_arrayDimension = binding.dimensions;
     m_package = new FinalValue<>();
@@ -65,7 +69,11 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public TypeSpi internalFindNewElement() {
+    var same = bindingToType(javaEnvWithEcj(), m_newElementLookupStrategy.get(), getDeclaringType(), m_isWildcard, m_newElementLookupStrategy);
+    if (same != null) {
+      return same;
+    }
     return getJavaEnvironment().findType(getName());
   }
 
@@ -81,7 +89,10 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public TypeSpi getLeafComponentType() {
-    return m_leafComponentType.computeIfAbsentAndGet(() -> SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), m_binding.leafComponentType));
+    return m_leafComponentType.computeIfAbsentAndGet(() -> {
+      Function<BindingArrayTypeWithEcj, TypeBinding> leafComponentTypeFunction = t -> t.m_binding.leafComponentType();
+      return bindingToType(javaEnvWithEcj(), leafComponentTypeFunction.apply(this), () -> withNewElement(leafComponentTypeFunction));
+    });
   }
 
   @Override

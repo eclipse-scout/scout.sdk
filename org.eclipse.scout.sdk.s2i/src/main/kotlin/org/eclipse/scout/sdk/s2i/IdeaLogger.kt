@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,19 +10,30 @@
  */
 package org.eclipse.scout.sdk.s2i
 
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
+import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import com.intellij.openapi.ui.MessageType
+import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.components.JBTextArea
+import com.intellij.util.ui.JBInsets
 import org.eclipse.scout.sdk.core.log.ISdkConsoleSpi
 import org.eclipse.scout.sdk.core.log.LogMessage
 import org.eclipse.scout.sdk.core.log.SdkConsole
 import org.eclipse.scout.sdk.core.util.Strings
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 import java.util.logging.Level
+import javax.swing.ScrollPaneConstants
+
 
 open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
 
@@ -71,12 +82,37 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
     }
 
     protected fun logToEventLogWindow(msg: LogMessage) {
-        if (!Strings.hasText(msg.text())) {
+        var text = msg.text()
+        val primaryThrowable = msg.firstThrowable()
+        if (Strings.isBlank(text) && primaryThrowable.isPresent) {
+            text = Strings.notBlank(primaryThrowable.get().message).orElse("Error")
+        }
+        if (Strings.isBlank(text)) {
             return // no balloon for empty log message
         }
-        val notification = m_balloonLog.createNotification(msg.text(), levelToMessageType(msg.severity()))
+        val notification = m_balloonLog.createNotification(text, levelToNotificationType(msg.severity()))
+        primaryThrowable.ifPresent { notification.addAction(ShowThrowableAction(it)) }
         notification.isImportant = msg.severity() == Level.SEVERE
         notification.notify(null)
+    }
+
+    private class ShowThrowableAction(private val throwable: Throwable) : NotificationAction(message("details") + "...") {
+        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+            val pos = JBPopupFactory.getInstance().guessBestPopupLocation(e.dataContext)
+            val detailsText = Strings.fromThrowable(throwable)
+            val textArea = JBTextArea(detailsText, 40, 150)
+            textArea.isEditable = false
+            val scrollPane = JBScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED)
+            val balloon = JBPopupFactory.getInstance().createBalloonBuilder(scrollPane)
+                    .setSmallVariant(true)
+                    .setBorderInsets(JBInsets.create(0, 0))
+                    .setHideOnClickOutside(true)
+                    .setHideOnKeyOutside(true)
+                    .setHideOnAction(false)
+                    .createBalloon()
+            balloon.setAnimationEnabled(false)
+            balloon.show(pos, Balloon.Position.atRight)
+        }
     }
 
     protected fun isControlFlowException(t: Throwable) = t is ControlFlowException
@@ -108,9 +144,9 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
         }
     }
 
-    protected fun levelToMessageType(level: Level): MessageType = when (level) {
-        Level.WARNING -> MessageType.WARNING
-        Level.SEVERE -> MessageType.ERROR
-        else -> MessageType.INFO
+    protected fun levelToNotificationType(level: Level) = when (level) {
+        Level.WARNING -> NotificationType.WARNING
+        Level.SEVERE -> NotificationType.ERROR
+        else -> NotificationType.INFORMATION
     }
 }

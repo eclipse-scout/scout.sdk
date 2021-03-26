@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.ImportSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -40,12 +39,12 @@ public class SyntheticCompilationUnitWithEcj extends AbstractJavaElementWithEcj<
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public CompilationUnitSpi internalFindNewElement() {
     var newType = getJavaEnvironment().findType(m_mainType.getName());
-    if (newType != null) {
-      return newType.getCompilationUnit();
+    if (newType == null) {
+      return null;
     }
-    return null;
+    return newType.getCompilationUnit();
   }
 
   @Override

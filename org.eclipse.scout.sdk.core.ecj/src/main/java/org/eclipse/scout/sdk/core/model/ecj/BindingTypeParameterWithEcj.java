@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,12 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingsToTypes;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
@@ -21,7 +25,6 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeParameterImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
@@ -50,7 +53,7 @@ public class BindingTypeParameterWithEcj extends AbstractJavaElementWithEcj<ITyp
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public TypeParameterSpi internalFindNewElement() {
     var newMember = (MemberSpi) getDeclaringMember().internalFindNewElement();
     if (newMember != null && newMember.getTypeParameters().size() > m_index) {
       return newMember.getTypeParameters().get(m_index);
@@ -78,10 +81,14 @@ public class BindingTypeParameterWithEcj extends AbstractJavaElementWithEcj<ITyp
     return m_bounds.computeIfAbsentAndGet(() -> {
       ReferenceBinding superclass;
       ReferenceBinding[] superInterfaces;
-      synchronized (javaEnvWithEcj().lock()) {
-        superclass = m_binding.superclass();
-        superInterfaces = m_binding.superInterfaces();
+      var javaEnv = javaEnvWithEcj();
+      Function<BindingTypeParameterWithEcj, ReferenceBinding> superClassFunc = tp -> tp.m_binding.superclass();
+      Function<BindingTypeParameterWithEcj, ReferenceBinding[]> superInterfacesFunc = tp -> tp.m_binding.superInterfaces();
+      synchronized (javaEnv.lock()) {
+        superclass = superClassFunc.apply(this);
+        superInterfaces = superInterfacesFunc.apply(this);
       }
+
       var hasSuperClass = superclass != null && !CharOperation.equals(superclass.compoundName, TypeConstants.JAVA_LANG_OBJECT);
       var hasSuperInterfaces = superInterfaces != null && superInterfaces.length > 0;
       var size = 0;
@@ -94,18 +101,13 @@ public class BindingTypeParameterWithEcj extends AbstractJavaElementWithEcj<ITyp
 
       List<TypeSpi> bounds = new ArrayList<>(size);
       if (hasSuperClass) {
-        var t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), superclass);
+        var t = bindingToType(javaEnv, superclass, () -> withNewElement(superClassFunc));
         if (t != null) {
           bounds.add(t);
         }
       }
       if (hasSuperInterfaces) {
-        for (var b : superInterfaces) {
-          var t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), b);
-          if (t != null) {
-            bounds.add(t);
-          }
-        }
+        bounds.addAll(bindingsToTypes(javaEnv, superInterfaces, () -> withNewElement(superInterfacesFunc)));
       }
       return bounds;
     });

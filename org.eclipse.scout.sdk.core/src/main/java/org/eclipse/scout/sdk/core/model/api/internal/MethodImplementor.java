@@ -102,9 +102,13 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
 
   @Override
   public String identifier(boolean includeTypeArguments) {
+    if (!includeTypeArguments) {
+      return m_spi.getMethodId();
+    }
+
     var parameterTypes = parameters().stream()
         .map(IMethodParameter::dataType)
-        .map(p -> p.reference(!includeTypeArguments))
+        .map(p -> p.reference(false))
         .collect(toList());
     return JavaTypes.createMethodIdentifier(elementName(), parameterTypes);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
@@ -40,7 +39,7 @@ public class WildcardOnlyTypeWithEcj extends AbstractTypeWithEcj {
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
+  public WildcardOnlyTypeWithEcj internalFindNewElement() {
     return ((JavaEnvironmentWithEcj) getJavaEnvironment()).createWildcardOnlyType();
   }
 

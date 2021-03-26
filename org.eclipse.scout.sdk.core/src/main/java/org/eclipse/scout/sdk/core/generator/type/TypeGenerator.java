@@ -28,6 +28,7 @@ import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.tra
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -245,9 +246,9 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   protected void buildUnimplementedMethods(IJavaSourceBuilder<?> builder) {
-    var unimplementedMethods =
-        UnimplementedMethodGenerator.create(this, builder.context().environment().orElseThrow(() -> newFail("Unimplemented methods can only be added if running with a java environment.")), m_unimplementedMethodsTransformer)
-            .sorted(comparing(g -> g.elementName().orElse("")));
+    var javaEnvironment = builder.context().environment().orElseThrow(() -> newFail("Unimplemented methods can only be added if running with a java environment."));
+    var unimplementedMethods = UnimplementedMethodGenerator.create(this, javaEnvironment, m_unimplementedMethodsTransformer).stream()
+        .sorted(comparing(g -> g.elementName().orElse("")));
     String startDelimiter;
     if (m_members.size() == 1) {
       startDelimiter = builder.context().lineDelimiter();
@@ -545,9 +546,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
       super(transformer);
     }
 
-    protected static Stream<IMethodGenerator<?, ?>> create(ITypeGenerator<?> typeGenerator, IJavaEnvironment env, IWorkingCopyTransformer transformer) {
-      return callWithTmpType(typeGenerator, env, tmpType -> getUnimplementedMethods(tmpType)
-          .map(m -> toMethodGenerator(typeGenerator, m, transformer)));
+    protected static Collection<IMethodGenerator<?, ?>> create(ITypeGenerator<?> typeGenerator, IJavaEnvironment env, IWorkingCopyTransformer transformer) {
+      return callWithTmpType(typeGenerator, env,
+          tmpType -> getUnimplementedMethods(tmpType)
+              .map(m -> toMethodGenerator(typeGenerator, m, transformer))
+              .collect(toList()) // collect here already because otherwise the environment will be closed when the stream is evaluated!
+      );
     }
 
     protected static IMethodGenerator<?, ?> toMethodGenerator(IJavaElementGenerator<?> typeGenerator, IMethod unimplementedMethod, IWorkingCopyTransformer transformer) {

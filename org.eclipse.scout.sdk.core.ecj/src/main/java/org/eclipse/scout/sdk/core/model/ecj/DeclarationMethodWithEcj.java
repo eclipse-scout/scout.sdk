@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingsToTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +21,18 @@ import java.util.stream.IntStream;
 
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.MethodDeclaration;
+import org.eclipse.jdt.internal.compiler.lookup.Binding;
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.MethodImplementor;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  *
@@ -45,6 +49,7 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   private final FinalValue<ISourceRange> m_source;
   private final FinalValue<ISourceRange> m_bodySource;
   private final FinalValue<ISourceRange> m_javaDocSource;
+  private final FinalValue<String> m_methodId;
   private int m_flags;
 
   protected DeclarationMethodWithEcj(JavaEnvironmentWithEcj env, DeclarationTypeWithEcj declaringType, AbstractMethodDeclaration astNode) {
@@ -61,11 +66,17 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
     m_source = new FinalValue<>();
     m_bodySource = new FinalValue<>();
     m_javaDocSource = new FinalValue<>();
+    m_methodId = new FinalValue<>();
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
-    return SpiWithEcjUtils.findNewMethodIn(this);
+  public MethodSpi internalFindNewElement() {
+    return SpiWithEcjUtils.findNewMethodIn(getDeclaringType(), getMethodId());
+  }
+
+  @Override
+  public String getMethodId() {
+    return m_methodId.computeIfAbsentAndGet(() -> JavaTypes.createMethodIdentifier(this));
   }
 
   @Override
@@ -84,19 +95,22 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
 
   @Override
   public TypeSpi getReturnType() {
-    return m_returnType.computeIfAbsentAndGet(() -> {
-      if (m_astNode instanceof MethodDeclaration) {
-        var ref = ((MethodDeclaration) m_astNode).returnType;
-        if (ref.resolvedType == null) {
-          synchronized (javaEnvWithEcj().lock()) {
-            ref.resolveType(m_astNode.scope);
-          }
-        }
-        return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), ref.resolvedType);
-      }
-      return null;
-    });
+    return m_returnType.computeIfAbsentAndGet(() -> bindingToType(javaEnvWithEcj(), resolveReturnType(this), () -> withNewElement(this::resolveReturnType)));
+  }
 
+  protected TypeBinding resolveReturnType(DeclarationMethodWithEcj declaration) {
+    var decl = declaration.m_astNode;
+    if (!(decl instanceof MethodDeclaration)) {
+      return null;
+    }
+    var methodDeclaration = (MethodDeclaration) decl;
+    var ref = methodDeclaration.returnType;
+    if (ref.resolvedType != null) {
+      return ref.resolvedType;
+    }
+    synchronized (javaEnvWithEcj().lock()) {
+      return ref.resolveType(methodDeclaration.scope);
+    }
   }
 
   @Override
@@ -153,26 +167,28 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
 
   @Override
   public List<TypeSpi> getExceptionTypes() {
-    return m_exceptions.computeIfAbsentAndGet(() -> {
-      var exceptions = m_astNode.thrownExceptions;
-      if (exceptions == null || exceptions.length < 1) {
-        return emptyList();
-      }
+    return m_exceptions.computeIfAbsentAndGet(() -> bindingsToTypes(javaEnvWithEcj(), resolveExceptionTypes(this), () -> withNewElement(this::resolveExceptionTypes)));
+  }
 
-      List<TypeSpi> result = new ArrayList<>(exceptions.length);
-      for (var r : exceptions) {
-        if (r.resolvedType == null) {
-          synchronized (javaEnvWithEcj().lock()) {
-            r.resolveType(SpiWithEcjUtils.classScopeOf(this));
-          }
-        }
-        var t = SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), r.resolvedType);
-        if (t != null) {
-          result.add(t);
+  protected TypeBinding[] resolveExceptionTypes(DeclarationMethodWithEcj method) {
+    var exceptions = method.m_astNode.thrownExceptions;
+    if (exceptions == null || exceptions.length < 1) {
+      return Binding.NO_TYPES;
+    }
+
+    List<TypeBinding> result = new ArrayList<>(exceptions.length);
+    for (var r : exceptions) {
+      var resolved = r.resolvedType;
+      if (resolved == null) {
+        synchronized (javaEnvWithEcj().lock()) {
+          resolved = r.resolveType(method.m_astNode.scope);
         }
       }
-      return result;
-    });
+      if (resolved != null) {
+        result.add(resolved);
+      }
+    }
+    return result.toArray(new TypeBinding[0]);
   }
 
   @Override

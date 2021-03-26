@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.model.ecj;
+
+import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
@@ -22,7 +24,6 @@ import org.eclipse.scout.sdk.core.model.ecj.metavalue.MetaValueFactory;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
@@ -52,9 +53,8 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   }
 
   @Override
-  public JavaElementSpi internalFindNewElement() {
-    //not supported
-    return null;
+  public AnnotationElementSpi internalFindNewElement() {
+    return SpiWithEcjUtils.findNewAnnotationElementIn(getDeclaringAnnotation(), getElementName());
   }
 
   @Override
@@ -74,12 +74,12 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   @Override
   public IMetaValue getMetaValue() {
     return m_value.computeIfAbsentAndGet(() -> {
-      var value = m_binding.getValue();
-      var metaVal = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), value);
+      Function<BindingAnnotationElementWithEcj, Object> valueFunction = a -> a.m_binding.getValue();
+      var value = valueFunction.apply(this);
+      var metaVal = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), value, () -> withNewElement(valueFunction));
       if (metaVal != null) {
         return metaVal;
       }
-
       return MetaValueFactory.createUnknown(value); // value cannot be determined. use unknown because annotation values cannot be null.
     });
   }
