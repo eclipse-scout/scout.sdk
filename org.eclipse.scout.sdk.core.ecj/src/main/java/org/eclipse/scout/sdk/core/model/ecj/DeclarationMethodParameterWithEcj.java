@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.MethodParameterImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
-import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -57,7 +56,7 @@ public class DeclarationMethodParameterWithEcj extends AbstractJavaElementWithEc
 
   @Override
   public MethodParameterSpi internalFindNewElement() {
-    var newMethod = (MethodSpi) getDeclaringMethod().internalFindNewElement();
+    var newMethod = getDeclaringMethod().internalFindNewElement();
     if (newMethod != null && newMethod.getParameters().size() > m_index) {
       return newMethod.getParameters().get(m_index);
     }

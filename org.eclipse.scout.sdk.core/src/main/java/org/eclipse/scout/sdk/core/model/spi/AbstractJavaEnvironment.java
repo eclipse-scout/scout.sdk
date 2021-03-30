@@ -135,7 +135,7 @@ public abstract class AbstractJavaEnvironment implements JavaEnvironmentSpi {
         onReloadStart();
         // reconnect all new SPI/API mappings
         for (var old : detachedSpiElements) {
-          var oldSpiElement = (AbstractSpiElement<? extends IJavaElement>) old;
+          var oldSpiElement = (AbstractSpiElement<?>) old;
           var apiElement = (AbstractJavaElementImplementor<JavaElementSpi>) oldSpiElement.getExistingApi(); // do not call wrap() to never create a new one
           if (apiElement == null) {
             continue; // there is no api element. no need to resolve it anymore

@@ -61,7 +61,7 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
 
   @Override
   public FieldSpi internalFindNewElement() {
-    var newType = (TypeSpi) getDeclaringType().internalFindNewElement();
+    var newType = getDeclaringType().internalFindNewElement();
     if (newType == null) {
       return null;
     }

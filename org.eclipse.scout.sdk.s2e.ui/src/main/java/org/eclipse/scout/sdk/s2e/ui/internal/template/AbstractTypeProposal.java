@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Type;
@@ -300,7 +302,16 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
 
     @Override
     public CompilationUnit call() {
-      return SharedASTProviderCore.getAST(m_icu, SharedASTProviderCore.WAIT_ACTIVE_ONLY, null);
+      var shared = SharedASTProviderCore.getAST(m_icu, SharedASTProviderCore.WAIT_ACTIVE_ONLY, null);
+      if (shared.getAST().hasResolvedBindings()) { // the template completion requires type bindings!
+        return shared;
+      }
+
+      var parser = ASTParser.newParser(AST.JLS_Latest);
+      parser.setKind(ASTParser.K_COMPILATION_UNIT);
+      parser.setSource(m_icu);
+      parser.setResolveBindings(true);
+      return (CompilationUnit) parser.createAST(null);
     }
   }
 

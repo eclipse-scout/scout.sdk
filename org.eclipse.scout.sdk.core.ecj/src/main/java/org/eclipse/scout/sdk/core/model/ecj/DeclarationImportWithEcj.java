@@ -16,7 +16,6 @@ import org.eclipse.scout.sdk.core.model.api.IImport;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.ImportImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.ImportSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
@@ -43,7 +42,7 @@ public class DeclarationImportWithEcj extends AbstractJavaElementWithEcj<IImport
 
   @Override
   public ImportSpi internalFindNewElement() {
-    var newCu = (CompilationUnitSpi) getCompilationUnit().internalFindNewElement();
+    var newCu = getCompilationUnit().internalFindNewElement();
     if (newCu == null) {
       return null;
     }
