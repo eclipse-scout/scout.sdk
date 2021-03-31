@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -85,8 +85,8 @@ public class FormDataAnnotationDescriptor {
       // check whether the super type is embedded into a form field that is annotated by @FormData with SdkCommand.IGNORE.
       var declaringType = superType.declaringType();
       while (declaringType.isPresent()) {
-        var declaringTypeformDataAnnotation = of(declaringType.get());
-        if (isIgnore(declaringTypeformDataAnnotation)) {
+        var declaringTypeFormDataAnnotation = of(declaringType.get());
+        if (isIgnore(declaringTypeFormDataAnnotation)) {
           // super type is embedded into a ignored form field. Hence this field is ignored as well. Adjust parsed annotation.
           descriptorToFill.setSdkCommand(SdkCommand.IGNORE);
           break;

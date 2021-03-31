@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,8 +81,7 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
     }
 
     var sdkColumnCommand = valueOf(type);
-    var replaceAnnotationFqn = type.javaEnvironment().requireApi(IScoutApi.class).Replace().fqn();
-    if (sdkColumnCommand.orElse(DEFAULT_VALUE) == SdkColumnCommand.IGNORE || !type.annotations().withName(replaceAnnotationFqn).existsAny()) {
+    if (sdkColumnCommand.orElse(DEFAULT_VALUE) == SdkColumnCommand.IGNORE || !type.annotations().withManagedWrapper(ReplaceAnnotation.class).existsAny()) {
       return sdkColumnCommand;
     }
 

@@ -38,6 +38,7 @@ import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.annotation.ExtendsAnnotation;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.annotation.ReplaceAnnotation;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
@@ -320,9 +321,9 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     }
   }
 
-  protected String computeSuperTypeForFormData(IType modelType, FormDataAnnotationDescriptor formDataAnnotation) {
+  protected static String computeSuperTypeForFormData(IType modelType, FormDataAnnotationDescriptor formDataAnnotation) {
     // handle replace
-    if (modelType.annotations().withName(scoutApi().Replace().fqn()).existsAny()) {
+    if (modelType.annotations().withManagedWrapper(ReplaceAnnotation.class).existsAny()) {
       var replaced = modelType.superClass()
           .flatMap(AbstractDtoGenerator::getFormDataType)
           .map(IType::reference);
@@ -330,7 +331,6 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
         return replaced.get();
       }
     }
-
     return computeSuperTypeForFormDataIgnoringReplace(modelType, formDataAnnotation);
   }
 
@@ -414,7 +414,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
 
   protected TYPE withReplaceIfNecessary() {
     // add replace annotation to DTO if replace annotation is present on the model
-    if (modelType().annotations().withName(scoutApi().Replace().fqn()).existsAny()) {
+    if (modelType().annotations().withManagedWrapper(ReplaceAnnotation.class).existsAny()) {
       withAnnotation(ScoutAnnotationGenerator.createReplace());
     }
     return thisInstance();
