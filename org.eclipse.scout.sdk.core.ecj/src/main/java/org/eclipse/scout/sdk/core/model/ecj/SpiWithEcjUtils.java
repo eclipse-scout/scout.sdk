@@ -647,7 +647,7 @@ public final class SpiWithEcjUtils {
   }
 
   @SuppressWarnings("unchecked")
-  static <T, R> R withNewElement(Class<T> type, Function<T, R> bla, Supplier<Object> valueSupplier) {
+  static <T, R> R withNewElement(Class<T> type, Function<T, R> function, Supplier<Object> valueSupplier) {
     var val = valueSupplier.get();
     if (val == null) {
       return null;
@@ -655,7 +655,7 @@ public final class SpiWithEcjUtils {
     if (!type.isInstance(val)) {
       return null;
     }
-    return bla.apply((T) val);
+    return function.apply((T) val);
   }
 
   static Object getElementFromArray(Object arr, int i) {

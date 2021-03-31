@@ -10,10 +10,12 @@
  */
 package org.eclipse.scout.sdk.s2i.nls.inspection
 
+import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.module.Module
@@ -75,19 +77,29 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
         }
 
         val project = module.project
+        val editor = prepareAndGetEditor(psiFile) // must be executed before opening the dialog so that a potential running template can be finished
         if (stores.size == 1) {
             openDialog(project, stores[0], stack)
             return
         }
 
-        val fileEditor = if (psiFile.isPhysical) FileEditorManager.getInstance(project).getSelectedEditor(psiFile.virtualFile) else null
-        val editor = if (fileEditor is TextEditor) fileEditor.editor else null
         val popup = JBPopupFactory.getInstance().createListPopup(TranslationStorePopupStep(project, stack, stores), 10)
         if (editor != null) {
             popup.showInBestPositionFor(editor)
         } else {
             popup.showCenteredInCurrentWindow(project)
         }
+    }
+
+    private fun prepareAndGetEditor(psiFile: PsiFile): Editor? {
+        if (!psiFile.isPhysical) return null
+        val project = psiFile.project
+        val fileEditorManager = FileEditorManager.getInstance(project)
+        val fileEditor = fileEditorManager.getSelectedEditor(psiFile.virtualFile) as? TextEditor ?: return null
+        val editor = fileEditor.editor
+        // in case the quick fix was launched directly from within a template. To show the chooser the template must first be finished
+        TemplateManager.getInstance(project).finishTemplate(editor)
+        return editor
     }
 
     private fun openDialog(project: Project, store: ITranslationStore, stack: TranslationStoreStack) {

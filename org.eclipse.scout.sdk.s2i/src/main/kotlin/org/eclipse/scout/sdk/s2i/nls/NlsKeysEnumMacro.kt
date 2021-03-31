@@ -41,6 +41,6 @@ class NlsKeysEnumMacro : Macro() {
         // do not use context.getPsiElementAtStartOffset() because it uses context.getTemplateStartOffset() but here context.getStartOffset() is required
         val psiElement = psiFile.findElementAt(context.startOffset) ?: return null
         val module = psiElement.containingModule() ?: return null
-        return NlsCompletionHelper.computeLookupElements(module, psiElement, false).toTypedArray()
+        return NlsCompletionHelper.computeLookupElements(module, psiElement).toTypedArray()
     }
 }

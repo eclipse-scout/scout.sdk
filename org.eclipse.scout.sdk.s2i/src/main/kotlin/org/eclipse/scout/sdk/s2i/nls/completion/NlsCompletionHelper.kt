@@ -48,7 +48,7 @@ object NlsCompletionHelper {
         }
     }
 
-    fun computeLookupElements(module: Module, psiElement: PsiElement, includeNewTranslationEntry: Boolean = true): List<LookupElementBuilder> {
+    fun computeLookupElements(module: Module, psiElement: PsiElement): List<LookupElementBuilder> {
         // compute original element so that the translation key may be modified. the completion clone will be discarded
         val psiFile = psiElement.containingFile.originalFile
         val element = psiFile.findElementAt(psiElement.startOffset)?.parent ?: return emptyList()
@@ -58,9 +58,7 @@ object NlsCompletionHelper {
         val elements = stack.allEntries()
                 .map { createExistingTranslationLookupElement(it, module, translationSpec, psiManager) }
                 .collect(toList())
-        if (includeNewTranslationEntry) {
-            createNewTranslationLookupElement(element, translationSpec)?.let { elements.add(it) }
-        }
+        createNewTranslationLookupElement(element, translationSpec)?.let { elements.add(0, it) }
         return elements
     }
 
