@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.core.util.Strings.toStringLiteral
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
-import org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro
 import org.eclipse.scout.sdk.s2i.template.BoolVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.EnumVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.VariableDescriptor
@@ -76,7 +75,10 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
     fun withEnumVariable(name: String, values: Iterable<String>, macroName: String? = null) = withVariable(name, EnumVariableAdapter(name, macroName, values))
     fun withBoolVariable(name: String, defaultValue: Boolean) = withVariable(name, BoolVariableAdapter(name, defaultValue.toString()))
 
-    fun withNlsVariable(name: String, defaultValue: String? = null) = withVariable(name) { VariableDescriptor(name, "${NlsKeysEnumMacro.NAME}()", toStringLiteral(defaultValue)?.toString()) }
+    fun withNlsVariable(name: String, defaultValue: String? = null) = withVariable(name) {
+        VariableDescriptor(name, "complete()" /* call the NlsCompletionContributorForJava */, toStringLiteral(defaultValue)?.toString())
+    }
+
     fun withVariable(name: String, value: String) = withVariable(name) { VariableDescriptor(name, null, toStringLiteral(value)?.toString()) }
     fun withVariable(name: String, variableAdapter: (TemplateEngine) -> VariableDescriptor?) = apply {
         Ensure.isFalse(TemplateImpl.INTERNAL_VARS_SET.contains(name), "Variable name '{}' is reserved for internal use.", name)

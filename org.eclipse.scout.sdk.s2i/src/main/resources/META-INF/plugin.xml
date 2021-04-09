@@ -102,7 +102,6 @@
     <lang.foldingBuilder language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForHtml"/>
     <codeFoldingOptionsProvider instance="org.eclipse.scout.sdk.s2i.settings.ScoutCodeFoldingOptionsProvider"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.java.DescendantAbstractClassesEnumMacro"/>
-    <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.nls.NlsKeysEnumMacro"/>
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.java.PsiExpressionEnumMacro"/>
     <moduleBuilder builderClass="org.eclipse.scout.sdk.s2i.project.ScoutModuleBuilder"/>
     <intentionAction order="first">

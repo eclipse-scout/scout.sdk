@@ -22,6 +22,7 @@ import com.intellij.codeInsight.template.impl.TemplateImplUtil
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.openapi.command.WriteCommandAction.writeCommandAction
+import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Conditions.alwaysTrue
@@ -170,6 +171,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
         private fun insertInnerTypeGetter(insertPos: Int) {
             if (insertPos < 0) return
             val project = editor.project ?: return
+            if (UndoManager.getInstance(project).isUndoInProgress) return
             val document = editor.document
             val psiDocumentManager = PsiDocumentManager.getInstance(project)
             val file = psiDocumentManager.getPsiFile(document) ?: return
