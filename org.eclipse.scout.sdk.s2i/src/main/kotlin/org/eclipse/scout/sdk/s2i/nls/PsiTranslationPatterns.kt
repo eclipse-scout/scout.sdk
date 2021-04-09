@@ -47,15 +47,35 @@ object PsiTranslationPatterns {
     val JAVA_NLS_KEY_PATTERN = or(javaNlsKeyArgumentPattern(), javaTextsGetPattern() /* legacy case */)
 
     private fun getTranslationKeyFromJava(element: PsiElement?): String? {
+        val key = resolveExpressionToString(element) {
+            JAVA_NLS_KEY_PATTERN.accepts(it)
+        }
+        if (key != null) {
+            return key
+        }
+
+        // a method call directly returning the nls key
+        return (element as? PsiCall)
+                ?.takeIf { JAVA_NLS_KEY_PATTERN.accepts(it) }
+                ?.resolveMethod()
+                ?.body
+                ?.children
+                ?.mapNotNull { it as? PsiReturnStatement }
+                ?.map { it.returnValue }
+                ?.mapNotNull { resolveExpressionToString(it) }
+                ?.firstOrNull()
+    }
+
+    private fun resolveExpressionToString(element: PsiElement?, locationFilter: ((Any?) -> Boolean)? = null): String? {
         if (element is PsiLiteralExpressionImpl) {
             return asStringLiteral(element)
-                    .takeIf { JAVA_NLS_KEY_PATTERN.accepts(it) }
+                    .takeIf { locationFilter == null || locationFilter(it) }
                     ?.value as? String
         }
 
         // reference to variable or constant
         val variable = (element as? PsiReference)
-                ?.takeIf { JAVA_NLS_KEY_PATTERN.accepts(it) }
+                ?.takeIf { locationFilter == null || locationFilter(it) }
                 ?.resolve() as? PsiVariable ?: return null
         val constant = variable.computeConstantValue() as? String
         if (constant != null) {

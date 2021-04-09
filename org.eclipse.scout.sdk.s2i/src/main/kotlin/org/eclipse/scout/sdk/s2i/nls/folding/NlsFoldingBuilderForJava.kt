@@ -31,6 +31,11 @@ class NlsFoldingBuilderForJava : AbstractNlsFoldingBuilder() {
                 visitElement(expression)
             }
 
+            override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
+                super.visitMethodCallExpression(expression)
+                visitElement(expression)
+            }
+
             private fun visitElement(expression: PsiExpression) {
                 val translationKey = expression.translationSpec()?.resolveTranslationKey() ?: return
                 createFoldingDescriptor(translationKey, expression, stack)?.let { folds.add(it) }
