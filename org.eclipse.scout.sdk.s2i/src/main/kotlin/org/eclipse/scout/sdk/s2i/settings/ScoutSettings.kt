@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,7 +50,7 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable 
             val raw = projectSettings(project).getValue(KEY_TRANSLATION_DEFAULT_LANG)
             return Strings.notBlank(raw)
                     .flatMap(Language::parse)
-                    .orElse(Language.LANGUAGE_DEFAULT)
+                    .orElseGet { Language(Locale.getDefault(Locale.Category.FORMAT)) }
         }
 
         fun setTranslationLanguage(project: Project, language: Language?) {
