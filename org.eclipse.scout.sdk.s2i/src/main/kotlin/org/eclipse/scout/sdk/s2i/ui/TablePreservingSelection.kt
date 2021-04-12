@@ -100,9 +100,8 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
             .map { columnModel.getColumn(it).headerValue }
 
     private fun backupColumnWidths() = (0 until columnModel.columnCount)
-            .map { columnModel.getColumn(it) }
-            .map { it.headerValue to it.preferredWidth }
-            .toMap()
+        .map { columnModel.getColumn(it) }
+        .associate { it.headerValue to it.preferredWidth }
 
     private fun restoreColumnWidth(columnWidths: Map<Any, Int>) =
             (0 until columnModel.columnCount)

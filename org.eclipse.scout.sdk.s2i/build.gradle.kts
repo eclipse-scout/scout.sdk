@@ -19,13 +19,13 @@ import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-val scoutSdkVersion = "11.0.0-SNAPSHOT"
+val scoutSdkVersion = "12.0.0-SNAPSHOT"
 val scoutSdkPluginVersion = scoutSdkVersion.replace("-SNAPSHOT", "." + timestamp())
 
 val kotlinVersion = "1.4"
 val javaVersion = JavaVersion.VERSION_11
 val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "22.0-SNAPSHOT")
-val intellijVersion = projectPropertyOr("intellij_version", "IU-2020.1.2") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
+val intellijVersion = projectPropertyOr("intellij_version", "IU-2021.1") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
@@ -49,17 +49,9 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "0.8.0-SNAPSHOT"
-    kotlin("jvm") version "1.4.31"
+    id("org.jetbrains.intellij") version "0.7.2"
+    kotlin("jvm") version "1.4.32"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
-}
-
-buildscript {
-    dependencies {
-        classpath("org.jetbrains.intellij.plugins:structure-base:3.139")
-        classpath("org.jetbrains.intellij.plugins:structure-intellij:3.139")
-        classpath("org.jetbrains.intellij:plugin-repository-rest-client:2.0.15")
-    }
 }
 
 group = "org.eclipse.scout.sdk.s2i"
@@ -76,7 +68,7 @@ dependencies {
     api("org.apache.poi", "poi-ooxml", "4.1.2")
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    testImplementation("org.mockito", "mockito-core", "3.8.0")
+    testImplementation("org.mockito", "mockito-core", "3.9.0")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }
@@ -94,7 +86,7 @@ intellij {
     }
 
     tasks.withType<RunPluginVerifierTask> {
-        setIdeVersions(listOf("IU-2020.2.4", "IU-2020.3.2", "IU-2021.1"))
+        setIdeVersions(listOf("IU-2021.1"))
         setSubsystemsToCheck("without-android")
         failureLevel = FailureLevel.ALL
     }

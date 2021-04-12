@@ -8,10 +8,10 @@
   ~ Contributors:
   ~     BSI Business Systems Integration AG - initial API and implementation
   -->
-<idea-plugin allow-bundled-update="true" require-restart="true">
+<idea-plugin allow-bundled-update="true">
   <id>org.eclipse.scout.sdk.s2i</id>
   <name>Eclipse Scout</name>
-  <version>11.0.0.9999999999</version>
+  <version>12.0.0.9999999999</version>
 
   <vendor url="https://www.eclipse.org/scout/">Eclipse Scout Project</vendor>
 
@@ -19,7 +19,7 @@
       <p>
       Eclipse Scout integration for IntelliJ IDEA
       </p>
-      <p>Supports Scout runtime versions 10 and 11.</p>
+      <p>Supports Scout runtime versions 10, 11 and 22.</p>
       <p>
       Features:
         <br>
@@ -45,13 +45,12 @@
 
   <change-notes><![CDATA[
         <ul>
-          <li>Adds Scout project creation support</li>
-          <li>Adds an action to update DataObject convenience methods</li>
+          <li>Adds support for Scout 22</li>
         </ul>
   ]]></change-notes>
 
   <!-- please see https://jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="201.7846.76"/>
+  <idea-version since-build="211.6693.111"/>
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
@@ -62,7 +61,7 @@
   <depends optional="true" config-file="withJavaScript.xml">JavaScript</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <notificationGroup displayType="BALLOON" id="scout.notification" key="notification.group.name"/> <!-- required for IJ 2020.3 -->
+    <notificationGroup displayType="BALLOON" id="scout.notification" key="notification.group.name"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.nls.IdeaTranslationStoreSupplier"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator"/>

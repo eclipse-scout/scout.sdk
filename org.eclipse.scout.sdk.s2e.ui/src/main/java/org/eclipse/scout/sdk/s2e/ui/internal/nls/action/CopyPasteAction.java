@@ -32,7 +32,6 @@ public class CopyPasteAction extends Action {
   public void run() {
     var clipboard = new Clipboard(m_display);
     try {
-      //noinspection HardcodedLineSeparator
       var rtfData = "{\\rtf1\\b\\i " + m_toCopy + '}'; // formatted as bold and italic
       var textTransfer = TextTransfer.getInstance();
       var rtfTransfer = RTFTransfer.getInstance();

@@ -147,7 +147,6 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
 
   protected Stream<String> getAsPropertiesEncodedLines() {
     var prop = new Properties();
-    //noinspection UseOfPropertiesAsHashtable
     prop.putAll(m_properties);
 
     String content;

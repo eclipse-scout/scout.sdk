@@ -15,13 +15,13 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_p2_plugin_config-master</artifactId>
-    <version>3.14.1</version>
+    <version>3.14.2-SNAPSHOT</version>
     <relativePath />
   </parent>
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk.p2</artifactId>
-  <version>11.0.0-SNAPSHOT</version>
+  <version>12.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK P2</name>
   <description>Eclipse Scout SDK - Eclipse Features/Repository</description>
@@ -34,9 +34,8 @@
 
   <properties>
     <eclipse_gerrit_username/>
-    <scout.base.version>11.0.0</scout.base.version>
+    <scout.base.version>12.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <!-- Don't replace version number with scout.base.version: Required by regex replacement -->
     <org.eclipse.scout.rt_version>22.0-SNAPSHOT</org.eclipse.scout.rt_version>
   </properties>
 
@@ -100,7 +99,7 @@
                 <groupId>org.eclipse.scout.sdk</groupId>
                 <artifactId>org.eclipse.scout.sdk-target</artifactId>
                 <version>${project.version}</version>
-                <classifier>org.eclipse.2020-12-dependencies</classifier>
+                <classifier>org.eclipse.2021-03-dependencies</classifier>
               </artifact>
             </target>
           </configuration>

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2i
 
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
+import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.PathManager
@@ -30,7 +31,6 @@ import org.eclipse.scout.sdk.core.log.LogMessage
 import org.eclipse.scout.sdk.core.log.SdkConsole
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
-import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 import java.util.logging.Level
 import javax.swing.ScrollPaneConstants
 
@@ -38,7 +38,7 @@ import javax.swing.ScrollPaneConstants
 open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
 
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
-    private val m_balloonLog = CompatibilityHelper.balloonGroup()
+    private val m_balloonLog = NotificationGroupManager.getInstance().getNotificationGroup("scout.notification")
 
     /**
      * Executed on [Project] open
@@ -104,12 +104,12 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
             textArea.isEditable = false
             val scrollPane = JBScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED)
             val balloon = JBPopupFactory.getInstance().createBalloonBuilder(scrollPane)
-                    .setSmallVariant(true)
-                    .setBorderInsets(JBInsets.create(0, 0))
-                    .setHideOnClickOutside(true)
-                    .setHideOnKeyOutside(true)
-                    .setHideOnAction(false)
-                    .createBalloon()
+                .setSmallVariant(true)
+                .setBorderInsets(JBInsets.create(0, 0))
+                .setHideOnClickOutside(true)
+                .setHideOnKeyOutside(true)
+                .setHideOnAction(false)
+                .createBalloon()
             balloon.setAnimationEnabled(false)
             balloon.show(pos, Balloon.Position.atRight)
         }

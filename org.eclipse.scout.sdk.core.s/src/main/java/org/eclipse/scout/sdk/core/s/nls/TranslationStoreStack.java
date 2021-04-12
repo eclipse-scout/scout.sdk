@@ -719,7 +719,7 @@ public class TranslationStoreStack {
     }
 
     private void rememberDuplicateOrder(String o1Fqn, String o2Fqn) {
-      String[] duplicateOrdersFqn = {o1Fqn, o2Fqn};
+      var duplicateOrdersFqn = new String[]{o1Fqn, o2Fqn};
       Arrays.sort(duplicateOrdersFqn);
       m_duplicateOrders.add(Arrays.toString(duplicateOrdersFqn));
     }

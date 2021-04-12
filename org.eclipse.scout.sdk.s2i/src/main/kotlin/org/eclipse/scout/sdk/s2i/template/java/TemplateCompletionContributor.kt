@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.scoutApi
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
-import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 
 class TemplateCompletionContributor : CompletionContributor() {
 
@@ -32,8 +31,8 @@ class TemplateCompletionContributor : CompletionContributor() {
     }
 
     private fun capture() = psiElement()
-            .withParent(psiElement(PsiJavaCodeReferenceElement::class.java))
-            .withSuperParent(3, psiClass())
+        .withParent(psiElement(PsiJavaCodeReferenceElement::class.java))
+        .withSuperParent(3, psiClass())
 
     private class TemplateCompletionProvider : CompletionProvider<CompletionParameters>() {
 
@@ -48,12 +47,12 @@ class TemplateCompletionContributor : CompletionContributor() {
             val description = Strings.notBlank(templateDescriptor.description()).map { " ($it)" }.orElse("")
             val name = templateDescriptor.name()
             val element = LookupElementBuilder.create(declaringClass, name)
-                    .withCaseSensitivity(false)
-                    .withPresentableText(name)
-                    .withTailText(description)
-                    .withIcon(AllIcons.Nodes.Class)
-                    .withLookupStrings(templateDescriptor.aliasNames())
-                    .withInsertHandler(TemplateInsertHandler(templateDescriptor, scoutApi, prefix))
+                .withCaseSensitivity(false)
+                .withPresentableText(name)
+                .withTailText(description)
+                .withIcon(AllIcons.Nodes.Class)
+                .withLookupStrings(templateDescriptor.aliasNames())
+                .withInsertHandler(TemplateInsertHandler(templateDescriptor, scoutApi, prefix))
             element.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true) // instructs the completion engine to not insert the name of the LookupElement into the source
             element.putUserData(TemplateHelper.SCOUT_LOOKUP_ELEMENT_MARKER, true) // to identify scout LookupElements. Used for testing.
             return element
@@ -79,7 +78,7 @@ class TemplateCompletionContributor : CompletionContributor() {
         if (PsiTreeUtil.findElementOfClassAtOffset(file, offset - 1, PsiReferenceParameterList::class.java, false) != null) {
             return CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED
         }
-        if (CompatibilityHelper.semicolonNeeded(context.editor, file, offset)) {
+        if (JavaCompletionContributor.semicolonNeeded(file, offset)) {
             return CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED + ";"
         }
         val leaf = file.findElementAt(offset)

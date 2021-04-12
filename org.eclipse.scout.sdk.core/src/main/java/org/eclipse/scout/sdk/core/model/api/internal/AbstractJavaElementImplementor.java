@@ -94,7 +94,7 @@ public abstract class AbstractJavaElementImplementor<SPI extends JavaElementSpi>
 
   @Override
   public TreeVisitResult visit(IDepthFirstJavaElementVisitor visitor) {
-    return visit(new DefaultDepthFirstVisitor<IJavaElement>() {
+    return visit(new DefaultDepthFirstVisitor<>() {
       @Override
       public TreeVisitResult preVisit(IJavaElement element, int level, int index) {
         return element.unwrap().acceptPreOrder(visitor, level, index);

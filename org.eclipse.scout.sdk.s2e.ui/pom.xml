@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>11.0.0-SNAPSHOT</version>
+    <version>12.0.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.sdk</relativePath>
   </parent>
 
@@ -77,7 +77,6 @@
     </dependency>
   </dependencies>
 
-
   <build>
     <pluginManagement>
       <plugins>
@@ -130,8 +129,8 @@
               *
             </Import-Package>
             <Require-Bundle>
-              org.eclipse.scout.sdk.s2e;bundle-version="[11.0,11.1)";visibility:=reexport,
-              org.eclipse.scout.sdk.s2e.doc;bundle-version="[11.0,11.1)";visibility:=reexport,
+              org.eclipse.scout.sdk.s2e;bundle-version="[12.0,12.1)";visibility:=reexport,
+              org.eclipse.scout.sdk.s2e.doc;bundle-version="[12.0,12.1)";visibility:=reexport,
               org.eclipse.jdt.ui;bundle-version="[3.21,4)";visibility:=reexport,
               org.eclipse.jdt.debug.ui;bundle-version="[3.10.600,4)";visibility:=reexport,
               org.eclipse.ui.workbench.texteditor;bundle-version="[3.14.100,4)";visibility:=reexport,

@@ -213,7 +213,7 @@ public final class S2eUtils {
     }
 
     // search for a test project
-    String[] testProjectSuffixes = {".test", ".tests", ".testing"};
+    var testProjectSuffixes = new String[]{".test", ".tests", ".testing"};
     @SuppressWarnings("squid:S2259") // NPE
     var javaModel = orig.getJavaModel();
     for (var suffix : testProjectSuffixes) {

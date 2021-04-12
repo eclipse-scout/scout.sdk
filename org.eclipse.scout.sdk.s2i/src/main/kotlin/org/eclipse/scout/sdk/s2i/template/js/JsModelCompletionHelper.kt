@@ -57,8 +57,7 @@ object JsModelCompletionHelper {
     val TEXT_VARIABLE = VariableDescriptor("TXT", null)
     val COMPLETE_VARIABLE = VariableDescriptor("COMP", "complete()")
     val ALL_VARIABLES = listOf(BOOL_VARIABLE, TEXT_VARIABLE, COMPLETE_VARIABLE)
-            .map { it.name to it }
-            .toMap()
+        .associateBy { it.name }
 
     const val END_VARIABLE_SRC = "\$${TemplateImpl.END}$"
     val BOOL_VARIABLE_SRC = "\$${BOOL_VARIABLE.name}$"

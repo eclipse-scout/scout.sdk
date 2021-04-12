@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2i.nls.editor
 
+import com.intellij.find.impl.RegExHelpPopup
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.fileChooser.FileChooser
@@ -44,7 +45,6 @@ import org.eclipse.scout.sdk.s2i.toScoutProgress
 import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import org.eclipse.scout.sdk.s2i.util.Xlsx
-import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
@@ -63,7 +63,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
 
     private val m_table = NlsTable(stack, project)
     private val m_textFilter = TextFieldWithMaxLen(maxLength = 2000)
-    private val m_regexHelpButton = CompatibilityHelper.createRegExLink("<html><body><b>?</b></body></html>", this)
+    private val m_regexHelpButton = RegExHelpPopup.createRegExLink("<html><body><b>?</b></body></html>", this)
     private val m_hideReadOnly = JBCheckBox(message("hide.readonly.rows"), true)
     private val m_hideInherited = JBCheckBox(message("hide.inherited.rows"), true)
 
@@ -151,8 +151,8 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
     }
 
     private fun createContextMenu() = ActionManager.getInstance()
-            .createActionPopupMenu(ActionPlaces.UNKNOWN, createContextMenuActionGroup())
-            .component
+        .createActionPopupMenu(ActionPlaces.UNKNOWN, createContextMenuActionGroup())
+        .component
 
     private fun createContextMenuActionGroup(): DefaultActionGroup {
         val group = DefaultActionGroup()
@@ -165,8 +165,8 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
 
     private fun createToolbar(): JComponent {
         return ActionManager.getInstance()
-                .createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, createToolbarActionGroup(), false)
-                .component
+            .createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, createToolbarActionGroup(), false)
+            .component
     }
 
     private fun createToolbarActionGroup(): ActionGroup {
@@ -191,13 +191,13 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
     private fun showBalloon(text: String, severity: MessageType) {
         val lbl = JBLabel(text)
         val balloon = JBPopupFactory.getInstance()
-                .createBalloonBuilder(lbl)
-                .setShowCallout(false)
-                .setAnimationCycle(Registry.intValue("ide.tooltip.animationCycle"))
-                .setBlockClicksThroughBalloon(true)
-                .setFillColor(severity.popupBackground)
-                .setBorderColor(severity.borderColor)
-                .createBalloon()
+            .createBalloonBuilder(lbl)
+            .setShowCallout(false)
+            .setAnimationCycle(Registry.intValue("ide.tooltip.animationCycle"))
+            .setBlockClicksThroughBalloon(true)
+            .setFillColor(severity.popupBackground)
+            .setBorderColor(severity.borderColor)
+            .createBalloon()
         if (balloon is BalloonImpl) {
             balloon.startSmartFadeoutTimer(TimeUnit.SECONDS.toMillis(30).toInt())
         }
@@ -258,8 +258,8 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
 
         override fun actionPerformed(e: AnActionEvent) {
             val toDelete = m_table.selectedTranslations()
-                    .map { it.key() }
-                    .stream()
+                .map { it.key() }
+                .stream()
             stack.removeTranslations(toDelete)
         }
     }
@@ -333,9 +333,9 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
 
         override fun actionPerformed(e: AnActionEvent) {
             val descriptor = FileChooserDescriptor(true, false, false, false, false, false)
-                    .withDescription(message("please.choose.the.xlsx.file.to.import"))
-                    .withTitle(message("import.translations.from.excel"))
-                    .withFileFilter { it.isValid && it.exists() && it.extension == "xlsx" }
+                .withDescription(message("please.choose.the.xlsx.file.to.import"))
+                .withTitle(message("import.translations.from.excel"))
+                .withFileFilter { it.isValid && it.exists() && it.extension == "xlsx" }
             val vFile = FileChooser.chooseFile(descriptor, project, null) ?: return
             try {
                 val file = vFile.resolveLocalPath()?.toFile()
@@ -382,8 +382,8 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
                 logMessages.add(message("import.columns.not.mapped", messages))
             }
             val invalidRows = importInfo.invalidRowIndices()
-                    .map { it + 1 } // convert to row number
-                    .toList()
+                .map { it + 1 } // convert to row number
+                .toList()
             if (invalidRows.isNotEmpty()) {
                 val balloonList = invalidRows.joinToString(listSeparator, listPrefix, listPostfix, maxNumItemsInBalloon)
                 balloonMessages.add(message("import.rows.invalid", balloonList))
@@ -410,8 +410,8 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         override fun actionPerformed(e: AnActionEvent) {
             val fileSaverDescriptor = FileSaverDescriptor(message("export.translations"), message("export.translations.desc"), "xlsx")
             val file = FileChooserFactory.getInstance().createSaveFileDialog(fileSaverDescriptor, project)
-                    .save(null as VirtualFile? /* cast required for IJ 2020.3 compatibility (overloads) */, null)
-                    ?.file ?: return
+                .save(null as VirtualFile? /* cast required for IJ 2020.3 compatibility (overloads) */, null)
+                ?.file ?: return
             val tableData = m_table.visibleData()
             OperationTask(message("export.translations"), project) { doExport(tableData, file) }.schedule<Unit>()
         }

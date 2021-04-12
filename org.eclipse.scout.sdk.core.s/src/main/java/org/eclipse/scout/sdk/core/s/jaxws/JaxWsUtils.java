@@ -310,7 +310,7 @@ public final class JaxWsUtils {
       return input;
     }
 
-    String[] suffixes = {"xml", "soap", "porttype", "port", "webservice", "services", "service"};
+    var suffixes = new String[]{"xml", "soap", "porttype", "port", "webservice", "services", "service"};
     for (var s : suffixes) {
       if (input.toLowerCase(Locale.US).endsWith(s)) {
         var newInputCandidate = input.substring(0, input.length() - s.length());

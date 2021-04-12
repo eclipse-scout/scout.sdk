@@ -89,7 +89,6 @@ public final class MockFactory {
     var f = mock(IFile.class);
     when(f.exists()).thenAnswer(invocation -> icus.containsKey(name));
     try {
-      //noinspection resource,IOResourceOpenedButNotSafelyClosed
       when(f.getContents()).thenAnswer(invocation -> new CharSequenceInputStream(icus.get(name), StandardCharsets.UTF_8));
     }
     catch (CoreException e) {

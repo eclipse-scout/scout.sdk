@@ -141,7 +141,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
   protected String calcPageBaseName() {
     var name = getPageName();
-    String[] suffixes = {ISdkConstants.SUFFIX_PAGE_WITH_NODES, ISdkConstants.SUFFIX_PAGE_WITH_TABLE, ISdkConstants.SUFFIX_OUTLINE_PAGE};
+    var suffixes = new String[]{ISdkConstants.SUFFIX_PAGE_WITH_NODES, ISdkConstants.SUFFIX_PAGE_WITH_TABLE, ISdkConstants.SUFFIX_OUTLINE_PAGE};
     for (var suffix : suffixes) {
       var suffixLen = suffix.length();
       var strOffset = name.length() - suffixLen;

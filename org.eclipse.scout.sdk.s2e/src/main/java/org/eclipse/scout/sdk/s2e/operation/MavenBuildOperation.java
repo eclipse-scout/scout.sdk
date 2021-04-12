@@ -208,7 +208,11 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
 
   protected void waitForArtifactBuildCompleted() {
     try {
-      m_artifactGenCompleted.await(15, TimeUnit.MINUTES);
+      var completed = m_artifactGenCompleted.await(15, TimeUnit.MINUTES);
+      if (!completed) {
+        // timeout reached
+        SdkLog.warning("Maven build did not complete within 15 minutes.");
+      }
     }
     catch (InterruptedException e) {
       SdkLog.debug(e);

@@ -37,7 +37,7 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
         new BooleanFieldEditor(S2ESdkUiActivator.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION, "Automatically create the @ClassId annotation for new classes.", getFieldEditorParent());
     addField(createClassIdField);
 
-    String[][] comboValues = {{"Error", "SEVERE"}, {"Warning", "WARNING"}, {"Info", "INFO"}, {"Debug", "FINE"}};
+    var comboValues = new String[][]{{"Error", "SEVERE"}, {"Warning", "WARNING"}, {"Info", "INFO"}, {"Debug", "FINE"}};
     FieldEditor logLevelField = new ComboFieldEditor(SdkLog.LOG_LEVEL_PROPERTY_NAME, "Log Level", comboValues, getFieldEditorParent());
     addField(logLevelField);
   }

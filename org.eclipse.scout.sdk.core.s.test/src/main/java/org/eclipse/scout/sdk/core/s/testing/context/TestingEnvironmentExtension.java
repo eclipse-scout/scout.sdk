@@ -35,7 +35,6 @@ public class TestingEnvironmentExtension extends AbstractContextExtension<Testin
   }
 
   @Override
-  @SuppressWarnings("resource")
   protected TestingEnvironment annotationToContext(ExtendWithTestingEnvironment annotation) {
     return new TestingEnvironment(createJavaEnvironmentUsingBuilder(annotation.primary().value()).get().wrap(),
         annotation.flushToDisk(),

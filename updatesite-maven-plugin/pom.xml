@@ -15,18 +15,18 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>3.14.1</version>
+    <version>3.14.2-SNAPSHOT</version>
     <relativePath />
   </parent>
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>updatesite-maven-plugin</artifactId>
-  <version>11.0.0-SNAPSHOT</version>
+  <version>12.0.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
-    <scout.base.version>11.0.0</scout.base.version>
+    <scout.base.version>12.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <maven.model.dependency.version>3.6.3</maven.model.dependency.version>
     <junit.version>5.7.1</junit.version>

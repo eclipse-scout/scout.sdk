@@ -219,7 +219,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     }
 
     var result = new StringBuilder(base.length() + rowDataSuffix.length());
-    String[] suffixes = {"PageData", "FieldData", ISdkConstants.SUFFIX_DTO};
+    var suffixes = new String[]{"PageData", "FieldData", ISdkConstants.SUFFIX_DTO};
     Arrays.stream(suffixes)
         .filter(base::endsWith)
         .findFirst()

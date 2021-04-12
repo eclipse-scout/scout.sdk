@@ -42,7 +42,6 @@ import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.findTypeByName
 import org.eclipse.scout.sdk.s2i.isInstanceOf
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
-import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 
 /**
  * Handler that inserts a selected [TemplateDescriptor].
@@ -73,7 +72,8 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
             val settingsManager = CodeStyleSettingsManager.getInstance(project)
             val origTempSettings = settingsManager.temporarySettings
             val origProjectSettings = CodeStyle.getSettings(editor) // must be obtained before creating temp settings!
-            val tempSettings = CompatibilityHelper.createTempSettings(origProjectSettings, settingsManager)
+            val tempSettings = CodeStyleSettingsManager.getInstance(project).createTemporarySettings()
+            tempSettings.copyFrom(origProjectSettings)
             tempSettings.getCustomSettings(JavaCodeStyleSettings::class.java).isInsertInnerClassImports = false
 
             val templateListener = TemplateListener(templateDescriptor, editor, settingsManager, origTempSettings) {
@@ -83,8 +83,8 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
             TemplateManager.getInstance(project).startTemplate(editor, template, templateListener)
 
             m_insertPos = TemplateManagerImpl.getTemplateState(editor)
-                    ?.getVariableRange(TemplateDescriptor.VARIABLE_NAME)
-                    ?.startOffset ?: -1
+                ?.getVariableRange(TemplateDescriptor.VARIABLE_NAME)
+                ?.startOffset ?: -1
         })
     }
 
@@ -114,7 +114,13 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
         target.addVariable(descriptor.name, descriptor.expression, descriptor.defaultValueExpression, true)
     }
 
-    private class TemplateListener(private val templateDescriptor: TemplateDescriptor, private val editor: Editor, private val settingsManager: CodeStyleSettingsManager, private val origSettings: CodeStyleSettings?, private val positionSupplier: () -> Int) : TemplateEditingAdapter() {
+    private class TemplateListener(
+        private val templateDescriptor: TemplateDescriptor,
+        private val editor: Editor,
+        private val settingsManager: CodeStyleSettingsManager,
+        private val origSettings: CodeStyleSettings?,
+        private val positionSupplier: () -> Int
+    ) : TemplateEditingAdapter() {
 
         override fun templateCancelled(template: Template?) {
             onTemplateCompletedOrCancelled(null)
@@ -158,7 +164,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
                     findEnclosingInstanceInScope(innerTypeGetterBase, createdClass, alwaysTrue(), false)
                 } else {
                     PsiTreeUtil.collectParents(createdClass, PsiClass::class.java, false) { it is PsiFile }
-                            .lastOrNull { it.isInstanceOf(info.definitionClassFqn) }
+                        .lastOrNull { it.isInstanceOf(info.definitionClassFqn) }
                 }
 
                 if (container != null) {
@@ -210,21 +216,21 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
 
         private fun getInsertAnchor(innerTypeGetterContainer: PsiClass, methodName: String, innerTypeGetterMethodName: String, document: Document): Pair<PsiElement, Boolean>? {
             val gettersWithSource = innerTypeGetterContainer.methods
-                    .filter { it.name.startsWith(PropertyBean.GETTER_PREFIX) }
-                    .map { it to document.getText(it.textRange) }
+                .filter { it.name.startsWith(PropertyBean.GETTER_PREFIX) }
+                .map { it to document.getText(it.textRange) }
             val otherInnerTypeGetters = gettersWithSource
-                    .filter { it.second.contains(innerTypeGetterMethodName) }
-                    .map { it.first }
+                .filter { it.second.contains(innerTypeGetterMethodName) }
+                .map { it.first }
             return getInsertAnchorFrom(otherInnerTypeGetters, methodName)  // find position within other inner-type-getters first
-                    ?: getInsertAnchorFrom(gettersWithSource.map { it.first }, methodName) // find position within all getters
-                    ?: getInsertAnchorFrom(innerTypeGetterContainer.methods.filter { !it.isConstructor }, methodName) // find position within all methods
+                ?: getInsertAnchorFrom(gettersWithSource.map { it.first }, methodName) // find position within all getters
+                ?: getInsertAnchorFrom(innerTypeGetterContainer.methods.filter { !it.isConstructor }, methodName) // find position within all methods
         }
 
         private fun getInsertAnchorFrom(candidates: Iterable<PsiMethod>, methodName: String) = candidates
-                .lastOrNull { it.name < methodName }
-                ?.let { it to true } // sort ascending, add after
-                ?: candidates
-                        .firstOrNull()
-                        ?.let { it to false } // all must be after, add before the first
+            .lastOrNull { it.name < methodName }
+            ?.let { it to true } // sort ascending, add after
+            ?: candidates
+                .firstOrNull()
+                ?.let { it to false } // all must be after, add before the first
     }
 }

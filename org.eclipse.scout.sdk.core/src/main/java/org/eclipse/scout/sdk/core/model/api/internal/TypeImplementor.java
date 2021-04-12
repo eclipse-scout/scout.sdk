@@ -46,11 +46,10 @@ import org.eclipse.scout.sdk.core.util.Strings;
 @SuppressWarnings("squid:S2160")
 public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implements IType {
   private static final Pattern PRIMITIVE_TYPE_ASSIGNABLE_PAT =
-      Pattern.compile("(?:"
-          + "char=(?:char|Character)|byte=(?:byte|Byte)|short=(?:short|Short)|int=(?:int|Integer)|long=(?:long|Long)"
-          + "|float=(?:float|Float)|double=(?:double|Double)|Character=(?:char|Character)|Byte=(?:byte|Byte)"
-          + "|Short=(?:short|Short)|Integer=(?:int|Integer)|Long=(?:long|Long)|Float=(?:float|Float)|Double=(?:double|Double)"
-          + ')');
+      Pattern.compile(
+          "char=(?:char|Character)|byte=(?:byte|Byte)|short=(?:short|Short)|int=(?:int|Integer)|long=(?:long|Long)|" +
+              "float=(?:float|Float)|double=(?:double|Double)|Character=(?:char|Character)|Byte=(?:byte|Byte)|" +
+              "Short=(?:short|Short)|Integer=(?:int|Integer)|Long=(?:long|Long)|Float=(?:float|Float)|Double=(?:double|Double)");
   private String m_reference;
   private String m_referenceErasureOnly;
 

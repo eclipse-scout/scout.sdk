@@ -203,7 +203,7 @@ public final class JaxWsModuleNewHelper {
 
       var properties = Xml.firstChildElement(parentPom.getDocumentElement(), IMavenConstants.PROPERTIES);
       if (properties.isPresent()) {
-        String[] suffixes = {".version", "_version"};
+        var suffixes = new String[]{".version", "_version"};
         Arrays.stream(suffixes)
             .map(suffix -> groupId + JavaTypes.C_DOT + parentArtifactId + suffix)
             .filter(versionPropertyName -> Xml.firstChildElement(properties.get(), versionPropertyName).isPresent())

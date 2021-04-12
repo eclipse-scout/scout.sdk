@@ -81,7 +81,7 @@ public final class FileUtility {
     }
 
     // file
-    var outFile = new File(toDir.getAbsolutePath() + File.separator + relPath.relativize(input.toURI()).toString());
+    var outFile = new File(toDir.getAbsolutePath() + File.separator + relPath.relativize(input.toURI()));
     ensureDirExists(outFile);
 
     try (InputStream in = new FileInputStream(input); OutputStream out = new FileOutputStream(outFile)) {
