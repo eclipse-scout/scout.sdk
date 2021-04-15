@@ -157,6 +157,7 @@ public class TestingEnvironment extends AbstractEnvironment implements AutoClose
    * Make visible for testing
    */
   @Override
+  @SuppressWarnings("squid:S1185") // Remove this method to simply inherit it
   protected <T extends JavaEnvironmentSpi> T initNewJavaEnvironment(T javaEnvironment) {
     return super.initNewJavaEnvironment(javaEnvironment);
   }
