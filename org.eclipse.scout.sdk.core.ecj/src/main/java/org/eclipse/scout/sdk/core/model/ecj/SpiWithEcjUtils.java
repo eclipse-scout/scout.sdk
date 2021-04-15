@@ -620,9 +620,11 @@ public final class SpiWithEcjUtils {
       var fb = (FieldBinding) compiledValue;
       var type = bindingToType(env, fb.declaringClass, () -> withNewElement(FieldBinding.class, f -> f.declaringClass, compiledValueSupplier));
       var name = new String(fb.name);
-      for (var f : type.getFields()) {
-        if (f.getElementName().equals(name)) {
-          return MetaValueFactory.createFromEnum(f);
+      if (type != null) {
+        for (var f : type.getFields()) {
+          if (f.getElementName().equals(name)) {
+            return MetaValueFactory.createFromEnum(f);
+          }
         }
       }
       return MetaValueFactory.createUnknown("ENUM " + fb.declaringClass.debugName() + '#' + name);

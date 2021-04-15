@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.eclipse.jdt.internal.compiler.lookup.Binding;
 import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
 import org.eclipse.jdt.internal.compiler.lookup.ExtraCompilerModifiers;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
@@ -275,7 +276,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
       memberTypes = owner.m_binding.memberTypes();
     }
     if (memberTypes == null || memberTypes.length < 1) {
-      return null;
+      return Binding.NO_MEMBER_TYPES;
     }
 
     memberTypes = Arrays.copyOf(memberTypes, memberTypes.length);
@@ -336,7 +337,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
     if (owner instanceof ParameterizedTypeBinding) {
       return ((ParameterizedTypeBinding) owner).arguments;
     }
-    return null;
+    return Binding.NO_TYPES;
   }
 
   protected TypeVariableBinding[] getTypeVariables() {
