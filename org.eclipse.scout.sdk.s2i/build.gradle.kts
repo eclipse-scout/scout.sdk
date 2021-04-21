@@ -59,6 +59,10 @@ buildscript {
         classpath("org.jetbrains.intellij.plugins:structure-base:3.139")
         classpath("org.jetbrains.intellij.plugins:structure-intellij:3.139")
         classpath("org.jetbrains.intellij:plugin-repository-rest-client:2.0.15")
+
+        // explicitly add build dependency to version 4.0.4 because the kotlin jvm plugin still contains 4.0.2 which suffers from https://github.com/michel-kraemer/gradle-download-task/issues/146
+        // Can be removed as soon as the Kotlin plugin is updated to 1.5.x
+        classpath("de.undercouch:gradle-download-task:4.0.4")
     }
 }
 
