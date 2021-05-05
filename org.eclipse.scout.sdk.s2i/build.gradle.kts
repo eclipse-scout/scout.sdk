@@ -49,7 +49,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "0.7.2"
+    id("org.jetbrains.intellij") version "0.7.3"
     kotlin("jvm") version "1.4.32"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
@@ -86,7 +86,7 @@ intellij {
     }
 
     tasks.withType<RunPluginVerifierTask> {
-        setIdeVersions(listOf("IU-2021.1"))
+        setIdeVersions(listOf("IU-2021.1.1"))
         setSubsystemsToCheck("without-android")
         failureLevel = FailureLevel.ALL
     }
