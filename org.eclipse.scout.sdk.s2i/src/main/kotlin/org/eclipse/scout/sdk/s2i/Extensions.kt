@@ -20,6 +20,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.projectRoots.JavaSdk
@@ -225,6 +226,10 @@ fun PsiElement.containingModule(returnReferencingModuleIfNotInFilesystem: Boolea
                     .takeIf { it.isValid }
                     ?.let { ModuleUtilCore.findModuleForPsiElement(searchElement) }
         }
+    } catch (e: IndexNotReadyException) {
+        // in case the current call is already in a read-action.
+        // then the creator of the read-action must know that the index is not ready and may retry it afterwards
+        throw e
     } catch (e: RuntimeException) {
         SdkLog.warning("Unable to compute module of '{}'.", this, e)
         return null

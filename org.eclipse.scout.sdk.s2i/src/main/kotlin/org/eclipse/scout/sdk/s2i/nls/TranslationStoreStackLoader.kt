@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2i.nls
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.eclipse.scout.sdk.core.log.SdkLog
@@ -123,6 +124,10 @@ object TranslationStoreStackLoader {
                     TranslationStores.createStack(modulePath, e, p, scope).orElse(null)
                 }
             }
+        } catch (e: IndexNotReadyException) {
+            // in case the current call is already in a read-action.
+            // then the creator of the read-action must know that the index is not ready and may retry it afterwards
+            throw e
         } catch (e: RuntimeException) {
             SdkLog.error("Error computing texts for module '{}'.", modulePath, e)
             null
