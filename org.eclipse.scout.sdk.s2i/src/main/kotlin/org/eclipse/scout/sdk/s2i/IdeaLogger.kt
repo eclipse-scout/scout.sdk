@@ -19,6 +19,7 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.ui.popup.Balloon
@@ -115,32 +116,31 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
         }
     }
 
-    protected fun isControlFlowException(t: Throwable) = t is ControlFlowException
+    protected fun shouldBeRethrown(t: Throwable) = t is ControlFlowException // ControlFlowExceptions should not be logged. See com.intellij.openapi.diagnostic.Logger.checkException
+            || t is IndexNotReadyException
 
     protected fun logToTextFile(msg: LogMessage) {
-        // ControlFlowExceptions should not be logged. See com.intellij.openapi.diagnostic.Logger.checkException
-        val controlFlowException = msg.throwableList().firstOrNull { isControlFlowException(it) }
-        val loggableThrowable = msg.throwableList().firstOrNull { !isControlFlowException(it) }
-        if (controlFlowException != null && loggableThrowable == null) {
-            // the log event is from a ControlFlowException. These must not be logged. Instead: rethrow
-            throw controlFlowException
+        val toRethrow = msg.throwableList().firstOrNull { shouldBeRethrown(it) }
+        val toLog = msg.throwableList().firstOrNull { !shouldBeRethrown(it) }
+        if (toRethrow != null && toLog == null) {
+            throw toRethrow
         }
 
         // do not log the prefix here as this information is already logged by the text logger
         when (msg.severity()) {
-            Level.SEVERE -> m_textLog.warn(msg.text(), loggableThrowable) // do not use m_textLog.error() because this is registered as fatal plugin error
-            Level.WARNING -> m_textLog.warn(msg.text(), loggableThrowable)
-            Level.INFO -> m_textLog.info(msg.text(), loggableThrowable)
-            Level.FINE -> m_textLog.debug(msg.text(), loggableThrowable)
+            Level.SEVERE -> m_textLog.warn(msg.text(), toLog) // do not use m_textLog.error() because this is registered as fatal plugin error
+            Level.WARNING -> m_textLog.warn(msg.text(), toLog)
+            Level.INFO -> m_textLog.info(msg.text(), toLog)
+            Level.FINE -> m_textLog.debug(msg.text(), toLog)
             else -> {
                 m_textLog.trace(msg.text())
-                loggableThrowable?.let { m_textLog.trace(it) }
+                toLog?.let { m_textLog.trace(it) }
             }
         }
-        if (controlFlowException != null) {
-            // there was a loggable throwable and a control flow exception. The loggable has already been reported.
-            // now rethrow the control flow exception so that both have been handled
-            throw controlFlowException
+        if (toRethrow != null) {
+            // there was a loggable throwable and an exception to rethrow. The loggable has already been reported.
+            // now throw so that both have been handled
+            throw toRethrow
         }
     }
 
