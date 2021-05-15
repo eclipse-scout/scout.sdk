@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -140,7 +141,7 @@ public final class FileUtility {
     addFileToJar(name, data, timestamp, zOut);
   }
 
-  private static void addFileToJar(String name, byte[] data, long timestamp, JarOutputStream zOut) throws IOException {
+  private static void addFileToJar(String name, byte[] data, long timestamp, ZipOutputStream zOut) throws IOException {
     var entry = new ZipEntry(name);
     entry.setTime(timestamp);
     zOut.putNextEntry(entry);
@@ -247,7 +248,7 @@ public final class FileUtility {
    * @throws ParserConfigurationException
    *           if a {@link DocumentBuilder} cannot be created which satisfies the configuration requested.
    */
-  @SuppressWarnings("squid:S1166")
+  @SuppressWarnings({"squid:S1166", "HttpUrlsUsage"})
   public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
     var dbf = DocumentBuilderFactory.newInstance();
     Map<String, Boolean> features = new HashMap<>(5);

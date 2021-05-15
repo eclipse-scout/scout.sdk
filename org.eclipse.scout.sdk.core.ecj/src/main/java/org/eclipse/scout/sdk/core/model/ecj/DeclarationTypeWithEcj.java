@@ -28,6 +28,7 @@ import org.eclipse.jdt.internal.compiler.lookup.TypeConstants;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
@@ -58,7 +59,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
   private final FinalValue<ISourceRange> m_staticInitSource;
   private int m_flags;
 
-  protected DeclarationTypeWithEcj(JavaEnvironmentWithEcj env, CompilationUnitSpi cu, DeclarationTypeWithEcj declaringType, TypeDeclaration astNode) {
+  protected DeclarationTypeWithEcj(AbstractJavaEnvironment env, CompilationUnitSpi cu, DeclarationTypeWithEcj declaringType, TypeDeclaration astNode) {
     super(env);
     m_cu = Ensure.notNull(cu);
     m_declaringType = declaringType;

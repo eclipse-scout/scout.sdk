@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
@@ -35,7 +36,7 @@ public class BindingBaseTypeWithEcj extends AbstractTypeWithEcj {
   private final BaseTypeBinding m_btb;
   private final String m_elementName;
 
-  protected BindingBaseTypeWithEcj(JavaEnvironmentWithEcj env, BaseTypeBinding binding) {
+  protected BindingBaseTypeWithEcj(AbstractJavaEnvironment env, BaseTypeBinding binding) {
     super(env);
     m_btb = Ensure.notNull(binding);
     m_elementName = new String(m_btb.simpleName);

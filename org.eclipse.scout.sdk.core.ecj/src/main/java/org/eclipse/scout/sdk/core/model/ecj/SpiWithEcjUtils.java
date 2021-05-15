@@ -28,9 +28,9 @@ import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ASTVisitor;
 import org.eclipse.jdt.internal.compiler.ast.ASTNode;
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
+import org.eclipse.jdt.internal.compiler.ast.AbstractVariableDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.AllocationExpression;
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
-import org.eclipse.jdt.internal.compiler.ast.Argument;
 import org.eclipse.jdt.internal.compiler.ast.ArrayInitializer;
 import org.eclipse.jdt.internal.compiler.ast.CharLiteral;
 import org.eclipse.jdt.internal.compiler.ast.ClassLiteralAccess;
@@ -227,7 +227,7 @@ public final class SpiWithEcjUtils {
     return new String(fqn);
   }
 
-  static TypeBinding resolveTypeOfArgument(Argument argument, BlockScope scope, AbstractJavaEnvironment env) {
+  static TypeBinding resolveTypeOfArgument(AbstractVariableDeclaration argument, BlockScope scope, AbstractJavaEnvironment env) {
     var type = argument.type;
     var result = type.resolvedType;
     if (result != null) {

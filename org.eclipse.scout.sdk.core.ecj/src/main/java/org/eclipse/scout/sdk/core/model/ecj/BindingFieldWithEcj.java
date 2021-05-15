@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.FieldImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
@@ -43,7 +44,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   private final FinalValue<ISourceRange> m_javaDocSource;
   private int m_flags;
 
-  protected BindingFieldWithEcj(JavaEnvironmentWithEcj env, AbstractTypeWithEcj declaringType, FieldBinding binding) {
+  protected BindingFieldWithEcj(AbstractJavaEnvironment env, AbstractTypeWithEcj declaringType, FieldBinding binding) {
     super(env);
     m_declaringType = Ensure.notNull(declaringType);
     m_binding = Ensure.notNull(binding);

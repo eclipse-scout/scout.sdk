@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
@@ -30,7 +31,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 public class VoidTypeWithEcj extends AbstractTypeWithEcj {
 
-  protected VoidTypeWithEcj(JavaEnvironmentWithEcj env) {
+  protected VoidTypeWithEcj(AbstractJavaEnvironment env) {
     super(env);
   }
 

@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.FieldImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
@@ -44,7 +45,7 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   private final FinalValue<ISourceRange> m_javaDocSource;
   private int m_flags;
 
-  protected DeclarationFieldWithEcj(JavaEnvironmentWithEcj env, DeclarationTypeWithEcj declaringType, FieldDeclaration astNode) {
+  protected DeclarationFieldWithEcj(AbstractJavaEnvironment env, DeclarationTypeWithEcj declaringType, FieldDeclaration astNode) {
     super(env);
     m_declaringType = Ensure.notNull(declaringType);
     m_astNode = Ensure.notNull(astNode);

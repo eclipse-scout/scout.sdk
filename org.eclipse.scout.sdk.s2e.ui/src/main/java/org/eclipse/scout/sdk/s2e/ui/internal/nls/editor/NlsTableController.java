@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -110,7 +110,7 @@ public class NlsTableController extends ViewerComparator {
   }
 
   /**
-   * Callback executed after all events have been handled. Here the table may be layouted or refreshed.
+   * Callback executed after all events have been handled. Here the table may be lay out or refreshed.
    */
   protected void finishTranslationStoreStackEvents(boolean requireReSort) {
     if (requireReSort) {

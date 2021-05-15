@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
@@ -54,7 +55,7 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
   private final FinalValue<List<FieldSpi>> m_fields;
   private final Supplier<ArrayBinding> m_newElementLookupStrategy;
 
-  protected BindingArrayTypeWithEcj(JavaEnvironmentWithEcj env, ArrayBinding binding, boolean isWildcard, Supplier<ArrayBinding> newElementLookupStrategy) {
+  protected BindingArrayTypeWithEcj(AbstractJavaEnvironment env, ArrayBinding binding, boolean isWildcard, Supplier<ArrayBinding> newElementLookupStrategy) {
     super(env);
     m_binding = Ensure.notNull(binding);
     m_newElementLookupStrategy = Ensure.notNull(newElementLookupStrategy);

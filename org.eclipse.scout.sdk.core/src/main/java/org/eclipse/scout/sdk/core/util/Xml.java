@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -266,6 +266,7 @@ public final class Xml {
   /**
    * @return A safe pre configured {@link DocumentBuilderFactory}. All external entities are disabled to prevent XXE.
    */
+  @SuppressWarnings("HttpUrlsUsage")
   public static DocumentBuilderFactory createDocumentBuilderFactory() {
     var dbf = DocumentBuilderFactory.newDefaultInstance();
     dbf.setXIncludeAware(false);
@@ -419,6 +420,7 @@ public final class Xml {
    * @throws TransformerConfigurationException
    *           When it is not possible to create a Transformer instance.
    */
+  @SuppressWarnings("HttpUrlsUsage")
   public static Transformer createTransformer(boolean format) throws TransformerConfigurationException {
     var tf = TransformerFactory.newDefaultInstance();
     try {

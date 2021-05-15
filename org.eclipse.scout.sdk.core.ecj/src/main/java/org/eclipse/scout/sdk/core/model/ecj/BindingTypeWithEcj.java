@@ -39,6 +39,7 @@ import org.eclipse.scout.sdk.core.model.api.internal.TypeImplementor;
 import org.eclipse.scout.sdk.core.model.ecj.SourcePositionComparators.FieldBindingComparator;
 import org.eclipse.scout.sdk.core.model.ecj.SourcePositionComparators.MethodBindingComparator;
 import org.eclipse.scout.sdk.core.model.ecj.SourcePositionComparators.TypeBindingComparator;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
@@ -74,7 +75,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   private final Supplier<? extends ReferenceBinding> m_newElementLookupStrategy;
   private int m_flags;
 
-  protected BindingTypeWithEcj(JavaEnvironmentWithEcj env, ReferenceBinding binding, TypeSpi declaringType, boolean isWildcard, Supplier<? extends ReferenceBinding> newElementLookupStrategy) {
+  protected BindingTypeWithEcj(AbstractJavaEnvironment env, ReferenceBinding binding, TypeSpi declaringType, boolean isWildcard, Supplier<? extends ReferenceBinding> newElementLookupStrategy) {
     super(env);
     if (binding == null || binding instanceof MissingTypeBinding || binding instanceof ProblemReferenceBinding) {
       // type not found -> parsing error. do not silently continue

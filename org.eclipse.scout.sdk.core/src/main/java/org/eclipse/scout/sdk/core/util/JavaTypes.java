@@ -16,6 +16,7 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
 import static org.eclipse.scout.sdk.core.util.Strings.lastIndexOf;
 
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
@@ -382,7 +383,7 @@ public final class JavaTypes {
    * qualifier("java.lang.Object") -> "java.lang"
    * qualifier("Outer.Inner") -> "Outer"
    * qualifier("java.util.List<java.lang.String>") -> "java.util"
-   * qualifier("org.eclipse.scout.Blub$Inner$Inner2") -> "org.eclipse.scout"
+   * qualifier("org.eclipse.scout.Outer$Inner$Inner2") -> "org.eclipse.scout"
    * }
    * </pre>
    *
@@ -502,7 +503,7 @@ public final class JavaTypes {
    *          is used.
    * @return The created identifier
    */
-  public static String createMethodIdentifier(Method method, boolean includeTypeArguments) {
+  public static String createMethodIdentifier(Executable method, boolean includeTypeArguments) {
     var paramTypes = includeTypeArguments ? method.getGenericParameterTypes() : method.getParameterTypes();
     var args = Arrays.stream(paramTypes)
         .map(Type::getTypeName)

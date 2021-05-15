@@ -26,6 +26,7 @@ import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.MethodImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
@@ -52,7 +53,7 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   private final FinalValue<String> m_methodId;
   private int m_flags;
 
-  protected DeclarationMethodWithEcj(JavaEnvironmentWithEcj env, DeclarationTypeWithEcj declaringType, AbstractMethodDeclaration astNode) {
+  protected DeclarationMethodWithEcj(AbstractJavaEnvironment env, DeclarationTypeWithEcj declaringType, AbstractMethodDeclaration astNode) {
     super(env);
     m_declaringType = Ensure.notNull(declaringType);
     m_astNode = Ensure.notNull(astNode);

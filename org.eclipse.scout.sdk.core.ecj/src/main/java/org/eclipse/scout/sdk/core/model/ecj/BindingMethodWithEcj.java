@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.MethodImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
@@ -53,7 +54,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   private final FinalValue<String> m_methodId;
   private int m_flags;
 
-  protected BindingMethodWithEcj(JavaEnvironmentWithEcj env, BindingTypeWithEcj declaringType, MethodBinding binding) {
+  protected BindingMethodWithEcj(AbstractJavaEnvironment env, BindingTypeWithEcj declaringType, MethodBinding binding) {
     super(env);
     m_declaringType = Ensure.notNull(declaringType);
     m_binding = Ensure.notNull(binding);
