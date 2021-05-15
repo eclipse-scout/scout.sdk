@@ -25,7 +25,7 @@ val scoutSdkPluginVersion = scoutSdkVersion.replace("-SNAPSHOT", "." + timestamp
 val kotlinVersion = "1.4"
 val javaVersion = JavaVersion.VERSION_11
 val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "22.0-SNAPSHOT")
-val intellijVersion = projectPropertyOr("intellij_version", "IU-2021.1") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
+val intellijVersion = projectPropertyOr("intellij_version", "IU-2021.1.1") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
@@ -68,7 +68,7 @@ dependencies {
     api("org.apache.poi", "poi-ooxml", "4.1.2")
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    testImplementation("org.mockito", "mockito-core", "3.9.0")
+    testImplementation("org.mockito", "mockito-core", "3.10.0")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }
@@ -86,7 +86,7 @@ intellij {
     }
 
     tasks.withType<RunPluginVerifierTask> {
-        setIdeVersions(listOf("IU-2021.1.1"))
+        setIdeVersions(listOf("IU-2021.1"))
         setSubsystemsToCheck("without-android")
         failureLevel = FailureLevel.ALL
     }
