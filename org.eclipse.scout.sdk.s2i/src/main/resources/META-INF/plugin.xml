@@ -8,7 +8,7 @@
   ~ Contributors:
   ~     BSI Business Systems Integration AG - initial API and implementation
   -->
-<idea-plugin allow-bundled-update="true">
+<idea-plugin allow-bundled-update="true" require-restart="true">
   <id>org.eclipse.scout.sdk.s2i</id>
   <name>Eclipse Scout</name>
   <version>12.0.0.9999999999</version>
