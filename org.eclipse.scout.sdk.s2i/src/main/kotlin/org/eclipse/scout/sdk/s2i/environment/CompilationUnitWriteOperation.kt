@@ -57,14 +57,12 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
                 .createFileFromText(cuInfo.fileName(), JavaFileType.INSTANCE, sourceClean, LocalTimeCounter.currentTime(), false, false)
         progress.worked(1)
 
-        formatAndOptimizeImports(newPsi, progress)
-
-        formattedSource = newPsi.text /* create source here to have the transaction member as short as possible (is executed in ui thread) */
+        formattedSource = formatAndOptimizeImports(newPsi, progress)
 
         TransactionManager.current().register(CompilationUnitWriter(cuInfo.targetFile(), newPsi, formattedSource))
     }
 
-    protected fun formatAndOptimizeImports(psi: PsiFile, progress: IdeaProgress) = computeInReadAction(project) {
+    protected fun formatAndOptimizeImports(psi: PsiFile, progress: IdeaProgress): String = computeInReadAction(project) {
         try {
             CodeStyleManager.getInstance(project).reformat(psi)
             progress.worked(1)
@@ -75,6 +73,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
         } catch (e: Exception) {
             SdkLog.warning("Error formatting Java source of file '{}'.", psi.name, e)
         }
+        return@computeInReadAction psi.text /* create source here to have the transaction member as short as possible (is executed in ui thread) */
     }
 
     private class CompilationUnitWriter(val targetFile: Path, val psi: PsiFile, val source: CharSequence) : TransactionMember {

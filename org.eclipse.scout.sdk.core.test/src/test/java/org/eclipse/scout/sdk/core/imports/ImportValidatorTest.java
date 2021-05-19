@@ -27,6 +27,9 @@ import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilder;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ImportTestClass;
+import org.eclipse.scout.sdk.core.fixture.impparent.ImportTestParentClass.ImportTestParentClassInner;
+import org.eclipse.scout.sdk.core.fixture.sub.ImportTestChildClass;
+import org.eclipse.scout.sdk.core.fixture.sub.ImportTestChildClass.ImportTestChildClassInner;
 import org.eclipse.scout.sdk.core.fixture.sub.ImportTestClass2;
 import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
@@ -239,6 +242,21 @@ public class ImportValidatorTest {
 
     // must be qualified because the same name also exists in the sub class itself (and the parent class).
     assertEquals(ImportTestClass.Long.class.getName().replace('$', '.'), validator.useReference(ImportTestClass.Long.class.getName()));
+  }
+
+  @Test
+  @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
+  public void testReferenceOfAnInnerTypeOfASuperClass(IJavaEnvironment env) {
+    var mainType = env.requireType(ImportTestChildClass.class.getName());
+    var cuGenerator = mainType.requireCompilationUnit().toWorkingCopy();
+    var collector1 = createCompilationUnitImportCollector(cuGenerator, env);
+    var mainTypeGenerator = cuGenerator.mainType().get();
+    var iv1 = new EnclosingTypeScopedImportCollector(collector1, mainTypeGenerator);
+    var iv2 = new EnclosingTypeScopedImportCollector(iv1, mainTypeGenerator.type(ImportTestChildClassInner.class.getSimpleName()).get());
+    IImportValidator validator = new ImportValidator(iv2);
+
+    // can be simple qualified because the referenced name is an inner type of a super class
+    assertEquals(ImportTestParentClassInner.class.getSimpleName(), validator.useReference(ImportTestParentClassInner.class.getName()));
   }
 
   @Test
