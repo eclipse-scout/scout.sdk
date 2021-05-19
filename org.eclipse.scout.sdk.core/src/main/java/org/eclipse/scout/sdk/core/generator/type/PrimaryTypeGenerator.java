@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
@@ -32,6 +33,7 @@ import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 
 /**
@@ -427,6 +429,11 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   }
 
   @Override
+  public IType getHierarchyType(IJavaBuilderContext context) {
+    return primary().getHierarchyType(context);
+  }
+
+  @Override
   public TYPE withoutAllMethodsImplemented() {
     primary().withoutAllMethodsImplemented();
     return thisInstance();
@@ -441,6 +448,12 @@ public class PrimaryTypeGenerator<TYPE extends PrimaryTypeGenerator<TYPE>> imple
   @Override
   public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded) {
     primary().withAllMethodsImplemented(callbackForMethodsAdded);
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded, Function<IMethodGenerator<?, ?>, Object[]> methodSortOrderProvider) {
+    primary().withAllMethodsImplemented(callbackForMethodsAdded, methodSortOrderProvider);
     return thisInstance();
   }
 

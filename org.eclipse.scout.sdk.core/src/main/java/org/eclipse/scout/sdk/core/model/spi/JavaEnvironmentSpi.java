@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.model.spi;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -64,21 +63,4 @@ public interface JavaEnvironmentSpi {
   List<ClasspathSpi> getClasspath();
 
   IJavaEnvironment wrap();
-
-  /**
-   * Calls the specified {@link Function} passing a new copy of this {@link JavaEnvironmentSpi} having the same setup
-   * (classpath and configuration).
-   * <p>
-   * This can be useful if a something should be executed without having any impact on the current
-   * {@link JavaEnvironmentSpi}.
-   * <p>
-   * This operation is quite resource intense because a complete new environment is created to execute the specified
-   * {@link Function}.
-   *
-   * @param function
-   *          The {@link Function} to call. Must not be {@code null}.
-   * @return The result of the {@link Function} specified.
-   */
-  <T> T callInEmptyCopy(Function<JavaEnvironmentSpi, T> function);
-
 }

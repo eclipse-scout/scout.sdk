@@ -18,7 +18,6 @@ import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.tra
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
@@ -29,7 +28,6 @@ import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
@@ -39,7 +37,6 @@ import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link MethodOverrideGenerator}</h3>
@@ -199,38 +196,11 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     var declaring = Ensure.instanceOf(declaringGenerator().orElse(null), ITypeGenerator.class, "Method can only be overridden if existing in a type.");
-    var javaEnvironment = builder.context().environment().orElseThrow(() -> newFail("Cannot override a method without java environment."));
-    callWithTmpType(declaring, javaEnvironment, this::createOverrideGenerator)
-        .ifPresent(overrideGenerator -> overrideGenerator.generate(builder));
+    createOverrideGenerator(declaring.getHierarchyType(builder.context())).ifPresent(overrideGenerator -> overrideGenerator.generate(builder));
   }
 
   protected Optional<IMethodGenerator<?, ?>> createOverrideGenerator(IType tmpType) {
     var template = findMethodToOverride(tmpType).orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName().orElse(null)));
     return createOverrideGenerator(template);
-  }
-
-  protected static <T> T callWithTmpType(ITypeGenerator<?> declaringGenerator, IJavaEnvironment env, Function<IType, T> task) {
-    Ensure.notNull(task);
-
-    var targetPackage = "not.existing.scout.sdk.tmp_pck";
-    var typeName = "ScoutSdkTempClass__";
-    return env.unwrap().callInEmptyCopy(copy -> {
-      var emptyCopy = copy.wrap();
-      var tmpTypeSource = PrimaryTypeGenerator.create()
-          .withPackageName(targetPackage)
-          .withElementName(typeName)
-          .withSuperClass(Ensure.notNull(declaringGenerator)
-              .superClass()
-              .flatMap(af -> af.apply(emptyCopy))
-              .orElse(Object.class.getName()))
-          .withInterfaces(declaringGenerator.interfaces()
-              .map(af -> af.apply(emptyCopy))
-              .flatMap(Optional::stream))
-          .toJavaSource(emptyCopy);
-
-      emptyCopy.registerCompilationUnitOverride(tmpTypeSource, targetPackage, typeName + JavaTypes.JAVA_FILE_SUFFIX);
-      var tmpType = emptyCopy.requireType(targetPackage + JavaTypes.C_DOT + typeName);
-      return task.apply(tmpType);
-    });
   }
 }

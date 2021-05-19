@@ -5,17 +5,17 @@ import org.eclipse.scout.sdk.core.s.test.shared.MyFormData;
 
 public class MyFormService implements IMyFormService {
 @Override
+public MyFormData prepareCreate(MyFormData formData) {
+// TODO [anonymous] Auto-generated method stub.
+return null;
+}
+@Override
 public MyFormData create(MyFormData formData) {
 // TODO [anonymous] Auto-generated method stub.
 return null;
 }
 @Override
 public MyFormData load(MyFormData formData) {
-// TODO [anonymous] Auto-generated method stub.
-return null;
-}
-@Override
-public MyFormData prepareCreate(MyFormData formData) {
 // TODO [anonymous] Auto-generated method stub.
 return null;
 }

@@ -245,6 +245,22 @@ public class MethodGeneratorTest {
   }
 
   @Test
+  public void testCreateUnimplementedWithOrder(IJavaEnvironment env) {
+    var typeGenerator = PrimaryTypeGenerator.create()
+        .withPackageName("a.b.x")
+        .withElementName("TestClassWithOrder")
+        .withSuperClass(AbstractClass.class.getName())
+        .withAllMethodsImplemented(null, MethodGeneratorTest::methodOrderFor);
+    assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest12.txt", typeGenerator);
+    assertNoCompileErrors(env, typeGenerator);
+  }
+
+  protected static Object[] methodOrderFor(IMethodGenerator<?, ?> g) {
+    // sort first by number of arguments, then by method name length
+    return new Object[]{g.parameters().count(), g.elementName((IJavaEnvironment) null).get().length()};
+  }
+
+  @Test
   public void testGetterFromFieldGenerator(IJavaEnvironment env) {
     var generator = FieldGenerator.create()
         .withElementName("m_testField")

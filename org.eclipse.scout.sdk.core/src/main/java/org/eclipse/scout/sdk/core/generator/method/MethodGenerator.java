@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.generator.method;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator.createOverride;
-import static org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator.callWithTmpType;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isDefaultMethod;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
@@ -328,14 +327,14 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     if (annotations().anyMatch(a -> overrideFqn.equals(a.elementName(context).orElse(null)))) {
       return null; // already exists
     }
-    var javaEnvironment = context.environment().orElseThrow(() -> newFail("To add an override annotation if necessary a Java environment is required."));
-    if (!existsMethodInSuperHierarchy(javaEnvironment)) {
+    if (!existsMethodInSuperHierarchy(context)) {
       return null;
     }
     return createOverride();
   }
 
-  protected boolean existsMethodInSuperHierarchy(IJavaEnvironment javaEnvironment) {
+  protected boolean existsMethodInSuperHierarchy(IJavaBuilderContext context) {
+    var javaEnvironment = context.environment().orElseThrow(() -> newFail("To add an override annotation if necessary a Java environment is required."));
     var methodId = identifier(javaEnvironment);
     var explicitDeclaringType = getOverrideIfNecessaryDeclaringType();
     if (explicitDeclaringType != null) {
@@ -349,7 +348,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     if (declaringGenerator instanceof ITypeGenerator) {
       var declaringTypeGenerator = (ITypeGenerator<?>) declaringGenerator;
       // use super types from declaring (surrounding) type generator
-      return callWithTmpType(declaringTypeGenerator, javaEnvironment, t -> existsMethodInSuperHierarchy(t, methodId));
+      return existsMethodInSuperHierarchy(declaringTypeGenerator.getHierarchyType(context), methodId);
     }
     return false;
   }

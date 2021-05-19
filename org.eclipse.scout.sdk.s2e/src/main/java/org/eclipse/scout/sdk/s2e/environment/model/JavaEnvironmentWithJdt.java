@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -220,15 +219,6 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
   protected void cleanup() {
     m_classpath = new FinalValue<>();
     super.cleanup();
-  }
-
-  @Override
-  protected JavaEnvironmentWithJdt emptyCopy() {
-    @SuppressWarnings("unchecked")
-    var classpath = (Set<ClasspathEntryWithJdt>) getNameEnvironment().classpath();
-    var newEnv = new JavaEnvironmentWithJdt(javaProject(), javaHome(), classpath);
-    runPreservingOverrides(this, newEnv, null);
-    return newEnv;
   }
 
   public IJavaProject javaProject() {
