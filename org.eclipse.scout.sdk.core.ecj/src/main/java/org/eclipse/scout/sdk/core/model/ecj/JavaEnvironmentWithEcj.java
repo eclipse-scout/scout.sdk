@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
@@ -71,7 +70,6 @@ import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
-import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
@@ -293,19 +291,6 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
       oldFs.cleanup();
       m_oldFsDuringReload = null;
     }
-  }
-
-  @Override
-  public <T> T callInEmptyCopy(Function<JavaEnvironmentSpi, T> function) {
-    try (var copy = emptyCopy()) {
-      return Ensure.notNull(function).apply(copy);
-    }
-  }
-
-  protected JavaEnvironmentWithEcj emptyCopy() {
-    var newEnv = new JavaEnvironmentWithEcj(javaHome(), getNameEnvironment().classpath(), getCompiler().options);
-    runPreservingOverrides(this, newEnv, null); // copy overrides
-    return newEnv;
   }
 
   /**

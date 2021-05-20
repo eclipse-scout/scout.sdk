@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
@@ -382,6 +383,24 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
   TYPE setDeclaringFullyQualifiedName(String parentFullyQualifiedName);
 
   /**
+   * Gets a synthetic created {@link IType} having the same super type hierarchy as this {@link ITypeGenerator}.<br>
+   * The resulting {@link IType} uses a generated name and an empty body.<br>
+   * This method may be handy if the super hierarchy of the resulting type of this {@link ITypeGenerator} must be
+   * analyzed (including all resolved type arguments) before the type is actually created.
+   * 
+   * @param context
+   *          The {@link IJavaBuilderContext} for which the hierarchy type should be returned.
+   * @return A synthetic {@link IType} having the same super hierarchy as this {@link ITypeGenerator} including all type
+   *         arguments.
+   * @throws IllegalArgumentException
+   *           If the {@link IJavaBuilderContext} passed has no {@link IJavaEnvironment} associated (see
+   *           {@link IJavaBuilderContext#environment()}).
+   * @throws NullPointerException
+   *           If the {@link IJavaBuilderContext} passed is {@code null}.
+   */
+  IType getHierarchyType(IJavaBuilderContext context);
+
+  /**
    * Instructs this {@link ITypeGenerator} to automatically add all missing methods that are required by a super type
    * (abstract method or interface method).
    * <p>
@@ -401,7 +420,6 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * <b>Note:</b> Methods can only be added if the generation is running with an {@link IJavaEnvironment} (see
    * {@link IJavaBuilderContext#environment()}). Otherwise an {@link IllegalArgumentException} is thrown.
    * <p>
-   * <b>Example:</b> See {@link IWorkingCopyTransformer}.
    *
    * @param callbackForMethodsAdded
    *          Optional callback that is invoked for each missing method that is generated. May be {@code null}.<br>
@@ -424,6 +442,40 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @see SimpleWorkingCopyTransformerBuilder
    */
   TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded);
+
+  /**
+   * Instructs this {@link ITypeGenerator} to automatically add all missing methods that are required by a super type
+   * (abstract method or interface method).
+   * <p>
+   * <b>Note:</b> Methods can only be added if the generation is running with an {@link IJavaEnvironment} (see
+   * {@link IJavaBuilderContext#environment()}). Otherwise an {@link IllegalArgumentException} is thrown.
+   * <p>
+   *
+   * @param callbackForMethodsAdded
+   *          Optional callback that is invoked for each missing method that is generated. May be {@code null}.<br>
+   *          The {@link IWorkingCopyTransformer} is called for each {@link IJavaElement} in every method that is
+   *          created. The corresponding {@link ITransformInput}s default working copy (see
+   *          {@link ITransformInput#requestDefaultWorkingCopy()}) is a {@link IMethodGenerator} with an
+   *          {@link Override} annotation and an auto generated body. This may be a super call (if a super method is
+   *          available) or an auto generated method stub (see {@link MethodOverrideGenerator#createOverride()} for
+   *          details).<br>
+   *          The result of the transformation will be the {@link IMethodGenerator} that is used. This may be the
+   *          modified input, a completely new one or {@code null}. If the result is {@code null}, this method will not
+   *          be generated for this {@link ITypeGenerator} and will be missing in the resulting type.
+   * @param methodSortOrderProvider
+   *          Optional {@link Function} called for each unimplemented method which is automatically added. The
+   *          {@link Function} gets the {@link IMethodGenerator} of the unimplemented method that will be added as input
+   *          and returns the desired order for this method (may be {@code null}).
+   * @return This generator.
+   * @throws IllegalArgumentException
+   *           if the generation is running without an {@link IJavaEnvironment}. See
+   *           {@link IJavaBuilderContext#environment()}.
+   * @see MethodOverrideGenerator#createOverride(IWorkingCopyTransformer)
+   * @see ITransformInput#requestDefaultWorkingCopy()
+   * @see DefaultWorkingCopyTransformer
+   * @see SimpleWorkingCopyTransformerBuilder
+   */
+  TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded, Function<IMethodGenerator<?, ?>, Object[]> methodSortOrderProvider);
 
   /**
    * Instructs this {@link ITypeGenerator} to not automatically add missing methods (as required by super types). This

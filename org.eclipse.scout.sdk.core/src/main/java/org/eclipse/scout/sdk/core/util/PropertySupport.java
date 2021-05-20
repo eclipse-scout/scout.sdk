@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.util.EventListenerList.IWeakEventListener;
 
@@ -165,14 +166,51 @@ public class PropertySupport {
     Ensure.notBlank(name);
 
     Object oldValue;
-    if (newValue == null) {
-      oldValue = m_props.remove(name);
-    }
-    else {
-      oldValue = m_props.put(name, newValue);
+    synchronized (m_props) {
+      if (newValue == null) {
+        oldValue = m_props.remove(name);
+      }
+      else {
+        oldValue = m_props.put(name, newValue);
+      }
     }
 
     return firePropertyChange(name, oldValue, newValue);
+  }
+
+  /**
+   * Removes the property with the given name
+   * 
+   * @param name
+   *          The name of the property. Must not be {@code null}.
+   * @param type
+   *          The property type.
+   * @return The removed property or {@code null} if there was no property with that name.
+   */
+  public <T> T removeProperty(String name, Class<T> type) {
+    synchronized (m_props) {
+      return type.cast(m_props.remove(name));
+    }
+  }
+
+  /**
+   * If the specified property name is not already associated with a value, attempts to compute its value using the
+   * given value provider and enters it into this map unless {@code null}. If the function returns {@code null}, no
+   * property is stored. If the mapping function itself throws an exception, the exception is rethrown, and no mapping
+   * is recorded.
+   * 
+   * @param name
+   *          The name of the property. Must not be {@code null}.
+   * @param valueProvider
+   *          The value provider function invoked in case there is no such property available yet.
+   * @return the current (existing or newly computed) value associated with the specified property name, or null if the
+   *         computed value is null (in that case nothing is stored).
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T computeIfAbsent(String name, Function<String, T> valueProvider) {
+    synchronized (m_props) {
+      return (T) m_props.computeIfAbsent(name, valueProvider);
+    }
   }
 
   public void addPropertyChangeListener(@SuppressWarnings("TypeMayBeWeakened") PropertyChangeListener listener) {

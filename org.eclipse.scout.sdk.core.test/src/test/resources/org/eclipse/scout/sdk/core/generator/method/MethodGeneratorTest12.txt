@@ -1,8 +1,8 @@
 /**
 * Default Testing Comment for
-* CompilationUnit TestClass.java
+* CompilationUnit TestClassWithOrder.java
 */
-package a.b.c;
+package a.b.x;
 
 import java.util.Set;
 
@@ -11,9 +11,9 @@ import org.eclipse.scout.sdk.core.fixture.Long;
 
 /**
 * Default Testing Comment for
-* Type TestClass
+* Type TestClassWithOrder
 */
-public class TestClass extends AbstractClass {
+public class TestClassWithOrder extends AbstractClass {
 @Override
 protected void voidMethod() {
 // TODO [anonymous] Auto-generated method stub.
@@ -24,9 +24,9 @@ public String methodWithoutArgs() {
 return null;
 }
 @Override
-protected int methodWithArgs(int a, String b, Set<String> c) throws RuntimeException {
+public Set<String> get(Set<String> t) {
 // TODO [anonymous] Auto-generated method stub.
-return 0;
+return null;
 }
 @Override
 protected int methodWithOverload(int a, String b) throws RuntimeException {
@@ -34,13 +34,13 @@ protected int methodWithOverload(int a, String b) throws RuntimeException {
 return 0;
 }
 @Override
-protected int methodWithOverload(int a, String b, Long c) throws RuntimeException {
+protected int methodWithArgs(int a, String b, Set<String> c) throws RuntimeException {
 // TODO [anonymous] Auto-generated method stub.
 return 0;
 }
 @Override
-public Set<String> get(Set<String> t) {
+protected int methodWithOverload(int a, String b, Long c) throws RuntimeException {
 // TODO [anonymous] Auto-generated method stub.
-return null;
+return 0;
 }
 }

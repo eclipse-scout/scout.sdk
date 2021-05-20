@@ -10,60 +10,58 @@
  */
 package org.eclipse.scout.sdk.core.imports;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.query.HierarchyInnerTypeQuery;
 import org.eclipse.scout.sdk.core.model.api.query.SuperTypeQuery;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
- * Ignore imports when the referenced type is a member type of the enclosing type or super classes of it
+ * Ignore imports when the referenced type is a member type of the enclosing type or in a super type of it
  */
 public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
   private final String m_qualifier;
-  private final Set<String> m_enclosingQualifiers; // as far as these types exist already!
-  private final Set<String> m_enclosedSimpleNames; // as far as these types exist already!
+  private final Set<String> m_visibleInnerTypeInSuperHierarchyNames; // fully qualified names as far as these types exist already!
+  private final Set<String> m_innerTypeSimpleNames; // simple names as far as these types exist already!
 
   public EnclosingTypeScopedImportCollector(IImportCollector inner, ITypeGenerator<?> enclosingTypeGenerator) {
     super(inner);
-    m_enclosingQualifiers = new HashSet<>();
     m_qualifier = enclosingTypeGenerator.fullyQualifiedName();
 
-    //self
-    m_enclosingQualifiers.add(m_qualifier);
-
     // inner types
-    m_enclosedSimpleNames = enclosingTypeGenerator.types()
+    m_innerTypeSimpleNames = enclosingTypeGenerator.types()
         .map(ITypeGenerator::elementName)
         .flatMap(Optional::stream)
         .collect(toSet());
 
     var env = getJavaEnvironment();
     if (env == null) {
+      m_visibleInnerTypeInSuperHierarchyNames = emptySet();
       return;
     }
 
-    Stream.concat(enclosingTypeGenerator.superClass().stream(), enclosingTypeGenerator.interfaces())
+    m_visibleInnerTypeInSuperHierarchyNames = Stream.concat(enclosingTypeGenerator.superClass().stream(), enclosingTypeGenerator.interfaces())
         .flatMap(af -> af.apply(env).stream())
         .map(JavaTypes::erasure)
-        .peek(m_enclosingQualifiers::add)
         .map(env::findType)
         .flatMap(Optional::stream)
         .map(IType::superTypes)
         .flatMap(SuperTypeQuery::stream)
         .filter(s -> !Object.class.getName().equals(s.name()))
-        .peek(s -> m_enclosingQualifiers.add(s.name()))
         .map(IType::innerTypes)
         .flatMap(HierarchyInnerTypeQuery::stream)
-        .map(IType::elementName)
-        .forEach(m_enclosedSimpleNames::add);
+        .filter(t -> !Flags.isPrivate(t.flags()))
+        .map(IType::name)
+        .map(s -> s.replace(JavaTypes.C_DOLLAR, JavaTypes.C_DOT))
+        .collect(toSet());
   }
 
   @Override
@@ -72,19 +70,21 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
   }
 
   @Override
-  public String checkCurrentScope(TypeReferenceDescriptor cand) {
-    if (m_enclosingQualifiers.contains(cand.getQualifier())) {
-      if (m_enclosedSimpleNames.contains(cand.getSimpleName()) && !m_qualifier.equals(cand.getQualifier())) {
-        return cand.getQualifiedName();
+  public String checkCurrentScope(TypeReferenceDescriptor descriptor) {
+    if (m_qualifier.equals(descriptor.getQualifiedName())) {
+      return descriptor.getSimpleName(); // myself
+    }
+    if (m_innerTypeSimpleNames.contains(descriptor.getSimpleName())) {
+      // a type with the same simple name as an inner type.
+      if (m_qualifier.equals(descriptor.getQualifier())) {
+        return descriptor.getSimpleName(); // it is the inner type. simple qualification
       }
-      return cand.getSimpleName();
+      return descriptor.getQualifiedName(); // it is another type with the same simple name as an inner type: full qualification necessary
+    }
+    if (m_visibleInnerTypeInSuperHierarchyNames.contains(descriptor.getQualifiedName())) {
+      return descriptor.getSimpleName(); // reference to a type visible because its an inner type in the super hierarchy
     }
 
-    // check if simpleName (with other qualifier) exists in same enclosing type
-    if (m_enclosedSimpleNames.contains(cand.getSimpleName())) {
-      return cand.getQualifiedName();
-    }
-
-    return super.checkCurrentScope(cand);
+    return super.checkCurrentScope(descriptor);
   }
 }

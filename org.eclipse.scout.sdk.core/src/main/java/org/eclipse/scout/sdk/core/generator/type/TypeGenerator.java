@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.generator.type;
 
-import static java.util.Comparator.comparing;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -28,9 +27,11 @@ import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.tra
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -38,6 +39,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
@@ -45,7 +47,6 @@ import org.eclipse.scout.sdk.core.builder.java.comment.JavaElementCommentBuilder
 import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.MemberBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
-import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.member.AbstractMemberGenerator;
@@ -77,6 +78,9 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMemberGenerator<TYPE> implements ITypeGenerator<TYPE> {
 
+  private static final AtomicLong HIERARCHY_TYPE_COUNTER = new AtomicLong();
+  private static final String HIERARCHY_TYPE_KEY = "tmpHierarchyType";
+
   private final List<ITypeParameterGenerator<?>> m_typeParameters;
   private final List<ApiFunction<?, String>> m_interfaces;
   private final List<SortedMemberEntry> m_members;
@@ -86,6 +90,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   private String m_declaringFullyQualifiedName;
   private boolean m_addAllNecessaryMethods;
   private IWorkingCopyTransformer m_unimplementedMethodsTransformer;
+  private Function<IMethodGenerator<?, ?>, Object[]> m_unimplementedMethodSortOrderProvider;
 
   protected TypeGenerator() {
     m_typeParameters = new ArrayList<>();
@@ -176,7 +181,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   protected void build(IJavaSourceBuilder<?> builder) {
     super.build(builder);
     var currentValidator = builder.context().validator();
-    currentValidator.runWithImportCollector(() -> buildType(builder), inner -> new EnclosingTypeScopedImportCollector(inner, this));
+    try {
+      currentValidator.runWithImportCollector(() -> buildType(builder), inner -> new EnclosingTypeScopedImportCollector(inner, this));
+    }
+    finally {
+      builder.context().properties().setProperty(HIERARCHY_TYPE_KEY, null);
+    }
   }
 
   protected void buildType(IJavaSourceBuilder<?> builder) {
@@ -236,27 +246,20 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
       methods().forEach(m -> m.withFlags(Flags.AccInterface).withoutFlags(Flags.AccPublic));
     }
 
-    Stream<ISourceGenerator<ISourceBuilder<?>>> memberSource = m_members.stream()
-        .sorted()
-        .map(SortedMemberEntry::generator);
-    builder.append(memberSource, null, builder.context().lineDelimiter(), null);
-    if (isWithAllMethodsImplemented()) {
-      buildUnimplementedMethods(builder);
-    }
+    builder.append(
+        Stream.concat(m_members.stream(), buildUnimplementedMethods(builder.context()))
+            .sorted()
+            .map(SortedMemberEntry::generator),
+        null, builder.context().lineDelimiter(), null);
   }
 
-  protected void buildUnimplementedMethods(IJavaSourceBuilder<?> builder) {
-    var javaEnvironment = builder.context().environment().orElseThrow(() -> newFail("Unimplemented methods can only be added if running with a java environment."));
-    var unimplementedMethods = UnimplementedMethodGenerator.create(this, javaEnvironment, m_unimplementedMethodsTransformer).stream()
-        .sorted(comparing(g -> g.elementName().orElse("")));
-    String startDelimiter;
-    if (m_members.size() == 1) {
-      startDelimiter = builder.context().lineDelimiter();
+  protected Stream<SortedMemberEntry> buildUnimplementedMethods(IJavaBuilderContext context) {
+    if (!isWithAllMethodsImplemented()) {
+      return Stream.empty();
     }
-    else {
-      startDelimiter = null;
-    }
-    builder.append(unimplementedMethods, startDelimiter, builder.context().lineDelimiter(), null);
+    var orderFunction = Objects.requireNonNullElseGet(m_unimplementedMethodSortOrderProvider, () -> g -> null);
+    return UnimplementedMethodGenerator.create(this, context, m_unimplementedMethodsTransformer)
+        .map(g -> new SortedMemberEntry(g, orderFunction.apply(g)));
   }
 
   @Override
@@ -470,19 +473,26 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   public TYPE withoutAllMethodsImplemented() {
     m_addAllNecessaryMethods = false;
     m_unimplementedMethodsTransformer = null;
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded) {
-    m_addAllNecessaryMethods = true;
-    m_unimplementedMethodsTransformer = callbackForMethodsAdded;
+    m_unimplementedMethodSortOrderProvider = null;
     return thisInstance();
   }
 
   @Override
   public TYPE withAllMethodsImplemented() {
     return withAllMethodsImplemented(null);
+  }
+
+  @Override
+  public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded) {
+    return withAllMethodsImplemented(callbackForMethodsAdded, null);
+  }
+
+  @Override
+  public TYPE withAllMethodsImplemented(IWorkingCopyTransformer callbackForMethodsAdded, Function<IMethodGenerator<?, ?>, Object[]> methodSortOrderProvider) {
+    m_addAllNecessaryMethods = true;
+    m_unimplementedMethodsTransformer = callbackForMethodsAdded;
+    m_unimplementedMethodSortOrderProvider = methodSortOrderProvider;
+    return thisInstance();
   }
 
   @Override
@@ -540,18 +550,38 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     return thisInstance();
   }
 
+  @Override
+  public IType getHierarchyType(IJavaBuilderContext context) {
+    return context.properties().computeIfAbsent(HIERARCHY_TYPE_KEY, k -> createHierarchyType(context));
+  }
+
+  protected IType createHierarchyType(IJavaBuilderContext context) {
+    var javaEnvironment = context.environment().orElseThrow(() -> newFail("Cannot override a method without Java environment."));
+    var targetPackage = "not.existing.scout.sdk.tmp_pck";
+    var typeName = "ScoutSdkTempClass__" + HIERARCHY_TYPE_COUNTER.getAndIncrement();
+    var hierarchyTypeGenerator = PrimaryTypeGenerator.create()
+        .withPackageName(targetPackage)
+        .withElementName(typeName)
+        .withInterfaces(interfaces()
+            .map(af -> af.apply(javaEnvironment))
+            .flatMap(Optional::stream));
+    superClass()
+        .flatMap(af -> af.apply(javaEnvironment))
+        .ifPresent(hierarchyTypeGenerator::withSuperClass);
+    var hierarchyTypeSource = hierarchyTypeGenerator.toJavaSource(javaEnvironment);
+    javaEnvironment.registerCompilationUnitOverride(hierarchyTypeSource, targetPackage, typeName + JavaTypes.JAVA_FILE_SUFFIX);
+    return javaEnvironment.requireType(targetPackage + JavaTypes.C_DOT + typeName);
+  }
+
   private static class UnimplementedMethodGenerator extends MethodOverrideGenerator<UnimplementedMethodGenerator, IMethodBodyBuilder<?>> {
 
     protected UnimplementedMethodGenerator(IWorkingCopyTransformer transformer) {
       super(transformer);
     }
 
-    protected static Collection<IMethodGenerator<?, ?>> create(ITypeGenerator<?> typeGenerator, IJavaEnvironment env, IWorkingCopyTransformer transformer) {
-      return callWithTmpType(typeGenerator, env,
-          tmpType -> getUnimplementedMethods(tmpType)
-              .map(m -> toMethodGenerator(typeGenerator, m, transformer))
-              .collect(toList()) // collect here already because otherwise the environment will be closed when the stream is evaluated!
-      );
+    protected static Stream<IMethodGenerator<?, ?>> create(ITypeGenerator<?> typeGenerator, IJavaBuilderContext context, IWorkingCopyTransformer transformer) {
+      return getUnimplementedMethods(typeGenerator.getHierarchyType(context))
+          .map(m -> toMethodGenerator(typeGenerator, m, transformer));
     }
 
     protected static IMethodGenerator<?, ?> toMethodGenerator(IJavaElementGenerator<?> typeGenerator, IMethod unimplementedMethod, IWorkingCopyTransformer transformer) {
@@ -575,7 +605,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
       var abstractMethodIds = type.methods().withSuperTypes(true).stream()
           .filter(method -> !isDefaultMethod(method.flags()) && !Flags.isStatic(method.flags()))
           .filter(method -> isAbstract(method.flags()) || isInterface(method.flags()) || isInterface(method.requireDeclaringType().flags()))
-          .collect(toMap(IMethod::identifier, identity(), (u, v) -> u));
+          .collect(toMap(IMethod::identifier, identity(), (u, v) -> u, LinkedHashMap::new));
 
       // remove all implemented methods
       type.methods().withSuperClasses(true).stream()

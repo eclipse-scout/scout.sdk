@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.beans.PropertyChangeEvent;
@@ -54,6 +55,24 @@ public class PropertySupportTest {
     System.gc();
     ps.removePropertyChangeListener(l); // should also remove the empty weak-entry
     assertNull(listenerFieldOf(ps));
+  }
+
+  @Test
+  public void testRemove() {
+    var secondPropName = "prop2";
+    var secondPropValue = "value2";
+    var ps = new PropertySupport(this);
+    ps.setProperty(PROP_NAME, PROP_VALUE);
+
+    assertNull(ps.computeIfAbsent(secondPropName, k -> null)); // no error and null is returned, but nothing should be stored
+    assertFalse(ps.hasProperty(secondPropName)); // null values are not stored
+
+    assertSame(secondPropValue, ps.computeIfAbsent(secondPropName, k -> secondPropValue));
+    assertTrue(ps.hasProperty(secondPropName));
+    assertSame(secondPropValue, ps.removeProperty(secondPropName, String.class)); // removed value is returned
+    assertFalse(ps.hasProperty(secondPropName));
+
+    assertEquals(1, ps.size()); // the original element remains
   }
 
   @Test
