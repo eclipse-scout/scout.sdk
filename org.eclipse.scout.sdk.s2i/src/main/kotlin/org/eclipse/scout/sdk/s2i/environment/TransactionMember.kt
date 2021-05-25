@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,4 +47,12 @@ interface TransactionMember {
      */
     fun commit(progress: IdeaProgress): Boolean
 
+    /**
+     * Specifies if this [TransactionMember] should replace the given one. This method is only called for members having the same [file].
+     * @param member The [TransactionMember] which should be checked
+     * @return true if this instance should replace the given member.
+     * This is typically the case if a member performs an idempotent action.
+     * In that case any existing member performing the same action can be replaced.
+     */
+    fun replaces(member: TransactionMember) = false
 }

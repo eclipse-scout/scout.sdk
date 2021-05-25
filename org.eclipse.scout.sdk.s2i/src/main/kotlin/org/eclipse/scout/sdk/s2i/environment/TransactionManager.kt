@@ -175,7 +175,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
         }
     }
 
-    private val m_members = HashMap<Path, MutableList<TransactionMember>>()
+    private val m_members = LinkedHashMap<Path, MutableList<TransactionMember>>()
 
     @Volatile
     private var m_size = 0
@@ -211,15 +211,50 @@ class TransactionManager constructor(val project: Project, val transactionName: 
      */
     fun register(member: TransactionMember) = synchronized(this) {
         ensureOpen(member)
-        m_members.computeIfAbsent(member.file()) { ArrayList() }
-                .add(member)
-        m_size++
+        val listForFile = m_members.computeIfAbsent(member.file()) { ArrayList() }
+        val startSize = listForFile.size
+        register(member, listForFile)
+        m_size += listForFile.size - startSize
+    }
+
+    /**
+     * Adds the given member to the given list.
+     * If the list contains elements for which [TransactionMember.replaces] returns true, these elements are removed from the list.
+     */
+    private fun register(member: TransactionMember, listForFile: MutableList<TransactionMember>) {
+        if (listForFile.isEmpty()) {
+            listForFile.add(member)
+            return
+        }
+
+        var memberInserted = false
+        val iterator = listForFile.listIterator()
+        while (iterator.hasNext()) {
+            val existing = iterator.next()
+            if (member.replaces(existing)) {
+                if (memberInserted) {
+                    // the new member has already been inserted into the list.
+                    // But this item is also no longer necessary. remove it
+                    iterator.remove()
+                } else {
+                    iterator.set(member) // replace existing member with the new one
+                    memberInserted = true
+                }
+            }
+        }
+        if (!memberInserted) {
+            listForFile.add(member)
+        }
     }
 
     /**
      * @return The number of [TransactionMember] instances available in this manager
      */
     fun size(): Int = m_size // do not use m_members.flatMap().size() here because this would require synchronization. Then the size() method could not longer be called from commitAllAsync -> deadlock!
+
+    internal fun members() = synchronized(this) {
+        m_members.values.flatten()
+    }
 
     private fun finishTransactionImpl(save: Boolean, progress: IdeaProgress): Boolean {
         ensureOpen(null)
@@ -356,3 +391,4 @@ class TransactionManager constructor(val project: Project, val transactionName: 
         Ensure.isTrue(m_open, "Transaction has already been committed. Tried to register member '{}'.", member)
     }
 }
+

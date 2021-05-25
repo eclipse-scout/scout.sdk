@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,6 +50,10 @@ open class FileWriter(val targetFile: Path, private val content: CharSequence, v
         document.setText(content)
         progress.worked(1)
         return true
+    }
+
+    override fun replaces(member: TransactionMember): Boolean {
+        return member is FileWriter
     }
 
     override fun toString() = message("write.file.x", targetFile)
