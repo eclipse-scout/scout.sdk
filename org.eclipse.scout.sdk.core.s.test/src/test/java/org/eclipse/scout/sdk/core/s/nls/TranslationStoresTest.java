@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,7 +60,8 @@ public class TranslationStoresTest {
     when(store.languages()).thenAnswer(invocation -> Stream.of(Language.LANGUAGE_DEFAULT));
     assertTrue(isContentAvailable(store));
 
+    // do not exclude empty text services. These might have been just created and users might want to fill them e.g. using the translation editor
     when(store.size()).thenReturn(0L);
-    assertFalse(isContentAvailable(store));
+    assertTrue(isContentAvailable(store));
   }
 }
