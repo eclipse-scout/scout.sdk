@@ -11,12 +11,10 @@
 package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.ide.highlighter.JavaFileType
-import com.intellij.ide.util.DirectoryUtil
 import com.intellij.lang.LanguageImportStatements
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
-import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.util.LocalTimeCounter
 import org.eclipse.scout.sdk.core.log.SdkLog
@@ -24,12 +22,9 @@ import org.eclipse.scout.sdk.core.model.CompilationUnitInfo
 import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
-import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
-import java.io.File
-import java.nio.file.Path
 
 open class CompilationUnitWriteOperation(val project: Project, val source: CharSequence, val cuInfo: CompilationUnitInfo) {
 
@@ -59,7 +54,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
 
         formattedSource = formatAndOptimizeImports(newPsi, progress)
 
-        TransactionManager.current().register(CompilationUnitWriter(cuInfo.targetFile(), newPsi.project, formattedSource))
+        TransactionManager.current().register(FileWriter(cuInfo.targetFile(), formattedSource, newPsi.project))
     }
 
     protected fun formatAndOptimizeImports(psi: PsiFile, progress: IdeaProgress): String = computeInReadAction(project) {
@@ -74,31 +69,5 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
             SdkLog.warning("Error formatting Java source of file '{}'.", psi.name, e)
         }
         return@computeInReadAction psi.text /* create source here to have the transaction member as short as possible (is executed in ui thread) */
-    }
-
-    private class CompilationUnitWriter(val targetFile: Path, val project: Project, val source: CharSequence) : TransactionMember {
-
-        override fun file() = targetFile
-
-        override fun commit(progress: IdeaProgress): Boolean {
-            progress.init(2, toString())
-
-            val targetDirectory = targetFile.parent
-            val dir = DirectoryUtil.mkdirs(PsiManager.getInstance(project), targetDirectory.toString().replace(File.separatorChar, '/'))
-                    ?: throw SdkException("Cannot write '$targetFile' because the directory could not be created.")
-            progress.worked(1)
-
-            val existingFile = dir.findFile(targetFile.fileName.toString())
-            if (existingFile == null) {
-                SdkLog.debug("Add new compilation unit '{}'.", targetFile)
-                dir.add(PsiFileFactory.getInstance(project)
-                        .createFileFromText(targetFile.fileName.toString(), JavaFileType.INSTANCE, "", LocalTimeCounter.currentTime(), false, false))
-                progress.worked(1)
-            }
-            FileWriter(targetFile, source, project).commit(progress.newChild(1))
-            return true
-        }
-
-        override fun toString() = message("write.cu.x", targetFile.fileName)
     }
 }
