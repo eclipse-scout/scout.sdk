@@ -200,7 +200,8 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
   }
 
   protected Optional<IMethodGenerator<?, ?>> createOverrideGenerator(IType tmpType) {
-    var template = findMethodToOverride(tmpType).orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName().orElse(null)));
+    var template = findMethodToOverride(tmpType)
+        .orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName(tmpType.javaEnvironment()).orElse(null)));
     return createOverrideGenerator(template);
   }
 }

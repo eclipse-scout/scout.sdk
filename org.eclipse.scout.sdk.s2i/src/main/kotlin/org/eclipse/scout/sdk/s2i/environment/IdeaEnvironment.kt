@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
@@ -121,8 +122,16 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
 
     override fun close() {
         super.close()
-        m_envs.values.forEach(AutoCloseable::close)
+        m_envs.values.forEach(this::closeSafe)
         m_envs.clear()
+    }
+
+    private fun closeSafe(closable: AutoCloseable) {
+        try {
+            closable.close()
+        } catch (e: Exception) {
+            SdkLog.info("Unable to close java environment.", e)
+        }
     }
 
     override fun findType(fqn: String) = project

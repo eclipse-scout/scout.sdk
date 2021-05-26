@@ -134,14 +134,19 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             val lastIndexOf = name.lastIndexOf(".")
             if (lastIndexOf > 0) pkg += "." + name.substring(0, lastIndexOf)
 
-            val op = sourceFolderHelper.classpathEntry()!!.javaEnvironment().let { EclipseScoutBundle.elementCreationManager().createOperation(operationClass(), name.substring(lastIndexOf + 1, name.length), pkg, sourceFolderHelper, it) }
-                    ?: return@callInIdeaEnvironment null
+            val op = sourceFolderHelper.classpathEntry()?.javaEnvironment()?.let {
+                EclipseScoutBundle.elementCreationManager()
+                        .createOperation(operationClass(), name.substring(lastIndexOf + 1, name.length), pkg, sourceFolderHelper, it)
+            } ?: return@callInIdeaEnvironment null
             op.accept(env, progress)
             return@callInIdeaEnvironment psiClassToOpen(op)
         }.thenAccept {
             DumbService.getInstance(dir.project).smartInvokeLater {
                 it.get()?.invoke()?.let { psi -> openPsiElement(psi) }
             }
+        }.exceptionally {
+            SdkLog.error("Error creating {}.", text, it)
+            null
         }
     }
 
