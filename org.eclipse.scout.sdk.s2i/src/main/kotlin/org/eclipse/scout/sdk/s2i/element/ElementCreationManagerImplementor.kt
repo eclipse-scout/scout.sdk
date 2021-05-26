@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.s.form.FormNewOperation
 import org.eclipse.scout.sdk.core.s.lookupcall.LookupCallNewOperation
 import org.eclipse.scout.sdk.core.s.page.PageNewOperation
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
+import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.util.SourceFolderHelper
 
 class ElementCreationManagerImplementor : ElementCreationManager {
@@ -149,14 +150,15 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 CodeTypeNewOperation()
             }
             override var prepareOperationFuncList: MutableList<(CodeTypeNewOperation, String, String?, SourceFolderHelper) -> Unit> = mutableListOf({ op, elementName, pkg, sourceFolderHelper ->
+                val idDataType = JavaTypes.Long
                 op.codeTypeName = elementName.plus(ISdkConstants.SUFFIX_CODE_TYPE)
                 op.`package` = sourceFolderHelper.tier()!!.convert(ScoutTier.Shared, pkg)
-                op.codeTypeIdDataType = Long::class.java.name
+                op.codeTypeIdDataType = idDataType
 
                 op.sharedSourceFolder = sourceFolderHelper.sharedSourceFolder()
 
                 sourceFolderHelper.sharedSourceFolder()?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
-                    op.superType = it.AbstractCodeType().fqn()
+                    op.superType = it.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + idDataType + ", " + idDataType + JavaTypes.C_GENERIC_END
                 }
             })
         })
