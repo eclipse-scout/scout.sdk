@@ -68,7 +68,7 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     }
     op.setCreateFormData(page.isCreateFormData());
     op.setCreatePermissions(page.isCreatePermissions());
-    op.setCreateService(page.isCreateService());
+    op.setCreateOrAppendService(page.isCreateService());
     op.setFormName(page.getIcuName());
 
     IJavaProject serverProject;

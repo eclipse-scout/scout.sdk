@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.*
 import com.intellij.openapi.vfs.VirtualFile
 import junit.framework.TestCase
+import org.eclipse.scout.sdk.core.ISourceFolders
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders
@@ -107,13 +108,18 @@ class SourceFolderHelperTest : TestCase() {
     }
 
     private fun initModules() {
-        m_scoutTierOfModuleMap[m_uiHtmlModule] = ScoutTier.HtmlUi
-        m_scoutTierOfModuleMap[m_clientModule] = ScoutTier.Client
-        m_scoutTierOfModuleMap[m_clientTestModule] = ScoutTier.Client
-        m_scoutTierOfModuleMap[m_sharedModule] = ScoutTier.Shared
-        m_scoutTierOfModuleMap[m_sharedTestModule] = ScoutTier.Shared
-        m_scoutTierOfModuleMap[m_serverModule] = ScoutTier.Server
-        m_scoutTierOfModuleMap[m_serverTestModule] = ScoutTier.Server
+        initModule(m_uiHtmlModule, ScoutTier.HtmlUi)
+        initModule(m_clientModule, ScoutTier.Client)
+        initModule(m_clientTestModule, ScoutTier.Client)
+        initModule(m_sharedModule, ScoutTier.Shared)
+        initModule(m_sharedTestModule, ScoutTier.Shared)
+        initModule(m_serverModule, ScoutTier.Server)
+        initModule(m_serverTestModule, ScoutTier.Server)
+    }
+
+    private fun initModule(m: Module, scoutTier: ScoutTier) {
+        m_scoutTierOfModuleMap[m] = scoutTier
+        `when`(m.project).thenAnswer { m_project }
     }
 
     private fun initJavaEnvironments() {
@@ -137,33 +143,30 @@ class SourceFolderHelperTest : TestCase() {
     }
 
     private fun initSourceFolders() {
-        val mainPathSuffix = "src/main/java"
-        val testPathSuffix = "src/test/java"
-
         // uiHtml
-        initSourceFolder(m_uiHtmlMainSourceFolder, m_uiHtmlModule, m_uiHtmlMainClasspathEntry, m_uiHtmlJavaEnvironment, false, mainPathSuffix)
+        initSourceFolder(m_uiHtmlMainSourceFolder, m_uiHtmlModule, m_uiHtmlMainClasspathEntry, m_uiHtmlJavaEnvironment, false, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
 
         // client
-        initSourceFolder(m_clientMainSourceFolder, m_clientModule, m_clientMainClasspathEntry, m_clientJavaEnvironment, false, mainPathSuffix)
+        initSourceFolder(m_clientMainSourceFolder, m_clientModule, m_clientMainClasspathEntry, m_clientJavaEnvironment, false, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
 
         // shared
-        initSourceFolder(m_sharedMainSourceFolder, m_sharedModule, m_sharedMainClasspathEntry, m_sharedJavaEnvironment, false, mainPathSuffix)
         initSourceFolder(m_sharedGeneratedSourceFolder, m_sharedModule, m_sharedGeneratedClasspathEntry, m_sharedJavaEnvironment, false, IScoutSourceFolders.GENERATED_SOURCE_FOLDER)
+        initSourceFolder(m_sharedMainSourceFolder, m_sharedModule, m_sharedMainClasspathEntry, m_sharedJavaEnvironment, false, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
 
         // server
-        initSourceFolder(m_serverMainSourceFolder, m_serverModule, m_serverMainClasspathEntry, m_serverJavaEnvironment, false, mainPathSuffix)
+        initSourceFolder(m_serverMainSourceFolder, m_serverModule, m_serverMainClasspathEntry, m_serverJavaEnvironment, false, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
 
         // client test
-        initSourceFolder(m_clientTestMainSourceFolder, m_clientTestModule, m_clientTestMainClasspathEntry, m_clientTestJavaEnvironment, false, mainPathSuffix)
-        initSourceFolder(m_clientTestTestSourceFolder, m_clientTestModule, m_clientTestTestClasspathEntry, m_clientTestJavaEnvironment, true, testPathSuffix)
+        initSourceFolder(m_clientTestMainSourceFolder, m_clientTestModule, m_clientTestMainClasspathEntry, m_clientTestJavaEnvironment, false, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
+        initSourceFolder(m_clientTestTestSourceFolder, m_clientTestModule, m_clientTestTestClasspathEntry, m_clientTestJavaEnvironment, true, ISourceFolders.TEST_JAVA_SOURCE_FOLDER)
 
         // shared test
-        initSourceFolder(m_sharedTestMainSourceFolder, m_sharedTestModule, m_sharedTestMainClasspathEntry, m_sharedTestJavaEnvironment, false, mainPathSuffix)
-        initSourceFolder(m_sharedTestTestSourceFolder, m_sharedTestModule, m_sharedTestTestClasspathEntry, m_sharedTestJavaEnvironment, true, testPathSuffix)
+        initSourceFolder(m_sharedTestMainSourceFolder, m_sharedTestModule, m_sharedTestMainClasspathEntry, m_sharedTestJavaEnvironment, false, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
+        initSourceFolder(m_sharedTestTestSourceFolder, m_sharedTestModule, m_sharedTestTestClasspathEntry, m_sharedTestJavaEnvironment, true, ISourceFolders.TEST_JAVA_SOURCE_FOLDER)
 
         // server test
-        initSourceFolder(m_serverTestMainSourceFolder, m_serverTestModule, m_serverTestMainClasspathEntry, m_serverTestJavaEnvironment, false, mainPathSuffix)
-        initSourceFolder(m_serverTestTestSourceFolder, m_serverTestModule, m_serverTestTestClasspathEntry, m_serverTestJavaEnvironment, true, testPathSuffix)
+        initSourceFolder(m_serverTestMainSourceFolder, m_serverTestModule, m_serverTestMainClasspathEntry, m_serverTestJavaEnvironment, false, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
+        initSourceFolder(m_serverTestTestSourceFolder, m_serverTestModule, m_serverTestTestClasspathEntry, m_serverTestJavaEnvironment, true, ISourceFolders.TEST_JAVA_SOURCE_FOLDER)
     }
 
     private fun initSourceFolder(sf: SourceFolder, m: Module, cpe: IClasspathEntry, je: IJavaEnvironment, test: Boolean, pathSuffix: String) {
@@ -182,6 +185,7 @@ class SourceFolderHelperTest : TestCase() {
         `when`(mrm.sourceRoots).thenAnswer { m_moduleSourceRootsMap[m]?.toTypedArray() }
 
         val vf = mock(VirtualFile::class.java, "$sf - VirtualFile")
+        `when`(vf.path).thenAnswer { "$m/$pathSuffix" }
         m_moduleSourceRootsMap.computeIfAbsent(m) { ArrayList() }.add(vf)
         `when`(m_projectFileIndex.getSourceFolder(same(vf))).thenAnswer { sf }
         `when`(sf.file).thenAnswer { vf }
@@ -262,8 +266,14 @@ class SourceFolderHelperTest : TestCase() {
 
     fun testStartFromSourceFolder() {
         assertSourceFolderHelper(SourceFolderHelper(m_project, m_clientMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_clientMainClasspathEntry, ScoutTier.Client)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_clientTestMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_clientTestMainClasspathEntry, ScoutTier.Client, true)
+
         assertSourceFolderHelper(SourceFolderHelper(m_project, m_sharedMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_sharedMainClasspathEntry, ScoutTier.Shared)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_sharedGeneratedSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_sharedGeneratedClasspathEntry, ScoutTier.Shared)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_sharedTestMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_sharedTestMainClasspathEntry, ScoutTier.Shared, true)
+
         assertSourceFolderHelper(SourceFolderHelper(m_project, m_serverMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_serverMainClasspathEntry, ScoutTier.Server)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_serverTestMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_serverTestMainClasspathEntry, ScoutTier.Server, true)
     }
 
     private fun <K, V> assertPairMatches(expectedPair: Pair<K, V>, actualPair: Pair<K, V>?) {
@@ -272,20 +282,20 @@ class SourceFolderHelperTest : TestCase() {
         assertEquals(expectedPair.second, actualPair?.second)
     }
 
-    private fun assertSourceFolderHelper(sourceFolderHelper: SourceFolderHelper, classpathEntry: IClasspathEntry, scoutTier: ScoutTier) {
+    private fun assertSourceFolderHelper(sourceFolderHelper: SourceFolderHelper, classpathEntry: IClasspathEntry, scoutTier: ScoutTier, startInTestModule: Boolean = false) {
         assertEquals(classpathEntry, sourceFolderHelper.classpathEntry())
         assertEquals(scoutTier, sourceFolderHelper.tier())
 
-        assertEquals(m_clientMainClasspathEntry, sourceFolderHelper.clientSourceFolder())
+        assertEquals(if (startInTestModule) m_clientTestMainClasspathEntry else m_clientMainClasspathEntry, sourceFolderHelper.clientSourceFolder())
         assertEquals(m_clientTestTestClasspathEntry, sourceFolderHelper.clientTestSourceFolder())
         assertEquals(m_clientTestMainClasspathEntry, sourceFolderHelper.clientMainTestSourceFolder())
 
-        assertEquals(m_sharedMainClasspathEntry, sourceFolderHelper.sharedSourceFolder())
-        assertEquals(m_sharedGeneratedClasspathEntry, sourceFolderHelper.sharedGeneratedSourceFolder())
+        assertEquals(if (startInTestModule) m_sharedTestMainClasspathEntry else m_sharedMainClasspathEntry, sourceFolderHelper.sharedSourceFolder())
+        assertEquals(if (startInTestModule) null else m_sharedGeneratedClasspathEntry, sourceFolderHelper.sharedGeneratedSourceFolder())
         assertEquals(m_sharedTestTestClasspathEntry, sourceFolderHelper.sharedTestSourceFolder())
         assertEquals(m_sharedTestMainClasspathEntry, sourceFolderHelper.sharedMainTestSourceFolder())
 
-        assertEquals(m_serverMainClasspathEntry, sourceFolderHelper.serverSourceFolder())
+        assertEquals(if (startInTestModule) m_serverTestMainClasspathEntry else m_serverMainClasspathEntry, sourceFolderHelper.serverSourceFolder())
         assertEquals(m_serverTestTestClasspathEntry, sourceFolderHelper.serverTestSourceFolder())
         assertEquals(m_serverTestMainClasspathEntry, sourceFolderHelper.serverMainTestSourceFolder())
     }

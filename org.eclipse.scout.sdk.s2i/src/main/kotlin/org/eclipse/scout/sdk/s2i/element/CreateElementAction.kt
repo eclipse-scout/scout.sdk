@@ -121,12 +121,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
 
             val sourceFolderHelper = SourceFolderHelper(project, sourceFolder!!) { env.findClasspathEntry(it) }
 
-            if (sourceFolderHelper.classpathEntry() == null) {
-                SdkLog.warning("No source folder could be determined for location '{}'", dir.virtualFile)
-                return@callInIdeaEnvironment null
-            }
-            if (!startScoutTiers().contains(sourceFolderHelper.tier())) {
-                SdkLog.warning("Location '{}' is not a {} module", dir.virtualFile, startScoutTiers().joinToString())
+            if (!validateSourceFolderHelper(sourceFolderHelper, dir)) {
                 return@callInIdeaEnvironment null
             }
 
@@ -148,6 +143,18 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             SdkLog.error("Error creating {}.", text, it)
             null
         }
+    }
+
+    protected open fun validateSourceFolderHelper(sourceFolderHelper: SourceFolderHelper, dir: PsiDirectory): Boolean {
+        if (sourceFolderHelper.classpathEntry() == null) {
+            SdkLog.warning("No source folder could be determined for location '{}'", dir.virtualFile)
+            return false
+        }
+        if (!startScoutTiers().contains(sourceFolderHelper.tier())) {
+            SdkLog.warning("Location '{}' is not a {} module", dir.virtualFile, startScoutTiers().joinToString())
+            return false
+        }
+        return true
     }
 
     protected open fun startScoutTiers(): Collection<ScoutTier> = listOf(ScoutTier.Client, ScoutTier.Shared, ScoutTier.Server)

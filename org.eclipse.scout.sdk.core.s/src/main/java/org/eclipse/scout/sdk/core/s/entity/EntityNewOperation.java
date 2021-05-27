@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.form.FormNewOperation;
 import org.eclipse.scout.sdk.core.s.page.PageNewOperation;
+import org.eclipse.scout.sdk.core.s.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
@@ -50,6 +51,7 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
   // operations
   private FormNewOperation m_formNewOperation;
   private PageNewOperation m_pageNewOperation;
+  private ServiceNewOperation m_serviceNewOperation;
 
   @Override
   public void accept(IEnvironment env, IProgress progress) {
@@ -74,6 +76,12 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected void executeOperation(IEnvironment env, IProgress progress) {
+    var runServiceNewOperation = runServiceNewOperation();
+    if (runServiceNewOperation) {
+      setServiceNewOperation(createServiceNewOperation());
+      prepareServiceNewOperation();
+    }
+
     // form
     setFormNewOperation(createFormNewOperation());
     if (prepareFormNewOperation()) {
@@ -85,11 +93,18 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
     if (preparePageNewOperation()) {
       getPageNewOperation().accept(env, progress.newChild(1));
     }
+
+    if (runServiceNewOperation) {
+      getServiceNewOperation().accept(env, progress.newChild(1));
+    }
   }
 
   protected int getTotalWork() {
     var result = 1; // FormNewOperation
     result += 1; // PageNewOperation
+    if (runServiceNewOperation()) {
+      result += 1; // ServiceNewOperation
+    }
     return result;
   }
 
@@ -111,8 +126,20 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
     return requireInputFor(element, "client package", getClientPackage(), warn);
   }
 
+  protected boolean requireSharedPackageFor(String element, boolean warn) {
+    return requireInputFor(element, "shared package", getSharedPackage(), warn);
+  }
+
   protected boolean requireClientSourceFolderFor(String element, boolean warn) {
     return requireInputFor(element, "client source folder", getClientSourceFolder(), warn);
+  }
+
+  protected boolean requireSharedSourceFolderFor(String element, boolean warn) {
+    return requireInputFor(element, "shared source folder", getSharedSourceFolder(), warn);
+  }
+
+  protected boolean requireServerSourceFolderFor(String element, boolean warn) {
+    return requireInputFor(element, "server source folder", getServerSourceFolder(), warn);
   }
 
   protected FormNewOperation createFormNewOperation() {
@@ -152,7 +179,9 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
     op.setCreateFormData(getSharedSourceFolder() != null);
     op.setCreatePermissions(getSharedSourceFolder() != null);
-    op.setCreateService(getSharedSourceFolder() != null && getServerSourceFolder() != null);
+    op.setCreateOrAppendService(getSharedSourceFolder() != null && getServerSourceFolder() != null);
+
+    op.setServiceNewOperation(getServiceNewOperation());
 
     return true;
   }
@@ -190,18 +219,66 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
     op.setPageDataSourceFolder(getSharedGeneratedSourceFolder() != null ? getSharedGeneratedSourceFolder() : getSharedSourceFolder());
 
     if (getServerSourceFolder() != null) {
-      op.setServerSession(getServerSourceFolder().javaEnvironment().api(IScoutApi.class).get().IServerSession().fqn());
+      op.setServerSession(getServerSourceFolder().javaEnvironment().requireApi(IScoutApi.class).IServerSession().fqn());
     }
     op.setServerSourceFolder(getServerSourceFolder());
     op.setTestSourceFolder(getServerTestSourceFolder());
 
     op.setCreateAbstractPage(false);
 
+    op.setServiceNewOperation(getServiceNewOperation());
+
     return true;
   }
 
   protected String getPageSuperType(IJavaEnvironment javaEnv) {
     return javaEnv.api(IScoutApi.class).get().AbstractPageWithTable().fqn();
+  }
+
+  @SuppressWarnings("MethodMayBeStatic")
+  protected ServiceNewOperation createServiceNewOperation() {
+    return new ServiceNewOperation();
+  }
+
+  protected boolean checkServiceNewOperationPrerequisites(boolean warn) {
+    if (!requireSharedPackageFor("Service", warn)) {
+      return false;
+    }
+    if (!requireSharedSourceFolderFor("Service", warn)) {
+      return false;
+    }
+    return requireServerSourceFolderFor("Service", warn);
+  }
+
+  protected boolean prepareServiceNewOperation() {
+    var op = getServiceNewOperation();
+    if (op == null) {
+      return false;
+    }
+    if (!checkServiceNewOperationPrerequisites(false)) {
+      return false;
+    }
+
+    op.setServiceName(getEntityName());
+    op.setSharedPackage(getSharedPackage());
+    op.setSharedSourceFolder(getSharedSourceFolder());
+    op.setServerSourceFolder(getServerSourceFolder());
+
+    op.setTestSourceFolder(getServerTestSourceFolder());
+    if (getServerSourceFolder() != null) {
+      op.setServerSession(getServerSourceFolder().javaEnvironment().requireApi(IScoutApi.class).IServerSession().fqn());
+    }
+    op.setCreateTest(getServerTestSourceFolder() != null);
+
+    return true;
+  }
+
+  public boolean runServiceNewOperation() {
+    return isCreateSingleService() && checkServiceNewOperationPrerequisites(false);
+  }
+
+  protected boolean isCreateSingleService() {
+    return true;
   }
 
   public String getEntityName() {
@@ -330,6 +407,14 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
   protected void setPageNewOperation(PageNewOperation pageNewOperation) {
     m_pageNewOperation = pageNewOperation;
+  }
+
+  public ServiceNewOperation getServiceNewOperation() {
+    return m_serviceNewOperation;
+  }
+
+  protected void setServiceNewOperation(ServiceNewOperation serviceNewOperation) {
+    m_serviceNewOperation = serviceNewOperation;
   }
 
   @Override

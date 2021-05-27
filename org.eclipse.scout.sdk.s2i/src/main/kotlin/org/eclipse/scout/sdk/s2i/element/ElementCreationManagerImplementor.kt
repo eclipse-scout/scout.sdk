@@ -85,7 +85,7 @@ class ElementCreationManagerImplementor : ElementCreationManager {
 
                 op.isCreateFormData = sourceFolderHelper.sharedSourceFolder() != null
                 op.isCreatePermissions = sourceFolderHelper.sharedSourceFolder() != null
-                op.isCreateService = sourceFolderHelper.sharedSourceFolder() != null && sourceFolderHelper.serverSourceFolder() != null
+                op.isCreateOrAppendService = sourceFolderHelper.sharedSourceFolder() != null && sourceFolderHelper.serverSourceFolder() != null
             })
         })
     }

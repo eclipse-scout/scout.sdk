@@ -56,7 +56,7 @@ public class FormNewOperationTest {
     }
     fno.setCreateFormData(isCreateFormData);
     fno.setCreatePermissions(isCreatePermissions);
-    fno.setCreateService(isCreateService);
+    fno.setCreateOrAppendService(isCreateService);
     fno.setFormDataSourceFolder(env.dtoSourceFolder());
     fno.setFormName("My" + ISdkConstants.SUFFIX_FORM);
     fno.setServerSourceFolder(env.primarySourceFolder());

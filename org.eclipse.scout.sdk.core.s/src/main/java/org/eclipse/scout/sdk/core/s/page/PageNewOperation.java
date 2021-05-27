@@ -28,11 +28,10 @@ import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
 import org.eclipse.scout.sdk.core.s.service.ServiceNewOperation;
-import org.eclipse.scout.sdk.core.s.testcase.TestGenerator;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -44,6 +43,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   // in
   private String m_pageName;
+  private FinalValue<String> m_baseName = new FinalValue<>();
   private IClasspathEntry m_clientSourceFolder;
   private IClasspathEntry m_pageDataSourceFolder;
   private IClasspathEntry m_sharedSourceFolder;
@@ -55,7 +55,8 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   private boolean m_createAbstractPage;
   private boolean m_pageWithTable;
   private boolean m_createPageData;
-  private boolean m_createService;
+  private boolean m_createOrAppendService;
+  private ServiceNewOperation m_serviceNewOperation; // optional
 
   // out
   private IFuture<IType> m_createdAbstractPage;
@@ -71,13 +72,13 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   private String m_createdAbstractPageDataFqn;
 
   private IFuture<IType> m_createdServiceIfc;
-  private String m_createdServiceIfcFqn;
+  private String m_serviceIfcFqn;
 
   private IFuture<IType> m_createdServiceImpl;
-  private String m_createdServiceImplFqn;
+  private String m_serviceImplFqn;
 
   private IFuture<IType> m_createdServiceTest;
-  private String m_createdServiceTestFqn;
+  private String m_serviceTestFqn;
 
   private String m_dataFetchMethodName;
 
@@ -99,7 +100,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   protected void prepareOperation() {
     setPageWithTable(calculatePageWithTable());
     setCreatePageData(isPageWithTable() && getPageDataSourceFolder() != null);
-    setCreateService(isCreatePageData() && getSharedSourceFolder() != null && getServerSourceFolder() != null);
+    setCreateOrAppendService(isCreatePageData() && getSharedSourceFolder() != null && getServerSourceFolder() != null);
   }
 
   protected void prepareProgress(IProgress progress) {
@@ -116,9 +117,8 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
       setCreatedPageData(createPageData(getPageName(), sharedPackage, this::setCreatedPageDataFqn, env, progress.newChild(1)));
     }
 
-    var isCreateService = isCreateService();
-    if (isCreateService) {
-      createService(sharedPackage, calcServiceBaseName(), env, progress.newChild(2));
+    if (isCreateOrAppendService()) {
+      createOrAppendService(sharedPackage, env, progress);
     }
 
     if (isCreateAbstractPage()) {
@@ -127,10 +127,6 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     }
 
     setCreatedPage(createPage(isPageWithTable(), env, progress.newChild(1)));
-
-    if (isCreateService) {
-      setCreatedServiceTest(createServiceTest(env, progress.newChild(1)));
-    }
 
     // run DTO update because the pageData has been created as empty java file
     if (isCreatePageData()) {
@@ -189,9 +185,8 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     return env.writeCompilationUnitAsync(pageBuilder, getClientSourceFolder(), progress);
   }
 
-  protected String calcServiceMethodName() {
-    var name = calcPageBaseName();
-    return "get" + name + "TableData";
+  protected String getBaseName() {
+    return m_baseName.computeIfAbsentAndGet(this::calcPageBaseName);
   }
 
   protected String calcPageBaseName() {
@@ -207,59 +202,56 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     return name;
   }
 
-  protected String calcServiceBaseName() {
-    var baseName = calcPageBaseName();
-    return baseName + "Page";
+  public String getServiceBaseName() {
+    return getBaseName();
   }
 
-  protected IFuture<IType> createServiceTest(IEnvironment env, IProgress progress) {
-    var testSourceFolder = getTestSourceFolder();
-    if (testSourceFolder == null) {
-      return null;
+  protected String getServiceMethodName() {
+    var name = getBaseName();
+    return "get" + name + "TableData";
+  }
+
+  protected void createOrAppendService(String sharedPackage, IEnvironment env, IProgress progress) {
+    if (isCreateService()) {
+      createService(sharedPackage, getServiceBaseName(), env, progress.newChild(3));
     }
+    else if (isAppendService()) {
+      var op = getServiceNewOperation();
+      addServiceMethods(op);
 
-    var serverPackage = JavaTypes.qualifier(getCreatedServiceImplFqn());
-    var baseName = JavaTypes.simpleName(getCreatedServiceImplFqn());
-    var elementName = baseName + ISdkConstants.SUFFIX_TEST;
+      var svcName = op.getServiceName() + ISdkConstants.SUFFIX_SERVICE;
+      var serverPackage = ScoutTier.Shared.convert(ScoutTier.Server, op.getSharedPackage());
+      setServiceIfcFqn(sharedPackage + JavaTypes.C_DOT + "I" + svcName);
+      setServiceImplFqn(serverPackage + JavaTypes.C_DOT + svcName);
 
-    var existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
-    if (existingServiceTest.isPresent()) {
-      // service test class already exists
-      return SdkFuture.completed(existingServiceTest.get());
+      if (op.isCreateTest()) {
+        setServiceTestFqn(getServiceImplFqn() + ISdkConstants.SUFFIX_TEST);
+      }
     }
-
-    var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
-    TestGenerator<?> testBuilder = new TestGenerator<>()
-        .withElementName(elementName)
-        .withPackageName(serverPackage)
-        .withRunner(scoutApi.ServerTestRunner().fqn())
-        .asClientTest(false);
-    if (Strings.hasText(getServerSession())) {
-      testBuilder.withSession(getServerSession());
-    }
-
-    setCreatedServiceTestFqn(testBuilder.fullyQualifiedName());
-    return env.writeCompilationUnitAsync(testBuilder, testSourceFolder, progress);
   }
 
   protected void createService(String sharedPackage, String baseName, IEnvironment env, IProgress progress) {
     var serviceNewOperation = createServiceOperation();
-    serviceNewOperation.setServiceName(baseName);
-    serviceNewOperation.setSharedPackage(sharedPackage);
-    serviceNewOperation.setSharedSourceFolder(getSharedSourceFolder());
-    serviceNewOperation.setServerSourceFolder(getServerSourceFolder());
-    serviceNewOperation.addMethod(createServiceMethod());
+    prepareServiceOperation(serviceNewOperation, sharedPackage, baseName);
+    addServiceMethods(serviceNewOperation);
     serviceNewOperation.accept(env, progress);
 
     setCreatedServiceImpl(serviceNewOperation.getCreatedServiceImpl());
-    setCreatedServiceImplFqn(serviceNewOperation.getCreatedServiceImplFqn());
+    setServiceImplFqn(serviceNewOperation.getCreatedServiceImplFqn());
 
     setCreatedServiceIfc(serviceNewOperation.getCreatedServiceInterface());
-    setCreatedServiceIfcFqn(serviceNewOperation.getCreatedServiceInterfaceFqn());
+    setServiceIfcFqn(serviceNewOperation.getCreatedServiceInterfaceFqn());
+
+    setCreatedServiceTest(serviceNewOperation.getCreatedServiceTest());
+    setServiceTestFqn(serviceNewOperation.getCreatedServiceTestFqn());
+  }
+
+  protected void addServiceMethods(ServiceNewOperation serviceNewOperation) {
+    serviceNewOperation.addMethod(createServiceMethod());
   }
 
   protected IMethodGenerator<?, ?> createServiceMethod() {
-    setDataFetchMethodName(calcServiceMethodName());
+    setDataFetchMethodName(getServiceMethodName());
     return MethodGenerator.create()
         .asPublic()
         .withReturnType(getCreatedPageDataFqn())
@@ -278,6 +270,19 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
   protected ServiceNewOperation createServiceOperation() {
     return new ServiceNewOperation();
+  }
+
+  protected void prepareServiceOperation(ServiceNewOperation serviceNewOperation, String sharedPackage, String baseName) {
+    serviceNewOperation.setServiceName(baseName);
+    serviceNewOperation.setSharedPackage(sharedPackage);
+    serviceNewOperation.setSharedSourceFolder(getSharedSourceFolder());
+    serviceNewOperation.setServerSourceFolder(getServerSourceFolder());
+    if (getTestSourceFolder() == null) {
+      return;
+    }
+    serviceNewOperation.setTestSourceFolder(getTestSourceFolder());
+    serviceNewOperation.setServerSession(getServerSession());
+    serviceNewOperation.setCreateTest(true);
   }
 
   protected PageGenerator<?> createPageBuilder(boolean isPageWithTable, boolean isAbstractPage) {
@@ -314,8 +319,8 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
       dtoFqn = getCreatedAbstractPageDataFqn();
     }
     generator.withPageData(dtoFqn);
-    if (!isAbstractPage && getCreatedServiceIfc() != null) {
-      generator.withPageServiceInterface(getCreatedServiceIfcFqn());
+    if (!isAbstractPage && Strings.hasText(getServiceIfcFqn())) {
+      generator.withPageServiceInterface(getServiceIfcFqn());
     }
   }
 
@@ -371,6 +376,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   public void setPageName(String pageName) {
+    m_baseName = new FinalValue<>();
     m_pageName = pageName;
   }
 
@@ -438,12 +444,12 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_createdServiceIfc = createdServiceIfc;
   }
 
-  public String getCreatedServiceIfcFqn() {
-    return m_createdServiceIfcFqn;
+  public String getServiceIfcFqn() {
+    return m_serviceIfcFqn;
   }
 
-  protected void setCreatedServiceIfcFqn(String createdServiceIfcFqn) {
-    m_createdServiceIfcFqn = createdServiceIfcFqn;
+  protected void setServiceIfcFqn(String serviceIfcFqn) {
+    m_serviceIfcFqn = serviceIfcFqn;
   }
 
   public IFuture<IType> getCreatedServiceImpl() {
@@ -454,12 +460,12 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_createdServiceImpl = createdServiceImpl;
   }
 
-  public String getCreatedServiceImplFqn() {
-    return m_createdServiceImplFqn;
+  public String getServiceImplFqn() {
+    return m_serviceImplFqn;
   }
 
-  protected void setCreatedServiceImplFqn(String createdServiceImplFqn) {
-    m_createdServiceImplFqn = createdServiceImplFqn;
+  protected void setServiceImplFqn(String serviceImplFqn) {
+    m_serviceImplFqn = serviceImplFqn;
   }
 
   public IClasspathEntry getPageDataSourceFolder() {
@@ -486,12 +492,12 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_createdServiceTest = createdServiceTest;
   }
 
-  public String getCreatedServiceTestFqn() {
-    return m_createdServiceTestFqn;
+  public String getServiceTestFqn() {
+    return m_serviceTestFqn;
   }
 
-  protected void setCreatedServiceTestFqn(String createdServiceTestFqn) {
-    m_createdServiceTestFqn = createdServiceTestFqn;
+  protected void setServiceTestFqn(String serviceTestFqn) {
+    m_serviceTestFqn = serviceTestFqn;
   }
 
   protected String getDataFetchMethodName() {
@@ -526,12 +532,28 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_createPageData = createPageData;
   }
 
-  public boolean isCreateService() {
-    return m_createService;
+  public boolean isCreateOrAppendService() {
+    return m_createOrAppendService;
   }
 
-  protected void setCreateService(boolean createService) {
-    m_createService = createService;
+  protected void setCreateOrAppendService(boolean createOrAppendService) {
+    m_createOrAppendService = createOrAppendService;
+  }
+
+  public boolean isCreateService() {
+    return isCreateOrAppendService() && getServiceNewOperation() == null;
+  }
+
+  public boolean isAppendService() {
+    return isCreateOrAppendService() && getServiceNewOperation() != null;
+  }
+
+  public ServiceNewOperation getServiceNewOperation() {
+    return m_serviceNewOperation;
+  }
+
+  public void setServiceNewOperation(ServiceNewOperation serviceNewOperation) {
+    m_serviceNewOperation = serviceNewOperation;
   }
 
   public IFuture<IType> getCreatedAbstractPage() {
